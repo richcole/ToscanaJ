@@ -82,7 +82,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	private static final Insets DEFAULT_BUTTON_INSETS = new Insets(2,16,2,16);
 	private static final Insets DEFAULT_LABEL_INSETS = new Insets(2,2,2,2);
 	private static final Insets DEFAULT_FIELD_INSETS = new Insets(2,20,2,2);
-	private static final String TRANSITION_LAYER_NAME = "transitions";
 
     private ArrowStyle[] styles = new ArrowStyle[] {
         new ArrowStyle(Color.RED, new BasicStroke(4), 14, 20, 0.75),
@@ -577,8 +576,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             this.timeController.setCurrentTime(i);
         	exportImage(new File(getNumberedFileName(selectedFile,i,targetStep)));
         }
-        
-        this.diagramView.removeLayer(TRANSITION_LAYER_NAME);
     }
     
     private String getNumberedFileName(File selectedFile, int currentStep, double targetStep) {
