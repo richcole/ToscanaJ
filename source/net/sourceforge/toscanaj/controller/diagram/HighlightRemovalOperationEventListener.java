@@ -8,8 +8,6 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
-import org.tockit.canvas.CanvasItem;
-import org.tockit.canvas.events.CanvasItemEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
@@ -21,21 +19,6 @@ public class HighlightRemovalOperationEventListener implements EventBrokerListen
     }
 
     public void processEvent(Event e) {
-        CanvasItemEvent itemEvent = null;
-        try {
-            itemEvent = (CanvasItemEvent) e;
-        } catch (ClassCastException e1) {
-            throw new RuntimeException(getClass().getName() +
-                    " has to be subscribed to CanvasItemEvents only");
-        }
-        CanvasItem item = null;
-        try {
-            item = (CanvasItem) itemEvent.getItem();
-        } catch (ClassCastException e1) {
-            throw new RuntimeException(getClass().getName() +
-                    " has to be subscribed to events from CanvasItems only");
-        }
-
         this.diagramView.setSelectedConcepts(null);
     }
 }
