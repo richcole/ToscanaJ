@@ -17,6 +17,9 @@ import java.util.Map.Entry;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAElement;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualValue;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualValueGroup;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TypeImplementation;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
@@ -48,6 +51,14 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 	private static final String VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME = "attributeRef";
 	
 	public ManyValuedContextImplementation() {
+		// add default types
+		TextualType booleanType = new TextualType("Boolean");
+		booleanType.addValue(new TextualValue("true"));
+		booleanType.addValue(new TextualValue("false"));
+		TextualValueGroup trueGroup = new TextualValueGroup(booleanType, "true", "true");
+		TextualValueGroup falseGroup = new TextualValueGroup(booleanType, "false", "false");
+		TextualValueGroup anyGroup = new TextualValueGroup(booleanType, "any", "any");
+		add(booleanType);
     }
 	
 	public ManyValuedContextImplementation(Element elem) throws XMLSyntaxError {
