@@ -16,6 +16,7 @@ Affecting different programs:
 - bugfix: the diagram export dialog now remembers the last export 
   position properly (was broken during session and in between sessions
   if the exported file was deleted)
+- the Save As... dialog now uses the location of the current file
 
 Specific for ToscanaJ:
 ======================

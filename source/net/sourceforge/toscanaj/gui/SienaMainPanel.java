@@ -164,7 +164,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private DiagramEditingView diagramEditingView;
     private TemporalControlsPanel temporalControls;
     private List mruList = new LinkedList();
-    private String currentFile = null;
+    private File currentFile;
     private DiagramExportSettings diagramExportSettings;
     private ExportDiagramAction exportDiagramAction;
     private File lastCSCFile;
@@ -477,18 +477,18 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         });
         saveActivity =
             new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
-        this.saveAsFileAction =
-            new SaveFileAction(
-                this,
-                saveActivity,
-                KeyEvent.VK_S,
-                KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+        if(this.saveAsFileAction == null) {
+            this.saveAsFileAction =
+                new SaveFileAction(
+                    this,
+                    saveActivity,
+                    KeyEvent.VK_S,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+        }
         saveAsFileAction.setPostSaveActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
-                currentFile = saveAsFileAction.getLastFileUsed().getPath();
-                addFileToMRUList(saveAsFileAction.getLastFileUsed());
+                setCurrentFile(saveAsFileAction.getLastFileUsed());
                 conceptualSchema.dataSaved();
-                updateWindowTitle();
                 return true;
             }
         });
@@ -987,8 +987,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         if (e instanceof ConceptualSchemaLoadedEvent) {
             ConceptualSchemaLoadedEvent loadEvent =
                 (ConceptualSchemaLoadedEvent) e;
-            File schemaFile = loadEvent.getFile();
-            addFileToMRUList(schemaFile);
+            setCurrentFile(loadEvent.getFile());
         }
         this.exportDiagramAction.setEnabled(
             (this.diagramEditingView.getDiagramView().getDiagram() != null)
@@ -1002,9 +1001,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         // get the current filename without the extension and full path
         if (currentFile != null) {
             String filename =
-                currentFile.substring(
-                    currentFile.lastIndexOf(File.separator) + 1,
-                    (currentFile.length() - 4));
+                this.currentFile.getName().substring(0,this.currentFile.getName().length() - 4);
             setTitle(filename + " - " + WINDOW_TITLE);
         } else {
             setTitle(WINDOW_TITLE);
@@ -1047,12 +1044,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
             colHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
             tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
-            setTitle(
-                schemaFile.getName().substring(
-                    0,
-                    ((schemaFile.getName()).length() - 4))
-                    + " - "
-                    + WINDOW_TITLE);
+            setCurrentFile(schemaFile);
             createMenuBar();
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(
@@ -1084,25 +1076,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             e.printStackTrace();
             conceptualSchema = new ConceptualSchema(eventBroker);
         }
-    }
-
-    private void addFileToMRUList(File file) {
-        try {
-            this.currentFile = file.getCanonicalPath();
-        } catch (IOException ex) { // could not resolve canonical path
-            ex.printStackTrace();
-            this.currentFile = file.getAbsolutePath();
-            /// @todo what could be done here?
-        }
-        if (this.mruList.contains(this.currentFile)) {
-            // if it is already in, just remove it and add it at the end
-            this.mruList.remove(this.currentFile);
-        }
-        this.mruList.add(this.currentFile);
-        if (this.mruList.size() > MaxMruFiles) {
-            this.mruList.remove(0);
-        }
-        recreateMruMenu();
     }
 
     protected boolean checkForMissingSave() throws HeadlessException {
@@ -1154,7 +1127,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             this.saveAsFileAction.saveFile();
         } else {
             try {
-                saveActivity.processFile(new File(this.currentFile));
+                saveActivity.processFile(this.currentFile);
                 this.conceptualSchema.dataSaved();
             } catch (Exception e) {
                 ErrorDialog.showError(this, e, "Saving file failed");
@@ -1292,4 +1265,20 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		}
 		return menu;
 	}
+
+    private void setCurrentFile(File newCurrentFile) {
+        this.currentFile = newCurrentFile;
+        this.saveAsFileAction.setPreviousFile(newCurrentFile);
+        String filePath = this.currentFile.getAbsolutePath();
+        if (this.mruList.contains(filePath)) {
+            // if it is already in, just remove it and add it at the end
+            this.mruList.remove(filePath);
+        }
+        this.mruList.add(filePath);
+        if (this.mruList.size() > MaxMruFiles) {
+            this.mruList.remove(0);
+        }
+        recreateMruMenu();
+        updateWindowTitle();
+    }
 }

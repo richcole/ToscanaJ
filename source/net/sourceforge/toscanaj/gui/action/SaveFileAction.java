@@ -83,12 +83,7 @@ public class SaveFileAction extends KeyboardMappedAction {
 			String[] csxExtension = {"csx"};
 			ExtensionFileFilter csxFileFilter = new ExtensionFileFilter(csxExtension,"Conceptual Schema");
 			ExtensionFileFilter[] filterArray = { csxFileFilter };
-		    if (previousFile != null) {
-		        saveDialog = new CheckDuplicateFileChooser(previousFile, filterArray);
-		        
-		    } else {
-		        saveDialog = new CheckDuplicateFileChooser(new File(System.getProperty("user.dir")), filterArray);
-		    }
+            saveDialog = new CheckDuplicateFileChooser(previousFile, filterArray);
 			
 		    if (saveDialog.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
 		        File selectedFile = saveDialog.getSelectedFile();
@@ -128,5 +123,9 @@ public class SaveFileAction extends KeyboardMappedAction {
 	public File getLastFileUsed() {
 		return this.previousFile;
 	}
+    
+    public void setPreviousFile(File previousFile) {
+        this.previousFile = previousFile;
+    }
 }
 

@@ -104,7 +104,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     private JMenu helpMenu;
 
     private List mruList = new LinkedList();
-    private String currentFile = null;
+    private File currentFile;
 
     /**
      * Views
@@ -418,20 +418,20 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
         saveActivity =
             new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
-        this.saveAsFileAction =
-            new SaveFileAction(
-                this,
-                saveActivity,
-                KeyEvent.VK_A,
-                KeyStroke.getKeyStroke(
-                    KeyEvent.VK_S,
-                    ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
+        if(this.saveAsFileAction == null) {
+            this.saveAsFileAction =
+                        new SaveFileAction(
+                            this,
+                            saveActivity,
+                            KeyEvent.VK_A,
+                            KeyStroke.getKeyStroke(
+                                KeyEvent.VK_S,
+                                ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
+        }
         this.saveAsFileAction.setPostSaveActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
-                currentFile = saveAsFileAction.getLastFileUsed().getPath();
-                addFileToMRUList(saveAsFileAction.getLastFileUsed());
+                setCurrentFile(saveAsFileAction.getLastFileUsed());
                 conceptualSchema.dataSaved();
-                updateWindowTitle();
                 return true;
             }
         });
@@ -703,9 +703,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         // we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
         if (currentFile != null) {
             String filename =
-                currentFile.substring(
-                    currentFile.lastIndexOf("\\") + 1,
-                    (currentFile.length() - 4));
+                currentFile.getName().substring(0,currentFile.getName().length() - 4);
             setTitle(filename + " - " + WINDOW_TITLE);
         } else {
             setTitle(WINDOW_TITLE);
@@ -744,12 +742,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     private void openSchemaFile(File schemaFile) {
         try {
             conceptualSchema = CSXParser.parse(eventBroker, schemaFile);
-            setTitle(
-                schemaFile.getName().substring(
-                    0,
-                    ((schemaFile.getName()).length() - 4))
-                    + " - "
-                    + WINDOW_TITLE);
+            setCurrentFile(schemaFile);
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(
                 this,
@@ -877,8 +870,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         if (e instanceof ConceptualSchemaLoadedEvent) {
             ConceptualSchemaLoadedEvent loadEvent =
                 (ConceptualSchemaLoadedEvent) e;
-            File schemaFile = loadEvent.getFile();
-            addFileToMRUList(schemaFile);
+            setCurrentFile(loadEvent.getFile());
         }
         this.exportDiagramAction.setEnabled(
             (this.diagramEditingView.getDiagramView().getDiagram() != null)
@@ -929,25 +921,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         }
     }
 
-    private void addFileToMRUList(File file) {
-        try {
-            this.currentFile = file.getCanonicalPath();
-        } catch (IOException ex) { // could not resolve canonical path
-            ex.printStackTrace();
-            this.currentFile = file.getAbsolutePath();
-            /// @todo what could be done here?
-        }
-        if (this.mruList.contains(this.currentFile)) {
-            // if it is already in, just remove it and add it at the end
-            this.mruList.remove(this.currentFile);
-        }
-        this.mruList.add(this.currentFile);
-        if (this.mruList.size() > MaxMruFiles) {
-            this.mruList.remove(0);
-        }
-        recreateMruMenu();
-    }
-    
     private void importCSC() {
         final JFileChooser openDialog;
         if (this.lastCSCFile != null) {
@@ -1169,7 +1142,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             this.saveAsFileAction.saveFile();
         } else {
             try {
-                saveActivity.processFile(new File(this.currentFile));
+                saveActivity.processFile(this.currentFile);
                 this.conceptualSchema.dataSaved();
             } catch (Exception e) {
                 ErrorDialog.showError(this, e, "Saving file failed");
@@ -1202,4 +1175,20 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             connectDatabase();
         }
     }    
+
+    private void setCurrentFile(File newCurrentFile) {
+        this.currentFile = newCurrentFile;
+        this.saveAsFileAction.setPreviousFile(newCurrentFile);
+        String filePath = newCurrentFile.getAbsolutePath();
+        if (this.mruList.contains(filePath)) {
+            // if it is already in, just remove it and add it at the end
+            this.mruList.remove(filePath);
+        }
+        this.mruList.add(filePath);
+        if (this.mruList.size() > MaxMruFiles) {
+            this.mruList.remove(0);
+        }
+        recreateMruMenu();
+        updateWindowTitle();
+    }
 }
