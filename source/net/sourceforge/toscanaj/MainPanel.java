@@ -41,7 +41,7 @@ import org.jdom.Element;
  *  This class provides the main GUI panel with menus and a toolbar
  *  for ToscanaJ.
  */
-public class MainPanel extends JFrame implements ActionListener, ChangeObserver, KeyListener {
+public class MainPanel extends JFrame implements ActionListener, ChangeObserver {
     /**
      * The version name used in the about dialog.
      */
@@ -170,8 +170,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         buildPanel();
         // listen to changes on DiagramController
         DiagramController.getController().addObserver(this);
-        // add listener for keys
-        this.addKeyListener(this);
         // we are the parent window for anything database viewers / report generators want to display
         DatabaseViewerManager.setParentComponent(this);
         // restore the old MRU list
@@ -678,74 +676,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
                 (actionSource == this.showAllMenuItem)) {
             updateLabelViews();
             return;
-        }
-    }
-
-    /**
-     * Nothing to do on key releases.
-     */
-    public void keyReleased(KeyEvent e) {
-    }
-
-    /**
-     * Nothing to do on key presses.
-     */
-    public void keyPressed(KeyEvent e) {
-    }
-
-    /**
-     * We do some things if keys were typed when the diagram view has the focus.
-     *
-     * @todo This does not work at the moment since the diagram view never has focus, even not
-     *       after clicking on it --> fix.
-     */
-    public void keyTyped(KeyEvent e) {
-        if (e.getKeyChar() == 'e') {
-            exportImage();
-        }
-        if (e.getKeyChar() == 'E') {
-            showImageExportOptions();
-        }
-        if (e.getKeyChar() == 'f') {
-            if (this.filterAllMenuItem.isSelected()) {
-                this.filterExactMenuItem.setSelected(true);
-                DiagramController.getController().setFilterMethod(DiagramController.FILTER_CONTINGENT);
-            } else {
-                this.filterAllMenuItem.setSelected(true);
-                DiagramController.getController().setFilterMethod(DiagramController.FILTER_EXTENT);
-            }
-        }
-        if (e.getKeyChar() == 'b') {
-            if (DiagramController.getController().undoIsPossible()) {
-                DiagramController.getController().back();
-            }
-        }
-        if (e.getKeyChar() == '0') {
-            this.noNestingMenuItem.setSelected(true);
-            DiagramController.getController().setNestingLevel(0);
-        }
-        if (e.getKeyChar() == '1') {
-            this.nestingLevel1MenuItem.setSelected(true);
-            DiagramController.getController().setNestingLevel(1);
-        }
-        if (e.getKeyChar() == 'o') {
-            // divider location starts with 1 on Windows, we give some more to be sure
-            if (this.splitPane.getDividerLocation() > 5) {
-                this.dividerPosition = this.splitPane.getDividerLocation();
-                this.splitPane.setDividerLocation(0);
-                // this ensures that the toggle button on the divider still can be used
-                this.splitPane.setLastDividerLocation(this.dividerPosition);
-            } else {
-                this.splitPane.setDividerLocation(this.dividerPosition);
-            }
-        }
-        if (e.getKeyChar() == 's') {
-            if (this.showAllMenuItem.isSelected()) {
-                this.showExactMenuItem.setSelected(true);
-            } else {
-                this.showAllMenuItem.setSelected(true);
-            }
-            updateLabelViews();
         }
     }
 
