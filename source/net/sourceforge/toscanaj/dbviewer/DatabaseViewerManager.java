@@ -426,4 +426,8 @@ public class DatabaseViewerManager implements XMLizable {
     public static void setBaseURL(URL baseURL) {
         DatabaseViewerManager.baseURL = baseURL;
     }
+    
+    public static URL getBaseURL() {
+        return baseURL;
+    }
 }
