@@ -192,8 +192,8 @@ public class ObjectLabelView extends LabelView {
 					int fullExtent = conceptInterpreter.getObjectCount(top,context);
 					context.setObjectDisplayMode(oldMode);
 					NumberFormat format = DecimalFormat.getNumberInstance();
-					format.setMaximumFractionDigits(4);
-					contents.add(format.format(objectCount/(double)fullExtent) + " %");
+					format.setMaximumFractionDigits(2);
+					contents.add(format.format(100 * objectCount/(double)fullExtent) + " %");
 				} else {
 					contents = null;
 				}
