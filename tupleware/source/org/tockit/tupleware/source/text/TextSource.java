@@ -37,14 +37,17 @@ public class TextSource implements TupleSource {
 			this.selectedFile = openDialog.getSelectedFile();
 			try {
 				Reader reader = new FileReader(this.selectedFile);
-				this.tuples = TabDelimitedParser.parseTabDelimitedTuples(reader);
-				reader.close();
+				try {
+					this.tuples = TabDelimitedParser.parseTabDelimitedTuples(reader);
+				} finally {
+					reader.close();
+				}
+				IndexSelectionDialog dialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getDimensionNames());
+				dialog.show();
+				this.objectIndices = dialog.getSelectedIndices();
 			} catch (Exception e) {
 				ErrorDialog.showError(parent, e, "Could not read file");
 			}
-			IndexSelectionDialog dialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getDimensionNames());
-			dialog.show();
-			this.objectIndices = dialog.getSelectedIndices();
 		}
     }
 
