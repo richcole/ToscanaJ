@@ -38,6 +38,9 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContextImplementation;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 import net.sourceforge.toscanaj.parser.BurmeisterParser;
 import net.sourceforge.toscanaj.parser.CSCParser;
@@ -49,6 +52,11 @@ import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
+import net.sourceforge.toscanaj.view.manyvaluedcontext.ColumnHeader;
+import net.sourceforge.toscanaj.view.manyvaluedcontext.ObjectDialog;
+import net.sourceforge.toscanaj.view.manyvaluedcontext.PropertiesDialog;
+import net.sourceforge.toscanaj.view.manyvaluedcontext.RowHeader;
+import net.sourceforge.toscanaj.view.manyvaluedcontext.TableView;
 
 import org.jdom.JDOMException;
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
@@ -63,12 +71,16 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * @todo make sure all changes to the context will propagate to make the schema dirty.
+ */
 public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     private static final String CONFIGURATION_SECTION_NAME = "SienaMainPanel";
     private static final String WINDOW_TITLE = "Siena";
@@ -83,18 +95,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
      *  Model
      */
     private ConceptualSchema conceptualSchema;
-
-    /**
-     * Controls
-     */
+    
     private JMenuBar menuBar;
     private JMenu helpMenu;
     private JMenu fileMenu;
     private JMenu mruMenu;
-
-    /**
-     * Views
-     */
     private DiagramEditingView diagramEditingView;
     private List mruList = new LinkedList();
     private String currentFile = null;
@@ -107,8 +112,31 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private SaveFileAction saveAsFileAction;
     private SaveConceptualSchemaActivity saveActivity;
 
-    private Object cernatoObjectDialog;
-	private Object cernatoTableView;
+	private TableView tableView;
+	private RowHeader rowHeader;
+	private ColumnHeader colHeader;
+	/**
+	 * @todo this class is superflous, it should be replaced by putting the calculation into the
+	 * TableView class.
+	 */
+	protected class Point{
+		
+		private int row;
+		private int col;
+		
+		public Point(double x, double y){
+			row = (int) x / TableView.CELL_WIDTH;
+			col = (int) y / TableView.CELL_HEIGHT;
+		}
+		
+		public int getRow(){
+			return row;
+		}
+		public int getCol(){
+			return col;
+		}
+	}
+	
 	public SienaMainPanel() {
         super(WINDOW_TITLE);
 
@@ -127,6 +155,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             this,
             NewConceptualSchemaEvent.class,
             Object.class);
+            
+        initializeModel();
 
         createViews();
 
@@ -174,6 +204,10 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         });
     }
 
+	private void initializeModel() {
+		this.conceptualSchema.setManyValuedContext(new ManyValuedContextImplementation());
+	}
+
 	protected void createViews() {
 		createDiagramEditingView();
 
@@ -199,7 +233,52 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	}
 
 	protected JPanel createContextEditingView() {
-		return new JPanel();
+		rowHeader = new RowHeader(this.conceptualSchema.getManyValuedContext());
+		colHeader = new ColumnHeader(this.conceptualSchema.getManyValuedContext());
+		tableView = new TableView(this.conceptualSchema.getManyValuedContext(),colHeader, rowHeader);
+		final Frame tFrame = JOptionPane.getFrameForComponent(tableView);
+		
+		final ObjectDialog objectDialog = new ObjectDialog(tFrame, this.conceptualSchema.getManyValuedContext());
+		
+		colHeader.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
+					double x = e.getPoint().getX();
+					double y = e.getPoint().getY();
+					Point p = new Point(x,y);
+					List propertyList = (List) conceptualSchema.getManyValuedContext().getAttributes();
+					WritableManyValuedAttribute property = (WritableManyValuedAttribute)
+													propertyList.get(p.getRow());
+					PropertiesDialog propertiesDialog = new PropertiesDialog(tFrame,property,conceptualSchema.getManyValuedContext());
+				}
+			}
+		});
+
+		rowHeader.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
+					double x = e.getPoint().getX();
+					double y = e.getPoint().getY();
+					Point p = new Point(x,y);
+					int col = p.getCol();
+					ArrayList objectList = (ArrayList) conceptualSchema.getManyValuedContext().getObjects();
+					FCAObject object = (FCAObject) objectList.get(col);
+					objectDialog.setObjectName(object.getName());
+					objectDialog.setSelectedObjectIndex(col);
+					objectDialog.show();
+				}
+			}
+		});
+
+		JScrollPane scrollPane = new JScrollPane(tableView);
+		scrollPane.setColumnHeaderView(colHeader);
+		scrollPane.setRowHeaderView(rowHeader);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+		JPanel retVal = new JPanel(new BorderLayout());
+		retVal.add(scrollPane, BorderLayout.CENTER);
+		return retVal;
 	}
 
     public void createMenuBar() {
@@ -470,11 +549,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         importCernatoXML(openDialog.getSelectedFile());
     }
 
-    public void importCernatoXML(String fileLocation) {
-        importCernatoXML(new File(fileLocation));
-    }
-
-    private void importCernatoXML(File file) {
+    public void importCernatoXML(File file) {
         this.lastCernatoFile = file;
         CernatoModel inputModel;
         try {
@@ -495,6 +570,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         this.conceptualSchema.setManyValuedContext(inputModel.getContext());
         addDiagrams(conceptualSchema, inputModel);
+		this.tableView.setManyValuedContext(inputModel.getContext());
+		this.rowHeader.setManyValuedContext(inputModel.getContext());
+		this.colHeader.setManyValuedContext(inputModel.getContext());
+		validate();
+		repaint();
     }
 
     private void importBurmeister() {
@@ -858,5 +938,4 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             }
         }
     }
-
 }

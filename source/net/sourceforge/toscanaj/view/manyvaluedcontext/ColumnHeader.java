@@ -19,7 +19,6 @@ import java.awt.event.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.ToolTipManager;
@@ -31,16 +30,12 @@ public class ColumnHeader extends JComponent{
 	
 	private static final Color TEXT_COLOR = Color.BLACK;
 	private static final Color TABLE_HEADER_COLOR = Color.LIGHT_GRAY;
-	public static final int CELL_HEIGHT= 30;
-	public static final int CELL_WIDTH= 150;
 	
-	private List attributeList;
 	private ManyValuedContext context;
 	
 	
 	public ColumnHeader(ManyValuedContext context){
 		this.context = context;
-		this.attributeList = (List) context.getAttributes();
 		ToolTipManager.sharedInstance().registerComponent(this);
 		updateSize();
 	}
@@ -52,10 +47,10 @@ public class ColumnHeader extends JComponent{
 		Paint oldPaint = g2d.getPaint();
 		Font oldFont = g2d.getFont();
 		int col = 0;
-		Iterator attrIt = attributeList.iterator();
+		Iterator attrIt = this.context.getAttributes().iterator();
 		while(attrIt.hasNext()){
 			ManyValuedAttribute attribute = (ManyValuedAttribute) attrIt.next();	
-			drawAttributeNameCell(g2d,attribute.getName(),col * CELL_WIDTH,0);	
+			drawAttributeNameCell(g2d,attribute.getName(),col * TableView.CELL_WIDTH,0);	
 			col+=1;
 		}
 		g2d.setPaint(oldPaint);
@@ -64,17 +59,17 @@ public class ColumnHeader extends JComponent{
 	
 	protected void drawAttributeNameCell(Graphics2D g2d, String content, int x, int y) {
 		g2d.setPaint(TABLE_HEADER_COLOR);
-		g2d.fill(new Rectangle2D.Double(x, y, CELL_WIDTH, CELL_HEIGHT));
+		g2d.fill(new Rectangle2D.Double(x, y, TableView.CELL_WIDTH, TableView.CELL_HEIGHT));
 		g2d.setPaint(TEXT_COLOR);
-		g2d.draw(new Rectangle2D.Double(x, y, CELL_WIDTH, CELL_HEIGHT));
+		g2d.draw(new Rectangle2D.Double(x, y, TableView.CELL_WIDTH, TableView.CELL_HEIGHT));
 	
 		FontMetrics fontMetrics = g2d.getFontMetrics();
 		String newContent = reduceStringDisplayWidth(content, g2d);
 	
 		g2d.drawString(
 			newContent,
-			x + CELL_WIDTH / 2 - fontMetrics.stringWidth(newContent) / 2,
-			y + CELL_HEIGHT / 2 + fontMetrics.getMaxAscent() / 2);
+			x + TableView.CELL_WIDTH / 2 - fontMetrics.stringWidth(newContent) / 2,
+			y + TableView.CELL_HEIGHT / 2 + fontMetrics.getMaxAscent() / 2);
 	}
 	
 	protected String reduceStringDisplayWidth(String content, Graphics2D g2d) {
@@ -82,8 +77,8 @@ public class ColumnHeader extends JComponent{
 		String tail = "...";
 		int stringWidth = g2d.getFontMetrics().stringWidth(newContent);
 		int tailWidth = g2d.getFontMetrics().stringWidth(tail);
-		if (stringWidth > (CELL_WIDTH - 10)) {
-			while ((stringWidth + tailWidth) > (CELL_WIDTH - 10)) {
+		if (stringWidth > (TableView.CELL_WIDTH - 10)) {
+			while ((stringWidth + tailWidth) > (TableView.CELL_WIDTH - 10)) {
 				newContent = newContent.substring(0, (newContent.length() - 1));
 				stringWidth = g2d.getFontMetrics().stringWidth(newContent);
 			}
@@ -97,20 +92,25 @@ public class ColumnHeader extends JComponent{
 	}
 	
 	private Dimension calculateNewSize() {
-		int numCol = context.getAttributes().size();
-		return new Dimension(numCol * CELL_WIDTH, CELL_HEIGHT);
+		int numCol = context.getAttributes().size() + 1;
+		return new Dimension(numCol * TableView.CELL_WIDTH + 1, TableView.CELL_HEIGHT);
 	}
 	
 	public String getToolTipText(MouseEvent e) {
 		
-		int col = e.getX()/CELL_WIDTH;
+		int col = e.getX()/TableView.CELL_WIDTH;
 		
 		ArrayList attributeList = (ArrayList) context.getAttributes();
-		ManyValuedAttribute property = (ManyValuedAttribute) attributeList.get(col);
-		String tooltipText = property.getType().toString();
+		ManyValuedAttribute attribute = (ManyValuedAttribute) attributeList.get(col);
+		String tooltipText = attribute.getType().toString();
 	
 		return tooltipText;
 	}
 
 	
+
+	public void setManyValuedContext(ManyValuedContext context) {
+		this.context = context;
+		validate();
+	}
 }

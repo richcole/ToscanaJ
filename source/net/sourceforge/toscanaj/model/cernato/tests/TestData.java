@@ -9,7 +9,6 @@ package net.sourceforge.toscanaj.model.cernato.tests;
 
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.cernato.CernatoObject;
-import net.sourceforge.toscanaj.model.cernato.CernatoTable;
 import net.sourceforge.toscanaj.model.cernato.Property;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.*;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalType;
@@ -96,7 +95,7 @@ public class TestData {
         Model.getTypes().add(TextType1);
         Model.getTypes().add(TextType2);
 
-        CernatoTable context = Model.getContext();
+        ManyValuedContextImplementation context = Model.getContext();
 
         Property1 = new Property(NumType1, "prop1");
         Property2 = new Property(NumType1, "prop2");

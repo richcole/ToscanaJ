@@ -12,13 +12,13 @@ import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.cernato.CernatoObject;
-import net.sourceforge.toscanaj.model.cernato.CernatoTable;
 import net.sourceforge.toscanaj.model.cernato.Property;
 import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContextImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 public class TextDumps {
-    public static final void dump(CernatoTable context, PrintStream stream) {
+    public static final void dump(ManyValuedContextImplementation context, PrintStream stream) {
         Collection objects = context.getObjects();
         Collection properties = context.getAttributes();
         stream.print("\t");

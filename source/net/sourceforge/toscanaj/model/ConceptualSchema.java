@@ -18,7 +18,7 @@ import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.DiagramChangedEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
 import net.sourceforge.toscanaj.util.CollectionFactory;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
@@ -88,7 +88,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
     private static final String VIEWS_ELEMENT_NAME = "views";
     private static final String QUERIES_ELEMENT_NAME = "queries";
     
-    private ManyValuedContext manyValuedContext;
+    private WritableManyValuedContext manyValuedContext;
 	private boolean dataSaved = true;
 
     /**
@@ -381,12 +381,12 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
         this.queries.add(query);
     }
 
-    public void setManyValuedContext(ManyValuedContext context) {
+    public void setManyValuedContext(WritableManyValuedContext context) {
 		markDataDirty();
         this.manyValuedContext = context;
     }
 
-    public ManyValuedContext getManyValuedContext() {
+    public WritableManyValuedContext getManyValuedContext() {
         return this.manyValuedContext;
     }
     

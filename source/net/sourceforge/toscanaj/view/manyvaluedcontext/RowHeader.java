@@ -15,7 +15,6 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.JComponent;
 
@@ -27,15 +26,11 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 public class RowHeader extends JComponent{
 	private static final Color TEXT_COLOR = Color.BLACK;
 	private static final Color CELL_COLOR = Color.LIGHT_GRAY;
-	private static final int CELL_HEIGHT = 30;
-	private static final int CELL_WIDTH = 150;
 
-	private List objectList;
 	private ManyValuedContext context;
 	
 	public RowHeader(ManyValuedContext context){
 		this.context = context;
-		this.objectList = (List) context.getObjects();
 		updateSize();
 	}
 	
@@ -45,10 +40,10 @@ public class RowHeader extends JComponent{
 		Paint oldPaint = g2d.getPaint();
 		
 		int row = 0;
-		Iterator objectIt = objectList.iterator();
+		Iterator objectIt = this.context.getObjects().iterator();
 		while(objectIt.hasNext()){
 			FCAObject object = (FCAObject)objectIt.next();
-			drawCell(g2d , object.toString() , 0 , row * CELL_HEIGHT);
+			drawCell(g2d , object.toString() , 0 , row * TableView.CELL_HEIGHT);
 			row += 1;
 		}
 		g2d.setPaint(oldPaint);
@@ -56,16 +51,16 @@ public class RowHeader extends JComponent{
 	
 	protected void drawCell(Graphics2D g2d, String content, int x, int y) {
 		g2d.setPaint(CELL_COLOR);
-		g2d.fill( new Rectangle2D.Double(x , y , CELL_WIDTH, CELL_HEIGHT));
+		g2d.fill( new Rectangle2D.Double(x , y , TableView.CELL_WIDTH, TableView.CELL_HEIGHT));
 		g2d.setPaint(TEXT_COLOR);
-		g2d.draw(new Rectangle2D.Double(x , y , CELL_WIDTH, CELL_HEIGHT));
+		g2d.draw(new Rectangle2D.Double(x , y , TableView.CELL_WIDTH, TableView.CELL_HEIGHT));
 		
 		FontMetrics fontMetrics = g2d.getFontMetrics();
 		String newContent = reduceStringDisplayWidth(content, g2d);
 
 		g2d.drawString(newContent,
-		x + CELL_WIDTH / 2 - fontMetrics.stringWidth(newContent) / 2,
-		y + CELL_HEIGHT / 2 + fontMetrics.getMaxAscent() / 2);
+		x + TableView.CELL_WIDTH / 2 - fontMetrics.stringWidth(newContent) / 2,
+		y + TableView.CELL_HEIGHT / 2 + fontMetrics.getMaxAscent() / 2);
 		
 	}
 	
@@ -74,8 +69,8 @@ public class RowHeader extends JComponent{
 		String tail = "...";
 		int stringWidth = g2d.getFontMetrics().stringWidth(newContent);
 		int tailWidth = g2d.getFontMetrics().stringWidth(tail);
-		if (stringWidth > (CELL_WIDTH - 10)) {
-			while ((stringWidth + tailWidth) > (CELL_WIDTH - 10)) {
+		if (stringWidth > (TableView.CELL_WIDTH - 10)) {
+			while ((stringWidth + tailWidth) > (TableView.CELL_WIDTH - 10)) {
 				newContent = newContent.substring(0, (newContent.length() - 1));
 				stringWidth = g2d.getFontMetrics().stringWidth(newContent);
 			}
@@ -89,8 +84,12 @@ public class RowHeader extends JComponent{
 	}
 	
 	private Dimension calculateNewSize() {
-		int numRow = context.getObjects().size();
-		return new Dimension(CELL_WIDTH, numRow * CELL_HEIGHT);
+		int numRow = context.getObjects().size() + 1;
+		return new Dimension(TableView.CELL_WIDTH, numRow * TableView.CELL_HEIGHT + 1);
 	}
 	
+	public void setManyValuedContext(ManyValuedContext context) {
+		this.context = context;
+		validate();
+	}
 }

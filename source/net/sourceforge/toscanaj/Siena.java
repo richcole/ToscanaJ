@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj;
 
+import java.io.File;
+
 import net.sourceforge.toscanaj.gui.SienaMainPanel;
 
 public class Siena {
@@ -20,7 +22,7 @@ public class Siena {
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if( (arg.compareToIgnoreCase("-importCernatoXML") == 0) && (i < args.length - 1) ){
-            	mainWindow.importCernatoXML(args[i+1]);
+            	mainWindow.importCernatoXML(new File(args[i+1]));
             	i++;
             }
         }

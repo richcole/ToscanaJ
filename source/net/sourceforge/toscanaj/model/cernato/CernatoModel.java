@@ -9,18 +9,20 @@ package net.sourceforge.toscanaj.model.cernato;
 
 import java.util.Vector;
 
+import net.sourceforge.toscanaj.model.manyvaluedcontext.*;
+
 /**
  * @todo this is pretty much a hack since the class exposes its member in a writable fashion
  */
 public class CernatoModel {
-    private CernatoTable context = new CernatoTable();
+    private ManyValuedContextImplementation context = new ManyValuedContextImplementation();
     private Vector types = new Vector();
     private Vector views = new Vector();
 
     public CernatoModel() {
     }
 
-    public CernatoTable getContext() {
+    public ManyValuedContextImplementation getContext() {
         return context;
     }
 

@@ -21,6 +21,7 @@ import javax.swing.JComponent;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
@@ -56,11 +57,11 @@ public class TableView extends JComponent implements Scrollable{
 		int col = 0;
 		Iterator attriIt = context.getAttributes().iterator();
 		while(attriIt.hasNext()){
-			ManyValuedAttribute property = (ManyValuedAttribute) attriIt.next();
+			ManyValuedAttribute attribute = (ManyValuedAttribute) attriIt.next();
 			if(selectedCell.getColumn()-1 == col){
-				drawColumn(g2d, col, true, property);
+				drawColumn(g2d, col, true, attribute);
 			}else{
-				drawColumn(g2d,col,false, property);
+				drawColumn(g2d,col,false, attribute);
 			}
 			col+=1;
 		}
@@ -74,17 +75,17 @@ public class TableView extends JComponent implements Scrollable{
 		int row = 0;
 		while(objIt.hasNext()){
 			FCAObject object = (FCAObject) objIt.next();
-			String content = context.getRelationship(object,attribute).toString();
+			AttributeValue relationship = context.getRelationship(object,attribute);
 			
 			boolean selected = checkCellSelected(row,columnSelected);
-			if(!attribute.getType().isValidValue(context.getRelationship(object,attribute))){
-				drawCell(g2d,col,row,ERROR_CELL_COLOR,content);
+			if(!attribute.getType().isValidValue(relationship)){
+				drawCell(g2d,col,row,ERROR_CELL_COLOR,relationship);
 			}
 			else if(selected){
-				drawCell(g2d,col,row,SELECTED_CELL_COLOR,content);
+				drawCell(g2d,col,row,SELECTED_CELL_COLOR,relationship);
 			}
 			else{
-				drawCell(g2d,col,row,CELL_COLOR,content);
+				drawCell(g2d,col,row,CELL_COLOR,relationship);
 			}
 			
 			row+= 1 ;
@@ -92,7 +93,7 @@ public class TableView extends JComponent implements Scrollable{
 	}
 	
 	protected void drawCell(Graphics2D g2d,int col, int row, Color cellColor,
-								String content){
+								AttributeValue relationship){
 		Paint oldPaint = g2d.getPaint();
 		g2d.setPaint(cellColor);
 		g2d.fill(new Rectangle2D.Double(col*CELL_WIDTH, row*CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT));
@@ -100,6 +101,11 @@ public class TableView extends JComponent implements Scrollable{
 		g2d.draw(new Rectangle2D.Double(col*CELL_WIDTH, row*CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT));
 		g2d.setPaint(oldPaint);
 		
+		if(relationship == null) {
+			return;
+		}
+		
+		String content = relationship.toString();
 		FontMetrics fontMetrics = g2d.getFontMetrics();
 
 		g2d.drawString(content,
@@ -148,6 +154,9 @@ public class TableView extends JComponent implements Scrollable{
 		return false;
 	}
 	
+	/**
+	 * @todo this could probably be moved into the standard validate() method
+	 */
 	public void updateSize() {
 		this.setPreferredSize(calculateNewSize());
 	}
@@ -155,7 +164,7 @@ public class TableView extends JComponent implements Scrollable{
 	protected Dimension calculateNewSize() {
 		int numCol = context.getAttributes().size();
 		int numRow = context.getObjects().size();
-		return new Dimension(numCol * CELL_WIDTH , numRow * CELL_HEIGHT);
+		return new Dimension(numCol * CELL_WIDTH + 1, numRow * CELL_HEIGHT + 1);
 	}
 	
 	public static class SelectedCell{
@@ -185,5 +194,10 @@ public class TableView extends JComponent implements Scrollable{
 	}
 
 	
-
+	public void setManyValuedContext(ManyValuedContext context) {
+		this.context = context;
+		updateSize();
+		validate();
+		repaint();
+	}
 }

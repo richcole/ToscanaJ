@@ -8,6 +8,7 @@
  
 package net.sourceforge.toscanaj.view.manyvaluedcontext;
 
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,7 +17,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -29,13 +29,13 @@ public class ObjectDialog extends JDialog{
 	private JTextField objectName;
 	private JButton closeButton;
 	private JButton changeButton;
-	private JFrame parent;
+	private Frame parent;
 	private int index;
 	private JDialog dialog = this;
 	private WritableManyValuedContext context;
 	
 	
-	public ObjectDialog(JFrame parent, WritableManyValuedContext context){
+	public ObjectDialog(Frame parent, WritableManyValuedContext context){
 		super(parent,"Object", false);
 		setResizable(false);
 		createView();
@@ -112,5 +112,4 @@ public class ObjectDialog extends JDialog{
 	public void setSelectedObjectIndex(int index){
 		this.index = index;
 	}
-
 }

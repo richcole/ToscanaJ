@@ -5,25 +5,22 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 
-import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
+import net.sourceforge.toscanaj.model.cernato.CernatoObject;
 
-public class CernatoTable implements WritableManyValuedContext {
+public class ManyValuedContextImplementation implements WritableManyValuedContext {
     private List objects = new ArrayList();
     private List properties = new ArrayList();
     private Hashtable relation = new Hashtable();
 	private List types = new ArrayList();
 
-    public CernatoTable() {
+    public ManyValuedContextImplementation() {
     }
 
     public void add(FCAObject object) {

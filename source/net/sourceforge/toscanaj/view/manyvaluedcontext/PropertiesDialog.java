@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.view.manyvaluedcontext;
 
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -18,7 +19,6 @@ import java.util.Iterator;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -35,16 +35,16 @@ public class PropertiesDialog extends JDialog{
 	private JButton editTypeButton;
 	private JButton changeButton;
 	private WritableManyValuedAttribute property;
-	private JFrame frame;
+	private Frame parent;
 	private JComboBox typeBox;
 	private PropertiesDialog dialog = this;
 	private ManyValuedContext context;
 	
-	public PropertiesDialog(JFrame frame,
+	public PropertiesDialog(Frame parent,
 										WritableManyValuedAttribute property, 
 										ManyValuedContext context){
-		super(frame,"Many Valued-Context:Properties",true);
-		this.frame = frame;
+		super(parent,"Many Valued-Context:Properties",true);
+		this.parent = parent;
 		this.property = property;
 		this.context = context;
 		setContentPane(createView());
@@ -157,7 +157,7 @@ public class PropertiesDialog extends JDialog{
 						property.setName(propertyName.getText());
 					}
 				}
-				frame.validate();
+				parent.validate();
 				dispose();
 			}
 		});
