@@ -240,7 +240,10 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         this.backMenuItem = new JMenuItem("Go Back one Diagram");
         this.backMenuItem.addActionListener(this);
         this.backMenuItem.setEnabled(false);
-        diagrMenu.add(printSetupMenuItem);
+        diagrMenu.add(backMenuItem);
+
+        // separator
+        diagrMenu.addSeparator();
 
         // menu radio buttons group:
         this.documentsDisplayGroup = new ButtonGroup();
