@@ -52,8 +52,10 @@ import java.io.IOException;
 import java.util.Iterator;
 
 public class TuplewareMainPanel extends JFrame implements MainPanel, EventBrokerListener {
-    private JMenuItem printMenuItem;
     private static final String CONFIGURATION_SECTION = "TuplewareMainPanel";
+    private static final String CONFIGURATION_ENTRY_LAST_FILE = "lastFileRead";
+    private static final String CONFIGURATION_ENTRY_DIVIDER = "diagramViewDivider";
+
 	private static final String WINDOW_TITLE = "Tupleware";
 
     private int[] objectIndices;
@@ -75,6 +77,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
      */
     private JMenuBar menuBar;
     private JMenu fileMenu;
+    private JMenuItem printMenuItem;
     private JMenu editMenu;
     private JMenu helpMenu;
     private JToolBar toolBar;
@@ -114,6 +117,11 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 
         ConfigurationManager.restorePlacement(CONFIGURATION_SECTION, this,
                 new Rectangle(10, 10, 900, 700));
+        String lastFilePath = ConfigurationManager.fetchString(CONFIGURATION_SECTION, 
+                                                               CONFIGURATION_ENTRY_LAST_FILE, null);
+        if(lastFilePath != null) {                                                    
+            this.lastFileRead = new File(lastFilePath);
+        }
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -163,7 +171,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 
     public void createViews() {
         diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
-        diagramEditingView.setDividerLocation(ConfigurationManager.fetchInt(CONFIGURATION_SECTION, "diagramViewDivider", 200));
+        diagramEditingView.setDividerLocation(ConfigurationManager.fetchInt(CONFIGURATION_SECTION, CONFIGURATION_ENTRY_DIVIDER, 200));
         this.diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
                                         this, DisplayedDiagramChangedEvent.class, Object.class);
 
@@ -472,9 +480,10 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
     public void closeMainPanel() {
         // store current position
         ConfigurationManager.storePlacement(CONFIGURATION_SECTION, this);
-        ConfigurationManager.storeInt(CONFIGURATION_SECTION, "diagramViewDivider",
-                diagramEditingView.getDividerLocation()
-        );
+        ConfigurationManager.storeInt(CONFIGURATION_SECTION, CONFIGURATION_ENTRY_DIVIDER, 
+                                      diagramEditingView.getDividerLocation());
+        ConfigurationManager.storeString(CONFIGURATION_SECTION, CONFIGURATION_ENTRY_LAST_FILE, 
+                                      this.lastFileRead.getAbsolutePath());
         ConfigurationManager.saveConfiguration();
         System.exit(0);
     }

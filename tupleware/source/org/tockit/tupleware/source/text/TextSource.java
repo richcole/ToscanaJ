@@ -31,7 +31,7 @@ public class TextSource implements TupleSource {
 	private File selectedFile;
 		
 	public void show(JFrame parent, File lastLocation) {
-		final JFileChooser openDialog = new JFileChooser();
+		final JFileChooser openDialog = new JFileChooser(lastLocation);
  		openDialog.setFileFilter(new ExtensionFileFilter(FILE_EXTENSIONS, FILE_DESCRIPTION));
 		if (openDialog.showOpenDialog(parent) == JFileChooser.APPROVE_OPTION) {
 			this.selectedFile = openDialog.getSelectedFile();
