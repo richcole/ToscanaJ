@@ -324,30 +324,66 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
             int numItems = this.labelInfo.getNumberOfEntries(this.showOnlyContingent);
             // draw the scroller elements when needed
             if(numItems > MIN_DISPLAY_LINES) {
+                // first a line separating the scrollbar from the rest
+                graphics.draw(new Line2D.Double( xPos + lw - this.scrollbarWidth, yPos,
+                                                 xPos + lw - this.scrollbarWidth, yPos + lh ) );
+                // calculate a size for the scroll buttons
+                double width = this.scrollbarWidth * 0.8;
+                double height = this.lineHeight * 0.8;
+                if(width < height) {
+                    height = width;
+                }
+                else {
+                    width = height;
+                }
+                // draw the upwards triangle
+                /// @todo find a way to use the double coordinate system
+                double xleft = xPos + lw - this.scrollbarWidth + (this.scrollbarWidth - width)/2;
+                double ytop = yPos + (this.lineHeight - height)/2;
+                int[] xpoints = new int[3];
+                int[] ypoints = new int[3];
+                xpoints[0] = (int)( xleft );
+                ypoints[0] = (int)( ytop + height );
+                xpoints[1] = (int)( xleft + width/2 );
+                ypoints[1] = (int)( ytop );
+                xpoints[2] = (int)( xleft + width );
+                ypoints[2] = (int)( ytop + height );
                 if(this.firstItem != 0) {
                     graphics.setPaint(Color.gray);
                 }
                 else {
                     graphics.setPaint(Color.lightGray);
                 }
-                graphics.drawString("^",
-                                (float)(xPos + lw - this.scrollbarWidth),
-                                (float)yPos + fm.getAscent() + fm.getLeading() );
+                graphics.fill(new Polygon(xpoints, ypoints, 3));
+                // draw the downwards triangle
+                ytop = yPos + (this.displayLines-2) * this.lineHeight + (this.lineHeight - height)/2;
+                xpoints[0] = (int)( xleft );
+                ypoints[0] = (int)( ytop );
+                xpoints[1] = (int)( xleft + width/2 );
+                ypoints[1] = (int)( ytop + height );
+                xpoints[2] = (int)( xleft + width );
+                ypoints[2] = (int)( ytop );
                 if(this.firstItem + this.displayLines < numItems) {
                     graphics.setPaint(Color.gray);
                 }
                 else {
                     graphics.setPaint(Color.lightGray);
                 }
-                graphics.drawString("v",
-                                (float)(xPos + lw - this.scrollbarWidth),
-                                (float)yPos + fm.getAscent() + fm.getLeading() +
-                                                           (this.displayLines - 2) * fm.getHeight() );
+                graphics.fill(new Polygon(xpoints, ypoints, 3));
+                // draw the current position
+                double scale = (this.lineHeight * (this.displayLines - 3)) / (double)numItems;
+                width = 0.8 * width;
+                xleft = xPos + lw - this.scrollbarWidth + (this.scrollbarWidth - width)/2;
+                ytop = yPos + this.lineHeight;
+                graphics.setPaint(Color.lightGray);
+                graphics.fill(new Rectangle2D.Double( xleft, ytop + this.firstItem * scale,
+                                                      width, this.displayLines * scale ) );
+                // draw the resize handle
                 graphics.setPaint(Color.gray);
-                graphics.drawString("/",
-                                (float)(xPos + lw - this.scrollbarWidth),
-                                (float)yPos + fm.getAscent() + fm.getLeading() +
-                                                           (this.displayLines - 1) * fm.getHeight() );
+                graphics.fill(new Ellipse2D.Double( xleft,
+                                                    yPos + (this.displayLines - 1) * this.lineHeight +
+                                                                (this.lineHeight - height)/2,
+                                                    width, height ) );
             }
         }
         else {
