@@ -16,6 +16,7 @@ import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.*;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
@@ -25,13 +26,19 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 import org.tockit.events.EventBroker;
+import org.tockit.tupelware.model.TupelSet;
+import org.tockit.tupelware.parser.TupelParser;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -39,6 +46,7 @@ import java.util.ListIterator;
 /// @todo check if the file we save to exists, warn if it does
 
 public class TupelwareMainPanel extends JFrame implements MainPanel {
+    private JTable tupelTable;
     private EventBroker eventBroker;
     static private final int MaxMruFiles = 8;
 	private static final String WINDOW_TITLE = "Tupelware";
@@ -47,6 +55,7 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
      *  Model
      */
     private ConceptualSchema conceptualSchema;
+    private TupelSet tupels;
 
     /**
      * Controls
@@ -108,8 +117,21 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
     private void createLayout() {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(toolBar, BorderLayout.NORTH);
-        mainPanel.add(diagramView, BorderLayout.CENTER);
+        mainPanel.add(createTabPanel(), BorderLayout.CENTER);
         setContentPane(mainPanel);
+    }
+
+    private Component createTabPanel() {
+        JTabbedPane tabPanel = new JTabbedPane();
+        tabPanel.addTab("Tupels", createTupelPanel());
+        tabPanel.addTab("Diagrams", diagramView);
+        tabPanel.setBorder(BorderFactory.createLoweredBevelBorder());
+        return tabPanel;
+    }
+    
+    private Component createTupelPanel() {
+        tupelTable = new JTable();
+        return new JScrollPane(tupelTable);
     }
 
     private void createToolBar() {
@@ -158,13 +180,27 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(fileMenu);
 		
+        FileActivity loadTupelsActivity = new FileActivity(){
+            public void processFile(File file) throws Exception {
+                loadTupels(file);
+            }
+            public boolean prepareToProcess() throws Exception {
+                return checkForMissingSave();
+            }
+            public String[] getExtensions() {
+                return new String[]{"tupels"};
+            }
+            public String getDescription() {
+                return "Tupel Sets";
+            }
+        };
         OpenFileAction openFileAction = new OpenFileAction(
                 this,
-                new LoadConceptualSchemaActivity(eventBroker),
+                loadTupelsActivity,
                 currentFile,
-                KeyEvent.VK_O,
+                KeyEvent.VK_L,
                 KeyStroke.getKeyStroke(
-                        KeyEvent.VK_O,
+                        KeyEvent.VK_L,
                         ActionEvent.CTRL_MASK
                 )
         );
@@ -254,10 +290,31 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         menuBar.add(helpMenu);
     }
 
-    private void loadTupels(File schemaFile) {
+    protected void loadTupels(File file) {
+        Reader reader;
+        try {
+            reader = new FileReader(file);
+            this.tupels = TupelParser.parseTabDelimitedTupels(reader);
+            fillTable();        
+        } catch (Exception e) {
+            ErrorDialog.showError(this, e, "Could not read file");
+        }
     }
-    
-	private void updateWindowTitle() {
+
+	private void fillTable() {
+        Object[][] data = new Object[this.tupels.getTupels().size()][this.tupels.getVariableNames().length];
+        int row = 0;
+        for (Iterator iter = this.tupels.getTupels().iterator(); iter.hasNext();) {
+            Object[] tupel = (Object[]) iter.next();
+            for (int col = 0; col < tupel.length; col++) {
+                data[row][col] = tupel[col];
+            }
+            row ++;
+        }
+        this.tupelTable.setModel(new DefaultTableModel(data, this.tupels.getVariableNames()));
+    }
+
+    private void updateWindowTitle() {
 	// get the current filename without the extension and full path
 	// we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
 		if(currentFile != null){
