@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ToscanaJ" default="compile" basedir="..">
+<project name="ToscanaJ" default="dist" basedir="..">
 	<!-- change this to a fixed value for releases -->
 	<target name="setBuildName">
 		<tstamp>
@@ -85,7 +85,7 @@
 	</target>
 	<target name="makeDebugJar" depends="compile,prepareDist">
 		<createManifest targetApp="${app.name}" targetLoc="${build.dev.dir}"/>
-		<jar jarfile="${dist.dir}/${dist.name}/${app.name}.jar" basedir="${build.dev.dir}" manifest="${build.release.dir}/${app.name}.MF" excludes="${app.name}.MF"/>
+		<jar jarfile="${dist.dir}/${dist.name}/${app.name}.jar" basedir="${build.dev.dir}" manifest="${build.dev.dir}/${app.name}.MF" excludes="${app.name}.MF"/>
 	</target>
 	<target name="makeReleaseJar" depends="compileRelease,prepareDist">
 		<createManifest targetApp="${app.name}" targetLoc="${build.release.dir}"/>
