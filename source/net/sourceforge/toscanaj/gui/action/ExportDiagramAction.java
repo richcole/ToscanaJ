@@ -179,29 +179,29 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 			
 			ImageWriter writer = this.diagramExportSettings.getGraphicFormat().getWriter();
             writer.exportGraphic(this.diagramView,this.diagramExportSettings,selectedFile,metadata);
-				if(this.diagramExportSettings.getSaveCommentsToFile()==true){
-					try{
-						PrintWriter out = new PrintWriter(new FileWriter(new File(selectedFile.getAbsolutePath()+".txt")));
-						out.println("The diagram(s) you have viewed for the resulting image: " + 
-								    lineSeparator + selectedFile.getAbsolutePath());
-						DateFormat dateFormatter = DateFormat.getDateTimeInstance();
-						out.println("as at " + dateFormatter.format(new Date(System.currentTimeMillis())) + " is(are): ");
-						out.println();
-						out.println(description);
-						out.close();
-					}catch(IOException e){
-						ErrorDialog.showError(frame, e, "Exporting text file error");
-					}
-				}
-				if(this.diagramExportSettings.getSaveCommentToClipboard()==true){
+			if(this.diagramExportSettings.getSaveCommentsToFile()==true){
+				try{
+					PrintWriter out = new PrintWriter(new FileWriter(new File(selectedFile.getAbsolutePath()+".txt")));
+					out.println("The diagram(s) you have viewed for the resulting image: " + 
+							    lineSeparator + selectedFile.getAbsolutePath());
 					DateFormat dateFormatter = DateFormat.getDateTimeInstance();
-					String header ="The diagram(s) you have viewed for the resulting image:\n"
-					+selectedFile.getAbsolutePath()+"\n"
-					+"as at "+dateFormatter.format(new Date(System.currentTimeMillis()))+" is(are): \n";
-					StringSelection comments = new StringSelection(header + "\n" + description);
-					Clipboard systemClipboard = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
-					systemClipboard.setContents(comments,null);
+					out.println("as at " + dateFormatter.format(new Date(System.currentTimeMillis())) + " is(are): ");
+					out.println();
+					out.println(description);
+					out.close();
+				} catch (IOException e){
+					ErrorDialog.showError(frame, e, "Exporting text file error");
 				}
+			}
+			if(this.diagramExportSettings.getSaveCommentToClipboard()==true){
+				DateFormat dateFormatter = DateFormat.getDateTimeInstance();
+				String header ="The diagram(s) you have viewed for the resulting image:\n"
+				+selectedFile.getAbsolutePath()+"\n"
+				+"as at "+dateFormatter.format(new Date(System.currentTimeMillis()))+" is(are): \n";
+				StringSelection comments = new StringSelection(header + "\n" + description);
+				Clipboard systemClipboard = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
+				systemClipboard.setContents(comments,null);
+			}
 		} catch (ImageGenerationException e) {
 			ErrorDialog.showError(frame, e, "Exporting image error");
 		} catch (OutOfMemoryError e) {
