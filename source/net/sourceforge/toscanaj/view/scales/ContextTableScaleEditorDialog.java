@@ -34,6 +34,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * @todo introduced OderedContext interface or something similar to get rid of
+ * the casts knowing about the internals of the ContextImplementation
+ */
 public class ContextTableScaleEditorDialog extends JDialog implements EventBrokerListener {
 
 	private static final String CONFIGURATION_SECTION_NAME = "ContextTableEditorDialog";
@@ -265,7 +269,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		if(!newNameField.getText().trim().equals("")){
 			if(!collectionContainsString(newNameField.getText(),context.getObjects())){
 				context.getObjects().add(newNameField.getText());
-				updateScrollPane();
+				updateView();
 				newNameField.setText("");
 			}else{
 				JOptionPane.showMessageDialog(contextTableScaleEditorDialog,
@@ -284,9 +288,10 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		doneButton.setEnabled(true);
 	}
 
-	private void updateScrollPane() {
+	private void updateView() {
 	    this.tableView.updateSize();
 		this.tableView.revalidate();
+		this.tableView.repaint();
 	}
 
 	private void addAttribute(final JButton doneButton, final JTextField newNameField)
@@ -294,7 +299,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		if(!newNameField.getText().trim().equals("")){
 			if(!collectionContainsString(newNameField.getText(),context.getAttributes())){
 				context.getAttributes().add(new Attribute(newNameField.getText()));
-				updateScrollPane();
+				updateView();
 				newNameField.setText("");
 			}else{
 				JOptionPane.showMessageDialog(contextTableScaleEditorDialog,
@@ -527,56 +532,69 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		show();
 		return result;
 	}
+	
+	private void removeObject(int pos) {
+		List objects = (List) this.context.getObjects();
+		objects.remove(pos);
+	    updateView();
+	}
+
+    private void removeAttribute(int pos) {
+        List attributes = (List) this.context.getAttributes();
+        attributes.remove(pos);
+        updateView();
+    }
 
 	private MouseListener getMouseListener(final ContextTableView tableView) {
 		MouseListener mouseListener = new MouseAdapter() {
-			final ArrayList attributeArrayList = (ArrayList) context.getAttributes();
-			final ArrayList objectsArrayList =	(ArrayList) context.getObjects();
-		
 			public void mousePressed(MouseEvent e) {
 				if(e.isPopupTrigger()) {
 					final ContextTableView.Position pos = tableView.getTablePosition(e.getX(), e.getY());
 					if( pos == null ) {
 						return;
 					} else {
-						if (pos.getCol() == 0 && pos.getRow()!=0){
-							JPopupMenu popupMenu = new JPopupMenu();
-							JMenuItem rename = new JMenuItem("Rename Object");
-							rename.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									renameItem( objectsArrayList, 
-									attributeArrayList , pos.getCol() , pos.getRow());
-							}});
-							JMenuItem remove = new JMenuItem("Remove Object");
-							remove.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									objectsArrayList.remove(pos.getRow()-1);
-									updateScrollPane();
-							}});
-							popupMenu.add(rename);
-							popupMenu.add(remove);
-							popupMenu.show(scrollpane, e.getX(), e.getY());
-						} else if (pos.getRow() == 0 && pos.getCol()!=0) {
-							JPopupMenu popupMenu = new JPopupMenu();
-							JMenuItem rename = new JMenuItem("Rename Attribute");
-							rename.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									renameItem( objectsArrayList, 
-									attributeArrayList , pos.getCol() , pos.getRow());
-							}});
-							JMenuItem remove = new JMenuItem("Remove Attribute");
-							remove.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-										attributeArrayList.remove(pos.getCol()-1);
-										updateScrollPane();
-							}});
-							popupMenu.add(rename);
-							popupMenu.add(remove);
-							popupMenu.show(scrollpane, e.getX(), e.getY());
-						}
+                        showPopupMenu(e, pos);
 					}
 				}			
 			}
+
+            public void showPopupMenu(MouseEvent e, final ContextTableView.Position pos) {
+                if (pos.getCol() == 0 && pos.getRow()!=0){
+                	JPopupMenu popupMenu = new JPopupMenu();
+                	JMenuItem rename = new JMenuItem("Rename Object");
+                	rename.addActionListener(new ActionListener() {
+                		public void actionPerformed(ActionEvent e) {
+                			renameObject( pos.getRow() - 1);
+                		}
+                	});
+                	JMenuItem remove = new JMenuItem("Remove Object");
+                	remove.addActionListener(new ActionListener() {
+                		public void actionPerformed(ActionEvent e) {
+                			removeObject(pos.getRow()-1);
+                		}
+                	});
+                	popupMenu.add(rename);
+                	popupMenu.add(remove);
+                	popupMenu.show(scrollpane, e.getX(), e.getY());
+                } else if (pos.getRow() == 0 && pos.getCol()!=0) {
+                	JPopupMenu popupMenu = new JPopupMenu();
+                	JMenuItem rename = new JMenuItem("Rename Attribute");
+                	rename.addActionListener(new ActionListener() {
+                		public void actionPerformed(ActionEvent e) {
+                			renameAttribute(pos.getCol() - 1);
+                		}
+                	});
+                	JMenuItem remove = new JMenuItem("Remove Attribute");
+                	remove.addActionListener(new ActionListener() {
+                		public void actionPerformed(ActionEvent e) {
+                				removeAttribute(pos.getCol()-1);
+                		}
+                	});
+                	popupMenu.add(rename);
+                	popupMenu.add(remove);
+                	popupMenu.show(scrollpane, e.getX(), e.getY());
+                }
+            }
 			
 			public void mouseReleased(MouseEvent e) {
 				if(e.isPopupTrigger()) {
@@ -584,42 +602,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 					if( pos == null ) {
 						return;
 					} else{
-						if (pos.getCol() == 0 && pos.getRow()!=0){
-							JPopupMenu popupMenu = new JPopupMenu();
-							JMenuItem rename = new JMenuItem("Rename Object");
-							rename.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									renameItem( objectsArrayList, 
-									attributeArrayList , pos.getCol() , pos.getRow());
-							}});
-							JMenuItem remove = new JMenuItem("Remove Object");
-							remove.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									objectsArrayList.remove(pos.getRow()-1);
-									updateScrollPane();
-							}});
-							popupMenu.add(rename);
-							popupMenu.add(remove);
-							popupMenu.show(scrollpane, e.getX(), e.getY());
-						}
-						else if(pos.getRow() == 0 && pos.getCol()!=0){
-							JPopupMenu popupMenu = new JPopupMenu();
-							JMenuItem rename = new JMenuItem("Rename Attribute");
-							rename.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-									renameItem( objectsArrayList, 
-									attributeArrayList , pos.getCol() , pos.getRow());
-							}});
-							JMenuItem remove = new JMenuItem("Remove Attribute");
-							remove.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent e) {
-										attributeArrayList.remove(pos.getCol()-1);
-										updateScrollPane();
-							}});
-							popupMenu.add(rename);
-							popupMenu.add(remove);
-							popupMenu.show(scrollpane, e.getX(), e.getY());
-						}
+					    showPopupMenu(e, pos);
 					}
 				}
 			}
@@ -629,88 +612,81 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 				if( pos == null ) {
 					return;
 				}
+				if(e.getButton() != MouseEvent.BUTTON1) {
+					return;
+				}
+				if(e.getClickCount() != 2) {
+					return;
+				}				
 				
 				if( pos.getCol() == 0 ) {
 					if( pos.getRow() != 0) {
-						if (e.getButton() == MouseEvent.BUTTON1) {
-							if (e.getClickCount() == 2) {
-								renameItem(objectsArrayList,attributeArrayList,
-								pos.getCol(),pos.getRow());
-							} 
-						} 
+					    renameObject(pos.getRow() - 1);
 					} 
 				} else {
 					if( pos.getRow() == 0) {
-						if (e.getButton() == MouseEvent.BUTTON1) {
-							if (e.getClickCount() == 2) {
-								renameItem(objectsArrayList,attributeArrayList,
-								pos.getCol(),pos.getRow());
-							} 
-						} 
+						renameAttribute(pos.getCol() - 1);
 					} else {
-						if (e.getButton() == MouseEvent.BUTTON1) {
-							if (e.getClickCount() == 2) {
-								Attribute attribute = (Attribute) attributeArrayList.get(pos.getCol() - 1);
-								Object object = objectsArrayList.get(pos.getRow() - 1);
-								changeRelationImplementation(object, attribute);
-							}
-						}
+						changeRelationImplementation(pos.getRow() - 1, pos.getCol() - 1);
 					}
-				}
+				}				
 			}
 		}; 
 		return mouseListener;
 	}
 	
-	private void renameItem(
-		ArrayList objectsArrayList,
-		ArrayList attributeArrayList,
-		int xP,
-		int yP) {
-		if (xP == 0) {
-			//rename Object
-			String inputValue = "";
-			do{
-				Object obj = objectsArrayList.get(yP - 1); 
-				inputValue = showTextInputDialog("Rename Object", "object", obj.toString());
-				if (inputValue != null && !inputValue.trim().equals("")) {
-					inputValue = inputValue.trim();
-					if(!collectionContainsString(inputValue, objectsArrayList)){
-						objectsArrayList.remove(yP - 1);
-						objectsArrayList.add(yP - 1, inputValue);
-						updateScrollPane();
-						inputValue ="";
-					}else{
-						JOptionPane.showMessageDialog(this,"An object named '"+inputValue+"' already exist. Please enter a different name.","Object exists",JOptionPane.WARNING_MESSAGE);
-					}
-				}else{
-					break;
-				}
-			}while(collectionContainsString(inputValue, objectsArrayList));
-		} else if (yP == 0) {
-			//rename attribute
-			String inputValue = "";
-			do{
-				Attribute attr = (Attribute) attributeArrayList.get(xP - 1);	
-				inputValue = showTextInputDialog("Rename Attribute", "attribute", (String) attr.getData());
-				if (inputValue != null && !inputValue.trim().equals("")) {
-					inputValue = inputValue.trim();
-					if(!collectionContainsString(inputValue, attributeArrayList)){
-						Attribute attribute = (Attribute) attributeArrayList.get(xP - 1);
-						attribute.setData(inputValue);
-						updateScrollPane();
-						inputValue = "";
-					}else{
-					JOptionPane.showMessageDialog(this,"An attribute named '"+inputValue+"' already exist. Please enter a different name.","Attribute exists",JOptionPane.WARNING_MESSAGE);
-					}	
-				}else{
-					break;
-				
-				}
-			}while(collectionContainsString(inputValue, attributeArrayList));
-		}
-	}
-	private void changeRelationImplementation(Object object, Attribute attribute) {
+    private void renameObject(int num) {
+        List objectList = (List) this.context.getObjects();
+        String inputValue = "";
+        do{
+            String object = (String) objectList.get(num);
+            inputValue = showTextInputDialog("Rename Object", "object", object);
+            if (inputValue != null && !inputValue.trim().equals("")) {
+                if(!collectionContainsString(inputValue, objectList)) {
+                    objectList.set(num, inputValue);
+                    updateView();
+                    inputValue = "";
+                } else {
+                    JOptionPane.showMessageDialog(this, "An object named '" + inputValue +
+                                                    "' already exist. Please enter a different name.","Object exists",
+                                                    JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                break;
+            }
+        } while (collectionContainsString(inputValue, objectList) );
+        updateView();
+    }
+
+    private void renameAttribute(int num) {
+        List attributeList = (List) this.context.getAttributes();
+        String inputValue = "";
+        do{
+            Attribute attr = (Attribute) attributeList.get(num);
+            inputValue = showTextInputDialog("Rename Attribute", "attribute", attr.toString());
+            if (inputValue != null && !inputValue.trim().equals("")) {
+                if(!collectionContainsString(inputValue, attributeList)) {
+                    Attribute attribute = (Attribute) attributeList.get(num);
+                    attribute.setData(inputValue);
+                    updateView();
+                    inputValue = "";
+                } else {
+                    JOptionPane.showMessageDialog(this, "An attribute named '" + inputValue +
+                                                    "' already exist. Please enter a different name.","Attribute exists",
+                                                    JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                break;
+            }
+        } while (collectionContainsString(inputValue, attributeList) );
+        updateView();
+    }
+
+	private void changeRelationImplementation(int objectPos, int attributePos) {
+	    List objectList = (List) this.context.getObjects();
+	    List attributeList = (List) this.context.getAttributes();
+	    Object object = objectList.get(objectPos);
+	    Attribute attribute = (Attribute) attributeList.get(attributePos);
 		if (context.getRelationImplementation().contains(object, attribute)) {
 			context.getRelationImplementation().remove(object, attribute);
 		} else {
@@ -718,6 +694,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		}
 		tableView.repaint();
 	}
+
 	/*
 	 * Checks against the context whether there are any objects/attributes. If
 	 * either one doesn't exist, disable the button.
