@@ -481,6 +481,7 @@ public class ElbaMainPanel
 				currentFile = saveAsFileAction.getLastFileUsed().getPath();
 				addFileToMRUList(saveAsFileAction.getLastFileUsed());
 				conceptualSchema.dataSaved();
+				updateWindowTitle();
                 return true;
             }
 		});
