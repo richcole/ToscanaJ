@@ -236,6 +236,24 @@ public class DiagramController implements ChangeObservable {
     private int nestingLevel = 0;
 
     /**
+     * Stores the number of objects in the current diagram.
+     */
+    private int numberOfCurrentObjects = 0;
+
+    /**
+     * Stores the maximal contingent size in the current diagram.
+     */
+    private int maxContingentSize = 0;
+
+    /**
+     * Stores the number of objects in the schema.
+     *
+     * This will currently be calculated by using the number of objects in the
+     * first diagram displayed.
+     */
+    private int numberOfObjects = -1;
+
+    /**
      * Returns the only instance of this class.
      */
     static public DiagramController getController() {
@@ -484,7 +502,16 @@ public class DiagramController implements ChangeObservable {
             // we don't have a diagram to display
             return null;
         }
-        return getNestedDiagram(history.currentDiagrams.size()-1);
+        /** @TODO: Calculating the objects in the diagram is currently a side
+                   effect of the diagram calculation --> fix by putting the
+                   calculation into Diagram2D. */
+        this.numberOfCurrentObjects = 0;
+        this.maxContingentSize = 0;
+        Diagram2D retVal = getNestedDiagram(history.currentDiagrams.size()-1);
+        if(this.numberOfObjects == -1) {
+            this.numberOfObjects = this.numberOfCurrentObjects;
+        }
+        return retVal;
     }
 
     /**
@@ -536,6 +563,11 @@ public class DiagramController implements ChangeObservable {
             }
             retVal.addNode(newNode);
             nodeMap.put(oldNode,newNode);
+            int contSize = newNode.getConcept().getObjectContingentSize();
+            this.numberOfCurrentObjects = this.numberOfCurrentObjects + contSize;
+            if(contSize > this.maxContingentSize) {
+                this.maxContingentSize = contSize;
+            }
         }
         for(int i = 0; i < diag.getNumberOfLines(); i++) {
             DiagramLine line = diag.getLine(i);
@@ -573,6 +605,28 @@ public class DiagramController implements ChangeObservable {
         // else created nested diagram recursively
         DiagramReference ref = (DiagramReference)history.currentDiagrams.get(pos);
         return new NestedLineDiagram(getNestedDiagram(pos-1), ref.getDiagram() );
+    }
+
+    /**
+     * Returns the number of objects currently displayed.
+     */
+    public int getNumberOfCurrentObjects() {
+        return this.numberOfCurrentObjects;
+    }
+
+    /**
+     * Returns the maximal number of objects in any contingent in the current
+     * diagram.
+     */
+    public int getMaximalObjectContingentSize() {
+        return this.maxContingentSize;
+    }
+
+    /**
+     * Returns the number of objects in the whole schema.
+     */
+    public int getNumberOfObjects() {
+        return this.numberOfObjects;
     }
 
     /**

@@ -545,9 +545,15 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
         // diagram view
         if (actionSource == this.filterExactMenuItem) {
+            // testing only
+            diagramSchema.setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT);
+            // ^^^^^^^^^^^^
             DiagramController.getController().setFilterMethod(DiagramController.FILTER_CONTINGENT);
         }
         if (actionSource == this.filterAllMenuItem) {
+            // testing only
+            diagramSchema.setGradientType(DiagramSchema.GRADIENT_TYPE_EXTENT);
+            // ^^^^^^^^^^^^
             DiagramController.getController().setFilterMethod(DiagramController.FILTER_EXTENT);
         }
         // the back button/menu entry
@@ -574,6 +580,14 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         }
         if (actionSource == this.percDistMenuItem) {
             this.diagramView.setShowPercentage(this.percDistMenuItem.getState());
+            // testing only
+            if(this.percDistMenuItem.getState()) {
+                DiagramSchema.getDiagramSchema().setGradientReference(DiagramSchema.GRADIENT_REFERENCE_SCHEMA);
+            }
+            else {
+                DiagramSchema.getDiagramSchema().setGradientReference(DiagramSchema.GRADIENT_REFERENCE_DIAGRAM);
+            }
+            // ^^^^^^^^^^^^
         }
 
         // the color entries

@@ -11,6 +11,27 @@ import java.awt.Color;
 
 public class DiagramSchema {
     /**
+     * Used when the gradient should use the extent size of a concept as measure.
+     */
+    public static int GRADIENT_TYPE_EXTENT = 1;
+
+    /**
+     * Used when the gradient should use the contingent size of a concept as measure.
+     */
+    public static int GRADIENT_TYPE_CONTINGENT = 2;
+
+    /**
+     * Used when the gradient should compare to the number of objects in the diagram.
+     */
+    public static int GRADIENT_REFERENCE_DIAGRAM = 1;
+
+    /**
+     * Used when the gradient should compare to the number of objects in the conceptual
+     * schema.
+     */
+    public static int GRADIENT_REFERENCE_SCHEMA = 2;
+
+    /**
      * Create and store DiagramSchema.
      */
     private static DiagramSchema diagramSchema = new DiagramSchema();
@@ -71,6 +92,20 @@ public class DiagramSchema {
      * concept.
      */
     private Color circleFilterColor = new Color(0,0,0);
+
+    /**
+     * The gradient type set.
+     *
+     * @see setGradientType(int)
+     */
+    private int gradientType = GRADIENT_TYPE_EXTENT;
+
+    /**
+     * The gradient reference set.
+     *
+     * @see setGradientReference(int)
+     */
+    private int gradientReference = GRADIENT_REFERENCE_DIAGRAM;
 
     /**
      * Default constructor.
@@ -175,6 +210,26 @@ public class DiagramSchema {
     }
 
     /**
+     * Returns the type of information that should be used to create the diagram.
+     *
+     * This can be either GRADIENT_TYPE_EXTENT or GRADIENT_TYPE_CONTINGENT.
+     */
+    public int getGradientType() {
+        return this.gradientType;
+    }
+
+    /**
+     * Returns the reference point for creating the gradient.
+     *
+     * This can be either GRADIENT_REFERENCE_DIAGRAM to compare extent/contingent
+     * to the number of objects in the diagram or GRADIENT_REFERENCE_SCHEMA to
+     * compare it to the full set of objects in the schema.
+     */
+    public int getGradientReference() {
+        return this.gradientReference;
+    }
+
+    /**
      * Set the circle color to new color.
      */
     public void setCircleColor(Color circleColor) {
@@ -200,6 +255,35 @@ public class DiagramSchema {
      */
     public void setBottomColor(Color bottomColor) {
         this.bottomColor = bottomColor;
+    }
+
+    /**
+     * Sets the type of information that should be used to create the diagram.
+     *
+     * This can be either GRADIENT_TYPE_EXTENT or GRADIENT_TYPE_CONTINGENT.
+     *
+     * @throws IllegalArgumentException  If argument is not one of the two allowed values.
+     */
+    public void setGradientType(int gradientType) {
+        if(gradientType != GRADIENT_TYPE_EXTENT  &&  gradientType != GRADIENT_TYPE_CONTINGENT ) {
+            throw new IllegalArgumentException("Unknown value for gradient type");
+        }
+        this.gradientType = gradientType;
+    }
+
+    /**
+     * Sets the reference point for creating the gradient.
+     *
+     * This can be either GRADIENT_REFERENCE_DIAGRAM to compare extent/contingent
+     * to the number of objects in the diagram or GRADIENT_REFERENCE_SCHEMA to
+     * compare it to the full set of objects in the schema.
+     */
+    public void setGradientReference(int gradientReference) {
+        if( gradientReference != GRADIENT_REFERENCE_DIAGRAM  &&
+            gradientReference != GRADIENT_REFERENCE_SCHEMA ) {
+            throw new IllegalArgumentException("Unknown value for gradient type");
+        }
+        this.gradientReference = gradientReference;
     }
 
     /**

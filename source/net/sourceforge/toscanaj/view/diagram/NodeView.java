@@ -117,7 +117,27 @@ public class NodeView extends CanvasItem {
             nodeColor = diagramSchema.getNestedDiagramNodeColor();
         }
         else {
-            double rel = this.diagramNode.getConcept().getExtentSizeRelative();
+            double rel;
+            if(diagramSchema.getGradientReference() == DiagramSchema.GRADIENT_REFERENCE_DIAGRAM) {
+                if(diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
+                    rel = this.diagramNode.getConcept().getExtentSize() /
+                               (double)DiagramController.getController().getNumberOfCurrentObjects();
+                }
+                else {
+                    rel = this.diagramNode.getConcept().getObjectContingentSize() /
+                               (double)DiagramController.getController().getMaximalObjectContingentSize();
+                }
+            }
+            else {
+                if(diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
+                    rel = this.diagramNode.getConcept().getExtentSize();
+                }
+                else {
+                    /// @todo Check if this one can be avoided -- it is pretty useless
+                    rel = this.diagramNode.getConcept().getObjectContingentSize();
+                }
+                rel = rel / DiagramController.getController().getNumberOfObjects();
+            }
             nodeColor = diagramSchema.getGradientColor(rel);
         }
         Stroke oldStroke = graphics.getStroke();
