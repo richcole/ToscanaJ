@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.query.sql;
+package org.tockit.tupelware.sql.query;
 
 
 public class SqlQueryEngine {

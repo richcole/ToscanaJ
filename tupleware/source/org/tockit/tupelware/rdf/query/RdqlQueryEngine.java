@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.query.rdql;
+package org.tockit.tupelware.rdf.query;
 
 
 public class RdqlQueryEngine {
