@@ -39,11 +39,10 @@ public class DiagramHistoryView extends JList {
             boolean isSelected,      // is the cell selected
             boolean cellHasFocus)    // the list and the cell have the focus
         {
-            Diagram2D diagram = (Diagram2D)value;
+            DiagramHistory.DiagramReference diagram = (DiagramHistory.DiagramReference)value;
             DiagramHistory history = (DiagramHistory) list.getModel();
 
-            String s = diagram.getTitle();
-            setText(s);
+            setText(diagram.toString());
             setOpaque(true);
             if(isSelected) {
                 setBackground(list.getSelectionBackground());

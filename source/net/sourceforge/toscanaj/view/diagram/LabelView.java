@@ -9,15 +9,15 @@ import javax.swing.*;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.observer.ChangeObserver;
+import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
 /**
  * This class encapsulates all label drawing code.
  */
-public class LabelView extends CanvasItem implements LabelObserver
-{
+public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * Label current width.
      */
@@ -79,8 +79,8 @@ public class LabelView extends CanvasItem implements LabelObserver
     /**
      * Update label view as label info has change
      */
-    public void labelChanged(){
-      diagramView.updateAllObservers();
+    public void update(){
+        notifyObservers();
     }
 
     /**

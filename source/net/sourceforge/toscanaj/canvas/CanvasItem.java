@@ -1,8 +1,14 @@
 package net.sourceforge.toscanaj.canvas;
 
+import net.sourceforge.toscanaj.observer.ChangeObservable;
+import net.sourceforge.toscanaj.observer.ChangeObserver;
+import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
+
 import java.awt.geom.Point2D;
 
-import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Abstract class to draw 2D graph items.
@@ -10,9 +16,39 @@ import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
  * CanvasItems can be put on a DrawingCanvas where they will have a z-order and
  * can be moved.
  */
-public abstract class CanvasItem {
+public abstract class CanvasItem implements ChangeObservable {
     /**
-     * draw method called to draw canvas item
+     * Stores the observers of the item.
+     */
+    private List observers = new LinkedList();
+
+    /**
+     * Implements ChangeObservable.addObserver(ChangeObserver).
+     */
+    public void addObserver(ChangeObserver observer) {
+        this.observers.add(observer);
+    }
+
+    /**
+     * Implements ChangeObservable.removeObserver(ChangeObserver).
+     */
+    public void removeObserver(ChangeObserver observer) {
+        this.observers.remove(observer);
+    }
+
+    /**
+     * Notifies all observers of an update.
+     */
+    protected void notifyObservers() {
+        Iterator it = this.observers.iterator();
+        while(it.hasNext()) {
+            ChangeObserver observer = (ChangeObserver)it.next();
+            observer.update();
+        }
+    }
+
+    /**
+     * Draw method called to draw canvas item
      */
     public abstract void draw(ToscanajGraphics2D g);
 

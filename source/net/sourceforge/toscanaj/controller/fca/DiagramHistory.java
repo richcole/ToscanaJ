@@ -19,6 +19,27 @@ import javax.swing.AbstractListModel;
  */
 public class DiagramHistory extends AbstractListModel {
     /**
+     *
+     */
+    public class DiagramReference {
+        private Diagram2D diagram;
+        private Concept zoomedConcept;
+        private DiagramReference(Diagram2D diagram, Concept zoomedConcept) {
+            this.diagram = diagram;
+            this.zoomedConcept = zoomedConcept;
+        }
+        public Diagram2D getDiagram() {
+            return this.diagram;
+        }
+        public Concept getZoomedConcept() {
+            return this.zoomedConcept;
+        }
+        public String toString() {
+            return diagram.getTitle();
+        }
+    }
+
+    /**
      * Stores the only instance of this class.
      */
     static private DiagramHistory singleton = new DiagramHistory();
@@ -76,10 +97,18 @@ public class DiagramHistory extends AbstractListModel {
     }
 
     /**
-     * Adds a diagram to the list of forthcoming diagrams.
+     * Adds a diagram to the history.
+     *
+     * If no diagram is open yet it will be used as current diagram, else it
+     * will be added to the list of future diagrams.
      */
-    public void addFutureDiagram(Diagram2D diagram){
-        this.futureDiagrams.add(diagram);
+    public void addDiagram(Diagram2D diagram){
+        if(this.currentDiagrams.isEmpty()) {
+            this.currentDiagrams.add(new DiagramReference(diagram,null));
+        }
+        else {
+            this.futureDiagrams.add(new DiagramReference(diagram,null));
+        }
         int lastPos = pastDiagrams.size() + currentDiagrams.size() + futureDiagrams.size() - 1;
         this.fireIntervalAdded(this,lastPos,lastPos);
     }
@@ -144,12 +173,11 @@ public class DiagramHistory extends AbstractListModel {
         if(this.futureDiagrams.isEmpty()) {
             throw new NoSuchElementException("No diagram left");
         }
-        if(!this.currentDiagrams.isEmpty()) {
-            this.pastDiagrams.add(this.currentDiagrams.get(0));
-            this.currentDiagrams.remove(0);
-        }
+        this.pastDiagrams.add(this.currentDiagrams.get(0));
+        this.currentDiagrams.remove(0);
         this.currentDiagrams.add(this.futureDiagrams.get(0));
         this.futureDiagrams.remove(0);
+        this.fireContentsChanged(this,0,getSize()-1);
     }
 
     /**
@@ -178,21 +206,21 @@ public class DiagramHistory extends AbstractListModel {
     /**
      * Returns true if the diagram is in the list of visited diagrams.
      */
-    public boolean isInPast(Diagram2D diagram) {
+    public boolean isInPast(DiagramReference diagram) {
         return this.pastDiagrams.contains(diagram);
     }
 
     /**
      * Returns true if the diagram is in the list of displayed diagrams.
      */
-    public boolean isInCurrent(Diagram2D diagram) {
+    public boolean isInCurrent(DiagramReference diagram) {
         return this.currentDiagrams.contains(diagram);
     }
 
     /**
      * Returns true if the diagram is in the list of diagrams still to be visited.
      */
-    public boolean isInFuture(Diagram2D diagram) {
+    public boolean isInFuture(DiagramReference diagram) {
         return this.futureDiagrams.contains(diagram);
     }
 }

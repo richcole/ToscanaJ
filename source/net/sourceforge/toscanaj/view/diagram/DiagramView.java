@@ -20,6 +20,8 @@ import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.observer.ChangeObservable;
+import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.view.diagram.LabelView;
 import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
@@ -27,8 +29,7 @@ import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 /**
  * This class paints a diagram defined by the SimpleLineDiagram class.
  */
-
-public class DiagramView extends DrawingCanvas implements DiagramObserver
+public class DiagramView extends DrawingCanvas implements ChangeObserver
 {
     /**
      * The minimum size for drawing.
@@ -75,17 +76,10 @@ public class DiagramView extends DrawingCanvas implements DiagramObserver
    }
 
     /**
-    * method to notify observer that a change has been made
-    */
-    public void diagramChanged(){
-      repaint();
-    }
-
-    /**
-    * Method called by LabelView to update all observers
-    */
-    public void updateAllObservers() {
-      ((SimpleLineDiagram)_diagram).emitChangeSignal();
+     * Implements ChangeObserver.update() by repainting the diagram.
+     */
+    public void update(){
+        repaint();
     }
 
     /**
@@ -165,7 +159,6 @@ public class DiagramView extends DrawingCanvas implements DiagramObserver
      */
     public void showDiagram(SimpleLineDiagram diagram ) {
         _diagram = diagram;
-        ((SimpleLineDiagram)_diagram).addObserver(this);
          newCanvasItemsList();
         // add all lines to the canvas
         for( int i = 0; i < _diagram.getNumberOfLines(); i++ ) {
@@ -179,11 +172,15 @@ public class DiagramView extends DrawingCanvas implements DiagramObserver
             addCanvasItem( nodeView );
             LabelInfo attrLabelInfo = _diagram.getAttributeLabel( i );
             if( attrLabelInfo != null ) {
-                addCanvasItem( new LabelView( this, LabelView.ABOVE, attrLabelInfo ) );
+                LabelView labelView = new LabelView( this, LabelView.ABOVE, attrLabelInfo );
+                addCanvasItem( labelView );
+                labelView.addObserver(this);
             }
             LabelInfo objLabelInfo = _diagram.getObjectLabel( i );
             if( objLabelInfo != null ) {
-                addCanvasItem( new LabelView( this, LabelView.BELOW, objLabelInfo ) );
+                LabelView labelView = new LabelView( this, LabelView.BELOW, objLabelInfo );
+                addCanvasItem( labelView );
+                labelView.addObserver(this);
             }
         }
         repaint();

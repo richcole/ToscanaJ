@@ -93,7 +93,7 @@ public class DiagramOrganiser extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 int index = availableDiagramsListview.getSelectedIndex();
                 if(index >= 0) {
-                    DiagramHistory.getDiagramHistory().addFutureDiagram(schema.getDiagram(index));
+                    DiagramHistory.getDiagramHistory().addDiagram(schema.getDiagram(index));
                 }
             }
         });
@@ -120,7 +120,7 @@ public class DiagramOrganiser extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int index = availableDiagramsListview.locationToIndex(e.getPoint());
-                    DiagramHistory.getDiagramHistory().addFutureDiagram(schema.getDiagram(index));
+                    DiagramHistory.getDiagramHistory().addDiagram(schema.getDiagram(index));
                 }
             }
         };

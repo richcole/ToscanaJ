@@ -605,12 +605,13 @@ public class MainPanel extends JFrame implements ActionListener {
 
         diagramOrganiser.setConceptualSchema(conceptualSchema);
         DiagramHistory.getDiagramHistory().clear();
-
+//        DiagramHistory.getDiagramHistory().addObserver(this.diagramView);
         // if there is at least one diagram, open the first
         if( conceptualSchema.getNumberOfDiagrams() != 0 ) {
             currentSelectedIndex = 0;
             diagramView.showDiagram( conceptualSchema.getDiagram( 0 ) );
         }
+
 
         // enable relevant buttons and menus
         fileIsOpen = true;

@@ -1,8 +1,8 @@
 package net.sourceforge.toscanaj.model.diagram;
 
-import net.sourceforge.toscanaj.model.diagram.LabelObservable;
 import net.sourceforge.toscanaj.MainPanel;
-import net.sourceforge.toscanaj.view.diagram.LabelObserver;
+import net.sourceforge.toscanaj.observer.ChangeObservable;
+import net.sourceforge.toscanaj.observer.ChangeObserver;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -12,7 +12,7 @@ import java.util.*;
  * This class encapsulates all information needed to paint a label.
  */
 
-abstract public class LabelInfo implements LabelObservable
+abstract public class LabelInfo implements ChangeObservable
 {
     /**
      * List of LabelObserver implementations currently observing the instance.
@@ -185,8 +185,15 @@ abstract public class LabelInfo implements LabelObservable
     /**
      * Method to add an observer.
      */
-    public void addObserver(LabelObserver observer){
+    public void addObserver(ChangeObserver observer){
         this.labelObservers.addElement(observer);
+    }
+
+    /**
+     * Method to remove an observer.
+     */
+    public void removeObserver(ChangeObserver observer){
+        this.labelObservers.remove(observer);
     }
 
     /**
@@ -196,7 +203,7 @@ abstract public class LabelInfo implements LabelObservable
         if(labelObservers != null){
             Iterator iterator = labelObservers.iterator();
             while(iterator.hasNext()) {
-                ((LabelObserver)iterator.next()).labelChanged();
+                ((ChangeObserver)iterator.next()).update();
             }
         }
     }

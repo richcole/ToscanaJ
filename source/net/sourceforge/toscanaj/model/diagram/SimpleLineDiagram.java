@@ -1,8 +1,5 @@
 package net.sourceforge.toscanaj.model.diagram;
 
-import net.sourceforge.toscanaj.model.diagram.DiagramObservable;
-import net.sourceforge.toscanaj.view.diagram.DiagramObserver;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -14,7 +11,7 @@ import java.util.LinkedList;
  * This class is an abstraction of all diagram related information.
  */
 
-public class SimpleLineDiagram implements DiagramObservable, Diagram2D
+public class SimpleLineDiagram implements Diagram2D
 {
     /**
      * The list of DiagramObserver implementations currently observing changes.
@@ -44,23 +41,6 @@ public class SimpleLineDiagram implements DiagramObservable, Diagram2D
         nodes = new LinkedList();
         lines = new LinkedList();
         diagramObserver = new LinkedList();
-    }
-
-    /**
-     * Method to add observer
-     */
-    public void addObserver(DiagramObserver observer) {
-        this.diagramObserver.add(observer);
-    }
-
-    /**
-     * Send to all obvservers that a change has been made
-     */
-    public void emitChangeSignal() {
-        Iterator iterator = diagramObserver.iterator();
-        while(iterator.hasNext()){
-            ((DiagramObserver)iterator.next()).diagramChanged();
-        }
     }
 
     /**
