@@ -208,14 +208,39 @@ public class DiagramController implements ChangeObservable {
     private DiagramHistory history = new DiagramHistory();
 
     /**
-     *
+     * Stores the number of levels we nest diagrams.
      */
+    private int nestingLevel = 0;
 
     /**
      * Returns the only instance of this class.
      */
     static public DiagramController getController() {
         return singleton;
+    }
+
+    /**
+     * Sets the number of diagrams used for nesting.
+     *
+     * This starts with zero (flat, non-nested diagram).
+     */
+    public void setNestingLevel(int level) {
+        this.nestingLevel = level;
+        int lastPos = history.currentDiagrams.size() - 1;
+        while( lastPos < level ) {
+            if( !history.futureDiagrams.isEmpty() ) {
+                history.currentDiagrams.add(history.futureDiagrams.get(0));
+                history.futureDiagrams.remove(0);
+                lastPos++;
+            }
+        }
+        while( lastPos > level ) {
+            history.futureDiagrams.add(0, history.currentDiagrams.get(lastPos));
+            history.currentDiagrams.remove(lastPos);
+            lastPos--;
+        }
+        history.fireContentsChanged(0,history.getSize()-1);
+        notifyObservers();
     }
 
     /**
@@ -257,7 +282,7 @@ public class DiagramController implements ChangeObservable {
      * will be added to the list of future diagrams.
      */
     public void addDiagram(Diagram2D diagram){
-        if(history.currentDiagrams.isEmpty()) {
+        if(history.currentDiagrams.size() <= this.nestingLevel) {
             history.currentDiagrams.add(new DiagramReference(diagram,null));
         }
         else {
@@ -333,13 +358,22 @@ public class DiagramController implements ChangeObservable {
            throws NoSuchElementException
     {
         if(history.futureDiagrams.isEmpty()) {
-            throw new NoSuchElementException("No diagram left");
+            if(history.currentDiagrams.size() == 1) {
+                // nothing to go to
+                throw new NoSuchElementException("No diagram left");
+            }
+            DiagramReference oldRef = (DiagramReference) history.currentDiagrams.get(0);
+            history.pastDiagrams.add(new DiagramReference( oldRef.getDiagram(), zoomedConcept ) );
+            history.currentDiagrams.remove(0);
         }
-        DiagramReference oldRef = (DiagramReference) history.currentDiagrams.get(0);
-        history.pastDiagrams.add(new DiagramReference( oldRef.getDiagram(), zoomedConcept ) );
-        history.currentDiagrams.remove(0);
-        history.currentDiagrams.add(history.futureDiagrams.get(0));
-        history.futureDiagrams.remove(0);
+        else {
+            // move one of the future diagrams in
+            DiagramReference oldRef = (DiagramReference) history.currentDiagrams.get(0);
+            history.pastDiagrams.add(new DiagramReference( oldRef.getDiagram(), zoomedConcept ) );
+            history.currentDiagrams.remove(0);
+            history.currentDiagrams.add(history.futureDiagrams.get(0));
+            history.futureDiagrams.remove(0);
+        }
         history.fireContentsChanged(0,history.getSize()-1);
         notifyObservers();
     }
@@ -355,9 +389,12 @@ public class DiagramController implements ChangeObservable {
         if(history.pastDiagrams.isEmpty()) {
             throw new NoSuchElementException("No visited diagram left");
         }
-        history.futureDiagrams.add(0,history.currentDiagrams.get(
-                                    history.currentDiagrams.size()-1));
-        history.currentDiagrams.remove(history.currentDiagrams.size()-1);
+        int lastPos = history.currentDiagrams.size() - 1;
+        if( lastPos == this.nestingLevel ) { // we have our nesting level
+            history.futureDiagrams.add(0,history.currentDiagrams.get(
+                                       history.currentDiagrams.size()-1));
+            history.currentDiagrams.remove(history.currentDiagrams.size()-1);
+        }
         history.currentDiagrams.add(0,history.pastDiagrams.get(
                                     history.pastDiagrams.size()-1));
         history.pastDiagrams.remove(history.pastDiagrams.size()-1);
@@ -382,7 +419,22 @@ public class DiagramController implements ChangeObservable {
             // we don't have a diagram to display
             return null;
         }
-        DiagramReference ref = (DiagramReference) history.currentDiagrams.get(0);
+        if(history.currentDiagrams.size() == 1) {
+            // we have only a flat diagram
+            return getSimpleDiagram(0);
+        }
+        else {
+            // create a nested diagram
+            return getNestedDiagram();
+        }
+    }
+
+    /**
+     * Returns a simple (flat) diagram created from the position in the list
+     * of current diagrams.
+     */
+    protected Diagram2D getSimpleDiagram(int pos) {
+        DiagramReference ref = (DiagramReference) history.currentDiagrams.get(pos);
         Diagram2D diag = ref.getDiagram();
         SimpleLineDiagram retVal = new SimpleLineDiagram();
         Concept filter = null;
@@ -448,6 +500,13 @@ public class DiagramController implements ChangeObservable {
         }
 
         return retVal;
+    }
+
+    /**
+     * Returns a nested diagram using the list of current diagrams.
+     */
+    protected Diagram2D getNestedDiagram() {
+        return getSimpleDiagram(0);
     }
 
     /**

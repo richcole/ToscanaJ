@@ -101,16 +101,18 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     // DIAGRAM menu
     private JMenuItem backMenuItem = null;
 
-    private ButtonGroup documentsFilterGroup = null;
     private JRadioButtonMenuItem filterAllMenuItem = null;
     private JRadioButtonMenuItem filterExactMenuItem = null;
 
+    // nesting submenu
+    private JRadioButtonMenuItem noNestingMenuItem = null;
+    private JRadioButtonMenuItem nestingLevel1MenuItem = null;
+    private JRadioButtonMenuItem nestingLevel2MenuItem = null;
+
     // view menu
-    private ButtonGroup documentsDisplayGroup = null;
     private JRadioButtonMenuItem showAllMenuItem = null;
     private JRadioButtonMenuItem showExactMenuItem = null;
 
-    private ButtonGroup labelContentGroup = null;
     private JRadioButtonMenuItem numDocMenuItem = null;
     private JRadioButtonMenuItem listDocMenuItem = null;
 
@@ -295,7 +297,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         diagrMenu.addSeparator();
 
         // menu radio buttons group:
-        this.documentsFilterGroup = new ButtonGroup();
+        ButtonGroup documentsFilterGroup = new ButtonGroup();
 
         this.filterExactMenuItem = new JRadioButtonMenuItem("Filter: use only exact matches");
         this.filterExactMenuItem.addActionListener(this);
@@ -308,16 +310,42 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         documentsFilterGroup.add(this.filterAllMenuItem);
         diagrMenu.add(this.filterAllMenuItem);
 
+        // separator
+        diagrMenu.addSeparator();
+
+        // create the nesting submenu
+        JMenu nestingMenu = new JMenu("Nesting");
+        nestingMenu.setMnemonic(KeyEvent.VK_N);
+        diagrMenu.add(nestingMenu);
+
+        ButtonGroup nestingGroup = new ButtonGroup();
+
+        this.noNestingMenuItem = new JRadioButtonMenuItem("No Nesting");
+        this.noNestingMenuItem.addActionListener(this);
+        this.noNestingMenuItem.setSelected(true);
+        nestingGroup.add(noNestingMenuItem);
+        nestingMenu.add(noNestingMenuItem);
+
+        this.nestingLevel1MenuItem = new JRadioButtonMenuItem("One level");
+        this.nestingLevel1MenuItem.addActionListener(this);
+        nestingGroup.add(nestingLevel1MenuItem);
+        nestingMenu.add(nestingLevel1MenuItem);
+
+        this.nestingLevel2MenuItem = new JRadioButtonMenuItem("Two levels");
+        this.nestingLevel2MenuItem.addActionListener(this);
+        nestingGroup.add(nestingLevel2MenuItem);
+        nestingMenu.add(nestingLevel2MenuItem);
+
         // create the view menu
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
         menubar.add(viewMenu);
 
         // menu radio buttons group:
-        this.labelContentGroup = new ButtonGroup();
+        ButtonGroup labelContentGroup = new ButtonGroup();
 
         // menu radio buttons group:
-        this.documentsDisplayGroup = new ButtonGroup();
+        ButtonGroup documentsDisplayGroup = new ButtonGroup();
 
         this.showExactMenuItem = new JRadioButtonMenuItem("Show only exact matches");
         this.showExactMenuItem.setSelected(true);
@@ -490,7 +518,31 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
             closeMainPanel();
         }
 
-        // view options in Diagram menu
+        // diagram view
+        if (actionSource == this.filterExactMenuItem) {
+            DiagramController.getController().setFilterMethod(DiagramController.FILTER_CONTINGENT);
+        }
+        if (actionSource == this.filterAllMenuItem) {
+            DiagramController.getController().setFilterMethod(DiagramController.FILTER_EXTENT);
+        }
+        // the back button/menu entry
+        if( (actionSource == this.backButton) ||
+            (actionSource == this.backMenuItem) )
+        {
+            DiagramController.getController().back();
+        }
+        // nesting
+        if (actionSource == this.noNestingMenuItem) {
+            DiagramController.getController().setNestingLevel(0);
+        }
+        if (actionSource == this.nestingLevel1MenuItem) {
+            DiagramController.getController().setNestingLevel(1);
+        }
+        if (actionSource == this.nestingLevel2MenuItem) {
+            DiagramController.getController().setNestingLevel(2);
+        }
+
+        // view menu
         if( (actionSource == this.showExactMenuItem) ||
             (actionSource == this.showAllMenuItem) ||
             (actionSource == this.numDocMenuItem) ||
@@ -498,21 +550,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         {
             updateLabelViews();
         }
-        if (actionSource == this.filterExactMenuItem) {
-            DiagramController.getController().setFilterMethod(DiagramController.FILTER_CONTINGENT);
-        }
-        if (actionSource == this.filterAllMenuItem) {
-            DiagramController.getController().setFilterMethod(DiagramController.FILTER_EXTENT);
-        }
         if (actionSource == this.percDistMenuItem) {
             this.diagramView.setShowPercentage(this.percDistMenuItem.getState());
-        }
-
-        // the back button/menu entry
-        if( (actionSource == this.backButton) ||
-            (actionSource == this.backMenuItem) )
-        {
-            DiagramController.getController().back();
         }
 
         // the color entries
