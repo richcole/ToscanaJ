@@ -622,6 +622,31 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		});
 		viewMenu.add(showObjectLabels);
 
+        // @todo rename property entry
+        // @todo disable gradient options while deviation is analyzed
+        if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerOrthogonalityGradient", 0) == 1) {
+            viewMenu.addSeparator();
+            final CombinedGradient redGreenGradient = new CombinedGradient(new LinearGradient(Color.RED, Color.WHITE), 1);
+            redGreenGradient.addGradientPart(new LinearGradient(Color.WHITE, Color.GREEN), 1);
+            final JCheckBoxMenuItem showOrthogonalityMenuItem = new JCheckBoxMenuItem("Analyze orthogonality");
+            showOrthogonalityMenuItem.addActionListener(new ActionListener() {
+                private IntervalType lastIntervalType; 
+                public void actionPerformed(ActionEvent e) {
+                    DiagramSchema diagramSchema = diagramView.getDiagramSchema();
+                    if(showOrthogonalityMenuItem.isSelected()) {
+                        this.lastIntervalType = diagramSchema.getGradientType();
+                        setDiagramGradient(redGreenGradient, ConceptInterpreter.INTERVAL_TYPE_ORTHOGONALTIY);
+                        diagramView.getConceptInterpreter().showDeviation(true);
+                    } else {
+                        setDiagramGradient(diagramSchema.getDefaultGradient(), this.lastIntervalType);
+                        diagramView.getConceptInterpreter().showDeviation(false);
+                    }
+                    diagramView.updateLabelEntries();
+                }
+            });
+            viewMenu.add(showOrthogonalityMenuItem);
+        }
+
         if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerGradientOptions", 0) == 1) {
             viewMenu.addSeparator();
             ButtonGroup colorGradientGroup = new ButtonGroup();
@@ -650,18 +675,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             colorGradientGroup.add(showAllMenuItem);
             viewMenu.add(showAllMenuItem);
 
-            if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerOrthogonalityGradient", 0) == 1) {
-                final CombinedGradient redGreenGradient = new CombinedGradient(new LinearGradient(Color.RED, Color.WHITE), 1);
-                redGreenGradient.addGradientPart(new LinearGradient(Color.WHITE, Color.GREEN), 1);
-                JRadioButtonMenuItem showOrthogonalityMenuItem = new JRadioButtonMenuItem("Use colors for orthogonality deviation");
-                showOrthogonalityMenuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-						setDiagramGradient(redGreenGradient, ConceptInterpreter.INTERVAL_TYPE_ORTHOGONALTIY);
-                    }
-                });
-                colorGradientGroup.add(showOrthogonalityMenuItem);
-                viewMenu.add(showOrthogonalityMenuItem);
-            }
         }
 
 		JMenu colorModeMenu = new JMenu("Color mode");

@@ -23,6 +23,7 @@ import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 public abstract class AbstractConceptInterperter implements ConceptInterpreter, EventBrokerListener {
+    private boolean showDeviation = false;
 	private Hashtable contingentSizes = new Hashtable();
 	private Hashtable extentSizes = new Hashtable();
 	
@@ -122,14 +123,6 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 		return count;
 	}
 	
-
-	/**
-	 * Gives the relation of the contingent size of the concept given and the largest contingent size queried in the
-	 * given context up to now.
-	 *
-	 * Note that it is not ensured that all contingent sizes have been queried before this call, this is up to the
-	 * caller.
-	 */
 	public NormedIntervalSource getIntervalSource(IntervalType type) {
 		if(type == INTERVAL_TYPE_CONTINGENT) {
 			return new NormedIntervalSource(){
@@ -186,11 +179,10 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 		if(!isRealized(concept, context)) {
 			return null;
 		}
-		Object[] retVal;
 		if (query == ListQuery.KEY_LIST_QUERY) {
 			int objectCount = getObjectCount(concept, context);
 			if( objectCount != 0) {
-				retVal = new Object[objectCount];
+				Object[] retVal = new Object[objectCount];
 				Iterator it = getObjectSetIterator(concept, context);
 				int pos = 0;
 				while (it.hasNext()) {
@@ -198,14 +190,34 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 					retVal[pos] = o;
 					pos++;
 				}
+                return retVal;
 			} else {
 				return null;
 			}
 		} else if (query == AggregateQuery.COUNT_QUERY) {
-			retVal = executeObjectCountQuery(concept, context);
+            if(this.showDeviation) {
+                if(context.getNestingContexts().size() == 0) {
+                    return executeObjectCountQuery(concept, context);
+                }
+                DeviationValuesRef deviationValues =
+                        calculateExpectedSize(concept, context); 
+                double expectedSize = deviationValues.getExpectedSize();
+                int objectCount = getObjectCount(concept, context); 
+                if ((objectCount == 0) && (expectedSize == 0.0)) {
+                    return null;
+                }
+                if (objectCount == expectedSize) {
+                    return executeObjectCountQuery(concept, context);
+                }
+                NumberFormat format = DecimalFormat.getNumberInstance();
+                format.setMaximumFractionDigits(1);
+                String returnValue = objectCount + " [exp: " + format.format(expectedSize) + "]";
+                return new Object[]{getObject(returnValue, concept, context)}; 
+            } else {
+                return executeObjectCountQuery(concept, context);
+            }
 		} else if (query == AggregateQuery.PERCENT_QUERY) {
 			int objectCount = getObjectCount(concept, context);
-			retVal = new Object[1];
 			if( objectCount != 0) {
 				boolean oldMode = context.getObjectDisplayMode();
 				context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
@@ -214,33 +226,13 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 				NumberFormat format = DecimalFormat.getNumberInstance();
 				format.setMaximumFractionDigits(2);
 				String objectValue = format.format(100 * objectCount/(double)fullExtent) + " %";
-				retVal[0] = getObject(objectValue, concept, context);				
+                return new Object[]{getObject(objectValue, concept, context)};				
 			} else {
 				return null;
 			}
-		} else if (query == AggregateQuery.DEVIATION_QUERY) {
-			retVal = new Object[1];
-			if(context.getNestingContexts().size() == 0) {
-				return executeObjectCountQuery(concept, context);
-			}
-			DeviationValuesRef deviationValues =
-                    calculateExpectedSize(concept, context); 
-			double expectedSize = deviationValues.getExpectedSize();
-			int objectCount = getObjectCount(concept, context); 
-			if ((objectCount == 0) && (expectedSize == 0.0)) {
-				return null;
-			}
-			if (objectCount == expectedSize) {
-				return executeObjectCountQuery(concept, context);
-			}
-			NumberFormat format = DecimalFormat.getNumberInstance();
-			format.setMaximumFractionDigits(1);
-			String returnValue = objectCount + " [exp: " + format.format(expectedSize) + "]";
-			retVal[0] = getObject(returnValue, concept, context); 
 		} else {
 			return handleNonDefaultQuery(query, concept, context);
 		}
-		return retVal;
 	}
 
 	private DeviationValuesRef calculateExpectedSize(Concept concept,
@@ -379,5 +371,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 		this.extentSizes.clear();
 	}
 	
-
+    public void showDeviation(boolean show) {
+        this.showDeviation = show;    
+    }
 }

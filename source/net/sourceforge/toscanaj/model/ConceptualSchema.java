@@ -202,7 +202,6 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
         queries.add(AggregateQuery.COUNT_QUERY);
 		queries.add(ListQuery.KEY_LIST_QUERY);
 		queries.add(AggregateQuery.PERCENT_QUERY);
-		queries.add(AggregateQuery.DEVIATION_QUERY);
     }
 
 

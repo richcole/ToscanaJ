@@ -304,7 +304,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         repaint();
     }
 
-    private void updateLabelEntries() {
+    public void updateLabelEntries() {
         Iterator it = this.getCanvasItemsByType(LabelView.class).iterator();
         while (it.hasNext()) {
             LabelView lv = (LabelView) it.next();

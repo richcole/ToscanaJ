@@ -70,4 +70,6 @@ public interface ConceptInterpreter {
     boolean isRealized(Concept concept, ConceptInterpretationContext context);
 
     Object[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context);
+    
+    void showDeviation(boolean show);
 }
