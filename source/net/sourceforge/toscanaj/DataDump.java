@@ -79,7 +79,7 @@ public class DataDump {
         /// @todo don't generate multiple connections, instead send the same connection object.
         if (filterClause != null) {
             try {
-                filterConcept = new DatabaseConnectedConcept(schema.getDatabaseInfo());
+                filterConcept = new DatabaseConnectedConcept();
             } catch (Exception e) {
                 System.err.println("Couldn't create filter for database");
                 System.exit(4);

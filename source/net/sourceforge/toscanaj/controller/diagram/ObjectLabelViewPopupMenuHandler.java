@@ -9,9 +9,9 @@ package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.canvas.events.CanvasItemEventWithPosition;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.events.BrokerEventListener;
-import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.model.database.*;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 
@@ -24,12 +24,20 @@ import java.util.List;
 
 public class ObjectLabelViewPopupMenuHandler implements BrokerEventListener {
     private DiagramView diagramView;
+    private List queries;
 
-    public ObjectLabelViewPopupMenuHandler(DiagramView diagramView) {
+    public ObjectLabelViewPopupMenuHandler(DiagramView diagramView, EventBroker schemaBroker) {
         this.diagramView = diagramView;
+        this.queries = null;
+        schemaBroker.subscribe(this,ConceptualSchemaChangeEvent.class,Object.class);
     }
 
     public void processEvent(Event e) {
+        if(e instanceof ConceptualSchemaChangeEvent) {
+            ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
+            this.queries = csce.getConceptualSchema().getQueries();
+            return;
+        }
         CanvasItemEventWithPosition itemEvent = null;
         try {
             itemEvent = (CanvasItemEventWithPosition) e;
@@ -52,16 +60,18 @@ public class ObjectLabelViewPopupMenuHandler implements BrokerEventListener {
         if (object == null) {
             return;
         }
-        List queries = Query.getQueries();
+        int numberOfQueries = 0;
+        if(this.queries != null) {
+            numberOfQueries = this.queries.size();
+        }
         List objectViewNames = DatabaseViewerManager.getObjectViewNames(object);
         List objectListViewNames = DatabaseViewerManager.getObjectListViewNames(object);
-        if (queries.size() + objectViewNames.size() + objectListViewNames.size() == 0) { // nothing to display
+        if (numberOfQueries + objectViewNames.size() + objectListViewNames.size() == 0) { // nothing to display
             return;
         }
         // create the menu
         JPopupMenu popupMenu = new JPopupMenu();
-        JMenuItem menuItem;
-        if (queries.size() != 0) {
+        if (numberOfQueries != 0) {
             addQueryOptions(queries, labelView, popupMenu);
         }
         if (objectViewNames.size() != 0) {

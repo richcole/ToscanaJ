@@ -9,11 +9,9 @@ package net.sourceforge.toscanaj.model;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.model.database.DatabaseInfo;
-import net.sourceforge.toscanaj.model.database.DatabaseSchema;
+import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.events.*;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.util.xmlize.*;
 import org.jdom.Element;
 import util.CollectionFactory;
@@ -42,6 +40,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
      * List of scales
      */
     private List scales;
+
+    private List queries = new ArrayList();
 
     /**
      * List of tables and views in the database
@@ -88,7 +88,6 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     public Element toXML() {
         Element retVal = new Element(CONCEPTUAL_SCHEMA_ELEMENT_NAME);
         retVal.setAttribute(VERSION_ATTRIBUTE_NAME, VERSION_ATTRIBUTE_VALUE);
-        Element descriptionElement = new Element(DESCRIPTION_ELEMENT_NAME);
         retVal.addContent(description);
         retVal.addContent(databaseInfo.toXML());
         retVal.addContent(dbScheme.toXML());
@@ -115,11 +114,6 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
             Element element = (Element) iterator.next();
             SimpleLineDiagram diagram = new SimpleLineDiagram(element);
             diagrams.add(diagram);
-            for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
-                DiagramNode node = (DiagramNode) diagram.getNode(i);
-                DatabaseConnectedConcept concept = (DatabaseConnectedConcept) node.getConcept();
-                concept.setDatabase(databaseInfo);
-            }
         }
     }
 
@@ -214,5 +208,13 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
 
     public DatabaseSchema getDbScheme() {
         return dbScheme;
+    }
+
+    public List getQueries() {
+        return queries;
+    }
+
+    public void addQuery(Query query) {
+        this.queries.add(query);
     }
 }

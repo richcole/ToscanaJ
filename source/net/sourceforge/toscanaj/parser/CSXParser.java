@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * This class reads a CSX file and does nothing with it except complaining.
  *
- * @ToDo: make code more stable and give more error messages.
+ * @todo make code more stable and give more error messages.
  */
 public class CSXParser {
     /**
@@ -133,8 +133,7 @@ public class CSXParser {
     /**
      * Parses the HTML description of the schema (if available).
      */
-    private static void parseDescription()
-            throws DataFormatException {
+    private static void parseDescription() {
         Element descElem = _Document.getRootElement().getChild("description");
         if (descElem != null) {
             _Schema.setDescription(descElem.detach());
@@ -276,7 +275,7 @@ public class CSXParser {
                             posElem.getAttribute("x").getDoubleValue(),
                             posElem.getAttribute("y").getDoubleValue());
                 } catch (DataConversionException e) {
-                    /** @TODO: give more info here */
+                    /// @todo: give more info here
                     throw new DataFormatException(
                             "Position of some concept does not contain double.");
                 }
@@ -350,8 +349,7 @@ public class CSXParser {
      */
     private static Concept parseDBConcept(Element conceptElem) {
         // create the concept
-        DatabaseConnectedConcept concept =
-                new DatabaseConnectedConcept(_Schema.getDatabaseInfo());
+        DatabaseConnectedConcept concept = new DatabaseConnectedConcept();
 
         // get the object contingent
         Element contElem = conceptElem.getChild("objectContingent");
@@ -407,7 +405,7 @@ public class CSXParser {
                         el.getAttribute("x").getDoubleValue(),
                         el.getAttribute("y").getDoubleValue()));
             } catch (DataConversionException e) {
-                /** @TODO: give more info here */
+                /// @todo give more info here
                 throw new DataFormatException(
                         "Offset of some label does not contain double.");
             }
@@ -431,7 +429,7 @@ public class CSXParser {
             } else if (text.compareTo("left") == 0) {
                 label.setTextAlignment(LabelInfo.ALIGNLEFT);
             } else {
-                /** @TODO: give more info here */
+                /// @todo give more info here
                 throw new DataFormatException("Unknown text alignment");
             }
         }
@@ -509,8 +507,10 @@ public class CSXParser {
             // add default queries
             DatabaseQuery query = dbInfo.createAggregateQuery("Number of Objects", "");
             query.insertQueryColumn("Count", "0", null, "count(*)");
+            _Schema.addQuery(query);
             query = dbInfo.createListQuery("List of Objects", "", false);
             query.insertQueryColumn("Object Name", null, null, keyName);
+            _Schema.addQuery(query);
         }
         if (queryElem != null) {
             Iterator it = queryElem.getChildren("listQuery").iterator();
@@ -532,6 +532,7 @@ public class CSXParser {
                     String sql = curCol.getText();
                     query.insertQueryColumn(colName, format, separator, sql);
                 }
+                _Schema.addQuery(query);
             }
             it = queryElem.getChildren("aggregateQuery").iterator();
             while (it.hasNext()) {
@@ -550,6 +551,7 @@ public class CSXParser {
                     String sql = curCol.getText();
                     query.insertQueryColumn(colName, format, separator, sql);
                 }
+                _Schema.addQuery(query);
             }
         }
     }

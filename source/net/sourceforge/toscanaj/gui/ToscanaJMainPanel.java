@@ -21,7 +21,6 @@ import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseQuery;
-import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
@@ -243,7 +242,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 CanvasBackground.class
         );
         diagramView.getController().getEventBroker().subscribe(
-                new ObjectLabelViewPopupMenuHandler(diagramView),
+                new ObjectLabelViewPopupMenuHandler(diagramView, this.broker),
                 CanvasItemContextMenuRequestEvent.class,
                 ObjectLabelView.class
         );
@@ -462,7 +461,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
          *       though I could not find another way to get this. Try again...
          */
         if (this.conceptualSchema != null) {
-            Iterator it = Query.getQueries().iterator();
+            Iterator it = this.conceptualSchema.getQueries().iterator();
             boolean first = true;
             String allowedChars = "abcdefghijklmnopqrstuvwxyz";
             String usedChars = "ax";
@@ -740,7 +739,6 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         }
 
         DatabaseViewerManager.resetRegistry();
-        Query.clearQueries();
         if (DatabaseConnection.getConnection().isConnected()) {
             try {
                 DatabaseConnection.getConnection().disconnect();
