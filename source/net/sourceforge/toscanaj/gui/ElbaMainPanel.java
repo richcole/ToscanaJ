@@ -80,6 +80,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
      */
     private PanelStackView mainView;
     private DatabaseSchemaView databaseSchemaView;
+    private ScaleEditingViewDialog scaleEditingViewDialog;
     private ScaleEditingView scaleView;
     private DiagramEditingView diagramView;
     private DatabaseConnectionInformationView connectionInformationView;
@@ -131,15 +132,33 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     public void createViews() {
 		final JFrame frame = this;
 		JPanel mainView = new JPanel(new GridBagLayout());
+		scaleEditingViewDialog= new ScaleEditingViewDialog(frame, conceptualSchema , eventBroker,
+						databaseConnection );
+		connectionInformationView =
+						new DatabaseConnectionInformationView(this, conceptualSchema, eventBroker);
+		schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
 		JPanel buttonPane = new JPanel(new GridBagLayout());
 		JButton newDiagramButton = new JButton("New Diagram...");
 		newDiagramButton.addActionListener(new ActionListener (){
 			public void actionPerformed(ActionEvent e){
-				
-				ScaleEditingViewDialog scale= new ScaleEditingViewDialog(frame, conceptualSchema , eventBroker,
-				databaseConnection );
+				scaleEditingViewDialog.show();
 			}
+		});
 		
+		JButton schemaDescriptionButton = new JButton("Schema Description");
+		schemaDescriptionButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				schemaDescriptionView.setContent(conceptualSchema.getDescription());
+				schemaDescriptionView.show();
+				conceptualSchema.setDescription(schemaDescriptionView.getContent());
+			}
+		}		);
+		
+		JButton databaseConnectionButton = new JButton("Database Connection");
+		databaseConnectionButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				connectionInformationView.show();
+			}
 		});
 		
 		buttonPane.add(newDiagramButton, new GridBagConstraints(
@@ -150,8 +169,23 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 						2,2
 		));
 		
+		buttonPane.add(schemaDescriptionButton, new GridBagConstraints(
+						1,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,
+						new Insets(5,1,1,1),
+						2,2
+		));
+		
+		buttonPane.add(databaseConnectionButton, new GridBagConstraints(
+						2,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,
+						new Insets(5,1,1,1),
+						2,2
+		));
 		buttonPane.add(new JPanel(), new GridBagConstraints(
-						1,0,1,1,1,1,
+						3,0,1,1,1,1,
 						GridBagConstraints.NORTHWEST,
 						GridBagConstraints.HORIZONTAL,
 						new Insets(1,1,1,1),
@@ -159,10 +193,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 			));
 		
 		
-        connectionInformationView =
-                new DatabaseConnectionInformationView(this, conceptualSchema, eventBroker);
-
-        schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
+        
+      
         
         diagramView = new DiagramEditingView(conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("ElbaMainPanel", "diagramViewDivider", 200));
@@ -252,14 +284,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         });
         fileMenu.add(importCSCMenuItem);
 
-        JMenuItem dbConnectionMenuItem = new JMenuItem("Database connection...");
-        dbConnectionMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                connectionInformationView.show();
-            }
-        });
-        fileMenu.add(dbConnectionMenuItem);
-
         mruMenu = new JMenu("Reopen");
         recreateMruMenu();
         fileMenu.add(mruMenu);
@@ -280,20 +304,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 )
         );
         fileMenu.add(exitMenuItem);
-
-        editMenu = new JMenu("Edit");
-        editMenu.setMnemonic(KeyEvent.VK_E);
-        menuBar.add(editMenu);
-
-        JMenuItem editSchemaDescriptionMenuItem = new JMenuItem("Schema Description");
-        editSchemaDescriptionMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                schemaDescriptionView.setContent(conceptualSchema.getDescription());
-                schemaDescriptionView.show();
-                conceptualSchema.setDescription(schemaDescriptionView.getContent());
-            }
-        });
-        editMenu.add(editSchemaDescriptionMenuItem);
         
         JMenu toolMenu = new JMenu("Tools");
         toolMenu.setMnemonic(KeyEvent.VK_T);
