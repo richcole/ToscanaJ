@@ -38,10 +38,12 @@ public class LineView extends CanvasItem {
     private NodeView fromView;
     private NodeView toView;
     
-	private Color showRatioColor;
-	private Color showRatioFillColor;
-    private float fontSize;
-    private boolean dynamicLineWidth;
+	private Color showRatioColor = new Color(204,255,204);
+	private Color showRatioFillColor = new Color(255,204,204);
+    private float fontSize  = 6;
+    private boolean dynamicLineWidth = false;
+    private String labelFormat = "0.## %";
+    private boolean useExtentLabels = false;
 
     /**
      * Creates a view for the given DiagramLine.
@@ -50,9 +52,11 @@ public class LineView extends CanvasItem {
         this.diagramLine = diagramLine;
         this.fromView = fromView;
         this.toView = toView;
-		this.showRatioColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioColor", null);
-		this.showRatioFillColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioFillColor", null);
-        this.fontSize = ConfigurationManager.fetchFloat("LineView", "labelFontSize", 8);
+        this.useExtentLabels = (ConfigurationManager.fetchInt("LineView", "showExtentRatioLabels", 0) == 1);
+		this.labelFormat = ConfigurationManager.fetchString("LineView", "labelFormat", this.labelFormat);
+		this.showRatioColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioColor", this.showRatioColor);
+		this.showRatioFillColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioFillColor", this.showRatioFillColor);
+        this.fontSize = ConfigurationManager.fetchFloat("LineView", "labelFontSize", 6);
         this.dynamicLineWidth = ConfigurationManager.fetchString("LineView", "lineWidth", "").equals("extentRatio");
     }
 
@@ -94,7 +98,7 @@ public class LineView extends CanvasItem {
         graphics.setPaint(oldPaint);
         graphics.setStroke(oldStroke);
         
-        if(this.showRatioColor != null) {
+        if(this.useExtentLabels) {
             drawExtentRatio(graphics);
         }
     }
@@ -113,7 +117,7 @@ public class LineView extends CanvasItem {
 			return;
 		}
 
-		DecimalFormat format = new DecimalFormat("#.## %");
+		DecimalFormat format = new DecimalFormat(this.labelFormat);
 		String formattedNumber = format.format(ratio);
         double x = (from.getX() + to.getX()) / 2; 
         double y = (from.getY() + to.getY()) / 2;
