@@ -12,6 +12,9 @@ import net.sourceforge.toscanaj.gui.MainPanel;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.*;
+import net.sourceforge.toscanaj.gui.dialog.CheckDuplicateFileChooser;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
@@ -30,7 +33,10 @@ import org.tockit.tupleware.source.sql.SqlQueryEngine;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
 
 public class TuplewareMainPanel extends JFrame implements MainPanel {
@@ -191,6 +197,15 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
         addTupleSourceMenuItem(tuplesMenu, this, new TextSource());
         addTupleSourceMenuItem(tuplesMenu, this, new SqlQueryEngine());
 		addTupleSourceMenuItem(tuplesMenu, this, new RdqlQueryEngine());
+		
+		tuplesMenu.addSeparator();
+		JMenuItem saveTuplesItem = new JMenuItem("Save tuples...");
+		saveTuplesItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+            	saveTuples();
+            }
+        });
+        tuplesMenu.add(saveTuplesItem);
 
 		menuBar.add(tuplesMenu);
 
@@ -226,6 +241,48 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
 
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(helpMenu);
+    }
+
+    protected void saveTuples() {
+		final JFileChooser saveDialog;
+		String[] csxExtension = {"csx"};
+		ExtensionFileFilter fileFilter = new ExtensionFileFilter(new String[]{"tuples"},"Tuple Set File");
+		ExtensionFileFilter[] filterArray = { fileFilter };
+		if (this.lastFileRead != null) {
+			saveDialog = new CheckDuplicateFileChooser(this.lastFileRead, filterArray);
+	        
+		} else {
+			saveDialog = new CheckDuplicateFileChooser(new File(System.getProperty("user.dir")), filterArray);
+		}
+		
+		if (saveDialog.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+			try {
+				this.lastFileRead = saveDialog.getSelectedFile();
+				BufferedWriter writer = new BufferedWriter(new FileWriter(this.lastFileRead));
+				for (int i = 0; i < this.tuples.getVariableNames().length; i++) {
+                    String name = this.tuples.getVariableNames()[i];
+                    if(i!=0) {
+                    	writer.write('\t');
+                    }
+                    writer.write(name);
+                }
+                writer.newLine();
+                for (Iterator iter = this.tuples.getTuples().iterator(); iter.hasNext();) {
+                    Object[] tuple = (Object[]) iter.next();
+                    for (int i = 0; i < tuple.length; i++) {
+                        Object object = tuple[i];
+						if(i!=0) {
+							writer.write('\t');
+						}
+                        writer.write(object.toString());
+                    }
+					writer.newLine();
+                }
+                writer.close();
+			} catch (IOException e) {
+				ErrorDialog.showError(this, e, "Failed to write file");
+			}
+		}
     }
 
     private void addTupleSourceMenuItem(JMenu tuplesMenu,
