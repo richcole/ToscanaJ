@@ -138,8 +138,11 @@ public class DiagramView extends Canvas implements ChangeObserver {
             showDiagram(DiagramController.getController().getCurrentDiagram());
         } else {
             requestScreenTransformUpdate();
-            showDiagram(this.diagram, false);
         }
+    }
+    
+    public void updateDiagram() {
+        showDiagram(this.diagram, false);
     }
 
     protected boolean isScreenTransformDirty() {

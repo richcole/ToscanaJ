@@ -263,7 +263,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     protected void removeTransitions() {
         SimpleLineDiagram diagram = (SimpleLineDiagram) this.diagramView.getDiagram();
         diagram.removeExtraCanvasItems();
-        this.diagramView.update(this);
+        this.diagramView.updateDiagram();
     }
 
     private JPanel createBasicSettingsPanel() {
@@ -663,7 +663,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         this.timeController.setCurrentTime(length + 1);
         addTransitions(length, false);
         
-        this.diagramView.update(this);
+        this.diagramView.updateDiagram();
     }
 
     private void startStepping() {
@@ -684,7 +684,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             this.timeController.setEndTime(length);
             addTransitions(this.timeController.getAllFadedTime(), true);
         }
-        this.diagramView.update(this);
+        this.diagramView.updateDiagram();
         gotoStep(1);
     }
 
@@ -711,7 +711,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         	addTransitions(this.timeController.getAllFadedTime(), true);
         }
         this.animating = true;
-        this.diagramView.update(this);
+        this.diagramView.updateDiagram();
     }
 
     private void addTransitions(double newTargetTime, boolean highlightStates) {
