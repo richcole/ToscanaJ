@@ -287,7 +287,7 @@ public abstract class AbstractConceptImplementation implements Concept
     public int getIntentSize() {
         if(intentSize < 0) { // not yet calculated
             intentSize = 0;
-            Iterator it = ideal.iterator();
+            Iterator it = filter.iterator();
             while( it.hasNext() ) {
                 Concept cur = (Concept) it.next();
                 intentSize += cur.getAttributeContingentSize();
