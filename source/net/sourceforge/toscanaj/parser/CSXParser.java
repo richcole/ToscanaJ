@@ -280,7 +280,7 @@ public class CSXParser {
                 }
 
                 // create the concept
-                Concept concept = parseDBConcept(conceptElem);
+                Concept concept = parseConcept(conceptElem);
 
                 // parse the label layout information if needed
                 LabelInfo objLabel = new LabelInfo();
@@ -346,38 +346,28 @@ public class CSXParser {
      * Creates a concept for DB access from the information in the given
      * XML element.
      */
-    private static Concept parseDBConcept(Element conceptElem) {
+    private static Concept parseConcept(Element conceptElem) {
         // create the concept
         ConceptImplementation concept = new ConceptImplementation();
 
         // get the object contingent
         Element contElem = conceptElem.getChild("objectContingent");
         List contingent = contElem.getChildren("objectRef");
-        Iterator it3 = contingent.iterator();
-        String query = null;
-        if (it3.hasNext()) {
-            query = "";
-        }
-        while (it3.hasNext()) {
-            Element ref = (Element) it3.next();
-            String objClause = (String) _Objects.get(ref.getText());
-            if (objClause != null) {
-                query = query + "(" + objClause + ")";
-                if (it3.hasNext()) {
-                    query = query + " OR ";
-                }
+        Iterator iterator = contingent.iterator();
+        while (iterator.hasNext()) {
+            Element ref = (Element) iterator.next();
+            Object object = _Objects.get(ref.getText());
+            if (object != null) {
+                concept.addObject(object);
             }
-        }
-        if (query != null && query.length() != 0) {
-            concept.addObject(query);
         }
 
         // get the attribute contingent
         contElem = conceptElem.getChild("attributeContingent");
         contingent = contElem.getChildren("attributeRef");
-        it3 = contingent.iterator();
-        while (it3.hasNext()) {
-            Element ref = (Element) it3.next();
+        iterator = contingent.iterator();
+        while (iterator.hasNext()) {
+            Element ref = (Element) iterator.next();
             Attribute attr = (Attribute) _Attributes.get(ref.getText());
             if (attr != null) {
                 concept.addAttribute(attr);
