@@ -465,8 +465,8 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     	boolean diagramAvailable = this.diagramView.getDiagram() != null;
 		this.zoomInButton.setEnabled(diagramAvailable);
 		this.zoomOutButton.setEnabled(diagramAvailable);
-        this.gridIncreaseButton.setEnabled(diagramAvailable);
-        this.gridDecreaseButton.setEnabled(diagramAvailable);
+        this.gridIncreaseButton.setEnabled(diagramAvailable && this.gridEnabledCheckBox.isSelected());
+        this.gridDecreaseButton.setEnabled(diagramAvailable && this.gridEnabledCheckBox.isSelected());
         this.gridEnabledCheckBox.setEnabled(diagramAvailable);
 		this.editContextButton.setEnabled(diagramAvailable);
 		this.editDiagramDescButton.setEnabled(diagramAvailable);
