@@ -214,7 +214,10 @@ public class DiagramView extends Canvas implements ChangeObserver {
             }
             return;
         }
-        getParent().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        if (getParent()!=null) {
+            getParent().setCursor(
+                    Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        }
         addLayer("lines-0");
         addLayer("nodes-0");
         addLayer("connectors-0");
@@ -234,7 +237,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
         	ErrorDialog.showError(this, e, "Showing diagram failed", "The selected diagram can not be shown");
         	showDiagram(null);
         }
-		getParent().setCursor(Cursor.getDefaultCursor());
+        if (getParent()!=null) {
+            getParent().setCursor(Cursor.getDefaultCursor());
+        }
     }
 
 	private void removeSubscriptions() {
