@@ -291,7 +291,8 @@ public class DiagramController implements ChangeObservable {
             throwUnknownFilterError();
         }
 
-        return new DiagramNode(oldNode.getPosition(),
+        return new DiagramNode("filtered:" + oldNode.getIdentifier(),
+                oldNode.getPosition(),
                 concept,
                 oldNode.getAttributeLabelInfo(),
                 oldNode.getObjectLabelInfo(),

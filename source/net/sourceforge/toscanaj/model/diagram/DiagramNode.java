@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.model.XML_Serializable;
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
 
 import java.awt.geom.Point2D;
+import java.util.HashSet;
 
 import org.jdom.Element;
 
@@ -29,6 +30,8 @@ public class DiagramNode implements XML_Serializable {
      * later.
      */
     private static final int RADIUS = 10;
+
+    private String identifier;
 
     /**
      * The concept the node represents.
@@ -63,9 +66,10 @@ public class DiagramNode implements XML_Serializable {
     private static final String ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME = "attributeLabelStyle";
     private static final String OBJECT_LABEL_STYLE_ELEMENT_NAME = "objectLabelStyle";
 
-    public DiagramNode(Point2D position, Concept concept,
+    public DiagramNode(String identifier, Point2D position, Concept concept,
                        LabelInfo attributeLabel, LabelInfo objectLabel,
                        DiagramNode outerNode) {
+        this.identifier = identifier;
         this.position = position;
         this.concept = concept;
         this.attributeLabel = attributeLabel;
@@ -85,7 +89,7 @@ public class DiagramNode implements XML_Serializable {
 
     public Element toXML() {
         Element retVal = new Element(NODE_ELEMENT_NAME);
-        retVal.setAttribute(ID_ATTRIBUTE_NAME, String.valueOf(hashCode()));
+        retVal.setAttribute(ID_ATTRIBUTE_NAME, identifier);
         Element positionElem = new Element(POSITION_ELEMENT_NAME);
         positionElem.setAttribute(POSITION_X_ATTRIBUTE_NAME, String.valueOf(position.getX()));
         positionElem.setAttribute(POSITION_Y_ATTRIBUTE_NAME, String.valueOf(position.getY()));
@@ -106,6 +110,10 @@ public class DiagramNode implements XML_Serializable {
 
     public void readXML(Element elem) throws XML_SyntaxError {
         throw new XML_SyntaxError("Not yet implemented");
+    }
+
+    public String getIdentifier() {
+        return identifier;
     }
 
     public DiagramNode getOuterNode() {

@@ -183,13 +183,15 @@ public class DataDump {
             DiagramNode oldNode = inputDiagram.getNode(i);
             DiagramNode newNode;
             if (filterConcept == null) {
-                newNode = new DiagramNode(oldNode.getPosition(),
+                newNode = new DiagramNode("filtered:" + oldNode.getIdentifier(),
+                        oldNode.getPosition(),
                         oldNode.getConcept(),
                         oldNode.getAttributeLabelInfo(),
                         oldNode.getObjectLabelInfo(),
                         null);
             } else {
-                newNode = new DiagramNode(oldNode.getPosition(),
+                newNode = new DiagramNode("filtered:" + oldNode.getIdentifier(),
+                        oldNode.getPosition(),
                         oldNode.getConcept().filterByContingent(filterConcept),
                         oldNode.getAttributeLabelInfo(),
                         oldNode.getObjectLabelInfo(),

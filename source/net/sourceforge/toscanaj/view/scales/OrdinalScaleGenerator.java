@@ -152,7 +152,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         ret.setTitle(scaleDialog.getDiagramTitle());
 
          Concept concept = new DummyConcept();
-         DiagramNode node = new DiagramNode(
+         DiagramNode node = new DiagramNode( "dummy",
                  new Point2D.Double(0., 0.),
                  concept,
                  null,

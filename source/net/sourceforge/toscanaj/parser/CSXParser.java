@@ -302,15 +302,16 @@ public class CSXParser {
                         parseLabelStyle(attrLabel, style);
                     }
                 }
+                String identifier = conceptElem.getAttribute("id").getValue();
 
                 // create the node
-                DiagramNode node = new DiagramNode(position, concept, attrLabel, objLabel, null);
+                DiagramNode node = new DiagramNode(identifier, position, concept, attrLabel, objLabel, null);
 
                 // put in into the diagram
                 diagram.addNode(node);
 
                 // store the node for later retrieval (lines)
-                nodes.put(conceptElem.getAttribute("id").getValue(), node);
+                nodes.put(identifier, node);
             }
 
             // get the edges and map them to the points
