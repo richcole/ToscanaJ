@@ -421,6 +421,7 @@ public class ElbaMainPanel
 				exportStatisticalData();
 			}
 		});
+		dumpStatisticalDataMenuItem.setEnabled(false);
 		toolMenu.add(dumpStatisticalDataMenuItem);
 		dumpSQLMenuItem = new JMenuItem("Export Database as SQL...");
 		dumpSQLMenuItem.setMnemonic(KeyEvent.VK_D);
@@ -429,6 +430,7 @@ public class ElbaMainPanel
 				exportSQLScript();
 			}
 		});
+		dumpSQLMenuItem.setEnabled(false);
 		toolMenu.add(dumpSQLMenuItem);
 		menuBar.add(toolMenu);
 
@@ -576,6 +578,9 @@ public class ElbaMainPanel
 				DatabaseViewerManager.resetRegistry();
 				connectDatabase();
 			}
+			if (e instanceof DatabaseInfoChangedEvent) {
+				connectDatabase();
+			}
 		}
 		if (e instanceof ConceptualSchemaLoadedEvent) {
 			ConceptualSchemaLoadedEvent loadEvent =
@@ -586,6 +591,8 @@ public class ElbaMainPanel
 	}
 
 	protected void connectDatabase() {
+	    this.dumpStatisticalDataMenuItem.setEnabled(false);
+	    this.dumpSQLMenuItem.setEnabled(false);
 		if (databaseConnection.isConnected()) {
 			try {
 				databaseConnection.disconnect();
@@ -616,6 +623,8 @@ public class ElbaMainPanel
 					"DB Connection failed",
 					"Can not connect to the database:\n" + ex.getMessage());
 			}
+		    this.dumpStatisticalDataMenuItem.setEnabled(true);
+		    this.dumpSQLMenuItem.setEnabled(true);
 		}
 	}
 
