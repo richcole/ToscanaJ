@@ -183,6 +183,7 @@ public class ElbaMainPanel
             }
         }
 
+		this.setVisible(true);
         ConfigurationManager.restorePlacement(
             CONFIGURATION_SECTION_NAME,
             this,

@@ -234,6 +234,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             }
         }
 
+		this.setVisible(true);
         ConfigurationManager.restorePlacement(
             "SienaMainPanel",
             this,
