@@ -101,32 +101,47 @@ public class DatabaseConnectionDialog extends JDialog {
             updateContents();
 
 			this.setLayout(new GridBagLayout());
-            this.add(embDBMSRadioButton,new GridBagConstraints(
-                    0,0,1,1,1,0,
-                    GridBagConstraints.NORTHWEST,
-                    GridBagConstraints.HORIZONTAL,
-                    new Insets(5, 5, 5, 0),
-                    2,2));
+			int row = 0;
+			
+			try {
+				DatabaseInfo embedInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
+				Class driverClass = Class.forName(embedInfo.getDriverClass());
+				this.add(embDBMSRadioButton,new GridBagConstraints(
+						0,row,1,1,1,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.HORIZONTAL,
+						new Insets(5, 5, 5, 0),
+						2,2));
+				row++;
+			}
+			catch (ClassNotFoundException e) {
+				// we only catch it so we can figure out if we
+				// should include embedded db or not.
+			}
+			
             this.add(jdbcRadioButton,new GridBagConstraints(
-                    0,1,1,1,1,0,
+                    0,row,1,1,1,0,
                     GridBagConstraints.NORTHWEST,
                     GridBagConstraints.HORIZONTAL,
                     new Insets(5, 5, 5, 0),
                     2,2));
+			row++;
             this.add(odbcRadioButton,new GridBagConstraints(
-                    0,2,1,1,1,0,
+                    0,row,1,1,1,0,
                     GridBagConstraints.NORTHWEST,
                     GridBagConstraints.HORIZONTAL,
                     new Insets(5, 5, 5, 0),
                     2,2));
+			row++;
             this.add(accessRadioButton,new GridBagConstraints(
-                    0,3,1,1,1,0,
+                    0,row,1,1,1,0,
                     GridBagConstraints.NORTHWEST,
                     GridBagConstraints.HORIZONTAL,
                     new Insets(5, 5, 5, 0),
                     2,2));
+			row++;
             this.add(new JPanel(),new GridBagConstraints(
-                    0,4,1,1,1,1,
+                    0,row,1,1,1,1,
                     GridBagConstraints.NORTHWEST,
                     GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 0),
@@ -140,7 +155,7 @@ public class DatabaseConnectionDialog extends JDialog {
             	if(type == DatabaseInfo.EMBEDDED) {
                     embDBMSRadioButton.setSelected(true);
                 } else if (type == DatabaseInfo.UNDEFINED) {
-                    embDBMSRadioButton.setSelected(true);
+					jdbcRadioButton.setSelected(true);
                 } else if (type == DatabaseInfo.JDBC) {
             	    jdbcRadioButton.setSelected(true);
                 } else if (type == DatabaseInfo.ODBC) {
