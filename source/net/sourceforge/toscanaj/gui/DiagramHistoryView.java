@@ -72,26 +72,6 @@ public class DiagramHistoryView extends JList{
         }
     }
 
-    static class NoSelectionListSelectionModel extends DefaultListSelectionModel {
-        // implements javax.swing.ListSelectionModel
-        public boolean isSelectionEmpty() {
-            return true;
-        }
-
-        public int getSelectionMode() {
-            return SINGLE_SELECTION;
-        }
-
-        // implements javax.swing.ListSelectionModel
-        public boolean isSelectedIndex(int index) {
-            return false;
-        }
-
-        public void setLeadSelectionIndex(int leadIndex) {
-            return;
-        }
-    }
-
     /**
      * Creates a new view for the given history.
      */
@@ -101,6 +81,5 @@ public class DiagramHistoryView extends JList{
             throw new ClassCastException("This view needs a model of type net.sourceforge.toscanaj.controller.fca.DiagramHistory");
         }
         this.setCellRenderer(new DiagramCellRenderer());
-        this.setSelectionModel(new NoSelectionListSelectionModel());
     }       
 }
