@@ -56,9 +56,6 @@ public class AttributeEditingLabelViewPopupMenuHandler implements EventBrokerLis
 		if (attribute == null) {
 			return;
 		}
-		if (attribute.getDescription() == null) {
-			return;
-		}
 		final DiagramView parent = this.diagramView;
 		JMenuItem menuItem;
 		menuItem = new JMenuItem("Description...");
