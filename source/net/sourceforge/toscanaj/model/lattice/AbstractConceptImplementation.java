@@ -478,6 +478,14 @@ public abstract class AbstractConceptImplementation implements Concept {
         return this.ideal.contains(concept);
     }
 
+    public Collection getDownset() {
+        return this.ideal;
+    }
+
+    public Collection getUpset() {
+        return this.filter;
+    }
+
     /**
      * For debugging purposes.
      */

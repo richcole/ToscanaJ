@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -72,8 +72,10 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         JComboBox movementChooser = new JComboBox(movementNames);
         toolPanel.add(movementChooser);
 
-        diagramView = new DiagramView(DiagramController.getController().getDefaultInterpreter(null),
-                                      new ConceptInterpretationContext(ConceptInterpretationContext.CONTINGENT,
+        DiagramController controller = DiagramController.getController();
+        diagramView = new DiagramView(controller.getDefaultInterpreter(null),
+                                      new ConceptInterpretationContext(controller.getDiagramHistory(),
+                                                                       ConceptInterpretationContext.CONTINGENT,
                                                                        ConceptInterpretationContext.EXTENT));
         final EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
         canvasEventBroker.subscribe(

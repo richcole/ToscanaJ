@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.model.database;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
@@ -55,7 +56,8 @@ public abstract class DatabaseQuery extends Query {
         // have subconcepts (at least one should have a contingent, otherwise this
         // concept shouldn't exist)
         if (dbConcept.getObjectClause() != null || (!contingentOnly && !concept.isBottom())) {
-            String whereClause = dbConcept.constructWhereClause(contingentOnly);
+            WhereClauseGenerator clauseGenerator = new WhereClauseGenerator();
+            String whereClause = clauseGenerator.createWhereClause(dbConcept, null, null, contingentOnly);
             if (whereClause != null) {
                 try {
                     String statement = this.getQueryHead() + whereClause;

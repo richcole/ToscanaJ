@@ -10,6 +10,9 @@ package net.sourceforge.toscanaj.controller.fca;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
 import java.util.List;
+import java.util.Set;
+
+import util.CollectionFactory;
 
 /// @todo add observer pattern or event listening
 public class ConceptInterpretationContext {
@@ -21,10 +24,10 @@ public class ConceptInterpretationContext {
 
     private boolean objectDisplayMode;
     private boolean filterMode;
-    private List filters;
-    private List nestings;
+    private DiagramHistory diagramHistory;
 
-    public ConceptInterpretationContext(boolean objectDisplayMode, boolean filterMode) {
+    public ConceptInterpretationContext(DiagramHistory diagramHistory, boolean objectDisplayMode, boolean filterMode) {
+        this.diagramHistory = diagramHistory;
         this.objectDisplayMode = objectDisplayMode;
         this.filterMode = filterMode;
     }
@@ -45,19 +48,7 @@ public class ConceptInterpretationContext {
         return filterMode;
     }
 
-    public void addFilterConcept(DatabaseConnectedConcept filterConcept) {
-        this.filters.add(filterConcept);
-    }
-
-    public List getFilterConcepts() {
-        return this.filters;
-    }
-
-    public void addNestingConcept(DatabaseConnectedConcept nestingConcept) {
-        this.nestings.add(nestingConcept);
-    }
-
-    public List getNestingConcepts() {
-        return this.nestings;
+    public DiagramHistory getDiagramHistory() {
+        return this.diagramHistory;
     }
 }

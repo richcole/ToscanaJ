@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.model.lattice;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 import net.sourceforge.toscanaj.model.*;
 import net.sourceforge.toscanaj.model.database.DatabaseQuery;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
@@ -319,49 +320,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         return retVal;
     }
 
-    public String constructWhereClause(boolean contingentOnly) {
-        boolean first = true;
-        String whereClause = "WHERE ";
-        if (contingentOnly) {
-            if (this.hasObjectClause()) {
-                whereClause += this.getObjectClause();
-                first = false;
-            }
-        } else {
-            // aggregate all clauses from the downset
-            Iterator iter = this.ideal.iterator();
-            while (iter.hasNext()) {
-                DatabaseConnectedConcept otherConcept = (DatabaseConnectedConcept) iter.next();
-                if (!otherConcept.hasObjectClause()) {
-                    continue;
-                }
-                if (first) {
-                    first = false;
-                    whereClause += " (";
-                } else {
-                    whereClause += " OR ";
-                }
-                whereClause += otherConcept.getObjectClause();
-            }
-            if (!first) {
-                whereClause += ") ";
-            }
-        }
-
-        Iterator iter = this.filterClauses.iterator();
-        while (iter.hasNext()) {
-            Object item = iter.next();
-            if (first) {
-                first = false;
-            } else {
-                whereClause += " AND ";
-            }
-            whereClause += item;
-        }
-        if (first) {
-            return null; // no clause at all
-        }
-        whereClause += ";";
-        return whereClause;
+    public Set getFilterClauses() {
+        return filterClauses;
     }
 }

@@ -248,8 +248,9 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 
         DiagramController controller = DiagramController.getController();
         diagramView = new DiagramView(controller.getDefaultInterpreter(DatabaseConnection.getConnection()),
-                                      new ConceptInterpretationContext(ConceptInterpretationContext.CONTINGENT,
-                                                                       ConceptInterpretationContext.EXTENT ));
+                                      new ConceptInterpretationContext(controller.getDiagramHistory(),
+                                                                       ConceptInterpretationContext.CONTINGENT,
+                                                                       ConceptInterpretationContext.EXTENT));
         diagramView.getController().getEventBroker().subscribe(
                 new FilterOperationEventListener(controller),
                 CanvasItemActivatedEvent.class,
