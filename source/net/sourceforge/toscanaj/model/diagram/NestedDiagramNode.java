@@ -53,7 +53,7 @@ public class NestedDiagramNode extends DiagramNode {
                                    outerNode.getY() * OUTER_SCALE_FACTOR),
                 outerNode.getConcept(),
                 new LabelInfo(outerNode.getAttributeLabelInfo()), null,
-                outerNode);
+                outerNode.getOuterNode());
                 
         double innerScale = (scale / OUTER_SCALE_FACTOR) * EXTRA_ELLIPSE_SCALING;
                 
