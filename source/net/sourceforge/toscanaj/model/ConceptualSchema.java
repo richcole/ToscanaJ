@@ -6,22 +6,17 @@
  */
 package net.sourceforge.toscanaj.model;
 
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import org.jdom.Element;
+import util.CollectionFactory;
 
 import java.util.Iterator;
-import java.util.Vector;
 import java.util.List;
-import java.net.URL;
-
-import util.CollectionFactory;
+import java.util.Vector;
 
 /**
  * This is the main interface for the data structures.
@@ -86,24 +81,6 @@ public class ConceptualSchema {
     }
 
     /**
-     * Turns this schema into a copy of the other.
-     *
-     * @todo get rid of the exception
-     */
-
-    /* remove:
-     public void copyContents(ConceptualSchema otherSchema)
-        throws DatabaseException
-    {
-        reset();
-        setDatabaseInfo(otherSchema.getDatabaseInfo());
-        diagrams.addAll(otherSchema.diagrams);
-        setDescription(otherSchema.description);
-        scales.addAll(otherSchema.scales);
-    }
-    */
-
-    /**
      * Returns the database information stored.
      *
      * The return value is null if no database is defined in the schema.
@@ -116,31 +93,8 @@ public class ConceptualSchema {
      * Sets the database information for the schema.
      */
     public void setDatabaseInfo(DatabaseInfo databaseInfo) throws DatabaseException {
-
         this.databaseInfo = databaseInfo;
         eventBroker.processEvent(new DatabaseInfoChangedEvent(this, this, databaseInfo));
-
-/* remove:
-        if (databaseInfo == null) {
-            return;
-        }
-        DatabaseConnection conn = new DatabaseConnection(null,
-                this.databaseInfo.getURL(),
-                this.databaseInfo.getUserName(),
-                this.databaseInfo.getPassword()
-        );
-        // update all concepts
-        Iterator diagIt = this.diagrams.iterator();
-        while (diagIt.hasNext()) {
-            SimpleLineDiagram cur = (SimpleLineDiagram) diagIt.next();
-            for (int i = 0; i < cur.getNumberOfNodes(); i++) {
-                Concept con = cur.getNode(i).getConcept();
-                if (con instanceof DatabaseConnectedConcept) {
-                    ((DatabaseConnectedConcept) con).setDatabase(this.databaseInfo, conn);
-                }
-            }
-        }
-        */
     }
 
     /**
@@ -153,18 +107,18 @@ public class ConceptualSchema {
     /**
      * Returns a diagram from the list using the index.
      */
-    public SimpleLineDiagram getDiagram(int number) {
-        return (SimpleLineDiagram) diagrams.get(number);
+    public Diagram2D getDiagram(int number) {
+        return (Diagram2D) diagrams.get(number);
     }
 
     /**
      * Returns a diagram from the list using the diagram title as key.
      */
-    public SimpleLineDiagram getDiagram(String title) {
-        SimpleLineDiagram retVal = null;
+    public Diagram2D getDiagram(String title) {
+        Diagram2D retVal = null;
         Iterator it = this.diagrams.iterator();
         while (it.hasNext()) {
-            SimpleLineDiagram cur = (SimpleLineDiagram) it.next();
+            Diagram2D cur = (Diagram2D) it.next();
             if (cur.getTitle().equals(title)) {
                 retVal = cur;
                 break;
@@ -178,14 +132,14 @@ public class ConceptualSchema {
      *
      * The new diagram will be the last one.
      */
-    public void addDiagram(SimpleLineDiagram diagram) {
+    public void addDiagram(Diagram2D diagram) {
         diagrams.add(diagram);
-        eventBroker.processEvent(new DiagramListChangeEvent(this,this));
+        eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
 
     public void removeDiagram(int diagramIndex) {
         diagrams.remove(diagramIndex);
-        eventBroker.processEvent(new DiagramListChangeEvent(this,this));
+        eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
 
     public void setDescription(Element description) {

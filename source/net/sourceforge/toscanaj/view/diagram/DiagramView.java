@@ -125,7 +125,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
      *
      * This will automatically cause a repaint of the view.
      */
-    public void showDiagram(SimpleLineDiagram diagram) {
+    public void showDiagram(Diagram2D diagram) {
         this.diagram = diagram;
         clearCanvas();
         if (diagram == null) {
@@ -134,8 +134,10 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
         if (diagram instanceof NestedLineDiagram) {
             addDiagram((NestedLineDiagram) diagram);
-        } else {
-            addDiagram(diagram);
+        } else if(diagram instanceof SimpleLineDiagram){
+            addDiagram((SimpleLineDiagram)diagram);
+        } else{
+            throw new RuntimeException("Unexpected type of diagram");
         }
         requestScreenTransformUpdate();
         repaint();

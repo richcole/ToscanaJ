@@ -7,6 +7,7 @@ import net.sourceforge.toscanaj.model.Column;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Table;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -42,18 +43,15 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
     public ScaleEditingView(JFrame frame, ConceptualSchema conceptualSchema, EventBroker eventBroker) {
         super();
         this.parentFrame = frame;
-        setLayout(new BorderLayout());
         this.conceptualSchema = conceptualSchema;
 
         setName("ScalesEditingView");
-
-        JComponent scaleGeneratorView = makeScaleGeneratorPane();
+        setLayout(new BorderLayout());
 
         leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, makeTableColumnsView(), makeScalesView());
         leftPane.setOneTouchExpandable(true);
 
-
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, scaleGeneratorView);
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, makeScaleGeneratorPane());
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);
@@ -91,7 +89,10 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
             JButton generatorButton = new JButton(generator.getScaleName());
             generatorButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    generator.generateScale(getSelectedColumns());
+                    Diagram2D returnValue = generator.generateScale(getSelectedColumns());
+                    if(null!=returnValue){
+                        conceptualSchema.addDiagram(returnValue);
+                    }
                 }
             });
             generatorButtonsPane.add(generatorButton);
