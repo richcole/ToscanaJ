@@ -58,7 +58,7 @@ public class Table implements XML_Serializable {
         List columnElems=elem.getChildren(Column.COLUMN_ELEMENT_NAME);
         for (Iterator iterator = columnElems.iterator(); iterator.hasNext();) {
             Element element = (Element) iterator.next();
-            columns.add(new Column(element));
+            columns.add(new Column(element, this));
         }
     }
 

@@ -16,16 +16,20 @@ public class Column implements XML_Serializable {
 
     private String name;
     private int type;
+    private Table table;
+
     public static final String COLUMN_ELEMENT_NAME = "column";
     public static final String COLUMN_NAME_ATTRIBUTE_NAME = "name";
     public static final String COLUMN_TYPE_ATTRIBUTE_NAME = "type";
 
-    public Column(String name, int type) {
+    public Column(String name, int type, Table table) {
+        this.table = table;
         this.name = name;
         this.type = type;
     }
 
-    public Column(Element elem) throws XML_SyntaxError {
+    public Column(Element elem, Table table) throws XML_SyntaxError {
+        this.table = table;
         readXML(elem);
     }
 
@@ -48,5 +52,9 @@ public class Column implements XML_Serializable {
 
     public int getType() {
         return type;
+    }
+
+    public Table getTable() {
+        return table;
     }
 }

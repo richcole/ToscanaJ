@@ -7,13 +7,16 @@
 package net.sourceforge.toscanaj.controller.db;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.model.Column;
-import net.sourceforge.toscanaj.events.*;
-import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
-import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
+import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
+import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.model.Column;
+import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.Table;
+import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -88,7 +91,7 @@ public class DatabaseConnection implements BrokerEventListener {
     }
 
     public void connect(DatabaseInfo info) throws DatabaseException {
-        if(this.isConnected()) {
+        if (this.isConnected()) {
             disconnect();
         }
         connect(info.getURL(), info.getDriverClass(), info.getUserName(), info.getPassword());
@@ -113,10 +116,10 @@ public class DatabaseConnection implements BrokerEventListener {
     }
 
     private static Connection getConnection(String url, String driverName, String account, String password) throws DatabaseException {
-        if( (url == null) || (url.equals("")) ) {
+        if ((url == null) || (url.equals(""))) {
             throw new DatabaseException("No URL given for connecting to the database");
         }
-        if( (driverName == null) || (driverName.equals("")) ) {
+        if ((driverName == null) || (driverName.equals(""))) {
             throw new DatabaseException("No driver given for connecting to the database");
         }
         try {
@@ -434,16 +437,16 @@ public class DatabaseConnection implements BrokerEventListener {
      *
      * The parameter view can be either a table or a view.
      */
-    public Vector getColumns(String table) {
+    public Vector getColumns(Table table) {
         Vector result = new Vector();
 
         try {
             DatabaseMetaData dmd = jdbcConnection.getMetaData();
-            ResultSet rs = dmd.getColumns(null, null, table, null);
+            ResultSet rs = dmd.getColumns(null, null, table.getName(), null);
             while (rs.next()) {
                 result.add(new Column(
                         rs.getString(4),
-                        rs.getInt(5))
+                        rs.getInt(5), table)
                 );
             }
         } catch (SQLException ex) {
@@ -537,8 +540,8 @@ public class DatabaseConnection implements BrokerEventListener {
     }
 
     public void processEvent(Event e) {
-        if(e instanceof DatabaseConnectEvent){
-            DatabaseConnectEvent event=(DatabaseConnectEvent)e;
+        if (e instanceof DatabaseConnectEvent) {
+            DatabaseConnectEvent event = (DatabaseConnectEvent) e;
             try {
                 connect(event.getInfo());
             } catch (DatabaseException ex) {
@@ -577,7 +580,11 @@ public class DatabaseConnection implements BrokerEventListener {
         // print out each table
         for (int i = 0; i < tables.size(); i++) {
             System.out.println("========== " + tables.get(i) + " ==========");
-            Vector columns = test.getColumns((String) tables.get(i));
+            Vector columns = test.getColumns(
+                    new Table(
+                            new EventBroker(),
+                            (String) tables.get(i))
+            );
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {
                 Column column = (Column) columns.get(j);
@@ -597,7 +604,11 @@ public class DatabaseConnection implements BrokerEventListener {
         // print out each view
         for (int i = 0; i < views.size(); i++) {
             System.out.println("========== " + views.get(i) + " ==========");
-            Vector columns = test.getColumns((String) views.get(i));
+            Vector columns = test.getColumns(
+                new Table(
+                    new EventBroker(),
+                    (String) views.get(i))
+            );
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {
                 Column column = (Column) columns.get(j);

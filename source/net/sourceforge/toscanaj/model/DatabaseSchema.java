@@ -81,7 +81,7 @@ public class DatabaseSchema implements XML_Serializable, BrokerEventListener {
             String tableName = (String) it.val();
             Table table = new Table(broker, tableName); //@todo get key name
             STD_Iterator colIt = new STD_Iterator(
-                    connection.getColumns(tableName)
+                    connection.getColumns(table)
             );
             for (colIt.reset(); !colIt.atEnd(); colIt.next()) {
                 table.addColumn((Column) colIt.val());

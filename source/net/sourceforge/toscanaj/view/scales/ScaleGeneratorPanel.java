@@ -6,6 +6,7 @@ import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import util.CollectionFactory;
 
 import javax.swing.*;
@@ -21,6 +22,7 @@ public class ScaleGeneratorPanel extends JPanel implements BrokerEventListener {
     private JFrame parentFrame;
     ConceptualSchema conceptualSchema;
     TableColumnPairsSelectionSource selectionSource;
+    DatabaseConnection databaseConnection;
 
     public JFrame getParentFrame() {
         return parentFrame;
@@ -29,10 +31,17 @@ public class ScaleGeneratorPanel extends JPanel implements BrokerEventListener {
     /**
      * Construct an instance of this view
      */
-    public ScaleGeneratorPanel(JFrame frame, ConceptualSchema conceptualSchema, TableColumnPairsSelectionSource selectionSource, EventBroker eventBroker) {
+    public ScaleGeneratorPanel(
+            JFrame frame,
+            ConceptualSchema conceptualSchema,
+            TableColumnPairsSelectionSource selectionSource,
+            DatabaseConnection databaseConnection,
+            EventBroker eventBroker)
+    {
         super();
         this.parentFrame = frame;
         this.conceptualSchema = conceptualSchema;
+        this.databaseConnection = databaseConnection;
         fillGeneratorButtonsPane();
 
         this.selectionSource = selectionSource;
@@ -53,6 +62,7 @@ public class ScaleGeneratorPanel extends JPanel implements BrokerEventListener {
 
     private void fillScalesGenerators() {
         scaleGenerators.add(new OrdinalScaleGenerator(getParentFrame()));
+        scaleGenerators.add(new NominalScaleGenerator(getParentFrame()));
     }
 
     public void processEvent(Event e) {
@@ -78,7 +88,7 @@ public class ScaleGeneratorPanel extends JPanel implements BrokerEventListener {
                 public void actionPerformed(ActionEvent e) {
                     Diagram2D returnValue =
                             generator.generateScale(selectionSource.getSelectedTableColumnPairs(),
-                                    conceptualSchema);
+                                    conceptualSchema, databaseConnection);
                     if (null != returnValue) {
                         conceptualSchema.addDiagram(returnValue);
                     }

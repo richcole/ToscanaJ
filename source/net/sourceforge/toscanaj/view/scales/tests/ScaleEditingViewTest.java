@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingView;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 
 public class ScaleEditingViewTest extends TestCase {
     public ScaleEditingViewTest(String s) {
@@ -27,7 +28,12 @@ public class ScaleEditingViewTest extends TestCase {
     public void testScaleListUpdateOnChangeOfConceptualScheme(){
         final EventBroker broker = new EventBroker();
         ConceptualSchema schema = new ConceptualSchema(broker);
-        ScaleEditingView view = new ScaleEditingView(null, schema, broker);
+        ScaleEditingView view = new ScaleEditingView(
+                null,
+                schema,
+                broker,
+                new DatabaseConnection(broker)
+        );
         assertEquals(0, view.getScalesListModel().getSize());
         final SimpleLineDiagram diagram = new SimpleLineDiagram();
         diagram.setTitle("One");

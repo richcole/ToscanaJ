@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -41,7 +42,12 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
     /**
      * Construct an instance of this view
      */
-    public ScaleEditingView(JFrame frame, ConceptualSchema conceptualSchema, EventBroker eventBroker) {
+    public ScaleEditingView(
+            JFrame frame,
+            ConceptualSchema conceptualSchema,
+            EventBroker eventBroker,
+            DatabaseConnection databaseConnection)
+    {
         super();
         this.parentFrame = frame;
         this.conceptualSchema = conceptualSchema;
@@ -53,7 +59,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
         leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, columnListView, makeScalesView());
         leftPane.setOneTouchExpandable(true);
 
-        scaleGeneratorPanel = makeScaleGeneratorPane(eventBroker);
+        scaleGeneratorPanel = makeScaleGeneratorPane(eventBroker, databaseConnection);
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, scaleGeneratorPanel);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
@@ -63,8 +69,17 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
         eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
     }
 
-    private ScaleGeneratorPanel makeScaleGeneratorPane(EventBroker eventBroker) {
-        return new ScaleGeneratorPanel(getParentFrame(), conceptualSchema, this, eventBroker);
+    private ScaleGeneratorPanel makeScaleGeneratorPane(
+            EventBroker eventBroker,
+            DatabaseConnection databaseConnection)
+    {
+        return new ScaleGeneratorPanel(
+                getParentFrame(),
+                conceptualSchema,
+                this,
+                databaseConnection,
+                eventBroker
+        );
     }
 
     public TableColumnPair[] getSelectedTableColumnPairs() {

@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DummyConcept;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import util.Assert;
 import util.CollectionFactory;
 import util.NullIterator;
@@ -37,7 +38,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         return columns.length == 1;
     }
 
-    public Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme) {
+    public Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
         Assert.isTrue(canHandleColumns(columns));
         TableColumnPair pair = columns[0];
         OrdinalScaleEditorDialog scaleDialog = new OrdinalScaleEditorDialog(parent, pair.getColumn());

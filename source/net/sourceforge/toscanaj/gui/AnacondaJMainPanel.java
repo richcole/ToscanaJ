@@ -123,7 +123,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         databaseSchemaView.setVerticalDividerLocation(
                             ConfigurationManager.fetchInt("AnacondaJMainPanel", "databaseSchemaViewVerticalDivider", 300));
 
-        scaleView = new ScaleEditingView(this, conceptualSchema, eventBroker);
+        scaleView = new ScaleEditingView(this, conceptualSchema, eventBroker, databaseConnection);
         scaleView.setHorizontalDividerLocation(
                             ConfigurationManager.fetchInt("AnacondaJMainPanel", "scaleViewHorizontalDivider", 200));
         scaleView.setVerticalDividerLocation(

@@ -19,6 +19,7 @@ import net.sourceforge.toscanaj.view.scales.ScaleEditingView;
 import net.sourceforge.toscanaj.view.scales.ScaleGeneratorPanel;
 import net.sourceforge.toscanaj.view.scales.TableColumnPairsSelectionSource;
 import net.sourceforge.toscanaj.view.scales.TableColumnPair;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 
 public class ScaleGeneratorPaneTest extends TestCase {
     public ScaleGeneratorPaneTest(String s) {
@@ -32,10 +33,11 @@ public class ScaleGeneratorPaneTest extends TestCase {
     public void testUpdateOfConceptualSchema(){
         final EventBroker broker = new EventBroker();
         ConceptualSchema schema = new ConceptualSchema(broker);
+        DatabaseConnection databaseConnection = new DatabaseConnection(broker);
         ScaleGeneratorPanel view =
                 new ScaleGeneratorPanel(null, schema,
                         new MockTableColumnPairsSelectionSource(),
-
+                        databaseConnection,
                         broker);
         assertSame(schema, view.getConceptualSchema());
         ConceptualSchema otherSchema = new ConceptualSchema(broker);

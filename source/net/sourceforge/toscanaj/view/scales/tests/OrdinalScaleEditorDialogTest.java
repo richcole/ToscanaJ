@@ -10,7 +10,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.Column;
+import net.sourceforge.toscanaj.model.Table;
 import net.sourceforge.toscanaj.view.scales.OrdinalScaleEditorDialog;
+import net.sourceforge.toscanaj.events.EventBroker;
 import util.CollectionFactory;
 
 import java.util.List;
@@ -25,8 +27,12 @@ public class OrdinalScaleEditorDialogTest extends TestCase {
     }
 
     public void testAddDivider() {
-        OrdinalScaleEditorDialog dialog = new OrdinalScaleEditorDialog(null,
-                new Column("Column", java.sql.Types.INTEGER));
+        Table table = new Table(new EventBroker(), "Table");
+        Column column = new Column("Column", java.sql.Types.INTEGER, table);
+        table.addColumn(column);
+        OrdinalScaleEditorDialog dialog = new OrdinalScaleEditorDialog(
+                null, column
+        );
         dialog.addDelimiter(1.);
 
         List expValues = makeListOfDoubles(new double[]{1.});
