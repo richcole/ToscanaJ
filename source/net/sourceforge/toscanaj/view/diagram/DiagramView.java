@@ -43,21 +43,6 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     private Diagram2D diagram = null;
 
     /**
-     * Flag to prevent label from being moved when just clicked on
-     */
-    private boolean dragMode = false;
-
-    /**
-     * Distance that label has to be moved to enable dragMode
-     */
-    private int dragMin = 5;
-
-    /**
-     * The position where the mouse was when the last event came.
-     */
-    private Point2D lastMousePos = null;
-
-    /**
      * Creates a new vew displaying an empty digram (i.e. nothing at all).
      */
     public DiagramView()
@@ -91,9 +76,9 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         // draw diagram title in the top left corner
         g2d.drawString( diagram.getTitle(), this.getX() + MARGIN, this.getY() + MARGIN );
 
+        // find current bounds
         Rectangle2D bounds = new Rectangle2D.Double( getX() + MARGIN, getY() + MARGIN,
                                                      getWidth() - 2*MARGIN, getHeight() - 2*MARGIN );
-
         this.scaleToFit(g2d, bounds);
 
         // paint all items on canvas

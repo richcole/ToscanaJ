@@ -84,6 +84,13 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     private AffineTransform transform = null;
 
     /**
+     * Keeps the size of the canvas.
+     *
+     * This is done to avoid resizing while the mouse is dragged.
+     */
+    private Rectangle2D canvasSize = null;
+
+    /**
      * Paints the canvas including all CanvasItems on it.
      */
     public void paintCanvas(Graphics2D graphics)
@@ -153,8 +160,10 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * visible in the rectangle.
      */
     public void scaleToFit(Graphics2D graphics2D, Rectangle2D bounds) {
-        // get the dimensions of the canvas
-        Rectangle2D canvasSize = this.getCanvasSize(graphics2D);
+        if(!dragMode) {
+            // get the dimensions of the canvas
+            this.canvasSize = this.getCanvasSize(graphics2D);
+        }
 
         // we need some values to do the projection -- the initial values are
         // centered and no size change. This is useful if the canvas has no
@@ -207,6 +216,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     public void mouseReleased(MouseEvent e) {
         if(dragMode) {
             dragMode = false;
+            repaint();
         }
         else {
             if(selectedCanvasItem == null) {
