@@ -44,7 +44,7 @@ public class AggregateQuery extends Query {
                 retValue += ", ";
             }
         }
-        retValue += " FROM " + info.getSQLTableName() + " ";
+        retValue += " FROM " + info.getTable().getSqlExpression() + " ";
         return retValue;
     }
 

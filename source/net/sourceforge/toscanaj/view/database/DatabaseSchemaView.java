@@ -231,7 +231,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		}
 
 		public String toString() {
-			return table.getPlainName();
+			return table.getDisplayName();
 		}
 
 		public Table getTable() {
@@ -247,7 +247,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		}
 
 		public String toString() {
-			return column.getName()
+			return column.getDisplayName()
 				+ ": "
 				+ SQLTypeMapper.getTypeDescription(column.getType());
 		}
@@ -266,9 +266,9 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 
 		public String toString() {
 			if (table.getKey() == null) {
-				return table.getPlainName() + ":" + "??? No key what's the story";
+				return table.getDisplayName() + ":" + "??? No key what's the story";
 			}
-			return table.getPlainName() + ":" + table.getKey().getName();
+			return table.getDisplayName() + ":" + table.getKey().getDisplayName();
 		}
 
 		public Column getKey() {
@@ -355,20 +355,20 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		return leftPane.getDividerLocation();
 	}
 
-	public String getTableName() {
+	public Table getTable() {
 		Enumeration enum = this.keyedTableList.elements();
 		while (enum.hasMoreElements()) {
 			KeyTableInfo element = (KeyTableInfo) enum.nextElement();
-			return element.getTable().getSqlExpression();
+			return element.getTable();
 		}
 		return null;
 	}
 
-	public String getKeyName() {
+	public Column getKey() {
 		Enumeration enum = this.keyedTableList.elements();
 		while (enum.hasMoreElements()) {
 			KeyTableInfo element = (KeyTableInfo) enum.nextElement();
-			return element.getKey().getSqlExpression();
+			return element.getKey();
 		}
 		return null;
 	}
@@ -377,11 +377,11 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		DefaultListModel list = this.unkeyedTableList;
 		for (int i = 0; i < list.size(); i++) {
 			Table table = ((TableInfo) list.get(i)).getTable();
-			if (table.getPlainName().equals(tableName)) {
+			if (table.getDisplayName().equals(tableName)) {
 				Iterator colIt = table.getColumns().iterator();
 				while (colIt.hasNext()) {
 					Column col = (Column) colIt.next();
-					if (col.getName().equals(key)) {
+					if (col.getDisplayName().equals(key)) {
 						removeUnkeyedTable(table);
 						table.setKey(col);
 					}

@@ -14,6 +14,7 @@ import org.jdom.Element;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Types;
 
 /**
  * This class contains information how to connect to a database.
@@ -31,12 +32,12 @@ public class DatabaseInfo implements XMLizable {
     /**
      * The table (or view) queried in the database.
      */
-    private String table = null;
+    private Table table = null;
 
     /**
      * The key used for the object names.
      */
-    private String objectKey = null;
+    private Column objectKey = null;
 
     private String userName = null;
 
@@ -46,17 +47,17 @@ public class DatabaseInfo implements XMLizable {
     private String embeddedSQLPath = null;
 
     private String driverClass = null;
-    
-    public static class Type{
-    	private String name;
-    	protected Type(String name) {
-    		this.name = name;
-    	}
-    	public String toString() {
-    		return name;
-    	}
+
+    public static class Type {
+        private String name;
+        protected Type(String name) {
+            this.name = name;
+        }
+        public String toString() {
+            return name;
+        }
     };
-    
+
     public static final Type UNDEFINED = new Type("UNDEFINED");
     public static final Type EMBEDDED = new Type("EMBEDDED");
     public static final Type JDBC = new Type("JDBC");
@@ -65,16 +66,17 @@ public class DatabaseInfo implements XMLizable {
 
     private static final String ODBC_PREFIX = "jdbc:odbc:";
     private static final String ACCESS_FILE_URL_PREFIX =
-                "jdbc:odbc:DRIVER=Microsoft Access Driver (*.mdb); DBQ=";
+        "jdbc:odbc:DRIVER=Microsoft Access Driver (*.mdb); DBQ=";
     private static final String ACCESS_FILE_URL_END =
-                ";UserCommitSync=Yes;Threads=3;SafeTransactions=0;PageTimeout=5;" +
-                "MaxScanRows=8;MaxBufferSize=2048;DriverId=281";
+        ";UserCommitSync=Yes;Threads=3;SafeTransactions=0;PageTimeout=5;"
+            + "MaxScanRows=8;MaxBufferSize=2048;DriverId=281";
 
     private static final String JDBC_ODBC_BRIDGE_DRIVER =
-                "sun.jdbc.odbc.JdbcOdbcDriver";
+        "sun.jdbc.odbc.JdbcOdbcDriver";
 
     private static final String TABLE_ELEMENT_NAME = "table";
-    public static final String DATABASE_CONNECTION_ELEMENT_NAME = "databaseConnection";
+    public static final String DATABASE_CONNECTION_ELEMENT_NAME =
+        "databaseConnection";
     private static final String EMBEDDED_SOURCE_ELEMENT_NAME = "embed";
     private static final String URL_SOURCE_ELEMENT_NAME = "url";
     private static final String DRIVER_CLASS_ATTRIBUTE_NAME = "driver";
@@ -95,7 +97,10 @@ public class DatabaseInfo implements XMLizable {
     /**
      * Creates a new Query that will query a list.
      */
-    public Query createListQuery(String name, String header, boolean isDistinct) {
+    public Query createListQuery(
+        String name,
+        String header,
+        boolean isDistinct) {
         if (isDistinct) {
             return new DistinctListQuery(this, name, header);
         } else {
@@ -124,7 +129,9 @@ public class DatabaseInfo implements XMLizable {
         Element retVal = new Element(DATABASE_CONNECTION_ELEMENT_NAME);
         if (embeddedSQLPath != null) {
             Element embedElem = new Element(EMBEDDED_SOURCE_ELEMENT_NAME);
-            embedElem.setAttribute(EMBEDDED_URL_ATTRIBUTE_NAME, embeddedSQLPath);
+            embedElem.setAttribute(
+                EMBEDDED_URL_ATTRIBUTE_NAME,
+                embeddedSQLPath);
             retVal.addContent(embedElem);
         } else {
             Element urlElem = new Element(URL_SOURCE_ELEMENT_NAME);
@@ -135,10 +142,10 @@ public class DatabaseInfo implements XMLizable {
             retVal.addContent(urlElem);
         }
         Element tableElem = new Element(TABLE_ELEMENT_NAME);
-        tableElem.addContent(table);
+        tableElem.addContent(table.getDisplayName());
         retVal.addContent(tableElem);
         Element keyElem = new Element(OBJECT_KEY_ELEMENT_NAME);
-        keyElem.addContent(objectKey);
+        keyElem.addContent(objectKey.getDisplayName());
         retVal.addContent(keyElem);
         return retVal;
     }
@@ -147,20 +154,37 @@ public class DatabaseInfo implements XMLizable {
         XMLHelper.checkName(DATABASE_CONNECTION_ELEMENT_NAME, elem);
         if (XMLHelper.contains(elem, EMBEDDED_SOURCE_ELEMENT_NAME)) {
             Element embedElem = elem.getChild(EMBEDDED_SOURCE_ELEMENT_NAME);
-            setEmbeddedSQLLocation(XMLHelper.getAttribute(embedElem, EMBEDDED_URL_ATTRIBUTE_NAME).getValue());
+            setEmbeddedSQLLocation(
+                XMLHelper
+                    .getAttribute(embedElem, EMBEDDED_URL_ATTRIBUTE_NAME)
+                    .getValue());
             setUrl("jdbc:hsqldb:.");
             setDriverClass("org.hsqldb.jdbcDriver");
             setUserName("sa");
             setPassword("");
         } else {
-            Element urlElement = XMLHelper.mustbe(URL_SOURCE_ELEMENT_NAME, elem);
+            Element urlElement =
+                XMLHelper.mustbe(URL_SOURCE_ELEMENT_NAME, elem);
             sourceURL = urlElement.getTextNormalize();
-            driverClass = XMLHelper.getAttribute(urlElement, DRIVER_CLASS_ATTRIBUTE_NAME).getValue();
-            userName = XMLHelper.getAttribute(urlElement, USERNAME_ATTRIBUTE_NAME).getValue();
-            password = XMLHelper.getAttribute(urlElement, PASSWORD_ATTRIBUTE_NAME).getValue();
+            driverClass =
+                XMLHelper
+                    .getAttribute(urlElement, DRIVER_CLASS_ATTRIBUTE_NAME)
+                    .getValue();
+            userName =
+                XMLHelper
+                    .getAttribute(urlElement, USERNAME_ATTRIBUTE_NAME)
+                    .getValue();
+            password =
+                XMLHelper
+                    .getAttribute(urlElement, PASSWORD_ATTRIBUTE_NAME)
+                    .getValue();
         }
-        table = XMLHelper.mustbe(TABLE_ELEMENT_NAME, elem).getText();
-        objectKey = XMLHelper.mustbe(OBJECT_KEY_ELEMENT_NAME, elem).getText();
+        String tableName = XMLHelper.mustbe(TABLE_ELEMENT_NAME, elem).getText();
+        String objectKeyName =
+            XMLHelper.mustbe(OBJECT_KEY_ELEMENT_NAME, elem).getText();
+        this.table = new Table(tableName);
+        /// @todo it is probably not ok to assume VARCHAR here
+        this.objectKey = new Column(objectKeyName, Types.VARCHAR, this.table);
     }
 
     /**
@@ -182,9 +206,9 @@ public class DatabaseInfo implements XMLizable {
     }
 
     public String getUserName() {
-    	if(this.userName == null) {
-    		return "";
-    	}
+        if (this.userName == null) {
+            return "";
+        }
         return this.userName;
     }
 
@@ -193,7 +217,7 @@ public class DatabaseInfo implements XMLizable {
     }
 
     public String getPassword() {
-        if(this.password == null) {
+        if (this.password == null) {
             return "";
         }
         return this.password;
@@ -201,39 +225,28 @@ public class DatabaseInfo implements XMLizable {
 
     /**
      * Sets the database table we want to query.
-     *
-     * This can be a view, too.
      */
-    public void setTableName(String table) {
+    public void setTable(Table table) {
         this.table = table;
     }
 
-    public String getSQLTableName() {
-    	/// @todo removed for testing purposes
-//    	if( getType() == ACCESS_FILE ) {
-//	    	return "[" + this.table + "]";
-//    	} else {
-    		return this.table;
-//    	}
-    }
-
-    public String getDisplayTableName() {
+    public Table getTable() {
         return this.table;
     }
 
     /**
      * Sets the key we use in queries.
      */
-    public void setKey(String key) {
+    public void setKey(Column key) {
         this.objectKey = key;
     }
 
-    public String getKey() {
+    public Column getKey() {
         return this.objectKey;
     }
 
     public void setEmbeddedSQLLocation(String relativePath) {
-        if(relativePath == null) {
+        if (relativePath == null) {
             this.embeddedSQLLocation = null;
             this.embeddedSQLPath = null;
         } else {
@@ -244,10 +257,10 @@ public class DatabaseInfo implements XMLizable {
 
     public void setEmbeddedSQLLocation(URL url) {
         this.embeddedSQLLocation = url;
-        if(url == null) {
-        	this.embeddedSQLPath = null;
+        if (url == null) {
+            this.embeddedSQLPath = null;
         } else {
-        	this.embeddedSQLPath = url.getPath();
+            this.embeddedSQLPath = url.getPath();
         }
     }
 
@@ -255,7 +268,8 @@ public class DatabaseInfo implements XMLizable {
         try {
             return new URL(baseURL, relativePath);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Could not create URL for database: " + relativePath);
+            throw new RuntimeException(
+                "Could not create URL for database: " + relativePath);
         }
     }
 
@@ -277,50 +291,64 @@ public class DatabaseInfo implements XMLizable {
     public String toString() {
         String result = "DatabaseInfo\n";
 
-        result += "\t" + "url: " + this.sourceURL + "\n" +
-                "\t" + "key/table: " + this.objectKey + "/" + this.table;
+        result += "\t"
+            + "url: "
+            + this.sourceURL
+            + "\n"
+            + "\t"
+            + "key/table: "
+            + this.objectKey
+            + "/"
+            + this.table;
 
         return result;
     }
 
-	public Type getType() {
-		return getType(this.getURL(), this.getDriverClass());
-	}
-	
-	public static Type getType(String url, String driverClass) {
-		if(url == null) {
-			return UNDEFINED;
-		}
-		if(url.equals(getEmbeddedDatabaseInfo().getURL())) {
-			return EMBEDDED;
-		}
-		if(driverClass.equals(JDBC_ODBC_BRIDGE_DRIVER)) {
-			if(url.indexOf(';') == -1){ // a semicolon is not allowed in DSN names
-				return ODBC;
-			}
-			else { // but always in the access file URLs
-				return ACCESS_FILE;
-			}
-		}
-		return JDBC;
-	}
-	
-	public void setAccessFileInfo(String fileLocation, String userName, String password) {
-		this.driverClass = JDBC_ODBC_BRIDGE_DRIVER;
-        this.sourceURL = ACCESS_FILE_URL_PREFIX + fileLocation + ACCESS_FILE_URL_END;
+    public Type getType() {
+        return getType(this.getURL(), this.getDriverClass());
+    }
+
+    public static Type getType(String url, String driverClass) {
+        if (url == null) {
+            return UNDEFINED;
+        }
+        if (url.equals(getEmbeddedDatabaseInfo().getURL())) {
+            return EMBEDDED;
+        }
+        if (driverClass.equals(JDBC_ODBC_BRIDGE_DRIVER)) {
+            if (url.indexOf(';') == -1) {
+                // a semicolon is not allowed in DSN names
+                return ODBC;
+            } else { // but always in the access file URLs
+                return ACCESS_FILE;
+            }
+        }
+        return JDBC;
+    }
+
+    public void setAccessFileInfo(
+        String fileLocation,
+        String userName,
+        String password) {
+        this.driverClass = JDBC_ODBC_BRIDGE_DRIVER;
+        this.sourceURL =
+            ACCESS_FILE_URL_PREFIX + fileLocation + ACCESS_FILE_URL_END;
         this.userName = userName;
         this.password = password;
         this.embeddedSQLLocation = null;
         this.embeddedSQLPath = null;
     }
-    
+
     public String getAccessFileUrl() {
-		int start = ACCESS_FILE_URL_PREFIX.length();
-		int end = getURL().length() - ACCESS_FILE_URL_END.length();
-		return getURL().substring(start, end);
+        int start = ACCESS_FILE_URL_PREFIX.length();
+        int end = getURL().length() - ACCESS_FILE_URL_END.length();
+        return getURL().substring(start, end);
     }
-    
-    public void setOdbcDataSource(String dsn, String userName, String password) {
+
+    public void setOdbcDataSource(
+        String dsn,
+        String userName,
+        String password) {
         this.driverClass = JDBC_ODBC_BRIDGE_DRIVER;
         this.sourceURL = ODBC_PREFIX + dsn;
         this.userName = userName;
@@ -328,8 +356,8 @@ public class DatabaseInfo implements XMLizable {
         this.embeddedSQLLocation = null;
         this.embeddedSQLPath = null;
     }
-    
+
     public String getOdbcDataSourceName() {
-		return getURL().substring(ODBC_PREFIX.length());
+        return getURL().substring(ODBC_PREFIX.length());
     }
 }

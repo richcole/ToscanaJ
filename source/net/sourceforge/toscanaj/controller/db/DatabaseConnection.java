@@ -445,7 +445,7 @@ public class DatabaseConnection implements EventBrokerListener {
 
         try {
             DatabaseMetaData dmd = jdbcConnection.getMetaData();
-            ResultSet rs = dmd.getColumns(null, null, table.getPlainName(), null);
+            ResultSet rs = dmd.getColumns(null, null, table.getDisplayName(), null);
             while (rs.next()) {
                 result.add(new Column(
                         rs.getString(4),
@@ -596,9 +596,9 @@ public class DatabaseConnection implements EventBrokerListener {
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {
                 Column column = (Column) columns.get(j);
-                System.out.println("----- " + column.getName() + " -----");
+                System.out.println("----- " + column.getDisplayName() + " -----");
                 // and querying the contents
-                System.out.println(test.getColumn(column.getName(),
+                System.out.println(test.getColumn(column.getDisplayName(),
                         (String) tables.get(i)));
             }
         }
@@ -620,9 +620,9 @@ public class DatabaseConnection implements EventBrokerListener {
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {
                 Column column = (Column) columns.get(j);
-                System.out.println("----- " + column.getName() + " -----");
+                System.out.println("----- " + column.getDisplayName() + " -----");
                 // and querying the contents
-                System.out.println(test.getColumn(column.getName(),
+                System.out.println(test.getColumn(column.getDisplayName(),
                         (String) views.get(i)));
             }
         }

@@ -35,7 +35,7 @@ public class ListQuery extends Query {
 
     public String getQueryHead() {
         String retValue = "SELECT ";
-        retValue += info.getKey() + ", ";
+        retValue += info.getKey().getSqlExpression() + ", ";
         Iterator it = fieldList.iterator();
         while (it.hasNext()) {
             QueryField field = (QueryField) it.next();
@@ -44,7 +44,7 @@ public class ListQuery extends Query {
                 retValue += ", ";
             }
         }
-        retValue += " FROM " + info.getSQLTableName() + " ";
+        retValue += " FROM " + info.getTable().getSqlExpression() + " ";
         return retValue;
     }
 

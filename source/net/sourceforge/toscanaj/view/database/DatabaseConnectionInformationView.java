@@ -12,8 +12,10 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
+import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo.Type;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
@@ -569,23 +571,23 @@ public class DatabaseConnectionInformationView extends JDialog
             return "Done";
         }
         boolean executeStep() {
-            String sqlTableName = this.tableView.getTableName();
-            String sqlKeyName = this.tableView.getKeyName();
-            if(sqlTableName == null || sqlKeyName == null) {
+            Table sqlTable = this.tableView.getTable();
+            Column sqlKey = this.tableView.getKey();
+            if(sqlTable == null || sqlKey == null) {
         		JOptionPane.showMessageDialog(this, "Please select a table/column pair as primary key", "No key selected", 
         									  JOptionPane.ERROR_MESSAGE);
         		return false;
         	}
-        	databaseInfo.setTableName(sqlTableName);
-        	databaseInfo.setKey(sqlKeyName);
+        	databaseInfo.setTable(sqlTable);
+        	databaseInfo.setKey(sqlKey);
         	return true;
         }
         WizardPanel getNextPanel() {
             return null;
         }
         void updateContents() {
-            String table = databaseInfo.getSQLTableName();
-            String key = databaseInfo.getKey();
+            String table = databaseInfo.getTable().getDisplayName();
+            String key = databaseInfo.getKey().getDisplayName();
             if(table != null && key != null) {
         		tableView.setKey(table, key);
         	}

@@ -41,7 +41,7 @@ public class DistinctListQuery extends Query {
                 retValue += ", ";
             }
         }
-        retValue += " FROM " + info.getSQLTableName() + " ";
+        retValue += " FROM " + info.getTable().getSqlExpression() + " ";
         return retValue;
     }
 

@@ -258,7 +258,7 @@ public class DatabaseViewerManager implements XMLizable {
         if (this.tableName != null) {
             return this.tableName;
         } else {
-            return this.databaseInfo.getSQLTableName();
+            return this.databaseInfo.getTable().getSqlExpression();
         }
     }
 
@@ -266,7 +266,7 @@ public class DatabaseViewerManager implements XMLizable {
         if (this.keyName != null) {
             return this.keyName;
         } else {
-            return this.databaseInfo.getKey();
+            return this.databaseInfo.getKey().getSqlExpression();
         }
     }
 

@@ -206,9 +206,9 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 	public Context createContext() {
 		ContextImplementation firstContext = 
 						(ContextImplementation) this.leftPanel.createContext("left");
-		extendAttributeNames(firstContext.getAttributes(), leftPanel.getColumn().getName());
+		extendAttributeNames(firstContext.getAttributes(), leftPanel.getColumn().getDisplayName());
 		Context secondContext = this.rightPanel.createContext("right");
-		extendAttributeNames(secondContext.getAttributes(), rightPanel.getColumn().getName());
+		extendAttributeNames(secondContext.getAttributes(), rightPanel.getColumn().getDisplayName());
 		return firstContext.createProduct(secondContext, this.titleEditor.getText());
 	}
 	

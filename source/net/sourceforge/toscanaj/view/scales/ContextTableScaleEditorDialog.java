@@ -690,7 +690,7 @@ public class ContextTableScaleEditorDialog
 			String clause = (String) it.next();
 			String query =
 				"SELECT count(*) FROM "
-					+ dbinfo.getSQLTableName()
+					+ dbinfo.getTable().getSqlExpression()
 					+ " WHERE ("
 					+ clause
 					+ ");";
@@ -717,7 +717,7 @@ public class ContextTableScaleEditorDialog
 				String otherClause = (String) it2.next();
 				String query =
 					"SELECT count(*) FROM "
-						+ dbinfo.getSQLTableName()
+						+ dbinfo.getTable().getSqlExpression()
 						+ " WHERE ("
 						+ clause
 						+ ") AND ("
@@ -746,7 +746,7 @@ public class ContextTableScaleEditorDialog
 		if (problems.isEmpty()) {
 			// doesn't make sense if we have problems so far
 			String query =
-				"SELECT count(*) FROM " + dbinfo.getSQLTableName() + ";";
+				"SELECT count(*) FROM " + dbinfo.getTable().getSqlExpression() + ";";
 			try {
 				int count = this.databaseConnection.queryInt(query, 1);
 				if (count != sumCounts) {

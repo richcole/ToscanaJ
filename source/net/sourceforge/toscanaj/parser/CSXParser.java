@@ -13,9 +13,11 @@ import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
+import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
+import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
@@ -35,6 +37,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Types;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -497,13 +500,14 @@ public class CSXParser {
         if (elem == null) {
             throw new DataFormatException("No <table> given for <databaseConnection>");
         }
-        dbInfo.setTableName(elem.getText());
+        dbInfo.setTable(new Table(elem.getText()));
         elem = dbElement.getChild("key");
         if (elem == null) {
             throw new DataFormatException("<table> but not <key> given in <databaseConnection> element");
         }
         String keyName = elem.getText();
-        dbInfo.setKey(keyName);
+        /// @todo it is probably not ok to assume VARCHAR here
+        dbInfo.setKey(new Column(keyName, Types.VARCHAR, dbInfo.getTable()));
         // check for additional queries
         Element queryElem = dbElement.getChild("queries");
         if (queryElem == null || queryElem.getAttribute("dropDefaults") == null ||

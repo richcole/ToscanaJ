@@ -85,7 +85,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 						int result =
 				databaseConnection.queryInt(
 					"SELECT count (*) FROM "
-						+ scheme.getDatabaseInfo().getSQLTableName()
+						+ scheme.getDatabaseInfo().getTable().getSqlExpression()
 						+ " WHERE ( "
 						+ object
 						+ " );",

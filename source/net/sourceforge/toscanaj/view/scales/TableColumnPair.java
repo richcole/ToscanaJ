@@ -28,6 +28,6 @@ public class TableColumnPair {
     }
 
     public String toString() {
-        return table.getPlainName() + "." + column.getName();
+        return table.getDisplayName() + "." + column.getDisplayName();
     }
 }

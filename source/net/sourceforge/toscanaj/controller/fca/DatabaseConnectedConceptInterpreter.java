@@ -33,7 +33,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     public DatabaseConnectedConceptInterpreter(DatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
         this.listQuery = new ListQuery(databaseInfo, "", "");
-        this.listQuery.insertQueryColumn("", null, "", databaseInfo.getKey());
+        this.listQuery.insertQueryColumn("", null, "", databaseInfo.getKey().getSqlExpression());
     }
 
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
@@ -78,7 +78,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
             return 0;
         }
         DatabaseConnection connection = DatabaseConnection.getConnection();
-        String statement = "SELECT count(*) FROM " + databaseInfo.getSQLTableName() + " " + whereClause;
+        String statement = "SELECT count(*) FROM " + databaseInfo.getTable().getSqlExpression() + " " + whereClause;
         return connection.queryInt(statement, 1);
     }
 

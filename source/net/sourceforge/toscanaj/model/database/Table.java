@@ -34,6 +34,12 @@ public class Table implements XMLizable {
         this.name = name;
     }
 
+    public Table(String name) {
+        this.columns = new ArrayList();
+        this.broker = null;
+        this.name = name;
+    }
+
     public Table(EventBroker broker, Element elem) throws XMLSyntaxError {
         this(broker, "");
         readXML(elem);
@@ -80,7 +86,9 @@ public class Table implements XMLizable {
 
     public void setKey(Column key) {
         this.key = key;
-        broker.processEvent(new TableChangedEvent(this, this));
+        if(broker != null) {
+        	broker.processEvent(new TableChangedEvent(this, this));
+        }
     }
 
     public void setName(String name) {
