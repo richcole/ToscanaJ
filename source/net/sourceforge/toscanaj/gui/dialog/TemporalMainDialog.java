@@ -50,9 +50,10 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 	private static final String TRANSITION_LAYER_NAME = "transitions";
     private ManyValuedContext context;
     private EventBroker eventBroker;
-    private JComboBox sequenceChooser;
-    private JComboBox timelineChooser;
+    private JComboBox sequenceColumnChooser;
+    private JComboBox timelineColumnChooser;
     private JButton addStaticTransitionsButton;
+    private JComboBox sequenceToShowChooser;
     private JButton animateTransitionsButton;
     private JButton exportImagesButton;
     private JButton exportAnimationButton;
@@ -62,13 +63,13 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private static final Color[] COLORS = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.CYAN, Color.GRAY, Color.MAGENTA,
                                                          Color.ORANGE, Color.PINK, Color.BLACK, Color.YELLOW};
     private double targetTime;
-    private int timelineLength;
     private double lastAnimationTime;
     private NumberField speedField;
-    private JButton addOneSequenceTransitionsButton;
     private NumberField fadeInField;
     private NumberField holdField;
     private NumberField fadeOutField;
+    private ArrayList sequenceValues;
+    private ArrayList timelineValues;
 	
     public TemporalMainDialog(Frame frame, DiagramView diagramView, EventBroker eventBroker) {
 	  	super(frame, "Temporal Controls", false);
@@ -86,20 +87,33 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     }
     
     private void buildGUI() {
-        JLabel sequenceLabel = new JLabel("Sequence Column:");
-        sequenceChooser = new JComboBox();
+        JLabel sequenceColumnLabel = new JLabel("Sequence Column:");
+        sequenceColumnChooser = new JComboBox();
+        sequenceColumnChooser.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	calculateValueLists();
+                fillSequenceChoosers();
+            }
+        });
 
         JLabel timelineLabel = new JLabel("Timeline Column:");
-        timelineChooser = new JComboBox();
+        timelineColumnChooser = new JComboBox();
+        timelineColumnChooser.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                calculateValueLists();
+                fillSequenceChoosers();
+            }
+        });
 
-        addStaticTransitionsButton = new JButton("Add All Static Transitions");
+        JLabel sequenceLabel = new JLabel("Sequence:");
+        sequenceToShowChooser = new JComboBox();
+
+        addStaticTransitionsButton = new JButton("Show Transitions");
         addStaticTransitionsButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 addFixedTransitions();
             }
         });
-
-        addOneSequenceTransitionsButton = new JButton("Add One Sequence");
 
         animateTransitionsButton = new JButton("Animate Transitions");
         animateTransitionsButton.addActionListener(new ActionListener(){
@@ -129,26 +143,26 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         contentPane.setLayout(layout);
 
 		int row = 0;
-        contentPane.add(sequenceLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
+        contentPane.add(sequenceColumnLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
                                                         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(sequenceChooser, new GridBagConstraints(2, row, 2, 1, 1, 0,
+        contentPane.add(sequenceColumnChooser, new GridBagConstraints(2, row, 2, 1, 1, 0,
                                                         GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
         row++;
         contentPane.add(timelineLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
                                                         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(timelineChooser, new GridBagConstraints(2, row, 2, 1, 1, 0,
+        contentPane.add(timelineColumnChooser, new GridBagConstraints(2, row, 2, 1, 1, 0,
                                                         GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        row++;
+        contentPane.add(sequenceToShowChooser, new GridBagConstraints(1, row, 2, 1, 1, 0,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
         row++;
         contentPane.add(addStaticTransitionsButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(addOneSequenceTransitionsButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
         row++;
         contentPane.add(speedLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
@@ -205,19 +219,33 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
             enabled = false;
         }
 
-        sequenceChooser.setModel(new DefaultComboBoxModel(attributes));
-        sequenceChooser.setEnabled(enabled);
+        sequenceColumnChooser.setModel(new DefaultComboBoxModel(attributes));
+        sequenceColumnChooser.setEnabled(enabled);
 
-        timelineChooser.setModel(new DefaultComboBoxModel(attributes));
-        timelineChooser.setEnabled(enabled);
+        timelineColumnChooser.setModel(new DefaultComboBoxModel(attributes));
+        timelineColumnChooser.setEnabled(enabled);
+
+		calculateValueLists();        
+        fillSequenceChoosers();
 
         setButtonStates(!enabled);
+    }
+
+    private void fillSequenceChoosers() {
+    	DefaultComboBoxModel model = new DefaultComboBoxModel();
+    	model.addElement("<All Sequences>");
+    	Iterator it = this.sequenceValues.iterator();
+    	while (it.hasNext()) {
+            AttributeValue value = (AttributeValue) it.next();
+            model.addElement(value);
+        }
+        
+    	this.sequenceToShowChooser.setModel(model);
     }
 
     private void setButtonStates(boolean allDisabled) {
         boolean enabled = !allDisabled && (this.diagramView.getDiagram() != null);
         addStaticTransitionsButton.setEnabled(enabled);
-        addOneSequenceTransitionsButton.setEnabled(false);
         animateTransitionsButton.setEnabled(enabled);
         exportImagesButton.setEnabled(false);
         exportAnimationButton.setEnabled(false);
@@ -251,24 +279,29 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     }
 
     private void addFixedTransitions() {
-    	// calculate timeline length
-    	calculateObjectSequences();
-        AnimationTimeController newTimeController = new AnimationTimeController(this.timelineLength,0,Double.MAX_VALUE,0,1);
-        addTransitions(this.timelineLength, newTimeController, false);
+        int length = this.timelineValues.size();
+        AnimationTimeController newTimeController = new AnimationTimeController(length,0,Double.MAX_VALUE,0,1);
+        Object selectedSequence = this.sequenceToShowChooser.getSelectedItem();
+        if(selectedSequence instanceof AttributeValue) {
+        	AttributeValue sequenceValue = (AttributeValue) selectedSequence;
+            addTransitions(length, newTimeController, false, sequenceValue);
+        } else {
+        	addTransitions(length, newTimeController, false, null);
+        }
     }
 
     private void addAnimatedTransitions() {
-        // calculate timeline length
-        calculateObjectSequences();
+        int length = this.timelineValues.size();
         double fadeIn = this.fadeInField.getDoubleValue();
         double hold = this.holdField.getDoubleValue();
         double fadeOut = this.fadeOutField.getDoubleValue();
         int speed = this.speedField.getIntegerValue();
-        AnimationTimeController newTimeController = new AnimationTimeController(this.timelineLength, fadeIn, hold, fadeOut, speed);
-        addTransitions(newTimeController.getAllFadedTime(), newTimeController, true);
+        AnimationTimeController newTimeController = new AnimationTimeController(length, fadeIn, hold, fadeOut, speed);
+        addTransitions(newTimeController.getAllFadedTime(), newTimeController, true, null);
     }
 
-    private void addTransitions(double newTargetTime, AnimationTimeController newTimeController, boolean highlightStates) {
+    private void addTransitions(double newTargetTime, AnimationTimeController newTimeController, 
+                                 boolean highlightStates, AttributeValue selectedSequence) {
         if(this.diagramView.hasLayer(TRANSITION_LAYER_NAME)) {
         	this.diagramView.removeLayer(TRANSITION_LAYER_NAME);
         }
@@ -277,16 +310,20 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         Hashtable nodeViewMap = createNodeViewMap();
         this.timeController = null;
         Iterator seqIt = objectSequences.iterator();
+        Iterator seqValIt = this.sequenceValues.iterator();
         int colNum = 0;
         while (seqIt.hasNext()) {
             List sequence = (List) seqIt.next();
+            AttributeValue curSequenceValue = (AttributeValue) seqValIt.next();
             if(this.timeController == null) {
                 this.timeController = newTimeController;
             	this.targetTime = newTargetTime;
                 this.lastAnimationTime = 0;
             }
             Color color = COLORS[colNum];
-            addTransitions(sequence, new Color(color.getRed(), color.getGreen(), color.getBlue(), 140), nodeViewMap, highlightStates);
+            if(selectedSequence == null || selectedSequence == curSequenceValue) {
+            	addTransitions(sequence, new Color(color.getRed(), color.getGreen(), color.getBlue(), 140), nodeViewMap, highlightStates);
+            }
             colNum = (colNum + 1) % COLORS.length;
         }
         this.diagramView.repaint();
@@ -333,56 +370,66 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         }
     }
 
+	private void calculateValueLists() {
+	    sequenceValues = new ArrayList();
+	    timelineValues = new ArrayList();
+
+	    Object selectedSequenceColumn = this.sequenceColumnChooser.getSelectedItem();
+	    if(!(selectedSequenceColumn instanceof ManyValuedAttribute) ) {
+	    	return;
+	    }
+        ManyValuedAttribute sequenceAttribute = (ManyValuedAttribute) selectedSequenceColumn;
+	    ManyValuedAttribute timelineAttribute = (ManyValuedAttribute) this.timelineColumnChooser.getSelectedItem();
+
+	    Iterator objIt = this.context.getObjects().iterator();
+	    while(objIt.hasNext()) {
+	        FCAObject object = (FCAObject) objIt.next();
+	        AttributeValue value = this.context.getRelationship(object, sequenceAttribute);
+	        if(!sequenceValues.contains(value)) {
+	            boolean inserted = false;;
+	            ListIterator seqIt = sequenceValues.listIterator();
+	            while(seqIt.hasNext()) {
+	                AttributeValue curValue = (AttributeValue) seqIt.next();
+	                if(value.isLesserThan(curValue)) {
+	                    if(seqIt.hasPrevious()) {
+	                        seqIt.previous();
+	                    }
+	                    seqIt.add(value);
+	                    inserted = true;
+	                    break;
+	                }
+	            }
+	            if(!inserted) {
+	                seqIt.add(value);
+	            }
+	        }
+	        value = this.context.getRelationship(object, timelineAttribute);
+	        if(!timelineValues.contains(value)) {
+	            boolean inserted = false;;
+	            ListIterator tlIt = timelineValues.listIterator();
+	            while(tlIt.hasNext()) {
+	                AttributeValue curValue = (AttributeValue) tlIt.next();
+	                if(value.isLesserThan(curValue)) {
+	                    if(tlIt.hasPrevious()) {
+	                        tlIt.previous();
+	                    }
+	                    tlIt.add(value);
+	                    inserted = true;
+	                    break;
+	                }
+	            }
+	            if(!inserted) {
+	                tlIt.add(value);
+	            }
+	        }
+	    }
+	}
+	
     private List calculateObjectSequences() {
+        ManyValuedAttribute sequenceAttribute = (ManyValuedAttribute) this.sequenceColumnChooser.getSelectedItem();
+        ManyValuedAttribute timelineAttribute = (ManyValuedAttribute) this.timelineColumnChooser.getSelectedItem();
+
         List objectSequences = new ArrayList();
-        ManyValuedAttribute sequenceAttribute = (ManyValuedAttribute) this.sequenceChooser.getSelectedItem();
-        List sequenceValues = new ArrayList();
-        
-        ManyValuedAttribute timelineAttribute = (ManyValuedAttribute) this.timelineChooser.getSelectedItem();
-        List timelineValues = new ArrayList();
-        
-        Iterator objIt = this.context.getObjects().iterator();
-        while(objIt.hasNext()) {
-        	FCAObject object = (FCAObject) objIt.next();
-            AttributeValue value = this.context.getRelationship(object, sequenceAttribute);
-            if(!sequenceValues.contains(value)) {
-                boolean inserted = false;;
-                ListIterator seqIt = sequenceValues.listIterator();
-                while(seqIt.hasNext()) {
-                    AttributeValue curValue = (AttributeValue) seqIt.next();
-                    if(value.isLesserThan(curValue)) {
-                        if(seqIt.hasPrevious()) {
-                            seqIt.previous();
-                        }
-                        seqIt.add(value);
-                        inserted = true;
-                        break;
-                    }
-                }
-                if(!inserted) {
-                    seqIt.add(value);
-                }
-            }
-            value = this.context.getRelationship(object, timelineAttribute);
-            if(!timelineValues.contains(value)) {
-                boolean inserted = false;;
-                ListIterator tlIt = timelineValues.listIterator();
-                while(tlIt.hasNext()) {
-                    AttributeValue curValue = (AttributeValue) tlIt.next();
-                    if(value.isLesserThan(curValue)) {
-                        if(tlIt.hasPrevious()) {
-                            tlIt.previous();
-                        }
-                        tlIt.add(value);
-                        inserted = true;
-                        break;
-                    }
-                }
-                if(!inserted) {
-                    tlIt.add(value);
-                }
-            }
-        }
         
         // initialise sequences with empty lists
         Iterator seqValIt = sequenceValues.iterator();
@@ -403,7 +450,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
                 AttributeValue sequenceValue = (AttributeValue) seqValIt.next();
                 List sequence = (List) seqIt.next();
         	    boolean objectFound = false;
-        	    objIt = this.context.getObjects().iterator();
+        	    Iterator objIt = this.context.getObjects().iterator();
         	    while (objIt.hasNext()) {
         	        FCAObject object = (FCAObject) objIt.next();
         			if( this.context.getRelationship(object, sequenceAttribute).equals(sequenceValue) && 
@@ -418,10 +465,6 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         	    }
             }            
         }
-        
-        // store length of timeline
-        /// @todo side effect! refactor
-        this.timelineLength = timelineValues.size();
         
         return objectSequences;
     }
