@@ -696,6 +696,8 @@ public class DatabaseConnectionInformationView extends JDialog
         	}
         	databaseInfo.setTable(sqlTable);
         	databaseInfo.setKey(sqlKey);
+            JOptionPane.showMessageDialog(this, "Database connection established", "Success", 
+                      JOptionPane.INFORMATION_MESSAGE);
         	return true;
         }
         WizardPanel getNextPanel() {

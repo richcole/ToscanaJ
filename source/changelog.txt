@@ -19,6 +19,8 @@ Specific for Elba:
   database and the conceptual schema
 - the table/key pair for the DB connection now gets selected via two combo
   boxes (should be more intuitive)
+- after setting up the DB connection, a popup notifies the user about the
+  success
 
 Specific for Siena (still not fully complete):
 ==============================================
