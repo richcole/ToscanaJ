@@ -14,19 +14,20 @@ import java.awt.Graphics2D;
 
 public class LineView extends CanvasItem {
     /**
-     * Store the node model for this view
+     * Store the line in the model for this view.
      */
     private DiagramLine diagramLine = null;
 
-
     /**
-     * Creates DiagramLine object, initialising fromPoint and toPoint variables to required values
-     * indicating positions of 2 nodes in a Diagram
-    */
+     * Creates a view for the given DiagramLine.
+     */
     public LineView(DiagramLine diagramLine) {
-    this.diagramLine = diagramLine;
+        this.diagramLine = diagramLine;
     }
 
+    /**
+     * Draws the line.
+     */
     public void draw(ToscanajGraphics2D g) {
         ///@TODO Probably should throw a LineNotFoundException
         if(diagramLine != null) {
