@@ -39,9 +39,9 @@ import net.sourceforge.toscanaj.model.context.ContextImplementation;
 
 public class ContextTableRowHeader extends JComponent implements Scrollable {
 	private ContextImplementation context;
-	private ContextTableScaleEditorDialog dialog;
+	private ContextTableEditorDialog dialog;
 	
-	public ContextTableRowHeader (ContextImplementation context, ContextTableScaleEditorDialog dialog) {
+	public ContextTableRowHeader (ContextImplementation context, ContextTableEditorDialog dialog) {
 		super();
 		this.context = context;
 		this.dialog = dialog;

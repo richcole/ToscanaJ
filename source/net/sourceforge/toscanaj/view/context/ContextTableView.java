@@ -35,7 +35,7 @@ public class ContextTableView extends JComponent implements Scrollable {
 	static final Dimension TABLE_HEADER_PREFERRED_VIEWPORT_SIZE = new Dimension(CELL_WIDTH,CELL_HEIGHT);
 	
 	private ContextImplementation context;
-	private ContextTableScaleEditorDialog dialog;
+	private ContextTableEditorDialog dialog;
     private static final Dimension PREFERRED_VIEWPORT_SIZE = new Dimension(6 * CELL_WIDTH, 6 * CELL_HEIGHT);
 
 	public static class Position {
@@ -55,7 +55,7 @@ public class ContextTableView extends JComponent implements Scrollable {
 		}
 	}
 
-	public ContextTableView(ContextImplementation context, ContextTableScaleEditorDialog dialog) {
+	public ContextTableView(ContextImplementation context, ContextTableEditorDialog dialog) {
 		super();
 		this.context = context;
 		this.dialog = dialog;

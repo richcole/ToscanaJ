@@ -39,7 +39,7 @@ import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
-import net.sourceforge.toscanaj.view.context.ContextTableScaleEditorDialog;
+import net.sourceforge.toscanaj.view.context.ContextTableEditorDialog;
 
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
@@ -77,7 +77,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 	private JButton zoomOutButton;
     private JComboBox movementChooser;
     private JButton editDiagramDescButton;
-    protected ContextTableScaleEditorDialog contextEditingDialog;
+    protected ContextTableEditorDialog contextEditingDialog;
     private JButton gridIncreaseButton;
     private JButton gridDecreaseButton;
     private JCheckBox gridEnabledCheckBox;
@@ -101,7 +101,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		splitPane.setResizeWeight(0);
 		add(splitPane);
 		
-		this.contextEditingDialog = new ContextTableScaleEditorDialog(parent, this.conceptualSchema, this.databaseConnection, eventBroker);
+		this.contextEditingDialog = new ContextTableEditorDialog(parent, this.conceptualSchema, this.databaseConnection, eventBroker);
 		
 		eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
 		eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);

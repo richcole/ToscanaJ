@@ -40,7 +40,7 @@ import java.util.Set;
  * 
  * @todo avoid completely recreating the whole view each time the table changes
  */
-public class ContextTableScaleEditorDialog
+public class ContextTableEditorDialog
 	extends JDialog
 	implements EventBrokerListener {
 
@@ -51,7 +51,7 @@ public class ContextTableScaleEditorDialog
 	private static final int DEFAULT_X_POS = 50;
 	private static final int DEFAULT_Y_POS = 100;
 
-	private ContextTableScaleEditorDialog contextTableScaleEditorDialog;
+	private ContextTableEditorDialog contextTableScaleEditorDialog;
 	private ConceptualSchema conceptualSchema;
 	private ContextImplementation context;
 	private ContextTableView tableView;
@@ -68,7 +68,7 @@ public class ContextTableScaleEditorDialog
 	private ContextTableColumnHeader colHeader;
 	private ContextTableRowHeader rowHeader;
 
-	public ContextTableScaleEditorDialog(
+	public ContextTableEditorDialog(
 		Frame owner,
 		ConceptualSchema conceptualSchema,
 		DatabaseConnection databaseConnection,
@@ -81,7 +81,7 @@ public class ContextTableScaleEditorDialog
 			eventBroker);
 	}
 
-	public ContextTableScaleEditorDialog(
+	public ContextTableEditorDialog(
 		Frame owner,
 		ConceptualSchema conceptualSchema,
 		DatabaseConnection databaseConnection,

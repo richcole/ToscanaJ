@@ -14,7 +14,7 @@ import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.Context;
-import net.sourceforge.toscanaj.view.context.ContextTableScaleEditorDialog;
+import net.sourceforge.toscanaj.view.context.ContextTableEditorDialog;
 
 public class ContextTableScaleGenerator implements ScaleGenerator {
     private Frame parent;
@@ -34,7 +34,7 @@ public class ContextTableScaleGenerator implements ScaleGenerator {
     }
 
     public Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection) {
-        ContextTableScaleEditorDialog dialog = new ContextTableScaleEditorDialog(
+        ContextTableEditorDialog dialog = new ContextTableEditorDialog(
                 parent,
                 scheme,
                 databaseConnection,
