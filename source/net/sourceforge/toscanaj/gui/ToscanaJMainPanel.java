@@ -280,6 +280,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
         diagramOrganiser = new DiagramOrganiser(this.conceptualSchema, broker);
 		if (preferences.getBoolean("showDiagramPreview", true)) {
+            // set preference in case it is not yet there -- otherwise the options dialog 
+            // will show the wrong setting
+            preferences.putBoolean("showDiagramPreview", true);
 			this.diagramPreview = new DiagramView();
 			this.diagramPreview.setConceptInterpreter(new DirectConceptInterpreter());
 			this.diagramPreview.setConceptInterpretationContext(
