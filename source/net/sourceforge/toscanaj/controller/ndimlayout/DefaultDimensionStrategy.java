@@ -1,53 +1,44 @@
 /*
- * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
- * Please read licence.txt in the toplevel source directory for licensing information.
- *
+ * Copyright Peter Becker (http://www.peterbecker.de). Please
+ * read licence.txt file provided with the distribution for
+ * licensing information.
+ * 
  * $Id$
  */
 package net.sourceforge.toscanaj.controller.ndimlayout;
 
-import net.sourceforge.toscanaj.controller.cernato.PartialOrderOperations;
-import net.sourceforge.toscanaj.model.context.FCAElement;
-import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
-import net.sourceforge.toscanaj.model.order.PartialOrderNode;
 
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Vector;
 
+/**
+ * This dimension strategy ensure the usual type of attribute-additivity.
+ * 
+ * One attribute of each meet-irreducible concept gets assigned a dimension, which
+ * results in an attribute-additive line diagram based on attributes of 
+ * meet-irreducibles. This is the usual layout used e.g. by Anaconda, except that
+ * the manipulation always works in a controlled way: moving the meet-irreducible
+ * elements moves the ideals (as with the ideal manipulator in our tools or Anaconda), 
+ * while moving other nodes splits the movement onto the dimensions involved (I think
+ * that can be expressed as moving the ideals of all meet-irreducibles in the interval
+ * between the concept and the join of all of its parents -- alternatively just think
+ * of it in the same way all the other n-dim stuff works).
+ */
 public class DefaultDimensionStrategy implements DimensionCreationStrategy {
     public Vector calculateDimensions(Lattice lattice) {
+        Vector dimensions = new Vector();
         Concept[] concepts = lattice.getConcepts();
-        Vector redCons = new Vector();
         for (int i = 0; i < concepts.length; i++) {
             Concept concept = concepts[i];
             if (concept.isMeetIrreducible()) {
-                redCons.add(concept);
-            }
-        }
-        Concept[] reducedConcepts = new Concept[redCons.size()];
-        redCons.toArray(reducedConcepts);
-        Vector dimensions = new Vector();
-        DirectedGraph graph = PartialOrderOperations.createGraphFromOrder(reducedConcepts);
-        Set paths = graph.getMaximalPaths();
-        for (Iterator it = paths.iterator(); it.hasNext();) {
-            Vector path = (Vector) it.next();
-            Vector attributes = new Vector();
-            for (Iterator it2 = path.iterator(); it2.hasNext();) {
-                PartialOrderNode node = (PartialOrderNode) it2.next();
-                Concept concept = (Concept) node.getData();
                 Iterator attrCont = concept.getAttributeContingentIterator();
-                // we just take one attribute for the dimension (if instead of while)
-                if (attrCont.hasNext()) {
-                    FCAElement attribute = (FCAElement) attrCont.next();
-                    attributes.add(attribute);
-                }
+                Vector attribVector = new Vector();
+                attribVector.add(attrCont.next());
+				dimensions.add(new Dimension(attribVector));
             }
-            dimensions.add(new Dimension(attributes));
         }
         return dimensions;
     }
