@@ -74,7 +74,7 @@
             </batchtest>
         </junit>
 	</target>
-    <target name="prepareDist" depends="compileRelease">
+    <target name="prepareDist">
 		<mkdir dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}/${dist.name}"/>
 		<jar jarfile="${dist.dir}/${dist.name}/${app.name}.jar" basedir="${build.release.dir}" manifest="${src.dir}/manifest.mf"/>
@@ -103,14 +103,18 @@
 		<fixcrlf srcDir="${dist.dir}/${dist.name}" eol="crlf" includes="*.txt, *.bat, toscanaj.prop"/>
 		<fixcrlf srcDir="${dist.dir}/${dist.name}" eol="lf" includes="*.sh"/>
     </target>
-	<target name="dist" depends="prepareDist">
+	<target name="dist" depends="compileRelease,prepareDist,zipFile">
+	</target>
+	<target name="zipFile">
 		<zip destfile="${dist.dir}/${dist.name}-bin.zip">
 			<fileset dir="${dist.dir}">
 				<include name="${dist.name}/**"/>
 			</fileset>
 		</zip>
 	</target>
-    <target name="splitDist" depends="prepareDist">
+    <target name="splitDist" depends="compileRelease,prepareDist,zipSplitFiles">
+	</target>
+    <target name="zipSplitFiles">
 		<zip destfile="${dist.dir}/${dist.name}-core-bin.zip">
 			<fileset dir="${dist.dir}">
                 <include name="${dist.name}/*"/>
