@@ -7,13 +7,14 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
-import net.sourceforge.toscanaj.gui.LabeledPanel;
-
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Arrays;
 
 public class OrdinalScaleEditorDialog extends JDialog {
@@ -24,6 +25,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
     private NumberField addField;
     private JList dividersList;
     private int scaleType;
+    private JButton okButton; 
 
     public static final int INTEGER = 0;
     public static final int FLOAT = 1;
@@ -31,6 +33,8 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
     public OrdinalScaleEditorDialog(Frame owner, String scaleName, int scaleType) {
         super(owner);
+      	setSize(400,600);
+      	setLocation(200,100);
         this.scaleType = scaleType;
         layoutDialog(scaleName);
         pack();
@@ -45,83 +49,205 @@ public class OrdinalScaleEditorDialog extends JDialog {
     private void layoutDialog(String scaleName) {
         setModal(true);
         setTitle("Ordinal scale editor");
-        getContentPane().setLayout(new BorderLayout());
-
+        JPanel mainPane = new JPanel(new GridBagLayout());
+        
+		JPanel titlePane = new JPanel(new GridBagLayout());
         titleEditor.setText(scaleName + " (ordinal)");
-        getContentPane().add(new LabeledPanel("Title", titleEditor), BorderLayout.NORTH);
+		this.titleEditor.addKeyListener(new KeyListener(){
+			private void validateTextField(){
+				if(titleEditor.getText().equals("") || dividersList.getModel().getSize()==0){
+					okButton.setEnabled(false);
+				}else{
+					okButton.setEnabled(true);
+				}
+			}
+			public void keyTyped(KeyEvent e) {
+				validateTextField();
+			}
+			public void keyReleased(KeyEvent e) {
+				validateTextField();
+			}
+			public void keyPressed(KeyEvent e) {}		
+		});
+        JLabel title = new JLabel("Title");
+        titlePane.add(title, new GridBagConstraints(
+        					0,0,1,1,0,0,
+        					GridBagConstraints.NORTHWEST,
+        					GridBagConstraints.NONE,
+        					new Insets(2,2,2,2),
+        					2,2      
+        ));
+        
+		titlePane.add(titleEditor, new GridBagConstraints(
+							 0,1,1,1,1.0,0,
+							 GridBagConstraints.WEST,
+							 GridBagConstraints.HORIZONTAL,
+							 new Insets(2,2,2,2),
+							 2,2      
+		 ));
+        
+        mainPane.add(titlePane,new GridBagConstraints(
+					0,0,2,1,1.0,0,
+					GridBagConstraints.NORTHWEST,
+					GridBagConstraints.HORIZONTAL,
+					new Insets(2,2,2,2),
+					2,2
+		));
+		
+		mainPane.add(makeCenterPane(), new GridBagConstraints(
+					0,1,1,1,1.0,1.0,
+					GridBagConstraints.NORTHWEST,
+					GridBagConstraints .BOTH,
+					new Insets(2,2,2,0),
+					2,2
+		));
+		
+		
+		mainPane.add(makeButtonsPane(), new GridBagConstraints(
+					0,3,2,1,1.0,0,
+					GridBagConstraints.NORTHWEST,
+					GridBagConstraints .HORIZONTAL,
+					new Insets(2,2,2,2),
+					2,2
+		));
+		
+		setContentPane(mainPane);
 
-
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-
-        dividersModel = new DefaultListModel();
-
-        dividersList = new JList(dividersModel);
-        dividersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        LabeledPanel dividerEditor = new LabeledPanel("Dividers", dividersList);
-
-        JPanel dividerPane = new JPanel();
-        dividerPane.setLayout(new BoxLayout(dividerPane, BoxLayout.Y_AXIS));
-        dividerPane.add(dividerEditor);
-
-        JPanel entryPanel = new JPanel();
-        entryPanel.setLayout(new BoxLayout(entryPanel, BoxLayout.X_AXIS));
-
-        entryPanel.add(makeAddDividerPanel());
-
-        final JButton removeButton = new JButton("Remove");
-        removeButton.setEnabled(hasSelectedDivider());
-
-
-        dividersList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                removeButton.setEnabled(e.getFirstIndex() != -1);
-            }
-        });
-        dividersModel.addListDataListener(new ListDataListener() {
-            private void updateRemoveButton() {
-                removeButton.setEnabled(dividersModel.getSize() > 0 && hasSelectedDivider());
-            }
-
-            public void intervalAdded(ListDataEvent e) {
-                updateRemoveButton();
-            }
-
-            public void intervalRemoved(ListDataEvent e) {
-                updateRemoveButton();
-            }
-
-            public void contentsChanged(ListDataEvent e) {
-                updateRemoveButton();
-            }
-        });
-
-        removeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int[] selected = dividersList.getSelectedIndices();
-                for (int i = selected.length; --i >= 0;) {
-                    removeDivider(selected[i]);
-                }
-            }
-        });
-
-        entryPanel.add(removeButton);
-
-
-        JButton removeAllButton = makeActionOnCorrectScaleButton("Remove All");
-        removeAllButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                removeAllDividers();
-            }
-        });
-
-        entryPanel.add(removeAllButton);
-        dividerPane.add(entryPanel);
-        centerPanel.add(dividerPane);
-
-        getContentPane().add(centerPanel, BorderLayout.CENTER);
-        getContentPane().add(makeButtonsPane(), BorderLayout.SOUTH);
     }
+
+	protected JPanel makeCenterPane() {
+		JPanel dividerPane = new JPanel(new GridBagLayout());
+		dividersModel = new DefaultListModel();
+		
+		dividersList = new JList(dividersModel);
+		dividersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+		
+		
+		dividerPane.add(new JScrollPane(dividersList),new GridBagConstraints(
+							0,1,1,1,1.0,1.0,
+							GridBagConstraints.WEST,
+							GridBagConstraints.BOTH,
+							new Insets(2,2,2,0),
+							2,2
+		));
+		
+		final JButton removeButton = new JButton("Remove");
+		removeButton.setEnabled(hasSelectedDivider());
+		
+		dividersList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			   public void valueChanged(ListSelectionEvent e) {
+				   removeButton.setEnabled(e.getFirstIndex() != -1);
+			   }
+		   });
+		   dividersModel.addListDataListener(new ListDataListener() {
+			   private void updateRemoveButton() {
+				   removeButton.setEnabled(dividersModel.getSize() > 0 && hasSelectedDivider());
+			   }
+		
+			   public void intervalAdded(ListDataEvent e) {
+				   updateRemoveButton();
+			   }
+		
+			   public void intervalRemoved(ListDataEvent e) {
+				   updateRemoveButton();
+			   }
+		
+			   public void contentsChanged(ListDataEvent e) {
+				   updateRemoveButton();
+			   }
+		   });
+		
+		   JPanel removeButtonPane = new JPanel(new GridBagLayout());
+		   
+		
+		   removeButton.addActionListener(new ActionListener() {
+			   public void actionPerformed(ActionEvent e) {
+				   int[] selected = dividersList.getSelectedIndices();
+				   for (int i = selected.length; --i >= 0;) {
+					   removeDivider(selected[i]);
+				   }
+			   }
+		   });
+		
+			final JButton removeAllButton = new JButton("Remove All");
+			removeAllButton.setEnabled(false);
+		    dividersModel.addListDataListener(new ListDataListener() {
+			  private void updateRemoveButton() {
+				  removeAllButton.setEnabled(dividersModel.size() != 0);
+			  }
+
+			  public void intervalAdded(ListDataEvent e) {
+				  updateRemoveButton();
+			  }
+
+			  public void intervalRemoved(ListDataEvent e) {
+				  updateRemoveButton();
+			  }
+
+			  public void contentsChanged(ListDataEvent e) {
+				  updateRemoveButton();
+			  }
+		  });
+				removeAllButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						removeAllDividers();
+				}
+			});
+			
+		removeButtonPane.add(removeButton, new GridBagConstraints(
+					0,0,1,1,1.0,0,
+					GridBagConstraints.WEST,
+					GridBagConstraints.HORIZONTAL,
+					new Insets(2,2,2,2),
+					2,2
+		));
+		removeButtonPane.add(removeAllButton, new GridBagConstraints(
+					1,0,1,1,1.0,0,
+					GridBagConstraints.WEST,
+					GridBagConstraints.HORIZONTAL,
+					new Insets(2,2,2,2),
+					2,2
+		));
+		
+		JPanel centerPane = new JPanel(new GridBagLayout());
+		
+		
+		
+		centerPane.add(makeAddDividerPanel(), new GridBagConstraints(
+					0,0,1,1,1.0,0,
+					GridBagConstraints.NORTHWEST,
+					GridBagConstraints .HORIZONTAL,
+					new Insets(2,0,2,0),
+					2,2
+		));
+		centerPane.add(dividerPane, new GridBagConstraints(
+					1,0,1,1,1.0,1.0,
+					GridBagConstraints.NORTHWEST,
+					GridBagConstraints.BOTH,
+					new Insets(2,2,2,0),
+					2,2
+		)); 
+		
+		centerPane.add(new JPanel(), new GridBagConstraints(
+					0,1,1,1,1.0,1.0,
+					GridBagConstraints.NORTHWEST,
+					GridBagConstraints.BOTH,
+					new Insets(2,2,2,0),
+					2,2
+		));
+		centerPane.add(removeButtonPane, new GridBagConstraints(
+					1,1,1,1,1.0,0,
+					GridBagConstraints.NORTHWEST,
+					GridBagConstraints.HORIZONTAL,
+					new Insets(2,2,2,2),
+					2,2
+		));
+		
+		TitledBorder titledBorder = BorderFactory.createTitledBorder("Divider");
+		titledBorder.setTitleJustification(TitledBorder.RIGHT);
+		centerPane.setBorder(titledBorder);
+		return centerPane;
+	}
 
     public void removeDivider(int i) {
         dividersModel.removeElementAt(i);
@@ -144,7 +270,8 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
     private JPanel makeAddDividerPanel() {
         JPanel addPanel = new JPanel();
-        addPanel.setLayout(new BoxLayout(addPanel, BoxLayout.X_AXIS));
+        JLabel enterValue = new JLabel("Enter Value:");
+        addPanel.setLayout(new GridBagLayout());
         if (scaleType == FLOAT) {
             addField = new NumberField(10, NumberField.FLOAT);
         } else {
@@ -182,9 +309,29 @@ public class OrdinalScaleEditorDialog extends JDialog {
                 addDelimiter();
             }
         });
+        
+		addPanel.add(enterValue, new GridBagConstraints(
+					0,0,1,1,0,0,
+					GridBagConstraints.NORTHWEST,
+					GridBagConstraints.NONE,
+					new Insets(0,2,0,2),
+					2,2
+		));
 
-        addPanel.add(addField);
-        addPanel.add(addButton);
+        addPanel.add(addField, new GridBagConstraints(
+        			0,1,1,1,0,0,
+        			GridBagConstraints.NORTHWEST,
+        			GridBagConstraints.VERTICAL,
+        			new Insets(0,2,0,2),
+        			2,2
+        ));
+        addPanel.add(addButton,new GridBagConstraints(
+					1,1,1,1,0,0,
+					GridBagConstraints.NORTHWEST,
+					GridBagConstraints.NONE,
+					new Insets(0,2,0,2),
+					2,2
+		));
         return addPanel;
     }
 
@@ -238,15 +385,16 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
     private JPanel makeButtonsPane() {
         JPanel buttonPane = new JPanel();
-        buttonPane.setLayout(new FlowLayout());
+        buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-        final JButton okButton = makeActionOnCorrectScaleButton("Ok");
+        okButton = makeActionOnCorrectScaleButton("Create");
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dispose();
                 result = true;
             }
         });
+        
 
         buttonPane.add(okButton);
 
@@ -262,7 +410,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
     }
 
     private boolean isScaleCorrect() {
-        return dividersModel.getSize() > 0;
+        return dividersModel.getSize() > 0 && !titleEditor.getText().equals("");
     }
 
     private class UpdateButtonForCorrectModelStateListDataListener implements ListDataListener {
@@ -288,6 +436,4 @@ public class OrdinalScaleEditorDialog extends JDialog {
             updateStateOfOkButton();
         }
     }
-
-
 }

@@ -13,9 +13,14 @@ import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.model.database.Column;
 
 import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
@@ -30,6 +35,8 @@ public class NominalScaleEditorDialog extends JDialog {
     private JList attributeListView;
     private DefaultListModel columnValuesListModel;
     private DefaultListModel attributeListModel;
+	private JButton cancelButton;
+	private JButton createButton;
 
     private JTextField scaleTitleField;
 
@@ -52,9 +59,42 @@ public class NominalScaleEditorDialog extends JDialog {
         // -- title pane ---
         this.scaleTitleField = new JTextField();
         scaleTitleField.setText(column.getName() + " (nominal)");
-        JPanel titlePane = new JPanel(new GridLayout(1, 0));
-        titlePane.add(new Label("Scale Title"));
-        titlePane.add(scaleTitleField);
+        this.scaleTitleField.addKeyListener(new KeyListener(){
+			private void validateTextField(){
+				if(scaleTitleField.getText().trim().equals("")){
+					createButton.setEnabled(false);
+				}else{
+					createButton.setEnabled(true);
+				}
+			}
+			public void keyTyped(KeyEvent e) {
+				validateTextField();
+				setCreateButtonStatus();
+			}
+			public void keyReleased(KeyEvent e) {
+				validateTextField();
+				setCreateButtonStatus();
+			}
+			public void keyPressed(KeyEvent e) {}		
+        });
+        JPanel titlePane = new JPanel(new GridBagLayout());
+        titlePane.add(new Label("Scale Title"), new GridBagConstraints(
+        				0,0,1,1,0,0,
+        				GridBagConstraints.NORTHWEST,
+        				GridBagConstraints.NONE,
+        				new Insets(2,2,2,2),
+        				2,2
+        ));
+        
+        titlePane.add(scaleTitleField, new GridBagConstraints(
+        				1,0,1,1,1,1,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.HORIZONTAL,
+						new Insets(2,2,2,2),
+						2,2
+		));
+		
+		
         getContentPane().add(
                 titlePane,
                 new GridBagConstraints(
@@ -142,22 +182,27 @@ public class NominalScaleEditorDialog extends JDialog {
         );
 
         JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton cancelButton = new JButton("Cancel");
+        cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 result = false;
                 hide();
             }
         });
-        JButton createButton = new JButton("Create");
+        createButton = new JButton("Create");
+        createButton.setEnabled(!scaleTitleField.getText().equals("") && 
+        attributeListView.getModel().getSize()!=0);
         createButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 result = true;
                 hide();
             }
         });
+	
+
+        
+		buttonPane.add(createButton);
         buttonPane.add(cancelButton);
-        buttonPane.add(createButton);
         getContentPane().add(
                 buttonPane,
                 new GridBagConstraints(
@@ -168,6 +213,8 @@ public class NominalScaleEditorDialog extends JDialog {
                         0, 0
                 )
         );
+        
+		attributeListView.getModel().addListDataListener(new UpdateButtonForCorrectModelStateListDataListener(createButton));
         pack();
     }
 
@@ -215,4 +262,43 @@ public class NominalScaleEditorDialog extends JDialog {
     public String getDiagramTitle() {
         return this.scaleTitleField.getText();
     }
+    
+	protected void setCreateButtonStatus(){
+		if(scaleTitleField.getText().equals("") && attributeListView.getModel().getSize()==0){
+			createButton.setEnabled(false);
+		}else{
+			if(!scaleTitleField.getText().equals("") && attributeListView.getModel().getSize()!=0){
+				createButton.setEnabled(true);
+			}else{
+				createButton.setEnabled(false);
+			}
+		}
+	}    
+	private boolean isScaleCorrect() {
+		  return attributeListView.getModel().getSize() > 0;
+	  }
+	private class UpdateButtonForCorrectModelStateListDataListener implements ListDataListener {
+			private final JButton actionButton;
+
+			public UpdateButtonForCorrectModelStateListDataListener(JButton button) {
+				this.actionButton = button;
+			}
+
+			private void updateStateOfOkButton() {
+				actionButton.setEnabled(isScaleCorrect() && !scaleTitleField.getText().equals(""));
+			}
+
+			public void contentsChanged(ListDataEvent e) {
+				updateStateOfOkButton();
+			}
+
+			public void intervalAdded(ListDataEvent e) {
+				updateStateOfOkButton();
+			}
+
+			public void intervalRemoved(ListDataEvent e) {
+				updateStateOfOkButton();
+			}
+		}
+    
 }
