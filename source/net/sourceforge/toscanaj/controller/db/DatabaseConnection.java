@@ -51,6 +51,7 @@ public class DatabaseConnection implements EventBrokerListener {
     static private final PrintStream logger;
 	private Type type;
 
+    private long lastStatementStartTime;
     /**
      * Initializes the logger from the system configuration.
      */
@@ -213,14 +214,15 @@ public class DatabaseConnection implements EventBrokerListener {
         // submit the query
         try {
             stmt = jdbcConnection.createStatement();
-            printLogMessage(System.currentTimeMillis() + ": Executing statement: " + statement);
+			logStatementStart(statement);
             resultSet = stmt.executeQuery(statement);
-            printLogMessage(System.currentTimeMillis() + ": done.");
+			logStatementEnd();
             while (resultSet.next()) {
                 result.add(resultSet.getString(column));
             }
         } catch (SQLException se) {
-            throw new DatabaseException("An error occured while querying the database.", se);
+			throw new DatabaseException("An error occured while querying the database.\nThe statement \"" + statement +
+										"\" failed.", se);
         } finally {
             try {
                 if (resultSet != null) {
@@ -265,9 +267,9 @@ public class DatabaseConnection implements EventBrokerListener {
         // submit the query
         try {
             stmt = jdbcConnection.createStatement();
-            printLogMessage(System.currentTimeMillis() + ": Executing query: " + statement);
+            logStatementStart(statement);
             resultSet = stmt.executeQuery(statement);
-            printLogMessage(System.currentTimeMillis() + ": done.");
+            logStatementEnd();
             int numberColumns = resultSet.getMetaData().getColumnCount();
             while (resultSet.next()) {
                 Vector item = new Vector(numberColumns);
@@ -277,7 +279,8 @@ public class DatabaseConnection implements EventBrokerListener {
                 result.add(item);
             }
         } catch (SQLException se) {
-            throw new DatabaseException("An error occured while querying the database.", se);
+			throw new DatabaseException("An error occured while querying the database.\nThe statement \"" + statement +
+										"\" failed.", se);
         } finally {
             try {
                 if (resultSet != null) {
@@ -303,13 +306,14 @@ public class DatabaseConnection implements EventBrokerListener {
         // submit the query
         try {
             stmt = jdbcConnection.createStatement();
-            printLogMessage(System.currentTimeMillis() + ": Executing statement: " + statement);
+            logStatementStart(statement);
             resultSet = stmt.executeQuery(statement);
-            printLogMessage(System.currentTimeMillis() + ": done.");
+            logStatementEnd();
             resultSet.next();
             result = resultSet.getInt(column);
         } catch (SQLException se) {
-            throw new DatabaseException("An error occured while querying the database.", se);
+            throw new DatabaseException("An error occured while querying the database.\nThe statement \"" + statement +
+            							"\" failed.", se);
         } finally {
             try {
                 if (resultSet != null) {
@@ -336,13 +340,14 @@ public class DatabaseConnection implements EventBrokerListener {
         // submit the query
         try {
             stmt = jdbcConnection.createStatement();
-            printLogMessage(System.currentTimeMillis() + ": Executing statement: " + statement);
+			logStatementStart(statement);
             resultSet = stmt.executeQuery(statement);
-            printLogMessage(System.currentTimeMillis() + ": done.");
+			logStatementEnd();
             resultSet.next();
             result = resultSet.getDouble(column);
         } catch (SQLException se) {
-            throw new DatabaseException("An error occured while querying the database.", se);
+			throw new DatabaseException("An error occured while querying the database.\nThe statement \"" + statement +
+										"\" failed.", se);
         } finally {
             try {
                 if (resultSet != null) {
@@ -630,6 +635,16 @@ public class DatabaseConnection implements EventBrokerListener {
     
 	public DatabaseInfo.Type getDatabaseType() {
 		return this.type;    
+	}
+
+	private void logStatementStart(String statement) {
+        this.lastStatementStartTime = System.currentTimeMillis();
+        printLogMessage(lastStatementStartTime + ": Executing statement: " + statement);
+	}
+
+	private void logStatementEnd() {
+		long statementStopTime = System.currentTimeMillis();
+        printLogMessage(statementStopTime + ": done (" + (statementStopTime - this.lastStatementStartTime) + " ms).");
 	}
 }
 
