@@ -59,8 +59,6 @@ public class EventBroker implements BrokerEventListener {
      * be a class or an interface) which comes from a source that
      * extends or implements the given source type (given as class
      * or interface).
-     *
-     * @see subscribe(BrokerEventListener, String, String)
      */
     public void subscribe(BrokerEventListener listener, Class eventType, Class sourceType) {
         try {
