@@ -6,6 +6,7 @@ Affecting different programs:
 - grid size now changes with a factor of third root of two. This means after
   three refinements the nodes are all on a grid location again
 - CSC import is greatly enhanced, most importantly it supports include files now
+- Bugfix: saving files with descriptions on objects or attributes works again
 
 Specific for ToscanaJ:
 ======================

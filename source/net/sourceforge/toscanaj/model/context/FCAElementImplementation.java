@@ -98,7 +98,7 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable, 
 		Element retVal = new Element(OBJECT_ELEMENT_NAME);
 		if (description != null) {
 			Element descriptionElement = new Element(DESCRIPTION_ELEMENT_NAME);
-			descriptionElement.addContent(description);
+			descriptionElement.addContent((Element)description.clone());
 			retVal.addContent(descriptionElement);
 		}
         /** @todo this is how it should be in 2.0
