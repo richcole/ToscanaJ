@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XML Spy v4.0 U (http://www.xmlspy.com) by Peter Becker (Research) -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 	<xsd:element name="conceptualSchema">
 		<xsd:complexType>
@@ -54,6 +53,14 @@
 							</xsd:element>
 						</xsd:sequence>
 					</xsd:complexType>
+					<xsd:key name="objectKey">
+						<xsd:selector xpath="object"/>
+						<xsd:field xpath="@id"/>
+					</xsd:key>
+					<xsd:key name="attributeKey">
+						<xsd:selector xpath="attribute"/>
+						<xsd:field xpath="@id"/>
+					</xsd:key>
 				</xsd:element>
 				<xsd:element name="diagram" minOccurs="0" maxOccurs="unbounded">
 					<xsd:complexType>
@@ -71,7 +78,12 @@
 											<xsd:complexType>
 												<xsd:sequence>
 													<xsd:element name="labelStyle" type="labelStyleType" minOccurs="0"/>
-													<xsd:element name="objectRef" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+													<xsd:element name="objectRef" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+														<xsd:keyref name="objectRef" refer="objectKey">
+															<xsd:selector xpath="."/>
+															<xsd:field xpath="."/>
+														</xsd:keyref>
+													</xsd:element>
 												</xsd:sequence>
 											</xsd:complexType>
 										</xsd:element>
@@ -79,7 +91,12 @@
 											<xsd:complexType>
 												<xsd:sequence>
 													<xsd:element name="labelStyle" type="labelStyleType" minOccurs="0"/>
-													<xsd:element name="attributeRef" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+													<xsd:element name="attributeRef" type="xsd:string" minOccurs="0" maxOccurs="unbounded">
+														<xsd:keyref name="attributeRef" refer="attributeKey">
+															<xsd:selector xpath="."/>
+															<xsd:field xpath="."/>
+														</xsd:keyref>
+													</xsd:element>
 												</xsd:sequence>
 											</xsd:complexType>
 										</xsd:element>
@@ -96,27 +113,11 @@
 						</xsd:sequence>
 						<xsd:attribute name="title" type="xsd:string" use="required"/>
 					</xsd:complexType>
-					<xsd:key name="conceptIDs">
-						<xsd:selector xpath="concept"/>
-						<xsd:field xpath="@id"/>
-					</xsd:key>
 				</xsd:element>
 			</xsd:sequence>
 			<xsd:attribute name="askDatabase" type="xsd:boolean" use="optional" default="false"/>
 			<xsd:attribute name="version" type="xsd:string" use="required" default="1.0"/>
 		</xsd:complexType>
-		<xsd:key name="diagramTitles">
-			<xsd:selector xpath="diagram"/>
-			<xsd:field xpath="@title"/>
-		</xsd:key>
-		<xsd:key name="objectIDs">
-			<xsd:selector xpath="context/object"/>
-			<xsd:field xpath="@id"/>
-		</xsd:key>
-		<xsd:key name="attributeIDs">
-			<xsd:selector xpath="context/attribute"/>
-			<xsd:field xpath="@id"/>
-		</xsd:key>
 	</xsd:element>
 	<xsd:complexType name="labelStyleType">
 		<xsd:sequence>
