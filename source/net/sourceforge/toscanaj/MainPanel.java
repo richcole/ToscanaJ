@@ -175,7 +175,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      */
     public MainPanel() {
         super("ToscanaJ");
-        buildPanel();
         // register all image writers we want to support
         net.sourceforge.toscanaj.canvas.imagewriter.BatikImageWriter.initialize();
         net.sourceforge.toscanaj.canvas.imagewriter.JimiImageWriter.initialize();
@@ -186,6 +185,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         if(it.hasNext()) {
             this.diagramExportSettings = new DiagramExportSettings((GraphicFormat)it.next(), 0, 0, true );
         }
+        // then build the panel (order is important for checking if we want export options)
+        buildPanel();
         // listen to changes on DiagramController
         DiagramController.getController().addObserver(this);
         // restore the old MRU list
@@ -278,18 +279,21 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         openMenuItem.addActionListener(this);
         fileMenu.add(openMenuItem);
 
-        // menu item export diagram
-        exportDiagramMenuItem = new JMenuItem("Export Diagram...");
-        exportDiagramMenuItem.setMnemonic(KeyEvent.VK_E);
-        exportDiagramMenuItem.addActionListener(this);
-        exportDiagramMenuItem.setEnabled(false);
-        fileMenu.add(exportDiagramMenuItem);
+        // we add the export options only if we can export at all
+        if(this.diagramExportSettings != null) {
+            // menu item export diagram
+            exportDiagramMenuItem = new JMenuItem("Export Diagram...");
+            exportDiagramMenuItem.setMnemonic(KeyEvent.VK_E);
+            exportDiagramMenuItem.addActionListener(this);
+            exportDiagramMenuItem.setEnabled(false);
+            fileMenu.add(exportDiagramMenuItem);
 
-        // create the export diagram save options submenu
-        this.exportDiagramSetupMenuItem = new JMenuItem("Export Diagram Setup...");
-        this.exportDiagramSetupMenuItem.setMnemonic(KeyEvent.VK_E);
-        this.exportDiagramSetupMenuItem.addActionListener(this);
-        fileMenu.add(exportDiagramSetupMenuItem);
+            // create the export diagram save options submenu
+            this.exportDiagramSetupMenuItem = new JMenuItem("Export Diagram Setup...");
+            this.exportDiagramSetupMenuItem.setMnemonic(KeyEvent.VK_E);
+            this.exportDiagramSetupMenuItem.addActionListener(this);
+            fileMenu.add(exportDiagramSetupMenuItem);
+        }
 
         // separator
         fileMenu.addSeparator();
