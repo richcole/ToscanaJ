@@ -75,16 +75,16 @@ public class DataDump {
             System.exit(4);
         }
         // create concept for filtering if needed
-        DatabaseConnectedConcept filterConcept = null;
+        ConceptImplementation filterConcept = null;
         /// @todo don't generate multiple connections, instead send the same connection object.
         if (filterClause != null) {
             try {
-                filterConcept = new DatabaseConnectedConcept();
+                filterConcept = new ConceptImplementation();
             } catch (Exception e) {
                 System.err.println("Couldn't create filter for database");
                 System.exit(4);
             }
-            filterConcept.setObjectClause(filterClause);
+            filterConcept.addObject(filterClause);
         }
         // create output structure
         Document output = new Document(new Element("csxDump"));
@@ -177,7 +177,7 @@ public class DataDump {
      * might want to get a common code base here. If the filterConcept is null,
      * a copy of the input is returned.
      */
-    protected static Diagram2D filterDiagram(Diagram2D inputDiagram, DatabaseConnectedConcept filterConcept) {
+    protected static Diagram2D filterDiagram(Diagram2D inputDiagram, Concept filterConcept) {
         SimpleLineDiagram retVal = new SimpleLineDiagram();
         Hashtable nodeMap = new Hashtable();
 
@@ -214,17 +214,17 @@ public class DataDump {
             retVal.addLine(from, to);
 
             // add direct neighbours to concepts
-            AbstractConceptImplementation concept1 =
-                    (AbstractConceptImplementation) from.getConcept();
-            AbstractConceptImplementation concept2 =
-                    (AbstractConceptImplementation) to.getConcept();
+            ConceptImplementation concept1 =
+                    (ConceptImplementation) from.getConcept();
+            ConceptImplementation concept2 =
+                    (ConceptImplementation) to.getConcept();
             concept1.addSubConcept(concept2);
             concept2.addSuperConcept(concept1);
         }
 
         // build transitive closures for each concept
         for (int i = 0; i < retVal.getNumberOfNodes(); i++) {
-            ((AbstractConceptImplementation) retVal.getNode(i).getConcept()).buildClosures();
+            ((ConceptImplementation) retVal.getNode(i).getConcept()).buildClosures();
         }
 
         return retVal;

@@ -13,7 +13,6 @@ import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
 import java.util.*;
 
@@ -33,12 +32,11 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
-        DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
         boolean displayMode = context.getObjectDisplayMode();
         if (displayMode == ConceptInterpretationContext.CONTINGENT) {
-            return dbConcept.getObjectContingentIterator();
+            return concept.getObjectContingentIterator();
         } else if (displayMode == ConceptInterpretationContext.EXTENT) {
-            return dbConcept.getExtentIterator();
+            return concept.getExtentIterator();
         } else {
             throw new RuntimeException("Can't happen");
         }
@@ -68,8 +66,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         if (cacheVal != null) {
             return cacheVal.intValue();
         }
-        DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
-        String whereClause = WhereClauseGenerator.createWhereClause(dbConcept,
+        String whereClause = WhereClauseGenerator.createWhereClause(concept,
                 context.getDiagramHistory(),
                 context.getNestingConcepts(),
                 countType,
@@ -177,13 +174,12 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     public List executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
-        DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
         boolean objectDisplayMode = context.getObjectDisplayMode();
         boolean filterMode = context.getFilterMode();
-        if (dbConcept.getObjectClause() != null ||
-                ((objectDisplayMode == ConceptInterpretationContext.EXTENT) && !dbConcept.isBottom())
+        if (concept.getObjectContingentSize() != 0 ||
+                ((objectDisplayMode == ConceptInterpretationContext.EXTENT) && !concept.isBottom())
         ) {
-            String whereClause = WhereClauseGenerator.createWhereClause(dbConcept,
+            String whereClause = WhereClauseGenerator.createWhereClause(concept,
                     context.getDiagramHistory(),
                     context.getNestingConcepts(),
                     objectDisplayMode,

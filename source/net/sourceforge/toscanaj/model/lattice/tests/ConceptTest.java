@@ -8,16 +8,13 @@
 package net.sourceforge.toscanaj.model.lattice.tests;
 
 import junit.framework.TestCase;
-import net.sourceforge.toscanaj.model.database.DatabaseInfo;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 /**
  * @todo these tests are rather broken, we should test with an embedded database with some objects
  * in it.
  */
 public abstract class ConceptTest extends TestCase {
-    private DatabaseInfo dbInfo = new DatabaseInfo();
-
     public ConceptTest(String s) {
         super(s);
     }
@@ -46,5 +43,5 @@ public abstract class ConceptTest extends TestCase {
         assertEquals(true, result.isEmpty());*/
     }
 
-    protected abstract DatabaseConnectedConcept makeConceptWithEmptyContingentAndExtent();
+    protected abstract ConceptImplementation makeConceptWithEmptyContingentAndExtent();
 }

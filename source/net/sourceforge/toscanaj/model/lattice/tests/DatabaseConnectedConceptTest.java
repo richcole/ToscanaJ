@@ -13,7 +13,7 @@ import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +37,11 @@ public class DatabaseConnectedConceptTest extends ConceptTest {
         }
     }
 
-    protected DatabaseConnectedConcept makeConceptWithEmptyContingentAndExtent() {
+    protected ConceptImplementation makeConceptWithEmptyContingentAndExtent() {
         try {
             DatabaseConnection.setConnection(new MockDBConnection());
-            DatabaseConnectedConcept databaseConnectedConcept = new DatabaseConnectedConcept();
-            databaseConnectedConcept.setObjectClause("clause");
+            ConceptImplementation databaseConnectedConcept = new ConceptImplementation();
+            databaseConnectedConcept.addObject("clause");
             //should be set, otherwise query will no be executed
             return databaseConnectedConcept;
         } catch (Exception e) {

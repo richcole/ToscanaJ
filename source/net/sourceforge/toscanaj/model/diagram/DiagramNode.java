@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.util.xmlize.*;
 import org.jdom.Element;
 import util.CollectionFactory;
@@ -123,8 +123,8 @@ public class DiagramNode implements XMLizable {
         if (XMLHelper.contains(elem, OBJECT_LABEL_STYLE_ELEMENT_NAME)) {
             objectLabel = new LabelInfo(elem.getChild(OBJECT_LABEL_STYLE_ELEMENT_NAME));
         }
-        concept = new DatabaseConnectedConcept(
-                XMLHelper.mustbe(DatabaseConnectedConcept.CONCEPT_ELEMENT_NAME, elem)
+        concept = new ConceptImplementation(
+                XMLHelper.mustbe(ConceptImplementation.CONCEPT_ELEMENT_NAME, elem)
         );
     }
 

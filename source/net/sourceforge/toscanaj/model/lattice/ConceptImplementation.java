@@ -8,12 +8,13 @@
 package net.sourceforge.toscanaj.model.lattice;
 
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import org.jdom.Element;
 
 import java.util.*;
 
 /**
- * This implements some shortcuts for implementing concepts.
+ * This implements concepts.
  *
  * Intent and extent are mapped into filter and ideal resp. to avoid redundant
  * storage. Filter and ideal are explicitely stored to reduce computational
@@ -26,12 +27,16 @@ import java.util.*;
  * buildClosures() can be called to extent this to the full sub-/superconcept
  * relation.
  */
-public abstract class AbstractConceptImplementation implements Concept {
+public class ConceptImplementation implements Concept {
     public static final String CONCEPT_ELEMENT_NAME = "concept";
     public static final String OBJECT_CONTINGENT_ELEMENT_NAME = "objectContingent";
     public static final String OBJECT_ELEMENT_NAME = "object";
     public static final String ATTRIBUTE_CONTINGENT_ELEMENT_NAME = "attributeContingent";
     public static final String ATTRIBUTE_ELEMENT_NAME = "attribute";
+    public static final String DESCRIPTION_ELEMENT_NAME = "description";
+
+    private Set attributeContingent = new HashSet();
+    private Set objectContingent = new HashSet();
 
     protected static List makeList() {
         return new ArrayList();
@@ -216,14 +221,14 @@ public abstract class AbstractConceptImplementation implements Concept {
      * Use addSuperConcept(Concept) and addSubConcept(Concept) to extent filter
      * and ideal.
      */
-    public AbstractConceptImplementation() {
+    public ConceptImplementation() {
         this.filter = new HashSet();
         this.filter.add(this);
         this.ideal = new HashSet();
         this.ideal.add(this);
     }
 
-    public AbstractConceptImplementation(Element element) throws XMLSyntaxError {
+    public ConceptImplementation(Element element) throws XMLSyntaxError {
         readXML(element);
     }
 
@@ -285,7 +290,7 @@ public abstract class AbstractConceptImplementation implements Concept {
         List idealList = new LinkedList(ideal);
         Set idealSet = new HashSet(ideal);
         while (!idealList.isEmpty()) {
-            AbstractConceptImplementation other = (AbstractConceptImplementation) idealList.remove(0);
+            ConceptImplementation other = (ConceptImplementation) idealList.remove(0);
             Iterator it = other.ideal.iterator();
             while (it.hasNext()) {
                 Object trans = it.next();
@@ -299,7 +304,7 @@ public abstract class AbstractConceptImplementation implements Concept {
         Set filterSet = new HashSet(filter);
         List filterList = new LinkedList(filter);
         while (!filterList.isEmpty()) {
-            AbstractConceptImplementation other = (AbstractConceptImplementation) filterList.remove(0);
+            ConceptImplementation other = (ConceptImplementation) filterList.remove(0);
             Iterator it = other.filter.iterator();
             while (it.hasNext()) {
                 Object trans = it.next();
@@ -389,7 +394,7 @@ public abstract class AbstractConceptImplementation implements Concept {
      * This is equal to the size of the extent of the top node.
      */
     private int getNumberOfObjects() {
-        AbstractConceptImplementation cur = this;
+        ConceptImplementation cur = this;
         while (cur.filter.size() != 1) {
             // there is another concept in the filter which is not this
             // (this is always the first) ==> go up
@@ -400,7 +405,7 @@ public abstract class AbstractConceptImplementation implements Concept {
             while (cur == next) { // we know there has to be a next()
                 next = it.next();
             }
-            cur = (AbstractConceptImplementation) next;
+            cur = (ConceptImplementation) next;
         }
         // now we are at the top
         return cur.getExtentSize();
@@ -412,7 +417,7 @@ public abstract class AbstractConceptImplementation implements Concept {
      * This is equal to the size of the intent of the bottom node.
      */
     private int getNumberOfAttributes() {
-        AbstractConceptImplementation cur = this;
+        ConceptImplementation cur = this;
         while (cur.ideal.size() != 1) {
             // there is another concept in the ideal which is not this
             // (this is always the first) ==> go down
@@ -423,7 +428,7 @@ public abstract class AbstractConceptImplementation implements Concept {
             while (cur == next) { // we know there has to be a next()
                 next = it.next();
             }
-            cur = (AbstractConceptImplementation) next;
+            cur = (ConceptImplementation) next;
         }
         // now we are at the bottom
         return cur.getIntentSize();
@@ -463,5 +468,45 @@ public abstract class AbstractConceptImplementation implements Concept {
 
     public Collection getUpset() {
         return this.filter;
+    }
+
+    public int getAttributeContingentSize() {
+        return this.attributeContingent.size();
+    }
+
+    public int getObjectContingentSize() {
+        return this.objectContingent.size();
+    }
+
+    public Iterator getAttributeContingentIterator() {
+        return this.attributeContingent.iterator();
+    }
+
+    public Iterator getObjectContingentIterator() {
+        return this.objectContingent.iterator();
+    }
+
+    public void readXML(Element elem) throws XMLSyntaxError {
+        XMLHelper.checkName(CONCEPT_ELEMENT_NAME, elem);
+        Element objectContingentElem = XMLHelper.mustbe(OBJECT_CONTINGENT_ELEMENT_NAME, elem);
+        List objects = objectContingentElem.getChildren(OBJECT_ELEMENT_NAME);
+        for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
+            Element objElem = (Element) iterator.next();
+            this.objectContingent.add(objElem);
+        }
+        Element attributeContingentElem = XMLHelper.mustbe(ATTRIBUTE_CONTINGENT_ELEMENT_NAME, elem);
+        List attributes = attributeContingentElem.getChildren(ATTRIBUTE_ELEMENT_NAME);
+        for (Iterator iterator = attributes.iterator(); iterator.hasNext();) {
+            Element attrElem = (Element) iterator.next();
+            this.attributeContingent.add(new Attribute(attrElem.getText(), attrElem.getChild(DESCRIPTION_ELEMENT_NAME)));
+        }
+    }
+
+    public void addObject(Object object) {
+        this.objectContingent.add(object);
+    }
+
+    public void addAttribute(Attribute attribute) {
+        this.attributeContingent.add(attribute);
     }
 }

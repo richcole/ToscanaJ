@@ -10,7 +10,7 @@ package net.sourceforge.toscanaj.controller.db;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 import java.util.Iterator;
 import java.util.List;
@@ -48,12 +48,38 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
 
     private void addNestingPart(List outerConcepts, boolean displayMode) {
         for (Iterator iterator = outerConcepts.iterator(); iterator.hasNext();) {
-            DatabaseConnectedConcept concept = (DatabaseConnectedConcept) iterator.next();
+            Concept concept = (Concept) iterator.next();
             if (displayMode == ConceptInterpretationContext.CONTINGENT) {
-                addClausePart(concept.getObjectClause());
+                addClausePart(getObjectClause(concept));
             } else {
-                addClausePart(concept.getExtentClause());
+                addClausePart(getExtentClause(concept));
             }
+        }
+    }
+
+    static private String getObjectClause(Concept concept) {
+        return createClause(concept.getObjectContingentIterator());
+    }
+
+    static private String getExtentClause(Concept concept) {
+        return createClause(concept.getExtentIterator());
+    }
+
+    static private String createClause(Iterator objectIterator) {
+        if(!objectIterator.hasNext()) {
+            return null;
+        }
+        else {
+            String retVal = "(";
+            for (Iterator iterator = objectIterator; iterator.hasNext();) {
+                Object o = (Object) iterator.next();
+                retVal += o.toString();
+                if(iterator.hasNext()) {
+                    retVal += " OR ";
+                }
+            }
+            retVal += ")";
+            return retVal;
         }
     }
 
@@ -66,11 +92,10 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
     }
 
     public void visitConcept(Concept concept) {
-        DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
         if (filterMode == ConceptInterpretationContext.CONTINGENT) {
-            addClausePart(dbConcept.getObjectClause());
+            addClausePart(getObjectClause(concept));
         } else {
-            addClausePart(dbConcept.getExtentClause());
+            addClausePart(getExtentClause(concept));
         }
     }
 
@@ -78,13 +103,13 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
         return this.clause;
     }
 
-    public static String createWhereClause(DatabaseConnectedConcept forConcept, DiagramHistory filterDiagrams,
+    public static String createWhereClause(Concept forConcept, DiagramHistory filterDiagrams,
                                            List outerConcepts, boolean displayMode, boolean filterMode) {
         WhereClauseGenerator generator;
         if (displayMode == ConceptInterpretationContext.CONTINGENT) {
-            generator = new WhereClauseGenerator(forConcept.getObjectClause(), filterDiagrams, outerConcepts, displayMode, filterMode);
+            generator = new WhereClauseGenerator(getObjectClause(forConcept), filterDiagrams, outerConcepts, displayMode, filterMode);
         } else {
-            generator = new WhereClauseGenerator(forConcept.getExtentClause(), filterDiagrams, outerConcepts, displayMode, filterMode);
+            generator = new WhereClauseGenerator(getExtentClause(forConcept), filterDiagrams, outerConcepts, displayMode, filterMode);
         }
         return generator.getClause();
     }

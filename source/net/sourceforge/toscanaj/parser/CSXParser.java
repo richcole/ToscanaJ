@@ -325,17 +325,17 @@ public class CSXParser {
                 diagram.addLine(from, to);
 
                 // add direct neighbours to concepts
-                AbstractConceptImplementation concept1 =
-                        (AbstractConceptImplementation) from.getConcept();
-                AbstractConceptImplementation concept2 =
-                        (AbstractConceptImplementation) to.getConcept();
+                ConceptImplementation concept1 =
+                        (ConceptImplementation) from.getConcept();
+                ConceptImplementation concept2 =
+                        (ConceptImplementation) to.getConcept();
                 concept1.addSubConcept(concept2);
                 concept2.addSuperConcept(concept1);
             }
 
             // build transitive closures for each concept
             for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
-                ((AbstractConceptImplementation) diagram.getNode(i).getConcept()).buildClosures();
+                ((ConceptImplementation) diagram.getNode(i).getConcept()).buildClosures();
             }
 
             _Schema.addDiagram(diagram);
@@ -348,7 +348,7 @@ public class CSXParser {
      */
     private static Concept parseDBConcept(Element conceptElem) {
         // create the concept
-        DatabaseConnectedConcept concept = new DatabaseConnectedConcept();
+        ConceptImplementation concept = new ConceptImplementation();
 
         // get the object contingent
         Element contElem = conceptElem.getChild("objectContingent");
@@ -369,9 +369,7 @@ public class CSXParser {
             }
         }
         if (query != null && query.length() != 0) {
-            concept.setObjectClause(query);
-        } else {
-            concept.setObjectClause(null);
+            concept.addObject(query);
         }
 
         // get the attribute contingent
@@ -380,7 +378,7 @@ public class CSXParser {
         it3 = contingent.iterator();
         while (it3.hasNext()) {
             Element ref = (Element) it3.next();
-            Object attr = _Attributes.get(ref.getText());
+            Attribute attr = (Attribute) _Attributes.get(ref.getText());
             if (attr != null) {
                 concept.addAttribute(attr);
             }

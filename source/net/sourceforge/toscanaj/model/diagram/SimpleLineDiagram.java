@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.diagram;
 
-import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
@@ -97,10 +97,10 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
             DiagramNode to = line.getToNode();
 
             // add direct neighbours to concepts
-            AbstractConceptImplementation concept1 =
-                    (AbstractConceptImplementation) from.getConcept();
-            AbstractConceptImplementation concept2 =
-                    (AbstractConceptImplementation) to.getConcept();
+            ConceptImplementation concept1 =
+                    (ConceptImplementation) from.getConcept();
+            ConceptImplementation concept2 =
+                    (ConceptImplementation) to.getConcept();
             concept1.addSubConcept(concept2);
             concept2.addSuperConcept(concept1);
         }
@@ -108,7 +108,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         // build transitive closures for each concept
         for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
             DiagramNode node = (DiagramNode) iterator.next();
-            ((AbstractConceptImplementation) node.getConcept()).buildClosures();
+            ((ConceptImplementation) node.getConcept()).buildClosures();
         }
     }
 

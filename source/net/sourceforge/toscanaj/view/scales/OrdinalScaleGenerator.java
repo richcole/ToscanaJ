@@ -10,7 +10,7 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.*;
-import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.DummyConcept;
 import util.Assert;
 import util.CollectionFactory;
@@ -53,7 +53,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         String id = "Ordinal";
         double x = 0.;
         double y = 0.;
-        AbstractConceptImplementation top = makeConcept();
+        ConceptImplementation top = makeConcept();
         DiagramNode topNode = new DiagramNode(id,
                 new Point2D.Double(x, y),
                 top,
@@ -62,12 +62,12 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
                 null
         );
         ret.addNode(topNode);
-        AbstractConceptImplementation prevConcept = top;
+        ConceptImplementation prevConcept = top;
         DiagramNode prevNode = topNode;
         conceptList.add(top);
         for (int i = 0; i < dividers.size(); i++) {
             y += 30;
-            AbstractConceptImplementation currentConcept = makeConcept("<" + String.valueOf(dividers.get(i)));
+            ConceptImplementation currentConcept = makeConcept("<" + String.valueOf(dividers.get(i)));
             conceptList.add(currentConcept);
 
             DiagramNode node = new DiagramNode(id,
@@ -86,7 +86,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
             prevConcept = currentConcept;
         }
         for (Iterator it = conceptList.iterator(); it.hasNext();) {
-            AbstractConceptImplementation concept = (AbstractConceptImplementation) it.next();
+            ConceptImplementation concept = (ConceptImplementation) it.next();
             concept.buildClosures();
         }
 
@@ -94,11 +94,11 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         return ret;
     }
 
-    private AbstractConceptImplementation makeConcept() {
+    private ConceptImplementation makeConcept() {
         return new DummyConcept();
     }
 
-    private AbstractConceptImplementation makeConcept(String label) {
+    private ConceptImplementation makeConcept(String label) {
         final List list = CollectionFactory.createDefaultList();
         list.add(label);
         return new DummyConcept(list);

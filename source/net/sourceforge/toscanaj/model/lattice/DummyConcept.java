@@ -16,7 +16,7 @@ import util.NullIterator;
 import java.util.Iterator;
 import java.util.List;
 
-public class DummyConcept extends AbstractConceptImplementation {
+public class DummyConcept extends ConceptImplementation {
     public DummyConcept(List attributeContigent) {
         this.attributeContigent = attributeContigent;
     }

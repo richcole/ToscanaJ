@@ -12,7 +12,6 @@ import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -112,11 +111,10 @@ public class ObjectLabelView extends LabelView {
     protected void doQuery() {
         if (query != null) {
             DiagramNode node = this.labelInfo.getNode();
-            DatabaseConnectedConcept concept = (DatabaseConnectedConcept) node.getConcept();
             ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
             DatabaseConnectedConceptInterpreter conceptInterpreter =
                                 (DatabaseConnectedConceptInterpreter) this.diagramView.getConceptInterpreter();
-            contents = conceptInterpreter.executeQuery(query, concept, context);
+            contents = conceptInterpreter.executeQuery(query, node.getConcept(), context);
         }
     }
 
