@@ -27,6 +27,7 @@ import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.*;
+
 import org.jdom.Element;
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemEvent;
@@ -63,7 +64,7 @@ import java.util.ListIterator;
  */
 public class ToscanaJMainPanel extends JFrame implements ChangeObserver, ClipboardOwner {
 
-    private static final String CONFIGURATION_KEY_PRINT_MODE = "printMode";
+    private static final String CONFIGURATION_KEY_COLOR_MODE = "colorMode";
 	private static final String CONFIGURATION_SECTION_NAME = "ToscanaJMainPanel";
     private static final String WINDOW_TITLE = "ToscanaJ";
     /**
@@ -167,9 +168,10 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     private DiagramExportSettings diagramExportSettings = null;
 
 	private JSplitPane leftHandPane;
-	private JRadioButtonMenuItem printColorMenuItem;
-	private JRadioButtonMenuItem printGrayScaleMenuItem;
-	private JRadioButtonMenuItem printBlackAndWhiteMenuItem;
+
+	private JRadioButtonMenuItem colorModeGrayscaleMenuItem;
+	private JRadioButtonMenuItem colorModeColorMenuItem;
+	private JRadioButtonMenuItem colorModeBlackAndWhiteMenuItem;
 	/**
 	 * Simple initialisation constructor.
 	 */
@@ -259,10 +261,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 															   (float)this.diagramView.getMinimumFontSize());
 		diagramView.setMinimumFontSize(minLabelFontSize);
 
-        createActions();
-        buildMenuBar();
-        setJMenuBar(menubar);
-        buildToolBar();
+		createActions();
+		buildToolBar();
 
         //Lay out the content pane.
         JPanel contentPane = new JPanel();
@@ -383,6 +383,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		if(leftHandPane != null) {
 			leftHandPane.setDividerLocation(secondaryDividerPos);
 		}
+
+		buildMenuBar();
+		setJMenuBar(menubar);
     }
 
     private void createActions() {
@@ -462,38 +465,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         printSetupMenuItem.setEnabled(true);
         fileMenu.add(printSetupMenuItem);
         
-        JMenu printModeMenu = new JMenu("Print Mode");
-        
-		ButtonGroup printModeGroup = new ButtonGroup();
-		printColorMenuItem = new JRadioButtonMenuItem("Color");
-		printModeMenu.add(printColorMenuItem);
-		printModeGroup.add(printColorMenuItem);
-		printGrayScaleMenuItem = new JRadioButtonMenuItem("Grayscale");
-		printModeMenu.add(printGrayScaleMenuItem);
-		printModeGroup.add(printGrayScaleMenuItem);
-		printBlackAndWhiteMenuItem = new JRadioButtonMenuItem("Black and White");
-		printModeMenu.add(printBlackAndWhiteMenuItem);
-		printModeGroup.add(printBlackAndWhiteMenuItem);
-
-		// @todo replace with typesafe enum pattern and find better place to put it
-		int printMode = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_PRINT_MODE, 0);
-		switch(printMode) {
-			case 0:
-				printColorMenuItem.setSelected(true);
-				break;
-			case 1:
-				printGrayScaleMenuItem.setSelected(true);
-				break;
-			case 2:
-				printBlackAndWhiteMenuItem.setSelected(true);
-				break;
-			default:
-				System.err.println("Unknown print mode setting, using color");
-				printColorMenuItem.setSelected(true);
-		}
-         
-        fileMenu.add(printModeMenu);
-
         // separator
         fileMenu.addSeparator();
 
@@ -667,6 +638,58 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             colorGradientGroup.add(showAllMenuItem);
             viewMenu.add(showAllMenuItem);
         }
+
+		JMenu colorModeMenu = new JMenu("Color mode");
+		ButtonGroup colorModeGroup = new ButtonGroup();
+		
+		colorModeColorMenuItem = new JRadioButtonMenuItem("Color");
+		colorModeColorMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setDiagramSchema(DiagramSchema.getDefaultSchema());
+			}
+		});
+		colorModeGroup.add(colorModeColorMenuItem);
+		colorModeMenu.add(colorModeColorMenuItem);
+
+		colorModeGrayscaleMenuItem = new JRadioButtonMenuItem("Grayscale");
+		colorModeGrayscaleMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setDiagramSchema(DiagramSchema.getDefaultSchema().getGrayScaleVersion());
+			}
+		});
+		colorModeGroup.add(colorModeGrayscaleMenuItem);
+		colorModeMenu.add(colorModeGrayscaleMenuItem);
+
+		colorModeBlackAndWhiteMenuItem = new JRadioButtonMenuItem("Black and White");
+		colorModeBlackAndWhiteMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				setDiagramSchema(DiagramSchema.getDefaultSchema().getBlackAndWhiteVersion());
+			}
+		});
+		colorModeGroup.add(colorModeBlackAndWhiteMenuItem);
+		colorModeMenu.add(colorModeBlackAndWhiteMenuItem);
+
+		// @todo replace with typesafe enum pattern
+		int colorMode = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, 0);
+		switch(colorMode) {
+			case 0:
+				colorModeColorMenuItem.setSelected(true);
+				setDiagramSchema(DiagramSchema.getDefaultSchema());
+				break;
+			case 1:
+				colorModeGrayscaleMenuItem.setSelected(true);
+				setDiagramSchema(DiagramSchema.getDefaultSchema().getGrayScaleVersion());
+				break;
+			case 2:
+				colorModeBlackAndWhiteMenuItem.setSelected(true);
+				setDiagramSchema(DiagramSchema.getDefaultSchema().getBlackAndWhiteVersion());
+				break;
+			default:
+				System.err.println("Unknown color mode setting, using color");
+				colorModeColorMenuItem.setSelected(true);
+		}
+
+		viewMenu.add(colorModeMenu);
 
         if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerNodeSizeScalingOptions", 0) == 1) {
             viewMenu.addSeparator();
@@ -858,7 +881,14 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         this.menubar.updateUI();
     }
 
-    /**
+    protected void setDiagramSchema(DiagramSchema schema) {
+    	this.diagramView.setDiagramSchema(schema);
+    	if(this.diagramPreview != null) {
+    		this.diagramPreview.setDiagramSchema(schema);
+    	}
+	}
+
+	/**
      *  Build the ToolBar.
      */
     private void buildToolBar() {
@@ -965,12 +995,12 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         // store the minimum label size
 		ConfigurationManager.storeFloat(CONFIGURATION_SECTION_NAME, "minLabelFontSize", (float)this.diagramView.getMinimumFontSize());
 		// store print mode
-		if(this.printColorMenuItem.isSelected()) {
-			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_PRINT_MODE, 0);
-		} else if(this.printGrayScaleMenuItem.isSelected()) {
-			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_PRINT_MODE, 1);
-		} else if(this.printBlackAndWhiteMenuItem.isSelected()) {
-			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_PRINT_MODE, 2);
+		if(this.colorModeColorMenuItem.isSelected()) {
+			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, 0);
+		} else if(this.colorModeGrayscaleMenuItem.isSelected()) {
+			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, 1);
+		} else if(this.colorModeBlackAndWhiteMenuItem.isSelected()) {
+			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, 2);
 		}
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
@@ -1159,16 +1189,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             PrinterJob printJob = PrinterJob.getPrinterJob();
             if (printJob.printDialog()) {
                 try {
-                	DiagramSchema oldSchema = this.diagramView.getDiagramSchema();
-					if(this.printGrayScaleMenuItem.isSelected()) {
-						this.diagramView.setDiagramSchema(oldSchema.getGrayScaleVersion());
-					}
-					if(this.printBlackAndWhiteMenuItem.isSelected()) {
-						this.diagramView.setDiagramSchema(oldSchema.getBlackAndWhiteVersion());
-					}
 					printJob.setPrintable(this.diagramView, pageFormat);
                     printJob.print();
-					this.diagramView.setDiagramSchema(oldSchema);
                 } catch (Exception e) {
                 	ErrorDialog.showError(this, e, "Printing failed");
                 }
