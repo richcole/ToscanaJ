@@ -132,11 +132,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
             repaint();
             return;
         }
-        if (diagram instanceof NestedLineDiagram) {
-            addNestedLineDiagram((NestedLineDiagram) diagram);
-        } else {
-            addDiagram(diagram);
-        }
+        addDiagram(diagram);
         requestScreenTransformUpdate();
         repaint();
     }
@@ -181,27 +177,15 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
     }
 
-    /**
-     * Adds a nested line diagram to the canvas.
-     */
-    private void addNestedLineDiagram(NestedLineDiagram diagram) {
-        // add the outer diagram lines/nodes
-        addDiagramLinesToCanvas(diagram);
-        addDiagramNodesToCanvas(diagram);
-        // recurse for the inner diagrams
-        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
-            NestedDiagramNode node = (NestedDiagramNode) diagram.getNode(i);
-            addDiagram(node.getInnerDiagram());
-        }
-        // add all outer labels to the canvas
-        addDiagramLabelsToCanvas(diagram);
-    }
-
     private void addDiagramNodesToCanvas(Diagram2D diagram) {
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
             NodeView nodeView = new NodeView(node, this);
             addCanvasItem(nodeView);
+            if (node instanceof NestedDiagramNode) {
+                NestedDiagramNode ndNode = (NestedDiagramNode) node;
+                addDiagram(ndNode.getInnerDiagram());
+            }
         }
     }
 
