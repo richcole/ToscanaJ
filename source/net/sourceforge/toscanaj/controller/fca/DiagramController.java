@@ -177,6 +177,27 @@ public class DiagramController implements ChangeObservable {
     }
 
     /**
+     * Constant for setFilterMethod(int).
+     *
+     * @see setFilterMethod(int)
+     */
+    static public int FILTER_CONTINGENT = 0;
+
+    /**
+     * Constant for setFilterMethod(int).
+     *
+     * @see setFilterMethod(int)
+     */
+    static public int FILTER_EXTENT = 1;
+
+    /**
+     * Stores how to filter when zooming.
+     *
+     * @see setFilterMethod(int)
+     */
+    private int filterMethod = FILTER_EXTENT;
+
+    /**
      * Stores the only instance of this class.
      */
     static private DiagramController singleton = new DiagramController();
@@ -185,6 +206,10 @@ public class DiagramController implements ChangeObservable {
      * Stores the diagram history.
      */
     private DiagramHistory history = new DiagramHistory();
+
+    /**
+     *
+     */
 
     /**
      * Returns the only instance of this class.
@@ -200,6 +225,22 @@ public class DiagramController implements ChangeObservable {
      */
     public DiagramHistory getDiagramHistory() {
         return history;
+    }
+
+    /**
+     * Sets if we filter on the extent or object contingent of concepts zoomed
+     * into.
+     *
+     * If this is set to FILTER_EXTENT all objects in the extent of a zoomed
+     * concept will be used in the next, if set to FILTER_CONTINGENT only the
+     * objects in the object contingent will be used.
+     *
+     * This can be changed after the zooming operation and will affect all
+     * diagrams used for zooming.
+     */
+    public void setFilterMethod(int method) {
+        this.filterMethod = method;
+        notifyObservers();
     }
 
     /**
@@ -302,6 +343,11 @@ public class DiagramController implements ChangeObservable {
      * no diagram selected this will return null.
      */
     public Diagram2D getCurrentDiagram() {
+        // this code is pretty tricky -- if concepts are filtered they loose
+        // their ideal/filter, this has to be either avoided or fixed. If we
+        // wouldn't check for (filter == null) and just call filterByXX(null)
+        // instead we would loose the ideal/filter information which results
+        // in wrong output (always filtering by contingent, never by extent)
         if(history.currentDiagrams.size() == 0) {
             // we don't have a diagram to display
             return null;
@@ -314,17 +360,40 @@ public class DiagramController implements ChangeObservable {
         while(it.hasNext()) {
             DiagramReference curRef = (DiagramReference) it.next();
             Concept curZC = curRef.getZoomedConcept();
-            filter = curZC.filterByExtent(filter);
+            if(filter == null) {
+                filter = curZC;
+            }
+            else if(this.filterMethod == FILTER_CONTINGENT) {
+                filter = curZC.filterByContingent(filter);
+            }
+            else {
+                filter = curZC.filterByExtent(filter);
+            }
         }
         Hashtable nodeMap = new Hashtable();
 
         retVal.setTitle(diag.getTitle());
         for(int i = 0; i<diag.getNumberOfNodes(); i++) {
             DiagramNode oldNode = diag.getNode(i);
-            DiagramNode newNode = new DiagramNode( oldNode.getPosition(),
-                                                   oldNode.getConcept().filterByExtent(filter),
-                                                   oldNode.getAttributeLabelInfo(),
-                                                   oldNode.getObjectLabelInfo() );
+            DiagramNode newNode;
+            if(filter == null) {
+                newNode = new DiagramNode( oldNode.getPosition(),
+                                           oldNode.getConcept(),
+                                           oldNode.getAttributeLabelInfo(),
+                                           oldNode.getObjectLabelInfo() );
+            }
+            else if(this.filterMethod == FILTER_CONTINGENT) {
+                newNode = new DiagramNode( oldNode.getPosition(),
+                                           oldNode.getConcept().filterByContingent(filter),
+                                           oldNode.getAttributeLabelInfo(),
+                                           oldNode.getObjectLabelInfo() );
+            }
+            else {
+                newNode = new DiagramNode( oldNode.getPosition(),
+                                           oldNode.getConcept().filterByExtent(filter),
+                                           oldNode.getAttributeLabelInfo(),
+                                           oldNode.getObjectLabelInfo() );
+            }
             retVal.addNode(newNode);
             nodeMap.put(oldNode,newNode);
         }

@@ -152,18 +152,49 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             retVal.setObjectClause(this.objectClause);
         }
         else {
-            DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
-            retVal.setObjectClause("(" + this.objectClause + ") AND (" + otherDB.objectClause + ")");
+            if(this.objectClause == null) {
+                retVal.setObjectClause(null);
+            }
+            else {
+                DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
+                String clause = "(" + this.objectClause + ") AND (";
+                Iterator it = otherDB.ideal.iterator();
+                boolean first = true;
+                while(it.hasNext()) {
+                    DatabaseConnectedConcept cur = (DatabaseConnectedConcept) it.next();
+                    if(!first) {
+                        clause = clause + " OR ";
+                    }
+                    else {
+                        first = false;
+                    }
+                    clause = clause + "(" + cur.objectClause + ")";
+                }
+                clause = clause + ")";
+                retVal.setObjectClause(clause);
+            }
         }
         return retVal;
     }
 
     /**
      * Implements Concept.filterByContingent(Concept).
-     *
-     * @TODO implement correctly (currently just a copy of filterByExtent())
      */
     public Concept filterByContingent(Concept other) {
-        throw new NoSuchMethodError("Not yet implemented");
+        DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo, this.connection);
+        retVal.attributeContingent.addAll(this.attributeContingent);
+        if(other == null) {
+            retVal.setObjectClause(this.objectClause);
+        }
+        else {
+            if(this.objectClause == null) {
+                retVal.setObjectClause(null);
+            }
+            else {
+                DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
+                retVal.setObjectClause("(" + this.objectClause + ") AND (" + otherDB.objectClause + ")");
+            }
+        }
+        return retVal;
     }
 }

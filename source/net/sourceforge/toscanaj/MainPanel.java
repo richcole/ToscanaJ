@@ -373,8 +373,10 @@ public class MainPanel extends JFrame implements ActionListener {
             updateLabelViews();
         }
         if (actionSource == this.filterExactMenuItem) {
+            DiagramController.getController().setFilterMethod(DiagramController.FILTER_CONTINGENT);
         }
         if (actionSource == this.filterAllMenuItem) {
+            DiagramController.getController().setFilterMethod(DiagramController.FILTER_EXTENT);
         }
         if (actionSource == this.percDistMenuItem) {
             this.diagramView.setShowPercentage(this.percDistMenuItem.getState());
