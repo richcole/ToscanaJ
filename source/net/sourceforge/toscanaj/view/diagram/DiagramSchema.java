@@ -41,6 +41,10 @@ public class DiagramSchema {
      * schema.
      */
     public static int GRADIENT_REFERENCE_SCHEMA = 2;
+    
+    public static int NODE_SIZE_SCALING_NONE = 0;
+    public static int NODE_SIZE_SCALING_CONTINGENT = 1;
+    public static int NODE_SIZE_SCALING_EXTENT = 2;
 
     /**
      * The amount of fade out for unselected nodes.
@@ -61,6 +65,13 @@ public class DiagramSchema {
      * Holds background color for the nested diagrams.
      */
     private Color nestedDiagramNodeColor = Color.white;
+
+    /**
+     * Holds color for the not realised nodes.
+     * 
+     * If set to null, the normal node color will be used.
+     */
+    private Color notRealisedDiagramNodeColor = null;
 
     /**
      * The color used for the top of the gradient.
@@ -122,6 +133,8 @@ public class DiagramSchema {
     private int margin = 20;
 
     private float notRealizedNodeSizeReductionFactor = 3;
+    
+    private int nodeSizeScalingType = NODE_SIZE_SCALING_NONE;
 
     /**
      * Default constructor.
@@ -132,6 +145,7 @@ public class DiagramSchema {
         bottomColor = ConfigurationManager.fetchColor("diagramSchema", "bottomColor", bottomColor);
         foreground = ConfigurationManager.fetchColor("diagramSchema", "foregroundColor", foreground);
         nestedDiagramNodeColor = ConfigurationManager.fetchColor("diagramSchema", "nestedDiagramNodeColor", nestedDiagramNodeColor);
+        notRealisedDiagramNodeColor = ConfigurationManager.fetchColor("diagramSchema", "notRealisedDiagramNodeColor", notRealisedDiagramNodeColor);
         circleColor = ConfigurationManager.fetchColor("diagramSchema", "circleColor", circleColor);
         lineColor = ConfigurationManager.fetchColor("diagramSchema", "lineColor", lineColor);
         circleSelectionColor = ConfigurationManager.fetchColor("diagramSchema", "circleSelectionColor", circleSelectionColor);
@@ -164,6 +178,18 @@ public class DiagramSchema {
                 selectionLineWidth);
         labelFontName = ConfigurationManager.fetchString("diagramSchema", "labelFontName", labelFontName);
         labelFontSize = ConfigurationManager.fetchInt("diagramSchema", "labelFontSize", labelFontSize);
+        propVal = ConfigurationManager.fetchString("diagramSchema", "scaleNodeSize", "none");
+        propVal = propVal.toLowerCase();
+        if (propVal.equals("contingent")) {
+            this.nodeSizeScalingType = NODE_SIZE_SCALING_CONTINGENT;
+        } else if (propVal.equals("extent")) {
+            this.nodeSizeScalingType = NODE_SIZE_SCALING_EXTENT;
+        } else if (propVal.equals("none")) {
+            this.nodeSizeScalingType = NODE_SIZE_SCALING_NONE;
+        } else {
+            System.err.println("Caught unknown node size scaling value for DiagramSchema: " + propVal);
+            System.err.println("-- using default");
+        }
     }
 
     /**
@@ -367,5 +393,26 @@ public class DiagramSchema {
 
     public double getNotRealizedNodeSizeReductionFactor() {
         return notRealizedNodeSizeReductionFactor;
+    }
+    
+    public int getNodeSizeScalingType() {
+        return nodeSizeScalingType;
+    }
+    
+    public void setNodeSizeScalingType(int nodeSizeScalingType) {
+        if (nodeSizeScalingType != NODE_SIZE_SCALING_CONTINGENT &&
+	        nodeSizeScalingType != NODE_SIZE_SCALING_EXTENT &&
+	        nodeSizeScalingType != NODE_SIZE_SCALING_NONE) {
+            throw new IllegalArgumentException("Unknown value for node size scaling");
+        }
+        this.nodeSizeScalingType = nodeSizeScalingType;
+    }
+
+    public Color getNotRealisedNodeColor(Color nodeColor) {
+        if(this.notRealisedDiagramNodeColor == null) {
+        	return nodeColor;
+        } else {
+        	return this.notRealisedDiagramNodeColor;
+        }
     }
 }

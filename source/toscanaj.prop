@@ -32,6 +32,9 @@ mainPanel-mruFiles-1=./examples/sql/pctest/pctest.csx
 # diagramSchema-selectionLineWidth=[the line width used when highlighting]
 # diagramSchema-labelFontName=[a font family used for the label text (any form on the platform should work)]
 # diagramSchema-labelFontSize=[the size of the label text]
+# diagramSchema-notRealisedDiagramNodeColor=[the color used for nodes of not realised concepts, if not given, the normal color is used]
+# diagramSchema-scaleNodeSize=["contingent", "extent" or "none" -- turns the scaling of node sizes on/off.]
+
 
 ###
 ### other options

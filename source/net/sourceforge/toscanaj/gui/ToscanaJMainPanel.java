@@ -241,7 +241,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         DiagramController controller = DiagramController.getController();
         diagramView = new DiagramView();
         /// @todo move the subscriptions into the handlers
-        org.tockit.events.EventBroker diagramEventBroker = diagramView.getController().getEventBroker();
+        EventBroker diagramEventBroker = diagramView.getController().getEventBroker();
         diagramEventBroker.subscribe(
                 new FilterOperationEventListener(controller),
                 CanvasItemActivatedEvent.class,

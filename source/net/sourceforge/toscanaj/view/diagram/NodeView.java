@@ -83,6 +83,9 @@ public class NodeView extends CanvasItem {
             nodeColor = diagramSchema.getNestedDiagramNodeColor();
         } else {
             nodeColor = diagramSchema.getGradientColor(calculateRelativeSize(diagramSchema));
+        	if( !isRealized() ) {
+        		nodeColor = diagramSchema.getNotRealisedNodeColor(nodeColor);
+        	}
         }
         Stroke oldStroke = graphics.getStroke();
         int selectionLineWidth = diagramSchema.getSelectionLineWidth();
@@ -136,20 +139,39 @@ public class NodeView extends CanvasItem {
     }
 
     public double getRadiusY() {
-        if (this.isRealized()) {
-            return diagramNode.getRadiusY();
-        } else {
-            double reductionFactor = this.diagramView.getDiagramSchema().getNotRealizedNodeSizeReductionFactor();
-            return diagramNode.getRadiusY() / reductionFactor;
-        }
+        return getRadius(diagramNode.getRadiusY());
     }
 
     public double getRadiusX() {
+        return getRadius(diagramNode.getRadiusX());
+    }
+
+    protected double getRadius(double maxRadius) {
+        double reductionFactor = this.diagramView.getDiagramSchema().getNotRealizedNodeSizeReductionFactor();
+        double minRadius = maxRadius / reductionFactor;
         if (this.isRealized()) {
-            return diagramNode.getRadiusX();
+        	if(this.diagramNode instanceof NestedDiagramNode) {
+        		return maxRadius;
+        	}
+        	double relativeSize;
+            if( this.diagramView.getDiagramSchema().getNodeSizeScalingType() == DiagramSchema.NODE_SIZE_SCALING_CONTINGENT ) {
+                relativeSize = diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
+                                this.diagramNode.getConcept(),
+                                conceptInterpretationContext,
+                                ConceptInterpreter.REFERENCE_DIAGRAM
+                );
+            } else if( this.diagramView.getDiagramSchema().getNodeSizeScalingType() == DiagramSchema.NODE_SIZE_SCALING_EXTENT ) {
+                relativeSize = diagramView.getConceptInterpreter().getRelativeExtentSize(
+                                this.diagramNode.getConcept(),
+                                conceptInterpretationContext,
+                                ConceptInterpreter.REFERENCE_DIAGRAM
+                );
+        	} else {
+            	relativeSize = 1;
+        	}
+            return maxRadius * relativeSize + minRadius * (1 - relativeSize);
         } else {
-            double reductionFactor = this.diagramView.getDiagramSchema().getNotRealizedNodeSizeReductionFactor();
-            return diagramNode.getRadiusX() / reductionFactor;
+            return minRadius;
         }
     }
 
