@@ -201,7 +201,11 @@ public class DatabaseInfo implements XMLizable {
     }
 
     public String getSQLTableName() {
-        return "\"" + this.table + "\"";
+    	if( getType() == ACCESS_FILE ) {
+	    	return "\"" + this.table + "\"";
+    	} else {
+    		return this.table;
+    	}
     }
 
     public String getDisplayTableName() {
