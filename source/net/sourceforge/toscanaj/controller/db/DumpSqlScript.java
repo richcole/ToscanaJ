@@ -31,7 +31,7 @@ public class DumpSqlScript {
 		Iterator tableNamesIt = connection.getTableNames().iterator();
 		while (tableNamesIt.hasNext()) {
             String tableName = (String) tableNamesIt.next();
-            out.println("CREATE TABLE " + getQuotedIdentifier(tableName) + " (");
+            out.println("CREATE TABLE " + Table.getQuotedIdentifier(tableName) + " (");
             Table table = new Table(new EventBroker(), tableName);
             
             Vector columns = connection.getColumns(table);
@@ -49,10 +49,10 @@ public class DumpSqlScript {
 		    out.println(");");
 		    out.println();
 		    
-			Iterator rowIt = connection.executeQuery("SELECT * FROM " + getQuotedIdentifier(tableName) + ";").iterator();
+			Iterator rowIt = connection.executeQuery("SELECT * FROM " + Table.getQuotedIdentifier(tableName) + ";").iterator();
 			while (rowIt.hasNext()) {
                 Vector rowResults = (Vector) rowIt.next();
-                out.print("INSERT INTO " + getQuotedIdentifier(tableName) + " VALUES (");
+                out.print("INSERT INTO " + Table.getQuotedIdentifier(tableName) + " VALUES (");
                 
                 Iterator resultIt = rowResults.iterator();
                 while (resultIt.hasNext()) {
@@ -76,20 +76,6 @@ public class DumpSqlScript {
                 out.println(");");
             }		    
         }
-	}
-	
-	private static String getQuotedIdentifier(String identifier) {
-		String retVal = "\"";
-		for(int i = 0; i < identifier.length(); i++) {
-			char curChar = identifier.charAt(i);
-			if(curChar == '\"') {
-				retVal += "\"\"";
-			} else {
-				retVal += curChar;
-			}
-		}
-		retVal += "\"";
-		return retVal;
 	}
 	
 	private static String getQuotedValueString(String value) {
