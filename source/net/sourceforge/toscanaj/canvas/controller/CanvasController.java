@@ -10,6 +10,7 @@ import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.Canvas;
 import net.sourceforge.toscanaj.canvas.events.CanvasItemActivatedEvent;
 import net.sourceforge.toscanaj.canvas.events.CanvasItemContextMenuRequestEvent;
+import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
 import net.sourceforge.toscanaj.events.EventBroker;
 
 import java.awt.event.MouseListener;
@@ -148,21 +149,24 @@ public class CanvasController implements MouseListener, MouseMotionListener {
         if (selectedCanvasItem == null) {
             return;
         }
-        if (!canvas.contains(e.getPoint())) {
+        Point mousePos = e.getPoint();
+        if (!canvas.contains(mousePos)) {
             return;
         }
-        if (!dragMode && (lastMousePos.distance(e.getPoint()) >= dragMin)) {
+        if (!dragMode && (lastMousePos.distance(mousePos) >= dragMin)) {
             dragMode = true;
         }
         if (dragMode) {
             Point2D mousePosTr = null;
             Point2D lastMousePosTr = null;
-            mousePosTr = canvas.getCanvasCoordinates(e.getPoint());
+            mousePosTr = canvas.getCanvasCoordinates(mousePos);
             lastMousePosTr = canvas.getCanvasCoordinates(lastMousePos);
-
-
             selectedCanvasItem.dragged(lastMousePosTr, mousePosTr);
-            lastMousePos = e.getPoint();
+            this.eventBroker.processEvent(new CanvasItemDraggedEvent(
+                    this.selectedCanvasItem,
+                    lastMousePosTr, lastMousePos,
+                    mousePosTr, mousePos ) );
+            lastMousePos = mousePos;
         }
     }
 
