@@ -244,6 +244,9 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
     }
 
     private Collection getExtent(Concept concept, ConceptInterpretationContext context) {
+    	if(context == null) {
+    		throw new RuntimeException("Missing context on call to getExtent(..)");
+    	}
         Hashtable contextExtents = (Hashtable) extents.get(context);
         if (contextExtents == null) {
             contextExtents = new Hashtable();
