@@ -117,7 +117,9 @@ public class DBConnection
         }
         finally {
             try {
-                resultSet.close();
+                if(resultSet != null) {
+                    resultSet.close();
+                }
                 stmt.close();
             }
             catch(SQLException e) {
