@@ -74,9 +74,12 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
             formatSelector.addItem(it.next());
         }
         formatSelector.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-        formatSelector.setSelectedItem(settings.getGraphicFormat());
+        GraphicFormat graphicFormat = settings.getGraphicFormat();
+        if(graphicFormat != null) {
+			formatSelector.setSelectedItem(graphicFormat);
+        }
         formatSelector.setEnabled(!settings.usesAutoMode());
-
+       
         JLabel widthLabel = new JLabel();
         widthLabel.setText("Width:");
         widthField = new JTextField();
@@ -119,7 +122,7 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
             }
         });
         getRootPane().setDefaultButton(okButton);
-
+		
         JPanel buttonPanel = new JPanel();
         GridBagLayout buttonLayout = new GridBagLayout();
         buttonPanel.setLayout(buttonLayout);

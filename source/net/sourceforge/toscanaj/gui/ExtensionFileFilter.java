@@ -12,12 +12,12 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 
 public class ExtensionFileFilter extends FileFilter {
-	String extension;
-	String description;
+	String[] extensions;
+	String fileTypeName;
 
-	public ExtensionFileFilter(String extension, String description) {
-		this.extension = extension;
-		this.description = description;
+	public ExtensionFileFilter(String[] extensions, String fileTypeName) {
+		this.extensions = extensions;
+		this.fileTypeName = fileTypeName;
 	}
 
 	public boolean accept(File f) {
@@ -27,15 +27,39 @@ public class ExtensionFileFilter extends FileFilter {
 			}
 
 			String ext = f.getName().substring(f.getName().length() - 3);
-			if ((ext != null) && (ext.equals(extension))) {
-				return true;
+			if (ext != null) {
+				return false;
+			}
+			for (int i = 0; i < extensions.length; i++) {
+				if (ext == extensions[i]) {
+					return true;				
+				}
 			}
 		}
 		return false;
 	} //accept
 
-	public String getDescription() {
-		return description;
+	public String getFileTypeName() {
+		return fileTypeName;
 	} //get desc
+
+	/**
+	 * Returns the extensions.
+	 */
+	public String[] getExtensions() {
+		return extensions;
+	}
+	
+	public String getDescription() {
+		String retVal = this.fileTypeName + " (";
+		for (int i = 0; i < this.extensions.length; i++) {
+			retVal += "*." + this.extensions[i];
+			if(i != this.extensions.length - 1) {
+				retVal += ", ";
+			}
+		}
+		retVal += ")";
+		return retVal;
+	}
 
 } //myfilter

@@ -37,6 +37,8 @@ import org.tockit.canvas.imagewriter.ImageGenerationException;
 import org.tockit.events.EventBroker;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.PageFormat;
@@ -180,7 +182,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         // if we have at least one format we use it, if not the settings stay null and the export options should
         // not be enabled
         if (it.hasNext()) {
-            this.diagramExportSettings = new DiagramExportSettings((GraphicFormat) it.next(), 0, 0, true);
+            this.diagramExportSettings = new DiagramExportSettings(null, 0, 0, true);
         }
         // then build the panel (order is important for checking if we want export options)
         buildPanel();
@@ -755,7 +757,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         } else {
             openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
-    	ExtensionFileFilter csxFilter = new ExtensionFileFilter("csx","Conceptual Schema (*.csx)");
+    	ExtensionFileFilter csxFilter = new ExtensionFileFilter(new String[]{"csx"},"Conceptual Schema");
     	openDialog.setFileFilter(csxFilter);
     	openDialog.addChoosableFileFilter(csxFilter);
         int rv = openDialog.showOpenDialog(this);
@@ -911,68 +913,123 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
      */
 	protected void exportImage() {
 		if (DiagramController.getController().getDiagramHistory().getSize() != 0) {
-			if (this.lastImageExportFile == null) {
-				this.lastImageExportFile =
-					new File(System.getProperty("user.dir"));
+			if(this.diagramExportSettings.usesAutoMode()) {
+				exportImageWithAutoMode();
+			} else {
+				exportImageWithManualMode();
 			}
-			final JFileChooser saveDialog =
-				new JFileChooser(this.lastImageExportFile);
-
-			boolean formatDefined;
-			do {
-				formatDefined = true;
-				int rv = saveDialog.showSaveDialog(this);
-				if (rv == JFileChooser.APPROVE_OPTION) {
-					File selectedFile = saveDialog.getSelectedFile();
-					this.lastImageExportFile = selectedFile;
-					if (this.diagramExportSettings.usesAutoMode()) {
-						GraphicFormat format =
-							GraphicFormatRegistry.getTypeByExtension(
-								selectedFile);
-						if (format != null) {
-							this.diagramExportSettings.setGraphicFormat(format);
-						} else {
-							JOptionPane.showMessageDialog(
-								this,
-								"Sorry, no type with this extension known.\n"
-									+ "Please use either another extension or try\n"
-									+ "manual settings.",
-								"Export failed",
-								JOptionPane.ERROR_MESSAGE);
-							formatDefined = false;
-						}
-					} else { // manual settings
-						if(selectedFile.getName().indexOf('.') == -1) { // check for extension
-							// add default
-							GraphicFormat format = this.diagramExportSettings.getGraphicFormat();
-							String[] extensions = format.getExtensions();
-							selectedFile = new File(selectedFile.getAbsolutePath() + "." + extensions[0]);
-						}
-					}
-					if (formatDefined) {
-						try {
-							this
-								.diagramExportSettings
-								.getGraphicFormat()
-								.getWriter()
-								.exportGraphic(
-								this.diagramView,
-								this.diagramExportSettings,
-								selectedFile);
-						} catch (ImageGenerationException e) {
-							ErrorDialog.showError(this, e, "Exporting image error");
-						} catch (OutOfMemoryError e) {
-							ErrorDialog.showError(
-								this,
-								"Out of memory",
-								"Not enough memory available to export\n"
-									+ "the diagram in this size");
-						}
-					}
-				}
-			} while (formatDefined == false);
 		}
     }
+
+	protected void exportImageWithAutoMode() {
+		if (this.lastImageExportFile == null) {
+			this.lastImageExportFile =
+				new File(System.getProperty("user.dir"));
+		}
+		final JFileChooser saveDialog =new JFileChooser(this.lastImageExportFile);
+		FileFilter defaultFilter = saveDialog.getFileFilter();
+		Iterator formatIterator = GraphicFormatRegistry.getIterator();
+		while (formatIterator.hasNext()) {
+			GraphicFormat format = (GraphicFormat) formatIterator.next();
+			ExtensionFileFilter fileFilter = new ExtensionFileFilter(format.getExtensions(),format.getName());
+			saveDialog.addChoosableFileFilter(fileFilter);
+			if(format == this.diagramExportSettings.getGraphicFormat()) {
+				defaultFilter = fileFilter;
+			}
+		}
+		saveDialog.setFileFilter(defaultFilter);
+		boolean formatDefined;
+		do {
+			formatDefined = true;
+			int rv = saveDialog.showSaveDialog(this);
+			if (rv == JFileChooser.APPROVE_OPTION) {
+				File selectedFile = saveDialog.getSelectedFile();
+				FileFilter fileFilter = saveDialog.getFileFilter();
+				if(fileFilter instanceof ExtensionFileFilter) {
+					ExtensionFileFilter extFileFilter = (ExtensionFileFilter) fileFilter;
+					String[] extensions = extFileFilter.getExtensions();
+					if (selectedFile.getName().indexOf('.') == -1) {
+						selectedFile = new File(selectedFile.getAbsolutePath() + "." + extensions[0]);
+					}
+				}
+				this.lastImageExportFile = selectedFile;
+				GraphicFormat format =
+					GraphicFormatRegistry.getTypeByExtension(
+						selectedFile);
+				if (format != null) {
+					this.diagramExportSettings.setGraphicFormat(format);
+				} else {
+					if(selectedFile.getName().indexOf('.') != -1) {
+						JOptionPane.showMessageDialog(
+							this,
+							"Sorry, no type with this extension known.\n"
+								+ "Please use either another extension or try\n"
+								+ "manual settings.",
+							"Export failed",
+							JOptionPane.ERROR_MESSAGE);
+					} else {
+						JOptionPane.showMessageDialog(
+							this,
+							"No extension given.\n" +
+							"Please give an extension or pick a file type\n" +
+							"from the options.",
+							"Export failed",
+							JOptionPane.ERROR_MESSAGE);
+					}	
+					formatDefined = false;
+				}
+
+				if (formatDefined) {
+					exportImage(selectedFile);
+				}
+			}
+		} while (formatDefined == false);
+	}
+
+	protected void exportImage(File selectedFile) {
+		try {
+			this
+				.diagramExportSettings
+				.getGraphicFormat()
+				.getWriter()
+				.exportGraphic(
+				this.diagramView,
+				this.diagramExportSettings,
+				selectedFile);
+		} catch (ImageGenerationException e) {
+			ErrorDialog.showError(this, e, "Exporting image error");
+		} catch (OutOfMemoryError e) {
+			ErrorDialog.showError(
+				this,
+				"Out of memory",
+				"Not enough memory available to export\n"
+					+ "the diagram in this size");
+		}
+	}
+ 
+	protected void exportImageWithManualMode() {
+		if (this.lastImageExportFile == null) {
+			this.lastImageExportFile =
+				new File(System.getProperty("user.dir"));
+		}
+		final JFileChooser saveDialog =
+			new JFileChooser(this.lastImageExportFile);
+		GraphicFormat currentFormat = this.diagramExportSettings.getGraphicFormat();
+		ExtensionFileFilter manualFileFilter = new ExtensionFileFilter(currentFormat.getExtensions(),currentFormat.getName());
+		saveDialog.addChoosableFileFilter(manualFileFilter);
+		int rv = saveDialog.showSaveDialog(this);
+		if (rv == JFileChooser.APPROVE_OPTION) {
+			File selectedFile = saveDialog.getSelectedFile();
+			this.lastImageExportFile = selectedFile;
+			if(selectedFile.getName().indexOf('.') == -1) { // check for extension
+				// add default
+				GraphicFormat format = this.diagramExportSettings.getGraphicFormat();
+				String[] extensions = format.getExtensions();
+				selectedFile = new File(selectedFile.getAbsolutePath() + "." + extensions[0]);
+			}
+			exportImage(selectedFile);
+		}
+	}
  
     /**
      * Shows the dialog to change the image export options.
