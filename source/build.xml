@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ToscanaJ" default="dist" basedir="..">
+<project name="ToscanaJ" default="compile" basedir="..">
 	<property name="app.name" value="ToscanaJ"/>
-	<property name="dist.name" value="ToscanaJ-0_2"/>
+	<property name="dist.name" value="ToscanaJ-CVSbuild"/>
 	<property name="build.dir" value="build"/>
 	<property name="dist.dir" value="dist"/>
 	<property name="doc.dir" value="javadoc"/>
 	<property name="src.dir" value="source"/>
 	<property name="libs.dir" value="libs"/>
 	<property name="examples.dir" value="examples"/>
+	<property name="class" value="net.sourceforge.toscanaj.MainPanel"/>
 	<path id="project.class.path">
 		<pathelement path="${classpath}"/>
 		<pathelement path="${build.dir}"/>
@@ -15,6 +16,9 @@
 			<include name="**/*.jar"/>
 		</fileset>
 		<fileset dir="${libs.dir}">
+			<include name="**/*.zip"/>
+		</fileset>
+		<fileset dir="${libs.dir}/testing">
 			<include name="**/*.zip"/>
 		</fileset>
 	</path>
@@ -36,12 +40,26 @@
 			<classpath refid="project.class.path"/>
 		</javac>
 	</target>
+        <target name="rebuild" depends="clean,compile"/>
+	<target name="test" depends="prepare">
+        <junit>
+            <batchtest>
+                <fileset dir="${src.dir}">
+                    <include name="**/tests/*.java"/>
+                    <exclude name="**/tests/AllTests.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+	</target>
 	<target name="dist" depends="prepare,compileRelease">
 		<mkdir dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}/${dist.name}"/>
 		<jar jarfile="${dist.dir}/${dist.name}/${app.name}.jar" basedir="${build.dir}" manifest="${src.dir}/manifest.mf"/>
-		<copy todir="${dist.dir}/${dist.name}/libs">
-			<fileset dir="${libs.dir}"/>
+        <!-- this copies all files in libs itself, but not the subdiretories ("testing") -->
+		<copy todir="${dist.dir}/${dist.name}/libs" includeEmptyDirs="no">
+			<fileset dir="${libs.dir}">
+                <include name="*"/>
+            </fileset>
 		</copy>
 		<copy todir="${dist.dir}/${dist.name}/examples">
 			<fileset dir="${examples.dir}">
@@ -82,7 +100,6 @@
 	<target name="run" depends="compile">
 		<java classname="${class}" fork="true">
 			<classpath refid="project.class.path"/>
-			<arg value="${args}"/>
 		</java>
 	</target>
 </project>
