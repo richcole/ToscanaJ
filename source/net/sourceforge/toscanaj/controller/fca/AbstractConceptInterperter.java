@@ -104,7 +104,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 	public abstract Iterator getObjectSetIterator(Concept concept,ConceptInterpretationContext context) ;
 
 	protected abstract Object getObject(String value, Concept concept, ConceptInterpretationContext context);
-	
+
 	protected abstract Object[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context); 
 	
 	protected abstract int calculateContingentSize (Concept concept, ConceptInterpretationContext context);

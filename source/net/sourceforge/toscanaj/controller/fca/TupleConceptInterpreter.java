@@ -80,7 +80,7 @@ public class TupleConceptInterpreter extends AbstractConceptInterperter
         	if(i != 0) {
         		object += " ";
         	}
-            object += tokens[this.objectColumns[i]];
+			object += tokens[this.objectColumns[i]];
         }
         return object;
     }
@@ -125,7 +125,7 @@ public class TupleConceptInterpreter extends AbstractConceptInterperter
     }
     
 	protected Object getObject(String value, Concept concept, ConceptInterpretationContext context) {
-		return getObject(value);
+		return value;
 	}
 	
 	protected Object[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) { 
