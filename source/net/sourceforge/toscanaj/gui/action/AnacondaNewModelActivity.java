@@ -1,7 +1,7 @@
 package net.sourceforge.toscanaj.gui.action;
 
 import net.sourceforge.toscanaj.model.AnacondaModel;
-import net.sourceforge.toscanaj.AnacondaJ;
+import net.sourceforge.toscanaj.gui.AnacondaJMainPanel;
 import net.sourceforge.toscanaj.model.XML_Reader;
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
@@ -27,7 +27,7 @@ public class AnacondaNewModelActivity implements SimpleActivity
         DatabaseInfo info = new DatabaseInfo("","","","");
         model.getDatabase().setInfo(info);
         CardLayout layout = (CardLayout) this.rightPane.getLayout();
-        layout.show(rightPane, "InfoView");
+        layout.show(rightPane, "DatabaseConnectionInformationView");
         return true;
     }
 }

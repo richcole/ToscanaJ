@@ -5,9 +5,9 @@ import  org.jdom.Element;
 
 
 /**
- * This serialization interface is used for the AnacondaJ model. All
+ * This serialization interface is used for the AnacondaJMainPanel model. All
  * elements of the model support this interface and in addition have a
- * constructor that callls readXML. 
+ * constructor that callls readXML.
  */
 public interface XML_Serializable {
 

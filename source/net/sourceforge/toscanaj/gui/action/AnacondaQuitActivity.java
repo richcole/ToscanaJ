@@ -1,7 +1,7 @@
 package net.sourceforge.toscanaj.gui.action;
 
 import net.sourceforge.toscanaj.model.AnacondaModel;
-import net.sourceforge.toscanaj.AnacondaJ;
+import net.sourceforge.toscanaj.gui.AnacondaJMainPanel;
 import net.sourceforge.toscanaj.model.XML_Reader;
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
 
@@ -14,9 +14,9 @@ import javax.swing.AbstractAction;
 
 public class AnacondaQuitActivity implements SimpleActivity
 {
-    AnacondaJ frame;
+    AnacondaJMainPanel frame;
 
-    public AnacondaQuitActivity(AnacondaJ a_frame)
+    public AnacondaQuitActivity(AnacondaJMainPanel a_frame)
     {
         frame = a_frame;
     }

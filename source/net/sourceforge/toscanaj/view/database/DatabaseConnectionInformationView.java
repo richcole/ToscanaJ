@@ -8,7 +8,6 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.action.ConnectDatabaseActivity;
 import net.sourceforge.toscanaj.gui.action.SimpleActivity;
-import net.sourceforge.toscanaj.view.ModelView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,12 +27,10 @@ import java.util.Observable;
  * retrieved with the methods getFormat(), getWidth() and getHeight().  
  *
  */
-public class InfoView extends ModelView implements Observer
+public class DatabaseConnectionInformationView extends JPanel implements Observer
 {
     protected AnacondaModel model;
     protected DatabaseInfo info;
-    protected JPanel rightPane;
-    protected JFrame frame;
 
     private JTextField urlField;
     private JTextField userField;
@@ -95,22 +92,13 @@ public class InfoView extends ModelView implements Observer
     /**
      * Construct an instance of this view
      */
-    public InfoView(JFrame frame, JPanel rightPane, AnacondaModel model)
+    public DatabaseConnectionInformationView(JFrame frame, DatabaseInfo databaseInfo)
     {
-        super(frame, rightPane);
+        super();
         setLayout(new BorderLayout());
-        this.model = model;
-        this.info = model.getDatabase().getInfo();
-        this.rightPane = rightPane;
-        this.frame = frame;
+        this.info = databaseInfo;
 
-        model.getModelViewList().register("Database Info", "InfoView", null);
-        System.out.println("register model view");
-
-        model.getDatabase().addObserver(this);
-        model.getDatabase().getInfo().addObserver(this);
-
-        setName("InfoView");
+        setName("DatabaseConnectionInformationView");
         info.addObserver(this);
 
         JLabel urlLabel      = new JLabel("Url:");
@@ -123,8 +111,7 @@ public class InfoView extends ModelView implements Observer
         userField     = new JTextField();
         passwordField = new JTextField();
 
-        JButton connectButton = new JButton();
-        connectButton.setText("Connect");
+        JButton connectButton = new JButton("Connect");
         SimpleAction action = new SimpleAction(frame);
         action.add(new SaveControlActivity());
         action.add(new ConnectDatabaseActivity(model));
@@ -146,39 +133,10 @@ public class InfoView extends ModelView implements Observer
 
         add(pane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.SOUTH);
-
-        rightPane.add(this, getName());
-    };
-
-    public void detach() {
-        rightPane.remove(this);
     };
 
     public void setInfo(DatabaseInfo info)
     {
         copyToControls(info);
-    };
-
-    public boolean prepareToSave()
-    {
-        if ( areControlsChanged() ) {
-
-            CardLayout layout = (CardLayout) this.rightPane.getLayout();
-            layout.show(rightPane, "InfoView");
-
-            switch(askUser("Save these changes", "InfoView")) {
-                case JOptionPane.OK_OPTION:
-                    copyFromControls(info);
-                    return true;
-                case JOptionPane.NO_OPTION:
-                    return true;
-                case JOptionPane.CANCEL_OPTION:
-                    return false;
-                default:
-                    return false;
-            }
-
-        }
-        return true;
     };
 }
