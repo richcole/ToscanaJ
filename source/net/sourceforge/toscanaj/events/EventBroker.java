@@ -42,6 +42,11 @@ public class EventBroker implements BrokerEventListener {
     private List subscriptions = new ArrayList();
 
     /**
+     * We store the package of this class as constant since Class.getPackage() does not always work.
+     */
+    private static final String PACKAGE_NAME = "net.sourceforge.toscanaj.events";
+
+    /**
      * Creates a new broker.
      */
     public EventBroker() {
@@ -60,8 +65,7 @@ public class EventBroker implements BrokerEventListener {
      */
     public void subscribe(BrokerEventListener listener, Class eventType, Class sourceType) {
         try {
-            String packageName = getClass().getPackage().getName();
-            Class eventClass = Class.forName(packageName + ".Event");
+            Class eventClass = Class.forName(PACKAGE_NAME + ".Event");
             if( !implementsInterface(eventType, eventClass) ) {
                 throw new RuntimeException("Subscription to class not implementing Event impossible");
             }

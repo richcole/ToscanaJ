@@ -44,8 +44,7 @@ public class EventBrokerTest extends TestCase {
             TestListener testListener6 = new TestListener();
 
             EventBroker mainBroker = new EventBroker();
-            getClass().getPackage();
-            String packageName = getClass().getPackage().getName();
+            String packageName = "net.sourceforge.toscanaj.events.tests";
             mainBroker.subscribe(testListener1, Class.forName(packageName + ".TestEventType1"), Object.class);
             mainBroker.subscribe(testListener2, Class.forName(packageName + ".TestEventType1"), Integer.class );
             mainBroker.subscribe(testListener3, Class.forName(packageName + ".TestEventType2"), Object.class );
