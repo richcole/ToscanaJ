@@ -253,9 +253,6 @@ public class DiagramView extends Canvas implements ChangeObserver {
         return nodeMap;
     }
 
-    /**
-     * @see LabelView.setDisplayType(boolean)
-     */
     public void setDisplayType(boolean contingentOnly) {
         Iterator it = this.canvasItems.iterator();
         while (it.hasNext()) {
