@@ -166,13 +166,6 @@ public class NodeView extends CanvasItem {
         }
     }
 
-    private double calcRate(double extentSize, double denom) {
-        if (denom == 0) {
-            return 0;
-        }
-        return extentSize / denom;
-    }
-
     /**
      * Implements CanvasItem.containsPoint(Point2D).
      *
@@ -224,9 +217,21 @@ public class NodeView extends CanvasItem {
                     this.selectionState = DiagramView.SELECTED_DIRECTLY;
                 }
             } else if (ourConcept.hasSuperConcept(selectedConcept)) {
-                this.selectionState = DiagramView.SELECTED_IDEAL;
+                if (this.selectionState == DiagramView.NOT_SELECTED) {
+                    this.selectionState = DiagramView.SELECTED_IDEAL;
+                }
+                else if (this.selectionState == DiagramView.SELECTED_FILTER) {
+                    this.selectionState = DiagramView.NOT_SELECTED;
+                    return;
+                }
             } else if (ourConcept.hasSubConcept(selectedConcept)) {
-                this.selectionState = DiagramView.SELECTED_FILTER;
+                if (this.selectionState == DiagramView.NOT_SELECTED) {
+                    this.selectionState = DiagramView.SELECTED_FILTER;
+                }
+                else if (this.selectionState == DiagramView.SELECTED_IDEAL) {
+                    this.selectionState = DiagramView.NOT_SELECTED;
+                    return;
+                }
             } else {
                 this.selectionState = DiagramView.NOT_SELECTED;
                 return;
@@ -248,7 +253,7 @@ public class NodeView extends CanvasItem {
      * - SELECTED_IN_IDEAL: the node displays a concept which is in the ideal
      *   of the selected concept
      *
-     * @see #setSelectedConcept(Concept)
+     * @see #setSelectedConcepts(List)
      */
     public int getSelectionState() {
         return this.selectionState;
