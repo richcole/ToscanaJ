@@ -141,7 +141,7 @@ public class ErrorDialog extends JDialog{
 	
 	private String createErrorLog(Throwable e) {
 		Throwable currentException = e;
-		String lineBreak = "\n";
+		String lineBreak = System.getProperty("line.separator");
 		String stackTrace = "=============="+lineBreak+"== Stack Trace =="+lineBreak+"=============="+lineBreak;
 		String causedBy="";
 		String exceptionName = e.getClass().getName();
