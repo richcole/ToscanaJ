@@ -20,10 +20,14 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
+
+import org.jdom.Element;
 import org.tockit.canvas.MovableCanvasItem;
 
-public class TransitionArrow extends MovableCanvasItem {
+public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     protected NodeView startNodeView;
     protected NodeView endNodeView;
     protected Rectangle2D bounds;
@@ -217,5 +221,24 @@ public class TransitionArrow extends MovableCanvasItem {
     public void setPosition(Point2D newPosition) {
     	this.manualOffset.setLocation(this.manualOffset.getX() + (newPosition.getX() - getPosition().getX()), 
 									  this.manualOffset.getY() + (newPosition.getY() - getPosition().getY()));
+    }
+
+    public Element toXML() {
+        Element result = new Element(getTagName());
+        result.setAttribute("from", startNodeView.getDiagramNode().getIdentifier());
+        result.setAttribute("to", endNodeView.getDiagramNode().getIdentifier());
+        Element offsetElem = new Element("offset");
+        offsetElem.setAttribute("x", String.valueOf(manualOffset.getX()));
+        offsetElem.setAttribute("y", String.valueOf(manualOffset.getY()));
+        result.addContent(offsetElem);
+        result.addContent(this.style.toXML());
+        return result;
+    }
+
+    protected String getTagName() {
+        return "transitionArrow";
+    }
+
+    public void readXML(Element elem) throws XMLSyntaxError {
     }
 }

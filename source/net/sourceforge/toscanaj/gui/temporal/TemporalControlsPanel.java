@@ -70,6 +70,13 @@ import net.sourceforge.toscanaj.view.temporal.InterSequenceTransitionArrow;
 import net.sourceforge.toscanaj.view.temporal.StateRing;
 import net.sourceforge.toscanaj.view.temporal.TransitionArrow;
 
+/**
+ * @todo instead of fiddling around everywhere there should be a proper subclass of
+ *   SimpleLineDiagram handling all the temporal stuff. Maybe even a separate program
+ *   would be useful. The current hacks like attaching the extra canvas items to the
+ *   diagram and saving those (instead of the information how to create them) is
+ *   pretty bad.
+ */
 public class TemporalControlsPanel extends JTabbedPane implements EventBrokerListener {
 	private static final Insets DEFAULT_SPACER_INSETS = new Insets(0,0,10,0);
 	private static final Insets DEFAULT_BUTTON_INSETS = new Insets(2,16,2,16);

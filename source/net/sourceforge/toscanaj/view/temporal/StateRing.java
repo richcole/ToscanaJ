@@ -15,10 +15,15 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
+import net.sourceforge.toscanaj.util.ColorStringConverter;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
+
+import org.jdom.Element;
 import org.tockit.canvas.CanvasItem;
 
-public class StateRing extends CanvasItem {
+public class StateRing extends CanvasItem implements XMLizable {
     private NodeView nodeView;
 	private Color baseColor;
     private double timePos;
@@ -78,5 +83,15 @@ public class StateRing extends CanvasItem {
 
     public Rectangle2D getCanvasBounds(Graphics2D g) {
     	return this.nodeView.getCanvasBounds(g);
+    }
+
+    public Element toXML() {
+        Element result = new Element("stateRing");
+        result.setAttribute("nodeView",nodeView.getDiagramNode().getIdentifier());
+        result.setAttribute("color", ColorStringConverter.colorToString(this.baseColor));
+        return result;
+    }
+
+    public void readXML(Element elem) throws XMLSyntaxError {
     }
 }

@@ -11,7 +11,10 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Paint;
 
+import org.jdom.Element;
+
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
+import net.sourceforge.toscanaj.util.ColorStringConverter;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 
 public class InterSequenceTransitionArrow extends TransitionArrow {
@@ -47,5 +50,15 @@ public class InterSequenceTransitionArrow extends TransitionArrow {
                           (int) (alpha * this.endColor.getAlpha()));
 
         return new GradientPaint(-arrowLength, 0, finalStartColor, 0, 0, finalEndColor);
+    }
+    
+    public Element toXML() {
+        Element result = super.toXML();
+        result.setAttribute("endColor", ColorStringConverter.colorToString(endColor));
+        return result;
+    }
+    
+    protected String getTagName() {
+        return "intersequenceTransitionArrow";
     }
 }

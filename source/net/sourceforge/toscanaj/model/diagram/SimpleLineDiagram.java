@@ -16,6 +16,8 @@ import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.util.IdPool;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+
 import org.jdom.Element;
 import org.tockit.canvas.CanvasItem;
 import org.tockit.events.EventBroker;
@@ -188,6 +190,13 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         for (Iterator iterator = lines.iterator(); iterator.hasNext();) {
             DiagramLine line = (DiagramLine) iterator.next();
             retVal.addContent(line.toXML());
+        }
+        for (Iterator iter = this.extraCanvasItems.iterator(); iter.hasNext();) {
+            CanvasItem item = (CanvasItem) iter.next();
+            if(item instanceof XMLizable) {
+                XMLizable xmlItem = (XMLizable) item;
+                retVal.addContent(xmlItem.toXML());
+            }
         }
         return retVal;
     }

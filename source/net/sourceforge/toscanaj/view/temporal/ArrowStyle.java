@@ -10,8 +10,14 @@ package net.sourceforge.toscanaj.view.temporal;
 import java.awt.Color;
 import java.awt.Stroke;
 
+import org.jdom.Element;
 
-public class ArrowStyle {
+import net.sourceforge.toscanaj.util.ColorStringConverter;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+
+
+public class ArrowStyle implements XMLizable {
     private Color color;
     private Stroke stroke;
     private double headWidth;
@@ -74,5 +80,15 @@ public class ArrowStyle {
 
     public void setStroke(Stroke stroke) {
         this.stroke = stroke;
+    }
+
+    public Element toXML() {
+        Element result = new Element("arrowStyle");
+        result.setAttribute("color", ColorStringConverter.colorToString(this.color));
+        /// @todo add stroke and sizes
+        return result;
+    }
+
+    public void readXML(Element elem) throws XMLSyntaxError {
     }
 }
