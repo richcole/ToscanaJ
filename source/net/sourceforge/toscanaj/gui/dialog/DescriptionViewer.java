@@ -19,6 +19,8 @@ import javax.swing.text.html.HTMLFrameHyperlinkEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -56,8 +58,7 @@ public class DescriptionViewer {
             final ViewerDialog dialog = this;
             closeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    ConfigurationManager.storePlacement("DescriptionViewerDialog", dialog);
-                    dialog.setVisible(false);
+                    closeDialog();
                 }
             });
             getRootPane().setDefaultButton(closeButton);
@@ -81,6 +82,18 @@ public class DescriptionViewer {
             Container contentPane = getContentPane();
             contentPane.add(scrollview, BorderLayout.CENTER);
             contentPane.add(buttonPane, BorderLayout.SOUTH);
+            
+            this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            this.addWindowListener(new WindowAdapter() {
+            	public void windowClosing(WindowEvent e) {
+                    closeDialog();
+                }
+            });
+        }
+        
+        private void closeDialog() {
+            ConfigurationManager.storePlacement("DescriptionViewerDialog", this);
+            this.setVisible(false);
         }
 
         private void showDescription(Element description, URL baseURL) {
