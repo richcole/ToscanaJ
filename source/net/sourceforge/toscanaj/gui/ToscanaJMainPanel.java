@@ -15,6 +15,8 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.FilterOperationEventListener;
 import net.sourceforge.toscanaj.controller.HighlightingOperationEventListener;
 import net.sourceforge.toscanaj.controller.HighlightRemovalOperationEventListener;
+import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
@@ -22,6 +24,7 @@ import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Query;
+import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
@@ -42,6 +45,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 /**
  *  This class provides the main GUI panel with menus and a toolbar
@@ -731,6 +736,24 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
             e.printStackTrace();
             return;
         }
+        /* needs outsourcing dbconnection first
+        try {
+            DatabaseInfo dbInfo = conceptualSchema.getDatabaseInfo();
+            DBConnection databaseConnection = new DBConnection(dbInfo.getURL(), dbInfo.getUserName(), dbInfo.getPassword());
+            String urlString = dbInfo.getEmbeddedSQLLocation();
+            if (urlString != null) {
+                URL sqlURL;
+                try {
+                    sqlURL = new URL(schemaFile.toURL(), urlString);
+                } catch (MalformedURLException e) {
+                    ErrorDialog.showError(this, e, "Opening DB failed", "Could not create URL for SQL script:\n" + e.getMessage());
+                }
+                databaseConnection.executeScript(sqlURL);
+            }
+        } catch (DatabaseException e) {
+            ErrorDialog.showError(this, e, "Opening DB failed", "Some error happened when opening the database:\n" + e.getMessage());
+        }
+         */
 
         diagramView.showDiagram(null);
         updateLabelViews();

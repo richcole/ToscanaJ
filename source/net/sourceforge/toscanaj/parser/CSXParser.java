@@ -141,10 +141,10 @@ public class CSXParser {
         if (dbElem == null) {
             throw new DataFormatException("<databaseConnection> not defined in conceptual schema");
         }
-        DatabaseInfo dbInfo;
+        DatabaseInfo dbInfo = new DatabaseInfo();
+        parseDBInfo(dbInfo, dbElem);
+        _Schema.setDatabaseInfo(dbInfo);
         try {
-            dbInfo = new DatabaseInfo();
-            parseDBInfo(dbInfo, dbElem);
             /// @TODO Shouldn't this be in the main panel?
             _DatabaseConnection = new DBConnection(dbInfo.getURL(), dbInfo.getUserName(), dbInfo.getPassword());
             String urlString = dbInfo.getEmbeddedSQLLocation();
@@ -157,14 +157,13 @@ public class CSXParser {
                 }
                 _DatabaseConnection.executeScript(sqlURL);
             }
-            _Schema.setDatabaseInfo(dbInfo);
-            Element viewsElem = dbElem.getChild("views");
-            if (viewsElem != null) {
-                parseDatabaseObjectViewerSetups(viewsElem);
-                parseDatabaseObjectListViewerSetups(viewsElem);
-            }
         } catch (DatabaseException e) {
             throw new DataFormatException("Could not open database.", e.getOriginal());
+        }
+        Element viewsElem = dbElem.getChild("views");
+        if (viewsElem != null) {
+            parseDatabaseObjectViewerSetups(viewsElem);
+            parseDatabaseObjectListViewerSetups(viewsElem);
         }
     }
 
