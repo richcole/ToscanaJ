@@ -938,10 +938,15 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     private void addDiagram(ConceptualSchema schema, Context context, String name,
                             DimensionCreationStrategy dimensionStrategy) {
-        LatticeGenerator lgen = new GantersAlgorithm();
-        Lattice lattice = lgen.createLattice(context);
-        Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, name, dimensionStrategy);
-        schema.addDiagram(diagram);
+        try {
+	        LatticeGenerator lgen = new GantersAlgorithm();
+            Lattice lattice = lgen.createLattice(context);
+            Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, name, dimensionStrategy);
+            schema.addDiagram(diagram);
+        } catch (Exception e) {
+            ErrorDialog.showError(this, e, "Diagram creation failed", 
+                                    "Could not create diagram \"" + name + "\"");
+        }
     }
 
     public EventBroker getEventBroker() {

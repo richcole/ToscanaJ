@@ -55,6 +55,9 @@ Specific for Siena (still not fully complete):
   the user and will be remembered.
 - bugfix: most recently used files are available even if loading the last
   one failed
+- if Cernato diagrams fail to be created (can happen if the XML file is
+  inconsistent), an error message will appear and the following diagrams
+  will still be created if possible
   
 
 Other new experimental features:
