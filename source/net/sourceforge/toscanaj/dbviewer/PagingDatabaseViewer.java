@@ -43,7 +43,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
 
     private class PagingDatabaseViewerDialog extends JDialog {
         private List fieldNames;
-        private String[] keyValues;
+        private String [] keyValues;
         private int position;
         private JButton navStartButton;
         private JButton navPrevButton;
