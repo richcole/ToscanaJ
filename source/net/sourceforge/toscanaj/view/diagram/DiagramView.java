@@ -17,7 +17,6 @@ import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import org.tockit.canvas.Canvas;
-import org.tockit.canvas.CanvasItem;
 import org.tockit.events.EventBroker;
 
 import java.awt.*;
@@ -101,13 +100,10 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     public void setFilterMode(boolean filterMode) {
-        Iterator it = this.canvasItems.iterator();
+        Iterator it = this.getCanvasItemsByType(NodeView.class).iterator();
         while (it.hasNext()) {
-            CanvasItem cur = (CanvasItem) it.next();
-            if (cur instanceof NodeView) {
-                NodeView nv = (NodeView) cur;
-                nv.getConceptInterpretationContext().setFilterMode(filterMode);
-            }
+            NodeView cur = (NodeView) it.next();
+            cur.getConceptInterpretationContext().setFilterMode(filterMode);
         }
     }
 
@@ -195,12 +191,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     private void removeSubscriptions() {
-        for (Iterator iterator = canvasItems.iterator(); iterator.hasNext();) {
-            CanvasItem canvasItem = (CanvasItem) iterator.next();
-            if (canvasItem instanceof LabelView) {
-                LabelView lv = (LabelView) canvasItem;
-                this.getController().getEventBroker().removeSubscriptions(lv);
-            }
+        for (Iterator iterator = this.getCanvasItemsByType(LabelView.class).iterator(); iterator.hasNext();) {
+            LabelView lv = (LabelView) iterator.next();
+            this.getController().getEventBroker().removeSubscriptions(lv);
         }
     }
 
@@ -280,13 +273,10 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     public void setDisplayType(boolean contingentOnly) {
-        Iterator it = this.canvasItems.iterator();
+        Iterator it = this.getCanvasItemsByType(NodeView.class).iterator();
         while (it.hasNext()) {
-            CanvasItem cur = (CanvasItem) it.next();
-            if (cur instanceof NodeView) {
-                NodeView nv = (NodeView) cur;
-                nv.getConceptInterpretationContext().setObjectDisplayMode(contingentOnly);
-            }
+            NodeView nv = (NodeView) it.next();
+            nv.getConceptInterpretationContext().setObjectDisplayMode(contingentOnly);
         }
         updateLabelEntries();
         requestScreenTransformUpdate();
@@ -294,25 +284,19 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     private void updateLabelEntries() {
-        Iterator it = this.canvasItems.iterator();
+        Iterator it = this.getCanvasItemsByType(LabelView.class).iterator();
         while (it.hasNext()) {
-            CanvasItem cur = (CanvasItem) it.next();
-            if (cur instanceof LabelView) {
-                LabelView lv = (LabelView) cur;
-                lv.updateEntries();
-            }
+            LabelView lv = (LabelView) it.next();
+            lv.updateEntries();
         }
     }
 
     public void setSelectedConcepts(List concepts) {
         // notify all nodes and lines
-        Iterator it = this.canvasItems.iterator();
+        Iterator it = this.getCanvasItemsByType(NodeView.class).iterator();
         while (it.hasNext()) {
-            CanvasItem cur = (CanvasItem) it.next();
-            if (cur instanceof NodeView) {
-                NodeView nv = (NodeView) cur;
-                nv.setSelectedConcepts(concepts);
-            }
+            NodeView nv = (NodeView) it.next();
+            nv.setSelectedConcepts(concepts);
         }
         getController().getEventBroker().processEvent(new SelectionChangedEvent(this));
         repaint();
@@ -323,13 +307,10 @@ public class DiagramView extends Canvas implements ChangeObserver {
      */
     public void setQuery(Query query) {
         // update the current labels
-        Iterator it = this.canvasItems.iterator();
+        Iterator it = this.getCanvasItemsByType(ObjectLabelView.class).iterator();
         while (it.hasNext()) {
-            CanvasItem cur = (CanvasItem) it.next();
-            if (cur instanceof ObjectLabelView) {
-                ObjectLabelView lv = (ObjectLabelView) cur;
-                lv.setQuery(query);
-            }
+            ObjectLabelView lv = (ObjectLabelView) it.next();
+            lv.setQuery(query);
         }
         requestScreenTransformUpdate();
         repaint();
