@@ -8,9 +8,6 @@
 package org.tockit.tupelware.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
-import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
-import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.gui.MainPanel;
 import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
@@ -19,9 +16,6 @@ import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
-import net.sourceforge.toscanaj.model.lattice.Lattice;
-import net.sourceforge.toscanaj.model.lattice.LatticeImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 
@@ -31,6 +25,7 @@ import javax.swing.table.DefaultTableModel;
 import org.tockit.events.EventBroker;
 import org.tockit.tupelware.model.TupelSet;
 import org.tockit.tupelware.parser.TupelParser;
+import org.tockit.tupelware.scaling.TupelScaling;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -76,7 +71,6 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
      */
     private DiagramEditingView diagramView;
     private XMLEditorDialog schemaDescriptionView;
-    private static final DimensionCreationStrategy DimensionStrategy = new DefaultDimensionStrategy();
 	private SaveFileAction saveAsFileAction;
 	private SaveConceptualSchemaActivity saveActivity;
 
@@ -110,9 +104,6 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
                 closeMainPanel();
             }
         });
-    }
-
-    public TupelwareMainPanel(String string) {
     }
 
     private void createLayout() {
@@ -150,16 +141,12 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         String result = JOptionPane.showInputDialog(this, "Please enter a name for the new diagram.",
                                                     "Enter name", JOptionPane.OK_CANCEL_OPTION);
         if(result != null) {
-            ConceptImplementation concept = new ConceptImplementation();
-            LatticeImplementation lattice = new LatticeImplementation();
-            lattice.addConcept(concept);
-            addDiagram(lattice, result);
+            IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tupels.getVariableNames());
+            dialog.show();
+            int[] attributeIndices = dialog.getSelectedIndices();
+            Diagram2D diagram = TupelScaling.scaleTupels(this.tupels, this.objectIndices, attributeIndices);
+            this.conceptualSchema.addDiagram(diagram);
         }
-    }
-
-    private void addDiagram(Lattice lattice, String name) {
-        Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, name, DimensionStrategy);
-        conceptualSchema.addDiagram(diagram);
     }
 
     public void createViews() {
@@ -299,7 +286,8 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
             IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select object set", this.tupels.getVariableNames());
             dialog.show();
             this.objectIndices = dialog.getSelectedIndices();
-            fillTable();        
+            fillTable();     
+            this.conceptualSchema = new ConceptualSchema(this.eventBroker);   
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Could not read file");
         }

@@ -22,13 +22,7 @@ public class Tupelware {
      */
     public static void main(String[] args) {
     	testJavaVersion();
-        final TupelwareMainPanel mainWindow;
-        if (args.length == 1) {
-            mainWindow = new TupelwareMainPanel(args[0]);
-        } else {
-            mainWindow = new TupelwareMainPanel();
-        }
-
+        final TupelwareMainPanel mainWindow = new TupelwareMainPanel();
         mainWindow.setVisible(true);
     }
 
