@@ -1,9 +1,11 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.events.BrokerEventListener;
-import net.sourceforge.toscanaj.model.DiagramCollection;
+import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import util.CollectionFactory;
 
 import javax.swing.*;
@@ -14,7 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class ScaleGeneratorPanel extends JPanel{
+public class ScaleGeneratorPanel extends JPanel implements BrokerEventListener {
     private List scaleGenerators = null;
     private JFrame parentFrame;
     ConceptualSchema conceptualSchema;
@@ -27,12 +29,17 @@ public class ScaleGeneratorPanel extends JPanel{
     /**
      * Construct an instance of this view
      */
-    public ScaleGeneratorPanel(JFrame frame, ConceptualSchema conceptualSchema, TableColumnPairsSelectionSource selectionSource) {
+    public ScaleGeneratorPanel(JFrame frame, ConceptualSchema conceptualSchema, TableColumnPairsSelectionSource selectionSource, EventBroker eventBroker) {
         super();
         this.parentFrame = frame;
         this.conceptualSchema = conceptualSchema;
         this.selectionSource = selectionSource;
+        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
         fillGeneratorButtonsPane();
+    }
+
+    public ConceptualSchema getConceptualSchema() {
+        return conceptualSchema;
     }
 
     private List getScaleGenerators() {
@@ -45,6 +52,13 @@ public class ScaleGeneratorPanel extends JPanel{
 
     private void fillScalesGenerators() {
         scaleGenerators.add(new OrdinalScaleGenerator(getParentFrame()));
+    }
+
+    public void processEvent(Event e) {
+        if (e instanceof NewConceptualSchemaEvent) {
+            NewConceptualSchemaEvent csEvent = (NewConceptualSchemaEvent) e;
+            conceptualSchema = csEvent.getConceptualSchema();
+        }
     }
 
     Map generatorButtonMap = CollectionFactory.createDefaultMap();
@@ -63,7 +77,8 @@ public class ScaleGeneratorPanel extends JPanel{
                 public void actionPerformed(ActionEvent e) {
                     Diagram2D returnValue =
                             generator.generateScale(selectionSource.getSelectedTableColumnPairs(),
-                                                    conceptualSchema);
+                                    conceptualSchema);
+                    System.out.println(conceptualSchema);
                     if (null != returnValue) {
                         conceptualSchema.addDiagram(returnValue);
                     }
@@ -78,19 +93,19 @@ public class ScaleGeneratorPanel extends JPanel{
         generatorButtonMap.put(generator, generatorButton);
     }
 
-    public void updateGeneratorViews(){
+    public void updateGeneratorViews() {
         final TableColumnPair[] selectedTableColumnPairs = selectionSource.getSelectedTableColumnPairs();
         Iterator scalesIterator = getScaleGenerators().iterator();
         while (scalesIterator.hasNext()) {
             ScaleGenerator scaleGenerator = (ScaleGenerator) scalesIterator.next();
             JComponent scaleComponent = getComponentForGenerator(scaleGenerator);
-            if(null!=scaleComponent){
+            if (null != scaleComponent) {
                 scaleComponent.setEnabled(scaleGenerator.canHandleColumns(selectedTableColumnPairs));
             }
         }
     }
 
     private JComponent getComponentForGenerator(ScaleGenerator scaleGenerator) {
-        return (JComponent)generatorButtonMap.get(scaleGenerator);
+        return (JComponent) generatorButtonMap.get(scaleGenerator);
     }
 }

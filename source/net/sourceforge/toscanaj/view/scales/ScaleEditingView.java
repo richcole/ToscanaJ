@@ -34,6 +34,10 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
         return parentFrame;
     }
 
+    public DefaultListModel getScalesListModel(){
+        return scalesListModel;
+    }
+
     /**
      * Construct an instance of this view
      */
@@ -49,7 +53,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
         leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, columnListView, makeScalesView());
         leftPane.setOneTouchExpandable(true);
 
-        scaleGeneratorPanel = makeScaleGeneratorPane();
+        scaleGeneratorPanel = makeScaleGeneratorPane(eventBroker);
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, scaleGeneratorPanel);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
@@ -59,8 +63,8 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
         eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
     }
 
-    private ScaleGeneratorPanel makeScaleGeneratorPane() {
-        return new ScaleGeneratorPanel(getParentFrame(), conceptualSchema, this);
+    private ScaleGeneratorPanel makeScaleGeneratorPane(EventBroker eventBroker) {
+        return new ScaleGeneratorPanel(getParentFrame(), conceptualSchema, this, eventBroker);
     }
 
     public TableColumnPair[] getSelectedTableColumnPairs() {

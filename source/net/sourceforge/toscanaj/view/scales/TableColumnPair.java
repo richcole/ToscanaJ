@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.model.Table;
 import net.sourceforge.toscanaj.model.Column;
 
-class TableColumnPair {
+public class TableColumnPair {
     Table table;
     Column column;
 

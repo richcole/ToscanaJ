@@ -4,11 +4,12 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.tests;
+package net.sourceforge.toscanaj.view.scales.tests;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import net.sourceforge.toscanaj.view.diagram.tests.DiagramViewTest;
 
 public class AllTests extends TestCase {
     public AllTests(String s) {
@@ -17,12 +18,8 @@ public class AllTests extends TestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTest(net.sourceforge.toscanaj.controller.fca.tests.AllTests.suite());
-        suite.addTest(net.sourceforge.toscanaj.events.tests.AllTests.suite());
-        suite.addTest(net.sourceforge.toscanaj.model.tests.AllTests.suite());
-        suite.addTest(net.sourceforge.toscanaj.util.tests.AllTests.suite());
-        suite.addTest(net.sourceforge.toscanaj.view.tests.AllTests.suite());
-
+        suite.addTest(ScaleEditingViewTest.suite());
+        suite.addTest(ScaleGeneratorPaneTest.suite());
         return suite;
     }
 

@@ -6,7 +6,6 @@
  */
 package net.sourceforge.toscanaj.view.diagram.tests;
 
-import com.mockobjects.ExpectationCounter;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -46,7 +45,7 @@ public class DiagramViewTest extends TestCase {
         assertEquals(new Dimension(100, 100), view.getSize());
         view.makeScreenTransformClear();
         assertEquals(false, view.isScreenTransformDirty());
-        view.addComponentListener(new ComponentAdapter(){
+        view.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
                 assertEquals(true, view.isScreenTransformDirty());
             }
