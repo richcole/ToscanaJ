@@ -37,46 +37,21 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
  */
 
 public interface ConceptInterpreter {
-
+    /** @note is Dependent on displayMode and filterMode */
+    Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context);
 
     /** @note is Dependent on displayMode and filterMode */
-    Iterator getObjectSetIterator(Concept concept);
+    Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context);
 
     /** @note is Dependent on displayMode and filterMode */
-    Iterator getAttributeSetIterator(Concept concept);
+    int  getObjectCount(Concept concept, ConceptInterpretationContext context);
 
     /** @note is Dependent on displayMode and filterMode */
-    int  getObjectCount(Concept concept);
-
-    /** @note is Dependent on displayMode and filterMode */
-    int  getAttributeCount(Concept concept);
+    int  getAttributeCount(Concept concept, ConceptInterpretationContext context);
 
     /** @note these are independent of displayMode and dependent on filterMode */
-    double getRelativeIntentSize(Concept concept);
+    double getRelativeIntentSize(Concept concept, ConceptInterpretationContext context);
 
     /** @note these are independent of displayMode and dependent on filterMode */
-    double getRelativeExtentSize(Concept concept);
-
-    /** @note see equation above for the effect of this change */
-    void setDisplayMode(boolean isContingent);
-
-    /** @note see equation above for the effect of this change */
-    void setFilterMode(boolean isContingent);
-
-    /** Constant value which may be used to set displayMode or filterMode */
-    public static final boolean CONTINGENT = true;
-
-    /** Constant value which may be used to set displayMode or filterMode */
-    public static final boolean EXTENT = false;
-
-    /**
-     * Construct a new interpreter that adds concept to N.
-     * The new interpreter doesn't reference the old interpreter.
-     */
-    public ConceptInterpreter createNestedInterpreter(Concept concept);
-
-    /* Construct a new interpreter that adds concept to Z.
-     * The new interpreter doesn't reference the old interpreter.
-     */
-    public ConceptInterpreter createFilteredInterpreter(Concept concept);
+    double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context);
 }

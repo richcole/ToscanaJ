@@ -32,9 +32,8 @@ public class AttributeLabelView extends LabelView {
     /**
      * Creates a view for the given label information.
      */
-    public AttributeLabelView(DiagramView diagramView, LabelInfo label, ConceptInterpreter conceptInterpreter) {
-        super(diagramView, label, conceptInterpreter);
-        setDisplayType(true);
+    public AttributeLabelView(DiagramView diagramView, LabelInfo label) {
+        super(diagramView, label);
     }
 
     /**
@@ -45,19 +44,11 @@ public class AttributeLabelView extends LabelView {
     }
 
     protected int getNumberOfEntries() {
-        if (this.showOnlyContingent) {
-            return this.labelInfo.getNode().getConcept().getAttributeContingentSize();
-        } else {
-            return this.labelInfo.getNode().getConcept().getIntentSize();
-        }
+        return this.labelInfo.getNode().getConcept().getAttributeContingentSize();
     }
 
     protected Iterator getEntryIterator() {
-        if (this.showOnlyContingent) {
-            return this.labelInfo.getNode().getConcept().getAttributeContingentIterator();
-        } else {
-            return this.labelInfo.getNode().getConcept().getIntentIterator();
-        }
+        return this.labelInfo.getNode().getConcept().getAttributeContingentIterator();
     }
 
     public void openPopupMenu(MouseEvent event, Point2D pos) {

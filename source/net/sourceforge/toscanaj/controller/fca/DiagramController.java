@@ -411,8 +411,6 @@ public class DiagramController implements ChangeObservable {
     }
 
     public ConceptInterpreter getDefaultInterpreter(DatabaseConnection databaseConnection) {
-        return new DatabaseConnectedConceptInterpreter( ConceptInterpreter.CONTINGENT,
-                                                        filterMethod == FILTER_CONTINGENT,
-                                                        databaseConnection );
+        return new DatabaseConnectedConceptInterpreter( databaseConnection );
     }
 }

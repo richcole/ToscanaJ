@@ -69,17 +69,14 @@ public class NodeView extends CanvasItem {
      */
     private int selectionState = NO_SELECTION;
 
-    private ConceptInterpreter conceptInterpreter;
-
     /**
      * Construct a nodeView for a Node.
      *
      * The DiagramView is used for the callback when a node was selected.
      */
-    public NodeView(DiagramNode diagramNode, DiagramView diagramView, ConceptInterpreter conceptInterpreter) {
+    public NodeView(DiagramNode diagramNode, DiagramView diagramView) {
         this.diagramNode = diagramNode;
         this.diagramView = diagramView;
-        this.conceptInterpreter = conceptInterpreter;
     }
 
     public DiagramNode getDiagramNode() {

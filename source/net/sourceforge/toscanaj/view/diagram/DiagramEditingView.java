@@ -20,6 +20,7 @@ import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.diagram.NodeMovementEventListener;
 import net.sourceforge.toscanaj.controller.diagram.IdealMovementEventListener;
 import net.sourceforge.toscanaj.controller.diagram.FilterMovementEventListener;
@@ -71,7 +72,9 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         JComboBox movementChooser = new JComboBox(movementNames);
         toolPanel.add(movementChooser);
 
-        diagramView = new DiagramView(DiagramController.getController().getDefaultInterpreter(null));
+        diagramView = new DiagramView(DiagramController.getController().getDefaultInterpreter(null),
+                                      new ConceptInterpretationContext(ConceptInterpretationContext.CONTINGENT,
+                                                                       ConceptInterpretationContext.EXTENT));
         final EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
         canvasEventBroker.subscribe(
                 nodeMovementEventListener,

@@ -20,75 +20,51 @@ import util.CollectionFactory;
 
 public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter {
 
-    List nestingConcepts = CollectionFactory.createDefaultList();
-    List filteringConcepts = CollectionFactory.createDefaultList();
-
-    boolean displayMode;
-    boolean filterMode;
-
     DatabaseConnection databaseConnection;
 
     public DatabaseConnectedConceptInterpreter(
-        boolean displayMode,
-        boolean filterMode,
         DatabaseConnection databaseConnection)
     {
-        this.displayMode = displayMode;
-        this.filterMode = filterMode;
         this.databaseConnection = databaseConnection;
     }
 
-    public Iterator getObjectSetIterator(Concept concept) {
+    public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
         DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
-        if( displayMode == CONTINGENT ) {
+        boolean displayMode = context.getObjectDisplayMode();
+        if( displayMode == ConceptInterpretationContext.CONTINGENT ) {
             return dbConcept.getObjectContingentIterator();
-        } else if( displayMode == EXTENT ) {
+        } else if( displayMode == ConceptInterpretationContext.EXTENT ) {
             return dbConcept.getExtentIterator();
         } else {
             throw new RuntimeException("Can't happen");
         }
     }
 
-    public Iterator getAttributeSetIterator(Concept concept) {
+    public Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context) {
         return concept.getAttributeContingentIterator();
     }
 
-    public int getObjectCount(Concept concept) {
+    public int getObjectCount(Concept concept, ConceptInterpretationContext context) {
         DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
-        if( displayMode == CONTINGENT ) {
+        boolean displayMode = context.getObjectDisplayMode();
+        if( displayMode == ConceptInterpretationContext.CONTINGENT ) {
             return dbConcept.getObjectContingentSize();
-        } else if( displayMode == EXTENT ) {
+        } else if( displayMode == ConceptInterpretationContext.EXTENT ) {
             return dbConcept.getExtentSize();
         } else {
             throw new RuntimeException("Can't happen");
         }
     }
 
-    public int getAttributeCount(Concept concept) {
+    public int getAttributeCount(Concept concept, ConceptInterpretationContext context) {
         return concept.getAttributeContingentSize();
     }
 
-    public void setDisplayMode(boolean isContingent) {
-        displayMode = isContingent;
-    }
-
-    public void setFilterMode(boolean isContingent) {
-        filterMode = isContingent;
-    }
-
-    public ConceptInterpreter createNestedInterpreter(Concept concept) {
-        return null;
-    }
-
-    public ConceptInterpreter createFilteredInterpreter(Concept concept) {
-        return null;
-    }
-
-    public double getRelativeIntentSize(Concept concept) {
+    public double getRelativeIntentSize(Concept concept, ConceptInterpretationContext context) {
         return concept.getIntentSizeRelative();
     }
 
-    public double getRelativeExtentSize(Concept concept) {
+    public double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context) {
         return concept.getExtentSizeRelative();
     }
 }

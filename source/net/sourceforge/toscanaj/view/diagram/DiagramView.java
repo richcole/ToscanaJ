@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.canvas.Canvas;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.database.DatabaseQuery;
 import net.sourceforge.toscanaj.model.diagram.*;
@@ -44,6 +45,8 @@ public class DiagramView extends Canvas implements ChangeObserver {
 
     private ConceptInterpreter conceptInterpreter;
 
+    private ConceptInterpretationContext conceptInterpretationContext;
+
     class ResizeListener extends ComponentAdapter {
         public void componentResized(ComponentEvent e) {
             requestScreenTransformUpdate();
@@ -54,17 +57,31 @@ public class DiagramView extends Canvas implements ChangeObserver {
     /**
      * Creates a new view displaying an empty digram (i.e. nothing at all).
      */
-    public DiagramView(ConceptInterpreter conceptInterpreter) {
+    public DiagramView(ConceptInterpreter conceptInterpreter,
+                       ConceptInterpretationContext conceptInterpretationContext) {
         super();
         this.conceptInterpreter = conceptInterpreter;
+        this.conceptInterpretationContext = conceptInterpretationContext;
         addComponentListener(new ResizeListener());
-        /// @todo this is not yet used since the title is not a canvas item yet
         getBackgroundItem().setPaint(DiagramSchema.getDiagramSchema().getBackgroundColor());
+    }
+
+    public ConceptInterpreter getConceptInterpreter() {
+        return conceptInterpreter;
     }
 
     public void setConceptInterpreter(ConceptInterpreter conceptInterpreter) {
         this.conceptInterpreter = conceptInterpreter;
-        /// @todo propagate change to parts, redraw
+        /// @todo update parts, redraw
+    }
+
+    public ConceptInterpretationContext getConceptInterpretationContext() {
+        return conceptInterpretationContext;
+    }
+
+    public void setConceptInterpretationContext(ConceptInterpretationContext conceptInterpretationContext) {
+        this.conceptInterpretationContext = conceptInterpretationContext;
+        /// @todo update parts, redraw
     }
 
     protected void dragFinished(MouseEvent e) {
@@ -143,7 +160,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
             repaint();
             return;
         }
-        addDiagram(diagram, conceptInterpreter);
+        addDiagram(diagram);
         requestScreenTransformUpdate();
         repaint();
     }
@@ -158,23 +175,23 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * If the filter concept is non-null all nodes created will use this for
      * filter operations.
      */
-    private void addDiagram(Diagram2D diagram, ConceptInterpreter conceptInterpreter) {
+    private void addDiagram(Diagram2D diagram) {
         addDiagramLinesToCanvas(diagram);
-        addDiagramNodesToCanvas(diagram, conceptInterpreter);
-        addDiagramLabelsToCanvas(diagram, conceptInterpreter);
+        addDiagramNodesToCanvas(diagram);
+        addDiagramLabelsToCanvas(diagram);
     }
 
-    private void addDiagramLabelsToCanvas(Diagram2D diagram, ConceptInterpreter conceptInterpreter) {
+    private void addDiagramLabelsToCanvas(Diagram2D diagram) {
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
             if (attrLabelInfo != null) {
-                LabelView labelView = new AttributeLabelView(this, attrLabelInfo, conceptInterpreter);
+                LabelView labelView = new AttributeLabelView(this, attrLabelInfo);
                 addCanvasItem(labelView);
                 labelView.addObserver(this);
             }
             LabelInfo objLabelInfo = diagram.getObjectLabel(i);
             if (objLabelInfo != null) {
-                LabelView labelView = new ObjectLabelView(this, objLabelInfo, conceptInterpreter);
+                LabelView labelView = new ObjectLabelView(this, objLabelInfo);
                 addCanvasItem(labelView);
                 labelView.addObserver(this);
             }
@@ -188,14 +205,14 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
     }
 
-    private void addDiagramNodesToCanvas(Diagram2D diagram, ConceptInterpreter conceptInterpreter) {
+    private void addDiagramNodesToCanvas(Diagram2D diagram) {
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node, this, conceptInterpreter);
+            NodeView nodeView = new NodeView(node, this);
             addCanvasItem(nodeView);
             if (node instanceof NestedDiagramNode) {
                 NestedDiagramNode ndNode = (NestedDiagramNode) node;
-                addDiagram(ndNode.getInnerDiagram(), conceptInterpreter);
+                addDiagram(ndNode.getInnerDiagram());
             }
         }
     }
@@ -204,22 +221,21 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * @see LabelView.setDisplayType(boolean)
      */
     public void setDisplayType(boolean contingentOnly) {
-        // change existing labels
+        this.conceptInterpretationContext.setObjectDisplayMode(contingentOnly);
+        updateLabelEntries();
+        requestScreenTransformUpdate();
+        repaint();
+    }
+
+    private void updateLabelEntries() {
         Iterator it = this.canvasItems.iterator();
         while (it.hasNext()) {
             CanvasItem cur = (CanvasItem) it.next();
-            if (cur instanceof ObjectLabelView) {
-                ObjectLabelView lv = (ObjectLabelView) cur;
-                lv.setDisplayType(contingentOnly);
-            } else if (cur instanceof AttributeLabelView) {
-                AttributeLabelView lv = (AttributeLabelView) cur;
-                lv.setDisplayType(true);
+            if (cur instanceof LabelView) {
+                LabelView lv = (LabelView) cur;
+                lv.updateEntries();
             }
         }
-        // set new default
-        ObjectLabelView.setDefaultDisplayType(contingentOnly);
-        requestScreenTransformUpdate();
-        repaint();
     }
 
     public void setSelectedConcepts(List concepts) {

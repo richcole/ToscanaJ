@@ -34,11 +34,6 @@ import java.util.Vector;
  */
 public class ObjectLabelView extends LabelView {
     /**
-     * Sets the default value for showing contingent or extent.
-     */
-    static private boolean defaultShowContingentOnly = true;
-
-    /**
      * Sets the default query used for new labels.
      */
     static private DatabaseQuery defaultQuery = null;
@@ -53,9 +48,8 @@ public class ObjectLabelView extends LabelView {
     /**
      * Creates a view for the given label information.
      */
-    public ObjectLabelView(DiagramView diagramView, LabelInfo label, ConceptInterpreter conceptInterpreter) {
-        super(diagramView, label, conceptInterpreter);
-        setDisplayType(defaultShowContingentOnly);
+    public ObjectLabelView(DiagramView diagramView, LabelInfo label) {
+        super(diagramView, label);
         setQuery(defaultQuery);
     }
 
@@ -68,11 +62,7 @@ public class ObjectLabelView extends LabelView {
         }
     }
 
-    /**
-     * Overwritten to reset the query cache.
-     */
-    public void setDisplayType(boolean contingentOnly) {
-        super.setDisplayType(contingentOnly);
+    public void updateEntries() {
         doQuery();
         if (this.getNumberOfEntries() > DEFAULT_DISPLAY_LINES) {
             this.displayLines = DEFAULT_DISPLAY_LINES;
@@ -80,13 +70,6 @@ public class ObjectLabelView extends LabelView {
             this.displayLines = this.getNumberOfEntries();
         }
         update(this);
-    }
-
-    /**
-     * Sets the default display type for new labels.
-     */
-    static public void setDefaultDisplayType(boolean contingentOnly) {
-        ObjectLabelView.defaultShowContingentOnly = contingentOnly;
     }
 
     /**
@@ -130,7 +113,8 @@ public class ObjectLabelView extends LabelView {
 
     protected void doQuery() {
         if (query != null) {
-            queryResults = this.query.execute(this.labelInfo.getNode().getConcept(),this.showOnlyContingent);
+            queryResults = this.query.execute(this.labelInfo.getNode().getConcept(),
+                                              diagramView.getConceptInterpretationContext().getObjectDisplayMode() );
         }
     }
 

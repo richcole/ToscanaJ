@@ -70,14 +70,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     private Font font = new Font("Arial", Font.PLAIN, 10);
 
     /**
-     * Stores if we display contingents or extent/intent.
-     *
-     * If set to true we show only the attribute or object contingent (depending
-     * on the given label info), otherwise it is intent or extent.
-     */
-    protected boolean showOnlyContingent = true;
-
-    /**
      * The bounding rectangle for the label itself.
      */
     protected Rectangle2D rect = null;
@@ -91,8 +83,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      * Store the diagram view that the label belongs to.
      */
     protected DiagramView diagramView = null;
-
-    protected ConceptInterpreter conceptInterpreter = null;
 
     /**
      * The current display size in lines.
@@ -122,21 +112,18 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * Creates a view for the given label information.
      */
-    public LabelView(DiagramView diagramView, LabelInfo label, ConceptInterpreter conceptInterpreter) {
+    public LabelView(DiagramView diagramView, LabelInfo label) {
         this.diagramView = diagramView;
         this.labelInfo = label;
         this.labelInfo.addObserver(this);
-        this.conceptInterpreter = conceptInterpreter;
         DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
         String fontName = diagramSchema.getLabelFontName();
         int fontSize = diagramSchema.getLabelFontSize();
         this.font = new Font(fontName, Font.PLAIN, fontSize);
+        updateEntries();
     }
 
-    /**
-     */
-    public void setDisplayType(boolean contingentOnly) {
-        this.showOnlyContingent = contingentOnly;
+    public void updateEntries() {
         if (this.getNumberOfEntries() > DEFAULT_DISPLAY_LINES) {
             this.displayLines = DEFAULT_DISPLAY_LINES;
         } else {

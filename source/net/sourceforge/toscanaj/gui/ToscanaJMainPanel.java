@@ -22,6 +22,7 @@ import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
@@ -246,7 +247,9 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         contentPane.setLayout(new BorderLayout());
 
         DiagramController controller = DiagramController.getController();
-        diagramView = new DiagramView(controller.getDefaultInterpreter(DatabaseConnection.getConnection()));
+        diagramView = new DiagramView(controller.getDefaultInterpreter(DatabaseConnection.getConnection()),
+                                      new ConceptInterpretationContext(ConceptInterpretationContext.CONTINGENT,
+                                                                       ConceptInterpretationContext.EXTENT ));
         diagramView.getController().getEventBroker().subscribe(
                 new FilterOperationEventListener(controller),
                 CanvasItemActivatedEvent.class,

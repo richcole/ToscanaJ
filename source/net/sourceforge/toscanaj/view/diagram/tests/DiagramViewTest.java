@@ -11,6 +11,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -28,7 +29,8 @@ public class DiagramViewTest extends TestCase {
     static class TestDiagramView extends DiagramView {
 
         public TestDiagramView() {
-            super(null);
+            super(null,new ConceptInterpretationContext(ConceptInterpretationContext.CONTINGENT,
+                                                        ConceptInterpretationContext.EXTENT));
         }
 
         public boolean isScreenTransformDirty() {
