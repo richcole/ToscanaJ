@@ -238,12 +238,12 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
         //Create a split pane with the two scroll panes in it.
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                                   diagramView, diagramOrganiser);
+                                   diagramOrganiser, diagramView);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(1);
 
         //Provide minimum sizes for the two components in the split pane
-        Dimension minimumSize = new Dimension(100, 50);
+        Dimension minimumSize = new Dimension(50,100);
         diagramView.setMinimumSize(minimumSize);
         diagramOrganiser.setMinimumSize(minimumSize);
 

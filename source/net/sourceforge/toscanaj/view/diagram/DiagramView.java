@@ -77,10 +77,10 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
 
         // draw diagram title in the top left corner
         g2d.setPaint(DiagramSchema.getDiagramSchema().getForeground());
-        g2d.drawString( diagram.getTitle(), this.getX() + MARGIN, this.getY() + MARGIN );
+        g2d.drawString( diagram.getTitle(), MARGIN, MARGIN );
 
         // find current bounds
-        Rectangle2D bounds = new Rectangle2D.Double( getX() + MARGIN, getY() + MARGIN,
+        Rectangle2D bounds = new Rectangle2D.Double( MARGIN, MARGIN,
                                                      getWidth() - 2*MARGIN, getHeight() - 2*MARGIN );
         this.scaleToFit(g2d, bounds);
 
