@@ -78,7 +78,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventListener {
     }
 
     public ElbaMainPanel() {
-        super("ElbaMainPanel");
+        super("Elba");
 
         eventBroker = new EventBroker();
         conceptualSchema = new ConceptualSchema(eventBroker);
