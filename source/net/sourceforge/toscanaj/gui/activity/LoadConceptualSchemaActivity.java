@@ -18,6 +18,7 @@ import java.io.File;
 public class LoadConceptualSchemaActivity implements FileActivity {
     private EventBroker broker;
     private DatabaseConnection databaseConnection;
+    private SimpleActivity testOpenOkActivity;
 
     public LoadConceptualSchemaActivity(EventBroker broker, DatabaseConnection databaseConnection) {
         this.broker = broker;
@@ -33,6 +34,14 @@ public class LoadConceptualSchemaActivity implements FileActivity {
     }
 
     public boolean prepareToProcess() throws Exception {
-        return true;
+    	if(this.testOpenOkActivity != null) {
+    		return this.testOpenOkActivity.doActivity();
+    	} else {
+        	return true;
+    	}
     }
+
+	public void setTestOpenOkActivity(SimpleActivity testOpenOkActivity) {
+		this.testOpenOkActivity = testOpenOkActivity;
+	}
 }

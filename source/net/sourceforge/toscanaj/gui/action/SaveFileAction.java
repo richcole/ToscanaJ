@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 
 import javax.swing.*;
 
+import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.io.File;
 
@@ -45,46 +46,54 @@ public class SaveFileAction extends KeyboardMappedAction {
     }
 
     public void actionPerformed(ActionEvent e) {
-        final JFileChooser saveDialog;
+		saveFile();
+    }
 
-        boolean result = false;
-        try {
-            result = activity.prepareToProcess();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(
-                    frame,
-                    "Unable to initiate file saving:" + ex.getMessage(),
-                    "Error preparing to save",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-
-        if (result) {
+	public boolean saveFile() throws HeadlessException {
+		final JFileChooser saveDialog;
+		
+		boolean result = false;
+		try {
+		    result = activity.prepareToProcess();
+		} catch (Exception ex) {
+		    JOptionPane.showMessageDialog(
+		            frame,
+		            "Unable to initiate file saving:" + ex.getMessage(),
+		            "Error preparing to save",
+		            JOptionPane.ERROR_MESSAGE);
+		}
+		
+		if (result) {
 			String[] csxExtension = {"csx"};
 			ExtensionFileFilter csxFileFilter = new ExtensionFileFilter(csxExtension,"Conceptual Schema");
 			ExtensionFileFilter[] filterArray = { csxFileFilter };
-            if (previousFile != null) {
-                saveDialog = new CheckDuplicateFileChooser(previousFile, filterArray);
-                
-            } else {
-                saveDialog = new CheckDuplicateFileChooser(new File(System.getProperty("user.dir")), filterArray);
-            }
+		    if (previousFile != null) {
+		        saveDialog = new CheckDuplicateFileChooser(previousFile, filterArray);
+		        
+		    } else {
+		        saveDialog = new CheckDuplicateFileChooser(new File(System.getProperty("user.dir")), filterArray);
+		    }
 			
-            if (saveDialog.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = saveDialog.getSelectedFile();
-                try {
-                    activity.processFile(selectedFile);
-                } catch (Exception ex) {
-                    ErrorDialog.showError(
-                            frame,
-                            ex,
-                            "Error saving file",
-                            "Failure to save the file:" + ex.getMessage()
-                    );
-                    ex.printStackTrace();
-                }
-                previousFile = selectedFile;
-            }
-        }
-    }
+		    if (saveDialog.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+		        File selectedFile = saveDialog.getSelectedFile();
+		        try {
+		            activity.processFile(selectedFile);
+		        } catch (Exception ex) {
+		            ErrorDialog.showError(
+		                    frame,
+		                    ex,
+		                    "Error saving file",
+		                    "Failure to save the file:" + ex.getMessage()
+		            );
+		            ex.printStackTrace();
+		        }
+		        previousFile = selectedFile;
+		        return true;
+		    } else {
+		    	return false;
+		    }
+		}
+		return false;
+	}
 }
 

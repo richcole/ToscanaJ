@@ -36,6 +36,9 @@ import java.util.Vector;
  * The class encapsulates (directly or indirectly) the whole data model used
  * in the program. Instances are created by parsing a CSX file with the
  * CSXParser class.
+ * 
+ * @todo write test cases, e.g. for testing if the dirty flag is handled
+ * properly
  */
 public class ConceptualSchema implements XMLizable, DiagramCollection {
     /**
@@ -82,7 +85,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     private static final String QUERIES_ELEMENT_NAME = "queries";
     
     private ManyValuedContext manyValuedContext;
-	private boolean dataSaved;
+	private boolean dataSaved = true;
 
     /**
      * Creates an empty schema.
@@ -185,13 +188,14 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
             }
             diagrams.add(diagram);
         }
+        this.dataSaved = true;
     }
 
 
     /**
      * Deletes all schema content, rendering the schema empty.
      */
-    public void reset() {
+    protected void reset() {
         databaseInfo = null;
         diagrams = new Vector();
         hasDiagramDescription = false;
@@ -212,8 +216,13 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
      */
     public void setDatabaseInfo(DatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
+		markDataDirty();
         eventBroker.processEvent(new DatabaseInfoChangedEvent(this, this, databaseInfo));
     }
+
+	private void markDataDirty() {
+		this.dataSaved = false;
+	}
 
     /**
      * Returns the number of diagrams available.
@@ -252,16 +261,19 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
      */
     public void addDiagram(Diagram2D diagram) {
         diagrams.add(diagram);
+		markDataDirty();
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
 
     public void removeDiagram(int diagramIndex) {
         diagrams.remove(diagramIndex);
+		markDataDirty();
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
 
     public void removeDiagram(Diagram2D diagram) {
         diagrams.remove(diagram);
+		markDataDirty();
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
     
@@ -270,6 +282,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
 		Diagram2D diagram = (Diagram2D)diagrams.get( to );
 		diagrams.setElementAt(indexDiagram,to);
 		diagrams.setElementAt(diagram,from);  
+		markDataDirty();
 		eventBroker.processEvent(new DiagramListChangeEvent(this, this));	
     }
     
@@ -279,10 +292,12 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     		throw new IllegalArgumentException("No such diagram to replace");
     	}
     	this.diagrams.set(index, newDiagram);
+		markDataDirty();
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
 
     public void setDescription(Element description) {
+		markDataDirty();
         if (description != null) {
             this.description = (Element) description.clone();
         } else {
@@ -295,6 +310,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     }
 
     public void setHasDiagramDescription(boolean flag) {
+		markDataDirty();
         this.hasDiagramDescription = flag;
     }
 
@@ -315,12 +331,13 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     }
 
     public void addQuery(Query query) {
+		markDataDirty();
         this.queries.add(query);
     }
 
     public void setManyValuedContext(ManyValuedContext context) {
+		markDataDirty();
         this.manyValuedContext = context;
-		this.dataSaved = false;
     }
 
     public ManyValuedContext getManyValuedContext() {

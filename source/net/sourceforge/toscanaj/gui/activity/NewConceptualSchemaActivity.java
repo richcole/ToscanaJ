@@ -12,13 +12,24 @@ import org.tockit.events.EventBroker;
 
 public class NewConceptualSchemaActivity implements SimpleActivity {
     private EventBroker broker;
+    private SimpleActivity testNewOkActivity;
 
     public NewConceptualSchemaActivity(EventBroker broker) {
         this.broker = broker;
     }
 
     public boolean doActivity() throws Exception {
-        new ConceptualSchema(broker);
+    	if(this.testNewOkActivity != null) {
+    		boolean result = this.testNewOkActivity.doActivity();
+    		if(result == false) {
+    			return false;
+    		}
+    	}
+		new ConceptualSchema(broker);
         return true;
     }
+
+	public void setTestNewOkActivity(SimpleActivity testNewOkActivity) {
+		this.testNewOkActivity = testNewOkActivity;
+	}
 }

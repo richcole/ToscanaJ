@@ -125,6 +125,8 @@ public class CSXParser {
             throw new DataFormatException("Root element name is not <conceptualSchema>");
         }
         eventBroker.processEvent(new ConceptualSchemaLoadedEvent(CSXParser.class, _Schema, csxFile));
+        
+        _Schema.dataSaved();
 
         return _Schema;
     }
