@@ -19,13 +19,7 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
-import net
-    .sourceforge
-    .toscanaj
-    .gui
-    .dialog
-    .attributeselection
-    .SelectedColumnChangedEvent;
+import net.sourceforge.toscanaj.gui.dialog.attributeselection.SelectedColumnChangedEvent;
 import net.sourceforge.toscanaj.gui.dialog.attributeselection.ValueSetSelector;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.Table;
@@ -173,7 +167,7 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
             Iterator it = table.getColumns().iterator();
             while(it.hasNext()) {
                 Column col = (Column) it.next();
-                columnsList.add(0, new ColumnInfo(col));
+                columnsList.addElement(new ColumnInfo(col));
             }
         }
     };

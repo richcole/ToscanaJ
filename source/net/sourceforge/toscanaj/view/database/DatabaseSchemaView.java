@@ -168,7 +168,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
         if (table != null) {
             STD_Iterator it = new STD_Iterator(table.getColumns());
             for (it.reset(); !it.atEnd(); it.next()) {
-                columnsList.add(0, new ColumnInfo((Column) it.val()));
+                columnsList.addElement(new ColumnInfo((Column) it.val()));
             }
         }
     };
