@@ -348,7 +348,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
             ytop = yPos + this.lineHeight;
             graphics.setPaint(scrollbarColorLight);
             graphics.fill(new Rectangle2D.Double(xleft, ytop + this.firstItem * scale,
-                    width, this.displayLines * scale));
+			width, this.displayLines * scale));
             // draw the resize handle
             graphics.setPaint(scrollbarColorDark);
             graphics.fill(new Ellipse2D.Double(xleft,
@@ -455,7 +455,16 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
                         notifyObservers();
                     }
                 }
-            } // otherwise do nothing
+            } else if( (lineHit >= 1) && (lineHit <= this.displayLines - 3) ){
+				// User wants to drag the scrollbar
+				int scrollbarHeight = (this.displayLines - 3) * this.lineHeight;
+				double scrollbarYToPos = to.getY() - this.rect.getY() - this.lineHeight;
+				double relativePos = scrollbarYToPos / scrollbarHeight;
+				int newLinePos = (int) (relativePos * (getNumberOfEntries() - this.displayLines));
+				this.firstItem = newLinePos;
+				ensureFirstItemBounds();
+				notifyObservers();
+            }
         } else {
             // move
             double deltaX = to.getX() - from.getX();
@@ -464,6 +473,17 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
                     this.labelInfo.getOffset().getY() + deltaY);
         }
     }
+	/**
+	 * Method ensureFirstItemBounds.
+	 */
+	private void ensureFirstItemBounds() {
+		if(firstItem<0){
+			firstItem = 0;
+		}
+		if( firstItem > (getNumberOfEntries() - displayLines)){
+			firstItem = getNumberOfEntries() - displayLines;
+		}
+	}
 
     /**
      * Handles scrolling of the items.
