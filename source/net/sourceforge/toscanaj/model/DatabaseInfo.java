@@ -2,6 +2,8 @@ package net.sourceforge.toscanaj.model;
 
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This class contains information how to connect to a database.
@@ -25,15 +27,96 @@ public class DatabaseInfo
      */
     private String objectKey = null;
 
-    /**
-     * The list of additional queries available as view option.
-     */
-    private Hashtable specialQueries = new Hashtable();
+    public abstract class DatabaseQuery extends Query {
+        public class Column {
+            String name;
+            String format;
+            String separator;
+            String queryPart;
+        };
+
+        public String header;
+        public List columnList = new LinkedList();
+
+        public DatabaseQuery(String name) {
+            super(name);
+        }
+
+        public void insertQueryColumn(String columnName, String columnFormat,
+            String separator, String queryPart)
+        {
+            Column col = new Column();
+            col.name = columnName;
+            col.format = columnFormat;
+            col.separator = separator;
+            col.queryPart = queryPart;
+            columnList.add(col);
+        };
+
+        abstract public String getQueryHead();
+    };
+
+    protected class ListQuery extends DatabaseQuery {
+        public boolean isDistinct;
+
+        public ListQuery(String name) {
+            super(name);
+        }
+
+        public String getQueryHead() {
+            String   retValue = "SELECT ";
+            if ( isDistinct ) {
+                retValue += "DISTINCT ";
+            }
+            Iterator it = columnList.iterator();
+            while(it.hasNext()) {
+                Column col = (Column) it.next();
+                retValue += col.queryPart;
+                if(it.hasNext()) {
+                    retValue += ", ";
+                }
+            }
+            retValue += " FROM [" + table + "]";
+            return retValue;
+        };
+    };
+
+    protected class AggregateQuery extends DatabaseQuery {
+
+        public AggregateQuery(String name) {
+            super(name);
+        }
+
+        public String getQueryHead() {
+            String   retValue = "SELECT ";
+            Iterator it = columnList.iterator();
+            while(it.hasNext()) {
+                Column col = (Column) it.next();
+                retValue += col.queryPart;
+                if(it.hasNext()) {
+                    retValue += ", ";
+                }
+            }
+            retValue += " FROM [" + table + "]";
+            return retValue;
+        };
+    };
 
     /**
-     * The list of format used for the results of the additional queries.
+     * Creates a new Query that will query a list.
      */
-    private Hashtable specialQueryFormats = new Hashtable();
+    public DatabaseQuery createListQuery(String name, boolean isDistinct) {
+        ListQuery query = new ListQuery(name);
+        query.isDistinct = isDistinct;
+        return query;
+    };
+
+    /**
+     * Creates a new Query that will query a single number as aggregate.
+     */
+    public DatabaseQuery createAggregateQuery(String name) {
+        return new AggregateQuery(name);
+    };
 
     /**
      * Creates an empty instance.
@@ -58,6 +141,8 @@ public class DatabaseInfo
      *
      * This should be always of the form "SELECT x FROM y" where x is the key
      * and y the table used. The where clauses will be added at the end.
+     *
+     * @deprecated
      */
     public String getQuery() {
         return "SELECT [" + this.objectKey + "] FROM [" + this.table + "] ";
@@ -66,32 +151,13 @@ public class DatabaseInfo
     /**
      * Returns the query string used for counting the objects.
      *
-     * This should be always of the form "SELECT count(x) FROM y" where x is the key
-     * and y the table used. The where clauses will be added at the end.
+     * This should be always of the form "SELECT count(*) FROM x" where x is the
+     * table used. The where clauses will be added at the end.
+     *
+     * @deprecated
      */
     public String getCountQuery() {
-        return "SELECT count(" + " [" + this.objectKey + "] ) FROM [" + this.table + "] ";
-    }
-
-    /**
-     * Returns all names of additional queries.
-     */
-    public Iterator getSpecialQueryNames() {
-        return this.specialQueries.keySet().iterator();
-    }
-
-    /**
-     * Returns a complete query for a given name.
-     */
-    public String getSpecialQuery(String name) {
-        return "SELECT " + this.specialQueries.get(name) + " FROM [" + this.table + "] ";
-    }
-
-    /**
-     * Returns the format for the results of a special query with the given name.
-     */
-    public String getSpecialQueryFormat(String name) {
-        return (String)this.specialQueryFormats.get(name);
+        return "SELECT count(*) FROM [" + this.table + "] ";
     }
 
     /**
@@ -102,24 +168,11 @@ public class DatabaseInfo
     }
 
     /**
-     * Sets the query string to the given SQL subcommand.
+     * Sets the database table we want to query.
      *
-     * This should be always of the form "SELECT x FROM y" where x is the key
-     * and y the table used. The where clauses will be added at the end.
+     * This can be a view, too.
      */
-    public void setQuery( String sql ) {
-        this.table = "not yet";
-        this.objectKey = "implemented";
-        /// @TODO Implement something that calculates table and key from the query string
-    }
-
-    /**
-     * Sets the query string to use the given table/key combination.
-     *
-     * Both table and key name can be given with the square brackets often used
-     * in SQL, but they don't have to.
-     */
-    public void setQuery( String table, String key ) {
+    public void setTable( String table ) {
         this.table = table;
         while(this.table.charAt(0) == '[') {
             this.table = this.table.substring(1);
@@ -127,6 +180,12 @@ public class DatabaseInfo
         while(this.table.charAt(this.table.length()-1) == ']') {
             this.table = this.table.substring(0,this.table.length()-1);
         }
+    }
+
+    /**
+     * Sets the key we use in queries.
+     */
+    public void setKey( String key ) {
         this.objectKey = key;
         while(this.objectKey.charAt(0) == '[') {
             this.objectKey = this.objectKey.substring(1);
@@ -134,24 +193,6 @@ public class DatabaseInfo
         while(this.objectKey.charAt(this.objectKey.length()-1) == ']') {
             this.objectKey = this.objectKey.substring(0,this.objectKey.length()-1);
         }
-    }
-
-    /**
-     * Adds a special query to the list of available queries.
-     *
-     * Special queries are given as SQL expressions like "AVG(price)" and are
-     * accessed using a unique name which is also used as menu entry for this
-     * query in the view menu.
-     *
-     * The format parameter can be null if the results should be presented as
-     * strings, if the format is not null, it will be used to format the result
-     * as a double, using an instance of the DecimalFormat class.
-     *
-     * @see java.text.DecimalFormat
-     */
-    public void addSpecialQuery(String name, String query, String format) {
-        this.specialQueries.put(name, query);
-        this.specialQueryFormats.put(name, format);
     }
 
     /**

@@ -14,6 +14,9 @@ import javax.swing.*;
  *
  * @TODO Add error handling -- this assumes the DBConnection class reports the
  *      errors.
+ * @todo remove
+ *
+ * @deprecated
  */
 public class DatabaseChooser extends JDialog
 {
@@ -108,8 +111,8 @@ public class DatabaseChooser extends JDialog
                 catch( ClassNotFoundException cnfe ) {
                     System.err.println("Could not load ODBC driver -- please check Java installation.");
                 }
-                _databaseInfo.setQuery( (String) _tableList.getSelectedValue(),
-                                        (String) _keyList.getSelectedValue() );
+                _databaseInfo.setTable( (String) _tableList.getSelectedValue() );
+                _databaseInfo.setKey( (String) _keyList.getSelectedValue() );
                 DatabaseChooser._dialog.setVisible(false);
             }
         });

@@ -3,6 +3,9 @@ package net.sourceforge.toscanaj.model.lattice;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DBConnection;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.ObjectListQuery;
+import net.sourceforge.toscanaj.model.ObjectNumberQuery;
+import net.sourceforge.toscanaj.model.Query;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -182,6 +185,73 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     }
 
     /**
+     * Implements Concept.executeQuery(Query, boolean).
+     */
+    public List executeQuery(Query query, boolean contingentOnly) {
+        if( query instanceof ObjectListQuery ) {
+            /// @todo implement this
+            throw new RuntimeException("NYI");
+        }
+        else if( query instanceof ObjectNumberQuery ) {
+            /// @todo implement this
+            throw new RuntimeException("NYI");
+        }
+        else if( query instanceof DatabaseInfo.DatabaseQuery ) {
+            DatabaseInfo.DatabaseQuery dbQuery = (DatabaseInfo.DatabaseQuery) query;
+            List retVal = new LinkedList();
+            if( this.objectClause != null ) {
+                try {
+                    String sql = dbQuery.getQueryHead() + " WHERE (";
+                    if(contingentOnly) {
+                        // use only the local clause (we assume there is one)
+                        sql += this.objectClause;
+                    }
+                    else {
+                        // aggregate all clauses from the downset
+                        Iterator iter = this.ideal.iterator();
+                        boolean first = true;
+                        while (iter.hasNext()) {
+                            DatabaseConnectedConcept concept = (DatabaseConnectedConcept) iter.next();
+                            if(concept.objectClause == null) {
+                                continue;
+                            }
+                            if(first) {
+                                first = false;
+                            }
+                            else {
+                                sql += " OR ";
+                            }
+                            sql += concept.objectClause;
+                        }
+                    }
+                    sql += ") ";
+                    Iterator iter = this.filterClauses.iterator();
+                    while (iter.hasNext()) {
+                        Object item = iter.next();
+                        sql += " AND " + item;
+                    }
+                    sql += ";";
+                    retVal = this.connection.queryColumn(sql,1);
+                }
+                catch (DatabaseException e) {
+                    /// @TODO Find something useful to do here.
+                    if(e.getOriginal()!=null) {
+                        System.err.println(e.getMessage());
+                        e.getOriginal().printStackTrace();
+                    }
+                    else {
+                        e.printStackTrace(System.err);
+                    }
+                }
+            }
+            return retVal;
+        }
+        else {
+            throw new RuntimeException("Unknown Query type");
+        }
+    }
+
+    /**
      * Implements Concept.filterByExtent(Concept).
      *
      * The other concept is assumed to be a DatabaseConnectedConcept.
@@ -274,60 +344,5 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         retVal.setObjectClause(clause);
         retVal.filterClauses.addAll(this.filterClauses);
         return retVal;
-    }
-
-    /**
-     * Does the given query for all objects in the extent or contingent.
-     *
-     * The query string given is expected to be of the form "SELECT [something]
-     * FROM [aTable]", the rest starting with the "WHERE" will be calculated
-     * dependent on the flag for querying the contingent or extent.
-     */
-    public String doSpecialQuery(String specialQuery, boolean contingentOnly) {
-        String result = null;
-        try {
-            String query = specialQuery + " WHERE (";
-            if(contingentOnly) {
-                // use only the local clause (we assume there is one)
-                query += this.objectClause;
-            }
-            else {
-                // aggregate all clauses from the downset
-                Iterator iter = this.ideal.iterator();
-                boolean first = true;
-                while (iter.hasNext()) {
-                    DatabaseConnectedConcept concept = (DatabaseConnectedConcept) iter.next();
-                    if(concept.objectClause == null) {
-                        continue;
-                    }
-                    if(first) {
-                        first = false;
-                    }
-                    else {
-                        query += " OR ";
-                    }
-                    query += concept.objectClause;
-                }
-            }
-            query += ") ";
-            Iterator iter = this.filterClauses.iterator();
-            while (iter.hasNext()) {
-                Object item = iter.next();
-                query += " AND " + item;
-            }
-            query += ";";
-            result = this.connection.queryValue(query,1);
-        }
-        catch (DatabaseException e) {
-            /// @TODO Find something useful to do here.
-            if(e.getOriginal()!=null) {
-                System.err.println(e.getMessage());
-                e.getOriginal().printStackTrace();
-            }
-            else {
-                e.printStackTrace(System.err);
-            }
-        }
-        return result;
     }
 }

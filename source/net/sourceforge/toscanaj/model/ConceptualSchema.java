@@ -2,6 +2,7 @@ package net.sourceforge.toscanaj.model;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
@@ -41,6 +42,11 @@ public class ConceptualSchema {
     private Vector diagrams;
 
     /**
+     * The list of queries that can be made for objects.
+     */
+    private List queries = new LinkedList();
+
+    /**
      * Creates an empty schema.
      */
     public ConceptualSchema()
@@ -48,6 +54,20 @@ public class ConceptualSchema {
         useDatabase = false;
         databaseInfo = null;
         diagrams = new Vector();
+    }
+
+    /**
+     * Returns an iterator on the queries.
+     */
+    public Iterator getQueries() {
+        return this.queries.iterator();
+    }
+
+    /**
+     * Adds a query to the schema.
+     */
+    public void addQuery(Query query) {
+        this.queries.add(query);
     }
 
     /**

@@ -2,6 +2,8 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 
+import java.util.Iterator;
+
 /**
  * A LabelView for displaying the attributes.
  *
@@ -16,10 +18,7 @@ public class AttributeLabelView extends LabelView {
      */
     public AttributeLabelView( DiagramView diagramView, LabelInfo label ) {
         super(diagramView,label);
-        // attribute labels always display the list (therefore we don't really mind
-        // about the showPercentage toggle)
-        setDisplayType(DISPLAY_LIST, true);
-        setShowPercentage(false);
+        setDisplayType(true);
     }
 
     /**
@@ -27,5 +26,23 @@ public class AttributeLabelView extends LabelView {
      */
     protected int getPlacement() {
         return LabelView.ABOVE;
+    }
+
+    protected int getNumberOfEntries() {
+        if(this.showOnlyContingent) {
+            return this.labelInfo.getNode().getConcept().getAttributeContingentSize();
+        }
+        else {
+            return this.labelInfo.getNode().getConcept().getIntentSize();
+        }
+    }
+
+    protected Iterator getEntryIterator() {
+        if(this.showOnlyContingent) {
+            return this.labelInfo.getNode().getConcept().getAttributeContingentIterator();
+        }
+        else {
+            return this.labelInfo.getNode().getConcept().getIntentIterator();
+        }
     }
 }

@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.controller.fca.DiagramController;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 
 import net.sourceforge.toscanaj.observer.ChangeObserver;
@@ -120,9 +121,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
     // view menu
     private JRadioButtonMenuItem showAllMenuItem = null;
     private JRadioButtonMenuItem showExactMenuItem = null;
-
-    private JRadioButtonMenuItem numDocMenuItem = null;
-    private JRadioButtonMenuItem listDocMenuItem = null;
 
     private JCheckBoxMenuItem percDistMenuItem = null;
 
@@ -414,36 +412,31 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // menu radio buttons group:
         ButtonGroup labelContentGroup = new ButtonGroup();
 
-        // radio button menu item NUMBER OF DOCUMENTS
-        numDocMenuItem = new JRadioButtonMenuItem("Number Of Documents");
-        numDocMenuItem.setSelected(true);
-        numDocMenuItem.addActionListener(this);
-        labelContentGroup.add(numDocMenuItem);
-        viewMenu.add(numDocMenuItem);
-
-        // radio button menu item LIST OF DOCUMENTS
-        listDocMenuItem = new JRadioButtonMenuItem("List Of Documents");
-        listDocMenuItem.addActionListener(this);
-        labelContentGroup.add(listDocMenuItem);
-        viewMenu.add(listDocMenuItem);
-
         if(this.conceptualSchema != null) {
-            // add extra entries from schema
-            DatabaseInfo dbInfo = this.conceptualSchema.getDatabaseInfo();
-            if(dbInfo != null){
-                Iterator it = dbInfo.getSpecialQueryNames();
-                while(it.hasNext()) {
-                    String name = (String) it.next();
-                    JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);
-                    menuItem.addActionListener(this);
-                    labelContentGroup.add(menuItem);
-                    viewMenu.add(menuItem);
+            Iterator it = this.conceptualSchema.getQueries();
+            boolean first = true;
+            while(it.hasNext()) {
+                final Query query = (Query) it.next();
+                String name = query.getName();
+                JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);
+                menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        JRadioButtonMenuItem item = (JRadioButtonMenuItem) e.getSource();
+                        diagramView.setQuery(query);
+                    }
+                });
+                labelContentGroup.add(menuItem);
+                viewMenu.add(menuItem);
+                if(first == true) {
+                    first = false;
+                    menuItem.setSelected(true);
+                    diagramView.setQuery(query);
                 }
             }
-        }
 
-        // separator
-        viewMenu.addSeparator();
+            // separator
+            viewMenu.addSeparator();
+        }
 
         // menu item PERCENTUAL DISTRIBUTION
         percDistMenuItem = new JCheckBoxMenuItem("Percentual Distribution");
@@ -470,6 +463,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         this.bottomColorMenuItem = new JMenuItem("Bottom...");
         this.bottomColorMenuItem.addActionListener(this);
         colorMenu.add(bottomColorMenuItem);
+
+        this.menubar.updateUI();
     }
 
 
@@ -501,8 +496,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         this.showExactMenuItem.setEnabled (isOpen);
         this.filterExactMenuItem.setEnabled (isOpen);
         this.filterAllMenuItem.setEnabled (isOpen);
-        this.numDocMenuItem.setEnabled (isOpen);
-        this.listDocMenuItem.setEnabled (isOpen);
         this.percDistMenuItem.setEnabled (isOpen);
     }
 
@@ -609,9 +602,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
 
         // view menu
         if( (actionSource == this.showExactMenuItem) ||
-            (actionSource == this.showAllMenuItem) ||
-            (actionSource == this.numDocMenuItem) ||
-            (actionSource == this.listDocMenuItem) ) {
+            (actionSource == this.showAllMenuItem) ) {
             updateLabelViews();
             return;
         }
@@ -652,15 +643,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             }
             repaint();
             return;
-        }
-        // we didn't match any known menu entry, let's try if it is a special query
-        if(actionSource instanceof JRadioButtonMenuItem) {
-            JRadioButtonMenuItem item = (JRadioButtonMenuItem) actionSource;
-            String name = item.getText();
-            // force the query string on all object labels
-            this.diagramView.setSpecialQuery(
-                        this.conceptualSchema.getDatabaseInfo().getSpecialQuery(name),
-                        this.conceptualSchema.getDatabaseInfo().getSpecialQueryFormat(name) );
         }
     }
 
@@ -734,15 +716,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             }
             else {
                 this.showAllMenuItem.setSelected(true);
-            }
-            updateLabelViews();
-        }
-        if (e.getKeyChar() == 'l') {
-            if(this.listDocMenuItem.isSelected()) {
-                this.numDocMenuItem.setSelected(true);
-            }
-            else {
-                this.listDocMenuItem.setSelected(true);
             }
             updateLabelViews();
         }
@@ -857,15 +830,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      * Sets all labels to the display options currently selected.
      */
     private void updateLabelViews(){
-        if(this.numDocMenuItem.isSelected()) {
-            this.diagramView.setDisplayType(LabelView.DISPLAY_NUMBER, this.showExactMenuItem.isSelected());
-        }
-        else if(this.listDocMenuItem.isSelected()) {
-            this.diagramView.setDisplayType(LabelView.DISPLAY_LIST, this.showExactMenuItem.isSelected());
-        }
-        else {
-            this.diagramView.setDisplayType(LabelView.DISPLAY_SPECIAL, this.showExactMenuItem.isSelected());
-        }
+        this.diagramView.setDisplayType(this.showExactMenuItem.isSelected());
     }
 
     /**

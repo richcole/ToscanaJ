@@ -3,6 +3,7 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.DrawingCanvas;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
@@ -190,22 +191,24 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     }
 
     /**
-     * Sets the display type on all object labels in the diagram.
-     *
-     * @see LabelView.setDisplayType(int, boolean)
+     * @see LabelView.setDisplayType(boolean)
      */
-    public void setDisplayType(int type, boolean contingentOnly) {
+    public void setDisplayType(boolean contingentOnly) {
         // change existing labels
         Iterator it = this.canvasItems.iterator();
         while( it.hasNext() ) {
             CanvasItem cur = (CanvasItem) it.next();
             if(cur instanceof ObjectLabelView) {
                 ObjectLabelView lv = (ObjectLabelView) cur;
-                lv.setDisplayType(type, contingentOnly);
+                lv.setDisplayType(contingentOnly);
+            }
+            else if(cur instanceof AttributeLabelView) {
+                AttributeLabelView lv = (AttributeLabelView) cur;
+                lv.setDisplayType(true);
             }
         }
         // set new default
-        ObjectLabelView.setDefaultDisplayType(type, contingentOnly);
+        ObjectLabelView.setDefaultDisplayType(contingentOnly);
     }
 
     /**
@@ -256,22 +259,20 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
 
     /**
      * Sets all object label views to use this query when asking their concepts.
-     *
-     * If format is not null, the string will be used as formatting string in a
-     * DecimalFormat instance.
-     *
-     * @see java.text.DecimalFormat
      */
-    public void setSpecialQuery(String query, String format) {
+    public void setQuery(Query query) {
+        // update the current labels
         Iterator it = this.canvasItems.iterator();
         while( it.hasNext() ) {
             CanvasItem cur = (CanvasItem) it.next();
             if(cur instanceof ObjectLabelView) {
                 ObjectLabelView lv = (ObjectLabelView) cur;
-                lv.setSpecialQuery(query, format);
+                lv.setQuery(query);
             }
         }
         repaint();
+        // set the value for new ones
+        ObjectLabelView.setDefaultQuery(query);
     }
 
     /**

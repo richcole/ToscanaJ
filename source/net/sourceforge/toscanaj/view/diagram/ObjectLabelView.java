@@ -1,11 +1,13 @@
 package net.sourceforge.toscanaj.view.diagram;
 
+import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
 import java.awt.Graphics2D;
-
-import java.text.DecimalFormat;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A LabelView for displaying the objects.
@@ -17,11 +19,6 @@ import java.text.DecimalFormat;
  */
 public class ObjectLabelView extends LabelView {
     /**
-     * Sets the default display type for new labels.
-     */
-    static private int defaultDisplayType = DISPLAY_NUMBER;
-
-    /**
      * Sets the default value for showing contingent or extent.
      */
     static private boolean defaultShowContingentOnly = true;
@@ -32,37 +29,28 @@ public class ObjectLabelView extends LabelView {
     static private boolean defaultShowPercentage = false;
 
     /**
-     * Sets the default value for a special query.
+     * Sets the default query used for new labels.
      */
-    static private String defaultSpecialQuery = null;
+    static private Query defaultQuery = null;
 
     /**
-     * Sets the default format for a special query.
+     * Stores the query we currently use.
      */
-    static private DecimalFormat defaultSpecialQueryFormat = null;
+    private Query query = null;
 
     /**
-     * Stores a special query we use for aggregates etc.
+     * Caches the result of the query.
      */
-    private String specialQuery = null;
-
-    /**
-     * Stores the format for the results of special queries.
-     *
-     * If null it is just returned as string, if not it will be formatted as
-     * decimal (double).
-     */
-    private DecimalFormat specialQueryFormat = null;
+    private List queryResult = null;
 
     /**
      * Creates a view for the given label information.
      */
     public ObjectLabelView( DiagramView diagramView, LabelInfo label ) {
         super(diagramView,label);
-        setDisplayType(defaultDisplayType,defaultShowContingentOnly);
+        setDisplayType(defaultShowContingentOnly);
         setShowPercentage(defaultShowPercentage);
-        this.specialQuery = defaultSpecialQuery;
-        this.specialQueryFormat = defaultSpecialQueryFormat;
+        setQuery(defaultQuery);
     }
 
     /**
@@ -75,19 +63,36 @@ public class ObjectLabelView extends LabelView {
     }
 
     /**
-     * Resets teh special query string before calling the implementation of the
-     * parent class.
+     * Overwritten to reset the query cache.
      */
-    public void setDisplayType(int type, boolean contingentOnly) {
-        super.setDisplayType(type,contingentOnly);
+    public void setDisplayType(boolean contingentOnly) {
+        super.setDisplayType(contingentOnly);
+        doQuery();
+        if( this.getNumberOfEntries() < this.displayLines ) {
+            this.displayLines = this.getNumberOfEntries();
+        }
+        if( this.displayLines < DEFAULT_DISPLAY_LINES && this.getNumberOfEntries() != 0 ) {
+            if( this.getNumberOfEntries() > DEFAULT_DISPLAY_LINES ) {
+                this.displayLines = DEFAULT_DISPLAY_LINES;
+            }
+            else {
+                this.displayLines = this.getNumberOfEntries();
+            }
+        }
     }
 
     /**
      * Sets the default display type for new labels.
      */
-    static public void setDefaultDisplayType(int type, boolean contingentOnly) {
-        ObjectLabelView.defaultDisplayType = type;
+    static public void setDefaultDisplayType(boolean contingentOnly) {
         ObjectLabelView.defaultShowContingentOnly = contingentOnly;
+    }
+
+    /**
+     * Sets the default query for new labels.
+     */
+    static public void setDefaultQuery(Query query) {
+        ObjectLabelView.defaultQuery = query;
     }
 
     /**
@@ -106,46 +111,34 @@ public class ObjectLabelView extends LabelView {
     }
 
     /**
-     * Sets a special query to use for display.
-     *
-     * If the format string is given, this will be used to format the query
-     * results using a DecimalFormat instance.
-     *
-     * @see java.text.DecimalFormat
      */
-    public void setSpecialQuery(String query, String format) {
-        this.setDisplayType(LabelView.DISPLAY_SPECIAL, this.showOnlyContingent);
-        defaultDisplayType = LabelView.DISPLAY_SPECIAL;
-        this.specialQuery = query;
-        defaultSpecialQuery = query;
-        if(format != null) {
-            this.specialQueryFormat = new DecimalFormat(format);
+    public void setQuery(Query query) {
+        this.query = query;
+        doQuery();
+        if( this.getNumberOfEntries() > DEFAULT_DISPLAY_LINES ) {
+            this.displayLines = DEFAULT_DISPLAY_LINES;
         }
         else {
-            this.specialQueryFormat = null;
+            this.displayLines = this.getNumberOfEntries();
         }
-        defaultSpecialQueryFormat = this.specialQueryFormat;
+        update(this);
     }
 
-    /**
-     * Overwrites LabelView.getNumberDisplay() to return the result of an
-     * special query if needed.
-     *
-     * This assumes the label belongs to a DatabaseConnectedConcept.
-     */
-    protected String getNumberDisplay() {
-        if(this.displayType == LabelView.DISPLAY_SPECIAL) {
-            DatabaseConnectedConcept concept = (DatabaseConnectedConcept) this.labelInfo.getNode().getConcept();
-            String val = concept.doSpecialQuery(this.specialQuery, this.showOnlyContingent);
-            if(this.specialQueryFormat != null) {
-                return this.specialQueryFormat.format(Double.parseDouble(val));
-            }
-            else {
-                return val;
-            }
+    protected int getNumberOfEntries() {
+        if(this.query == null) {
+            return 0;
         }
-        else {
-            return super.getNumberDisplay();
+        return this.queryResult.size();
+    }
+
+    protected Iterator getEntryIterator() {
+        return this.queryResult.iterator();
+    }
+
+    protected void doQuery() {
+        if(query != null) {
+            this.queryResult = this.labelInfo.getNode().getConcept().executeQuery(
+                                               this.query, this.showOnlyContingent);
         }
     }
 }

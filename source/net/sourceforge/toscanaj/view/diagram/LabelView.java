@@ -22,28 +22,6 @@ import net.sourceforge.toscanaj.observer.ChangeObserver;
  */
 abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
-     * A constant used to set the labels to display the number of objects.
-     *
-     * @see setDisplayType(int)
-     */
-    static public final int DISPLAY_NUMBER = 0;
-
-    /**
-     * A constant used to set the labels to display the list of objects.
-     *
-     * @see setDisplayType(int)
-     */
-    static public final int DISPLAY_LIST = 1;
-
-    /**
-     * A constant used to set the labels to display something special (used for
-     * special queries in ObjectLabelView).
-     *
-     * @see setDisplayType(int)
-     */
-    static public final int DISPLAY_SPECIAL = 2;
-
-    /**
      * Used when the label should be drawn above the given point.
      *
      * See Draw( Graphics2D, double ,double ,int ).
@@ -70,13 +48,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      * @see displayLines
      */
     protected static final int DEFAULT_DISPLAY_LINES = 4;
-
-    /**
-     * Stores the type of information we want to display.
-     *
-     * @see setDisplayType(int)
-     */
-    protected int displayType = DISPLAY_LIST;
 
     /**
      * This is the smallest font size we accept.
@@ -156,17 +127,14 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     }
 
     /**
-     * Sets the type of information displayed by the label: the number or the list
-     * of objects.
      */
-    public void setDisplayType(int type, boolean contingentOnly) {
-        this.displayType = type;
+    public void setDisplayType(boolean contingentOnly) {
         this.showOnlyContingent = contingentOnly;
-        if( this.labelInfo.getNumberOfEntries(this.showOnlyContingent) > DEFAULT_DISPLAY_LINES ) {
+        if( this.getNumberOfEntries() > DEFAULT_DISPLAY_LINES ) {
             this.displayLines = DEFAULT_DISPLAY_LINES;
         }
         else {
-            this.displayLines = this.labelInfo.getNumberOfEntries(this.showOnlyContingent);
+            this.displayLines = this.getNumberOfEntries();
         }
         update(this);
     }
@@ -290,139 +258,103 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         graphics.setPaint( this.labelInfo.getTextColor() );
         graphics.draw( rect );
 
-        if(this.displayType == DISPLAY_LIST) {
-            // draw the object names
-            Iterator it = this.labelInfo.getEntryIterator(this.showOnlyContingent);
-            int numItem = 0;
-            while(it.hasNext()) {
-                String cur = it.next().toString();
-                if(numItem >= this.firstItem) {
-                    int curPos = numItem - this.firstItem;
-                    if(curPos < this.displayLines) {
-                        if(this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT) {
-                            graphics.drawString( cur,
-                                    (float)xPos + fm.getLeading() + fm.getDescent(),
-                                    (float)yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight() );
-                        }
-                        else if(this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER) {
-                            graphics.drawString( cur,
-                                    (float)(xPos + (fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(cur))/2 )),
-                                    (float)yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight() );
-                        }
-                        else if(this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT) {
-                            graphics.drawString( cur,
-                                    (float)(xPos + (-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(cur))),
-                                    (float)yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight() );
-                        }
-                        else {
-                            throw new RuntimeException("Unknown label alignment.");
-                        }
+        // draw the object names
+        Iterator it = this.getEntryIterator();
+        int numItem = 0;
+        while(it.hasNext()) {
+            String cur = it.next().toString();
+            if(numItem >= this.firstItem) {
+                int curPos = numItem - this.firstItem;
+                if(curPos < this.displayLines) {
+                    if(this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT) {
+                        graphics.drawString( cur,
+                                (float)xPos + fm.getLeading() + fm.getDescent(),
+                                (float)yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight() );
+                    }
+                    else if(this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER) {
+                        graphics.drawString( cur,
+                                (float)(xPos + (fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(cur))/2 )),
+                                (float)yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight() );
+                    }
+                    else if(this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT) {
+                        graphics.drawString( cur,
+                                (float)(xPos + (-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(cur))),
+                                (float)yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight() );
+                    }
+                    else {
+                        throw new RuntimeException("Unknown label alignment.");
                     }
                 }
-                numItem++;
             }
-            int numItems = this.labelInfo.getNumberOfEntries(this.showOnlyContingent);
-            // draw the scroller elements when needed
-            if(numItems > MIN_DISPLAY_LINES) {
-                // first a line separating the scrollbar from the rest
-                graphics.draw(new Line2D.Double( xPos + lw - this.scrollbarWidth, yPos,
-                                                 xPos + lw - this.scrollbarWidth, yPos + lh ) );
-                // calculate a size for the scroll buttons
-                double width = this.scrollbarWidth * 0.8;
-                double height = this.lineHeight * 0.8;
-                if(width < height) {
-                    height = width;
-                }
-                else {
-                    width = height;
-                }
-                // draw the upwards triangle
-                /// @todo find a way to use the double coordinate system
-                double xleft = xPos + lw - this.scrollbarWidth + (this.scrollbarWidth - width)/2;
-                double ytop = yPos + (this.lineHeight - height)/2;
-                int[] xpoints = new int[3];
-                int[] ypoints = new int[3];
-                xpoints[0] = (int)( xleft );
-                ypoints[0] = (int)( ytop + height );
-                xpoints[1] = (int)( xleft + width/2 );
-                ypoints[1] = (int)( ytop );
-                xpoints[2] = (int)( xleft + width );
-                ypoints[2] = (int)( ytop + height );
-                if(this.firstItem != 0) {
-                    graphics.setPaint(Color.gray);
-                }
-                else {
-                    graphics.setPaint(Color.lightGray);
-                }
-                graphics.fill(new Polygon(xpoints, ypoints, 3));
-                // draw the downwards triangle
-                ytop = yPos + (this.displayLines-2) * this.lineHeight + (this.lineHeight - height)/2;
-                xpoints[0] = (int)( xleft );
-                ypoints[0] = (int)( ytop );
-                xpoints[1] = (int)( xleft + width/2 );
-                ypoints[1] = (int)( ytop + height );
-                xpoints[2] = (int)( xleft + width );
-                ypoints[2] = (int)( ytop );
-                if(this.firstItem + this.displayLines < numItems) {
-                    graphics.setPaint(Color.gray);
-                }
-                else {
-                    graphics.setPaint(Color.lightGray);
-                }
-                graphics.fill(new Polygon(xpoints, ypoints, 3));
-                // draw the current position
-                double scale = (this.lineHeight * (this.displayLines - 3)) / (double)numItems;
-                width = 0.8 * width;
-                xleft = xPos + lw - this.scrollbarWidth + (this.scrollbarWidth - width)/2;
-                ytop = yPos + this.lineHeight;
-                graphics.setPaint(Color.lightGray);
-                graphics.fill(new Rectangle2D.Double( xleft, ytop + this.firstItem * scale,
-                                                      width, this.displayLines * scale ) );
-                // draw the resize handle
-                graphics.setPaint(Color.gray);
-                graphics.fill(new Ellipse2D.Double( xleft,
-                                                    yPos + (this.displayLines - 1) * this.lineHeight +
-                                                                (this.lineHeight - height)/2,
-                                                    width, height ) );
-            }
+            numItem++;
         }
-        else {
-            // draw the number
-            String num = getNumberDisplay();
-
-            if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT )
-            {
-                graphics.drawString( num,
-                                     (float)xPos + fm.getLeading() + fm.getDescent(),
-                                     (float)yPos + fm.getAscent() + fm.getLeading() );
+        int numItems = this.getNumberOfEntries();
+        // draw the scroller elements when needed
+        if(numItems > MIN_DISPLAY_LINES) {
+            // first a line separating the scrollbar from the rest
+            graphics.draw(new Line2D.Double( xPos + lw - this.scrollbarWidth, yPos,
+                                             xPos + lw - this.scrollbarWidth, yPos + lh ) );
+            // calculate a size for the scroll buttons
+            double width = this.scrollbarWidth * 0.8;
+            double height = this.lineHeight * 0.8;
+            if(width < height) {
+                height = width;
             }
-            else if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER )
-            {
-                graphics.drawString( num,
-                        (float)(xPos + (fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(num))/2 )),
-                        (float)yPos + fm.getAscent() + fm.getLeading() );
+            else {
+                width = height;
             }
-            else if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT )
-            {
-                graphics.drawString( num,
-                            (float)(xPos + (-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(num))),
-                            (float)yPos + fm.getAscent() + fm.getLeading() );
+            // draw the upwards triangle
+            /// @todo find a way to use the double coordinate system
+            double xleft = xPos + lw - this.scrollbarWidth + (this.scrollbarWidth - width)/2;
+            double ytop = yPos + (this.lineHeight - height)/2;
+            int[] xpoints = new int[3];
+            int[] ypoints = new int[3];
+            xpoints[0] = (int)( xleft );
+            ypoints[0] = (int)( ytop + height );
+            xpoints[1] = (int)( xleft + width/2 );
+            ypoints[1] = (int)( ytop );
+            xpoints[2] = (int)( xleft + width );
+            ypoints[2] = (int)( ytop + height );
+            if(this.firstItem != 0) {
+                graphics.setPaint(Color.gray);
             }
+            else {
+                graphics.setPaint(Color.lightGray);
+            }
+            graphics.fill(new Polygon(xpoints, ypoints, 3));
+            // draw the downwards triangle
+            ytop = yPos + (this.displayLines-2) * this.lineHeight + (this.lineHeight - height)/2;
+            xpoints[0] = (int)( xleft );
+            ypoints[0] = (int)( ytop );
+            xpoints[1] = (int)( xleft + width/2 );
+            ypoints[1] = (int)( ytop + height );
+            xpoints[2] = (int)( xleft + width );
+            ypoints[2] = (int)( ytop );
+            if(this.firstItem + this.displayLines < numItems) {
+                graphics.setPaint(Color.gray);
+            }
+            else {
+                graphics.setPaint(Color.lightGray);
+            }
+            graphics.fill(new Polygon(xpoints, ypoints, 3));
+            // draw the current position
+            double scale = (this.lineHeight * (this.displayLines - 3)) / (double)numItems;
+            width = 0.8 * width;
+            xleft = xPos + lw - this.scrollbarWidth + (this.scrollbarWidth - width)/2;
+            ytop = yPos + this.lineHeight;
+            graphics.setPaint(Color.lightGray);
+            graphics.fill(new Rectangle2D.Double( xleft, ytop + this.firstItem * scale,
+                                                  width, this.displayLines * scale ) );
+            // draw the resize handle
+            graphics.setPaint(Color.gray);
+            graphics.fill(new Ellipse2D.Double( xleft,
+                                                yPos + (this.displayLines - 1) * this.lineHeight +
+                                                            (this.lineHeight - height)/2,
+                                                width, height ) );
         }
 
         // restore old settings
         graphics.setPaint( oldPaint );
-    }
-
-    /**
-     * Returns the number to display when in number mode.
-     */
-    protected String getNumberDisplay() {
-        String num = String.valueOf(this.labelInfo.getNumberOfEntries(this.showOnlyContingent));
-        if(this.showPercentage) {
-            num = num.concat(" (" + (int)(this.labelInfo.getNumberOfEntriesRelative(this.showOnlyContingent) * 100) + "%)");
-        }
-        return num;
     }
 
     /**
@@ -443,11 +375,11 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      */
     public double getWidth( FontMetrics fontMetrics )
     {
-        if(this.labelInfo.getNumberOfEntries(this.showOnlyContingent) == 0) {
+        if(this.getNumberOfEntries() == 0) {
             return 0;
         }
 
-        if(this.labelInfo.getNumberOfEntries(this.showOnlyContingent) > MIN_DISPLAY_LINES) {
+        if(this.getNumberOfEntries() > MIN_DISPLAY_LINES) {
             this.scrollbarWidth = fontMetrics.stringWidth("M");
         }
         else {
@@ -456,25 +388,18 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
 
         double result = 0;
 
-        if(this.displayType == DISPLAY_LIST) {
-            // find maximum width of string
-            Iterator it = this.labelInfo.getEntryIterator(this.showOnlyContingent);
-            while(it.hasNext()) {
-                String cur = it.next().toString();
-                double w = fontMetrics.stringWidth( cur );
-                if( w > result )
-                {
-                    result = w;
-                }
+        // find maximum width of string
+        Iterator it = this.getEntryIterator();
+        while(it.hasNext()) {
+            String cur = it.next().toString();
+            double w = fontMetrics.stringWidth( cur );
+            if( w > result )
+            {
+                result = w;
             }
-            // add scrollbar width if needed
-            result += this.scrollbarWidth;
         }
-        else {
-            // find width of number
-            String num = getNumberDisplay();
-            result = fontMetrics.stringWidth( num );
-        }
+        // add scrollbar width if needed
+        result += this.scrollbarWidth;
 
         // add two leadings and two descents to have some spacing on the left
         // and right side
@@ -489,12 +414,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     public int getHeight( FontMetrics fontMetrics )
     {
         this.lineHeight = fontMetrics.getHeight();
-        if( this.displayType == DISPLAY_LIST ) {
-            return this.displayLines * fontMetrics.getHeight();
-        }
-        else {
-            return fontMetrics.getHeight();
-        }
+        return this.displayLines * fontMetrics.getHeight();
     }
 
     /**
@@ -511,8 +431,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      * Moves or resizes the label, depending on where the drag event occured.
      */
     public void dragged(Point2D from, Point2D to) {
-        if( (this.displayType == LabelView.DISPLAY_LIST) &&
-            (from.getX() >= this.rect.getMaxX() - this.scrollbarWidth) ) {
+        if( (from.getX() >= this.rect.getMaxX() - this.scrollbarWidth) ) {
             // we have a click on the scrollbar, calculate the line hit
             int lineHit = (int)((from.getY()-this.rect.getY())/this.lineHeight);
             if(lineHit == this.displayLines - 1) { // it is on the resize handle
@@ -520,10 +439,10 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
                 int newLine = (int)((to.getY()-this.rect.getY())/this.lineHeight);
                 // check if it is above/below
                 if(newLine > lineHit) {
-                    if(this.displayLines < this.labelInfo.getNumberOfEntries(this.showOnlyContingent)) {
+                    if(this.displayLines < this.getNumberOfEntries()) {
                         this.displayLines++;
                         if(this.firstItem + this.displayLines >
-                                        this.labelInfo.getNumberOfEntries(this.showOnlyContingent)) {
+                                        this.getNumberOfEntries()) {
                             this.firstItem--;
                         }
                         notifyObservers();
@@ -550,10 +469,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      * Handles scrolling of the items.
      */
     public void clicked(Point2D pos) {
-        if(this.displayType != LabelView.DISPLAY_LIST) {
-            // nothing to do if not in list mode
-            return;
-        }
         if(pos.getX() < this.rect.getMaxX() - this.scrollbarWidth) {
             // not a click on the scrollbar
             return;
@@ -569,33 +484,12 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         }
         else if(lineHit == this.displayLines - 2) {
             // scroll down
-            if(this.firstItem != this.labelInfo.getNumberOfEntries(this.showOnlyContingent) -
+            if(this.firstItem != this.getNumberOfEntries() -
                                  this.displayLines ) {
                 this.firstItem++;
             }
             this.notifyObservers();
         }
-    }
-
-    /**
-     * Switches the mode for this label between displaying number or list.
-     */
-    public void doubleClicked(Point2D pos) {
-        if(this.displayType == LabelView.DISPLAY_LIST) {
-            if(pos.getX() < this.rect.getMaxX() - this.scrollbarWidth) {
-                // not on the scrollbar
-                this.displayType = LabelView.DISPLAY_NUMBER;
-            }
-            else {
-                // do two single clicks
-                clicked(pos);
-                clicked(pos);
-            }
-        }
-        else {
-            this.displayType = LabelView.DISPLAY_LIST;
-        }
-        notifyObservers();
     }
 
     /**
@@ -626,4 +520,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         }
         return new Rectangle2D.Double(xPos, yPos, lw, lh);
     }
+
+    abstract protected int getNumberOfEntries();
+
+    abstract protected Iterator getEntryIterator();
 }

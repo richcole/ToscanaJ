@@ -4,15 +4,15 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DBConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.ObjectListQuery;
+import net.sourceforge.toscanaj.model.ObjectNumberQuery;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.model.lattice.MemoryMappedConcept;
-import net.sourceforge.toscanaj.model.diagram.AttributeLabelInfo;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.model.diagram.ObjectLabelInfo;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
@@ -115,32 +115,30 @@ public class CSXParser
         throws DataFormatException
     {
         // check if database should be used and fetch the data if needed
-        Attribute askDB = _Document.getRootElement()
-                                    .getAttribute( "askDatabase" );
-        if( askDB != null )
-        {
-            if( askDB.getValue().compareTo("true") == 0 )
-            {
-                _Schema.setUseDatabase( true );
-                DatabaseInfo dbInfo;
-                Element dbElem = _Document.getRootElement().getChild("database");
-                try {
-                    if( dbElem != null ) {
-                        dbInfo = new DatabaseInfo();
-                        parseDBInfo(dbInfo, dbElem);
-                        /// @TODO Shouldn't this be in the main panel?
-                        _DatabaseConnection = new DBConnection(dbInfo.getSource());
-                    }
-                    else {
-                        dbInfo = null;
-                    }
-                    _Schema.setDatabaseInformation(dbInfo);
+        Element dbElem = _Document.getRootElement().getChild("database");
+        if(dbElem != null) {
+            _Schema.setUseDatabase( true );
+            DatabaseInfo dbInfo;
+            try {
+                if( dbElem != null ) {
+                    dbInfo = new DatabaseInfo();
+                    parseDBInfo(dbInfo, dbElem);
+                    /// @TODO Shouldn't this be in the main panel?
+                    _DatabaseConnection = new DBConnection(dbInfo.getSource());
                 }
-                catch (DatabaseException e) {
+                else {
                     dbInfo = null;
-                    throw new DataFormatException("Could not open database.", e.getOriginal());
                 }
+                _Schema.setDatabaseInformation(dbInfo);
             }
+            catch (DatabaseException e) {
+                dbInfo = null;
+                throw new DataFormatException("Could not open database.", e.getOriginal());
+            }
+        }
+        else{
+            _Schema.addQuery(new ObjectNumberQuery("Number of Objects"));
+            _Schema.addQuery(new ObjectListQuery("List of Objects"));
         }
     }
 
@@ -232,7 +230,7 @@ public class CSXParser
                 }
 
                 // parse the label layout information if needed
-                LabelInfo objLabel = new ObjectLabelInfo();
+                LabelInfo objLabel = new LabelInfo();
                 // don't use the Concept.getObjectContingentSize() method here, it might cause DB calls
                 if(conceptElem.getChild("objectContingent").getChildren("objectRef").size() != 0) {
                     Element style = conceptElem.getChild("objectContingent").
@@ -243,7 +241,7 @@ public class CSXParser
                     }
                 }
 
-                LabelInfo attrLabel = new AttributeLabelInfo();
+                LabelInfo attrLabel = new LabelInfo();
                 if(conceptElem.getChild("attributeContingent").getChildren("attributeRef").size() != 0) {
                     Element style = conceptElem.getChild( "attributeContingent" ).
                                                 getChild( "labelStyle" );
@@ -488,7 +486,8 @@ public class CSXParser
                     Class.forName(driver);
                 }
                 catch( ClassNotFoundException e ) {
-                    /// @todo Do we want to do something here?
+                    throw new DataFormatException("Could not load class \"" +
+                                    driver + "\" as database driver.");
                 }
             }
         }
@@ -496,41 +495,70 @@ public class CSXParser
             throw new DataFormatException("One of <dsn>, <path> or <url> expected in <database> element.");
         }
         // let's try to find the query
-        Element elem = dbElement.getChild("query");
-        if( elem != null ) {
-            // found query
-            dbInfo.setQuery(elem.getText());
+        Element elem = dbElement.getChild("table");
+        if( elem == null ) {
+            throw new DataFormatException("No <table> given for <database>");
         }
-        else {
-            // need table and key
-            elem = dbElement.getChild("table");
-            if( elem == null ) {
-                throw new DataFormatException("Neither <query> nor <table> given for <database>");
-            }
-            String table = elem.getText();
-            elem = dbElement.getChild("key");
-            if( elem == null ) {
-                throw new DataFormatException("<table> but not <key> given in <database> element");
-            }
-            dbInfo.setQuery(table, elem.getText());
+        dbInfo.setTable( elem.getText() );
+        elem = dbElement.getChild("key");
+        if( elem == null ) {
+            throw new DataFormatException("<table> but not <key> given in <database> element");
         }
-        // check for additional queries for special queries
-        Iterator it = dbElement.getChildren("specialQuery").iterator();
-        while(it.hasNext()) {
-            Element cur = (Element) it.next();
-            String name = cur.getAttributeValue("name");
-            if(name == null) {
-                throw new DataFormatException("<specialQuery> without name attribute in <database> element found");
+        String keyName = elem.getText();
+        dbInfo.setKey(keyName);
+        // check for additional queries
+        Element queryElem = dbElement.getChild("queries");
+        if(queryElem == null || queryElem.getAttribute("dropDefaults") == null ||
+           queryElem.getAttributeValue("dropDefaults").equals("false") ) {
+            // add default queries
+            DatabaseInfo.DatabaseQuery query = dbInfo.createAggregateQuery("Number of Objects");
+            query.insertQueryColumn("Count","0",null,"count(*)");
+            _Schema.addQuery(query);
+            query = dbInfo.createListQuery("List of Objects", false);
+            query.insertQueryColumn("Object Name", null, null, keyName);
+            _Schema.addQuery(query);
+        }
+        if(queryElem != null) {
+            Iterator it = queryElem.getChildren("list").iterator();
+            while(it.hasNext()) {
+                Element cur = (Element) it.next();
+                /// @todo add error handling
+                String name = cur.getAttributeValue("name");
+                /// @todo handle the head
+                String head = cur.getAttributeValue("head");
+                String distinct = cur.getAttributeValue("distinct");
+                boolean isDistinct = (distinct != null) && (distinct.equals("true"));
+                DatabaseInfo.DatabaseQuery query = dbInfo.createListQuery(name, isDistinct);
+                Iterator it2 = cur.getChildren("column").iterator();
+                while(it2.hasNext()) {
+                    Element curCol = (Element) it2.next();
+                    String colName = curCol.getAttributeValue("name");
+                    String format = curCol.getAttributeValue("format");
+                    String separator = curCol.getAttributeValue("separator");
+                    String sql = curCol.getText();
+                    query.insertQueryColumn(colName, format, separator, sql);
+                }
+                _Schema.addQuery(query);
             }
-            if(name.length() == 0) {
-                throw new DataFormatException("<specialQuery> with empty name attribute in <database> element found");
+            it = queryElem.getChildren("aggregate").iterator();
+            while(it.hasNext()) {
+                Element cur = (Element) it.next();
+                /// @todo add error handling
+                String name = cur.getAttributeValue("name");
+                /// @todo handle the head
+                String head = cur.getAttributeValue("head");
+                DatabaseInfo.DatabaseQuery query = dbInfo.createAggregateQuery(name);
+                Iterator it2 = cur.getChildren("column").iterator();
+                while(it2.hasNext()) {
+                    Element curCol = (Element) it2.next();
+                    String colName = curCol.getAttributeValue("name");
+                    String format = curCol.getAttributeValue("format");
+                    String separator = curCol.getAttributeValue("separator");
+                    String sql = curCol.getText();
+                    query.insertQueryColumn(colName, format, separator, sql);
+                }
+                _Schema.addQuery(query);
             }
-            String query = cur.getText();
-            if(query.length() == 0) {
-                throw new DataFormatException("<specialQuery> with empty content in <database> element found");
-            }
-            String format = cur.getAttributeValue("format"); // can be null
-            dbInfo.addSpecialQuery(name, query, format);
         }
     }
 }

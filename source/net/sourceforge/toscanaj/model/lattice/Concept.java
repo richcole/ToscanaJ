@@ -1,6 +1,9 @@
 package net.sourceforge.toscanaj.model.lattice;
 
+import net.sourceforge.toscanaj.model.Query;
+
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Offers read access to information about a concept in a Formal Concept
@@ -103,6 +106,17 @@ public interface Concept {
      * implementation suited for displaying the attributes.
      */
     Iterator getAttributeContingentIterator();
+
+    /**
+     * Executes the given query on the objects and returns a list as result.
+     *
+     * If the boolean flag is set, only the object contingent qill be queried,
+     * otherwise the full extent.
+     *
+     * If the Query type given is not supported, a RuntimeException will be
+     * thrown.
+     */
+    List executeQuery(Query query, boolean contingentOnly);
 
     /**
      * Returns an iterator returning the objects from the contingent.

@@ -72,14 +72,14 @@ public class DiagramNode {
         this.position = (Point2D) other.position.clone();
         this.concept = other.concept;
         if(this.attributeLabel != null) {
-            this.attributeLabel = new AttributeLabelInfo(other.attributeLabel);
+            this.attributeLabel = new LabelInfo(other.attributeLabel);
             this.attributeLabel.attachNode(this);
         }
         else {
             this.attributeLabel = null;
         }
         if(this.objectLabel != null) {
-            this.objectLabel = new ObjectLabelInfo(other.objectLabel);
+            this.objectLabel = new LabelInfo(other.objectLabel);
             this.objectLabel.attachNode(this);
         }
         else {

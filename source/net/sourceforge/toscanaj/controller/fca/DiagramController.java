@@ -1,11 +1,10 @@
 package net.sourceforge.toscanaj.controller.fca;
 
-import net.sourceforge.toscanaj.model.diagram.AttributeLabelInfo;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
-import net.sourceforge.toscanaj.model.diagram.ObjectLabelInfo;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 
 import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;

@@ -1,5 +1,9 @@
 package net.sourceforge.toscanaj.model.lattice;
 
+import net.sourceforge.toscanaj.model.ObjectListQuery;
+import net.sourceforge.toscanaj.model.ObjectNumberQuery;
+import net.sourceforge.toscanaj.model.Query;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,6 +73,39 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
      */
     public void addObject(Object object) {
         this.objectContingent.add(object);
+    }
+
+    /**
+     * Implements Concept.executeQuery(Query, boolean).
+     */
+    public List executeQuery(Query query, boolean contingentOnly) {
+        if( query instanceof ObjectListQuery ) {
+            if( contingentOnly ) {
+                return this.objectContingent;
+            }
+            else {
+                List retVal = new LinkedList();
+                Iterator it = this.ideal.iterator();
+                while(it.hasNext()) {
+                    MemoryMappedConcept cur = (MemoryMappedConcept) it.next();
+                    retVal.addAll(cur.objectContingent);
+                }
+                return retVal;
+            }
+        }
+        else if( query instanceof ObjectNumberQuery ) {
+            List retVal = new LinkedList();
+            if( contingentOnly ) {
+                retVal.add(new Integer(this.getObjectContingentSize()));
+            }
+            else {
+                retVal.add(new Integer(this.getExtentSize()));
+            }
+            return retVal;
+        }
+        else {
+            throw new RuntimeException("Unknown Query type");
+        }
     }
 
     /**
