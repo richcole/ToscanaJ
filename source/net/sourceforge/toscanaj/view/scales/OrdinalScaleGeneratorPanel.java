@@ -300,16 +300,16 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 				double min = this.connection.queryDouble(minQu,1);
 				double max = this.connection.queryDouble(maxQu,1);
 				double avg = this.connection.queryDouble(avgQu,1);
-				this.minLabel.setText("Min: "+roundOff(min));
-				this.maxLabel.setText("Max: "+roundOff(max));
-				this.avgLabel.setText("Average: "+roundOff(avg));
+				this.minLabel.setText("Min: "+createFormattedNumberString(min));
+				this.maxLabel.setText("Max: "+createFormattedNumberString(max));
+				this.avgLabel.setText("Average: "+createFormattedNumberString(avg));
 			} else {
 				int min = this.connection.queryInt(minQu,1);
 				int max = this.connection.queryInt(maxQu,1);
 				int avg = this.connection.queryInt(avgQu,1);
-				this.minLabel.setText("Min: "+roundOff(min));
-				this.maxLabel.setText("Max: "+roundOff(max));
-				this.avgLabel.setText("Average: "+ roundOff(avg));
+				this.minLabel.setText("Min: "+createFormattedNumberString(min));
+				this.maxLabel.setText("Max: "+createFormattedNumberString(max));
+				this.avgLabel.setText("Average: "+ createFormattedNumberString(avg));
 			}
 		} catch (DatabaseException e) {
 			ErrorDialog.showError(this,e,"Database query failed");
@@ -319,13 +319,13 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 		}
 	}
 
-	private double roundOff(double numToRound) {
+	private String createFormattedNumberString(double numToRound) {
 		if( numToRound< 10 ) {
-		    return Double.parseDouble(new DecimalFormat(".######").format(numToRound));
-		}else if( numToRound< 100 ) {
-			return Double.parseDouble(new DecimalFormat(".####").format(numToRound));
-		}else {
-			return Double.parseDouble(new DecimalFormat(".##").format(numToRound));
+		    return new DecimalFormat(".######").format(numToRound);
+		} else if( numToRound< 100 ) {
+			return new DecimalFormat(".####").format(numToRound);
+		} else {
+			return new DecimalFormat(".##").format(numToRound);
 		}
 	}
 
