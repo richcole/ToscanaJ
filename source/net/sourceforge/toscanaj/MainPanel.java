@@ -19,7 +19,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.LabelView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
-import net.sourceforge.toscanaj.view.dialogs.DiagramExportDialog;
+import net.sourceforge.toscanaj.view.dialogs.DiagramExportSettingsDialog;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -251,7 +251,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         fileMenu.add(exportDiagramMenuItem);
 
         // create the export diagram save options submenu
-        this.setupDiagramMenuItem = new JMenu("Setup Export Diagram");
+        this.setupDiagramMenuItem = new JMenu("Export Diagram Setup");
         this.setupDiagramMenuItem.setMnemonic(KeyEvent.VK_N);
         this.setupDiagramMenuItem.setEnabled(false);
         fileMenu.add(setupDiagramMenuItem);
@@ -265,6 +265,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         exportDiagramGroup.add(this.autoExportDiagramMenuItem);
         //manual export
         this.manualExportDiagramMenuItem = new JRadioButtonMenuItem("Manual");
+        this.manualExportDiagramMenuItem.setSelected(true);
         this.manualExportDiagramMenuItem.setMnemonic(KeyEvent.VK_E);
         this.manualExportDiagramMenuItem.addActionListener(this);
         this.setupDiagramMenuItem.add(manualExportDiagramMenuItem);
@@ -506,16 +507,21 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         if (actionSource == openMenuItem) {
             openSchema();
         }
+        if(actionSource == this.autoExportDiagramMenuItem) {
+            this.diagramExportSettings = new DiagramExportSettings(  1,
+                                                                      this.diagramView.getWidth(),
+                                                                      this.diagramView.getHeight() );
+        }
         if (actionSource == exportDiagramMenuItem) {
             //manualy export diagram is the delault setting
             if(this.autoExportDiagramMenuItem.isSelected()){
-                System.out.println("Auto export diagram");
+                autoExportDiagram();
             } else {
                 manualExportDiagram();
             }
         }
         if (actionSource == manualExportDiagramMenuItem) {
-            manualExportDiagram();
+            showDiagramExportDialog();
         }
         if (actionSource == printMenuItem) {
             PrinterJob printJob = PrinterJob.getPrinterJob();
@@ -596,25 +602,104 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         }
     }
 
+    // temp member to hold the current export diagram setting
+    static private DiagramExportSettings diagramExportSettings = null;
+
+    /**
+     * store the latest file path
+     */
+    private String imagePath = null;
+
+
+    // DiagramExportSettings stores the default image setting
+
+    private class DiagramExportSettings {
+        private int format;
+        private int width;
+        private int height;
+        public DiagramExportSettings(int format, int width, int height) {
+            this.format = format;
+            this.width = width;
+            this.height = height;
+        }
+        /**
+         * get the current image format
+         */
+        public int getImageFormat(){ return this.format; }
+
+        /**
+         * get the current image width
+         */
+        public int getImageWidth() { return this.width; }
+
+        /**
+         * get the current image height
+         */
+        public int getImageHeight() { return this.height; }
+
+    }
+
+    private boolean showDiagramExportDialog() {
+        if(diagramExportSettings != null) {
+            DiagramExportSettingsDialog.initialize(this, diagramExportSettings.getImageWidth(), diagramExportSettings.getImageHeight());
+        } else {
+            DiagramExportSettingsDialog.initialize(this, diagramView.getWidth(), diagramView.getHeight());
+        }
+        if(DiagramExportSettingsDialog.showDialog(this)) {
+            this.diagramExportSettings = new DiagramExportSettings(  DiagramExportSettingsDialog.getImageFormat(),
+                                                                      DiagramExportSettingsDialog.getImageWidth(),
+                                                                      DiagramExportSettingsDialog.getImageHeight() );
+            return true;
+        }
+        return false;
+    }
+
     /**
      * DiagramExportDialog called to manualy export a diagram
+     *
      */
     private void manualExportDiagram() {
-    DiagramExportDialog.initialize(this, diagramView.getWidth(), diagramView.getHeight());
-        if(DiagramExportDialog.showDialog(this)) {
-            final JFileChooser saveDialog =
-                            new JFileChooser( System.getProperty( "user.dir" ) );
-            int rv = saveDialog.showSaveDialog( this );
-            if( rv == JFileChooser.APPROVE_OPTION ) {
-                try {
-                    this.diagramView.exportGraphic( DiagramExportDialog.getImageFormat(),
-                                                    DiagramExportDialog.getImageWidth(),
-                                                    DiagramExportDialog.getImageHeight(),
-                                                    saveDialog.getSelectedFile().getPath() );
-                }
-                catch(ImageGenerationException e) {
-                    /// @TODO give some feedback here
-                }
+        if( diagramExportSettings == null) {
+            if(showDiagramExportDialog() == false) {
+                return;
+            }
+        }
+        final JFileChooser saveDialog =
+                        new JFileChooser( (imagePath == null)? "user.dir" : imagePath );
+        int rv = saveDialog.showSaveDialog( this );
+        if( rv == JFileChooser.APPROVE_OPTION ) {
+            try {
+                imagePath = saveDialog.getSelectedFile().getPath();
+                this.diagramView.exportGraphic( diagramExportSettings.getImageFormat(),
+                                                diagramExportSettings.getImageWidth(),
+                                                diagramExportSettings.getImageHeight(),
+                                                imagePath );
+            }
+            catch(ImageGenerationException e) {
+                /// @TODO give some feedback here
+            }
+        }
+    }
+
+    /**
+     * method automatically export a diagram
+     *
+     */
+    private void autoExportDiagram() {
+        final JFileChooser saveDialog =
+                        new JFileChooser( (imagePath == null)? "user.dir" : imagePath );
+        int rv = saveDialog.showSaveDialog( this );
+        if( rv == JFileChooser.APPROVE_OPTION ) {
+            try {
+                imagePath = saveDialog.getSelectedFile().getPath();
+                System.out.println(imagePath);
+                this.diagramView.exportGraphic( 1,
+                                                this.diagramView.getWidth(),
+                                                this.diagramView.getHeight(),
+                                                imagePath );
+            }
+            catch(ImageGenerationException e) {
+                /// @TODO give some feedback here
             }
         }
     }
@@ -762,5 +847,4 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
         test.setVisible(true);
     }
-
 }
