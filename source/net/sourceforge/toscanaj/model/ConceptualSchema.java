@@ -26,7 +26,7 @@ import java.util.Vector;
  * in the program. Instances are created by parsing a CSX file with the
  * CSXParser class.
  */
-public class ConceptualSchema implements DiagramCollection {
+public class ConceptualSchema implements XML_Serializable, DiagramCollection {
     /**
      * The database information.
      */
@@ -70,6 +70,30 @@ public class ConceptualSchema implements DiagramCollection {
         this.dbScheme = new DatabaseSchema(broker);
         reset();
         eventBroker.processEvent(new NewConceptualSchemaEvent(this, this));
+    }
+
+    public ConceptualSchema(EventBroker eventBroker, Element element) throws XML_SyntaxError {
+        this.eventBroker = eventBroker;
+        this.dbScheme = new DatabaseSchema(eventBroker);
+        readXML(element);
+        eventBroker.processEvent(new NewConceptualSchemaEvent(this, this));
+    }
+
+    public Element toXML() {
+        Element retVal = new Element("conceptualSchema");
+        retVal.setAttribute("version", "TJ0.6");
+        retVal.addContent(description);
+        retVal.addContent(databaseInfo.toXML());
+        retVal.addContent(dbScheme.toXML());
+        for (int i = 0; i < diagrams.size(); i++) {
+            Diagram2D d = (Diagram2D) diagrams.elementAt(i);
+            retVal.addContent(d.toXML());
+        }
+        return retVal;
+    }
+
+    public void readXML(Element elem) throws XML_SyntaxError {
+        throw new XML_SyntaxError("Not yet implemented");
     }
 
     /**

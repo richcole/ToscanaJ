@@ -25,11 +25,11 @@ public abstract class XML_Helper {
         Element child = parent.getChild(name);
         if ( child == null ) {
             String reason = "Expected element '" +
-                    name + "' in '" + parent.getName();
+                    name + "' in '" + parent.getName() + "'";
             throw new XML_SyntaxError(reason);
         }
         return child;
     }
 
-};
+}
 

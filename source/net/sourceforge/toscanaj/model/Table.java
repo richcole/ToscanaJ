@@ -12,22 +12,43 @@ import util.CollectionFactory;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.events.TableChangedEvent;
+import org.jdom.Element;
 
-public class Table {
+public class Table implements XML_Serializable {
 
     private String name;
 
     private Column key;
     private EventBroker broker;
     private List columns;
+    private static final String TABLE_ELEMENT_NAME = "table";
+    private static final String TABLE_NAME_ATTRIBUTE_NAME = "name";
 
     public Table(EventBroker broker, String name) {
         this.columns = new ArrayList();
         this.broker = broker;
         this.name = name;
+    }
+
+    public Element toXML() {
+        Element retVal = new Element(TABLE_ELEMENT_NAME);
+        retVal.setAttribute(TABLE_NAME_ATTRIBUTE_NAME, name);
+        if( key != null ) {
+            retVal.addContent(key.toXML());
+        }
+        for (Iterator iterator = columns.iterator(); iterator.hasNext();) {
+            Column column = (Column) iterator.next();
+            retVal.addContent(column.toXML());
+        }
+        return retVal;
+    }
+
+    public void readXML(Element elem) throws XML_SyntaxError {
+        throw new XML_SyntaxError("Not yet implemented");
     }
 
     public void addColumn(Column column) {

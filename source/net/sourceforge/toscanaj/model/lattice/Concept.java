@@ -7,6 +7,8 @@
 package net.sourceforge.toscanaj.model.lattice;
 
 import net.sourceforge.toscanaj.model.Query;
+import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.model.XML_Serializable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +32,7 @@ import java.util.List;
  *
  * The contingents are usually used for labelling the diagram.
  */
-public interface Concept {
+public interface Concept extends XML_Serializable {
     /**
      * Returns true if the concept is realised.
      *

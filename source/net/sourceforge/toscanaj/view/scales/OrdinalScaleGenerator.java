@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Query;
+import net.sourceforge.toscanaj.model.XML_SyntaxError;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 
 import javax.swing.*;
@@ -26,6 +27,8 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.List;
+
+import org.jdom.Element;
 
 public class OrdinalScaleGenerator implements ScaleGenerator {
     private JFrame parent;
@@ -43,6 +46,13 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
     }
 
     static class DummyConcept implements Concept{
+        public Element toXML() {
+            return null;
+        }
+
+        public void readXML(Element elem) throws XML_SyntaxError {
+        }
+
         public boolean isRealised() {
             return false;
         }

@@ -11,11 +11,13 @@ import org.jdom.Element;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import net.sourceforge.toscanaj.model.XML_Serializable;
+
 /**
  * Interface for getting diagram related information.
  */
 
-public interface Diagram2D {
+public interface Diagram2D extends XML_Serializable {
     /**
      * Returns the title of the diagram.
      */

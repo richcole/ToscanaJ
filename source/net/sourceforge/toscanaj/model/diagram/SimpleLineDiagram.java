@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.toscanaj.model.XML_SyntaxError;
+
 /**
  * This class is an abstraction of all diagram related information.
  *
@@ -48,11 +50,38 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     private boolean coordinateSystemChecked = false;
 
     private Element description = null;
+    private static final String DIAGRAM_ELEMENT_NAME = "diagram";
+    private static final String TITLE_ATTRIBUTE_NAME = "title";
 
     /**
      * The default constructor creates a diagram with just nothing in it at all.
      */
     public SimpleLineDiagram() {
+    }
+
+    public SimpleLineDiagram(Element element) throws XML_SyntaxError {
+        readXML(element);
+    }
+
+    public Element toXML() {
+        Element retVal = new Element(DIAGRAM_ELEMENT_NAME);
+        retVal.setAttribute(TITLE_ATTRIBUTE_NAME, title);
+        if( description != null ) {
+            retVal.addContent(description);
+        }
+        for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
+            DiagramNode node = (DiagramNode) iterator.next();
+            retVal.addContent(node.toXML());
+        }
+        for (Iterator iterator = lines.iterator(); iterator.hasNext();) {
+            DiagramLine line = (DiagramLine) iterator.next();
+            retVal.addContent(line.toXML());
+        }
+        return retVal;
+    }
+
+    public void readXML(Element elem) throws XML_SyntaxError {
+        throw new XML_SyntaxError("Not yet implemented");
     }
 
     /**

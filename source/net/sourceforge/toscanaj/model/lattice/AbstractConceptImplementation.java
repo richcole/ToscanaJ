@@ -6,7 +6,11 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
+import org.jdom.Element;
+
 import java.util.*;
+
+import net.sourceforge.toscanaj.model.XML_SyntaxError;
 
 /**
  * This implements some shortcuts for implementing concepts.
@@ -23,6 +27,12 @@ import java.util.*;
  * relation.
  */
 public abstract class AbstractConceptImplementation implements Concept {
+    private static final String CONCEPT_ELEMENT_NAME = "concept";
+    private static final String OBJECT_CONTINGENT_ELEMENT_NAME = "objectContingent";
+    private static final String OBJECT_ELEMENT_NAME = "object";
+    private static final String ATTRIBUTE_CONTINGENT_ELEMENT_NAME = "attributeContingent";
+    private static final String ATTRIBUTE_ELEMENT_NAME = "attribute";
+
     protected static List makeList() {
         return new ArrayList();
     }
@@ -211,6 +221,36 @@ public abstract class AbstractConceptImplementation implements Concept {
         this.filter.add(this);
         this.ideal = new HashSet();
         this.ideal.add(this);
+    }
+
+    public AbstractConceptImplementation(Element element) throws XML_SyntaxError {
+        readXML(element);
+    }
+
+    public Element toXML() {
+        Element retVal = new Element(CONCEPT_ELEMENT_NAME);
+        Element objectContingentElem = new Element(OBJECT_CONTINGENT_ELEMENT_NAME);
+        retVal.addContent(objectContingentElem);
+        Iterator objIt = getObjectContingentIterator();
+        while (objIt.hasNext()) {
+            Object o = (Object) objIt.next();
+            Element objectElem = new Element(OBJECT_ELEMENT_NAME);
+            objectElem.addContent(o.toString());
+            objectContingentElem.addContent(objectElem);
+        }
+        Element attributeContingentElem = new Element(ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
+        retVal.addContent(attributeContingentElem);
+        Iterator attrIt = getAttributeContingentIterator();
+        while (attrIt.hasNext()) {
+            Object o = (Object) attrIt.next();
+            Element attribElem = new Element(ATTRIBUTE_ELEMENT_NAME);
+            attribElem.addContent(o.toString());
+            attributeContingentElem.addContent(attribElem);
+        }
+        return retVal;
+    }
+
+    public void readXML(Element elem) throws XML_SyntaxError {
     }
 
     /**

@@ -8,10 +8,8 @@ import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
-import net.sourceforge.toscanaj.gui.activity.CloseMainPanelActivity;
-import net.sourceforge.toscanaj.gui.activity.LoadConceptualSchemaActivity;
-import net.sourceforge.toscanaj.gui.activity.NewConceptualSchemaActivity;
-import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
+import net.sourceforge.toscanaj.gui.action.SaveFileAction;
+import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -190,10 +188,9 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         openMenuItem.addActionListener(openFileAction);
         fileMenu.add(openMenuItem);
 
-        /*
         JMenuItem saveMenuItem = new JMenuItem("Save...");
-        AnacondaSaveFileActivity saveActivity =
-            new AnacondaSaveFileActivity(conceptualSchema, this);
+        SaveConceptualSchemaActivity saveActivity =
+            new SaveConceptualSchemaActivity(conceptualSchema);
         saveMenuItem.addActionListener(
             new SaveFileAction(
                     this,
@@ -205,9 +202,8 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
                     )
             )
         );
-        saveActivity.setPrepareActivity(new PrepareToSaveActivity());
+//        saveActivity.setPrepareActivity(new PrepareToSaveActivity());
         fileMenu.add(saveMenuItem);
-        */
 
         mruMenu = new JMenu("Reopen");
         recreateMruMenu();

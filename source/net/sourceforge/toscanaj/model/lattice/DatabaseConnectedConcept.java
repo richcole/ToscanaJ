@@ -10,8 +10,11 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.Query;
+import net.sourceforge.toscanaj.model.XML_SyntaxError;
 
 import java.util.*;
+
+import org.jdom.Element;
 
 /**
  * Implements a concept whose objects are stored in a relational database.

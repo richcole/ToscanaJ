@@ -3,7 +3,7 @@
  * User: rjcole
  * Date: Jun 28, 2002
  * Time: 3:40:32 AM
- * To change template for new class use 
+ * To change template for new class use
  * Code Style | Class Templates options (Tools | IDE Options).
  */
 package net.sourceforge.toscanaj.model;
@@ -22,16 +22,32 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.sql.Types;
 
-public class DatabaseSchema implements BrokerEventListener {
+import org.jdom.Element;
+
+public class DatabaseSchema implements XML_Serializable, BrokerEventListener {
 
     EventBroker broker;
     List tables;
+    private static final String DATABASE_SCHEMA_ELEMENT_NAME = "databaseSchema";
 
     public DatabaseSchema(EventBroker broker) {
         this.tables = new ArrayList();
         this.broker = broker;
         this.broker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
         this.broker.subscribe(this, DatabaseModifiedEvent.class, Object.class);
+    }
+
+    public Element toXML() {
+        Element retVal = new Element(DATABASE_SCHEMA_ELEMENT_NAME);
+        for (Iterator iterator = tables.iterator(); iterator.hasNext();) {
+            Table table = (Table) iterator.next();
+            retVal.addContent(table.toXML());
+        }
+        return retVal;
+    }
+
+    public void readXML(Element elem) throws XML_SyntaxError {
+        throw new XML_SyntaxError("Not yet implemented");
     }
 
     void addTable(Table table) {

@@ -7,8 +7,12 @@
 package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.XML_Serializable;
+import net.sourceforge.toscanaj.model.XML_SyntaxError;
 
 import java.awt.geom.Point2D;
+
+import org.jdom.Element;
 
 /**
  * Stores the information on a node in a diagram.
@@ -16,7 +20,7 @@ import java.awt.geom.Point2D;
  * This is mainly the position, the concept for the node and the information
  * on the labels attached to it.
  */
-public class DiagramNode {
+public class DiagramNode implements XML_Serializable {
     /**
      * The size of nodes.
      *
@@ -51,6 +55,13 @@ public class DiagramNode {
     protected LabelInfo objectLabel;
 
     protected DiagramNode outerNode;
+    private static final String NODE_ELEMENT_NAME = "node";
+    private static final String POSITION_ELEMENT_NAME = "position";
+    private static final String POSITION_X_ATTRIBUTE_NAME = "x";
+    private static final String POSITION_Y_ATTRIBUTE_NAME = "y";
+    private static final String ID_ATTRIBUTE_NAME = "id";
+    private static final String ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME = "attributeLabelStyle";
+    private static final String OBJECT_LABEL_STYLE_ELEMENT_NAME = "objectLabelStyle";
 
     public DiagramNode(Point2D position, Concept concept,
                        LabelInfo attributeLabel, LabelInfo objectLabel,
@@ -66,6 +77,35 @@ public class DiagramNode {
             objectLabel.attachNode(this);
         }
         this.outerNode = outerNode;
+    }
+
+    public DiagramNode(Element element) throws XML_SyntaxError {
+        readXML(element);
+    }
+
+    public Element toXML() {
+        Element retVal = new Element(NODE_ELEMENT_NAME);
+        retVal.setAttribute(ID_ATTRIBUTE_NAME, String.valueOf(hashCode()));
+        Element positionElem = new Element(POSITION_ELEMENT_NAME);
+        positionElem.setAttribute(POSITION_X_ATTRIBUTE_NAME, String.valueOf(position.getX()));
+        positionElem.setAttribute(POSITION_Y_ATTRIBUTE_NAME, String.valueOf(position.getY()));
+        retVal.addContent(positionElem);
+        if(attributeLabel != null) {
+            Element attrLabelInfoElem = attributeLabel.toXML();
+            attrLabelInfoElem.setName(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME);
+            retVal.addContent(attrLabelInfoElem);
+        }
+        if(objectLabel != null) {
+            Element objectLabelInfoElem = objectLabel.toXML();
+            objectLabelInfoElem.setName(OBJECT_LABEL_STYLE_ELEMENT_NAME);
+            retVal.addContent(objectLabelInfoElem);
+        }
+        retVal.addContent(concept.toXML());
+        return retVal;
+    }
+
+    public void readXML(Element elem) throws XML_SyntaxError {
+        throw new XML_SyntaxError("Not yet implemented");
     }
 
     public DiagramNode getOuterNode() {

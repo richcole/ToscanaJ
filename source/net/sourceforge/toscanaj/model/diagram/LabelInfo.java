@@ -8,17 +8,21 @@ package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
+import net.sourceforge.toscanaj.model.XML_Serializable;
+import net.sourceforge.toscanaj.model.XML_SyntaxError;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.jdom.Element;
+
 /**
  * This class encapsulates all information needed to paint a label.
  */
 
-public class LabelInfo implements ChangeObservable {
+public class LabelInfo implements XML_Serializable, ChangeObservable {
     /**
      * List of LabelObserver implementations currently observing the instance.
      */
@@ -63,6 +67,16 @@ public class LabelInfo implements ChangeObservable {
      * A constant for right alignment.
      */
     public static final int ALIGNRIGHT = 2;
+    private static final String LABEL_INFO_ELEMENT_NAME = "labelStyle";
+    private static final String OFFSET_ELEMENT_NAME = "offset";
+    private static final String OFFSET_X_ATTRIBUTE_NAME = "x";
+    private static final String OFFSET_Y_ATTRIBUTE_NAME = "y";
+    private static final String TEXT_COLOR_ELEMENT_NAME = "textColor";
+    private static final String BACKGROUND_COLOR_ELEMENT_NAME = "backgroundColor";
+    private static final String TEXT_ALIGNMENT_ELEMENT_NAME = "textAlignment";
+    private static final String TEXT_ALIGNMENT_LEFT_CONTENT = "left";
+    private static final String TEXT_ALIGNMENT_CENTER_CONTENT = "center";
+    private static final String TEXT_ALIGNMENT_RIGHT_CONTENT = "right";
 
     /**
      * The default constructor creates a label with default settings.
@@ -94,6 +108,41 @@ public class LabelInfo implements ChangeObservable {
                 other.textColor.getAlpha());
         this.textAlignment = other.textAlignment;
         labelObservers = new Vector();
+    }
+
+    public LabelInfo(Element element) throws XML_SyntaxError {
+        readXML(element);
+    }
+
+    public Element toXML() {
+        Element retVal = new Element(LABEL_INFO_ELEMENT_NAME);
+        Element offsetElem = new Element(OFFSET_ELEMENT_NAME);
+        offsetElem.setAttribute(OFFSET_X_ATTRIBUTE_NAME, String.valueOf(offset.getX()));
+        offsetElem.setAttribute(OFFSET_Y_ATTRIBUTE_NAME, String.valueOf(offset.getY()));
+        Element backgroundColorElem = new Element(BACKGROUND_COLOR_ELEMENT_NAME);
+        backgroundColorElem.addContent("#" + Integer.toHexString(backgroundColor.getRGB()));
+        retVal.addContent(backgroundColorElem);
+        Element textColorElem = new Element(TEXT_COLOR_ELEMENT_NAME);
+        textColorElem.addContent("#" + Integer.toHexString(textColor.getRGB()));
+        retVal.addContent(textColorElem);
+        Element textAlignmentElem = new Element(TEXT_ALIGNMENT_ELEMENT_NAME);
+        switch(textAlignment) {
+            case ALIGNLEFT:
+                textAlignmentElem.addContent(TEXT_ALIGNMENT_LEFT_CONTENT);
+                break;
+            case ALIGNCENTER:
+                textAlignmentElem.addContent(TEXT_ALIGNMENT_CENTER_CONTENT);
+                break;
+            case ALIGNRIGHT:
+                textAlignmentElem.addContent(TEXT_ALIGNMENT_RIGHT_CONTENT);
+                break;
+        }
+        retVal.addContent(textAlignmentElem);
+        return retVal;
+    }
+
+    public void readXML(Element elem) throws XML_SyntaxError {
+        throw new XML_SyntaxError("Not yet implemented");
     }
 
     /**

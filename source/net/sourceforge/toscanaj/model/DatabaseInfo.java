@@ -6,6 +6,8 @@
  */
 package net.sourceforge.toscanaj.model;
 
+import org.jdom.Element;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -17,7 +19,7 @@ import java.net.URL;
 /**
  * This class contains information how to connect to a database.
  */
-public class DatabaseInfo {
+public class DatabaseInfo implements XML_Serializable {
     /**
      * The source where the database can be found.
      *
@@ -42,6 +44,16 @@ public class DatabaseInfo {
     private URL embeddedSQLLocation = null;
 
     private String driverClass = null;
+
+    private static final String TABLE_ELEMENT_NAME = "table";
+    private static final String DATABASE_CONNECTION_ELEMENT_NAME = "databaseConnection";
+    private static final String EMBEDDED_SOURCE_ELEMENT_NAME = "embed";
+    private static final String URL_SOURCE_ELEMENT_NAME = "url";
+    private static final String DRIVER_CLASS_ATTRIBUTE_NAME = "driver";
+    private static final String USERNAME_ATTRIBUTE_NAME = "user";
+    private static final String PASSWORD_ATTRIBUTE_NAME = "password";
+    private static final String EMBEDDED_URL_ATTRIBUTE_NAME = "url";
+    private static final String OBJECT_KEY_ELEMENT_NAME = "key";
 
     public static DatabaseInfo getEmbeddedDatabaseInfo() {
         DatabaseInfo info = new DatabaseInfo();
@@ -190,6 +202,37 @@ public class DatabaseInfo {
      * Type is set to TYPE_UNDEFINED, the strings are all null.
      */
     public DatabaseInfo() {
+    }
+
+    public DatabaseInfo(Element element) throws XML_SyntaxError {
+        readXML(element);
+    }
+
+    public Element toXML() {
+        Element retVal = new Element(DATABASE_CONNECTION_ELEMENT_NAME);
+        if( embeddedSQLLocation != null ) {
+            Element embedElem = new Element(EMBEDDED_SOURCE_ELEMENT_NAME);
+            embedElem.setAttribute(EMBEDDED_URL_ATTRIBUTE_NAME,embeddedSQLLocation.toString());
+            retVal.addContent(embedElem);
+        } else {
+            Element urlElem = new Element(URL_SOURCE_ELEMENT_NAME);
+            urlElem.addContent(sourceURL);
+            urlElem.setAttribute(DRIVER_CLASS_ATTRIBUTE_NAME, driverClass);
+            urlElem.setAttribute(USERNAME_ATTRIBUTE_NAME, userName);
+            urlElem.setAttribute(PASSWORD_ATTRIBUTE_NAME, password);
+            retVal.addContent(urlElem);
+        }
+        Element tableElem = new Element(TABLE_ELEMENT_NAME);
+        tableElem.addContent(table);
+        retVal.addContent(tableElem);
+        Element keyElem = new Element(OBJECT_KEY_ELEMENT_NAME);
+        keyElem.addContent(objectKey);
+        retVal.addContent(keyElem);
+        return retVal;
+    }
+
+    public void readXML(Element elem) throws XML_SyntaxError {
+        throw new XML_SyntaxError("Not yet implemented");
     }
 
     /**

@@ -14,8 +14,8 @@ import org.jdom.Element;
 public class DefaultScale implements Scale {
     private Context context = new Context(0,0);
 
-    public void writeXML(Element elem) {
-        elem.addContent(new Element("Scale"));
+    public Element toXML() {
+        return new Element("Scale");
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {

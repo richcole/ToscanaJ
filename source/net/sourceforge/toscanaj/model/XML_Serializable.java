@@ -14,7 +14,7 @@ public interface XML_Serializable {
     /**
      * Write this element as the content of elem.
      */
-    public abstract void writeXML(Element elem);
+    public abstract Element toXML();
 
     /**
      * Read this element as the content of elem.

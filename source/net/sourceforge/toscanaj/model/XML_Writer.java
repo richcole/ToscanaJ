@@ -19,19 +19,16 @@ import org.jdom.input.DOMBuilder;
  */
 public class XML_Writer
 {
-    /**
-     * The constructor does the reading from a file and throws if there is a *
-     * problem.
-     */
-    public XML_Writer(File file, XML_Serializable object, String rootElementName)
+    public static void write(File file, XML_Serializable object)
             throws Exception
     {
         // open stream on file
         FileOutputStream out = new FileOutputStream(file);
         XMLOutputter outputter = new XMLOutputter();
+        outputter.setIndent(true);
+        outputter.setNewlines(true);
 
-        Document document = new Document(new Element(rootElementName));
-        object.writeXML(document.getRootElement());
+        Document document = new Document(object.toXML());
         outputter.output(document, out);
     }
 

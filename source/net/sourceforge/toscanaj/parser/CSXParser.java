@@ -135,7 +135,9 @@ public class CSXParser {
     private static void parseDescription()
             throws DataFormatException {
         Element descElem = _Document.getRootElement().getChild("description");
-        _Schema.setDescription(descElem);
+        if(descElem != null) {
+            _Schema.setDescription(descElem.detach());
+        }
     }
 
     /**
@@ -226,9 +228,12 @@ public class CSXParser {
             Element attribute = (Element) it.next();
             org.jdom.Attribute name = attribute.getAttribute("name");
             if ((name != null) && (name.getValue() != null) && (name.getValue().length() != 0)) {
+                Element descriptionElem = attribute.getChild("description");
+                if(descriptionElem != null) {
+                    descriptionElem = descriptionElem.detach();
+                }
                 _Attributes.put(attribute.getAttribute("id").getValue(),
-                        new Attribute(name.getValue(),
-                                attribute.getChild("description"))
+                        new Attribute(name.getValue(), descriptionElem)
                 );
             }
         }
@@ -250,7 +255,7 @@ public class CSXParser {
 
             Element descElem = diagElem.getChild("description");
             if (descElem != null) {
-                diagram.setDescription(descElem);
+                diagram.setDescription(descElem.detach());
                 _Schema.setHasDiagramDescription(true);
             }
 

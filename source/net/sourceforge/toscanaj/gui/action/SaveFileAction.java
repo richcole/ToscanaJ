@@ -3,6 +3,7 @@ package net.sourceforge.toscanaj.gui.action;
 import net.sourceforge.toscanaj.model.XML_Reader;
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
 import net.sourceforge.toscanaj.gui.activity.FileActivity;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -65,12 +66,13 @@ public class SaveFileAction extends KeyboardMappedAction {
                 try {
                     activity.processFile(selectedFile);
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(
+                    ErrorDialog.showError(
                             frame,
-                            "Failure to save the file:" + ex.getMessage(),
+                            ex,
                             "Error saving file",
-                            JOptionPane.ERROR_MESSAGE
+                            "Failure to save the file:" + ex.getMessage()
                     );
+                    ex.printStackTrace();
                 }
                 previousFile = selectedFile;
             }
