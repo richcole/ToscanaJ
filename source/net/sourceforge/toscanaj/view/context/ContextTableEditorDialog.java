@@ -727,8 +727,8 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		}
 		return false;
 	}
-	
-	protected ContextTableView.Position getTablePosition(int xLoc, int yLoc) {
+		
+	ContextTableView.Position getTablePosition(int xLoc, int yLoc) {
 		return this.tableView.getTablePosition(xLoc, yLoc);
 	}
 	

@@ -121,17 +121,9 @@ public class ContextTableView extends JComponent implements Scrollable {
 		g2d.setPaint(oldPaint);
 	}
 
-	public int getCellHeight() {
-		return CELL_HEIGHT;
-	}
-
-	public int getCellWidth() {
-		return CELL_WIDTH;
-	}
-
 	protected Position getTablePosition(int xLoc, int yLoc) {
-		int col = xLoc / getCellWidth();
-		int row = yLoc / getCellHeight();
+		int col = xLoc / CELL_WIDTH;
+		int row = yLoc / CELL_HEIGHT;
 		if ((col > this.context.getAttributes().size() )
 			|| (row > this.context.getObjects().size() )) {
 			return null;
