@@ -236,7 +236,7 @@ public class ConceptImplementation implements Concept {
     public ConceptImplementation(Element element) throws XMLSyntaxError {
         readXML(element);
     }
-
+    
     public Element toXML() {
         Element retVal = new Element(CONCEPT_ELEMENT_NAME);
         Element objectContingentElem = new Element(OBJECT_CONTINGENT_ELEMENT_NAME);

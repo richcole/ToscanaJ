@@ -120,7 +120,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 		LabelInfo attributeLabelInfo = new LabelInfo(node.getAttributeLabelInfo());
 		LabelInfo objectLabelInfo = new LabelInfo(node.getObjectLabelInfo());
 
-		DiagramNode newNode = new DiagramNode(this, node.getIdentifier(), node.getPosition(), concept, attributeLabelInfo, objectLabelInfo, null);
+		DiagramNode newNode = new DiagramNode(this, node.getIdentifier(), position, concept, attributeLabelInfo, objectLabelInfo, null);
 		attributeLabelInfo.attachNode(newNode);
 		objectLabelInfo.attachNode(newNode);
 		return newNode;
