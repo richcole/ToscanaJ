@@ -8,10 +8,14 @@
 package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import org.tockit.canvas.CanvasItem;
 
 import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -22,6 +26,8 @@ import java.text.DecimalFormat;
  * Draws a line between two points, representing a DiagramLine in the model.
  */
 public class LineView extends CanvasItem {
+    private static final double LABEL_MARGIN = 2;
+
     /**
      * Store the line in the model for this view.
      */
@@ -30,7 +36,8 @@ public class LineView extends CanvasItem {
     private NodeView fromView;
     private NodeView toView;
     
-    private boolean showRatios;
+    private Color showRatioColor;
+    private float fontSize;
 
     /**
      * Creates a view for the given DiagramLine.
@@ -39,7 +46,8 @@ public class LineView extends CanvasItem {
         this.diagramLine = diagramLine;
         this.fromView = fromView;
         this.toView = toView;
-        this.showRatios = (ConfigurationManager.fetchInt("LineView", "showExtentRatios", 0) == 1);
+        this.showRatioColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioColor", null);
+        this.fontSize = ConfigurationManager.fetchFloat("LineView", "labelFontSize", 8);
     }
 
     /**
@@ -72,35 +80,60 @@ public class LineView extends CanvasItem {
         graphics.setPaint(oldPaint);
         graphics.setStroke(oldStroke);
         
-        if(this.showRatios) {
+        if(this.showRatioColor != null) {
             drawExtentRatio(graphics);
         }
     }
 
     private void drawExtentRatio(Graphics2D graphics) {
+    	Paint oldPaint = graphics.getPaint();
         Font oldFont = graphics.getFont();
         AffineTransform oldTransform = graphics.getTransform();
 
+		DiagramView diagramView = this.fromView.getDiagramView();
+		ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
+		ConceptInterpretationContext interpretationContext = this.fromView.getConceptInterpretationContext();
+		boolean oldObjectDisplayMode = interpretationContext.getObjectDisplayMode();
+		interpretationContext.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
+
 		Point2D from = diagramLine.getFromPosition();
 		Point2D to = diagramLine.getToPosition();
-        int startExtent = this.fromView.getDiagramNode().getConcept().getExtentSize();
-        int endExtent   = this.toView.  getDiagramNode().getConcept().getExtentSize();
-        double ratioInPercent = (double)endExtent / (double)startExtent;
+		int startExtent = interpreter.getObjectCount(this.fromView.getDiagramNode().getConcept(),interpretationContext);
+		int endExtent = interpreter.getObjectCount(this.toView.getDiagramNode().getConcept(),interpretationContext);
+        double ratioInPercent;
+        if(startExtent == 0) {
+			ratioInPercent = 1.0;
+        } else {
+			ratioInPercent = (double)endExtent / (double)startExtent;
+        }
 
 		DecimalFormat format = new DecimalFormat("#.## %");
 		String formattedNumber = format.format(ratioInPercent);
         double x = (from.getX() + to.getX()) / 2; 
         double y = (from.getY() + to.getY()) / 2;
         
-        Font font = fromView.getDiagramView().getFont();
+        Font font = diagramView.getFont().deriveFont(fontSize);
         graphics.setFont(font);
-		graphics.transform(AffineTransform.getTranslateInstance(x,y));
-		graphics.transform(AffineTransform.getRotateInstance(Math.atan2(to.getY() - from.getY(), to.getX() - from.getX())));
-		double xOffset = -font.getStringBounds(formattedNumber, graphics.getFontRenderContext()).getCenterX();
-        graphics.drawString(formattedNumber, (float)xOffset, -1);
+		FontRenderContext frc = graphics.getFontRenderContext();
+		TextLayout layout = new TextLayout(formattedNumber, font, frc);
 
+		Rectangle2D bounds = layout.getBounds();
+		Rectangle2D labelRectangle = new Rectangle2D.Double(x - bounds.getWidth()/2 - LABEL_MARGIN,
+ 														   y - bounds.getHeight()/2 - LABEL_MARGIN,
+ 														   bounds.getWidth() + 2*LABEL_MARGIN,
+ 														   bounds.getHeight() + 2*LABEL_MARGIN);
+
+		graphics.setPaint(Color.BLACK);
+        graphics.draw(labelRectangle);
+		graphics.setPaint(this.showRatioColor);
+		graphics.fill(labelRectangle);
+		graphics.setPaint(Color.BLACK);
+        graphics.drawString(formattedNumber, (float)(x - bounds.getWidth()/2 - bounds.getX()), (float)(y - bounds.getHeight()/2 - bounds.getY()));
+
+		interpretationContext.setObjectDisplayMode(oldObjectDisplayMode);
         graphics.setFont(oldFont); 
         graphics.setTransform(oldTransform);
+        graphics.setPaint(oldPaint);
     }
 
     /**
