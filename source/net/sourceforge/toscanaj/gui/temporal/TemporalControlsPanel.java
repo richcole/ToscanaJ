@@ -642,6 +642,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     private void animate() {
     	if(this.lastAnimationTime > this.targetTime) {
             removeTransitions();
+            this.animating = false;
     		return;
     	}
         this.timeController.calculateCurrentTime();
