@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -31,6 +32,8 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
 
 import org.tockit.canvas.events.CanvasDrawnEvent;
 import org.tockit.canvas.imagewriter.DiagramExportSettings;
@@ -66,7 +69,6 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private JComboBox sequenceToShowChooser;
     private JButton animateTransitionsButton;
     private JButton exportImagesButton;
-    private JButton exportAnimationButton;
     private DiagramView diagramView;
     private AnimationTimeController timeController;
     
@@ -74,6 +76,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
                                                          Color.ORANGE, Color.PINK, Color.BLACK, Color.YELLOW};
     private double targetTime;
     private double lastAnimationTime;
+    private int currentStep;
     private NumberField speedField;
     private NumberField fadeInField;
     private NumberField holdField;
@@ -83,6 +86,12 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private JCheckBox serializeSequencesBox;
     private File lastImageExportFile;
     private DiagramExportSettings diagramExportSettings;
+    private JButton firstStepButton;
+    private JButton previousStepButton;
+    private JButton nextStepButton;
+    private JButton lastStepButton;
+    private JLabel stepPositionLabel;
+    private JButton startSteppingButton;
 	
     public TemporalMainDialog(Frame frame, DiagramView diagramView, EventBroker eventBroker) {
 	  	super(frame, "Temporal Controls", false);
@@ -107,6 +116,8 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         if (it.hasNext()) {
             this.diagramExportSettings = new DiagramExportSettings(null, 0, 0, true);
         }
+        
+        this.timeController = new AnimationTimeController(0,0,0,0,0);
 	  	
 	  	buildGUI();
 	  	fillGUI();
@@ -141,9 +152,16 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
             }
         });
 
+        startSteppingButton = new JButton("Start Stepping");
+        startSteppingButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                startStepping();
+            }
+        });
+
         JLabel speedLabel = new JLabel("Speed (ms/step):");
         speedField = new NumberField(10,NumberField.INTEGER);
-        speedField.setText("300");
+        speedField.setText("200");
         JLabel fadeInLabel = new JLabel("Fade-in steps:");
         fadeInField= new NumberField(10,NumberField.FLOAT);
         fadeInField.setText("1");
@@ -169,8 +187,56 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
                 exportImages();
             }
         });
+        
+        firstStepButton = new JButton(" << ");
+        firstStepButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                gotoFirstStep();
+            }
+        });
 
-        exportAnimationButton = new JButton("Export Animation");
+        previousStepButton = new JButton(" < ");
+        previousStepButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                gotoPreviousStep();
+            }
+        });
+
+        nextStepButton = new JButton(" > ");
+        nextStepButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                gotoNextStep();
+            }
+        });
+
+        lastStepButton = new JButton(" >> ");
+        lastStepButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                gotoLastStep();
+            }
+        });
+        
+        stepPositionLabel = new JLabel("0/0");
+        
+        JPanel stepPanel = new JPanel(new GridBagLayout());
+        stepPanel.add(firstStepButton, new GridBagConstraints(0, 0, 1, 1, 1, 0,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                                        new Insets(2,2,2,2), 20, 0));
+        stepPanel.add(previousStepButton, new GridBagConstraints(1, 0, 1, 1, 1, 0,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                                        new Insets(2,2,2,2), 20, 0));
+        stepPanel.add(nextStepButton, new GridBagConstraints(2, 0, 1, 1, 1, 0,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                                        new Insets(2,2,2,2), 20, 0));
+        stepPanel.add(lastStepButton, new GridBagConstraints(3, 0, 1, 1, 1, 0,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                                        new Insets(2,2,2,2), 20, 0));
+        stepPanel.add(stepPositionLabel, new GridBagConstraints(4, 0, 1, 1, 1, 0,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                                        new Insets(2,2,2,2), 50, 0));
+		stepPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        
+
 
         Container contentPane = this.getContentPane();
         GridBagLayout layout = new GridBagLayout();
@@ -198,8 +264,19 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
                                                         GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
         row++;
-        contentPane.add(addStaticTransitionsButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
+        contentPane.add(serializeSequencesBox, new GridBagConstraints(0, row, 4, 1, 1, 0,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                                        new Insets(2,2,2,2), 0, 0));
+        row++;
+        contentPane.add(addStaticTransitionsButton, new GridBagConstraints(0, row, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        contentPane.add(startSteppingButton, new GridBagConstraints(2, row, 2, 1, 1, 0,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        row++;
+        contentPane.add(stepPanel, new GridBagConstraints(0, row, 4, 1, 1, 0,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
         row++;
         contentPane.add(speedLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
@@ -230,19 +307,10 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
                                                         GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
         row++;
-        contentPane.add(serializeSequencesBox, new GridBagConstraints(0, row, 4, 1, 1, 0,
+        contentPane.add(animateTransitionsButton, new GridBagConstraints(0, row, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(animateTransitionsButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
-                                                        new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(exportImagesButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
-                                                        new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(exportAnimationButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
+        contentPane.add(exportImagesButton, new GridBagConstraints(2, row, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
 
@@ -287,9 +355,19 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private void setButtonStates(boolean allDisabled) {
         boolean enabled = !allDisabled && (this.diagramView.getDiagram() != null);
         addStaticTransitionsButton.setEnabled(enabled);
+        startSteppingButton.setEnabled(enabled);
         animateTransitionsButton.setEnabled(enabled);
         exportImagesButton.setEnabled(enabled && this.diagramExportSettings != null);
-        exportAnimationButton.setEnabled(false);
+        setStepButtonStates(!enabled);
+    }
+    
+    private void setStepButtonStates(boolean allDisabled) {
+        firstStepButton.setEnabled(!allDisabled && this.currentStep > 1);
+        previousStepButton.setEnabled(!allDisabled && this.currentStep > 1);
+        nextStepButton.setEnabled(!allDisabled && this.currentStep < this.timeController.getEndTime());
+        lastStepButton.setEnabled(!allDisabled && this.currentStep < this.timeController.getEndTime());
+        int endTime = (int) this.timeController.getEndTime();
+        this.stepPositionLabel.setText(this.currentStep + "/" + endTime);
     }
 
 	/**
@@ -298,6 +376,8 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 	 * here.
 	 */    
     protected void exportImages() {
+    	disableStepControls();
+    	
         if (this.lastImageExportFile == null) {
             this.lastImageExportFile =
                 new File(System.getProperty("user.dir"));
@@ -346,35 +426,37 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     }
 
     protected void exportImages(File selectedFile){
+        clearTransitionLayer();
+
     	// export all transitions into main file
         int length = this.timelineValues.size();
-        AnimationTimeController newTimeController = new AnimationTimeController(length,0,Double.MAX_VALUE,0,1);
-        addTransitions(length, newTimeController, false);
-		newTimeController.setCurrentTime(newTimeController.getEndTime());        
+        this.timeController.setEndTime(length);
+        this.timeController.setFadeInTime(0);
+        this.timeController.setVisibleTime(Double.MAX_VALUE);
+        this.timeController.setFadeOutTime(0);
+        this.timeController.setMillisecondsPerStep(1);
+        this.timeController.reset();
+        addTransitions(this.timeController.getEndTime(), false);
+        this.timeController.setCurrentTime(this.timeController.getEndTime());        
         exportImage(selectedFile);
         this.lastImageExportFile = selectedFile;
 
-		// export animation steps into numbered files
-        length = this.timelineValues.size();
-        double fadeIn = this.fadeInField.getDoubleValue();
-        double hold = this.holdField.getDoubleValue();
-        double fadeOut = this.fadeOutField.getDoubleValue();
+        this.timeController.setVisibleTime(1);
 		
         if(this.serializeSequencesBox.isSelected() &&
                     !(this.sequenceToShowChooser.getSelectedItem() instanceof AttributeValue)) {
             int numSeq = this.sequenceValues.size();
-            newTimeController = new AnimationTimeController(length * numSeq, fadeIn, hold, fadeOut, 1);
-            addTransitionsSerialized(newTimeController.getAllFadedTime(), newTimeController, true);
+            this.timeController.setEndTime(length * numSeq);
+            addTransitionsSerialized(this.timeController.getAllFadedTime(), true);
         } else {
-            newTimeController = new AnimationTimeController(length, fadeIn, hold, fadeOut, 1);
-            addTransitions(newTimeController.getAllFadedTime(), newTimeController, true);
+            this.timeController.setEndTime(length);
+            addTransitions(this.timeController.getAllFadedTime(), true);
         }
         
-        this.timeController = null; // make sure we don't animate
-        double targetStep = newTimeController.getAllFadedTime();
+        double targetStep = this.timeController.getAllFadedTime();
         
         for(int i = 0; i <= targetStep; i++) {
-        	newTimeController.setCurrentTime(i);
+            this.timeController.setCurrentTime(i);
         	exportImage(new File(getNumberedFileName(selectedFile,i,targetStep)));
         }
         
@@ -426,17 +508,21 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
             pack();
         }
         if(e instanceof DisplayedDiagramChangedEvent) {
+            disableStepControls();
         	setButtonStates(false);
         }
         if(e instanceof CanvasDrawnEvent) {
         	animate();
         }
     }
+
+    public void disableStepControls() {
+        this.currentStep = 0;
+        this.timeController.setEndTime(0);
+        setStepButtonStates(true);
+    }
     
     private void animate() {
-    	if(this.timeController == null) {
-    		return; // we are not animating
-    	} 
     	if(this.lastAnimationTime > this.targetTime) {
     		return; // nothing to animate anymore
     	}
@@ -446,35 +532,67 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     }
 
     private void addFixedTransitions() {
+        clearTransitionLayer();
+
+        disableStepControls();
+
         int length = this.timelineValues.size();
-        AnimationTimeController newTimeController = new AnimationTimeController(length,0,Double.MAX_VALUE,0,1);
-        addTransitions(length, newTimeController, false);
+        this.timeController.setEndTime(length);
+        this.timeController.setFadeInTime(0);
+        this.timeController.setVisibleTime(Double.MAX_VALUE);
+        this.timeController.setFadeOutTime(0);
+        this.timeController.setMillisecondsPerStep(1);
+        this.timeController.reset();
+        addTransitions(length, false);
+        
+        this.diagramView.repaint();
+    }
+
+    private void startStepping() {
+        clearTransitionLayer();
+
+        int length = this.timelineValues.size();
+        this.timeController.setFadeInTime(0);
+        this.timeController.setVisibleTime(1);
+        this.timeController.setFadeOutTime(0);
+        this.timeController.setMillisecondsPerStep(1);
+        if(this.serializeSequencesBox.isSelected() &&
+                    !(this.sequenceToShowChooser.getSelectedItem() instanceof AttributeValue)) {
+            int numSeq = this.sequenceValues.size();
+            this.timeController.setEndTime(length * numSeq);
+            addTransitionsSerialized(this.timeController.getAllFadedTime(), true);
+        } else {
+            this.timeController.setEndTime(length);
+            addTransitions(this.timeController.getAllFadedTime(), true);
+        }
+        this.lastAnimationTime = this.timeController.getEndTime() + 23; // don't animate
+        gotoStep(1);
     }
 
     private void addAnimatedTransitions() {
+        clearTransitionLayer();
+        
+        disableStepControls();
+
         int length = this.timelineValues.size();
-        double fadeIn = this.fadeInField.getDoubleValue();
-        double hold = this.holdField.getDoubleValue();
-        double fadeOut = this.fadeOutField.getDoubleValue();
-        int speed = this.speedField.getIntegerValue();
+        this.timeController.setFadeInTime(this.fadeInField.getDoubleValue());
+        this.timeController.setVisibleTime(this.holdField.getDoubleValue());
+        this.timeController.setFadeOutTime(this.fadeOutField.getDoubleValue());
+        this.timeController.setMillisecondsPerStep(this.speedField.getIntegerValue());
+        this.timeController.reset();
         if(this.serializeSequencesBox.isSelected() && 
                     !(this.sequenceToShowChooser.getSelectedItem() instanceof AttributeValue)) {
         	int numSeq = this.sequenceValues.size();
-            AnimationTimeController newTimeController = new AnimationTimeController(length * numSeq, fadeIn, hold, fadeOut, speed);
-            addTransitionsSerialized(newTimeController.getAllFadedTime(), newTimeController, true);
+            this.timeController.setEndTime(length * numSeq);
+            addTransitionsSerialized(this.timeController.getAllFadedTime(), true);
         } else {
-            AnimationTimeController newTimeController = new AnimationTimeController(length, fadeIn, hold, fadeOut, speed);
-        	addTransitions(newTimeController.getAllFadedTime(), newTimeController, true);
+            this.timeController.setEndTime(length);
+        	addTransitions(this.timeController.getAllFadedTime(), true);
         }
+        this.diagramView.repaint();
     }
 
-    private void addTransitions(double newTargetTime, AnimationTimeController newTimeController,
-                                 boolean highlightStates) {
-        if(this.diagramView.hasLayer(TRANSITION_LAYER_NAME)) {
-            this.diagramView.removeLayer(TRANSITION_LAYER_NAME);
-        }
-        this.diagramView.addLayer(TRANSITION_LAYER_NAME);
-
+    private void addTransitions(double newTargetTime, boolean highlightStates) {
         AttributeValue selectedSequence = null; // no specific sequence selected
         Object selectedSequenceItem = this.sequenceToShowChooser.getSelectedItem();
         if(selectedSequenceItem instanceof AttributeValue) {
@@ -483,25 +601,30 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 
         List objectSequences = calculateObjectSequences();
         Hashtable nodeViewMap = createNodeViewMap();
-        this.timeController = null;
         Iterator seqIt = objectSequences.iterator();
         Iterator seqValIt = this.sequenceValues.iterator();
         int colNum = 0;
+        boolean start = true;
         while (seqIt.hasNext()) {
             List sequence = (List) seqIt.next();
             AttributeValue curSequenceValue = (AttributeValue) seqValIt.next();
-            if(this.timeController == null) {
-                this.timeController = newTimeController;
+            if(start) {
+                start = false;
                 this.targetTime = newTargetTime;
                 this.lastAnimationTime = 0;
             }
-            Color color = COLORS[colNum];
             if(selectedSequence == null || selectedSequence == curSequenceValue) {
-                addTransitions(sequence, new Color(color.getRed(), color.getGreen(), color.getBlue(), 140), nodeViewMap, highlightStates);
+                addTransitions(sequence, COLORS[colNum], nodeViewMap, highlightStates);
             }
             colNum = (colNum + 1) % COLORS.length;
         }
-        this.diagramView.repaint();
+    }
+
+    private void clearTransitionLayer() {
+        if(this.diagramView.hasLayer(TRANSITION_LAYER_NAME)) {
+            this.diagramView.removeLayer(TRANSITION_LAYER_NAME);
+        }
+        this.diagramView.addLayer(TRANSITION_LAYER_NAME);
     }
 
 	/**
@@ -510,13 +633,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 	 * The buttons would then change only the time controller and not affect the
 	 * canvas items directly.
 	 */
-    private void addTransitionsSerialized(double newTargetTime, AnimationTimeController newTimeController,
-                                           boolean highlightStates) {
-        if(this.diagramView.hasLayer(TRANSITION_LAYER_NAME)) {
-            this.diagramView.removeLayer(TRANSITION_LAYER_NAME);
-        }
-        this.diagramView.addLayer(TRANSITION_LAYER_NAME);
-
+    private void addTransitionsSerialized(double newTargetTime, boolean highlightStates) {
         AttributeValue selectedSequence = null; // no specific sequence selected
         Object selectedSequenceItem = this.sequenceToShowChooser.getSelectedItem();
         if(selectedSequenceItem instanceof AttributeValue) {
@@ -525,7 +642,6 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 
         List objectSequences = calculateObjectSequences();
         Hashtable nodeViewMap = createNodeViewMap();
-        this.timeController = null;
         Iterator seqIt = objectSequences.iterator();
         Iterator seqValIt = this.sequenceValues.iterator();
         int seqNum = 0;
@@ -542,7 +658,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
                 if(endViewLast != startViewNew) {
 	                this.diagramView.addCanvasItem(
 	                            new InterSequenceTransitionArrow(endViewLast, startViewNew,
-	                                                             color, nextColor, seqNum * seqLength - 0.5,
+	                                                             color, nextColor, seqNum * seqLength + 0.5,
 	                                                             this.timeController),
 	                            TRANSITION_LAYER_NAME);
                 }
@@ -550,19 +666,17 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 
             color = COLORS[seqNum % COLORS.length];
             AttributeValue curSequenceValue = (AttributeValue) seqValIt.next();
-            if(this.timeController == null) {
-                this.timeController = newTimeController;
+            if(lastSequence == null) {
                 this.targetTime = newTargetTime;
                 this.lastAnimationTime = 0;
             }
             if(selectedSequence == null || selectedSequence == curSequenceValue) {
-                addTransitions(sequence, new Color(color.getRed(), color.getGreen(), color.getBlue(), 140), 
+                addTransitions(sequence, color, 
                                nodeViewMap, highlightStates, seqNum * seqLength);
             }
             seqNum++;
             lastSequence = sequence;
         }
-        this.diagramView.repaint();
     }
 
     private Hashtable createNodeViewMap() {
@@ -711,5 +825,28 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         }
         
         return objectSequences;
+    }
+
+    private void gotoFirstStep() {
+    	gotoStep(1);
+    }
+
+    private void gotoPreviousStep() {
+    	gotoStep(this.currentStep - 1);
+    }
+
+    private void gotoNextStep() {
+        gotoStep(this.currentStep + 1);
+    }
+
+    private void gotoLastStep() {
+        gotoStep((int) this.timeController.getEndTime());
+    }
+
+    private void gotoStep(int i) {
+    	this.currentStep = i;
+    	this.timeController.setCurrentTime(i);
+    	this.diagramView.repaint();
+    	setStepButtonStates(false);
     }
 }

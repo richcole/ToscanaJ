@@ -96,7 +96,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		if(ConfigurationManager.fetchInt("SienaTemporalControls", "enabled", 0) == 1) {
 		    temporalControls = new TemporalMainDialog(this, this.diagramView.getDiagramView(), eventBroker);
 		    ConfigurationManager.restorePlacement("SienaTemporalControls", temporalControls, 
-		    		new Rectangle(350,350,420,240));
+		    		new Rectangle(350,350,420,350));
 		    temporalControls.show();
 		}
 
