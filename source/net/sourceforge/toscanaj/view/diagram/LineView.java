@@ -32,7 +32,7 @@ import java.text.DecimalFormat;
 public class LineView extends CanvasItem {
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(LineView.class);
     
-	private static class NonRealizedConceptGroupingMode{};
+	private static class NonRealizedConceptGroupingMode{}
 	
 	public static final NonRealizedConceptGroupingMode NO_GROUPING = new NonRealizedConceptGroupingMode();
 	public static final NonRealizedConceptGroupingMode COLORED_LINES_GROUPING = new NonRealizedConceptGroupingMode();

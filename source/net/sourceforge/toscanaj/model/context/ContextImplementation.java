@@ -62,30 +62,30 @@ public class ContextImplementation implements ListsContext {
 		
 		Iterator objIt = this.getObjects().iterator();
 		while (objIt.hasNext()) {
-			Object object = (Object) objIt.next();
+			Object object = objIt.next();
 			objects.add(object);
 		}
 		objIt = other.getObjects().iterator();
 		while (objIt.hasNext()) {
-			Object object = (Object) objIt.next();
+			Object object = objIt.next();
 			objects.add(object);
 		}
 		Iterator attrIt = this.getAttributes().iterator();
 		while (attrIt.hasNext()) {
-			Object attribute = (Object) attrIt.next();
+			Object attribute = attrIt.next();
 			attributes.add(attribute);
 		}
 		attrIt = other.getAttributes().iterator();
 		while (attrIt.hasNext()) {
-			Object attribute = (Object) attrIt.next();
+			Object attribute = attrIt.next();
 			attributes.add(attribute);
 		}
 		objIt = objects.iterator();
 		while (objIt.hasNext()) {
-			Object object = (Object) objIt.next();
+			Object object = objIt.next();
 			attrIt = attributes.iterator();
 			while (attrIt.hasNext()) {
-				Object attribute = (Object) attrIt.next();
+				Object attribute = attrIt.next();
 				if(this.getRelation().contains(object,attribute) ||
 				   other.getRelation().contains(object,attribute)) {
 					relation.insert(object,attribute);
@@ -106,12 +106,12 @@ public class ContextImplementation implements ListsContext {
 		
 		Iterator attrIt = this.getAttributes().iterator();
 		while (attrIt.hasNext()) {
-			Object attribute = (Object) attrIt.next();
+			Object attribute = attrIt.next();
 			attributes.add(attribute);
 		}
 		attrIt = other.getAttributes().iterator();
 		while (attrIt.hasNext()) {
-			Object attribute = (Object) attrIt.next();
+			Object attribute = attrIt.next();
 			attributes.add(attribute);
 		}
 		Iterator objIt = this.getObjects().iterator();
@@ -126,14 +126,14 @@ public class ContextImplementation implements ListsContext {
 				objects.add(newObject);
 				attrIt = this.getAttributes().iterator();
 				while (attrIt.hasNext()) {
-					Object attribute = (Object) attrIt.next();
+					Object attribute = attrIt.next();
 					if(this.getRelation().contains(objectL, attribute)) {
 						relation.insert(newObject, attribute);
 					}
 				}
 				attrIt = other.getAttributes().iterator();
 				while (attrIt.hasNext()) {
-					Object attribute = (Object) attrIt.next();
+					Object attribute = attrIt.next();
 					if(other.getRelation().contains(objectR, attribute)) {
 						relation.insert(newObject, attribute);
 					}

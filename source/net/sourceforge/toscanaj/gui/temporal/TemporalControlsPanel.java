@@ -853,7 +853,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	        FCAObject object = (FCAObject) objIt.next();
 	        AttributeValue value = this.context.getRelationship(object, sequenceAttribute);
 	        if(!sequenceValues.contains(value) && value != null) {
-	            boolean inserted = false;;
+	            boolean inserted = false;
 	            ListIterator seqIt = sequenceValues.listIterator();
 	            while(seqIt.hasNext()) {
 	                AttributeValue curValue = (AttributeValue) seqIt.next();
@@ -872,7 +872,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	        }
 	        value = this.context.getRelationship(object, timelineAttribute);
 	        if(!timelineValues.contains(value)) {
-	            boolean inserted = false;;
+	            boolean inserted = false;
 	            ListIterator tlIt = timelineValues.listIterator();
 	            while(tlIt.hasNext()) {
 	                AttributeValue curValue = (AttributeValue) tlIt.next();

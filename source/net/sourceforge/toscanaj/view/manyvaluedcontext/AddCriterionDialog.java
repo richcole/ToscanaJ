@@ -45,7 +45,6 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 public class AddCriterionDialog extends JDialog{
 		private ManyValuedAttribute attr;
 		private View view;
-		private JFrame parent;
 		private JButton createButton;
 		private List checkBoxList = new ArrayList();
 		private JTextField minTextField,maxTextField,name;
@@ -53,7 +52,6 @@ public class AddCriterionDialog extends JDialog{
 		public AddCriterionDialog(ManyValuedAttribute attr, JFrame parent, View view){
 			super(parent,"Conditions",false);
 			this.attr = attr;
-			this.parent = parent;
 			this.view = view;
 			if(attr.getType() instanceof TextualType){
 				TextualType textualType = (TextualType)attr.getType();

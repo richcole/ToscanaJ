@@ -56,10 +56,10 @@ public class IteratorTest extends TestCase {
 
         it.reset();
         it.nextGTE(new Integer(POS));
-        assertEquals((Integer) it.val(), new Integer(POS));
+        assertEquals(it.val(), new Integer(POS));
 
         it.nextGTE(new Integer(20));
-        assertEquals((Integer) it.val(), new Integer(POS));
+        assertEquals(it.val(), new Integer(POS));
 
         it.nextGTE(new Integer(200));
         assertTrue(it.atEnd());

@@ -18,7 +18,6 @@ import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.ExtraCanvasItemFactory;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 import org.jdom.Element;
@@ -110,6 +109,6 @@ public class StateRing extends CanvasItem implements XMLizable {
         return result;
     }
 
-    public void readXML(Element elem) throws XMLSyntaxError {
+    public void readXML(Element elem) {
     }
 }

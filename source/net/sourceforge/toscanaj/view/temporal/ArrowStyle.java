@@ -14,7 +14,6 @@ import java.util.StringTokenizer;
 import org.jdom.Element;
 import org.tockit.util.ColorStringConverter;
 
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 
@@ -47,7 +46,7 @@ public class ArrowStyle implements XMLizable {
         this.relativeLength = style.relativeLength;
     }
 
-    public ArrowStyle(Element element) throws XMLSyntaxError {
+    public ArrowStyle(Element element) {
         readXML(element);
     }
     
@@ -111,7 +110,7 @@ public class ArrowStyle implements XMLizable {
         return result;
     }
 
-    public void readXML(Element elem) throws XMLSyntaxError {
+    public void readXML(Element elem) {
         String colorValue = elem.getAttributeValue("color");
         this.color = ColorStringConverter.stringToColor(colorValue);
         float width = Float.parseFloat(elem.getAttributeValue("stroke-width"));

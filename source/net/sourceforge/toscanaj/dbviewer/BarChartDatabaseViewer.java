@@ -310,8 +310,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
         }
     }
 
-	protected PageViewPanel createPanel()
-		throws DatabaseViewerInitializationException {
+	protected PageViewPanel createPanel() {
 		return new BarChartPanel();
 	}
 }

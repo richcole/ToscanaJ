@@ -208,8 +208,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         // initialization has to be done separately, so we can use the dynamic class loading mechanism
     }
 
-    public void initialize(DatabaseViewerManager manager)
-            throws DatabaseViewerInitializationException {
+    public void initialize(DatabaseViewerManager manager) {
         this.viewerManager = manager;
     }
 

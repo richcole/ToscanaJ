@@ -23,7 +23,7 @@ public class DBConnectionEmbeddTest extends TestCase {
 
     public DBConnectionEmbeddTest(String testName) {
         super(testName);
-    };
+    }
 
     static String SQLCommand =
             "create table student (name VARCHAR(20), age INTEGER, height INTEGER);";

@@ -75,7 +75,7 @@ public class CSCParser {
         private int currentLine = 1;
         private boolean newLineStarted = true;
 
-		public CSCTokenizer(File file) throws IOException, DataFormatException {
+		public CSCTokenizer(File file) throws FileNotFoundException, IOException, DataFormatException {
 		    this.inputReader = new BufferedReader(new FileReader(file));
 		    advance();
 		}
@@ -173,7 +173,7 @@ public class CSCParser {
     		}
     		tokenizer.advance();
     	}
-    };
+    }
     
     protected static final CSCFileSectionParser REMARK_SECTION = new CSCFileSectionParser("REMARK");
 
@@ -516,7 +516,7 @@ public class CSCParser {
     protected CSCFileSectionParser currentSectionParser = null;
     
     public void importCSCFile(File file, ConceptualSchema schema) 
-    								throws FileNotFoundException, DataFormatException {
+    								throws DataFormatException {
         try {
             CSCTokenizer tokenizer = new CSCTokenizer(file);
             

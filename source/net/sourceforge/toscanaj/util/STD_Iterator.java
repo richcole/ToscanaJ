@@ -53,6 +53,6 @@ public class STD_Iterator implements Iterator {
 
     public void nextGTE(Comparable o) {
         it.nextGTE(o);
-    };
+    }
 }
 

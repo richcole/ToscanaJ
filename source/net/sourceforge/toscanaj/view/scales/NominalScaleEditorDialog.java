@@ -151,7 +151,7 @@ public class NominalScaleEditorDialog extends JDialog {
         public String getAttributeLabel() {
 			String res = "";
 			for (int i = 0; i < this.sqlFragments.length; i++) {
-				SqlFragment curFragment = (SqlFragment) sqlFragments[i];
+				SqlFragment curFragment = sqlFragments[i];
 				if (i == 0) {
 					res = curFragment.getClosedAttributeLabel();
 				}
@@ -165,7 +165,7 @@ public class NominalScaleEditorDialog extends JDialog {
         public String getSqlClause() {
 			String res = "";
 			for (int i = 0; i < this.sqlFragments.length; i++) {
-				SqlFragment curFragment = (SqlFragment) sqlFragments[i];
+				SqlFragment curFragment = sqlFragments[i];
 				if (i == 0) {
 					res = "(" + curFragment.getSqlClause() + ")";
 				}
@@ -194,7 +194,7 @@ public class NominalScaleEditorDialog extends JDialog {
         public String getAttributeLabel() {
 			String res = "";
 			for (int i = 0; i < this.sqlFragments.length; i++) {
-				SqlFragment curFragment = (SqlFragment) sqlFragments[i];
+				SqlFragment curFragment = sqlFragments[i];
 				if (i == 0) {
 					res = curFragment.getClosedAttributeLabel();
 				}
@@ -208,7 +208,7 @@ public class NominalScaleEditorDialog extends JDialog {
         public String getSqlClause() {
 			String res = "";
 			for (int i = 0; i < this.sqlFragments.length; i++) {
-				SqlFragment curSqlFragment = (SqlFragment) sqlFragments[i];
+				SqlFragment curSqlFragment = sqlFragments[i];
 				if (i == 0) {
 					res = "(" + curSqlFragment.getSqlClause() + ")";
 				}

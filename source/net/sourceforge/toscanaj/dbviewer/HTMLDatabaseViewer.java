@@ -219,8 +219,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
         /// @todo this is not true, it could be done using the Contructor class from the reflection API
     }
 
-    public void initialize(DatabaseViewerManager manager)
-            throws DatabaseViewerInitializationException {
+    public void initialize(DatabaseViewerManager manager) {
         /// @todo some of the initialization of repeat and field sections could be done here
         this.manager = manager;
     }

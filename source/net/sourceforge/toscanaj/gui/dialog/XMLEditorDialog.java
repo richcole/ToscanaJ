@@ -195,7 +195,7 @@ public class XMLEditorDialog extends JDialog {
 			}
 		});
 		useDescriptionButton.setMnemonic(KeyEvent.VK_U);
-		JButton removeDescriptionButton = new JButton("Remove Description");;
+		JButton removeDescriptionButton = new JButton("Remove Description");
 		removeDescriptionButton.setMnemonic(KeyEvent.VK_R);
 		removeDescriptionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

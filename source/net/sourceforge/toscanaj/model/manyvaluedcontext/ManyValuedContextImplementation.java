@@ -13,13 +13,13 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import net.sourceforge.toscanaj.model.context.FCAObject;
+import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+
 import org.jdom.Element;
 import org.tockit.util.ListSet;
 import org.tockit.util.ListSetImplementation;
-
-import net.sourceforge.toscanaj.model.context.*;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 
 public class ManyValuedContextImplementation implements WritableManyValuedContext, XMLizable {
@@ -128,13 +128,14 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 			FCAObjectImplementation itObject = (FCAObjectImplementation) iter.next();
 			objectsElement.addContent(itObject.toXML());
 		}
+		retVal.addContent(objectsElement);
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#readXML(org.jdom.Element)
 	 */
-	public void readXML(Element elem) throws XMLSyntaxError {
+	public void readXML(Element elem) {
 		// TODO Auto-generated method stub
 		
 	}

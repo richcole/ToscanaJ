@@ -12,7 +12,6 @@ import java.sql.Types;
 import org.tockit.events.EventBroker;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.tests.MockDBConnection;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
@@ -40,11 +39,7 @@ public class DatabaseConnectedConceptInterpreterTest extends TestCase {
 
     public void testSizesCaches() {
         DatabaseConnectedConceptInterpreter interpreter;
-        try {
-            interpreter = initializeInterpreter();
-        } catch (DatabaseException e) {
-            throw new RuntimeException("couldn't initialise interpreter");
-        }
+        interpreter = initializeInterpreter();
 
         DiagramHistory history1 = new DiagramHistory();
         ConceptInterpretationContext context1 = new ConceptInterpretationContext(history1, new EventBroker());
@@ -101,8 +96,7 @@ public class DatabaseConnectedConceptInterpreterTest extends TestCase {
         checkAssertion(dbConnection.queryNumberCallCounter == 10);
     }
 
-    protected DatabaseConnectedConceptInterpreter initializeInterpreter()
-        throws DatabaseException {
+    protected DatabaseConnectedConceptInterpreter initializeInterpreter() {
         DatabaseConnection databaseConnection = new MockDBConnection();
         DatabaseInfo dbInfo = new DatabaseInfo();
         Table testTable = new Table("testing", false);

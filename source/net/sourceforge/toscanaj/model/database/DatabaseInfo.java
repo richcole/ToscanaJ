@@ -55,7 +55,7 @@ public class DatabaseInfo implements XMLizable {
         public String toString() {
             return name;
         }
-    };
+    }
 
     public static final Type UNDEFINED = new Type("UNDEFINED");
     public static final Type EMBEDDED = new Type("EMBEDDED");

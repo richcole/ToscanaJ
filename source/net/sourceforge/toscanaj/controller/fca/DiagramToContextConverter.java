@@ -21,8 +21,8 @@ public class DiagramToContextConverter {
 	public static Context getContext(Diagram2D diagram) {
 		ContextImplementation context = new ContextImplementation(diagram.getTitle());
 		
-		Set objects = (Set) context.getObjects();
-		Set attributes = (Set) context.getAttributes();
+		Set objects = context.getObjects();
+		Set attributes = context.getAttributes();
 		BinaryRelationImplementation relation = context.getRelationImplementation();
 		
 		Iterator nodesIt = diagram.getNodes();

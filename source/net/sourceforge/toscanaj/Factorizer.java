@@ -192,9 +192,9 @@ public class Factorizer {
 		retVal.getObjects().addAll(context.getObjects());
 		retVal.getAttributes().addAll(context.getAttributes());
 		for (Iterator objIt = retVal.getObjects().iterator(); objIt.hasNext();) {
-			Object obj = (Object) objIt.next();
+			Object obj = objIt.next();
 			for (Iterator attrIt = retVal.getAttributes().iterator(); attrIt.hasNext();) {
-				Object attr = (Object) attrIt.next();
+				Object attr = attrIt.next();
 				if(context.getRelation().contains(obj,attr)) {
 					retVal.getRelationImplementation().insert(obj,attr);
 				}

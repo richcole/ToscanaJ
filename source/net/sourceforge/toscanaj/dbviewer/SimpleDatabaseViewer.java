@@ -95,8 +95,7 @@ public class SimpleDatabaseViewer extends PagingDatabaseViewer {
 	    }
 	}
 
-	protected PageViewPanel createPanel()
-		throws DatabaseViewerInitializationException {
+	protected PageViewPanel createPanel() {
 		return new SimpleViewPanel();
 	}
 }

@@ -404,6 +404,9 @@ public class DatabaseViewerManager implements XMLizable {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
+    	if (elem == null) {
+    		throw new XMLSyntaxError("No element for " + this.getClass().getName()+ "given.");
+    	}
         screenName = elem.getAttributeValue(SCREEN_NAME_ATTRIBUTE_NAME);
         originalTemplateElement = elem.getChild(TEMPLATE_ELEMENT_NAME);
         if (originalTemplateElement != null) {

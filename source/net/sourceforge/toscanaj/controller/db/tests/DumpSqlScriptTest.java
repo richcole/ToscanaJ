@@ -26,7 +26,7 @@ public class DumpSqlScriptTest extends TestCase {
 
     public DumpSqlScriptTest(String testName) {
         super(testName);
-    };
+    }
 
     public void testDumpSQLScript() {
 

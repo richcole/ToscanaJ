@@ -277,7 +277,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                         NumberFormat format = DecimalFormat.getPercentInstance();
                         format.setMaximumFractionDigits(2);
                         String returnValue = format.format(objectCount/(double)fullExtent);
-                        String expectedValue = "[exp: " + format.format(expectedSize/(double)fullExtent) + "]";
+                        String expectedValue = "[exp: " + format.format(expectedSize/fullExtent) + "]";
                         return new Object[]{getObject(returnValue, concept, context),
                                             getObject(expectedValue, concept, context)};              
                     } // else fall back into normal behaviour

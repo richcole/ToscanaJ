@@ -23,7 +23,6 @@ import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.ExtraCanvasItemFactory;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 import org.jdom.Element;
@@ -32,7 +31,7 @@ import org.tockit.canvas.MovableCanvasItem;
 
 public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     private static class Factory implements ExtraCanvasItemFactory {
-        public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) throws XMLSyntaxError {
+        public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) {
             TransitionArrow retVal = new TransitionArrow();
             retVal.timeController = new AnimationTimeController(Double.MAX_VALUE, 0, Double.MAX_VALUE, 0, 1);
             retVal.timeController.setCurrentTime(Double.MAX_VALUE/2);
@@ -268,7 +267,7 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
         return "transitionArrow";
     }
 
-    public void readXML(Element elem) throws XMLSyntaxError {
+    public void readXML(Element elem) {
         // done in Factory -- can't be done without access to diagram
     }
 }

@@ -150,7 +150,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		/// @todo remove workaround for a bug in swing ver. < 1.3rel03
 		if (unkeyedTableList.size() == 0) {
 			displayTable(null);
-		};
+		}
 	}
 
 	private void removeKeyedTable(Table table) {
@@ -173,7 +173,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 				columnsList.addElement(new ColumnInfo((Column) it.val()));
 			}
 		}
-	};
+	}
 
 	public DatabaseSchemaView(EventBroker broker) {
 		super(new GridLayout(0, 1));

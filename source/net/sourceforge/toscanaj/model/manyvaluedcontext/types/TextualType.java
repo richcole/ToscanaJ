@@ -16,7 +16,6 @@ import org.jdom.Element;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 
 public class TextualType extends TypeImplementation {
@@ -100,7 +99,7 @@ public class TextualType extends TypeImplementation {
 	/* (non-Javadoc)
 	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.types.TypeImplementation#readRangeElement(org.jdom.Element)
 	 */
-	protected void readRangeElement(Element rangeElement) throws XMLSyntaxError {
+	protected void readRangeElement(Element rangeElement) {
 		List valueListElements = rangeElement.getChildren();
 		for (Iterator iter = valueListElements.iterator(); iter.hasNext();) {
 			Element valueElement = (Element) iter.next();

@@ -159,7 +159,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 		Collection collection) {
 		Iterator it = collection.iterator();
 		while (it.hasNext()) {
-			Object obj = (Object) it.next();
+			Object obj = it.next();
 			if (obj.toString().equalsIgnoreCase(value.trim())) {
 				return true;
 			}

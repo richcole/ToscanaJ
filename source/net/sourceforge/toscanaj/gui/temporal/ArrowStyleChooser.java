@@ -128,10 +128,7 @@ public class ArrowStyleChooser extends JComponent {
     private Component createStrokePane() {
         JPanel retVal = new JPanel(new GridBagLayout());
 
-        int width = 4;
-        if(this.style.getStroke() instanceof BasicStroke) {
-            width = (int) ((BasicStroke) this.style.getStroke()).getLineWidth();
-        }
+        int width = (int) this.style.getStroke().getLineWidth();
         this.strokeWidthSlider = new JSlider(0,20,width);
         this.strokeWidthSlider.setMajorTickSpacing(5);
         this.strokeWidthSlider.setMinorTickSpacing(1);
@@ -213,7 +210,7 @@ public class ArrowStyleChooser extends JComponent {
     }
 
     protected void updateStroke() {
-        BasicStroke oldStroke = (BasicStroke) this.style.getStroke();
+        BasicStroke oldStroke = this.style.getStroke();
         BasicStroke newStroke = new BasicStroke(this.strokeWidthSlider.getValue(), 
                                                 oldStroke.getEndCap(), 
                                                 oldStroke.getLineJoin(), 

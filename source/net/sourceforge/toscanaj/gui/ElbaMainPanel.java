@@ -994,9 +994,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     private void importCSC(File file) {
         try {
             new CSCParser().importCSCFile(file, this.conceptualSchema);
-        } catch (FileNotFoundException e) {
-            ErrorDialog.showError(this, e, "Could not find file");
-            return;
         } catch (DataFormatException e) {
             ErrorDialog.showError(this, e, "Could not parse file");
             return;
@@ -1029,7 +1026,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                     new File(System.getProperty("user.dir")),
                     filterArray);
         }
-        saveDialog.setAccessory((JComponent) expSettingsPanel);
+        saveDialog.setAccessory(expSettingsPanel);
         saveDialog.setApproveButtonText("Export");
         int rv = saveDialog.showSaveDialog(this);
         if (rv != JFileChooser.APPROVE_OPTION) {

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import org.tockit.events.EventBroker;
 
 import com.mockobjects.sql.MockConnection;
@@ -18,15 +17,14 @@ import com.mockobjects.sql.MockConnection;
 public class MockDBConnection extends DatabaseConnection {
     public int queryNumberCallCounter = 0;
 
-    public MockDBConnection() throws DatabaseException {
+    public MockDBConnection() {
         super(new EventBroker(), new MockConnection());
     }
-    public List executeQuery(List fields, String tableName, String whereClause)
-        throws DatabaseException {
+    public List executeQuery(List fields, String tableName, String whereClause) {
         return new ArrayList();
     }
     
-    public int queryInt(String statement, int column) throws DatabaseException {
+    public int queryInt(String statement, int column) {
     	this.queryNumberCallCounter ++;
         return 0;
     }

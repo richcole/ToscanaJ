@@ -900,9 +900,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         this.lastCSCFile = file;
         try {
             new CSCParser().importCSCFile(file, this.conceptualSchema);
-        } catch (FileNotFoundException e) {
-            ErrorDialog.showError(this, e, "Could not find file '" + file.getAbsolutePath() + "'");
-            return;
         } catch (DataFormatException e) {
             ErrorDialog.showError(this, e, "Could not parse file '" + file.getAbsolutePath() + "'");
             return;
@@ -1220,7 +1217,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 			}
 			
 			for (Iterator diffIt = difference.iterator(); diffIt.hasNext();) {
-                Object object = (Object) diffIt.next();
+                Object object = diffIt.next();
                 concept.addObject(object);
             }
 		}
@@ -1280,7 +1277,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		JPopupMenu menu = new JPopupMenu();
 		menu.setLayout(new GridLayout(numOfRows ,numOfCol));
 		for(int i = 0 ; i < textualValueList.length ; i++){
-			final AttributeValue textualValue = (AttributeValue) textualValueList[i];
+			final AttributeValue textualValue = textualValueList[i];
 			JMenuItem menuItem = new JMenuItem(textualValue.getDisplayString());
 			menuItem.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){

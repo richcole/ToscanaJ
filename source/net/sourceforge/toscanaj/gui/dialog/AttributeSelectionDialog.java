@@ -172,7 +172,7 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
                 columnsList.addElement(new ColumnInfo(col));
             }
         }
-    };
+    }
 
     public AttributeSelectionDialog(Frame aFrame, String title, DatabaseConnection connection, EventBroker eventBroker) {
         super(aFrame, true);

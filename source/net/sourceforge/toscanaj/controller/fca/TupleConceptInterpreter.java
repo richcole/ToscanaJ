@@ -9,7 +9,6 @@ package net.sourceforge.toscanaj.controller.fca;
 
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 import java.util.HashSet;
@@ -34,7 +33,7 @@ public class TupleConceptInterpreter extends AbstractConceptInterperter
         this.objectColumns = objectColumns;    
     }	
     
-	public TupleConceptInterpreter(Element elem) throws XMLSyntaxError {
+	public TupleConceptInterpreter(Element elem) {
 		readXML(elem);
 	}
 											
@@ -141,7 +140,7 @@ public class TupleConceptInterpreter extends AbstractConceptInterperter
         return retVal;
     }
 
-    public void readXML(Element elem) throws XMLSyntaxError {
+    public void readXML(Element elem) {
     	List objColElems = elem.getChildren(OBJECT_COLUMN_ELEMENT_NAME);
     	this.objectColumns = new int[objColElems.size()];
     	int i = 0;

@@ -62,7 +62,7 @@ public class DatabaseSchema implements XMLizable, EventBrokerListener {
 
     void addTable(Table table) {
         this.tables.add(table);
-    };
+    }
 
     public List getTables() {
         return tables;

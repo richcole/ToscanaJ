@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 
 import java.util.Iterator;
@@ -25,7 +24,7 @@ public class AggregateQuery extends Query {
         this.info = info;
     }
 
-    public AggregateQuery(DatabaseInfo info, Element element) throws XMLSyntaxError {
+    public AggregateQuery(DatabaseInfo info, Element element) {
         super(element);
         this.info = info;
     }

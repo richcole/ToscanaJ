@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.model.database;
 
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
 
@@ -73,7 +72,7 @@ public abstract class Query implements XMLizable {
         this.header = header;
     }
 
-    public Query(Element element) throws XMLSyntaxError {
+    public Query(Element element) {
         readXML(element);
     }
 
@@ -93,7 +92,7 @@ public abstract class Query implements XMLizable {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XMLSyntaxError {
+    public void readXML(Element elem) {
         this.name = elem.getAttributeValue(QUERY_FIELD_NAME_ATTRIBUTE_NAME);
         this.header = elem.getAttributeValue(QUERY_HEAD_ATTRIBUTE_NAME);
         for (Iterator iterator = elem.getChildren(QUERY_FIELD_ELEMENT_NAME).iterator(); iterator.hasNext();) {

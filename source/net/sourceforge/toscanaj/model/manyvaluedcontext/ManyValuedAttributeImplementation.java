@@ -9,7 +9,6 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
 import org.jdom.Element;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TypeImplementation;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 
@@ -62,7 +61,7 @@ public class ManyValuedAttributeImplementation implements WritableManyValuedAttr
 	/* (non-Javadoc)
 	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#readXML(org.jdom.Element)
 	 */
-	public void readXML(Element elem) throws XMLSyntaxError {
+	public void readXML(Element elem) { //throws XMLSyntaxError {
 		// TODO Auto-generated method stub
 		
 	}
