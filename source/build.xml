@@ -74,7 +74,7 @@
             </batchtest>
         </junit>
 	</target>
-        <target name="prepareDist" depends="compileRelease">
+    <target name="prepareDist" depends="compileRelease">
 		<mkdir dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}/${dist.name}"/>
 		<jar jarfile="${dist.dir}/${dist.name}/${app.name}.jar" basedir="${build.release.dir}" manifest="${src.dir}/manifest.mf"/>
@@ -101,48 +101,31 @@
 			</fileset>
 		</copy>
 		<fixcrlf srcDir="${dist.dir}/${dist.name}" eol="crlf" includes="*.txt, *.bat, toscanaj.prop"/>
-        </target>
+    </target>
 	<target name="dist" depends="prepareDist">
-		<!-- remove old tar-file (the task doesn't update properly) -->
-		<delete file="${dist.dir}/${dist.name}-bin.tar"/>
-		<tar tarfile="${dist.dir}/${dist.name}-bin.tar">
-			<tarfileset dir="${dist.dir}" mode="755">
-				<include name="${dist.name}/*.sh"/>
-			</tarfileset>
-			<tarfileset dir="${dist.dir}">
+		<zip destfile="${dist.dir}/${dist.name}-bin.zip">
+			<fileset dir="${dist.dir}">
 				<include name="${dist.name}/**"/>
-				<exclude name="${dist.name}/*.sh"/>
-			</tarfileset>
-		</tar>
-		<gzip src="${dist.dir}/${dist.name}-bin.tar" zipfile="${dist.dir}/${dist.name}-bin.tgz"/>
+			</fileset>
+		</zip>
 	</target>
-        <target name="splitDist" depends="prepareDist">
-		<!-- remove old tar-files (the task doesn't update properly) -->
-		<delete file="${dist.dir}/${dist.name}-core-bin.tar"/>
-		<tar tarfile="${dist.dir}/${dist.name}-core-bin.tar">
-			<tarfileset dir="${dist.dir}" mode="755">
-				<include name="${dist.name}/*.sh"/>
-			</tarfileset>
-			<tarfileset dir="${dist.dir}">
+    <target name="splitDist" depends="prepareDist">
+		<zip destfile="${dist.dir}/${dist.name}-core-bin.zip">
+			<fileset dir="${dist.dir}">
                 <include name="${dist.name}/*"/>
-			</tarfileset>
-		</tar>
-		<gzip src="${dist.dir}/${dist.name}-core-bin.tar" zipfile="${dist.dir}/${dist.name}-core-bin.tgz"/>
-		<delete file="${dist.dir}/${dist.name}-libs-bin.tar"/>
-		<tar tarfile="${dist.dir}/${dist.name}-libs-bin.tar">
-			<tarfileset dir="${dist.dir}">
+			</fileset>
+		</zip>
+		<zip destfile="${dist.dir}/${dist.name}-libs-bin.zip">
+			<fileset dir="${dist.dir}">
                 <include name="${dist.name}/libs/**"/>
-			</tarfileset>
-		</tar>
-		<gzip src="${dist.dir}/${dist.name}-libs-bin.tar" zipfile="${dist.dir}/${dist.name}-libs-bin.tgz"/>
-		<delete file="${dist.dir}/${dist.name}-examples-bin.tar"/>
-		<tar tarfile="${dist.dir}/${dist.name}-examples-bin.tar">
-			<tarfileset dir="${dist.dir}">
+			</fileset>
+		</zip>
+		<zip destfile="${dist.dir}/${dist.name}-examples-bin.zip">
+			<fileset dir="${dist.dir}">
                 <include name="${dist.name}/examples/**"/>
-            </tarfileset>
-		</tar>
-		<gzip src="${dist.dir}/${dist.name}-examples-bin.tar" zipfile="${dist.dir}/${dist.name}-examples-bin.tgz"/>
-        </target>
+            </fileset>
+		</zip>
+	</target>
 	<target name="javadoc" depends="prepare">
 		<mkdir dir="${doc.dir}"/>
 		<javadoc sourcepath="${src.dir}" packagenames="net.sourceforge.toscanaj" destdir="${doc.dir}">
