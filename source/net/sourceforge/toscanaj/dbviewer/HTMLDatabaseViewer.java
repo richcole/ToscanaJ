@@ -179,7 +179,13 @@ public class HTMLDatabaseViewer implements DatabaseViewer
                 {
                     String result = (String) itFields.next();
                     Element fieldElem = (Element) itElems.next();
-                    fieldElem.setText(result);
+                    if( result == null ) {
+                        // an empty <span> is displayed as greater than symbol in JEditPane
+                        fieldElem.setText(" ");
+                    }
+                    else {
+                        fieldElem.setText(result);
+                    }
                 }
                 if(repeatElement != null) {
                     results = this.viewerManager.getConnection().executeQuery(repeatedFieldNames,
@@ -196,7 +202,13 @@ public class HTMLDatabaseViewer implements DatabaseViewer
                         {
                             String result = (String) itFields.next();
                             Element fieldElem = (Element) itElems.next();
-                            fieldElem.setText(result);
+                            if( result == null ) {
+                                // an empty <span> is displayed as greater than symbol in JEditPane
+                                fieldElem.setText(" ");
+                            }
+                            else {
+                                fieldElem.setText(result);
+                            }
                         }
                         /// @todo only the content of repetitionBlock should be added (but _all_ content, not just elements)
                         repeatElement.addContent((Element)repetitionBlock.clone());
