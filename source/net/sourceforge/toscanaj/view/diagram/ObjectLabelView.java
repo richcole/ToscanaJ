@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
+import net.sourceforge.toscanaj.model.database.DistributionQuery;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
@@ -19,6 +20,8 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.awt.geom.Point2D;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -157,18 +160,46 @@ public class ObjectLabelView extends LabelView {
             } catch (Exception e) {
                 ErrorDialog.showError(this.diagramView, e, "Getting object list failed");
             }
-        } else if (query == AggregateQuery.COUNT_QUERY) {
-            try{
-                int objectCount = conceptInterpreter.getObjectCount(concept, context);
-                if( objectCount != 0) {
-                    contents = new ArrayList();
-                    contents.add(new Integer(objectCount));
-                } else {
-                    contents = null;
-                }
-            } catch (Exception e) {
-                ErrorDialog.showError(this.diagramView, e, "Getting object count failed");
-            }
+		} else if (query == AggregateQuery.COUNT_QUERY) {
+			try{
+				int objectCount = conceptInterpreter.getObjectCount(concept, context);
+				if( objectCount != 0) {
+					contents = new ArrayList();
+					contents.add(new Integer(objectCount));
+				} else {
+					contents = null;
+				}
+			} catch (Exception e) {
+				ErrorDialog.showError(this.diagramView, e, "Getting object count failed");
+			}
+		} else if (query == DistributionQuery.PERCENT_QUERY) {
+			try{
+				int objectCount = conceptInterpreter.getObjectCount(concept, context);
+				if( objectCount != 0) {
+					contents = new ArrayList();
+					Concept top = concept;
+					while(top.getUpset().size() > 1) {
+						Iterator it = top.getUpset().iterator();
+						Concept upper = (Concept) it.next();
+						if(upper != top) {
+							top = upper;
+						} else {
+							top = (Concept) it.next();
+						}
+					}
+					boolean oldMode = context.getObjectDisplayMode();
+					context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
+					int fullExtent = conceptInterpreter.getObjectCount(top,context);
+					context.setObjectDisplayMode(oldMode);
+					NumberFormat format = DecimalFormat.getNumberInstance();
+					format.setMaximumFractionDigits(4);
+					contents.add(format.format(objectCount/(double)fullExtent) + " %");
+				} else {
+					contents = null;
+				}
+			} catch (Exception e) {
+				ErrorDialog.showError(this.diagramView, e, "Getting object count failed");
+			}
         } else {
             DatabaseConnectedConceptInterpreter dbConceptInterpreter =
                     (DatabaseConnectedConceptInterpreter) conceptInterpreter;

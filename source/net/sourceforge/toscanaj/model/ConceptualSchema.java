@@ -186,9 +186,11 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
                     this.queries.add(new DistinctListQuery(databaseInfo, queryElem));
                 }
             }
+            if(! "true".equals(queriesElem.getAttributeValue("dropDefaults") )) { // the latter might be null
+				addDefaultQueries();
+            }
         } else {
-        	queries.add(AggregateQuery.COUNT_QUERY);
-        	queries.add(ListQuery.KEY_LIST_QUERY);
+            addDefaultQueries();
         }
         List diagramElems = elem.getChildren(Diagram2D.DIAGRAM_ELEMENT_NAME);
         for (Iterator iterator = diagramElems.iterator(); iterator.hasNext();) {
@@ -202,6 +204,12 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
             addDiagram(diagram);
         }
         this.dataSaved = true;
+    }
+
+    private void addDefaultQueries() {
+        queries.add(AggregateQuery.COUNT_QUERY);
+		queries.add(ListQuery.KEY_LIST_QUERY);
+		queries.add(DistributionQuery.PERCENT_QUERY);
     }
 
 
