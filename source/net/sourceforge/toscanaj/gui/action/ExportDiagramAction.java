@@ -21,6 +21,7 @@ import javax.swing.filechooser.FileFilter;
 import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.canvas.imagewriter.ImageGenerationException;
+import org.tockit.canvas.imagewriter.ImageWriter;
 
 import java.awt.Frame;
 import java.awt.datatransfer.Clipboard;
@@ -109,7 +110,6 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 			formatDefined = true;
 			int rv = saveDialog.showSaveDialog(frame);
 			if (rv == JFileChooser.APPROVE_OPTION) {
-				
 				File selectedFile = saveDialog.getSelectedFile();
 				FileFilter fileFilter = saveDialog.getFileFilter();
 				if(fileFilter instanceof ExtensionFileFilter) {
@@ -119,9 +119,8 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 						selectedFile = new File(selectedFile.getAbsolutePath() + "." + extensions[0]);
 					}
 				}
-				GraphicFormat gFormat =
-					GraphicFormatRegistry.getTypeByExtension(
-						selectedFile);
+				
+				GraphicFormat gFormat =	GraphicFormatRegistry.getTypeByExtension(selectedFile);
 				if (gFormat != null) {
 					this.diagramExportSettings.setGraphicFormat(gFormat);
 				} else {
@@ -180,15 +179,9 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 			Properties metadata = new Properties();
 			metadata.setProperty("title", title);
 			metadata.setProperty("description", description.trim());
-			this
-				.diagramExportSettings
-				.getGraphicFormat()
-				.getWriter()
-				.exportGraphic(
-				this.diagramView,
-				this.diagramExportSettings,
-				selectedFile,
-				metadata);
+			
+			ImageWriter writer = this.diagramExportSettings.getGraphicFormat().getWriter();
+            writer.exportGraphic(this.diagramView,this.diagramExportSettings,selectedFile,metadata);
 				if(this.diagramExportSettings.getSaveCommentsToFile()==true){
 					try{
 						PrintWriter out = new PrintWriter(new FileWriter(new File(selectedFile.getAbsolutePath()+".txt")));
