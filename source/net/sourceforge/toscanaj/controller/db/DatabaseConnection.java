@@ -34,6 +34,9 @@ import java.util.Vector;
 /**
  * This class facilitates connection to and communication with a database
  * via JDBC.
+ * 
+ * @todo there is some chance for more reuse in the different queries, the logging/querying/exception handling
+ *       code could be unified in one method
  */
 public class DatabaseConnection implements EventBrokerListener {
     /**
