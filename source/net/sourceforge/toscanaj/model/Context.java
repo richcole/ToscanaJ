@@ -7,14 +7,14 @@
  */
 package net.sourceforge.toscanaj.model;
 
-import java.util.Collection;
+import java.util.Set;
 
 public interface Context {
 	String getName();
 	
-    Collection getObjects();
+    Set getObjects();
 
-    Collection getAttributes();
+    Set getAttributes();
 
     BinaryRelation getRelation();
 }

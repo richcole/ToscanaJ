@@ -11,7 +11,6 @@ import net.sourceforge.toscanaj.model.BinaryRelation;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
-import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
@@ -22,6 +21,7 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttributeImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.ViewContext;
 
 import java.io.PrintStream;
 import java.util.Collection;
@@ -73,7 +73,7 @@ public class TextDumps {
         }
         stream.println();
 
-        Context context = new ViewContext(model, view);
+        Context context = new ViewContext(model.getContext(), view);
         Collection objects = context.getObjects();
         Collection attributes = context.getAttributes();
         BinaryRelation relation = context.getRelation();

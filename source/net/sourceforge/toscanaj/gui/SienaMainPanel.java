@@ -82,7 +82,6 @@ import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
-import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
@@ -101,6 +100,7 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContex
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.ViewContext;
 import net.sourceforge.toscanaj.parser.BurmeisterParser;
 import net.sourceforge.toscanaj.parser.CSCParser;
 import net.sourceforge.toscanaj.parser.CSXParser;
@@ -841,7 +841,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             View view = (View) iterator.next();
             addDiagram(
                 schema,
-                new ViewContext(cernatoModel, view),
+                new ViewContext(cernatoModel.getContext(), view),
                 view.getName(),
                 new CernatoDimensionStrategy());
         }

@@ -15,9 +15,9 @@ import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
 import net.sourceforge.toscanaj.model.Context;
-import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.cernato.tests.TestData;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.ViewContext;
 
 import java.util.Vector;
 
@@ -39,17 +39,17 @@ public class LayoutOperationsTest extends TestCase {
         LatticeGenerator latticeGenerator = new GantersAlgorithm();
         Context context;
 
-        context = new ViewContext(TestData.Model, TestData.View1);
+        context = new ViewContext(TestData.Model.getContext(), TestData.View1);
         lattice = latticeGenerator.createLattice(context);
         dimensions = cernatoDimensionStrategy.calculateDimensions(lattice);
         assertEquals(6, dimensions.size());
 
-        context = new ViewContext(TestData.Model, TestData.View2);
+        context = new ViewContext(TestData.Model.getContext(), TestData.View2);
         lattice = latticeGenerator.createLattice(context);
         dimensions = cernatoDimensionStrategy.calculateDimensions(lattice);
         assertEquals(2, dimensions.size());
 
-        context = new ViewContext(TestData.Model, TestData.View3);
+        context = new ViewContext(TestData.Model.getContext(), TestData.View3);
         lattice = latticeGenerator.createLattice(context);
         dimensions = cernatoDimensionStrategy.calculateDimensions(lattice);
         assertEquals(6, dimensions.size());

@@ -19,6 +19,9 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 
 import java.util.*;
 
+/**
+ * @todo move tests into model for any many valued data
+ */
 public class TestData {
     public static CernatoModel Model;
     public static NumericalType NumType1;

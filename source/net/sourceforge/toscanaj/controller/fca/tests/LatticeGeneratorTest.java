@@ -76,29 +76,6 @@ public class LatticeGeneratorTest extends TestCase {
         checkLatticeSizes(lattice);
     }
 
-    public void testGantersAlgorithmOnInvalidContext() {
-    	// add complete duplicate object to context
-    	String oldObject = OBJECTS[OBJECTS.length - 1];
-        String newObject = new String(oldObject);
-        this.context.getObjects().add(newObject);
-		BinaryRelationImplementation relation = this.context.getRelationImplementation();
-		
-		for (int i = 0; i < ATTRIBUTES.length; i++) {
-            Attribute attribute = ATTRIBUTES[i];
-            if(relation.contains(oldObject, attribute)) {
-            	relation.insert(newObject, attribute);
-            }
-        }		
-
-		// that is illegal, so we want an exception to be raised
-        LatticeGenerator lgen = new GantersAlgorithm();
-		try {
-        	lgen.createLattice(this.context);
-        	fail("Lattice should not be generated on invalid context");
-		} catch(Exception e) {
-		}
-    }
-
     protected void checkLatticeSizes(Lattice lattice) {
         assertEquals(31, lattice.getConcepts().length);
         

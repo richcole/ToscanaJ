@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext.types;
 
-import java.util.Collection;
+import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -22,7 +22,7 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 public class ViewContext implements Context{
 	private ManyValuedContext context;
 	private ScalingRelation relation;
-	private Collection attributes;
+	private Set attributes;
 	private String name;
 	private class ScalingRelation implements BinaryRelation {
 		  public boolean contains(Object domainObject, Object rangeObject) {
@@ -54,11 +54,11 @@ public class ViewContext implements Context{
 		this.name = view.getName();
 	}
 
-	public Collection getObjects() {
+	public Set getObjects() {
 		return context.getObjects();
 	}
 
-	public Collection getAttributes() {
+	public Set getAttributes() {
 		return attributes;
 	}
 

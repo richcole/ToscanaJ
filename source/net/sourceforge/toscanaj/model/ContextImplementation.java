@@ -8,16 +8,16 @@
 package net.sourceforge.toscanaj.model;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Set;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 /**
- * @todo hide access to collections and relation by playing middle man.
+ * @todo hide access to collections and relation by playing man in the middle.
  */
 public class ContextImplementation implements Context {
-    private Collection objects = new ArrayList();
-    private Collection attributes = new ArrayList();
+    private Set objects = new LinkedHashSet();
+    private Set attributes = new LinkedHashSet();
     private BinaryRelationImplementation relation = new BinaryRelationImplementation();
     private String name = null;
 
@@ -28,11 +28,11 @@ public class ContextImplementation implements Context {
     	this.name = name;
     }
 
-    public Collection getObjects() {
+    public Set getObjects() {
         return objects;
     }
 
-    public Collection getAttributes() {
+    public Set getAttributes() {
         return attributes;
     }
 
@@ -54,8 +54,8 @@ public class ContextImplementation implements Context {
 	
 	public Context createSum(Context other, String title) {
 		ContextImplementation context = new ContextImplementation(title);
-		ArrayList objects = (ArrayList) context.getObjects();
-		ArrayList attributes = (ArrayList) context.getAttributes();
+		Set objects = context.getObjects();
+		Set attributes = context.getAttributes();
 		BinaryRelationImplementation relation = context.getRelationImplementation();
 		
 		Iterator objIt = this.getObjects().iterator();
@@ -98,8 +98,8 @@ public class ContextImplementation implements Context {
 	 */
 	public Context createProduct(Context other, String title) {
 		ContextImplementation context = new ContextImplementation(title);
-		ArrayList objects = (ArrayList) context.getObjects();
-		ArrayList attributes = (ArrayList) context.getAttributes();
+		Set objects = context.getObjects();
+		Set attributes = context.getAttributes();
 		BinaryRelationImplementation relation = context.getRelationImplementation();
 		
 		Iterator attrIt = this.getAttributes().iterator();

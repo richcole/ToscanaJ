@@ -11,11 +11,11 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.Context;
-import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.ViewContext;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -38,7 +38,7 @@ public class ViewContextTest extends TestCase {
     }
 
     private void checkView(View view) {
-        Context scaledContext = new ViewContext(TestData.Model, view);
+        Context scaledContext = new ViewContext(TestData.Model.getContext(), view);
         Collection objects = scaledContext.getObjects();
         Collection attributes = scaledContext.getAttributes();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {

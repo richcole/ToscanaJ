@@ -7,17 +7,16 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.Hashtable;
-import java.util.List;
 
 
 public class ManyValuedContextImplementation implements WritableManyValuedContext {
-    private List objects = new ArrayList();
-    private List properties = new ArrayList();
+    private Set objects = new LinkedHashSet();
+    private Set properties = new LinkedHashSet();
     private Hashtable relation = new Hashtable();
-	private List types = new ArrayList();
+	private Set types = new LinkedHashSet();
 
     public ManyValuedContextImplementation() {
     }
@@ -27,7 +26,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
         relation.put(object, new Hashtable());
     }
 
-    public Collection getObjects() {
+    public Set getObjects() {
         return objects;
     }
 
@@ -35,11 +34,11 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
         properties.add(attribute);
     }
 
-    public Collection getAttributes() {
+    public Set getAttributes() {
         return properties;
     }
     
-    public Collection getTypes(){
+    public Set getTypes(){
     	return types;
     }
 
@@ -52,10 +51,4 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
         Hashtable row = (Hashtable) relation.get(object);
         return (AttributeValue) row.get(attribute);
     }	
-    
-	public void updateObject(String objName, int index){
-		FCAObjectImplementation obj = (FCAObjectImplementation) objects.get(index);
-		obj.setName(objName);
-		objects.set(index,obj);
-	}
 }
