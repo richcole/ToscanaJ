@@ -13,7 +13,7 @@ public class ImageGenerationException extends Exception
     /**
      * This can be used to get the original Exception.
      */
-    private Exception exception;
+    private Exception exception = null;
 
     /**
      * Constructs an exception without detail message.

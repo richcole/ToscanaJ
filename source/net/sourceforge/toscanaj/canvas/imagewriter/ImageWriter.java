@@ -120,17 +120,17 @@ public class ImageWriter {
             catch( JimiException e )
             {
                 throw new ImageGenerationException( "Error while generating '" +
-                    outputFile.getPath() + "' - Jimi error: "  + e.getMessage(), e );
+                    outputFile.getPath() + "' - Jimi error " , e );
             }
             catch( FileNotFoundException e )
             {
                 throw new ImageGenerationException( "Error while generating '" +
-                    outputFile.getPath() + "' - not found ??? "  + e.getMessage(), e );
+                    outputFile.getPath() + "' - not found " , e );
             }
             catch( IOException e )
             {
                 throw new ImageGenerationException( "Error while generating '" +
-                    outputFile.getPath() + "' - IO problem: "  + e.getMessage(), e );
+                    outputFile.getPath() + "' - IO problem "  , e );
             }
         }
     }

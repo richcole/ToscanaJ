@@ -22,6 +22,7 @@ import net.sourceforge.toscanaj.view.diagram.LabelView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
 import net.sourceforge.toscanaj.view.dialogs.DiagramExportSettingsDialog;
+import net.sourceforge.toscanaj.view.dialogs.ErrorDialog;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -609,29 +610,15 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
             conceptualSchema = CSXParser.parse(schemaFile);
         }
         catch( FileNotFoundException e) {
-            JOptionPane.showMessageDialog( this,
-                    "Couldn't access the file.",
-                    "File error",
-                    JOptionPane.ERROR_MESSAGE );
-            System.err.println( e.getMessage() );
+            ErrorDialog.showError(this, e, "File access error", "Couldn't access the file.");
             return;
         }
         catch( IOException e) {
-            JOptionPane.showMessageDialog( this,
-                    "Some error happened when parsing the file:\n" +
-                        e.getMessage(),
-                    "File/XML error",
-                    JOptionPane.ERROR_MESSAGE );
-            System.err.println( e.getMessage() );
+            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file.\nFile/XML error");
             return;
         }
         catch( DataFormatException e) {
-            JOptionPane.showMessageDialog( this,
-                    "Some error happened when parsing the file:\n" +
-                        e.getMessage(),
-                    "CSX error",
-                    JOptionPane.ERROR_MESSAGE );
-            System.err.println( e.getMessage() );
+            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file.\nCSX error");
             return;
         }
 
@@ -738,8 +725,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
                     ImageWriter.exportGraphic(this.diagramView, this.diagramExportSettings, saveDialog.getSelectedFile());
                 }
                 catch ( ImageGenerationException e ) {
-                    /// @TODO Give feedback here
-                    e.printStackTrace();
+                    ErrorDialog.showError(this, e, "Exporting image error");
+                    //e.printStackTrace();
                 }
             }
         }
