@@ -670,7 +670,12 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         DiagramController.getController().reset();
         DiagramController.getController().addObserver(this.diagramView);
 
-        DatabaseViewer.initialize(this, DatabaseViewerSetup.getViewerSetup(0));
+        try {
+            DatabaseViewer.initialize(this, DatabaseViewerSetup.getViewerSetup(0));
+        }
+        catch (IndexOutOfBoundsException e) {
+            // we just don't have one
+        }
 
         // enable relevant buttons and menus
         fileIsOpen = true;
