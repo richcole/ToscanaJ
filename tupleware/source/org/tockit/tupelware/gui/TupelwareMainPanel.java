@@ -25,7 +25,7 @@ import org.tockit.tupelware.model.TupelSet;
 import org.tockit.tupelware.scaling.TupelScaling;
 import org.tockit.tupelware.source.TupelSource;
 import org.tockit.tupelware.source.text.TextSource;
-import org.tockit.tupelware.sql.query.SqlQueryEngine;
+import org.tockit.tupelware.source.sql.SqlQueryEngine;
 
 import java.awt.*;
 import java.awt.event.*;

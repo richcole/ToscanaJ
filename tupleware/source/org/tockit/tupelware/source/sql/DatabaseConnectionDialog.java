@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.sql.query;
+package org.tockit.tupelware.source.sql;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;

@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.sql.query;
+package org.tockit.tupelware.source.sql;
 
 import java.io.File;
 
