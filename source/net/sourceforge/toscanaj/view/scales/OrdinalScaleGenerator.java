@@ -8,18 +8,15 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.fca.DiagramToContextConverter;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.database.Column;
-import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 import javax.swing.*;
-import java.awt.geom.Point2D;
 import java.sql.Types;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -83,60 +80,40 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
 
         List dividers = scaleDialog.getDividers();
 
+		ContextImplementation context = new ContextImplementation();
+		context.setName(scaleDialog.getDiagramTitle());
 
-        WriteableDiagram2D ret = new SimpleLineDiagram();
-        ret.setTitle(scaleDialog.getDiagramTitle());
-
-
-        List conceptList = new ArrayList();
-        double x = 0.;
-        double y = 0.;
-        /// @todo handle or avoid the case where there is no divider
-        ConceptImplementation top = makeConcept(null,
-                "(" + columnName + "<=" + String.valueOf(dividers.get(0)) + ")");
-        DiagramNode topNode = new DiagramNode("top",
-                new Point2D.Double(x, y),
-                top,
-                new LabelInfo(),
-                new LabelInfo(),
-                null
-        );
-        ret.addNode(topNode);
-        ConceptImplementation prevConcept = top;
-        DiagramNode prevNode = topNode;
-        conceptList.add(top);
-        for (int i = 0; i < dividers.size(); i++) {
-            y += 60;
-            ConceptImplementation currentConcept = makeConcept(">" + String.valueOf(dividers.get(i)),
-                    getSQLClause(columnName, dividers, i));
-            conceptList.add(currentConcept);
-
-            DiagramNode node = new DiagramNode((new Integer(i)).toString(),
-                    new Point2D.Double(x, y),
-                    currentConcept,
-                    new LabelInfo(),
-                    new LabelInfo(),
-                    null
-            );
-            prevConcept.addSubConcept(currentConcept);
-            currentConcept.addSuperConcept(prevConcept);
-
-            ret.addNode(node);
-            ret.addLine(prevNode, node);
-            prevNode = node;
-            prevConcept = currentConcept;
+        for (int i = -1; i < dividers.size(); i++) {
+        	String object = createSQLClause(column.getName(), dividers, i);
+        	String attributeName = createAttributeName(dividers, i);
+        	context.getObjects().add(object);
+        	if(attributeName != null) {
+        		context.getAttributes().add(new Attribute(attributeName));
+        	}
+        	Iterator it = context.getAttributes().iterator();
+        	while (it.hasNext()) {
+				Attribute attribute = (Attribute) it.next();
+				context.getRelationImplementation().insert(object,attribute);
+			}
         }
-        for (Iterator it = conceptList.iterator(); it.hasNext();) {
-            ConceptImplementation concept = (ConceptImplementation) it.next();
-            concept.buildClosures();
-        }
-		return DiagramToContextConverter.getContext(ret);
+        
+		return context;
     }
 
-    private String getSQLClause(String columnName, List dividers, int i) {
+	private String createAttributeName(List dividers, int i) {
+		if(i == -1){
+			return null;
+		}
+		return ">" + String.valueOf(dividers.get(i));
+	}
+
+    private String createSQLClause(String columnName, List dividers, int i) {
+    	if(i == -1) {
+    		return "(" + columnName + "<=" + String.valueOf(dividers.get(0)) + ")";
+    	}
         String retVal = "(" + columnName + ">" + String.valueOf(dividers.get(i)) + ")";
         if (i < dividers.size() - 1) {
-            retVal += "AND (" + columnName + "<=" + String.valueOf(dividers.get(i + 1)) + ")";
+            retVal += " AND (" + columnName + "<=" + String.valueOf(dividers.get(i + 1)) + ")";
         }
         return retVal;
     }
