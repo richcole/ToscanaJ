@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.parser;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -33,6 +34,8 @@ import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 
 public class CSCParser {
+    private static final int TARGET_DIAGRAM_HEIGHT = 460;
+    private static final int TARGET_DIAGRAM_WIDTH = 600;
     protected static final class SectionTypeNotSupportedException
         extends DataFormatException {
 
@@ -471,6 +474,7 @@ public class CSCParser {
                     if(existingDiagram != null) {
                         schema.removeDiagram(existingDiagram);
                     }
+                    rescale(diagram);
                     schema.addDiagram(diagram);
                     importedDiagrams.add(diagram.getTitle());
                 }
@@ -491,6 +495,33 @@ public class CSCParser {
             }
         } catch (IOException e) {
             throw new DataFormatException("Error reading input file", e);
+        }
+    }
+
+    private void rescale(Diagram2D diagram) {
+    	Rectangle2D bounds = diagram.getBounds();
+        
+        double scaleX;
+        if(bounds.getWidth() == 0) {
+            scaleX = Double.MAX_VALUE;
+        } else {
+            scaleX = TARGET_DIAGRAM_WIDTH / bounds.getWidth();
+        }
+        
+        double scaleY;
+        if(bounds.getHeight() == 0) {
+            scaleY = Double.MAX_VALUE;
+        } else {
+            scaleY = TARGET_DIAGRAM_HEIGHT / bounds.getHeight();
+        }
+        
+        double scale = (scaleX < scaleY) ? scaleX : scaleY;
+        
+        Iterator it = diagram.getNodes();
+        while (it.hasNext()) {
+            DiagramNode node = (DiagramNode) it.next();
+            Point2D pos = node.getPosition();
+            node.setPosition(new Point2D.Double(scale * pos.getX(), scale * pos.getY()));
         }
     }
     
