@@ -73,7 +73,7 @@ public class DatabaseSchema implements XMLizable, EventBrokerListener {
         this.tables.clear();
         for (it.reset(); !it.atEnd(); it.next()) {
             String tableName = (String) it.val();
-            Table table = new Table(broker, tableName); ///@todo get key name
+            Table table = new Table(broker, tableName, false); ///@todo get key name
             STD_Iterator colIt = new STD_Iterator(
                     connection.getColumns(table)
             );

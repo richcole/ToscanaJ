@@ -495,7 +495,7 @@ public class CSXParser {
         if (elem == null) {
             throw new DataFormatException("No <table> given for <databaseConnection>");
         }
-        dbInfo.setTable(new Table(elem.getText()));
+        dbInfo.setTable(new Table(elem.getText(), false));
         elem = dbElement.getChild("key");
         if (elem == null) {
             throw new DataFormatException("<table> but not <key> given in <databaseConnection> element");

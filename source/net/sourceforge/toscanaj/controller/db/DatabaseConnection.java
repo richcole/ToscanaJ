@@ -626,9 +626,7 @@ public class DatabaseConnection implements EventBrokerListener {
         for (int i = 0; i < tables.size(); i++) {
             System.out.println("========== " + tables.get(i) + " ==========");
             Vector columns = test.getColumns(
-                    new Table(
-                            new EventBroker(),
-                            (String) tables.get(i))
+                    new Table(new EventBroker(), (String) tables.get(i), false)
             );
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {
@@ -650,9 +648,7 @@ public class DatabaseConnection implements EventBrokerListener {
         for (int i = 0; i < views.size(); i++) {
             System.out.println("========== " + views.get(i) + " ==========");
             Vector columns = test.getColumns(
-                    new Table(
-                            new EventBroker(),
-                            (String) views.get(i))
+                    new Table(new EventBroker(),(String) views.get(i),false)
             );
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {

@@ -41,9 +41,16 @@ public class Column implements XMLizable {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
-        XMLHelper.checkName(COLUMN_ELEMENT_NAME, elem);
-        name = XMLHelper.getAttribute(elem, COLUMN_NAME_ATTRIBUTE_NAME).getValue();
-        type = XMLHelper.getIntAttribute(elem, COLUMN_TYPE_ATTRIBUTE_NAME);
+		this.name = elem.getAttributeValue(COLUMN_NAME_ATTRIBUTE_NAME);
+		if(this.name == null) {
+			this.name = elem.getText();
+			if(this.name == null) {
+				throw new XMLSyntaxError("No name given for column");
+			}
+		}
+		if(elem.getAttribute(COLUMN_TYPE_ATTRIBUTE_NAME) != null) {
+			this.type = XMLHelper.getIntAttribute(elem, COLUMN_TYPE_ATTRIBUTE_NAME);
+		}
     }
 
     public String getDisplayName() {

@@ -28,7 +28,7 @@ public class DumpSqlScript {
 		while (tableNamesIt.hasNext()) {
             String tableName = (String) tableNamesIt.next();
             out.println("CREATE TABLE " + Table.getQuotedIdentifier(tableName) + " (");
-            Table table = new Table(new EventBroker(), tableName);
+            Table table = new Table(new EventBroker(), tableName, false);
             
             Vector columns = connection.getColumns(table);
             Iterator columnIt = columns.iterator();

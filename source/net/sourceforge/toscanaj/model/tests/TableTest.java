@@ -26,7 +26,7 @@ public class TableTest extends TestCase {
     }
 
     public void testAddColumns() {
-        Table table = new Table(new EventBroker(), "Table");
+        Table table = new Table(new EventBroker(), "Table", false);
         table.addColumn(new Column("Second", java.sql.Types.INTEGER, table));
 
     }

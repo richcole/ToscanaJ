@@ -232,7 +232,7 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
     	Iterator it = this.connection.getTableNames().iterator();
     	while(it.hasNext()) {
     		String tableName = (String) it.next();
-    		Table table = new Table(eventBroker, tableName);
+    		Table table = new Table(eventBroker, tableName, false);
     		Iterator itCol = this.connection.getColumns(table).iterator();
     		while(itCol.hasNext()) {
     			Column col = (Column) itCol.next();

@@ -105,7 +105,7 @@ public class DatabaseConnectedConceptInterpreterTest extends TestCase {
         throws DatabaseException {
         DatabaseConnection databaseConnection = new MockDBConnection();
         DatabaseInfo dbInfo = new DatabaseInfo();
-        Table testTable = new Table("testing");
+        Table testTable = new Table("testing", false);
         dbInfo.setTable(testTable);
         dbInfo.setKey(new Column("testing",Types.VARCHAR,testTable));
         DatabaseConnection.setConnection(databaseConnection);

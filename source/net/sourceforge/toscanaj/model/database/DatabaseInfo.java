@@ -14,7 +14,6 @@ import org.jdom.Element;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.Types;
 
 /**
  * This class contains information how to connect to a database.
@@ -74,7 +73,6 @@ public class DatabaseInfo implements XMLizable {
     private static final String JDBC_ODBC_BRIDGE_DRIVER =
         "sun.jdbc.odbc.JdbcOdbcDriver";
 
-    private static final String TABLE_ELEMENT_NAME = "table";
     public static final String DATABASE_CONNECTION_ELEMENT_NAME =
         "databaseConnection";
     private static final String EMBEDDED_SOURCE_ELEMENT_NAME = "embed";
@@ -83,7 +81,8 @@ public class DatabaseInfo implements XMLizable {
     private static final String USERNAME_ATTRIBUTE_NAME = "user";
     private static final String PASSWORD_ATTRIBUTE_NAME = "password";
     private static final String EMBEDDED_URL_ATTRIBUTE_NAME = "url";
-    private static final String OBJECT_KEY_ELEMENT_NAME = "key";
+	private static final String TABLE_ELEMENT_NAME = "table";
+	private static final String OBJECT_KEY_ELEMENT_NAME = "key";
 
     public static DatabaseInfo getEmbeddedDatabaseInfo() {
         DatabaseInfo info = new DatabaseInfo();
@@ -152,12 +151,8 @@ public class DatabaseInfo implements XMLizable {
             urlElem.setAttribute(PASSWORD_ATTRIBUTE_NAME, getPassword());
             retVal.addContent(urlElem);
         }
-        Element tableElem = new Element(TABLE_ELEMENT_NAME);
-        tableElem.addContent(table.getDisplayName());
-        retVal.addContent(tableElem);
-        Element keyElem = new Element(OBJECT_KEY_ELEMENT_NAME);
-        keyElem.addContent(objectKey.getDisplayName());
-        retVal.addContent(keyElem);
+        retVal.addContent(this.table.toXML());
+        retVal.addContent(this.objectKey.toXML());
         return retVal;
     }
 
@@ -190,12 +185,8 @@ public class DatabaseInfo implements XMLizable {
                     .getAttribute(urlElement, PASSWORD_ATTRIBUTE_NAME)
                     .getValue();
         }
-        String tableName = XMLHelper.mustbe(TABLE_ELEMENT_NAME, elem).getText();
-        String objectKeyName =
-            XMLHelper.mustbe(OBJECT_KEY_ELEMENT_NAME, elem).getText();
-        this.table = new Table(tableName);
-        /// @todo it is probably not ok to assume VARCHAR here
-        this.objectKey = new Column(objectKeyName, Types.VARCHAR, this.table);
+        this.table = new Table(XMLHelper.mustbe(TABLE_ELEMENT_NAME, elem));
+        this.objectKey = new Column(XMLHelper.mustbe(OBJECT_KEY_ELEMENT_NAME, elem), this.table);
     }
 
     /**
