@@ -168,7 +168,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                 if (nesting.size() != 0) {
                     // go outermost
                     compareConcept = (Concept) nesting.get(0);
-                    compareContext = new ConceptInterpretationContext(context.getDiagramHistory(), context.getEventBroker());
+                    compareContext = (ConceptInterpretationContext) context.getNestingContexts().get(0);
                 } else {
                     compareConcept = concept;
                     compareContext = context;

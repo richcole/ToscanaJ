@@ -31,6 +31,7 @@ public class ConceptInterpretationContext implements ChangeObserver {
     private EventBroker eventBroker;
 
     private List nestingConcepts = CollectionFactory.createDefaultList();
+    private List nestingContexts = CollectionFactory.createDefaultList();
 
     /// @todo use something else than diagramHistory as first parameter -- not useful in anything but Toscana, even not
     /// in the editors
@@ -48,11 +49,13 @@ public class ConceptInterpretationContext implements ChangeObserver {
         retVal.filterMode = this.filterMode;
         retVal.nestingConcepts.addAll(this.nestingConcepts);
         retVal.nestingConcepts.add(nestingConcept);
+        retVal.nestingContexts.addAll(this.nestingContexts);
+        retVal.nestingContexts.add(this);
         return retVal;
     }
 
     public EventBroker getEventBroker() {
-        return eventBroker;
+        return this.eventBroker;
     }
 
     public void setObjectDisplayMode(boolean isContingent) {
@@ -61,7 +64,7 @@ public class ConceptInterpretationContext implements ChangeObserver {
     }
 
     public boolean getObjectDisplayMode() {
-        return objectDisplayMode;
+        return this.objectDisplayMode;
     }
 
     public void setFilterMode(boolean isContingent) {
@@ -70,7 +73,7 @@ public class ConceptInterpretationContext implements ChangeObserver {
     }
 
     public boolean getFilterMode() {
-        return filterMode;
+        return this.filterMode;
     }
 
     public DiagramHistory getDiagramHistory() {
@@ -78,7 +81,11 @@ public class ConceptInterpretationContext implements ChangeObserver {
     }
 
     public List getNestingConcepts() {
-        return nestingConcepts;
+        return this.nestingConcepts;
+    }
+
+    public List getNestingContexts() {
+        return this.nestingContexts;
     }
 
     public void update(Object source) {
