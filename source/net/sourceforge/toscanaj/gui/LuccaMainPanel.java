@@ -326,10 +326,14 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
     
 	private void updateWindowTitle() {
-		// get the current filename without the extension and full path
-		// we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
-		String filename = currentFile.substring(currentFile.lastIndexOf("\\")+1,(currentFile.length()-4));
-		setTitle(filename +" - "+WINDOW_TITLE);
+	// get the current filename without the extension and full path
+	// we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
+		if(currentFile != null){
+			String filename = currentFile.substring(currentFile.lastIndexOf("\\")+1,(currentFile.length()-4));
+			setTitle(filename +" - "+WINDOW_TITLE);
+		} else {
+			setTitle(WINDOW_TITLE);
+		}
 	}
 
     private void recreateMruMenu() {
