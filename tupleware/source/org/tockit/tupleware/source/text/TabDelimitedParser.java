@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.tockit.relations.model.Relation;
 import org.tockit.relations.model.RelationImplementation;
@@ -47,16 +46,11 @@ public class TabDelimitedParser {
                 break;            
             }
             lineNum++;
-            StringTokenizer tokenizer = new StringTokenizer(line, "\t", false);
+            StringTokenizer tokenizer = new StringTokenizer(line, '\t', '\"', '\000');
+            String[] tuple = tokenizer.tokenizeAll();
             // lines without tabs are considered comments
-            if(tokenizer.countTokens() <= 1) {
+            if(tuple.length <= 1) {
                 continue;
-            }
-            String[] tuple = new String[tokenizer.countTokens()];
-            int i = 0;
-            while(tokenizer.hasMoreTokens()) {
-                tuple[i] = tokenizer.nextToken();
-                i++;
             }
             if(retVal == null) {
                 retVal = new RelationImplementation(tuple); 

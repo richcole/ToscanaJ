@@ -9,6 +9,7 @@ package org.tockit.tupleware.source.text;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.Reader;
 
 import javax.swing.JFileChooser;
@@ -42,6 +43,9 @@ public class TextSource implements TupleSource {
 				} finally {
 					reader.close();
 				}
+                if(this.tuples == null) {
+                    throw new IOException("No tuples found in file");
+                }
 				IndexSelectionDialog dialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getDimensionNames());
 				dialog.show();
 				this.objectIndices = dialog.getSelectedIndices();
