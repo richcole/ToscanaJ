@@ -117,6 +117,7 @@ import net.sourceforge.toscanaj.parser.CernatoXMLParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
+import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
@@ -140,6 +141,12 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private static final int NUMBER_OF_VALUE_POPUP_MENU_ROWS = 15;
     private static final String WINDOW_TITLE = "Siena";
     private static final int MaxMruFiles = 8;
+
+    private static final String CONFIGURATION_KEY_COLOR_MODE = "colorMode";
+    private static final String CONFIGURATION_VALUE_COLOR_MODE_COLOR = "color";
+    private static final String CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE = "grayscale";
+    private static final String CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES = "whiteNodes";
+    private static final String CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES = "blackNodes";
     
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(SienaMainPanel.class);
 
@@ -157,6 +164,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private JMenu helpMenu;
     private JMenu fileMenu;
     private JMenu mruMenu;
+    private JRadioButtonMenuItem colorModeGrayscaleMenuItem;
+    private JRadioButtonMenuItem colorModeColorMenuItem;
+    private JRadioButtonMenuItem colorModeWhiteNodesMenuItem;
+    private JRadioButtonMenuItem colorModeBlackNodesMenuItem;
+
     private DiagramEditingView diagramEditingView;
     private TemporalControlsPanel temporalControls;
     private List mruList = new LinkedList();
@@ -604,8 +616,68 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         });
         viewMenu.add(showObjectLabels);
 
-        viewMenu.addSeparator();
+        JMenu colorModeMenu = new JMenu("Color mode");
+        ButtonGroup colorModeGroup = new ButtonGroup();
         
+        colorModeColorMenuItem = new JRadioButtonMenuItem("Color");
+        colorModeColorMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setDiagramSchema(DiagramSchema.getDefaultSchema());
+            }
+        });
+        colorModeGroup.add(colorModeColorMenuItem);
+        colorModeMenu.add(colorModeColorMenuItem);
+
+        colorModeGrayscaleMenuItem = new JRadioButtonMenuItem("Grayscale");
+        colorModeGrayscaleMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setDiagramSchema(DiagramSchema.getDefaultSchema().getGrayScaleVersion());
+            }
+        });
+        colorModeGroup.add(colorModeGrayscaleMenuItem);
+        colorModeMenu.add(colorModeGrayscaleMenuItem);
+
+        colorModeWhiteNodesMenuItem = new JRadioButtonMenuItem("White nodes");
+        colorModeWhiteNodesMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setDiagramSchema(DiagramSchema.getDefaultSchema().getWhiteNodeVersion());
+            }
+        });
+        colorModeGroup.add(colorModeWhiteNodesMenuItem);
+        colorModeMenu.add(colorModeWhiteNodesMenuItem);
+
+        colorModeBlackNodesMenuItem = new JRadioButtonMenuItem("Black nodes");
+        colorModeBlackNodesMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setDiagramSchema(DiagramSchema.getDefaultSchema().getBlackNodeVersion());
+            }
+        });
+        colorModeGroup.add(colorModeBlackNodesMenuItem);
+        colorModeMenu.add(colorModeBlackNodesMenuItem);
+
+        String colorMode = preferences.get(CONFIGURATION_KEY_COLOR_MODE, null);
+        if(CONFIGURATION_VALUE_COLOR_MODE_COLOR.equals(colorMode)) {
+            colorModeColorMenuItem.setSelected(true);
+            setDiagramSchema(DiagramSchema.getDefaultSchema());
+        } else if(CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE.equals(colorMode)) {
+            colorModeGrayscaleMenuItem.setSelected(true);
+            setDiagramSchema(DiagramSchema.getDefaultSchema().getGrayScaleVersion());
+        } else if(CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES.equals(colorMode)) {
+            colorModeWhiteNodesMenuItem.setSelected(true);
+            setDiagramSchema(DiagramSchema.getDefaultSchema().getWhiteNodeVersion());
+        } else if(CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES.equals(colorMode)) {
+            colorModeBlackNodesMenuItem.setSelected(true);
+            setDiagramSchema(DiagramSchema.getDefaultSchema().getBlackNodeVersion());
+        } else {
+            System.err.println("Unknown color mode setting, using color");
+            colorModeColorMenuItem.setSelected(true);
+            setDiagramSchema(DiagramSchema.getDefaultSchema());
+        } 
+
+        viewMenu.add(colorModeMenu);
+        
+        viewMenu.addSeparator();
+
         final JCheckBoxMenuItem showTemporalControls =
             new JCheckBoxMenuItem("Show Temporal Controls");
         showTemporalControls.setMnemonic(KeyEvent.VK_T);
@@ -886,6 +958,17 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         preferences.storeWindowPlacement(this);
         preferences.putInt("diagramViewDivider",
                            diagramEditingView.getDividerLocation());
+        // store color settings
+        if(this.colorModeColorMenuItem.isSelected()) {
+            preferences.put(CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_COLOR);
+        } else if(this.colorModeGrayscaleMenuItem.isSelected()) {
+            preferences.put(CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE);
+        } else if(this.colorModeWhiteNodesMenuItem.isSelected()) {
+            preferences.put(CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES);
+        } else if(this.colorModeBlackNodesMenuItem.isSelected()) {
+            preferences.put(CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES);
+        }
+        
         System.exit(0);
     }
 
@@ -1199,4 +1282,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		}
 		return menu;
 	}
+
+    protected void setDiagramSchema(DiagramSchema schema) {
+        this.diagramEditingView.getDiagramView().setDiagramSchema(schema);
+    }
 }
