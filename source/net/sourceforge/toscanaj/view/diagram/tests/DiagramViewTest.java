@@ -13,6 +13,8 @@ import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class DiagramViewTest extends TestCase {
     public DiagramViewTest(String s) {
@@ -25,8 +27,6 @@ public class DiagramViewTest extends TestCase {
 
     static class TestDiagramView extends DiagramView {
 
-        boolean repaintCalled = false;
-
         public TestDiagramView() {
         }
 
@@ -38,27 +38,20 @@ public class DiagramViewTest extends TestCase {
             super.makeScreenTransformClear();
         }
 
-        public void clearRepaintFlag(){
-            repaintCalled = false;
-        }
-
-        public void repaint() {
-            repaintCalled = true;
-            // super.p;
-        }
-
     }
 
     public void testChangeOfScreenTransform() {
-        TestDiagramView view = new TestDiagramView();
+        final TestDiagramView view = new TestDiagramView();
         view.setSize(100, 100);
         assertEquals(new Dimension(100, 100), view.getSize());
         view.makeScreenTransformClear();
         assertEquals(false, view.isScreenTransformDirty());
-        view.clearRepaintFlag();
+        view.addComponentListener(new ComponentAdapter(){
+            public void componentResized(ComponentEvent e) {
+                assertEquals(true, view.isScreenTransformDirty());
+            }
+        });
         view.setSize(200, 200);
         assertEquals(new Dimension(200, 200), view.getSize());
-        assertEquals(true, view.isScreenTransformDirty());
-        assertEquals(true, view.repaintCalled);
     }
 }
