@@ -24,7 +24,10 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
  * @TODO Create common abstract class for both types of diagrams.
  */
 public class NestedLineDiagram extends SimpleLineDiagram {
-    /**
+    private final Diagram2D originalOuterDiagram;
+	private final Diagram2D originalInnerDiagram;
+
+	/**
      * Creates a new nested line diagram from the given two diagrams.
      *
      * The inner diagram will be nested in each node of the outer diagram.
@@ -32,7 +35,9 @@ public class NestedLineDiagram extends SimpleLineDiagram {
      * for a diagram on top level.
      */
     public NestedLineDiagram(final Diagram2D outerDiagram, final Diagram2D innerDiagram) {
-        calculateDiagram(outerDiagram, innerDiagram);
+        this.originalOuterDiagram = outerDiagram;
+		this.originalInnerDiagram = innerDiagram;
+		calculateDiagram(outerDiagram, innerDiagram);
         if(outerDiagram.getEventBroker() != null) {
 			outerDiagram.getEventBroker().subscribe(new EventBrokerListener(){
 				public void processEvent(Event e) {
@@ -146,5 +151,13 @@ public class NestedLineDiagram extends SimpleLineDiagram {
     
     public String toString() {
     	return this.getTitle();
+    }
+    
+    public Diagram2D getInnerDiagram() {
+        return this.originalInnerDiagram;
+    }
+
+    public Diagram2D getOuterDiagram() {
+        return this.originalOuterDiagram;
     }
 }
