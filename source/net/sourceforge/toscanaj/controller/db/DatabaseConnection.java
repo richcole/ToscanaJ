@@ -117,6 +117,7 @@ public class DatabaseConnection implements EventBrokerListener {
         try {
             jdbcConnection.close();
             jdbcConnection = null;
+            printLogMessage("Disconnected");
         } catch (SQLException e) {
             throw new DatabaseException("Could not disconnect from the database.", e);
         }
