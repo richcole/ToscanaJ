@@ -123,6 +123,9 @@ public class DatabaseConnection implements EventBrokerListener {
     }
 
     public void disconnect() throws DatabaseException {
+    	if(jdbcConnection == null) {
+    		throw new DatabaseException("Disconnect requested but we are not connected.");
+    	}
         try {
             jdbcConnection.close();
             jdbcConnection = null;
