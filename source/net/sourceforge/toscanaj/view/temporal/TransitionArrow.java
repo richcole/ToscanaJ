@@ -13,6 +13,7 @@ import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -21,22 +22,21 @@ import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.MovableCanvasItem;
 
 public class TransitionArrow extends MovableCanvasItem {
-	protected static final double SHORTENING_FACTOR = 0.15;
     protected NodeView startNodeView;
     protected NodeView endNodeView;
-    protected Color baseColor;
     protected Rectangle2D bounds;
     protected Point2D shiftVector = new Point2D.Double();
     protected Point2D manualOffset = new Point2D.Double();
     protected double timePos;
     protected AnimationTimeController timeController;
+    protected ArrowStyle style;
 	
     private Shape currentShape;
     
-    public TransitionArrow(NodeView startNodeView, NodeView endNodeView, Color color, double timePos, AnimationTimeController timeController) {
+    public TransitionArrow(NodeView startNodeView, NodeView endNodeView, ArrowStyle style, double timePos, AnimationTimeController timeController) {
     	this.startNodeView = startNodeView;
     	this.endNodeView = endNodeView;
-    	this.baseColor = color;
+    	this.style = style;
     	this.timePos = timePos;
     	this.timeController = timeController;
 
@@ -53,8 +53,12 @@ public class TransitionArrow extends MovableCanvasItem {
         double startY = getStartY();
         double endX = getEndX();
         double endY = getEndY();
+
+        float headLength = (float) this.style.getHeadLength();
+        float headWidth = (float) this.style.getHeadWidth();
         float length = (float) Math.sqrt((startX - endX) * (startX - endX) +
                                           (startY - endY) * (startY - endY));
+
         Paint paint = calculatePaint(length);
         if(paint == null) { // nothing to draw
         	this.currentShape = null;
@@ -64,17 +68,15 @@ public class TransitionArrow extends MovableCanvasItem {
     	updateShiftVector();
     	
     	Paint oldPaint = g.getPaint();
+        
+        Shape line = this.style.getStroke().createStrokedShape(new Line2D.Double(-length,0,-headLength,0));
     	
-		GeneralPath arrow = new GeneralPath();
-		arrow.moveTo(-20,-7);
+		GeneralPath arrow = new GeneralPath(line);
+        arrow.moveTo(-headLength,-headWidth/2);
 		arrow.lineTo(0,0);
-		arrow.lineTo(-20,7);
-		arrow.lineTo(-20,2);
-		arrow.lineTo(-length,2);
-		arrow.lineTo(-length,-2);
-		arrow.lineTo(-20,-2);
+		arrow.lineTo(-headLength,headWidth/2);
 		arrow.closePath();
-
+        
 		AffineTransform shapeTransform = new AffineTransform();        
 		shapeTransform.translate(this.manualOffset.getX(), this.manualOffset.getY());
 		shapeTransform.translate(endX, endY);
@@ -103,8 +105,9 @@ public class TransitionArrow extends MovableCanvasItem {
         } else {
             return null;
         }
-        Color finalColor = new Color(this.baseColor.getRed(), this.baseColor.getGreen(), this.baseColor.getBlue(),
-                          (int) (alpha * this.baseColor.getAlpha()));
+        Color baseColor = this.style.getColor();
+        Color finalColor = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(),
+                          (int) (alpha * baseColor.getAlpha()));
 
         return finalColor;
     }
@@ -161,31 +164,34 @@ public class TransitionArrow extends MovableCanvasItem {
         this.shiftVector = new Point2D.Double(yDiff * factor, -xDiff * factor);
     }
 
+    /**
+     * @todo start and end positions should consider node radius
+     */
     protected double getStartX() {
         double x = this.startNodeView.getPosition().getX();
         return x + 
-               SHORTENING_FACTOR * (this.endNodeView.getPosition().getX() - x) + 
+               this.style.getRelativeLength() * (this.endNodeView.getPosition().getX() - x) + 
                this.shiftVector.getX();
     }
 
     protected double getStartY() {
         double y = this.startNodeView.getPosition().getY();
         return y + 
-               SHORTENING_FACTOR * (this.endNodeView.getPosition().getY() - y) +
+               this.style.getRelativeLength() * (this.endNodeView.getPosition().getY() - y) +
                this.shiftVector.getY();
     }
 
     protected double getEndX() {
         double x = this.endNodeView.getPosition().getX();
         return x + 
-               SHORTENING_FACTOR * (this.startNodeView.getPosition().getX() - x) +
+               this.style.getRelativeLength() * (this.startNodeView.getPosition().getX() - x) +
                this.shiftVector.getX();
     }
 
     protected double getEndY() {
         double y = this.endNodeView.getPosition().getY();
         return y + 
-               SHORTENING_FACTOR * (this.startNodeView.getPosition().getY() - y) +
+               this.style.getRelativeLength() * (this.startNodeView.getPosition().getY() - y) +
                this.shiftVector.getY();
     }
 

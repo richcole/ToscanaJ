@@ -18,10 +18,10 @@ public class InterSequenceTransitionArrow extends TransitionArrow {
 	protected Color endColor;
 	
     public InterSequenceTransitionArrow(NodeView startNodeView, NodeView endNodeView, 
-                                         Color startColor, Color endColor, double timePos, 
+                                         ArrowStyle style, Color secondColor, double timePos, 
                                          AnimationTimeController timeController) {
-        super(startNodeView, endNodeView, startColor, timePos, timeController);
-    	this.endColor = endColor;
+        super(startNodeView, endNodeView, style, timePos, timeController);
+    	this.endColor = secondColor;
     }
 
     protected Paint calculatePaint(float arrowLength) {
@@ -40,8 +40,9 @@ public class InterSequenceTransitionArrow extends TransitionArrow {
         } else {
             return null;
         }
-        Color finalStartColor = new Color(this.baseColor.getRed(), this.baseColor.getGreen(), this.baseColor.getBlue(),
-                          (int) (alpha * this.baseColor.getAlpha()));
+        Color baseColor = this.style.getColor();
+        Color finalStartColor = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(),
+                          (int) (alpha * baseColor.getAlpha()));
         Color finalEndColor = new Color(this.endColor.getRed(), this.endColor.getGreen(), this.endColor.getBlue(),
                           (int) (alpha * this.endColor.getAlpha()));
 
