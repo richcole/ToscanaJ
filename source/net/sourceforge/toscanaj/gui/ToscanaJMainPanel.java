@@ -737,6 +737,16 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 
         DatabaseViewerManager.resetRegistry();
         Query.clearQueries();
+        if (databaseConnection.isConnected()) {
+            try {
+                databaseConnection.disconnect();
+            } catch (DatabaseException e) {
+                ErrorDialog.showError(this, e, "Closing database error", "Some error closing the old database:\n" + e.getMessage());
+                e.printStackTrace();
+                return;
+            }
+        }
+
         try {
             conceptualSchema = CSXParser.parse(broker, schemaFile, databaseConnection);
             databaseConnection.connect(conceptualSchema.getDatabaseInfo());

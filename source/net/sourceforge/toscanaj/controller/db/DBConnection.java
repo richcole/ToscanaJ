@@ -30,7 +30,7 @@ public class DBConnection {
     /**
      * The JDBC database connection we use.
      */
-    private Connection con;
+    private Connection jdbcConnection = null;
     private EventBroker broker;
 
     /**
@@ -72,7 +72,7 @@ public class DBConnection {
 
     public DBConnection(EventBroker broker, Connection connection) {
         this.broker = broker;
-        con = connection;
+        jdbcConnection = connection;
     }
 
     /**
@@ -86,8 +86,21 @@ public class DBConnection {
         connect(info.getURL(), info.getUserName(), info.getPassword());
     }
 
+    public void disconnect() throws DatabaseException {
+        try {
+            jdbcConnection.close();
+            jdbcConnection = null;
+        } catch (SQLException e) {
+            throw new DatabaseException("Could not disconnect from the database.", e);
+        }
+    }
+
+    public boolean isConnected() {
+        return jdbcConnection != null;
+    }
+
     public void connect(String url, String account, String password) throws DatabaseException {
-        con = getConnection(url, account, password);
+        jdbcConnection = getConnection(url, account, password);
         broker.processEvent(new DatabaseConnectedEvent(this, this));
     }
 
@@ -131,7 +144,7 @@ public class DBConnection {
         // submit the SQL
         Statement stmt;
         try {
-            stmt = con.createStatement();
+            stmt = jdbcConnection.createStatement();
             printLogMessage(System.currentTimeMillis() + ": Submitting script: " + sqlURL.toString());
             stmt.execute(sqlCommand);
             printLogMessage(System.currentTimeMillis() + ": done.");
@@ -150,7 +163,7 @@ public class DBConnection {
 
         // submit the query
         try {
-            stmt = con.createStatement();
+            stmt = jdbcConnection.createStatement();
             printLogMessage(System.currentTimeMillis() + ": Executing statement: " + statement);
             resultSet = stmt.executeQuery(statement);
             printLogMessage(System.currentTimeMillis() + ": done.");
@@ -192,7 +205,7 @@ public class DBConnection {
 
         // submit the query
         try {
-            stmt = con.createStatement();
+            stmt = jdbcConnection.createStatement();
             printLogMessage(System.currentTimeMillis() + ": Executing query: " + statement);
             resultSet = stmt.executeQuery(statement);
             printLogMessage(System.currentTimeMillis() + ": done.");
@@ -252,7 +265,7 @@ public class DBConnection {
 
         // submit the query
         try {
-            stmt = con.createStatement();
+            stmt = jdbcConnection.createStatement();
             printLogMessage(System.currentTimeMillis() + ": Executing query: " + statement);
             resultSet = stmt.executeQuery(statement);
             printLogMessage(System.currentTimeMillis() + ": done.");
@@ -290,7 +303,7 @@ public class DBConnection {
 
         // submit the query
         try {
-            stmt = con.createStatement();
+            stmt = jdbcConnection.createStatement();
             printLogMessage(System.currentTimeMillis() + ": Executing statement: " + statement);
             resultSet = stmt.executeQuery(statement);
             printLogMessage(System.currentTimeMillis() + ": done.");
@@ -337,7 +350,7 @@ public class DBConnection {
         final String[] tableTypes = {"TABLE"};
 
         try {
-            DatabaseMetaData dmd = con.getMetaData();
+            DatabaseMetaData dmd = jdbcConnection.getMetaData();
             ResultSet rs = dmd.getTables(null, null, null, tableTypes);
             while (rs.next()) {
                 result.add(rs.getString(3));
@@ -368,7 +381,7 @@ public class DBConnection {
         final String[] viewTypes = {"VIEW"};
 
         try {
-            DatabaseMetaData dmd = con.getMetaData();
+            DatabaseMetaData dmd = jdbcConnection.getMetaData();
             ResultSet rs = dmd.getTables(null, null, null, viewTypes);
             while (rs.next()) {
                 result.add(rs.getString(3));
@@ -400,7 +413,7 @@ public class DBConnection {
         Vector result = new Vector();
 
         try {
-            DatabaseMetaData dmd = con.getMetaData();
+            DatabaseMetaData dmd = jdbcConnection.getMetaData();
             ResultSet rs = dmd.getColumns(null, null, table, null);
             while (rs.next()) {
                 result.add(rs.getString(4));
@@ -435,7 +448,7 @@ public class DBConnection {
         Vector result = new Vector();
 
         try {
-            Statement stmt = con.createStatement();
+            Statement stmt = jdbcConnection.createStatement();
             ResultSet resultSet = stmt.executeQuery("SELECT [" + column +
                     "] FROM [" + table + "]");
 
