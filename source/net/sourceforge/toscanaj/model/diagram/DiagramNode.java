@@ -65,17 +65,25 @@ public class DiagramNode {
 
     /**
      * A copy constructor creating a duplicate of the given node.
+     *
+     * This is a deep copy for position and labels but refers to the same concept.
      */
     public DiagramNode(DiagramNode other) {
-        this.position = other.position;
+        this.position = (Point2D) other.position.clone();
         this.concept = other.concept;
-        this.attributeLabel = other.attributeLabel;
         if(this.attributeLabel != null) {
+            this.attributeLabel = new AttributeLabelInfo(other.attributeLabel);
             this.attributeLabel.attachNode(this);
         }
-        this.objectLabel = other.objectLabel;
+        else {
+            this.attributeLabel = null;
+        }
         if(this.objectLabel != null) {
+            this.objectLabel = new ObjectLabelInfo(other.objectLabel);
             this.objectLabel.attachNode(this);
+        }
+        else {
+            this.objectLabel = null;
         }
     }
 

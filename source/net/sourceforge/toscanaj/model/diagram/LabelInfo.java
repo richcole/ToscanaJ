@@ -27,7 +27,7 @@ abstract public class LabelInfo implements ChangeObservable
     /**
      * The offset for the label position.
      */
-    private Point2D offset;
+    private Point2D offset = null;
 
     /**
      * The background color for the label.
@@ -79,9 +79,15 @@ abstract public class LabelInfo implements ChangeObservable
      * The copy constructor makes a deep copy without the observers.
      */
     public LabelInfo(LabelInfo other) {
-        this.offset = other.offset;
-        this.backgroundColor = other.backgroundColor;
-        this.textColor = other.textColor;
+        this.offset = (Point2D)other.offset.clone();
+        this.backgroundColor = new Color( other.backgroundColor.getRed(),
+                                          other.backgroundColor.getGreen(),
+                                          other.backgroundColor.getBlue(),
+                                          other.backgroundColor.getAlpha() );
+        this.textColor = new Color( other.textColor.getRed(),
+                                    other.textColor.getGreen(),
+                                    other.textColor.getBlue(),
+                                    other.textColor.getAlpha() );
         this.textAlignment = other.textAlignment;
         labelObservers = new Vector();
     }
@@ -235,5 +241,16 @@ abstract public class LabelInfo implements ChangeObservable
                 ((ChangeObserver)iterator.next()).update(this);
             }
         }
+    }
+
+    /**
+     * Debug output.
+     */
+    public String toString() {
+        String retVal = "LabelInfo:\n";
+        retVal += "Offset: (" + offset.getX() + "," + offset.getY() + ")\n";
+        retVal += "Align: " + textAlignment + "\n";
+        retVal += "Colors: " + textColor + " on " + backgroundColor;
+        return retVal;
     }
 }
