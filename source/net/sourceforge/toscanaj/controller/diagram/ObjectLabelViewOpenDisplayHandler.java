@@ -30,7 +30,8 @@ public class ObjectLabelViewOpenDisplayHandler implements BrokerEventListener {
             throw new RuntimeException(getClass().getName() +
                     " has to be subscribed to events from ObjectLabelViews only");
         }
-        DatabaseRetrievedObject object = labelView.getObjectAtPosition(itemEvent.getCanvasPosition());
+        DatabaseRetrievedObject object =
+             (DatabaseRetrievedObject) labelView.getObjectAtPosition(itemEvent.getCanvasPosition());
         showObject(object);
     }
 

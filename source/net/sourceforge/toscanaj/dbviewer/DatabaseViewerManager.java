@@ -30,6 +30,8 @@ import java.util.List;
  * @todo the actual storing of the available viewers should not be part of this class, but
  *      should be in the ConceptualSchema instead, this class should just have a reference
  *      to a list.
+ *
+ * @todo create some less db-specific abstraction
  */
 public class DatabaseViewerManager {
     private static Component parentComponent = null;

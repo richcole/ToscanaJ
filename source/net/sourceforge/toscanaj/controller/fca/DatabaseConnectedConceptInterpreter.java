@@ -12,11 +12,11 @@ import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationConte
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.*;
 
 public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, BrokerEventListener {
 
@@ -174,5 +174,23 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 
     public void processEvent(Event e) {
         clearCaches((ConceptInterpretationContext) e.getSource());
+    }
+
+    public List executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
+        DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
+        boolean objectDisplayMode = context.getObjectDisplayMode();
+        boolean filterMode = context.getFilterMode();
+        if (dbConcept.getObjectClause() != null ||
+                ((objectDisplayMode == ConceptInterpretationContext.EXTENT) && !dbConcept.isBottom())
+        ) {
+            String whereClause = WhereClauseGenerator.createWhereClause(dbConcept,
+                    context.getDiagramHistory(),
+                    context.getNestingConcepts(),
+                    objectDisplayMode,
+                    filterMode);
+            return query.execute(whereClause);
+        } else {
+            return null;
+        }
     }
 }

@@ -8,8 +8,10 @@
 package net.sourceforge.toscanaj.controller.fca;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.database.Query;
 
 import java.util.Iterator;
+import java.util.List;
 
 
 /*
@@ -39,23 +41,25 @@ public interface ConceptInterpreter {
     int REFERENCE_DIAGRAM = 0;
     int REFERENCE_SCHEMA = 1;
 
-    /** @note is Dependent on displayMode and filterMode */
+    /** is Dependent on displayMode and filterMode */
     Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context);
 
-    /** @note is Dependent on displayMode and filterMode */
+    /** is Dependent on displayMode and filterMode */
     Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context);
 
-    /** @note is Dependent on displayMode and filterMode */
+    /** is Dependent on displayMode and filterMode */
     int getObjectCount(Concept concept, ConceptInterpretationContext context);
 
-    /** @note is Dependent on displayMode and filterMode */
+    /** is Dependent on displayMode and filterMode */
     int getAttributeCount(Concept concept, ConceptInterpretationContext context);
 
-    /** @note these are independent of displayMode and dependent on filterMode */
+    /** these are independent of displayMode and dependent on filterMode */
     double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context, int reference);
 
-    /** @note these are independent of displayMode and dependent on filterMode */
+    /** these are independent of displayMode and dependent on filterMode */
     double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context, int reference);
 
     boolean isRealized(Concept concept, ConceptInterpretationContext context);
+
+    List executeQuery(Query query, Concept concept, ConceptInterpretationContext context);
 }

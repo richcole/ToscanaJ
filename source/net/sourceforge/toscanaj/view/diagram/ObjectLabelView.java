@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.model.database.*;
@@ -40,7 +39,7 @@ public class ObjectLabelView extends LabelView {
      */
     private Query query = null;
 
-    private List queryResults = null;
+    private List contents = null;
 
     /**
      * Creates a view for the given label information.
@@ -101,14 +100,14 @@ public class ObjectLabelView extends LabelView {
     }
 
     protected int getNumberOfEntries() {
-        if (this.queryResults == null) {
+        if (this.contents == null) {
             return 0;
         }
-        return this.queryResults.size();
+        return this.contents.size();
     }
 
     protected Iterator getEntryIterator() {
-        return this.queryResults.iterator();
+        return this.contents.iterator();
     }
 
     protected void doQuery() {
@@ -116,29 +115,17 @@ public class ObjectLabelView extends LabelView {
             DiagramNode node = this.labelInfo.getNode();
             DatabaseConnectedConcept concept = (DatabaseConnectedConcept) node.getConcept();
             ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
-            boolean objectDisplayMode = context.getObjectDisplayMode();
-            boolean filterMode = context.getFilterMode();
-            if (concept.getObjectClause() != null ||
-                    ((objectDisplayMode == ConceptInterpretationContext.EXTENT) && !concept.isBottom())
-            ) {
-                String whereClause = WhereClauseGenerator.createWhereClause(concept,
-                        context.getDiagramHistory(),
-                        context.getNestingConcepts(),
-                        objectDisplayMode,
-                        filterMode);
-                queryResults = this.query.execute(whereClause);
-            } else {
-                queryResults = null;
-            }
+            contents =
+                   this.diagramView.getConceptInterpreter().executeQuery(query, concept, context);
         }
     }
 
-    public DatabaseRetrievedObject getObjectAtPosition(Point2D position) {
+    public Object getObjectAtPosition(Point2D position) {
         int itemHit = getItemAtPosition(position);
         if (itemHit == -1) {
             return null;
         }
-        return (DatabaseRetrievedObject) this.queryResults.get(itemHit);
+        return this.contents.get(itemHit);
     }
 
     protected boolean highlightedInIdeal() {

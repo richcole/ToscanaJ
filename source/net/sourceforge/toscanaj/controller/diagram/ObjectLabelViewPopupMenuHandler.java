@@ -56,7 +56,8 @@ public class ObjectLabelViewPopupMenuHandler implements BrokerEventListener {
     }
 
     public void openPopupMenu(final ObjectLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
-        final DatabaseRetrievedObject object = labelView.getObjectAtPosition(canvasPosition);
+        final DatabaseRetrievedObject object =
+                        (DatabaseRetrievedObject) labelView.getObjectAtPosition(canvasPosition);
         if (object == null) {
             return;
         }
