@@ -111,6 +111,7 @@ public class ColumnHeader extends JComponent{
 
 	public void setManyValuedContext(ManyValuedContext context) {
 		this.context = context;
+		updateSize();
 		validate();
 	}
 }
