@@ -105,7 +105,8 @@ public class DatabaseConnectionDialog extends JDialog {
 			
 			try {
 				DatabaseInfo embedInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
-				Class driverClass = Class.forName(embedInfo.getDriverClass());
+                // try loading the embedded engine to see if it is available
+				Class.forName(embedInfo.getDriverClass());
 				this.add(embDBMSRadioButton,new GridBagConstraints(
 						0,row,1,1,1,0,
 						GridBagConstraints.NORTHWEST,

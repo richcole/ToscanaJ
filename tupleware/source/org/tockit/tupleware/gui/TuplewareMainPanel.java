@@ -245,7 +245,6 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
 
     protected void saveTuples() {
 		final JFileChooser saveDialog;
-		String[] csxExtension = {"csx"};
 		ExtensionFileFilter fileFilter = new ExtensionFileFilter(new String[]{"tuples"},"Tuple Set File");
 		ExtensionFileFilter[] filterArray = { fileFilter };
 		if (this.lastFileRead != null) {
