@@ -108,7 +108,7 @@ public class DiagramController implements ChangeObservable {
      * @see #back()
      */
     public boolean undoIsPossible() {
-        return history.hasPastDiagrams();
+        return history.canMoveUp();
     }
 
     /**
@@ -135,19 +135,6 @@ public class DiagramController implements ChangeObservable {
      */
     public void addDiagram(Diagram2D diagram) {
         history.addDiagram(diagram);
-    }
-
-    /**
-     * Removes a specific diagram from the model.
-     *
-     * Throws NoSuchElementException if there is no such diagram. If it is tried
-     * to remove a currently displayed diagram nothing will happen.
-     *
-     * @TODO Find something useful when removing a current diagram.
-     * @TODO Do some testing on this, it might be broken.
-     */
-    public void removeDiagram(int position) {
-        history.removeDiagram(position);
     }
 
     /**
@@ -223,7 +210,7 @@ public class DiagramController implements ChangeObservable {
             // we don't have a diagram to display
             return null;
         }
-        /** @TODO: Calculating the objects in the diagram is currently a side
+        /** @todo : Calculating the objects in the diagram is currently a side
          effect of the diagram calculation --> fix by putting the
          calculation into Diagram2D. */
         this.numberOfCurrentObjects = 0;

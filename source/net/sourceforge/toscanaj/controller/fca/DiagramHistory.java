@@ -10,16 +10,16 @@ import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 
 import javax.swing.*;
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 /**
  * This stores the diagram references for visited, shown and forthcoming
  * diagrams and can be used as a model for JList components.
  */
-public class DiagramHistory extends AbstractListModel implements  ChangeObservable  {
+public class DiagramHistory extends AbstractListModel implements ChangeObservable {
 
     /**
      * Used to store references to diagrams, including the concept used for
@@ -67,6 +67,16 @@ public class DiagramHistory extends AbstractListModel implements  ChangeObservab
         }
 
         /**
+         * This is private so it can be called only by the outer class. Other
+         * classes are allowed to use this class (and have to) but they can not
+         * change zoomed concept.
+         */
+
+        private void setZoomedConcept(Concept zoomedConcept) {
+            this.zoomedConcept = zoomedConcept;
+        }
+
+        /**
          * Returns the diagram title for usage in a view.
          */
         public String toString() {
@@ -75,20 +85,23 @@ public class DiagramHistory extends AbstractListModel implements  ChangeObservab
     }
 
 
-    /**
-     * Stores the diagrams that have already been visited.
-     */
-    private List pastDiagrams = new LinkedList();
+    private List diagrams = new LinkedList();
+
+    private int currStartPosition;
+    private int firstFutureDiagramPosition;
 
     /**
-     * Stores the diagrams that are in use.
+     * Creates an empty list of diagrams.
      */
-    private List currentDiagrams = new LinkedList();
+    public DiagramHistory() {
+        init();
+    }
 
-    /**
-     * Stores the diagrams that are scheduled to come.
-     */
-    private List futureDiagrams = new LinkedList();
+    private void init() {
+        diagrams.clear();
+        currStartPosition = 0;
+        firstFutureDiagramPosition = 0;
+    }
 
     /**
      * Stores the number of levels we nest diagrams.
@@ -96,139 +109,235 @@ public class DiagramHistory extends AbstractListModel implements  ChangeObservab
     private int nestingLevel = 0;
 
     public void setNestingLevel(int level) {
+        if (level < 0) {
+            throw new IllegalArgumentException("Nesting level should be greater than zero, and was :" + level);
+        }
+
         this.nestingLevel = level;
-        int lastPos = currentDiagrams.size() - 1;
-        while( lastPos < level ) {
-            if( futureDiagrams.isEmpty() ) {
+        int lastPos = getNumberOfCurrentDiagrams() - 1;
+        while (lastPos < level) {
+            if (!hasFutureDiagrams()) {
                 break; // nothing more to get
             }
-            currentDiagrams.add(futureDiagrams.get(0));
-            futureDiagrams.remove(0);
+            firstFutureDiagramPosition++;
             lastPos++;
         }
-        while( lastPos > level ) {
-            futureDiagrams.add(0, currentDiagrams.get(lastPos));
-            currentDiagrams.remove(lastPos);
+        while (lastPos > level) {
+            firstFutureDiagramPosition--;
             lastPos--;
         }
-        fireContentsChanged(0,getSize()-1);
+        fireContentsChanged();
         notifyObservers();
     }
 
-    public boolean hasPastDiagrams(){
-        return !pastDiagrams.isEmpty();
+    public int getNestingLevel() {
+        return nestingLevel;
     }
 
-    /**
-     * Creates an empty list of diagrams.
-     */
-    public DiagramHistory() {
+    public boolean hasPastDiagrams() {
+        return currStartPosition > 0;
     }
+
 
     /**
      * Implements AbstractListModel.getSize().
      */
     public int getSize() {
-        return this.pastDiagrams.size() +
-               this.currentDiagrams.size() +
-               this.futureDiagrams.size();
+        return diagrams.size();
+    }
+
+
+    public boolean isEmpty() {
+        return 0 == getSize();
     }
 
     /**
      * Implements AbstractListModel.getElementAt(int).
      */
     public Object getElementAt(int position) {
-        if(position < this.pastDiagrams.size()) {
-            return this.pastDiagrams.get(position);
-        }
-        int pos = position - this.pastDiagrams.size();
-        if(pos < this.currentDiagrams.size()) {
-            return this.currentDiagrams.get(pos);
-        }
-        pos = pos - this.currentDiagrams.size();
-        return this.futureDiagrams.get(pos);
+        return this.diagrams.get(position);
+    }
+
+    private DiagramReference getReferenceAt(int elementPosition) {
+        return (DiagramReference) getElementAt(elementPosition);
     }
 
     /**
      * Returns true if the diagram is in the list of visited diagrams.
      */
-    public boolean isInPast(DiagramReference diagram) {
-        return this.pastDiagrams.contains(diagram);
+    public boolean isInPast(int elementPosition) {
+        return elementPosition < currStartPosition;
     }
 
     /**
      * Returns true if the diagram is in the list of displayed diagrams.
      */
     public boolean isInCurrent(DiagramReference diagram) {
-        return this.currentDiagrams.contains(diagram);
+        return isInCurrent(this.diagrams.indexOf(diagram));
+    }
+
+    public boolean isInCurrent(int elementPosition) {
+        return elementPosition >= currStartPosition && currStartPosition >= 0 && elementPosition < firstFutureDiagramPosition;
     }
 
     /**
      * Returns true if the diagram is in the list of diagrams still to be visited.
      */
     public boolean isInFuture(DiagramReference diagram) {
-        return this.futureDiagrams.contains(diagram);
+        return isInFuture(diagrams.indexOf(diagram));
     }
 
-    /**
-     * Redirects to the AbstractListModel method.
-     */
-    void fireContentsChanged(int from, int to) {
-        this.fireContentsChanged(this, from, to);
+    public boolean isInFuture(int elementPosition) {
+        return elementPosition >= firstFutureDiagramPosition;
     }
 
-    /**
-     * Redirects to the AbstractListModel method.
-     */
-    void fireIntervalAdded(int from, int to) {
-         this.fireIntervalAdded(this, from, to);
+    public boolean hasFutureDiagrams() {
+        return getSize() > firstFutureDiagramPosition;
     }
 
-    /**
-     * Redirects to the AbstractListModel method.
-     */
-    void fireIntervalRemoved(int from, int to) {
-        this.fireIntervalRemoved(this, from, to);
+
+    public int getNumberOfCurrentDiagrams() {
+        return firstFutureDiagramPosition - currStartPosition;
     }
+
+    public int getFirstCurrentDiagramPosition(){
+        return currStartPosition;
+    }
+
+    public Diagram2D getCurrentDiagram(int pos) {
+        final int elementPosition = currStartPosition + pos;
+        if (isInCurrent(elementPosition)) {
+            return getReferenceAt(elementPosition).getDiagram();
+        }
+        throw new NoSuchElementException("There are no current diagram with index:" + pos);
+    }
+
 
     /**
      * Debug output.
      */
     public String toString() {
+        final String newLine = "\n";
+        int i = 0;
         String retVal = "Past Diagrams:\n";
-        Iterator it = this.pastDiagrams.iterator();
-        while(it.hasNext()) {
-            retVal += it.next().toString() + "\n";
+        while (isInPast(i)) {
+            retVal += getReferenceAt(i).toString() + newLine;
+            i++;
         }
         retVal += "Current Diagrams:\n";
-        it = this.currentDiagrams.iterator();
-        while(it.hasNext()) {
-            retVal += it.next().toString() + "\n";
+        while (isInCurrent(i)) {
+            retVal += getReferenceAt(i).toString() + newLine;
+            i++;
         }
         retVal += "Future Diagrams:\n";
-        it = this.futureDiagrams.iterator();
-        while(it.hasNext()) {
-            retVal += it.next().toString() + "\n";
+        while (isInFuture(i)) {
+            retVal += getReferenceAt(i).toString() + newLine;
+            i++;
         }
         return retVal;
     }
 
+
     public void addDiagram(Diagram2D diagram) {
-        if(currentDiagrams.size() <= this.nestingLevel) {
-            currentDiagrams.add(new DiagramReference(diagram,null));
+
+        diagrams.add(new DiagramReference(diagram, null));
+        if (getNumberOfCurrentDiagrams() <= getNestingLevel()) {
+            firstFutureDiagramPosition++;
             notifyObservers();
         }
-        else {
-            futureDiagrams.add(new DiagramReference(diagram,null));
-        }
-        int lastPos = pastDiagrams.size() +
-                      currentDiagrams.size() +
-                      futureDiagrams.size() - 1;
-        fireIntervalAdded(lastPos,lastPos);
+        int lastPos = getSize() - 1;
+        fireIntervalAdded(lastPos, lastPos);
 
     }
 
-        /**
+    public void removeLastDiagram() {
+        if (getSize() == 0) {
+            throw new NoSuchElementException("The list of diagrams is already empty.");
+        }
+        final int lastPosition = getSize() - 1;
+        if (isInCurrent(lastPosition)) {
+            firstFutureDiagramPosition--;
+            if (currStartPosition >= firstFutureDiagramPosition) {
+                currStartPosition = Math.max(firstFutureDiagramPosition-1, 0);
+            }
+        }
+        diagrams.remove(lastPosition);
+        fireIntervalRemoved(getSize(), getSize());
+        notifyObservers();
+    }
+
+    public void reset() {
+        int last = getSize() - 1;
+        if (last == -1) {
+            return;
+        }
+        init();
+        fireIntervalRemoved(0, last);
+        notifyObservers();
+    }
+
+
+    private boolean canPerformNext() {
+        if (isEmpty()) {
+            return false;
+        }
+        if ((!hasFutureDiagrams()) &&
+                (getNumberOfCurrentDiagrams() == 1)) {
+            // nothing to go to
+            ///@todo Give feedback, when know how
+            return false;
+        }
+        return true;
+    }
+
+    public void next(Concept zoomedConcept) {
+        if (!canPerformNext()) {
+            return;
+        }
+        getReferenceAt(currStartPosition).setZoomedConcept(zoomedConcept);
+        if( shouldChangeCurrentStartDiagram()){
+            currStartPosition++;
+        }
+        if(hasFutureDiagrams()){
+            firstFutureDiagramPosition++;
+        }
+
+        fireContentsChanged();
+        notifyObservers();
+    }
+
+    private boolean shouldChangeCurrentStartDiagram() {
+        return currStartPosition>0 || (getNumberOfCurrentDiagrams()>getNestingLevel());
+    }
+
+    public void back() {
+        if (firstFutureDiagramPosition <= 0) {
+            throw new NoSuchElementException("No diagram left to go back to.");
+        }
+        int lastPos = getNumberOfCurrentDiagrams() - 1;
+        if (lastPos == getNestingLevel()) { // we have our nesting level
+            firstFutureDiagramPosition--;
+        }
+        if (hasPastDiagrams()) {
+            currStartPosition--;
+            // we have something to go back to, otherwise we just lose nesting
+        }
+        fireContentsChanged();
+        notifyObservers();
+    }
+
+    public interface ConceptVisitor {
+        void visitConcept(Concept concept);
+    }
+
+    public void visitZoomedConcepts(ConceptVisitor visitor) {
+        for (int i = 0; isInPast(i); i++) {
+            visitor.visitConcept(getReferenceAt(i).getZoomedConcept());
+        }
+    }
+
+
+    /**
      * Stores the observers of the controller.
      */
     private List observers = new LinkedList();
@@ -253,134 +362,40 @@ public class DiagramHistory extends AbstractListModel implements  ChangeObservab
      */
     protected void notifyObservers() {
         Iterator it = this.observers.iterator();
-        while(it.hasNext()) {
-            ChangeObserver observer = (ChangeObserver)it.next();
+        while (it.hasNext()) {
+            ChangeObserver observer = (ChangeObserver) it.next();
             observer.update(this);
         }
     }
 
-    public void removeDiagram(int position) {
-        if(position < pastDiagrams.size()) {
-            pastDiagrams.remove(position);
-            fireIntervalAdded(position,position);
-            notifyObservers();
-            return;
-        }
-        int pos = position - pastDiagrams.size();
-        if(pos < currentDiagrams.size()) {
-            return;
-        }
-        pos = pos - currentDiagrams.size();
-        if( pos < futureDiagrams.size()) {
-            futureDiagrams.remove(pos);
-            fireIntervalAdded(position,position);
-            return;
-        }
-        throw new NoSuchElementException("Tried to remove diagram beyond range");
+    /**
+     * Redirects to the AbstractListModel method.
+     */
+    private void fireContentsChanged(int from, int to) {
+        this.fireContentsChanged(this, from, to);
     }
 
-    public void removeLastDiagram() {
-        if( !futureDiagrams.isEmpty() ) {
-            futureDiagrams.remove(futureDiagrams.size()-1);
-            fireIntervalRemoved(getSize(),getSize());
-            return;
-        }
-        // no future diagrams, check if we can undo
-        if( pastDiagrams.size() + currentDiagrams.size() > 1 ) {
-            back();
-            futureDiagrams.remove(0);
-            fireIntervalRemoved(getSize(),getSize());
-            return;
-        }
-        // no future diagrams, no undo -- do we have at least one diagram?
-        if( !currentDiagrams.isEmpty() ) {
-            currentDiagrams.clear();
-            fireIntervalRemoved(getSize(),getSize());
-            notifyObservers();
-            return;
-        }
-        throw new NoSuchElementException("The list of diagrams is already empty.");
+    /**
+     * Redirects to the AbstractListModel method.
+     */
+    private void fireIntervalAdded(int from, int to) {
+        this.fireIntervalAdded(this, from, to);
     }
 
-    public void reset() {
-        int last = getSize()-1;
-        if(last == -1) {
-            return;
-        }
-        pastDiagrams.clear();
-        currentDiagrams.clear();
-        futureDiagrams.clear();
-        fireIntervalRemoved(0,last);
-        notifyObservers();
+    /**
+     * Redirects to the AbstractListModel method.
+     */
+    private void fireIntervalRemoved(int from, int to) {
+        this.fireIntervalRemoved(this, from, to);
     }
 
-    public boolean hasFutureDiagrams() {
-        return !futureDiagrams.isEmpty();
+    private void fireContentsChanged() {
+        fireContentsChanged(0, getSize() - 1);
     }
 
-    public void next(Concept zoomedConcept) {
-        if(futureDiagrams.isEmpty()) {
-            if(currentDiagrams.size() == 1) {
-                // nothing to go to
-                ///@todo Give feedback, when know how
-                return;
-            }
-            DiagramReference oldRef = (DiagramReference) currentDiagrams.get(0);
-            pastDiagrams.add(new DiagramReference( oldRef.getDiagram(), zoomedConcept ) );
-            currentDiagrams.remove(0);
-        }
-        else {
-            // move one of the future diagrams in
-            DiagramReference oldRef = (DiagramReference) currentDiagrams.get(0);
-            pastDiagrams.add(new DiagramReference( oldRef.getDiagram(), zoomedConcept ) );
-            currentDiagrams.remove(0);
-            currentDiagrams.add(futureDiagrams.get(0));
-            futureDiagrams.remove(0);
-        }
-        fireContentsChanged(0,getSize()-1);
-        notifyObservers();
+    public boolean canMoveUp() {
+        return hasPastDiagrams() || (getFirstCurrentDiagramPosition()==0 && getNumberOfCurrentDiagrams()>1);
     }
 
-    public void back() {
-
-        if(pastDiagrams.size() + currentDiagrams.size() < 2) {
-            throw new NoSuchElementException("No diagram left to go back to.");
-        }
-        int lastPos = currentDiagrams.size() - 1;
-        if( lastPos == this.nestingLevel ) { // we have our nesting level
-            futureDiagrams.add(0,currentDiagrams.get(lastPos));
-            currentDiagrams.remove(lastPos);
-        }
-        if( !pastDiagrams.isEmpty() ) {
-            // we have something to go back to, otherwise we just lose nesting
-            currentDiagrams.add(0,pastDiagrams.get(
-                                        pastDiagrams.size()-1));
-            pastDiagrams.remove(pastDiagrams.size()-1);
-        }
-        fireContentsChanged(0,getSize()-1);
-        notifyObservers();
-    }
-
-    public int getNumberOfCurrentDiagrams(){
-          return currentDiagrams.size();
-    }
-
-    public Diagram2D getCurrentDiagram(int pos){
-        DiagramReference ref = (DiagramReference) currentDiagrams.get(pos);
-        return ref.getDiagram();
-    }
-
-    public interface ConceptVisitor{
-        void visitConcept(Concept concept);
-    }
-
-    public void visitZoomedConcepts(ConceptVisitor visitor){
-        Iterator it = pastDiagrams.iterator();
-        while(it.hasNext()) {
-            DiagramReference curRef = (DiagramReference) it.next();
-            Concept currentZoomedConcept = curRef.getZoomedConcept();
-            visitor.visitConcept(currentZoomedConcept);
-        }
-    }
 
 }
