@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.DataDump;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.db.DumpSqlScript;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
@@ -783,6 +784,7 @@ public class ElbaMainPanel
 	private void exportSQLScript(File file) {
 		try {
 			FileOutputStream outputStream = new FileOutputStream(file);
+		    DumpSqlScript.dumpSqlScript(this.databaseConnection, outputStream);
 			outputStream.close();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
