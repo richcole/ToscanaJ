@@ -82,7 +82,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 			Iterator it = relatedAttributes.iterator();
 			while (it.hasNext()) {
 				Attribute attrib = (Attribute) it.next();
-				relation.insert(objectData, attrib);
+				relation.insert(object, attrib);
 			}
 		}else{
 			try{
@@ -99,7 +99,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 					Iterator it = relatedAttributes.iterator();
 					while (it.hasNext()) {
 						Attribute attrib = (Attribute) it.next();
-						relation.insert(objectData, attrib);
+						relation.insert(object, attrib);
 					}
 				}	
 			}catch(DatabaseException e) {
