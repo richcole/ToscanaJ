@@ -32,13 +32,13 @@ public class DatabaseViewerException extends Exception {
      */
     public DatabaseViewerException(String s, Exception e) {
         super(s);
-        exception = e;
+        this.exception = e;
     }
 
     /**
      * Returns the originial exception if attached.
      */
     public Exception getOriginal() {
-        return exception;
+        return this.exception;
     }
 }

@@ -99,18 +99,19 @@ public class StateRing extends CanvasItem implements XMLizable {
         Point2D center = this.node.getPosition();
         double x = center.getX();
         double y = center.getY();
-        double rx = node.getRadiusX() + EXTRA_RADIUS;
-        double ry = node.getRadiusY() + EXTRA_RADIUS;
+        double rx = this.node.getRadiusX() + EXTRA_RADIUS;
+        double ry = this.node.getRadiusY() + EXTRA_RADIUS;
         return new Rectangle2D.Double(x - rx, y - ry, 2 * rx, 2 * ry);
     }
 
     public Element toXML() {
         Element result = new Element("stateRing");
-        result.setAttribute("nodeView",node.getIdentifier());
+        result.setAttribute("nodeView",this.node.getIdentifier());
         result.setAttribute("color", ColorStringConverter.colorToString(this.baseColor));
         return result;
     }
 
     public void readXML(Element elem) {
+    	// @TODO
     }
 }

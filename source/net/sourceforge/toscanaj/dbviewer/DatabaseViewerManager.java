@@ -104,8 +104,8 @@ public class DatabaseViewerManager implements XMLizable {
             }
         }
         try {
-            viewer = (DatabaseViewer) viewerClass.newInstance();
-            viewer.initialize(this);
+            this.viewer = (DatabaseViewer) viewerClass.newInstance();
+            this.viewer.initialize(this);
         } catch (InstantiationException e) {
             throw new DatabaseViewerException("Could not instantiate class '" + className + "'");
         } catch (IllegalAccessException e) {
@@ -206,10 +206,10 @@ public class DatabaseViewerManager implements XMLizable {
     }
 
     public Element getTemplate() {
-        if (templateElement != null) {
+        if (this.templateElement != null) {
             String url = this.templateElement.getAttributeValue("url");
             if (url != null) {
-                insertXML(templateElement);
+                insertXML(this.templateElement);
             }
         }
         return (Element) this.templateElement.clone();
@@ -219,7 +219,7 @@ public class DatabaseViewerManager implements XMLizable {
         if (this.templateElement != null) {
             String url = this.templateElement.getAttributeValue("url");
             if (url != null) {
-                loadText(templateElement);
+                loadText(this.templateElement);
             }
         }
         return this.templateElement.getText();
@@ -377,27 +377,27 @@ public class DatabaseViewerManager implements XMLizable {
         } else {
             throw new RuntimeException("Totally unexpected situation");
         }
-        retVal.setAttribute(SCREEN_NAME_ATTRIBUTE_NAME, screenName);
+        retVal.setAttribute(SCREEN_NAME_ATTRIBUTE_NAME, this.screenName);
         retVal.setAttribute(CLASS_ATTRIBUTE_NAME, this.viewer.getClass().getName());
-        if (originalTemplateElement != null) {
-            retVal.addContent((Element) originalTemplateElement.clone());
+        if (this.originalTemplateElement != null) {
+            retVal.addContent((Element) this.originalTemplateElement.clone());
         }
-        if (tableName != null) {
+        if (this.tableName != null) {
             Element tableElem = new Element(TABLE_ELEMENT_NAME);
-            tableElem.addContent(tableName);
+            tableElem.addContent(this.tableName);
             retVal.addContent(tableElem);
         }
-        if (keyName != null) {
+        if (this.keyName != null) {
             Element keyElem = new Element(KEY_ELEMENT_NAME);
-            keyElem.addContent(keyName);
+            keyElem.addContent(this.keyName);
             retVal.addContent(keyElem);
         }
-        Enumeration parKeys = parameters.keys();
+        Enumeration parKeys = this.parameters.keys();
         while (parKeys.hasMoreElements()) {
             String key = (String) parKeys.nextElement();
             Element parElem = new Element(PARAMETER_ELEMENT_NAME);
             parElem.setAttribute(PARAMETER_NAME_ATTRIBUTE_NAME, key);
-            parElem.setAttribute(PARAMETER_VALUE_ATTRIBUTE_NAME, (String) parameters.get(key));
+            parElem.setAttribute(PARAMETER_VALUE_ATTRIBUTE_NAME, (String) this.parameters.get(key));
             retVal.addContent(parElem);
         }
         return retVal;
@@ -407,13 +407,13 @@ public class DatabaseViewerManager implements XMLizable {
     	if (elem == null) {
     		throw new XMLSyntaxError("No element for " + this.getClass().getName()+ "given.");
     	}
-        screenName = elem.getAttributeValue(SCREEN_NAME_ATTRIBUTE_NAME);
-        originalTemplateElement = elem.getChild(TEMPLATE_ELEMENT_NAME);
-        if (originalTemplateElement != null) {
-            templateElement = (Element) originalTemplateElement.clone();
+    	this.screenName = elem.getAttributeValue(SCREEN_NAME_ATTRIBUTE_NAME);
+    	this.originalTemplateElement = elem.getChild(TEMPLATE_ELEMENT_NAME);
+        if (this.originalTemplateElement != null) {
+        	this.templateElement = (Element) this.originalTemplateElement.clone();
         }
-        tableName = elem.getChildText(TABLE_ELEMENT_NAME);
-        keyName = elem.getChildText(KEY_ELEMENT_NAME);
+        this.tableName = elem.getChildText(TABLE_ELEMENT_NAME);
+        this.keyName = elem.getChildText(KEY_ELEMENT_NAME);
         List parameterElems = elem.getChildren(PARAMETER_ELEMENT_NAME);
         Iterator it = parameterElems.iterator();
         while (it.hasNext()) {

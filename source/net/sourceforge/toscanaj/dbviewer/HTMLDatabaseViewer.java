@@ -78,7 +78,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
             this.viewerManager = viewerManager;
             this.template = viewerManager.getTemplate();
 
-            if (template == null) {
+            if (this.template == null) {
                 throw new DatabaseViewerException("HTMLDatabaseViewer needs <template> in definition");
             }
             
@@ -103,31 +103,31 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
                 Element elem = (Element) queue.remove(0);
                 queue.addAll(elem.getChildren());
                 if (elem.getName().equals("repeat")) {
-                    if (repeatElement != null) {
+                    if (this.repeatElement != null) {
                         throw new DatabaseViewerException("Two repeat sections found in template.");
                     }
-                    repeatElement = elem;
-                    repetitionBlock = (Element) elem.clone();
+                    this.repeatElement = elem;
+                    this.repetitionBlock = (Element) elem.clone();
                     /// @todo find some way to neutralize <repeat>
                 }
                 if (elem.getName().equals("field")) {
-                    singleFieldElements.add(elem);
-                    singleFieldNames.add(elem.getAttributeValue("content"));
+                	this.singleFieldElements.add(elem);
+                	this.singleFieldNames.add(elem.getAttributeValue("content"));
                     elem.setName("span");
                     elem.removeAttribute("content");
                 }
             }
 
             // find repeated fields
-            if (repeatElement != null) {
+            if (this.repeatElement != null) {
                 queue = new LinkedList();
-                queue.add(repetitionBlock);
+                queue.add(this.repetitionBlock);
                 while (!queue.isEmpty()) {
                     Element elem = (Element) queue.remove(0);
                     queue.addAll(elem.getChildren());
                     if (elem.getName().equals("field")) {
-                        repeatedFieldElements.add(elem);
-                        repeatedFieldNames.add(elem.getAttributeValue("content"));
+                    	this.repeatedFieldElements.add(elem);
+                        this.repeatedFieldNames.add(elem.getAttributeValue("content"));
                         elem.setName("span");
                         elem.removeAttribute("content");
                     }
@@ -175,12 +175,12 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
 
         private void showView(String whereClause) {
             try {
-                List results = this.viewerManager.getConnection().executeQuery(singleFieldNames,
-                        viewerManager.getTableName(),
+                List results = this.viewerManager.getConnection().executeQuery(this.singleFieldNames,
+                		this.viewerManager.getTableName(),
                         whereClause);
                 Vector fields = (Vector) results.get(0);
                 Iterator itFields = fields.iterator();
-                Iterator itElems = singleFieldElements.iterator();
+                Iterator itElems = this.singleFieldElements.iterator();
                 while (itFields.hasNext()) {
                     String result = (String) itFields.next();
                     Element fieldElem = (Element) itElems.next();
@@ -191,16 +191,16 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
                         fieldElem.setText(result);
                     }
                 }
-                if (repeatElement != null) {
-                    results = this.viewerManager.getConnection().executeQuery(repeatedFieldNames,
-                            viewerManager.getTableName(),
+                if (this.repeatElement != null) {
+                    results = this.viewerManager.getConnection().executeQuery(this.repeatedFieldNames,
+                    		this.viewerManager.getTableName(),
                             whereClause);
-                    repeatElement.setContent(null);
+                    this.repeatElement.setContent(null);
                     Iterator it = results.iterator();
                     while (it.hasNext()) {
                         fields = (Vector) it.next();
                         itFields = fields.iterator();
-                        itElems = repeatedFieldElements.iterator();
+                        itElems = this.repeatedFieldElements.iterator();
                         while (itFields.hasNext()) {
                             String result = (String) itFields.next();
                             Element fieldElem = (Element) itElems.next();
@@ -212,7 +212,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
                             }
                         }
                         /// @todo only the content of repetitionBlock should be added (but _all_ content, not just elements)
-                        repeatElement.addContent((Element) repetitionBlock.clone());
+                        this.repeatElement.addContent((Element) this.repetitionBlock.clone());
                     }
                 }
                 XMLOutputter outputter = new XMLOutputter();
@@ -232,9 +232,9 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
         /// @todo this is not true, it could be done using the Contructor class from the reflection API
     }
 
-    public void initialize(DatabaseViewerManager manager) {
+    public void initialize(DatabaseViewerManager dbManager) {
         /// @todo some of the initialization of repeat and field sections could be done here
-        this.manager = manager;
+        this.manager = dbManager;
     }
 
     public void showView(String whereClause) {

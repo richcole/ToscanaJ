@@ -87,6 +87,7 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     }
 
     private TransitionArrow() {
+    	// should be created through factory
     }
 
     public void draw(Graphics2D g) {
@@ -123,11 +124,11 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
 		this.currentShape = shapeTransform.createTransformedShape(arrow);
 
         g.setPaint(paint);
-        g.fill(currentShape);
+        g.fill(this.currentShape);
         if(this.style.getBorderWidth() != 0) {
             g.setStroke(new BasicStroke(this.style.getBorderWidth()));
             g.setPaint(calculatePaint(length, Color.BLACK));
-            g.draw(currentShape);
+            g.draw(this.currentShape);
         }
     	
         g.setStroke(oldStroke);
@@ -184,14 +185,14 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     }
 
     public Point2D getPosition() {
-        return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
+        return new Point2D.Double(this.bounds.getCenterX(), this.bounds.getCenterY());
     }
 
     public Rectangle2D getCanvasBounds(Graphics2D g) {
         // we need to update in case one of the nodes has moved
         // @todo try finding something better
         calculateBounds();
-        return bounds;
+        return this.bounds;
     }
 
     protected void calculateBounds() {
@@ -253,11 +254,11 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
 
     public Element toXML() {
         Element result = new Element(getTagName());
-        result.setAttribute("from", startNode.getIdentifier());
-        result.setAttribute("to", endNode.getIdentifier());
+        result.setAttribute("from", this.startNode.getIdentifier());
+        result.setAttribute("to", this.endNode.getIdentifier());
         Element offsetElem = new Element("offset");
-        offsetElem.setAttribute("x", String.valueOf(manualOffset.getX()));
-        offsetElem.setAttribute("y", String.valueOf(manualOffset.getY()));
+        offsetElem.setAttribute("x", String.valueOf(this.manualOffset.getX()));
+        offsetElem.setAttribute("y", String.valueOf(this.manualOffset.getY()));
         result.addContent(offsetElem);
         for (int i = 0; i < DiagramSchema.getCurrentSchema().getArrowStyles().length; i++) {
             if(this.style == DiagramSchema.getCurrentSchema().getArrowStyles()[i]) {
