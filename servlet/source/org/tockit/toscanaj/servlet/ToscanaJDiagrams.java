@@ -48,7 +48,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     public void init() throws ServletException 
     {
     		
-		System.out.println("ToscanaJDiagrams: init");
+		//System.out.println("ToscanaJDiagrams: init");
         super.init();
 		if(!GlobalVariables.isInitialized()) {
 			// get the schema filename from the servlet init parameter
@@ -92,7 +92,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     		throws IOException
     {
     	
-		System.out.println("ToscanaJDiagrams: doGet");		
+		//System.out.println("ToscanaJDiagrams: doGet");		
 
 		// local variable declaration
 		DiagramHistory 	diagramHistory;
@@ -118,7 +118,9 @@ public class ToscanaJDiagrams extends HttpServlet {
         StringBuffer svgContent = printDiagram(diagramNumber, diagramHistory, out);
         
         // calculate view box size
-		calculateViewBoxSize();
+        // used to call the viewBoxCalculater. 
+        // Is placed wrong here, I reckon, I moved it into printSVGFile. Bastian
+        // calculateViewBoxSize();
 		
 		// translate the svg image
 		svgContent.insert(0,"<g transform=\"translate(-" + marginLeft + ",-" 
@@ -127,13 +129,14 @@ public class ToscanaJDiagrams extends HttpServlet {
 
 		// print out the SVG file
 		printSVGFile(svgContent, out, resp);
-		
     }
 
 	private void printSVGFile(StringBuffer buffer, PrintWriter out, 
 			HttpServletResponse resp) 
 	{
-
+		// First create the viewBox
+		calculateViewBoxSize();
+		
 		// set the response content type to be svg image		
 		resp.setContentType("image/svg-xml");
         
@@ -154,7 +157,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     private void printScript(PrintWriter out) 
     {
     	
-		System.out.println("ToscanaJDiagrams: PrintScript");
+		//System.out.println("ToscanaJDiagrams: PrintScript");
         out.println("<script type=\"text/javascript\">");
         out.println("function openWindow(URL) {");
         out.println("window1 = window.open(URL,\"my_new_window\"," +
@@ -167,8 +170,13 @@ public class ToscanaJDiagrams extends HttpServlet {
     private StringBuffer printDiagram(int diagramNumber, 
     		DiagramHistory diagramHistory, PrintWriter out) 
     {
-    	
-		System.out.println("ToscanaJDiagrams: printDiagram");
+//		System.out.println("ToscanaJDiagrams: printDiagram");
+//		minimalDiagramX = 0.0;
+//		maximalDiagramX = 0.0;
+//		minimalDiagramY = 0.0;
+//		maximalDiagramY = 0.0;
+//		diagramX = 0.0;
+//		diagramY = 0.0;
 		
 		//	local variables declaration
         Diagram2D 		diagram;			// initialise the diagram
@@ -248,7 +256,8 @@ public class ToscanaJDiagrams extends HttpServlet {
 				+ "," + nodeColor.getGreen() + "," 
 				+ nodeColor.getBlue() + ")\" stroke=\"black\" />");
 			buffer.append("\n");
-				
+			
+			
 //            buffer.append("</a>");
 //			buffer.append("\n");
 
@@ -380,9 +389,9 @@ public class ToscanaJDiagrams extends HttpServlet {
             
             LabelInfo objLabel = node.getObjectLabelInfo();
 
-			System.out.println("checking object label");
+			//System.out.println("checking object label");
             if(objLabel != null) {
-            	System.out.println("object label exists !!!!!!!!!!!!!!!!!!!");
+            	//System.out.println("object label exists !!!!!!!!!!!!!!!!!!!");
             	
 				Color backgroundColor = objLabel.getBackgroundColor();
 				Point2D offset = objLabel.getOffset();
@@ -393,18 +402,18 @@ public class ToscanaJDiagrams extends HttpServlet {
 
                 if (objectCount != 0) 
                 {
-					System.out.println("object count exists");
+					//System.out.println("object count exists");
 					
                     
 					double maxLabelWidth = fm.stringWidth(String.valueOf(objectCount))
 						+ 2 * fm.getLeading() + 2 * fm.getDescent();
 					int maxLabelHeight = getHeight(fm);
 
-					System.out.println("max label height" + maxLabelHeight);
+					//System.out.println("max label height" + maxLabelHeight);
 					updateMargins(pos, offset, maxLabelWidth, maxLabelHeight, 
 						"labelInfo");
 
-					System.out.println("textAlignment: "+textAlignment);
+					//System.out.println("textAlignment: "+textAlignment);
                     if ((textAlignment == 0) && (maxLabelWidth != 0.0)) 
                     {
 
@@ -452,7 +461,7 @@ public class ToscanaJDiagrams extends HttpServlet {
                         try 
                         {
                             buffer.append("" + objectCount);
-                            System.out.println("" + objectCount);
+                            //System.out.println("" + objectCount);
                         } 
                         
                         catch (Exception e) {
@@ -470,13 +479,13 @@ public class ToscanaJDiagrams extends HttpServlet {
                     
                 }
                 else {
-					System.out.println("object count does exists");
+					//System.out.println("object count does exists");
 
                 }
                 
             }
             else {
-				System.out.println("object label does not exists");
+				//System.out.println("object label does not exists");
             }
             
         }
@@ -490,7 +499,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     		int theTextAlignment) 
     {
 
-		System.out.println("ToscanaJDiagrams: drawLineConnector");
+		//System.out.println("ToscanaJDiagrams: drawLineConnector");
         if ((theTextAlignment == 1) && (labelWidth != 0.0)) 
         {
         	
@@ -534,7 +543,7 @@ public class ToscanaJDiagrams extends HttpServlet {
 
     private String drawLineConnector2(PrintWriter out, Point2D centerOfNode, Point2D offset, double labelWidth, int labelHeight, int theTextAlignment) {
     	
-		System.out.println("ToscanaJDiagrams: drawLineConnector2");
+		//System.out.println("ToscanaJDiagrams: drawLineConnector2");
         if ((theTextAlignment == 1) && (labelWidth != 0.0)) 
         {
         	
@@ -580,7 +589,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     private String escapeEntities(String string) 
     {
     	
-		System.out.println("ToscanaJDiagrams: escapeEntities");
+		//System.out.println("ToscanaJDiagrams: escapeEntities");
         String retVal = "";
         for(int i = 0; i < string.length(); i++) 
         {
@@ -668,20 +677,20 @@ public class ToscanaJDiagrams extends HttpServlet {
         
     }
 
-	private void calculateViewBoxSize() 
-	{
-		
-		/*
-		viewBoxX = marginLeft - 10.0;
-		viewBoxY = marginTop;
-		*/
-		//viewBoxWidth = (marginRight - marginLeft) + 20.0;
-		//viewBoxHeight = (marginBottom - marginTop) + 170.0;
-		viewBoxX = -20.0;
-		viewBoxY = 0.0; 
-		viewBoxWidth = ( marginRight - marginLeft ) + 40.0;
-		viewBoxHeight = ( marginBottom - marginTop ) + 80.0;
-		
+//	private void calculateViewBoxSize()//double maximalDiagramX, double maximalDiagramY) // braucht jawohl die Diagrammgroesse
+	// Bastian: changed the calculation of viewBoxWidth and viewBoxHeight 
+    private void calculateViewBoxSize() 
+    {
+    	viewBoxWidth = 0;
+		viewBoxHeight = 0;
+
+		viewBoxX = 0.0;	
+		viewBoxY = -60.0; 
+//		viewBoxWidth = ( marginRight - marginLeft ) + 40.0;
+//		viewBoxHeight = ( marginBottom - marginTop ) + 80.0;
+
+		viewBoxWidth = (marginRight-marginLeft ) + 10; //minimalDiagramX + maximalDiagramX;// + (minimalDiagramX + maximalDiagramX)/20;
+		viewBoxHeight = (marginBottom - marginTop) + 75; //minimalDiagramY + maximalDiagramY;
 	}
 	
 	private void updateMargins(Point2D pos, Point2D offset, 
@@ -696,169 +705,123 @@ public class ToscanaJDiagrams extends HttpServlet {
 				marginLeft 		= addXPos(pos.getX());
 				marginRight 	= addXPos(pos.getX());
 				marginTop		= addYPos(pos.getY());
-				marginBottom	= addYPos(pos.getY());				 	
+				marginBottom	= addYPos(pos.getY());
 			}
 			else 
 			{			
 				// if current node is the left most node in the diagram
 				if (addXPos(pos.getX()) < marginLeft) 
 				{
-					
 					// update left margin
-					marginLeft = addXPos(pos.getX());
-					
+					marginLeft = addXPos(pos.getX());	
 				}
 				// if current node is not the left most node in the diagram
 				else 
 				{
-					
-					// do not update left margin
-					
+					// do not update left margin	
 				}
 	
 				// if current node is the right most node in the diagram
 				if (marginRight < addXPos(pos.getX())) 
-				{
-					
+				{	
 					// update right margin
-					marginRight = addXPos(pos.getX());
-					
+					marginRight = addXPos(pos.getX());	
 				}
 				// if current node is not the right most node in the diagram
 				else 
 				{
-					
 					// do not update right margin
-					
 				}
-	
 				// if current node is the upper most node in the diagram
 				if (addYPos(pos.getY()) < marginTop) 
 				{
-					
 					// update top margin
 					marginTop = addYPos(pos.getY());
-					
 				}
 				// if current node is not the upper most node in the diagram
 				else 
 				{
-					
 					// do not update top margin
-					
 				}
-	
 				// if current node is the bottom most node in the diagram
 				if (marginBottom < addYPos(pos.getY())) 
 				{
-					
 					// update bottom margin
 					marginBottom = addYPos(pos.getY());
-					
 				}
 				else 
 				{
-					
 					// do not update bottom margin
-					
 				}
-			}			
+			}
 		}
 		else if (element.equals("attrLabel")) 
 		{
-			
 			// if node label is the right most part of the diagram
 			if (marginRight < ((addXPos((pos.getX() + offset.getX())) - 3.0 
 				- (0.35 * maxLabelWidth)) + maxLabelWidth)) 
 			{
-				
 				// update right margin
 				marginRight = (addXPos((pos.getX() + offset.getX())) - 3.0 
 					- (0.35 * maxLabelWidth)) + maxLabelWidth;
-				
 			}			
 			else {
-				
 				// do not update right margin
-				
 			}
-
 			// if node label is the left most part of the diagram
 			if ((addXPos((pos.getX() + offset.getX())) - 3.0 
 				- (0.65 * maxLabelWidth)) < marginLeft) 
 			{
-				
 				// update left margin
 				marginLeft = addXPos((pos.getX() + offset.getX())) - 3.0 - (0.65 * maxLabelWidth);
-				
 			}
 			else 
-			{
-				
-				// do not update left margin
-				
+			{	
+				// do not update left margin	
 			}
-
 			// if the node label is the upper most part of the diagram
 			if (addYPos((pos.getY() + offset.getY() - 10.0 
 				- maxLabelHeight )) < marginTop) 
-			{
-				
+			{	
 				// update top margin
 				marginTop = addYPos((pos.getY() + offset.getY() - 10.0 
-					- maxLabelHeight ));
-				
+					- maxLabelHeight ));	
 			}
 			else 
 			{
-				
-				// do not update top margin
-				
+				// do not update top margin				
 			}
-
 			// if the node label is the bottom most part of the diagram
 			if (marginBottom < (addYPos((pos.getY() + offset.getY() - 10.0 
 				- maxLabelHeight )) + maxLabelHeight)) 
-			{
-				
+			{				
 				// update bottom margin
 				marginBottom = addYPos((pos.getY() + offset.getY() - 10.0 
-					- maxLabelHeight )) + maxLabelHeight;
-				
+					- maxLabelHeight )) + maxLabelHeight;				
 			}
 			else 
-			{
-				
-				// do not update bottom margin
-				
-			}
-			
+			{				
+				// do not update bottom margin				
+			}			
 		}
 		else if (element.equals("labelInfo")) 
-		{
-			
+		{			
 			// if this label info is the right most part of the diagram
 			if (marginRight < ((addXPos((pos.getX() + offset.getX())) - 3.0 
 				- (0.5 * maxLabelWidth)) + maxLabelWidth)) 
-			{
-				
+			{				
 				// update the right margin
 				marginRight = (addXPos((pos.getX() + offset.getX())) - 3.0 
-					- (0.5 * maxLabelWidth)) + maxLabelWidth;
-					
+					- (0.5 * maxLabelWidth)) + maxLabelWidth;					
 			}
 			else 
-			{
-				
-				// do not update right margin
-				
+			{				
+				// do not update right margin				
 			}
-
 			// if this label info is the left most part of the diagram
 			if ((addXPos((pos.getX() + offset.getX())) - 3.0 
 				- (0.5 * maxLabelWidth)) < marginLeft) 
-			{
-				
+			{				
 				// update margin left
 				marginLeft = (addXPos((pos.getX() + offset.getX())) - 3.0 
 					- (0.5 * maxLabelWidth));
@@ -905,7 +868,5 @@ public class ToscanaJDiagrams extends HttpServlet {
 			}	
 					
 		}
-		
-    }
-
+	}
 }
