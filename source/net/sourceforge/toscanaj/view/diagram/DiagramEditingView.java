@@ -40,6 +40,7 @@ import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
 import net.sourceforge.toscanaj.view.context.ContextTableEditorDialog;
+import net.sourceforge.toscanaj.view.context.InputTextDialog;
 
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
@@ -81,6 +82,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private JButton gridIncreaseButton;
     private JButton gridDecreaseButton;
     private JCheckBox gridEnabledCheckBox;
+    private Frame parent;
     
 
     /**
@@ -89,6 +91,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 	public DiagramEditingView(Frame parent, ConceptualSchema conceptualSchema, EventBroker eventBroker) {
 		super();
 		this.conceptualSchema = conceptualSchema;
+		this.parent = parent;
 
 		setLayout(new BorderLayout());
 		
@@ -402,11 +405,22 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         ContextImplementation context = (ContextImplementation) DiagramToContextConverter.getContext(this.diagramView.getDiagram());
         contextEditingDialog.setContext(context);
     	if(contextEditingDialog.execute()) {
-    		/// @todo check for duplicate names
     		LatticeGenerator lgen = new GantersAlgorithm();
     		context = contextEditingDialog.getContext();
     		Lattice lattice = lgen.createLattice(context);
-    		Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, context.getName(), new DefaultDimensionStrategy());
+    		String contextName = context.getName();
+    		do {
+				Diagram2D foundDiagram = this.conceptualSchema.getDiagram(contextName);
+				if (foundDiagram != null) {				
+					InputTextDialog inputDialog = new InputTextDialog(this.parent, 
+													"Duplicate Diagram Title", 
+													" diagram title", contextName,
+													false);
+					contextName = inputDialog.getInput();
+				}
+    		} while (contextName.equals(context.getName()));
+    		
+    		Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, contextName, new DefaultDimensionStrategy());
     		this.conceptualSchema.replaceDiagram(this.diagramView.getDiagram(), diagram);
     		this.diagramView.showDiagram(diagram);
     	}

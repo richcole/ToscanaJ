@@ -27,6 +27,8 @@ import javax.swing.JTextField;
  * "object" or "attribute" during renaming or the title during creation.
  *  - currentTextValue The value of the current string.
  * To be used in the formatting of the text message prompt in the JDialog
+ *  - withCancelButton allows user to specify whether or not they want 
+ * dialog to have a "Cancel" button. By default dialog is built with Cancel button.
  */
 public class InputTextDialog extends JDialog {
 	
@@ -34,7 +36,9 @@ public class InputTextDialog extends JDialog {
 
     private JOptionPane optionPane;
 	private JTextField textField;
-
+	
+	private boolean withCancelButton = true;
+	
 	public InputTextDialog(Dialog aDialog, String title, String thingToAdd, String currentTextValue) {
 		super(aDialog, isModal);
 		buildDialog(aDialog, title, thingToAdd, currentTextValue);
@@ -45,6 +49,11 @@ public class InputTextDialog extends JDialog {
 		buildDialog(aFrame, title, thingToAdd, currentTextValue);
     }
 
+	public InputTextDialog(Frame aFrame, String title, String thingToAdd, String currentTextValue, boolean withCancelButton) {
+		super(aFrame, isModal);
+		this.withCancelButton = withCancelButton;
+		buildDialog(aFrame, title, thingToAdd, currentTextValue);
+	}
 
 	private void buildDialog(Component parent, String title, String thingToAdd, String currentTextValue) {
 		setTitle(title);
@@ -58,24 +67,37 @@ public class InputTextDialog extends JDialog {
 		
 		final String enterButtonString = "Enter";
 		final String cancelButtonString = "Cancel";
-		Object[] options = {enterButtonString, cancelButtonString};
 		
-		optionPane = new JOptionPane(array, 
-		                            JOptionPane.QUESTION_MESSAGE,
-		                            JOptionPane.YES_NO_OPTION,
-		                            null,
-		                            options,
-		                            options[0]);
+		if (this.withCancelButton) {
+			Object[] options = {enterButtonString, cancelButtonString};
+			optionPane = new JOptionPane(array, 
+										JOptionPane.QUESTION_MESSAGE,
+										JOptionPane.YES_NO_OPTION,
+										null,
+										options,
+										options[0]);
+		}
+		else {
+			Object[] options = {enterButtonString};
+			optionPane = new JOptionPane(array, 
+										JOptionPane.QUESTION_MESSAGE,
+										JOptionPane.YES_NO_OPTION,
+										null,
+										options);
+		}
+		
 		setContentPane(optionPane);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 		        public void windowClosing(WindowEvent we) {
-		        /*
-		         * Instead of directly closing the window,
-		         * we're going to change the JOptionPane's
-		         * value property.
-		         */
-		        optionPane.setValue(new Integer(JOptionPane.CLOSED_OPTION));
+		        	if (withCancelButton) {
+						/*
+						 * Instead of directly closing the window,
+						 * we're going to change the JOptionPane's
+						 * value property.
+						 */
+						optionPane.setValue(new Integer(JOptionPane.CLOSED_OPTION));
+		        	}
 		    }
 		});
 		
