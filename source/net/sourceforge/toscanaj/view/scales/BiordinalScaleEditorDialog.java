@@ -96,7 +96,6 @@ public class BiordinalScaleEditorDialog extends JDialog {
 	}
 	
 	protected void setCreateButtonState() {
-		System.out.println("here");
 		createButton.setEnabled(!titleEditor.getText().equals("") && 
 								leftPanel.getDividersList().getModel().getSize()!=0 && 
 								rightPanel.getDividersList().getModel().getSize()!=0);
