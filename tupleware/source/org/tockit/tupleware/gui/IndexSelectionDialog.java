@@ -44,7 +44,7 @@ public class IndexSelectionDialog extends JDialog {
                     return;
                 }
                 if (!selModel.isSelectionEmpty()) {
-                    Object data = availableList.getElementAt(selModel.getLeadSelectionIndex());
+                    Object data = fromModel.getElementAt(selModel.getLeadSelectionIndex());
                     fromModel.removeElement(data);
                     toModel.addElement(data);
                 }
