@@ -47,7 +47,6 @@ import java.util.Vector;
 public class ShellExecuteDatabaseViewer implements DatabaseViewer {
     private DatabaseViewerManager viewerManager = null;
 
-    //private List textFragments = new LinkedList();
     private String columnName;
 
     private List fieldNames = new LinkedList();
@@ -59,40 +58,26 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
     public void initialize(DatabaseViewerManager manager) {
         this.viewerManager = manager;
 
-        //String openDelimiter = (String) viewerManager.getParameters().get("openDelimiter");
-        //String closeDelimiter = (String) viewerManager.getParameters().get("closeDelimiter");
-        
         // @todo need errorchecking on columnName here
         columnName = (String) viewerManager.getParameters().get("columnName");
         System.out.println("column name = " + columnName);
         fieldNames.add(columnName);
-//        String commandLine = (String) viewerManager.getParameters().get("commandLine");
-//        while (commandLine.indexOf(openDelimiter) != -1) {
-//            textFragments.add(commandLine.substring(0, commandLine.indexOf(openDelimiter)));
-//            commandLine = commandLine.substring(commandLine.indexOf(openDelimiter) + openDelimiter.length());
-//            fieldNames.add(commandLine.substring(0, commandLine.indexOf(closeDelimiter)));
-//            commandLine = commandLine.substring(commandLine.indexOf(closeDelimiter) + closeDelimiter.length());
-//        }
-//        textFragments.add(commandLine);
     }
 
     public void showView(String whereClause) {
+        String resourceLocation = "";
         String command = "";
         try {
             List results = this.viewerManager.getConnection().executeQuery(fieldNames,
                     viewerManager.getTableName(),
                     whereClause);
             Vector fields = (Vector) results.get(0);
-//            Iterator itText = textFragments.iterator();
             Iterator itFields = fields.iterator();
             while (itFields.hasNext()) { // we assume length(textFragements) = length(results) + 1
-//                String text = (String) itText.next();
                 String result = (String) itFields.next();
-//                command += text + result;
-				command += result;
+				resourceLocation += result;
             }
-//            command += (String) itText.next();
-            System.out.println("command = " + command);
+            System.out.println("resourceLocation = " + resourceLocation);
         } catch (DatabaseException e) {
         	/// @todo maybe we should introduce a proper DatabaseViewerException in the signature
             throw new RuntimeException("Failed to query database.", e);
@@ -118,17 +103,7 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
 				// at the end of command, otherwise we get an error.
 				//windowsCommand = windowsCommand + "javascript:location.href=%22";
 				
-				// works for txt, pdf, xml and doc:
-            	//command = windowsCommand + "file://d:/temp/test.txt";
-				//command = windowsCommand + "file://d:/temp/www2003.pdf";
-				//command = windowsCommand + "file://d:/temp/test.xml";
-				//command = windowsCommand + "file://d:/temp/test.doc";
-				//command = windowsCommand + "file://d:/temp/test.docdfsd";
-				
-				// doesn't work for files that are not local
-				//command = windowsCommand + "http://www.dstc.edu.au/index.html";
-				// works:
-				//command = windowsCommand + "http://www.dstc.edu.au/";
+				//command = windowsCommand + resourceLocation;
 				
 				//command = command + "%22";
 				
@@ -136,17 +111,7 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
 				// as the above approach, but also has a good working feature:
 				// if there a file type is unknown - user gets a dialog
 				// allowing them to choose an appropriate application.
-				
-				// works:
-				//command = "cmd.exe /c start " + "http://www.dstc.edu.au/index.html";
-				//command = "cmd.exe /c start " + "http://www.dstc.edu.au";
-				// works for txt, pdf, xml and doc:
-				//command = "cmd.exe /c start " + "file://d:/temp/test.txt";
-				//command = "cmd.exe /c start " + "file://d:/temp/www2003.pdf";
-				//command = "cmd.exe /c start " + "file://d:/temp/test.xml";
-				//command = "cmd.exe /c start " + "file://d:/temp/test.doc";
-				//command = "cmd.exe /c start " + "file://d:/temp/test.docdfsd";
-				command = "cmd.exe /c start " + command;
+				command = "cmd.exe /c start " + resourceLocation;
             }
 //            if (osName.equals("Windows NT")) {
 //                command = "cmd.exe /C " + command;
