@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.controller.diagram.SelectionChangedEvent;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
@@ -241,6 +242,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         graphics.setPaint(textColor);
         graphics.draw(rect);
 
+		try{ // debugging test for bug #686310, which unfurtunately happens rarely but must be somewhere in here
 		double textWidth;
         int numItems = this.getNumberOfEntries();
         if (numItems > MIN_DISPLAY_LINES) {
@@ -335,6 +337,11 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
                     (this.lineHeight - height) / 2,
                     width, height));
         }
+		} catch(Exception e) {
+			/// @todo remove this once the bug is fixed
+			ErrorDialog.showError(this.diagramView, e, "Here comes the weird one...");
+			e.printStackTrace();
+		}
 
         // restore old settings
         graphics.setPaint(oldPaint);
