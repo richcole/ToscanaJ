@@ -61,7 +61,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.cernato.CernatoDimensionStrategy;
 import net.sourceforge.toscanaj.controller.diagram.ObjectEditingLabelViewPopupMenuHandler;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
@@ -132,15 +131,17 @@ import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
+import org.tockit.swing.ExtendedPreferences;
 
 /**
  * @todo make sure all changes to the context will propagate to make the schema dirty.
  */
 public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     private static final int NUMBER_OF_VALUE_POPUP_MENU_ROWS = 15;
-    private static final String CONFIGURATION_SECTION_NAME = "SienaMainPanel";
     private static final String WINDOW_TITLE = "Siena";
-    static private final int MaxMruFiles = 8;
+    private static final int MaxMruFiles = 8;
+    
+    private static final ExtendedPreferences preferences = (ExtendedPreferences) ExtendedPreferences.userNodeForPackageEx(SienaMainPanel.class).node("Siena");
 
     /**
      *  Main Controllers
@@ -219,11 +220,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         createMenuBar();
 
-        mruList =
-            ConfigurationManager.fetchStringList(
-                CONFIGURATION_SECTION_NAME,
-                "mruFiles",
-                MaxMruFiles);
+        mruList = preferences.getStringList("mruFiles");
+
         // if we have at least one MRU file try to open it
         if (this.mruList.size() > 0) {
             File schemaFile =
@@ -233,21 +231,12 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             }
         }
         
-        this.lastCernatoFile = new File(
-                ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, "lastCernatoImport", "")
-        );
-        this.lastCSCFile = new File(
-                ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, "lastCSCImport", "")
-        );
-        this.lastBurmeisterFile = new File(
-                ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, "lastBurmeisterImport", "")
-        );
+        this.lastCernatoFile = new File(preferences.get("lastCernatoImport", ""));
+        this.lastCSCFile = new File(preferences.get("lastCSCImport",""));
+        this.lastBurmeisterFile = new File(preferences.get("lastBurmeisterImport",""));
 
 		this.setVisible(true);
-        ConfigurationManager.restorePlacement(
-            "SienaMainPanel",
-            this,
-            new Rectangle(10, 10, 900, 700));
+        preferences.restoreWindowPlacement(this, new Rectangle(10, 10, 900, 700));
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -279,7 +268,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                                             this.diagramEditingView.getDiagramView(),
                                             diagramExportSettings,
                                             eventBroker);
-        boolean temporalControlsEnabled = ConfigurationManager.fetchBoolean("SienaTemporalControls", "enabled", false);
+        boolean temporalControlsEnabled = preferences.getBoolean("temporalControlsEnabled", false); 
         this.temporalControlsLabel.setVisible(temporalControlsEnabled);
         this.temporalControls.setVisible(temporalControlsEnabled);                                    
         this.diagramEditingView.addAccessory(temporalControlsLabel);
@@ -293,7 +282,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 				eventBroker),
 			CanvasItemContextMenuRequestEvent.class,
 			ObjectLabelView.getFactory().getLabelClass());
-		this.diagramEditingView.setDividerLocation(ConfigurationManager.fetchInt("SienaMainPanel", "diagramViewDivider", 200));
+		this.diagramEditingView.setDividerLocation(preferences.getInt("diagramViewDivider", 200));
 	}
 
 	/**
@@ -652,8 +641,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         final JCheckBoxMenuItem showTemporalControls =
             new JCheckBoxMenuItem("Show Temporal Controls");
         showTemporalControls.setMnemonic(KeyEvent.VK_T);
-        showTemporalControls.setSelected(
-                        ConfigurationManager.fetchBoolean("SienaTemporalControls", "enabled", true));
+        showTemporalControls.setSelected(preferences.getBoolean("temporalControlsEnabled", false));
         showTemporalControls.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 boolean newState = !temporalControls.isVisible();
@@ -911,33 +899,25 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 			return;
 		}
         // store file locations
-        ConfigurationManager.storeStringList(
-            CONFIGURATION_SECTION_NAME,
-            "mruFiles",
-            this.mruList);
+        preferences.putStringList("mruFiles", this.mruList);
         if(this.lastCernatoFile != null) {
-            ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, 
-                                             "lastCernatoImport", 
-                                             this.lastCernatoFile.getAbsolutePath());
+            preferences.put("lastCernatoImport", 
+                            this.lastCernatoFile.getAbsolutePath());
         }
         if(this.lastBurmeisterFile!= null) {
-            ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, 
-                                             "lastBurmeisterImport", 
-                                             this.lastBurmeisterFile.getAbsolutePath());
+            preferences.put("lastBurmeisterImport", 
+                            this.lastBurmeisterFile.getAbsolutePath());
         }
         if(this.lastCSCFile!= null) {
-            ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, 
-                                             "lastCSCImport", 
-                                             this.lastCSCFile.getAbsolutePath());
+            preferences.put("lastCSCImport", 
+                            this.lastCSCFile.getAbsolutePath());
         }
-        ConfigurationManager.storeBoolean("SienaTemporalControls", "enabled", this.temporalControls.isVisible());
+        preferences.putBoolean("temporalControlsEnabled", 
+                               this.temporalControls.isVisible());
         // store current position
-        ConfigurationManager.storePlacement("SienaMainPanel", this);
-        ConfigurationManager.storeInt(
-            "SienaMainPanel",
-            "diagramViewDivider",
-            diagramEditingView.getDividerLocation());
-        ConfigurationManager.saveConfiguration();
+        preferences.storeWindowPlacement(this);
+        preferences.putInt("diagramViewDivider",
+                           diagramEditingView.getDividerLocation());
         System.exit(0);
     }
 

@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.DataDump;
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DumpSqlScript;
@@ -63,6 +62,7 @@ import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
+import org.tockit.swing.ExtendedPreferences;
 
 import javax.swing.*;
 import java.awt.*;
@@ -78,12 +78,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-public class ElbaMainPanel
-    extends JFrame
-    implements MainPanel, EventBrokerListener {
-    private static final String CONFIGURATION_SECTION_NAME = "ElbaMainPanel";
+public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     private static final String WINDOW_TITLE = "Elba";
-    static private final int MaxMruFiles = 8;
+    private static final int MaxMruFiles = 8;
+
+    private static final ExtendedPreferences preferences = (ExtendedPreferences) ExtendedPreferences.userNodeForPackageEx(ElbaMainPanel.class).node("Elba");
 
     /**
      *  Main Controllers
@@ -158,20 +157,14 @@ public class ElbaMainPanel
         createViews();
         // this has to happen before the menu gets created, since the menu uses the information
         DiagramView diagramView = this.diagramEditingView.getDiagramView();
-        float minLabelFontSize =
-            ConfigurationManager.fetchFloat(
-                CONFIGURATION_SECTION_NAME,
-                "minLabelFontSize",
-                (float) diagramView.getMinimumFontSize());
+        double minLabelFontSize = preferences.getDouble("minLabelFontSize",
+                                                        diagramView.getMinimumFontSize());
         diagramView.setMinimumFontSize(minLabelFontSize);
 
         createMenuBar();
 
-        mruList =
-            ConfigurationManager.fetchStringList(
-                CONFIGURATION_SECTION_NAME,
-                "mruFiles",
-                MaxMruFiles);
+        mruList = preferences.getStringList("mruFiles");
+        
         // if we have at least one MRU file try to open it
         if (this.mruList.size() > 0) {
             File schemaFile =
@@ -182,10 +175,7 @@ public class ElbaMainPanel
         }
 
 		this.setVisible(true);
-        ConfigurationManager.restorePlacement(
-            CONFIGURATION_SECTION_NAME,
-            this,
-            new Rectangle(10, 10, 1000, 700));
+        preferences.restoreWindowPlacement(this, new Rectangle(10, 10, 1000, 700));
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -295,11 +285,7 @@ public class ElbaMainPanel
 
         diagramEditingView =
             new DiagramEditingView(this, conceptualSchema, eventBroker);
-        diagramEditingView.setDividerLocation(
-            ConfigurationManager.fetchInt(
-                CONFIGURATION_SECTION_NAME,
-                "diagramViewDivider",
-                200));
+        diagramEditingView.setDividerLocation(preferences.getInt("diagramViewDivider", 200));
         DiagramView diagramView = diagramEditingView.getDiagramView();
         diagramView.setObjectLabelFactory(SqlClauseLabelView.getFactory());
 
@@ -928,24 +914,12 @@ public class ElbaMainPanel
             return;
         }
         // store current position
-        ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, this);
-        ConfigurationManager.storeFloat(
-            CONFIGURATION_SECTION_NAME,
-            "minLabelFontSize",
-            (float) this
-                .diagramEditingView
-                .getDiagramView()
-                .getMinimumFontSize());
-        ConfigurationManager.storeStringList(
-            CONFIGURATION_SECTION_NAME,
-            "mruFiles",
-            this.mruList);
-        ConfigurationManager.storeInt(
-            CONFIGURATION_SECTION_NAME,
-            "diagramViewDivider",
-            diagramEditingView.getDividerLocation());
+        preferences.storeWindowPlacement(this);
+        preferences.putDouble("minLabelFontSize",
+                              this.diagramEditingView.getDiagramView().getMinimumFontSize());
+        preferences.putStringList("mruFiles", this.mruList);
+        preferences.putInt("diagramViewDivider", diagramEditingView.getDividerLocation());
         this.diagramEditingView.saveConfigurationSettings();
-        ConfigurationManager.saveConfiguration();
         System.exit(0);
     }
 

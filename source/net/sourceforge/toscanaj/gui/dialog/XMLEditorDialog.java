@@ -7,13 +7,12 @@
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
-
 import org.jdom.Element;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import org.tockit.swing.ExtendedPreferences;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -30,7 +29,8 @@ import java.io.IOException;
 import java.io.StringReader;
 
 public class XMLEditorDialog extends JDialog {
-	private static final String CONFIGURATION_SECTION_NAME = "XMLEditorDialog";
+	private static final ExtendedPreferences preferences = (ExtendedPreferences) ExtendedPreferences.userNodeForPackageEx(XMLEditorDialog.class).node("XMLEditorDialog");
+    
 	private JTextArea textPane = new JTextArea();
     private JLabel statusBar = new JLabel();
     private JButton useDescriptionButton = new JButton("Use Description");
@@ -44,14 +44,11 @@ public class XMLEditorDialog extends JDialog {
         setTitle(title);
 		this.addWindowListener(new WindowAdapter() {
 		    public void windowClosing(WindowEvent evt) {
-				ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, dialog);
+                preferences.storeWindowPlacement(dialog);
 				setVisible(false);
 			}
 		});
-		ConfigurationManager.restorePlacement(
-		CONFIGURATION_SECTION_NAME,
-		this,
-		new Rectangle(100,100, 250, 400));
+        preferences.restoreWindowPlacement(this, new Rectangle(100,100, 250, 400));
 		
         init();
     }
@@ -203,7 +200,7 @@ public class XMLEditorDialog extends JDialog {
 		removeDescriptionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				result = null;
-				ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, dialog);
+                preferences.storeWindowPlacement(dialog);
 				dispose();
 			}
 		});
@@ -212,7 +209,7 @@ public class XMLEditorDialog extends JDialog {
 		cancelEditingButton.setMnemonic(KeyEvent.VK_C);
 		cancelEditingButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, dialog);
+                preferences.storeWindowPlacement(dialog);
 				dispose();
 			}
 		});

@@ -7,11 +7,12 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.util.gradients.*;
 
 import java.awt.*;
+
+import org.tockit.swing.ExtendedPreferences;
 
 /**
  * DiagramSchema will hold the palette colors, line widths and similar information
@@ -20,7 +21,7 @@ import java.awt.*;
  * This class uses a Singleton design pattern.
  */
 public class DiagramSchema {
-    private static final String PROPERTY_SECTION_NAME = "DiagramSchema";
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForPackageEx(DiagramSchema.class);
 
     /**
      * The amount of fade out for unselected nodes.
@@ -110,22 +111,22 @@ public class DiagramSchema {
     
     public static DiagramSchema getDefaultSchema() {
     	DiagramSchema retVal = new DiagramSchema();
-		retVal.background = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "backgroundColor", null);
-		retVal.topColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "topColor", new Color(0, 0, 150));
-		retVal.bottomColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "bottomColor", new Color(255, 255, 150));
+		retVal.background = preferences.getColor("backgroundColor", null);
+		retVal.topColor = preferences.getColor("topColor", new Color(0, 0, 150));
+		retVal.bottomColor = preferences.getColor("bottomColor", new Color(255, 255, 150));
 		retVal.gradient = retVal.getDefaultGradient();
-		retVal.foreground = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "foregroundColor", new Color(0, 0, 0));
-		retVal.nestedDiagramNodeColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "nestedDiagramNodeColor", new Color(255, 255, 255));
-		retVal.notRealisedDiagramNodeColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "notRealisedDiagramNodeColor", null);
-		retVal.circleColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleColor", new Color(0, 0, 0));
-		retVal.lineColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "lineColor", new Color(0, 0, 0));
-		retVal.circleSelectionColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleSelectionColor", new Color(255, 0, 0));
-		retVal.circleIdealColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleIdealColor", new Color(0, 0, 0));
-		retVal.circleFilterColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleFilterColor", new Color(0, 0, 0));
-		retVal.fadeOut = ConfigurationManager.fetchFloat(PROPERTY_SECTION_NAME, "fadeOutValue", 0.7F);
-		retVal.margin = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "margin", 20);
-		retVal.notRealizedNodeSizeReductionFactor = ConfigurationManager.fetchFloat(PROPERTY_SECTION_NAME, "notRealizedNodeSizeReductionFactor", 3);
-		String propVal = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "gradientType", "extent");
+		retVal.foreground = preferences.getColor("foregroundColor", new Color(0, 0, 0));
+		retVal.nestedDiagramNodeColor = preferences.getColor("nestedDiagramNodeColor", new Color(255, 255, 255));
+		retVal.notRealisedDiagramNodeColor = preferences.getColor("notRealisedDiagramNodeColor", null);
+		retVal.circleColor = preferences.getColor("circleColor", new Color(0, 0, 0));
+		retVal.lineColor = preferences.getColor("lineColor", new Color(0, 0, 0));
+		retVal.circleSelectionColor = preferences.getColor("circleSelectionColor", new Color(255, 0, 0));
+		retVal.circleIdealColor = preferences.getColor("circleIdealColor", new Color(0, 0, 0));
+		retVal.circleFilterColor = preferences.getColor("circleFilterColor", new Color(0, 0, 0));
+		retVal.fadeOut = preferences.getFloat("fadeOutValue", 0.7F);
+		retVal.margin = preferences.getInt("margin", 20);
+		retVal.notRealizedNodeSizeReductionFactor = preferences.getFloat("notRealizedNodeSizeReductionFactor", 3);
+		String propVal = preferences.get("gradientType", "extent");
 		propVal = propVal.toLowerCase();
 		if (propVal.equals("extent")) {
 			retVal.gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
@@ -135,10 +136,10 @@ public class DiagramSchema {
 			System.err.println("Caught unknown gradient type for DiagramSchema: " + propVal);
 			System.err.println("-- using default");
 		}
-		retVal.selectionLineWidth = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "selectionLineWidth", 3);
-		String labelFontName = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "labelFontName", "SansSerif");
-		int labelFontSize = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "labelFontSize", 10);
-		propVal = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "scaleNodeSize", "none");
+		retVal.selectionLineWidth = preferences.getInt("selectionLineWidth", 3);
+		String labelFontName = preferences.get("labelFontName", "SansSerif");
+		int labelFontSize = preferences.getInt("labelFontSize", 10);
+		propVal = preferences.get("scaleNodeSize", "none");
 		propVal = propVal.toLowerCase();
 		retVal.labelFont = new Font(labelFontName, Font.PLAIN, labelFontSize);
 		if (propVal.equals("contingent")) {

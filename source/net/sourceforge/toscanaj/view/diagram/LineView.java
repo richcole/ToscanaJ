@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.NormedIntervalSource;
@@ -15,6 +14,7 @@ import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import org.tockit.canvas.CanvasItem;
+import org.tockit.swing.ExtendedPreferences;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
@@ -30,6 +30,8 @@ import java.text.DecimalFormat;
  * Draws a line between two points, representing a DiagramLine in the model.
  */
 public class LineView extends CanvasItem {
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForPackageEx(LineView.class);
+    
 	private static class NonRealizedConceptGroupingMode{};
 	
 	public static final NonRealizedConceptGroupingMode NO_GROUPING = new NonRealizedConceptGroupingMode();
@@ -62,16 +64,16 @@ public class LineView extends CanvasItem {
         this.diagramLine = diagramLine;
         this.fromView = fromView;
         this.toView = toView;
-        this.useExtentLabels = (ConfigurationManager.fetchInt("LineView", "showExtentRatioLabels", 0) == 1);
-		this.labelFormat = ConfigurationManager.fetchString("LineView", "labelFormat", this.labelFormat);
-		this.showRatioColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioColor", this.showRatioColor);
-		this.showRatioFillColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioFillColor", this.showRatioFillColor);
-        this.fontSize = ConfigurationManager.fetchFloat("LineView", "labelFontSize", 6);
-        this.dynamicLineWidth = ConfigurationManager.fetchString("LineView", "lineWidth", "").equals("extentRatio");
-		if(ConfigurationManager.fetchString("LineView", "nonRealizedConceptGrouping", "").equals("coloredLines")) {
+        this.useExtentLabels = preferences.getBoolean("showExtentRatioLabels", false);
+		this.labelFormat = preferences.get("labelFormat", this.labelFormat);
+		this.showRatioColor = preferences.getColor("showExtentRatioColor", this.showRatioColor);
+		this.showRatioFillColor = preferences.getColor("showExtentRatioFillColor", this.showRatioFillColor);
+        this.fontSize = preferences.getFloat("labelFontSize", 6);
+        this.dynamicLineWidth = preferences.get("lineWidth", "").equals("extentRatio");
+		if(preferences.get("nonRealizedConceptGrouping", "").equals("coloredLines")) {
 			this.groupingMode = COLORED_LINES_GROUPING;
 		}
-		if(ConfigurationManager.fetchString("LineView", "nonRealizedConceptGrouping", "").equals("clouds")) {
+		if(preferences.get("nonRealizedConceptGrouping", "").equals("clouds")) {
 			this.groupingMode = CLOUDS_GROUPING;
 		}
     }

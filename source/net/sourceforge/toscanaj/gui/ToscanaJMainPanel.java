@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.ToscanaJ;
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.diagram.*;
@@ -41,6 +40,7 @@ import org.tockit.canvas.manipulators.ItemMovementManipulator;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
+import org.tockit.swing.ExtendedPreferences;
 
 import javax.swing.*;
 
@@ -73,7 +73,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
     private static final String WINDOW_TITLE = "ToscanaJ";
 
-    private static final String CONFIGURATION_SECTION_NAME = "ToscanaJMainPanel";
+    private static final ExtendedPreferences preferences = (ExtendedPreferences) ExtendedPreferences.userNodeForPackageEx(ToscanaJMainPanel.class).node("ToscanaJ");
     
     private static final String CONFIGURATION_KEY_COLOR_MODE = "colorMode";
     private static final String CONFIGURATION_VALUE_COLOR_MODE_COLOR = "color";
@@ -213,7 +213,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         // we are the parent window for anything database viewers / report generators want to display
         DatabaseViewerManager.setParentComponent(this);
         // restore the old MRU list
-        mruList = ConfigurationManager.fetchStringList(CONFIGURATION_SECTION_NAME, "mruFiles", MaxMruFiles);
+        mruList = preferences.getStringList("mruFiles");
         // set up the menu for the MRU files
         recreateMruMenu();
         // if we have at least one MRU file try to open it
@@ -273,8 +273,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         diagramView = new DiagramView();
 		// set the minimum font size of the label into diagramView from the properties file
         // this has to happen before the menu gets created, since the menu uses the information
-		float minLabelFontSize = ConfigurationManager.fetchFloat(CONFIGURATION_SECTION_NAME, "minLabelFontSize", 
-															   (float)this.diagramView.getMinimumFontSize());
+		double minLabelFontSize = preferences.getDouble("minLabelFontSize", 
+														this.diagramView.getMinimumFontSize());
 		diagramView.setMinimumFontSize(minLabelFontSize);
 
 		createActions();
@@ -310,7 +310,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		Dimension minimumSize = new Dimension(50, 50);
 
         diagramOrganiser = new DiagramOrganiser(this.conceptualSchema, broker);
-		if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "showDiagramPreview", 1) == 1) {
+		if (preferences.getBoolean("showDiagramPreview", true)) {
 			this.diagramPreview = new DiagramView();
 			this.diagramPreview.setConceptInterpreter(new DirectConceptInterpreter());
 			this.diagramPreview.setConceptInterpretationContext(
@@ -392,10 +392,10 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         setContentPane(contentPane);
         // restore old position
 		this.setVisible(true);
-        ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, this, new Rectangle(10, 10, 900, 700));
-		int mainDividerPos = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "mainDivider", 200);
+        preferences.restoreWindowPlacement(this, new Rectangle(10, 10, 900, 700));
+		int mainDividerPos = preferences.getInt("mainDivider", 200);
 		splitPane.setDividerLocation(mainDividerPos);
-		int secondaryDividerPos = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "secondaryDivider", 420);
+		int secondaryDividerPos = preferences.getInt("secondaryDivider", 420);
 		if(leftHandPane != null) {
 			leftHandPane.setDividerLocation(secondaryDividerPos);
 		}
@@ -628,7 +628,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
         // @todo rename property entry
         // @todo disable gradient options while deviation is analyzed
-        if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerOrthogonalityGradient", 0) == 1) {
+        if (preferences.getBoolean("offerOrthogonalityGradient", false)) {
             viewMenu.addSeparator();
             final CombinedGradient redGreenGradient = new CombinedGradient(new LinearGradient(new Color(180,0,0), Color.WHITE), 1);
             redGreenGradient.addGradientPart(new LinearGradient(Color.WHITE, new Color(0,130,0)), 1);
@@ -665,7 +665,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             viewMenu.add(showSignificanceLegendMenuItem);
         }
 
-        if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerGradientOptions", 0) == 1) {
+        if (preferences.getBoolean("offerGradientOptions", false)) {
             viewMenu.addSeparator();
             ButtonGroup colorGradientGroup = new ButtonGroup();
             JRadioButtonMenuItem showExactMenuItem = new JRadioButtonMenuItem("Use colors for exact matches");
@@ -734,7 +734,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         colorModeGroup.add(colorModeBlackNodesMenuItem);
         colorModeMenu.add(colorModeBlackNodesMenuItem);
 
-		String colorMode = ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, null);
+		String colorMode = preferences.get(CONFIGURATION_KEY_COLOR_MODE, null);
         if(CONFIGURATION_VALUE_COLOR_MODE_COLOR.equals(colorMode)) {
             colorModeColorMenuItem.setSelected(true);
             setDiagramSchema(DiagramSchema.getDefaultSchema());
@@ -755,7 +755,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
 		viewMenu.add(colorModeMenu);
 
-        if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerNodeSizeScalingOptions", 0) == 1) {
+        if (preferences.getBoolean("offerNodeSizeScalingOptions", false)) {
             viewMenu.addSeparator();
             ButtonGroup nodeSizeScalingGroup = new ButtonGroup();
             JRadioButtonMenuItem nodeSizeExactMenuItem = new JRadioButtonMenuItem("Change node sizes with number of exact matches");
@@ -1054,27 +1054,26 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
      */
     private void closeMainPanel() {
         // store current position
-        ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, this);
-		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, "mainDivider", splitPane.getDividerLocation());
+        preferences.storeWindowPlacement(this);
+		preferences.putInt("mainDivider", splitPane.getDividerLocation());
 		if(leftHandPane != null) {
-			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, "secondaryDivider", leftHandPane.getDividerLocation());
+			preferences.putInt("secondaryDivider", leftHandPane.getDividerLocation());
 		}
         // save the MRU list
-        ConfigurationManager.storeStringList(CONFIGURATION_SECTION_NAME, "mruFiles", this.mruList);
+        preferences.putStringList("mruFiles", this.mruList);
         // store the minimum label size
-		ConfigurationManager.storeFloat(CONFIGURATION_SECTION_NAME, "minLabelFontSize", (float)this.diagramView.getMinimumFontSize());
+        preferences.putDouble("minLabelFontSize", this.diagramView.getMinimumFontSize());
 		// store print mode
 		if(this.colorModeColorMenuItem.isSelected()) {
-			ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_COLOR);
+            preferences.put(CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_COLOR);
 		} else if(this.colorModeGrayscaleMenuItem.isSelected()) {
-			ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE);
+            preferences.put(CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE);
         } else if(this.colorModeWhiteNodesMenuItem.isSelected()) {
-            ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES);
+            preferences.put(CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES);
         } else if(this.colorModeBlackNodesMenuItem.isSelected()) {
-            ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES);
+            preferences.put(CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES);
 		}
         // and save the whole configuration
-        ConfigurationManager.saveConfiguration();
 
         if (DatabaseConnection.getConnection().isConnected()) {
             try {

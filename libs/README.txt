@@ -1,7 +1,7 @@
 This folder contains libraries from other projects and parties. For 3rd party libraries a license is provided
 as a LICENSE.* file, please read these files. At the moment it contains:
 
-canvas.jar, events.jar, relations.jar, pluginArchitecture.jar: 
+tockit-*.jar: 
   part of our Tockit project (http://www.tockit.org, same licence as ToscanaJ)
 
 jdom.jar: 
