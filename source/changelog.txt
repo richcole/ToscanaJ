@@ -1,8 +1,27 @@
-Changes not in the 1.5 branch:
-- label scrollbars inside
+Changes between version 1.5.1 and the cvs version of the ToscanaJ 
+program suite:
+
+Affecting different programs:
+=============================
+- Label scrollbars are now inside the normal label bounds instead of extending to
+  the right.
+
+Specific for ToscanaJ:
+======================
+
+Specific for Elba:
+==================
+- Bugfix: SQL object labels do not write beyond the bounds anymore.
+
+Specific for Siena (still not fully complete):
+==============================================
+
+Other new experimental features:
+================================
 
 
-Changes between version 1.5 and the cvs version of the ToscanaJ 
+
+Changes between versions 1.5 and 1.5.1 of the ToscanaJ 
 program suite:
 
 Affecting different programs:
@@ -30,12 +49,6 @@ Specific for Elba:
 ==================
 - Bugfix: the layout for scales created by the generators has been reset to the old 
   version of 1.4, since ordinal scales are not layed out in chains with the new approach.
-
-Specific for Siena (still not fully complete):
-==============================================
-
-Other new experimental features:
-================================
 
 
 

@@ -107,6 +107,7 @@ public class LabelInfo implements XMLizable, ChangeObservable {
                 makeColorCopy(other.textColor),
                 other.textAlignment
         );
+        this.node = other.node;
     }
 
     private static Color makeColorCopy(Color color) {

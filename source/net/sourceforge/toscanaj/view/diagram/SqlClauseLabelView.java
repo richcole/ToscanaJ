@@ -42,7 +42,10 @@ public class SqlClauseLabelView extends LabelView {
     public static LabelFactory getFactory() {
         return new LabelFactory(){
             public LabelView createLabelView(DiagramView diagramView,NodeView nodeView,LabelInfo label){
-                return new SqlClauseLabelView(diagramView, nodeView, label);
+                // enforce left align, independent of align given for the normal label
+                LabelInfo newLabelInfo = new LabelInfo(label);
+                newLabelInfo.setTextAlignment(LabelInfo.ALIGNLEFT);
+                return new SqlClauseLabelView(diagramView, nodeView, newLabelInfo);
             }
 
 			public Class getLabelClass() {

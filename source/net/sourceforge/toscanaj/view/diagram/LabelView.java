@@ -259,7 +259,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 				cur = getTextLayoutForEntry(i, graphics.getFontRenderContext());
 			}
             int curPos = i - this.firstItem;
-			float curWidth = (float)cur.getBounds().getWidth() + 2 * this.textmargin;
+			float curWidth = (float)cur.getAdvance() + 2 * this.textmargin;
         	float textX;
             if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT) {
 				textX = (float)xPos;
@@ -382,7 +382,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         // find maximum width and height of string content
         for (int i = 0; i < getNumberOfEntries(); i++) {
             TextLayout cur = getTextLayoutForEntry(i, fontRenderContext);
-        	double w = cur.getBounds().getWidth();
+        	double w = cur.getAdvance();
         	if (w > lw) {
         		lw = w;
         	}
