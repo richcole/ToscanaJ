@@ -42,6 +42,17 @@ import java.util.List;
 
 public class NominalScaleEditorDialog extends JDialog {
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(NominalScaleEditorDialog.class);
+    
+    /**
+     * This is used to figure out if multiple columns are involved and we need
+     * to add the column names to the attribute labels.
+     * 
+     * This is a hack to get more things going, but in the end it is just another
+     * sign that the nominal scale generator as it is is no good. 
+     */
+    private static boolean multipleColumnsUsed;
+    private Column columnUsed;
+    
     private boolean result;
 
     private TableColumnPair selectedTableColumnPair;
@@ -131,7 +142,11 @@ public class NominalScaleEditorDialog extends JDialog {
         	return this.getSqlClause();
         }
         public String getAttributeLabel() {
-            return this.colValue.getValue();
+            if(multipleColumnsUsed) {
+                return this.tableColumnPair.getColumn().getDisplayName() + ": " + this.colValue.getValue();
+            } else {
+                return this.colValue.getValue();
+            }
         }
         public String getSqlClause() {
 			return this.tableColumnPair.getSqlExpression() + this.colValue.getSqlClause(tableColumnPair.getColumn());
@@ -269,6 +284,9 @@ public class NominalScaleEditorDialog extends JDialog {
         super(owner);
         this.databaseConnection = databaseConnection;
         this.databaseSchema = databaseSchema;
+        
+        multipleColumnsUsed = false;
+        this.columnUsed = null;
 
         preferences.restoreWindowPlacement(this, DEFAULT_PLACEMENT);
 		//	to enforce the minimum size during resizing of the JDialog
@@ -564,6 +582,11 @@ public class NominalScaleEditorDialog extends JDialog {
         for (int i = this.columnValuesListView.getSelectedValues().length - 1; i >= 0; i--) {
 			ColumnValue value = (ColumnValue)this.columnValuesListView.getSelectedValues()[i];
             this.attributeListModel.addElement(new TableColumnValueTriple(this.selectedTableColumnPair, value));
+            if(this.columnUsed == null) {
+                this.columnUsed = this.selectedTableColumnPair.getColumn();
+            } else if (this.columnUsed != this.selectedTableColumnPair.getColumn()) {
+                multipleColumnsUsed = true;
+            }
         }
         fillAvailableValueList();
     }
