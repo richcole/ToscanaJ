@@ -171,29 +171,32 @@ public class DatabaseConnection implements EventBrokerListener {
      * Loads an SQL script into the database.
      */
     public void executeScript(URL sqlURL) throws DatabaseException {
+    	// we have to concatenate a couple of lines sometimes since the SQL commands don't have to be on one line
+        printLogMessage(System.currentTimeMillis() + ": Submitting script: " + sqlURL.toString());
         String sqlCommand = "";
         try {
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(sqlURL.openStream()));
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
-                sqlCommand += inputLine;
+                sqlCommand = (sqlCommand + inputLine).trim();
+                if( (sqlCommand.length() != 0) && sqlCommand.charAt(sqlCommand.length()-1) == ';') {
+                    executeSQLAsString(sqlCommand);
+                    sqlCommand = "";
+                }
             }
         } catch (Exception e) {
             throw new DatabaseException("Could not read SQL script from URL '" + sqlURL.toString() + "'.", e);
         }
-        // submit the SQL
-        executeSQLAsString(sqlCommand, sqlURL.toString());
+        printLogMessage(System.currentTimeMillis() + ": done.");
         this.broker.processEvent(new DatabaseModifiedEvent(this, this));
     }
 
-    public void executeSQLAsString(String sqlCommand, String descr) throws DatabaseException {
+    public void executeSQLAsString(String sqlCommand) throws DatabaseException {
         Statement stmt;
         try {
             stmt = jdbcConnection.createStatement();
-            printLogMessage(System.currentTimeMillis() + ": Submitting script: " + descr);
             stmt.execute(sqlCommand);
-            printLogMessage(System.currentTimeMillis() + ": done.");
         } catch (SQLException se) {
             throw new DatabaseException("An error occured while processing the DB script.", se);
         }
