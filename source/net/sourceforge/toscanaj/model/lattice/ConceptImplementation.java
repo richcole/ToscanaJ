@@ -562,4 +562,30 @@ public class ConceptImplementation implements Concept {
     public void removeObjectContingent() {
     	this.objectContingent.clear();
     }
+
+	public Concept getTopConcept() {
+		Concept topCandidate = this;
+		while (!topCandidate.isTop()) {
+			Concept other = topCandidate;
+			Iterator it = topCandidate.getUpset().iterator();
+			do {
+				other = (Concept) it.next();
+			} while (other == topCandidate);
+			topCandidate = other;
+		}
+		return topCandidate;
+	}
+
+	public Concept getBottomConcept() {
+		Concept bottomCandidate = this;
+		while (!bottomCandidate.isBottom()) {
+			Concept other = bottomCandidate;
+			Iterator it = bottomCandidate.getDownset().iterator();
+			do {
+				other = (Concept) it.next();
+			} while (other == bottomCandidate);
+			bottomCandidate = other;
+		}
+		return bottomCandidate;
+	}
 }

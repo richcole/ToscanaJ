@@ -112,4 +112,8 @@ public interface Concept extends XMLizable, Ordered {
     boolean isMeetIrreducible();
 
     boolean isJoinIrreducible();
+
+	public Concept getTopConcept();
+	
+	public Concept getBottomConcept();
 }

@@ -95,6 +95,15 @@ public class ConceptInterpretationContext implements ChangeObserver {
     public List getNestingContexts() {
         return this.nestingContexts;
     }
+    
+    public Concept getOutermostTopConcept(Concept concept) {
+    	if(this.nestingConcepts.size() == 0) {
+    		return concept.getTopConcept();
+    	} else {
+    		Concept outermostConcept = (Concept) this.nestingConcepts.get(0);
+    		return outermostConcept.getTopConcept();
+    	}
+    }
 
     public void update(Object source) {
         this.eventBroker.processEvent(new ConceptInterpretationContextChangedEvent(this));
