@@ -4,11 +4,12 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.tests;
+package net.sourceforge.toscanaj.model.diagram.tests;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import net.sourceforge.toscanaj.model.tests.TableTest;
 
 public class AllTests extends TestCase {
     public AllTests(String s) {
@@ -17,10 +18,7 @@ public class AllTests extends TestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTest(TableTest.suite());
-
-        suite.addTest(net.sourceforge.toscanaj.model.diagram.tests.AllTests.suite());
-        suite.addTest(net.sourceforge.toscanaj.model.lattice.tests.AllTests.suite());
+        suite.addTest(DiagramNodeTest.suite());
         return suite;
     }
 

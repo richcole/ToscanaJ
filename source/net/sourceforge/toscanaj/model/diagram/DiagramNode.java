@@ -9,11 +9,13 @@ package net.sourceforge.toscanaj.model.diagram;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.XML_Serializable;
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.model.XML_Helper;
 
 import java.awt.geom.Point2D;
 import java.util.HashSet;
 
 import org.jdom.Element;
+import org.jdom.DataConversionException;
 
 /**
  * Stores the information on a node in a diagram.
@@ -58,7 +60,7 @@ public class DiagramNode implements XML_Serializable {
     protected LabelInfo objectLabel;
 
     protected DiagramNode outerNode;
-    private static final String NODE_ELEMENT_NAME = "node";
+    public static final String NODE_ELEMENT_NAME = "node";
     private static final String POSITION_ELEMENT_NAME = "position";
     private static final String POSITION_X_ATTRIBUTE_NAME = "x";
     private static final String POSITION_Y_ATTRIBUTE_NAME = "y";
@@ -109,7 +111,22 @@ public class DiagramNode implements XML_Serializable {
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {
-        throw new XML_SyntaxError("Not yet implemented");
+        XML_Helper.checkName(getElementName(), elem);
+        identifier = XML_Helper.getAttribute(elem, ID_ATTRIBUTE_NAME).getValue();
+        Element positionElement = XML_Helper.mustbe(POSITION_ELEMENT_NAME, elem);
+
+        try {
+            position = new Point2D.Double(
+                XML_Helper.getAttribute(positionElement, POSITION_X_ATTRIBUTE_NAME).getDoubleValue(),
+                XML_Helper.getAttribute(positionElement, POSITION_Y_ATTRIBUTE_NAME).getDoubleValue()
+            );
+        } catch (DataConversionException e) {
+            throw new XML_SyntaxError(e.toString());
+        }
+        // if (
+
+
+     //   throw new XML_SyntaxError("Not yet implemented");
     }
 
     public String getIdentifier() {
@@ -197,6 +214,9 @@ public class DiagramNode implements XML_Serializable {
      * Get the horizontal radius used for this node.
      */
     public double getRadiusX() {
+        if(null==this.concept){
+            return 0;
+        }
         if (this.concept.isRealised()) {
             return RADIUS;
         } else {
@@ -208,6 +228,9 @@ public class DiagramNode implements XML_Serializable {
      * Get the vertical radius used for this node.
      */
     public double getRadiusY() {
+        if(null==concept){
+            return 0;
+        }
         if (this.concept.isRealised()) {
             return RADIUS;
         } else {
@@ -270,5 +293,24 @@ public class DiagramNode implements XML_Serializable {
         retVal += "- Pos : (" + getX() + "," + getY() + ")\n";
         retVal += "- Size: (" + getRadiusX() + "," + getRadiusY() + ")\n";
         return retVal;
+    }
+
+    public static String getElementName() {
+        return NODE_ELEMENT_NAME;
+    }
+
+    public boolean equals(Object obj) {
+        if(!(obj instanceof DiagramNode)){
+            return false;
+        }
+        DiagramNode other = (DiagramNode)obj;
+        if(!this.getIdentifier().equals(other.getIdentifier())){
+            return false;
+        }
+        if(!this.getPosition().equals(other.getPosition())){
+            return false;
+        }
+
+        return true;
     }
 }

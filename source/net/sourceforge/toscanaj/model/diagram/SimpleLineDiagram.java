@@ -51,6 +51,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     private boolean coordinateSystemChecked = false;
 
     private Element description = null;
+    private static final String DESCRIPTION = "Description";
 
     /**
      * The default constructor creates a diagram with just nothing in it at all.
@@ -82,6 +83,8 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     public void readXML(Element elem) throws XML_SyntaxError {
         XML_Helper.checkName(DIAGRAM_ELEMENT_NAME, elem);
         title=XML_Helper.getAttribute(elem, TITLE_ATTRIBUTE_NAME).getValue();
+        description = elem.getChild(DESCRIPTION);
+     //   List elemList = elem.getChildren(DiagramNode);
         throw new XML_SyntaxError("not yet implemented.");
 
     }

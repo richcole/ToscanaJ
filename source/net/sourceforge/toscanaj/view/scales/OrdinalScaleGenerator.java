@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.DummyConcept;
 import util.Assert;
 import util.CollectionFactory;
 import util.NullIterator;
@@ -19,6 +20,7 @@ import javax.swing.*;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
 
 public class OrdinalScaleGenerator implements ScaleGenerator {
     private JFrame parent;
@@ -33,50 +35,6 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
 
     public boolean canHandleColumns(TableColumnPair[] columns) {
         return columns.length == 1;
-    }
-
-    static class DummyConcept extends AbstractConceptImplementation {
-        public DummyConcept(List attributeContigent) {
-            this.attributeContigent = attributeContigent;
-        }
-
-        public DummyConcept() {
-            this(CollectionFactory.createDefaultList());
-        }
-
-        List attributeContigent;
-
-        public int getAttributeContingentSize() {
-            return attributeContigent.size();
-        }
-
-        public int getObjectContingentSize() {
-            return 0;
-        }
-
-        public Iterator getAttributeContingentIterator() {
-            return attributeContigent.iterator();
-        }
-
-        public List executeQuery(Query query, boolean contingentOnly) {
-            return CollectionFactory.createDefaultList();
-        }
-
-        public Iterator getObjectContingentIterator() {
-            return NullIterator.makeNull();
-        }
-
-        public Concept filterByExtent(Concept other) {
-            return this;
-        }
-
-        public Concept filterByContingent(Concept other) {
-            return this;
-        }
-
-        public Concept getCollapsedConcept() {
-            return this;
-        }
     }
 
     public Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme) {
@@ -94,6 +52,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         ret.setTitle(scaleDialog.getDiagramTitle());
 
 
+        List conceptList = new ArrayList();
         String id = "Ordinal";
         double x = 0.;
         double y = 0.;
@@ -108,9 +67,11 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         ret.addNode(topNode);
         AbstractConceptImplementation prevConcept = top;
         DiagramNode prevNode = topNode;
+        conceptList.add(top);
         for (int i = 0; i < dividers.size(); i++) {
             y += 30;
             AbstractConceptImplementation currentConcept = makeConcept("<"+String.valueOf(dividers.get(i)));
+            conceptList.add(currentConcept);
 
             DiagramNode node = new DiagramNode(id,
                     new Point2D.Double(x, y),
@@ -127,6 +88,11 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
             prevNode = node;
             prevConcept = currentConcept;
         }
+        for (Iterator it = conceptList.iterator(); it.hasNext();) {
+            AbstractConceptImplementation concept = (AbstractConceptImplementation) it.next();
+            concept.buildClosures();
+        }
+
 
         return ret;
     }
