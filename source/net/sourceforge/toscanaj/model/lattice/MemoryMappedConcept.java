@@ -90,11 +90,7 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
                 }
             }
         }
-        it = this.attributeContingent.iterator();
-        while(it.hasNext()) {
-            Object cur = it.next();
-            retVal.addAttribute(cur);
-        }
+        retVal.attributeContingent.addAll(this.attributeContingent);
         return retVal;
     }
 
@@ -117,11 +113,7 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
                 }
             }
         }
-        it = this.attributeContingent.iterator();
-        while(it.hasNext()) {
-            Object cur = it.next();
-            retVal.addAttribute(cur);
-        }
+        retVal.attributeContingent.addAll(this.attributeContingent);
         return retVal;
     }
 }
