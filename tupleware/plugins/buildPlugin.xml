@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Build Plugin Script" default="dist" basedir=".">
+<project name="Build Plugin Script" default="makeJar" basedir=".">
 	<description>
 		Build file capable of compiling and building given plugin.
 		Assumptions are that this script is called from build.xml
@@ -14,7 +14,13 @@
 		- plugin directory should contain source subdirectory will all 
 			plugin source files.
 		- plugin directory should contain libs subdirectory containing
-			all libs (jar or zip files) needed by this plugin. 
+			all libs (jar or zip files) needed by this plugin.
+			
+		The plugin files creates get a version number, which follows the
+		scheme "CVSbuild-{timestamp}" by default. To give specific version
+		numbers/names, add a file "version" into the main plugin dir and
+		set the property "plugin.version.name" in it (standard Java
+		property file format).
 	</description>
 
 	<!-- 
@@ -23,27 +29,19 @@
 	-->
 
 	<!-- plugin name a.e. MultivalentPlugin -->
-	<property name="plugin.name" value="RdqlTupleSourcePlugin"/>
+	<property name="plugin.name" value="MultivalentDocumentHandlerPlugin"/>
 
 	<!-- pluging destination directory name that will appear in plugins
 		directory once plugin is deployed, for example,multivalent
 		plugin will be deployed in plugins/multivalent, so 
 		value here will be 'multivalent' -->
-	<property name="plugin.dist.dir.name" value="RdqlTupleSource"/>
+	<property name="plugin.dist.dir.name" value="multivalent"/>
 	
-	<!-- where to find compiled classes from the main application -->
+	<!-- where to find compiled classes and the libraries (if needed) from the main application -->
 	<property name="mainApp.classes" value="../../build/dev"/>
-
-	<!-- where to find libs used by main App. We may use the same 
-		libraries, for example: canvas or events. -->
 	<property name="mainApp.libs.dir" value="../../libs"/>
 
-	<!-- where to find plugins architecture classes (if it is not 
-		included in mainApp.classes path) -->
-	<property name="pluginArchitecture.classes" value="../../libs/pluginArchitecture.jar"/>
-
-	<!-- Shouldn't need to change anything from now on -->
-	
+	<!-- usually these stay fixed -->
 	<property name="plugin.build.dir" value="build"/>
 	<property name="plugin.src.dir" value="source"/>
 	<property name="plugin.libs.dir" value="libs"/>
@@ -52,43 +50,62 @@
 	<property name="plugin.description.file" value="plugin.txt"/>
 
     <path id="plugin.class.path">
-        <pathelement path="${classpath}"/>
         <pathelement path="${plugin.build.dir}"/>
         <pathelement path="${mainApp.classes}"/>
-        <pathelement path="${pluginArchitecture.classes}"/>
-        <fileset dir="${mainApp.libs.dir}">
+        <fileset dir="${plugin.libs.dir}">
             <include name="**/*.jar"/>
         </fileset>
-        <fileset dir="${mainApp.libs.dir}">
+        <fileset dir="${plugin.libs.dir}">
             <include name="**/*.zip"/>
         </fileset>
-        <fileset dir="${plugin.libs.dir}">
+        <fileset dir="${mainApp.libs.dir}">
             <include name="**/*.jar"/>
         </fileset>
-        <fileset dir="${plugin.libs.dir}">
+        <fileset dir="${mainApp.libs.dir}">
             <include name="**/*.zip"/>
         </fileset>
     </path>
     
-	<target name="prepare">
+	<target name="_tryReadingVersionNumber">
+		<property file="${basedir}/version"/>
+		<antcall target="_ensureVersionAvailable" inheritAll="true"/>
+	</target>
+
+	<target name="_prepare" depends="_setProperties">
 		<mkdir dir="${plugin.build.dir}"/>
 	</target>
 
+	<target name="_setProperties" depends="_tryReadingVersionNumber, _ensureVersionAvailable">
+		<property name="plugin.versioned.name" value="${plugin.name}-${plugin.version.name}"/>
+	</target>
+
+	<target name="_ensureVersionAvailable" unless="plugin.version.name">
+		<tstamp>
+    		<format property="timestamp" pattern="yyyyMMdd-HHmm"/>
+		</tstamp>
+		<!-- change this to a fixed value for releases -->
+		<property name="plugin.version.name" value="CVSbuild-${timestamp}"/>
+	</target>
+	
 	<target name="clean">
 		<delete dir="${plugin.build.dir}"/>
 		<delete dir="${plugin.dist.dir}"/>
 		<delete file="${plugin.jar.name}"/>
 	</target>
 
-	<target name="compile" depends="prepare">
-		<javac srcdir="${plugin.src.dir}" destdir="${plugin.build.dir}" debug="on" optimize="off" deprecation="on">
+	<target name="compile" depends="_prepare">
+		<javac srcdir="${plugin.src.dir}" 
+				destdir="${plugin.build.dir}" debug="on" 
+				optimize="off" deprecation="on"
+				source="1.4">
 			<classpath refid="plugin.class.path"/>
 		</javac>
 	</target>
 	
 	<target name="dist" depends="compile">	
 		<mkdir dir="${plugin.dist.dir}"/>
-		<property name="plugin.full.dist.dir" value="${plugin.dist.dir}/${plugin.dist.dir.name}"/>
+		<property name="plugin.versioned.dist.dir.name" value="${plugin.dist.dir.name}-${plugin.version.name}"/>
+		<property name="plugin.full.dist.dir" value="${plugin.dist.dir}/${plugin.versioned.dist.dir.name}"/>
 		<mkdir dir="${plugin.full.dist.dir}"/>
 		<jar jarfile="${plugin.full.dist.dir}/${plugin.jar.name}" basedir="${plugin.build.dir}" />
 		<copy todir="${plugin.full.dist.dir}" includeEmptyDirs="no">
@@ -98,9 +115,9 @@
 	        	<include name="${plugin.description.file}"/>
             </fileset>
 		</copy>
-		<zip destfile="${plugin.dist.dir}/${plugin.name}.zip">
+		<zip destfile="${plugin.dist.dir}/${plugin.versioned.name}.zip">
 			<fileset dir="${plugin.dist.dir}">
-				<include name="${plugin.dist.dir.name}/**"/>
+				<include name="${plugin.versioned.dist.dir.name}/**"/>
 			</fileset>
 		</zip>		
 	</target>
