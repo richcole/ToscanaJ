@@ -53,7 +53,6 @@ public class SqlClauseLabelView extends LabelView {
 
     protected SqlClauseLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
         super(diagramView, nodeView, label);
-        this.labelInfo.setTextAlignment(LabelInfo.ALIGNLEFT);
     }
 
     protected int getPlacement() {

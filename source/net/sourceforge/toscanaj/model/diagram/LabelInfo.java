@@ -301,6 +301,9 @@ public class LabelInfo implements XMLizable, ChangeObservable {
                 ((ChangeObserver) iterator.next()).update(this);
             }
         }
+        if(this.node != null) {
+			this.node.diagram.sendChangeEvent();
+        }
     }
 
     public boolean equals(Object obj) {
