@@ -108,4 +108,8 @@ public interface Concept extends XMLizable, Ordered {
     Collection getDownset();
 
     Collection getUpset();
+
+    boolean isMeetIrreducible();
+
+    boolean isJoinIrreducible();
 }

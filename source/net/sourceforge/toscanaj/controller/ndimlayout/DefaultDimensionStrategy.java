@@ -22,8 +22,17 @@ import java.util.Iterator;
 public class DefaultDimensionStrategy implements DimensionCreationStrategy {
     public Vector calculateDimensions(Lattice lattice) {
         Concept[] concepts = lattice.getConcepts();
+        Vector redCons = new Vector();
+        for (int i = 0; i < concepts.length; i++) {
+            Concept concept = concepts[i];
+            if(concept.isMeetIrreducible()) {
+                redCons.add(concept);
+            }
+        }
+        Concept[] reducedConcepts = new Concept[redCons.size()];
+        redCons.toArray(reducedConcepts);
         Vector dimensions = new Vector();
-        DirectedGraph graph = PartialOrderOperations.createGraphFromOrder(concepts);
+        DirectedGraph graph = PartialOrderOperations.createGraphFromOrder(reducedConcepts);
         Set paths = graph.getMaximalPaths();
         for (Iterator it = paths.iterator(); it.hasNext();) {
             Vector path = (Vector) it.next();

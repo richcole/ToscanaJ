@@ -531,4 +531,24 @@ public class ConceptImplementation implements Concept {
     public boolean isEqual(Ordered other) {
         return other == this;
     }
+
+    public boolean isMeetIrreducible() {
+        for (Iterator iterator = filter.iterator(); iterator.hasNext();) {
+            ConceptImplementation conceptImplementation = (ConceptImplementation) iterator.next();
+            if(conceptImplementation.filter.size() == this.filter.size() - 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isJoinIrreducible() {
+        for (Iterator iterator = filter.iterator(); iterator.hasNext();) {
+            ConceptImplementation conceptImplementation = (ConceptImplementation) iterator.next();
+            if(conceptImplementation.filter.size() == this.filter.size() - 1) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
