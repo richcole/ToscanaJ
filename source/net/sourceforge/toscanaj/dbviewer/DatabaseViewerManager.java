@@ -10,6 +10,8 @@ package net.sourceforge.toscanaj.dbviewer;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 import org.jdom.input.DOMBuilder;
 
@@ -22,8 +24,7 @@ import java.util.*;
 import java.util.List;
 
 /**
- * @todo drop distinction between the one element viewers and the multi-element viewers.
- *      Implementing multi-element viewers can still easily done by supplying a framework
+ * @todo supply a framework
  *      giving a dialog which shows a one-element view and adds controls for changing the
  *      item (first/prev/next/last/number) if needed.
  *
@@ -32,8 +33,12 @@ import java.util.List;
  *      to a list.
  *
  * @todo create some less db-specific abstraction
+ *
+ * @todo external templates are automatically inlined when loading from and saving into XML,
+ *       fix that
  */
-public class DatabaseViewerManager {
+public class DatabaseViewerManager implements XMLizable {
+    /// @todo look for a better way to get the parent
     private static Component parentComponent = null;
     private static List objectViewerRegistry = new LinkedList();
     private static List objectListViewerRegistry = new LinkedList();
@@ -45,28 +50,34 @@ public class DatabaseViewerManager {
     private Dictionary parameters = new Hashtable();
     private DatabaseInfo databaseInfo;
     private DatabaseConnection dbConnection;
-    private URL baseURL;
+    private static URL baseURL;
+    private static final String OBJECT_VIEW_ELEMENT_NAME = "objectView";
+    private static final String OBJECT_LIST_VIEW_ELEMENT_NAME = "objectListView";
+    private static final String CLASS_ATTRIBUTE_NAME = "class";
+    private static final String SCREEN_NAME_ATTRIBUTE_NAME = "name";
+    private static final String TEMPLATE_ELEMENT_NAME = "template";
+    private static final String TABLE_ELEMENT_NAME = "table";
+    private static final String KEY_ELEMENT_NAME = "key";
+    private static final String PARAMETER_ELEMENT_NAME = "parameter";
+    private static final String PARAMETER_NAME_ATTRIBUTE_NAME = "name";
+    private static final String PARAMETER_VALUE_ATTRIBUTE_NAME = "value";
 
-    public DatabaseViewerManager(Element viewerDefinition, DatabaseInfo databaseInfo, DatabaseConnection connection, URL baseURL)
+    public DatabaseViewerManager(Element viewerDefinition, DatabaseInfo databaseInfo, DatabaseConnection connection)
             throws DatabaseViewerInitializationException {
-        screenName = viewerDefinition.getAttributeValue("name");
-        template = viewerDefinition.getChild("template");
-        tableName = viewerDefinition.getChildText("table");
-        keyName = viewerDefinition.getChildText("key");
-        List parameterElems = viewerDefinition.getChildren("parameter");
-        Iterator it = parameterElems.iterator();
-        while (it.hasNext()) {
-            Element parameterElem = (Element) it.next();
-            this.parameters.put(parameterElem.getAttributeValue("name"), parameterElem.getAttributeValue("value"));
-        }
         this.databaseInfo = databaseInfo;
         this.dbConnection = connection;
-        this.baseURL = baseURL;
-        // register the viewer object as last step, after all info has been set (which is used by the viewer)
-        String className = viewerDefinition.getAttributeValue("class");
+        try {
+            readXML(viewerDefinition);
+        } catch (XMLSyntaxError xmlSyntaxError) {
+            throw new DatabaseViewerInitializationException("XML Syntax error in viewer definition.", xmlSyntaxError);
+        }
+        registerViewer(viewerDefinition.getAttributeValue(CLASS_ATTRIBUTE_NAME), viewerDefinition.getName());
+    }
+
+    private void registerViewer(String className, String viewerType) throws DatabaseViewerInitializationException {
         if (className == null) {
             throw new DatabaseViewerInitializationException("Could not find class attribute on <" +
-                    viewerDefinition.getName() + ">");
+                    viewerType + ">");
         }
         try {
             Class viewerClass = Class.forName(className);
@@ -79,12 +90,12 @@ public class DatabaseViewerManager {
         } catch (IllegalAccessException e) {
             throw new DatabaseViewerInitializationException("Could not access class '" + className + "'");
         }
-        if (viewerDefinition.getName().equals("objectView")) {
+        if (viewerType.equals(OBJECT_VIEW_ELEMENT_NAME)) {
             objectViewerRegistry.add(this);
-        } else if (viewerDefinition.getName().equals("objectListView")) {
+        } else if (viewerType.equals(OBJECT_LIST_VIEW_ELEMENT_NAME)) {
             objectListViewerRegistry.add(this);
         } else {
-            throw new DatabaseViewerInitializationException("Unknown viewer type: <" + viewerDefinition.getName() + ">");
+            throw new DatabaseViewerInitializationException("Unknown viewer type: <" + viewerType + ">");
         }
     }
 
@@ -278,5 +289,84 @@ public class DatabaseViewerManager {
     public static void resetRegistry() {
         objectViewerRegistry.clear();
         objectListViewerRegistry.clear();
+    }
+
+    public static void listsToXML(Element parentElem) {
+        for (Iterator iterator = objectViewerRegistry.iterator(); iterator.hasNext();) {
+            DatabaseViewerManager databaseViewerManager = (DatabaseViewerManager) iterator.next();
+            parentElem.addContent(databaseViewerManager.toXML());
+        }
+        for (Iterator iterator = objectListViewerRegistry.iterator(); iterator.hasNext();) {
+            DatabaseViewerManager databaseViewerManager = (DatabaseViewerManager) iterator.next();
+            parentElem.addContent(databaseViewerManager.toXML());
+        }
+    }
+
+    public static void listsReadXML(Element parentElem, DatabaseInfo databaseInfo, DatabaseConnection connection)
+            throws DatabaseViewerInitializationException
+    {
+        for (Iterator iterator = parentElem.getChildren(OBJECT_VIEW_ELEMENT_NAME).iterator(); iterator.hasNext();) {
+            Element element = (Element) iterator.next();
+            new DatabaseViewerManager(element, databaseInfo, connection);
+        }
+        for (Iterator iterator = parentElem.getChildren(OBJECT_LIST_VIEW_ELEMENT_NAME).iterator(); iterator.hasNext();) {
+            Element element = (Element) iterator.next();
+            new DatabaseViewerManager(element, databaseInfo, connection);
+        }
+    }
+
+    public Element toXML() {
+        Element retVal;
+        if(objectViewerRegistry.contains(this)) {
+            retVal = new Element(OBJECT_VIEW_ELEMENT_NAME);
+        }
+        else if (objectListViewerRegistry.contains(this)) {
+            retVal = new Element(OBJECT_LIST_VIEW_ELEMENT_NAME);
+        }
+        else {
+            throw new RuntimeException("Totally unexpected situation");
+        }
+        retVal.setAttribute(SCREEN_NAME_ATTRIBUTE_NAME, screenName);
+        retVal.setAttribute(CLASS_ATTRIBUTE_NAME, this.viewer.getClass().getName());
+        if(template != null) {
+            retVal.addContent((Element) template.clone());
+        }
+        if(tableName != null) {
+            Element tableElem = new Element(TABLE_ELEMENT_NAME);
+            tableElem.addContent(tableName);
+            retVal.addContent(tableElem);
+        }
+        if(keyName != null) {
+            Element keyElem = new Element(KEY_ELEMENT_NAME);
+            keyElem.addContent(keyName);
+            retVal.addContent(keyElem);
+        }
+        Enumeration parKeys = parameters.keys();
+        while (parKeys.hasMoreElements()) {
+            String key = (String) parKeys.nextElement();
+            Element parElem = new Element(PARAMETER_ELEMENT_NAME);
+            parElem.setAttribute(PARAMETER_NAME_ATTRIBUTE_NAME, key);
+            parElem.setAttribute(PARAMETER_VALUE_ATTRIBUTE_NAME, (String) parameters.get(key));
+            retVal.addContent(parElem);
+        }
+        return retVal;
+    }
+
+    public void readXML(Element elem) throws XMLSyntaxError {
+        screenName = elem.getAttributeValue(SCREEN_NAME_ATTRIBUTE_NAME);
+        template = elem.getChild(TEMPLATE_ELEMENT_NAME);
+        tableName = elem.getChildText(TABLE_ELEMENT_NAME);
+        keyName = elem.getChildText(KEY_ELEMENT_NAME);
+        List parameterElems = elem.getChildren(PARAMETER_ELEMENT_NAME);
+        Iterator it = parameterElems.iterator();
+        while (it.hasNext()) {
+            Element parameterElem = (Element) it.next();
+            this.parameters.put(parameterElem.getAttributeValue(PARAMETER_NAME_ATTRIBUTE_NAME),
+                                parameterElem.getAttributeValue(PARAMETER_VALUE_ATTRIBUTE_NAME));
+        }
+    }
+
+    public static void setBaseURL(URL baseURL) {
+        DatabaseViewerManager.baseURL = baseURL;
     }
 }

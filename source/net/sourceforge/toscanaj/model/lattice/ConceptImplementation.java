@@ -191,12 +191,12 @@ public class ConceptImplementation implements Concept {
     /**
      * Stores all concepts in the filter, including this.
      */
-    protected Set filter = null;
+    protected Set filter = new HashSet();
 
     /**
      * Stores all concepts in the ideal, including this.
      */
-    protected Set ideal = null;
+    protected Set ideal = new HashSet();
 
     /**
      * Stores the number of objects in the extent to avoid unneccessary
@@ -222,9 +222,7 @@ public class ConceptImplementation implements Concept {
      * and ideal.
      */
     public ConceptImplementation() {
-        this.filter = new HashSet();
         this.filter.add(this);
-        this.ideal = new HashSet();
         this.ideal.add(this);
     }
 
@@ -288,32 +286,28 @@ public class ConceptImplementation implements Concept {
      */
     public void buildClosures() {
         List idealList = new LinkedList(ideal);
-        Set idealSet = new HashSet(ideal);
         while (!idealList.isEmpty()) {
             ConceptImplementation other = (ConceptImplementation) idealList.remove(0);
             Iterator it = other.ideal.iterator();
             while (it.hasNext()) {
                 Object trans = it.next();
-                if (idealSet.add(trans)) {
+                if (ideal.add(trans)) {
                     idealList.add(trans);
                 }
             }
         }
-        ideal = idealSet;
 
-        Set filterSet = new HashSet(filter);
         List filterList = new LinkedList(filter);
         while (!filterList.isEmpty()) {
             ConceptImplementation other = (ConceptImplementation) filterList.remove(0);
             Iterator it = other.filter.iterator();
             while (it.hasNext()) {
                 Object trans = it.next();
-                if (filterSet.add(trans)) {
+                if (filter.add(trans)) {
                     filterList.add(trans);
                 }
             }
         }
-        filter = filterSet;
     }
 
     /**

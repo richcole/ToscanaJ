@@ -75,9 +75,10 @@ public class DatabaseConnection implements BrokerEventListener {
      *  This constructor takes the data source as driver/url combination, an
      *  account name and a password.
      *
-     * @TODO Throw exceptions instead of just printing them.
+     * @todo Throw exceptions instead of just printing them.
      */
-    public DatabaseConnection(EventBroker broker, String url, String driver, String account, String password) throws DatabaseException {
+    public DatabaseConnection(EventBroker broker, String url, String driver, String account, String password)
+                throws DatabaseException {
         this.broker = broker;
         connect(url, driver, account, password);
     }
@@ -164,7 +165,7 @@ public class DatabaseConnection implements BrokerEventListener {
                 sqlCommand += inputLine;
             }
         } catch (Exception e) {
-            throw new DatabaseException("Could not read SQL script.", e);
+            throw new DatabaseException("Could not read SQL script from URL '" + sqlURL.toString() + "'.", e);
         }
         // submit the SQL
         executeSQLAsString(sqlCommand, sqlURL.toString());

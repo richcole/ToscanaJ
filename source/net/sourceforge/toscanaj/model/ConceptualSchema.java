@@ -8,11 +8,14 @@
 package net.sourceforge.toscanaj.model;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.events.*;
 import net.sourceforge.toscanaj.util.xmlize.*;
+import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import org.jdom.Element;
 import util.CollectionFactory;
 
@@ -66,6 +69,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     private static final String VERSION_ATTRIBUTE_NAME = "version";
     private static final String VERSION_ATTRIBUTE_VALUE = "TJ0.6";
     private static final String DESCRIPTION_ELEMENT_NAME = "description";
+    private static final String VIEWS_ELEMENT_NAME = "views";
 
     /**
      * Creates an empty schema.
@@ -95,6 +99,12 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
             Diagram2D d = (Diagram2D) diagrams.elementAt(i);
             retVal.addContent(d.toXML());
         }
+        if(DatabaseViewerManager.getNumberOfObjectListViews() != 0 ||
+           DatabaseViewerManager.getNumberOfObjectViews() != 0 ) {
+            Element viewsElem = new Element(VIEWS_ELEMENT_NAME);
+            DatabaseViewerManager.listsToXML(viewsElem);
+            retVal.addContent(viewsElem);
+        }
         return retVal;
     }
 
@@ -114,6 +124,17 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
             Element element = (Element) iterator.next();
             SimpleLineDiagram diagram = new SimpleLineDiagram(element);
             diagrams.add(diagram);
+        }
+        /// @todo change this once DatabaseViewers are one the schema itself
+        Element viewsElem = elem.getChild(VIEWS_ELEMENT_NAME);
+        if(viewsElem != null) {
+            try {
+                DatabaseViewerManager.listsReadXML(viewsElem, databaseInfo, DatabaseConnection.getConnection());
+            } catch (DatabaseViewerInitializationException e) {
+                /// @todo we loose information here, fix and remove stack trace
+                e.printStackTrace();
+                throw new XMLSyntaxError("Could not initialize database viewer.");
+            }
         }
     }
 

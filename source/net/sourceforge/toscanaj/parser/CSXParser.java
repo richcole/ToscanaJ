@@ -108,6 +108,7 @@ public class CSXParser {
 
         _BaseURL = csxFile.toURL();
         DatabaseInfo.baseURL = _BaseURL;
+        DatabaseViewerManager.setBaseURL(_BaseURL);
 
         Element element = _Document.getRootElement();
         if (element.getName().equals("conceptualSchema")) {
@@ -170,7 +171,7 @@ public class CSXParser {
         while (it.hasNext()) {
             Element viewerElem = (Element) it.next();
             try {
-                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection(), _BaseURL);
+                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection());
             } catch (DatabaseViewerInitializationException e) {
                 throw new DataFormatException("A database viewer could not be initialized.", e);
             }
@@ -184,7 +185,7 @@ public class CSXParser {
         while (it.hasNext()) {
             Element viewerElem = (Element) it.next();
             try {
-                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection(), _BaseURL);
+                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection());
             } catch (DatabaseViewerInitializationException e) {
                 throw new DataFormatException("A database viewer could not be initialized.", e);
             }

@@ -33,6 +33,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.List;
 
+/// @todo check if the file we save to exists, warn if it does
 public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEventListener {
     static private final int MaxMruFiles = 8;
 
