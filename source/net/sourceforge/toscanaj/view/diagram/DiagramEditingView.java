@@ -60,6 +60,7 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 
 public class DiagramEditingView extends JPanel implements EventBrokerListener {
+    private static final double GRID_SIZE_CHANGE_FACTOR = 1.2;
     private static final int DEFAULT_GRID_SIZE = 15;
     private static final String[] FULL_MOVEMENT_OPTION_NAMES = {"NDim", "Node", "Ideal", "Filter"};
     private static final String[] SIMPLE_MOVEMENT_OPTION_NAMES = {"Node", "Ideal", "Filter"};
@@ -232,7 +233,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		gridIncreaseButton = new JButton("+");
 		gridIncreaseButton.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
-		        diagramView.increaseGridSize();
+                changeGridSize(GRID_SIZE_CHANGE_FACTOR);
 		    }
 		});
 		gridIncreaseButton.setEnabled(false);
@@ -245,7 +246,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		gridDecreaseButton = new JButton("-");
 		gridDecreaseButton.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
-		        diagramView.decreaseGridSize();
+				changeGridSize(1 / GRID_SIZE_CHANGE_FACTOR);
 		    }
 		});
 		gridDecreaseButton.setEnabled(false);
@@ -258,9 +259,15 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		return gridPanel;
 	}
 
+	private void changeGridSize(double factor) {
+		double width = diagramView.getGridCellWidth();
+		double height = diagramView.getGridCellHeight();
+		diagramView.setGrid(width * factor, height * factor);
+	}
+
 	protected JPanel createZoomPanel() {
 		JPanel zoomPanel = new JPanel(new GridBagLayout());
-		zoomPanel.setBorder(BorderFactory.createTitledBorder("Zoom"));
+		zoomPanel.setBorder(BorderFactory.createTitledBorder("Rescale"));
 		zoomInButton = new JButton("+");
 		zoomInButton.setEnabled(false);
 		zoomInButton.addActionListener(new ActionListener() {
@@ -404,6 +411,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
             Point2D pos = diagramNode.getPosition();
             diagramNode.setPosition(new Point2D.Double(pos.getX() * zoomFactor, pos.getY() * zoomFactor));
         }
+        changeGridSize(zoomFactor);
         this.diagramView.requestScreenTransformUpdate();
         this.diagramView.repaint();
     }
