@@ -54,7 +54,13 @@ public class TupleConceptInterpreter extends AbstractConceptInterperter
     		return baseSet;
     	}
     	Relation relation = RelationImplementation.fromSet(baseSet);
-    	return PickColumnsOperation.pickColumns(relation, this.objectColumns).toSet();
+    	Set projectedRelation = PickColumnsOperation.pickColumns(relation, this.objectColumns).toSet();
+        Set retVal = new HashSet();
+        for (Iterator iter = projectedRelation.iterator(); iter.hasNext(); ) {
+            Object element = iter.next();
+            retVal.add(new FCAElementImplementation(element));
+        }
+        return retVal;
     }
 
     protected int calculateContingentSize(Concept concept, ConceptInterpretationContext context) {
@@ -78,7 +84,7 @@ public class TupleConceptInterpreter extends AbstractConceptInterperter
 		Set retVal = new HashSet();
 		while (objectContingentIterator.hasNext()) {
 			Object object = Tuple.fromString(objectContingentIterator.next().toString());
-			retVal.add(object);
+			retVal.add(new FCAElementImplementation(object));
 		}
 		return retVal;
 	}
