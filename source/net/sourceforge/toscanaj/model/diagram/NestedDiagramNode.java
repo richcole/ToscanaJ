@@ -93,7 +93,13 @@ public class NestedDiagramNode extends DiagramNode {
      * This is based on the bounds of the inner diagram.
      */
     public double getRadiusX() {
-        return this.innerDiagram.getBounds().getWidth()/1.7;
+        Rectangle2D bounds = this.innerDiagram.getBounds();
+        if( bounds.getHeight() > 2*bounds.getWidth()) {
+            return bounds.getHeight()/3.4;
+        }
+        else {
+            return bounds.getWidth()/1.7;
+        }
     }
 
     /**
@@ -102,6 +108,12 @@ public class NestedDiagramNode extends DiagramNode {
      * This is based on the bounds of the inner diagram.
      */
     public double getRadiusY() {
-        return this.innerDiagram.getBounds().getHeight()/1.7;
+        Rectangle2D bounds = this.innerDiagram.getBounds();
+        if( bounds.getWidth() > 2*bounds.getHeight()) {
+            return bounds.getWidth()/3.4;
+        }
+        else {
+            return bounds.getHeight()/1.7;
+        }
     }
 }
