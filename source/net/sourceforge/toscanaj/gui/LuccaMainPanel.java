@@ -59,7 +59,6 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
      *  Main Controllers
      */
     private EventBroker eventBroker;
-    private DatabaseConnection databaseConnection;
 
     /**
      *  Model
@@ -93,9 +92,10 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         eventBroker = new EventBroker();
         conceptualSchema = new ConceptualSchema(eventBroker);
-        databaseConnection = new DatabaseConnection(eventBroker);
+        DatabaseConnection.initialize(eventBroker);
 
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+        eventBroker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
         eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class);
 
         createViews();
@@ -177,7 +177,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);
 
         schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
-        columnChooserDialog = new AttributeSelectionDialog(this, "Choose Column", this.databaseConnection, eventBroker);
+        columnChooserDialog = new AttributeSelectionDialog(this, "Choose Column", DatabaseConnection.getConnection(), eventBroker);
     }
 
 
@@ -209,7 +209,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         OpenFileAction openFileAction = new OpenFileAction(
                 this,
-                new LoadConceptualSchemaActivity(eventBroker, databaseConnection),
+                new LoadConceptualSchemaActivity(eventBroker, DatabaseConnection.getConnection()),
                 currentFile,
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(
@@ -354,6 +354,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
     public void processEvent(Event e) {
+        System.out.println(e.getClass().getName());
         if (e instanceof ConceptualSchemaChangeEvent) {
             // set schema in any change event, sometimes the order of the events is wrong
             /// @todo make sure the events come in the proper order
@@ -369,9 +370,9 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
         if (e instanceof DatabaseInfoChangedEvent) {
             DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
             if (databaseInformation.getDriverClass() != null && databaseInformation.getURL() != null) {
-                if (databaseConnection.isConnected()) {
+                if (DatabaseConnection.getConnection().isConnected()) {
                     try {
-                        databaseConnection.disconnect();
+                        DatabaseConnection.getConnection().disconnect();
                     } catch (DatabaseException ex) {
                         ErrorDialog.showError(this, ex, "Closing database error",
                                 "Some error closing the old database:\n" + ex.getMessage());
@@ -379,10 +380,10 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
                     }
                 }
                 try {
-                    databaseConnection.connect(databaseInformation);
+                    DatabaseConnection.getConnection().connect(databaseInformation);
                     URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
                     if (location != null) {
-                        databaseConnection.executeScript(location);
+                        DatabaseConnection.getConnection().executeScript(location);
                     }
                 } catch (DatabaseException ex) {
                     ErrorDialog.showError(this, ex, "DB Connection failed",
@@ -390,6 +391,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 }
             }
         }
+        columnChooserDialog.fillTableList();
     }
 
     private void addFileToMRUList(File file) {

@@ -216,8 +216,12 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
         setContentPane(mainSplitPane);
     }
     
-    private void fillTableList() {
+    public void fillTableList() {
     	this.tablesList.clear();
+    	
+    	if(!this.connection.isConnected()) {
+    		return;
+    	}
     	
     	Iterator it = this.connection.getTableNames().iterator();
     	while(it.hasNext()) {
