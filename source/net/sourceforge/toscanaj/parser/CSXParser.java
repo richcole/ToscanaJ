@@ -43,8 +43,6 @@ import java.util.List;
 
 /**
  * This class reads a CSX file and does nothing with it except complaining.
- *
- * @todo make code more stable and give more error messages.
  */
 public class CSXParser {
     /**
@@ -411,7 +409,6 @@ public class CSXParser {
                         el.getAttribute("x").getDoubleValue(),
                         el.getAttribute("y").getDoubleValue()));
             } catch (DataConversionException e) {
-                /// @todo give more info here
                 throw new DataFormatException(
                         "Offset of some label does not contain double.");
             }
