@@ -1,1 +1,1 @@
-start javaw -cp ToscanaJ.jar;libs/canvas.jar;libs/events.jar;libs/jdom.jar;libs/batik-awt-util.jar;libs/batik-dom.jar;libs/batik-svggen.jar;libs/batik-util.jar;libs/batik-xml.jar;libs/hsqldb.jar net.sourceforge.toscanaj.Elba
+javaw -cp ToscanaJ.jar;libs/canvas.jar;libs/events.jar;libs/jdom.jar;libs/batik-awt-util.jar;libs/batik-dom.jar;libs/batik-svggen.jar;libs/batik-util.jar;libs/batik-xml.jar;libs/hsqldb.jar net.sourceforge.toscanaj.Elba

@@ -1,1 +1,1 @@
-start javaw -jar ToscanaJ.jar
+javaw -jar ToscanaJ.jar
