@@ -199,6 +199,17 @@ public class DBConnection
             catch(SQLException e) {
             }
         }
+        // here comes a nasty hack: if we have an aggregate on nothing, we don't want to show it
+        // since the first column of the results does contain count(*) for AggregateQueries we can
+        // figure out which aggregates are called on nothing (others might return zero although being
+        // useful, e.g. an average). So if the count is zero, we remove the entry.
+        /// @todo This is so ugly it really needs to be changed
+        if( query instanceof DatabaseInfo.AggregateQuery ) {
+            Vector firstRow = (Vector)result.get(0);
+            if(firstRow.get(0).equals("0")) {
+                result.clear();
+            }
+        }
         return result;
     }
 
