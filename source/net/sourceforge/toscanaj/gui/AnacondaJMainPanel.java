@@ -15,6 +15,7 @@ import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
@@ -23,16 +24,22 @@ import net.sourceforge.toscanaj.view.database.DatabaseSchemaView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingView;
+import net.sourceforge.toscanaj.parser.CSXParser;
+import net.sourceforge.toscanaj.parser.DataFormatException;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.net.URL;
+import java.io.File;
+import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEventListener {
+    static private final int MaxMruFiles = 8;
 
     /**
      *  Main Controllers
@@ -51,6 +58,10 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
     private JMenuBar menuBar;
     private JMenu helpMenu;
     private JMenu fileMenu;
+    private JMenu mruMenu;
+
+    private List mruList = new LinkedList();
+    private String currentFile = null;
 
     /**
      * Views
@@ -79,6 +90,16 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class );
 
         createViews();
+
+        mruList = ConfigurationManager.fetchStringList("AnacondaJMainPanel", "mruFiles", MaxMruFiles);
+        // if we have at least one MRU file try to open it
+        if (this.mruList.size() > 0) {
+            File schemaFile = new File((String) mruList.get(mruList.size() - 1));
+            if (schemaFile.canRead()) {
+                openSchemaFile(schemaFile);
+            }
+        }
+
         createMenuBar();
 
         ConfigurationManager.restorePlacement("AnacondaJMainPanel", this,
@@ -157,6 +178,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         OpenFileAction openFileAction = new OpenFileAction(
                 this,
                 new LoadConceptualSchemaActivity(eventBroker, databaseConnection),
+                currentFile,
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(
                         KeyEvent.VK_O,
@@ -187,6 +209,12 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         fileMenu.add(saveMenuItem);
         */
 
+        mruMenu = new JMenu("Reopen");
+        recreateMruMenu();
+        fileMenu.add(mruMenu);
+
+        fileMenu.addSeparator();
+
         // --- file exit item ---
         JMenuItem exitMenuItem;
         exitMenuItem = new JMenuItem("Exit");
@@ -203,6 +231,54 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         fileMenu.add(exitMenuItem);
     }
 
+    private void openSchemaFile(File schemaFile) {
+        try {
+            conceptualSchema = CSXParser.parse(eventBroker, schemaFile, databaseConnection);
+        } catch (FileNotFoundException e) {
+            ErrorDialog.showError(this, e, "Could not find file", e.getMessage());
+            conceptualSchema = new ConceptualSchema(eventBroker);
+        } catch (IOException e) {
+            ErrorDialog.showError(this, e, "Could not open file", e.getMessage());
+            conceptualSchema = new ConceptualSchema(eventBroker);
+        } catch (DataFormatException e) {
+            ErrorDialog.showError(this, e, "Could not read file", e.getMessage());
+            conceptualSchema = new ConceptualSchema(eventBroker);
+        } catch (Exception e) {
+            ErrorDialog.showError(this, e, "Could not open file", e.getMessage());
+            e.printStackTrace();
+            conceptualSchema = new ConceptualSchema(eventBroker);
+        }
+    }
+
+    private void recreateMruMenu() {
+        if(mruMenu == null) { // no menu yet
+            return;
+        }
+        this.mruMenu.removeAll();
+        boolean empty = true; // will be used to check if we have at least one entry
+        if (this.mruList.size() > 0) {
+            ListIterator it = mruList.listIterator(mruList.size() - 1);
+            while (it.hasPrevious()) {
+                String cur = (String) it.previous();
+                if (cur.equals(currentFile)) {
+                    // don't enlist the current file
+                    continue;
+                }
+                empty = false;
+                JMenuItem mruItem = new JMenuItem(cur);
+                mruItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        JMenuItem menuItem = (JMenuItem) e.getSource();
+                        openSchemaFile(new File(menuItem.getText()));
+                    }
+                });
+                this.mruMenu.add(mruItem);
+            }
+        }
+        // we have now at least one file
+        this.mruMenu.setEnabled(!empty);
+    }
+
     public EventBroker getEventBroker() {
         return eventBroker;
     }
@@ -213,6 +289,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         ConfigurationManager.storeInt("AnacondaJMainPanel", "mainPanelDivider",
                 mainView.getDividerLocation()
         );
+        ConfigurationManager.storeStringList("AnacondaJMainPanel", "mruFiles", this.mruList);
         ConfigurationManager.storeInt("AnacondaJMainPanel", "databaseSchemaViewHorizontalDivider",
                 databaseSchemaView.getHorizontalDividerLocation()
         );
@@ -239,6 +316,11 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
             ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
             conceptualSchema = schemaEvent.getConceptualSchema();
         }
+        if ( e instanceof ConceptualSchemaLoadedEvent ) {
+            ConceptualSchemaLoadedEvent loadEvent = (ConceptualSchemaLoadedEvent) e;
+            File schemaFile = loadEvent.getFile();
+            addFileToMRUList(schemaFile);
+        }
         if ( e instanceof DatabaseInfoChangedEvent ) {
             DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
             if (databaseInformation.getDriverClass() != null && databaseInformation.getURL() != null) {
@@ -263,5 +345,24 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
                 }
             }
         }
+    }
+
+    private void addFileToMRUList(File file) {
+        try {
+            this.currentFile = file.getCanonicalPath();
+        } catch (IOException ex) { // could not resolve canonical path
+            ex.printStackTrace();
+            this.currentFile = file.getAbsolutePath();
+            /// @todo what could be done here?
+        }
+        if (this.mruList.contains(this.currentFile)) {
+            // if it is already in, just remove it and add it at the end
+            this.mruList.remove(this.currentFile);
+        }
+        this.mruList.add(this.currentFile);
+        if (this.mruList.size() > MaxMruFiles) {
+            this.mruList.remove(0);
+        }
+        recreateMruMenu();
     }
 }

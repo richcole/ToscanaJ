@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import org.jdom.Element;
 import util.CollectionFactory;
 
@@ -68,6 +69,7 @@ public class ConceptualSchema implements DiagramCollection {
         this.eventBroker = broker;
         this.dbScheme = new DatabaseSchema(broker);
         reset();
+        eventBroker.processEvent(new NewConceptualSchemaEvent(this, this));
     }
 
     /**

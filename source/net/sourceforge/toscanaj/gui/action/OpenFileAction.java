@@ -42,19 +42,33 @@ public class OpenFileAction extends KeyboardMappedAction {
     public OpenFileAction(
             JFrame frame,
             FileActivity activity,
+            String defaultOpenLocation,
             int mnemonic,
             KeyStroke keystroke)
     {
         super(frame, "Open...", mnemonic, keystroke);
         this.openActivity = activity;
+        this.previousFile = getFile(defaultOpenLocation);
     }
 
     public OpenFileAction(
             JFrame frame,
-            FileActivity activity)
+            FileActivity activity,
+            String defaultOpenLocation)
     {
         super(frame, "Open...");
         this.openActivity = activity;
+        this.previousFile = getFile(defaultOpenLocation);
+    }
+
+    private File getFile(String defaultOpenLocation) {
+        File retVal;
+        try {
+            retVal = new File(defaultOpenLocation);
+        } catch (Exception e) {
+            retVal = null;
+        }
+        return retVal;
     }
 
     public void actionPerformed(ActionEvent e) {
