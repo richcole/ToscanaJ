@@ -178,7 +178,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
      * Returns true if the diagram is in the list of visited diagrams.
      */
     public boolean isInPast(int elementPosition) {
-        return elementPosition < currStartPosition;
+        return (elementPosition < currStartPosition) && (elementPosition >= 0);
     }
 
     /**
@@ -251,15 +251,11 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
 
 
     public void addDiagram(Diagram2D diagram) {
-
-        diagrams.add(new DiagramReference(diagram, null));
-        int newDiagramIndex = getSize() - 1;
-        if (getNumberOfCurrentDiagrams() <= getNestingLevel() && isFirstFutureDiagram(newDiagramIndex)) {
-            firstFutureDiagramPosition++;
-            notifyObservers();
-        }
-        fireIntervalAdded(newDiagramIndex, newDiagramIndex);
-
+    	if(getSize() == 0) {
+    		insertDiagram(0, diagram);
+    	} else {
+			insertDiagram(getSize() - 1, diagram);
+    	}
     }
 
     private boolean isFirstFutureDiagram(int newDiagramIndex) {
@@ -463,5 +459,18 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
 		}
 		return comments;
 			
+	}
+
+	public void insertDiagram(int index, Diagram2D diagram2D) {
+		if (isInPast(index)) {
+			throw new RuntimeException("Trying to change past");
+		}
+
+		diagrams.add(index, new DiagramReference(diagram2D, null));
+		if (getNumberOfCurrentDiagrams() <= getNestingLevel() && isFirstFutureDiagram(index)) {
+			firstFutureDiagramPosition++;
+			notifyObservers();
+		}
+		fireIntervalAdded(index, index);
 	}
 }

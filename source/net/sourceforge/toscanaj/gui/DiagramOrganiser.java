@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.gui.eventhandler.DiagramOrganiserDnDController;
 import net.sourceforge.toscanaj.model.DiagramCollection;
 
 import javax.swing.*;
@@ -18,6 +19,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 
+
 /**
  * A panel for editing the list of diagrams used.
  *
@@ -25,7 +27,6 @@ import java.awt.event.*;
  * current conceptual schema ofr selection as further views
  */
 public class DiagramOrganiser extends JPanel {
-
     /**
      * Stores the conceptual schema used for accessing the available diagrams.
      */
@@ -50,21 +51,24 @@ public class DiagramOrganiser extends JPanel {
      * The listview for the selected diagrams.
      */
     private DiagramHistoryView selectedDiagramsListview;
-
+    
+    	
+	
     public DiagramOrganiser(DiagramCollection conceptualSchema) {
         // store model
         this.schema = conceptualSchema;
-
+       	
+		
         // create view components
         removeButton = new JButton();
         addButton = new JButton();
         JScrollPane availableDiagramsPanel = new JScrollPane();
         JScrollPane selectedDiagramsPanel = new JScrollPane();
         availableDiagramsListview = new JList();
-        availableDiagramsListview.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		availableDiagramsListview.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         selectedDiagramsListview = new DiagramHistoryView(DiagramController.getController().getDiagramHistory());
         selectedDiagramsListview.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
+	    
         // label the buttons
         addButton.setText("Add Selected");
         removeButton.setText("Remove Last");
@@ -111,7 +115,9 @@ public class DiagramOrganiser extends JPanel {
                     int index = availableDiagramsListview.locationToIndex(e.getPoint());
                     DiagramController.getController().addDiagram(schema.getDiagram(index));
                 }
+                            
             }
+            
         };
         availableDiagramsListview.addMouseListener(mouseListener);
 
@@ -146,7 +152,10 @@ public class DiagramOrganiser extends JPanel {
                 }
         );
         removeButton.setEnabled(false);
+        
+        DiagramOrganiserDnDController con=new DiagramOrganiserDnDController(availableDiagramsListview , selectedDiagramsListview , this);
     }
+    
 
     /**
      * This changes the conceptual schema used for the list of available diagrams.
@@ -162,5 +171,15 @@ public class DiagramOrganiser extends JPanel {
             listEntries[i] = schema.getDiagram(i).getTitle();
         }
         this.availableDiagramsListview.setListData(listEntries);
+    } 
+    
+    
+    
+    public DiagramCollection getSchema(){
+    	
+    	return schema;
     }
+    
+  
+
 }
