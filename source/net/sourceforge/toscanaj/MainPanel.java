@@ -246,23 +246,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         diagrMenu.addSeparator();
 
         // menu radio buttons group:
-        this.documentsDisplayGroup = new ButtonGroup();
-
-        this.showExactMenuItem = new JRadioButtonMenuItem("Show only exact matches");
-        this.showExactMenuItem.setSelected(true);
-        this.showExactMenuItem.addActionListener(this);
-        documentsDisplayGroup.add(this.showExactMenuItem);
-        diagrMenu.add(this.showExactMenuItem);
-
-        this.showAllMenuItem = new JRadioButtonMenuItem("Show all matches");
-        this.showAllMenuItem.addActionListener(this);
-        documentsDisplayGroup.add(this.showAllMenuItem);
-        diagrMenu.add(this.showAllMenuItem);
-
-        // separator
-        diagrMenu.addSeparator();
-
-        // menu radio buttons group:
         this.documentsFilterGroup = new ButtonGroup();
 
         this.filterExactMenuItem = new JRadioButtonMenuItem("Filter: use only exact matches");
@@ -276,33 +259,52 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         documentsFilterGroup.add(this.filterAllMenuItem);
         diagrMenu.add(this.filterAllMenuItem);
 
-        // separator
-        diagrMenu.addSeparator();
+        // create the view menu
+        JMenu viewMenu = new JMenu("View");
+        viewMenu.setMnemonic(KeyEvent.VK_V);
+        menubar.add(viewMenu);
 
         // menu radio buttons group:
         this.labelContentGroup = new ButtonGroup();
+
+        // menu radio buttons group:
+        this.documentsDisplayGroup = new ButtonGroup();
+
+        this.showExactMenuItem = new JRadioButtonMenuItem("Show only exact matches");
+        this.showExactMenuItem.setSelected(true);
+        this.showExactMenuItem.addActionListener(this);
+        documentsDisplayGroup.add(this.showExactMenuItem);
+        viewMenu.add(this.showExactMenuItem);
+
+        this.showAllMenuItem = new JRadioButtonMenuItem("Show all matches");
+        this.showAllMenuItem.addActionListener(this);
+        documentsDisplayGroup.add(this.showAllMenuItem);
+        viewMenu.add(this.showAllMenuItem);
+
+        // separator
+        viewMenu.addSeparator();
 
         // radio button menu item NUMBER OF DOCUMENTS
         numDocMenuItem = new JRadioButtonMenuItem("Number Of Documents");
         numDocMenuItem.setSelected(true);
         numDocMenuItem.addActionListener(this);
         labelContentGroup.add(numDocMenuItem);
-        diagrMenu.add(numDocMenuItem);
+        viewMenu.add(numDocMenuItem);
 
         // radio button menu item LIST OF DOCUMENTS
         listDocMenuItem = new JRadioButtonMenuItem("List Of Documents");
         listDocMenuItem.addActionListener(this);
         labelContentGroup.add(listDocMenuItem);
-        diagrMenu.add(listDocMenuItem);
+        viewMenu.add(listDocMenuItem);
 
         // separator
-        diagrMenu.addSeparator();
+        viewMenu.addSeparator();
 
         // menu item PERCENTUAL DISTRIBUTION
         percDistMenuItem = new JCheckBoxMenuItem("Percentual Distribution");
         percDistMenuItem.addActionListener(this);
         percDistMenuItem.setState(false);
-        diagrMenu.add(percDistMenuItem);
+        viewMenu.add(percDistMenuItem);
     }
 
 

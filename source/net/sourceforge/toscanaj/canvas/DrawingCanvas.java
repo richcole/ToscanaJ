@@ -122,14 +122,22 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     }
 
     /**
-     * Handles dragging the labels.
+     * Handles dragging the canvas items.
      */
     public void mouseDragged(MouseEvent e) {
-        if(selectedCanvasItem != null && (dragMode || ((getDistance(lastMousePos.getX(), lastMousePos.getY(), e.getX(), e.getY()) >= dragMin)))) {
+        if(selectedCanvasItem == null) {
+            return;
+        }
+        if(!this.contains(e.getPoint())) {
+            return;
+        }
+        if(!dragMode && (getDistance(lastMousePos.getX(), lastMousePos.getY(), e.getX(), e.getY()) >= dragMin)) {
+            dragMode = true;
+        }
+        if(dragMode) {
             selectedCanvasItem.moveBy(graphics.inverseScaleX(e.getX() - lastMousePos.getX()),
                                  graphics.inverseScaleY(e.getY() - lastMousePos.getY()));
             lastMousePos = new Point2D.Double(e.getX(), e.getY());
-            dragMode = true;
         }
     }
 
