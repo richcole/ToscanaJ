@@ -7,7 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
+import org.tockit.datatype.Datatype;
+
 public interface WritableManyValuedAttribute extends ManyValuedAttribute {
 	void setName(String name);
-	void setType(AttributeType type);
+	void setType(Datatype type);
 }

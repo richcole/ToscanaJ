@@ -22,7 +22,6 @@ public class AllTests extends TestCase {
 
         suite.addTest(net.sourceforge.toscanaj.model.diagram.tests.AllTests.suite());
         suite.addTest(net.sourceforge.toscanaj.model.directedgraph.tests.AllTests.suite());
-		suite.addTest(net.sourceforge.toscanaj.model.manyvaluedcontext.types.tests.AllTests.suite());
         return suite;
     }
 

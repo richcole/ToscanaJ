@@ -7,10 +7,12 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
+import org.tockit.datatype.Value;
+
 import net.sourceforge.toscanaj.model.order.Ordered;
 
 public interface ScaleColumn extends Ordered {
     String getName();
-    boolean containsValue(AttributeValue value);
+    boolean containsValue(Value value);
     boolean isSuperSetOf(ScaleColumn otherColumn);
 }

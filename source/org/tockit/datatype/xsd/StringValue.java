@@ -9,10 +9,10 @@ package org.tockit.datatype.xsd;
 
 import net.sourceforge.toscanaj.model.order.Ordered;
 
-import org.tockit.datatype.Value;
+import org.tockit.datatype.AbstractValue;
 
 
-public class StringValue implements Value {
+public class StringValue extends AbstractValue {
     private String value;
 
     public StringValue(String value) {
@@ -22,19 +22,27 @@ public class StringValue implements Value {
     public String getDisplayString() {
         return this.value;
     }
-
+    
     public boolean isLesserThan(Ordered other) {
-        return false;
-    }
-
-    public boolean isEqual(Ordered other) {
-        if(other.getClass() != StringValue.class) {
+        if(!(this.getClass() == other.getClass())) {
             return false;
         }
         StringValue otherValue = (StringValue) other;
-        return otherValue.value == this.value;
+        return this.value.compareTo(otherValue.value) < 0;
+    }
+
+    public boolean equals(Object other) {
+        if(!(this.getClass() == other.getClass())) {
+            return false;
+        }
+        StringValue otherValue = (StringValue) other;
+        return otherValue.value.equals(this.value);
     }
     
+    public int hashCode() {
+        return value.hashCode();
+    }
+
     public String getValue() {
         return this.value;
     }

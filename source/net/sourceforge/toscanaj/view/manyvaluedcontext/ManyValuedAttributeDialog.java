@@ -23,10 +23,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
+import org.tockit.datatype.Datatype;
+
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 
 public class ManyValuedAttributeDialog extends JDialog{
 	
@@ -113,12 +113,7 @@ public class ManyValuedAttributeDialog extends JDialog{
 		editTypeButton = new JButton ("Edit Type");
 		editTypeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				AttributeType type = (AttributeType) typeBox.getSelectedItem();
-				if(type instanceof TextualType){
-					new TextualTypeDialog(dialog,type);
-				} else {
-					new NumericalTypeDialog(dialog,type);
-				}
+                // @todo do something here
 			}
 		});
 		
@@ -153,7 +148,7 @@ public class ManyValuedAttributeDialog extends JDialog{
 		changeButton = new JButton("Change");
 		changeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				AttributeType type = (AttributeType) typeBox.getSelectedItem();
+				Datatype type = (Datatype) typeBox.getSelectedItem();
 				property.setType(type);
 				//if(!(property.getName().equals(propertyName.getText()))){
 					if(!(nameTextField.getText().equals(""))){
@@ -182,7 +177,7 @@ public class ManyValuedAttributeDialog extends JDialog{
 		typeBox = new JComboBox();
 		Iterator typeIt = context.getTypes().iterator();
 		while(typeIt.hasNext()){
-			AttributeType type = (AttributeType) typeIt.next();
+            Datatype type = (Datatype) typeIt.next();
 			typeBox.addItem(type);
 			if(type.getName().equals(property.getType().getName())){
 				typeBox.setSelectedItem(type);

@@ -17,27 +17,23 @@ import java.util.Map.Entry;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAElement;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualValue;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualValueGroup;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TypeImplementation;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 import org.jdom.Element;
+import org.tockit.datatype.Datatype;
+import org.tockit.datatype.Value;
 import org.tockit.util.IdPool;
 import org.tockit.util.ListSet;
 import org.tockit.util.ListSetImplementation;
 
 
 public class ManyValuedContextImplementation implements WritableManyValuedContext, XMLizable {
-
-	private ListSet objects = new ListSetImplementation();
+    private ListSet objects = new ListSetImplementation();
     private ListSet attributes = new ListSetImplementation();
     private Hashtable relation = new Hashtable();
 	private ListSet types = new ListSetImplementation();
-	
 	
 	public static final String MANY_VALUED_CONTEXT_ELEMENT_NAME = "manyValuedContext";
 	private static final String ATTRIBUTE_ID_ATTRIBUTE_NAME = "attributeId";
@@ -49,16 +45,9 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 	private static final String TYPE_ID_ATTRIBUTE_NAME = "typeId";
 	private static final String VALUE_OBJECT_REF_ATTRIBUTE_NAME = "objectRef";
 	private static final String VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME = "attributeRef";
+	private static final String CLASS_ATTRIBUTE_NAME = "class";
 	
 	public ManyValuedContextImplementation() {
-		// add default types
-		TextualType booleanType = new TextualType("Boolean");
-		booleanType.addValue(new TextualValue("true"));
-		booleanType.addValue(new TextualValue("false"));
-		TextualValueGroup trueGroup = new TextualValueGroup(booleanType, "true", "true");
-		TextualValueGroup falseGroup = new TextualValueGroup(booleanType, "false", "false");
-		TextualValueGroup anyGroup = new TextualValueGroup(booleanType, "any", "any");
-		add(booleanType);
     }
 	
 	public ManyValuedContextImplementation(Element elem) throws XMLSyntaxError {
@@ -97,11 +86,11 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
         return ListSetImplementation.unmodifiableListSet(this.attributes);
     }
     
-    public void add(AttributeType type) {
+    public void add(Datatype type) {
         this.types.add(type);
     }
 
-    public void remove(AttributeType type) {
+    public void remove(Datatype type) {
         this.types.remove(type);
     }
 
@@ -109,14 +98,14 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
     	return ListSetImplementation.unmodifiableListSet(this.types);
     }
 
-    public void setRelationship(FCAElement object, ManyValuedAttribute attribute, AttributeValue value) {
+    public void setRelationship(FCAElement object, ManyValuedAttribute attribute, Value value) {
         Hashtable row = (Hashtable) this.relation.get(object);
         row.put(attribute, value);
     }
 
-    public AttributeValue getRelationship(FCAElement object, ManyValuedAttribute attribute) {
+    public Value getRelationship(FCAElement object, ManyValuedAttribute attribute) {
         Hashtable row = (Hashtable) this.relation.get(object);
-        return (AttributeValue) row.get(attribute);
+        return (Value) row.get(attribute);
     }
     
     public void update(){
@@ -170,7 +159,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		retVal.addContent(objectsElement);
 		Element typesElement = new Element(TYPES_ELEMENT_NAME);
 		for (Iterator iter = types.iterator(); iter.hasNext();) {
-			AttributeType itType = (AttributeType) iter.next();
+            Datatype itType = (Datatype) iter.next();
 			if (! (itType instanceof XMLizable)){
 				throw new RuntimeException("Found type \"" +
 						itType.getName() + "\" not to be XMLizable.");
@@ -204,7 +193,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 				Entry  itAttributeValue = (Entry) iterator.next();
 				ManyValuedAttributeImplementation mvAttribute = (ManyValuedAttributeImplementation) itAttributeValue.getKey();
 				String attributeId = (String) attributeIdMapping.get(mvAttribute);
-				Element valueElement = mvAttribute.getType().toElement((AttributeValue)itAttributeValue.getValue());
+				Element valueElement = mvAttribute.getType().toElement((Value)itAttributeValue.getValue());
 				valueElement.setAttribute(VALUE_OBJECT_REF_ATTRIBUTE_NAME, (String) objectIdMapping.get(itRow.getKey()));
 				valueElement.setAttribute(VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME, attributeId);
 				relationElement.addContent(valueElement);
@@ -232,11 +221,11 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		}
 		for (Iterator iter = typesElement.getChildren().iterator(); iter.hasNext();) {
 			Element typeElement = (Element) iter.next();
-			String className = XMLHelper.getAttribute(typeElement, TypeImplementation.CLASS_ATTRIBUTE_NAME).getValue();
-			AttributeType newType;
+			String className = XMLHelper.getAttribute(typeElement, CLASS_ATTRIBUTE_NAME).getValue();
+			Datatype newType;
 			try {
 				Constructor construct = Class.forName(className).getConstructor(new Class[] {Element.class});
-				newType = (AttributeType) construct.newInstance(new Object[] {typeElement});
+				newType = (Datatype) construct.newInstance(new Object[] {typeElement});
 			} catch (Exception e) {
 				throw new XMLSyntaxError("Initialization of attribute type \"" + className + "\" failed.", e);
 			}
@@ -257,7 +246,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 			FCAElementImplementation rowObject = (FCAElementImplementation) objectIdMapping.get(objectRef);
             String attributeRef = XMLHelper.getAttribute(valueElement, VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME).getValue();
 			ManyValuedAttribute tempAttribute = (ManyValuedAttribute) attributeIdMapping.get(attributeRef);
-			AttributeValue tempValue = tempAttribute.getType().toValue(valueElement);
+			Value tempValue = tempAttribute.getType().toValue(valueElement);
 			setRelationship(rowObject, tempAttribute, tempValue);
 		}
 	}

@@ -9,10 +9,10 @@ package org.tockit.datatype.xsd;
 
 import net.sourceforge.toscanaj.model.order.Ordered;
 
-import org.tockit.datatype.Value;
+import org.tockit.datatype.AbstractValue;
 
 
-public class DecimalValue implements Value {
+public class DecimalValue extends AbstractValue {
     private double value;
 
     public DecimalValue(double value) {
@@ -28,18 +28,24 @@ public class DecimalValue implements Value {
             return false;
         }
         DecimalValue otherValue = (DecimalValue) other;
-        return otherValue.value < this.value;
+        return otherValue.value > this.value;
     }
 
-    public boolean isEqual(Ordered other) {
-        if(other.getClass() != DecimalValue.class) {
+    public double getValue() {
+        return this.value;
+    }
+    
+    public boolean equals(Object other) {
+        if(!(this.getClass() == other.getClass())) {
             return false;
         }
         DecimalValue otherValue = (DecimalValue) other;
         return otherValue.value == this.value;
     }
     
-    public double getValue() {
-        return this.value;
+    public int hashCode() {
+        // create hashCode a la java.lang.Double
+        long bits = Double.doubleToLongBits(value);
+        return (int)(bits ^ (bits >>> 32));
     }
 }

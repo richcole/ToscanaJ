@@ -7,27 +7,20 @@
  */
 package net.sourceforge.toscanaj.view.manyvaluedcontext;
 
-import java.text.NumberFormat;
-
-import javax.swing.DefaultCellEditor;
-import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellEditor;
-import javax.swing.text.NumberFormatter;
+
+import org.tockit.datatype.Datatype;
+import org.tockit.datatype.Value;
+import org.tockit.datatype.swing.DatatypeViewFactory;
 
 import net.sourceforge.toscanaj.model.context.FCAElement;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalType;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValue;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 
 /**
  * A view for many-valued contexts.
@@ -63,14 +56,14 @@ public class TableView extends JTable {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			FCAElement object = getObjectForRow(rowIndex);
 			ManyValuedAttribute attribute = getAttributeForColumn(columnIndex);
-			return context.getRelationship(object, attribute);
+			return context.getRelationship(object, attribute).getDisplayString();
 		}
 
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 			FCAElement object = getObjectForRow(rowIndex);
 			ManyValuedAttribute attribute = getAttributeForColumn(columnIndex);
 			WritableManyValuedContext writableContext = (WritableManyValuedContext) context;
-			writableContext.setRelationship(object, attribute, (AttributeValue) aValue);
+			writableContext.setRelationship(object, attribute, (Value) aValue);
 		}
 
 		public String getColumnName(int columnIndex) {
@@ -104,24 +97,7 @@ public class TableView extends JTable {
 	
 	public TableCellEditor getCellEditor(int row, int column) {
 		ManyValuedAttribute	mvAttr = (ManyValuedAttribute) this.context.getAttributes().get(column);
-		AttributeType type = mvAttr.getType();
-		if(type instanceof TextualType) {
-			TextualType textType = (TextualType) type;
-			JComboBox comp = new JComboBox(type.getValueRange());
-			return new DefaultCellEditor(comp);
-		}
-		if(type instanceof NumericalType) {
-			NumericalType numType = (NumericalType) type;
-			NumberFormat format = NumberFormat.getNumberInstance();
-			format.setMaximumFractionDigits(1);
-			final JFormattedTextField comp = new JFormattedTextField(new NumberFormatter(format));
-			return new DefaultCellEditor(comp) {
-				public Object getCellEditorValue() {
-					double value = Double.parseDouble(comp.getText());
-					return new NumericalValue(value);
-				}
-			};
-		}
-		throw new RuntimeException("Unknown table cell type");
+		Datatype type = mvAttr.getType();
+        return DatatypeViewFactory.getValueCellEditor(type);
 	}
 }

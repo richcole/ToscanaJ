@@ -7,7 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
+import org.tockit.datatype.Datatype;
+
 public interface ManyValuedAttribute {
-    AttributeType getType();
+    Datatype getType();
     String getName();
 }

@@ -13,16 +13,17 @@ import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 import org.jdom.Element;
+import org.tockit.datatype.Datatype;
 
 
 public class ManyValuedAttributeImplementation implements WritableManyValuedAttribute {
-    private AttributeType type;
+    private Datatype type;
     private String name;
 	private static final String MANY_VALUED_ATTRIBUTE_ELEMENT_NAME = "attribute";
 	private static final String NAME_ATTRIBUTE_NAME = "name";
 	private static final String TYPE_REF_ATTRIBUTE_NAME = "typeRef";
 
-    public ManyValuedAttributeImplementation(AttributeType type, String name) {
+    public ManyValuedAttributeImplementation(Datatype type, String name) {
         this.type = type;
         this.name = name;
     }
@@ -31,11 +32,11 @@ public class ManyValuedAttributeImplementation implements WritableManyValuedAttr
     	readXML(element, typeIdMapping);
     }
 
-    public AttributeType getType() {
+    public Datatype getType() {
         return type;
     }
     
-    public void setType(AttributeType type){
+    public void setType(Datatype type){
     	this.type = type;
     }
 
@@ -60,7 +61,7 @@ public class ManyValuedAttributeImplementation implements WritableManyValuedAttr
 
 	public void readXML(Element elem, Hashtable typesIdMapping) throws XMLSyntaxError { 
 		String typeRef = XMLHelper.getAttribute(elem, TYPE_REF_ATTRIBUTE_NAME).getValue();
-		this.type = (AttributeType) typesIdMapping.get(typeRef);
+		this.type = (Datatype) typesIdMapping.get(typeRef);
 		this.name = XMLHelper.getAttribute(elem, NAME_ATTRIBUTE_NAME).getValue();
 	}
 }

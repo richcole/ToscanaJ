@@ -98,17 +98,11 @@ import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttributeImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContextImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalType;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValue;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualValue;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 import net.sourceforge.toscanaj.parser.BurmeisterParser;
@@ -122,9 +116,9 @@ import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
+import net.sourceforge.toscanaj.view.manyvaluedcontext.ManyValuedAttributeDialog;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.TableRowHeaderResizer;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ObjectDialog;
-import net.sourceforge.toscanaj.view.manyvaluedcontext.ManyValuedAttributeDialog;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.RowHeader;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.TableView;
 
@@ -135,15 +129,24 @@ import org.tockit.cernatoXML.model.CernatoModel;
 import org.tockit.cernatoXML.model.CernatoObject;
 import org.tockit.cernatoXML.model.CernatoTable;
 import org.tockit.cernatoXML.model.Criterion;
+import org.tockit.cernatoXML.model.NumericalType;
+import org.tockit.cernatoXML.model.NumericalValue;
 import org.tockit.cernatoXML.model.Property;
 import org.tockit.cernatoXML.model.PropertyType;
-import org.tockit.cernatoXML.model.Value;
+import org.tockit.cernatoXML.model.TextualType;
+import org.tockit.cernatoXML.model.TextualValue;
 import org.tockit.cernatoXML.model.View;
 import org.tockit.cernatoXML.model.ViewContext;
 import org.tockit.cernatoXML.parser.CernatoXMLParser;
 import org.tockit.context.model.BinaryRelation;
 import org.tockit.context.model.BinaryRelationImplementation;
 import org.tockit.context.model.Context;
+import org.tockit.datatype.Datatype;
+import org.tockit.datatype.Value;
+import org.tockit.datatype.xsd.DecimalType;
+import org.tockit.datatype.xsd.DecimalValue;
+import org.tockit.datatype.xsd.StringType;
+import org.tockit.datatype.xsd.StringValue;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -320,7 +323,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		Frame tFrame = JOptionPane.getFrameForComponent(tableView);
 		List manyValuedAttributeList = (List) conceptualSchema.getManyValuedContext().getAttributes();
 		WritableManyValuedAttribute attribute = (WritableManyValuedAttribute) manyValuedAttributeList.get(column);
-		new ManyValuedAttributeDialog(tFrame, attribute,	conceptualSchema.getManyValuedContext());
+		new ManyValuedAttributeDialog(tFrame, attribute, conceptualSchema.getManyValuedContext());
 		this.conceptualSchema.getManyValuedContext().update();
 	}
 
@@ -339,11 +342,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		addAttributeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				WritableManyValuedContext manyValuedContext = conceptualSchema.getManyValuedContext();
-				AttributeType firstType;
+				Datatype firstType;
 				if (manyValuedContext.getTypes().isEmpty()) {
 					firstType = null;
 				} else {
-					firstType = (AttributeType) manyValuedContext.getTypes().iterator().next();
+					firstType = (Datatype) manyValuedContext.getTypes().iterator().next();
 				}
 				manyValuedContext.add(new ManyValuedAttributeImplementation(firstType,""));
 				editAttribute(manyValuedContext.getAttributes().size() - 1);
@@ -804,29 +807,29 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         Map typeMap = new Hashtable();
         for (Iterator it = types.iterator(); it.hasNext();) {
             PropertyType cernatoType = (PropertyType) it.next();
-            Value[] valueRange = cernatoType.getValueRange();
+            org.tockit.cernatoXML.model.Value[] valueRange = 
+                cernatoType.getValueRange();
 
-            AttributeType targetType;
-            if(cernatoType instanceof org.tockit.cernatoXML.model.NumericalType) {
-                org.tockit.cernatoXML.model.NumericalValue min = 
-                    (org.tockit.cernatoXML.model.NumericalValue) valueRange[0];
-                org.tockit.cernatoXML.model.NumericalValue max = 
-                    (org.tockit.cernatoXML.model.NumericalValue) valueRange[1];
+            Datatype targetType;
+            if(cernatoType instanceof NumericalType) {
+                NumericalType numType = (NumericalType) cernatoType;
+                NumericalValue min = (NumericalValue) valueRange[0];
+                NumericalValue max = (NumericalValue) valueRange[1];
                 
                 /// @todo we lack support for the number of decimals on the Cernato side
-                NumericalType numType = new NumericalType(cernatoType.getName());
-                numType.setMinimumValue(min.getValue());
-                numType.setMaximumValue(max.getValue());
-                targetType = numType;
+                DecimalType decType = DecimalType.createDecimalType(
+                        numType.getName(), min.getValue(), max.getValue(),
+                        numType.getNumberOfDecimals());
+                targetType = decType;
             } else if(cernatoType instanceof org.tockit.cernatoXML.model.TextualType) {
-                targetType = new TextualType(cernatoType.getName());
+                String[] stringValues = new String[valueRange.length];
                 TextualType textType = new TextualType(cernatoType.getName());
                 for (int i = 0; i < valueRange.length; i++) {
-                    org.tockit.cernatoXML.model.TextualValue value = 
-                        (org.tockit.cernatoXML.model.TextualValue) valueRange[i];
-                    textType.addValue(new TextualValue(value.getDisplayString()));
+                    TextualValue textualValue = (TextualValue) valueRange[i];
+                    stringValues[i] = textualValue.getDisplayString();
                 }
-                targetType = textType;
+                targetType = StringType.createEnumerationRestrictedType(
+                        textType.getName(), stringValues);
             } else {
                 throw new RuntimeException("Unknown Cernato type");
             }
@@ -837,7 +840,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         Map attributeMap = new Hashtable();
         for (Iterator it = properties.iterator(); it.hasNext();) {
             Property property = (Property) it.next();
-            AttributeType attributeType = (AttributeType)typeMap.get(property.getType());
+            Datatype attributeType = (Datatype)typeMap.get(property.getType());
             ManyValuedAttributeImplementation attribute = 
                 new ManyValuedAttributeImplementation(attributeType, property.getName());
             result.add(attribute);
@@ -856,18 +859,17 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             CernatoObject cernatoObject = (CernatoObject) objIt.next();
             for (Iterator propIt = properties.iterator(); propIt.hasNext();) {
                 Property property = (Property) propIt.next();
-                Value value = cernatoContext.getRelationship(cernatoObject, property);
+                org.tockit.cernatoXML.model.Value value = 
+                    cernatoContext.getRelationship(cernatoObject, property);
 
                 FCAElement targetObject = (FCAElement) objectMap.get(cernatoObject);
                 ManyValuedAttribute attribute = (ManyValuedAttribute) attributeMap.get(property);
-                if(value instanceof org.tockit.cernatoXML.model.NumericalValue) {
-                    org.tockit.cernatoXML.model.NumericalValue numValue = 
-                        (org.tockit.cernatoXML.model.NumericalValue) value;
-                    result.setRelationship(targetObject, attribute, new NumericalValue(numValue.getValue()));
-                } else if(value instanceof org.tockit.cernatoXML.model.TextualValue) {
-                    org.tockit.cernatoXML.model.TextualValue textValue = 
-                        (org.tockit.cernatoXML.model.TextualValue) value;
-                    result.setRelationship(targetObject, attribute, new TextualValue(textValue.getDisplayString()));
+                if(value instanceof NumericalValue) {
+                    NumericalValue numValue = (NumericalValue) value;
+                    result.setRelationship(targetObject, attribute, new DecimalValue(numValue.getValue()));
+                } else if(value instanceof TextualValue) {
+                    TextualValue textValue = (TextualValue) value;
+                    result.setRelationship(targetObject, attribute, new StringValue(textValue.getDisplayString()));
                 } else {
                     throw new RuntimeException("Unknown Cernato value");
                 }
@@ -1127,7 +1129,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             Map objectMap = new Hashtable();
             for (Iterator objIt = viewContext.getObjects().iterator(); objIt.hasNext();) {
                 CernatoObject object = (CernatoObject) objIt.next();
-                FCAElement newObject = new FCAElementImplementation(object);
+                FCAElement newObject = new FCAElementImplementation(object.getName());
                 mappedContext.getObjects().add(newObject);
                 objectMap.put(object, newObject);
             }
@@ -1307,12 +1309,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     private WritableManyValuedContext createManyValuedContextFromDiagrams() {
         ManyValuedContextImplementation mvContext = new ManyValuedContextImplementation();
-        TextualType type = new TextualType("single valued");
-        TextualValue value = new TextualValue("X");
-        type.addValue(value);
-        // @todo remove nullValue once we allow null in a proper fashion
-        TextualValue nullValue = new TextualValue(""); // otherwise we still get red cells
-        type.addValue(nullValue);
+        StringType type = StringType.createEnumerationRestrictedType("single valued", new String[]{"X"});
         mvContext.add(type);
         for (Iterator iter = this.conceptualSchema.getDiagramsIterator(); iter.hasNext(); ) {
             Diagram2D diagram = (Diagram2D) iter.next();
@@ -1331,9 +1328,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 for (Iterator attrIt = svContext.getAttributes().iterator(); attrIt.hasNext(); ) {
                     FCAElement attribute = (FCAElement) attrIt.next();
                     if(relation.contains(object, attribute)) {
-                        mvContext.setRelationship(object, (ManyValuedAttribute) attributeMap.get(attribute), value);
+                        mvContext.setRelationship(object, (ManyValuedAttribute) attributeMap.get(attribute), new StringValue("X"));
                     } else {
-                        mvContext.setRelationship(object, (ManyValuedAttribute) attributeMap.get(attribute), nullValue);
+                        mvContext.setRelationship(object, (ManyValuedAttribute) attributeMap.get(attribute), null);
                     }
                 }
             }
@@ -1467,7 +1464,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     protected void showNumericInputDialog(WritableManyValuedAttribute attribute,
 												WritableFCAElement obj) {
 		WritableManyValuedContext context = this.conceptualSchema.getManyValuedContext();
-        AttributeValue relationship = context.getRelationship(obj,attribute);
+        Value relationship = context.getRelationship(obj,attribute);
         String content;
         if(relationship != null) {
 			content = relationship.toString();
@@ -1480,8 +1477,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		if(value!=null){
 			try{
 				double val = Double.parseDouble(value);
-				NumericalValue numericalValue = new NumericalValue(val);
-				context.setRelationship(obj,attribute,numericalValue);
+				DecimalValue decimalValue = new DecimalValue(val);
+				context.setRelationship(obj,attribute,decimalValue);
 				validate();
 			}catch(NumberFormatException e){
 				JOptionPane.showMessageDialog(this,

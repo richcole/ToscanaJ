@@ -46,6 +46,7 @@ import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.canvas.imagewriter.ImageGenerationException;
 import org.tockit.canvas.manipulators.ItemMovementManipulator;
+import org.tockit.datatype.Value;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -56,7 +57,6 @@ import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
@@ -459,7 +459,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     	model.addElement("<All Sequences>");
     	Iterator it = this.sequenceValues.iterator();
     	while (it.hasNext()) {
-            AttributeValue value = (AttributeValue) it.next();
+            Value value = (Value) it.next();
             model.addElement(value);
         }
         
@@ -552,7 +552,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         this.timeController.setVisibleTime(1);
 		
         if(this.serializeSequencesBox.isSelected() &&
-                    !(this.sequenceToShowChooser.getSelectedItem() instanceof AttributeValue)) {
+                    !(this.sequenceToShowChooser.getSelectedItem() instanceof Value)) {
             int numSeq = this.sequenceValues.size();
             this.timeController.setEndTime(length * numSeq);
             addTransitionsSerialized(this.timeController.getAllFadedTime(), true);
@@ -668,7 +668,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         this.timeController.setFadeOutTime(0);
         this.timeController.setMillisecondsPerStep(1);
         if(this.serializeSequencesBox.isSelected() &&
-                    !(this.sequenceToShowChooser.getSelectedItem() instanceof AttributeValue)) {
+                    !(this.sequenceToShowChooser.getSelectedItem() instanceof Value)) {
             int numSeq = this.sequenceValues.size();
             this.timeController.setEndTime(length * numSeq);
             addTransitionsSerialized(this.timeController.getAllFadedTime(), true);
@@ -694,7 +694,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         this.timeController.setMillisecondsPerStep(this.speedField.getIntegerValue());
         this.timeController.reset();
         if(this.serializeSequencesBox.isSelected() && 
-                    !(this.sequenceToShowChooser.getSelectedItem() instanceof AttributeValue)) {
+                    !(this.sequenceToShowChooser.getSelectedItem() instanceof Value)) {
         	int numSeq = this.sequenceValues.size();
             this.timeController.setEndTime(length * numSeq);
             addTransitionsSerialized(this.timeController.getAllFadedTime(), true);
@@ -707,10 +707,10 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     }
 
     private void addTransitions(double newTargetTime, boolean highlightStates) {
-        AttributeValue selectedSequence = null; // no specific sequence selected
+        Value selectedSequence = null; // no specific sequence selected
         Object selectedSequenceItem = this.sequenceToShowChooser.getSelectedItem();
-        if(selectedSequenceItem instanceof AttributeValue) {
-            selectedSequence = (AttributeValue) selectedSequenceItem;
+        if(selectedSequenceItem instanceof Value) {
+            selectedSequence = (Value) selectedSequenceItem;
         }
 
         List objectSequences = calculateObjectSequences();
@@ -720,7 +720,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         boolean start = true;
         while (seqIt.hasNext()) {
             List sequence = (List) seqIt.next();
-            AttributeValue curSequenceValue = (AttributeValue) seqValIt.next();
+            Value curSequenceValue = (Value) seqValIt.next();
             if(start) {
                 start = false;
                 this.targetTime = newTargetTime;
@@ -741,10 +741,10 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	 * canvas items directly.
 	 */
     private void addTransitionsSerialized(double newTargetTime, boolean highlightStates) {
-        AttributeValue selectedSequence = null; // no specific sequence selected
+        Value selectedSequence = null; // no specific sequence selected
         Object selectedSequenceItem = this.sequenceToShowChooser.getSelectedItem();
-        if(selectedSequenceItem instanceof AttributeValue) {
-            selectedSequence = (AttributeValue) selectedSequenceItem;
+        if(selectedSequenceItem instanceof Value) {
+            selectedSequence = (Value) selectedSequenceItem;
         }
 
         List objectSequences = calculateObjectSequences();
@@ -774,7 +774,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             }
 
             style = styles[seqNum % styles.length];
-            AttributeValue curSequenceValue = (AttributeValue) seqValIt.next();
+            Value curSequenceValue = (Value) seqValIt.next();
             if(lastSequence == null) {
                 this.targetTime = newTargetTime;
                 this.lastAnimationTime = 0;
@@ -796,7 +796,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         DiagramNode oldNode = null;
     	Iterator objectIt = sequence.iterator();
     	int count = countStart;
-    	objLoop: while (objectIt.hasNext()) {
+    	while (objectIt.hasNext()) {
     		count++;
             FCAElement object = (FCAElement) objectIt.next();
     	    DiagramNode curNode = findObjectConceptNode(object);
@@ -842,12 +842,12 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	    Iterator objIt = this.context.getObjects().iterator();
 	    while(objIt.hasNext()) {
 	        FCAElement object = (FCAElement) objIt.next();
-	        AttributeValue value = this.context.getRelationship(object, sequenceAttribute);
+	        Value value = this.context.getRelationship(object, sequenceAttribute);
 	        if(!sequenceValues.contains(value) && value != null) {
 	            boolean inserted = false;
 	            ListIterator seqIt = sequenceValues.listIterator();
 	            while(seqIt.hasNext()) {
-	                AttributeValue curValue = (AttributeValue) seqIt.next();
+	                Value curValue = (Value) seqIt.next();
 	                if(value.isLesserThan(curValue)) {
 	                    if(seqIt.hasPrevious()) {
 	                        seqIt.previous();
@@ -866,7 +866,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	            boolean inserted = false;
 	            ListIterator tlIt = timelineValues.listIterator();
 	            while(tlIt.hasNext()) {
-	                AttributeValue curValue = (AttributeValue) tlIt.next();
+	                Value curValue = (Value) tlIt.next();
 	                if(value != null && value.isLesserThan(curValue)) {
 	                    if(tlIt.hasPrevious()) {
 	                        tlIt.previous();
@@ -899,13 +899,13 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         // go over time
         Iterator timeIt = timelineValues.iterator();
         while (timeIt.hasNext()) {
-            AttributeValue timelineValue = (AttributeValue) timeIt.next();
+            Value timelineValue = (Value) timeIt.next();
             
             // try to find matching object for each sequence
             seqValIt = sequenceValues.iterator();
             Iterator seqIt = objectSequences.iterator();
         	while (seqValIt.hasNext()) {
-                AttributeValue sequenceValue = (AttributeValue) seqValIt.next();
+                Value sequenceValue = (Value) seqValIt.next();
                 List sequence = (List) seqIt.next();
         	    boolean objectFound = false;
         	    Iterator objIt = this.context.getObjects().iterator();

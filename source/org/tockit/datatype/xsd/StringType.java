@@ -7,45 +7,48 @@
  */
 package org.tockit.datatype.xsd;
 
-import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.swing.JComponent;
 
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 import org.jdom.Element;
 import org.tockit.datatype.AbstractDatatype;
+import org.tockit.datatype.ConversionException;
 import org.tockit.datatype.Value;
 
 
 public class StringType extends AbstractDatatype {
-    private StringType(){};
+    protected StringType(String name) {
+        super(name);
+    }
+
+    public static StringType createUnrestrictedType(String name) {
+        return new StringType(name);
+    }
     
-    public static StringType createUnrestrictedType() {
-        return new StringType();
-    }
-    
-    public static StringType createLengthRestrictedType(int minLength, int maxLength) {
-        return new LengthRestrictedStringType(minLength, maxLength);
+    public static StringType createLengthRestrictedType(String name, int minLength, int maxLength) {
+        return new LengthRestrictedStringType(name, minLength, maxLength);
     }
 
-    public static StringType createPatternRestrictedType(String regExp) {
-        return new PatternRestrictedStringType(regExp);
+    public static StringType createPatternRestrictedType(String name, String regExp) {
+        return new PatternRestrictedStringType(name, regExp);
     }
 
-    public static StringType createEnumerationRestrictedType(String[] enumeration) {
-        return new EnumerationRestrictedStringType(enumeration);
+    public static StringType createEnumerationRestrictedType(String name, StringValue[] enumeration) {
+        return new EnumerationRestrictedStringType(name, enumeration);
     }
 
-    public static StringType createEnumerationRestrictedType(Collection enumeration) {
-        String[] enumerationArray = (String[]) enumeration.toArray(new String[enumeration.size()]);
-        return new EnumerationRestrictedStringType(enumerationArray);
+    public static StringType createEnumerationRestrictedType(String name, String[] enumeration) {
+        StringValue[] stringValues = new StringValue[enumeration.length];
+        for (int i = 0; i < stringValues.length; i++) {
+            stringValues[i] = new StringValue(enumeration[i]);
+        }
+        return new EnumerationRestrictedStringType(name, stringValues);
     }
 
     public boolean isValidValue(Value valueToTest) {
-        if(valueToTest.getClass() != StringValue.class) {
+        if(!(valueToTest instanceof StringValue)) {
             return false;
         }
         StringValue stringValue = (StringValue) valueToTest;
@@ -55,7 +58,26 @@ public class StringType extends AbstractDatatype {
     protected boolean isValidStringValue(String valueToTest) {
         return true;
     }
+    
+    public boolean canConvertFrom(Value value) {
+        return isValidStringValue(value.getDisplayString());
+    }
+    
+    public Value convertType(Value value) throws ConversionException {
+        return parse(value.getDisplayString());
+    }
 
+    public boolean canParse(String text) {
+        return isValidStringValue(text);
+    }
+    
+    public Value parse(String text) throws ConversionException {
+        if(isValidStringValue(text)) {
+            return new StringValue(text);
+        }
+        throw new ConversionException("Invalid string value for type");
+    }
+    
     public Value toValue(Element element) {
         return null;
     }
@@ -71,21 +93,22 @@ public class StringType extends AbstractDatatype {
     public void readXML(Element elem) throws XMLSyntaxError {
     }
 
-    private static class LengthRestrictedStringType extends StringType {
+    public static class LengthRestrictedStringType extends StringType {
         private int minLength;
         private int maxLength;
         
-        public LengthRestrictedStringType(int minLength, int maxLength) {
+        private LengthRestrictedStringType(String name, int minLength, int maxLength) {
+            super(name);
             this.minLength = minLength;
             this.maxLength = maxLength;
         }
         
-        public JComponent getTypeDisplayComponent() {
-            return null;
+        public int getMaxLength() {
+            return maxLength;
         }
 
-        public JComponent getTypeEditingComponent() {
-            return null;
+        public int getMinLength() {
+            return minLength;
         }
         
         public boolean isValidStringValue(String valueToTest) {
@@ -99,49 +122,43 @@ public class StringType extends AbstractDatatype {
         }
     }
 
-    private static class PatternRestrictedStringType extends StringType {
+    public static class PatternRestrictedStringType extends StringType {
         private Pattern pattern;
         
-        public PatternRestrictedStringType(String regExp) {
+        private PatternRestrictedStringType(String name, String regExp) {
+            super(name);
             this.pattern = Pattern.compile(regExp);
         }
         
-        public JComponent getTypeDisplayComponent() {
-            return null;
+        public Pattern getPattern() {
+            return pattern;
         }
 
-        public JComponent getTypeEditingComponent() {
-            return null;
-        }
-        
         public boolean isValidStringValue(String valueToTest) {
             Matcher matcher = this.pattern.matcher(valueToTest); 
             return matcher.matches();
         }
     }
 
-    private static class EnumerationRestrictedStringType extends StringType {
-        private String[] enumeration;
+    public static class EnumerationRestrictedStringType extends StringType {
+        private StringValue[] enumeration;
         
-        public EnumerationRestrictedStringType(String[] enumeration) {
+        private EnumerationRestrictedStringType(String name, StringValue[] enumeration) {
+            super(name);
             this.enumeration = enumeration;
-        }
-        
-        public JComponent getTypeDisplayComponent() {
-            return null;
-        }
-
-        public JComponent getTypeEditingComponent() {
-            return null;
         }
         
         public boolean isValidStringValue(String valueToTest) {
             for (int i = 0; i < this.enumeration.length; i++) {
-                if(this.enumeration[i].equals(valueToTest)) {
+                if(this.enumeration[i].getValue().equals(valueToTest)) {
                     return true;
                 }
             }
             return false;
+        }
+        
+        public StringValue[] getEnumeration() {
+            return enumeration;
         }
     }
 }

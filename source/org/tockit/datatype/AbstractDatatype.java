@@ -10,7 +10,14 @@ package org.tockit.datatype;
 
 public abstract class AbstractDatatype implements Datatype {
     private String name;
-
+    
+    /**
+     * Constructor is to be called from the subtypes.
+     */
+    protected AbstractDatatype(String name) {
+        this.name = name;
+    }
+    
     public String getName() {
         return this.name;
     }
@@ -23,7 +30,15 @@ public abstract class AbstractDatatype implements Datatype {
         return false;
     }
 
-    public Value convertType(Value value) {
-        throw new IllegalArgumentException("Can not convert datatypes");
+    public Value convertType(Value value) throws ConversionException {
+        throw new ConversionException("Can not convert datatypes");
+    }
+    
+    public boolean canParse(String text) {
+        return false;
+    }
+    
+    public Value parse(String text) throws ConversionException {
+        throw new ConversionException("This type can not parse strings");
     }
 }

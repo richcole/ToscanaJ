@@ -8,7 +8,9 @@
  
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
+import org.tockit.datatype.Value;
+
 
 public interface WritableScaleColumn extends ScaleColumn{
-	public void addValue(AttributeValue attributeValue);
+	public void addValue(Value attributeValue);
 }

@@ -15,12 +15,13 @@ import org.jdom.Element;
 public interface Datatype extends XMLizable {
     // core methods
     String getName();
-    void setName(String name);
     boolean isValidValue(Value valueToTest);
     
     // type conversion
     boolean canConvertFrom(Value value);
-    Value convertType(Value value);
+    Value convertType(Value value) throws ConversionException;
+    boolean canParse(String text);
+    Value parse(String text) throws ConversionException;
     
     // XML marshalling/demarshalling of values
     Value toValue(Element element);

@@ -7,15 +7,18 @@
 */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
+import org.tockit.datatype.Datatype;
+import org.tockit.datatype.Value;
+
 import net.sourceforge.toscanaj.model.context.*;
 
 public interface WritableManyValuedContext extends ManyValuedContext {
     void add(FCAElement object);
     void add(ManyValuedAttribute attribute);
-    void add(AttributeType type);
+    void add(Datatype type);
     void remove(FCAElement object);
     void remove(ManyValuedAttribute attribute);
-    void remove(AttributeType type);
-    void setRelationship(FCAElement object, ManyValuedAttribute attribute, AttributeValue value);
+    void remove(Datatype type);
+    void setRelationship(FCAElement object, ManyValuedAttribute attribute, Value value);
     void update();
 }

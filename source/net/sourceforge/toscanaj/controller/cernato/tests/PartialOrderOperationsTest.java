@@ -12,13 +12,43 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.controller.cernato.PartialOrderOperations;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.*;
+import net.sourceforge.toscanaj.model.order.Ordered;
 
 import java.util.Set;
 
+import org.tockit.cernatoXML.model.NumericalType;
+import org.tockit.cernatoXML.model.NumericalValueGroup;
+import org.tockit.cernatoXML.model.TextualType;
+import org.tockit.cernatoXML.model.TextualValue;
+import org.tockit.cernatoXML.model.TextualValueGroup;
+import org.tockit.cernatoXML.model.ValueGroup;
+
 public class PartialOrderOperationsTest extends TestCase {
     final static Class THIS = PartialOrderOperationsTest.class;
+
+    private static class OrderedValueGroup implements Ordered {
+        private ValueGroup valueGroup;
+        public OrderedValueGroup(ValueGroup valueGroup) {
+            this.valueGroup = valueGroup;
+        }
+        public ValueGroup getValueGroup() {
+            return valueGroup;
+        }
+        public boolean isLesserThan(Ordered other) {
+            if(other.getClass() != this.getClass()) {
+                return false;
+            }
+            OrderedValueGroup ocOther = (OrderedValueGroup) other;
+            return this.getValueGroup().isLesserThan(ocOther.getValueGroup());
+        }
+        public boolean isEqual(Ordered other) {
+            if(other.getClass() != this.getClass()) {
+                return false;
+            }
+            OrderedValueGroup ocOther = (OrderedValueGroup) other;
+            return this.getValueGroup().isEqual(ocOther.getValueGroup());
+        }
+    }
 
     public PartialOrderOperationsTest(String s) {
         super(s);
@@ -41,8 +71,16 @@ public class PartialOrderOperationsTest extends TestCase {
         NumericalValueGroup numGroup8 = new NumericalValueGroup(numType1, "num8", "num8", 3, true, 3, true);
 
         DirectedGraph graph = PartialOrderOperations.createGraphFromOrder(
-                new ScaleColumn[]{numGroup1, numGroup2, numGroup3, numGroup4, numGroup5,
-                                 numGroup6, numGroup7, numGroup8});
+                new Ordered[]{
+                        new OrderedValueGroup(numGroup1), 
+                        new OrderedValueGroup(numGroup2), 
+                        new OrderedValueGroup(numGroup3), 
+                        new OrderedValueGroup(numGroup4), 
+                        new OrderedValueGroup(numGroup5), 
+                        new OrderedValueGroup(numGroup6), 
+                        new OrderedValueGroup(numGroup7), 
+                        new OrderedValueGroup(numGroup8)
+                });
         Set sources;
         Set sinks;
         Set maximalPaths;
@@ -69,7 +107,13 @@ public class PartialOrderOperationsTest extends TestCase {
         textGroup5.addValue(new TextualValue("two"));
 
         graph = PartialOrderOperations.createGraphFromOrder(
-                new ScaleColumn[]{textGroup1, textGroup2, textGroup3, textGroup4, textGroup5});
+                new Ordered[]{
+                        new OrderedValueGroup(textGroup1), 
+                        new OrderedValueGroup(textGroup2), 
+                        new OrderedValueGroup(textGroup3), 
+                        new OrderedValueGroup(textGroup4), 
+                        new OrderedValueGroup(textGroup5)
+                });
         sources = graph.getSources();
         assertEquals(2, sources.size());
 
