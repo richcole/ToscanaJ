@@ -211,7 +211,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         double radius = node.getRadiusY();
 
         // get the bounding rectangle
-        this.rect = getBounds(graphics);
+        this.rect = getCanvasBounds(graphics);
         double xPos = rect.getX();
         double yPos = rect.getY();
         double lw = rect.getWidth();
@@ -404,7 +404,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * Calculates the rectangle around label and its connection line.
      */
-    public Rectangle2D getBounds(Graphics2D graphics) {
+    public Rectangle2D getCanvasBounds(Graphics2D graphics) {
         // get the font metrics
         FontMetrics fm = graphics.getFontMetrics();
 

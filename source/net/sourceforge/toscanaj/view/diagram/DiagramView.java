@@ -43,13 +43,11 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     private Diagram2D diagram = null;
 
     /**
-     * Creates a new vew displaying an empty digram (i.e. nothing at all).
+     * Creates a new view displaying an empty digram (i.e. nothing at all).
      */
-    public DiagramView()
-    {
-        addMouseListener(this);
-        addMouseMotionListener(this);
-   }
+    public DiagramView() {
+        super();
+    }
 
     /**
      * Implements ChangeObserver.update(Object) by repainting the diagram.
@@ -73,7 +71,12 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         }
         Graphics2D g2d = (Graphics2D) g;
 
+        // fill the background
+        g2d.setPaint(DiagramSchema.getDiagramSchema().getBackground());
+        g2d.fill(this.getBounds());
+
         // draw diagram title in the top left corner
+        g2d.setPaint(DiagramSchema.getDiagramSchema().getForeground());
         g2d.drawString( diagram.getTitle(), this.getX() + MARGIN, this.getY() + MARGIN );
 
         // find current bounds

@@ -158,6 +158,14 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     private Timer doubleClickTimer = null;
 
     /**
+     * Just adds the listeners we need to work.
+     */
+    public DrawingCanvas() {
+        addMouseListener(this);
+        addMouseMotionListener(this);
+    }
+
+    /**
      * Paints the canvas including all CanvasItems on it.
      */
     public void paintCanvas(Graphics2D graphics)
@@ -190,10 +198,10 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
             return new Rectangle2D.Double(0,0,0,0);
         }
         CanvasItem cur = (CanvasItem) it.next();
-        Rectangle2D retVal = cur.getBounds(graphics);
+        Rectangle2D retVal = cur.getCanvasBounds(graphics);
         while(it.hasNext()) {
             cur = (CanvasItem) it.next();
-            retVal = retVal.createUnion(cur.getBounds(graphics));
+            retVal = retVal.createUnion(cur.getCanvasBounds(graphics));
         }
         return retVal;
     }

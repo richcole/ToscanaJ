@@ -94,7 +94,7 @@ public abstract class CanvasItem implements ChangeObservable {
     /**
      * Returns the rectangular bounds of the canvas item.
      */
-    abstract public Rectangle2D getBounds(Graphics2D g);
+    abstract public Rectangle2D getCanvasBounds(Graphics2D g);
 
     /**
      * Returns true if the item should be raised on clicks.

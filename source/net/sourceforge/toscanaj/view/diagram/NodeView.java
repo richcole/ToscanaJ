@@ -177,7 +177,7 @@ public class NodeView extends CanvasItem {
     /**
      * Calculates the rectangle around this node.
      */
-    public Rectangle2D getBounds(Graphics2D g) {
+    public Rectangle2D getCanvasBounds(Graphics2D g) {
         Point2D center = this.diagramNode.getPosition();
         double x = center.getX();
         double y = center.getY();

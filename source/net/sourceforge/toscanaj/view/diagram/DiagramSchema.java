@@ -22,7 +22,7 @@ public class DiagramSchema {
     /**
      * Holds diagram canvas background color.
      */
-    private Color background = new Color(207, 207, 207);
+    private Color background = new Color(204, 204, 204);
 
     /**
      * Holds background color for the nested diagrams.

@@ -79,7 +79,7 @@ public class LineView extends CanvasItem {
     /**
      * Calculates the rectangle around this line.
      */
-    public Rectangle2D getBounds(Graphics2D graphics) {
+    public Rectangle2D getCanvasBounds(Graphics2D graphics) {
         Point2D from = diagramLine.getFromPosition();
         Point2D to = diagramLine.getToPosition();
         double x,y,w,h;
