@@ -378,6 +378,9 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * Finds, raises and stores the canvas item hit.
      */
     public void mousePressed(MouseEvent e) {
+        if(transform == null) { //nothing to do yet
+            return;
+        }
         Point2D point = null;
         try {
             point = (Point2D)this.transform.inverseTransform(e.getPoint(),null);
