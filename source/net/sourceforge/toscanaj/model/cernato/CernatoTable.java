@@ -51,4 +51,10 @@ public class CernatoTable implements ManyValuedContext {
         Hashtable row = (Hashtable) relation.get(object);
         return (AttributeValue) row.get(attribute);
     }	
+    
+	public void updateObject(String objName, int index){
+		CernatoObject obj = (CernatoObject) objects.get(index);
+		obj.setName(objName);
+		objects.set(index,obj);
+	}
 }

@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.view.manyvaluecontext;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -18,6 +18,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JComponent;
+
+import net.sourceforge.toscanaj.model.cernato.CernatoObject;
+import net.sourceforge.toscanaj.model.cernato.CernatoTable;
+
 
 public class CernatoRowHeader extends JComponent{
 	private static final Color TEXT_COLOR = Color.BLACK;

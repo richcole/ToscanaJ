@@ -5,10 +5,11 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.view.manyvaluecontext;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
@@ -19,6 +20,11 @@ import java.awt.geom.Rectangle2D;
 import javax.swing.JComponent;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
+
+import net.sourceforge.toscanaj.model.cernato.CernatoObject;
+import net.sourceforge.toscanaj.model.cernato.CernatoTable;
+import net.sourceforge.toscanaj.model.cernato.Property;
+
 
 public class CernatoTableView extends JComponent implements Scrollable{
 	
@@ -38,10 +44,9 @@ public class CernatoTableView extends JComponent implements Scrollable{
 		this.cernatoTable = cernatoTable;
 		this.colHeader = colHeader;
 		this.rowHeader = rowHeader;
-		this.selectedCell = new SelectedCell(-1,-1);
+		this.selectedCell = new SelectedCell(0,0);
 		updateSize();
 	}
-	
 	
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
@@ -50,39 +55,60 @@ public class CernatoTableView extends JComponent implements Scrollable{
 		int col = 0;
 		Iterator attriIt = cernatoTable.getAttributes().iterator();
 		while(attriIt.hasNext()){
-			attriIt.next();
+			Property property = (Property) attriIt.next();
 			if(selectedCell.getColumn()-1 == col){
-				drawColumn(g2d, col, true);
+				drawColumn(g2d, col, true, property);
 			}else{
-				drawColumn(g2d,col,false);
+				drawColumn(g2d,col,false, property);
 			}
 			col+=1;
 		}
 		g2d.setPaint(oldPaint);
 	}
 	
-	private void drawColumn(Graphics2D g2d , int col, boolean columnSelected) {
+	private void drawColumn(Graphics2D g2d , int col, boolean columnSelected,
+							Property attribute) {
 
 		Iterator objIt = cernatoTable.getObjects().iterator();
-		Paint oldPaint = g2d.getPaint();
 		int row = 0;
 		while(objIt.hasNext()){
-			objIt.next();
+			CernatoObject object = (CernatoObject) objIt.next();
 			if(selectedCell.getRow()-1 == row || columnSelected){
-				g2d.setPaint(SELECTED_CELL_COLOR);
-				g2d.fill(new Rectangle2D.Double(col*CELL_WIDTH, row*CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT));
-				g2d.setPaint(BORDER_COLOR);
-				g2d.draw(new Rectangle2D.Double(col*CELL_WIDTH, row*CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT));
-				g2d.setPaint(oldPaint);
+				if(cernatoTable.getRelationship(object,attribute)!=null){
+					String content = cernatoTable.getRelationship(object,attribute).toString();
+					drawCell(g2d,col,row,SELECTED_CELL_COLOR,content);
+				}
+				else{
+					drawCell(g2d,col,row,SELECTED_CELL_COLOR,"");
+				}
+				
 			}else{
-				g2d.setPaint(CELL_COLOR);
-				g2d.fill(new Rectangle2D.Double(col*CELL_WIDTH, row*CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT));
-				g2d.setPaint(BORDER_COLOR);
-				g2d.draw(new Rectangle2D.Double(col*CELL_WIDTH, row*CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT));
-				g2d.setPaint(oldPaint);
+				if(cernatoTable.getRelationship(object,attribute)!=null){
+					String content = cernatoTable.getRelationship(object,attribute).toString();
+					drawCell(g2d,col,row,CELL_COLOR,content);
+				}
+				else{
+					drawCell(g2d,col,row,CELL_COLOR,"");
+				}
 			}
 			row+= 1 ;
 		}
+	}
+	
+	protected void drawCell(Graphics2D g2d,int col, int row, Color cellColor,
+								String content){
+		Paint oldPaint = g2d.getPaint();
+		g2d.setPaint(cellColor);
+		g2d.fill(new Rectangle2D.Double(col*CELL_WIDTH, row*CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT));
+		g2d.setPaint(BORDER_COLOR);
+		g2d.draw(new Rectangle2D.Double(col*CELL_WIDTH, row*CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT));
+		g2d.setPaint(oldPaint);
+		
+		FontMetrics fontMetrics = g2d.getFontMetrics();
+
+		g2d.drawString(content,
+		(col*CELL_WIDTH) + CELL_WIDTH / 2 - fontMetrics.stringWidth(content) / 2,
+		(row*CELL_HEIGHT) + CELL_HEIGHT / 2 + fontMetrics.getMaxAscent() / 2);
 	}
 	
 	public void setSelectedColumn(SelectedCell col){
@@ -115,6 +141,9 @@ public class CernatoTableView extends JComponent implements Scrollable{
 		}
 			
 	}
+	public void update() {
+		repaint();
+	}
 
 	public boolean getScrollableTracksViewportWidth() {
 		return false;
@@ -133,14 +162,13 @@ public class CernatoTableView extends JComponent implements Scrollable{
 		return new Dimension(numCol * CELL_WIDTH , numRow * CELL_HEIGHT);
 	}
 	
-	
 	public static class SelectedCell{
 		public int col;
 		public int row;
 		
-		public SelectedCell(int col, int row){
-			this.col = col;
+		public SelectedCell(int row, int col){
 			this.row = row;
+			this.col = col;
 		}
 		
 		public void setColumn(int col){
@@ -159,6 +187,7 @@ public class CernatoTableView extends JComponent implements Scrollable{
 			return col;
 		}
 	}
+
 	
 
 }

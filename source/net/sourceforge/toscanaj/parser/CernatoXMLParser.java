@@ -74,14 +74,21 @@ public class CernatoXMLParser {
             throw new DataFormatException("Type missing name");
         }
         TextualType newType = new TextualType(name);
+
+		List values = element.getChildren("text_value");
+		for (Iterator iterator1 = values.iterator(); iterator1.hasNext();) {
+			Element valueElement = (Element) iterator1.next();
+			newType.addValue(new TextualValue(valueElement.getText()));
+		}
+
         List valueGroups = element.getChildren("text_value_group");
         for (Iterator iterator = valueGroups.iterator(); iterator.hasNext();) {
             Element valueGroupElement = (Element) iterator.next();
             String groupId = valueGroupElement.getAttributeValue("id");
             String groupName = valueGroupElement.getChild("name").getText();
             TextualValueGroup group = new TextualValueGroup(newType, groupName, groupId);
-            List values = valueGroupElement.getChildren("text_value");
-            for (Iterator iterator2 = values.iterator(); iterator2.hasNext();) {
+            List value = valueGroupElement.getChildren("text_value");
+            for (Iterator iterator2 = value.iterator(); iterator2.hasNext();) {
                 Element valueElement = (Element) iterator2.next();
                 group.addValue(new TextualValue(valueElement.getText()));
             }

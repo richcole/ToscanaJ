@@ -7,11 +7,17 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
+
+import java.util.ArrayList;
+
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 
 public class TextualType extends TypeImplementation {
+	private ArrayList valueGroupList ;
+	
     public TextualType(String name) {
         super(name);
+        valueGroupList = new ArrayList();
     }
 
     public void addValueGroup(ScaleColumn column, String id) {
@@ -21,4 +27,14 @@ public class TextualType extends TypeImplementation {
         }
         throw new RuntimeException("Wrong value group type");
     }
+
+	public void addValue(TextualValue textualValue) {
+		valueGroupList.add(textualValue);
+	}
+	
+	public ArrayList getTextualValue(){
+		return valueGroupList;
+	}
+	
+	
 }

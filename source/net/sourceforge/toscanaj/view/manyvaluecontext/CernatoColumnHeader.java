@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.view.manyvaluecontext;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,6 +20,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JComponent;
+
+import net.sourceforge.toscanaj.model.cernato.CernatoTable;
+import net.sourceforge.toscanaj.model.cernato.Property;
+
 
 
 public class CernatoColumnHeader extends JComponent{
@@ -42,7 +46,7 @@ public class CernatoColumnHeader extends JComponent{
 	
 	
 	public void paintComponent(Graphics g){
-	
+		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		Paint oldPaint = g2d.getPaint();
 		Font oldFont = g2d.getFont();

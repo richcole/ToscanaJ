@@ -6,7 +6,7 @@
  * $Id$
  */
 
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.view.manyvaluecontext;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
@@ -17,6 +17,9 @@ import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.JComponent;
+
+import net.sourceforge.toscanaj.model.cernato.CernatoTable;
+
 
 public class CernatoTableCorner extends JComponent{
 	private CernatoTable cernatoTable;
