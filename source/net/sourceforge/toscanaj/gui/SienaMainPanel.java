@@ -1113,6 +1113,10 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 			if(concept.getAttributeContingentSize() != 0) {
 				DiagramNode topNode = diagram.getNodeForConcept(concept);
 				concept = new ConceptImplementation();
+				ConceptImplementation oldTopConcept = (ConceptImplementation) topNode.getConcept();
+                concept.addSubConcept(oldTopConcept);
+				oldTopConcept.addSuperConcept(concept);
+				concept.buildClosures();
 				
 				diagram.getBase().add(new Point2D.Double(0,diagram.getBounds().getHeight()/10));
 				DiagramNode newTop = new NDimDiagramNode(diagram,"new top", new double[diagram.getBase().size()], concept, 
@@ -1125,7 +1129,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                         newPos[i] = node.getNdimVector()[i];
                     }
                     newPos[newPos.length - 1] = 1;
-                    node.setNdimVector(newPos); 
+                    node.setNdimVector(newPos);
+                    ConceptImplementation curConcept = (ConceptImplementation) node.getConcept(); 
+                    curConcept.buildClosures();
                 }
                 
 				diagram.addNode(newTop);
@@ -1137,6 +1143,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 concept.addObject(object);
             }
 		}
+		DiagramView diagramView = this.diagramEditingView.getDiagramView();
+        diagramView.showDiagram(diagramView.getDiagram());
     }
 
     protected void showNumericInputDialog(WritableManyValuedAttribute attribute,
