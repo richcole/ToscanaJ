@@ -31,8 +31,13 @@ public class DiagramNode implements XMLizable {
      * This is currently a fixed value common for all nodes, but the access is
      * already done using a method on each instance, thus allowing easy extension
      * later.
+     * 
+     * @todo this value should probably be one as default
      */
-    private static final int RADIUS = 10;
+    private static final int DEFAULT_RADIUS = 10;
+    
+    private double radiusX = DEFAULT_RADIUS;
+    private double radiusY = DEFAULT_RADIUS;
 
     private String identifier;
 
@@ -84,6 +89,14 @@ public class DiagramNode implements XMLizable {
             objectLabel.attachNode(this);
         }
         this.outerNode = outerNode;
+    }
+    
+    public DiagramNode(String identifier, Point2D position, Concept concept,
+                           LabelInfo attributeLabel, LabelInfo objectLabel,
+                           DiagramNode outerNode, double radiusX, double radiusY) {
+        this(identifier, position, concept, attributeLabel, objectLabel, outerNode);
+        this.radiusX = radiusX;
+        this.radiusY = radiusY;
     }
 
     public DiagramNode(Element element) throws XMLSyntaxError {
@@ -219,7 +232,7 @@ public class DiagramNode implements XMLizable {
         if (null == concept) {
             return 0;
         }
-        return RADIUS;
+        return radiusX;
     }
 
     /**
@@ -229,7 +242,7 @@ public class DiagramNode implements XMLizable {
         if (null == concept) {
             return 0;
         }
-        return RADIUS;
+        return radiusY;
     }
 
     /**

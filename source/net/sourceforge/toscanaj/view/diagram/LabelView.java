@@ -206,15 +206,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         // remember some settings to restore them later
         Paint oldPaint = graphics.getPaint();
 
-        // set the font we want -- don't get too small
-        if (graphics.getTransform().getScaleX() * this.font.getSize() < MinFontSize) {
-            Font newFont = new Font(this.font.getName(), this.font.getStyle(),
-                    (int) (MinFontSize / graphics.getTransform().getScaleX()));
-            graphics.setFont(newFont);
-        } else {
-            graphics.setFont(this.font);
-        }
-
         // get the font metrics
         FontMetrics fm = graphics.getFontMetrics();
 

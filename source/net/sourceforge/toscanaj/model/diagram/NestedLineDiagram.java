@@ -63,6 +63,8 @@ public class NestedLineDiagram extends SimpleLineDiagram {
      * This is of course oversimplified: we ignore the distinction between x and
      * y sizes, we ignore the distinction between ellipses and rectangles. The
      * code does more details but the idea is the same.
+     * 
+     * @todo handle different X and Y radii. 
      */
     protected float calculateNeededScaling(Diagram2D outerDiagram, Diagram2D innerDiagram) {
         // if we have only one node we just don't scale at all (we can make this node as
