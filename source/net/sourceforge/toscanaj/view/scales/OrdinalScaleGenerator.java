@@ -11,9 +11,8 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
-import net.sourceforge.toscanaj.model.lattice.DummyConcept;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
 import util.Assert;
-import util.CollectionFactory;
 
 import javax.swing.*;
 import java.awt.geom.Point2D;
@@ -30,6 +29,8 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         return "Ordinal Scale";
     }
 
+    /// @todo should check type of column, too -- we need at least two versions for int and float values (should be
+    /// transparent to the user
     public boolean canHandleColumns(TableColumnPair[] columns) {
         return columns.length == 1;
     }
@@ -50,11 +51,12 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
 
 
         List conceptList = new ArrayList();
-        String id = "Ordinal";
         double x = 0.;
         double y = 0.;
-        ConceptImplementation top = makeConcept();
-        DiagramNode topNode = new DiagramNode(id,
+        /// @todo handle or avoid the case where there is no divider
+        ConceptImplementation top = makeConcept(null,
+                                "(" + pair.getColumn().getName() + "<=" + String.valueOf(dividers.get(1)) + ")");
+        DiagramNode topNode = new DiagramNode("top",
                 new Point2D.Double(x, y),
                 top,
                 new LabelInfo(),
@@ -66,11 +68,12 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         DiagramNode prevNode = topNode;
         conceptList.add(top);
         for (int i = 0; i < dividers.size(); i++) {
-            y += 30;
-            ConceptImplementation currentConcept = makeConcept("<" + String.valueOf(dividers.get(i)));
+            y += 60;
+            ConceptImplementation currentConcept = makeConcept(">" + String.valueOf(dividers.get(i)),
+                                                               getSQLClause(pair, dividers, i));
             conceptList.add(currentConcept);
 
-            DiagramNode node = new DiagramNode(id,
+            DiagramNode node = new DiagramNode((new Integer(i)).toString(),
                     new Point2D.Double(x, y),
                     currentConcept,
                     new LabelInfo(),
@@ -90,18 +93,24 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
             concept.buildClosures();
         }
 
-
         return ret;
     }
 
-    private ConceptImplementation makeConcept() {
-        return new DummyConcept();
+    private String getSQLClause(TableColumnPair pair, List dividers, int i) {
+        String retVal = "(" + pair.getColumn().getName() + ">" + String.valueOf(dividers.get(i)) + ")";
+        if(i < dividers.size()-1 ) {
+            retVal += "AND (" + pair.getColumn().getName() + "<=" + String.valueOf(dividers.get(i+1)) + ")";
+        }
+        return retVal;
     }
 
-    private ConceptImplementation makeConcept(String label) {
-        final List list = CollectionFactory.createDefaultList();
-        list.add(label);
-        return new DummyConcept(list);
+    private ConceptImplementation makeConcept(String label, String queryClause) {
+        ConceptImplementation retVal = new ConceptImplementation();
+        if(label != null) {
+            retVal.addAttribute(new Attribute(label, null));
+        }
+        retVal.addObject(queryClause);
+        return retVal;
     }
 
     public Diagram2D generateScale(Diagram2D oldVersion) {

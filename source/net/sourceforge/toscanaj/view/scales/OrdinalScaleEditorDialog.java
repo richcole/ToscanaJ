@@ -144,7 +144,9 @@ public class OrdinalScaleEditorDialog extends JDialog {
         JPanel addPanel = new JPanel();
         addPanel.setLayout(new BoxLayout(addPanel, BoxLayout.X_AXIS));
         addField = new DoubleNumberField(0, 10);
+        addField.setText("");
         addButton = new JButton("Add");
+        addButton.setEnabled(false);
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -168,7 +170,14 @@ public class OrdinalScaleEditorDialog extends JDialog {
             private void processDocumentEvent(DocumentEvent e) {
                 addButton.setEnabled(addField.isValid());
             }
+        });
 
+        addField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (addField.isValid()) {
+                    addDelimiter(addField.getValue());
+                }
+            }
         });
 
         addPanel.add(addField);
@@ -190,6 +199,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
             }
         }
         dividersModel.insertElementAt(new Double(value), i);
+        addField.setText("");
     }
 
     private double getDelimiter(int i) {
