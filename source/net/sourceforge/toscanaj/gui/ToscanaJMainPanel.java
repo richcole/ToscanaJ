@@ -840,7 +840,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		diagramContextDescriptionButton.setVisible(true);
 		diagramContextDescriptionButton.setEnabled(false);
 		toolbar.add(diagramContextDescriptionButton);
-		schemaDescriptionButton = new JButton("About Schema...");
+		schemaDescriptionButton = new JButton("About System...");
         schemaDescriptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showSchemaDescription();
