@@ -3008,6 +3008,14 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
 		<edge from="48" to="49"/>
 	</diagram>
 	<diagram title="Means of distribution">
+        <description>
+            <html>
+                <body>
+                    <h1>Means of Distribution</h1>
+                    Shows how the PCs are sold.
+                </body>
+            </html>
+        </description>
 		<concept id="1">
 			<position x="0" y="0"/>
 			<objectContingent/>
@@ -3102,6 +3110,14 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
 		<edge from="6" to="7"/>
 	</diagram>
 	<diagram title="Cases">
+        <description>
+            <html>
+                <body>
+                    <h1>Case Types</h1>
+                    Shows which types of cases are used for the PCs.
+                </body>
+            </html>
+        </description>
 		<concept id="1">
 			<position x="0" y="0"/>
 			<objectContingent/>
