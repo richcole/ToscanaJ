@@ -30,7 +30,7 @@ import java.util.Iterator;
  * of a concept, i which exists in a nesting N and a zooming Z.
  * N and Z are considered sequences.
  *
- * The above equation is manifest in the program by constucting
+ * The above equation is manifest in the program by constructing
  * new concept interpreters using the functions:
  *
  *     createNestedInterpreter
@@ -55,8 +55,11 @@ public interface ConceptInterpreter {
     /** is dependent on displayMode and filterMode */
     Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context);
 
-    /** is dependent on displayMode and filterMode */
-    Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context);
+    /** independent of displayMode and filterMode */
+    Iterator getAttributeContingentIterator(Concept concept, ConceptInterpretationContext context);
+
+    /** independent of displayMode and filterMode */
+    Iterator getIntentIterator(Concept concept, ConceptInterpretationContext context);
 
     /** is dependent on displayMode and filterMode */
     int getObjectCount(Concept concept, ConceptInterpretationContext context);

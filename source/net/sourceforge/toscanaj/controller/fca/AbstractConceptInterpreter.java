@@ -8,9 +8,12 @@
 package net.sourceforge.toscanaj.controller.fca;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
@@ -139,8 +142,32 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 		return retVal;
 	}
 
-	public Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context) {
-		return concept.getAttributeContingentIterator();
+	/**
+	 * @todo this method and the intent one could probably be merged, including their
+	 * helpers: just iterate through all concepts and join the attribute sets
+	 */
+	public Iterator getAttributeContingentIterator(Concept concept, ConceptInterpretationContext context) {
+        ArrayList retVal = new ArrayList();
+        Iterator attributeContingentIterator = concept.getAttributeContingentIterator();
+        while (attributeContingentIterator.hasNext()) {
+            Object a = attributeContingentIterator.next();
+            retVal.add(a);
+        }
+        addAttributesFromNesting(retVal, context, true);
+        addAttributesFromFiltering(retVal, context, true);
+        return retVal.iterator();
+	}
+	
+	public Iterator getIntentIterator(Concept concept, ConceptInterpretationContext context) {
+        ArrayList retVal = new ArrayList();
+        Iterator intentIterator = concept.getIntentIterator();
+        while (intentIterator.hasNext()) {
+            Object a = intentIterator.next();
+            retVal.add(a);
+        }
+        addAttributesFromNesting(retVal, context, false);
+        addAttributesFromFiltering(retVal, context, false);
+        return retVal.iterator();
 	}
 	
 	public int getObjectCount(Concept concept, ConceptInterpretationContext context) {
@@ -422,4 +449,42 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 	public boolean isVisible(Concept concept, ConceptInterpretationContext context) {
 	    return this.showDeviation || isRealized(concept, context);
 	}
+
+	private void addAttributesFromNesting(List currentSet, ConceptInterpretationContext context, boolean contingentOnly) {
+        Iterator mainIt = context.getNestingConcepts().iterator();
+        Set attributesToAdd = new HashSet();
+        while (mainIt.hasNext()) {
+            Concept concept = (Concept) mainIt.next();
+            Iterator attributeIterator;
+            if(contingentOnly) {
+            	attributeIterator = concept.getAttributeContingentIterator();
+            } else {
+            	attributeIterator = concept.getIntentIterator();
+            }
+            while (attributeIterator.hasNext()) {
+                attributesToAdd.add(attributeIterator.next());
+            }
+        }
+        currentSet.addAll(attributesToAdd);
+    }
+
+    private void addAttributesFromFiltering(List currentSet, ConceptInterpretationContext context, final boolean contingentOnly) {
+        final Set attributesToAdd = new HashSet();
+        DiagramHistory.ConceptVisitor visitor;
+        visitor = new DiagramHistory.ConceptVisitor() {
+            public void visitConcept(Concept concept) {
+                Iterator attributeIterator;
+                if(contingentOnly) {
+                	attributeIterator = concept.getAttributeContingentIterator();
+                } else {
+                	attributeIterator = concept.getIntentIterator();
+                }
+                while (attributeIterator.hasNext()) {
+                    attributesToAdd.add(attributeIterator.next());
+                }
+            }
+        };
+        context.getDiagramHistory().visitZoomedConcepts(visitor);
+        currentSet.addAll(attributesToAdd);
+    }
 }

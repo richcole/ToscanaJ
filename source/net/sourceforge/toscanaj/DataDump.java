@@ -187,7 +187,7 @@ public class DataDump {
             
             if (includeContingentLists) {
                 Iterator it;
-                it = interpreter.getAttributeSetIterator(cur, contContext);
+                it = interpreter.getAttributeContingentIterator(cur, contContext);
                 while (it.hasNext()) {
                     String name = it.next().toString();
                     Element newElem = new Element("attribute");

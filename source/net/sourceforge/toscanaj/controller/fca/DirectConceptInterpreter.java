@@ -122,9 +122,9 @@ public class DirectConceptInterpreter extends AbstractConceptInterpreter
 
     private List calculateExtent(Concept concept, ConceptInterpretationContext context) {
         ArrayList retVal = new ArrayList();
-        Iterator extentContingentIterator = concept.getExtentIterator();
-        while (extentContingentIterator.hasNext()) {
-            Object o = extentContingentIterator.next();
+        Iterator extentIterator = concept.getExtentIterator();
+        while (extentIterator.hasNext()) {
+            Object o = extentIterator.next();
             retVal.add(o);
         }
         nestObjects(retVal, context, false);
