@@ -1,41 +1,51 @@
-/*
- * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
- * Please read licence.txt in the toplevel source directory for licensing information.
- *
- * $Id$
+/**
+ * Created by IntelliJ IDEA.
+ * User: Adrian
+ * Date: Nov 22, 2002
+ * Time: 11:50:56 AM
+ * To change this template use Options | File Templates.
  */
 package org.tockit.toscanaj.servlet;
-
-import net.sourceforge.toscanaj.parser.CSXParser;
-import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.database.*;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
-import net.sourceforge.toscanaj.model.diagram.*;
-import org.tockit.events.EventBroker;
-import net.sourceforge.toscanaj.controller.fca.*;
+import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.DiagramLine;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
+import net.sourceforge.toscanaj.parser.CSXParser;
 
-import java.io.*;
-import java.util.*;
-import java.util.List;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.servlet.ServletException;
+
+import org.tockit.events.EventBroker;
+
+import java.net.URL;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.File;
 import java.awt.geom.Point2D;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.net.URL;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ArrayList;
 
-/**
- * @todo
- */
-public class ToscanaJServlet extends HttpServlet {
+public class ToscanaJDiagrams extends HttpServlet {
     private static String SERVLET_URL;
     private static double viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight;
-    private static int windowWidth, windowHeight;
     private ConceptualSchema conceptualSchema = null;
     private DatabaseConnectedConceptInterpreter conceptInterpreter = null;
     private static final int NODE_SIZE = 10;
@@ -59,18 +69,19 @@ public class ToscanaJServlet extends HttpServlet {
         }
         DatabaseInfo databaseInfo = conceptualSchema.getDatabaseInfo();
         conceptInterpreter = new DatabaseConnectedConceptInterpreter(databaseInfo);
-        try {
-            DatabaseConnection connection = new DatabaseConnection(new EventBroker());
-            connection.connect(databaseInfo);
-            URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
-            if (location != null) {
-                connection.executeScript(location);
-            }
-            DatabaseConnection.setConnection(connection);
-        } catch (DatabaseException e) {
-            e.getOriginal().printStackTrace();
-            throw new ServletException("Could not connect to database: " + e.getOriginal().getMessage(), e);
-        }
+        URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
+//        try {
+//            DatabaseConnection connection = new DatabaseConnection(new EventBroker());
+//            connection.connect(databaseInfo);
+//            URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
+//            if (location != null) {
+//                connection.executeScript(location);
+//            }
+//            DatabaseConnection.setConnection(connection);
+//        } catch (DatabaseException e) {
+//            e.getOriginal().printStackTrace();
+//            throw new ServletException("Could not connect to database: " + e.getOriginal().getMessage(), e);
+//        }
     }
 
     public void destroy() {
@@ -96,61 +107,29 @@ public class ToscanaJServlet extends HttpServlet {
         String conceptParameter = req.getParameter("concept");
         String filterConceptParameter = req.getParameter("filterConcept");
         String diagramParameter = req.getParameter("diagram");
-        String xParameter = req.getParameter("x");
-        String yParameter = req.getParameter("y");
         DiagramHistory diagramHistory = (DiagramHistory) session.getAttribute("diagramHistory");
-        if ((xParameter != null) && (yParameter != null)) {
-            windowWidth = Integer.parseInt(xParameter);
-            windowHeight = Integer.parseInt(yParameter);
-        }
+
         if(diagramHistory == null) {
             diagramHistory = new DiagramHistory();
             session.setAttribute("diagramHistory", diagramHistory);
         }
-        if(filterConceptParameter != null) {
-            int diagramNumber = Integer.parseInt(diagramParameter);
-            diagramHistory.addDiagram(conceptualSchema.getDiagram(diagramNumber));
-            Concept concept = getConcept(diagramNumber, filterConceptParameter);
-            diagramHistory.next(concept);
-            resp.setContentType("text/html");
-//            printDiagramList(out);
-            printDiagramAndList(out, diagramNumber, req);
+
+        resp.setContentType("image/svg-xml");
+        int diagramNumber = Integer.parseInt(diagramParameter);
+        printHead(diagramNumber, diagramHistory, out, req);
+        printScript(out);
+        printDiagram(diagramNumber, diagramHistory, out);
+        printEnd(out);
+    }
+
+    private void parseSchemaFile() throws Exception, IOException {
+        String initParameter = getInitParameter("schemaFile");
+//        String initParameter = "/Adrian/examples/sql/pctest/pctest.csx";
+        if(initParameter == null) {
+            throw new RuntimeException("No file given as parameter");
         }
-        else if(conceptParameter != null) {
-            resp.setContentType("text/html");
-            int diagramNumber = Integer.parseInt(diagramParameter);
-            String queryParameter = req.getParameter("query");
-            Query query;
-            if(queryParameter != null) {
-                int queryNumber = Integer.parseInt(queryParameter);
-                query = (Query) conceptualSchema.getQueries().get(queryNumber);
-                session.setAttribute("query", query);
-            }
-            else {
-                query = (Query) session.getAttribute("query");
-                if(query == null) {
-                    query = (Query) conceptualSchema.getQueries().get(0);
-                }
-            }
-            printConceptList(diagramNumber, conceptParameter, query, diagramHistory, out);
-        }
-//        else if(diagramParameter != null) {
-//            resp.setContentType("image/svg-xml");
-//            int diagramNumber = Integer.parseInt(diagramParameter);
-//            printHead(diagramNumber, diagramHistory, out, req);
-//            printScript(out);
-//            printDiagram(diagramNumber, diagramHistory, out);
-//            printEnd(out);
-//        }
-        else if(diagramParameter != null) {
-            int diagramNumber = Integer.parseInt(diagramParameter);
-            resp.setContentType("text/html");
-            printDiagramAndList(out, diagramNumber, req);
-        }
-        else {
-            resp.setContentType("text/html");
-            printDiagramList(out);
-        }
+        File schemaFile = new File(initParameter);
+        conceptualSchema = CSXParser.parse(new EventBroker(), schemaFile);
     }
 
     private void printScript(PrintWriter out) {
@@ -161,133 +140,19 @@ public class ToscanaJServlet extends HttpServlet {
         out.println("</script>");
     }
 
-    private void printConceptList(int diagramNumber, String nodeId, Query query, DiagramHistory diagramHistory, PrintWriter out) {
-        out.println("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"./css/style.css\"><title>ToscanaJServlet</title>");
-        out.println("<meta http-equiv=\"Expires\" content=\"0\">");
-        out.println("<meta http-equiv=\"Pragma\" content=\"no-cache;\">");
+    private void printHead(int diagramNumber, DiagramHistory diagramHistory, PrintWriter out, HttpServletRequest req) {
+        out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        out.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">");
+        String screenWidth = req.getParameter("x");
+        String screenHeight = req.getParameter("y");
+        double width = Integer.parseInt(screenWidth) * 0.7;
+        double height = Integer.parseInt(screenHeight) * 0.8;
 
-        out.println("<style>");
-        out.println("all.clsMenuItemNS, .clsMenuItemIE{text-decoration: none; font: bold 12px Arial; color: white; cursor: hand; z-index:100}");
-        out.println("#MainTable A:hover {color: yellow;}");
-        out.println("</style>");
-
-        out.println("<script language=\"JavaScript\">");
-
-        out.println("//Top Nav Bar I v2.1- By Constantin Kuznetsov Jr. (script@esolutiononline.com)");
-        out.println("//Modified by Dynamic Drive for NS6/Opera6 compatibility and code streamlining March 4th, 2002");
-        out.println("//Visit http://www.dynamicdrive.com for this script");
-
-        out.println("var keepstatic=1");
-        out.println("var menucolor=\"#297A01\"");
-        out.println("var submenuwidth=150");
-
-        out.println("</script>");
-
-        out.println("</head><body>");
-
-        out.println("<SCRIPT LANGUAGE=\"JavaScript\" SRC=\"./javascript/menu.js\"></SCRIPT>");
-
-        out.println("<SCRIPT LANGUAGE=\"JavaScript\">");
-        out.println("function showToolbar()");
-        out.println("{");
-
-        out.println(" menu = new Menu();");
-        out.println(" menu.addItem(\"querytype\", \"Change Query\", \"Change Query\",  null, null);");
-
-        Iterator queryIterator = conceptualSchema.getQueries().iterator();
-        int i = 0;
-        while (queryIterator.hasNext()) {
-            Query curQuery = (Query) queryIterator.next();
-            out.println("menu.addSubItem(\"querytype\", \"" + curQuery.getName() + "\", \"" + curQuery.getName() + "\", \"" + SERVLET_URL + "?diagram=" + diagramNumber + "&amp;concept=" + nodeId +
-                        "&amp;query=" + i + "\", \"\");");
-//            out.println("<li><a class=\"one\" href=\"" + SERVLET_URL + "?diagram=" + diagramNumber + "&amp;concept=" + nodeId +
-//                        "&amp;query=" + i + "\">" + curQuery.getName() + "</a></li>");
-            i++;
-        }
-
-        out.println(" menu.showMenu();");
-        out.println("}");
-        out.println("</SCRIPT>");
-
-        out.println("<script language=\"JavaScript\">");
-        out.println("showToolbar();");
-        out.println("</script>");
-        out.println("<script language=\"JavaScript\">");
-        out.println("function UpdateIt(){");
-        out.println("if (ie&&keepstatic&&!opr6)");
-        out.println("document.all[\"MainTable\"].style.top = document.body.scrollTop;");
-        out.println("setTimeout(\"UpdateIt()\", 200);");
-        out.println("}");
-        out.println("UpdateIt();");
-        out.println("</script>");
-
-
-        out.println("<h2>Result of query '" + query.getName() + "':</h1>");
-        Concept concept = getConcept(diagramNumber, nodeId);
-        Iterator objIterator = conceptInterpreter.executeQuery(query,
-                                                    concept,
-                                                    new ConceptInterpretationContext(diagramHistory,new EventBroker())).iterator();
-        out.println("<ul>");
-        while (objIterator.hasNext()) {
-            String object = objIterator.next().toString();
-            out.println("<li>" + object + "</li>");
-        }
-        out.println("</ul>");
-//        out.println("<h2>Change query:</h2>");
-        out.println("</body></html>");
-    }
-
-    private Concept getConcept(int diagramNumber, String nodeId) {
-        Diagram2D diagram = conceptualSchema.getDiagram(diagramNumber);
-        DiagramNode node = diagram.getNode(nodeId);
-        Concept concept = node.getConcept();
-        return concept;
-    }
-
-    private double addXPos(double oldPos) {
-        return (oldPos + 350);
-    }
-
-    private double addYPos(double oldPos) {
-        return (oldPos + 150);
-    }
-
-    /**
-     * Calculates the width of the label given a specific font metric.
-     *
-     * The width is calculated as the maximum string width plus two times the
-     * leading and the descent from the font metrics. When drawing the text the
-     * horizontal position should be the left edge of the label plus one times
-     * the two values (FontMetrics::getLeading() and FontMetrics::getDescent()).
-     */
-    public double getWidth(FontMetrics fontMetrics, List entries) {
-        if (entries.size() == 0) {
-            return 0;
-        }
-        double result = 0;
-
-        // find maximum width of string
-        Iterator it = entries.iterator();
-        while (it.hasNext()) {
-            String cur = it.next().toString();
-            double w = fontMetrics.stringWidth(cur);
-            if (w > result) {
-                result = w;
-            }
-        }
-
-        // add two leadings and two descents to have some spacing on the left
-        // and right side
-        result += 2 * fontMetrics.getLeading() + 2 * fontMetrics.getDescent();
-
-        return result;
-    }
-
-    /**
-     * Calculates the height of the label given a specific font metric.
-     */
-    public int getHeight(FontMetrics fontMetrics) {
-        return fontMetrics.getHeight();
+        // calculate the appropriate view box size
+        calculateViewBoxSize(diagramNumber, diagramHistory, out);
+        out.println("<svg width=\"" + width + "\" height=\"" + height + "\" viewBox=\"" + viewBoxX + " " + viewBoxY + " " + viewBoxWidth + " " + viewBoxHeight + "\" xmlns=\"http://www.w3.org/2000/svg\">");
+        //177.6 122.0 345.29999999999995 358.0
+//        out.println("<svg width=\"" + 1024 + "\" height=\"" + 768 + "\" xmlns=\"http://www.w3.org/2000/svg\">");
     }
 
     private void printDiagram(int diagramNumber, DiagramHistory diagramHistory, PrintWriter out) {
@@ -332,7 +197,7 @@ public class ToscanaJServlet extends HttpServlet {
             Font font = new Font(FONT_FAMILY, Font.PLAIN, 12);
             FontMetrics fm = g2d.getFontMetrics(font);
 
-            out.println("<a target=\"diagramlist\" xlink:href=\"" + SERVLET_URL + "?diagram=" + diagramNumber + "&amp;filterConcept=" + node.getIdentifier() + "\">");
+            out.println("<a target=\"diagrams\" xlink:href=\"" + SERVLET_URL + "?diagram=" + diagramNumber + "&amp;filterConcept=" + node.getIdentifier() + "\">");
             out.println("<circle cx=\"" + addXPos(pos.getX()) + "\" cy=\"" + addYPos(pos.getY()) +"\" r=\"" +
                         radius + "\" style=\"fill:RGB(" + nodeColor.getRed() + "," + nodeColor.getGreen() + "," +
                         nodeColor.getBlue() + ")\" stroke=\"black\" />");
@@ -489,191 +354,57 @@ public class ToscanaJServlet extends HttpServlet {
         return retVal;
     }
 
-    private void printDiagramAndList(PrintWriter out, int diagramNumber, HttpServletRequest req) {
-//        out.println("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"./css/style.css\"><title>ToscanaJServlet</title>");
-        out.println("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"./css/style.css\">");
-
-        out.println("<style>");
-        out.println("all.clsMenuItemNS, .clsMenuItemIE{text-decoration: none; font: bold 12px Arial; color: white; cursor: hand; z-index:1}");
-        out.println("embed { z-index: -100; }");
-        out.println("#MainTable A:hover {color: yellow;}");
-        out.println("</style>");
-
-        out.println("<script language=\"JavaScript\">");
-
-        out.println("//Top Nav Bar I v2.1- By Constantin Kuznetsov Jr. (script@esolutiononline.com)");
-        out.println("//Modified by Dynamic Drive for NS6/Opera6 compatibility and code streamlining March 4th, 2002");
-        out.println("//Visit http://www.dynamicdrive.com for this script");
-
-        out.println("var keepstatic=1");
-        out.println("var menucolor=\"#0B70A2\"");
-        out.println("var submenuwidth=150");
-
-        out.println("</script>");
-        out.println("</head><body>");
-        out.println("<SCRIPT LANGUAGE=\"JavaScript\" SRC=\"./javascript/menu.js\"></SCRIPT>");
-
-        out.println("<SCRIPT LANGUAGE=\"JavaScript\">");
-        out.println("function showToolbar()");
-        out.println("{");
-
-        out.println(" menu = new Menu();");
-        out.println(" menu.addItem(\"listofdiagrams\", \"Display All Diagrams\", \"All Diagrams\",  null, null);");
-        out.println("var url2 = \"\";");
-        out.println("url2 += \"&x=\";");
-        out.println("url2 += screen.width;");
-        out.println("url2 += \"&y=\";");
-        out.println("url2 += screen.height;");
-
-        int numberOfDiagrams = conceptualSchema.getNumberOfDiagrams();
-        for(int i = 0; i<numberOfDiagrams; i++) {
-            Diagram2D diagram = conceptualSchema.getDiagram(i);
-            out.println("menu.addSubItem(\"listofdiagrams\", \"" + diagram.getTitle() + "\", \"" + diagram.getTitle() + "\", \"" + SERVLET_URL + "?diagram=" + i + "\"" + "+url2, \"_self\");");
-//            out.println("menu.addSubItem(\"listofdiagrams\", \"" + diagram.getTitle() + "\", \"" + diagram.getTitle() + "\", \"" + SERVLET_URL + "?diagram=" + i + "\"" + "+url2, \"_self\");");
-        }
-
-
-        out.println(" menu.showMenu();");
-        out.println("}");
-        out.println("</SCRIPT>");
-
-        out.println("<script language=\"JavaScript\">");
-        out.println("showToolbar();");
-        out.println("</script>");
-        out.println("<script language=\"JavaScript\">");
-        out.println("function UpdateIt(){");
-        out.println("if (ie&&keepstatic&&!opr6)");
-        out.println("document.all[\"MainTable\"].style.top = document.body.scrollTop;");
-        out.println("setTimeout(\"UpdateIt()\", 200);");
-        out.println("}");
-        out.println("UpdateIt();");
-        out.println("</script>");
-        out.println("<br><br><center><table><tr>" +
-                "<td valign=\"center\"><embed type=\"image/svg-xml\" " +
-                "width=\"" + 1024 * 0.7 + "\" height=\"" + 768 * 0.8 + "\" pluginspace=\"http://www.adobe.com/svg/viewer/install/\" " +
-//                "name=\"svg1\" src=\"" + SERVLET_URL + "/ToscanaJDiagrams?&x='+screen.width+'&y='+screen.height+'&diagram=" + diagramNumber + "\"></td></tr></table></center>");
-//                "name=\"svg1\" src=\"" + SERVLET_URL + "/ToscanaJDiagrams?&x=1024&y=768&diagram=" + diagramNumber + "\"></td></tr></table></center>");
-        "name=\"svg1\" src=\"" + SERVLET_URL + "/ToscanaJDiagrams?diagram=" + diagramNumber + "&x=" + windowWidth + "&y=" + windowHeight +"\"></td></tr></table></center>");
-//        "name=\"svg1\" src=\"" + SERVLET_URL + "/ToscanaJDiagrams?diagram=" + diagramNumber + "&x=1024&y=768\"></td></tr></table></center>");
-
-            //<A HREF="javascript:alert('Your resolution is '+screen.width+'x'+screen.height);">
-
-        //out.println("<table><tr><td onMouseOver=\"javascript:window.showMenu(window.myMenu);\">Show Diagrams</td></table>");
-//        out.println("<h1>All Diagrams:</h1>");
-//        int numberOfDiagrams = conceptualSchema.getNumberOfDiagrams();
-//        out.println("<ol>");
-//        for(int i = 0; i<numberOfDiagrams; i++) {
-//            Diagram2D diagram = conceptualSchema.getDiagram(i);
-////            out.println("<li><a href=\"" + SERVLET_URL + "?diagram=" + i + "\">" + diagram.getTitle() + "</a></li>");
-//            out.println("<li><a class=\"one\" href=\"javascript:window.location('" + SERVLET_URL + "?diagram=" + i + "&x='+screen.width+'&y='+screen.height)\" target=\"diagram\">" + diagram.getTitle() + "</a></li>");
-//            //<A HREF="javascript:alert('Your resolution is '+screen.width+'x'+screen.height);">
-
-//        }
-//        out.println("</ol>");
-        out.println("</body></html>");
+    private Concept getConcept(int diagramNumber, String nodeId) {
+        Diagram2D diagram = conceptualSchema.getDiagram(diagramNumber);
+        DiagramNode node = diagram.getNode(nodeId);
+        Concept concept = node.getConcept();
+        return concept;
     }
 
-    private void printDiagramList(PrintWriter out) {
-//        out.println("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"./css/style.css\"><title>ToscanaJServlet</title>");
-        out.println("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"./css/style.css\">");
-
-        out.println("<style>");
-        out.println("all.clsMenuItemNS, .clsMenuItemIE{text-decoration: none; font: bold 12px Arial; color: white; cursor: hand; z-index:1}");
-        out.println("#MainTable A:hover {color: yellow;}");
-        out.println("</style>");
-
-        out.println("<script language=\"JavaScript\">");
-
-        out.println("//Top Nav Bar I v2.1- By Constantin Kuznetsov Jr. (script@esolutiononline.com)");
-        out.println("//Modified by Dynamic Drive for NS6/Opera6 compatibility and code streamlining March 4th, 2002");
-        out.println("//Visit http://www.dynamicdrive.com for this script");
-
-        out.println("var keepstatic=1");
-        out.println("var menucolor=\"#0B70A2\"");
-        out.println("var submenuwidth=150");
-
-        out.println("</script>");
-        out.println("</head><body>");
-        out.println("<SCRIPT LANGUAGE=\"JavaScript\" SRC=\"./javascript/menu.js\"></SCRIPT>");
-
-        out.println("<SCRIPT LANGUAGE=\"JavaScript\">");
-        out.println("function showToolbar()");
-        out.println("{");
-
-        out.println(" menu = new Menu();");
-        out.println(" menu.addItem(\"listofdiagrams\", \"Display All Diagrams\", \"All Diagrams\",  null, null);");
-        out.println("var url2 = \"\";");
-        out.println("url2 += \"&x=\";");
-        out.println("url2 += screen.width;");
-        out.println("url2 += \"&y=\";");
-        out.println("url2 += screen.height;");
-
-        int numberOfDiagrams = conceptualSchema.getNumberOfDiagrams();
-        for(int i = 0; i<numberOfDiagrams; i++) {
-            Diagram2D diagram = conceptualSchema.getDiagram(i);
-            out.println("menu.addSubItem(\"listofdiagrams\", \"" + diagram.getTitle() + "\", \"" + diagram.getTitle() + "\", \"" + SERVLET_URL + "?diagram=" + i + "\"" + "+url2, \"_self\");");
-//            out.println("menu.addSubItem(\"listofdiagrams\", \"" + diagram.getTitle() + "\", \"" + diagram.getTitle() + "\", \"" + SERVLET_URL + "?diagram=" + i + "\"" + "+url2, \"_self\");");
-        }
-
-
-        out.println(" menu.showMenu();");
-        out.println("}");
-        out.println("</SCRIPT>");
-
-        out.println("<script language=\"JavaScript\">");
-        out.println("showToolbar();");
-        out.println("</script>");
-        out.println("<script language=\"JavaScript\">");
-        out.println("function UpdateIt(){");
-        out.println("if (ie&&keepstatic&&!opr6)");
-        out.println("document.all[\"MainTable\"].style.top = document.body.scrollTop;");
-        out.println("setTimeout(\"UpdateIt()\", 200);");
-        out.println("}");
-        out.println("UpdateIt();");
-        out.println("</script>");
-        out.println("<br><br><center><table><tr><td align=\"center\" width=\"75\" height=\"400\"></td>" +
-                "<td valign=\"center\"><embed type=\"image/svg-xml\" " +
-                "width=\"350\" height=\"200\" pluginspace=\"http://www.adobe.com/svg/viewer/install/\" " +
-                "name=\"svg1\" src=\"./images/ToscanaJLogo.svg\"></td></tr></table></center>");
-
-            //<A HREF="javascript:alert('Your resolution is '+screen.width+'x'+screen.height);">
-
-        //out.println("<table><tr><td onMouseOver=\"javascript:window.showMenu(window.myMenu);\">Show Diagrams</td></table>");
-//        out.println("<h1>All Diagrams:</h1>");
-//        int numberOfDiagrams = conceptualSchema.getNumberOfDiagrams();
-//        out.println("<ol>");
-//        for(int i = 0; i<numberOfDiagrams; i++) {
-//            Diagram2D diagram = conceptualSchema.getDiagram(i);
-////            out.println("<li><a href=\"" + SERVLET_URL + "?diagram=" + i + "\">" + diagram.getTitle() + "</a></li>");
-//            out.println("<li><a class=\"one\" href=\"javascript:window.location('" + SERVLET_URL + "?diagram=" + i + "&x='+screen.width+'&y='+screen.height)\" target=\"diagram\">" + diagram.getTitle() + "</a></li>");
-//            //<A HREF="javascript:alert('Your resolution is '+screen.width+'x'+screen.height);">
-
-//        }
-//        out.println("</ol>");
-        out.println("</body></html>");
+    private double addXPos(double oldPos) {
+        return (oldPos + 350);
     }
 
-    private void parseSchemaFile() throws Exception, IOException {
-        String initParameter = getInitParameter("schemaFile");
-//        String initParameter = "/Adrian/examples/sql/pctest/pctest.csx";
-        if(initParameter == null) {
-            throw new RuntimeException("No file given as parameter");
-        }
-        File schemaFile = new File(initParameter);
-        conceptualSchema = CSXParser.parse(new EventBroker(), schemaFile);
+    private double addYPos(double oldPos) {
+        return (oldPos + 150);
     }
 
-    private void printHead(int diagramNumber, DiagramHistory diagramHistory, PrintWriter out, HttpServletRequest req) {
-        out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        out.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">");
-        String screenWidth = req.getParameter("x");
-        String screenHeight = req.getParameter("y");
-        double width = Integer.parseInt(screenWidth) * 0.63;
-        double height = Integer.parseInt(screenHeight) * 1;
+    /**
+     * Calculates the width of the label given a specific font metric.
+     *
+     * The width is calculated as the maximum string width plus two times the
+     * leading and the descent from the font metrics. When drawing the text the
+     * horizontal position should be the left edge of the label plus one times
+     * the two values (FontMetrics::getLeading() and FontMetrics::getDescent()).
+     */
+    public double getWidth(FontMetrics fontMetrics, List entries) {
+        if (entries.size() == 0) {
+            return 0;
+        }
+        double result = 0;
 
-        // calculate the appropriate view box size
-        calculateViewBoxSize(diagramNumber, diagramHistory, out);
-        out.println("<svg width=\"" + width + "\" height=\"" + height + "\" viewBox=\"" + viewBoxX + " " + viewBoxY + " " + viewBoxWidth + " " + viewBoxHeight + "\" xmlns=\"http://www.w3.org/2000/svg\">");
+        // find maximum width of string
+        Iterator it = entries.iterator();
+        while (it.hasNext()) {
+            String cur = it.next().toString();
+            double w = fontMetrics.stringWidth(cur);
+            if (w > result) {
+                result = w;
+            }
+        }
+
+        // add two leadings and two descents to have some spacing on the left
+        // and right side
+        result += 2 * fontMetrics.getLeading() + 2 * fontMetrics.getDescent();
+
+        return result;
+    }
+
+    /**
+     * Calculates the height of the label given a specific font metric.
+     */
+    public int getHeight(FontMetrics fontMetrics) {
+        return fontMetrics.getHeight();
     }
 
     private void calculateViewBoxSize(int diagramNumber, DiagramHistory diagramHistory, PrintWriter out) {
@@ -879,4 +610,5 @@ public class ToscanaJServlet extends HttpServlet {
     private void printEnd(PrintWriter out) {
         out.println("</svg>");
     }
+
 }
