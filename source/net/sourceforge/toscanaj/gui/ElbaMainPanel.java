@@ -303,7 +303,7 @@ public class ElbaMainPanel
                 2));
 
         diagramEditingView =
-            new DiagramEditingView(conceptualSchema, eventBroker);
+            new DiagramEditingView(this, conceptualSchema, eventBroker);
         diagramEditingView.setDividerLocation(
             ConfigurationManager.fetchInt(
                 CONFIGURATION_SECTION_NAME,

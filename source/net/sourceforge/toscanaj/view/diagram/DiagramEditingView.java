@@ -88,29 +88,49 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
      */
     public DiagramEditingView(ConceptualSchema conceptualSchema, EventBroker eventBroker) {
         super();
-        setLayout(new BorderLayout());
         this.conceptualSchema = conceptualSchema;
 
-        setName("DiagramEditingView");
-
-        JComponent diagramListView = makeDiagramListView();
-        JPanel mainDiagramView = makeDiagramViewPanel();
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, diagramListView, mainDiagramView);
-        splitPane.setOneTouchExpandable(true);
-        splitPane.setResizeWeight(0);
-        add(splitPane);
-        
         Frame frame = JOptionPane.getFrameForComponent(this);
-        this.contextEditingDialog = new ContextTableScaleEditorDialog(frame, this.conceptualSchema, this.databaseConnection, eventBroker);
-        
-        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
-        eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
-        eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
-        this.diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, Object.class);
+        init(frame, eventBroker);
+    }
+
+	/**
+	 * Alternative constructor allowing to specify parent frame, so it can be passed to
+	 * dialogs used in this view.
+	 * @todo this is a temp costructor to test a bug with dialog raising. One of these
+	 * constructors should be remove after testing is finished. And possibly contents of
+	 * init() method should be moved into remaining constructor.  
+	 */
+	public DiagramEditingView(Frame parent, ConceptualSchema conceptualSchema, EventBroker eventBroker) {
+		super();
+		this.conceptualSchema = conceptualSchema;
+
+		init(parent, eventBroker);
+	}
+
+	public void init(Frame parent, EventBroker eventBroker) {
+		setLayout(new BorderLayout());
+		
+		setName("DiagramEditingView");
+		
+		JComponent diagramListView = makeDiagramListView();
+		JPanel mainDiagramView = makeDiagramViewPanel();
+		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, diagramListView, mainDiagramView);
+		splitPane.setOneTouchExpandable(true);
+		splitPane.setResizeWeight(0);
+		add(splitPane);
+		
+		this.contextEditingDialog = new ContextTableScaleEditorDialog(parent, this.conceptualSchema, this.databaseConnection, eventBroker);
+		
+		eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+		eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
+		eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
+		this.diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, Object.class);
 		this.diagramView.getController().getEventBroker().subscribe( 
 							new AttributeEditingLabelViewPopupMenuHandler(diagramView, eventBroker),
 							CanvasItemContextMenuRequestEvent.class, AttributeLabelView.class);							
-    }
+	}
+
 
     protected JPanel makeDiagramViewPanel() {
         JPanel diagramViewPanel = new JPanel(new BorderLayout());
