@@ -39,8 +39,8 @@ public class ToscanaJPreferences {
                 "Node Colors"),
                 new ConfigurationSubsection(new ConfigurationEntry[] {
                     new ConfigurationEntry(DIAGRAM_SCHEMA_NODE, "circleSelectionColor", ConfigurationType.COLOR, "Selection"),
-                    new ConfigurationEntry(DIAGRAM_SCHEMA_NODE, "circleIdealColor", ConfigurationType.COLOR, "Upset"),
-                    new ConfigurationEntry(DIAGRAM_SCHEMA_NODE, "circleFilterColor", ConfigurationType.COLOR, "Downset")
+                    new ConfigurationEntry(DIAGRAM_SCHEMA_NODE, "circleIdealColor", ConfigurationType.COLOR, "Downset"),
+                    new ConfigurationEntry(DIAGRAM_SCHEMA_NODE, "circleFilterColor", ConfigurationType.COLOR, "Upset")
                 }, 
                 "Highlight Colors"),
                 new ConfigurationSubsection(new ConfigurationEntry[] {
