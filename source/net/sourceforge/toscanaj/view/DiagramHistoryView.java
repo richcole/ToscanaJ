@@ -2,8 +2,11 @@ package net.sourceforge.toscanaj.view;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 
-import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.dnd.*;
+import java.io.IOException;
+import javax.swing.*;
 
 /**
  * A view for presenting the list of all diagrams.
@@ -15,7 +18,9 @@ import java.awt.*;
  *
  * All three list are shown as one long list but with different fonts.
  */
-public class DiagramHistoryView extends JList {
+public class DiagramHistoryView extends JList 
+        implements DropTargetListener,DragSourceListener, DragGestureListener
+{
     /**
      * The cell renderer renders the diagram titles according to the position
      * of the diagram (past, current, future).
@@ -83,6 +88,9 @@ public class DiagramHistoryView extends JList {
             return;
         }
     }
+    
+    private DragSource dragSource = null;
+    private DropTarget dropTarget = null;
 
     /**
      * Creates a new view for the given history.
@@ -90,9 +98,126 @@ public class DiagramHistoryView extends JList {
     public DiagramHistoryView(ListModel history) {
         super(history);
         if (!(history instanceof DiagramHistory)) {
-            throw new ClassCastException("This view needs a model of type DiagramController.DiagramHistory");
+            throw new ClassCastException("This view needs a model of type net.sourceforge.toscanaj.controller.fca.DiagramHistory");
         }
         this.setCellRenderer(new DiagramCellRenderer());
         this.setSelectionModel(new NoSelectionListSelectionModel());
+        
+        dropTarget = new DropTarget(this, this);
+        dragSource = new DragSource();
+        dragSource.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_MOVE, this);
+    }
+    
+    public void dragEnter (DropTargetDragEvent event) {
+    }
+
+    /**
+     * is invoked when you are exit the DropSite without dropping
+     *
+     */
+    public void dragExit (DropTargetEvent event) {
+    }
+
+    /**
+     * is invoked when a drag operation is going on
+     *
+     */
+    public void dragOver (DropTargetDragEvent event) {
+        int itemUnder = locationToIndex(event.getLocation());
+        DiagramHistory history = (DiagramHistory) getModel();
+        if(history.isInPast(itemUnder))
+        {
+            event.rejectDrag();
+        }
+        else
+        {
+            event.acceptDrag(DnDConstants.ACTION_MOVE);
+        }
+    }
+
+    /**
+     * a drop has occurred
+     *
+     */
+    public void drop (DropTargetDropEvent event) {
+        try {
+            Transferable transferable = event.getTransferable();
+            
+            // we accept only Strings
+            if (transferable.isDataFlavorSupported (DataFlavor.stringFlavor)){
+                event.acceptDrop(DnDConstants.ACTION_MOVE);
+                String s = (String)transferable.getTransferData ( DataFlavor.stringFlavor);
+                int startItem = Integer.parseInt(s);
+                int endItem = locationToIndex(event.getLocation());
+                DiagramHistory history = (DiagramHistory) getModel();
+                history.moveDiagram(startItem,endItem);
+                event.getDropTargetContext().dropComplete(true);
+            }
+            else{
+                event.rejectDrop();
+            }
+        }
+        catch (IOException exception) {
+            exception.printStackTrace();
+            event.rejectDrop();
+        }
+        catch (UnsupportedFlavorException ufException ) {
+            ufException.printStackTrace();
+            event.rejectDrop();
+        }
+    }
+
+    /**
+     * is invoked if the use modifies the current drop gesture
+     */
+    public void dropActionChanged ( DropTargetDragEvent event ) {
+    }
+
+    /**
+     * a drag gesture has been initiated
+     */
+    public void dragGestureRecognized( DragGestureEvent event) {
+        int itemDragged = locationToIndex(event.getDragOrigin());
+        DiagramHistory history = (DiagramHistory) getModel();
+        if(!history.isInPast(itemDragged))
+        {
+            /// @todo add specific transferable and data flavor for this
+            StringSelection transferable = new StringSelection((new Integer(itemDragged)).toString());
+            dragSource.startDrag(event, DragSource.DefaultMoveDrop, transferable, this);
+        }
+    }
+
+    /**
+     * this message goes to DragSourceListener, informing it that the dragging
+     * has ended
+     */
+    public void dragDropEnd (DragSourceDropEvent event) {
+    }
+
+    /**
+     * this message goes to DragSourceListener, informing it that the dragging
+     * has entered the DropSite
+     */
+    public void dragEnter (DragSourceDragEvent event) {
+    }
+
+    /**
+     * this message goes to DragSourceListener, informing it that the dragging
+     * has exited the DropSite
+     */
+    public void dragExit (DragSourceEvent event) {
+    }
+
+    /**
+     * this message goes to DragSourceListener, informing it that the dragging is currently
+     * ocurring over the DropSite
+     */
+    public void dragOver (DragSourceDragEvent event) {
+    }
+    
+    /**
+     * is invoked when the user changes the dropAction
+     */
+    public void dropActionChanged ( DragSourceDragEvent event) {
     }
 }

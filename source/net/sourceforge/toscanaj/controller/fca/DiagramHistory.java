@@ -266,6 +266,19 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         notifyObservers();
     }
 
+    public void moveDiagram(int from, int to) {
+        if (getSize() == 0) {
+            throw new NoSuchElementException("The list of diagrams is already empty.");
+        }
+        if (isInPast(from) || isInPast(to)) {
+            throw new RuntimeException("Trying to change past");
+        }
+        Object item = diagrams.remove(from);
+        diagrams.add(to, item);
+        fireIntervalRemoved(getSize(), getSize());
+        notifyObservers();
+    }
+
     public void reset() {
         int last = getSize() - 1;
         if (last == -1) {
