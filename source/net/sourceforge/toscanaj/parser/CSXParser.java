@@ -112,6 +112,7 @@ public class CSXParser {
 				    	element.getAttributeValue("version").equals("TJ1.0") ||
                         element.getAttributeValue("version").equals("TJ2.0")) {
 	                _Schema = new ConceptualSchema(eventBroker, element);
+	                _Schema.setLocation(_BaseURL);
 	            } else {
 	                // create data structure
 	                _Schema = new ConceptualSchema(eventBroker);

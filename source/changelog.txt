@@ -22,6 +22,7 @@ Specific for ToscanaJ:
 Specific for Elba:
 ==================
 - Bugfix: SQL object labels do not write beyond the bounds anymore.
+- SQL scripts, Access and Excel files are now set as relative paths were possible
 
 Specific for Siena (still not fully complete):
 ==============================================

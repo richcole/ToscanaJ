@@ -34,6 +34,7 @@ import org.tockit.events.EventBrokerListener;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -88,6 +89,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
     
     private WritableManyValuedContext manyValuedContext;
 	private boolean dataSaved = true;
+	private URL location;
 
     /**
      * Creates an empty schema.
@@ -451,5 +453,13 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
 
     public void setConceptInterpreter(ConceptInterpreter interpreter) {
         this.conceptInterpreter = interpreter;
+    }
+    
+    public URL getLocation() {
+        return location;
+    }
+    
+    public void setLocation(URL location) {
+        this.location = location;
     }
 }

@@ -7,6 +7,36 @@
  */
 package net.sourceforge.toscanaj.view.database;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.border.BevelBorder;
+import javax.swing.filechooser.FileFilter;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
@@ -24,17 +54,7 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 import org.tockit.swing.preferences.ExtendedPreferences;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.filechooser.FileFilter;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.io.File;
-import java.net.MalformedURLException;
+import org.tockit.util.FileUtils;
 
 
 
@@ -217,6 +237,27 @@ public class DatabaseConnectionInformationView extends JDialog
             }
         	return connection.isConnected();
         }
+        protected void setPathInTextField(JTextField textField, String path) {
+            if("file".equals(conceptualSchema.getLocation().getProtocol())) {
+                File csxFile = new File(conceptualSchema.getLocation().getPath());
+                File dbFile = new File(path);
+                String dbFilePath = FileUtils.findRelativePath(csxFile, dbFile);
+                textField.setText(dbFilePath);
+            } else {
+                textField.setText(path);
+            }
+        }
+        protected String createAbsoluteLocation(String inputLocation) {
+            if (inputLocation.startsWith("..") || 
+                inputLocation.indexOf(File.separator) == -1) {
+                // we assume the schema has a file URL, since we wouldn't have the relative
+                // path otherwise
+                return new File(new File(conceptualSchema.getLocation().getPath()).getParent(),
+                                 inputLocation).toString();
+            } else {
+                return new File(inputLocation).toString();
+            }
+        }
     }
     
     class EmbeddedDbConnectionPanel extends ConnectionPanel {
@@ -268,7 +309,7 @@ public class DatabaseConnectionInformationView extends JDialog
 
         void updateContents() {
             if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.EMBEDDED) {
-            	this.scriptLocationField.setText(databaseInfo.getEmbeddedSQLLocation().getPath());
+                setPathInTextField(this.scriptLocationField, databaseInfo.getEmbeddedSQLLocation().getPath());
             } else {
             	this.scriptLocationField.setText("");
             }
@@ -281,10 +322,12 @@ public class DatabaseConnectionInformationView extends JDialog
             databaseInfo.setPassword(embedInfo.getPassword());
             databaseInfo.setDriverClass(embedInfo.getDriverClass());
             try {
-                databaseInfo.setEmbeddedSQLLocation(new File(scriptLocationField.getText()).toURL());
+                databaseInfo.setEmbeddedSQLLocation(
+                        new File(createAbsoluteLocation(
+                                scriptLocationField.getText())).toURL());
             } catch (MalformedURLException e) {
-            	ErrorDialog.showError(this,e,"URL invalid");
-            	return false;
+                ErrorDialog.showError(this,e,"Connection failed");
+                return false;
             }
             boolean connected = connectDatabase();
             if(!connected) {
@@ -561,8 +604,8 @@ public class DatabaseConnectionInformationView extends JDialog
                     2,2));
         }
         void updateContents() {
-            if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.EXCEL_FILE) {
-                this.fileUrlField.setText(databaseInfo.getExcelFileUrl());
+            if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.ACCESS_FILE) {
+                setPathInTextField(this.fileUrlField, databaseInfo.getAccessFileUrl());
                 this.userNameField.setText(databaseInfo.getUserName());
                 this.passwordField.setText(databaseInfo.getPassword());
             } else {
@@ -572,7 +615,10 @@ public class DatabaseConnectionInformationView extends JDialog
             }
         }
         boolean executeStep() {
-            databaseInfo.setAccessFileInfo(fileUrlField.getText(), userNameField.getText(), new String(passwordField.getPassword()));
+            databaseInfo.setAccessFileInfo(
+                    createAbsoluteLocation(fileUrlField.getText()), 
+                    userNameField.getText(), 
+                    new String(passwordField.getPassword()));
             return connectDatabase();
         }
     }
@@ -656,8 +702,8 @@ public class DatabaseConnectionInformationView extends JDialog
                     2,2));
         }
         void updateContents() {
-            if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.ACCESS_FILE) {
-                this.fileUrlField.setText(databaseInfo.getAccessFileUrl());
+            if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.EXCEL_FILE) {
+                setPathInTextField(this.fileUrlField, databaseInfo.getExcelFileUrl());
                 this.userNameField.setText(databaseInfo.getUserName());
                 this.passwordField.setText(databaseInfo.getPassword());
             } else {
@@ -667,7 +713,10 @@ public class DatabaseConnectionInformationView extends JDialog
             }
         }
         boolean executeStep() {
-            databaseInfo.setExcelFileInfo(fileUrlField.getText(), userNameField.getText(), new String(passwordField.getPassword()));
+            databaseInfo.setExcelFileInfo(
+                    createAbsoluteLocation(fileUrlField.getText()), 
+                    userNameField.getText(), 
+                    new String(passwordField.getPassword()));
             return connectDatabase();
         }
     }
@@ -860,12 +909,7 @@ public class DatabaseConnectionInformationView extends JDialog
     }
 
 	private void getFileURL(JTextField urlField, final String extension, final String description) {
-		JFileChooser openDialog;
-		if (openedDatabaseFile != null) {
-			openDialog = new JFileChooser(openedDatabaseFile);
-		} else {
-			openDialog = new JFileChooser(System.getProperty("user.dir"));
-		}
+		JFileChooser openDialog = new JFileChooser(openedDatabaseFile);
 		openDialog.setFileFilter(new FileFilter() {
 			public boolean accept(File f) {
 				if (f.isDirectory()) {
@@ -886,8 +930,15 @@ public class DatabaseConnectionInformationView extends JDialog
 
 		if (openDialog.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			openedDatabaseFile = openDialog.getSelectedFile();
-			String fileURL = openedDatabaseFile.getAbsolutePath();
-			urlField.setText(fileURL);
+			URL schemaURL = conceptualSchema.getLocation();
+	        String dbFilePath;
+			if("file".equals(schemaURL.getProtocol())) {
+			    File csxFile = new File(schemaURL.getPath());
+			    dbFilePath = FileUtils.findRelativePath(csxFile, openedDatabaseFile);
+			} else {
+			    dbFilePath = openedDatabaseFile.getAbsolutePath();
+			}
+            urlField.setText(dbFilePath);
 		}
 	}
 
