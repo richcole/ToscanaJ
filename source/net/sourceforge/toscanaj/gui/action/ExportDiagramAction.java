@@ -80,8 +80,13 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 
 	public void exportImage() {
         // important: getParentFile() -- otherwise it won't work if the exported image was deleted
-		final CustomJFileChooser saveDialog =
-			new CustomJFileChooser(this.diagramExportSettings.getLastImageExportFile().getParentFile());
+		final CustomJFileChooser saveDialog;
+        File lastImageExportFile = this.diagramExportSettings.getLastImageExportFile();
+        if(lastImageExportFile != null) {
+            saveDialog = new CustomJFileChooser(lastImageExportFile.getParentFile());
+        } else {
+            saveDialog = new CustomJFileChooser(null);
+        }
 		// populate the file extension combo box in the dialog
 		// with all the possible file formats 
 		FileFilter defaultFilter = saveDialog.getFileFilter();

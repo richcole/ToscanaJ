@@ -35,11 +35,12 @@ public class DiagramExportSettingsPanel extends JComponent implements ActionList
     private JTextField heightField;
     private JCheckBox saveToFileCheckBox;
     private JCheckBox copyToClipboardCheckBox; 
-	private JCheckBox useScrSizeCheckBox; 
+	private JCheckBox useScrSizeCheckBox;
 
-    /**
-     * No public instances of this dialog.
-     */
+    private JCheckBox forceColorCheckBox;
+
+    private JButton backgroundColorButton; 
+
     public DiagramExportSettingsPanel(DiagramExportSettings settings) {
         super();
         setPreferredSize(new Dimension(150,200));
@@ -48,27 +49,14 @@ public class DiagramExportSettingsPanel extends JComponent implements ActionList
     }
 
 	private void buildPanel() {
-		JPanel modePanel = createModePanel();
-		JPanel historyPanel = createHistoryPanel();
-		GridBagLayout gridBagLayout = new GridBagLayout();
-		setLayout(gridBagLayout);
-		add(modePanel, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0
-					   , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 0, 0, 0), 200, 0));
-		add(historyPanel, new GridBagConstraints(1, 1, 3, 1, 1.0, 0.0
-			   , GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 0, 0), 200, 0));
-	}
-
-	private JPanel createHistoryPanel() {
-		JPanel historyPanel = new JPanel(new GridBagLayout());
-		historyPanel.setBorder(BorderFactory.createTitledBorder("History Export"));
-		saveToFileCheckBox = new JCheckBox("Save to file", this.diagramSettings.getSaveCommentsToFile());
-		copyToClipboardCheckBox = new JCheckBox("Copy to clipboard", this.diagramSettings.getSaveCommentToClipboard());
-		historyPanel.add(saveToFileCheckBox, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 5, 0, 5), 0, 0));
-		historyPanel.add(copyToClipboardCheckBox, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
-				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 5, 0, 5), 0, 0));
-		return historyPanel;
-	}
+		setLayout(new GridBagLayout());
+		add(createModePanel(), new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0
+					   , GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 0, 0), 0, 0));
+        add(createHistoryPanel(), new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0
+                , GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 0, 0), 0, 0));
+        add(createBackgroundPanel(), new GridBagConstraints(1, 2, 1, 1, 1.0, 1.0
+                , GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(5, 0, 0, 0), 0, 0));
+    }
 
 	private JPanel createModePanel() {
 		useScrSizeCheckBox = new JCheckBox("Use Screen Size",this.diagramSettings.usesAutoMode());
@@ -94,7 +82,7 @@ public class DiagramExportSettingsPanel extends JComponent implements ActionList
 		
 		//add the items of the same classification to a JPanel
 		JPanel modePanel = new JPanel(new GridBagLayout());
-		modePanel.setBorder(BorderFactory.createTitledBorder("Size"));
+//		modePanel.setBorder(BorderFactory.createTitledBorder("Size"));
 		
 		modePanel.add(useScrSizeCheckBox, new GridBagConstraints(0, 0, 1, 1, 0.0,0.0, 
 			GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0, 5, 5, 5), 0, 0));
@@ -116,6 +104,44 @@ public class DiagramExportSettingsPanel extends JComponent implements ActionList
 		return modePanel;
 	}
 
+	private JPanel createHistoryPanel() {
+		JPanel historyPanel = new JPanel(new GridBagLayout());
+//		historyPanel.setBorder(BorderFactory.createTitledBorder("History Export"));
+		saveToFileCheckBox = new JCheckBox("Save history to file", this.diagramSettings.getSaveCommentsToFile());
+		copyToClipboardCheckBox = new JCheckBox("History to clipboard", this.diagramSettings.getSaveCommentToClipboard());
+		historyPanel.add(saveToFileCheckBox, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 5, 0, 5), 0, 0));
+		historyPanel.add(copyToClipboardCheckBox, new GridBagConstraints(0, 1, 1, 1, 1.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 5, 0, 5), 0, 0));
+		return historyPanel;
+	}
+
+	private JPanel createBackgroundPanel() {
+		JPanel backgroundPanel = new JPanel(new GridBagLayout());
+        final JComponent parent = this;
+//		backgroundPanel.setBorder(BorderFactory.createTitledBorder("Background options"));
+		this.forceColorCheckBox = new JCheckBox("Force Background", this.diagramSettings.forceColorIsSet());
+		this.backgroundColorButton = new JButton("");
+        Dimension buttonSize = new Dimension(20,20);
+        this.backgroundColorButton.setMinimumSize(buttonSize);
+        this.backgroundColorButton.setPreferredSize(buttonSize);
+        this.backgroundColorButton.setBackground(this.diagramSettings.getBackgroundColor());
+        this.backgroundColorButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Color newColor = JColorChooser.showDialog(
+                                parent, "Select background color", backgroundColorButton.getBackground());
+                backgroundColorButton.setBackground(newColor);
+            }
+        });
+		backgroundPanel.add(this.forceColorCheckBox, new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 0, 5), 0, 0));
+        backgroundPanel.add(new JLabel("Color: "), new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 15, 0, 5), 0, 0));
+        backgroundPanel.add(this.backgroundColorButton, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 0, 5), 0, 0));
+        return backgroundPanel;
+	}
+
     public void actionPerformed(ActionEvent a) {
         Object source = a.getSource();
         if ((source == useScrSizeCheckBox)) {
@@ -127,10 +153,12 @@ public class DiagramExportSettingsPanel extends JComponent implements ActionList
     }
     
 	public void saveSettings(){
-	   this.diagramSettings.setImageSize(Integer.parseInt(widthField.getText()),
-			   Integer.parseInt(heightField.getText()));
-		this.diagramSettings.setAutoMode(useScrSizeCheckBox.isSelected());
-		this.diagramSettings.setSaveCommentsToFile(saveToFileCheckBox.isSelected());
-	   this.diagramSettings.setSaveCommentToClipboard(copyToClipboardCheckBox.isSelected());
+	   this.diagramSettings.setImageSize(Integer.parseInt(this.widthField.getText()),
+			   Integer.parseInt(this.heightField.getText()));
+	   this.diagramSettings.setAutoMode(this.useScrSizeCheckBox.isSelected());
+	   this.diagramSettings.setSaveCommentsToFile(this.saveToFileCheckBox.isSelected());
+	   this.diagramSettings.setSaveCommentToClipboard(this.copyToClipboardCheckBox.isSelected());
+       this.diagramSettings.setForceColor(this.forceColorCheckBox.isSelected());
+       this.diagramSettings.setBackgroundColor(this.backgroundColorButton.getBackground());
 	}
 }

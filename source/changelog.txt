@@ -17,6 +17,10 @@ Affecting different programs:
   position properly (was broken during session and in between sessions
   if the exported file was deleted)
 - the Save As... dialog now uses the location of the current file
+- when exporting diagrams a new option allows setting a background
+  color, which will also be used in formats otherwise supporting a
+  transparent background. This can be useful if the program used to
+  import e.g. a PNG into can not handle the transparency properly
 
 Specific for ToscanaJ:
 ======================
