@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<website baseURL="http://toscanaj.sourceforge.net" sourceDir="content" targetDir="output">
+        <structure>
+		<section name="Welcome" sourceDir="." targetDir=".">
+			<entry name="Welcome" sourceFile="index.xhtml" targetFile="index.html" type="XHTML"/>
+		</section>
+	
+		<section name="Downloads" sourceDir="downloads" targetDir="downloads">
+			<entry name="Downloads" sourceFile="index.xhtml" targetFile="index.html" type="XHTML"/>
+		</section>
+	
+		<section name="ToscanaJ" sourceDir="toscanaJ" targetDir="toscanaJ">
+			<entry name="ToscanaJ" sourceFile="index.xhtml" targetFile="index.html" type="XHTML"/>
+			<entry name="Screenshots" sourceFile="screenshots.xhtml" targetFile="screenshots.html" type="XHTML"/>
+		</section>
+      		
+		<section name="Elba" sourceDir="elba" targetDir="elba">
+			<entry name="Elba" sourceFile="index.xhtml" targetFile="index.html" type="XHTML"/>
+			<entry name="Screenshots" sourceFile="screenshots.xhtml" targetFile="screenshots.html" type="XHTML"/>
+		</section>
+	  
+		<section name="Siena" sourceDir="siena" targetDir="siena">
+			<entry name="Siena" sourceFile="index.xhtml" targetFile="index.html" type="XHTML"/>
+			<entry name="Screenshots" sourceFile="screenshots.xhtml" targetFile="screenshots.html" type="XHTML"/>
+		</section>
+
+		<section name="Participate" sourceDir="participate" targetDir="participate">
+			<entry name="Participate" sourceFile="index.xhtml" targetFile="index.html" type="XHTML" id="participate"/>
+		</section>
+		<file sourceFile="style.css" targetFile="style.css" type="copy" id="style"/>
+
+	</structure>
+        <layout>
+                <documentStyle type="XHTML">
+                        <xsl stylesheet="layout/generic.xsl" navigationElement="html">
+                                <parameter name="nav.main.pos" value="left"/>
+                                <parameter name="nav.sec.pos" value="nested"/>
+                                <parameter name="nav.sec.visible" value="all"/>
+                                <parameter name="nav.sec.firstEntry" value="section"/>
+                                <parameter name="style.markup.firstLetter" value="on"/>
+                                <parameter name="style.markup.linkTypes" value="on"/>
+                                <parameter name="feature.internalLink.token" value="!"/>
+                                <parameter name="feature.javascript" value="off"/>
+                        </xsl>
+                </documentStyle>
+		<documentStyle type="copy">
+			<copy/>
+		</documentStyle>
+		<sectionStyle type="section"/>
+
+
+	</layout>
+</website>
