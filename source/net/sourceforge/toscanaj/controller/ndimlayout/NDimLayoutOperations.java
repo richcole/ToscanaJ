@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.controller.ndimlayout;
 
 import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
@@ -23,14 +24,14 @@ import java.util.*;
 
 public abstract class NDimLayoutOperations {
     // constants for base vector calculation
-    private static final double BASE_SCALE = 10;
+    private static final double BASE_SCALE = 20;
     private static final double BASE_X_STRETCH = 2;
-    private static final double BASE_X_SHEAR = 0.3;
+	private static final double BASE_X_SHEAR = 0.3;
 
     public static final Diagram2D createDiagram(Lattice lattice, String title,
                                                 DimensionCreationStrategy dimensionStrategy) {
         Vector dimensions = dimensionStrategy.calculateDimensions(lattice);
-        Vector base = createBase(dimensions);
+        Vector base = createBase(dimensions.size());
         NDimDiagram diagram = new NDimDiagram(base);
         diagram.setTitle(title);
         Concept[] concepts = lattice.getConcepts();
@@ -59,10 +60,135 @@ public abstract class NDimLayoutOperations {
             node.setNdimVector(substract(node.getNdimVector(), topVector));
         }
         createConnections(diagram, nodemap);
+        changeBase(diagram);
         return diagram;
     }
 
-    public static double[] substract(double[] a, double[] b) {
+    private static void changeBase(NDimDiagram diagram) {
+    	int n = diagram.getBase().size();
+    	int[] perm = new int[n];
+    	for (int i = 0; i < perm.length; i++) {
+			perm[i] = i;
+		}
+		int numVectors = n;
+		Vector largeBase = createBase(numVectors);
+		
+		Vector bestBase = new Vector();
+		double maxMinDist = -1;
+		do {
+			Vector curBase = new Vector();
+			for (int i = 0; i < perm.length; i++) {
+				int cur = perm[i];
+				curBase.add(largeBase.get(cur));
+			}
+			diagram.setBase(curBase);
+			double curDist = calculateMinimumDistance(diagram);
+			if(curDist > maxMinDist) {
+				maxMinDist = curDist;
+				bestBase = curBase;
+			}
+			perm = findNextPermutation(perm, numVectors);
+		} while(perm != null);
+		diagram.setBase(bestBase);
+	}
+
+	private static int[] findNextPermutation(int[] currentPermutation, int numValues) {
+		boolean last = true;
+		for (int i = 0; i < currentPermutation.length; i++) {
+			int cur = currentPermutation[i];
+			if(cur != numValues - i - 1) {
+				last=false;
+				break;
+			}
+		}
+		if(last) {
+			return null;
+		}
+		int[] result = increasePermutation(currentPermutation, numValues);
+		while(!isValid(result)) {
+			result = increasePermutation(result, numValues);
+		}
+		
+		return result;
+	}
+
+	private static boolean isValid(int[] testArray) {
+		for (int i = 0; i < testArray.length; i++) {
+			int cur = testArray[i];
+			for (int j = i + 1; j < testArray.length; j++) {
+				if(testArray[j] == cur) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private static int[] increasePermutation(int[] currentPermutation, int numValues) {
+		int overflow = 1;
+		int[] result = new int[currentPermutation.length];
+		for (int i = currentPermutation.length - 1; i >= 0; i--) {
+			result[i] = currentPermutation[i] + overflow;
+			if(result[i] > numValues - 1) {
+				result[i] = 0;
+				overflow = 1;
+			} else {
+				overflow = 0;
+			}
+		}
+		return result;
+	}
+
+	private static double calculateMinimumDistance(NDimDiagram diagram) {
+		Iterator lineIt = diagram.getLines();
+		double minDist = Double.MAX_VALUE;
+		while(lineIt.hasNext()) {
+			DiagramLine line = (DiagramLine) lineIt.next();
+			Iterator nodeIt = diagram.getNodes();
+			while(nodeIt.hasNext()) {
+				DiagramNode node = (DiagramNode) nodeIt.next();
+				if(line.getFromNode() == node) {
+					continue;
+				}
+				if(line.getToNode() == node) {
+					continue;
+				}
+				double distFrom = node.getPosition().distance(line.getFromPosition());
+				double distTo = node.getPosition().distance(line.getToPosition());
+				double lengthLine = line.getFromPosition().distance(line.getToPosition());
+				double curDist;
+				if(distFrom > lengthLine) {
+					curDist = distTo;
+				} else if(distTo > lengthLine) {
+					curDist = distFrom;
+				} else {
+					curDist = calculateDistanceToLine(node, line);
+				}
+				if(curDist < minDist) {
+					minDist = curDist;
+				}
+			}
+		}
+		return minDist;
+	}
+
+	private static double calculateDistanceToLine(DiagramNode node, DiagramLine line) {
+		Point2D from = line.getFromPosition();
+		Point2D to = line.getToPosition();
+		
+		double hesseX = from.getY() - to.getY();
+		double hesseY = to.getX() - from.getX();
+		double length = Math.sqrt(hesseX * hesseX + hesseY * hesseY);
+		hesseX /= length; 
+		hesseY /= length;
+		
+		double hesseV = from.getX() * hesseX + from.getY() * hesseY;
+		double nodeV = node.getX() * hesseX + node.getY() * hesseY;
+		 
+		return Math.abs(hesseV - nodeV);
+	}
+
+	public static double[] substract(double[] a, double[] b) {
         double[] retVal = new double[a.length];
         for (int i = 0; i < a.length; i++) {
             retVal[i] = a[i] - b[i];
@@ -76,17 +202,13 @@ public abstract class NDimLayoutOperations {
      * The return value is a set of base vectors as given in Frank Vogt's book "Formale Begriffsanalyse mit C++",
      * page 61, rescaled and stretched by the two constants BASE_SCALE and BASE_X_STRETCH, and sheared by BASE_X_SHEAR.
      */
-    private static Vector createBase(Vector dimensions) {
+    private static Vector createBase(int n) {
         Vector base = new Vector();
-        int n = dimensions.size();
-        int i = n - 1;
-        for (Iterator iterator = dimensions.iterator(); iterator.hasNext();) {
-            iterator.next();
+        for(int i = n - 1;i >= 0; i--) {
             double a = 1 << i;
             double b = 1 << (n - i - 1);
             base.add(new Point2D.Double((a - b + BASE_X_SHEAR) * BASE_X_STRETCH * BASE_SCALE,
                     (a + b) * BASE_SCALE));
-            i--;
         }
         return base;
     }

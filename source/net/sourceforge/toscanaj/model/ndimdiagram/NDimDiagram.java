@@ -17,6 +17,9 @@ import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 
 public class NDimDiagram extends SimpleLineDiagram {
+	/**
+	 * @todo this could be an array
+	 */
 	private Vector base;
 	
     public NDimDiagram(Vector base) {
@@ -55,7 +58,11 @@ public class NDimDiagram extends SimpleLineDiagram {
         return new NDimDiagramNode(this, diagramNode);
     }
 
-    public Vector getBase() {
-        return base;
-    }
+	public Vector getBase() {
+		return base;
+	}
+
+	public void setBase(Vector base) {
+		this.base = base;
+	}
 }
