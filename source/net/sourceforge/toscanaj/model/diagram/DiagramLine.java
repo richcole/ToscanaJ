@@ -46,8 +46,8 @@ public class DiagramLine implements XML_Serializable {
 
     public Element toXML() {
         Element retVal = new Element(DIAGRAM_LINE_ELEMENT_NAME);
-        retVal.setAttribute(FROM_NODE_ATTRIBUTE_NAME, String.valueOf(fromNode.hashCode()));
-        retVal.setAttribute(TO_NODE_ATTRIBUTE_NAME, String.valueOf(toNode.hashCode()));
+        retVal.setAttribute(FROM_NODE_ATTRIBUTE_NAME, fromNode.getIdentifier());
+        retVal.setAttribute(TO_NODE_ATTRIBUTE_NAME, toNode.getIdentifier());
         return retVal;
     }
 
