@@ -277,7 +277,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	}
 
 	protected void createDiagramEditingView() {
-		this.diagramEditingView = new DiagramEditingView(conceptualSchema, eventBroker);
+		this.diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
 		this.diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
 										this, DisplayedDiagramChangedEvent.class, Object.class);
 		DiagramView diagramView = diagramEditingView.getDiagramView();

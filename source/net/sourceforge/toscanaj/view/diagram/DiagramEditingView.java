@@ -85,30 +85,11 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     /**
      * Construct an instance of this view
-     */
-    public DiagramEditingView(ConceptualSchema conceptualSchema, EventBroker eventBroker) {
-        super();
-        this.conceptualSchema = conceptualSchema;
-
-        Frame frame = JOptionPane.getFrameForComponent(this);
-        init(frame, eventBroker);
-    }
-
-	/**
-	 * Alternative constructor allowing to specify parent frame, so it can be passed to
-	 * dialogs used in this view.
-	 * @todo this is a temp costructor to test a bug with dialog raising. One of these
-	 * constructors should be remove after testing is finished. And possibly contents of
-	 * init() method should be moved into remaining constructor.  
 	 */
 	public DiagramEditingView(Frame parent, ConceptualSchema conceptualSchema, EventBroker eventBroker) {
 		super();
 		this.conceptualSchema = conceptualSchema;
 
-		init(parent, eventBroker);
-	}
-
-	public void init(Frame parent, EventBroker eventBroker) {
 		setLayout(new BorderLayout());
 		
 		setName("DiagramEditingView");
@@ -128,9 +109,8 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		this.diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, Object.class);
 		this.diagramView.getController().getEventBroker().subscribe( 
 							new AttributeEditingLabelViewPopupMenuHandler(diagramView, eventBroker),
-							CanvasItemContextMenuRequestEvent.class, AttributeLabelView.class);							
+							CanvasItemContextMenuRequestEvent.class, AttributeLabelView.class);
 	}
-
 
     protected JPanel makeDiagramViewPanel() {
         JPanel diagramViewPanel = new JPanel(new BorderLayout());

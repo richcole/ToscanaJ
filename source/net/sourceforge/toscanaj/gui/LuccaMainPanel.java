@@ -173,7 +173,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
     public void createViews() {
-        diagramView = new DiagramEditingView(conceptualSchema, eventBroker);
+        diagramView = new DiagramEditingView(this, conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("LuccaMainPanel", "diagramViewDivider", 200));
         connectionInformationView =
                 new DatabaseConnectionInformationView(this, conceptualSchema, eventBroker);
