@@ -111,8 +111,31 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     public double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context, int reference) {
-        /// @todo implement
-        return 1;
+        try {
+            int contingentSize = getCount(concept, context, ConceptInterpretationContext.CONTINGENT);
+            if (reference == REFERENCE_DIAGRAM) {
+                /// @todo add way to find top concept more easily
+		/// @todo refactor lookup of diagram object count here and in getRelativeExtentSize
+                while (!concept.isTop()) {
+                    Concept other = concept;
+                    Iterator it = concept.getUpset().iterator();
+                    do {
+                        other = (Concept) it.next();
+                    } while (other == concept);
+                    concept = other;
+                }
+                if (contingentSize == 0) {
+                    return 0; //avoids division by zero
+                }
+                return (double) contingentSize / (double) getCount(concept, context, ConceptInterpretationContext.EXTENT);
+            } else {
+                /// @todo implement
+                return 1;
+            }
+        } catch (DatabaseException e) {
+            e.getOriginal().printStackTrace();
+            throw new RuntimeException("Error querying database");
+        }
     }
 
     public double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context, int reference) {
