@@ -20,7 +20,9 @@ import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.CloseMainPanelActivity;
 import net.sourceforge.toscanaj.gui.activity.LoadConceptualSchemaActivity;
+import net.sourceforge.toscanaj.gui.activity.NewConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.SaveConceptualSchemaActivity;
+import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
@@ -153,6 +155,26 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(fileMenu);
+
+        NewConceptualSchemaActivity newSchemaActivity = new NewConceptualSchemaActivity(eventBroker);
+        newSchemaActivity.setPostNewActivity(new SimpleActivity() {
+            public boolean doActivity() throws Exception {
+                currentFile = null;
+                return true;
+            }
+        });
+        SimpleAction newAction =
+            new SimpleAction(
+                this,
+                newSchemaActivity,
+                "New",
+                KeyEvent.VK_N,
+                KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+
+        JMenuItem newMenuItem = new JMenuItem("New");
+        newMenuItem.setMnemonic(KeyEvent.VK_N);
+        newMenuItem.addActionListener(newAction);
+        fileMenu.add(newMenuItem);
 
         LoadConceptualSchemaActivity loadSchemaActivity = new LoadConceptualSchemaActivity(eventBroker);
         /// @todo add dirty flag support as Elba has
