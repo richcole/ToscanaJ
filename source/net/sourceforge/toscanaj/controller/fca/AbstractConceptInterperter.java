@@ -122,7 +122,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                                                                       context.getOutermostContext());
                     int numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
                                                                     context.getOutermostContext());
-                    int expectedSize = neutralContingentSize * outerContingentSize / numberOfAllObjectsInDiagram;
+                    double expectedSize = neutralContingentSize * outerContingentSize / (double) numberOfAllObjectsInDiagram;
                     int contingentSize = getObjectContingentSize(concept, context);
                     if(contingentSize == expectedSize) {
                         return 0.5;                                        
@@ -131,8 +131,8 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                         return 0.5 * contingentSize / expectedSize;                                        
                     }
                     int max = Math.min(neutralContingentSize, outerContingentSize);
-                    int range = max - expectedSize;
-                    return 0.5 + 0.5 * (contingentSize - expectedSize)/range;                                        
+                    double range = max - expectedSize;
+                    return 0.5 + 0.5 * (contingentSize - expectedSize) / range;                                        
                 }
             };
         } else if(type == INTERVAL_TYPE_EXTENT_ORTHOGONALTIY) {
@@ -146,7 +146,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                                                                       context.getOutermostContext());
                     int numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
                                                                     context.getOutermostContext());
-                    int expectedSize = neutralExtentSize * outerExtentSize / numberOfAllObjectsInDiagram;
+                    double expectedSize = neutralExtentSize * outerExtentSize / (double) numberOfAllObjectsInDiagram;
                     int extentSize = getExtentSize(concept, context);
                     if(extentSize == expectedSize) {
                         return 0.5;                                        
@@ -155,7 +155,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                         return 0.5 * extentSize / expectedSize;                                        
                     }
                     int max = Math.min(neutralExtentSize, outerExtentSize);
-                    int range = max - expectedSize;
+                    double range = max - expectedSize;
                     return 0.5 + 0.5 * (extentSize - expectedSize)/range;                                        
                 }
             };
