@@ -56,9 +56,11 @@ public class TextualType extends TypeImplementation {
 		}
 		return false;
 	}
+    
 	public void removeValue(int selectedIndex) {
 		valueList.remove(selectedIndex);
 	}
+    
 	public void move(int startIndex, int endIndex) {	
 		TextualValue textualValue = (TextualValue) valueList.get(startIndex);
 		valueList.remove(startIndex);
@@ -88,9 +90,6 @@ public class TextualType extends TypeImplementation {
 		return attribute;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.types.TypeImplementation#fillRangeElement(org.jdom.Element)
-	 */
 	protected void fillRangeElement(Element rangeElement) {
 		for (Iterator iter = valueList.iterator(); iter.hasNext();) {
 			TextualValue element = (TextualValue) iter.next();
@@ -100,9 +99,6 @@ public class TextualType extends TypeImplementation {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.types.TypeImplementation#readRangeElement(org.jdom.Element)
-	 */
 	protected void readRangeElement(Element rangeElement) {
 		this.valueList = new ArrayList();
 		List valueListElements = rangeElement.getChildren();
@@ -112,16 +108,10 @@ public class TextualType extends TypeImplementation {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType#toValue(org.jdom.Element)
-	 */
 	public AttributeValue toValue(Element element) {
 		return new TextualValue(element.getTextTrim());
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType#toElement(net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue)
-	 */
 	public Element toElement(AttributeValue value) {
 		Element retVal = new Element(VALUE_ELEMENT_NAME);
 		retVal.addContent(((TextualValue) value).getDisplayString());

@@ -27,8 +27,6 @@ public class NumericalType extends TypeImplementation {
         super(name);
     }
     
-    
-    
     public void addValueGroup(ScaleColumn column, String id) {
         if (column instanceof NumericalValueGroup) {
             scale.addColumn(column, id);
@@ -76,18 +74,12 @@ public class NumericalType extends TypeImplementation {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#toXML()
-	 */
 	public void fillRangeElement(Element rangeElement) {
 		rangeElement.setAttribute(MIN_ATTRIBUTE_NAME, String.valueOf(minValue));
 		rangeElement.setAttribute(MAX_ATTRIBUTE_NAME, String.valueOf(maxValue));
 		rangeElement.setAttribute(NUMBER_OF_DECIMALS_ATTRIBUTE_NAME, String.valueOf(numOfDecimals));
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#readXML(org.jdom.Element)
-	 */
 	public void readRangeElement(Element rangeElement) throws XMLSyntaxError {
 		this.minValue = XMLHelper.getDoubleAttribute(rangeElement, MIN_ATTRIBUTE_NAME);
 		this.maxValue = XMLHelper.getDoubleAttribute(rangeElement, MAX_ATTRIBUTE_NAME);
@@ -98,9 +90,6 @@ public class NumericalType extends TypeImplementation {
 		return new NumericalValue(Double.parseDouble(element.getTextTrim()));
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType#toElement(net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue)
-	 */
 	public Element toElement(AttributeValue value) {
 		Element retVal = new Element(VALUE_ELEMENT_NAME);
 		retVal.addContent(String.valueOf(((NumericalValue) value).getValue()));
@@ -110,5 +99,4 @@ public class NumericalType extends TypeImplementation {
 	public NumericalType(Element element) throws XMLSyntaxError {
 		super(element);
 	}
-
 }
