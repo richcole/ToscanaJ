@@ -25,17 +25,17 @@ import org.tockit.tupelware.model.TupelSet;
  */
 public class TabDelimitedParser {
     /**
-     * Reads a list of tupels from a tab-delimited file.
+     * Reads a list of tuples from a tab-delimited file.
      * 
-     * The format used is one tupel per line, the elements delimited
+     * The format used is one tuple per line, the elements delimited
      * with tabs. No escaping, so no tabs in the elements are allowed.
      * 
      * If a line doesn't contain at least two entries it is consider a
      * comment.
      * 
-     * @return a Set of Object[] representing the tupels parsed
+     * @return a Set of Object[] representing the tuples parsed
      */
-    public static TupelSet parseTabDelimitedTupels(Reader input) throws IOException {
+    public static TupelSet parseTabDelimitedTuples(Reader input) throws IOException {
         TupelSet retVal = null;
         BufferedReader buffReader = new BufferedReader(input);
         int lineNum = 0;
@@ -50,19 +50,19 @@ public class TabDelimitedParser {
             if(tokenizer.countTokens() <= 1) {
                 continue;
             }
-            String[] tupel = new String[tokenizer.countTokens()];
+            String[] tuple = new String[tokenizer.countTokens()];
             int i = 0;
             while(tokenizer.hasMoreTokens()) {
-                tupel[i] = tokenizer.nextToken();
+                tuple[i] = tokenizer.nextToken();
                 i++;
             }
             if(retVal == null) {
-                retVal = new TupelSet(tupel); 
+                retVal = new TupelSet(tuple); 
             } else {
             	try {
-					retVal.addTupel(tupel);
+					retVal.addTuple(tuple);
 	           	} catch(IllegalArgumentException e) {
-	           		throw new IOException("Illegal tupel in line #" + lineNum);
+	           		throw new IOException("Illegal tuple in line #" + lineNum);
 	           	}
             }
         }
@@ -70,14 +70,14 @@ public class TabDelimitedParser {
     }
     
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        TupelSet result = parseTabDelimitedTupels(new FileReader(new File(args[0])));
+        TupelSet result = parseTabDelimitedTuples(new FileReader(new File(args[0])));
         System.out.println("Vars:");
         System.out.println(TupelSet.toString(result.getVariableNames()));
-        System.out.println("Tupels:");
-        Set tupels = result.getTupels();
-        for (Iterator iter = tupels.iterator(); iter.hasNext();) {
-            Object[] tupel = (Object[]) iter.next();
-            System.out.println(TupelSet.toString(tupel));
+        System.out.println("Tuples:");
+        Set tuples = result.getTuples();
+        for (Iterator iter = tuples.iterator(); iter.hasNext();) {
+            Object[] tuple = (Object[]) iter.next();
+            System.out.println(TupelSet.toString(tuple));
         }
     }
 }

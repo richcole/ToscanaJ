@@ -23,11 +23,11 @@ import org.tockit.tupelware.source.TupelSource;
 
 
 public class TextSource implements TupelSource {
-    public static final String[] FILE_EXTENSIONS = new String[]{"tupels"};
-	public static final String FILE_DESCRIPTION = "Tupel Sets";
+    public static final String[] FILE_EXTENSIONS = new String[]{"tuples"};
+	public static final String FILE_DESCRIPTION = "Tuple Sets";
 	
 	private int[] objectIndices;
-	private TupelSet tupels;
+	private TupelSet tuples;
 	private File selectedFile;
 		
 	public void show(JFrame parent, File lastLocation) {
@@ -37,8 +37,8 @@ public class TextSource implements TupelSource {
 			this.selectedFile = openDialog.getSelectedFile();
 			try {
 				Reader reader = new FileReader(this.selectedFile);
-				this.tupels = TabDelimitedParser.parseTabDelimitedTupels(reader);
-				IndexSelectionDialog dialog = new IndexSelectionDialog(parent, "Select object set", this.tupels.getVariableNames());
+				this.tuples = TabDelimitedParser.parseTabDelimitedTuples(reader);
+				IndexSelectionDialog dialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getVariableNames());
 				dialog.show();
 				this.objectIndices = dialog.getSelectedIndices();
 			} catch (Exception e) {
@@ -55,8 +55,8 @@ public class TextSource implements TupelSource {
         return this.selectedFile;
     }
 
-    public TupelSet getTupels() {
-        return this.tupels;
+    public TupelSet getTuples() {
+        return this.tuples;
     }
 
     public int[] getObjectIndices() {

@@ -15,7 +15,7 @@ import org.tockit.tupelware.model.TupelSet;
 
 
 /**
- * Interface for getting Tupels via GUI.
+ * Interface for getting Tuples via GUI.
  */
 public interface TupelSource {
     /**
@@ -36,7 +36,7 @@ public interface TupelSource {
      * 
      * @pre show() has been called
      */
-	TupelSet getTupels();
+	TupelSet getTuples();
     
     /**
      * Returns the indices making up the object (as a crossproduct).

@@ -64,7 +64,7 @@ public class DatabaseConnectionDialog extends JDialog {
     private AccessFileConnectionPanel accessDbPanel;
     private SqlQueryPanel sqlQueryPanel;
 
-    private TupelSet tupels;
+    private TupelSet tuples;
 
     private Frame owner;
     
@@ -592,13 +592,13 @@ public class DatabaseConnectionDialog extends JDialog {
 				for (int i = 0; i < numberColumns; i++) {
                     names[i] = metaData.getColumnLabel(i + 1);
                 }
-				tupels = new TupelSet(names);
+				tuples = new TupelSet(names);
 				while (resultSet.next()) {
-					Object[] tupel = new Object[numberColumns];
+					Object[] tuple = new Object[numberColumns];
 					for (int i = 0; i < numberColumns; i++) {
-						tupel[i] = resultSet.getObject(i + 1);
+						tuple[i] = resultSet.getObject(i + 1);
 					}
-					tupels.addTupel(tupel);
+					tuples.addTuple(tuple);
 				}
 				connection.disconnect();
                 return true;
@@ -787,7 +787,7 @@ public class DatabaseConnectionDialog extends JDialog {
 		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,	this);
 	}
 
-    public TupelSet getTupels() {
-        return this.tupels;
+    public TupelSet getTuples() {
+        return this.tuples;
     }
 }

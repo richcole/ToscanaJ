@@ -33,16 +33,18 @@ import java.io.File;
 import java.util.Iterator;
 
 public class TupelwareMainPanel extends JFrame implements MainPanel {
+    private static final String CONFIGURATION_SECTION = "TuplewareMainPanel";
+	private static final String WINDOW_TITLE = "Tupleware";
+
     private int[] objectIndices;
-    private JTable tupelTable;
+    private JTable tupleTable;
     private EventBroker eventBroker;
-	private static final String WINDOW_TITLE = "Tupelware";
 
     /**
      *  Model
      */
     private ConceptualSchema conceptualSchema;
-    private TupelSet tupels;
+    private TupelSet tuples;
 
     /**
      * Controls
@@ -76,7 +78,7 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 
         createLayout();
 
-        ConfigurationManager.restorePlacement("TupelwareMainPanel", this,
+        ConfigurationManager.restorePlacement(CONFIGURATION_SECTION, this,
                 new Rectangle(10, 10, 900, 700));
 
         this.addWindowListener(new WindowAdapter() {
@@ -95,15 +97,15 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 
     private Component createTabPanel() {
         JTabbedPane tabPanel = new JTabbedPane();
-        tabPanel.addTab("Tupels", createTupelPanel());
+        tabPanel.addTab("Tuples", createTuplePanel());
         tabPanel.addTab("Diagrams", diagramView);
         tabPanel.setBorder(BorderFactory.createLoweredBevelBorder());
         return tabPanel;
     }
     
-    private Component createTupelPanel() {
-        tupelTable = new JTable();
-        return new JScrollPane(tupelTable);
+    private Component createTuplePanel() {
+        tupleTable = new JTable();
+        return new JScrollPane(tupleTable);
     }
 
     private void createToolBar() {
@@ -121,17 +123,17 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         String result = JOptionPane.showInputDialog(this, "Please enter a name for the new diagram.",
                                                     "Enter name", JOptionPane.OK_CANCEL_OPTION);
         if(result != null) {
-            IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tupels.getVariableNames());
+            IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tuples.getVariableNames());
             dialog.show();
             int[] attributeIndices = dialog.getSelectedIndices();
-            Diagram2D diagram = TupelScaling.scaleTupels(this.tupels, this.objectIndices, attributeIndices);
+            Diagram2D diagram = TupelScaling.scaleTuples(this.tuples, this.objectIndices, attributeIndices);
             this.conceptualSchema.addDiagram(diagram);
         }
     }
 
     public void createViews() {
         diagramView = new DiagramEditingView(this, conceptualSchema, eventBroker);
-        diagramView.setDividerLocation(ConfigurationManager.fetchInt("TupelwareMainPanel", "diagramViewDivider", 200));
+        diagramView.setDividerLocation(ConfigurationManager.fetchInt(CONFIGURATION_SECTION, "diagramViewDivider", 200));
 
         schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
     }
@@ -185,8 +187,8 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 		JMenu tuplesMenu = new JMenu("Tuples");
 		tuplesMenu.setMnemonic('t');
 		
-        addTupelSourceMenuItem(tuplesMenu, this, new TextSource());
-        addTupelSourceMenuItem(tuplesMenu, this, new SqlQueryEngine());
+        addTupleSourceMenuItem(tuplesMenu, this, new TextSource());
+        addTupleSourceMenuItem(tuplesMenu, this, new SqlQueryEngine());
 
 		menuBar.add(tuplesMenu);
 
@@ -210,11 +212,11 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
         final Component parent = this;
-		JMenuItem aboutItem = new JMenuItem("About Tupelware...");
+		JMenuItem aboutItem = new JMenuItem("About Tupleware...");
 		aboutItem.setMnemonic(KeyEvent.VK_A);
 		aboutItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(parent, "This is a crusty early version of Tupelware, (c) DSTC Pty. Ltd,\n" +
+                JOptionPane.showMessageDialog(parent, "This is a crusty early version of Tupleware, (c) DSTC Pty. Ltd,\n" +
                                                       "University of Queenland and Technical University Darmstadt");
 			}
 		});
@@ -224,17 +226,17 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         menuBar.add(helpMenu);
     }
 
-    private void addTupelSourceMenuItem(JMenu tuplesMenu,
+    private void addTupleSourceMenuItem(JMenu tuplesMenu,
                                         final JFrame parent,
                                         final TupelSource source) {
         JMenuItem menuItem = new JMenuItem(source.getMenuName());
         menuItem.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 source.show(parent,lastFileRead);
-                if(source.getTupels() == null) {
+                if(source.getTuples() == null) {
                     return;
                 }
-                tupels = source.getTupels();
+                tuples = source.getTuples();
                 objectIndices = source.getObjectIndices();
                 if(source.getSelectedFile() != null) {
                     lastFileRead = source.getSelectedFile();
@@ -247,22 +249,22 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
     }
 
 	private void fillTable() {
-        Object[][] data = new Object[this.tupels.getTupels().size()][this.tupels.getVariableNames().length];
+        Object[][] data = new Object[this.tuples.getTuples().size()][this.tuples.getVariableNames().length];
         int row = 0;
-        for (Iterator iter = this.tupels.getTupels().iterator(); iter.hasNext();) {
-            Object[] tupel = (Object[]) iter.next();
-            for (int col = 0; col < tupel.length; col++) {
-                data[row][col] = tupel[col];
+        for (Iterator iter = this.tuples.getTuples().iterator(); iter.hasNext();) {
+            Object[] tuple = (Object[]) iter.next();
+            for (int col = 0; col < tuple.length; col++) {
+                data[row][col] = tuple[col];
             }
             row ++;
         }
-        this.tupelTable.setModel(new DefaultTableModel(data, this.tupels.getVariableNames()));
+        this.tupleTable.setModel(new DefaultTableModel(data, this.tuples.getVariableNames()));
     }
 
     public void closeMainPanel() {
         // store current position
-        ConfigurationManager.storePlacement("TupelwareMainPanel", this);
-        ConfigurationManager.storeInt("TupelwareMainPanel", "diagramViewDivider",
+        ConfigurationManager.storePlacement(CONFIGURATION_SECTION, this);
+        ConfigurationManager.storeInt(CONFIGURATION_SECTION, "diagramViewDivider",
                 diagramView.getDividerLocation()
         );
         ConfigurationManager.saveConfiguration();

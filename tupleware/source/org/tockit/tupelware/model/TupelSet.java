@@ -14,34 +14,34 @@ import java.util.Set;
 
 public class TupelSet {
     private String[] variableNames;
-    private Set tupels = new HashSet();
+    private Set tuples = new HashSet();
     
     public TupelSet(String[] variableNames) {
         this.variableNames = variableNames;  
     }
     
-    public void addTupel(Object[] tupel) {
-        if(tupel.length != this.variableNames.length) {
-            throw new IllegalArgumentException("Tupels have to have the same length as the number of variables");
+    public void addTuple(Object[] tuple) {
+        if(tuple.length != this.variableNames.length) {
+            throw new IllegalArgumentException("Tuples have to have the same length as the number of variables");
         }
-        this.tupels.add(tupel);
+        this.tuples.add(tuple);
     }
     
     public String[] getVariableNames() {
         return this.variableNames;
     }
     
-    public Set getTupels() {
-        return Collections.unmodifiableSet(tupels);
+    public Set getTuples() {
+        return Collections.unmodifiableSet(tuples);
     }
     
-    public static String toString(Object[] tupel) {
+    public static String toString(Object[] tuple) {
         StringBuffer retVal = new StringBuffer();
-        for (int i = 0; i < tupel.length; i++) {
+        for (int i = 0; i < tuple.length; i++) {
             if(i != 0) {
                 retVal.append(" ");
             }
-            retVal.append(tupel[i].toString());
+            retVal.append(tuple[i].toString());
         }
         return retVal.toString();
     }

@@ -48,7 +48,7 @@ public class RdqlQueryEngine {
 				Object obj = resBinding.get(queryVar);
 				tupel[i] = obj;				
 			} 
-			resTupelSet.addTupel(tupel);
+			resTupelSet.addTuple(tupel);
 		}
 		results.close() ;
 		return resTupelSet;
@@ -88,7 +88,7 @@ public class RdqlQueryEngine {
 		System.out.println("Query: " + queryString);
 
 		TupelSet tupelSet = RdqlQueryEngine.executeQuery(queryString, model);
-		Iterator it = tupelSet.getTupels().iterator();
+		Iterator it = tupelSet.getTuples().iterator();
 		System.out.println("TUPEL SET: ");
 		while (it.hasNext()) {
 			Object[] element = (Object[]) it.next();

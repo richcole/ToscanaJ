@@ -18,7 +18,7 @@ import org.tockit.tupelware.source.TupelSource;
 
 public class SqlQueryEngine implements TupelSource {
     private int[] objectIndices;
-    private TupelSet tupels;
+    private TupelSet tuples;
 
     public String getMenuName() {
         return "Query from database...";
@@ -27,16 +27,16 @@ public class SqlQueryEngine implements TupelSource {
     public void show(JFrame parent, File lastLocation) {
         DatabaseConnectionDialog connectionDialog = new DatabaseConnectionDialog(parent);
         connectionDialog.show();
-        this.tupels = connectionDialog.getTupels();
-        if(this.tupels != null) {
-            IndexSelectionDialog objectSetDialog = new IndexSelectionDialog(parent, "Select object set", this.tupels.getVariableNames());
+        this.tuples = connectionDialog.getTuples();
+        if(this.tuples != null) {
+            IndexSelectionDialog objectSetDialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getVariableNames());
             objectSetDialog.show();
             this.objectIndices = objectSetDialog.getSelectedIndices();
         }
     }
 
-    public TupelSet getTupels() {
-        return this.tupels;
+    public TupelSet getTuples() {
+        return this.tuples;
     }
 
     public int[] getObjectIndices() {
