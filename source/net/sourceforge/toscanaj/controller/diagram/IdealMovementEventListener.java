@@ -19,25 +19,9 @@ import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
-public class IdealMovementEventListener implements BrokerEventListener {
-    public void processEvent(Event e) {
-        CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
-        NodeView nodeView = (NodeView) dragEvent.getSource();
-        DiagramNode node = nodeView.getDiagramNode();
-        Point2D toPosition = dragEvent.getCanvasToPosition();
-        Point2D fromPosition = dragEvent.getCanvasFromPosition();
-        double diffX = toPosition.getX() - fromPosition.getX();
-        double diffY = toPosition.getY() - fromPosition.getY();
-        DiagramView diagramView = nodeView.getDiagramView();
-        Diagram2D diagram = diagramView.getDiagram();
-        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
-            DiagramNode otherNode = diagram.getNode(i);
-            if(node.getConcept().hasSubConcept(otherNode.getConcept())) {
-                Point2D oldPosition = otherNode.getPosition();
-                otherNode.setPosition(new Point2D.Double(oldPosition.getX() + diffX, oldPosition.getY() + diffY));
-            }
-        }
-        diagramView.requestScreenTransformUpdate();
-        diagramView.repaint();
+public class IdealMovementEventListener extends SetMovementEventListener {
+
+    protected boolean isPartOfSet(DiagramNode node, DiagramNode otherNode) {
+        return node.getConcept().hasSubConcept(otherNode.getConcept());
     }
 }

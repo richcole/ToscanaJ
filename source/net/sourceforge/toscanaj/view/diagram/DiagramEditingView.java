@@ -15,6 +15,7 @@ import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.diagram.NodeMovementEventListener;
 import net.sourceforge.toscanaj.controller.diagram.IdealMovementEventListener;
 import net.sourceforge.toscanaj.controller.diagram.FilterMovementEventListener;
+import net.sourceforge.toscanaj.controller.diagram.SetMovementEventListener;
 import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
 
 import javax.swing.*;
@@ -31,7 +32,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
     private JSplitPane splitPane;
     private DiagramView diagramView;
     private NodeMovementEventListener nodeMovementEventListener = new NodeMovementEventListener();
-    private IdealMovementEventListener idealMovementEventListener = new IdealMovementEventListener();
+    private SetMovementEventListener idealMovementEventListener = new IdealMovementEventListener();
     private FilterMovementEventListener filterMovementEventListener = new FilterMovementEventListener();
 
     /**
