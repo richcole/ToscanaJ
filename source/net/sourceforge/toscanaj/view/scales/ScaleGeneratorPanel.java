@@ -122,7 +122,7 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
 				private void replaceTitle(Diagram2D returnValue, Diagram2D diagramWithSameTitle, int indexOfExistingDiagram) {
 					conceptualSchema.addDiagram(returnValue);
 					if(indexOfExistingDiagram!=-1){
-						conceptualSchema.exchangeDiagram((conceptualSchema.getNumberOfDiagrams()-1),indexOfExistingDiagram);
+						conceptualSchema.exchangeDiagrams((conceptualSchema.getNumberOfDiagrams()-1),indexOfExistingDiagram);
 						conceptualSchema.removeDiagram(diagramWithSameTitle);
 					}else{
 						conceptualSchema.removeDiagram(diagramWithSameTitle);

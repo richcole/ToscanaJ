@@ -470,12 +470,7 @@ public class CSCParser {
                 Object result = iter.next();
                 if(result instanceof Diagram2D) {
                     Diagram2D diagram = (Diagram2D) result;
-                    Diagram2D existingDiagram = schema.getDiagram(diagram.getTitle());
-                    if(existingDiagram != null) {
-                        schema.removeDiagram(existingDiagram);
-                    }
-                    rescale(diagram);
-                    schema.addDiagram(diagram);
+                    insertDiagram(schema, diagram);
                     importedDiagrams.add(diagram.getTitle());
                 }
             }
@@ -490,11 +485,21 @@ public class CSCParser {
                     LatticeGenerator lgen = new GantersAlgorithm();
                     Lattice lattice = lgen.createLattice(context);
                     Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, context.getName(), new DefaultDimensionStrategy());
-                    schema.addDiagram(diagram);                	
+                    insertDiagram(schema,diagram);                	
                 }
             }
         } catch (IOException e) {
             throw new DataFormatException("Error reading input file", e);
+        }
+    }
+
+    public void insertDiagram(ConceptualSchema schema, Diagram2D diagram) {
+        Diagram2D existingDiagram = schema.getDiagram(diagram.getTitle());
+        rescale(diagram);
+        if(existingDiagram != null) {
+            schema.replaceDiagram(existingDiagram, diagram);
+        } else {
+        	schema.addDiagram(diagram);
         }
     }
 

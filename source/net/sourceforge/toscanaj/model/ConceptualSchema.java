@@ -259,14 +259,22 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
     
-    public void exchangeDiagram(int index, int position){
-		Diagram2D indexDiagram = (Diagram2D)diagrams.get( index );
-		Diagram2D diagram = (Diagram2D)diagrams.get( position );
-		diagrams.setElementAt(indexDiagram,position);
-		diagrams.setElementAt(diagram,index);  
+    public void exchangeDiagrams(int from, int to){
+		Diagram2D indexDiagram = (Diagram2D)diagrams.get( from );
+		Diagram2D diagram = (Diagram2D)diagrams.get( to );
+		diagrams.setElementAt(indexDiagram,to);
+		diagrams.setElementAt(diagram,from);  
 		eventBroker.processEvent(new DiagramListChangeEvent(this, this));	
     }
     
+    public void replaceDiagram(Diagram2D existingDiagram, Diagram2D newDiagram){
+    	int index = this.diagrams.indexOf(existingDiagram);
+    	if(index == -1) {
+    		throw new IllegalArgumentException("No such diagram to replace");
+    	}
+    	this.diagrams.set(index, newDiagram);
+        eventBroker.processEvent(new DiagramListChangeEvent(this, this));
+    }
 
     public void setDescription(Element description) {
         if (description != null) {

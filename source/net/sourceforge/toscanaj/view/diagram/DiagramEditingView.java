@@ -7,11 +7,17 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.diagram.*;
+import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.controller.fca.DiagramToContextConverter;
 import net.sourceforge.toscanaj.controller.fca.DirectConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
+import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
+import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.ContextImplementation;
@@ -22,6 +28,7 @@ import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.view.scales.ContextTableScaleEditorDialog;
 
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
@@ -48,6 +55,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     protected FilterMovementEventListener filterMovementEventListener = new FilterMovementEventListener();
     private static final double ZOOM_FACTOR = 1.1;
     private JButton editContextButton;
+    private DatabaseConnection databaseConnection = null;
 
     /**
      * Construct an instance of this view
@@ -66,6 +74,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
         eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
+        eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
         this.diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, Object.class);
     }
 
@@ -182,10 +191,18 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     
     protected void editContext() {
         ContextImplementation context = (ContextImplementation) DiagramToContextConverter.getContext(this.diagramView.getDiagram());
-    	/// @todo add database connection
     	Frame frame = JOptionPane.getFrameForComponent(this);
-    	ContextTableScaleEditorDialog dialog = new ContextTableScaleEditorDialog(frame, this.conceptualSchema, null, context);
-    	dialog.execute();
+    	ContextTableScaleEditorDialog dialog = 
+    					new ContextTableScaleEditorDialog(frame, this.conceptualSchema, this.databaseConnection, context);
+    	if(dialog.execute()) {
+    		/// @todo check for duplicate names
+    		LatticeGenerator lgen = new GantersAlgorithm();
+    		context = dialog.getContext();
+    		Lattice lattice = lgen.createLattice(context);
+    		Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, context.getName(), new DefaultDimensionStrategy());
+    		this.conceptualSchema.replaceDiagram(this.diagramView.getDiagram(), diagram);
+    		this.diagramView.showDiagram(diagram);
+    	}
     }
 
     protected JComponent makeDiagramListView() {
@@ -270,7 +287,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 			 public void actionPerformed(ActionEvent e) {
 			 	int index = listView.getSelectedIndex();
 				 if(index!=-1){
-				 	conceptualSchema.exchangeDiagram(index , index - 1);
+				 	conceptualSchema.exchangeDiagrams(index , index - 1);
 				 	listView.setSelectedIndex(index-1);
 				 }
 			 }
@@ -280,7 +297,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 			 public void actionPerformed(ActionEvent e) {
 				int index = listView.getSelectedIndex();
 				if(index!=-1){
-				   conceptualSchema.exchangeDiagram(index , index + 1);
+				   conceptualSchema.exchangeDiagrams(index , index + 1);
 				   listView.setSelectedIndex(index+1);
 				}
 			 }
@@ -301,12 +318,18 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     	    updateButtons();
     	    return;
     	}
-        ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
-        if (event instanceof NewConceptualSchemaEvent) {
-            conceptualSchema = changeEvent.getConceptualSchema();
-        }
-        fillDiagramListView();
-        updateButtons();
+    	if(event instanceof DatabaseConnectedEvent) {
+    		DatabaseConnectedEvent dbConEv = (DatabaseConnectedEvent) event;
+    		this.databaseConnection = dbConEv.getConnection();
+    	}
+    	if(event instanceof ConceptualSchemaChangeEvent) {
+	        ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
+	        if (event instanceof NewConceptualSchemaEvent) {
+	            conceptualSchema = changeEvent.getConceptualSchema();
+	        }
+	        fillDiagramListView();
+	        updateButtons();
+    	}
     }
     
     private void updateButtons() {

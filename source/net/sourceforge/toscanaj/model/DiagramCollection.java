@@ -20,6 +20,7 @@ public interface DiagramCollection {
 
     void removeDiagram(int diagramIndex);
     
-    void exchangeDiagram(int index, int position);
-    
+    void exchangeDiagrams(int index, int position);
+
+    void replaceDiagram(Diagram2D existingDiagram, Diagram2D newDiagram);
 }
