@@ -254,7 +254,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     	if(getSize() == 0) {
     		insertDiagram(0, diagram);
     	} else {
-			insertDiagram(getSize() - 1, diagram);
+			insertDiagram(getSize(), diagram);
     	}
     }
 
