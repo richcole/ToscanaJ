@@ -27,6 +27,8 @@ Specific for Siena (still not fully complete):
   the border line
 - three query types are allowed: count, list, distribution (as in
   the ToscanaJ defaults)
+- diagrams based on the Cernato import feature will use the same order
+  in the labels as in the imported many-valued context
   
 
 Other new experimental features:
