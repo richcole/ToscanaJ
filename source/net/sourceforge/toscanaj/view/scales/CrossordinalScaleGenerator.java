@@ -13,10 +13,10 @@ import net.sourceforge.toscanaj.model.Context;
  *
  * $Id$
  */
-public class BiordinalScaleGenerator implements ScaleGenerator{
+public class CrossordinalScaleGenerator implements ScaleGenerator{
     private Frame parent;
 
-    public BiordinalScaleGenerator(Frame parent){
+    public CrossordinalScaleGenerator(Frame parent){
         this.parent = parent;
     }
     public String getScaleName() {
@@ -38,7 +38,7 @@ public class BiordinalScaleGenerator implements ScaleGenerator{
      }
 
      public Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection) {
-         BiordinalScaleEditorDialog scaleDialog = new BiordinalScaleEditorDialog(parent, scheme.getDatabaseSchema(), databaseConnection);
+         CrossordinalScaleEditorDialog scaleDialog = new CrossordinalScaleEditorDialog(parent, scheme.getDatabaseSchema(), databaseConnection);
          if (!scaleDialog.execute()) {
              return null;
          }

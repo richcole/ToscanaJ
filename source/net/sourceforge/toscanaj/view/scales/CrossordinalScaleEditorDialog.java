@@ -28,7 +28,7 @@ import java.awt.event.KeyListener;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class BiordinalScaleEditorDialog extends JDialog {
+public class CrossordinalScaleEditorDialog extends JDialog {
 	
 	boolean result;
 	private JTextField titleEditor = new JTextField();
@@ -45,7 +45,7 @@ public class BiordinalScaleEditorDialog extends JDialog {
 	private static final int DEFAULT_X_POS = 10;
 	private static final int DEFAULT_Y_POS = 10;
 
-	public BiordinalScaleEditorDialog(Frame owner, DatabaseSchema databaseSchema, DatabaseConnection connection) {
+	public CrossordinalScaleEditorDialog(Frame owner, DatabaseSchema databaseSchema, DatabaseConnection connection) {
 		super(owner);
 		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
 			this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
