@@ -10,9 +10,9 @@
 	<property name="libs.dir" value="libs"/>
 	<property name="examples.dir" value="examples"/>
 	<property name="toscanaj.class" 
-           value="net.sourceforge.toscanaj.MainPanel"/>
+           value="net.sourceforge.toscanaj.ToscanaJ"/>
 	<property name="anacondaj.class" 
-	   value="net.sourceforge.toscanaj.AnacondaMainPanel"/>
+	   value="net.sourceforge.toscanaj.gui.AnacondaJ"/>
 	<path id="project.class.path">
 		<pathelement path="${classpath}"/>
 		<pathelement path="${build.dev.dir}"/>

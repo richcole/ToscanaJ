@@ -1,4 +1,4 @@
-package net.sourceforge.toscanaj.gui;
+package net.sourceforge.toscanaj;
 
 import net.sourceforge.toscanaj.model.AnacondaModel;
 
@@ -12,7 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class AnacondaMainPanel extends JFrame
+public class AnacondaJ extends JFrame
 {
     /**
      * Stores the anaconda model, initially this is an empty model.
@@ -33,13 +33,13 @@ public class AnacondaMainPanel extends JFrame
     AnacondaModelView   modelView;
     JPanel              rightPane;
 
-    public AnacondaMainPanel() {
+    public AnacondaJ() {
         super("AnacondaJ");
 
         createViews();
         createMenuBar();
 
-        ConfigurationManager.restorePlacement("AnacondaMainPanel", this,
+        ConfigurationManager.restorePlacement("AnacondaJ", this,
                 new Rectangle(100, 100, 500, 400));
     }
 
@@ -56,7 +56,7 @@ public class AnacondaMainPanel extends JFrame
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         splitPane.setDividerLocation(
-                ConfigurationManager.fetchInt("AnacondaMainPanel", "divider", 200)
+                ConfigurationManager.fetchInt("AnacondaJ", "divider", 200)
         );
 
         setContentPane(splitPane);
@@ -143,8 +143,8 @@ public class AnacondaMainPanel extends JFrame
 
     public void closeMainPanel() {
         // store current position
-        ConfigurationManager.storePlacement("AnacondaMainPanel", this);
-        ConfigurationManager.storeInt("AnacondaMainPanel", "divider",
+        ConfigurationManager.storePlacement("AnacondaJ", this);
+        ConfigurationManager.storeInt("AnacondaJ", "divider",
                 splitPane.getDividerLocation()
         );
         ConfigurationManager.saveConfiguration();
@@ -155,8 +155,8 @@ public class AnacondaMainPanel extends JFrame
      *  Main method for running the program
      */
     public static void main(String[] args) {
-        final AnacondaMainPanel mainWindow;
-        mainWindow = new AnacondaMainPanel();
+        final AnacondaJ mainWindow;
+        mainWindow = new AnacondaJ();
 
         mainWindow.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
