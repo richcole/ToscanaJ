@@ -293,7 +293,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
 
     public void visitZoomedConcepts(ConceptVisitor visitor) {
         for (int i = 0; isInPast(i); i++) {
-            visitor.visitConcept(getReferenceAt(i).getZoomedConcept());
+            visitor.visitConcept(getReferenceAt(i).getFilterConcept());
         }
     }
 
@@ -375,7 +375,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
 		for(int i=0; i <= firstCurrentPos - 1; i++) { 
 			DiagramReference diagramReference = diagramHistory.getReferenceAt(i);
 			comments+=(i+1) +") "+diagramReference.getDiagram().getTitle() + lineSeparator;
-			Concept concept = diagramReference.getZoomedConcept();
+			Concept concept = diagramReference.getFilterConcept();
 			Iterator attrIt = concept.getIntentIterator();
 			while (attrIt.hasNext()) {
 				Attribute curAttr = (Attribute) attrIt.next();

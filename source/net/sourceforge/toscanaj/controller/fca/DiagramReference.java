@@ -5,7 +5,7 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 
 /**
  * Used to store references to diagrams, including the concept used for
- * zooming in past diagrams.
+ * filtering in past diagrams.
  *
  * Beneath adding the concept reference (which is null for current and future
  * diagrams) this gives the references identity, otherwise we would get problems
@@ -18,16 +18,16 @@ public class DiagramReference {
     private Diagram2D diagram;
 
     /**
-     * The concept the user zoomed into (null for current and future diagrams).
+     * The concept used as filter (null for current and future diagrams).
      */
-    private Concept zoomedConcept;
+    private Concept filterConcept;
 
     /**
      * Initialises a new reference.
      */
-    public DiagramReference(Diagram2D diagram, Concept zoomedConcept) {
+    public DiagramReference(Diagram2D diagram, Concept filterConcept) {
         this.diagram = diagram;
-        this.zoomedConcept = zoomedConcept;
+        this.filterConcept = filterConcept;
     }
 
     /**
@@ -38,14 +38,14 @@ public class DiagramReference {
     }
 
     /**
-     * Returns the concept the user zoomed into (null for current and future diagrams).
+     * Returns the concept used as filter (null for current and future diagrams).
      */
-    public Concept getZoomedConcept() {
-        return this.zoomedConcept;
+    public Concept getFilterConcept() {
+        return this.filterConcept;
     }
 
-    public void setZoomedConcept(Concept zoomedConcept) {
-        this.zoomedConcept = zoomedConcept;
+    public void setZoomedConcept(Concept filterConcept) {
+        this.filterConcept = filterConcept;
     }
 
     /**

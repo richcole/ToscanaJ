@@ -330,7 +330,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 			public void processEvent(Event e) {
 				DiagramReference diagramReference = ((DiagramClickedEvent)e).getDiagramReference();
 				diagramPreview.showDiagram(diagramReference.getDiagram());
-				Concept zoomedConcept = diagramReference.getZoomedConcept();
+				Concept zoomedConcept = diagramReference.getFilterConcept();
 				if(zoomedConcept != null) {
 					diagramPreview.setSelectedConcepts(new Concept[]{zoomedConcept});				
 				}
