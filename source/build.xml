@@ -59,12 +59,14 @@
 		<delete dir="${doc.dir}"/>
 	</target>
 	<target name="compile" depends="prepare">
-		<javac srcdir="${src.dir}" destdir="${build.dev.dir}" debug="on" optimize="off" deprecation="on">
+		<javac srcdir="${src.dir}" destdir="${build.dev.dir}" debug="on" optimize="off" deprecation="on"
+			target="1.4" source="1.4">
 			<classpath refid="project.dev.class.path"/>
 		</javac>
 	</target>
 	<target name="compileRelease" depends="prepare">
-		<javac srcdir="${src.dir}" destdir="${build.release.dir}" debug="off" optimize="on" deprecation="off">
+		<javac srcdir="${src.dir}" destdir="${build.release.dir}" debug="off" optimize="on" deprecation="off"
+			target="1.4" source="1.4">
 			<classpath refid="project.release.class.path"/>
 		</javac>
 	</target>
