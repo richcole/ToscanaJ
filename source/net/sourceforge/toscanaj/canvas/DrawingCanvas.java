@@ -59,10 +59,10 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     private Point2D lastMousePos = null;
 
     /**
-     * Holds the LabelView for selected label view
+     * Holds the selected CanvasItem
      * that the user has clicked on with intent to move
      */
-    private LabelView selectedLabel = null;
+    private CanvasItem selectedCanvasItem = null;
 
     /**
      * Paints the CanvasItems in the diagram.
@@ -90,7 +90,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      */
     public void mouseReleased(MouseEvent e) {
         dragMode = false;
-        selectedLabel = null;
+        selectedCanvasItem = null;
     }
 
     /**
@@ -111,8 +111,8 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * Handles dragging the labels.
      */
     public void mouseDragged(MouseEvent e) {
-        if(selectedLabel != null && (dragMode || ((getDistance(lastMousePos.getX(), lastMousePos.getY(), e.getX(), e.getY()) >= dragMin)))) {
-            selectedLabel.moveBy(graphics.inverseScaleX(e.getX() - lastMousePos.getX()),
+        if(selectedCanvasItem != null && (dragMode || ((getDistance(lastMousePos.getX(), lastMousePos.getY(), e.getX(), e.getY()) >= dragMin)))) {
+            selectedCanvasItem.moveBy(graphics.inverseScaleX(e.getX() - lastMousePos.getX()),
                                  graphics.inverseScaleY(e.getY() - lastMousePos.getY()));
             lastMousePos = new Point2D.Double(e.getX(), e.getY());
             dragMode = true;
@@ -136,8 +136,8 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
             Point2D point = this.graphics.inverseProject(e.getPoint());
             if(cur.containsPoint(point)) {
                 if(cur instanceof LabelView) {
-                    // store the information needed for moving the label
-                    this.selectedLabel = (LabelView) cur;
+                    // store the CanvasItem needed for moving
+                    this.selectedCanvasItem = cur;
                     this.lastMousePos = e.getPoint();
                     // raise the label
                     it.remove();

@@ -40,4 +40,10 @@ public class NodeView extends CanvasItem {
     public boolean containsPoint(Point2D point) {
         return false;
     }
+
+    /**
+     * A node is not currently moveable.
+     */
+    public void moveBy(double deltaX, double deltaY) {
+    }
 }

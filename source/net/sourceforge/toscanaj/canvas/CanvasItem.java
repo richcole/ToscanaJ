@@ -20,4 +20,9 @@ public abstract class CanvasItem {
      * Returns true when the given point is on the item.
      */
     public abstract boolean containsPoint(Point2D point);
+
+    /**
+     * Moves the label by the given distance.
+     */
+    public abstract void moveBy(double deltaX, double deltaY);
 }
