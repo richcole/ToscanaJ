@@ -251,6 +251,17 @@ public class DiagramHistoryTest extends TestCase {
 
     }
 
+    public void testAddDiagramSideEffects(){
+        addDiagram();
+        diagramHistory.setNestingLevel(1);
+        addDiagram();
+        assertEquals(2, diagramHistory.getNumberOfCurrentDiagrams());
+        diagramHistory.back();
+        assertEquals(1, diagramHistory.getNumberOfCurrentDiagrams());
+        addDiagram();
+        assertEquals(1, diagramHistory.getNumberOfCurrentDiagrams());
+    }
+
     protected void setUp() {
         diagramHistory = new DiagramHistory();
     }

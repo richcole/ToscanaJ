@@ -241,13 +241,17 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     public void addDiagram(Diagram2D diagram) {
 
         diagrams.add(new DiagramReference(diagram, null));
-        if (getNumberOfCurrentDiagrams() <= getNestingLevel()) {
+        int newDiagramIndex = getSize() - 1;
+        if (getNumberOfCurrentDiagrams() <= getNestingLevel() && isFirstFutureDiagram(newDiagramIndex)) {
             firstFutureDiagramPosition++;
             notifyObservers();
         }
-        int lastPos = getSize() - 1;
-        fireIntervalAdded(lastPos, lastPos);
+        fireIntervalAdded(newDiagramIndex, newDiagramIndex);
 
+    }
+
+    private boolean isFirstFutureDiagram(int newDiagramIndex) {
+        return firstFutureDiagramPosition == newDiagramIndex;
     }
 
     public void removeLastDiagram() {
