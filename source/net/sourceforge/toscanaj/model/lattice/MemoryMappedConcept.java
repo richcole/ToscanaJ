@@ -11,10 +11,7 @@ import java.util.NoSuchElementException;
  * This is based on AbstractConceptImplementation to reduce implementation
  * effort and to increase reuse.
  */
-public class MemoryMappedConcept
-    extends AbstractConceptImplementation
-    implements Concept
-{
+public class MemoryMappedConcept extends AbstractConceptImplementation {
     /**
      * Stores the information on the attribute contingent.
      */
