@@ -2,14 +2,17 @@ package net.sourceforge.toscanaj.view.database;
 
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
+import net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.Event;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Observable;
 import java.util.Observer;
 
-public class DatabaseConnectionInformationView extends JPanel implements Observer {
+public class DatabaseConnectionInformationView extends JPanel implements BrokerEventListener {
     protected DatabaseInfo info;
 
     private JTextField urlField;
@@ -55,9 +58,10 @@ public class DatabaseConnectionInformationView extends JPanel implements Observe
         userField.setText(info.getUserName());
     }
 
-    public void update(Observable o, Object arg) {
-        //copyToControls((DatabaseInfo) o);
-    };
+    public void processEvent(Event event) {
+        ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
+        copyToControls(changeEvent.getConceptualSchema().getDatabaseInfo());
+    }
 
     /**
      * Construct an instance of this view

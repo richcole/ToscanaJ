@@ -3,16 +3,34 @@ package net.sourceforge.toscanaj.gui.action;
 import net.sourceforge.toscanaj.model.XML_Reader;
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
 import net.sourceforge.toscanaj.gui.activity.FileActivity;
+import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class OpenFileAction extends KeyboardMappedAction {
 
-    FileActivity activity;
-    File previousFile;
+    private FileActivity openActivity;
+    private File previousFile;
+
+    private ArrayList postOpenActivities = new ArrayList();
+
+    public void addPostOpenActivity(SimpleActivity activity) {
+        postOpenActivities.add(activity);
+    }
+
+    protected void processPostOpenActivities() throws Exception {
+        for (Iterator it = postOpenActivities.iterator(); it.hasNext();) {
+            SimpleActivity activity = (SimpleActivity) it.next();
+            if ( ! activity.doActivity() ) {
+                break;
+            }
+        }
+    }
 
     /**
      *  @note
@@ -27,7 +45,7 @@ public class OpenFileAction extends KeyboardMappedAction {
             KeyStroke keystroke)
     {
         super(frame, "Open...", mnemonic, keystroke);
-        this.activity = activity;
+        this.openActivity = activity;
     }
 
     public OpenFileAction(
@@ -35,7 +53,7 @@ public class OpenFileAction extends KeyboardMappedAction {
             FileActivity activity)
     {
         super(frame, "Open...");
-        this.activity = activity;
+        this.openActivity = activity;
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -43,7 +61,7 @@ public class OpenFileAction extends KeyboardMappedAction {
 
         boolean result = false;
         try {
-            result = activity.prepareToProcess();
+            result = openActivity.prepareToProcess();
         }
         catch (Exception ex) {
             JOptionPane.showMessageDialog(
@@ -64,7 +82,7 @@ public class OpenFileAction extends KeyboardMappedAction {
             if (openDialog.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = openDialog.getSelectedFile();
                 try {
-                    activity.processFile(selectedFile);
+                    openActivity.processFile(selectedFile);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(
                             frame,
@@ -73,6 +91,15 @@ public class OpenFileAction extends KeyboardMappedAction {
                             JOptionPane.ERROR_MESSAGE);
                 }
                 previousFile = selectedFile;
+                try {
+                    processPostOpenActivities();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(
+                            frame,
+                            "Failure to process the file:" + ex.getMessage(),
+                            "Error processing file",
+                            JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
     }

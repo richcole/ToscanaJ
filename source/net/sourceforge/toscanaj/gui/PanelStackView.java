@@ -15,6 +15,8 @@ import java.awt.event.ActionListener;
 
 public class PanelStackView extends JPanel {
 
+    int SomeArbitraryLargeNumberForStupidSwing = 1000000;
+
     private JPanel mainPane;
     private JPanel buttonPane;
     private JSplitPane splitPane;
@@ -28,6 +30,9 @@ public class PanelStackView extends JPanel {
                 layout.show(mainPane, displayName);
             }
         });
+        button.setPreferredSize(new Dimension(SomeArbitraryLargeNumberForStupidSwing,SomeArbitraryLargeNumberForStupidSwing));
+        button.setMaximumSize(new Dimension(SomeArbitraryLargeNumberForStupidSwing,SomeArbitraryLargeNumberForStupidSwing));
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
         buttonPane.add(button);
     }
 

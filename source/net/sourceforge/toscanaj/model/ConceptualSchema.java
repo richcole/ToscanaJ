@@ -63,7 +63,7 @@ public class ConceptualSchema {
      * Deletes all schema content, rendering the schema empty.
      */
     public void reset() {
-        databaseInfo = null;
+        databaseInfo = new DatabaseInfo();
         diagrams = new Vector();
         hasDiagramDescription = false;
         scales = CollectionFactory.createDefaultList();

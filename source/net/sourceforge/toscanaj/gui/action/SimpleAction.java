@@ -52,6 +52,7 @@ public class SimpleAction extends KeyboardMappedAction {
                     "Error",
                     JOptionPane.ERROR_MESSAGE
             );
+            ex.printStackTrace();
         }
     }
 }

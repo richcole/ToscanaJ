@@ -484,6 +484,7 @@ public class CSXParser {
                         driver + "\" as database driver.");
             }
         }
+        dbInfo.setDriverClass(driver);
         dbInfo.setUserName(username);
         dbInfo.setPassword(password);
         dbInfo.setEmbeddedSQLLocation(embeddedDB);
