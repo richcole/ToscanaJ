@@ -11,6 +11,7 @@ Affecting all programs:
   API, which means we don't rely on write access to the installation
   directory anymore and multi-user systems should now store the settings
   on a per-user basis
+- look and feels can be loaded via plugins
 
 ToscanaJ:
 =========
