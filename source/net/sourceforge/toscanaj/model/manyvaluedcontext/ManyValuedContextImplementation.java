@@ -60,6 +60,9 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
         if(object instanceof WritableFCAElement) {
             ((WritableFCAElement)object).setContextPosition(this.objects.size());
         }
+        if(this.objects.contains(object)) {
+            return; // do not create new hashtable
+        }
         this.objects.add(object);
         this.relation.put(object, new Hashtable());
     }

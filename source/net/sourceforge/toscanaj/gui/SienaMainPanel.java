@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -62,6 +63,7 @@ import javax.swing.KeyStroke;
 
 import net.sourceforge.toscanaj.controller.cernato.CernatoDimensionStrategy;
 import net.sourceforge.toscanaj.controller.diagram.ObjectEditingLabelViewPopupMenuHandler;
+import net.sourceforge.toscanaj.controller.fca.DiagramToContextConverter;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
@@ -81,6 +83,7 @@ import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.temporal.TemporalControlsPanel;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
+import net.sourceforge.toscanaj.model.context.BinaryRelation;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElement;
@@ -107,6 +110,7 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttrib
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.ViewContext;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
@@ -1045,10 +1049,13 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     private void openSchemaFile(File schemaFile) {
         try {
-            conceptualSchema = CSXParser.parse(eventBroker, schemaFile);
-            rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
-            colHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
-            tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
+            this.conceptualSchema = CSXParser.parse(eventBroker, schemaFile);
+            if(this.conceptualSchema.getManyValuedContext() == null) {
+                this.conceptualSchema.setManyValuedContext(createManyValuedContextFromDiagrams());
+            }
+            this.rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
+            this.colHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
+            this.tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
             setCurrentFile(schemaFile);
             createMenuBar();
         } catch (FileNotFoundException e) {
@@ -1081,6 +1088,42 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             e.printStackTrace();
             conceptualSchema = new ConceptualSchema(eventBroker);
         }
+    }
+
+    private WritableManyValuedContext createManyValuedContextFromDiagrams() {
+        ManyValuedContextImplementation mvContext = new ManyValuedContextImplementation();
+        TextualType type = new TextualType("single valued");
+        TextualValue value = new TextualValue("X");
+        type.addValue(value);
+        // @todo remove nullValue once we allow null in a proper fashion
+        TextualValue nullValue = new TextualValue(""); // otherwise we still get red cells
+        type.addValue(nullValue);
+        mvContext.add(type);
+        for (Iterator iter = this.conceptualSchema.getDiagramsIterator(); iter.hasNext(); ) {
+            Diagram2D diagram = (Diagram2D) iter.next();
+            Context svContext = DiagramToContextConverter.getContext(diagram);
+            BinaryRelation relation = svContext.getRelation();
+            HashMap attributeMap = new HashMap(); 
+            for (Iterator attrIt = svContext.getAttributes().iterator(); attrIt.hasNext(); ) {
+                FCAElement attribute = (FCAElement) attrIt.next();
+                ManyValuedAttribute mvAttribute = new ManyValuedAttributeImplementation(type,attribute.getData().toString());
+                mvContext.add(mvAttribute);
+                attributeMap.put(attribute, mvAttribute);
+            }
+            for (Iterator objIt = svContext.getObjects().iterator(); objIt.hasNext(); ) {
+                FCAElement object = (FCAElement) objIt.next();
+                mvContext.add(object);
+                for (Iterator attrIt = svContext.getAttributes().iterator(); attrIt.hasNext(); ) {
+                    FCAElement attribute = (FCAElement) attrIt.next();
+                    if(relation.contains(object, attribute)) {
+                        mvContext.setRelationship(object, (ManyValuedAttribute) attributeMap.get(attribute), value);
+                    } else {
+                        mvContext.setRelationship(object, (ManyValuedAttribute) attributeMap.get(attribute), nullValue);
+                    }
+                }
+            }
+        }
+        return mvContext;
     }
 
     protected boolean checkForMissingSave() throws HeadlessException {
