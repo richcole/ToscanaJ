@@ -29,6 +29,9 @@ import org.tockit.conscript.parser.DataFormatException;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
+import net.sourceforge.toscanaj.model.database.Column;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -53,6 +56,18 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
                 Diagram2D diagram2D = createDiagram2D(scale);
                 rescale(diagram2D);
                 schema.addDiagram(diagram2D);
+            }
+            
+            if(!cscFile.getDatabaseDefinitions().isEmpty()) {
+                // if there is at least one DB definition, we use the first for the CSX
+                // multiple ones are unlikely and we wouldn't know what to do then anyway
+                DatabaseDefinition dbDef = (DatabaseDefinition) cscFile.getDatabaseDefinitions().get(0);
+                DatabaseInfo dbInfo = new DatabaseInfo();
+                dbInfo.setOdbcDataSource(dbDef.getDatabaseName(), null, null);
+                Table table = new Table(dbDef.getTable(), false);
+                dbInfo.setTable(table);
+                dbInfo.setKey(new Column(dbDef.getPrimaryKey(), 0, table));
+                schema.setDatabaseInfo(dbInfo);
             }
         } catch (MalformedURLException e) {
             // should not happen

@@ -982,8 +982,10 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         if (openNewSchema.isSelected()) {
 			currentFile = null;
 			updateWindowTitle();
-			showDatabaseConnectionDialog();
-			DatabaseViewerManager.resetRegistry();
+            if(this.conceptualSchema.getDatabaseInfo() == null) {
+    			showDatabaseConnectionDialog();
+    			DatabaseViewerManager.resetRegistry();
+            }
         }
     }
 
