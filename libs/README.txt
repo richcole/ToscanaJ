@@ -8,7 +8,7 @@ jdom.jar:
   JDOM, beta 8 (http://www.jdom.org, licence in LICENCE.jdom)
 
 hsqldb.jar: 
-  HSQL Database Engine (http://hsqldb.sourceforge.net/, licence in LICENCE.hsqldb.html)
+  HSQL Database Engine, version 1.7.1.b (http://hsqldb.sourceforge.net/, licence in LICENCE.hsqldb.html)
 
 JimiProClasses.zip: 
   JIMI image manipulation library from Sun (http://java.sun.com/products/jimi/, licence in LICENCE.jimi)
