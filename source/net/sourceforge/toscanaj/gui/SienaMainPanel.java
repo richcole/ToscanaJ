@@ -447,9 +447,12 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         CernatoModel inputModel;
         try {
             inputModel = CernatoXMLParser.importCernatoXMLFile(file);
-        } catch (FileNotFoundException e) {
-            ErrorDialog.showError(this, e, "Could not find file");
-            return;
+		} catch (FileNotFoundException e) {
+			ErrorDialog.showError(this, e, "Could not find file");
+			return;
+		} catch (IOException e) {
+			ErrorDialog.showError(this, e, "Could not read file");
+			return;
         } catch (DataFormatException e) {
             ErrorDialog.showError(this, e, "Could not parse file");
             return;

@@ -28,13 +28,12 @@ import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.DOMBuilder;
+import org.jdom.input.SAXBuilder;
 import org.tockit.events.EventBroker;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Types;
@@ -99,9 +98,9 @@ public class CSXParser {
     public static ConceptualSchema parse(
             EventBroker eventBroker,
             File csxFile)
-            throws FileNotFoundException, IOException, DataFormatException, Exception {
+            throws IOException, DataFormatException, Exception {
         try {
-	        DOMBuilder parser = new DOMBuilder();
+			SAXBuilder parser = new SAXBuilder();
 	        _Document = parser.build(csxFile);
 	
 	        _BaseURL = csxFile.toURL();

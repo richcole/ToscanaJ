@@ -18,18 +18,18 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.types.*;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.input.DOMBuilder;
+import org.jdom.input.SAXBuilder;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
 public class CernatoXMLParser {
     public static CernatoModel importCernatoXMLFile(File cernatoXMLFile)
-            throws FileNotFoundException, DataFormatException, JDOMException {
-        DOMBuilder parser = new DOMBuilder();
+            throws DataFormatException, JDOMException, IOException {
+        SAXBuilder parser = new SAXBuilder();
         Document document = parser.build(cernatoXMLFile);
 
         Element rootElement = document.getRootElement();

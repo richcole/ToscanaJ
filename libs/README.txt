@@ -5,7 +5,7 @@ canvas.jar, events.jar:
   part of our Tockit project (http://www.tockit.org, same licence as ToscanaJ)
 
 jdom.jar: 
-  JDOM, beta 8 (http://www.jdom.org, licence in LICENCE.jdom)
+  JDOM, beta 9 (http://www.jdom.org, licence in LICENCE.jdom)
 
 hsqldb.jar: 
   HSQL Database Engine, version 1.7.1.b (http://hsqldb.sourceforge.net/, licence in LICENCE.hsqldb.html)

@@ -23,7 +23,7 @@ public class XMLWriter {
         // open stream on file
         FileOutputStream out = new FileOutputStream(file);
         XMLOutputter outputter = new XMLOutputter();
-        outputter.setIndent(true);
+        outputter.setIndent("    ");
         outputter.setNewlines(true);
 
         Document document = new Document(object.toXML());

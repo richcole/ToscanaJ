@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.io.StringReader;
 
 public class XMLEditorDialog extends JDialog {
@@ -120,30 +121,36 @@ public class XMLEditorDialog extends JDialog {
 			statusBar.setToolTipText(null);
 			useDescriptionButton.setEnabled(true);
         } catch (JDOMException e) {
-        	useDescriptionButton.setEnabled(false);
-            statusBar.setForeground(Color.RED);
-            String message = e.getMessage();
-            statusBar.setText(message);
-			statusBar.setToolTipText(message);
-            int posLine = message.indexOf("line");
+            showErrorMessage(e);
+        } catch (IOException e) {
+			showErrorMessage(e);
+        }
+    }
+
+    private void showErrorMessage(Exception exception) {
+        useDescriptionButton.setEnabled(false);
+        statusBar.setForeground(Color.RED);
+        String message = exception.getMessage();
+        statusBar.setText(message);
+        statusBar.setToolTipText(message);
+        int posLine = message.indexOf("line");
+        if (posLine > 0) {
+            String rest = message.substring(posLine + 5);
+            int errorLine =
+                Integer.parseInt(rest.substring(0, rest.indexOf(":")));
+            addErrorHighlight(errorLine);
+            posLine = rest.lastIndexOf(" ");
             if (posLine > 0) {
-                String rest = message.substring(posLine + 5);
-                int errorLine =
-                    Integer.parseInt(rest.substring(0, rest.indexOf(":")));
-                addErrorHighlight(errorLine);
-                posLine = rest.lastIndexOf(" ");
-                if (posLine > 0) {
-                    rest = rest.substring(posLine + 1);
-                    try {
-                        int dotIndex = rest.indexOf(".");
-                        if (dotIndex != -1) {
-                            int openTagLine =
-                                Integer.parseInt(rest.substring(0, dotIndex));
-                            addErrorHighlight(openTagLine);
-                        }
-                    } catch (NumberFormatException e1) {
-                        // ignore, we don't understand the message, just highlight one line
+                rest = rest.substring(posLine + 1);
+                try {
+                    int dotIndex = rest.indexOf(".");
+                    if (dotIndex != -1) {
+                        int openTagLine =
+                            Integer.parseInt(rest.substring(0, dotIndex));
+                        addErrorHighlight(openTagLine);
                     }
+                } catch (NumberFormatException e1) {
+                    // ignore, we don't understand the message, just highlight one line
                 }
             }
         }
