@@ -29,7 +29,6 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 public class AddCriterionAttributeDialog extends JDialog{
 	private JFrame parent;
 	private List manyValuedAttributeList;
-	private AddCriterionAttributeDialog dialog =this;
 	private View view;
 		
 	public AddCriterionAttributeDialog(Collection manyValuedAttributeList,JFrame parent,View view){
@@ -52,7 +51,7 @@ public class AddCriterionAttributeDialog extends JDialog{
 		continueButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				ManyValuedAttribute attr = (ManyValuedAttribute) comboBox.getSelectedItem();
-				AddCriterionDialog dialog = new AddCriterionDialog(attr,parent,view);
+				new AddCriterionDialog(attr,parent,view);
 			}
 		});
 		

@@ -104,7 +104,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
     // menu items list
     // FILE menu
-    private JMenuItem exportDiagramSetupMenuItem = null;
     private JMenuItem printMenuItem = null;
     private JMenuItem printSetupMenuItem = null;
     private JMenu mruMenu = null;

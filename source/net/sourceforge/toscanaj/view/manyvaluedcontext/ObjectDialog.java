@@ -30,7 +30,6 @@ public class ObjectDialog extends JDialog{
 	private JButton closeButton;
 	private JButton changeButton;
 	private Frame parent;
-	private int index;
 	private JDialog dialog = this;
 	private WritableFCAObject object;
 	

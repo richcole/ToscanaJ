@@ -98,16 +98,16 @@ public class ToscanaJDiagrams extends HttpServlet {
 		DiagramHistory 	diagramHistory;
 		PrintWriter 	out;
 		HttpSession 	session;
-		String 			conceptParameter;
-		String 			filterConceptParameter;
+//		String 			conceptParameter;
+//		String 			filterConceptParameter;
 		String 			diagramParameter;
 		int			diagramNumber;
 
 		// local variable initialisation
         session 				= req.getSession();
 		out 					= resp.getWriter();
-        conceptParameter 		= req.getParameter("concept");
-        filterConceptParameter 	= req.getParameter("filterConcept");
+//        conceptParameter 		= req.getParameter("concept");
+//        filterConceptParameter 	= req.getParameter("filterConcept");
         diagramParameter 		= req.getParameter("diagram");
         diagramHistory 			= (DiagramHistory) session.getAttribute("diagramHistory");
 		diagramNumber 			= Integer.parseInt(diagramParameter);
@@ -179,7 +179,6 @@ public class ToscanaJDiagrams extends HttpServlet {
         StringBuffer	buffer;				// initialise the StringBuffer
 		int 			numNodes;			// number of nodes
         int 			numLines;			// number of lines 
-        int 			numLabel;			// number of labels
 		double 		radius;				// radius of a node
 		double 		gradientPosition;	// position of a gradient
 				
@@ -241,7 +240,6 @@ public class ToscanaJDiagrams extends HttpServlet {
             );
             
             Color nodeColor = GlobalVariables.getDiagramSchema().getGradientColor(gradientPosition);
-            Color lineColor = GlobalVariables.getDiagramSchema().getLineColor();
             
             LabelInfo attrLabel = node.getAttributeLabelInfo();
 
@@ -343,7 +341,6 @@ public class ToscanaJDiagrams extends HttpServlet {
 				buffer.append("\n");
 
                 attrIt = concept.getAttributeContingentIterator();
-                numLabel = 0;
                 
                 while (attrIt.hasNext()) 
                 {

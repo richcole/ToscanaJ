@@ -135,9 +135,6 @@ public class BrowserLauncher {
 	/** The linkage object required for JDirect 3 on Mac OS X. */
 	private static Object linkage;
 	
-	/** The framework to reference on Mac OS X */
-	private static final String JDirect_MacOSX = "/System/Library/Frameworks/Carbon.framework/Frameworks/HIToolbox.framework/HIToolbox";
-
 	/** JVM constant for MRJ 2.0 */
 	private static final int MRJ_2_0 = 0;
 	

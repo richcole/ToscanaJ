@@ -31,7 +31,6 @@ public class DiagramExportSettingsPanel extends JComponent implements ActionList
      */
     private DiagramExportSettings diagramSettings;
 
-    private JLabel formatLabel;
     private JLabel widthLabel;
 	private JLabel heightLabel;
     private JTextField widthField;

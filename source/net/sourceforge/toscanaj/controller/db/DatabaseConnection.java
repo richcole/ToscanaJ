@@ -695,8 +695,6 @@ public class DatabaseConnection implements EventBrokerListener {
 			ResultSet typeInfo = dbMetadata.getTypeInfo();
 	
 			while (typeInfo.next()) {
-				ResultSetMetaData cur = typeInfo.getMetaData();
-				int colCount = cur.getColumnCount();
 				// according to java documentation the first column should
 				// contain TYPE_NAME and the second column should contain DATA_TYPE.
 				result.add(new SQLTypeInfo( typeInfo.getInt(2), typeInfo.getString(1) )); 

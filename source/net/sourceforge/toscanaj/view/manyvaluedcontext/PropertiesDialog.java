@@ -115,10 +115,9 @@ public class PropertiesDialog extends JDialog{
 			public void actionPerformed(ActionEvent e) {
 				AttributeType type = (AttributeType) typeBox.getSelectedItem();
 				if(type instanceof TextualType){
-					TextualTypeDialog typeDialog = new TextualTypeDialog(dialog,type);
-				}
-				else{
-					NumericalTypeDialog typeDialog = new NumericalTypeDialog(dialog,type);
+					new TextualTypeDialog(dialog,type);
+				} else {
+					new NumericalTypeDialog(dialog,type);
 				}
 			}
 		});

@@ -206,7 +206,6 @@ public class DatabaseConnectionInformationView extends JDialog
     
     class EmbeddedDbConnectionPanel extends ConnectionPanel {
         private JTextField scriptLocationField;
-		private JTextField csvFileLocationField;
 
     	EmbeddedDbConnectionPanel() {
     		super();
@@ -220,14 +219,6 @@ public class DatabaseConnectionInformationView extends JDialog
     	    });
     	    fileButton.setMnemonic('f');
 
-			JLabel csvFileLabel = new JLabel("CSV File Location:");
-			csvFileLocationField = new JTextField();
-			JButton csvFileButton = new JButton("Browse...");
-			csvFileButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					getFileURL(csvFileLocationField, "csv", "Comma Separated Files (*.csv)");
-				}
-			});
             updateContents();
     	    this.setLayout(new GridBagLayout());
 
@@ -289,9 +280,6 @@ public class DatabaseConnectionInformationView extends JDialog
             } catch (DatabaseException e) {
             	ErrorDialog.showError(this, e, "Script error");
             	return false;
-            }
-            if (csvFileLocationField.getText().length() > 0) {
-				CSVImportDetailsDialog csvImportDialog = new CSVImportDetailsDialog(owner, csvFileLocationField.getText(), connection);
             }
             return true;
         }
