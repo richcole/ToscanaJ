@@ -31,19 +31,22 @@ import net.sourceforge.toscanaj.util.xmlize.XMLWriter;
 
 
 public class TupelScaling {
-    public static ConceptualSchema scaleWithTupelsAsObjects(TupelSet tupels) {
+    public static ConceptualSchema scaleTupels(TupelSet tupels, int objectPosition) {
         ConceptualSchema schema = new ConceptualSchema(new EventBroker());
 
         // first turn all tupels into FCAObjects, the attributes are done inline
         Map tupelObjectMap = new HashMap();
         for (Iterator iter = tupels.getTupels().iterator(); iter.hasNext();) {
             Object[] tupel = (Object[]) iter.next();
-            FCAObject newObject = new FCAObjectImplementation(TupelSet.toString(tupel));
-            tupelObjectMap.put(tupel, newObject);
+            FCAObject newObject = new FCAObjectImplementation(tupel[objectPosition]);
+            tupelObjectMap.put(tupel[objectPosition], newObject);
         }
         
         String[] variableNames = tupels.getVariableNames();
         for (int i = 0; i < variableNames.length; i++) {
+            if(i == objectPosition) {
+                continue;
+            }
             String varName = variableNames[i];
             Map valueAttributeMap = new HashMap();
             ContextImplementation context = new ContextImplementation("Tupels");
@@ -55,7 +58,7 @@ public class TupelScaling {
                     valueAttributeMap.put(tupel[i], newAttribute);
                     context.getAttributes().add(newAttribute);
                 }
-                context.getRelationImplementation().insert(tupelObjectMap.get(tupel), valueAttributeMap.get(tupel[i]));
+                context.getRelationImplementation().insert(tupelObjectMap.get(tupel[objectPosition]), valueAttributeMap.get(tupel[i]));
             }
             Lattice lattice = new GantersAlgorithm().createLattice(context);
             Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, varName, new DefaultDimensionStrategy());
@@ -66,8 +69,14 @@ public class TupelScaling {
     }
     
     public static void main(String[] args) throws Exception {
+        int objectPos;
+        if(args.length == 3) {
+            objectPos = Integer.parseInt(args[2]);
+        } else {
+            objectPos = 1;
+        }
         TupelSet input = TupelParser.parseTabDelimitedTupels(new FileReader(new File(args[0])));
-        ConceptualSchema result = scaleWithTupelsAsObjects(input);
+        ConceptualSchema result = scaleTupels(input, objectPos);
         XMLWriter.write(new File(args[1]), result);
     }
 }
