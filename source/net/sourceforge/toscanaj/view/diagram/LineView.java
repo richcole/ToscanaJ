@@ -40,21 +40,22 @@ public class LineView extends CanvasItem {
      * Draws the line.
      */
     public void draw(Graphics2D graphics) {
+        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
         Point2D from = diagramLine.getFromPosition();
         Point2D to = diagramLine.getToPosition();
         Paint oldPaint = graphics.getPaint();
         Stroke oldStroke = graphics.getStroke();
         if(this.selectionState != NodeView.NO_SELECTION) {
             if(this.selectionState == NodeView.SELECTED_IDEAL) {
-                graphics.setPaint(NodeView.circleIdealColor);
+                graphics.setPaint(diagramSchema.getCircleIdealColor());
                 graphics.setStroke(new BasicStroke(NodeView.selectionSize));
             }
             else if(this.selectionState == NodeView.SELECTED_FILTER) {
-                graphics.setPaint(NodeView.circleFilterColor);
+                graphics.setPaint(diagramSchema.getCircleFilterColor());
                 graphics.setStroke(new BasicStroke(NodeView.selectionSize));
             }
             else if(this.selectionState == NodeView.NOT_SELECTED) {
-                Color circleColor = NodeView.circleColor;
+                Color circleColor = diagramSchema.getCircleColor();
                 float rel = NodeView.fadeOut;
                 circleColor = new Color( (int)(circleColor.getRed()*(1-rel) + 255*rel),
                                          (int)(circleColor.getGreen()*(1-rel) + 255*rel),

@@ -188,7 +188,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         if(this.labelInfo.getNumberOfEntries(this.showOnlyContingent) == 0) {
             return;
         }
-
         // remember some settings to restore them later
         Paint oldPaint = graphics.getPaint();
 

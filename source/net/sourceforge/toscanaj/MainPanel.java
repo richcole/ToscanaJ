@@ -17,6 +17,7 @@ import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 
 import net.sourceforge.toscanaj.view.DiagramOrganiser;
+import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.LabelView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
@@ -495,7 +496,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
     public void actionPerformed (ActionEvent ae) {
         Object actionSource = ae.getSource();
-
+        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
         // Button actions
         if (actionSource == openButton) {
             openSchema();
@@ -559,23 +560,23 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
         // the color entries
         if( actionSource == this.circleColorMenuItem ) {
-            Color newColor = JColorChooser.showDialog(this, "Change circle color", NodeView.getCircleColor());
+            Color newColor = JColorChooser.showDialog(this, "Change circle color", diagramSchema.getCircleColor());
             if(newColor != null) {
-                NodeView.setCircleColor(newColor);
+                diagramSchema.setCircleColor(newColor);
             }
             repaint();
         }
         if( actionSource == this.topColorMenuItem ) {
-            Color newColor = JColorChooser.showDialog(this, "Change gradient color", NodeView.getTopColor());
+            Color newColor = JColorChooser.showDialog(this, "Change gradient color", diagramSchema.getTopColor());
             if(newColor != null) {
-                NodeView.setTopColor(newColor);
+                diagramSchema.setTopColor(newColor);
             }
             repaint();
         }
         if( actionSource == this.bottomColorMenuItem ) {
-            Color newColor = JColorChooser.showDialog(this, "Change gradient color", NodeView.getBottomColor());
+            Color newColor = JColorChooser.showDialog(this, "Change gradient color", diagramSchema.getBottomColor());
             if(newColor != null) {
-                NodeView.setBottomColor(newColor);
+                diagramSchema.setBottomColor(newColor);
             }
             repaint();
         }

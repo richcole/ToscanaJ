@@ -1,5 +1,7 @@
 package net.sourceforge.toscanaj.canvas;
 
+import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
+
 import javax.swing.JComponent;
 
 import java.awt.Dimension;
@@ -161,10 +163,10 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     public void paintCanvas(Graphics2D graphics)
     {
         // fill the background
-        /// @TODO Make Background color configurable
-        graphics.setPaint(this.getBackground());
+        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
+        graphics.setPaint(diagramSchema.getBackground());
         graphics.fill(this.getCanvasSize(graphics));
-        graphics.setPaint(java.awt.Color.black);
+        graphics.setPaint(diagramSchema.getForeground());
 
         // paint all items on canvas
         Iterator it = this.canvasItems.iterator();

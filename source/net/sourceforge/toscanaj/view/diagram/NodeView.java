@@ -5,6 +5,7 @@ import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -46,38 +47,6 @@ public class NodeView extends CanvasItem {
     static final public int SELECTED_IDEAL = 4;
 
     /**
-     * The color used for the top of the gradient.
-     */
-    static protected Color topColor =  new Color(0,0,150);
-
-    /**
-     * The colort used for the bottom of the gradient;
-     */
-    static protected Color bottomColor = new Color(255,255,150);
-
-    /**
-     * The Color for the circles around the nodes.
-     */
-    static protected Color circleColor = new Color(0,0,0);
-
-    /**
-     * The Color for the circles around the node with the selected concept.
-     */
-    static public Color circleSelectionColor = new Color(255,0,0);
-
-    /**
-     * The Color for the circles around the nodes in the ideal of the selected
-     * concept.
-     */
-    static public Color circleIdealColor = new Color(0,0,0);
-
-    /**
-     * The Color for the circles around the nodes in the filter of the selected
-     * concept.
-     */
-    static public Color circleFilterColor = new Color(0,0,0);
-
-    /**
      * The amount of fade out for unselected nodes.
      */
     static public float fadeOut = 0.7F;
@@ -105,48 +74,6 @@ public class NodeView extends CanvasItem {
     private int selectionState = NO_SELECTION;
 
     /**
-     * Changes the top color of the gradient.
-     */
-    static public void setTopColor(Color topColor) {
-        NodeView.topColor = topColor;
-    }
-
-    /**
-     * Changes the bottom color of the gradient.
-     */
-    static public void setBottomColor(Color bottomColor) {
-        NodeView.bottomColor = bottomColor;
-    }
-
-    /**
-     * Changes the color of the circles around the nodes.
-     */
-    static public void setCircleColor(Color circleColor) {
-        NodeView.circleColor = circleColor;
-    }
-
-    /**
-     * Returns the top color of the gradient.
-     */
-    static public Color getTopColor() {
-        return NodeView.topColor;
-    }
-
-    /**
-     * Returns the bottom color of the gradient.
-     */
-    static public Color getBottomColor() {
-        return NodeView.bottomColor;
-    }
-
-    /**
-     * Returns the color of the circles around the nodes.
-     */
-    static public Color getCircleColor() {
-        return NodeView.circleColor;
-    }
-
-    /**
      * Construct a nodeView for a Node.
      *
      * The DiagramView is used for the callback when a node was selected.
@@ -160,59 +87,63 @@ public class NodeView extends CanvasItem {
      * Draws the node as circle.
      */
     public void draw(Graphics2D graphics) {
-        if(diagramNode != null) {
-            Paint oldPaint = graphics.getPaint();
-            Color nodeColor;
-            Color circleColor = this.circleColor;
-            if(diagramNode instanceof NestedDiagramNode) {
-                nodeColor = Color.white;
-            }
-            else {
-                float rel = (float) this.diagramNode.getConcept().getExtentSizeRelative();
-                nodeColor = new Color( (int)(topColor.getRed()*rel + bottomColor.getRed()*(1-rel)),
-                                       (int)(topColor.getGreen()*rel + bottomColor.getGreen()*(1-rel)),
-                                       (int)(topColor.getBlue()*rel + bottomColor.getBlue()*(1-rel)),
-                                       (int)(topColor.getAlpha()*rel + bottomColor.getAlpha()*(1-rel)) );
-            }
-            Stroke oldStroke = graphics.getStroke();
-            if(this.selectionState != NO_SELECTION) {
-                if(this.selectionState == SELECTED_DIRECTLY) {
-                    graphics.setStroke(new BasicStroke(this.selectionSize));
-                    circleColor = this.circleSelectionColor;
-                }
-                else if(this.selectionState == SELECTED_IDEAL) {
-                    graphics.setStroke(new BasicStroke(this.selectionSize));
-                    circleColor = this.circleIdealColor;
-                }
-                else if(this.selectionState == SELECTED_FILTER) {
-                    graphics.setStroke(new BasicStroke(this.selectionSize));
-                    circleColor = this.circleFilterColor;
-                }
-                else if(this.selectionState == NOT_SELECTED) {
-                    // lighten
-                    float rel = fadeOut;
-                    nodeColor = new Color( (int)(nodeColor.getRed()*(1-rel) + 255*rel),
-                                           (int)(nodeColor.getGreen()*(1-rel) + 255*rel),
-                                           (int)(nodeColor.getBlue()*(1-rel) + 255*rel),
-                                           (int)(nodeColor.getAlpha()*(1-rel) + 255*rel) );
-                    circleColor = new Color( (int)(circleColor.getRed()*(1-rel) + 255*rel),
-                                             (int)(circleColor.getGreen()*(1-rel) + 255*rel),
-                                             (int)(circleColor.getBlue()*(1-rel) + 255*rel),
-                                             (int)(circleColor.getAlpha()*(1-rel) + 255*rel) );
-                }
-            }
-
-            Ellipse2D ellipse = new Ellipse2D.Double(
-                                        diagramNode.getPosition().getX() - diagramNode.getRadiusX(),
-                                        diagramNode.getPosition().getY() - diagramNode.getRadiusY(),
-                                        diagramNode.getRadiusX() * 2, diagramNode.getRadiusY() * 2 );
-            graphics.setPaint(nodeColor);
-            graphics.fill(ellipse);
-            graphics.setPaint(circleColor);
-            graphics.draw(ellipse);
-            graphics.setPaint(oldPaint);
-            graphics.setStroke(oldStroke);
+        if(diagramNode == null) {
+            return;
         }
+        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
+        Paint oldPaint = graphics.getPaint();
+        Color nodeColor;
+        Color circleColor = diagramSchema.getCircleColor();
+        if(diagramNode instanceof NestedDiagramNode) {
+            nodeColor = diagramSchema.getNestedDiagramNodeColor();
+        }
+        else {
+            Color topColor = diagramSchema.getTopColor();
+            Color bottomColor = diagramSchema.getBottomColor();
+            float rel = (float) this.diagramNode.getConcept().getExtentSizeRelative();
+            nodeColor = new Color( (int)(topColor.getRed()*rel + bottomColor.getRed()*(1-rel)),
+                                   (int)(topColor.getGreen()*rel + bottomColor.getGreen()*(1-rel)),
+                                   (int)(topColor.getBlue()*rel + bottomColor.getBlue()*(1-rel)),
+                                   (int)(topColor.getAlpha()*rel + bottomColor.getAlpha()*(1-rel)) );
+        }
+        Stroke oldStroke = graphics.getStroke();
+        if(this.selectionState != NO_SELECTION) {
+            if(this.selectionState == SELECTED_DIRECTLY) {
+                graphics.setStroke(new BasicStroke(this.selectionSize));
+                circleColor = diagramSchema.getCircleSelectionColor();
+            }
+            else if(this.selectionState == SELECTED_IDEAL) {
+                graphics.setStroke(new BasicStroke(this.selectionSize));
+                circleColor = diagramSchema.getCircleIdealColor();
+            }
+            else if(this.selectionState == SELECTED_FILTER) {
+                graphics.setStroke(new BasicStroke(this.selectionSize));
+                circleColor = diagramSchema.getCircleFilterColor();
+            }
+            else if(this.selectionState == NOT_SELECTED) {
+                // lighten
+                float rel = fadeOut;
+                nodeColor = new Color( (int)(nodeColor.getRed()*(1-rel) + 255*rel),
+                                       (int)(nodeColor.getGreen()*(1-rel) + 255*rel),
+                                       (int)(nodeColor.getBlue()*(1-rel) + 255*rel),
+                                       (int)(nodeColor.getAlpha()*(1-rel) + 255*rel) );
+                circleColor = new Color( (int)(circleColor.getRed()*(1-rel) + 255*rel),
+                                         (int)(circleColor.getGreen()*(1-rel) + 255*rel),
+                                         (int)(circleColor.getBlue()*(1-rel) + 255*rel),
+                                         (int)(circleColor.getAlpha()*(1-rel) + 255*rel) );
+            }
+        }
+
+        Ellipse2D ellipse = new Ellipse2D.Double(
+                                    diagramNode.getPosition().getX() - diagramNode.getRadiusX(),
+                                    diagramNode.getPosition().getY() - diagramNode.getRadiusY(),
+                                    diagramNode.getRadiusX() * 2, diagramNode.getRadiusY() * 2 );
+        graphics.setPaint(nodeColor);
+        graphics.fill(ellipse);
+        graphics.setPaint(circleColor);
+        graphics.draw(ellipse);
+        graphics.setPaint(oldPaint);
+        graphics.setStroke(oldStroke);
     }
 
     /**
