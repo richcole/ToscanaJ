@@ -8,22 +8,20 @@
  */
 package net.sourceforge.toscanaj.view.database;
 
-import net.sourceforge.toscanaj.gui.PanelStackView;
-import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
-import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
-import net.sourceforge.toscanaj.model.events.TableChangedEvent;
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
+import net.sourceforge.toscanaj.model.Column;
 import net.sourceforge.toscanaj.model.DatabaseSchema;
 import net.sourceforge.toscanaj.model.Table;
-import net.sourceforge.toscanaj.model.Column;
+import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
+import net.sourceforge.toscanaj.model.events.TableChangedEvent;
 import net.sourceforge.toscanaj.util.STD_Iterator;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
@@ -62,11 +60,12 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
 
     class TableSelectionListener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent event) {
-            ListSelectionModel model;
             if (event.getSource() instanceof JList) {
                 JList list = (JList) event.getSource();
-                model = list.getSelectionModel();
-
+                ListSelectionModel model = list.getSelectionModel();
+                if(model.getValueIsAdjusting()){
+                    return;
+                }
                 if (model.isSelectionEmpty()) {
                     displayTable(null);
                 } else {
@@ -92,26 +91,27 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
 
     class ColumnSelectionListener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent event) {
-            ListSelectionModel model;
-            if (event.getSource() instanceof JList) {
-                JList list = (JList) event.getSource();
-                model = list.getSelectionModel();
-            } else {
+            if (!(event.getSource() instanceof JList)) {
                 return;
             }
+            JList list = (JList) event.getSource();
+            ListSelectionModel model = list.getSelectionModel();
             if (model.isSelectionEmpty()) {
-                // do nothing, there is nothing to do
-            } else {
-                ColumnInfo columnInfo =
-                        (ColumnInfo) columnsList.elementAt(
-                                model.getMinSelectionIndex()
-                        );
-                TableInfo tableInfo =
-                        (TableInfo) unkeyedTableList.elementAt(
-                                unkeyedTableListPanel.getSelectedIndex()
-                        );
-                setObjectKey(tableInfo.getTable(), columnInfo.getColumn());
+                return;
             }
+            if (model.getValueIsAdjusting()) {
+                return;
+            }
+
+            ColumnInfo columnInfo =
+                    (ColumnInfo) columnsList.elementAt(
+                            model.getMinSelectionIndex()
+                    );
+            TableInfo tableInfo =
+                    (TableInfo) unkeyedTableList.elementAt(
+                            unkeyedTableListPanel.getSelectedIndex()
+                    );
+            setObjectKey(tableInfo.getTable(), columnInfo.getColumn());
         }
     }
 
