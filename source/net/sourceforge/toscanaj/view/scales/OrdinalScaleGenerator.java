@@ -24,6 +24,8 @@ import util.NullIterator;
 import util.CollectionFactory;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.List;
@@ -141,25 +143,13 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
     public Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme) {
         Assert.isTrue(canHandleColumns(columns));
         TableColumnPair pair = columns[0];
-        JDialog scaleDialog =  new JDialog(parent);
-        scaleDialog.setModal(true);
-        scaleDialog.setTitle("Ordinal scale for :"+pair.getColumn().getName());
-        scaleDialog.getContentPane().setLayout(new BorderLayout());
-
-        JTextField titleEditor = new JTextField();
-        scaleDialog.getContentPane().add(new LabeledScrollPaneView("Title", titleEditor), BorderLayout.CENTER);
-
-        JPanel buttonPane = new JPanel();
-        buttonPane.setLayout(new FlowLayout());
-
-        buttonPane.add(new JButton("OK"));
-        buttonPane.add(new JButton("Cancel"));
-        scaleDialog.getContentPane().add(buttonPane, BorderLayout.SOUTH);
-        scaleDialog.pack();
-        scaleDialog.show();
+        OrdinalScaleEditorDialog scaleDialog =  new OrdinalScaleEditorDialog(parent, pair);
+        if(!scaleDialog.execute()){
+            return null;
+        }
 
         WriteableDiagram2D ret = new SimpleLineDiagram();
-        ret.setTitle("Ordinal scale for "+pair.getColumn());
+        ret.setTitle(scaleDialog.getDiagramTitle());
 
          Concept concept = new DummyConcept();
          DiagramNode node = new DiagramNode(

@@ -33,9 +33,10 @@ public class ScaleGeneratorPanel extends JPanel implements BrokerEventListener {
         super();
         this.parentFrame = frame;
         this.conceptualSchema = conceptualSchema;
+        fillGeneratorButtonsPane();
+
         this.selectionSource = selectionSource;
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
-        fillGeneratorButtonsPane();
     }
 
     public ConceptualSchema getConceptualSchema() {
@@ -78,7 +79,6 @@ public class ScaleGeneratorPanel extends JPanel implements BrokerEventListener {
                     Diagram2D returnValue =
                             generator.generateScale(selectionSource.getSelectedTableColumnPairs(),
                                     conceptualSchema);
-                    System.out.println(conceptualSchema);
                     if (null != returnValue) {
                         conceptualSchema.addDiagram(returnValue);
                     }
