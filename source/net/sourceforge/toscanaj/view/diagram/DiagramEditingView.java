@@ -24,7 +24,7 @@ import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
-import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
+import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.ContextImplementation;
@@ -300,18 +300,20 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         JPanel upDownButtonPane = new JPanel(new GridBagLayout());
         upDownButtonPane.add(upButton, new GridBagConstraints(
 					        0, 0, 1, 1, 1.0, 0,
-							GridBagConstraints.CENTER,
+							GridBagConstraints.WEST,
 							GridBagConstraints.HORIZONTAL,
 							new Insets(1, 1, 1, 1),
 							2, 2)
 		);
 		upDownButtonPane.add(downButton, new GridBagConstraints(
 							1, 0, 1, 1, 1.0, 0,
-							GridBagConstraints.CENTER,
+							GridBagConstraints.WEST,
 							GridBagConstraints.HORIZONTAL,
 							new Insets(1, 1, 1, 1),
 							2, 2)
 		);
+		
+		
 		buttonsPane.add(upDownButtonPane,new GridBagConstraints(
 							0, 0, 1, 1, 1.0, 0,
 							GridBagConstraints.CENTER,
@@ -387,7 +389,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 				}
 			 }
 		 });
-        return new LabeledScrollPaneView("Diagrams:", listView, buttonsPane);
+        return new LabeledPanel("Diagrams:", listView, buttonsPane);
     }
 
     protected void fillDiagramListView() {

@@ -7,17 +7,17 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
+import java.awt.Frame;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.database.Column;
 
-import javax.swing.*;
-
 public class ContextTableScaleGenerator implements ScaleGenerator {
-    private JFrame parent;
+    private Frame parent;
 
-    public ContextTableScaleGenerator(JFrame parent) {
+    public ContextTableScaleGenerator(Frame parent) {
         this.parent = parent;
     }
 

@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
+import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.model.database.Column;
 
 import javax.swing.*;
@@ -102,7 +102,7 @@ public class NominalScaleEditorDialog extends JDialog {
                 }
             }
         });
-        tablePane.add(new LabeledScrollPaneView("Available Values", this.columnValuesListView),
+        tablePane.add(new LabeledPanel("Available Values", this.columnValuesListView),
                 new GridBagConstraints(
                         0, 0, 1, 1, 1, 1,
                         GridBagConstraints.CENTER,
@@ -120,7 +120,7 @@ public class NominalScaleEditorDialog extends JDialog {
                         0, 0
                 )
         );
-        tablePane.add(new LabeledScrollPaneView("Selected Attributes", this.attributeListView),
+        tablePane.add(new LabeledPanel("Selected Attributes", this.attributeListView),
                 new GridBagConstraints(
                         2, 0, 1, 1, 1, 1,
                         GridBagConstraints.CENTER,

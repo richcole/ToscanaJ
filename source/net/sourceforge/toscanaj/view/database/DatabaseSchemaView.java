@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.view.database;
 
-import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
+import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.Table;
@@ -188,10 +188,10 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
         leftPane =
             new JSplitPane(
                 JSplitPane.VERTICAL_SPLIT,
-                new LabeledScrollPaneView(
+                new LabeledPanel(
                     "Available Tables:",
                     unkeyedTableListPanel),
-                new LabeledScrollPaneView(
+                new LabeledPanel(
                     "Selected Keys:",
                     keyedTableListPanel,
                     removeButton));
@@ -203,7 +203,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
             new JSplitPane(
                 JSplitPane.HORIZONTAL_SPLIT,
                 leftPane,
-                new LabeledScrollPaneView(
+                new LabeledPanel(
                     "Available Object Keys:",
                     columnsPanel));
         splitPane.setDividerLocation(180);

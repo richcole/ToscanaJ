@@ -18,7 +18,6 @@ public class AllTests extends TestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTest(ScaleEditingViewTest.suite());
         suite.addTest(ScaleGeneratorPaneTest.suite());
         suite.addTest(OrdinalScaleEditorDialogTest.suite());
         return suite;

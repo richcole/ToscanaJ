@@ -18,7 +18,7 @@ import org.tockit.events.EventBrokerListener;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
-import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
+import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net
     .sourceforge
     .toscanaj
@@ -205,8 +205,8 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
         this.tableListView.addListSelectionListener(new TableSelectionListener());
         this.columnListView.addListSelectionListener(new ColumnSelectionListener());
 
-        LabeledScrollPaneView tableView = new LabeledScrollPaneView("Tables:", tableListView);
-        LabeledScrollPaneView columnView = new LabeledScrollPaneView("Columns:", columnListView);
+        LabeledPanel tableView = new LabeledPanel("Tables:", tableListView);
+        LabeledPanel columnView = new LabeledPanel("Columns:", columnListView);
         
         listSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, tableView, columnView);
 

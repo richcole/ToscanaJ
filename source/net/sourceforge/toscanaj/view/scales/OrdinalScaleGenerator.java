@@ -15,15 +15,15 @@ import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
-import javax.swing.*;
+import java.awt.Frame;
 import java.sql.Types;
 import java.util.Iterator;
 import java.util.List;
 
 public class OrdinalScaleGenerator implements ScaleGenerator {
-    private JFrame parent;
+    private Frame parent;
 
-    public OrdinalScaleGenerator(JFrame parent) {
+    public OrdinalScaleGenerator(Frame parent) {
         this.parent = parent;
     }
 

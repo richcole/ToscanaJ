@@ -32,7 +32,7 @@ public class ScaleGeneratorPaneTest extends TestCase {
         ConceptualSchema schema = new ConceptualSchema(broker);
         DatabaseConnection databaseConnection = new DatabaseConnection(broker);
         ScaleGeneratorPanel view =
-                new ScaleGeneratorPanel(null, schema,
+                new ScaleGeneratorPanel(schema,
                         new MockTableColumnPairsSelectionSource(),
                         databaseConnection,
                         broker);

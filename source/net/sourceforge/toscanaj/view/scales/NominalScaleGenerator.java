@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
+import java.awt.Frame;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
@@ -15,14 +17,12 @@ import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
-import javax.swing.*;
-
 public class NominalScaleGenerator implements ScaleGenerator {
-	private JFrame parent;
+	private Frame parent;
 	/// @todo this should be calculated from the number of nodes (the more nodes the wider)
 	private static final int DIAGRAM_WIDTH = 400;
 
-	public NominalScaleGenerator(JFrame parent) {
+	public NominalScaleGenerator(Frame parent) {
 		this.parent = parent;
 	}
 

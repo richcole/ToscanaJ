@@ -10,12 +10,12 @@ package net.sourceforge.toscanaj.gui;
 import javax.swing.*;
 import java.awt.*;
 
-public class LabeledScrollPaneView extends JPanel {
-    public LabeledScrollPaneView(String label, Component contentView) {
+public class LabeledPanel extends JPanel {
+    public LabeledPanel(String label, Component contentView) {
         this(label, contentView, null);
     }
     
-    public LabeledScrollPaneView(String label, Component contentView, Component extraComponent) {
+    public LabeledPanel(String label, Component contentView, Component extraComponent) {
         super();
         setLayout(new GridBagLayout());
         add(new JLabel(label),

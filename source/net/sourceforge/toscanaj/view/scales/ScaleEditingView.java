@@ -8,12 +8,11 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
+import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.Table;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -25,40 +24,24 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Iterator;
 
 public class ScaleEditingView extends JPanel implements EventBrokerListener, TableColumnPairsSelectionSource {
 	private EventBroker eventBroker;
     private ConceptualSchema conceptualSchema;
     private DefaultListModel tableColumnListModel;
-    private DefaultListModel scalesListModel;
     private JSplitPane splitPane;
-    private JSplitPane leftPane;
     private JList tableColumnsListView;
-
-    private JFrame parentFrame;
     private ScaleGeneratorPanel scaleGeneratorPanel;
-
-    public JFrame getParentFrame() {
-        return parentFrame;
-    }
-
-    public DefaultListModel getScalesListModel() {
-        return scalesListModel;
-    }
 
     /**
      * Construct an instance of this view
      */
     public ScaleEditingView(
-            JFrame frame,
             ConceptualSchema conceptualSchema,
             EventBroker eventBroker,
             DatabaseConnection databaseConnection) {
         super();
-        this.parentFrame = frame;
         this.eventBroker = eventBroker;
         this.conceptualSchema = conceptualSchema;
         if(this.conceptualSchema.getDatabaseSchema() == null) {
@@ -67,13 +50,12 @@ public class ScaleEditingView extends JPanel implements EventBrokerListener, Tab
 
         setName("ScalesEditingView");
         setLayout(new BorderLayout());
-
-        LabeledScrollPaneView columnListView = new LabeledScrollPaneView("Available Columns:", makeTableColumnListView());
-        leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, columnListView, makeScalesView());
-        leftPane.setOneTouchExpandable(true);
+        
+        LabeledPanel columnListView = new LabeledPanel("Available Columns:", makeTableColumnListView());
 
         scaleGeneratorPanel = makeScaleGeneratorPane(eventBroker, databaseConnection);
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, scaleGeneratorPanel);
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, columnListView, scaleGeneratorPanel);
+        splitPane.setDividerLocation(200);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);
@@ -86,7 +68,6 @@ public class ScaleEditingView extends JPanel implements EventBrokerListener, Tab
             EventBroker eventBroker,
             DatabaseConnection databaseConnection) {
         return new ScaleGeneratorPanel(
-                getParentFrame(),
                 conceptualSchema,
                 this,
                 databaseConnection,
@@ -133,41 +114,6 @@ public class ScaleEditingView extends JPanel implements EventBrokerListener, Tab
         }
     }
 
-    private JComponent makeScalesView() {
-        scalesListModel = new DefaultListModel();
-
-        fillScalesList();
-
-        final JList listView = new JList(scalesListModel);
-        final JButton removeButton = new JButton("Remove");
-        removeButton.setEnabled(false);
-        listView.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        listView.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                removeButton.setEnabled(listView.getSelectedIndex() != -1);
-            }
-        });
-        removeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int[] selections = listView.getSelectedIndices();
-                for (int i = selections.length - 1; i >= 0; i--) {
-                    int selection = selections[i];
-                    conceptualSchema.removeDiagram(selection);
-                }
-            }
-        });
-
-        return new LabeledScrollPaneView("Scales for Selection:", listView, removeButton);
-    }
-
-    private void fillScalesList() {
-        scalesListModel.removeAllElements();
-        for (int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
-            SimpleLineDiagram diagram = (SimpleLineDiagram) conceptualSchema.getDiagram(i);
-            scalesListModel.addElement(diagram.getTitle());
-        }
-    }
-
     public void processEvent(Event event) {
         ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
         if (event instanceof NewConceptualSchemaEvent) {
@@ -177,7 +123,6 @@ public class ScaleEditingView extends JPanel implements EventBrokerListener, Tab
             }
             fillTableColumnsList();
         }
-        fillScalesList();
     }
 
     public void setHorizontalDividerLocation(int location) {
@@ -186,13 +131,5 @@ public class ScaleEditingView extends JPanel implements EventBrokerListener, Tab
 
     public int getHorizontalDividerLocation() {
         return splitPane.getDividerLocation();
-    }
-
-    public void setVerticalDividerLocation(int location) {
-        leftPane.setDividerLocation(location);
-    }
-
-    public int getVerticalDividerLocation() {
-        return leftPane.getDividerLocation();
     }
 }

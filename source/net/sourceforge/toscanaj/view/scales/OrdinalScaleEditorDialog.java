@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
-import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
+import net.sourceforge.toscanaj.gui.LabeledPanel;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -48,7 +48,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
 
         titleEditor.setText(scaleName + " (ordinal)");
-        getContentPane().add(new LabeledScrollPaneView("Title", titleEditor), BorderLayout.NORTH);
+        getContentPane().add(new LabeledPanel("Title", titleEditor), BorderLayout.NORTH);
 
 
         JPanel centerPanel = new JPanel();
@@ -58,7 +58,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
         dividersList = new JList(dividersModel);
         dividersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        LabeledScrollPaneView dividerEditor = new LabeledScrollPaneView("Dividers", dividersList);
+        LabeledPanel dividerEditor = new LabeledPanel("Dividers", dividersList);
 
         JPanel dividerPane = new JPanel();
         dividerPane.setLayout(new BoxLayout(dividerPane, BoxLayout.Y_AXIS));

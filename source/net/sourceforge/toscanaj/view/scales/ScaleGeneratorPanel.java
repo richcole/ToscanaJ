@@ -34,26 +34,19 @@ import java.util.Map;
 
 public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
     private List scaleGenerators = null;
-    private JFrame parentFrame;
     ConceptualSchema conceptualSchema;
     TableColumnPairsSelectionSource selectionSource;
     DatabaseConnection databaseConnection;
-
-    public JFrame getParentFrame() {
-        return parentFrame;
-    }
 
     /**
      * Construct an instance of this view
      */
     public ScaleGeneratorPanel(
-            JFrame frame,
             ConceptualSchema conceptualSchema,
             TableColumnPairsSelectionSource selectionSource,
             DatabaseConnection databaseConnection,
             EventBroker eventBroker) {
         super();
-        this.parentFrame = frame;
         this.conceptualSchema = conceptualSchema;
         this.databaseConnection = databaseConnection;
         fillGeneratorButtonsPane();
@@ -79,6 +72,10 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
         scaleGenerators.add(new NominalScaleGenerator(getParentFrame()));
         scaleGenerators.add(new ContextTableScaleGenerator(getParentFrame()));
     }
+	
+	private Frame getParentFrame() {
+		return JOptionPane.getFrameForComponent(this);
+	}
 
     public void processEvent(Event e) {
         if (e instanceof NewConceptualSchemaEvent) {
@@ -93,6 +90,8 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
         setLayout(new FlowLayout());
         removeAll();
         generatorButtonMap.clear();
+        
+        final JComponent parent = this;
 
         Iterator it = getScaleGenerators().iterator();
         while (it.hasNext()) {
@@ -175,7 +174,7 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
 						options = new Object[]{ "Replace Old Diagram", "Discard New Diagram" };
                 	}
 					return JOptionPane.showOptionDialog( 
-									parentFrame, 
+									parent, 
 									"A diagram with the title '"+
 									returnValue.getTitle()+
 									"' already exists.", 

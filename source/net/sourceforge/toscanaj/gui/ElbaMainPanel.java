@@ -3,7 +3,11 @@
  * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
+<<<<<<< ElbaMainPanel.java
  * $Id$
+=======
+ * $Id$
+>>>>>>> 1.20
  */
 package net.sourceforge.toscanaj.gui;
 
@@ -11,7 +15,6 @@ import net.sourceforge.toscanaj.DataDump;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.controller.db.DumpSqlScript;
 import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
@@ -32,6 +35,8 @@ import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
 import net.sourceforge.toscanaj.view.database.DatabaseSchemaView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingView;
+import net.sourceforge.toscanaj.view.scales.ScaleEditingViewDialog;
+
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -50,7 +55,7 @@ import java.util.ListIterator;
 
 public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     static private final int MaxMruFiles = 8;
-
+    
     /**
      *  Main Controllers
      */
@@ -128,25 +133,67 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     }
 
     public void createViews() {
-        mainView = new PanelStackView(this);
-        mainView.setDividerLocation(ConfigurationManager.fetchInt("ElbaMainPanel", "mainPanelDivider", 200));
-
+		final JFrame frame = this;
+		JPanel mainView = new JPanel(new GridBagLayout());
+		JPanel buttonPane = new JPanel(new GridBagLayout());
+		JButton newDiagramButton = new JButton("New Diagram...");
+		newDiagramButton.addActionListener(new ActionListener (){
+			public void actionPerformed(ActionEvent e){
+				
+				ScaleEditingViewDialog scale= new ScaleEditingViewDialog(frame, conceptualSchema , eventBroker,
+				databaseConnection );
+			}
+		
+		});
+		
+		buttonPane.add(newDiagramButton, new GridBagConstraints(
+						0,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,
+						new Insets(5,1,1,1),
+						2,2
+		));
+		
+		buttonPane.add(new JPanel(), new GridBagConstraints(
+						1,0,1,1,1,1,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.HORIZONTAL,
+						new Insets(1,1,1,1),
+						2,2
+			));
+		
+		
         connectionInformationView =
                 new DatabaseConnectionInformationView(this, conceptualSchema, eventBroker);
 
         schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
-
-        scaleView = new ScaleEditingView(this, conceptualSchema, eventBroker, databaseConnection);
-        scaleView.setHorizontalDividerLocation(
-                ConfigurationManager.fetchInt("ElbaMainPanel", "scaleViewHorizontalDivider", 200));
-        scaleView.setVerticalDividerLocation(
-                ConfigurationManager.fetchInt("ElbaMainPanel", "scaleViewVerticalDivider", 300));
+        
+//        scaleView = new ScaleEditingView(this, conceptualSchema, eventBroker, databaseConnection);
+//        scaleView.setHorizontalDividerLocation(
+//                ConfigurationManager.fetchInt("ElbaMainPanel", "scaleViewHorizontalDivider", 200));
+//        scaleView.setVerticalDividerLocation(
+//                ConfigurationManager.fetchInt("ElbaMainPanel", "scaleViewVerticalDivider", 300));
 
         diagramView = new DiagramEditingView(conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("ElbaMainPanel", "diagramViewDivider", 200));
-
-        mainView.addView("Scales", scaleView);
-        mainView.addView("Diagrams", diagramView);
+		
+		
+		mainView.add(buttonPane, new GridBagConstraints(
+						0,0,1,1,1.0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.HORIZONTAL,
+						new Insets(2,2,2,2),
+						2,2)
+		);
+		mainView.add(diagramView, new GridBagConstraints(
+						0,1,1,1,1,1,
+						GridBagConstraints.WEST,
+						GridBagConstraints.BOTH,
+						new Insets(2,2,2,2),
+						2,2)
+		);
+//        mainView.addView("Scales", scaleView);
+//        mainView.addView("Diagrams", diagramView);
         setContentPane(mainView);
     }
 
@@ -342,18 +389,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
     public void closeMainPanel() {
         // store current position
-        ConfigurationManager.storePlacement("ElbaMainPanel", this);
-        ConfigurationManager.storeInt("ElbaMainPanel", "mainPanelDivider",
-                mainView.getDividerLocation()
-        );
-        ConfigurationManager.storeStringList("ElbaMainPanel", "mruFiles", this.mruList);
 
-        ConfigurationManager.storeInt("ElbaMainPanel", "scaleViewHorizontalDivider",
-                scaleView.getHorizontalDividerLocation()
-        );
-        ConfigurationManager.storeInt("ElbaMainPanel", "scaleViewVerticalDivider",
-                scaleView.getVerticalDividerLocation()
-        );
+        ConfigurationManager.storeStringList("ElbaMainPanel", "mruFiles", this.mruList);
         ConfigurationManager.storeInt("ElbaMainPanel", "diagramViewDivider",
                 diagramView.getDividerLocation()
         );
@@ -401,10 +438,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                     ErrorDialog.showError(this, ex, "DB Connection failed",
                             "Can not connect to the database:\n" + ex.getMessage());
                 }
-            }
-            if(this.dumpSQLMenuItem != null) {
-	            this.dumpSQLMenuItem.setEnabled(this.databaseConnection.isConnected());
-	            this.dumpStatisticalDataMenuItem.setEnabled(this.databaseConnection.isConnected());
             }
         }
     }
@@ -520,7 +553,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     private void exportSQLScript(File file) {
         try {
             FileOutputStream outputStream = new FileOutputStream(file);
-            DumpSqlScript.dumpSqlScript(this.databaseConnection, outputStream);
             outputStream.close();
         } catch (NullPointerException e) {
         	e.printStackTrace();
