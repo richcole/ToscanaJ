@@ -175,6 +175,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
      */
     public void showDiagram(Diagram2D diagram) {
         this.diagram = diagram;
+        removeSubscriptions();
         clearCanvas();
         if (diagram == null) {
             repaint();
@@ -183,6 +184,16 @@ public class DiagramView extends Canvas implements ChangeObserver {
         addDiagram(diagram, conceptInterpretationContext);
         requestScreenTransformUpdate();
         repaint();
+    }
+
+    private void removeSubscriptions() {
+        for (Iterator iterator = canvasItems.iterator(); iterator.hasNext();) {
+            CanvasItem canvasItem = (CanvasItem) iterator.next();
+            if (canvasItem instanceof LabelView) {
+                LabelView lv = (LabelView) canvasItem;
+                this.getController().getEventBroker().removeSubscriptions(lv);
+            }
+        }
     }
 
     public Diagram2D getDiagram() {
