@@ -1,5 +1,6 @@
 package net.sourceforge.toscanaj.model.lattice;
 
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DBConnection;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 
@@ -104,6 +105,10 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                     e.printStackTrace(System.err);
                     /// @TODO Find something useful to do here.
                 }
+                catch (DatabaseException e) {
+                    e.printStackTrace(System.err);
+                    /// @TODO Find something useful to do here.
+                }
             }
         }
         return this.numObjects;
@@ -138,6 +143,10 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                     }
                 }
                 catch (SQLException e) {
+                    e.printStackTrace(System.err);
+                    /// @TODO Find something useful to do here.
+                }
+                catch (DatabaseException e) {
                     e.printStackTrace(System.err);
                     /// @TODO Find something useful to do here.
                 }

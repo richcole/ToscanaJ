@@ -1,5 +1,6 @@
 package net.sourceforge.toscanaj.parser;
 
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DBConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
@@ -121,13 +122,24 @@ public class CSXParser
             if( askDB.getValue().compareTo("true") == 0 )
             {
                 _Schema.setUseDatabase( true );
-                DatabaseInfo dbInfo = new DatabaseInfo();
-                _Schema.setDatabaseInformation(dbInfo);
+                DatabaseInfo dbInfo;
                 Element dbElem = _Document.getRootElement().getChild("database");
                 if( dbElem != null ) {
+                    dbInfo = new DatabaseInfo();
                     parseDBInfo(dbInfo, dbElem);
-                    _DatabaseConnection = new DBConnection(dbInfo.getSource());
+                    try {
+                        /// @TODO Shouldn't this be in the main panel?
+                        _DatabaseConnection = new DBConnection(dbInfo.getSource());
+                    }
+                    catch (DatabaseException e) {
+                        dbInfo = null;
+                        throw new DataFormatException("Could not open database.", e.getOriginal());
+                    }
                 }
+                else {
+                    dbInfo = null;
+                }
+                _Schema.setDatabaseInformation(dbInfo);
             }
         }
     }
@@ -350,7 +362,7 @@ public class CSXParser
         while( it3.hasNext() )
         {
             Element ref = (Element) it3.next();
-            String obj = (String)_Attributes.get( ref.getText() );
+            String obj = (String)_Objects.get( ref.getText() );
             if(obj != null) {
                 concept.addObject(obj);
             }

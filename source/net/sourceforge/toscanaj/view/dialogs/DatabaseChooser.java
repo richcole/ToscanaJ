@@ -1,11 +1,12 @@
 package net.sourceforge.toscanaj.view.dialogs;
 
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.model.DatabaseInfo;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-
-import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.controller.db.DBConnection;
 
 /**
  * This dialog asks the user for the information needed to connect to a
@@ -211,8 +212,14 @@ public class DatabaseChooser extends JDialog
      */
     private void fillTableList()
     {
-        _connection = new DBConnection( _dsnField.getText() );
-        _tableList.setListData( _connection.getTableNames() );
+        try {
+            _connection = new DBConnection( _dsnField.getText() );
+            _tableList.setListData( _connection.getTableNames() );
+        }
+        catch(DatabaseException e) {
+            e.printStackTrace();
+            /// @TODO give feedback
+        }
     }
 
     /**
@@ -221,9 +228,15 @@ public class DatabaseChooser extends JDialog
      */
     private void fillKeyList()
     {
-        _connection = new DBConnection( _dsnField.getText() );
-        _keyList.setListData( _connection.getColumnNames(
-                                    (String)_tableList.getSelectedValue() ) );
+        try {
+            _connection = new DBConnection( _dsnField.getText() );
+            _keyList.setListData( _connection.getColumnNames(
+                                        (String)_tableList.getSelectedValue() ) );
+        }
+        catch(DatabaseException e) {
+            e.printStackTrace();
+            /// @TODO give feedback
+        }
     }
 
     /**

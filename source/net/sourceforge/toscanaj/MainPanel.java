@@ -627,15 +627,15 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
             conceptualSchema = CSXParser.parse(schemaFile);
         }
         catch( FileNotFoundException e) {
-            ErrorDialog.showError(this, e, "File access error", "Couldn't access the file.");
+            ErrorDialog.showError(this, e, "File access error", e.getMessage());
             return;
         }
         catch( IOException e) {
-            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file.\nFile/XML error");
+            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n"+e.getMessage());
             return;
         }
         catch( DataFormatException e) {
-            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file.\nCSX error");
+            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n"+e.getMessage());
             return;
         }
 

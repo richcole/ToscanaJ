@@ -58,8 +58,7 @@ public class DBConnection
      * This is a convenience function, it calls the full initialisation
      * constructor with empty username and password.
      */
-    public DBConnection(String source)
-    {
+    public DBConnection(String source) throws DatabaseException {
         this( source, "", "" );
     }
 
@@ -69,13 +68,12 @@ public class DBConnection
      *
      * @TODO Throw exceptions instead of just printing them.
      */
-    public DBConnection( String source, String account,	String password) {
+    public DBConnection( String source, String account,	String password) throws DatabaseException {
         try {
             Class.forName(JDBC_ODBC_BRIDGE);
         }
         catch (ClassNotFoundException cnfe) {
-            System.err.println( "Could not locate JDBC Driver class: " +
-                                cnfe.getMessage());
+            throw new DatabaseException("Could not locate JDBC Driver class", cnfe);
         }
 
         dbURL = "jdbc:odbc:" + source;
@@ -85,8 +83,7 @@ public class DBConnection
             con = DriverManager.getConnection(dbURL, account, password);
         }
         catch (SQLException se) {
-            System.out.println("An error occured connecting to the DB: " +
-                               se.getMessage());
+            throw new DatabaseException("An error occured connecting to the database", se);
         }
         printLogMessage("Created new DB connection to " + dbURL);
     }
@@ -94,8 +91,7 @@ public class DBConnection
     /**
      * Execute a query and return the results.
      */
-    public ResultSet query(String statement)
-    {
+    public ResultSet query(String statement) throws DatabaseException {
         ResultSet result = null;
 
         // submit a query
@@ -106,8 +102,7 @@ public class DBConnection
             printLogMessage(System.currentTimeMillis() + ": done.");
         }
         catch( SQLException se ) {
-            System.err.println("An error occured while querying the DB: " +
-                       se.getMessage());
+            throw new DatabaseException("An error occured while querying the database.", se);
         }
 
         return result;
@@ -283,7 +278,7 @@ public class DBConnection
      * is printed to stdout with each column and each entry, so be cautious on
      * which kind of DB you use the function ;-)
      */
-    public static void main (String [] args) {
+    public static void main (String [] args) throws DatabaseException {
         if( args.length != 1 ) {
             System.err.println(
                         "Usage: DBConnection [ODBC database source name]" );

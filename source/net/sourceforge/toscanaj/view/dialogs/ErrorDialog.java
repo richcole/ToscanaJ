@@ -1,6 +1,8 @@
 package net.sourceforge.toscanaj.view.dialogs;
 
 import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.parser.DataFormatException;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -51,29 +53,34 @@ public class ErrorDialog {
      */
     private void showDetailedErrorMsg(JFrame frame, Exception e, String title, String errorMsg) {
         ///@TODO an interface is requird for all toscanaJ exceptions
+        Exception original = null;
         if( e instanceof ImageGenerationException) {
-            Exception original = ((ImageGenerationException)e).getOriginal();
-            if( original == null ) {
-                new ErrorDialog(frame, title, errorMsg);
-                return;
-            }
-            Object[] options = {"OK", "Details"};
-            int n = JOptionPane.showOptionDialog(frame,
-                                                errorMsg,
-                                                title,
-                                                JOptionPane.OK_CANCEL_OPTION,
-                                                JOptionPane.ERROR_MESSAGE,
-                                                null,
-                                                options,
-                                                options[0]);
-            if(n == 1) {
-                JOptionPane.showMessageDialog(frame,
-                                                original.getMessage(),
-                                                title,
-                                                JOptionPane.ERROR_MESSAGE);
-            }
-        } else {
+            original = ((ImageGenerationException)e).getOriginal();
+        }
+        else if( e instanceof DataFormatException) {
+            original = ((DataFormatException)e).getOriginal();
+        }
+        else if( e instanceof DatabaseException) {
+            original = ((DatabaseException)e).getOriginal();
+        }
+        if( original == null ) {
             new ErrorDialog(frame, title, errorMsg);
+            return;
+        }
+        Object[] options = {"OK", "Details"};
+        int n = JOptionPane.showOptionDialog(frame,
+                                            errorMsg,
+                                            title,
+                                            JOptionPane.OK_CANCEL_OPTION,
+                                            JOptionPane.ERROR_MESSAGE,
+                                            null,
+                                            options,
+                                            options[0]);
+        if(n == 1) {
+            JOptionPane.showMessageDialog(frame,
+                                            original.getMessage(),
+                                            title,
+                                            JOptionPane.ERROR_MESSAGE);
         }
     }
 
