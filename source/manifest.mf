@@ -1,0 +1,2 @@
+Main-Class: net/sourceforge/toscanaj/MainPanel
+Class-Path: libs/xerces.jar libs/jdom.jar libs/JimiProClasses.zip libs/batik-awt-util.jar libs/batik-dom.jar libs/batik-svggen.jar libs/batik-util.jar libs/batik-xml.jar
