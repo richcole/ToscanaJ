@@ -70,7 +70,7 @@ public class DiagramOrganiserDnDController implements
 		if( event.getComponent() == this.sourceList ) {
 			int itemDragged = sourceList.locationToIndex(event.getDragOrigin());
 			StringSelection transferable = new StringSelection((new Integer(itemDragged)).toString());
-			event.startDrag(DragSource.DefaultCopyDrop, transferable, this);
+			event.startDrag(null, transferable, this);
 			this.mode = ADD_DIAGRAM_MODE;
 		} else if ( event.getComponent() == this.destinationList ) {
 			int itemDragged = this.destinationList.locationToIndex(event.getDragOrigin());
@@ -78,7 +78,7 @@ public class DiagramOrganiserDnDController implements
 			if (!history.isInPast(itemDragged)) {
 			/// @todo add specific transferable and data flavor for this
 				StringSelection transferable = new StringSelection((new Integer(itemDragged)).toString());
-				newDiagramDragSource.startDrag(event, DragSource.DefaultMoveDrop, transferable, this);
+				newDiagramDragSource.startDrag(event, null, transferable, this);
 			}	
 			this.mode = HISTORY_REORDER_MODE; 
 		} else {
