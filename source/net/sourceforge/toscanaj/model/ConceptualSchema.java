@@ -113,6 +113,10 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
         if (description != null) {
             retVal.addContent(description.detach());
         }
+        if( this.conceptInterpreter instanceof XMLizable) {
+            XMLizable xmlConceptInterpreter = (XMLizable) this.conceptInterpreter;
+            retVal.addContent(xmlConceptInterpreter.toXML());
+        }
         if (databaseInfo != null) {
             retVal.addContent(databaseInfo.toXML());
         }

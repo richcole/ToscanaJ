@@ -29,7 +29,11 @@ public class TupleConceptInterpreter extends AbstractConceptInterperter
 	private final static String OBJECT_COLUMN_ELEMENT_NAME = "objectColumn"; 
 											
 	private int[] objectColumns;
-	
+
+    public TupleConceptInterpreter(int[] objectColumns) {
+        this.objectColumns = objectColumns;    
+    }	
+    
 	public TupleConceptInterpreter(Element elem) throws XMLSyntaxError {
 		readXML(elem);
 	}
