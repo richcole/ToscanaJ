@@ -49,6 +49,7 @@ public class NDimDiagramNode extends DiagramNode {
     	while (it.hasNext()) {
             Element coordElem = (Element) it.next();
             this.ndimVector[i] = Double.parseDouble(coordElem.getTextNormalize());
+            i++;
         }
     }
 
