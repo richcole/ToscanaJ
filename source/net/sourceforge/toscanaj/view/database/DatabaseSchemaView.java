@@ -45,7 +45,7 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
             super(name);
         }
 
-        void actionPerformed(ActionEvent event) {
+        public void actionPerformed(ActionEvent event) {
             int[] selectedColumns = columnsPanel.getSelectedIndices();
             for (int i = 0; i < selectedColumns.length; ++i) {
                 KeyTableInfo info = (KeyTableInfo)
@@ -262,6 +262,7 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
         add(splitPane);
 
         broker.subscribe(this, DatabaseSchemaChangedEvent.class, Object.class);
+        broker.subscribe(this, TableChangedEvent.class, Object.class);
     }
 
     class TableInfo {
