@@ -266,7 +266,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         if (rv != JFileChooser.APPROVE_OPTION) {
             return;
         }
-        System.out.println(openDialog.getSelectedFile().getAbsolutePath());
         importCernatoXML(openDialog.getSelectedFile());
     }
 
