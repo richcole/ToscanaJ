@@ -16,6 +16,7 @@ import net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
+import net.sourceforge.toscanaj.view.database.SchemeView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 
@@ -95,8 +96,9 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
                               ConceptualSchemaChangeEvent.class,
                               Object.class );
 
-        JPanel tableView = new JPanel();
-        tableView.setBackground(Color.black);
+        JPanel tableView = new SchemeView(this);
+//        JPanel tableView = new JPanel();
+//        tableView.setBackground(Color.black);
 
         JPanel scaleView = new JPanel();
         scaleView.setBackground(Color.green);
