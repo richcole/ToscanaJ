@@ -48,7 +48,7 @@ public class TextSource implements TupleSource {
     }
 
     public String getMenuName() {
-        return "Load form tab-delimited file...";
+        return "Load from tab-delimited file...";
     }
 
     public File getSelectedFile() {
