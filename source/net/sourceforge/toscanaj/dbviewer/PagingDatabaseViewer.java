@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.dbviewer;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,6 +38,11 @@ import java.util.Vector;
  * getting the table and object key information.
  */
 abstract public class PagingDatabaseViewer implements DatabaseViewer {
+	protected interface PageViewPanel {
+		void showItem(String keyValue);
+		Component getComponent() throws DatabaseViewerInitializationException;
+	}
+	
     private DatabaseViewerManager viewerManager;
 
     private class PagingDatabaseViewerDialog extends JDialog {
@@ -48,6 +54,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         private JButton navNextButton;
         private JButton navEndButton;
         private JLabel infoLabel;
+        private PageViewPanel viewPanel;
 
         protected void showView(String whereClause) {
             try {
@@ -66,6 +73,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
                 position = 0;
                 enableButtons();
                 showCurrentItem();
+                show();
             } catch (DatabaseException e) {
                 JOptionPane.showMessageDialog(this,
                         "Failed to query database:\n" + e.getMessage() + "\n" + e.getCause().getMessage(),
@@ -78,7 +86,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         public PagingDatabaseViewerDialog(Frame frame)
                 throws DatabaseViewerInitializationException {
             super(frame, "View Items", true);
-
+			this.setModal(false);
             this.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent e) {
                     closeDialog();
@@ -91,6 +99,9 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
                     closeDialog();
                 }
             });
+            
+            this.viewPanel = createPanel();
+            
             getRootPane().setDefaultButton(closeButton);
             navStartButton = new JButton("<<");
             navStartButton.addActionListener(new ActionListener() {
@@ -135,13 +146,13 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
 
             //Put everything together, using the content pane's BorderLayout.
             Container contentPane = getContentPane();
-            contentPane.add(getPanel(), BorderLayout.CENTER);
+            contentPane.add(this.viewPanel.getComponent(), BorderLayout.CENTER);
             contentPane.add(buttonPane, BorderLayout.SOUTH);
         }
 
 
         protected void closeDialog() {
-            ConfigurationManager.storePlacement("PagingDatabaseViewerDialog", dialog);
+            ConfigurationManager.storePlacement("PagingDatabaseViewerDialog", this);
             this.dispose();
         }
 
@@ -166,7 +177,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         }
 
         private void showCurrentItem() {
-            showItem(keyValues[position]);
+            this.viewPanel.showItem(keyValues[position]);
             infoLabel.setText((position + 1) + "/" + keyValues.length);
         }
 
@@ -183,11 +194,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         }
     }
 
-    protected abstract Component getPanel() throws DatabaseViewerInitializationException;
-
-    protected abstract void showItem(String keyValue);
-
-    protected PagingDatabaseViewerDialog dialog;
+    protected abstract PageViewPanel createPanel() throws DatabaseViewerInitializationException;
 
     protected DatabaseViewerManager getManager() {
         return this.viewerManager;
@@ -200,17 +207,18 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
     public void initialize(DatabaseViewerManager manager)
             throws DatabaseViewerInitializationException {
         this.viewerManager = manager;
-        this.dialog = new PagingDatabaseViewerDialog(DatabaseViewerManager.getParentWindow());
-        ConfigurationManager.restorePlacement("PagingDatabaseViewerDialog", dialog, new Rectangle(100, 100, 350, 300));
     }
 
     public void showView(String whereClause) {
-        if (this.dialog != null) {
-            this.dialog.showView(whereClause);
-            this.dialog.setVisible(true);
-        } else {
-            System.err.println("PagingDatabaseViewerDialog has to be initialize(..)d " +
-                    "before showView(..) is called.");
-        }
+		Frame parentWindow = DatabaseViewerManager.getParentWindow();
+		PagingDatabaseViewerDialog dialog;
+		try {
+			dialog =
+				new PagingDatabaseViewerDialog(parentWindow);
+			ConfigurationManager.restorePlacement("PagingDatabaseViewerDialog", dialog, new Rectangle(100, 100, 350, 300));
+			dialog.showView(whereClause);
+		} catch (DatabaseViewerInitializationException e) {
+			ErrorDialog.showError(parentWindow,e,"Viewer could not be initialized");
+		}
     }
 }

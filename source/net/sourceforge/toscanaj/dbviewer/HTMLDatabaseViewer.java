@@ -9,6 +9,8 @@ package net.sourceforge.toscanaj.dbviewer;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
@@ -48,6 +50,7 @@ import java.util.Vector;
  * attribute.
  */
 public class HTMLDatabaseViewer implements DatabaseViewer {
+	private DatabaseViewerManager manager;
     private class HTMLDatabaseViewDialog extends JDialog {
         private DatabaseViewerManager viewerManager;
 
@@ -70,9 +73,8 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
         public HTMLDatabaseViewDialog(Frame frame, DatabaseViewerManager viewerManager)
                 throws DatabaseViewerInitializationException {
             super(frame, "View Item", true);
-
             this.viewerManager = viewerManager;
-
+			this.setModal(false);
             this.template = viewerManager.getTemplate();
 
             if (template == null) {
@@ -210,24 +212,28 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
         }
     }
 
-    private HTMLDatabaseViewDialog dialog;
-
     public HTMLDatabaseViewer() {
         // initialization has to be done separately, so we can use the dynamic class loading mechanism
+        /// @todo this is not true, it could be done using the Contructor class from the reflection API
     }
 
     public void initialize(DatabaseViewerManager manager)
             throws DatabaseViewerInitializationException {
-        this.dialog = new HTMLDatabaseViewDialog(DatabaseViewerManager.getParentWindow(), manager);
-        ConfigurationManager.restorePlacement("HTMLDatabaseViewDialog", dialog, new Rectangle(100, 100, 350, 300));
+        /// @todo some of the initialization of repeat and field sections could be done here
+        this.manager = manager;
     }
 
     public void showView(String whereClause) {
-        if (this.dialog != null) {
-            this.dialog.showView(whereClause);
-        } else {
-            System.err.println("HTMLDatabaseViewDialog has to be initialize(..)d " +
-                    "before showDialog(..) is called.");
-        }
+		Frame parentWindow = DatabaseViewerManager.getParentWindow();
+		HTMLDatabaseViewDialog dialog;
+		try {
+			dialog =
+				new HTMLDatabaseViewDialog(parentWindow,
+					                       this.manager);
+			ConfigurationManager.restorePlacement("HTMLDatabaseViewDialog", dialog, new Rectangle(100, 100, 350, 300));
+			dialog.showView(whereClause);
+		} catch (DatabaseViewerInitializationException e) {
+			ErrorDialog.showError(parentWindow,e,"Viewer could not be initialized");
+		}
     }
 }

@@ -37,59 +37,66 @@ import java.util.Vector;
  * If multiple items have to be displayed, paging buttons will be used.
  */
 public class SimpleDatabaseViewer extends PagingDatabaseViewer {
-    private JTextArea textArea;
+	private class SimpleViewPanel implements PageViewPanel {
+	    private JTextArea textArea;
+	
+	    private List textFragments = new LinkedList();
+	
+	    private List fieldNames = new LinkedList();
+	
+	    public void showItem(String keyValue) {
+	        try {
+	            DatabaseViewerManager viewerManager = getManager();
+	            List results = viewerManager.getConnection().executeQuery(fieldNames,
+	                    viewerManager.getTableName(),
+	                    "WHERE " + viewerManager.getKeyName() + "='" + keyValue + "'");
+	            Vector fields = (Vector) results.get(0);
+	            Iterator itText = textFragments.iterator();
+	            Iterator itFields = fields.iterator();
+	            String output = "";
+	            while (itFields.hasNext()) { // we assume length(textFragements) = length(results) + 1
+	                String text = (String) itText.next();
+	                String result = (String) itFields.next();
+	                output += text + result;
+	            }
+	            output += (String) itText.next();
+	            this.textArea.setText(output);
+	        } catch (DatabaseException e) {
+	            this.textArea.setText("Failed to query database:\n" + e.getMessage() + "\n" + e.getCause().getMessage());
+	        }
+	    }
+	
+	    public Component getComponent() throws DatabaseViewerInitializationException {
+	        DatabaseViewerManager viewerManager = getManager();
+	        String openDelimiter = (String) viewerManager.getParameters().get("openDelimiter");
+	        if (openDelimiter == null) {
+	            throw new DatabaseViewerInitializationException("Open delimiter not defined");
+	        }
+	        String closeDelimiter = (String) viewerManager.getParameters().get("closeDelimiter");
+	        if (closeDelimiter == null) {
+	            throw new DatabaseViewerInitializationException("Close delimiter not defined");
+	        }
+	        String template = viewerManager.getTemplateString();
+	        if (template == null) {
+	            throw new DatabaseViewerInitializationException("No template found");
+	        }
+	        while (template.indexOf(openDelimiter) != -1) {
+	            textFragments.add(template.substring(0, template.indexOf(openDelimiter)));
+	            template = template.substring(template.indexOf(openDelimiter) + openDelimiter.length());
+	            fieldNames.add(template.substring(0, template.indexOf(closeDelimiter)));
+	            template = template.substring(template.indexOf(closeDelimiter) + closeDelimiter.length());
+	        }
+	        textFragments.add(template);
+	
+	        this.textArea = new JTextArea();
+	        this.textArea.setEditable(false);
+	        this.textArea.setBorder(BorderFactory.createBevelBorder(1));
+	        return this.textArea;
+	    }
+	}
 
-    private List textFragments = new LinkedList();
-
-    private List fieldNames = new LinkedList();
-
-    protected void showItem(String keyValue) {
-        try {
-            DatabaseViewerManager viewerManager = getManager();
-            List results = viewerManager.getConnection().executeQuery(fieldNames,
-                    viewerManager.getTableName(),
-                    "WHERE " + viewerManager.getKeyName() + "='" + keyValue + "'");
-            Vector fields = (Vector) results.get(0);
-            Iterator itText = textFragments.iterator();
-            Iterator itFields = fields.iterator();
-            String output = "";
-            while (itFields.hasNext()) { // we assume length(textFragements) = length(results) + 1
-                String text = (String) itText.next();
-                String result = (String) itFields.next();
-                output += text + result;
-            }
-            output += (String) itText.next();
-            this.textArea.setText(output);
-        } catch (DatabaseException e) {
-            this.textArea.setText("Failed to query database:\n" + e.getMessage() + "\n" + e.getCause().getMessage());
-        }
-    }
-
-    protected Component getPanel() throws DatabaseViewerInitializationException {
-        DatabaseViewerManager viewerManager = getManager();
-        String openDelimiter = (String) viewerManager.getParameters().get("openDelimiter");
-        if (openDelimiter == null) {
-            throw new DatabaseViewerInitializationException("Open delimiter not defined");
-        }
-        String closeDelimiter = (String) viewerManager.getParameters().get("closeDelimiter");
-        if (closeDelimiter == null) {
-            throw new DatabaseViewerInitializationException("Close delimiter not defined");
-        }
-        String template = viewerManager.getTemplateString();
-        if (template == null) {
-            throw new DatabaseViewerInitializationException("No template found");
-        }
-        while (template.indexOf(openDelimiter) != -1) {
-            textFragments.add(template.substring(0, template.indexOf(openDelimiter)));
-            template = template.substring(template.indexOf(openDelimiter) + openDelimiter.length());
-            fieldNames.add(template.substring(0, template.indexOf(closeDelimiter)));
-            template = template.substring(template.indexOf(closeDelimiter) + closeDelimiter.length());
-        }
-        textFragments.add(template);
-
-        this.textArea = new JTextArea();
-        this.textArea.setEditable(false);
-        this.textArea.setBorder(BorderFactory.createBevelBorder(1));
-        return this.textArea;
-    }
+	protected PageViewPanel createPanel()
+		throws DatabaseViewerInitializationException {
+		return new SimpleViewPanel();
+	}
 }

@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.dbviewer;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+
 import org.jdom.Element;
 
 import javax.swing.*;
@@ -24,117 +25,117 @@ import java.util.List;
 import java.util.Vector;
 
 public class BarChartDatabaseViewer extends PagingDatabaseViewer {
-    private JPanel barChartPanel;
-    private List columnDefSQL, columnDefDisplay, panels;
-    private List columnDefLineCol, columnDefMinCol, columnDefMaxCol;
+	private class BarChartPanel implements PageViewPanel {
+		private List columnDefSQL, columnDefDisplay, panels;
+		private List columnDefLineCol, columnDefMinCol, columnDefMaxCol;
 
-
-    protected Component getPanel() throws DatabaseViewerInitializationException {
-
-        columnDefSQL = new ArrayList();
-        columnDefDisplay = new ArrayList();
-        columnDefLineCol = new ArrayList();
-        columnDefMaxCol = new ArrayList();
-        columnDefMinCol = new ArrayList();
-
-        panels = new ArrayList();
-
-
-        DatabaseViewerManager viewerManager = getManager();
-        Element template = viewerManager.getTemplate();
-        List columnElements = template.getChildren("column");
-        for (Iterator iterator = columnElements.iterator(); iterator.hasNext();) {
-            Element columnElement = (Element) iterator.next();
-            if (columnElement.getAttributeValue("sqlname") == null) {
-                throw new DatabaseViewerInitializationException();
-            } else {
-                columnDefSQL.add(columnElement.getAttributeValue("sqlname"));
-            }
-            if (columnElement.getAttributeValue("displayname") == null) {
-                throw new DatabaseViewerInitializationException();
-            } else {
-                columnDefDisplay.add(columnElement.getAttributeValue("displayname"));
-            }
-            if (columnElement.getAttributeValue("linecolor") == null) {
-                columnDefLineCol.add(new Color(255, 255, 255));
-            } else {
-                try {
-                    columnDefLineCol.add(Color.decode(columnElement.getAttributeValue("linecolor")));
-                } catch (Exception e) {
-                    System.err.println("Invalid linecolor code for " + columnElement.getAttributeValue("displayname") + ". Using Default setting.");
-                    columnDefLineCol.add(new Color(255, 255, 255));
-                }
-            }
-            if (columnElement.getAttributeValue("maxcolor") == null) {
-                columnDefMaxCol.add(new Color(255, 0, 255));
-            } else {
-                try {
-                    columnDefMaxCol.add(Color.decode(columnElement.getAttributeValue("maxcolor")));
-                } catch (Exception e) {
-                    System.err.println("Invalid maxcolor code for " + columnElement.getAttributeValue("displayname") + ". Using Default setting.");
-                    columnDefMaxCol.add(new Color(255, 0, 255));
-                }
-            }
-            if (columnElement.getAttributeValue("mincolor") == null) {
-                columnDefMinCol.add(new Color(0, 255, 0));
-            } else {
-                try {
-                    columnDefMinCol.add(Color.decode(columnElement.getAttributeValue("mincolor")));
-                } catch (Exception e) {
-                    System.err.println("Invalid mincolor code for " + columnElement.getAttributeValue("displayname") + ". Using Default setting.");
-                    columnDefMinCol.add(new Color(0, 255, 0));
-                }
-            }
-        }
-
-        BarContainer tmpBC;
-
-        barChartPanel = new JPanel();
-        barChartPanel.setLayout(new BoxLayout(barChartPanel, BoxLayout.Y_AXIS));
-        for (int i = 0; i < columnDefSQL.size(); i++) {
-            tmpBC = new BarContainer();
-            tmpBC.setColors((Color) columnDefMinCol.get(i), (Color) columnDefMaxCol.get(i), (Color) columnDefLineCol.get(i));
-            panels.add(tmpBC);
-            barChartPanel.add(tmpBC);
-        }
-
-        return barChartPanel;
-    }
-
-    protected void showItem(String keyValue) {
-        DatabaseViewerManager viewerManager = getManager();
-        List tmpList;
-
-        String tmpS = "";
-        try {
-            for (int i = 0; i < columnDefSQL.size(); i++) {
-
-                tmpS = (String) columnDefSQL.get(i);
-                tmpList = (viewerManager.getConnection().executeQuery(
-                        "SELECT " + tmpS +
-                        " FROM " + viewerManager.getTableName() +
-                        " ORDER BY " + tmpS + ";"));
-
-                float min = Float.parseFloat((String) ((Vector) (tmpList.get(0))).elementAt(0));
-                float max = Float.parseFloat((String) ((Vector) (tmpList.get(tmpList.size() - 1))).elementAt(0));
-                ((BarContainer) panels.get(i)).setList(tmpList);
-                tmpList = (viewerManager.getConnection().executeQuery(
-                        "SELECT " + tmpS +
-                        " FROM " + viewerManager.getTableName() +
-                        " WHERE " + viewerManager.getKeyName() + " = '" + keyValue + "';"));
-
-                float cur = Float.parseFloat((String) ((Vector) (tmpList.get(0))).elementAt(0));
-                ((BarContainer) panels.get(i)).setInfo(cur, min, max, (String) columnDefDisplay.get(i));
-
-
-            }
-
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Could not query database", e);
-        }
-
-    }
-
+	    public Component getComponent() throws DatabaseViewerInitializationException {
+	
+	        columnDefSQL = new ArrayList();
+	        columnDefDisplay = new ArrayList();
+	        columnDefLineCol = new ArrayList();
+	        columnDefMaxCol = new ArrayList();
+	        columnDefMinCol = new ArrayList();
+	
+	        panels = new ArrayList();
+	
+	
+	        DatabaseViewerManager viewerManager = getManager();
+	        Element template = viewerManager.getTemplate();
+	        List columnElements = template.getChildren("column");
+	        for (Iterator iterator = columnElements.iterator(); iterator.hasNext();) {
+	            Element columnElement = (Element) iterator.next();
+	            if (columnElement.getAttributeValue("sqlname") == null) {
+	                throw new DatabaseViewerInitializationException();
+	            } else {
+	                columnDefSQL.add(columnElement.getAttributeValue("sqlname"));
+	            }
+	            if (columnElement.getAttributeValue("displayname") == null) {
+	                throw new DatabaseViewerInitializationException();
+	            } else {
+	                columnDefDisplay.add(columnElement.getAttributeValue("displayname"));
+	            }
+	            if (columnElement.getAttributeValue("linecolor") == null) {
+	                columnDefLineCol.add(new Color(255, 255, 255));
+	            } else {
+	                try {
+	                    columnDefLineCol.add(Color.decode(columnElement.getAttributeValue("linecolor")));
+	                } catch (Exception e) {
+	                    System.err.println("Invalid linecolor code for " + columnElement.getAttributeValue("displayname") + ". Using Default setting.");
+	                    columnDefLineCol.add(new Color(255, 255, 255));
+	                }
+	            }
+	            if (columnElement.getAttributeValue("maxcolor") == null) {
+	                columnDefMaxCol.add(new Color(255, 0, 255));
+	            } else {
+	                try {
+	                    columnDefMaxCol.add(Color.decode(columnElement.getAttributeValue("maxcolor")));
+	                } catch (Exception e) {
+	                    System.err.println("Invalid maxcolor code for " + columnElement.getAttributeValue("displayname") + ". Using Default setting.");
+	                    columnDefMaxCol.add(new Color(255, 0, 255));
+	                }
+	            }
+	            if (columnElement.getAttributeValue("mincolor") == null) {
+	                columnDefMinCol.add(new Color(0, 255, 0));
+	            } else {
+	                try {
+	                    columnDefMinCol.add(Color.decode(columnElement.getAttributeValue("mincolor")));
+	                } catch (Exception e) {
+	                    System.err.println("Invalid mincolor code for " + columnElement.getAttributeValue("displayname") + ". Using Default setting.");
+	                    columnDefMinCol.add(new Color(0, 255, 0));
+	                }
+	            }
+	        }
+	
+	        BarContainer tmpBC;
+	
+	        JPanel barChartPanel = new JPanel();
+	        barChartPanel.setLayout(new BoxLayout(barChartPanel, BoxLayout.Y_AXIS));
+	        for (int i = 0; i < columnDefSQL.size(); i++) {
+	            tmpBC = new BarContainer();
+	            tmpBC.setColors((Color) columnDefMinCol.get(i), (Color) columnDefMaxCol.get(i), (Color) columnDefLineCol.get(i));
+	            panels.add(tmpBC);
+	            barChartPanel.add(tmpBC);
+	        }
+	
+	        return barChartPanel;
+	    }
+	
+	    public void showItem(String keyValue) {
+			DatabaseViewerManager viewerManager = getManager();
+	        List tmpList;
+	
+	        String tmpS = "";
+	        try {
+	            for (int i = 0; i < columnDefSQL.size(); i++) {
+	
+	                tmpS = (String) columnDefSQL.get(i);
+	                tmpList = (viewerManager.getConnection().executeQuery(
+	                        "SELECT " + tmpS +
+	                        " FROM " + viewerManager.getTableName() +
+	                        " ORDER BY " + tmpS + ";"));
+	
+	                float min = Float.parseFloat((String) ((Vector) (tmpList.get(0))).elementAt(0));
+	                float max = Float.parseFloat((String) ((Vector) (tmpList.get(tmpList.size() - 1))).elementAt(0));
+	                ((BarContainer) panels.get(i)).setList(tmpList);
+	                tmpList = (viewerManager.getConnection().executeQuery(
+	                        "SELECT " + tmpS +
+	                        " FROM " + viewerManager.getTableName() +
+	                        " WHERE " + viewerManager.getKeyName() + " = '" + keyValue + "';"));
+	
+	                float cur = Float.parseFloat((String) ((Vector) (tmpList.get(0))).elementAt(0));
+	                ((BarContainer) panels.get(i)).setInfo(cur, min, max, (String) columnDefDisplay.get(i));
+	
+	
+	            }
+	
+	        } catch (DatabaseException e) {
+	            throw new RuntimeException("Could not query database", e);
+	        }
+	
+	    }
+	}
+	
     private class BarContainer extends JPanel {
         private JLabel minLabel;
         private JLabel maxLabel;
@@ -308,4 +309,9 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
             }
         }
     }
+
+	protected PageViewPanel createPanel()
+		throws DatabaseViewerInitializationException {
+		return new BarChartPanel();
+	}
 }

@@ -197,7 +197,7 @@ public class DatabaseViewerManager implements XMLizable {
                 insertXML(templateElement);
             }
         }
-        return this.templateElement;
+        return (Element) this.templateElement.clone();
     }
 
     public String getTemplateString() {
