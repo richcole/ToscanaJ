@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
-import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
@@ -17,13 +16,13 @@ import java.util.*;
 
 /**
  * Implements a concept whose objects are stored in a relational database.
+ *
+ * @todo the clauses can be replaced with just storing strings and giving the extent
+ *    as a set of the strings in the downset. This means the DatabaseConnectedConcept
+ *    is actually not really needed to be database connected, a generic concept
+ *    implementation would be sufficient.
  */
 public class DatabaseConnectedConcept extends AbstractConceptImplementation {
-    /**
-     * Stores the information on how to use the Database connected.
-     */
-    private DatabaseInfo dbInfo;
-
     /**
      * Stores the attributes as Java Objects.
      */
@@ -34,8 +33,6 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      *
      * This is only the part that comes from the current diagram, the rest is
      * stored in a separate list to avoid duplication.
-     *
-     * @see #filterClauses
      */
     private String objectClause = null;
 
@@ -45,8 +42,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * The constructor always needs the DB connection and the information how
      * to use it.
      */
-    public DatabaseConnectedConcept(DatabaseInfo dbInfo) {
-        this.dbInfo = dbInfo;
+    public DatabaseConnectedConcept() {
     }
 
     public DatabaseConnectedConcept(Element element) throws XMLSyntaxError {
@@ -83,13 +79,6 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             objectElem.addContent(objectClause);
             objectContingentElem.addContent(objectElem);
         }
-    }
-
-    /**
-     * Changes the information about the database connection.
-     */
-    public void setDatabase(DatabaseInfo dbInfo) {
-        this.dbInfo = dbInfo;
     }
 
     /**
