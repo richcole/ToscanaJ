@@ -80,7 +80,7 @@ public class TupelScaling {
         if(args.length == 3) {
             objectPos = Integer.parseInt(args[2]);
         } else {
-            objectPos = 1;
+            objectPos = 0;
         }
         TupelSet input = TupelParser.parseTabDelimitedTupels(new FileReader(new File(args[0])));
         ConceptualSchema result = scaleTupels(input, objectPos);
