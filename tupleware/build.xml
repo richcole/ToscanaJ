@@ -83,6 +83,7 @@
 				<include name="*.bat"/>
 				<include name="*.sh"/>
 				<include name="tupleware.prop"/>
+				<include name="examples/**"/>
 			</fileset>
 		</copy>
 		<fixcrlf srcDir="${dist.dir}" eol="crlf" includes="*.txt, *.bat, tupleware.prop"/>
