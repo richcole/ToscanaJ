@@ -3,8 +3,6 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
-import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
@@ -14,6 +12,9 @@ import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.tockit.context.model.BinaryRelationImplementation;
+import org.tockit.context.model.Context;
 
 
 

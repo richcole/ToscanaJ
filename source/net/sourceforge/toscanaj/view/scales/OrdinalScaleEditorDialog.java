@@ -10,11 +10,11 @@ package net.sourceforge.toscanaj.view.scales;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import org.tockit.context.model.Context;
 import org.tockit.swing.preferences.ExtendedPreferences;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
-import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 
 import java.awt.*;
@@ -197,5 +197,4 @@ public class OrdinalScaleEditorDialog extends JDialog {
     public Context createContext() {
         return this.scalePanel.createContext(this.getDiagramTitle());
     }
-
 }

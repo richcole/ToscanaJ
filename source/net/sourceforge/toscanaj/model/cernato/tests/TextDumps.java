@@ -8,8 +8,6 @@
 package net.sourceforge.toscanaj.model.cernato.tests;
 
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
-import net.sourceforge.toscanaj.model.context.BinaryRelation;
-import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -25,6 +23,9 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.types.ViewContext;
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
+
+import org.tockit.context.model.BinaryRelation;
+import org.tockit.context.model.Context;
 
 public class TextDumps {
     public static final void dump(ManyValuedContextImplementation context, PrintStream stream) {

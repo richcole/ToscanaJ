@@ -14,9 +14,10 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.tockit.context.model.BinaryRelation;
+import org.tockit.context.model.Context;
+
 import net.sourceforge.toscanaj.model.context.*;
-import net.sourceforge.toscanaj.model.context.BinaryRelation;
-import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.lattice.*;
 
 public class GantersAlgorithm implements LatticeGenerator {

@@ -11,6 +11,10 @@ package net.sourceforge.toscanaj.model.context;
 import java.util.Set;
 import java.util.Iterator;
 
+import org.tockit.context.model.BinaryRelation;
+import org.tockit.context.model.BinaryRelationImplementation;
+import org.tockit.context.model.Context;
+import org.tockit.context.model.ListsContext;
 import org.tockit.util.ListSet;
 import org.tockit.util.ListSetImplementation;
 

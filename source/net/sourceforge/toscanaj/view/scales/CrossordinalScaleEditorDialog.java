@@ -10,13 +10,13 @@ package net.sourceforge.toscanaj.view.scales;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import org.tockit.context.model.BinaryRelationImplementation;
+import org.tockit.context.model.Context;
 import org.tockit.swing.preferences.ExtendedPreferences;
 import org.tockit.util.ListSet;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
-import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
-import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;

@@ -10,10 +10,10 @@ package net.sourceforge.toscanaj.controller.fca;
 import java.util.Iterator;
 import java.util.List;
 
+import org.tockit.context.model.BinaryRelationImplementation;
+import org.tockit.context.model.Context;
 import org.tockit.util.ListSet;
 
-import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
-import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;

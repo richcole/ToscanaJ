@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import javax.swing.JFrame;
 
+import org.tockit.context.model.BinaryRelationImplementation;
 import org.tockit.events.EventBroker;
 
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
@@ -17,7 +18,6 @@ import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;

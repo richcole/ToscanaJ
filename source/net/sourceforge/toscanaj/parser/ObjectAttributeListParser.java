@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.parser;
 
-import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
@@ -15,6 +14,7 @@ import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import java.io.*;
 import java.util.Collection;
 
+import org.tockit.context.model.BinaryRelationImplementation;
 import org.tockit.util.StringTokenizer;
 
 /**

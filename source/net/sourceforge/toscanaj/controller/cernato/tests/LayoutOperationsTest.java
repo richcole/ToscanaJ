@@ -15,11 +15,12 @@ import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
 import net.sourceforge.toscanaj.model.cernato.tests.TestData;
-import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.ViewContext;
 
 import java.util.Vector;
+
+import org.tockit.context.model.Context;
 
 public class LayoutOperationsTest extends TestCase {
     final static Class THIS = LayoutOperationsTest.class;

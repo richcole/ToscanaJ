@@ -30,7 +30,6 @@ import net.sourceforge.toscanaj.gui.dialog.ExportStatisticalDataSettingsPanel;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
@@ -60,6 +59,7 @@ import net.sourceforge.toscanaj.view.scales.ScaleGenerator;
 
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.imagewriter.DiagramExportSettings;
+import org.tockit.context.model.Context;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;

@@ -10,7 +10,6 @@ package net.sourceforge.toscanaj.model.cernato.tests;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
@@ -19,6 +18,8 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.types.ViewContext;
 
 import java.util.Collection;
 import java.util.Iterator;
+
+import org.tockit.context.model.Context;
 
 public class ViewContextTest extends TestCase {
     final static Class THIS = ViewContextTest.class;

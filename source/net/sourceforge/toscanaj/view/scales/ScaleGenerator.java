@@ -7,9 +7,10 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
+import org.tockit.context.model.Context;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.context.Context;
 
 public interface ScaleGenerator {
     String getScaleName();

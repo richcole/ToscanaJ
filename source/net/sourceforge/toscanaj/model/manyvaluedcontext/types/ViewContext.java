@@ -11,8 +11,9 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import net.sourceforge.toscanaj.model.context.BinaryRelation;
-import net.sourceforge.toscanaj.model.context.Context;
+import org.tockit.context.model.BinaryRelation;
+import org.tockit.context.model.Context;
+
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;

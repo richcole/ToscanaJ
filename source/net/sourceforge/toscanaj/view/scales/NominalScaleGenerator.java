@@ -9,10 +9,11 @@ package net.sourceforge.toscanaj.view.scales;
 
 import java.awt.Frame;
 
+import org.tockit.context.model.Context;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.FCAElement;
-import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 

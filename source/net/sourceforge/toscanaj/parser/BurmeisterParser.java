@@ -7,13 +7,14 @@
  */
 package net.sourceforge.toscanaj.parser;
 
-import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 
 import java.io.*;
 import java.util.Collection;
+
+import org.tockit.context.model.BinaryRelationImplementation;
 
 public class BurmeisterParser {
     public static final String DEFAULT_NAME = "<unnamed>";

@@ -9,10 +9,11 @@ package net.sourceforge.toscanaj.controller.fca.tests;
 
 import java.util.Arrays;
 
+import org.tockit.context.model.BinaryRelationImplementation;
+
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.model.context.FCAElement;
-import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
