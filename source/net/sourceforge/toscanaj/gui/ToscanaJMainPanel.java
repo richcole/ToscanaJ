@@ -1002,6 +1002,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 		}
 		final GraphicFormat graphicFormat = this.diagramExportSettings.getGraphicFormat();
 		if(graphicFormat==null){}
+		final DiagramExportSettings exportSettings= this.diagramExportSettings;
 		final JFileChooser saveDialog =
 			new JFileChooser(this.lastImageExportFile) {
 			public void approveSelection() {
@@ -1017,20 +1018,41 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 					}	
 				}
 				if (selectedFile != null && selectedFile.exists()) {
-					//Ask the user if they are sure they want to overwrite the existing file
+					String warningMessage = "The image file '"	+ selectedFile.getName() + "' already exists.\nDo you want to overwrite the existing file?";
+					if(exportSettings.getSaveCommentsToFile()==true) {
+						File textFile = new File(selectedFile.getAbsoluteFile()+".txt");
+						if(textFile.exists()) {
+						warningMessage = "The files '"	+ selectedFile.getName() + "' and '" + textFile.getName()+ "' already exist.\nDo you want to overwrite the existing files?";
+						}
+					}
 					int response =
 						JOptionPane.showOptionDialog(
 							this,
-							"The file "
-								+ selectedFile.getName()
-								+ " already exists.\n"
-								+ "Do you want to overwrite the existing file?",
+							warningMessage,
 							"File Export Warning: File exists",
 							JOptionPane.YES_NO_OPTION,
 							JOptionPane.WARNING_MESSAGE,null,new Object[] {"Yes", "No"}, "No");
 					if (response != JOptionPane.YES_OPTION) {
 						return;
 					}
+				}
+				if(selectedFile!=null && !selectedFile.exists() && exportSettings.getSaveCommentsToFile()==true){
+					File textFile = new File(selectedFile.getAbsoluteFile()+".txt");
+					if(textFile.exists()) {
+						int response =
+							JOptionPane.showOptionDialog(
+								this,
+								"The text file '" + textFile.getName()
+								+ "' already exists.\n"
+								+"Do you want to overwrite the existing file?",
+								"File Export Warning: File exists",
+								JOptionPane.YES_NO_OPTION,
+								JOptionPane.WARNING_MESSAGE,null,new Object[] {"Yes", "No"}, "No");
+							if (response != JOptionPane.YES_OPTION) {
+								return;
+							}
+					}
+					
 				}
 				super.approveSelection();
 			}
@@ -1104,8 +1126,6 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 				this.diagramExportSettings,
 				selectedFile);
 				if(this.diagramExportSettings.getSaveCommentsToFile()==true){
-					/// @todo The text file might be overwritten without user interaction, check if it exists before overwriting
-					//write the textual description of the diagram view history to a text file
 					try{
 						PrintWriter out = new PrintWriter(new FileWriter(new File(selectedFile.getAbsolutePath()+".txt")));
 						out.println("The diagram(s) you have viewed for the resulting image: "+System.getProperty("line.separator")+selectedFile.getAbsolutePath());
@@ -1119,8 +1139,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 					}
 				}
 				if(this.diagramExportSettings.getSaveCommentToClipboard()==true){
-					//copy the history comments to the system clipboard
-					StringSelection comments = new StringSelection(DiagramController.getController().getDiagramHistory().getTextualDescription());
+					DateFormat dateFormatter = DateFormat.getDateTimeInstance();
+					String header ="The diagram(s) you have viewed for the resulting image:\n"
+					+selectedFile.getAbsolutePath()+"\n"
+					+"as at "+dateFormatter.format(new Date(System.currentTimeMillis()))+" is(are): \n";
+					StringSelection comments = new StringSelection(header+"\n"+DiagramController.getController().getDiagramHistory().getTextualDescription());
 					Clipboard systemClipboard = getToolkit().getSystemClipboard();
 					systemClipboard.setContents(comments,ToscanaJMainPanel.this);
 				}
@@ -1142,38 +1165,56 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 				new File(System.getProperty("user.dir"));
 		}
 		final GraphicFormat format = this.diagramExportSettings.getGraphicFormat();
+		final DiagramExportSettings exportSettings = this.diagramExportSettings;
 		final JFileChooser saveDialog =
 			new JFileChooser(this.lastImageExportFile) {
-			public void approveSelection() {
-				File selectedFile = getSelectedFile();
-				if(selectedFile.getName().indexOf('.') == -1) { // check for extension
-					// add default
-					String[] extensions = format.getExtensions();
-					selectedFile = new File(selectedFile.getAbsolutePath() + "."+extensions[0]);
-					setSelectedFile(selectedFile);
-				}
-				if (selectedFile != null && selectedFile.exists()) {
-					//Ask the user if they are sure they want to overwrite the existing file
-					int response =
-				JOptionPane.showOptionDialog(
-					this,
-					"The file "
-						+ selectedFile.getName()
-						+ " already exists.\n"
-						+ "Do you want to overwrite the existing file?",
-					"File Export Warning: File exists",
-					JOptionPane.YES_NO_OPTION,
-					JOptionPane.WARNING_MESSAGE,
-					null,
-					new Object[] { "Yes", "No" },
-					"No");
-					if (response != JOptionPane.YES_OPTION) {
-						return;
+				public void approveSelection() {
+					File selectedFile = getSelectedFile();
+					if(selectedFile.getName().indexOf('.') == -1) { // check for extension
+						// add default
+						String[] extensions = format.getExtensions();
+						selectedFile = new File(selectedFile.getAbsolutePath() + "."+extensions[0]);
+						setSelectedFile(selectedFile);
 					}
+					if (selectedFile != null && selectedFile.exists()) {
+						String warningMessage = "The image file '"	+ selectedFile.getName() + "' already exists.\nDo you want to overwrite the existing file?";
+						if(exportSettings.getSaveCommentsToFile()==true) {
+							File textFile = new File(selectedFile.getAbsoluteFile()+".txt");
+							if(textFile.exists()) {
+								warningMessage = "The files '"	+ selectedFile.getName() + "' and '" + textFile.getName()+ "' already exist.\nDo you want to overwrite the existing files?";
+							}
+						}
+						int response =
+							JOptionPane.showOptionDialog(
+							this,
+							warningMessage,
+							"File Export Warning: File exists",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.WARNING_MESSAGE,null,new Object[] {"Yes", "No"}, "No");
+						if (response != JOptionPane.YES_OPTION) {
+							return;
+						}
+					}
+					if(selectedFile!=null && !selectedFile.exists() && exportSettings.getSaveCommentsToFile()==true){
+						File textFile = new File(selectedFile.getAbsoluteFile()+".txt");
+						if(textFile.exists()) {
+							int response =
+								JOptionPane.showOptionDialog(
+								this,
+								"The text file '" + textFile.getName()
+								+ "' already exists.\n"
+								+"Do you want to overwrite the existing file?",
+								"File Export Warning: File exists",
+								JOptionPane.YES_NO_OPTION,
+								JOptionPane.WARNING_MESSAGE,null,new Object[] {"Yes", "No"}, "No");
+							if (response != JOptionPane.YES_OPTION) {
+								return;
+							}
+						}
+					}
+					super.approveSelection();
 				}
-				super.approveSelection();
-			}
-		};
+			};
 		GraphicFormat currentFormat = diagramExportSettings.getGraphicFormat();
 		ExtensionFileFilter manualFileFilter = new ExtensionFileFilter(currentFormat.getExtensions(),currentFormat.getName());
 		saveDialog.addChoosableFileFilter(manualFileFilter);
