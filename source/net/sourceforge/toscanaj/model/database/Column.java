@@ -22,13 +22,13 @@ public class Column implements XMLizable {
     public static final String COLUMN_NAME_ATTRIBUTE_NAME = "name";
     public static final String COLUMN_TYPE_ATTRIBUTE_NAME = "type";
 
-    public Column(String name, int type, net.sourceforge.toscanaj.model.database.Table table) {
+    public Column(String name, int type, Table table) {
         this.table = table;
         this.name = name;
         this.type = type;
     }
 
-    public Column(Element elem, net.sourceforge.toscanaj.model.database.Table table) throws XMLSyntaxError {
+    public Column(Element elem, Table table) throws XMLSyntaxError {
         this.table = table;
         readXML(elem);
     }
@@ -54,7 +54,7 @@ public class Column implements XMLizable {
         return type;
     }
 
-    public net.sourceforge.toscanaj.model.database.Table getTable() {
+    public Table getTable() {
         return table;
     }
 }
