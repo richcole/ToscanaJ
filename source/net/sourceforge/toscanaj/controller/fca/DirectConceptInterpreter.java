@@ -155,7 +155,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
             Object o = objectContingentIterator.next();
             retVal.add(o);
         }
-        nestObjects(retVal, context);
+        nestObjects(retVal, context, true);
         filterObjects(retVal, context);
         return retVal;
     }
@@ -211,7 +211,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
         }
     }
 
-    private void nestObjects(Vector retVal, ConceptInterpretationContext context) {
+    private void nestObjects(Vector retVal, ConceptInterpretationContext context, boolean contingentOnly) {
         Iterator mainIt = context.getNestingConcepts().iterator();
         while (mainIt.hasNext()) {
             Concept concept = (Concept) mainIt.next();
@@ -219,9 +219,14 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
             for (Iterator iterator = retVal.iterator(); iterator.hasNext();) {
                 Object o = iterator.next();
                 boolean found = false;
-                Iterator contingentIterator = concept.getObjectContingentIterator();
-                while (contingentIterator.hasNext()) {
-                    Object o2 = contingentIterator.next();
+                Iterator objectIterator;
+                if(contingentOnly) {
+                	objectIterator = concept.getObjectContingentIterator();
+                } else {
+                	objectIterator = concept.getExtentIterator();
+                }
+                while (objectIterator.hasNext()) {
+                    Object o2 = objectIterator.next();
                     if (o == o2) {
                         found = true;
                         break;
@@ -259,7 +264,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
             Object o = extentContingentIterator.next();
             retVal.add(o);
         }
-        nestObjects(retVal, context);
+        nestObjects(retVal, context, false);
         filterObjects(retVal, context);
         return retVal;
     }
