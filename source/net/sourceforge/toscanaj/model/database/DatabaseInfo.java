@@ -106,8 +106,8 @@ public class DatabaseInfo implements XMLizable {
             Element urlElem = new Element(URL_SOURCE_ELEMENT_NAME);
             urlElem.addContent(sourceURL);
             urlElem.setAttribute(DRIVER_CLASS_ATTRIBUTE_NAME, driverClass);
-            urlElem.setAttribute(USERNAME_ATTRIBUTE_NAME, userName);
-            urlElem.setAttribute(PASSWORD_ATTRIBUTE_NAME, password);
+            urlElem.setAttribute(USERNAME_ATTRIBUTE_NAME, getUserName());
+            urlElem.setAttribute(PASSWORD_ATTRIBUTE_NAME, getPassword());
             retVal.addContent(urlElem);
         }
         Element tableElem = new Element(TABLE_ELEMENT_NAME);
@@ -183,6 +183,9 @@ public class DatabaseInfo implements XMLizable {
     }
 
     public String getUserName() {
+    	if(this.userName == null) {
+    		return "";
+    	}
         return this.userName;
     }
 
@@ -191,6 +194,9 @@ public class DatabaseInfo implements XMLizable {
     }
 
     public String getPassword() {
+        if(this.password == null) {
+            return "";
+        }
         return this.password;
     }
 
