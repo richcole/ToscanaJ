@@ -23,9 +23,9 @@ import java.util.*;
 
 public abstract class NDimLayoutOperations {
     // constants for base vector calculation
-    private static final double BASE_SCALE = 100;
+    private static final double BASE_SCALE = 10;
     private static final double BASE_X_STRETCH = 2;
-    private static final double BASE_X_SHEAR = 0;
+    private static final double BASE_X_SHEAR = 0.3;
 
     public static final Diagram2D createDiagram(Lattice lattice, String title,
                                                 DimensionCreationStrategy dimensionStrategy) {
@@ -80,13 +80,12 @@ public abstract class NDimLayoutOperations {
         Vector base = new Vector();
         int n = dimensions.size();
         int i = n - 1;
-        double scale = BASE_SCALE / (Math.pow(2, n));
         for (Iterator iterator = dimensions.iterator(); iterator.hasNext();) {
             iterator.next();
-            double a = Math.pow(2, i);
-            double b = Math.pow(2, n - i - 1);
-            base.add(new Point2D.Double((a - b + BASE_X_SHEAR) * BASE_X_STRETCH * scale,
-                    (a + b) * scale));
+            double a = 1 << i;
+            double b = 1 << (n - i - 1);
+            base.add(new Point2D.Double((a - b + BASE_X_SHEAR) * BASE_X_STRETCH * BASE_SCALE,
+                    (a + b) * BASE_SCALE));
             i--;
         }
         return base;
