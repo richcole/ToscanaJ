@@ -1,11 +1,16 @@
 package net.sourceforge.toscanaj;
 
+import net.sourceforge.toscanaj.controller.fca.DiagramController;
+
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+
+import net.sourceforge.toscanaj.observer.ChangeObserver;
+
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
+
 import net.sourceforge.toscanaj.view.DiagramOrganiser;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.LabelView;
@@ -42,7 +47,7 @@ import javax.swing.JSplitPane;
  *  This class provides the main GUI panel with menus and a toolbar
  *  for ToscanaJ.
  */
-public class MainPanel extends JFrame implements ActionListener {
+public class MainPanel extends JFrame implements ActionListener, ChangeObserver {
 
     private JToolBar toolbar = null;
     private JMenuBar menubar = null;
@@ -52,7 +57,8 @@ public class MainPanel extends JFrame implements ActionListener {
     public static boolean debug = false;
 
     // buttons list
-    private JButton openButton     = null;
+    private JButton openButton = null;
+    private JButton backButton = null;
 
     // menu items list
     // FILE menu
@@ -62,13 +68,15 @@ public class MainPanel extends JFrame implements ActionListener {
     private JMenuItem exitMenuItem		= null;
 
     // DIAGRAM menu
+    private JMenuItem backMenuItem = null;
+
     private ButtonGroup documentsDisplayGroup = null;
-    private JRadioButtonMenuItem showAllMenuItem		= null;
-    private JRadioButtonMenuItem showExactMenuItem		= null;
+    private JRadioButtonMenuItem showAllMenuItem = null;
+    private JRadioButtonMenuItem showExactMenuItem = null;
 
     private ButtonGroup documentsFilterGroup = null;
-    private JRadioButtonMenuItem filterAllMenuItem		= null;
-    private JRadioButtonMenuItem filterExactMenuItem		= null;
+    private JRadioButtonMenuItem filterAllMenuItem = null;
+    private JRadioButtonMenuItem filterExactMenuItem = null;
 
     private ButtonGroup labelContentGroup = null;
     private JRadioButtonMenuItem numDocMenuItem = null;
@@ -77,11 +85,6 @@ public class MainPanel extends JFrame implements ActionListener {
     private JCheckBoxMenuItem percDistMenuItem = null;
 
     private int currentSelectedIndex;
-
-    // icon images
-    private static final String OPEN_ICON          = "open.gif";
-    private static final String CONTENTS_ICON      = "contents.gif";
-    private static final String CLEAR_ICON          = "clear.gif";
 
     /**
      * The main model member.
@@ -98,13 +101,10 @@ public class MainPanel extends JFrame implements ActionListener {
      */
     DiagramOrganiser diagramOrganiser;
 
-    // specify the location of icon images - this is platform safe
-    // because the String is converted into a URL so the "/" is OK for
-    // all platforms.
-    private static final String IMAGE_PATH         = "resource/icons/";
-
-    // flag to indicate if the save icon and menu options should be
-    // enabled
+    /**
+     * Flag to indicate if the save icon and menu options should be
+     * enabled
+     */
     public boolean fileIsOpen = false;
 
     /**
@@ -113,6 +113,8 @@ public class MainPanel extends JFrame implements ActionListener {
     public MainPanel() {
         super("ToscanaJ");
         buildPanel();
+        // listen to changes on DiagramController
+        DiagramController.getController().addObserver(this);
         // try to set Windows LnF
         try {
             javax.swing.UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
@@ -143,7 +145,7 @@ public class MainPanel extends JFrame implements ActionListener {
         buildMenuBar();
         setJMenuBar(menubar);
 
-        // buildToolBar();
+        buildToolBar();
 
         //Lay out the content pane.
         JPanel contentPane = new JPanel();
@@ -164,6 +166,7 @@ public class MainPanel extends JFrame implements ActionListener {
         diagramView.setMinimumSize(minimumSize);
         diagramOrganiser.setMinimumSize(minimumSize);
 
+        contentPane.add(this.toolbar, BorderLayout.NORTH);
         contentPane.add(splitPane, BorderLayout.CENTER);
 
         setContentPane( contentPane );
@@ -234,6 +237,11 @@ public class MainPanel extends JFrame implements ActionListener {
         diagrMenu.setMnemonic(KeyEvent.VK_D);
         menubar.add(diagrMenu);
 
+        this.backMenuItem = new JMenuItem("Go Back one Diagram");
+        this.backMenuItem.addActionListener(this);
+        this.backMenuItem.setEnabled(false);
+        diagrMenu.add(printSetupMenuItem);
+
         // menu radio buttons group:
         this.documentsDisplayGroup = new ButtonGroup();
 
@@ -296,18 +304,20 @@ public class MainPanel extends JFrame implements ActionListener {
 
 
     /**
-     *  build the ToolBar
+     *  Build the ToolBar.
      */
-
     private void buildToolBar() {
         toolbar = new JToolBar();
         toolbar.setFloatable(true);
 
-        // Open button
-        openButton = new JButton(new ImageIcon(IMAGE_PATH + OPEN_ICON));
-        openButton.setToolTipText("Open");
+        openButton = new JButton(" Open ");
         openButton.addActionListener(this);
         toolbar.add(openButton);
+
+        backButton = new JButton(" Back ");
+        backButton.addActionListener(this);
+        backButton.setEnabled(false);
+        toolbar.add(backButton);
     }
 
     /**
@@ -327,6 +337,18 @@ public class MainPanel extends JFrame implements ActionListener {
         this.numDocMenuItem.setEnabled (isOpen);
         this.listDocMenuItem.setEnabled (isOpen);
         this.percDistMenuItem.setEnabled (isOpen);
+
+        // toolbar
+    }
+
+    /**
+     * Callback for listening to changes on DiagramController.
+     *
+     * Updates the back button / menu entry.
+     */
+    public void update(Object source) {
+        this.backMenuItem.setEnabled(DiagramController.getController().undoIsPossible());
+        this.backButton.setEnabled(DiagramController.getController().undoIsPossible());
     }
 
     /**
@@ -354,17 +376,16 @@ public class MainPanel extends JFrame implements ActionListener {
             openSchema();
         }
         if (actionSource == printMenuItem) {
-            System.out.println("Action for menu item: Print "); // stub
+            /// @TODO
         }
         if (actionSource == printSetupMenuItem) {
-            System.out.println("Action for menu item: Print Setup "); // stub
+            /// @TODO
         }
         if (actionSource == exitMenuItem) {
-            System.out.println("Action for menu item: exit ");
             closeMainPanel();
         }
 
-        // menu DIAGRAM
+        // view options in Diagram menu
         if( (actionSource == this.showExactMenuItem) ||
             (actionSource == this.showAllMenuItem) ||
             (actionSource == this.numDocMenuItem) ||
@@ -380,6 +401,13 @@ public class MainPanel extends JFrame implements ActionListener {
         }
         if (actionSource == this.percDistMenuItem) {
             this.diagramView.setShowPercentage(this.percDistMenuItem.getState());
+        }
+
+        // the back button/menu entry
+        if( (actionSource == this.backButton) ||
+            (actionSource == this.backMenuItem) )
+        {
+            DiagramController.getController().back();
         }
     }
 

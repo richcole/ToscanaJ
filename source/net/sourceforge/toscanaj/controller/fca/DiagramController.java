@@ -228,6 +228,13 @@ public class DiagramController implements ChangeObservable {
     }
 
     /**
+     * Returns true if an undo step can be made.
+     */
+    public boolean undoIsPossible() {
+        return history.pastDiagrams.size() != 0;
+    }
+
+    /**
      * Sets if we filter on the extent or object contingent of concepts zoomed
      * into.
      *
@@ -319,6 +326,8 @@ public class DiagramController implements ChangeObservable {
      *
      * This is done by putting the outermost current one into the history and
      * getting a new one out of the list of future diagrams.
+     *
+     * @see back()
      */
     public void next(Concept zoomedConcept)
            throws NoSuchElementException
@@ -331,6 +340,27 @@ public class DiagramController implements ChangeObservable {
         history.currentDiagrams.remove(0);
         history.currentDiagrams.add(history.futureDiagrams.get(0));
         history.futureDiagrams.remove(0);
+        history.fireContentsChanged(0,history.getSize()-1);
+        notifyObservers();
+    }
+
+    /**
+     * Goes one step back in the history.
+     *
+     * This is the undo operation for next().
+     *
+     * @see next()
+     */
+    public void back() {
+        if(history.pastDiagrams.isEmpty()) {
+            throw new NoSuchElementException("No visited diagram left");
+        }
+        history.futureDiagrams.add(0,history.currentDiagrams.get(
+                                    history.currentDiagrams.size()-1));
+        history.currentDiagrams.remove(history.currentDiagrams.size()-1);
+        history.currentDiagrams.add(0,history.pastDiagrams.get(
+                                    history.pastDiagrams.size()-1));
+        history.pastDiagrams.remove(history.pastDiagrams.size()-1);
         history.fireContentsChanged(0,history.getSize()-1);
         notifyObservers();
     }

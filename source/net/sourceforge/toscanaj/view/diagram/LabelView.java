@@ -90,7 +90,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * The label information that should be drawn.
      */
-    private LabelInfo labelInfo;
+    protected LabelInfo labelInfo;
 
     /**
      * Store the diagram view that the label belongs to.

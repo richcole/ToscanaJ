@@ -36,6 +36,15 @@ public class ObjectLabelView extends LabelView {
     }
 
     /**
+     * Avoids drawing object labels for non-realised concepts.
+     */
+    public void draw(ToscanajGraphics2D graphics) {
+        if(this.labelInfo.getNode().getConcept().isRealised()) {
+            super.draw(graphics);
+        }
+    }
+
+    /**
      * Sets the default display type for new labels.
      */
     static public void setDefaultDisplayType(int type, boolean contingentOnly) {
