@@ -182,9 +182,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         // set up the menu for the MRU files
         recreateMruMenu();
         // if we have at least one MRU file try to open it
-        File schemaFile = new File((String) mruList.get(mruList.size()-1));
-        if(schemaFile.canRead()) {
-            openSchemaFile(schemaFile);
+        if(this.mruList.size() > 0) {
+            File schemaFile = new File((String) mruList.get(mruList.size()-1));
+            if(schemaFile.canRead()) {
+                openSchemaFile(schemaFile);
+            }
         }
         // restore the last image export position
         String lastImage = ConfigurationManager.fetchString("mainPanel","lastImageExport",null);
