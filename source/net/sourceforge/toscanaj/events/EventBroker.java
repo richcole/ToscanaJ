@@ -53,10 +53,36 @@ public class EventBroker implements BrokerEventListener {
     }
 
     private boolean implementsInterface(Class classType, Class interfaceType) {
+        Class curClass = classType;
+        while( curClass != null ) {
+            if( implementsInterfaceDirectly(curClass, interfaceType) ) {
+                return true;
+            }
+            curClass = curClass.getSuperclass();
+        }
+        return false;
+    }
+
+    private boolean implementsInterfaceDirectly(Class classType, Class interfaceType) {
         Class[] interfaces = classType.getInterfaces();
         for(int i = 0; i < interfaces.length; i++) {
             Class curInterface = interfaces[i];
-            if( curInterface.equals(interfaceType) ) {
+            if( extendsInterface(curInterface, interfaceType) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean extendsInterface(Class subInterface, Class superInterface) {
+        if( subInterface.equals(superInterface) ) {
+            return true;
+        }
+        // this gets the super interfaces if we have an interface
+        Class[] interfaces = subInterface.getInterfaces();
+        for(int i = 0; i < interfaces.length; i++) {
+            Class curInterface = interfaces[i];
+            if( extendsInterface(curInterface, superInterface) ) {
                 return true;
             }
         }
