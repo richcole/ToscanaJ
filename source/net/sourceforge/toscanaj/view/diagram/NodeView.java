@@ -125,7 +125,7 @@ public class NodeView extends CanvasItem {
     }
 
     /**
-     * Tells the filter controller to add the nodes concept to
+     * Implements CanvasItem.doubleClicked(Point2D) and starts a zooming operation.
      */
     public void doubleClicked(Point2D point) {
         DiagramController.getController().next(diagramNode.getConcept());
