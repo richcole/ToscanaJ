@@ -127,4 +127,8 @@ public class NestedDiagramNode extends DiagramNode {
             return bounds.getHeight() / 1.7;
         }
     }
+
+    public List getConceptNestingList() {
+        return innerDiagram.getNode(0).getConceptNestingList();
+    }
 }

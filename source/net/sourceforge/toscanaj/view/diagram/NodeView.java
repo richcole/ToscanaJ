@@ -206,12 +206,16 @@ public class NodeView extends CanvasItem {
         List ourConcepts = getDiagramNode().getConceptNestingList();
         Iterator it = selectedConcepts.iterator();
         Iterator it2 = ourConcepts.iterator();
-        for (int i = 0; i < selectedConcepts.size() - ourConcepts.size(); i++) {
-            it.next();
-        }
+        boolean onOurLevel = false;
         while (it.hasNext()) {
             Concept selectedConcept = (Concept) it.next();
             Concept ourConcept = (Concept) it2.next();
+            if( !onOurLevel && ourConcept != this.getDiagramNode().getConcept()) {
+                continue;
+            }
+            else {
+                onOurLevel = true;
+            }
             if (ourConcept == selectedConcept) {
                 if (this.selectionState == DiagramView.NOT_SELECTED) {
                     this.selectionState = DiagramView.SELECTED_DIRECTLY;
