@@ -8,16 +8,13 @@
 package org.tockit.tupelware.rdf.query;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.Iterator;
 import java.util.List;
 
 
 import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.n3.N3JenaReader;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFException;
 import com.hp.hpl.jena.rdf.model.RDFReader;
 import com.hp.hpl.jena.rdf.model.RDFReaderF;
 import com.hp.hpl.jena.rdf.model.Statement;
