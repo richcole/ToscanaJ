@@ -309,6 +309,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private void openSchemaFile(File schemaFile) {
         try {
             conceptualSchema = CSXParser.parse(eventBroker, schemaFile);
+			setTitle(schemaFile.getName().substring(0,((schemaFile.getName()).length()-4))+" - "+WINDOW_TITLE);
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(this, e, "Could not find file", e.getMessage());
             conceptualSchema = new ConceptualSchema(eventBroker);
