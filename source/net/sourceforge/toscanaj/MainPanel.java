@@ -27,7 +27,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import java.util.Vector;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -53,6 +55,11 @@ import javax.swing.KeyStroke;
  *  for ToscanaJ.
  */
 public class MainPanel extends JFrame implements ActionListener, ChangeObserver {
+    /**
+     * The maximum number of files in the most recently used files list.
+     */
+    static private final int MaxMruFiles = 6;
+
     /**
      * Our toolbar.
      */
@@ -81,10 +88,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
     // menu items list
     // FILE menu
-    private JMenuItem openMenuItem		= null;
-    private JMenuItem printMenuItem		= null;
-    private JMenuItem printSetupMenuItem= null;
-    private JMenuItem exitMenuItem		= null;
+    private JMenuItem openMenuItem = null;
+    private JMenuItem printMenuItem = null;
+    private JMenuItem printSetupMenuItem = null;
+    private JMenu mruMenu = null;
+    private JMenuItem exitMenuItem = null;
 
     // DIAGRAM menu
     private JMenuItem backMenuItem = null;
@@ -131,6 +139,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     private boolean fileIsOpen = false;
 
     /**
+     * Keeps a list of most recently files.
+     */
+    private List mruList = new LinkedList();
+
+    /**
      * The last setup for page format given by the user.
      */
     private PageFormat pageFormat = new PageFormat();
@@ -151,6 +164,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
             // we don't really care if it fails -- just print message on stderr
             System.err.println("Warning: could not set Windows Look and Feel");
         }
+        // restore the old MRU list
+        mruList = ConfigurationManager.fetchStringList("mainPanel", "mruFiles", MaxMruFiles);
     }
 
     /**
@@ -246,10 +261,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         // separator
         fileMenu.addSeparator();
 
-        // recent edited files should come here
-        JMenuItem dummyMenu = new JMenuItem("recent files here");
-        dummyMenu.setEnabled(false);
-        fileMenu.add(dummyMenu);
+        // recent edited files will be in this menu
+        mruMenu = new JMenu("Reopen");
+        mruMenu.setMnemonic(KeyEvent.VK_R);
+        mruMenu.setEnabled(false);
+        fileMenu.add(mruMenu);
 
         // separator
         fileMenu.addSeparator();
@@ -409,6 +425,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         // store current position
         ConfigurationManager.storePlacement("mainWindow",this);
         ConfigurationManager.storeInt("mainPanel","divider",splitPane.getDividerLocation());
+        // save the MRU list
+        ConfigurationManager.storeStringList("mainPanel","mruFiles",this.mruList);
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
         System.exit(0);
@@ -571,6 +589,35 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         // enable relevant buttons and menus
         fileIsOpen = true;
         resetButtons(fileIsOpen);
+
+        // update MRU list
+        if(!this.mruList.contains(schemaFile.getPath())) {
+            this.mruList.add(schemaFile.getPath());
+        }
+        if(this.mruList.size() > MaxMruFiles) {
+            this.mruList.remove(0);
+        }
+
+        // recreate MRU menu
+        this.mruMenu.removeAll();
+        Iterator it = mruList.iterator();
+        while(it.hasNext()) {
+            String cur = (String) it.next();
+            if(cur.equals(schemaFile.getPath())) {
+                // don't enlist the current file
+                continue;
+            }
+            JMenuItem mruItem = new JMenuItem(cur);
+            mruItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JMenuItem menuItem = (JMenuItem) e.getSource();
+                    openSchemaFile(new File(menuItem.getText()));
+                }
+            });
+            this.mruMenu.add(mruItem);
+        }
+        // we have now at least one file
+        this.mruMenu.setEnabled(this.mruList.size() > 1);
     }
 
     /**

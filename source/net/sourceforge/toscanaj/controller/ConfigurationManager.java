@@ -1,9 +1,14 @@
 package net.sourceforge.toscanaj.controller;
 
 import java.awt.Rectangle;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.JFrame;
@@ -104,5 +109,34 @@ public class ConfigurationManager {
         catch(NumberFormatException e) {
             return defaultValue;
         }
+    }
+
+    /**
+     * Stores a list of strings.
+     */
+    static public void storeStringList(String section, String key, List list) {
+        Iterator it = list.iterator();
+        int index = 1;
+        while(it.hasNext()) {
+            String cur = (String) it.next();
+            properties.setProperty(section + "-" + key + "-" + index, cur);
+        }
+    }
+
+    /**
+     * Retrieves a list of strings.
+     *
+     * The list will at most contains maxItems items, maybe less if less are
+     * found.
+     */
+    static public List fetchStringList(String section, String key, int maxItems) {
+        List retVal = new LinkedList();
+        for(int i = 1; i <= maxItems; i++) {
+            String cur = properties.getProperty(section + "-" + key + "-" + i);
+            if(cur != null) {
+                retVal.add(cur);
+            }
+        }
+        return retVal;
     }
 }
