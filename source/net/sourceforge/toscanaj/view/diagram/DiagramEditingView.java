@@ -130,7 +130,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         diagramView.setGrid(DEFAULT_GRID_SIZE,DEFAULT_GRID_SIZE);
         diagramView.setGridEnabled(false);
         new LabelDragEventHandler(canvasEventBroker);
-        new LabelClickEventHandler(canvasEventBroker);
+		new LabelClickEventHandler(canvasEventBroker);
 		diagramView.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
         JPanel toolPanel = new JPanel(new GridBagLayout());

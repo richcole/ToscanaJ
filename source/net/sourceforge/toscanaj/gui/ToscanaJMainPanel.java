@@ -291,6 +291,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		
 		new LabelClickEventHandler(diagramEventBroker);
         new LabelDragEventHandler(diagramEventBroker);
+		new LabelScrollEventHandler(diagramEventBroker);
 
 		Dimension minimumSize = new Dimension(50, 50);
 
