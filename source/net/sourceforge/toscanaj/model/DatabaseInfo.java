@@ -15,11 +15,16 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.net.URL;
+import java.net.MalformedURLException;
+
+import net.sourceforge.toscanaj.parser.DataFormatException;
 
 /**
  * This class contains information how to connect to a database.
  */
 public class DatabaseInfo implements XML_Serializable {
+    /// @todo yet another hack that should go away after ConceptInterpreter is done
+    static public URL baseURL;
     /**
      * The source where the database can be found.
      *
@@ -236,7 +241,11 @@ public class DatabaseInfo implements XML_Serializable {
         XML_Helper.checkName(DATABASE_CONNECTION_ELEMENT_NAME, elem);
         if (XML_Helper.contains(elem, EMBEDDED_SOURCE_ELEMENT_NAME)) {
             Element embedElem = elem.getChild(EMBEDDED_SOURCE_ELEMENT_NAME);
-            embeddedSQLPath=XML_Helper.getAttribute(embedElem,EMBEDDED_URL_ATTRIBUTE_NAME).getValue();
+            setEmbeddedSQLLocation(XML_Helper.getAttribute(embedElem,EMBEDDED_URL_ATTRIBUTE_NAME).getValue());
+            setUrl("jdbc:hsqldb:.");
+            setDriverClass("org.hsqldb.jdbcDriver");
+            setUserName("sa");
+            setPassword("");
         } else {
             Element urlElement=XML_Helper.mustbe(URL_SOURCE_ELEMENT_NAME,elem);
             sourceURL=urlElement.getText();
@@ -326,9 +335,17 @@ public class DatabaseInfo implements XML_Serializable {
         return this.objectKey;
     }
 
-    public void setEmbeddedSQLLocation(URL resolvedLocation, String relativePath) {
-        this.embeddedSQLLocation = resolvedLocation;
+    public void setEmbeddedSQLLocation(String relativePath) {
+        this.embeddedSQLLocation = resolveLocation(relativePath);
         this.embeddedSQLPath = relativePath;
+    }
+
+    private URL resolveLocation(String relativePath) {
+        try {
+            return new URL(baseURL, relativePath);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Could not create URL for database: " + relativePath);
+        }
     }
 
     public URL getEmbeddedSQLLocation() {

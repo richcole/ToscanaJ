@@ -8,6 +8,7 @@ package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.model.XML_Serializable;
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.model.XML_Helper;
 
 import java.awt.geom.Point2D;
 
@@ -24,6 +25,8 @@ public class DiagramLine implements XML_Serializable {
      */
     private DiagramNode fromNode;
 
+    private Diagram2D diagram;
+
     /**
      * Holds the ending node in the Diagram the line belongs to.
      */
@@ -35,12 +38,14 @@ public class DiagramLine implements XML_Serializable {
     /**
      * Initialises a line between the given nodes.
      */
-    public DiagramLine(DiagramNode fromNode, DiagramNode toNode) {
+    public DiagramLine(DiagramNode fromNode, DiagramNode toNode, Diagram2D diagram) {
         this.fromNode = fromNode;
         this.toNode = toNode;
+        this.diagram = diagram;
     }
 
-    public DiagramLine(Element element) throws XML_SyntaxError {
+    public DiagramLine(Element element, Diagram2D diagram) throws XML_SyntaxError {
+        this.diagram = diagram;
         readXML(element);
     }
 
@@ -52,7 +57,11 @@ public class DiagramLine implements XML_Serializable {
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {
-        throw new XML_SyntaxError("Not yet implemented");
+        XML_Helper.checkName(DIAGRAM_LINE_ELEMENT_NAME, elem);
+        String fromId=XML_Helper.getAttribute(elem, FROM_NODE_ATTRIBUTE_NAME).getValue();
+        String toId=XML_Helper.getAttribute(elem, TO_NODE_ATTRIBUTE_NAME).getValue();
+        fromNode = diagram.getNode(fromId);
+        toNode = diagram.getNode(toId);
     }
 
     /**

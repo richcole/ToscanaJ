@@ -98,8 +98,7 @@ public class CSXParser {
      */
     public static ConceptualSchema parse(
             EventBroker eventBroker,
-            File csxFile,
-            DatabaseConnection databaseConnection)
+            File csxFile)
             throws FileNotFoundException, IOException, DataFormatException, Exception {
         // open stream on file
         FileInputStream in;
@@ -114,6 +113,9 @@ public class CSXParser {
                 new DOMBuilder("org.jdom.adapters.XercesDOMAdapter");
         _Document = builder.build(w3cdoc);
 
+        _BaseURL = csxFile.toURL();
+        DatabaseInfo.baseURL = _BaseURL;
+
         Element element=_Document.getRootElement();
         if(element.getName().equals("conceptualSchema")){
             if(element.getAttributeValue("version").equals("TJ0.6")){
@@ -124,12 +126,10 @@ public class CSXParser {
         // create data structure
         _Schema = new ConceptualSchema(eventBroker);
 
-        _BaseURL = csxFile.toURL();
-
         // parse the different sections
         parseDescription();
-        parseContext(databaseConnection);
-        parseDiagrams(databaseConnection);
+        parseContext();
+        parseDiagrams();
 
         eventBroker.processEvent(new ConceptualSchemaLoadedEvent(CSXParser.class, _Schema, csxFile));
 
@@ -150,7 +150,7 @@ public class CSXParser {
     /**
      * Parses the database section of the file.
      */
-    private static void parseDatabaseInformation(Element contextElem, DatabaseConnection databaseConnection)
+    private static void parseDatabaseInformation(Element contextElem)
             throws DataFormatException {
         // check if database should be used and fetch the data if needed
         Element dbElem = contextElem.getChild("databaseConnection");
@@ -166,33 +166,33 @@ public class CSXParser {
         }
         Element viewsElem = dbElem.getChild("views");
         if (viewsElem != null) {
-            parseDatabaseObjectViewerSetups(viewsElem, databaseConnection);
-            parseDatabaseObjectListViewerSetups(viewsElem, databaseConnection);
+            parseDatabaseObjectViewerSetups(viewsElem);
+            parseDatabaseObjectListViewerSetups(viewsElem);
         }
     }
 
-    private static void parseDatabaseObjectViewerSetups(Element viewsElem, DatabaseConnection databaseConnection)
+    private static void parseDatabaseObjectViewerSetups(Element viewsElem)
             throws DataFormatException {
         List viewerElems = viewsElem.getChildren("objectView");
         Iterator it = viewerElems.iterator();
         while (it.hasNext()) {
             Element viewerElem = (Element) it.next();
             try {
-                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), databaseConnection, _BaseURL);
+                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection(), _BaseURL);
             } catch (DatabaseViewerInitializationException e) {
                 throw new DataFormatException("A database viewer could not be initialized.", e);
             }
         }
     }
 
-    private static void parseDatabaseObjectListViewerSetups(Element viewsElem, DatabaseConnection databaseConnection)
+    private static void parseDatabaseObjectListViewerSetups(Element viewsElem)
             throws DataFormatException {
         List viewerElems = viewsElem.getChildren("objectListView");
         Iterator it = viewerElems.iterator();
         while (it.hasNext()) {
             Element viewerElem = (Element) it.next();
             try {
-                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), databaseConnection, _BaseURL);
+                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection(), _BaseURL);
             } catch (DatabaseViewerInitializationException e) {
                 throw new DataFormatException("A database viewer could not be initialized.", e);
             }
@@ -202,7 +202,7 @@ public class CSXParser {
     /**
      * Parses the context in the file.
      */
-    private static void parseContext(DatabaseConnection databaseConnection)
+    private static void parseContext()
             throws DataFormatException {
         Element contextElem = _Document.getRootElement().getChild("context");
         if (contextElem == null) {
@@ -210,7 +210,7 @@ public class CSXParser {
         }
 
         // parse the database connection if given
-        parseDatabaseInformation(contextElem, databaseConnection);
+        parseDatabaseInformation(contextElem);
 
         // build hashtable for objects
         List elements = contextElem.getChildren("object");
@@ -249,7 +249,7 @@ public class CSXParser {
     /**
      * Parses the diagrams in the file.
      */
-    private static void parseDiagrams(DatabaseConnection databaseConnection) throws DataFormatException {
+    private static void parseDiagrams() throws DataFormatException {
         // find and store diagrams
         List elements = _Document.getRootElement().getChildren("diagram");
         Iterator it = elements.iterator();
@@ -288,7 +288,7 @@ public class CSXParser {
                 }
 
                 // create the concept
-                Concept concept = parseDBConcept(conceptElem, databaseConnection);
+                Concept concept = parseDBConcept(conceptElem);
 
                 // parse the label layout information if needed
                 LabelInfo objLabel = new LabelInfo();
@@ -354,11 +354,10 @@ public class CSXParser {
      * Creates a concept for DB access from the information in the given
      * XML element.
      */
-    private static Concept parseDBConcept(Element conceptElem, DatabaseConnection databaseConnection) {
+    private static Concept parseDBConcept(Element conceptElem) {
         // create the concept
         DatabaseConnectedConcept concept =
-                new DatabaseConnectedConcept(_Schema.getDatabaseInfo(),
-                        databaseConnection);
+                new DatabaseConnectedConcept(_Schema.getDatabaseInfo());
 
         // get the object contingent
         Element contElem = conceptElem.getChild("objectContingent");
@@ -467,14 +466,12 @@ public class CSXParser {
         String username;
         String password;
         String embeddedDBlocation;
-        URL embeddedDB;
         if (urlElem != null) {
             url = urlElem.getText();
             driver = urlElem.getAttributeValue("driver");
             username = urlElem.getAttributeValue("user");
             password = urlElem.getAttributeValue("password");
             embeddedDBlocation = null;
-            embeddedDB = null;
         } else {
             DatabaseInfo tmpInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
             url = tmpInfo.getURL();
@@ -482,14 +479,6 @@ public class CSXParser {
             username = tmpInfo.getUserName();
             password = tmpInfo.getPassword();
             embeddedDBlocation = embedElem.getAttributeValue("url");
-            embeddedDB = null;
-            if (embeddedDBlocation != null) {
-                try {
-                    embeddedDB = new URL(_BaseURL, embeddedDBlocation);
-                } catch (MalformedURLException e) {
-                    throw new DataFormatException("Could not create URL for database: " + embeddedDBlocation);
-                }
-            }
         }
 
         dbInfo.setUrl(url);
@@ -505,7 +494,7 @@ public class CSXParser {
         dbInfo.setDriverClass(driver);
         dbInfo.setUserName(username);
         dbInfo.setPassword(password);
-        dbInfo.setEmbeddedSQLLocation(embeddedDB, embeddedDBlocation);
+        dbInfo.setEmbeddedSQLLocation(embeddedDBlocation);
 
         // let's try to find the query
         Element elem = dbElement.getChild("table");

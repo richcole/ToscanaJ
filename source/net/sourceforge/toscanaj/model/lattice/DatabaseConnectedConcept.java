@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.model.XML_Helper;
 
 import java.util.*;
 
@@ -20,11 +21,6 @@ import org.jdom.Element;
  * Implements a concept whose objects are stored in a relational database.
  */
 public class DatabaseConnectedConcept extends AbstractConceptImplementation {
-    /**
-     * Stores the database connection we use for querying the objects.
-     */
-    private DatabaseConnection connection;
-
     /**
      * Stores the information on how to use the Database connected.
      */
@@ -71,14 +67,38 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * The constructor always needs the DB connection and the information how
      * to use it.
      */
-    public DatabaseConnectedConcept(DatabaseInfo dbInfo, DatabaseConnection connection) {
+    public DatabaseConnectedConcept(DatabaseInfo dbInfo) {
         this.dbInfo = dbInfo;
-        this.connection = connection;
     }
 
     public DatabaseConnectedConcept(Element element) throws XML_SyntaxError{
-           super(element);
+           readXML(element);
     }
+
+
+    /// @todo this is DB specific, but it should be changed to be more generic
+    public void readXML(Element elem) throws XML_SyntaxError {
+        XML_Helper.checkName(CONCEPT_ELEMENT_NAME, elem);
+        Element objectContingentElem = XML_Helper.mustbe(OBJECT_CONTINGENT_ELEMENT_NAME, elem);
+        List objects = objectContingentElem.getChildren(OBJECT_ELEMENT_NAME);
+        if(objects.size() > 1) {
+            throw new XML_SyntaxError("Only one object clause allowed in this version");
+        }
+        if(objects.size() == 1) {
+            Element objElem = (Element) objects.get(0);
+            this.objectClause = objElem.getText();
+        }
+        else {
+            this.objectClause = null;
+        }
+        Element attributeContingentElem = XML_Helper.mustbe(ATTRIBUTE_CONTINGENT_ELEMENT_NAME, elem);
+        List attributes = attributeContingentElem.getChildren(ATTRIBUTE_ELEMENT_NAME);
+        for (Iterator iterator = attributes.iterator(); iterator.hasNext();) {
+            Element attrElem = (Element) iterator.next();
+            addAttribute(new Attribute(attrElem.getText(),null));
+        }
+    }
+
 
     protected void fillObjectContingentElement(Element objectContingentElem) {
         if (objectClause != null) {
@@ -91,9 +111,8 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     /**
      * Changes the information about the database connection.
      */
-    public void setDatabase(DatabaseInfo dbInfo, DatabaseConnection connection) {
+    public void setDatabase(DatabaseInfo dbInfo) {
         this.dbInfo = dbInfo;
-        this.connection = connection;
     }
 
     /**
@@ -140,7 +159,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             } else {
                 // we don't know the answer yet, ask DB
                 try {
-                    this.numObjects = this.connection.queryNumber(calculateContingentQuery(), 1);
+                    this.numObjects = DatabaseConnection.getConnection().queryNumber(calculateContingentQuery(), 1);
                 } catch (DatabaseException e) {
                     /// @TODO Find something useful to do here.
                     if (e.getOriginal() != null) {
@@ -187,7 +206,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             objects = new HashSet();
             if (this.objectClause != null) {
                 try {
-                    objects.addAll(this.connection.queryColumn(calculateContingentQuery(), 1));
+                    objects.addAll(DatabaseConnection.getConnection().queryColumn(calculateContingentQuery(), 1));
                 } catch (DatabaseException e) {
                     /// @TODO Find something useful to do here.
                     if (e.getOriginal() != null) {
@@ -223,7 +242,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             String whereClause = constructWhereClause(contingentOnly);
             if (whereClause != null) {
                 try {
-                    retVal = this.connection.executeQuery(dbQuery, whereClause);
+                    retVal = DatabaseConnection.getConnection().executeQuery(dbQuery, whereClause);
                 } catch (DatabaseException e) {
                     handleDBException(e);
                 }
@@ -294,7 +313,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * The other concept is assumed to be a DatabaseConnectedConcept.
      */
     public Concept filterByExtent(Concept other) {
-        DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo, this.connection);
+        DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo);
         retVal.attributeContingent.addAll(this.attributeContingent);
         if (other == null) {
             retVal.setObjectClause(this.objectClause);
@@ -333,7 +352,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * Implements Concept.filterByContingent(Concept).
      */
     public Concept filterByContingent(Concept other) {
-        DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo, this.connection);
+        DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo);
         retVal.attributeContingent.addAll(this.attributeContingent);
         if (other == null) {
             retVal.setObjectClause(this.objectClause);
@@ -354,7 +373,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * Implements Concept.getCollapsedConcept().
      */
     public Concept getCollapsedConcept() {
-        DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo, this.connection);
+        DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo);
         retVal.attributeContingent.addAll(this.attributeContingent);
         String clause = "(";
         boolean first = true;

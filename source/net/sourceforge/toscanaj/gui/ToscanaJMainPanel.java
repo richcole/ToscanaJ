@@ -87,11 +87,6 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
     private JSplitPane splitPane = null;
 
     /**
-     * The database connection
-     */
-    private DatabaseConnection databaseConnection;
-
-    /**
      * Stores the divider position when the diagram organizer is hidden.
      */
     private int dividerPosition = 0;
@@ -180,7 +175,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 
         broker = new EventBroker();
         conceptualSchema = new ConceptualSchema(broker);
-        databaseConnection = new DatabaseConnection(broker);
+        DatabaseConnection.initialize(broker);
 
         // register all image writers we want to support
         net.sourceforge.toscanaj.canvas.imagewriter.BatikImageWriter.initialize();
@@ -249,7 +244,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         contentPane.setLayout(new BorderLayout());
 
         DiagramController controller = DiagramController.getController();
-        diagramView = new DiagramView(controller.getDefaultInterpreter(databaseConnection));
+        diagramView = new DiagramView(controller.getDefaultInterpreter(DatabaseConnection.getConnection()));
         diagramView.getController().getEventBroker().subscribe(
                 new FilterOperationEventListener(controller),
                 CanvasItemActivatedEvent.class,
@@ -657,9 +652,9 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
 
-        if (databaseConnection.isConnected()) {
+        if (DatabaseConnection.getConnection().isConnected()) {
             try {
-                databaseConnection.disconnect();
+                DatabaseConnection.getConnection().disconnect();
             } catch (DatabaseException e) {
                 ErrorDialog.showError(this, e, "Closing database error", "Some error closing the old database:\n" + e.getMessage());
                 e.printStackTrace();
@@ -752,9 +747,9 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 
         DatabaseViewerManager.resetRegistry();
         Query.clearQueries();
-        if (databaseConnection.isConnected()) {
+        if (DatabaseConnection.getConnection().isConnected()) {
             try {
-                databaseConnection.disconnect();
+                DatabaseConnection.getConnection().disconnect();
             } catch (DatabaseException e) {
                 ErrorDialog.showError(this, e, "Closing database error", "Some error closing the old database:\n" + e.getMessage());
                 e.printStackTrace();
@@ -763,11 +758,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         }
 
         try {
-            conceptualSchema = CSXParser.parse(broker, schemaFile, databaseConnection);
-            databaseConnection.connect(conceptualSchema.getDatabaseInfo());
+            conceptualSchema = CSXParser.parse(broker, schemaFile);
+            DatabaseConnection.getConnection().connect(conceptualSchema.getDatabaseInfo());
             URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
             if (location != null) {
-                databaseConnection.executeScript(location);
+                DatabaseConnection.getConnection().executeScript(location);
             }
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(this, e, "File access error", e.getMessage());
@@ -780,6 +775,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
             return;
         } catch (DatabaseException e) {
             ErrorDialog.showError(this, e, "Error initializing database connection", "Error report:\n" + e.getMessage());
+            e.printStackTrace();
             return;
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n" + e.getMessage());

@@ -54,9 +54,9 @@ public class DataDump {
         // parse input
         ConceptualSchema schema = null;
         EventBroker broker = new EventBroker();
-        DatabaseConnection databaseConnection = new DatabaseConnection(broker);
+        DatabaseConnection.initialize(broker);
         try {
-            schema = CSXParser.parse(new EventBroker(), file, databaseConnection);
+            schema = CSXParser.parse(new EventBroker(), file);
         } catch (DataFormatException e) {
             System.err.println("Could not parse input.");
             System.err.println("- " + e.getMessage());
@@ -75,8 +75,7 @@ public class DataDump {
         /// @todo don't generate multiple connections, instead send the same connection object.
         if (filterClause != null) {
             try {
-                filterConcept = new DatabaseConnectedConcept(schema.getDatabaseInfo(),
-                        new DatabaseConnection(broker, schema.getDatabaseInfo().getURL(), "", "", ""));
+                filterConcept = new DatabaseConnectedConcept(schema.getDatabaseInfo());
             } catch (Exception e) {
                 System.err.println("Couldn't create filter for database");
                 System.exit(4);

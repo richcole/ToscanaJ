@@ -27,7 +27,7 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
     /**
      * List of LabelObserver implementations currently observing the instance.
      */
-    private Vector labelObservers = null;
+    private Vector labelObservers = new Vector();
 
     /**
      * The node the label belongs to.
@@ -95,7 +95,6 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
         this.backgroundColor = backColor;
         this.textColor = textColor;
         this.textAlignment = alignment;
-        labelObservers = new Vector();
     }
 
     /**

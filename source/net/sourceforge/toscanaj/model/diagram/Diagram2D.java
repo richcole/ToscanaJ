@@ -48,6 +48,8 @@ public interface Diagram2D extends XML_Serializable {
      */
     DiagramNode getNode(int nodeNumber);
 
+    DiagramNode getNode(String identifier);
+
     /**
      * Returns the coordinates of a starting point of a line.
      *

@@ -40,6 +40,8 @@ public class DatabaseConnection implements BrokerEventListener {
     private Connection jdbcConnection = null;
     private EventBroker broker;
 
+    static private DatabaseConnection singleton = null;
+
     /**
      * If set to something else than null we will print log entries into this
      * stream.
@@ -64,6 +66,18 @@ public class DatabaseConnection implements BrokerEventListener {
             }
         }
         logger = result;
+    }
+
+    static public void initialize(EventBroker eventBroker) {
+        singleton = new DatabaseConnection(eventBroker);
+    }
+
+    static public DatabaseConnection getConnection() {
+        return singleton;
+    }
+
+    static public void setConnection(DatabaseConnection connection) {
+        singleton = connection;
     }
 
     /**

@@ -41,8 +41,8 @@ public class DatabaseConnectedConceptTest extends ConceptTest {
 
     protected Concept makeConceptWithEmptyContingentAndExtent() {
         try {
-            DatabaseConnectedConcept databaseConnectedConcept = new DatabaseConnectedConcept(new DatabaseInfo(),
-                    new MockDBConnection());
+            DatabaseConnection.setConnection(new MockDBConnection());
+            DatabaseConnectedConcept databaseConnectedConcept = new DatabaseConnectedConcept(new DatabaseInfo());
             databaseConnectedConcept.setObjectClause("clause");
             //should be set, otherwise query will no be executed
             return databaseConnectedConcept;

@@ -16,6 +16,7 @@ import java.util.List;
 
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
 import net.sourceforge.toscanaj.model.XML_Helper;
+import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 
 /**
  * This class is an abstraction of all diagram related information.
@@ -92,7 +93,24 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         List lineElems = elem.getChildren(DiagramLine.DIAGRAM_LINE_ELEMENT_NAME);
         for (Iterator iterator = lineElems.iterator(); iterator.hasNext();) {
             Element diagramLine = (Element) iterator.next();
-            lines.add(new DiagramLine(diagramLine));
+            DiagramLine line = new DiagramLine(diagramLine, this);
+            lines.add(line);
+            DiagramNode from = line.getFromNode();
+            DiagramNode to = line.getToNode();
+
+            // add direct neighbours to concepts
+            AbstractConceptImplementation concept1 =
+                    (AbstractConceptImplementation) from.getConcept();
+            AbstractConceptImplementation concept2 =
+                    (AbstractConceptImplementation) to.getConcept();
+            concept1.addSubConcept(concept2);
+            concept2.addSuperConcept(concept1);
+        }
+
+        // build transitive closures for each concept
+        for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
+            DiagramNode node = (DiagramNode) iterator.next();
+            ((AbstractConceptImplementation) node.getConcept()).buildClosures();
         }
     }
 
@@ -170,6 +188,19 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         return (DiagramNode) this.nodes.get(nodeNumber);
     }
 
+    public DiagramNode getNode(String identifier) {
+        if (!coordinateSystemChecked) {
+            checkCoordinateSystem();
+        }
+        for (int i = 0; i < nodes.size(); i++) {
+            DiagramNode node = (DiagramNode) nodes.get(i);
+            if(node.getIdentifier().equals(identifier)) {
+                return node;
+            }
+        }
+        throw new RuntimeException("No diagram node with id '" + identifier + "' found.");
+    }
+
     /**
      * Implements Diagram2D.getLine(int).
      */
@@ -210,7 +241,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      * Adds a line to the diagram (at the end of the list).
      */
     public void addLine(DiagramNode from, DiagramNode to) {
-        this.lines.add(new DiagramLine(from, to));
+        this.lines.add(new DiagramLine(from, to, this));
     }
 
     /**

@@ -7,18 +7,22 @@
 package net.sourceforge.toscanaj.model;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import org.jdom.Element;
 import util.CollectionFactory;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.net.URL;
 
 /**
  * This is the main interface for the data structures.
@@ -80,6 +84,7 @@ public class ConceptualSchema implements XML_Serializable, DiagramCollection {
     public ConceptualSchema(EventBroker eventBroker, Element element) throws XML_SyntaxError {
         this.eventBroker = eventBroker;
         this.dbScheme = new DatabaseSchema(eventBroker);
+        reset();
         readXML(element);
         eventBroker.processEvent(new NewConceptualSchemaEvent(this, this));
     }
@@ -112,9 +117,14 @@ public class ConceptualSchema implements XML_Serializable, DiagramCollection {
         List diagramElems = elem.getChildren(Diagram2D.DIAGRAM_ELEMENT_NAME);
         for (Iterator iterator = diagramElems.iterator(); iterator.hasNext();) {
             Element element = (Element) iterator.next();
-            diagrams.add(new SimpleLineDiagram(element));
+            SimpleLineDiagram diagram = new SimpleLineDiagram(element);
+            diagrams.add(diagram);
+            for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
+                DiagramNode node = (DiagramNode) diagram.getNode(i);
+                DatabaseConnectedConcept concept = (DatabaseConnectedConcept) node.getConcept();
+                concept.setDatabase(databaseInfo);
+            }
         }
-
     }
 
 

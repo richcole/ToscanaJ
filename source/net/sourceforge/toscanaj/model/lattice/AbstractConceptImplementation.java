@@ -11,6 +11,7 @@ import org.jdom.Element;
 import java.util.*;
 
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.model.XML_Helper;
 
 /**
  * This implements some shortcuts for implementing concepts.
@@ -234,6 +235,12 @@ public abstract class AbstractConceptImplementation implements Concept {
         fillObjectContingentElement(objectContingentElem);
         Element attributeContingentElem = new Element(ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
         retVal.addContent(attributeContingentElem);
+        fillAttributeContingentElement(attributeContingentElem);
+        return retVal;
+    }
+
+    /** @todo we lack the descriptions here */
+    protected void fillAttributeContingentElement(Element attributeContingentElem) {
         Iterator attrIt = getAttributeContingentIterator();
         while (attrIt.hasNext()) {
             Object o = (Object) attrIt.next();
@@ -241,7 +248,6 @@ public abstract class AbstractConceptImplementation implements Concept {
             attribElem.addContent(o.toString());
             attributeContingentElem.addContent(attribElem);
         }
-        return retVal;
     }
 
     protected void fillObjectContingentElement(Element objectContingentElem) {
@@ -252,10 +258,6 @@ public abstract class AbstractConceptImplementation implements Concept {
             objectElem.addContent(o.toString());
             objectContingentElem.addContent(objectElem);
         }
-    }
-
-    public void readXML(Element elem) throws XML_SyntaxError {
-        throw new XML_SyntaxError("Not yet implemented.");
     }
 
     /**
