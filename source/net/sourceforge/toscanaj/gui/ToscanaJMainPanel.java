@@ -69,6 +69,8 @@ import java.util.ListIterator;
  * @todo store view settings (contingent/extent labels/gradient) in session management
  */
 public class ToscanaJMainPanel extends JFrame implements ChangeObserver, ClipboardOwner {
+    private ItemMovementManipulator legendMoveManipulator;
+
     private static final String WINDOW_TITLE = "ToscanaJ";
 
     private static final String CONFIGURATION_SECTION_NAME = "ToscanaJMainPanel";
@@ -631,7 +633,10 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             final CombinedGradient redGreenGradient = new CombinedGradient(new LinearGradient(new Color(180,0,0), Color.WHITE), 1);
             redGreenGradient.addGradientPart(new LinearGradient(Color.WHITE, new Color(0,130,0)), 1);
 			final SignificanceLegend legendItem = new SignificanceLegend(new Font("sans-serif",Font.PLAIN, 12),new Point2D.Double(0,0),redGreenGradient);
-			new ItemMovementManipulator(diagramView, SignificanceLegend.class, diagramView.getController().getEventBroker());
+			if(this.legendMoveManipulator == null) {
+				this.legendMoveManipulator = 
+					new ItemMovementManipulator(diagramView, SignificanceLegend.class, diagramView.getController().getEventBroker());
+			}
             final JCheckBoxMenuItem showOrthogonalityMenuItem = new JCheckBoxMenuItem("Analyze orthogonality");
             showOrthogonalityMenuItem.addActionListener(new ActionListener() {
                 private IntervalType lastIntervalType; 
