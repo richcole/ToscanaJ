@@ -442,6 +442,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         newMenuItem.addActionListener(newAction);
         fileMenu.add(newMenuItem);
 
+        // @todo check why this code doesn't use openSchema(File)
         LoadConceptualSchemaActivity loadSchemaActivity =
             new LoadConceptualSchemaActivity(eventBroker);
         loadSchemaActivity.setTestOpenOkActivity(testSchemaSavedActivity);
@@ -1052,6 +1053,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private void openSchemaFile(File schemaFile) {
         try {
             conceptualSchema = CSXParser.parse(eventBroker, schemaFile);
+            rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
+            colHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
+            tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
             setTitle(
                 schemaFile.getName().substring(
                     0,
