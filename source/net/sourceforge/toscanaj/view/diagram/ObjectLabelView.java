@@ -149,8 +149,4 @@ public class ObjectLabelView extends LabelView {
     protected boolean highlightedInFilter() {
         return false;
     }
-
-    protected boolean hideIfUnselected() {
-        return true;
-    }
 }

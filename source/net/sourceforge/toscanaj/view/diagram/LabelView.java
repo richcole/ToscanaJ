@@ -193,10 +193,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Br
             return;
         }
 
-        if (hideIfUnselected() && (nodeView.getSelectionState() == DiagramView.NOT_SELECTED)) {
-            return;
-        }
-
         // remember some settings to restore them later
         Paint oldPaint = graphics.getPaint();
 
@@ -419,9 +415,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Br
         if (this.rect == null) {
             return false;
         }
-        if (hideIfUnselected() && (nodeView.getSelectionState() == DiagramView.NOT_SELECTED)) {
-            return false;
-        }
         return this.rect.contains(point);
     }
 
@@ -544,10 +537,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Br
     abstract protected boolean highlightedInIdeal();
 
     abstract protected boolean highlightedInFilter();
-
-    protected boolean hideIfUnselected() {
-        return false;
-    }
 
     abstract protected int getNumberOfEntries();
 
