@@ -19,14 +19,14 @@ import java.net.URL;
 import java.net.MalformedURLException;
 
 import net.sourceforge.toscanaj.parser.DataFormatException;
-import net.sourceforge.toscanaj.model.XML_Serializable;
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
-import net.sourceforge.toscanaj.model.XML_Helper;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 
 /**
  * This class contains information how to connect to a database.
  */
-public class DatabaseInfo implements XML_Serializable {
+public class DatabaseInfo implements XMLizable {
     /// @todo yet another hack that should go away after ConceptInterpreter is done
     static public URL baseURL;
     /**
@@ -96,7 +96,7 @@ public class DatabaseInfo implements XML_Serializable {
     public DatabaseInfo() {
     }
 
-    public DatabaseInfo(Element element) throws XML_SyntaxError {
+    public DatabaseInfo(Element element) throws XMLSyntaxError {
         readXML(element);
     }
 
@@ -123,24 +123,24 @@ public class DatabaseInfo implements XML_Serializable {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XML_SyntaxError {
-        XML_Helper.checkName(DATABASE_CONNECTION_ELEMENT_NAME, elem);
-        if (XML_Helper.contains(elem, EMBEDDED_SOURCE_ELEMENT_NAME)) {
+    public void readXML(Element elem) throws XMLSyntaxError {
+        XMLHelper.checkName(DATABASE_CONNECTION_ELEMENT_NAME, elem);
+        if (XMLHelper.contains(elem, EMBEDDED_SOURCE_ELEMENT_NAME)) {
             Element embedElem = elem.getChild(EMBEDDED_SOURCE_ELEMENT_NAME);
-            setEmbeddedSQLLocation(XML_Helper.getAttribute(embedElem,EMBEDDED_URL_ATTRIBUTE_NAME).getValue());
+            setEmbeddedSQLLocation(XMLHelper.getAttribute(embedElem,EMBEDDED_URL_ATTRIBUTE_NAME).getValue());
             setUrl("jdbc:hsqldb:.");
             setDriverClass("org.hsqldb.jdbcDriver");
             setUserName("sa");
             setPassword("");
         } else {
-            Element urlElement=XML_Helper.mustbe(URL_SOURCE_ELEMENT_NAME,elem);
+            Element urlElement=XMLHelper.mustbe(URL_SOURCE_ELEMENT_NAME,elem);
             sourceURL=urlElement.getText();
-            driverClass=XML_Helper.getAttribute(urlElement, DRIVER_CLASS_ATTRIBUTE_NAME).getValue();
-            userName=XML_Helper.getAttribute(urlElement, USERNAME_ATTRIBUTE_NAME).getValue();
-            password=XML_Helper.getAttribute(urlElement, PASSWORD_ATTRIBUTE_NAME).getValue();;
+            driverClass=XMLHelper.getAttribute(urlElement, DRIVER_CLASS_ATTRIBUTE_NAME).getValue();
+            userName=XMLHelper.getAttribute(urlElement, USERNAME_ATTRIBUTE_NAME).getValue();
+            password=XMLHelper.getAttribute(urlElement, PASSWORD_ATTRIBUTE_NAME).getValue();;
         }
-        table=XML_Helper.mustbe(TABLE_ELEMENT_NAME, elem).getText();
-        objectKey= XML_Helper.mustbe(OBJECT_KEY_ELEMENT_NAME,elem).getText();
+        table=XMLHelper.mustbe(TABLE_ELEMENT_NAME, elem).getText();
+        objectKey= XMLHelper.mustbe(OBJECT_KEY_ELEMENT_NAME,elem).getText();
     }
 
     /**

@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.gui.action;
 
-import net.sourceforge.toscanaj.model.XML_Reader;
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLReader;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.gui.activity.FileActivity;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 

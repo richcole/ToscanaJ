@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.model.lattice;
 
 import net.sourceforge.toscanaj.model.database.Query;
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 import java.util.List;
 import java.util.Iterator;
@@ -26,7 +26,7 @@ public class DummyConcept extends AbstractConceptImplementation {
         this(CollectionFactory.createDefaultList());
     }
 
-    public void readXML(Element elem) throws XML_SyntaxError {
+    public void readXML(Element elem) throws XMLSyntaxError {
     }
 
     List attributeContigent;

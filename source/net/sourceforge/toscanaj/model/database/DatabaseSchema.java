@@ -9,6 +9,9 @@ package net.sourceforge.toscanaj.model.database;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.util.STD_Iterator;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
@@ -24,7 +27,7 @@ import java.sql.Types;
 
 import org.jdom.Element;
 
-public class DatabaseSchema implements XML_Serializable, BrokerEventListener {
+public class DatabaseSchema implements XMLizable, BrokerEventListener {
 
     EventBroker broker;
     List tables;
@@ -37,7 +40,7 @@ public class DatabaseSchema implements XML_Serializable, BrokerEventListener {
         this.broker.subscribe(this, DatabaseModifiedEvent.class, Object.class);
     }
 
-    public DatabaseSchema(EventBroker broker, Element elem) throws XML_SyntaxError {
+    public DatabaseSchema(EventBroker broker, Element elem) throws XMLSyntaxError {
         this(broker);
         readXML(elem);
     }
@@ -51,8 +54,8 @@ public class DatabaseSchema implements XML_Serializable, BrokerEventListener {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XML_SyntaxError {
-        XML_Helper.checkName(DATABASE_SCHEMA_ELEMENT_NAME, elem);
+    public void readXML(Element elem) throws XMLSyntaxError {
+        XMLHelper.checkName(DATABASE_SCHEMA_ELEMENT_NAME, elem);
         List tableElems = elem.getChildren(Table.TABLE_ELEMENT_NAME);
         for (Iterator iterator = tableElems.iterator(); iterator.hasNext();) {
             Element element = (Element) iterator.next();

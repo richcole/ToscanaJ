@@ -15,8 +15,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
-import net.sourceforge.toscanaj.model.XML_Helper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 
 /**
@@ -61,7 +61,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     public SimpleLineDiagram() {
     }
 
-    public SimpleLineDiagram(Element element) throws XML_SyntaxError {
+    public SimpleLineDiagram(Element element) throws XMLSyntaxError {
         readXML(element);
     }
 
@@ -82,9 +82,9 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XML_SyntaxError {
-        XML_Helper.checkName(DIAGRAM_ELEMENT_NAME, elem);
-        title=XML_Helper.getAttribute(elem, TITLE_ATTRIBUTE_NAME).getValue();
+    public void readXML(Element elem) throws XMLSyntaxError {
+        XMLHelper.checkName(DIAGRAM_ELEMENT_NAME, elem);
+        title=XMLHelper.getAttribute(elem, TITLE_ATTRIBUTE_NAME).getValue();
         description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
         List nodeElems = elem.getChildren(DiagramNode.NODE_ELEMENT_NAME);
         for (Iterator iterator = nodeElems.iterator(); iterator.hasNext();) {

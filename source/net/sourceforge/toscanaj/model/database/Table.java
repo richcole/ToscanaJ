@@ -15,12 +15,12 @@ import java.util.Iterator;
 
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.events.TableChangedEvent;
-import net.sourceforge.toscanaj.model.XML_Serializable;
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
-import net.sourceforge.toscanaj.model.XML_Helper;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import org.jdom.Element;
 
-public class Table implements XML_Serializable {
+public class Table implements XMLizable {
 
     private String name;
 
@@ -36,7 +36,7 @@ public class Table implements XML_Serializable {
         this.name = name;
     }
 
-    public Table(EventBroker broker, Element elem) throws XML_SyntaxError {
+    public Table(EventBroker broker, Element elem) throws XMLSyntaxError {
         this(broker, "");
         readXML(elem);
     }
@@ -54,9 +54,9 @@ public class Table implements XML_Serializable {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XML_SyntaxError {
-        XML_Helper.checkName(TABLE_ELEMENT_NAME, elem);
-        name = XML_Helper.getAttribute(elem, TABLE_NAME_ATTRIBUTE_NAME).getValue();
+    public void readXML(Element elem) throws XMLSyntaxError {
+        XMLHelper.checkName(TABLE_ELEMENT_NAME, elem);
+        name = XMLHelper.getAttribute(elem, TABLE_NAME_ATTRIBUTE_NAME).getValue();
         List columnElems=elem.getChildren(Column.COLUMN_ELEMENT_NAME);
         for (Iterator iterator = columnElems.iterator(); iterator.hasNext();) {
             Element element = (Element) iterator.next();

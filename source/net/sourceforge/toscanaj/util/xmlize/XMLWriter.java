@@ -1,13 +1,12 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model;
+package net.sourceforge.toscanaj.util.xmlize;
 
-import  net.sourceforge.toscanaj.model.XML_Serializable;
 import  java.lang.Exception;
 import  java.io.FileInputStream;
 import java.io.File;
@@ -21,12 +20,12 @@ import org.jdom.adapters.DOMAdapter;
 import org.jdom.input.DOMBuilder;
 
 /**
- * This class provides a mechanism to read an XML_Serializable object from a
+ * This class provides a mechanism to read an XMLizable object from a
  * filename.
  */
-public class XML_Writer
+public class XMLWriter
 {
-    public static void write(File file, XML_Serializable object)
+    public static void write(File file, XMLizable object)
             throws Exception
     {
         // open stream on file

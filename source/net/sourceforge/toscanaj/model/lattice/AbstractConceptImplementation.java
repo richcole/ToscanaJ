@@ -11,8 +11,8 @@ import org.jdom.Element;
 
 import java.util.*;
 
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
-import net.sourceforge.toscanaj.model.XML_Helper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 
 /**
  * This implements some shortcuts for implementing concepts.
@@ -225,7 +225,7 @@ public abstract class AbstractConceptImplementation implements Concept {
         this.ideal.add(this);
     }
 
-    public AbstractConceptImplementation(Element element) throws XML_SyntaxError {
+    public AbstractConceptImplementation(Element element) throws XMLSyntaxError {
         readXML(element);
     }
 

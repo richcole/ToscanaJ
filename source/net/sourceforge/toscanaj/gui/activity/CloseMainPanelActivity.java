@@ -9,8 +9,8 @@ package net.sourceforge.toscanaj.gui.activity;
 
 import net.sourceforge.toscanaj.gui.AnacondaJMainPanel;
 import net.sourceforge.toscanaj.gui.MainPanel;
-import net.sourceforge.toscanaj.model.XML_Reader;
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLReader;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 import java.awt.event.ActionEvent;
 

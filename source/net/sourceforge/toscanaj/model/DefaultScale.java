@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.model;
 
 import concept.context.Context;
 import org.jdom.Element;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 public class DefaultScale implements Scale {
     private Context context = new Context(0,0);
@@ -17,6 +18,6 @@ public class DefaultScale implements Scale {
         return new Element("Scale");
     }
 
-    public void readXML(Element elem) throws XML_SyntaxError {
+    public void readXML(Element elem) throws XMLSyntaxError {
     }
 }

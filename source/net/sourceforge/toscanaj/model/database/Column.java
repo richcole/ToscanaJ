@@ -11,11 +11,11 @@ import org.jdom.*;
 
 import java.sql.Types;
 
-import net.sourceforge.toscanaj.model.XML_Serializable;
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
-import net.sourceforge.toscanaj.model.XML_Helper;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 
-public class Column implements XML_Serializable {
+public class Column implements XMLizable {
 
     private String name;
     private int type;
@@ -31,7 +31,7 @@ public class Column implements XML_Serializable {
         this.type = type;
     }
 
-    public Column(Element elem, net.sourceforge.toscanaj.model.database.Table table) throws XML_SyntaxError {
+    public Column(Element elem, net.sourceforge.toscanaj.model.database.Table table) throws XMLSyntaxError {
         this.table = table;
         readXML(elem);
     }
@@ -43,10 +43,10 @@ public class Column implements XML_Serializable {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XML_SyntaxError {
-        XML_Helper.checkName(COLUMN_ELEMENT_NAME, elem);
-        name = XML_Helper.getAttribute(elem, COLUMN_NAME_ATTRIBUTE_NAME).getValue();
-        type = XML_Helper.getIntAttribute(elem, COLUMN_TYPE_ATTRIBUTE_NAME);
+    public void readXML(Element elem) throws XMLSyntaxError {
+        XMLHelper.checkName(COLUMN_ELEMENT_NAME, elem);
+        name = XMLHelper.getAttribute(elem, COLUMN_NAME_ATTRIBUTE_NAME).getValue();
+        type = XMLHelper.getIntAttribute(elem, COLUMN_TYPE_ATTRIBUTE_NAME);
     }
 
     public String getName() {

@@ -7,5 +7,7 @@
  */
 package net.sourceforge.toscanaj.model;
 
-public interface Scale extends XML_Serializable {
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+
+public interface Scale extends XMLizable {
 }

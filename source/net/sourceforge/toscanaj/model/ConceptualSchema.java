@@ -19,6 +19,9 @@ import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 import util.CollectionFactory;
 
@@ -34,7 +37,7 @@ import java.net.URL;
  * in the program. Instances are created by parsing a CSX file with the
  * CSXParser class.
  */
-public class ConceptualSchema implements XML_Serializable, DiagramCollection {
+public class ConceptualSchema implements XMLizable, DiagramCollection {
     /**
      * The database information.
      */
@@ -84,7 +87,7 @@ public class ConceptualSchema implements XML_Serializable, DiagramCollection {
         eventBroker.processEvent(new NewConceptualSchemaEvent(this, this));
     }
 
-    public ConceptualSchema(EventBroker eventBroker, Element element) throws XML_SyntaxError {
+    public ConceptualSchema(EventBroker eventBroker, Element element) throws XMLSyntaxError {
         this.eventBroker = eventBroker;
         this.dbScheme = new DatabaseSchema(eventBroker);
         reset();
@@ -106,13 +109,13 @@ public class ConceptualSchema implements XML_Serializable, DiagramCollection {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XML_SyntaxError {
-        XML_Helper.checkName(CONCEPTUAL_SCHEMA_ELEMENT_NAME, elem);
+    public void readXML(Element elem) throws XMLSyntaxError {
+        XMLHelper.checkName(CONCEPTUAL_SCHEMA_ELEMENT_NAME, elem);
         description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
         databaseInfo = new DatabaseInfo(
-                XML_Helper.mustbe(DatabaseInfo.DATABASE_CONNECTION_ELEMENT_NAME, elem)
+                XMLHelper.mustbe(DatabaseInfo.DATABASE_CONNECTION_ELEMENT_NAME, elem)
         );
-        if(XML_Helper.contains(elem, DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME)){
+        if(XMLHelper.contains(elem, DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME)){
             dbScheme = new DatabaseSchema(eventBroker, elem.getChild(DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME));
         } else {
             dbScheme = new DatabaseSchema(eventBroker);

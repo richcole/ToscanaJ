@@ -10,6 +10,9 @@ package net.sourceforge.toscanaj.model.diagram;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.model.*;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 import java.awt.geom.Point2D;
 
@@ -21,7 +24,7 @@ import org.jdom.Element;
  * This is mainly the position, the concept for the node and the information
  * on the labels attached to it.
  */
-public class DiagramNode implements XML_Serializable {
+public class DiagramNode implements XMLizable {
     /**
      * The size of nodes.
      *
@@ -83,7 +86,7 @@ public class DiagramNode implements XML_Serializable {
         this.outerNode = outerNode;
     }
 
-    public DiagramNode(Element element) throws XML_SyntaxError {
+    public DiagramNode(Element element) throws XMLSyntaxError {
         readXML(element);
     }
 
@@ -108,22 +111,22 @@ public class DiagramNode implements XML_Serializable {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XML_SyntaxError {
-        XML_Helper.checkName(NODE_ELEMENT_NAME, elem);
-        identifier=XML_Helper.getAttribute(elem, ID_ATTRIBUTE_NAME).getValue();
-        Element positionElem = XML_Helper.mustbe(POSITION_ELEMENT_NAME, elem);
+    public void readXML(Element elem) throws XMLSyntaxError {
+        XMLHelper.checkName(NODE_ELEMENT_NAME, elem);
+        identifier=XMLHelper.getAttribute(elem, ID_ATTRIBUTE_NAME).getValue();
+        Element positionElem = XMLHelper.mustbe(POSITION_ELEMENT_NAME, elem);
         position = new Point2D.Double(
-                XML_Helper.getDoubleAttribute(positionElem, POSITION_X_ATTRIBUTE_NAME),
-                XML_Helper.getDoubleAttribute(positionElem, POSITION_Y_ATTRIBUTE_NAME)
+                XMLHelper.getDoubleAttribute(positionElem, POSITION_X_ATTRIBUTE_NAME),
+                XMLHelper.getDoubleAttribute(positionElem, POSITION_Y_ATTRIBUTE_NAME)
         );
-        if (XML_Helper.contains(elem, ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)){
+        if (XMLHelper.contains(elem, ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)){
             attributeLabel=new LabelInfo(elem.getChild(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME));
         }
-        if (XML_Helper.contains(elem, OBJECT_LABEL_STYLE_ELEMENT_NAME)){
+        if (XMLHelper.contains(elem, OBJECT_LABEL_STYLE_ELEMENT_NAME)){
             objectLabel=new LabelInfo(elem.getChild(OBJECT_LABEL_STYLE_ELEMENT_NAME));
         }
         concept =  new DatabaseConnectedConcept(
-                   XML_Helper.mustbe(DatabaseConnectedConcept.CONCEPT_ELEMENT_NAME,elem)
+                   XMLHelper.mustbe(DatabaseConnectedConcept.CONCEPT_ELEMENT_NAME,elem)
         );
     }
 

@@ -11,6 +11,9 @@ import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.model.*;
 import net.sourceforge.toscanaj.util.ColorWriter;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -24,7 +27,7 @@ import org.jdom.Element;
  * This class encapsulates all information needed to paint a label.
  */
 
-public class LabelInfo implements XML_Serializable, ChangeObservable {
+public class LabelInfo implements XMLizable, ChangeObservable {
     /**
      * List of LabelObserver implementations currently observing the instance.
      */
@@ -116,7 +119,7 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
                         color.getAlpha());
     }
 
-    public LabelInfo(Element element) throws XML_SyntaxError {
+    public LabelInfo(Element element) throws XMLSyntaxError {
         readXML(element);
     }
 
@@ -148,27 +151,27 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XML_SyntaxError {
+    public void readXML(Element elem) throws XMLSyntaxError {
         if (!elem.getName().equals(LABEL_INFO_ELEMENT_NAME)){
             if(!elem.getName().equals(DiagramNode.ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)){
                 if(!elem.getName().equals(DiagramNode.OBJECT_LABEL_STYLE_ELEMENT_NAME)){
-                    throw new XML_SyntaxError("Expected either " +
+                    throw new XMLSyntaxError("Expected either " +
                             LABEL_INFO_ELEMENT_NAME + " or " +
                             DiagramNode.ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME + " or " +
                             DiagramNode.OBJECT_LABEL_STYLE_ELEMENT_NAME);
                 }
             }
         }
-        Element offsetElem = XML_Helper.mustbe(OFFSET_ELEMENT_NAME, elem);
+        Element offsetElem = XMLHelper.mustbe(OFFSET_ELEMENT_NAME, elem);
         setOffset(
-                XML_Helper.getDoubleAttribute(offsetElem, OFFSET_X_ATTRIBUTE_NAME),
-                XML_Helper.getDoubleAttribute(offsetElem, OFFSET_Y_ATTRIBUTE_NAME)
+                XMLHelper.getDoubleAttribute(offsetElem, OFFSET_X_ATTRIBUTE_NAME),
+                XMLHelper.getDoubleAttribute(offsetElem, OFFSET_Y_ATTRIBUTE_NAME)
         );
-        Element backgroundColorElem = XML_Helper.mustbe(BACKGROUND_COLOR_ELEMENT_NAME, elem);
+        Element backgroundColorElem = XMLHelper.mustbe(BACKGROUND_COLOR_ELEMENT_NAME, elem);
         setBackgroundColor(ColorWriter.fromHexString(
                 backgroundColorElem.getText().substring(1)
         ));
-        Element textColorElem = XML_Helper.mustbe(TEXT_COLOR_ELEMENT_NAME, elem);
+        Element textColorElem = XMLHelper.mustbe(TEXT_COLOR_ELEMENT_NAME, elem);
         setTextColor(ColorWriter.fromHexString(
                 textColorElem.getText().substring(1)
         ));
@@ -176,8 +179,8 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
         readTextAlignment(elem);
     }
 
-    private void readTextAlignment(Element elem) throws XML_SyntaxError {
-        Element textAlignmentElem = XML_Helper.mustbe(TEXT_ALIGNMENT_ELEMENT_NAME, elem);
+    private void readTextAlignment(Element elem) throws XMLSyntaxError {
+        Element textAlignmentElem = XMLHelper.mustbe(TEXT_ALIGNMENT_ELEMENT_NAME, elem);
         String textAlignmentElemText = textAlignmentElem.getText();
         if (textAlignmentElemText.equals(TEXT_ALIGNMENT_LEFT_CONTENT)) {
             textAlignment = ALIGNLEFT;
@@ -186,7 +189,7 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
         } else if (textAlignmentElemText.equals(TEXT_ALIGNMENT_RIGHT_CONTENT)) {
             textAlignment = ALIGNRIGHT;
         } else {
-            throw new XML_SyntaxError(
+            throw new XMLSyntaxError(
                     "Unknown value " + textAlignmentElemText + " for text alignment."
             );
         }

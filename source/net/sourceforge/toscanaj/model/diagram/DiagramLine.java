@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.diagram;
 
-import net.sourceforge.toscanaj.model.XML_Serializable;
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
-import net.sourceforge.toscanaj.model.XML_Helper;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 
 import java.awt.geom.Point2D;
 
@@ -20,7 +20,7 @@ import org.jdom.Element;
  *
  * This is just the information which nodes the line connects.
  */
-public class DiagramLine implements XML_Serializable {
+public class DiagramLine implements XMLizable {
     /**
      * Holds the starting node in the Diagram the line belongs to.
      */
@@ -45,7 +45,7 @@ public class DiagramLine implements XML_Serializable {
         this.diagram = diagram;
     }
 
-    public DiagramLine(Element element, Diagram2D diagram) throws XML_SyntaxError {
+    public DiagramLine(Element element, Diagram2D diagram) throws XMLSyntaxError {
         this.diagram = diagram;
         readXML(element);
     }
@@ -57,10 +57,10 @@ public class DiagramLine implements XML_Serializable {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XML_SyntaxError {
-        XML_Helper.checkName(DIAGRAM_LINE_ELEMENT_NAME, elem);
-        String fromId=XML_Helper.getAttribute(elem, FROM_NODE_ATTRIBUTE_NAME).getValue();
-        String toId=XML_Helper.getAttribute(elem, TO_NODE_ATTRIBUTE_NAME).getValue();
+    public void readXML(Element elem) throws XMLSyntaxError {
+        XMLHelper.checkName(DIAGRAM_LINE_ELEMENT_NAME, elem);
+        String fromId=XMLHelper.getAttribute(elem, FROM_NODE_ATTRIBUTE_NAME).getValue();
+        String toId=XMLHelper.getAttribute(elem, TO_NODE_ATTRIBUTE_NAME).getValue();
         fromNode = diagram.getNode(fromId);
         toNode = diagram.getNode(toId);
     }

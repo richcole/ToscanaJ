@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.gui.activity;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.XML_Writer;
+import net.sourceforge.toscanaj.util.xmlize.XMLWriter;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.parser.CSXParser;
@@ -29,7 +29,7 @@ public class SaveConceptualSchemaActivity implements FileActivity, BrokerEventLi
     }
 
     public void processFile(File file) throws Exception {
-        XML_Writer.write(file, conceptualSchema);
+        XMLWriter.write(file, conceptualSchema);
     }
 
     public boolean prepareToProcess() throws Exception {

@@ -13,7 +13,7 @@ import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.Table;
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.model.lattice.DummyConcept;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -45,7 +45,7 @@ public class DiagramNodeTest extends TestCase {
         try {
             DiagramNode other = new DiagramNode(xmlDesc);
             assertEquals(node, other);
-        } catch (XML_SyntaxError error) {
+        } catch (XMLSyntaxError error) {
             fail(StringUtil.stackTraceToString(error));
         }
 

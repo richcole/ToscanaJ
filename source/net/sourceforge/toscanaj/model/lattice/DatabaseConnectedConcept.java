@@ -13,6 +13,8 @@ import net.sourceforge.toscanaj.model.*;
 import net.sourceforge.toscanaj.model.database.DatabaseQuery;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.Query;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 import java.util.*;
 
@@ -72,18 +74,18 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         this.dbInfo = dbInfo;
     }
 
-    public DatabaseConnectedConcept(Element element) throws XML_SyntaxError{
+    public DatabaseConnectedConcept(Element element) throws XMLSyntaxError{
            readXML(element);
     }
 
 
     /// @todo this is DB specific, but it should be changed to be more generic
-    public void readXML(Element elem) throws XML_SyntaxError {
-        XML_Helper.checkName(CONCEPT_ELEMENT_NAME, elem);
-        Element objectContingentElem = XML_Helper.mustbe(OBJECT_CONTINGENT_ELEMENT_NAME, elem);
+    public void readXML(Element elem) throws XMLSyntaxError {
+        XMLHelper.checkName(CONCEPT_ELEMENT_NAME, elem);
+        Element objectContingentElem = XMLHelper.mustbe(OBJECT_CONTINGENT_ELEMENT_NAME, elem);
         List objects = objectContingentElem.getChildren(OBJECT_ELEMENT_NAME);
         if(objects.size() > 1) {
-            throw new XML_SyntaxError("Only one object clause allowed in this version");
+            throw new XMLSyntaxError("Only one object clause allowed in this version");
         }
         if(objects.size() == 1) {
             Element objElem = (Element) objects.get(0);
@@ -92,7 +94,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         else {
             this.objectClause = null;
         }
-        Element attributeContingentElem = XML_Helper.mustbe(ATTRIBUTE_CONTINGENT_ELEMENT_NAME, elem);
+        Element attributeContingentElem = XMLHelper.mustbe(ATTRIBUTE_CONTINGENT_ELEMENT_NAME, elem);
         List attributes = attributeContingentElem.getChildren(ATTRIBUTE_ELEMENT_NAME);
         for (Iterator iterator = attributes.iterator(); iterator.hasNext();) {
             Element attrElem = (Element) iterator.next();
