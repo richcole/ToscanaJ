@@ -156,14 +156,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         buildPanel();
         // listen to changes on DiagramController
         DiagramController.getController().addObserver(this);
-        // try to set Windows LnF
-        try {
-            javax.swing.UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-        }
-        catch( Exception e ) {
-            // we don't really care if it fails -- just print message on stderr
-            System.err.println("Warning: could not set Windows Look and Feel");
-        }
         // restore the old MRU list
         mruList = ConfigurationManager.fetchStringList("mainPanel", "mruFiles", MaxMruFiles);
     }
@@ -638,7 +630,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     public static void main(String [] args) {
         final MainPanel test;
         if(args.length == 1) {
-      test = new MainPanel(args[0]);
+          test = new MainPanel(args[0]);
         } else if(args.length == 2) {
           if(args[1].equals("-debug")) {
             test = new MainPanel(args[0]);
