@@ -429,13 +429,16 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
 
         if(this.conceptualSchema != null) {
             // add extra entries from schema
-            Iterator it = this.conceptualSchema.getDatabaseInfo().getSpecialQueryNames();
-            while(it.hasNext()) {
-                String name = (String) it.next();
-                JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);
-                menuItem.addActionListener(this);
-                labelContentGroup.add(menuItem);
-                viewMenu.add(menuItem);
+            DatabaseInfo dbInfo = this.conceptualSchema.getDatabaseInfo();
+            if(dbInfo != null){
+                Iterator it = dbInfo.getSpecialQueryNames();
+                while(it.hasNext()) {
+                    String name = (String) it.next();
+                    JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);
+                    menuItem.addActionListener(this);
+                    labelContentGroup.add(menuItem);
+                    viewMenu.add(menuItem);
+                }
             }
         }
 
