@@ -13,21 +13,28 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
+/**
+ * @todo restrict data entered to be integer instead of turning it into integer at the end
+ */
 public class DoubleNumberField extends JTextField {
+    public static final int INTEGER = 0;
+    public static final int FLOAT = 1;
 
-    private Toolkit toolkit;
-    private NumberFormat doubleFormatter;
+    private NumberFormat formatter;
 
-    public DoubleNumberField(double value, int columns) {
+    public DoubleNumberField(int columns, int formatType) {
         super(columns);
-        toolkit = Toolkit.getDefaultToolkit();
-        doubleFormatter = NumberFormat.getNumberInstance(Locale.US);
-        setValue(value);
+        if(formatType == FLOAT) {
+            formatter = NumberFormat.getNumberInstance(Locale.US);
+        }
+        else {
+            formatter = NumberFormat.getIntegerInstance(Locale.US);
+        }
     }
 
     public boolean isValid() {
         try {
-            doubleFormatter.parse(getText()).doubleValue();
+            formatter.parse(getText());
             return true;
         } catch (ParseException e) {
             return false;
@@ -38,19 +45,35 @@ public class DoubleNumberField extends JTextField {
         return getPreferredSize();
     }
 
-    public double getValue() {
+    public double getDoubleValue() {
         double retVal = 0;
         try {
-            retVal = doubleFormatter.parse(getText()).doubleValue();
+            retVal = formatter.parse(getText()).doubleValue();
         } catch (ParseException e) {
             // This should never happen because insertString allows
             // only properly formatted data to get in the field.
-            toolkit.beep();
+            throw new RuntimeException("Could not parse value in NumberField");
         }
         return retVal;
     }
 
-    public void setValue(double value) {
-        setText(doubleFormatter.format(value));
+    public int getIntegerValue() {
+        int retVal = 0;
+        try {
+            retVal = formatter.parse(getText()).intValue();
+        } catch (ParseException e) {
+            // This should never happen because insertString allows
+            // only properly formatted data to get in the field.
+            throw new RuntimeException("Could not parse value in NumberField");
+        }
+        return retVal;
+    }
+
+    public void setIntegerValue(int value) {
+        setText(formatter.format(value));
+    }
+
+    public void setDoubleValue(double value) {
+        setText(formatter.format(value));
     }
 }

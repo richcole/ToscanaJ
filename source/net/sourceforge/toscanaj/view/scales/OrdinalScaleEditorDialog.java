@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
-import net.sourceforge.toscanaj.model.database.Column;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -24,13 +23,15 @@ public class OrdinalScaleEditorDialog extends JDialog {
     private JButton addButton;
     private DoubleNumberField addField;
     private JList dividersList;
-    /// @todo support INTEGER (i.e. give it different number than -1)
-    public static final int INTEGER = -1;
+    private int scaleType;
+
+    public static final int INTEGER = 0;
     public static final int FLOAT = 1;
     public static final int UNSUPPORTED = -1;
 
     public OrdinalScaleEditorDialog(Frame owner, String scaleName, int scaleType) {
         super(owner);
+        this.scaleType = scaleType;
         layoutDialog(scaleName);
         pack();
     }
@@ -144,14 +145,18 @@ public class OrdinalScaleEditorDialog extends JDialog {
     private JPanel makeAddDividerPanel() {
         JPanel addPanel = new JPanel();
         addPanel.setLayout(new BoxLayout(addPanel, BoxLayout.X_AXIS));
-        addField = new DoubleNumberField(0, 10);
-        addField.setText("");
+        if(scaleType == FLOAT) {
+            addField = new DoubleNumberField(10,DoubleNumberField.FLOAT);
+        }
+        else {
+            addField = new DoubleNumberField(10,DoubleNumberField.INTEGER);
+        }
         addButton = new JButton("Add");
         addButton.setEnabled(false);
 
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                addDelimiter(addField.getValue());
+                addDelimiter();
             }
         });
 
@@ -175,9 +180,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
         addField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (addField.isValid()) {
-                    addDelimiter(addField.getValue());
-                }
+                addDelimiter();
             }
         });
 
@@ -186,12 +189,21 @@ public class OrdinalScaleEditorDialog extends JDialog {
         return addPanel;
     }
 
+    private void addDelimiter() {
+        if(scaleType == FLOAT) {
+            addDelimiter(addField.getDoubleValue());
+        }
+        else {
+            addDelimiter(addField.getIntegerValue());
+        }
+    }
+
     private DefaultListModel dividersModel;
 
     public void addDelimiter(double value) {
         int i;
         for (i = 0; i < dividersModel.size(); i++) {
-            final double currDivider = getDelimiter(i);
+            final double currDivider = ((Double) dividersModel.elementAt(i)).doubleValue();
             if (value == currDivider) {
                 return;
             }
@@ -203,14 +215,24 @@ public class OrdinalScaleEditorDialog extends JDialog {
         addField.setText("");
     }
 
-    private double getDelimiter(int i) {
-        return ((Double) dividersModel.elementAt(i)).doubleValue();
+    public void addDelimiter(int value) {
+        int i;
+        for (i = 0; i < dividersModel.size(); i++) {
+            final int currDivider = ((Integer) dividersModel.elementAt(i)).intValue();
+            if (value == currDivider) {
+                return;
+            }
+            if (value < currDivider) {
+                break;
+            }
+        }
+        dividersModel.insertElementAt(new Integer(value), i);
+        addField.setText("");
     }
 
     public java.util.List getDividers() {
         return Arrays.asList(dividersModel.toArray());
     }
-
 
     public String getDiagramTitle() {
         return titleEditor.getText();
