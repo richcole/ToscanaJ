@@ -37,6 +37,7 @@ import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemEvent;
 import org.tockit.canvas.events.CanvasItemSelectedEvent;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
+import org.tockit.canvas.manipulators.ItemMovementManipulator;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -48,6 +49,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
+import java.awt.geom.Point2D;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
 import java.io.File;
@@ -637,6 +639,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                         this.lastIntervalType = diagramSchema.getGradientType();
                         setDiagramGradient(redGreenGradient, ConceptInterpreter.INTERVAL_TYPE_ORTHOGONALTIY);
                         diagramView.getConceptInterpreter().showDeviation(true);
+                        diagramView.addCanvasItem(new SignificanceLegend(new Font("sans-serif",Font.PLAIN, 10),new Point2D.Double(0,0)));
+                        new ItemMovementManipulator(diagramView, SignificanceLegend.class, diagramView.getController().getEventBroker());
                     } else {
                         setDiagramGradient(diagramSchema.getDefaultGradient(), this.lastIntervalType);
                         diagramView.getConceptInterpreter().showDeviation(false);
