@@ -67,13 +67,13 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
     private static final ExtendedPreferences preferences = 
         ExtendedPreferences.userNodeForClass(TuplewareMainPanel.class);
 
-    private final class ModalContext implements Context {
+    private final class AgreementContext implements Context {
         private String name;
 		private Set objects;
 		private Set attributes;        
         private BinaryRelation incidenceRelation;
         
-        private ModalContext(int dim) {
+        private AgreementContext(int dim) {
             this.name = tuples.getDimensionNames()[dim];
             Set objectTuples = tuples.getTuples();
             this.objects = new HashSet();
@@ -226,13 +226,13 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 		});
 		toolBar.add(newDiagramButton);
 
-        JButton createModalSystemButton = new JButton("Create modal system");
-        createModalSystemButton.addActionListener(new ActionListener() {
+        JButton createAgreementSystemButton = new JButton("Create agreement system");
+        createAgreementSystemButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                createModalSystem();
+                createAgreementSystem();
             }
         });
-        toolBar.add(createModalSystemButton);
+        toolBar.add(createAgreementSystemButton);
     }
 
     private void createNewDiagram() {
@@ -243,7 +243,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 		this.conceptualSchema.addDiagram(diagram);
 	}
 
-	private void createModalSystem() {
+	private void createAgreementSystem() {
 		String[] dimensionNames = this.tuples.getDimensionNames();
 		int[] nonObjectDims = new int[this.tuples.getArity() - this.objectIndices.length];
 		int offset = 0;
@@ -259,7 +259,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
         for (int i = 0; i < nonObjectDims.length; i++) {
         	int dim = nonObjectDims[i];
 			String dimensionName = dimensionNames[dim];
-            Context context = new ModalContext(dim);
+            Context context = new AgreementContext(dim);
             Lattice lattice = new GantersAlgorithm().createLattice(context);
             Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, dimensionName, new DefaultDimensionStrategy());
             this.conceptualSchema.addDiagram(diagram);
