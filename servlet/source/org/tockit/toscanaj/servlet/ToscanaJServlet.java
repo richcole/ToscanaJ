@@ -36,6 +36,7 @@ import javax.servlet.http.*;
  */
 public class ToscanaJServlet extends HttpServlet {
     private static String SERVLET_URL;
+    private static double viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight;
     private ConceptualSchema conceptualSchema = null;
     private DatabaseConnectedConceptInterpreter conceptInterpreter = null;
     private static final int NODE_SIZE = 10;
@@ -129,9 +130,9 @@ public class ToscanaJServlet extends HttpServlet {
         }
         else if(diagramParameter != null) {
             resp.setContentType("image/svg-xml");
-            printHead(out);
-            printScript(out);
             int diagramNumber = Integer.parseInt(diagramParameter);
+            printHead(diagramNumber, diagramHistory, out, req);
+            printScript(out);
             printDiagram(diagramNumber, diagramHistory, out);
             printEnd(out);
         }
@@ -150,7 +151,7 @@ public class ToscanaJServlet extends HttpServlet {
     }
 
     private void printConceptList(int diagramNumber, String nodeId, Query query, DiagramHistory diagramHistory, PrintWriter out) {
-        out.println("<html><head><title>ToscanaJServlet</title>");
+        out.println("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"./css/style.css\"><title>ToscanaJServlet</title>");
         out.println("<meta http-equiv=\"Expires\" content=\"0\">");
         out.println("<meta http-equiv=\"Pragma\" content=\"no-cache;\">");
         out.println("</head><body>");
@@ -171,7 +172,7 @@ public class ToscanaJServlet extends HttpServlet {
         out.println("<ol>");
         while (queryIterator.hasNext()) {
             Query curQuery = (Query) queryIterator.next();
-            out.println("<li><a href=\"" + SERVLET_URL + "?diagram=" + diagramNumber + "&amp;concept=" + nodeId +
+            out.println("<li><a class=\"one\" href=\"" + SERVLET_URL + "?diagram=" + diagramNumber + "&amp;concept=" + nodeId +
                         "&amp;query=" + i + "\">" + curQuery.getName() + "</a></li>");
             i++;
         }
@@ -273,7 +274,7 @@ public class ToscanaJServlet extends HttpServlet {
             Font font = new Font(FONT_FAMILY, Font.PLAIN, 12);
             FontMetrics fm = g2d.getFontMetrics(font);
 
-            out.println("<a xlink:href=\"" + SERVLET_URL + "?diagram=" + diagramNumber + "&amp;filterConcept=" + node.getIdentifier() + "\">");
+            out.println("<a target=\"diagramlist\" xlink:href=\"" + SERVLET_URL + "?diagram=" + diagramNumber + "&amp;filterConcept=" + node.getIdentifier() + "\">");
             out.println("<circle cx=\"" + addXPos(pos.getX()) + "\" cy=\"" + addYPos(pos.getY()) +"\" r=\"" +
                         radius + "\" style=\"fill:RGB(" + nodeColor.getRed() + "," + nodeColor.getGreen() + "," +
                         nodeColor.getBlue() + ")\" stroke=\"black\" />");
@@ -350,7 +351,7 @@ public class ToscanaJServlet extends HttpServlet {
 //                        out.println("<a onclick=\"openWindow('" + SERVLET_URL + "?concept=" + node.getIdentifier() +
 //                                    "&amp;diagram=" + diagramNumber + "')\">");
                         out.println("<a xlink:href=\"" + SERVLET_URL + "?concept=" + node.getIdentifier() +
-                                    "&amp;diagram=" + diagramNumber + "\" target=\"_blank\">");
+                                    "&amp;diagram=" + diagramNumber + "\" target=\"objectlabel\">");
                         out.println("<rect width=\"" + maxLabelWidth + "\" height=\"" + maxLabelHeight + "\" x=\"" + (addXPos((pos.getX() + offset.getX())) - 3.0 - (0.5 * maxLabelWidth)) + "\" y=\"" + addYPos((pos.getY() + offset.getY() - 10.0 + maxLabelHeight )) + "\" style=\"fill:RGB(" + backgroundColor.getRed() + "," + backgroundColor.getGreen() + "," + backgroundColor.getBlue() +")\" stroke=\"Black\" />");
 //                        out.println("<rect width=\"" + maxLabelWidth + "\" height=\"" + maxLabelHeight + "\" x=\"" + (addXPos((pos.getX() + offset.getX())) - 3.0 - (0.5 * maxLabelWidth)) + "\" y=\"" + addYPos((pos.getY() + offset.getY() - 10.0 + maxLabelHeight )) + "\" style=\"fill:RGB(" + backgroundColor.getRed() + "," + backgroundColor.getGreen() + "," + backgroundColor.getBlue() +")\" stroke=\"Black\" />");
 //                        out.println("<rect onclick=\"openWindow('" + SERVLET_URL + "?concept=" + node.getIdentifier() + "&amp;diagram=" + diagramNumber + "')\" width=\"" + maxLabelWidth + "\" height=\"" + maxLabelHeight + "\" x=\"" + (addXPos((pos.getX() + offset.getX())) - 3.0 - (0.5 * maxLabelWidth)) + "\" y=\"" + addYPos((pos.getY() + offset.getY() - 10.0 + maxLabelHeight )) + "\" style=\"fill:RGB(" + backgroundColor.getRed() + "," + backgroundColor.getGreen() + "," + backgroundColor.getBlue() +")\" stroke=\"Black\" />");
@@ -427,13 +428,16 @@ public class ToscanaJServlet extends HttpServlet {
     }
 
     private void printDiagramList(PrintWriter out) {
-        out.println("<html><head><title>ToscanaJServlet</title></head><body>");
+        out.println("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"./css/style.css\"><title>ToscanaJServlet</title></head><body>");
         out.println("<h1>All Diagrams:</h1>");
         int numberOfDiagrams = conceptualSchema.getNumberOfDiagrams();
         out.println("<ol>");
         for(int i = 0; i<numberOfDiagrams; i++) {
             Diagram2D diagram = conceptualSchema.getDiagram(i);
-            out.println("<li><a href=\"" + SERVLET_URL + "?diagram=" + i + "\">" + diagram.getTitle() + "</a></li>");
+//            out.println("<li><a href=\"" + SERVLET_URL + "?diagram=" + i + "\">" + diagram.getTitle() + "</a></li>");
+            out.println("<li><a class=\"one\" href=\"javascript:window.location('" + SERVLET_URL + "?diagram=" + i + "&x='+screen.width+'&y='+screen.height)\" target=\"diagram\">" + diagram.getTitle() + "</a></li>");
+            //<A HREF="javascript:alert('Your resolution is '+screen.width+'x'+screen.height);">
+
         }
         out.println("</ol>");
         out.println("</body></html>");
@@ -449,10 +453,217 @@ public class ToscanaJServlet extends HttpServlet {
         conceptualSchema = CSXParser.parse(new EventBroker(), schemaFile);
     }
 
-    private void printHead(PrintWriter out) {
+    private void printHead(int diagramNumber, DiagramHistory diagramHistory, PrintWriter out, HttpServletRequest req) {
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         out.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">");
-        out.println("<svg viewBox=\"0 0 1000 850\" xmlns=\"http://www.w3.org/2000/svg\">");
+        String screenWidth = req.getParameter("x");
+        String screenHeight = req.getParameter("y");
+        double width = Integer.parseInt(screenWidth) * 0.66;
+        double height = Integer.parseInt(screenHeight) * 1;
+
+        // calculate the appropriate view box size
+        calculateViewBoxSize(diagramNumber, diagramHistory, out);
+        out.println("<svg width=\"" + width + "\" height=\"" + height + "\" viewBox=\"" + viewBoxX + " " + viewBoxY + " " + viewBoxWidth + " " + viewBoxHeight + "\" xmlns=\"http://www.w3.org/2000/svg\">");
+    }
+
+    private void calculateViewBoxSize(int diagramNumber, DiagramHistory diagramHistory, PrintWriter out) {
+        Diagram2D diagram = conceptualSchema.getDiagram(diagramNumber);
+
+        double marginLeft = 0.0; // initializes the left most margin
+        double marginRight = 0.0; // initializes the right most margin
+        double marginTop = 0.0; // initializes the top most margin
+        double marginBottom = 0.0; // initializes the bottom margin
+
+        int numNodes = diagram.getNumberOfNodes();
+
+        // iterate through the nodes to find to obtain the appropriate view box size for the diagram
+        for(int i = 0; i < numNodes; i ++) {
+            DiagramNode node = diagram.getNode(i);
+            Concept concept = node.getConcept();
+            ConceptInterpretationContext interpretationContext =
+                                                new ConceptInterpretationContext(diagramHistory, new EventBroker());
+
+            Point2D pos = node.getPosition();
+            double radius;
+            if( this.conceptInterpreter.isRealized(concept, interpretationContext)) {
+                radius = NODE_SIZE;
+            }
+            else {
+                radius = NODE_SIZE/3.0;
+            }
+            double gradientPosition = this.conceptInterpreter.getRelativeExtentSize(
+                    concept,
+                    interpretationContext,
+                    ConceptInterpreter.REFERENCE_DIAGRAM
+            );
+            Color nodeColor = diagramSchema.getGradientColor(gradientPosition);
+            Color lineColor = diagramSchema.getLineColor();
+            LabelInfo attrLabel = node.getAttributeLabelInfo();
+
+            BufferedImage bi = new BufferedImage(IMAGE_WIDTH,IMAGE_HEIGHT,BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = bi.createGraphics();
+            Font font = new Font(FONT_FAMILY, Font.PLAIN, 12);
+            FontMetrics fm = g2d.getFontMetrics(font);
+
+            // if it is the first node
+            if (i==0) {
+                marginLeft = addXPos(pos.getX());
+                marginRight = addXPos(pos.getX());
+                marginTop = addYPos(pos.getY());
+                marginBottom = addYPos(pos.getY());
+            }
+            // if it is not the first node
+            else {
+                // if current node is the left most node in the diagram
+                if (addXPos(pos.getX()) < marginLeft) {
+                    // update left margin
+                    marginLeft = addXPos(pos.getX());
+                }
+                // if current node is not the left most node in the diagram
+                else {
+                    // do not update left margin
+                }
+
+                // if current node is the right most node in the diagram
+                if (marginRight < addXPos(pos.getX())) {
+                    // update right margin
+                    marginRight = addXPos(pos.getX());
+                }
+                // if current node is not the right most node in the diagram
+                else {
+                    // do not update right margin
+                }
+
+                // if current node is the upper most node in the diagram
+                if (addYPos(pos.getY()) < marginTop) {
+                    // update top margin
+                    marginTop = addYPos(pos.getY());
+                }
+                // if current node is not the upper most node in the diagram
+                else {
+                    // do not update top margin
+                }
+
+                // if current node is the bottom most node in the diagram
+                if (marginBottom < addYPos(pos.getY())) {
+                    // update bottom margin
+                    marginBottom = addYPos(pos.getY());
+                }
+                else {
+                    // do not update bottom margin
+                }
+            }
+
+            if(attrLabel != null) {
+                // diagram related info (layout)
+                Color backgroundColor = attrLabel.getBackgroundColor();
+                Point2D offset = attrLabel.getOffset();
+                Color textColor = attrLabel.getTextColor();
+                int textAlignment = attrLabel.getTextAlignment(); // do not use yet
+                // lattice related info (content)
+                Iterator attrIt = concept.getAttributeContingentIterator();
+                List attrList = new ArrayList();
+                while (attrIt.hasNext()) {
+                    Attribute attribute = (Attribute) attrIt.next();
+                    attrList.add(attribute.getData().toString());
+                }
+                double maxLabelWidth = getWidth(fm, attrList);
+                int maxLabelHeight = getHeight(fm);
+
+                // if node label is the right most part of the diagram
+                if (marginRight < ((addXPos((pos.getX() + offset.getX())) - 3.0 - (0.35 * maxLabelWidth)) + maxLabelWidth)) {
+                    // update right margin
+                    marginRight = (addXPos((pos.getX() + offset.getX())) - 3.0 - (0.35 * maxLabelWidth)) + maxLabelWidth;
+                }
+                else {
+                    // do not update right margin
+                }
+
+                // if node label is the left most part of the diagram
+                if ((addXPos((pos.getX() + offset.getX())) - 3.0 - (0.65 * maxLabelWidth)) < marginLeft) {
+                    // update left margin
+                    marginLeft = addXPos((pos.getX() + offset.getX())) - 3.0 - (0.65 * maxLabelWidth);
+                }
+                else {
+                    // do not update left margin
+                }
+
+                // if the node label is the upper most part of the diagram
+                if (addYPos((pos.getY() + offset.getY() - 10.0 - maxLabelHeight )) < marginTop) {
+                    // update top margin
+                    marginTop = addYPos((pos.getY() + offset.getY() - 10.0 - maxLabelHeight ));
+                }
+                else {
+                    // do not update top margin
+                }
+
+                // if the node label is the bottom most part of the diagram
+                if (marginBottom < (addYPos((pos.getY() + offset.getY() - 10.0 - maxLabelHeight )) + maxLabelHeight)) {
+                    // update bottom margin
+                    marginBottom = addYPos((pos.getY() + offset.getY() - 10.0 - maxLabelHeight )) + maxLabelHeight;
+                }
+                else {
+                    // do not update bottom margin
+                }
+
+
+            }
+
+            LabelInfo objLabel = node.getObjectLabelInfo();
+            if(objLabel != null) {
+                Color backgroundColor = objLabel.getBackgroundColor();
+                Point2D offset = objLabel.getOffset();
+                Color textColor = objLabel.getTextColor();
+                int textAlignment = objLabel.getTextAlignment(); // do not use yet
+                int objectCount = conceptInterpreter.getObjectCount(concept, interpretationContext);
+
+                if (objectCount != 0) {
+                    double maxLabelWidth = fm.stringWidth(String.valueOf(objectCount)) + 2 * fm.getLeading() + 2 * fm.getDescent();
+                    int maxLabelHeight = getHeight(fm);
+
+                    // if this label info is the right most part of the diagram
+                    if (marginRight < ((addXPos((pos.getX() + offset.getX())) - 3.0 - (0.5 * maxLabelWidth)) + maxLabelWidth)) {
+                        // update the right margin
+                        marginRight = (addXPos((pos.getX() + offset.getX())) - 3.0 - (0.5 * maxLabelWidth)) + maxLabelWidth;
+                    }
+                    else {
+                        // do not update right margin
+                    }
+
+                    // if this label info is the left most part of the diagram
+                    if ((addXPos((pos.getX() + offset.getX())) - 3.0 - (0.5 * maxLabelWidth)) < marginLeft) {
+                        // update margin left
+                        marginLeft = (addXPos((pos.getX() + offset.getX())) - 3.0 - (0.5 * maxLabelWidth));
+                    }
+                    else {
+                        // do not update left margin
+                    }
+
+                    // if this label info is the top most part of the diagram
+                    if (addYPos((pos.getY() + offset.getY() - 10.0 + maxLabelHeight )) < marginTop) {
+                        // update top margin
+                        marginTop = addYPos((pos.getY() + offset.getY() - 10.0 - maxLabelHeight ));
+                    }
+                    else {
+                        // do not update top margin
+                    }
+
+                    if (marginBottom < (addYPos((pos.getY() + offset.getY() - 10.0 + maxLabelHeight )) + maxLabelHeight)) {
+                        // update bottom margin
+                        marginBottom = addYPos((pos.getY() + offset.getY() - 10.0 + maxLabelHeight )) + maxLabelHeight;
+                    }
+                    else {
+                        // do not update bottom margin
+                    }
+
+                }
+            }
+        }
+        viewBoxX = marginLeft - 10.0;
+        viewBoxY = marginTop;
+        viewBoxWidth = (marginRight - marginLeft) + 20.0;
+        viewBoxHeight = (marginBottom - marginTop) + 170.0;
+
     }
 
     private void printEnd(PrintWriter out) {
