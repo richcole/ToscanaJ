@@ -38,266 +38,264 @@ import java.util.Iterator;
  */
 public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 
-    DefaultListModel unkeyedTableList;
-    DefaultListModel keyedTableList;
-    DefaultListModel columnsList;
+	DefaultListModel unkeyedTableList;
+	DefaultListModel keyedTableList;
+	DefaultListModel columnsList;
 
-    private DatabaseSchema dbScheme;
-    private JList unkeyedTableListPanel;
-    private JList keyedTableListPanel;
-    private JList columnsPanel;
-    private JSplitPane splitPane;
-    private JSplitPane leftPane;
+	private DatabaseSchema dbScheme;
+	private JList unkeyedTableListPanel;
+	private JList keyedTableListPanel;
+	private JList columnsPanel;
+	private JSplitPane splitPane;
+	private JSplitPane leftPane;
 
-    private RemoveTableKeyAction removeTableAction;
+	private RemoveTableKeyAction removeTableAction;
 
-    class RemoveTableKeyAction extends AbstractAction {
+	class RemoveTableKeyAction extends AbstractAction {
 
-        RemoveTableKeyAction(String name) {
-            super(name);
-        }
+		RemoveTableKeyAction(String name) {
+			super(name);
+		}
 
-        public void actionPerformed(ActionEvent event) {
-            int[] selectedList = keyedTableListPanel.getSelectedIndices();
-            for (int i = 0; i < selectedList.length; ++i) {
-                KeyTableInfo info =
-                    (KeyTableInfo) keyedTableList.elementAt(selectedList[i]);
-                info.getTable().setKey(null);
-            }
-        }
+		public void actionPerformed(ActionEvent event) {
+			int[] selectedList = keyedTableListPanel.getSelectedIndices();
+			for (int i = 0; i < selectedList.length; ++i) {
+				KeyTableInfo info =
+					(KeyTableInfo) keyedTableList.elementAt(selectedList[i]);
+				info.getTable().setKey(null);
+			}
+		}
 
-    }
+	}
 
-    class TableSelectionListener implements ListSelectionListener {
-        public void valueChanged(ListSelectionEvent event) {
-            if (event.getSource() instanceof JList) {
-                JList list = (JList) event.getSource();
-                ListSelectionModel model = list.getSelectionModel();
-                if (model.getValueIsAdjusting()) {
-                    return;
-                }
-                if (model.isSelectionEmpty()) {
-                    displayTable(null);
-                } else {
-                    TableInfo info =
-                        (TableInfo) unkeyedTableList.elementAt(
-                            model.getMinSelectionIndex());
-                    displayTable(info.getTable());
-                }
-            }
-        }
-    }
+	class TableSelectionListener implements ListSelectionListener {
+		public void valueChanged(ListSelectionEvent event) {
+			if (event.getSource() instanceof JList) {
+				JList list = (JList) event.getSource();
+				ListSelectionModel model = list.getSelectionModel();
+				if (model.getValueIsAdjusting()) {
+					return;
+				}
+				if (model.isSelectionEmpty()) {
+					displayTable(null);
+				} else {
+					TableInfo info =
+						(TableInfo) unkeyedTableList.elementAt(
+							model.getMinSelectionIndex());
+					displayTable(info.getTable());
+				}
+			}
+		}
+	}
 
-    class UnkeyedTableSelectionListener implements ListSelectionListener {
-        public void valueChanged(ListSelectionEvent event) {
-            ListSelectionModel model;
-            if (event.getSource() instanceof JList) {
-                JList list = (JList) event.getSource();
-                model = list.getSelectionModel();
+	class UnkeyedTableSelectionListener implements ListSelectionListener {
+		public void valueChanged(ListSelectionEvent event) {
+			ListSelectionModel model;
+			if (event.getSource() instanceof JList) {
+				JList list = (JList) event.getSource();
+				model = list.getSelectionModel();
 
-                removeTableAction.setEnabled(model.isSelectionEmpty());
-            }
-        }
-    }
+				removeTableAction.setEnabled(model.isSelectionEmpty());
+			}
+		}
+	}
 
-    class ColumnSelectionListener implements ListSelectionListener {
-        public void valueChanged(ListSelectionEvent event) {
-            if (!(event.getSource() instanceof JList)) {
-                return;
-            }
-            JList list = (JList) event.getSource();
-            ListSelectionModel model = list.getSelectionModel();
-            if (model.isSelectionEmpty()) {
-                return;
-            }
-            if (model.getValueIsAdjusting()) {
-                return;
-            }
+	class ColumnSelectionListener implements ListSelectionListener {
+		public void valueChanged(ListSelectionEvent event) {
+			if (!(event.getSource() instanceof JList)) {
+				return;
+			}
+			JList list = (JList) event.getSource();
+			ListSelectionModel model = list.getSelectionModel();
+			if (model.isSelectionEmpty()) {
+				return;
+			}
+			if (model.getValueIsAdjusting()) {
+				return;
+			}
 
-            ColumnInfo columnInfo =
-                (ColumnInfo) columnsList.elementAt(
-                    model.getMinSelectionIndex());
-            final int selectedIndex = unkeyedTableListPanel.getSelectedIndex();
-            if (selectedIndex < 0) {
-                return;
-            }
-            TableInfo tableInfo =
-                (TableInfo) unkeyedTableList.elementAt(selectedIndex);
-            setObjectKey(tableInfo.getTable(), columnInfo.getColumn());
-        }
-    }
+			ColumnInfo columnInfo =
+				(ColumnInfo) columnsList.elementAt(
+					model.getMinSelectionIndex());
+			final int selectedIndex = unkeyedTableListPanel.getSelectedIndex();
+			if (selectedIndex < 0) {
+				return;
+			}
+			TableInfo tableInfo =
+				(TableInfo) unkeyedTableList.elementAt(selectedIndex);
+			setObjectKey(tableInfo.getTable(), columnInfo.getColumn());
+		}
+	}
 
-    public void setObjectKey(Table table, Column key) {
-        table.setKey(key);
-    }
+	public void setObjectKey(Table table, Column key) {
+		table.setKey(key);
+	}
 
-    private void addKeyedTable(Table table) {
-        keyedTableList.addElement(new KeyTableInfo(table));
-    }
+	private void addKeyedTable(Table table) {
+		keyedTableList.addElement(new KeyTableInfo(table));
+	}
 
-    private void addUnkeyedTable(Table table) {
-        unkeyedTableList.addElement(new TableInfo(table));
-    }
+	private void addUnkeyedTable(Table table) {
+		unkeyedTableList.addElement(new TableInfo(table));
+	}
 
-    private void removeUnkeyedTable(Table table) {
-        for (int i = 0; i < unkeyedTableList.size(); ++i) {
-            TableInfo info = (TableInfo) unkeyedTableList.elementAt(i);
-            if (info.getTable() == table) {
-                unkeyedTableList.removeElementAt(i);
-                break;
-            }
-        }
-        /// @todo remove workaround for a bug in swing ver. < 1.3rel03
-        if (unkeyedTableList.size() == 0) {
-            displayTable(null);
-        };
-    }
+	private void removeUnkeyedTable(Table table) {
+		for (int i = 0; i < unkeyedTableList.size(); ++i) {
+			TableInfo info = (TableInfo) unkeyedTableList.elementAt(i);
+			if (info.getTable() == table) {
+				unkeyedTableList.removeElementAt(i);
+				break;
+			}
+		}
+		/// @todo remove workaround for a bug in swing ver. < 1.3rel03
+		if (unkeyedTableList.size() == 0) {
+			displayTable(null);
+		};
+	}
 
-    private void removeKeyedTable(Table table) {
-        for (int i = 0; i < keyedTableList.size(); ++i) {
-            KeyTableInfo info = (KeyTableInfo) keyedTableList.elementAt(i);
-            if (info.getTable() == table) {
-                keyedTableList.removeElementAt(i);
-                break;
-            }
-        }
+	private void removeKeyedTable(Table table) {
+		for (int i = 0; i < keyedTableList.size(); ++i) {
+			KeyTableInfo info = (KeyTableInfo) keyedTableList.elementAt(i);
+			if (info.getTable() == table) {
+				keyedTableList.removeElementAt(i);
+				break;
+			}
+		}
 
-    }
+	}
 
-    public void displayTable(Table table) {
-        columnsList.clear();
+	public void displayTable(Table table) {
+		columnsList.clear();
 
-        if (table != null) {
-            STD_Iterator it = new STD_Iterator(table.getColumns());
-            for (it.reset(); !it.atEnd(); it.next()) {
-                columnsList.addElement(new ColumnInfo((Column) it.val()));
-            }
-        }
-    };
+		if (table != null) {
+			STD_Iterator it = new STD_Iterator(table.getColumns());
+			for (it.reset(); !it.atEnd(); it.next()) {
+				columnsList.addElement(new ColumnInfo((Column) it.val()));
+			}
+		}
+	};
 
-    public DatabaseSchemaView(EventBroker broker) {
-        super(new GridLayout(0, 1));
+	public DatabaseSchemaView(EventBroker broker) {
+		super(new GridLayout(0, 1));
 
-        this.unkeyedTableList = new DefaultListModel();
-        this.keyedTableList = new DefaultListModel();
-        this.columnsList = new DefaultListModel();
+		this.unkeyedTableList = new DefaultListModel();
+		this.keyedTableList = new DefaultListModel();
+		this.columnsList = new DefaultListModel();
 
-        unkeyedTableListPanel = new JList(this.unkeyedTableList);
-        keyedTableListPanel = new JList(this.keyedTableList);
-        columnsPanel = new JList(this.columnsList);
+		unkeyedTableListPanel = new JList(this.unkeyedTableList);
+		keyedTableListPanel = new JList(this.keyedTableList);
+		columnsPanel = new JList(this.columnsList);
 
-        unkeyedTableListPanel.addListSelectionListener(
-            new TableSelectionListener());
+		unkeyedTableListPanel.addListSelectionListener(
+			new TableSelectionListener());
 
-        columnsPanel.addListSelectionListener(new ColumnSelectionListener());
+		columnsPanel.addListSelectionListener(new ColumnSelectionListener());
 
-        this.removeTableAction = new RemoveTableKeyAction("Remove Key");
-        JButton removeButton = new JButton(removeTableAction);
+		this.removeTableAction = new RemoveTableKeyAction("Remove Key");
+		JButton removeButton = new JButton(removeTableAction);
 
-        leftPane =
-            new JSplitPane(
-                JSplitPane.VERTICAL_SPLIT,
-                new LabeledPanel(
-                    "Available Tables:",
-                    unkeyedTableListPanel),
-                new LabeledPanel(
-                    "Selected Keys:",
-                    keyedTableListPanel,
-                    removeButton));
-        leftPane.setDividerLocation(100);
-        leftPane.setOneTouchExpandable(true);
-        leftPane.setResizeWeight(0);
+		leftPane =
+			new JSplitPane(
+				JSplitPane.VERTICAL_SPLIT,
+				new LabeledPanel("Available Tables:", unkeyedTableListPanel),
+				new LabeledPanel(
+					"Selected Keys:",
+					keyedTableListPanel,
+					removeButton));
+		leftPane.setDividerLocation(100);
+		leftPane.setOneTouchExpandable(true);
+		leftPane.setResizeWeight(0);
 
-        splitPane =
-            new JSplitPane(
-                JSplitPane.HORIZONTAL_SPLIT,
-                leftPane,
-                new LabeledPanel(
-                    "Available Object Keys:",
-                    columnsPanel));
-        splitPane.setDividerLocation(180);
-        splitPane.setOneTouchExpandable(true);
-        splitPane.setResizeWeight(0);
-        add(splitPane);
+		splitPane =
+			new JSplitPane(
+				JSplitPane.HORIZONTAL_SPLIT,
+				leftPane,
+				new LabeledPanel("Available Object Keys:", columnsPanel));
+		splitPane.setDividerLocation(180);
+		splitPane.setOneTouchExpandable(true);
+		splitPane.setResizeWeight(0);
+		add(splitPane);
 
 		broker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
 		broker.subscribe(this, DatabaseSchemaChangedEvent.class, Object.class);
-        broker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
-        broker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
-        broker.subscribe(this, TableChangedEvent.class, Object.class);
-    }
+		broker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+		broker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
+		broker.subscribe(this, TableChangedEvent.class, Object.class);
+	}
 
-    class TableInfo {
-        Table table;
+	class TableInfo {
+		Table table;
 
-        public TableInfo(Table table) {
-            this.table = table;
-        }
+		public TableInfo(Table table) {
+			this.table = table;
+		}
 
-        public String toString() {
-            return table.getName();
-        }
+		public String toString() {
+			return table.getName();
+		}
 
-        public Table getTable() {
-            return table;
-        }
-    }
+		public Table getTable() {
+			return table;
+		}
+	}
 
-    class ColumnInfo {
-        Column column;
+	class ColumnInfo {
+		Column column;
 
-        public ColumnInfo(Column column) {
-            this.column = column;
-        }
+		public ColumnInfo(Column column) {
+			this.column = column;
+		}
 
-        public String toString() {
-            return column.getName()
-                + ": "
-                + SQLTypeMapper.getTypeDescription(column.getType());
-        }
+		public String toString() {
+			return column.getName()
+				+ ": "
+				+ SQLTypeMapper.getTypeDescription(column.getType());
+		}
 
-        public Column getColumn() {
-            return column;
-        }
-    }
+		public Column getColumn() {
+			return column;
+		}
+	}
 
-    class KeyTableInfo {
-        Table table;
+	class KeyTableInfo {
+		Table table;
 
-        public KeyTableInfo(Table table) {
-            this.table = table;
-        }
+		public KeyTableInfo(Table table) {
+			this.table = table;
+		}
 
-        public String toString() {
-            if (table.getKey() == null) {
-                return table.getName() + ":" + "??? No key what's the story";
-            }
-            return table.getName() + ":" + table.getKey().getName();
-        }
+		public String toString() {
+			if (table.getKey() == null) {
+				return table.getName() + ":" + "??? No key what's the story";
+			}
+			return table.getName() + ":" + table.getKey().getName();
+		}
 
-        public Column getKey() {
-            return table.getKey();
-        }
+		public Column getKey() {
+			return table.getKey();
+		}
 
-        public Table getTable() {
-            return table;
-        }
-    }
+		public Table getTable() {
+			return table;
+		}
+	}
 
-    public void processEvent(Event e) {
-        if (e instanceof ConceptualSchemaChangeEvent) {
-        	ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
-            this.dbScheme = csce.getConceptualSchema().getDatabaseSchema();
-            updateTableViews();
-        }
-        
-        if(e instanceof DatabaseConnectedEvent) {
-			DatabaseConnection connection = DatabaseConnection.getConnection();
-			if(connection.isConnected()) {
+	public void processEvent(Event e) {
+		if (e instanceof ConceptualSchemaChangeEvent) {
+			ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
+			this.dbScheme = csce.getConceptualSchema().getDatabaseSchema();
+			updateTableViews();
+		}
+
+		if (e instanceof DatabaseConnectedEvent) {
+			DatabaseConnectedEvent dbce = (DatabaseConnectedEvent) e;
+			DatabaseConnection connection = dbce.getConnection();
+			if (connection.isConnected()) {
+				this.dbScheme = new DatabaseSchema(new EventBroker());
 				this.dbScheme.readFromDBConnection(connection);
 			}
 			updateTableViews();
-        }
+		}
 
 		if (e instanceof DatabaseSchemaChangedEvent) {
 			DatabaseSchemaChangedEvent event = (DatabaseSchemaChangedEvent) e;
@@ -305,90 +303,90 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 			updateTableViews();
 		}
 
-        if (e instanceof TableChangedEvent) {
-            TableChangedEvent event = (TableChangedEvent) e;
-            Table table = event.getTable();
-            updateViewOfTable(table);
-        }
-    }
+		if (e instanceof TableChangedEvent) {
+			TableChangedEvent event = (TableChangedEvent) e;
+			Table table = event.getTable();
+			updateViewOfTable(table);
+		}
+	}
 
-    protected void updateTableViews() {
-        clear();
-        
-        if(this.dbScheme == null) {
-        	return;
-        }
-        
-        STD_Iterator it = new STD_Iterator(dbScheme.getTables());
-        for (it.reset(); !it.atEnd(); it.next()) {
-            updateViewOfTable((Table) it.val());
-        }
-    }
+	protected void updateTableViews() {
+		clear();
 
-    private void updateViewOfTable(Table table) {
-        if (table.getKey() == null) {
-            removeKeyedTable(table);
-            addUnkeyedTable(table);
-        } else {
-            removeUnkeyedTable(table);
-            addKeyedTable(table);
-        }
-    }
+		if (this.dbScheme == null) {
+			return;
+		}
 
-    private void clear() {
-        this.keyedTableList.clear();
-        this.unkeyedTableList.clear();
-        this.columnsList.clear();
-    }
+		STD_Iterator it = new STD_Iterator(dbScheme.getTables());
+		for (it.reset(); !it.atEnd(); it.next()) {
+			updateViewOfTable((Table) it.val());
+		}
+	}
 
-    public void setHorizontalDividerLocation(int location) {
-        splitPane.setDividerLocation(location);
-    }
+	private void updateViewOfTable(Table table) {
+		if (table.getKey() == null) {
+			removeKeyedTable(table);
+			addUnkeyedTable(table);
+		} else {
+			removeUnkeyedTable(table);
+			addKeyedTable(table);
+		}
+	}
 
-    public int getHorizontalDividerLocation() {
-        return splitPane.getDividerLocation();
-    }
+	private void clear() {
+		this.keyedTableList.clear();
+		this.unkeyedTableList.clear();
+		this.columnsList.clear();
+	}
 
-    public void setVerticalDividerLocation(int location) {
-        leftPane.setDividerLocation(location);
-    }
+	public void setHorizontalDividerLocation(int location) {
+		splitPane.setDividerLocation(location);
+	}
 
-    public int getVerticalDividerLocation() {
-        return leftPane.getDividerLocation();
-    }
+	public int getHorizontalDividerLocation() {
+		return splitPane.getDividerLocation();
+	}
 
-    public String getSqlTableName() {
-        Enumeration enum = this.keyedTableList.elements();
-        while (enum.hasMoreElements()) {
-            KeyTableInfo element = (KeyTableInfo) enum.nextElement();
-            return element.getTable().getName();
-        }
-        return null;
-    }
+	public void setVerticalDividerLocation(int location) {
+		leftPane.setDividerLocation(location);
+	}
 
-    public String getSqlKeyName() {
-        Enumeration enum = this.keyedTableList.elements();
-        while (enum.hasMoreElements()) {
-            KeyTableInfo element = (KeyTableInfo) enum.nextElement();
-            return element.getKey().getName();
-        }
-        return null;
-    }
-    
-    public void setKey(String tableName, String key) {
-    	DefaultListModel list = this.unkeyedTableList;
-    	for(int i = 0; i < list.size(); i++) {
-    		Table table = ((TableInfo) list.get(i)).getTable();
-    		if(table.getName().equals(tableName)) {
-    			Iterator colIt = table.getColumns().iterator();
-    			while (colIt.hasNext()) {
-                    Column col = (Column) colIt.next();
-                    if(col.getName().equals(key)) {
-                        removeUnkeyedTable(table);
-                        table.setKey(col);
-                    }
-                } 
-    		}
-    	}
-    }
+	public int getVerticalDividerLocation() {
+		return leftPane.getDividerLocation();
+	}
+
+	public String getSqlTableName() {
+		Enumeration enum = this.keyedTableList.elements();
+		while (enum.hasMoreElements()) {
+			KeyTableInfo element = (KeyTableInfo) enum.nextElement();
+			return element.getTable().getName();
+		}
+		return null;
+	}
+
+	public String getSqlKeyName() {
+		Enumeration enum = this.keyedTableList.elements();
+		while (enum.hasMoreElements()) {
+			KeyTableInfo element = (KeyTableInfo) enum.nextElement();
+			return element.getKey().getName();
+		}
+		return null;
+	}
+
+	public void setKey(String tableName, String key) {
+		DefaultListModel list = this.unkeyedTableList;
+		for (int i = 0; i < list.size(); i++) {
+			Table table = ((TableInfo) list.get(i)).getTable();
+			if (table.getName().equals(tableName)) {
+				Iterator colIt = table.getColumns().iterator();
+				while (colIt.hasNext()) {
+					Column col = (Column) colIt.next();
+					if (col.getName().equals(key)) {
+						removeUnkeyedTable(table);
+						table.setKey(col);
+					}
+				}
+			}
+		}
+	}
 }

@@ -915,6 +915,7 @@ public class ElbaMainPanel
 			&& databaseInformation.getDriverClass() != null
 			&& databaseInformation.getURL() != null) {
 			try {
+				DatabaseConnection.setConnection(databaseConnection);
 				databaseConnection.connect(databaseInformation);
 				URL location =
 					conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();

@@ -446,7 +446,7 @@ public class DatabaseConnection implements EventBrokerListener {
 
         try {
             DatabaseMetaData dmd = jdbcConnection.getMetaData();
-            ResultSet rs = dmd.getColumns(null, null, table.getName(), null);
+            ResultSet rs = dmd.getColumns(null, null, table.getPlainName(), null);
             while (rs.next()) {
                 result.add(new Column(
                         rs.getString(4),

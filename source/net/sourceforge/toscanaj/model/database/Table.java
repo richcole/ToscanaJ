@@ -74,6 +74,10 @@ public class Table implements XMLizable {
     	}
         return name;
     }
+    
+    public String getPlainName() {
+    	return this.name;
+    }
 
     public Column getKey() {
         return key;

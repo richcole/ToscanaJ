@@ -188,6 +188,7 @@ public class DatabaseConnectionInformationView extends JDialog
         }
         boolean connectDatabase() {
         	try {
+				DatabaseConnection.setConnection(connection);
                 connection.connect(databaseInfo);
             } catch (DatabaseException e) {
             	ErrorDialog.showError(this,e,"Connection failed");
