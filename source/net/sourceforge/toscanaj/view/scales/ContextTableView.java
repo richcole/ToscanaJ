@@ -15,9 +15,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Rectangle;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.JComponent;
@@ -26,7 +24,6 @@ import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
 import net.sourceforge.toscanaj.model.ContextImplementation;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 public class ContextTableView extends JComponent implements Scrollable {
 	private static final Color TEXT_COLOR = Color.BLACK;
@@ -71,11 +68,8 @@ public class ContextTableView extends JComponent implements Scrollable {
 		Paint oldPaint = g2d.getPaint();
 		Font oldFont = g2d.getFont();
 
-		g2d.setFont(oldFont.deriveFont(Font.BOLD));
-		drawColumnHeader(g2d);
-
 		Iterator objIt = this.context.getObjects().iterator();
-		int row = 1;
+		int row = 0;
 		while (objIt.hasNext()) {
 			Object object = objIt.next();
 			drawRow(g2d, object, row);
@@ -88,36 +82,18 @@ public class ContextTableView extends JComponent implements Scrollable {
 	}
 
 	public Dimension calculateNewSize() {
-		int numCol = this.context.getAttributes().size() + 1;
-		int numRow = this.context.getObjects().size() + 1;
+		int numCol = this.context.getAttributes().size();
+		int numRow = this.context.getObjects().size();
 		return new Dimension(numCol * CELL_WIDTH + 1, numRow * CELL_HEIGHT + 1);
-	}
-
-	protected void drawColumnHeader(Graphics2D g2d) {
-		g2d.setPaint(TABLE_CORNER_COLOR);
-		drawCell(g2d, "", 0, 0);
-
-		g2d.setPaint(TABLE_HEADER_COLOR);
-		Iterator attrIt = this.context.getAttributes().iterator();
-		int col = 1;
-		while (attrIt.hasNext()) {
-			Object attribute = attrIt.next();
-			drawCell(g2d, attribute.toString(), col * CELL_WIDTH, 0);
-			col += 1;
-		}
 	}
 
 	protected void drawRow(Graphics2D g2d, Object object, int row) {
 		Font font = g2d.getFont();
-		g2d.setFont(font.deriveFont(Font.BOLD));
-		g2d.setPaint(TABLE_HEADER_COLOR);
 		int y = row * CELL_HEIGHT;
-		drawCell(g2d, object.toString(), 0, y);
-
 		g2d.setFont(font.deriveFont(Font.PLAIN));
 		g2d.setPaint(TABLE_CELL_COLOR);
 		Iterator attrIt = this.context.getAttributes().iterator();
-		int col = 1;
+		int col = 0;
 		while (attrIt.hasNext()) {
 			Object attribute = attrIt.next();
 			if (this.context.getRelation().contains(object, attribute)) {
@@ -136,28 +112,11 @@ public class ContextTableView extends JComponent implements Scrollable {
 		g2d.draw(new Rectangle2D.Double(x, y, CELL_WIDTH, CELL_HEIGHT));
 
 		FontMetrics fontMetrics = g2d.getFontMetrics();
-		String newContent = reduceStringDisplayWidth(content, g2d);
-
 		g2d.drawString(
-			newContent,
-			x + CELL_WIDTH / 2 - fontMetrics.stringWidth(newContent) / 2,
+			content,
+			x + CELL_WIDTH / 2 - fontMetrics.stringWidth(content) / 2,
 			y + CELL_HEIGHT / 2 + fontMetrics.getMaxAscent() / 2);
 		g2d.setPaint(oldPaint);
-	}
-
-	protected String reduceStringDisplayWidth(String content, Graphics2D g2d) {
-		String newContent = content;
-		String tail = "...";
-		int stringWidth = g2d.getFontMetrics().stringWidth(newContent);
-		int tailWidth = g2d.getFontMetrics().stringWidth(tail);
-		if (stringWidth > (CELL_WIDTH - 10)) {
-			while ((stringWidth + tailWidth) > (CELL_WIDTH - 10)) {
-				newContent = newContent.substring(0, (newContent.length() - 1));
-				stringWidth = g2d.getFontMetrics().stringWidth(newContent);
-			}
-			newContent += tail;
-		}
-		return newContent;
 	}
 
 	public int getCellHeight() {
@@ -166,24 +125,6 @@ public class ContextTableView extends JComponent implements Scrollable {
 
 	public int getCellWidth() {
 		return CELL_WIDTH;
-	}
-
-	public String getToolTipText(MouseEvent e) {
-		String tooltipText = null;
-
-		ArrayList attributeArrayList = (ArrayList) context.getAttributes();
-		ArrayList objectsArrayList = (ArrayList) context.getObjects();
-		Position pos = getTablePosition(e.getX(), e.getY());
-
-		if (pos != null) {
-			if (pos.getCol() == 0 && pos.getRow() != 0) {
-				tooltipText = (String) objectsArrayList.get(pos.getRow() - 1);
-			} else if (pos.getCol() != 0 && pos.getRow() == 0) {
-				Attribute attr = (Attribute) attributeArrayList.get(pos.getCol() - 1);
-				tooltipText = (String) attr.getData();
-			}
-		}
-		return tooltipText;
 	}
 
 	protected Position getTablePosition(int xLoc, int yLoc) {
