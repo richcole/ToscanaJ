@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.events.TableChangedEvent;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
@@ -67,14 +66,6 @@ public class Table implements XMLizable {
         columns.add(column);
     }
 
-    public String getName() {
-    	DatabaseConnection connection = DatabaseConnection.getConnection();
-    	if( connection != null && connection.getDatabaseType() == DatabaseInfo.ACCESS_FILE) {
-			return "[" + name + "]";
-    	}
-        return name;
-    }
-    
     public String getPlainName() {
     	return this.name;
     }
@@ -94,5 +85,33 @@ public class Table implements XMLizable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSqlExpression() {
+        return getQuotedIdentifier(this.name);
+    }
+
+    /**
+     * @todo outsource this into some central place. It is copied and pasted
+     * from DumpSqlScript. A good idea might be implementing an interface for
+     * SQL expressions, which allows access to this stuff.
+     */
+    private static String getQuotedIdentifier(String identifier) {
+    	/// @todo we might need something like the following lines for supporting Access
+//        DatabaseConnection connection = DatabaseConnection.getConnection();
+//        if( connection != null && connection.getDatabaseType() == DatabaseInfo.ACCESS_FILE) {
+//            return "[" + name + "]";
+//        }
+        String retVal = "\"";
+        for(int i = 0; i < identifier.length(); i++) {
+            char curChar = identifier.charAt(i);
+            if(curChar == '\"') {
+                retVal += "\"\"";
+            } else {
+                retVal += curChar;
+            }
+        }
+        retVal += "\"";
+        return retVal;
     }
 }

@@ -231,7 +231,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		}
 
 		public String toString() {
-			return table.getName();
+			return table.getPlainName();
 		}
 
 		public Table getTable() {
@@ -266,9 +266,9 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 
 		public String toString() {
 			if (table.getKey() == null) {
-				return table.getName() + ":" + "??? No key what's the story";
+				return table.getPlainName() + ":" + "??? No key what's the story";
 			}
-			return table.getName() + ":" + table.getKey().getName();
+			return table.getPlainName() + ":" + table.getKey().getName();
 		}
 
 		public Column getKey() {
@@ -359,7 +359,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		Enumeration enum = this.keyedTableList.elements();
 		while (enum.hasMoreElements()) {
 			KeyTableInfo element = (KeyTableInfo) enum.nextElement();
-			return element.getTable().getPlainName();
+			return element.getTable().getSqlExpression();
 		}
 		return null;
 	}
@@ -377,7 +377,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		DefaultListModel list = this.unkeyedTableList;
 		for (int i = 0; i < list.size(); i++) {
 			Table table = ((TableInfo) list.get(i)).getTable();
-			if (table.getName().equals(tableName)) {
+			if (table.getPlainName().equals(tableName)) {
 				Iterator colIt = table.getColumns().iterator();
 				while (colIt.hasNext()) {
 					Column col = (Column) colIt.next();

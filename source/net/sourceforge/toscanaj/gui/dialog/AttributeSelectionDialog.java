@@ -57,7 +57,7 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
         }
 
         public String toString() {
-            return table.getName();
+            return table.getSqlExpression();
         }
 
         public Table getTable() {

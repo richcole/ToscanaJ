@@ -291,7 +291,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 	}
     
 	protected void updateRangeInfo() {
-		String tail = " FROM " + this.column.getTable().getName() + ";";
+		String tail = " FROM " + this.column.getTable().getSqlExpression() + ";";
 		String minQu = "SELECT min(" + this.column.getSqlExpression() + ")" + tail;
 		String maxQu = "SELECT max(" + this.column.getSqlExpression() + ")" + tail;
 		String avgQu = "SELECT avg(" + this.column.getSqlExpression() + ")" + tail;
