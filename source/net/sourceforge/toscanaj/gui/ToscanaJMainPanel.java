@@ -926,7 +926,41 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 			this.lastImageExportFile =
 				new File(System.getProperty("user.dir"));
 		}
-		final JFileChooser saveDialog =new JFileChooser(this.lastImageExportFile);
+		final GraphicFormat graphicFormat = this.diagramExportSettings.getGraphicFormat();
+		if(graphicFormat==null){}
+		final JFileChooser saveDialog =
+			new JFileChooser(this.lastImageExportFile) {
+			public void approveSelection() {
+				File selectedFile = getSelectedFile();
+				if(selectedFile.getName().indexOf('.') == -1) { // check for extension
+					// add default
+					FileFilter filter = getFileFilter();
+					if(filter instanceof ExtensionFileFilter) {
+						ExtensionFileFilter extFileFilter = (ExtensionFileFilter) filter;
+						String[] extensions = extFileFilter.getExtensions();
+						selectedFile = new File(selectedFile.getAbsolutePath() + "."+extensions[0]);
+						setSelectedFile(selectedFile);
+					}	
+				}
+				if (selectedFile != null && selectedFile.exists()) {
+					//Ask the user if they are sure they want to overwrite the existing file
+					int response =
+						JOptionPane.showConfirmDialog(
+							this,
+							"The file "
+								+ selectedFile.getName()
+								+ " already exists.\n"
+								+ "Do you want to overwrite the existing file?",
+							"File Export Warning: File exists",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.WARNING_MESSAGE);
+					if (response != JOptionPane.YES_OPTION) {
+						return;
+					}
+				}
+				super.approveSelection();
+			}
+		};
 		FileFilter defaultFilter = saveDialog.getFileFilter();
 		Iterator formatIterator = GraphicFormatRegistry.getIterator();
 		while (formatIterator.hasNext()) {
@@ -952,7 +986,6 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 						selectedFile = new File(selectedFile.getAbsolutePath() + "." + extensions[0]);
 					}
 				}
-				this.lastImageExportFile = selectedFile;
 				GraphicFormat format =
 					GraphicFormatRegistry.getTypeByExtension(
 						selectedFile);
@@ -986,7 +1019,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 		} while (formatDefined == false);
 	}
 
-	protected void exportImage(File selectedFile) {
+	protected void exportImage(File selectedFile){
 		try {
 			this
 				.diagramExportSettings
@@ -1005,6 +1038,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 				"Not enough memory available to export\n"
 					+ "the diagram in this size");
 		}
+		this.lastImageExportFile = selectedFile;
 	}
  
 	protected void exportImageWithManualMode() {
@@ -1012,21 +1046,42 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 			this.lastImageExportFile =
 				new File(System.getProperty("user.dir"));
 		}
+		final GraphicFormat format = this.diagramExportSettings.getGraphicFormat();
 		final JFileChooser saveDialog =
-			new JFileChooser(this.lastImageExportFile);
-		GraphicFormat currentFormat = this.diagramExportSettings.getGraphicFormat();
+			new JFileChooser(this.lastImageExportFile) {
+			public void approveSelection() {
+				File selectedFile = getSelectedFile();
+				if(selectedFile.getName().indexOf('.') == -1) { // check for extension
+					// add default
+					String[] extensions = format.getExtensions();
+					selectedFile = new File(selectedFile.getAbsolutePath() + "."+extensions[0]);
+					setSelectedFile(selectedFile);
+				}
+				if (selectedFile != null && selectedFile.exists()) {
+					//Ask the user if they are sure they want to overwrite the existing file
+					int response =
+						JOptionPane.showConfirmDialog(
+							this,
+							"The file "
+								+ selectedFile.getName()
+								+ " already exists.\n"
+								+ "Do you want to overwrite the existing file?",
+							"File Export Warning: File exists",
+							JOptionPane.YES_NO_OPTION,
+							JOptionPane.WARNING_MESSAGE);
+					if (response != JOptionPane.YES_OPTION) {
+						return;
+					}
+				}
+				super.approveSelection();
+			}
+		};
+		GraphicFormat currentFormat = diagramExportSettings.getGraphicFormat();
 		ExtensionFileFilter manualFileFilter = new ExtensionFileFilter(currentFormat.getExtensions(),currentFormat.getName());
 		saveDialog.addChoosableFileFilter(manualFileFilter);
 		int rv = saveDialog.showSaveDialog(this);
 		if (rv == JFileChooser.APPROVE_OPTION) {
 			File selectedFile = saveDialog.getSelectedFile();
-			this.lastImageExportFile = selectedFile;
-			if(selectedFile.getName().indexOf('.') == -1) { // check for extension
-				// add default
-				GraphicFormat format = this.diagramExportSettings.getGraphicFormat();
-				String[] extensions = format.getExtensions();
-				selectedFile = new File(selectedFile.getAbsolutePath() + "." + extensions[0]);
-			}
 			exportImage(selectedFile);
 		}
 	}
