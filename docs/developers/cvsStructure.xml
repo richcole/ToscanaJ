@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cvsStructure>
+	<module name="docs">
+		<description>
+			All kinds of documentation
+		</description>
+		<directory name="developers">
+			<description>
+				Information for developers of the program itself
+			</description>
+		</directory>
+		<directory name="users">
+			<description>
+				User manual, howtos etc.
+			</description>
+		</directory>
+		<directory name="?">
+			<description>
+				Information on setting up Toscana systems
+			</description>
+		</directory>
+	</module>
+	<module name="examples">
+		<description>
+			All kinds of examples: for learning, for testing, etc.
+		</description>
+	</module>
+	<module name="libs">
+		<description>
+			Libraries used for ToscanaJ but developed elsewhere. This is to ensure you can always get the correct version of a library.
+		</description>
+	</module>
+	<module name="source">
+		<description>
+			The source code for ToscanaJ
+		</description>
+	</module>
+	<module name="specs">
+		<description>
+			All kinds of specifications for ToscanaJ, e.g. the file format description.
+		</description>
+	</module>
+	<module name="tools">
+		<description>
+			Additional tools useful for ToscanaJ users and developers.
+		</description>
+		<directory name="csc2csx">
+			<description>
+				A conversion tool to turn CSC files from Toscana 2/3 into ToscanaJs CSX format.
+			</description>
+			<directory name="source">
+				<description>
+					The source for the program (Borland C++ using Frank Vogts FCA library).
+				</description>
+			</directory>
+			<directory name="bin">
+				<description>
+					A compiled version and all DLLs needed to run it.
+				</description>
+			</directory>
+		</directory>
+	</module>
+	<module name="website">
+		<description>
+			The files used for creating the website.
+		</description>
+	</module>
+</cvsStructure>
+
+<!-- copy and paste stuff
+	<module name="">
+		<description>
+		</description>
+		<directory name="">
+			<description>
+			</description>
+		</directory>
+	</module>
+-->
