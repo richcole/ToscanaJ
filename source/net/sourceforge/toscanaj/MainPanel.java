@@ -1,5 +1,7 @@
 package net.sourceforge.toscanaj;
 
+import net.sourceforge.toscanaj.canvas.ImageGenerationException;
+
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 
@@ -17,6 +19,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.LabelView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
+import net.sourceforge.toscanaj.view.dialogs.DiagramExportDialog;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -89,6 +92,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     // menu items list
     // FILE menu
     private JMenuItem openMenuItem = null;
+    private JMenuItem exportDiagramMenuItem = null;
     private JMenuItem printMenuItem = null;
     private JMenuItem printSetupMenuItem = null;
     private JMenu mruMenu = null;
@@ -231,6 +235,13 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
                  KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         openMenuItem.addActionListener(this);
         fileMenu.add(openMenuItem);
+
+        // menu item export diagram
+        exportDiagramMenuItem = new JMenuItem("Export Diagram...");
+        exportDiagramMenuItem.setMnemonic(KeyEvent.VK_E);
+        exportDiagramMenuItem.addActionListener(this);
+        exportDiagramMenuItem.setEnabled(false);
+        fileMenu.add(exportDiagramMenuItem);
 
         // separator
         fileMenu.addSeparator();
@@ -406,6 +417,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      */
     public void update(Object source) {
         this.printMenuItem.setEnabled(DiagramController.getController().getDiagramHistory().getSize()!=0);
+        this.exportDiagramMenuItem.setEnabled(DiagramController.getController().getDiagramHistory().getSize()!=0);
         this.backMenuItem.setEnabled(DiagramController.getController().undoIsPossible());
         this.backButton.setEnabled(DiagramController.getController().undoIsPossible());
     }
@@ -439,6 +451,25 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         // menu FILE
         if (actionSource == openMenuItem) {
             openSchema();
+        }
+        if (actionSource == exportDiagramMenuItem) {
+            DiagramExportDialog.initialize(this, diagramView.getWidth(), diagramView.getHeight());
+            if(DiagramExportDialog.showDialog(this)) {
+                final JFileChooser saveDialog =
+                                new JFileChooser( System.getProperty( "user.dir" ) );
+                int rv = saveDialog.showSaveDialog( this );
+                if( rv == JFileChooser.APPROVE_OPTION ) {
+                    try {
+                        this.diagramView.exportGraphic( DiagramExportDialog.getImageFormat(),
+                                                        DiagramExportDialog.getImageWidth(),
+                                                        DiagramExportDialog.getImageHeight(),
+                                                        saveDialog.getSelectedFile().getPath() );
+                    }
+                    catch(ImageGenerationException e) {
+                        /// @TODO give some feedback here
+                    }
+                }
+            }
         }
         if (actionSource == printMenuItem) {
             PrinterJob printJob = PrinterJob.getPrinterJob();

@@ -1,24 +1,41 @@
 package net.sourceforge.toscanaj.canvas;
 
+import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
+
+import com.sun.jimi.core.Jimi;
+import com.sun.jimi.core.JimiException;
+import com.sun.jimi.core.JimiWriter;
+
 import javax.swing.JComponent;
 
+import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sourceforge.toscanaj.canvas.CanvasItem;
-import net.sourceforge.toscanaj.view.diagram.LabelView;
-import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
+import org.apache.batik.svggen.SVGGraphics2D;
+import org.apache.batik.dom.GenericDOMImplementation;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.DOMImplementation;
 
 /**
  * DrawingCanvas controls all the updating of CanvasItems contained in a DiagramView
@@ -29,6 +46,26 @@ import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
  */
 
 public class DrawingCanvas extends JComponent implements MouseListener, MouseMotionListener, Printable {
+    /**
+     * Used to indicate that no graphic format has been set.
+     */
+    static public final int FORMAT_UNSET = 0;
+
+    /**
+     * Used to indicate PNG format.
+     */
+    static public final int FORMAT_PNG = 1;
+
+    /**
+     * Used to indicate JPG format.
+     */
+    static public final int FORMAT_JPG = 2;
+
+    /**
+     * Used to indicate SVG format.
+     */
+    static public final int FORMAT_SVG = 3;
+
     /**
      * A list of all canvas items to draw.
      */
@@ -69,6 +106,14 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      */
     public void paintCanvasItems(ToscanajGraphics2D graphics)
     {
+        // fill the background
+        /// @TODO Rename this method (it draws not only the items)
+        /// @TODO Make Background color configurable
+        Graphics2D graphics2D = graphics.getGraphics2D();
+        graphics2D.setPaint(this.getBackground());
+        graphics2D.fillRect(0,0,this.getWidth(), this.getHeight());
+        graphics2D.setPaint(java.awt.Color.black);
+
         // paint all items on canvas
         Iterator it = this.canvasItems.iterator();
         while( it.hasNext() ) {
@@ -111,6 +156,107 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
         }
         else {
             return NO_SUCH_PAGE;
+        }
+    }
+
+    /**
+     * Saves a graphic using the given format, size and filename.
+     *
+     * Allowed formats are FORMAT_PNG, FORMAT_JPG and FORMAT_SVG.
+     */
+    public void exportGraphic(int format, int width, int height, String fileName)
+           throws ImageGenerationException {
+        if( format == FORMAT_SVG ) {
+            // use Batik
+            // Get a DOMImplementation
+            DOMImplementation domImpl =
+                GenericDOMImplementation.getDOMImplementation();
+
+            // Create an instance of org.w3c.dom.Document
+            Document document = domImpl.createDocument(null, "svg", null);
+
+            // Create an instance of the SVG Generator
+            SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
+            svgGenerator.setSVGCanvasSize(new Dimension(width,height));
+
+            // render the graphic into the DOM
+            ToscanajGraphics2D tgraphics = new ToscanajGraphics2D( svgGenerator,
+                                                                   this.graphics.getOffset(),
+                                                                   this.graphics.getXScaling(),
+                                                                   this.graphics.getYScaling() );
+            paintCanvasItems(tgraphics);
+
+            // Finally, stream out SVG to the standard output using UTF-8
+            // character to byte encoding
+            boolean useCSS = true; // we want to use CSS style attribute
+            try {
+                FileOutputStream outStream = new FileOutputStream(fileName);
+                Writer out = new OutputStreamWriter(outStream, "UTF-8");
+                svgGenerator.stream(out, useCSS);
+                outStream.close();
+            }
+            catch(Exception e) {
+                throw new ImageGenerationException( "Error while generating '" +
+                    fileName + "' - writing SVG error: "  + e.getMessage(), e );
+            }
+        }
+        else {
+            // use Jimi
+            Image image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D graphics2D = (Graphics2D) image.getGraphics();
+
+            // scale to just fit the page
+            double xScale = width/this.getWidth();
+            double yScale = height/this.getHeight();
+            double scale;
+            if(xScale < yScale) {
+                scale = xScale;
+            }
+            else {
+                scale = yScale;
+            }
+            graphics2D.scale(scale,scale);
+
+            ToscanajGraphics2D tgraphics = new ToscanajGraphics2D( graphics2D,
+                                                                   this.graphics.getOffset(),
+                                                                   this.graphics.getXScaling(),
+                                                                   this.graphics.getYScaling() );
+
+            // paint all items on canvas
+            paintCanvasItems(tgraphics);
+            try
+            {
+                JimiWriter writer;
+                if( format == FORMAT_PNG ) {
+                    writer = Jimi.createJimiWriter( "dummy.png" );
+                }
+                else if( format == FORMAT_JPG ) {
+                    writer = Jimi.createJimiWriter( "dummy.jpg" );
+                }
+                else {
+                    throw new ImageGenerationException( "Error while generating '" +
+                               fileName + "' - unknown graphic format" );
+                }
+                writer.setSource( image );
+                FileOutputStream outStream = new FileOutputStream(fileName);
+                writer.putImage( outStream );
+                outStream.close();
+            }
+            catch( JimiException e )
+            {
+                throw new ImageGenerationException( "Error while generating '" +
+                    fileName + "' - Jimi error: "  + e.getMessage(), e );
+            }
+            catch( FileNotFoundException e )
+            {
+                throw new ImageGenerationException( "Error while generating '" +
+                    fileName + "' - not found ??? "  + e.getMessage(), e );
+            }
+            catch( IOException e )
+            {
+                throw new ImageGenerationException( "Error while generating '" +
+                    fileName + "' - IO problem: "  + e.getMessage(), e );
+            }
         }
     }
 
