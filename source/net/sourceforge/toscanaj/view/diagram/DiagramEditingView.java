@@ -57,7 +57,7 @@ import java.util.Iterator;
 public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private static final double GRID_SIZE_CHANGE_FACTOR = 1.2599210498948731647672106072782;
     private static final int DEFAULT_GRID_SIZE = 15;
-    private static final String[] FULL_MOVEMENT_OPTION_NAMES = {"NDim", "Node", "Ideal", "Filter"};
+    private static final String[] FULL_MOVEMENT_OPTION_NAMES = {"Additive", "Node", "Ideal", "Filter"};
     private static final String[] SIMPLE_MOVEMENT_OPTION_NAMES = {"Node", "Ideal", "Filter"};
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramEditingView.class);
     private ConceptualSchema conceptualSchema;
@@ -305,13 +305,13 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
             public void actionPerformed(ActionEvent e) {
                 JComboBox combobox = (JComboBox) e.getSource();
                 String selection = combobox.getSelectedItem().toString();
-                if (selection.equals("NDim")) {
+                if (selection.equals(FULL_MOVEMENT_OPTION_NAMES[0])) {
                     setNDimManipulator();
-                } else if (selection.equals("Node")) {
+                } else if (selection.equals(FULL_MOVEMENT_OPTION_NAMES[1])) {
                 	setNodeManipulator();
-                } else if (selection.equals("Ideal")) {
+                } else if (selection.equals(FULL_MOVEMENT_OPTION_NAMES[2])) {
                 	setIdealManipulator();
-                } else if (selection.equals("Filter")) {
+                } else if (selection.equals(FULL_MOVEMENT_OPTION_NAMES[3])) {
                 	setFilterManipulator();
                 }
             }
@@ -323,7 +323,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         Diagram2D diagram = this.diagramView.getDiagram();
         if(diagram == null) {
         	movementChooser.setEnabled(false);
-        	movementChooser.setPreferredSize(new Dimension(60,25));
+        	movementChooser.setPreferredSize(new Dimension(80,25));
         } else {
         	movementChooser.setEnabled(true);
         	if (diagram instanceof NDimDiagram) {

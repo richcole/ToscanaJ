@@ -11,10 +11,12 @@ Affecting different programs:
   situations there was a visible offset before.
 - creating lattice diagrams is now a lot faster (noticable esp. when importing
   Cernato or Burmeister files).
-- the restrictions of the n-dim manipulator on diagrams created without external
+- the former "n-dim" manipulator is now called "Additive" (credit goes to Richard
+  Cole for finding the obvious).
+- the restrictions of the additive manipulator on diagrams created without external
   order (all but Cernato-import) are reduced -- the manipulator appears like the
   ideal manipulator on meet-irreducible nodes now but allows dragging other nodes
-  while keeping additivvity. This applies only to new diagrams, existing diagrams
+  while keeping additivity. This applies only to new diagrams, existing diagrams
   need to be recreated (e.g. by hitting "Create" in the context editor).
 
 Specific for ToscanaJ:
