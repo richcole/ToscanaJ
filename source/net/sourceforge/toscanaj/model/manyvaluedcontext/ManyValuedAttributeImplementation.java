@@ -52,10 +52,10 @@ public class ManyValuedAttributeImplementation implements WritableManyValuedAttr
 		this.name = name;
 	}
 
-	public Element toXML(Hashtable typesIdMapping) {
+	public Element toXML() {
 		Element retVal = new Element(MANY_VALUED_ATTRIBUTE_ELEMENT_NAME);
 		retVal.setAttribute(NAME_ATTRIBUTE_NAME, name);
-		retVal.setAttribute(TYPE_REF_ATTRIBUTE_NAME, (String) typesIdMapping.get(this.getType()));
+		retVal.setAttribute(TYPE_REF_ATTRIBUTE_NAME, type.getName());
 		return retVal;
 	}
 

@@ -29,7 +29,7 @@ public abstract class AbstractXSDDatatype extends AbstractDatatype {
         private String baseType;
         
         public TypeCreator(String baseType) {
-            this.baseType = baseType;
+            this.baseType = XSD_NAMESPACE.getPrefix() + ":" + baseType;
         }
         
         public boolean accepts(Element element) {
@@ -37,7 +37,7 @@ public abstract class AbstractXSDDatatype extends AbstractDatatype {
             if(restElem == null) {
                 return false;
             }
-            return restElem.getAttributeValue("base", XSD_NAMESPACE).equals(this.baseType);
+            return restElem.getAttributeValue("base").equals(this.baseType);
         }
         
         protected Element getRestrictionElement(Element element) {
@@ -57,7 +57,7 @@ public abstract class AbstractXSDDatatype extends AbstractDatatype {
         Element retVal = createElement(XSD_ELEMENT_SIMPLE_TYPE);
         retVal.setAttribute("name", getName());
         Element restElem = createElement(XSD_ELEMENT_RESTRICTION);
-        restElem.setAttribute("base", getBaseType());
+        restElem.setAttribute("base", XSD_NAMESPACE.getPrefix() + ":" + getBaseType());
         addRestrictions(restElem);
         retVal.addContent(restElem);
         return retVal;

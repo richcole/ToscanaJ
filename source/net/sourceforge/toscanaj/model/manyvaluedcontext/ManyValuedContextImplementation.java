@@ -44,7 +44,6 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 	private static final String RELATION_ELEMENT_NAME = "relation";
     private static final String RELATIONSHIP_ELEMENT_NAME = "tuple";
 	private static final String OBJECT_ID_ATTRIBUTE_NAME = "objectId";
-	private static final String TYPE_ID_ATTRIBUTE_NAME = "typeId";
 	private static final String VALUE_OBJECT_REF_ATTRIBUTE_NAME = "objectRef";
 	private static final String VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME = "attributeRef";
     
@@ -150,7 +149,6 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		IdPool tidpool = new IdPool();
 		Hashtable objectIdMapping = new Hashtable();
 		Hashtable attributeIdMapping = new Hashtable();
-		Hashtable typeIdMapping = new Hashtable();
 		
 		Element objectsElement = new Element(OBJECTS_ELEMENT_NAME);
 		for (Iterator iter = objects.iterator(); iter.hasNext();) {
@@ -169,10 +167,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 				throw new RuntimeException("Found type \"" +
 						itType.getName() + "\" not to be XMLizable.");
 			}
-			String id = tidpool.getFreeId(itType.toString());
-			typeIdMapping.put(itType, id);
 			Element typeElement = ((XMLizable) itType).toXML();
-			typeElement.setAttribute(TYPE_ID_ATTRIBUTE_NAME, id);
 			typesElement.addContent(typeElement);
 		}
 		retVal.addContent(typesElement);
@@ -183,7 +178,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 				throw new RuntimeException("Found attribute \"" +
 						itAttribute.getName() + "\" not to be XMLizable.");
 			}
-			Element attributeElement = ((ManyValuedAttributeImplementation)itAttribute).toXML(typeIdMapping);
+			Element attributeElement = ((ManyValuedAttributeImplementation)itAttribute).toXML();
 			String id = aidpool.getFreeId(itAttribute.toString());
 			attributeIdMapping.put(itAttribute, id);
 			attributeElement.setAttribute(ATTRIBUTE_ID_ATTRIBUTE_NAME, id);
@@ -228,8 +223,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		for (Iterator iter = typesElement.getChildren().iterator(); iter.hasNext();) {
 			Element typeElement = (Element) iter.next();
 			Datatype newType = DatatypeFactory.readType(typeElement);
-			String id = XMLHelper.getAttribute(typeElement, TYPE_ID_ATTRIBUTE_NAME).getValue();
-			typeIdMapping.put(id, newType);
+			typeIdMapping.put(newType.getName(), newType);
 			types.add(newType);
 		}
 		for (Iterator iter = attributesElement.getChildren().iterator(); iter.hasNext();) {
