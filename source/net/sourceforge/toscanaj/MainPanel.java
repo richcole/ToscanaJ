@@ -65,7 +65,7 @@ import javax.swing.KeyStroke;
  *  This class provides the main GUI panel with menus and a toolbar
  *  for ToscanaJ.
  */
-public class MainPanel extends JFrame implements ActionListener, ChangeObserver {
+public class MainPanel extends JFrame implements ActionListener, ChangeObserver, KeyListener {
     /**
      * The maximum number of files in the most recently used files list.
      */
@@ -191,6 +191,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         buildPanel();
         // listen to changes on DiagramController
         DiagramController.getController().addObserver(this);
+        // add listener for keys
+        this.addKeyListener(this);
         // restore the old MRU list
         mruList = ConfigurationManager.fetchStringList("mainPanel", "mruFiles", MaxMruFiles);
         // set up the menu for the MRU files
@@ -611,6 +613,90 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
                 diagramSchema.setBottomColor(newColor);
             }
             repaint();
+        }
+    }
+
+    /**
+     * Nothing to do on key releases.
+     */
+    public void keyReleased(KeyEvent e) {
+    }
+
+    /**
+     * Nothing to do on key presses.
+     */
+    public void keyPressed(KeyEvent e) {
+    }
+
+    /**
+     * We do some things if keys were typed when the diagram view has the focus.
+     */
+    public void keyTyped(KeyEvent e) {
+        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
+        if (e.getKeyChar() == 'e') {
+            exportImage();
+        }
+        if (e.getKeyChar() == 'E') {
+            showImageExportOptions();
+        }
+        if (e.getKeyChar() == 'f') {
+            if(this.filterAllMenuItem.isSelected()) {
+                this.filterExactMenuItem.setSelected(true);
+                // testing only
+                diagramSchema.setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT);
+                // ^^^^^^^^^^^^
+                DiagramController.getController().setFilterMethod(DiagramController.FILTER_CONTINGENT);
+            }
+            else {
+                this.filterAllMenuItem.setSelected(true);
+                // testing only
+                diagramSchema.setGradientType(DiagramSchema.GRADIENT_TYPE_EXTENT);
+                // ^^^^^^^^^^^^
+                DiagramController.getController().setFilterMethod(DiagramController.FILTER_EXTENT);
+            }
+        }
+        if (e.getKeyChar() == 'b') {
+            if(DiagramController.getController().undoIsPossible()) {
+                DiagramController.getController().back();
+            }
+        }
+        if (e.getKeyChar() == '0') {
+            this.noNestingMenuItem.setSelected(true);
+            DiagramController.getController().setNestingLevel(0);
+        }
+        if (e.getKeyChar() == '1') {
+            this.nestingLevel1MenuItem.setSelected(true);
+            DiagramController.getController().setNestingLevel(1);
+        }
+        if (e.getKeyChar() == 's') {
+            if(this.showAllMenuItem.isSelected()) {
+                this.showExactMenuItem.setSelected(true);
+            }
+            else {
+                this.showAllMenuItem.setSelected(true);
+            }
+            updateLabelViews();
+        }
+        if (e.getKeyChar() == 'l') {
+            if(this.listDocMenuItem.isSelected()) {
+                this.numDocMenuItem.setSelected(true);
+            }
+            else {
+                this.listDocMenuItem.setSelected(true);
+            }
+            updateLabelViews();
+        }
+        if (e.getKeyChar() == '%') {
+            this.percDistMenuItem.setState(!this.percDistMenuItem.getState());
+            this.diagramView.setShowPercentage(this.percDistMenuItem.getState());
+            // testing only
+            if(this.percDistMenuItem.getState()) {
+                DiagramSchema.getDiagramSchema().setGradientReference(DiagramSchema.GRADIENT_REFERENCE_SCHEMA);
+            }
+            else {
+                DiagramSchema.getDiagramSchema().setGradientReference(DiagramSchema.GRADIENT_REFERENCE_DIAGRAM);
+            }
+            // ^^^^^^^^^^^^
         }
     }
 
