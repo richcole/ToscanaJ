@@ -9,13 +9,18 @@ package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.database.Column;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.diagram.*;
 
 import javax.swing.*;
+import java.util.*;
+import java.awt.geom.Point2D;
 
 public class NominalScaleGenerator implements ScaleGenerator {
     private JFrame parent;
+    private static final int DIAGRAM_WIDTH = 400;
 
     public NominalScaleGenerator(JFrame parent) {
         this.parent = parent;
@@ -30,15 +35,84 @@ public class NominalScaleGenerator implements ScaleGenerator {
     }
 
     public Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
+        Column column = columns[0].getColumn();
         NominalScaleEditorDialog dialog = new NominalScaleEditorDialog(
                 parent,
-                columns[0].getColumn(),
+                column,
                 databaseConnection
         );
         if(!dialog.execute()) {
             return null;
         }
-        return new SimpleLineDiagram();
+
+        Object[] values = dialog.getValues();
+
+        WriteableDiagram2D ret = new SimpleLineDiagram();
+        ret.setTitle(dialog.getDiagramTitle());
+
+        List conceptList = new ArrayList();
+        ConceptImplementation top = makeConcept(null,null);
+        DiagramNode topNode = new DiagramNode("top",
+                new Point2D.Double(0,0),
+                top,
+                new LabelInfo(),
+                new LabelInfo(),
+                null
+        );
+        ret.addNode(topNode);
+        conceptList.add(top);
+        ConceptImplementation bottom = makeConcept(null,null);
+        DiagramNode bottomNode = new DiagramNode("bottom",
+                new Point2D.Double(0,100),
+                top,
+                new LabelInfo(),
+                new LabelInfo(),
+                null
+        );
+        ret.addNode(bottomNode);
+        conceptList.add(bottom);
+        int numberOfValues = values.length;
+        for (int i = 0; i < numberOfValues; i++) {
+            double x = -DIAGRAM_WIDTH/2 + i*DIAGRAM_WIDTH/(double)(numberOfValues-1);
+            ConceptImplementation currentConcept = makeConcept(String.valueOf(values[i]),
+                                                       getSQLClause(column.getName(), values, i));
+            conceptList.add(currentConcept);
+
+            DiagramNode node = new DiagramNode((new Integer(i)).toString(),
+                    new Point2D.Double(x, 50),
+                    currentConcept,
+                    new LabelInfo(),
+                    new LabelInfo(),
+                    null
+            );
+            currentConcept.addSuperConcept(top);
+            currentConcept.addSubConcept(bottom);
+
+            ret.addNode(node);
+            ret.addLine(topNode, node);
+            ret.addLine(node, bottomNode);
+        }
+        for (Iterator it = conceptList.iterator(); it.hasNext();) {
+            ConceptImplementation concept = (ConceptImplementation) it.next();
+            concept.buildClosures();
+        }
+
+        return ret;
+    }
+
+    private String getSQLClause(String columnName, Object[] values, int i) {
+        return columnName + "='" + values[i].toString() + "'";
+    }
+
+    private ConceptImplementation makeConcept(String label, String queryClause) {
+        ConceptImplementation retVal = new ConceptImplementation();
+        if(label != null) {
+            retVal.addAttribute(new Attribute(label, null));
+        }
+        if(queryClause != null) {
+            retVal.addObject(queryClause);
+        }
+        return retVal;
     }
 
     public Diagram2D generateScale(Diagram2D oldVersion) {

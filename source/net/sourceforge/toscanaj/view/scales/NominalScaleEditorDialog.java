@@ -17,6 +17,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Iterator;
+import java.util.List;
 
 public class NominalScaleEditorDialog extends JDialog {
     private boolean result;
@@ -204,5 +205,13 @@ public class NominalScaleEditorDialog extends JDialog {
         result = false;
         show();
         return result;
+    }
+
+    public Object[] getValues() {
+        return this.attributeListModel.toArray();
+    }
+
+    public String getDiagramTitle() {
+        return this.scaleTitleField.getText();
     }
 }
