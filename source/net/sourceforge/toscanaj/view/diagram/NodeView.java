@@ -47,11 +47,6 @@ public class NodeView extends CanvasItem {
     static final public int SELECTED_IDEAL = 4;
 
     /**
-     * The amount of fade out for unselected nodes.
-     */
-    static public float fadeOut = 0.7F;
-
-    /**
      * The size of the circles around selected nodes.
      */
     static public int selectionSize = 3;
@@ -122,13 +117,8 @@ public class NodeView extends CanvasItem {
             nodeColor = diagramSchema.getNestedDiagramNodeColor();
         }
         else {
-            Color topColor = diagramSchema.getTopColor();
-            Color bottomColor = diagramSchema.getBottomColor();
-            float rel = (float) this.diagramNode.getConcept().getExtentSizeRelative();
-            nodeColor = new Color( (int)(topColor.getRed()*rel + bottomColor.getRed()*(1-rel)),
-                                   (int)(topColor.getGreen()*rel + bottomColor.getGreen()*(1-rel)),
-                                   (int)(topColor.getBlue()*rel + bottomColor.getBlue()*(1-rel)),
-                                   (int)(topColor.getAlpha()*rel + bottomColor.getAlpha()*(1-rel)) );
+            double rel = this.diagramNode.getConcept().getExtentSizeRelative();
+            nodeColor = diagramSchema.getGradientColor(rel);
         }
         Stroke oldStroke = graphics.getStroke();
         if(this.selectionState != NO_SELECTION) {
@@ -146,15 +136,8 @@ public class NodeView extends CanvasItem {
             }
             else if(this.selectionState == NOT_SELECTED) {
                 // lighten
-                float rel = fadeOut;
-                nodeColor = new Color( (int)(nodeColor.getRed()*(1-rel) + 255*rel),
-                                       (int)(nodeColor.getGreen()*(1-rel) + 255*rel),
-                                       (int)(nodeColor.getBlue()*(1-rel) + 255*rel),
-                                       (int)(nodeColor.getAlpha()*(1-rel) + 255*rel) );
-                circleColor = new Color( (int)(circleColor.getRed()*(1-rel) + 255*rel),
-                                         (int)(circleColor.getGreen()*(1-rel) + 255*rel),
-                                         (int)(circleColor.getBlue()*(1-rel) + 255*rel),
-                                         (int)(circleColor.getAlpha()*(1-rel) + 255*rel) );
+                nodeColor = diagramSchema.fadeOut(nodeColor);
+                circleColor = diagramSchema.fadeOut(circleColor);
             }
         }
 

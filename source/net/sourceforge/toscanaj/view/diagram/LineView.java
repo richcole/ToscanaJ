@@ -55,13 +55,7 @@ public class LineView extends CanvasItem {
                 graphics.setStroke(new BasicStroke(NodeView.selectionSize));
             }
             else if(this.selectionState == NodeView.NOT_SELECTED) {
-                Color circleColor = diagramSchema.getCircleColor();
-                float rel = NodeView.fadeOut;
-                circleColor = new Color( (int)(circleColor.getRed()*(1-rel) + 255*rel),
-                                         (int)(circleColor.getGreen()*(1-rel) + 255*rel),
-                                         (int)(circleColor.getBlue()*(1-rel) + 255*rel),
-                                         (int)(circleColor.getAlpha()*(1-rel) + 255*rel) );
-                graphics.setPaint(circleColor);
+                graphics.setPaint(diagramSchema.fadeOut(diagramSchema.getLineColor()));
             }
         }
         graphics.draw(new Line2D.Double(from,to));

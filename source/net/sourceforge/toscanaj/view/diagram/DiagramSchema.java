@@ -3,16 +3,22 @@ package net.sourceforge.toscanaj.view.diagram;
 import java.awt.Color;
 
 /**
- * DiagramSchema will hold the palette colors and pixcel width for CanvasItems.
+ * DiagramSchema will hold the palette colors, line widths and similar information
+ * for the DiagramView.
  *
  * This class uses a Singleton design pattern.
  */
 
 public class DiagramSchema {
     /**
-     * create and store DiagramSchema
+     * Create and store DiagramSchema.
      */
     private static DiagramSchema diagramSchema = new DiagramSchema();
+
+    /**
+     * The amount of fade out for unselected nodes.
+     */
+    private static float fadeOut = 0.7F;
 
     /**
      * Holds diagram canvas foreground color
@@ -35,28 +41,33 @@ public class DiagramSchema {
     private Color topColor =  new Color(0,0,150);
 
     /**
-     * The colort used for the bottom of the gradient.
+     * The color used for the bottom of the gradient.
      */
     private Color bottomColor = new Color(255,255,150);
 
     /**
-     * The Color for the circles around the nodes.
+     * The color for the circles around the nodes.
      */
     private Color circleColor = new Color(0,0,0);
 
     /**
-     * The Color for the circles around the node with the selected concept.
+     * The color for lines between nodes.
+     */
+    private Color lineColor = new Color(0,0,0);
+
+    /**
+     * The color for the circles around the node with the selected concept.
      */
     private Color circleSelectionColor = new Color(255,0,0);
 
     /**
-     * The Color for the circles around the nodes in the ideal of the selected.
+     * The color for the circles around the nodes in the ideal of the selected.
      * concept.
      */
     private Color circleIdealColor = new Color(0,0,0);
 
     /**
-     * The Color for the circles around the nodes in the filter of the selected.
+     * The color for the circles around the nodes in the filter of the selected.
      * concept.
      */
     private Color circleFilterColor = new Color(0,0,0);
@@ -68,7 +79,7 @@ public class DiagramSchema {
     }
 
     /**
-     * Get DiagramSchema instance.
+     * Get the only DiagramSchema instance.
      */
     public static DiagramSchema getDiagramSchema() {
         return diagramSchema;
@@ -94,30 +105,60 @@ public class DiagramSchema {
     public Color getTopColor() {
         return topColor;
     }
+
     /**
      * Returns the bottem gradient color.
      */
     public Color getBottomColor() {
         return bottomColor;
     }
+
+    /**
+     * Returns a color on the gradient.
+     *
+     * The parameter has to be between 0 and 1 (otherwise an
+     * IllegalArgumentException will be thrown). The color returned will be the
+     * bottom color if the number is zero, the top color if it is one, some
+     * interpolation otherwise.
+     */
+    public Color getGradientColor(double position) {
+        if( position < 0 || position > 1 ) {
+            throw new IllegalArgumentException("Gradient position not in [0,1]");
+        }
+        return new Color( (int)(topColor.getRed()*position + bottomColor.getRed()*(1-position)),
+                          (int)(topColor.getGreen()*position + bottomColor.getGreen()*(1-position)),
+                          (int)(topColor.getBlue()*position + bottomColor.getBlue()*(1-position)),
+                          (int)(topColor.getAlpha()*position + bottomColor.getAlpha()*(1-position)) );
+    }
+
     /**
      * Returns color for the circles around the nodes.
      */
     public Color getCircleColor() {
         return circleColor;
     }
+
+    /**
+     * Returns color for the lines between nodes.
+     */
+    public Color getLineColor() {
+        return lineColor;
+    }
+
     /**
      * Returns color for the circles around the node with the selected concept.
      */
     public Color getCircleSelectionColor() {
         return circleSelectionColor;
     }
+
     /**
      * Returns color for the circles around the nodes in the ideal of the selected.
      */
     public Color getCircleIdealColor() {
         return circleIdealColor;
     }
+
     /**
      * Returns color for the circles around the nodes in the filter of the selected
      * concept.
@@ -141,6 +182,13 @@ public class DiagramSchema {
     }
 
     /**
+     * Set the line color to new color.
+     */
+    public void setLineColor(Color LineColor) {
+        this.lineColor = lineColor;
+    }
+
+    /**
      * Set the top color to new color.
      */
     public void setTopColor(Color topColor) {
@@ -152,5 +200,18 @@ public class DiagramSchema {
      */
     public void setBottomColor(Color bottomColor) {
         this.bottomColor = bottomColor;
+    }
+
+    /**
+     * Fades a color into the background.
+     *
+     * This is typically used for highlighting the rest of the diagram by using
+     * the returned colors for the non-highlighted part.
+     */
+    public Color fadeOut(Color original) {
+        return new Color( (int)(original.getRed()*(1-fadeOut) + 255*fadeOut),
+                          (int)(original.getGreen()*(1-fadeOut) + 255*fadeOut),
+                          (int)(original.getBlue()*(1-fadeOut) + 255*fadeOut),
+                          (int)(original.getAlpha()*(1-fadeOut) + 255*fadeOut) );
     }
 }
