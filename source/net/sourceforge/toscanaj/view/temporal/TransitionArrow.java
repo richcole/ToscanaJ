@@ -21,14 +21,14 @@ import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.CanvasItem;
 
 public class TransitionArrow extends CanvasItem {
-	private static final double SHORTENING_FACTOR = 0.15;
-    private NodeView startNodeView;
-	private NodeView endNodeView;
-	private Color baseColor;
-	private Rectangle2D bounds;
-    private Point2D shiftVector = new Point2D.Double();
-    private double timePos;
-    private AnimationTimeController timeController;
+	protected static final double SHORTENING_FACTOR = 0.15;
+    protected NodeView startNodeView;
+    protected NodeView endNodeView;
+    protected Color baseColor;
+    protected Rectangle2D bounds;
+    protected Point2D shiftVector = new Point2D.Double();
+    protected double timePos;
+    protected AnimationTimeController timeController;
 	
     public TransitionArrow(NodeView startNodeView, NodeView endNodeView, Color color, double timePos, AnimationTimeController timeController) {
     	this.startNodeView = startNodeView;
@@ -44,8 +44,15 @@ public class TransitionArrow extends CanvasItem {
     	if(this.startNodeView == this.endNodeView) {
     		return;
     	}
-        Paint color = calculatePaint();
-        if(color == null) { // nothing to draw
+
+        double startX = getStartX();
+        double startY = getStartY();
+        double endX = getEndX();
+        double endY = getEndY();
+        float length = (float) Math.sqrt((startX - endX) * (startX - endX) +
+                                          (startY - endY) * (startY - endY));
+        Paint paint = calculatePaint(length);
+        if(paint == null) { // nothing to draw
         	return;
         }
 
@@ -54,13 +61,6 @@ public class TransitionArrow extends CanvasItem {
     	Paint oldPaint = g.getPaint();
     	AffineTransform oldTransform = g.getTransform();
     	
-        double startX = getStartX();
-        double startY = getStartY();
-        double endX = getEndX();
-        double endY = getEndY();
-    	float length = (float) Math.sqrt((startX - endX) * (startX - endX) +
-        				       		      (startY - endY) * (startY - endY));
-
         GeneralPath arrow = new GeneralPath();
         arrow.moveTo(-20,-7);
         arrow.lineTo(0,0);
@@ -71,7 +71,7 @@ public class TransitionArrow extends CanvasItem {
         arrow.lineTo(-20,-2);
         arrow.closePath();
 
-        g.setPaint(color);
+        g.setPaint(paint);
         g.translate(endX, endY);
         g.rotate(Math.atan2(endY - startY, endX - startX));
     	g.fill(arrow);
@@ -80,7 +80,7 @@ public class TransitionArrow extends CanvasItem {
     	g.setTransform(oldTransform);
     }
     
-    private Paint calculatePaint() {
+    protected Paint calculatePaint(float arrowLength) {
         AnimationTimeController controller = this.timeController;
         double timeOffset = controller.getCurrentTime() - this.timePos;
         double alpha = 0;

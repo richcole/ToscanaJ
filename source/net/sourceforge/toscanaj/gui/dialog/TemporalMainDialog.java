@@ -44,6 +44,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import net.sourceforge.toscanaj.view.scales.NumberField;
+import net.sourceforge.toscanaj.view.temporal.InterSequenceTransitionArrow;
 import net.sourceforge.toscanaj.view.temporal.StateRing;
 import net.sourceforge.toscanaj.view.temporal.TransitionArrow;
 
@@ -373,20 +374,37 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         Iterator seqValIt = this.sequenceValues.iterator();
         int seqNum = 0;
         int seqLength = this.timelineValues.size();
+        List lastSequence = null;
+        Color color = null;
         while (seqIt.hasNext()) {
             List sequence = (List) seqIt.next();
+
+            if(lastSequence != null) {
+                Color nextColor = COLORS[seqNum % COLORS.length];
+                NodeView endViewLast = findObjectConceptView((FCAObject) lastSequence.get(lastSequence.size()-1), nodeViewMap);
+                NodeView startViewNew = findObjectConceptView((FCAObject) sequence.get(0), nodeViewMap);
+                if(endViewLast != startViewNew) {
+	                this.diagramView.addCanvasItem(
+	                            new InterSequenceTransitionArrow(endViewLast, startViewNew,
+	                                                             color, nextColor, seqNum * seqLength - 0.5,
+	                                                             this.timeController),
+	                            TRANSITION_LAYER_NAME);
+                }
+            }
+
+            color = COLORS[seqNum % COLORS.length];
             AttributeValue curSequenceValue = (AttributeValue) seqValIt.next();
             if(this.timeController == null) {
                 this.timeController = newTimeController;
                 this.targetTime = newTargetTime;
                 this.lastAnimationTime = 0;
             }
-            Color color = COLORS[seqNum % COLORS.length];
             if(selectedSequence == null || selectedSequence == curSequenceValue) {
                 addTransitions(sequence, new Color(color.getRed(), color.getGreen(), color.getBlue(), 140), 
                                nodeViewMap, highlightStates, seqNum * seqLength);
             }
             seqNum++;
+            lastSequence = sequence;
         }
         this.diagramView.repaint();
     }
@@ -412,30 +430,34 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     	objLoop: while (objectIt.hasNext()) {
     		count++;
             FCAObject object = (FCAObject) objectIt.next();
-            Iterator nodeIt = diagramView.getDiagram().getNodes();
-            while (nodeIt.hasNext()) {
-                DiagramNode node = (DiagramNode) nodeIt.next();
-                Iterator objIt = node.getConcept().getObjectContingentIterator();
-                while (objIt.hasNext()) {
-                    FCAObject contObj = (FCAObject) objIt.next();
-                    if(contObj.equals(object)) {
-                    	NodeView curView = (NodeView) nodeViewMap.get(node);
-                    	if(highlightStates) {
-	                        this.diagramView.addCanvasItem(new StateRing(curView, color, count, this.timeController),
-	                                                       TRANSITION_LAYER_NAME);
-                    	}
-                    	if(oldView != null && oldView != curView) {
-                    	    this.diagramView.addCanvasItem(new TransitionArrow(oldView, curView, color, count - 0.5, this.timeController),
-                    	                                   TRANSITION_LAYER_NAME);
-                    	}
-                    	oldView = curView;
-                        continue objLoop;
-                    }
-                }
-            }
+    	    NodeView curView = findObjectConceptView(object, nodeViewMap);
+    	    if(highlightStates) {
+    	        this.diagramView.addCanvasItem(new StateRing(curView, color, count, this.timeController),
+    	                                       TRANSITION_LAYER_NAME);
+    	    }
+    	    if(oldView != null && oldView != curView) {
+    	        this.diagramView.addCanvasItem(new TransitionArrow(oldView, curView, color, count - 0.5, this.timeController),
+    	                                       TRANSITION_LAYER_NAME);
+    	    }
+    	    oldView = curView;
         }
     }
 
+	private NodeView findObjectConceptView(FCAObject object, Hashtable nodeViewMap) {
+	    Iterator nodeIt = this.diagramView.getDiagram().getNodes();
+	    while (nodeIt.hasNext()) {
+	        DiagramNode node = (DiagramNode) nodeIt.next();
+	        Iterator objIt = node.getConcept().getObjectContingentIterator();
+	        while (objIt.hasNext()) {
+	            FCAObject contObj = (FCAObject) objIt.next();
+	            if(contObj.equals(object)) {
+	            	return (NodeView) nodeViewMap.get(node);
+	            }
+	        }
+	    }
+	    return null;
+	}
+	
 	private void calculateValueLists() {
 	    sequenceValues = new ArrayList();
 	    timelineValues = new ArrayList();
