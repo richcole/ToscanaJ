@@ -17,6 +17,8 @@ Specific for Elba:
   been saved
 - Elba warns before creating a speed optimized system that this changes the
   database and the conceptual schema
+- the table/key pair for the DB connection now gets selected via two combo
+  boxes (should be more intuitive)
 
 Specific for Siena (still not fully complete):
 ==============================================
