@@ -121,6 +121,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         diagramView.setConceptInterpreter(interpreter);
         diagramView.setConceptInterpretationContext(interpretationContext);
         diagramView.setGrid(DEFAULT_GRID_SIZE,DEFAULT_GRID_SIZE);
+        diagramView.setGridEnabled(false);
         new LabelDragEventHandler(canvasEventBroker);
         new LabelClickEventHandler(canvasEventBroker);
         diagramView.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -170,7 +171,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         		diagramView.setGridEnabled(enabled);	
             }
         });
-        gridEnabledCheckBox.setSelected(true);
+        gridEnabledCheckBox.setSelected(false);
         gridEnabledCheckBox.setEnabled(false);
         toolPanel.add(gridEnabledCheckBox);
 
