@@ -36,18 +36,18 @@
 	</database>
 	<context>
 		<object id="1">Preis&gt;=5000</object>
-		<object id="2">(Preis&lt;5000 and Preis&gt;=4500)</object>
-		<object id="3">(Preis&lt;4500 and Preis&gt;=4000)</object>
-		<object id="4">(Preis&lt;4000 and Preis&gt;=3500)</object>
-		<object id="5">(Preis&lt;3500 and Preis&gt;=3000)</object>
-		<object id="6">(Preis&lt;3000 and Preis&gt;=2500)</object>
+		<object id="2">Preis&lt;5000 and Preis&gt;=4500</object>
+		<object id="3">Preis&lt;4500 and Preis&gt;=4000</object>
+		<object id="4">Preis&lt;4000 and Preis&gt;=3500</object>
+		<object id="5">Preis&lt;3500 and Preis&gt;=3000</object>
+		<object id="6">Preis&lt;3000 and Preis&gt;=2500</object>
 		<object id="7">Preis&lt;2500</object>
 		<object id="8">Festplatte&gt;=500</object>
-		<object id="9">(Festplatte&lt;500 and Festplatte&gt;=450)</object>
-		<object id="10">(Festplatte&lt;450 and Festplatte&gt;=400)</object>
-		<object id="11">(Festplatte&lt;400 and Festplatte&gt;=350)</object>
-		<object id="12">(Festplatte&lt;350 and Festplatte&gt;=300)</object>
-		<object id="13">(Festplatte&lt;250 and Festplatte&gt;=225)</object>
+		<object id="9">Festplatte&lt;500 and Festplatte&gt;=450</object>
+		<object id="10">Festplatte&lt;450 and Festplatte&gt;=400</object>
+		<object id="11">Festplatte&lt;400 and Festplatte&gt;=350</object>
+		<object id="12">Festplatte&lt;350 and Festplatte&gt;=300</object>
+		<object id="13">Festplatte&lt;250 and Festplatte&gt;=225</object>
 		<object id="14">Festplatte&lt;225</object>
 		<object id="15">DISKmark&gt;0 and DISKmark&lt;=15 AND Graphics&gt;0 and Graphics&lt;=5</object>
 		<object id="16">DISKmark&gt;0 and DISKmark&lt;=15 AND Graphics&gt;5 and Graphics&lt;=10</object>
@@ -99,18 +99,18 @@
 		<object id="62">DISKmark&gt;120 AND Graphics&gt;30 and Graphics&lt;=40</object>
 		<object id="63">DISKmark&gt;120 AND Graphics&gt;40</object>
 		<object id="64"/>
-		<object id="65">Bustyp="ISA"</object>
-		<object id="66">Bustyp="EISA"</object>
-		<object id="67">Bustyp="MCA"</object>
+		<object id="65">Bustyp='ISA'</object>
+		<object id="66">Bustyp='EISA'</object>
+		<object id="67">Bustyp='MCA'</object>
 		<object id="68">Festplatte &lt; 200</object>
 		<object id="69">Festplatte Between 200 And 399</object>
 		<object id="70">Festplatte &gt;= 400</object>
 		<object id="71">Video&gt;=9000</object>
-		<object id="72">(Video between 7500 and 8999)</object>
-		<object id="73">(Video between 6000 and 7499)</object>
-		<object id="74">(Video between 4500 and 5999)</object>
-		<object id="75">(Video between 3000 and 4499)</object>
-		<object id="76">(Video between 1500 and 2999)</object>
+		<object id="72">Video between 7500 and 8999</object>
+		<object id="73">Video between 6000 and 7499</object>
+		<object id="74">Video between 4500 and 5999</object>
+		<object id="75">Video between 3000 and 4499</object>
+		<object id="76">Video between 1500 and 2999</object>
 		<object id="77">Video&lt;1500</object>
 		<object id="78">DISKmark&gt;0 and DISKmark&lt;=15 AND DOSmark&gt;=0 and DOSmark&lt;40</object>
 		<object id="79">DISKmark&gt;0 and DISKmark&lt;=15 AND DOSmark&gt;=40 and DOSmark&lt;50</object>
@@ -164,11 +164,11 @@
 		<object id="127">Direktvertrieb=Yes and [Händler]=No</object>
 		<object id="128">Direktvertrieb=No and [Händler]=Yes</object>
 		<object id="129">Direktvertrieb=Yes and [Händler]=Yes</object>
-		<object id="130">[Gehäusetyp] = "Desktop"</object>
-		<object id="131">[Gehäusetyp] = "Slimline"</object>
-		<object id="132">[Gehäusetyp] = "Small-footprint"</object>
-		<object id="133">[Gehäusetyp] = "Tower"</object>
-		<object id="134">[Gehäusetyp] = "Minitower"</object>
+		<object id="130">[Gehäusetyp] = 'Desktop'</object>
+		<object id="131">[Gehäusetyp] = 'Slimline'</object>
+		<object id="132">[Gehäusetyp] = 'Small-footprint'</object>
+		<object id="133">[Gehäusetyp] = 'Tower'</object>
+		<object id="134">[Gehäusetyp] = 'Minitower'</object>
 		<object id="135">[Freie Laufwerksschächte] = 0</object>
 		<object id="136">[Freie Laufwerksschächte] = 1</object>
 		<object id="137">[Freie Laufwerksschächte] = 2</object>
@@ -236,21 +236,21 @@
 		<object id="199">Netzteil between 200 and 249 and [Netzteilanschlüsse]=2</object>
 		<object id="200">Netzteil between 250 and 299 and [Netzteilanschlüsse]=2</object>
 		<object id="201">Netzteil&gt;=300 and [Netzteilanschlüsse]=2</object>
-		<object id="202">Graphikkarte = "ISA"</object>
-		<object id="203">Graphikkarte = "EISA"</object>
-		<object id="204">Graphikkarte = "Local Bus"</object>
-		<object id="205">Graphikkarte = "Motherboard"</object>
-		<object id="206">Graphikkarte = "MCA"</object>
-		<object id="207">Graphikkarte = "VESA Local Bus"</object>
-		<object id="208">Graphikkarte = "Proprietary Local Bus"</object>
-		<object id="209">Graphikkarte = "UBSA Local Bus"</object>
-		<object id="210">Ports = "Keine"</object>
-		<object id="211">Ports = "1,1,0"</object>
-		<object id="212">Ports = "1,1,1"</object>
-		<object id="213">Ports = "1,2,0"</object>
-		<object id="214">Ports = "1,2,1"</object>
-		<object id="215">Ports = "2,1,0"</object>
-		<object id="216">Ports = "2,1,1"</object>
+		<object id="202">Graphikkarte = 'ISA'</object>
+		<object id="203">Graphikkarte = 'EISA'</object>
+		<object id="204">Graphikkarte = 'Local Bus'</object>
+		<object id="205">Graphikkarte = 'Motherboard'</object>
+		<object id="206">Graphikkarte = 'MCA'</object>
+		<object id="207">Graphikkarte = 'VESA Local Bus'</object>
+		<object id="208">Graphikkarte = 'Proprietary Local Bus'</object>
+		<object id="209">Graphikkarte = 'UBSA Local Bus'</object>
+		<object id="210">Ports = 'Keine'</object>
+		<object id="211">Ports = '1,1,0'</object>
+		<object id="212">Ports = '1,1,1'</object>
+		<object id="213">Ports = '1,2,0'</object>
+		<object id="214">Ports = '1,2,1'</object>
+		<object id="215">Ports = '2,1,0'</object>
+		<object id="216">Ports = '2,1,1'</object>
 		<object id="217">[interne Laufwerkschächte] = 0</object>
 		<object id="218">[interne Laufwerkschächte] = 10</object>
 		<object id="219">[interne Laufwerkschächte] = 20</object>
