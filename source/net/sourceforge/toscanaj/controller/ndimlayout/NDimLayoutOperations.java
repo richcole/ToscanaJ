@@ -60,7 +60,9 @@ public abstract class NDimLayoutOperations {
             node.setNdimVector(substract(node.getNdimVector(), topVector));
         }
         createConnections(diagram, nodemap);
-        changeBase(diagram);
+        if(diagram.getBase().size() <= 5) {
+            changeBase(diagram);
+        }
         return diagram;
     }
 
