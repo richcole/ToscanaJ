@@ -43,6 +43,8 @@ import org.tockit.tupleware.source.TupleSourceRegistry;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -50,6 +52,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 public class TuplewareMainPanel extends JFrame implements MainPanel, EventBrokerListener {
+    private JMenuItem printMenuItem;
     private static final String CONFIGURATION_SECTION = "TuplewareMainPanel";
 	private static final String WINDOW_TITLE = "Tupleware";
 
@@ -65,6 +68,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 
     private DiagramExportSettings diagramExportSettings;
     private ExportDiagramAction exportDiagramAction;
+    private PageFormat pageFormat = new PageFormat();
 
     /**
      * Controls
@@ -218,6 +222,29 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
             fileMenu.addSeparator();
         }
         
+        printMenuItem = new JMenuItem("Print...");
+        printMenuItem.setMnemonic(KeyEvent.VK_P);
+        printMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_P, ActionEvent.CTRL_MASK));
+        printMenuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                printDiagram();
+            }
+        });
+        printMenuItem.setEnabled(false);
+        fileMenu.add(printMenuItem);
+
+        JMenuItem printSetupMenuItem = new JMenuItem("Print Setup...");
+        printSetupMenuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                pageFormat = PrinterJob.getPrinterJob().pageDialog(pageFormat);
+                printDiagram();
+            }
+        });
+        printSetupMenuItem.setEnabled(true);
+        fileMenu.add(printSetupMenuItem);
+
+        fileMenu.addSeparator();
 
         // --- file exit item ---
         JMenuItem exitMenuItem;
@@ -352,6 +379,18 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(helpMenu);
+    }
+
+    protected void printDiagram() {
+        PrinterJob printJob = PrinterJob.getPrinterJob();
+        if (printJob.printDialog()) {
+            try {
+                printJob.setPrintable(this.diagramEditingView.getDiagramView(), pageFormat);
+                printJob.print();
+            } catch (Exception PrintException) {
+                PrintException.printStackTrace();
+            }
+        }
     }
 
     protected void saveTuples() {
@@ -513,8 +552,8 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 	}
 	
     public void processEvent(Event e) {
-        this.exportDiagramAction.setEnabled(
-            (this.diagramEditingView.getDiagramView().getDiagram() != null)
-                && (this.diagramExportSettings != null));
+        boolean haveDiagram = (this.diagramEditingView.getDiagramView().getDiagram() != null);
+        this.exportDiagramAction.setEnabled(haveDiagram && (this.diagramExportSettings != null));
+        this.printMenuItem.setEnabled(haveDiagram);
     }
 }
