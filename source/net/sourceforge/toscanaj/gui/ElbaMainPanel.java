@@ -987,14 +987,6 @@ public class ElbaMainPanel
 	}
 
 	private void importCSC(File file) {
-		// store current file
-		try {
-			this.currentFile = file.getCanonicalPath();
-		} catch (IOException e) { // could not resolve canonical path
-			e.printStackTrace();
-			this.currentFile = file.getAbsolutePath();
-			/// @todo what could be done here?
-		}
 		try {
 			new CSCParser().importCSCFile(file, this.conceptualSchema);
 		} catch (FileNotFoundException e) {
