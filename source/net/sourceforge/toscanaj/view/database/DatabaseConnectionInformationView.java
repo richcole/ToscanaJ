@@ -194,6 +194,7 @@ public class DatabaseConnectionInformationView extends JDialog
         }
         boolean connectDatabase() {
         	try {
+                conceptualSchema.setDatabaseSchema(new DatabaseSchema(internalBroker));
 				DatabaseConnection.setConnection(connection);
                 connection.connect(databaseInfo);
             } catch (DatabaseException e) {
