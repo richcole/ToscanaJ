@@ -20,6 +20,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.JComponent;
@@ -31,6 +32,7 @@ import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
 import net.sourceforge.toscanaj.gui.dialog.*;
+import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAObject;
 import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAObject;
@@ -245,12 +247,22 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 	private void renameObject(int num) {
 		String inputValue = "";
 		do {
-			String oldName = this.objects[num].toString();
-			InputTextDialog dialog = new InputTextDialog(this.dialog, "Rename Object", "object", oldName);
+			WritableFCAObject oldObject = this.objects[num];
+			InputTextDialog dialog = new InputTextDialog(this.dialog, "Rename Object", "object", oldObject.toString());
 			if (!dialog.isCancelled()) {
 				inputValue = dialog.getInput();
 				if (!collectionContainsString(inputValue, this.objects)) {
-					this.objects[num].setData(inputValue);
+				    ContextImplementation context = this.dialog.getContext();
+                    WritableFCAObject newObject = new FCAObjectImplementation(inputValue);
+                    context.getObjects().add(newObject);
+                    for (Iterator iter = context.getAttributes().iterator(); iter.hasNext(); ) {
+                        Object attribute = iter.next();
+                        if(context.getRelation().contains(oldObject, attribute)) {
+                            context.getRelationImplementation().insert(newObject, attribute);
+                            context.getRelationImplementation().remove(oldObject, attribute);
+                        }
+                    }
+                    context.getObjects().remove(oldObject);
 					repaint();
 					inputValue = "";
 				} else {
