@@ -14,10 +14,42 @@ import javax.swing.JFrame;
 import org.tockit.tupelware.model.TupelSet;
 
 
+/**
+ * Interface for getting Tupels via GUI.
+ */
 public interface TupelSource {
+    /**
+     * The text used in the menu.
+     */
 	String getMenuName();
+    
+    /**
+     * Should pop up some dialog for the user to enter the required information.
+     * 
+     * The lastLocation can be used in file open dialogs. All information collected has to be
+     * stored for later retrieval through the other methods of this interface.
+     */
 	void show(JFrame parent, File lastLocation);
+    
+    /**
+     * Retrieves the tupels collected.
+     * 
+     * @pre show() has been called
+     */
 	TupelSet getTupels();
+    
+    /**
+     * Returns the indices making up the object (as a crossproduct).
+     * 
+     * @pre show() has been called
+     */
 	int[] getObjectIndices();
+    
+    /**
+     * Returns the file selected during the process of getting tupels if applicable.
+     * 
+     * @pre show() has been called
+     * @return the file that was selected or null if not applicable
+     */
 	File getSelectedFile();
 }
