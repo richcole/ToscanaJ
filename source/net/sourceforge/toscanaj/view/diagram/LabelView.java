@@ -79,7 +79,7 @@ public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * Update label view as label info has change
      */
-    public void update(){
+    public void update(Object source){
         notifyObservers();
     }
 

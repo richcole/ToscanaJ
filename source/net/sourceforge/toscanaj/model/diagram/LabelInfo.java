@@ -203,7 +203,7 @@ abstract public class LabelInfo implements ChangeObservable
         if(labelObservers != null){
             Iterator iterator = labelObservers.iterator();
             while(iterator.hasNext()) {
-                ((ChangeObserver)iterator.next()).update();
+                ((ChangeObserver)iterator.next()).update(this);
             }
         }
     }

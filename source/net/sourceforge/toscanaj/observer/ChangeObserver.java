@@ -11,5 +11,5 @@ public interface ChangeObserver{
     /**
      * Callback for getting notice on changes.
      */
-    public void update();
+    public void update(Object source);
 }

@@ -15,6 +15,7 @@ import java.util.ListIterator;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.DrawingCanvas;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
@@ -49,7 +50,7 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
     /**
      * The diagram to display.
      */
-    private Diagram2D _diagram = null;
+    private Diagram2D diagram = null;
 
     /**
      * Flag to prevent label from being moved when just clicked on
@@ -76,10 +77,19 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
    }
 
     /**
-     * Implements ChangeObserver.update() by repainting the diagram.
+     * Implements ChangeObserver.update(Object) by repainting the diagram.
      */
-    public void update(){
-        repaint();
+    public void update(Object source){
+        if(source instanceof DiagramHistory) {
+            Iterator it = DiagramHistory.getDiagramHistory().getCurrentDiagramsIterator();
+            if(it.hasNext()) {
+                DiagramHistory.DiagramReference diagRef = (DiagramHistory.DiagramReference) it.next();
+                showDiagram((SimpleLineDiagram)diagRef.getDiagram());
+            }
+        }
+        else {
+            repaint();
+        }
     }
 
     /**
@@ -87,7 +97,7 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
      */
     public void paintComponent( Graphics g )
     {
-        if( _diagram == null ) {
+        if( diagram == null ) {
             return;
         }
         Graphics2D g2d = (Graphics2D) g;
@@ -105,10 +115,10 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
         }
 
         // draw diagram title in the top left corner
-        g2d.drawString( _diagram.getTitle(), x - MARGIN/2, y - MARGIN/2 );
+        g2d.drawString( diagram.getTitle(), x - MARGIN/2, y - MARGIN/2 );
 
         // get the dimensions of the diagram
-        Rectangle2D diagBounds = _diagram.getBounds();
+        Rectangle2D diagBounds = diagram.getBounds();
 
         // check if the y-coordinate in the file is denoted in math-style, i.e.
         // up is positive
@@ -117,8 +127,8 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
         // in combination with absolute Y coordinates like e.g. the predefined
         // RADIUS of the points
         int invY = 1;
-        if( _diagram.getNumberOfNodes() > 0 ) {
-            if( diagBounds.getY() < _diagram.getNode(0).getPosition().getY() ) {
+        if( diagram.getNumberOfNodes() > 0 ) {
+            if( diagBounds.getY() < diagram.getNode(0).getPosition().getY() ) {
                 invY = -1;
             }
         }
@@ -141,10 +151,10 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
             xScale = w / diagBounds.getWidth();
             xOrigin = x - diagBounds.getX() * xScale;
         }
-        if( diagBounds.getHeight() != 0 && _diagram.getNumberOfNodes() != 0 )
+        if( diagBounds.getHeight() != 0 && diagram.getNumberOfNodes() != 0 )
         {
             yScale = h / diagBounds.getHeight() * invY;
-            yOrigin = y - _diagram.getNode(0).getPosition().getY() * yScale;
+            yOrigin = y - diagram.getNode(0).getPosition().getY() * yScale;
         }
         //store updated ToscanajGraphics2D
         graphics = new ToscanajGraphics2D(g2d, new Point2D.Double( xOrigin, yOrigin ), xScale, yScale );
@@ -158,25 +168,29 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
      * This will automatically cause a repaint of the view.
      */
     public void showDiagram(SimpleLineDiagram diagram ) {
-        _diagram = diagram;
-         newCanvasItemsList();
+        this.diagram = diagram;
+        if(diagram == null) {
+            repaint();
+            return;
+        }
+        newCanvasItemsList();
         // add all lines to the canvas
-        for( int i = 0; i < _diagram.getNumberOfLines(); i++ ) {
-            DiagramLine dl = _diagram.getLine(i);
+        for( int i = 0; i < diagram.getNumberOfLines(); i++ ) {
+            DiagramLine dl = diagram.getLine(i);
             addCanvasItem( new LineView(dl) );
         }
         // add all points and labels to the canvas
-        for( int i = 0; i < _diagram.getNumberOfNodes(); i++ ) {
-            DiagramNode node = _diagram.getNode(i);
+        for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
+            DiagramNode node = diagram.getNode(i);
             NodeView nodeView = new NodeView(node);
             addCanvasItem( nodeView );
-            LabelInfo attrLabelInfo = _diagram.getAttributeLabel( i );
+            LabelInfo attrLabelInfo = diagram.getAttributeLabel( i );
             if( attrLabelInfo != null ) {
                 LabelView labelView = new LabelView( this, LabelView.ABOVE, attrLabelInfo );
                 addCanvasItem( labelView );
                 labelView.addObserver(this);
             }
-            LabelInfo objLabelInfo = _diagram.getObjectLabel( i );
+            LabelInfo objLabelInfo = diagram.getObjectLabel( i );
             if( objLabelInfo != null ) {
                 LabelView labelView = new LabelView( this, LabelView.BELOW, objLabelInfo );
                 addCanvasItem( labelView );
