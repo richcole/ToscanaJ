@@ -421,7 +421,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     }
 
     public boolean canMoveUp() {
-        return hasPastDiagrams() || (getFirstCurrentDiagramPosition() == 0 && getNumberOfCurrentDiagrams() > 1);
+        return hasPastDiagrams();
     }
 
 	public String getTextualDescription() {
