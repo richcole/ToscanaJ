@@ -221,6 +221,9 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
      * @todo DatabaseInfo should be immutable, then we don't need the defensive copy anymore
      */
     public DatabaseInfo getDatabaseInfo() {
+    	if (databaseInfo == null) {
+    		return new DatabaseInfo();
+    	}
         return new DatabaseInfo(databaseInfo);
     }
 
