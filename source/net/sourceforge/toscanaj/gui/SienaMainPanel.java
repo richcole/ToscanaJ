@@ -136,7 +136,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 				  MaxMruFiles);
 		// if we have at least one MRU file try to open it
 		if (this.mruList.size() > 0) {
-			System.out.println("at least 1 mru file");
 			File schemaFile =
 				new File((String) mruList.get(mruList.size() - 1));
 			if (schemaFile.canRead()) {
@@ -454,6 +453,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             return;
         }
         importCernatoXML(openDialog.getSelectedFile());
+		updateWindowTitle();
     }
 
 	public void importCernatoXML(String fileLocation) {
@@ -515,6 +515,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         }
         importBurmeister(openDialog.getSelectedFile());
+		updateWindowTitle();
     }
 
     private void importBurmeister(File file) {
@@ -557,6 +558,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         try {
             importCSC(openDialog.getSelectedFile());
             this.lastCSCFile = openDialog.getSelectedFile();
+			updateWindowTitle();
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Import failed");
         }
