@@ -277,7 +277,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
     /**
      * Overwrites Canvas.backgroundSingleClicked(Point2D) to erase the highlighting.
      */
-    protected void backgroundSingleClicked(Point2D point) {
+    public void backgroundSingleClicked(Point2D point) {
         this.setSelectedConcepts(null);
     }
 }
