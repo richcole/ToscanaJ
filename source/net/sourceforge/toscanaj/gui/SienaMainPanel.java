@@ -192,10 +192,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         this.diagramExportSettings = new DiagramExportSettings();
 
-        eventBroker.subscribe(
-            this,
-            NewConceptualSchemaEvent.class,
-            Object.class);
+        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+        eventBroker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
             
         initializeModel();
 
@@ -467,7 +465,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         mruMenu = new JMenu("Reopen");
         mruMenu.setMnemonic(KeyEvent.VK_R);
-        recreateMruMenu();
         fileMenu.add(mruMenu);
 
         JMenuItem saveMenuItem = new JMenuItem("Save...");
@@ -493,6 +490,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             public boolean doActivity() throws Exception {
                 setCurrentFile(saveAsFileAction.getLastFileUsed());
                 conceptualSchema.dataSaved();
+                recreateMruMenu();
                 return true;
             }
         });
@@ -996,7 +994,15 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         if (e instanceof ConceptualSchemaLoadedEvent) {
             ConceptualSchemaLoadedEvent loadEvent =
                 (ConceptualSchemaLoadedEvent) e;
+            if(this.conceptualSchema.getManyValuedContext() == null) {
+                this.conceptualSchema.setManyValuedContext(createManyValuedContextFromDiagrams());
+            }
+            this.rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
+            this.colHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
+            this.tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
             setCurrentFile(loadEvent.getFile());
+        } else if (e instanceof NewConceptualSchemaEvent) {
+            setCurrentFile(null);
         }
         this.exportDiagramAction.setEnabled(
             (this.diagramEditingView.getDiagramView().getDiagram() != null)
@@ -1025,10 +1031,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         boolean empty = true;
         // will be used to check if we have at least one entry
         if (this.mruList.size() > 0) {
-            ListIterator it = mruList.listIterator(mruList.size() - 1);
+            ListIterator it = mruList.listIterator(mruList.size());
             while (it.hasPrevious()) {
                 String cur = (String) it.previous();
-                if (cur.equals(currentFile)) {
+                if (this.currentFile != null && 
+                        cur.equals(this.currentFile.getAbsolutePath())) {
                     // don't enlist the current file
                     continue;
                 }
@@ -1050,14 +1057,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private void openSchemaFile(File schemaFile) {
         try {
             this.conceptualSchema = CSXParser.parse(eventBroker, schemaFile);
-            if(this.conceptualSchema.getManyValuedContext() == null) {
-                this.conceptualSchema.setManyValuedContext(createManyValuedContextFromDiagrams());
-            }
-            this.rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
-            this.colHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
-            this.tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
-            setCurrentFile(schemaFile);
-            createMenuBar();
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(
                 this,
@@ -1316,15 +1315,17 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     private void setCurrentFile(File newCurrentFile) {
         this.currentFile = newCurrentFile;
-        this.saveAsFileAction.setPreviousFile(newCurrentFile);
-        String filePath = this.currentFile.getAbsolutePath();
-        if (this.mruList.contains(filePath)) {
-            // if it is already in, just remove it and add it at the end
-            this.mruList.remove(filePath);
-        }
-        this.mruList.add(filePath);
-        if (this.mruList.size() > MaxMruFiles) {
-            this.mruList.remove(0);
+        if(newCurrentFile != null) {
+            this.saveAsFileAction.setPreviousFile(newCurrentFile);
+            String filePath = this.currentFile.getAbsolutePath();
+            if (this.mruList.contains(filePath)) {
+                // if it is already in, just remove it and add it at the end
+                this.mruList.remove(filePath);
+            }
+            this.mruList.add(filePath);
+            if (this.mruList.size() > MaxMruFiles) {
+                this.mruList.remove(0);
+            }
         }
         recreateMruMenu();
         updateWindowTitle();

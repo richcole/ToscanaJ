@@ -23,6 +23,8 @@ Specific for Elba:
 
 Specific for Siena (still not fully complete):
 ==============================================
+- Bugfix: MRU menu is handled correctly now
+- Bugfix: title of the window adjusts after File->New
 
 Other new experimental features:
 ================================
