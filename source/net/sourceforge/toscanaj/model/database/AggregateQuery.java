@@ -19,6 +19,7 @@ public class AggregateQuery extends Query {
 
     public static final AggregateQuery COUNT_QUERY = new AggregateQuery(null, "Count", "fake");
 	public static final AggregateQuery PERCENT_QUERY = new AggregateQuery(null, "Distribution of Objects", "fake");
+	public static final AggregateQuery DEVIATION_QUERY = new AggregateQuery(null, "Deviation from Expected Values", "fake");
 
     public AggregateQuery(DatabaseInfo info, String name, String header) {
         super(name, header);

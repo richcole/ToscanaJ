@@ -231,6 +231,43 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 			} else {
 				return null;
 			}
+		} else if (query == AggregateQuery.DEVIATION_QUERY) {
+			retVal = new Object[1];
+			if(context.getNestingContexts().size() == 0) {
+				// @todo or should we reexecute the query with AggregateQuery.COUNT_QUERY?
+				int objectCount = getObjectCount(concept, context);
+				retVal = new Object[1];
+				if( objectCount != 0) {
+					retVal[0] = getObject(Integer.toString(objectCount), concept, context);
+					return retVal;
+				} else {
+					return null;
+				}
+			}
+			boolean displayMode = context.getObjectDisplayMode();
+			int neutralSize;
+			int outerSize;
+			if (displayMode == ConceptInterpretationContext.EXTENT) {
+				neutralSize = getExtentSize(concept, context.getOutermostContext());
+				outerSize = getExtentSize((Concept) context.getNestingConcepts().get(0), 
+																  context.getOutermostContext());
+			}
+			else {
+				neutralSize = getObjectContingentSize(concept, context.getOutermostContext());
+				outerSize = getObjectContingentSize((Concept) context.getNestingConcepts().get(0), 
+																  context.getOutermostContext());				
+			}
+			int numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
+															context.getOutermostContext());
+			double expectedSize = neutralSize * outerSize / (double) numberOfAllObjectsInDiagram;
+			int objectCount = getObjectCount(concept, context); 
+			if ((objectCount == 0) && (expectedSize == 0.0)) {
+				return null;
+			}
+			NumberFormat format = DecimalFormat.getNumberInstance();
+			format.setMaximumFractionDigits(1);
+			String returnValue = objectCount + " (expected: " + format.format(expectedSize) + ")";
+			retVal[0] = getObject(returnValue, concept, context); 
 		} else {
 			return handleNonDefaultQuery(query, concept, context);
 		}
