@@ -20,6 +20,7 @@ import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.action.ExportDiagramAction;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
@@ -32,7 +33,6 @@ import org.tockit.canvas.CanvasBackground;
 import org.tockit.canvas.events.CanvasItemActivatedEvent;
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemSelectedEvent;
-import org.tockit.canvas.imagewriter.DiagramExportSettings;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.events.EventBroker;
 
@@ -184,7 +184,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         // if there is no format, we don't set the settings, which causes the menu items to be unavailable 
         Iterator it = GraphicFormatRegistry.getIterator();
         if (it.hasNext()) {
-            this.diagramExportSettings = new DiagramExportSettings(null, 0, 0, true);
+			this.diagramExportSettings = new DiagramExportSettings();
         }
 
         // then build the panel (order is important for checking if we want export options)

@@ -22,6 +22,7 @@ import java.util.Properties;
  * @TODO document
  * @TODO what do to with exceptions? At the moment they are caught and the default
  *       value is returned.
+ * @todo create something for boolean expressions
  */
 public class ConfigurationManager {
     /**

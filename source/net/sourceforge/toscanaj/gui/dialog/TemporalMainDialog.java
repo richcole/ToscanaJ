@@ -36,7 +36,6 @@ import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 
 import org.tockit.canvas.events.CanvasDrawnEvent;
-import org.tockit.canvas.imagewriter.DiagramExportSettings;
 import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.canvas.imagewriter.ImageGenerationException;
@@ -45,6 +44,7 @@ import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
+import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;

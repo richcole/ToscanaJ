@@ -11,12 +11,12 @@ import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.gui.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
-import org.tockit.canvas.imagewriter.DiagramExportSettings;
 import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.canvas.imagewriter.ImageGenerationException;
@@ -47,7 +47,6 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 	 *     then use the other constructor.
 	 * @todo if you want another conmbination then write another constructor.
 	 */
-
 	public ExportDiagramAction (
 			JFrame frame,
 			File lastFile,

@@ -8,7 +8,8 @@
 package net.sourceforge.toscanaj.gui.dialog;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import org.tockit.canvas.imagewriter.DiagramExportSettings;
+import net.sourceforge.toscanaj.model.DiagramExportSettings;
+
 import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 
@@ -115,18 +116,9 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
 		        diagramSettings.setImageSize(Integer.parseInt(widthField.getText()),
 						Integer.parseInt(heightField.getText()));
 		        diagramSettings.setAutoMode(auto.isSelected());
-		        if (saveToFileCheckBox.isSelected()) {
-					diagramSettings.setSaveCommentsToFile(true);
-				} else {
-					diagramSettings.setSaveCommentsToFile(false);
-				}
-				if (copyToClipboardCheckBox.isSelected()) {
-					diagramSettings.setSaveCommentToClipboard(true);
-				} else {
-					diagramSettings.setSaveCommentToClipboard(false);
-				}
-				
-		        closeDialog();
+				diagramSettings.setSaveCommentsToFile(saveToFileCheckBox.isSelected());
+		        diagramSettings.setSaveCommentToClipboard(copyToClipboardCheckBox.isSelected());
+				closeDialog();
 		    }
 		});
 		getRootPane().setDefaultButton(okButton);
@@ -228,6 +220,7 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
     protected void closeDialog() {
         DiagramExportSettingsDialog.dialog.setVisible(false);
         ConfigurationManager.storePlacement("DiagramExportSettingsDialog", this);
+        
     }
 
     public void actionPerformed(ActionEvent a) {
