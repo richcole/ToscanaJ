@@ -19,6 +19,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileFilter;
 
 import org.tockit.events.EventBroker;
+import org.tockit.plugin.DatabaseDriverLoader;
 import org.tockit.tupleware.model.TupleSet;
 
 import java.awt.*;
@@ -28,6 +29,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.sql.Driver;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -643,6 +645,27 @@ public class DatabaseConnectionDialog extends JDialog {
 	 */
 	public DatabaseConnectionDialog(JFrame parent, File lastFile) {
 		super(parent, "Database connection", true);
+		
+		System.out.println("starting to load DB drivers");
+		// @todo location of dbdrivers should be read from config manager
+		String dbDriversDir = System.getProperty("user.dir") + File.separator + "dbdrivers";
+		// @todo this code is very similar to code it TuplewareMainPanel.loadPlugins. need to refactor!
+		File[] dbDriversLocations = { new File (dbDriversDir) };
+		DatabaseDriverLoader.Result result = DatabaseDriverLoader.loadDrivers(dbDriversLocations);
+		Driver[] drivers = result.getDrivers();
+		DatabaseDriverLoader.Error[] errors = result.getErrors();
+		for (int i = 0; i < errors.length; i++) {
+			DatabaseDriverLoader.Error error = errors[i];
+			System.out.println("Error: " + error.getException());
+			error.getException().printStackTrace();
+		}
+		System.out.println("finished loading DB drivers");
+		for (int i = 0; i < drivers.length; i++) {
+			Driver driver = drivers[i];
+			System.out.println(" - " + driver.getClass().getName());
+			System.out.println("\t" + driver.toString());
+		}
+				
 		this.databaseInfo = new DatabaseInfo();
 		this.connection = new DatabaseConnection(new EventBroker());
         this.owner = parent;
