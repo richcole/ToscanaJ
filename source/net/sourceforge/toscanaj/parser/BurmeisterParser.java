@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.parser;
 
 import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
-import net.sourceforge.toscanaj.model.burmeister.BurmeisterContext;
+import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import java.io.*;
@@ -17,7 +17,7 @@ import java.util.Collection;
 public class BurmeisterParser {
     public static final String DEFAULT_NAME = "<unnamed>";
 
-    public static BurmeisterContext importBurmeisterFile(File file) throws FileNotFoundException, DataFormatException {
+    public static ContextImplementation importBurmeisterFile(File file) throws FileNotFoundException, DataFormatException {
         BufferedReader in;
         in = new BufferedReader(new FileReader(file));
 
@@ -33,7 +33,7 @@ public class BurmeisterParser {
             if (curLine.equals("")) {
                 curLine = DEFAULT_NAME;
             }
-            BurmeisterContext context = new BurmeisterContext(curLine);
+            ContextImplementation context = new ContextImplementation(curLine);
 
             // get context size
             curLine = getNextNonEmptyLine(in);

@@ -15,8 +15,13 @@ public class ContextImplementation implements Context {
     private Collection objects = new ArrayList();
     private Collection attributes = new ArrayList();
     private BinaryRelationImplementation relation = new BinaryRelationImplementation();
+    private String name = null;
 
     public ContextImplementation() {
+    }
+
+    public ContextImplementation(String name) {
+    	this.name = name;
     }
 
     public Collection getObjects() {
@@ -33,5 +38,9 @@ public class ContextImplementation implements Context {
     
     public BinaryRelationImplementation getRelationImplementation() {
     	return this.relation;
+    }
+
+    public String getName() {
+        return name;
     }
 }

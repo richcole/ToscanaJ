@@ -23,7 +23,7 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.TemporalMainDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
-import net.sourceforge.toscanaj.model.burmeister.BurmeisterContext;
+import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.cernato.View;
 import net.sourceforge.toscanaj.model.cernato.ViewContext;
@@ -278,7 +278,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             this.currentFile = file.getAbsolutePath();
             /// @todo what could be done here?
         }
-        BurmeisterContext context;
+		ContextImplementation context;
         try {
             context = BurmeisterParser.importBurmeisterFile(file);
         } catch (FileNotFoundException e) {

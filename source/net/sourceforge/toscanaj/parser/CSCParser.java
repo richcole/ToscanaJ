@@ -23,7 +23,7 @@ import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.burmeister.BurmeisterContext;
+import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -158,7 +158,7 @@ public class CSCParser {
 
     protected static final CSCFileSectionParser FORMAL_CONTEXT_SECTION = new CSCFileSectionParser("FORMAL_CONTEXT"){
         public Object parse(CSCTokenizer tokenizer) throws IOException, DataFormatException {
-            BurmeisterContext context = new BurmeisterContext(tokenizer.getCurrentToken());
+            ContextImplementation context = new ContextImplementation(tokenizer.getCurrentToken());
             List objects = new ArrayList();
             List attributes = new ArrayList();
 
@@ -398,8 +398,8 @@ public class CSCParser {
 
             for (Iterator iter = results.iterator(); iter.hasNext();) {
                 Object result = iter.next();
-                if(result instanceof BurmeisterContext) {
-                	BurmeisterContext context = (BurmeisterContext) result;
+                if(result instanceof ContextImplementation) {
+                    ContextImplementation context = (ContextImplementation) result;
                 	if(importedDiagrams.contains(context.getName())) {
                 		continue;
                 	}

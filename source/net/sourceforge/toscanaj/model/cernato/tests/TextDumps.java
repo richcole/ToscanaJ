@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.model.cernato.tests;
 
 import net.sourceforge.toscanaj.model.BinaryRelation;
 import net.sourceforge.toscanaj.model.Context;
-import net.sourceforge.toscanaj.model.burmeister.BurmeisterContext;
+import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.cernato.*;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -131,12 +131,14 @@ public class TextDumps {
      */
     public static final void dump(Context context, PrintStream stream) {
         stream.println("B");
-        if (context instanceof BurmeisterContext) {
-            BurmeisterContext burCon = (BurmeisterContext) context;
-            stream.println(burCon.getName());
-        } else {
-            stream.println("unnamed context");
+        String name = "unnamed context";
+        if (context instanceof ContextImplementation) {
+            ContextImplementation conImp = (ContextImplementation) context;
+            if(conImp.getName() != null) {
+            	name = conImp.getName();
+            }
         }
+        stream.println(name);
 
         Collection objects = context.getObjects();
         Collection attributes = context.getAttributes();
