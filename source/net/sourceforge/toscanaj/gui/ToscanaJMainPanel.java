@@ -743,6 +743,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         }
     }
 
+
     /**
      * Open a schema using the file open dialog.
      */
@@ -754,6 +755,9 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         } else {
             openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
+    	ExtensionFileFilter csxFilter = new ExtensionFileFilter("csx","Conceptual Schema (*.csx)");
+    	openDialog.setFileFilter(csxFilter);
+    	openDialog.addChoosableFileFilter(csxFilter);
         int rv = openDialog.showOpenDialog(this);
         if (rv != JFileChooser.APPROVE_OPTION) {
             return;
