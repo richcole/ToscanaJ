@@ -335,3 +335,4 @@ public class DiagramView extends Canvas implements ChangeObserver {
         return diagramSchema;
     }
 }
+
