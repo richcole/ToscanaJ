@@ -17,6 +17,7 @@ import util.Assert;
 import javax.swing.*;
 import java.awt.geom.Point2D;
 import java.util.*;
+import java.sql.Types;
 
 public class OrdinalScaleGenerator implements ScaleGenerator {
     private JFrame parent;
@@ -32,7 +33,19 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
     /// @todo should check type of column, too -- we need at least two versions for int and float values (should be
     /// transparent to the user
     public boolean canHandleColumns(TableColumnPair[] columns) {
-        return columns.length == 1;
+        if(columns.length != 1) {
+            return false;
+        }
+        switch(columns[0].getColumn().getType()) {
+            case Types.DOUBLE:
+                return true;
+            case Types.FLOAT:
+                return true;
+            case Types.REAL:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
