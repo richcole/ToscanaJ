@@ -274,10 +274,23 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * @TODO Use system double click timing instead of hard-coded 300ms
      */
     public void mouseReleased(MouseEvent e) {
-        if ( popupOpen || e.isPopupTrigger() )
+        if ( popupOpen )
         {
             popupOpen = false;
             return; // nothing to do, we react only on normal clicks
+        }
+        if(e.isPopupTrigger()) 
+        {
+            Point2D point = getUserCoords(e.getPoint());
+            if(this.selectedCanvasItem != null) 
+            {
+                this.selectedCanvasItem.openPopupMenu(e, point);
+            }
+            else
+            {
+                openBackgroundPopupMenu(e, point);
+            }
+            popupOpen = true;
         }
         if (dragMode) {
             dragMode = false;
