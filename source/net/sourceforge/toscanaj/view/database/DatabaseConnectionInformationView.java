@@ -714,6 +714,8 @@ public class DatabaseConnectionInformationView extends JDialog
                 GridBagConstraints.BOTH,
                 new Insets(0, 5, 5, 5),
                 2,2));
+        contentPane.invalidate();
+        this.repaint();
     }
 
 	private void getFileURL(JTextField urlField, final String extension, final String description) {
