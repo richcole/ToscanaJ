@@ -180,7 +180,6 @@ public class ElbaMainPanel
 				openSchemaFile(schemaFile);
 			}
 		}
-
 		ConfigurationManager.restorePlacement(
 			CONFIGURATION_SECTION_NAME,
 			this,
@@ -846,6 +845,7 @@ public class ElbaMainPanel
 			CONFIGURATION_SECTION_NAME,
 			"diagramViewDivider",
 			diagramEditingView.getDividerLocation());
+		this.diagramEditingView.saveConfigurationSettings();
 		ConfigurationManager.saveConfiguration();
 		System.exit(0);
 	}

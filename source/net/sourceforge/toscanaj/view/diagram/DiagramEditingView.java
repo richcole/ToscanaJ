@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net
     .sourceforge
     .toscanaj
@@ -60,6 +61,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private static final int DEFAULT_GRID_SIZE = 15;
     private static final String[] FULL_MOVEMENT_OPTION_NAMES = {"NDim", "Node", "Ideal", "Filter"};
     private static final String[] SIMPLE_MOVEMENT_OPTION_NAMES = {"Node", "Ideal", "Filter"};
+    private static final String CONFIGURATION_SECTION_NAME = "DiagramEditingView";
     private ConceptualSchema conceptualSchema;
     private DefaultListModel diagramListModel;
     private JSplitPane splitPane;
@@ -120,8 +122,6 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 new ConceptInterpretationContext(new DiagramHistory(), canvasEventBroker);
         diagramView.setConceptInterpreter(interpreter);
         diagramView.setConceptInterpretationContext(interpretationContext);
-        diagramView.setGrid(DEFAULT_GRID_SIZE,DEFAULT_GRID_SIZE);
-        diagramView.setGridEnabled(false);
         new LabelDragEventHandler(canvasEventBroker);
         new LabelClickEventHandler(canvasEventBroker);
         diagramView.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -171,8 +171,6 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         		diagramView.setGridEnabled(enabled);	
             }
         });
-        gridEnabledCheckBox.setSelected(false);
-        gridEnabledCheckBox.setEnabled(false);
         toolPanel.add(gridEnabledCheckBox);
 
         editContextButton = new JButton("Edit Context...");
@@ -195,6 +193,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		
         diagramViewPanel.add(toolPanel, BorderLayout.NORTH);
         diagramViewPanel.add(diagramView, BorderLayout.CENTER);
+		loadConfigurationSettings();
         return diagramViewPanel;
     }
 
@@ -485,5 +484,29 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     public DiagramView getDiagramView() {
         return this.diagramView;
+    }
+    
+    public void saveConfigurationSettings() {
+    	ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME,"useGrid",new Boolean(this.gridEnabledCheckBox.isSelected()).toString());
+		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME,"gridCellHeight",(int) this.diagramView.getGridCellHeight());
+		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME,"gridCellWidth",(int) this.diagramView.getGridCellWidth());
+    }
+    
+    public void loadConfigurationSettings() {
+    	String useGrid = ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME,"useGrid","false");
+		boolean use = false;
+    	if(useGrid.trim().equalsIgnoreCase("true")){
+    		use = true;
+    	}
+    	if(use) {
+			int cellWidth = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME,"gridCellWidth",DEFAULT_GRID_SIZE);
+			int cellHeight = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME,"gridCellWidth",DEFAULT_GRID_SIZE);
+			this.diagramView.setGrid(cellWidth, cellHeight);	
+    	}else{
+			this.diagramView.setGrid(DEFAULT_GRID_SIZE, DEFAULT_GRID_SIZE);
+    	}
+		this.diagramView.setGridEnabled(use);
+		this.gridEnabledCheckBox.setSelected(use);
+		this.gridEnabledCheckBox.setEnabled(use);
     }
 }
