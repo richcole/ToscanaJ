@@ -240,7 +240,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         }
 
         // draw the label itself
-        this.rect = new Rectangle2D.Double(xPos, yPos, lw, lh);
+        this.rect = new Rectangle2D.Double(xPos, yPos, lw, lh); /// @todo this doesn't seem to change anything: check
         graphics.setPaint(backgroundColor);
         graphics.fill(rect);
         graphics.setPaint(textColor);
