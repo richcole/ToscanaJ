@@ -26,7 +26,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 
 import org.tockit.canvas.events.CanvasDrawnEvent;
 import org.tockit.events.Event;
@@ -43,6 +42,7 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
+import net.sourceforge.toscanaj.view.scales.NumberField;
 import net.sourceforge.toscanaj.view.temporal.StateRing;
 import net.sourceforge.toscanaj.view.temporal.TransitionArrow;
 
@@ -56,7 +56,6 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private JButton animateTransitionsButton;
     private JButton exportImagesButton;
     private JButton exportAnimationButton;
-    private JButton stepControlsButton;
     private DiagramView diagramView;
     private AnimationTimeController timeController;
     
@@ -65,6 +64,11 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private double targetTime;
     private int timelineLength;
     private double lastAnimationTime;
+    private NumberField speedField;
+    private JButton addOneSequenceTransitionsButton;
+    private NumberField fadeInField;
+    private NumberField holdField;
+    private NumberField fadeOutField;
 	
     public TemporalMainDialog(Frame frame, DiagramView diagramView, EventBroker eventBroker) {
 	  	super(frame, "Temporal Controls", false);
@@ -88,12 +92,15 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         JLabel timelineLabel = new JLabel("Timeline Column:");
         timelineChooser = new JComboBox();
 
-        addStaticTransitionsButton = new JButton("Add Static Transitions");
+        addStaticTransitionsButton = new JButton("Add All Static Transitions");
         addStaticTransitionsButton.addActionListener(new ActionListener(){
-        	public void actionPerformed(ActionEvent e) {
-        		addFixedTransitions();
-        	}
+            public void actionPerformed(ActionEvent e) {
+                addFixedTransitions();
+            }
         });
+
+        addOneSequenceTransitionsButton = new JButton("Add One Sequence");
+
         animateTransitionsButton = new JButton("Animate Transitions");
         animateTransitionsButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
@@ -103,43 +110,84 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 
         exportImagesButton = new JButton("Export Images");
         exportAnimationButton = new JButton("Export Animation");
-        stepControlsButton = new JButton("Step Controls");
-
+        
+        JLabel speedLabel = new JLabel("Speed (ms/step):");
+        speedField = new NumberField(10,NumberField.INTEGER);
+        speedField.setText("300");
+        JLabel fadeInLabel = new JLabel("Fade-in steps:");
+        fadeInField= new NumberField(10,NumberField.FLOAT);
+        fadeInField.setText("1");
+        JLabel holdLabel = new JLabel("Hold steps:");
+        holdField= new NumberField(10,NumberField.FLOAT);
+        holdField.setText("1");
+        JLabel fadeOutLabel = new JLabel("Fade-out steps:");
+        fadeOutField = new NumberField(10,NumberField.FLOAT);
+        fadeOutField.setText("5");
+        
         Container contentPane = this.getContentPane();
         GridBagLayout layout = new GridBagLayout();
         contentPane.setLayout(layout);
 
-        contentPane.add(sequenceLabel, new GridBagConstraints(0, 0, 2, 1, 1, 0,
+		int row = 0;
+        contentPane.add(sequenceLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
                                                         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(sequenceChooser, new GridBagConstraints(2, 0, 2, 1, 1, 0,
+        contentPane.add(sequenceChooser, new GridBagConstraints(2, row, 2, 1, 1, 0,
                                                         GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(timelineLabel, new GridBagConstraints(0, 1, 2, 1, 1, 0,
+        row++;
+        contentPane.add(timelineLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
                                                         GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(timelineChooser, new GridBagConstraints(2, 1, 2, 1, 1, 0,
+        contentPane.add(timelineChooser, new GridBagConstraints(2, row, 2, 1, 1, 0,
                                                         GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(new JPanel(), new GridBagConstraints(0, 2, 1, 1, 1, 0,
+        row++;
+        contentPane.add(addStaticTransitionsButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(addStaticTransitionsButton, new GridBagConstraints(1, 2, 2, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        contentPane.add(new JPanel(), new GridBagConstraints(3, 2, 1, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        contentPane.add(animateTransitionsButton, new GridBagConstraints(1, 3, 2, 1, 1, 0,
+        row++;
+        contentPane.add(addOneSequenceTransitionsButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(exportAnimationButton, new GridBagConstraints(1, 4, 2, 1, 1, 0,
+        row++;
+        contentPane.add(speedLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
+                                                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        contentPane.add(speedField, new GridBagConstraints(2, row, 2, 1, 1, 0,
+                                                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        row++;
+        contentPane.add(fadeInLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
+                                                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        contentPane.add(fadeInField, new GridBagConstraints(2, row, 2, 1, 1, 0,
+                                                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        row++;
+        contentPane.add(holdLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
+                                                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        contentPane.add(holdField, new GridBagConstraints(2, row, 2, 1, 1, 0,
+                                                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        row++;
+        contentPane.add(fadeOutLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
+                                                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        contentPane.add(fadeOutField, new GridBagConstraints(2, row, 2, 1, 1, 0,
+                                                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        row++;
+        contentPane.add(animateTransitionsButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(stepControlsButton, new GridBagConstraints(1, 5, 2, 1, 1, 0,
+        row++;
+        contentPane.add(exportAnimationButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(exportImagesButton, new GridBagConstraints(1, 6, 2, 1, 1, 0,
+        row++;
+        contentPane.add(exportImagesButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
 
@@ -169,10 +217,10 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private void setButtonStates(boolean allDisabled) {
         boolean enabled = !allDisabled && (this.diagramView.getDiagram() != null);
         addStaticTransitionsButton.setEnabled(enabled);
+        addOneSequenceTransitionsButton.setEnabled(false);
         animateTransitionsButton.setEnabled(enabled);
         exportImagesButton.setEnabled(false);
         exportAnimationButton.setEnabled(false);
-        stepControlsButton.setEnabled(false);
     }
     
     public void processEvent(Event e) {
@@ -212,7 +260,11 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private void addAnimatedTransitions() {
         // calculate timeline length
         calculateObjectSequences();
-        AnimationTimeController newTimeController = new AnimationTimeController(this.timelineLength,1,1,5,300);
+        double fadeIn = this.fadeInField.getDoubleValue();
+        double hold = this.holdField.getDoubleValue();
+        double fadeOut = this.fadeOutField.getDoubleValue();
+        int speed = this.speedField.getIntegerValue();
+        AnimationTimeController newTimeController = new AnimationTimeController(this.timelineLength, fadeIn, hold, fadeOut, speed);
         addTransitions(newTimeController.getAllFadedTime(), newTimeController, true);
     }
 
