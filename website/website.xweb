@@ -12,11 +12,25 @@
 		<section name="ToscanaJ" sourceDir="toscanaJ" targetDir="toscanaJ">
 			<entry name="ToscanaJ" sourceFile="index.xhtml" targetFile="index.html" type="XHTML"/>
 			<entry name="Screenshots" sourceFile="screenshots.xhtml" targetFile="screenshots.html" type="XHTML"/>
+			<!-- example image line below - need one for each image so they are copied across -->
+			<file sourceFile="benchmark_view.png" targetFile="benchmark_view.png" type="copy"/>
+			<file sourceFile="db_reporting_html.png" targetFile="db_reporting_html.png" type="copy"/>
+			<file sourceFile="flat_one_list.png" targetFile="flat_one_list.png" type="copy"/>
+			<file sourceFile="large_nesting.png" targetFile="large_nesting.png" type="copy"/>
+			<file sourceFile="nested_small.png" targetFile="nested_small.png" type="copy"/>
+			<file sourceFile="node_size_contingent.png" targetFile="node_size_contingent.png" type="copy"/>
+			<file sourceFile="price_range.png" targetFile="price_range.png" type="copy"/>
 		</section>
       		
 		<section name="Elba" sourceDir="elba" targetDir="elba">
 			<entry name="Elba" sourceFile="index.xhtml" targetFile="index.html" type="XHTML"/>
 			<entry name="Screenshots" sourceFile="screenshots.xhtml" targetFile="screenshots.html" type="XHTML"/>
+			<file sourceFile="context_editor.png" targetFile="context_editor.png" type="copy"/>
+			<file sourceFile="crossordinal.png" targetFile="crossordinal.png" type="copy"/>
+			<file sourceFile="db_wizard.png" targetFile="db_wizard.png" type="copy"/>
+			<file sourceFile="grid_editing.png" targetFile="grid_editing.png" type="copy"/>
+			<file sourceFile="simple.png" targetFile="simple.png" type="copy"/>
+
 		</section>
 	  
 		<section name="Siena" sourceDir="siena" targetDir="siena">
