@@ -8,17 +8,23 @@ package net.sourceforge.toscanaj.gui.activity;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.XML_Writer;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
-import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.events.*;
 
 import java.io.File;
 
-public class SaveConceptualSchemaActivity implements FileActivity {
+public class SaveConceptualSchemaActivity implements FileActivity, BrokerEventListener {
     private ConceptualSchema conceptualSchema;
+    private EventBroker eventBroker;
 
-    public SaveConceptualSchemaActivity(ConceptualSchema conceptualSchema) {
+    public SaveConceptualSchemaActivity(ConceptualSchema conceptualSchema, EventBroker eventBroker) {
         this.conceptualSchema = conceptualSchema;
+        this.eventBroker=eventBroker;
+        eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class );
+
     }
 
     public void processFile(File file) throws Exception {
@@ -27,5 +33,13 @@ public class SaveConceptualSchemaActivity implements FileActivity {
 
     public boolean prepareToProcess() throws Exception {
         return true;
+    }
+
+    public void processEvent(Event e) {
+        if ( e instanceof ConceptualSchemaChangeEvent ) {
+            ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
+            conceptualSchema = schemaEvent.getConceptualSchema();
+        }
+
     }
 }

@@ -190,7 +190,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
 
         JMenuItem saveMenuItem = new JMenuItem("Save...");
         SaveConceptualSchemaActivity saveActivity =
-            new SaveConceptualSchemaActivity(conceptualSchema);
+            new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
         saveMenuItem.addActionListener(
             new SaveFileAction(
                     this,
