@@ -20,7 +20,7 @@ Other new experimental features:
 
 
 
-Changes between versions 1.2 and 1,3 version of the ToscanaJ 
+Changes between versions 1.2 and 1.3 version of the ToscanaJ 
 program suite:
 
 Affecting all programs:
