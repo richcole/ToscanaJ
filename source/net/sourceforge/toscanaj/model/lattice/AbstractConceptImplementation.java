@@ -314,25 +314,6 @@ public abstract class AbstractConceptImplementation implements Concept {
     }
 
     /**
-     * Checks if the concept is realised.
-     *
-     * This is done be looking if any concept in the ideal has the same extent.
-     */
-    public boolean isRealised() {
-        int extentSize = this.getExtentSize();
-        Iterator it = this.ideal.iterator();
-        while (it.hasNext()) {
-            Concept cur = (Concept) it.next();
-            if (cur != this) {
-                if (cur.getExtentSize() == extentSize) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
      * Calculates the intent size based on the contingent sizes in the filter.
      */
     public int getIntentSize() {
@@ -484,36 +465,5 @@ public abstract class AbstractConceptImplementation implements Concept {
 
     public Collection getUpset() {
         return this.filter;
-    }
-
-    /**
-     * For debugging purposes.
-     */
-    public String toString() {
-        String retVal = "Object Contingent (" + this.getObjectContingentSize() + "):\n";
-        Iterator iter = this.getObjectContingentIterator();
-        while (iter.hasNext()) {
-            Object item = iter.next();
-            retVal = retVal + "- " + item.toString() + "\n";
-        }
-        retVal = retVal + "Attribute Contingent (" + this.getAttributeContingentSize() + "):\n";
-        iter = this.getAttributeContingentIterator();
-        while (iter.hasNext()) {
-            Object item = iter.next();
-            retVal = retVal + "- " + item.toString() + "\n";
-        }
-        retVal = retVal + "Extent (" + this.getExtentSize() + "):\n";
-        iter = this.getExtentIterator();
-        while (iter.hasNext()) {
-            Object item = iter.next();
-            retVal = retVal + "- " + item.toString() + "\n";
-        }
-        retVal = retVal + "Intent (" + this.getIntentSize() + "):\n";
-        iter = this.getIntentIterator();
-        while (iter.hasNext()) {
-            Object item = iter.next();
-            retVal = retVal + "- " + item.toString() + "\n";
-        }
-        return retVal;
     }
 }

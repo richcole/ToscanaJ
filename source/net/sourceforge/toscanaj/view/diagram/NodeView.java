@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -44,18 +45,25 @@ public class NodeView extends CanvasItem {
      */
     private int selectionState = DiagramView.NO_SELECTION;
 
+    private ConceptInterpretationContext conceptInterpretationContext;
+
     /**
      * Construct a nodeView for a Node.
      *
      * The DiagramView is used for the callback when a node was selected.
      */
-    public NodeView(DiagramNode diagramNode, DiagramView diagramView) {
+    public NodeView(DiagramNode diagramNode, DiagramView diagramView, ConceptInterpretationContext context) {
         this.diagramNode = diagramNode;
         this.diagramView = diagramView;
+        this.conceptInterpretationContext = context;
     }
 
     public DiagramNode getDiagramNode() {
         return diagramNode;
+    }
+
+    public ConceptInterpretationContext getConceptInterpretationContext() {
+        return conceptInterpretationContext;
     }
 
     /**
@@ -94,15 +102,37 @@ public class NodeView extends CanvasItem {
         }
 
         Ellipse2D ellipse = new Ellipse2D.Double(
-                diagramNode.getPosition().getX() - diagramNode.getRadiusX(),
-                diagramNode.getPosition().getY() - diagramNode.getRadiusY(),
-                diagramNode.getRadiusX() * 2, diagramNode.getRadiusY() * 2);
+                diagramNode.getPosition().getX() - getRadiusX(),
+                diagramNode.getPosition().getY() - getRadiusY(),
+                getRadiusX() * 2, getRadiusY() * 2);
         graphics.setPaint(nodeColor);
         graphics.fill(ellipse);
         graphics.setPaint(circleColor);
         graphics.draw(ellipse);
         graphics.setPaint(oldPaint);
         graphics.setStroke(oldStroke);
+    }
+
+    public double getRadiusY() {
+        Concept concept = this.diagramNode.getConcept();
+        ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
+        if (interpreter.isRealized(concept, conceptInterpretationContext)) {
+            return diagramNode.getRadiusY();
+        }
+        else {
+            return diagramNode.getRadiusY()/3;
+        }
+    }
+
+    public double getRadiusX() {
+        Concept concept = this.diagramNode.getConcept();
+        ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
+        if (interpreter.isRealized(concept, conceptInterpretationContext)) {
+            return diagramNode.getRadiusX();
+        }
+        else {
+            return diagramNode.getRadiusX()/3;
+        }
     }
 
     /**
@@ -114,13 +144,13 @@ public class NodeView extends CanvasItem {
             if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
                 return diagramView.getConceptInterpreter().getRelativeExtentSize(
                                         this.diagramNode.getConcept(),
-                                        diagramView.getConceptInterpretationContext(),
+                                        conceptInterpretationContext,
                                         ConceptInterpreter.REFERENCE_DIAGRAM
                         );
             } else {
                 return diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
                                         this.diagramNode.getConcept(),
-                                        diagramView.getConceptInterpretationContext(),
+                                        conceptInterpretationContext,
                                         ConceptInterpreter.REFERENCE_DIAGRAM
                         );
             }
@@ -128,14 +158,14 @@ public class NodeView extends CanvasItem {
             if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
                 return diagramView.getConceptInterpreter().getRelativeExtentSize(
                                         this.diagramNode.getConcept(),
-                                        diagramView.getConceptInterpretationContext(),
+                                        conceptInterpretationContext,
                                         ConceptInterpreter.REFERENCE_SCHEMA
                         );
             } else {
                 /// @todo Check if this one can be avoided -- it is pretty useless
                 return diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
                                         this.diagramNode.getConcept(),
-                                        diagramView.getConceptInterpretationContext(),
+                                        conceptInterpretationContext,
                                         ConceptInterpreter.REFERENCE_SCHEMA
                         );
             }
@@ -159,7 +189,7 @@ public class NodeView extends CanvasItem {
         double deltaX = point.getX() - diagramNode.getPosition().getX();
         double deltaY = point.getY() - diagramNode.getPosition().getY();
         double sqDist = deltaX * deltaX + deltaY * deltaY;
-        double sqRadius = diagramNode.getRadiusX() * diagramNode.getRadiusY();
+        double sqRadius = getRadiusX() * getRadiusY();
         return sqDist <= sqRadius;
     }
 
@@ -170,8 +200,8 @@ public class NodeView extends CanvasItem {
         Point2D center = this.diagramNode.getPosition();
         double x = center.getX();
         double y = center.getY();
-        double rx = this.diagramNode.getRadiusX();
-        double ry = this.diagramNode.getRadiusY();
+        double rx = getRadiusX();
+        double ry = getRadiusY();
         return new Rectangle2D.Double(x - rx, y - ry, 2 * rx, 2 * ry);
     }
 

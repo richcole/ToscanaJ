@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -94,13 +94,20 @@ public class DiagramView extends Canvas implements ChangeObserver {
         /// @todo update parts, redraw
     }
 
-    public ConceptInterpretationContext getConceptInterpretationContext() {
-        return conceptInterpretationContext;
-    }
-
     public void setConceptInterpretationContext(ConceptInterpretationContext conceptInterpretationContext) {
         this.conceptInterpretationContext = conceptInterpretationContext;
         /// @todo update parts, redraw
+    }
+
+    public void setFilterMode(boolean filterMode) {
+        Iterator it = this.canvasItems.iterator();
+        while (it.hasNext()) {
+            CanvasItem cur = (CanvasItem) it.next();
+            if (cur instanceof NodeView) {
+                NodeView nv = (NodeView) cur;
+                nv.getConceptInterpretationContext().setFilterMode(filterMode);
+            }
+        }
     }
 
     protected void dragFinished(MouseEvent e) {
@@ -179,7 +186,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
             repaint();
             return;
         }
-        addDiagram(diagram);
+        addDiagram(diagram, conceptInterpretationContext);
         requestScreenTransformUpdate();
         repaint();
     }
@@ -194,27 +201,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * If the filter concept is non-null all nodes created will use this for
      * filter operations.
      */
-    private void addDiagram(Diagram2D diagram) {
+    private void addDiagram(Diagram2D diagram, ConceptInterpretationContext context) {
         addDiagramLinesToCanvas(diagram);
-        addDiagramNodesToCanvas(diagram);
-        addDiagramLabelsToCanvas(diagram);
-    }
-
-    private void addDiagramLabelsToCanvas(Diagram2D diagram) {
-        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
-            LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
-            if (attrLabelInfo != null) {
-                LabelView labelView = new AttributeLabelView(this, attrLabelInfo);
-                addCanvasItem(labelView);
-                labelView.addObserver(this);
-            }
-            LabelInfo objLabelInfo = diagram.getObjectLabel(i);
-            if (objLabelInfo != null) {
-                LabelView labelView = new ObjectLabelView(this, objLabelInfo);
-                addCanvasItem(labelView);
-                labelView.addObserver(this);
-            }
-        }
+        addDiagramNodesToCanvas(diagram, context);
     }
 
     private void addDiagramLinesToCanvas(Diagram2D diagram) {
@@ -224,14 +213,29 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
     }
 
-    private void addDiagramNodesToCanvas(Diagram2D diagram) {
+    private void addDiagramNodesToCanvas(Diagram2D diagram, ConceptInterpretationContext context) {
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node, this);
+            NodeView nodeView = new NodeView(node, this, context);
             addCanvasItem(nodeView);
             if (node instanceof NestedDiagramNode) {
-                NestedDiagramNode ndNode = (NestedDiagramNode) node;
-                addDiagram(ndNode.getInnerDiagram());
+                Concept concept = node.getConcept();
+                if (conceptInterpreter.isRealized(concept, context)) {
+                    NestedDiagramNode ndNode = (NestedDiagramNode) node;
+                    addDiagram(ndNode.getInnerDiagram(), context.getNestedContext(concept));
+                }
+            }
+            LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
+            if (attrLabelInfo != null) {
+                LabelView labelView = new AttributeLabelView(this, nodeView, attrLabelInfo);
+                addCanvasItem(labelView);
+                labelView.addObserver(this);
+            }
+            LabelInfo objLabelInfo = diagram.getObjectLabel(i);
+            if (objLabelInfo != null) {
+                LabelView labelView = new ObjectLabelView(this, nodeView, objLabelInfo);
+                addCanvasItem(labelView);
+                labelView.addObserver(this);
             }
         }
     }
@@ -240,7 +244,14 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * @see LabelView.setDisplayType(boolean)
      */
     public void setDisplayType(boolean contingentOnly) {
-        this.conceptInterpretationContext.setObjectDisplayMode(contingentOnly);
+        Iterator it = this.canvasItems.iterator();
+        while (it.hasNext()) {
+            CanvasItem cur = (CanvasItem) it.next();
+            if (cur instanceof NodeView) {
+                NodeView nv = (NodeView) cur;
+                nv.getConceptInterpretationContext().setObjectDisplayMode(contingentOnly);
+            }
+        }
         updateLabelEntries();
         requestScreenTransformUpdate();
         repaint();

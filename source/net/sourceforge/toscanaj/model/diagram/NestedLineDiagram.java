@@ -32,8 +32,6 @@ public class NestedLineDiagram extends SimpleLineDiagram {
     public NestedLineDiagram(Diagram2D outerDiagram, Diagram2D innerDiagram) {
         float scale = 1.2f * calculateNeededScaling(outerDiagram, innerDiagram);
         Hashtable nodeMap = new Hashtable();
-        HashSet concepts = new HashSet(); // stores all concepts involved
-//        long start = System.currentTimeMillis();
         for (int i = 0; i < outerDiagram.getNumberOfNodes(); i++) {
             DiagramNode oldNode = outerDiagram.getNode(i);
             NestedDiagramNode node = new NestedDiagramNode(oldNode, innerDiagram, scale,
@@ -41,39 +39,12 @@ public class NestedLineDiagram extends SimpleLineDiagram {
             this.addNode(node);
             nodeMap.put(oldNode, node);
         }
-        //      long end = System.currentTimeMillis();
-
-        //       System.out.println("creating nodes"+(end-start));
-        //       start = end;
-
         for (int i = 0; i < outerDiagram.getNumberOfLines(); i++) {
             DiagramLine oldLine = outerDiagram.getLine(i);
             NestedDiagramNode from = (NestedDiagramNode) nodeMap.get(oldLine.getFromNode());
             NestedDiagramNode to = (NestedDiagramNode) nodeMap.get(oldLine.getToNode());
             this.addLine(from, to);
-            // add edges between inner nodes of two outer nodes
-            for (int j = 0; j < innerDiagram.getNumberOfNodes(); j++) {
-                AbstractConceptImplementation concept1 =
-                        (AbstractConceptImplementation) from.getInnerDiagram().getNode(j).getConcept();
-                AbstractConceptImplementation concept2 =
-                        (AbstractConceptImplementation) to.getInnerDiagram().getNode(j).getConcept();
-                concept1.addSubConcept(concept2);
-                concept2.addSuperConcept(concept1);
-                concepts.add(concept1);
-                concepts.add(concept2);
-            }
         }
-//        end = System.currentTimeMillis();
-//        System.out.println("creating lines and edges"+(end-start));
-        //start = end;
-        // build transitive closures for each concept
-        Iterator it = concepts.iterator();
-        while (it.hasNext()) {
-            AbstractConceptImplementation cur = (AbstractConceptImplementation) it.next();
-            cur.buildClosures();
-        }
-//        end = System.currentTimeMillis();
-//        System.out.println("building the closures"+(end-start));
     }
 
     /**

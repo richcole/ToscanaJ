@@ -32,8 +32,8 @@ public class AttributeLabelView extends LabelView {
     /**
      * Creates a view for the given label information.
      */
-    public AttributeLabelView(DiagramView diagramView, LabelInfo label) {
-        super(diagramView, label);
+    public AttributeLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
+        super(diagramView, nodeView, label);
     }
 
     /**

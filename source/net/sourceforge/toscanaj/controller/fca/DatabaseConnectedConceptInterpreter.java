@@ -8,26 +8,38 @@
 package net.sourceforge.toscanaj.controller.fca;
 
 import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
 
 import java.util.List;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Hashtable;
 
 import util.CollectionFactory;
 
-public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter {
+/**
+ * @todo attach ConceptInterpretationContext to this???
+ * @todo add caching of sizes and maybe other information (reset when context changes)
+ */
+public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, BrokerEventListener {
 
-    DatabaseConnection databaseConnection;
+    private DatabaseConnection databaseConnection;
 
-    DatabaseInfo databaseInfo;
+    private DatabaseInfo databaseInfo;
 
-    public DatabaseConnectedConceptInterpreter(DatabaseConnection databaseConnection, DatabaseInfo databaseInfo)
+    private Hashtable extentSizes = new Hashtable();
+    private Hashtable contingentSizes = new Hashtable();
+
+    public DatabaseConnectedConceptInterpreter(DatabaseConnection databaseConnection,
+                                               DatabaseInfo databaseInfo)
     {
         this.databaseConnection = databaseConnection;
         this.databaseInfo = databaseInfo;
@@ -59,10 +71,21 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter {
     }
 
     private int getCount(Concept concept, ConceptInterpretationContext context, boolean countType) throws DatabaseException {
+        Hashtable sizes;
+        if(countType == ConceptInterpretationContext.CONTINGENT) {
+            sizes=getContingentSizesCache(context);
+        }
+        else {
+            sizes=getExtentSizesCache(context);
+        }
+        Integer cacheVal = (Integer) sizes.get(concept);
+        if(cacheVal!=null) {
+            return cacheVal.intValue();
+        }
         DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
         String whereClause = WhereClauseGenerator.createWhereClause(dbConcept,
                                     context.getDiagramHistory(),
-                                    CollectionFactory.createDefaultList(),
+                                    context.getNestingConcepts(),
                                     countType,
                                     context.getFilterMode());
         if(whereClause == null) {
@@ -70,7 +93,33 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter {
         }
         DatabaseConnection connection = DatabaseConnection.getConnection();
         String statement = "SELECT count(*) FROM " + databaseInfo.getTableName() + " " + whereClause;
-        return connection.queryNumber(statement, 1);
+        int count = connection.queryNumber(statement, 1);
+        sizes.put(concept, new Integer(count));
+        return count;
+    }
+
+    private Hashtable getContingentSizesCache(ConceptInterpretationContext context) {
+        Hashtable retVal=(Hashtable) contingentSizes.get(context);
+        if(retVal == null) {
+            retVal = new Hashtable();
+            contingentSizes.put(context, retVal);
+            context.getEventBroker().subscribe(this,
+                                               ConceptInterpretationContextChangedEvent.class,
+                                               ConceptInterpretationContext.class);
+        }
+        return retVal;
+    }
+
+    private Hashtable getExtentSizesCache(ConceptInterpretationContext context) {
+        Hashtable retVal=(Hashtable) extentSizes.get(context);
+        if(retVal == null) {
+            retVal = new Hashtable();
+            extentSizes.put(context, retVal);
+            context.getEventBroker().subscribe(this,
+                                               ConceptInterpretationContextChangedEvent.class,
+                                               ConceptInterpretationContext.class);
+        }
+        return retVal;
     }
 
     public int getAttributeCount(Concept concept, ConceptInterpretationContext context) {
@@ -105,5 +154,35 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter {
             e.getOriginal().printStackTrace();
             throw new RuntimeException("Error querying database");
         }
+    }
+
+    public boolean isRealized(Concept concept, ConceptInterpretationContext context) {
+        /// @todo do check only lower neighbours
+        try {
+            int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
+            for (Iterator iterator = concept.getDownset().iterator(); iterator.hasNext();) {
+                Concept other = (Concept) iterator.next();
+                if(other == concept) {
+                    continue;
+                }
+                int otherExtentSize = getCount(other, context, ConceptInterpretationContext.EXTENT);
+                if(otherExtentSize == extentSize) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (DatabaseException e) {
+            e.getOriginal().printStackTrace();
+            throw new RuntimeException("Error querying the database");
+        }
+    }
+
+    private void clearCaches(ConceptInterpretationContext context) {
+        extentSizes.remove(context);
+        contingentSizes.remove(context);
+    }
+
+    public void processEvent(Event e) {
+        clearCaches((ConceptInterpretationContext)e.getSource());
     }
 }

@@ -86,6 +86,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      */
     protected DiagramView diagramView = null;
 
+    protected NodeView nodeView;
+
     /**
      * The current display size in lines.
      *
@@ -116,8 +118,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * Creates a view for the given label information.
      */
-    public LabelView(DiagramView diagramView, LabelInfo label) {
+    public LabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
         this.diagramView = diagramView;
+        this.nodeView = nodeView;
         this.labelInfo = label;
         this.labelInfo.addObserver(this);
         DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
@@ -217,7 +220,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         DiagramNode node = this.labelInfo.getNode();
         double x = node.getX();
         double y = node.getY();
-        double radius = node.getRadiusY();
+        double radius = nodeView.getRadiusY();
 
         // get the bounding rectangle
         this.rect = getCanvasBounds(graphics);
@@ -502,7 +505,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         double lw = getWidth(fm);
         double lh = getHeight(fm);
         double xPos = x - lw / 2 + this.labelInfo.getOffset().getX();
-        double radius = node.getRadiusY();
+        double radius = nodeView.getRadiusY();
         double yPos;
         if (getPlacement() == ABOVE) {
             y = y - radius;

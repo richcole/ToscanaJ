@@ -36,16 +36,6 @@ import java.util.Collection;
  */
 public interface Concept extends XMLizable {
     /**
-     * Returns true if the concept is realised.
-     *
-     * Realised means it is distinguished from all other concepts by the data,
-     * if there is another concept with the same extent but larger intent this
-     * concept is only theoretically existent, if a lattice would be created
-     * from the data it would not be in it.
-     */
-    boolean isRealised();
-
-    /**
      * Returns the size of the intent.
      */
     int getIntentSize();

@@ -47,13 +47,8 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
     }
 
     private void addNestingPart(List outerConcepts) {
-        boolean first = true;
         for (Iterator iterator = outerConcepts.iterator(); iterator.hasNext();) {
             DatabaseConnectedConcept concept = (DatabaseConnectedConcept) iterator.next();
-            if(first) { // ignore the concept we visit itself
-                first = false;
-                continue;
-            }
             if(concept.hasObjectClause()) {
                 clause += " AND " + concept.getObjectClause();
             }

@@ -265,8 +265,4 @@ public class DiagramController implements ChangeObservable {
             observer.update(this);
         }
     }
-
-    public ConceptInterpreter getDefaultInterpreter(DatabaseConnection databaseConnection, DatabaseInfo databaseInfo) {
-        return new DatabaseConnectedConceptInterpreter( databaseConnection, databaseInfo );
-    }
 }

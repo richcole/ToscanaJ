@@ -23,6 +23,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
@@ -701,13 +702,13 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 
         // diagram view
         if (actionSource == this.filterExactMenuItem) {
-            diagramView.getConceptInterpretationContext().setFilterMode(ConceptInterpretationContext.CONTINGENT);
+            diagramView.setFilterMode(ConceptInterpretationContext.CONTINGENT);
             updateLabelViews();
             return;
         }
         if (actionSource == this.filterAllMenuItem) {
 
-            diagramView.getConceptInterpretationContext().setFilterMode(ConceptInterpretationContext.EXTENT);
+            diagramView.setFilterMode(ConceptInterpretationContext.EXTENT);
             updateLabelViews();
             return;
         }
@@ -801,11 +802,13 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 
         diagramView.showDiagram(null);
         DiagramController controller = DiagramController.getController();
-        diagramView.setConceptInterpreter(controller.getDefaultInterpreter(DatabaseConnection.getConnection(),
-                                                                           conceptualSchema.getDatabaseInfo()));
-        diagramView.setConceptInterpretationContext(new ConceptInterpretationContext(controller.getDiagramHistory(),
-                                                                                     ConceptInterpretationContext.CONTINGENT,
-                                                                                     ConceptInterpretationContext.EXTENT) );
+        DatabaseConnectedConceptInterpreter interpreter =
+                                            new DatabaseConnectedConceptInterpreter(DatabaseConnection.getConnection(),
+                                                                                    conceptualSchema.getDatabaseInfo());
+        ConceptInterpretationContext interpretationContext = new ConceptInterpretationContext(controller.getDiagramHistory(),
+                                                                                 broker);
+        diagramView.setConceptInterpreter(interpreter);
+        diagramView.setConceptInterpretationContext(interpretationContext);
         updateLabelViews();
         diagramOrganiser.setConceptualSchema(conceptualSchema);
         DiagramController.getController().reset();

@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
+import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
@@ -52,8 +53,8 @@ public class ObjectLabelView extends LabelView {
     /**
      * Creates a view for the given label information.
      */
-    public ObjectLabelView(DiagramView diagramView, LabelInfo label) {
-        super(diagramView, label);
+    public ObjectLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
+        super(diagramView, nodeView, label);
         setQuery(defaultQuery);
     }
 
@@ -61,7 +62,10 @@ public class ObjectLabelView extends LabelView {
      * Avoids drawing object labels for non-realised concepts.
      */
     public void draw(Graphics2D graphics) {
-        if (this.labelInfo.getNode().getConcept().isRealised()) {
+        Concept concept = this.labelInfo.getNode().getConcept();
+        ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
+        ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
+        if (interpreter.isRealized(concept, context)) {
             super.draw(graphics);
         }
     }
@@ -119,14 +123,15 @@ public class ObjectLabelView extends LabelView {
         if (query != null) {
             DiagramNode node = this.labelInfo.getNode();
             DatabaseConnectedConcept concept = (DatabaseConnectedConcept) node.getConcept();
-            boolean objectDisplayMode = diagramView.getConceptInterpretationContext().getObjectDisplayMode();
-            boolean filterMode = diagramView.getConceptInterpretationContext().getFilterMode();
+            ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
+            boolean objectDisplayMode = context.getObjectDisplayMode();
+            boolean filterMode = context.getFilterMode();
             if (concept.getObjectClause() != null ||
                     ((objectDisplayMode==ConceptInterpretationContext.EXTENT) && !concept.isBottom())
             ) {
                 String whereClause = WhereClauseGenerator.createWhereClause(concept,
-                                                                       DiagramController.getController().getDiagramHistory(),
-                                                                       node.getConceptNestingList(),
+                                                                       context.getDiagramHistory(),
+                                                                       context.getNestingConcepts(),
                                                                        objectDisplayMode,
                                                                        filterMode);
                 queryResults = this.query.execute(whereClause);

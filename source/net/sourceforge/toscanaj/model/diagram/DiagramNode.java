@@ -218,14 +218,10 @@ public class DiagramNode implements XMLizable {
      * Get the horizontal radius used for this node.
      */
     public double getRadiusX() {
-        if(null==this.concept){
+        if(null==concept){
             return 0;
         }
-        if (this.concept.isRealised()) {
-            return RADIUS;
-        } else {
-            return RADIUS / 3;
-        }
+        return RADIUS;
     }
 
     /**
@@ -235,11 +231,7 @@ public class DiagramNode implements XMLizable {
         if(null==concept){
             return 0;
         }
-        if (this.concept.isRealised()) {
-            return RADIUS;
-        } else {
-            return RADIUS / 3;
-        }
+        return RADIUS;
     }
 
     /**

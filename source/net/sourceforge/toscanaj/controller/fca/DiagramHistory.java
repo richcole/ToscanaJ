@@ -18,9 +18,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import util.CollectionFactory;
+
 /**
  * This stores the diagram references for visited, shown and forthcoming
  * diagrams and can be used as a model for JList components.
+ *
+ * @todo Use event broker instead of being an observable.
  */
 public class DiagramHistory extends AbstractListModel implements ChangeObservable {
 
@@ -382,9 +386,11 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
      * This should not be called if the changes affect only future diagrams.
      */
     protected void notifyObservers() {
-        Iterator it = this.observers.iterator();
-        while (it.hasNext()) {
-            ChangeObserver observer = (ChangeObserver) it.next();
+        // avoid stupid ConcurrentModificationExceptions by operating on copy of list
+        List observerCopy = CollectionFactory.createDefaultList();
+        observerCopy.addAll(observers);
+        while (!observerCopy.isEmpty()) {
+            ChangeObserver observer = (ChangeObserver) observerCopy.remove(0);
             observer.update(this);
         }
     }
