@@ -79,7 +79,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         }
         DatabaseConnection connection = DatabaseConnection.getConnection();
         String statement = "SELECT count(*) FROM " + databaseInfo.getTableName() + " " + whereClause;
-        return connection.queryNumber(statement, 1);
+        return connection.queryInt(statement, 1);
     }
 
     private Hashtable getContingentSizesCache(ConceptInterpretationContext context) {

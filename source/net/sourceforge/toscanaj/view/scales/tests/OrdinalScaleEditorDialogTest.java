@@ -10,6 +10,8 @@ package net.sourceforge.toscanaj.view.scales.tests;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.db.tests.MockDBConnection;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.Table;
@@ -28,12 +30,12 @@ public class OrdinalScaleEditorDialogTest extends TestCase {
         return new TestSuite(OrdinalScaleEditorDialogTest.class);
     }
 
-    public void testAddDivider() {
+    public void testAddDivider() throws DatabaseException {
         Table table = new Table(new EventBroker(), "Table");
         Column column = new Column("Column", java.sql.Types.DOUBLE, table);
         table.addColumn(column);
         OrdinalScaleEditorDialog dialog = new OrdinalScaleEditorDialog(
-                null, new DatabaseSchema(new EventBroker()), column, OrdinalScaleEditorDialog.FLOAT
+                null, new DatabaseSchema(new EventBroker()), new MockDBConnection()
         );
         dialog.addDelimiter(1.);
 

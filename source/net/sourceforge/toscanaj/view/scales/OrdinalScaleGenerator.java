@@ -10,10 +10,8 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
-import net.sourceforge.toscanaj.model.database.Column;
 
 import java.awt.Frame;
-import java.sql.Types;
 
 public class OrdinalScaleGenerator implements ScaleGenerator {
     private Frame parent;
@@ -33,41 +31,15 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
             return false;
         }
         int columnType = columns[0].getColumn().getType();
-        if (determineDataType(columnType) == OrdinalScaleEditorDialog.UNSUPPORTED) {
+        if (OrdinalScaleEditorDialog.determineDataType(columnType) == OrdinalScaleEditorDialog.UNSUPPORTED) {
             return false;
         } else {
             return true;
         }
     }
 
-    public static int determineDataType(int columnType) {
-        switch (columnType) {
-            case Types.DOUBLE:
-                return OrdinalScaleEditorDialog.FLOAT;
-            case Types.FLOAT:
-                return OrdinalScaleEditorDialog.FLOAT;
-            case Types.REAL:
-                return OrdinalScaleEditorDialog.FLOAT;
-            case Types.BIGINT:
-                return OrdinalScaleEditorDialog.INTEGER;
-            case Types.INTEGER:
-                return OrdinalScaleEditorDialog.INTEGER;
-            case Types.SMALLINT:
-                return OrdinalScaleEditorDialog.INTEGER;
-            case Types.TINYINT:
-                return OrdinalScaleEditorDialog.INTEGER;
-            default:
-                return OrdinalScaleEditorDialog.UNSUPPORTED;
-        }
-    }
-
     public Context generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
-        Column column = columns[0].getColumn();
-        int scaleType = determineDataType(column.getType());
-        if(scaleType == OrdinalScaleEditorDialog.UNSUPPORTED) {
-        	throw new RuntimeException("Unsupported scale type");
-        }
-        OrdinalScaleEditorDialog scaleDialog = new OrdinalScaleEditorDialog(parent, scheme.getDatabaseSchema(), column, scaleType);
+        OrdinalScaleEditorDialog scaleDialog = new OrdinalScaleEditorDialog(parent, scheme.getDatabaseSchema(), databaseConnection);
         if (!scaleDialog.execute()) {
             return null;
         }

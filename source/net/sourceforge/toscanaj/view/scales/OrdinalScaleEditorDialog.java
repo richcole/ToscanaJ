@@ -10,7 +10,10 @@ package net.sourceforge.toscanaj.view.scales;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
@@ -24,6 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.sql.Types;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -35,7 +39,6 @@ public class OrdinalScaleEditorDialog extends JDialog {
     private JButton addButton;
     private NumberField addField;
     private JList dividersList;
-    private int scaleType;
     private JButton okButton; 
 
     public static final int INTEGER = 0;
@@ -44,6 +47,9 @@ public class OrdinalScaleEditorDialog extends JDialog {
     private Column column;
     private JComboBox columnChooser;
     private DatabaseSchema databaseSchema;
+    private JLabel avgLabel;
+    private JLabel rangeLabel;
+    private DatabaseConnection connection;
     
     private static interface ContextGenerator {
     	Context createContext(String name, List dividers, Column column);
@@ -220,13 +226,12 @@ public class OrdinalScaleEditorDialog extends JDialog {
         }
     }
 
-    public OrdinalScaleEditorDialog(Frame owner, DatabaseSchema databaseSchema, Column column, int scaleType) {
+    public OrdinalScaleEditorDialog(Frame owner, DatabaseSchema databaseSchema, DatabaseConnection connection) {
         super(owner);
       	setSize(400,600);
       	setLocation(200,100);
-      	this.column = column;
       	this.databaseSchema = databaseSchema;
-        this.scaleType = scaleType;
+      	this.connection = connection;
         layoutDialog();
         fillControls();
         pack();
@@ -317,11 +322,43 @@ public class OrdinalScaleEditorDialog extends JDialog {
                 JComboBox cb = (JComboBox) e.getSource();
                 if(column != cb.getSelectedItem()) {
                     column = ((TableColumnPair) cb.getSelectedItem()).getColumn();
+                    if(determineDataType(column.getType()) == FLOAT) {
+                    	addField.setNumberType(NumberField.FLOAT);
+                    } else {
+                        addField.setNumberType(NumberField.INTEGER);
+                    }
+                    updateRangeInfo();
                 }
             }
         });
 
         return new LabeledPanel("Column:", this.columnChooser, false);
+    }
+    
+    protected void updateRangeInfo() {
+    	String tail = " FROM " + this.column.getTable().getName() + ";";
+        String minQu = "SELECT min(" + this.column.getName() + ")" + tail;
+        String maxQu = "SELECT max(" + this.column.getName() + ")" + tail;
+        String avgQu = "SELECT avg(" + this.column.getName() + ")" + tail;
+        try {
+		    if (determineDataType(this.column.getType()) == FLOAT) {
+		        double min = this.connection.queryDouble(minQu,1);
+		        double max = this.connection.queryDouble(maxQu,1);
+		        double avg = this.connection.queryDouble(avgQu,1);
+		        this.rangeLabel.setText("Values between " + min + " and " + max);
+		        this.avgLabel.setText("Average value is " + avg);
+		    } else {
+		        int min = this.connection.queryInt(minQu,1);
+		        int max = this.connection.queryInt(maxQu,1);
+		        int avg = this.connection.queryInt(avgQu,1);
+		        this.rangeLabel.setText("Values between " + min + " and " + max);
+		        this.avgLabel.setText("Average value is " + avg);
+		    }
+        } catch (DatabaseException e) {
+        	ErrorDialog.showError(this,e,"Database query failed");
+        	this.rangeLabel.setText("");
+        	this.avgLabel.setText("");
+        }
     }
 
 	protected JPanel makeDividerPane() {
@@ -423,7 +460,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
 		
 		
 		centerPane.add(makeAddDividerPanel(), new GridBagConstraints(
-					0,0,1,1,1.0,0,
+					0,0,1,2,1.0,0,
 					GridBagConstraints.NORTHWEST,
 					GridBagConstraints .HORIZONTAL,
 					new Insets(2,0,2,0),
@@ -437,13 +474,6 @@ public class OrdinalScaleEditorDialog extends JDialog {
 					2,2
 		)); 
 		
-		centerPane.add(new JPanel(), new GridBagConstraints(
-					0,1,1,1,1.0,1.0,
-					GridBagConstraints.NORTHWEST,
-					GridBagConstraints.BOTH,
-					new Insets(2,2,2,0),
-					2,2
-		));
 		centerPane.add(removeButtonPane, new GridBagConstraints(
 					1,1,1,1,1.0,0,
 					GridBagConstraints.NORTHWEST,
@@ -464,7 +494,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
             List columns = table.getColumns();
             for (Iterator columnsIterator = columns.iterator(); columnsIterator.hasNext();) {
                 Column column = (Column) columnsIterator.next();
-                if(OrdinalScaleGenerator.determineDataType(column.getType()) != UNSUPPORTED) {
+                if(determineDataType(column.getType()) != UNSUPPORTED) {
                 	this.columnChooser.addItem(new TableColumnPair(table, column));
                 }
             }
@@ -492,13 +522,9 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
     private JPanel makeAddDividerPanel() {
         JPanel addPanel = new JPanel();
-        JLabel enterValue = new JLabel("Enter Value:");
+        JLabel enterValueLabel = new JLabel("Enter Value:");
         addPanel.setLayout(new GridBagLayout());
-        if (scaleType == FLOAT) {
-            addField = new NumberField(10, NumberField.FLOAT);
-        } else {
-            addField = new NumberField(10, NumberField.INTEGER);
-        }
+        addField = new NumberField(10, NumberField.FLOAT);
         addButton = new JButton("Add");
         addButton.setEnabled(false);
 
@@ -532,7 +558,10 @@ public class OrdinalScaleEditorDialog extends JDialog {
             }
         });
         
-		addPanel.add(enterValue, new GridBagConstraints(
+        this.rangeLabel = new JLabel();
+        this.avgLabel = new JLabel();
+        
+		addPanel.add(enterValueLabel, new GridBagConstraints(
 					0,0,1,1,0,0,
 					GridBagConstraints.NORTHWEST,
 					GridBagConstraints.NONE,
@@ -543,22 +572,36 @@ public class OrdinalScaleEditorDialog extends JDialog {
         addPanel.add(addField, new GridBagConstraints(
         			0,1,1,1,0,0,
         			GridBagConstraints.NORTHWEST,
-        			GridBagConstraints.VERTICAL,
+        			GridBagConstraints.NONE,
         			new Insets(0,2,0,2),
         			2,2
         ));
         addPanel.add(addButton,new GridBagConstraints(
-					1,1,1,1,0,0,
-					GridBagConstraints.NORTHWEST,
-					GridBagConstraints.NONE,
-					new Insets(0,2,0,2),
-					2,2
-		));
+                    1,1,1,1,0,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.NONE,
+                    new Insets(0,2,0,2),
+                    2,2
+        ));
+        addPanel.add(this.rangeLabel,new GridBagConstraints(
+                    0,2,2,1,1,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(0,2,0,2),
+                    2,2
+        ));
+        addPanel.add(this.avgLabel,new GridBagConstraints(
+                    0,3,2,1,1,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(0,2,0,2),
+                    2,2
+        ));
         return addPanel;
     }
 
     private void addDelimiter() {
-        if (scaleType == FLOAT) {
+        if (determineDataType(this.column.getType()) == FLOAT) {
             addDelimiter(addField.getDoubleValue());
         } else {
             addDelimiter(addField.getIntegerValue());
@@ -674,5 +717,26 @@ public class OrdinalScaleEditorDialog extends JDialog {
     public Context createContext() {
 		ContextGenerator generator = (ContextGenerator) this.typeChooser.getSelectedItem();
         return generator.createContext(getDiagramTitle(), getDividers(), this.column);
+    }
+
+    public static int determineDataType(int columnType) {
+        switch (columnType) {
+            case Types.DOUBLE:
+                return OrdinalScaleEditorDialog.FLOAT;
+            case Types.FLOAT:
+                return OrdinalScaleEditorDialog.FLOAT;
+            case Types.REAL:
+                return OrdinalScaleEditorDialog.FLOAT;
+            case Types.BIGINT:
+                return OrdinalScaleEditorDialog.INTEGER;
+            case Types.INTEGER:
+                return OrdinalScaleEditorDialog.INTEGER;
+            case Types.SMALLINT:
+                return OrdinalScaleEditorDialog.INTEGER;
+            case Types.TINYINT:
+                return OrdinalScaleEditorDialog.INTEGER;
+            default:
+                return OrdinalScaleEditorDialog.UNSUPPORTED;
+        }
     }
 }

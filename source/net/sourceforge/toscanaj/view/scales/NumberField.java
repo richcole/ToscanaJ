@@ -24,6 +24,10 @@ public class NumberField extends JTextField {
 
     public NumberField(int columns, int formatType) {
         super(columns);
+        setNumberType(formatType);
+    }
+
+    public void setNumberType(int formatType) {
         if (formatType == FLOAT) {
             formatter = NumberFormat.getNumberInstance(Locale.US);
         } else {

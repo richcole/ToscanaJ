@@ -26,7 +26,7 @@ public class MockDBConnection extends DatabaseConnection {
         return new ArrayList();
     }
     
-    public int queryNumber(String statement, int column) throws DatabaseException {
+    public int queryInt(String statement, int column) throws DatabaseException {
     	this.queryNumberCallCounter ++;
         return 0;
     }

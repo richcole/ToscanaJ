@@ -752,7 +752,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 			String query = "SELECT count(*) FROM " + dbinfo.getTableName() + 
 			                  " WHERE (" + clause + ");";
 			try {
-				sumCounts += this.databaseConnection.queryNumber(query, 1);
+				sumCounts += this.databaseConnection.queryInt(query, 1);
 				validClauses.add(clause);
 			} catch (DatabaseException e) {
 				problems.add("Object '" + clause + "' is not a valid clause for the database.\n" +
@@ -771,7 +771,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 				String query = "SELECT count(*) FROM " + dbinfo.getTableName() +
 				               " WHERE (" + clause + ") AND (" + otherClause + ");";
 				try {
-					int count = this.databaseConnection.queryNumber(query, 1);
+					int count = this.databaseConnection.queryInt(query, 1);
 					if(count != 0) {
 						problems.add("Object clauses '" + clause + "' and '" +
 						             otherClause + "' overlap.");
@@ -787,7 +787,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		if(problems.isEmpty()) { // doesn't make sense if we have problems so far
 			String query = "SELECT count(*) FROM " + dbinfo.getTableName() + ";";
 			try {
-				int count = this.databaseConnection.queryNumber(query, 1);
+				int count = this.databaseConnection.queryInt(query, 1);
 				if(count != sumCounts) {
 					problems.add("Object clauses do not cover database.");
 				}

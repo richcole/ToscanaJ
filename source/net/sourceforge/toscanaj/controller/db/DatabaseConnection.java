@@ -287,7 +287,7 @@ public class DatabaseConnection implements EventBrokerListener {
     /**
      * Retrieves the first value of the given column as integer.
      */
-    public int queryNumber(String statement, int column) throws DatabaseException {
+    public int queryInt(String statement, int column) throws DatabaseException {
         ResultSet resultSet = null;
         Statement stmt = null;
         int result;
@@ -300,6 +300,39 @@ public class DatabaseConnection implements EventBrokerListener {
             printLogMessage(System.currentTimeMillis() + ": done.");
             resultSet.next();
             result = resultSet.getInt(column);
+        } catch (SQLException se) {
+            throw new DatabaseException("An error occured while querying the database.", se);
+        } finally {
+            try {
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+            } catch (SQLException e) {
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Retrieves the first value of the given column as double.
+     */
+    public double queryDouble(String statement, int column) throws DatabaseException {
+        ResultSet resultSet = null;
+        Statement stmt = null;
+        double result;
+
+        // submit the query
+        try {
+            stmt = jdbcConnection.createStatement();
+            printLogMessage(System.currentTimeMillis() + ": Executing statement: " + statement);
+            resultSet = stmt.executeQuery(statement);
+            printLogMessage(System.currentTimeMillis() + ": done.");
+            resultSet.next();
+            result = resultSet.getDouble(column);
         } catch (SQLException se) {
             throw new DatabaseException("An error occured while querying the database.", se);
         } finally {
