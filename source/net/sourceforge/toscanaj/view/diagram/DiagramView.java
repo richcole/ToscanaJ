@@ -81,11 +81,7 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
      */
     public void update(Object source){
         if(source instanceof DiagramHistory) {
-            Iterator it = DiagramHistory.getDiagramHistory().getCurrentDiagramsIterator();
-            if(it.hasNext()) {
-                DiagramHistory.DiagramReference diagRef = (DiagramHistory.DiagramReference) it.next();
-                showDiagram((SimpleLineDiagram)diagRef.getDiagram());
-            }
+            showDiagram((SimpleLineDiagram)DiagramHistory.getDiagramHistory().getCurrentDiagram());
         }
         else {
             repaint();

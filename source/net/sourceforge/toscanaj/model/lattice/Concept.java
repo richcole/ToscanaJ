@@ -81,6 +81,8 @@ public interface Concept {
      * input concepts which is created by the union of the intents and the
      * join on the extents.
      *
+     * If the other concept is null, the original concept will be returned.
+     *
      * @TODO check terms here. This is basically the infimum of the two input
      * concepts in the new lattice, plus some additional information on realized
      * or not.

@@ -1,10 +1,20 @@
 package net.sourceforge.toscanaj.controller.fca;
 
+import net.sourceforge.toscanaj.model.diagram.AttributeLabelInfo;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.DiagramLine;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.ObjectLabelInfo;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+
 import net.sourceforge.toscanaj.model.lattice.Concept;
+// testing only:
+import net.sourceforge.toscanaj.model.lattice.MemoryMappedConcept;
+
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
@@ -241,7 +251,8 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         if(this.futureDiagrams.isEmpty()) {
             throw new NoSuchElementException("No diagram left");
         }
-        this.pastDiagrams.add(this.currentDiagrams.get(0));
+        DiagramReference oldRef = (DiagramReference) this.currentDiagrams.get(0);
+        this.pastDiagrams.add(new DiagramReference( oldRef.getDiagram(), zoomedConcept ) );
         this.currentDiagrams.remove(0);
         this.currentDiagrams.add(this.futureDiagrams.get(0));
         this.futureDiagrams.remove(0);
@@ -250,26 +261,40 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     }
 
     /**
-     * Returns an iterator on the list of already visited diagrams.
-     */
-    public Iterator getPastDiagramsIterator() {
-        return this.pastDiagrams.iterator();
-    }
-
-    /**
-     * Returns an iterator on the list of currently used diagrams.
+     * Returns the current diagram to be displayed.
      *
-     * Can be more than one if a nested view is used.
+     * This is currently an instance of SimpleLineDiagram which is filtered
+     * by the extent of the zoomed concepts in the past diagrams.
      */
-    public Iterator getCurrentDiagramsIterator() {
-        return this.currentDiagrams.iterator();
-    }
+    public Diagram2D getCurrentDiagram() {
+        DiagramReference ref = (DiagramReference) this.currentDiagrams.get(0);
+        Diagram2D diag = ref.getDiagram();
+        SimpleLineDiagram retVal = new SimpleLineDiagram();
+        Concept filter = null;
+        Iterator it = this.pastDiagrams.iterator();
+        while(it.hasNext()) {
+            DiagramReference curRef = (DiagramReference) it.next();
+            Concept curZC = curRef.getZoomedConcept();
+            filter = curZC.directProduct(filter);
+        }
+        Hashtable nodeMap = new Hashtable();
 
-    /**
-     * Returns an iterator on the list of forthcoming diagrams (for zooming).
-     */
-    public Iterator getFutureDiagramsIterator() {
-        return this.futureDiagrams.iterator();
+        retVal.setTitle(diag.getTitle());
+        for(int i = 0; i<diag.getNumberOfNodes(); i++) {
+            DiagramNode oldNode = diag.getNode(i);
+            DiagramNode newNode = new DiagramNode( oldNode.getPosition(),
+                                                   oldNode.getConcept().directProduct(filter),
+                                                   oldNode.getAttributeLabelInfo(),
+                                                   oldNode.getObjectLabelInfo() );
+            retVal.addNode(newNode);
+            nodeMap.put(oldNode,newNode);
+        }
+        for(int i = 0; i < diag.getNumberOfLines(); i++) {
+            DiagramLine line = diag.getLine(i);
+            retVal.addLine( (DiagramNode) nodeMap.get(line.getFromNode()),
+                            (DiagramNode) nodeMap.get(line.getToNode()));
+        }
+        return retVal;
     }
 
     /**

@@ -5,6 +5,7 @@ import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.model.lattice.MemoryMappedConcept;
@@ -65,8 +66,7 @@ public class CSXParser
     /**
      * No public constructor -- the class should not be instantiated.
      */
-    private CSXParser()
-    {
+    private CSXParser() {
     }
 
     /**
@@ -79,8 +79,6 @@ public class CSXParser
      * And IDs are not yet checked for uniqueness.
      *
      * The code might also have problems when namespaces are used.
-     *
-     * @TODO: add parsing of database info
      */
     public static ConceptualSchema parse( File csxFile )
             throws FileNotFoundException, IOException, DataFormatException
@@ -271,7 +269,19 @@ public class CSXParser
                 DiagramNode to   = (DiagramNode) nodes.get(
                                     edge.getAttribute( "to" ).getValue());
                 diagram.addLine( from, to );
-                /// @TODO create filter/ideal here
+
+                // add direct neighbours to concepts
+                AbstractConceptImplementation concept1 =
+                                 (AbstractConceptImplementation) from.getConcept();
+                AbstractConceptImplementation concept2 =
+                                 (AbstractConceptImplementation) to.getConcept();
+                concept1.addSubConcept(concept2);
+                concept2.addSuperConcept(concept1);
+            }
+
+            // build transitive closures for each concept
+            for(int i = 0; i < diagram.getNumberOfNodes(); i++) {
+                ((AbstractConceptImplementation) diagram.getNode(i).getConcept()).buildClosures();
             }
 
             _Schema.addDiagram( diagram );

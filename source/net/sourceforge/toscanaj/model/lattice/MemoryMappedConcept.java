@@ -72,10 +72,29 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
     }
 
     /**
-     * Will some day implement Concept.directProduct(Concept), returns >this< at
-     * the moment.
+     * Implements Concept.directProduct(Concept).
      */
-    public Concept directProduct( Concept other ) {
-        return this;
+    public Concept directProduct(Concept other) {
+        if(other == null) {
+            return this;
+        }
+        MemoryMappedConcept retVal = new MemoryMappedConcept();
+        Iterator it = other.getExtentIterator();
+        while(it.hasNext()) {
+            Object cur = it.next();
+            Iterator it2 = this.objectContingent.iterator();
+            while(it2.hasNext()) {
+                Object cur2 = it2.next();
+                if(cur.equals(cur2)) {
+                    retVal.addObject(cur);
+                }
+            }
+        }
+        it = this.attributeContingent.iterator();
+        while(it.hasNext()) {
+            Object cur = it.next();
+            retVal.addAttribute(cur);
+        }
+        return retVal;
     }
 }

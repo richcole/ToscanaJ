@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
  * done in this class, the joins on the sets themselves are done by creating an
  * iterator which iterates over all contingents in filter and ideal resp.
  */
-abstract class AbstractConceptImplementation implements Concept
+public abstract class AbstractConceptImplementation implements Concept
 {
     /**
      * This class implements an iterator that iterates over all attribute
@@ -50,7 +50,14 @@ abstract class AbstractConceptImplementation implements Concept
          * yet.
          */
         public boolean hasNext() {
-            return this.mainIterator.hasNext() && this.secondaryIterator.hasNext();
+            // make sure that we point to the next object, even if there are
+            // empty contingents coming ahead
+            while( ! this.secondaryIterator.hasNext() &&  this.mainIterator.hasNext() ) {
+                // go to next concept
+                Concept next = (Concept) this.mainIterator.next();
+                this.secondaryIterator = next.getAttributeContingentIterator();
+            }
+            return this.secondaryIterator.hasNext();
         }
 
         /**
@@ -65,8 +72,6 @@ abstract class AbstractConceptImplementation implements Concept
                 // we were already finished
                 throw new NoSuchElementException();
             }
-            // Assume: there is something to go for
-            Object retVal = this.secondaryIterator.next();
             // make sure that we point to the next attribute, even if there are
             // empty contingents coming ahead
             while( ! this.secondaryIterator.hasNext() &&  this.mainIterator.hasNext() ) {
@@ -119,7 +124,14 @@ abstract class AbstractConceptImplementation implements Concept
          * yet.
          */
         public boolean hasNext() {
-            return this.mainIterator.hasNext() && this.secondaryIterator.hasNext();
+            // make sure that we point to the next object, even if there are
+            // empty contingents coming ahead
+            while( ! this.secondaryIterator.hasNext() &&  this.mainIterator.hasNext() ) {
+                // go to next concept
+                Concept next = (Concept) this.mainIterator.next();
+                this.secondaryIterator = next.getObjectContingentIterator();
+            }
+            return this.secondaryIterator.hasNext();
         }
 
         /**
@@ -134,8 +146,6 @@ abstract class AbstractConceptImplementation implements Concept
                 // we were already finished
                 throw new NoSuchElementException();
             }
-            // Assume: there is something to go for
-            Object retVal = this.secondaryIterator.next();
             // make sure that we point to the next object, even if there are
             // empty contingents coming ahead
             while( ! this.secondaryIterator.hasNext() &&  this.mainIterator.hasNext() ) {
@@ -190,6 +200,37 @@ abstract class AbstractConceptImplementation implements Concept
      */
     public void addSubConcept( Concept superConcept ) {
         this.ideal.add( superConcept );
+    }
+
+    /**
+     * Calculates the ideal and filter for this concept if only direct neighbours
+     * are given.
+     *
+     * If only direct neighbours in the neighbouthoud relation where given this
+     * method can be called to create the ideal and filter by building the
+     * transitive closures.
+     */
+    public void buildClosures() {
+        for(int i = 0; i < ideal.size(); i++) {
+            AbstractConceptImplementation other = (AbstractConceptImplementation) ideal.get(i);
+            Iterator it = other.ideal.iterator();
+            while(it.hasNext()) {
+                Object trans = it.next();
+                if(! ideal.contains(trans) ) {
+                    ideal.add(trans);
+                }
+            }
+        }
+        for(int i = 0; i < filter.size(); i++) {
+            AbstractConceptImplementation other = (AbstractConceptImplementation) filter.get(i);
+            Iterator it = other.filter.iterator();
+            while(it.hasNext()) {
+                Object trans = it.next();
+                if(! filter.contains(trans) ) {
+                    filter.add(trans);
+                }
+            }
+        }
     }
 
     /**
