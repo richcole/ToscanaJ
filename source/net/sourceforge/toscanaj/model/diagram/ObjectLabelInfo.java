@@ -7,6 +7,20 @@ import java.util.Iterator;
  */
 public class ObjectLabelInfo extends LabelInfo {
     /**
+     * Calls the default constructor of the superclass.
+     */
+    public ObjectLabelInfo() {
+        super();
+    }
+
+    /**
+     * Calls the copy constructor of the superclass.
+     */
+    public ObjectLabelInfo(LabelInfo other) {
+        super(other);
+    }
+
+    /**
      * Returns the number of objects in the contingent of the concept attached.
      */
     public int getNumberOfEntries(boolean contingentOnly) {

@@ -76,6 +76,17 @@ abstract public class LabelInfo implements ChangeObservable
     }
 
     /**
+     * The copy constructor makes a deep copy without the observers.
+     */
+    public LabelInfo(LabelInfo other) {
+        this.offset = other.offset;
+        this.backgroundColor = other.backgroundColor;
+        this.textColor = other.textColor;
+        this.textAlignment = other.textAlignment;
+        labelObservers = new Vector();
+    }
+
+    /**
      * Attaches the node as the node belonging to the label.
      *
      * Access is package level here since this should be called from DiagramNode.

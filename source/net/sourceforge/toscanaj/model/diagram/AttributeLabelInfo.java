@@ -7,6 +7,20 @@ import java.util.Iterator;
  */
 public class AttributeLabelInfo extends LabelInfo {
     /**
+     * Calls the default constructor of the superclass.
+     */
+    public AttributeLabelInfo() {
+        super();
+    }
+
+    /**
+     * Calls the copy constructor of the superclass.
+     */
+    public AttributeLabelInfo(LabelInfo other) {
+        super(other);
+    }
+
+    /**
      * Returns the number of attributes in the contingent of the concept attached.
      */
     public int getNumberOfEntries(boolean contingentOnly) {

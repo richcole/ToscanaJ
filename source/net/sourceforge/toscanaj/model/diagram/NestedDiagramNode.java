@@ -1,6 +1,7 @@
 package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
+import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -25,9 +26,13 @@ public class NestedDiagramNode extends DiagramNode {
      * determines how much the new diagram will be scaled to accomodate the inner
      * diagrams.
      */
-    public NestedDiagramNode(DiagramNode outerNode, Diagram2D innerDiagram, double scale) {
+    public NestedDiagramNode(DiagramNode outerNode, Diagram2D innerDiagram, double scale ) {
         super( new Point2D.Double(outerNode.getX()*scale, outerNode.getY()*scale),
-               outerNode.getConcept(), outerNode.getAttributeLabelInfo(), outerNode.getObjectLabelInfo());
+               outerNode.getConcept(), outerNode.getAttributeLabelInfo(), null);
+        // scale attribute label position
+        this.attributeLabel.setOffset(new Point2D.Double( this.attributeLabel.getOffset().getX() * scale,
+                                                          this.attributeLabel.getOffset().getY() * scale ) );
+
         // calculate an offset that places center of the inner diagram into the middle of the node
         Rectangle2D rect = innerDiagram.getBounds();
         Point2D offset = new Point2D.Double(
@@ -39,10 +44,11 @@ public class NestedDiagramNode extends DiagramNode {
             DiagramNode oldNode = innerDiagram.getNode(i);
             Point2D newPos = new Point2D.Double( oldNode.getX() + offset.getX(),
                                                  oldNode.getY() + offset.getY() );
-            DiagramNode newNode = new DiagramNode( newPos,
-                                                   oldNode.getConcept().filterByContingent(outerNode.getConcept()),
-                                                   oldNode.getAttributeLabelInfo(),
-                                                   oldNode.getObjectLabelInfo() );
+            Concept newConcept = oldNode.getConcept().filterByContingent(outerNode.getConcept());
+            LabelInfo newAttrLabel = new AttributeLabelInfo(oldNode.getAttributeLabelInfo());
+            LabelInfo newObjLabel = new ObjectLabelInfo(oldNode.getObjectLabelInfo());
+
+            DiagramNode newNode = new DiagramNode(newPos, newConcept, newAttrLabel, newObjLabel);
             nodeMap.put(oldNode,newNode);
             newDiag.addNode(newNode);
         }

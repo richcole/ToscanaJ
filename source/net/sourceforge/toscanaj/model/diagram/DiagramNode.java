@@ -28,22 +28,22 @@ public class DiagramNode {
      * diagram, i.e. the concept theoretically could exist but is not supported
      * by the current set of data.
      */
-    private Concept concept = null;
+    protected Concept concept = null;
 
     /**
      * The position of the node.
      */
-    private Point2D position = null;
+    protected Point2D position = null;
 
     /**
      * The layout information for the attribute label.
      */
-    private LabelInfo attributeLabel;
+    protected LabelInfo attributeLabel;
 
     /**
      * The layout information for the attribute label.
      */
-    private LabelInfo objectLabel;
+    protected LabelInfo objectLabel;
 
     /**
      * Construct a node for a concept at a position with two labels attached.
