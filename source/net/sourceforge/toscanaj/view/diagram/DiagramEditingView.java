@@ -114,7 +114,9 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         fillDiagramListView();
         listView.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                showDiagram(listView.getSelectedIndex());
+                if(!e.getValueIsAdjusting()) {
+                    showDiagram(listView.getSelectedIndex());
+                }
             }
         });
 
