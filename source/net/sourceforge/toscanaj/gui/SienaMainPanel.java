@@ -69,8 +69,6 @@ import java.util.Vector;
 import java.util.List;
 import java.util.ListIterator;
 
-/// @todo check if the file we save to exists, warn if it does
-
 public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
 	private static final String CONFIGURATION_SECTION_NAME = "SienaMainPanel";
 	private static final String WINDOW_TITLE = "Siena";
@@ -103,7 +101,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private TemporalMainDialog temporalControls;
     private DiagramExportSettings diagramExportSettings;
     private ExportDiagramAction exportDiagramAction;
-    private File lastCSCFile;
+	private File lastCSCFile;
+	private File lastBurmeisterFile;
+	private File lastCernatoFile;
 	private SaveFileAction saveAsFileAction;
 	private SaveConceptualSchemaActivity saveActivity;
 
@@ -422,9 +422,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
     private void importCernatoXML() {
         final JFileChooser openDialog;
-        if (this.currentFile != null) {
+        if (this.lastCernatoFile != null) {
             // use position of last file for dialog
-            openDialog = new JFileChooser(this.currentFile);
+            openDialog = new JFileChooser(this.lastCernatoFile);
         } else {
             openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
@@ -443,14 +443,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	}
 	
     private void importCernatoXML(File file) {
-        // store current file
-        try {
-            this.currentFile = file.getCanonicalPath();
-        } catch (IOException e) { // could not resolve canonical path
-            e.printStackTrace();
-            this.currentFile = file.getAbsolutePath();
-            /// @todo what could be done here?
-        }
+    	this.lastCernatoFile = file;
         CernatoModel inputModel;
         try {
             inputModel = CernatoXMLParser.importCernatoXMLFile(file);
@@ -471,9 +464,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     private void importBurmeister() {
         final JFileChooser openDialog;
-        if (this.currentFile != null) {
+        if (this.lastBurmeisterFile != null) {
             // use position of last file for dialog
-            openDialog = new JFileChooser(this.currentFile);
+            openDialog = new JFileChooser(this.lastBurmeisterFile);
         } else {
             openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
@@ -522,14 +515,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
     private void importBurmeister(File file) {
-        // store current file
-        try {
-            this.currentFile = file.getCanonicalPath();
-        } catch (IOException e) { // could not resolve canonical path
-            e.printStackTrace();
-            this.currentFile = file.getAbsolutePath();
-            /// @todo what could be done here?
-        }
+    	this.lastBurmeisterFile = file;
 		ContextImplementation context;
         try {
             context = BurmeisterParser.importBurmeisterFile(file);
@@ -560,13 +546,13 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
         try {
             importCSC(openDialog.getSelectedFile());
-            this.lastCSCFile = openDialog.getSelectedFile();
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Import failed");
         }
     }
 
     private void importCSC(File file) {
+		this.lastCSCFile = file;
         try {
             new CSCParser().importCSCFile(file, this.conceptualSchema);
         } catch (FileNotFoundException e) {
