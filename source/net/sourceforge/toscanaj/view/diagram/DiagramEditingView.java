@@ -6,7 +6,7 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.DiagramCollection;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
@@ -27,7 +27,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 public class DiagramEditingView extends JPanel implements BrokerEventListener {
-    private ConceptualSchema conceptualSchema;
+    private DiagramCollection conceptualSchema;
     private DefaultListModel diagramListModel;
     private JSplitPane splitPane;
     private DiagramView diagramView;
@@ -38,7 +38,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
     /**
      * Construct an instance of this view
      */
-    public DiagramEditingView(JFrame frame, ConceptualSchema conceptualSchema, EventBroker eventBroker) {
+    public DiagramEditingView(JFrame frame, DiagramCollection conceptualSchema, EventBroker eventBroker) {
         super();
         setLayout(new BorderLayout());
         this.conceptualSchema = conceptualSchema;

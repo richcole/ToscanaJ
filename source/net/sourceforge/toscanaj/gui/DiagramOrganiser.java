@@ -7,7 +7,7 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
-import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.DiagramCollection;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
@@ -28,7 +28,7 @@ public class DiagramOrganiser extends JPanel {
     /**
      * Stores the conceptual schema used for accessing the available diagrams.
      */
-    private ConceptualSchema schema;
+    private DiagramCollection schema;
 
     /**
      * The listview for the available diagrams.
@@ -50,7 +50,7 @@ public class DiagramOrganiser extends JPanel {
      */
     private DiagramHistoryView selectedDiagramsListview;
 
-    public DiagramOrganiser(ConceptualSchema conceptualSchema) {
+    public DiagramOrganiser(DiagramCollection conceptualSchema) {
         // store model
         this.schema = conceptualSchema;
 
@@ -150,7 +150,7 @@ public class DiagramOrganiser extends JPanel {
     /**
      * This changes the conceptual schema used for the list of available diagrams.
      */
-    public void setConceptualSchema(ConceptualSchema schema) {
+    public void setConceptualSchema(DiagramCollection schema) {
         this.schema = schema;
         if (schema == null) {
             this.availableDiagramsListview.removeAll();

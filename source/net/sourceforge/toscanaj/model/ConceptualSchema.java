@@ -25,7 +25,7 @@ import java.util.Vector;
  * in the program. Instances are created by parsing a CSX file with the
  * CSXParser class.
  */
-public class ConceptualSchema {
+public class ConceptualSchema implements DiagramCollection {
     /**
      * The database information.
      */

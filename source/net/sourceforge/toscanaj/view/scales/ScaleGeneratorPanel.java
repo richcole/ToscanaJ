@@ -1,7 +1,7 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.events.BrokerEventListener;
-import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.DiagramCollection;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import util.CollectionFactory;
 
@@ -16,7 +16,7 @@ import java.util.Map;
 public class ScaleGeneratorPanel extends JPanel{
     private List scaleGenerators = null;
     private JFrame parentFrame;
-    ConceptualSchema conceptualSchema;
+    DiagramCollection conceptualSchema;
     TableColumnPairsSelectionSource selectionSource;
 
     public JFrame getParentFrame() {
@@ -26,7 +26,7 @@ public class ScaleGeneratorPanel extends JPanel{
     /**
      * Construct an instance of this view
      */
-    public ScaleGeneratorPanel(JFrame frame, ConceptualSchema conceptualSchema, TableColumnPairsSelectionSource selectionSource) {
+    public ScaleGeneratorPanel(JFrame frame, DiagramCollection conceptualSchema, TableColumnPairsSelectionSource selectionSource) {
         super();
         this.parentFrame = frame;
         this.conceptualSchema = conceptualSchema;
