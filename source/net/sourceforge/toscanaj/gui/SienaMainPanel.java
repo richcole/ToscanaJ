@@ -42,6 +42,7 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.swing.*;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -170,6 +171,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	private TableView tableView;
 	private RowHeader rowHeader;
 	private ColumnHeader colHeader;
+    private JLabel temporalControlsLabel;
     /**
 	 * @todo this class is superflous, it should be replaced by putting the calculation into the
 	 * TableView class.
@@ -272,11 +274,15 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
 	protected void createDiagramEditingView() {
         this.diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
+        this.temporalControlsLabel = new JLabel("Temporal Concept Analysis:");
         this.temporalControls = new TemporalControlsPanel(
                                             this.diagramEditingView.getDiagramView(),
                                             diagramExportSettings,
                                             eventBroker);
-        this.temporalControls.setVisible(ConfigurationManager.fetchBoolean("SienaTemporalControls", "enabled", false));                                    
+        boolean temporalControlsEnabled = ConfigurationManager.fetchBoolean("SienaTemporalControls", "enabled", false);
+        this.temporalControlsLabel.setVisible(temporalControlsEnabled);
+        this.temporalControls.setVisible(temporalControlsEnabled);                                    
+        this.diagramEditingView.addAccessory(temporalControlsLabel);
         this.diagramEditingView.addAccessory(temporalControls);
 		this.diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
 										this, DisplayedDiagramChangedEvent.class, Object.class);
@@ -651,6 +657,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         showTemporalControls.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 boolean newState = !temporalControls.isVisible();
+                temporalControlsLabel.setVisible(newState);
                 temporalControls.setVisible(newState);
             }
         });

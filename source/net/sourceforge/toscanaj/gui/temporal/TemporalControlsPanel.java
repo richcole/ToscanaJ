@@ -120,7 +120,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     private void buildGUI() {
         this.addTab("Controls", createControlsPanel());
         this.addTab("Data", createBasicSettingsPanel());
-        this.addTab("Animation Settings", createAnimationsSettingsPanel());
+        this.addTab("Options", createAnimationsSettingsPanel());
     }
 
 	private JPanel createControlsPanel() {
@@ -177,7 +177,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         panel.add(new JPanel(), new GridBagConstraints(0, row, 1, 1, 1, 1,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         DEFAULT_SPACER_INSETS, 0, 0));
-        panel.setBorder(createTitledBorder("Temporal Controls"));                                                
         return panel;
     }
 
@@ -238,7 +237,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         basicSettingsPanel.add(new JPanel(), new GridBagConstraints(0, r, 1, 1, 1, 1,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         DEFAULT_SPACER_INSETS, 0, 0));
-		basicSettingsPanel.setBorder(createTitledBorder("Data settings"));
 		return basicSettingsPanel;
 	}
 
@@ -293,7 +291,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         animationSettingsPanel.add(new JPanel(), new GridBagConstraints(0, r, 1, 1, 1, 1,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         DEFAULT_SPACER_INSETS, 0, 0));
-		animationSettingsPanel.setBorder(createTitledBorder("Animation controls"));
 		return animationSettingsPanel;
 	}
 
