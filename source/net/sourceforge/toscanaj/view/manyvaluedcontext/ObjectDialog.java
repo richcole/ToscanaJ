@@ -35,7 +35,7 @@ public class ObjectDialog extends JDialog{
 	
 	
 	public ObjectDialog(Frame parent, WritableFCAObject object){
-		super(parent,"Object", false);
+		super(parent,"Object", true);
 		setResizable(false);
 		createView(object.toString());
 		pack();

@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
 import java.util.Hashtable;
+import java.util.TreeMap;
 
 import org.tockit.util.ListSet;
 import org.tockit.util.ListSetImplementation;
@@ -18,7 +19,7 @@ import net.sourceforge.toscanaj.model.context.*;
 public class ManyValuedContextImplementation implements WritableManyValuedContext {
     private ListSet objects = new ListSetImplementation();
     private ListSet properties = new ListSetImplementation();
-    private Hashtable relation = new Hashtable();
+    private TreeMap relation = new TreeMap();
 	private ListSet types = new ListSetImplementation();
 
     public ManyValuedContextImplementation() {

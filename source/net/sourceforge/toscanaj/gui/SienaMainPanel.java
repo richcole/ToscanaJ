@@ -316,11 +316,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		objectDialog.show();
 		this.tableView.updateSize();
 		this.rowHeader.updateSize();
+		this.rowHeader.repaint();
 	}
 
 	private void editAttribute(int column) {
-		this.tableView.updateSize();
-		this.colHeader.updateSize();
+		throw new UnsupportedOperationException("Not yet implemented"); 
 	}
 
 	private JToolBar createContextToolbar() {
