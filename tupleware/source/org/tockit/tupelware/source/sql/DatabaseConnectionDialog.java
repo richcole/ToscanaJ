@@ -28,9 +28,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 
 
@@ -560,9 +561,9 @@ public class DatabaseConnectionDialog extends JDialog {
         SqlQueryPanel() {
             super();
             sqlQueryArea = new JTextArea();
-            updateContents();
-            this.setLayout(new GridBagLayout());
+            sqlQueryArea.setBorder(BorderFactory.createLoweredBevelBorder());
 
+            this.setLayout(new GridBagLayout());
             this.add(new JLabel("SQL Query:"),new GridBagConstraints(
                     0,0,1,1,1,0,
                     GridBagConstraints.NORTHWEST,
@@ -583,32 +584,28 @@ public class DatabaseConnectionDialog extends JDialog {
         
         boolean executeStep() {
             try {
-                List results = connection.executeQuery(sqlQueryArea.getText());
-                Vector firstRow = (Vector) results.get(0);
-                String[] names = new String[firstRow.size()];
-                for (int i = 0; i < names.length; i++) {
-                    names[i] = String.valueOf(i);
+				Statement stmt = connection.getJdbcConnection().createStatement();
+				ResultSet resultSet = stmt.executeQuery(this.sqlQueryArea.getText());
+				ResultSetMetaData metaData = resultSet.getMetaData();
+                int numberColumns = metaData.getColumnCount();
+                String[] names = new String[numberColumns];
+				for (int i = 0; i < numberColumns; i++) {
+                    names[i] = metaData.getColumnLabel(i + 1);
                 }
-                tupels = new TupelSet(names);
-                for (Iterator iter = results.iterator(); iter.hasNext();) {
-                    Vector result = (Vector) iter.next();
-                    Object[] tupel = new Object[result.size()];
-                    int i = 0;
-                    for (Iterator iterator = result.iterator(); iterator.hasNext(); ) {
-                        tupel[i] = iterator.next();
-                        i++;
-                    }
-                    tupels.addTupel(tupel);
-                }
+				tupels = new TupelSet(names);
+				while (resultSet.next()) {
+					Object[] tupel = new Object[numberColumns];
+					for (int i = 0; i < numberColumns; i++) {
+						tupel[i] = resultSet.getObject(i + 1);
+					}
+					tupels.addTupel(tupel);
+				}
+				connection.disconnect();
                 return true;
+			} catch (SQLException se) {
+				ErrorDialog.showError(owner, se, "An error occured while querying the database.");
             } catch (DatabaseException e) {
-                ErrorDialog.showError(owner, e, "Could not query database");
-            } finally {
-                try {
-                    connection.disconnect();
-                } catch (DatabaseException e1) {
-                    e1.printStackTrace();
-                }
+				ErrorDialog.showError(owner, e, "An error occured while closing the database.");
             }
             return false;
         }
