@@ -22,7 +22,7 @@ import java.awt.geom.Point2D;
 
 public abstract class NDimLayoutOperations {
     // constants for base vector calculation
-    private static final double BASE_SCALE = 30;
+    private static final double BASE_SCALE = 100;
     private static final double BASE_X_STRETCH = 2;
     private static final double BASE_X_SHEAR = -0.1;
 
@@ -79,12 +79,13 @@ public abstract class NDimLayoutOperations {
         Vector base = new Vector();
         int n = dimensions.size();
         int i = 0;
+        double scale = BASE_SCALE / (Math.pow(2,n));
         for (Iterator iterator = dimensions.iterator(); iterator.hasNext();) {
             iterator.next();
             double a = Math.pow(2,i);
             double b = Math.pow(2,n-i-1);
-            base.add(new Point2D.Double( (a-b + BASE_X_SHEAR) * BASE_X_STRETCH * BASE_SCALE,
-                                         (a+b) * BASE_SCALE));
+            base.add(new Point2D.Double( (a-b + BASE_X_SHEAR) * BASE_X_STRETCH * scale,
+                                         (a+b) * scale));
             i++;
         }
         return base;
