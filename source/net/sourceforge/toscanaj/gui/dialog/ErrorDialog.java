@@ -8,6 +8,8 @@
 package net.sourceforge.toscanaj.gui.dialog;
 
 import java.awt.Component;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import javax.swing.JOptionPane;
 
@@ -38,7 +40,7 @@ public class ErrorDialog {
      * based on the original exception thrown.
      */
     private ErrorDialog(Component component, Throwable e, String title) {
-        showDetailedErrorMsg(component, e, title, e.getMessage());
+        showDetailedErrorMessage(component, e, title);
     }
 
     /**
@@ -50,20 +52,16 @@ public class ErrorDialog {
     private ErrorDialog(Component component, Throwable e, String title, String errorMsg) {
         showDetailedErrorMsg(component, e, title, errorMsg);
     }
-
-    /**
-     * Show an error dialog that gives the option to show a more detailed
-     * error message if required.
-     */
-    private void showDetailedErrorMsg(Component component, Throwable e, String title, String errorMsg) {
+    
+    private void showDetailedErrorMessage(Component component, Throwable e, String title) {
         Throwable original = e.getCause();
         if (original == null) {
-            new ErrorDialog(component, title, errorMsg);
+            showLastErrorMessage(component, e, title);
             return;
         }
         Object[] options = {"OK", "Details"};
         int n = JOptionPane.showOptionDialog(component,
-                errorMsg,
+                e.getMessage(),
                 title,
                 JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.ERROR_MESSAGE,
@@ -71,7 +69,39 @@ public class ErrorDialog {
                 options,
                 options[0]);
         if (n == 1) {
-        	ErrorDialog.showError(component, original, title, original.getMessage());
+            ErrorDialog.showError(component, original, title, original.getMessage());
+        }
+    }
+
+    private void showLastErrorMessage(Component component, Throwable e, String title) {
+        Object[] options = {"OK", "Details"};
+        int n = JOptionPane.showOptionDialog(component,
+                e.getMessage(),
+                title,
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.ERROR_MESSAGE,
+                null,
+                options,
+                options[0]);
+        if (n == 1) {
+        	StringWriter stackTraceWriter = new StringWriter();
+        	e.printStackTrace(new PrintWriter(stackTraceWriter));
+            ErrorDialog.showError(component, title, stackTraceWriter.toString());
+        }
+    }
+
+    private void showDetailedErrorMsg(Component component, Throwable e, String title, String extraMessage) {
+        Object[] options = {"OK", "Details"};
+        int n = JOptionPane.showOptionDialog(component,
+                extraMessage,
+                title,
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.ERROR_MESSAGE,
+                null,
+                options,
+                options[0]);
+        if (n == 1) {
+            ErrorDialog.showError(component, e, title);
         }
     }
 
