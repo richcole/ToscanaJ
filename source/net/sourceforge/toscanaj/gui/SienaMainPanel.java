@@ -197,10 +197,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         createViews();
 
-        createMenuBar();
-
         mruList = preferences.getStringList("mruFiles");
-
+        createMenuBar();
+        
         // if we have at least one MRU file try to open it
         if (loadLastFile && this.mruList.size() > 0) {
             File schemaFile =
