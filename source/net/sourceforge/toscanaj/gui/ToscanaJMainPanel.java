@@ -170,12 +170,13 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         conceptualSchema = new ConceptualSchema(broker);
         DatabaseConnection.initialize(broker);
 
-        // register all image writers we want to support
-        try {
+        // register all image writers we want to support -- order is relevant since applied
+        // in the export dialog
+		try {
 			org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
-        } catch (Throwable t) {
-        	// do nothing, we just don't support SVG
-        }
+		} catch (Throwable t) {
+			// do nothing, we just don't support SVG
+		}
 
         // the next one is part of JDK 1.4, so it should give us JPG and PNG all the time
        	org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
