@@ -224,7 +224,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         contentPane.setLayout(new BorderLayout());
         DiagramController controller = DiagramController.getController();
         diagramView = new DiagramView();
-        /// @todo move the subscriptions into the listeners/handlers
+        /// @todo move the subscriptions into the handlers
         EventBroker diagramEventBroker = diagramView.getController().getEventBroker();
         diagramEventBroker.subscribe(
                 new FilterOperationEventListener(controller),
@@ -251,6 +251,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 CanvasItemActivatedEvent.class,
                 ObjectLabelView.class
         );
+        new LabelClickEventHandler(diagramEventBroker);
         new LabelDragEventHandler(diagramEventBroker);
 
         diagramOrganiser = new DiagramOrganiser(this.conceptualSchema);

@@ -107,6 +107,8 @@ public class CanvasController implements MouseListener, MouseMotionListener {
             Point2D modelPos = null;
             modelPos = canvas.getCanvasCoordinates(screenPos);
             selectedCanvasItem.clicked(modelPos);
+            this.eventBroker.processEvent(
+                    new CanvasItemClickedEvent(this.selectedCanvasItem,modelPos,screenPos));
             if (e.getClickCount() == 1) {
                 this.doubleClickTimer = new Timer();
                 this.doubleClickTimer.schedule(

@@ -456,10 +456,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 
     /**
      * Handles scrolling of the items.
-     *
-     * @todo move this into event handler
      */
-    public void clicked(Point2D pos) {
+    public void processClickEvent(Point2D pos) {
         if (pos.getX() < this.rect.getMaxX() - this.scrollbarWidth) {
             // not a click on the scrollbar
             return;
