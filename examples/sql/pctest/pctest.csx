@@ -94,8 +94,10 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
                         <column sqlname="price"     displayname="Price"     mincolor="#ff0000" maxcolor="#ffff00" linecolor="#ffffff"/>
                     </template>
                 </objectListView>
-                <!-- this one is just showing syntax, it does not do anything useful. It would if the program would be found
-                     and there would be a table AttributeURLs, mapping AttributeNames to DescriptionURLs-->
+                <!-- This one is just showing syntax, it does not do anything useful. It would if the program would be found
+                     and there would be a table AttributeURLs, mapping AttributeNames to DescriptionURLs.
+                     since we don't have those, we don't actually use the setting. -->
+                <!--
                 <attributeView class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer" name="Open description...">
                     <parameter name="openDelimiter" value="$$$"/>
                     <parameter name="closeDelimiter" value="%%%"/>
@@ -103,6 +105,7 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
                     <table>AttributeURLs</table>
                     <key>AttributeName</key>
                 </attributeView>
+                -->
             </views>
         </databaseConnection>
 		<object id="1">price&gt;=5000</object>
