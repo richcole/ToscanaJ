@@ -9,6 +9,11 @@ Specific for ToscanaJ:
 
 Specific for Elba:
 ==================
+- Bugfix: ordinal scale generation works again
+- Bugfix: nominal scale generator allows re-adding values after removal from
+  selection
+- Bugfix: nominal scales across columns add the column names and can have the 
+  same values in different columns without breaking the scale
 
 Specific for Siena (still not fully complete):
 ==============================================
