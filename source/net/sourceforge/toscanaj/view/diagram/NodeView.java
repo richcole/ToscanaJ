@@ -43,6 +43,11 @@ public class NodeView extends CanvasItem {
 
     private ConceptInterpretationContext conceptInterpretationContext;
 
+    private boolean isRealized;
+
+    /// @todo move into DiagramSchema
+    private static final int NOT_REALIZED_REDUCTION_FACTOR = 3;
+
     /**
      * Construct a nodeView for a Node.
      *
@@ -52,6 +57,9 @@ public class NodeView extends CanvasItem {
         this.diagramNode = diagramNode;
         this.diagramView = diagramView;
         this.conceptInterpretationContext = context;
+        ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
+        Concept concept = this.diagramNode.getConcept();
+        this.isRealized = interpreter.isRealized(concept, conceptInterpretationContext);
     }
 
     public DiagramNode getDiagramNode() {
@@ -110,22 +118,18 @@ public class NodeView extends CanvasItem {
     }
 
     public double getRadiusY() {
-        Concept concept = this.diagramNode.getConcept();
-        ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
-        if (interpreter.isRealized(concept, conceptInterpretationContext)) {
+        if (this.isRealized) {
             return diagramNode.getRadiusY();
         } else {
-            return diagramNode.getRadiusY() / 3;
+            return diagramNode.getRadiusY() / NOT_REALIZED_REDUCTION_FACTOR;
         }
     }
 
     public double getRadiusX() {
-        Concept concept = this.diagramNode.getConcept();
-        ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
-        if (interpreter.isRealized(concept, conceptInterpretationContext)) {
+        if (this.isRealized) {
             return diagramNode.getRadiusX();
         } else {
-            return diagramNode.getRadiusX() / 3;
+            return diagramNode.getRadiusX() / NOT_REALIZED_REDUCTION_FACTOR;
         }
     }
 
