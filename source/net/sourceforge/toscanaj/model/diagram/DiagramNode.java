@@ -311,12 +311,25 @@ public class DiagramNode implements XMLizable {
             return false;
         }
 
-        if(!this.getObjectLabelInfo().equals(other.getObjectLabelInfo())){
-            return false;
+        if(this.getObjectLabelInfo() != null) {
+            if(!this.getObjectLabelInfo().equals(other.getObjectLabelInfo())){
+                return false;
+            }
+        }
+        else {
+            if(other.getObjectLabelInfo() != null) {
+                return false;
+            }
         }
 
-        if(!this.getAttributeLabelInfo().equals(other.getAttributeLabelInfo())){
-            return false;
+        if (this.getAttributeLabelInfo() != null) {
+            if(!this.getAttributeLabelInfo().equals(other.getAttributeLabelInfo())){
+                return false;
+            }
+        } else {
+            if(other.getAttributeLabelInfo() != null) {
+                return false;
+            }
         }
         return true;
     }
