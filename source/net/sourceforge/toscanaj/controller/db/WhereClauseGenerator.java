@@ -10,7 +10,6 @@ package net.sourceforge.toscanaj.controller.db;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 import java.util.Iterator;
 import java.util.List;
@@ -72,7 +71,7 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
         else {
             String retVal = "(";
             for (Iterator iterator = objectIterator; iterator.hasNext();) {
-                Object o = (Object) iterator.next();
+                Object o = iterator.next();
                 retVal += o.toString();
                 if(iterator.hasNext()) {
                     retVal += " OR ";
