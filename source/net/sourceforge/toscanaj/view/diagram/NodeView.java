@@ -267,6 +267,8 @@ public class NodeView extends CanvasItem {
             return;
         }
         this.selectionState = DiagramView.NOT_SELECTED;
+        // we are comparing nodes from the inside out, assuming both lists are the same lengths
+        // (as they always should be)
         List ourConcepts = getDiagramNode().getConceptNestingList();
         Iterator it = selectedConcepts.iterator();
         Iterator it2 = ourConcepts.iterator();
@@ -274,30 +276,40 @@ public class NodeView extends CanvasItem {
         while (it.hasNext()) {
             Concept selectedConcept = (Concept) it.next();
             Concept ourConcept = (Concept) it2.next();
+            // we don't care about anything nested deeper than we are
             if (!onOurLevel && ourConcept != this.getDiagramNode().getConcept()) {
                 continue;
             } else {
                 onOurLevel = true;
             }
             if (ourConcept == selectedConcept) {
+            	// direct hit, but if we had another hit before it doesn't count, if
+            	// it was another direct hit we keep it, otherwise we are still in 
+            	// filter or ideal
                 if (this.selectionState == DiagramView.NOT_SELECTED) {
                     this.selectionState = DiagramView.SELECTED_DIRECTLY;
                 }
             } else if (ourConcept.hasSuperConcept(selectedConcept)) {
-                if (this.selectionState == DiagramView.NOT_SELECTED) {
-                    this.selectionState = DiagramView.SELECTED_IDEAL;
-                } else if (this.selectionState == DiagramView.SELECTED_FILTER) {
+            	// we are in the ideal on this level, if this is the first comparison
+            	// or we had a direct hit or an ideal hit before, we are in the ideal,
+            	// otherwise we are out
+                if (this.selectionState == DiagramView.SELECTED_FILTER) {
                     this.selectionState = DiagramView.NOT_SELECTED;
                     return;
+                } else {
+                    this.selectionState = DiagramView.SELECTED_IDEAL;
                 }
             } else if (ourConcept.hasSubConcept(selectedConcept)) {
-                if (this.selectionState == DiagramView.NOT_SELECTED) {
-                    this.selectionState = DiagramView.SELECTED_FILTER;
-                } else if (this.selectionState == DiagramView.SELECTED_IDEAL) {
+                // dual to the last one
+                if (this.selectionState == DiagramView.SELECTED_IDEAL) {
                     this.selectionState = DiagramView.NOT_SELECTED;
                     return;
+                } else {
+                    this.selectionState = DiagramView.SELECTED_FILTER;
+
                 }
             } else {
+            	// we fail to hit anything on this level
                 this.selectionState = DiagramView.NOT_SELECTED;
                 return;
             }
