@@ -13,7 +13,9 @@ Specific for ToscanaJ:
 - the database viewer for opening documents (ShellExectuteDatabaseViewewr) now
   starts external programs in a separate Thread, thus not blocking the UI anymore
 - the HTMLDatabaseViewer does support giving a title in the way typical for HTML
-  (<html>/<head>/<title>). This is used ass the dialog title for the views created.
+  (<html>/<head>/<title>). This is used ass the dialog title for the views created
+- a new database viewer called "InfoDatabaseViewer" allows showing plain text or
+  HTML found either directly in the database or via a URL found in the database
 
 Specific for Elba:
 ==================

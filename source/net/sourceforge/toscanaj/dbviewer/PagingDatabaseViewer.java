@@ -211,7 +211,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         this.viewerManager = manager;
     }
 
-    public void showView(String whereClause) throws DatabaseViewerException {
+    final public void showView(String whereClause) throws DatabaseViewerException {
 		Frame parentWindow = DatabaseViewerManager.getParentWindow();
 		PagingDatabaseViewerDialog dialog;
 		try {
