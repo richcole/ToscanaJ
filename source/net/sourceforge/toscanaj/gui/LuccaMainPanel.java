@@ -236,7 +236,6 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
                         )
                 )
         );
-//        saveActivity.setPrepareActivity(new PrepareToSaveActivity());
         fileMenu.add(saveMenuItem);
 
         JMenuItem dbConnectionMenuItem = new JMenuItem("Database connection...");
@@ -354,7 +353,6 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
     public void processEvent(Event e) {
-        System.out.println(e.getClass().getName());
         if (e instanceof ConceptualSchemaChangeEvent) {
             // set schema in any change event, sometimes the order of the events is wrong
             /// @todo make sure the events come in the proper order
