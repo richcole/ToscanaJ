@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.scales;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.model.Context;
@@ -19,6 +20,8 @@ import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -33,13 +36,33 @@ public class BiordinalScaleEditorDialog extends JDialog {
 	public static final int INTEGER = 0;
 	public static final int FLOAT = 1;
 	public static final int UNSUPPORTED = -1;
-	
+	private static final String CONFIGURATION_SECTION_NAME = "BiordinalScaleEditorDialog";
+	private static final int MINIMUM_WIDTH = 800;
+	private static final int MINIMUM_HEIGHT = 500;
+	private static final int DEFAULT_X_POS = 10;
+	private static final int DEFAULT_Y_POS = 10;
+	private BiordinalScaleEditorDialog biordinalScaleEditorDialog;
 
 
 	public BiordinalScaleEditorDialog(Frame owner, DatabaseSchema databaseSchema, DatabaseConnection connection) {
 		super(owner);
-		setSize(800,500);
-		setLocation(10,10);
+		biordinalScaleEditorDialog = this;
+		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
+			this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
+			//	to enforce the minimum size during resizing of the JDialog
+			 addComponentListener( new ComponentAdapter() {
+				 public void componentResized(ComponentEvent e) {
+					 int width = getWidth();
+					 int height = getHeight();
+					 if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
+					 if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
+					 setSize(width, height);
+				 }
+				 public void componentShown(ComponentEvent e) {
+					 componentResized(e);
+				 }
+			 });
+		
 		layoutDialog(databaseSchema, connection);
 	}
 
@@ -154,8 +177,7 @@ public class BiordinalScaleEditorDialog extends JDialog {
 		createButton = makeActionOnCorrectScaleButton("Create");
 		createButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dispose();
-				result = true;
+				closeDialog(true);
 			}
 		});
 
@@ -164,12 +186,17 @@ public class BiordinalScaleEditorDialog extends JDialog {
 		final JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dispose();
-				result = false;
+				closeDialog(false);
 			}
 		});
 		buttonPane.add(cancelButton);
 		return buttonPane;
+	}
+	
+	private void closeDialog(boolean result) {
+		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,biordinalScaleEditorDialog);
+		dispose();
+		this.result = result;
 	}
 	
 	private JButton makeActionOnCorrectScaleButton(final String label) {
