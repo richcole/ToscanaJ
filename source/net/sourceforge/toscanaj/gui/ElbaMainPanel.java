@@ -510,6 +510,7 @@ public class ElbaMainPanel
 		newSchemaActivity.setPostNewActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
             	currentFile = null;
+            	updateWindowTitle();
                 showDatabaseConnectionDialog();
 				DatabaseViewerManager.resetRegistry();
                 return databaseConnection.isConnected();
@@ -735,8 +736,12 @@ public class ElbaMainPanel
 	private void updateWindowTitle() {
 		// get the current filename without the extension and full path
 		// we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
-		String filename = currentFile.substring(currentFile.lastIndexOf("\\")+1,(currentFile.length()-4));
-		setTitle(filename +" - "+WINDOW_TITLE);
+		if(currentFile != null){
+			String filename = currentFile.substring(currentFile.lastIndexOf("\\")+1,(currentFile.length()-4));
+			setTitle(filename +" - "+WINDOW_TITLE);
+		} else {
+			setTitle(WINDOW_TITLE);
+		}
 	}
 	
 	private boolean databaseWellDefined() {
