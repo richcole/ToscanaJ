@@ -8,10 +8,12 @@
 package net.sourceforge.toscanaj.view.database;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import net.sourceforge.toscanaj.gui.action.SimpleAction;
-import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -21,7 +23,7 @@ import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
+import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -32,9 +34,13 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class DatabaseConnectionInformationView
-	extends JDialog
-	implements EventBrokerListener {
+/**
+ * @todo at the moment we connect and then disconnect instead of passing the
+ * connection around. This means insourcing SQL scripts twice and some other
+ * overhead. Avoid.
+ */
+public class DatabaseConnectionInformationView extends JDialog
+												implements EventBrokerListener {
 
 	private static final String ODBC_PREFIX = "jdbc:odbc:";
 	private static final String ACCESS_FILE_URL_PREFIX = 
@@ -52,40 +58,475 @@ public class DatabaseConnectionInformationView
 	private static final String ACCESS_FILE_ID_STRING = "Access File";
 	
 	private static final int MINIMUM_WIDTH = 400;
-	private static final int MINIMUM_HEIGHT = 500;
+	private static final int MINIMUM_HEIGHT = 350;
 	
 	protected ConceptualSchema conceptualSchema;
+	private EventBroker internalBroker;
+	private DatabaseInfo databaseInfo;
+	private DatabaseConnection connection;
 
-	private File openedDatabaseFile = null;
+    private JButton nextButton;
+    private JLabel stepLabel;
+    private WizardPanel currentStep;
+    private File openedDatabaseFile;
 
-	private JTextField jdbcUrlField;
-	private JTextField jdbcUserField;
-	private JTextField jdbcPasswordField;
-	private JTextField jdbcDriverField;
+	private EmbeddedDbConnectionPanel embeddedDbPanel;
+    private JdbcConnectionPanel jdbcDbPanel;
+    private OdbcConnectionPanel odbcDbPanel;
+    private AccessFileConnectionPanel accessDbPanel;
+	private KeySelectPanel keySelectPanel;
+    private DatabaseTypePanel dbTypePanel;
+    private DatabaseSchema databaseSchema;
+    
+    abstract class WizardPanel extends JPanel {
+    	WizardPanel() {
+    		super();
+    	    setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+    	}
+    	abstract String getTitle();
+    	abstract String getNextButtonText();
+    	abstract boolean executeStep();
+    	abstract WizardPanel getNextPanel();
+    }
+    
+    class DatabaseTypePanel extends WizardPanel {
+        private JRadioButton embDBMSRadioButton;
+        private JRadioButton jdbcRadioButton;
+        private JRadioButton accessRadioButton;
+        private JRadioButton odbcRadioButton;
+        DatabaseTypePanel() {
+            super();
+            embDBMSRadioButton = new JRadioButton(EMBEDDED_DBMS_ID_STRING);
+            jdbcRadioButton = new JRadioButton(JDBC_ID_STRING);
+            accessRadioButton = new JRadioButton(ACCESS_FILE_ID_STRING);
+            odbcRadioButton = new JRadioButton(ODBC_ID_STRING);
 
-	private JTextField odbcDataSourceNameField;
-	private JTextField odbcUserField;
-	private JTextField odbcPasswordField;
+            ButtonGroup buttonGroup = new ButtonGroup();
+            buttonGroup.add(embDBMSRadioButton);
+            buttonGroup.add(jdbcRadioButton);
+            buttonGroup.add(accessRadioButton);
+            buttonGroup.add(odbcRadioButton);
+            embDBMSRadioButton.setSelected(true);
 
-	private JTextField accessUrlField;
-	private JTextField accessUserField;
-	private JTextField accessPasswordField;
-	private JTextField sqlScriptLocationField;
-	private String activePanel = "";
+			this.setLayout(new GridBagLayout());
+            this.add(embDBMSRadioButton,new GridBagConstraints(
+                    0,0,1,1,1,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(5, 5, 5, 0),
+                    2,2));
+            this.add(jdbcRadioButton,new GridBagConstraints(
+                    0,1,1,1,1,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(5, 5, 5, 0),
+                    2,2));
+            this.add(odbcRadioButton,new GridBagConstraints(
+                    0,2,1,1,1,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(5, 5, 5, 0),
+                    2,2));
+            this.add(accessRadioButton,new GridBagConstraints(
+                    0,3,1,1,1,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(5, 5, 5, 0),
+                    2,2));
+            this.add(new JPanel(),new GridBagConstraints(
+                    0,4,1,1,1,1,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.BOTH,
+                    new Insets(0, 0, 0, 0),
+                    2,2));
+        }
+        String getTitle() {
+            return "Database Type:";
+        }
+        String getNextButtonText() {
+            return "Use selected type >>";
+        }
+        boolean executeStep() {
+        	// nothing to do here, we just return different panels
+        	return true;
+        }
+        WizardPanel getNextPanel() {
+            if(embDBMSRadioButton.isSelected()) {
+                return embeddedDbPanel;
+            } else if(jdbcRadioButton.isSelected()) {
+                return jdbcDbPanel;
+            } else if(odbcRadioButton.isSelected()) {
+                return odbcDbPanel;
+            } else if(accessRadioButton.isSelected()) {
+                return accessDbPanel;
+            }
+            throw new RuntimeException("Something went really wrong");
+        }
+    }
 
-	private JPanel inputPanel;
-	private JRadioButton embDBMSRadioButton;
-	private JRadioButton jdbcRadioButton;
-	private JRadioButton accessRadioButton;
-	private JRadioButton odbcRadioButton;
-    private DatabaseSchemaView tableView;
-	
-	class SaveControlActivity implements SimpleActivity {
-		public boolean doActivity() throws Exception {
-			copyFromControls();
-			return true;
-		}
-	}
+    abstract class ConnectionPanel extends WizardPanel {
+        String getTitle() {
+            return "Connection Details:";
+        }
+        String getNextButtonText() {
+            return "Connect >>";
+        }
+        WizardPanel getNextPanel() {
+            return keySelectPanel;
+        }
+        boolean connectDatabase() {
+        	try {
+                connection.connect(databaseInfo);
+            } catch (DatabaseException e) {
+            	ErrorDialog.showError(this,e,"Connection failed");
+            }
+        	return connection.isConnected();
+        }
+    }
+    
+    class EmbeddedDbConnectionPanel extends ConnectionPanel {
+        private JTextField sqlScriptLocationField;
+
+    	EmbeddedDbConnectionPanel() {
+    		super();
+    	    sqlScriptLocationField = new JTextField();
+    	    JLabel sqlFileLabel = new JLabel("SQL File Location:");
+    	    JButton fileButton = new JButton("Browse...");
+    	    fileButton.addActionListener(new ActionListener() {
+    	        public void actionPerformed(ActionEvent e) {
+    	            getFileURL(sqlScriptLocationField, "sql", "SQL Scripts (*.sql)");
+    	        }
+    	    });
+    	    fileButton.setMnemonic('f');
+    	    
+    	    this.setLayout(new GridBagLayout());
+    	    this.add(sqlFileLabel,new GridBagConstraints(
+    	            0,0,2,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(5, 5, 5, 5),
+    	            2,2));
+
+    	    this.add(sqlScriptLocationField,new GridBagConstraints(
+    	            0,1,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets( 5, 15, 5, 5),
+    	            2,2));
+    	    this.add(fileButton,new GridBagConstraints(
+    	            0,2,1,1,0,0,
+    	            GridBagConstraints.NORTHEAST,
+    	            GridBagConstraints.NONE,
+    	            new Insets(5, 5, 5, 5),
+    	            2,2));
+    	    this.add(new JPanel(),new GridBagConstraints(
+    	            0,3,1,1,1,1,
+    	            GridBagConstraints.WEST,
+    	            GridBagConstraints.BOTH,
+    	            new Insets(5, 5, 5, 5),
+    	            2,2));
+    	}
+    	
+        boolean executeStep() {
+            DatabaseInfo embedInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
+            databaseInfo.setUrl(embedInfo.getURL());
+            databaseInfo.setUserName(embedInfo.getUserName());
+            databaseInfo.setPassword(embedInfo.getPassword());
+            databaseInfo.setDriverClass(embedInfo.getDriverClass());
+            try {
+                databaseInfo.setEmbeddedSQLLocation(new URL("file:\\" + sqlScriptLocationField.getText()));
+            } catch (MalformedURLException e) {
+            	ErrorDialog.showError(this,e,"URL invalid");
+            	return false;
+            }
+            boolean connected = connectDatabase();
+            if(!connected) {
+            	return false;
+            }
+            try {
+                connection.executeScript(databaseInfo.getEmbeddedSQLLocation());
+            } catch (DatabaseException e) {
+            	ErrorDialog.showError(this, e, "Script error");
+            	return false;
+            }
+            return true;
+        }
+    }
+
+    class JdbcConnectionPanel extends ConnectionPanel {
+        private JTextField jdbcUrlField;
+        private JTextField jdbcUserField;
+        private JTextField jdbcPasswordField;
+        private JTextField jdbcDriverField;
+
+    	JdbcConnectionPanel() {
+            super();
+    	    jdbcUrlField = new JTextField();
+    	    jdbcUserField = new JTextField();
+    	    jdbcPasswordField = new JTextField();
+    	    jdbcDriverField = new JTextField();
+    	    this.setLayout(new GridBagLayout());
+
+    	    this.add(new JLabel("URL: "),new GridBagConstraints(
+    	            0,0,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(5, 5, 5, 0),
+    	            2,2));
+
+    	    this.add(jdbcUrlField,new GridBagConstraints(
+    	            0,1,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(0, 15, 5, 5),
+    	            2,2));
+
+    	    this.add(new JLabel("Driver: "),new GridBagConstraints(
+    	            0,2,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(5, 5, 5, 0),
+    	            2,2));
+
+    	    this.add(jdbcDriverField,new GridBagConstraints(
+    	            0,3,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(0, 15, 5, 5),
+    	            2,2));
+
+    	    this.add(new JLabel("Username: "),new GridBagConstraints(
+    	            0,4,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(5, 5, 5, 0),
+    	            2,2));
+
+    	    this.add(jdbcUserField,new GridBagConstraints(
+    	            0,5,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(0, 15, 5, 5),
+    	            2,2));
+
+    	    this.add(new JLabel("Password: "),new GridBagConstraints(
+    	            0,6,1,1,0,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(5, 5, 5, 0),
+    	            2,2));
+
+    	    this.add(jdbcPasswordField,new GridBagConstraints(
+    	            0,7,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(0, 15, 5, 5),
+    	            2,2));
+
+    	    this.add(new JPanel(),new GridBagConstraints(
+    	            0,8,1,1,1,1,
+    	            GridBagConstraints.WEST,
+    	            GridBagConstraints.BOTH,
+    	            new Insets(5, 5, 5, 0),
+    	            2,2));
+        }
+
+        boolean executeStep() {
+			databaseInfo.setUrl(jdbcUrlField.getText());
+            databaseInfo.setUserName(jdbcUserField.getText());
+            databaseInfo.setPassword(jdbcPasswordField.getText());
+            databaseInfo.setDriverClass(jdbcDriverField.getText());
+            databaseInfo.setEmbeddedSQLLocation((String) null);
+            return connectDatabase();
+        }
+    }
+
+    class OdbcConnectionPanel extends ConnectionPanel {
+        private JTextField odbcDataSourceNameField;
+        private JTextField odbcUserField;
+        private JTextField odbcPasswordField;
+
+    	OdbcConnectionPanel() {
+            super();
+    	    odbcDataSourceNameField = new JTextField();
+    	    odbcUserField = new JTextField();
+    	    odbcPasswordField = new JTextField();
+    	    this.setLayout(new GridBagLayout());
+
+    	    this.add(new JLabel("Data Name Source: "),new GridBagConstraints(
+    	            0,0,1,1,0,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(5, 5, 5, 0),
+    	            2,2));
+
+    	    this.add(odbcDataSourceNameField,new GridBagConstraints(
+    	            0,1,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(0, 15, 5, 5),
+    	            2,2));
+
+    	    this.add(new JLabel("Username: "),new GridBagConstraints(
+    	            0,2,1,1,0,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(5, 5, 5, 0),
+    	            2,2));
+
+    	    this.add(odbcUserField,new GridBagConstraints(
+    	            0,3,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(0, 15, 5, 5),
+    	            2,2));
+
+    	    this.add(new JLabel("Password: "),new GridBagConstraints(
+    	            0,4,1,1,0,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(5, 5, 5, 0),
+    	            2,2));
+
+    	    this.add(odbcPasswordField,new GridBagConstraints(
+    	            0,5,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(0, 15, 5, 5),
+    	            2,2));
+    	    this.add(new JPanel(),new GridBagConstraints(
+    	            0,6,1,2,1,1,
+    	            GridBagConstraints.WEST,
+    	            GridBagConstraints.VERTICAL,
+    	            new Insets(5, 5, 5, 0),
+    	            2,2));
+        }
+        boolean executeStep() {
+            databaseInfo.setDriverClass(JDBC_ODBC_BRIDGE_DRIVER);
+            databaseInfo.setUrl(ODBC_PREFIX + odbcDataSourceNameField.getText());
+            databaseInfo.setUserName(odbcUserField.getText());
+            databaseInfo.setPassword(odbcPasswordField.getText());
+            databaseInfo.setEmbeddedSQLLocation((String) null);
+            return connectDatabase();
+        }
+    }
+
+    class AccessFileConnectionPanel extends ConnectionPanel {
+        private JTextField accessUrlField;
+        private JTextField accessUserField;
+        private JTextField accessPasswordField;
+
+    	AccessFileConnectionPanel() {
+            super();
+    	    accessUrlField = new JTextField();
+    	    accessUserField = new JTextField();
+    	    accessPasswordField = new JTextField();
+    	    this.setLayout(new GridBagLayout());
+    	    
+    	    JButton fileButton = new JButton("Browse...");
+    	    fileButton.addActionListener(new ActionListener() {
+    	        public void actionPerformed(ActionEvent e) {
+    	            getFileURL(accessUrlField, "mdb", "Microsoft Access Databases (*.mdb)");
+    	        }
+    	    });
+    	    fileButton.setMnemonic('f');
+
+    	    this.add(new JLabel("File Access Location: "),new GridBagConstraints(
+    	            0,0,1,1,0,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.NONE,
+    	            new Insets(5, 5, 5, 0),
+    	            2,2));
+
+    	    this.add(accessUrlField,new GridBagConstraints(
+    	            0,1,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(0, 15, 5, 0),
+    	            2,2));
+
+    	    this.add(fileButton,new GridBagConstraints(
+    	            0,2,1,1,0,0,
+    	            GridBagConstraints.EAST,
+    	            GridBagConstraints.NONE,
+    	            new Insets(5, 5, 5, 5),
+    	            2,2));
+    	    this.add(new JLabel("Username: "),new GridBagConstraints(
+    	            0,3,1,1,0,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.NONE,
+    	            new Insets(5, 5, 5, 5),
+    	            2,2));
+
+    	    this.add(accessUserField,new GridBagConstraints(
+    	            0,4,1,1,1,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(0, 15, 5, 5),
+    	            2,2));
+
+    	    this.add(new JLabel("Password: "),new GridBagConstraints(
+    	            0,5,1,1,0,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.NONE,
+    	            new Insets(5, 5, 5, 5),
+    	            2,2));
+
+    	    this.add(accessPasswordField,new GridBagConstraints(
+    	            0,6,1,1,10,0,
+    	            GridBagConstraints.NORTHWEST,
+    	            GridBagConstraints.HORIZONTAL,
+    	            new Insets(0, 15, 5, 5),
+    	            2,2));
+
+    	    this.add(new JPanel(),new GridBagConstraints(
+    	            0,7,1,1,1,1,
+    	            GridBagConstraints.WEST,
+    	            GridBagConstraints.VERTICAL,
+    	            new Insets(5, 5, 5, 5),
+    	            2,2));
+        }
+        boolean executeStep() {
+            databaseInfo.setDriverClass(JDBC_ODBC_BRIDGE_DRIVER);
+            databaseInfo.setUrl(createAccessFileURL(accessUrlField.getText()));
+            databaseInfo.setUserName(accessUserField.getText());
+            databaseInfo.setPassword(accessPasswordField.getText());
+            databaseInfo.setEmbeddedSQLLocation((String) null);
+            return connectDatabase();
+        }
+    }
+
+    class KeySelectPanel extends WizardPanel {
+        private DatabaseSchemaView tableView;
+
+        KeySelectPanel(EventBroker broker) {
+        	super();
+        	this.setLayout(new BorderLayout());
+        	this.tableView = new DatabaseSchemaView(broker);
+        	this.add(tableView, BorderLayout.CENTER);
+        }
+        String getTitle() {
+            return "Select Key:";
+        }
+        String getNextButtonText() {
+            return "Done";
+        }
+        boolean executeStep() {
+            String sqlTableName = this.tableView.getSqlTableName();
+            String sqlKeyName = this.tableView.getSqlKeyName();
+            if(sqlTableName == null || sqlKeyName == null) {
+        		JOptionPane.showMessageDialog(this, "Please select a table/column pair as primary key", "No key selected", 
+        									  JOptionPane.ERROR_MESSAGE);
+        		return false;
+        	}
+        	databaseInfo.setTableName(sqlTableName);
+        	databaseInfo.setKey(sqlKeyName);
+        	return true;
+        }
+        WizardPanel getNextPanel() {
+            return null;
+        }
+    }
 
 	/**
 	 * Construct an instance of this view
@@ -95,7 +536,13 @@ public class DatabaseConnectionInformationView
 												EventBroker eventBroker) {
 		super(frame, "Database connection");
 		this.conceptualSchema = conceptualSchema;
+		this.internalBroker = new EventBroker();
+		this.databaseInfo = new DatabaseInfo();
+		this.connection = new DatabaseConnection(internalBroker);
+        this.databaseSchema = new DatabaseSchema(internalBroker);
 		
+        initializePanels();
+
 		Container contentPane = this.getContentPane();
 		contentPane.setLayout(new GridBagLayout());
 		
@@ -111,51 +558,30 @@ public class DatabaseConnectionInformationView
 				componentResized(e);
 			}
 		});
-		JTabbedPane tabbedPane = new JTabbedPane();
-		JPanel connection = createConnectionPanel();
-		tableView = new DatabaseSchemaView(eventBroker);
-		tabbedPane.addTab(
-			"Step 1: Select Connection",
-			null,
-			connection,
-			"Database Connections");
-		tabbedPane.addTab("Step 2: Select Key", null, tableView, "Tables View");
 		
-		JButton connectButton = new JButton();
-		SimpleAction action = new SimpleAction(frame, "Connect");
-		action.add(new SaveControlActivity());
-		connectButton.setAction(action);
-
-		JButton closeButton = new JButton("Close Dialog");
-		closeButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				/// @todo this is a quick hack, should be fixed (or should get superflous)
-				updateDBInfo();
-				hide();
-			}
-		});
-
-		JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		buttonPane.add(connectButton);
-		buttonPane.add(closeButton);
+        this.stepLabel = new JLabel();
+				
+        JPanel buttonPane = createButtonPanel(frame);
 		
-		contentPane.add(tabbedPane,new GridBagConstraints(
-				0,0,1,1,1,1,
-				GridBagConstraints.CENTER,
-				GridBagConstraints.BOTH,
-				new Insets(0, 5, 5, 5),
-				2,2));
+	    contentPane.add(stepLabel,new GridBagConstraints(
+	            0,0,1,1,1,0,
+	            GridBagConstraints.WEST,
+	            GridBagConstraints.HORIZONTAL,
+	            new Insets(0, 10, 5, 5),
+	            2,2));
 		contentPane.add(buttonPane, new GridBagConstraints(
-				0,1,1,1,1,0,
+				0,2,1,1,1,0,
 				GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL,
 				new Insets(0, 5, 5, 5),
 				2,2));
 				
+		setCurrentPanel(this.dbTypePanel);
+				
 		ConfigurationManager.restorePlacement(
 			"DatabaseConnectionInformationView",
 			this,
-			new Rectangle(100, 100, 300, 600));
+			new Rectangle(100, 100, MINIMUM_WIDTH, MINIMUM_WIDTH));
 
 	    eventBroker.subscribe(
 	        this,
@@ -167,372 +593,68 @@ public class DatabaseConnectionInformationView
 	        Object.class);
 	}
 
-    protected void updateDBInfo() {
-        DatabaseInfo databaseInfo = this.conceptualSchema.getDatabaseInfo();
-        if(databaseInfo != null) {
-	        databaseInfo.setTableName(this.tableView.getSqlTableName());
-	        databaseInfo.setKey(this.tableView.getSqlKeyName());
+    protected void initializePanels() {
+        dbTypePanel = new DatabaseTypePanel();
+        this.embeddedDbPanel = new EmbeddedDbConnectionPanel();
+        this.jdbcDbPanel = new JdbcConnectionPanel();
+        this.odbcDbPanel = new OdbcConnectionPanel();
+        this.accessDbPanel = new AccessFileConnectionPanel();
+        this.keySelectPanel = new KeySelectPanel(this.internalBroker);
+    }
+
+    public JPanel createButtonPanel(JFrame frame) {
+        nextButton = new JButton();
+        nextButton.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e) {
+        		boolean success = executeCurrentStep();
+        		if(success) {
+        			gotoNextStep();
+        		}
+            }
+        });
+        
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		hide();
+        	}
+        });
+        
+        JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPane.add(nextButton);
+        buttonPane.add(cancelButton);
+        return buttonPane;
+    }
+    
+    protected boolean executeCurrentStep() {
+   		return this.currentStep.executeStep();
+    }
+
+    protected void gotoNextStep() {
+		WizardPanel nextPanel = this.currentStep.getNextPanel();
+        if(nextPanel == null) {
+            hide();
+            this.conceptualSchema.setDatabaseInfo(this.databaseInfo);
+        } else {
+        	setCurrentPanel(nextPanel);
         }
     }
 
-	public JPanel createConnectionPanel() {
-		JPanel connection = new JPanel(new GridBagLayout());
-		embDBMSRadioButton = new JRadioButton(EMBEDDED_DBMS_ID_STRING);
-		jdbcRadioButton = new JRadioButton(JDBC_ID_STRING);
-		accessRadioButton = new JRadioButton(ACCESS_FILE_ID_STRING);
-		odbcRadioButton = new JRadioButton(ODBC_ID_STRING);
-
-		inputPanel = new JPanel();
-		
-		inputPanel.setLayout(new CardLayout());
-		inputPanel.add("blankPanel", new JPanel());
-		inputPanel.add(EMBEDDED_DBMS_ID_STRING, createSQLPane());
-		inputPanel.add(JDBC_ID_STRING, createJDBCPane());
-		inputPanel.add(ODBC_ID_STRING, createODBCPane());
-		inputPanel.add(ACCESS_FILE_ID_STRING, createAccessPane());
-		
-		ButtonGroup buttonGroup = new ButtonGroup();
-		buttonGroup.add(embDBMSRadioButton);
-		buttonGroup.add(jdbcRadioButton);
-		buttonGroup.add(accessRadioButton);
-		buttonGroup.add(odbcRadioButton);
-		
-		connection.add(inputPanel,new GridBagConstraints(
-				1,0,1,5,1,1,
-				GridBagConstraints.NORTH,
-				GridBagConstraints.BOTH,
-				new Insets(5, 0, 5, 5),
-				2,2));
-
-		connection.add(embDBMSRadioButton,new GridBagConstraints(
-				0,0,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 0),
-				2,2));
-				
-		connection.add(jdbcRadioButton,new GridBagConstraints(
-				0,1,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 0),
-				2,2));
-				
-		connection.add(odbcRadioButton,new GridBagConstraints(
-				0,2,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 0),
-				2,2));
-
-		connection.add(accessRadioButton,new GridBagConstraints(
-				0,3,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 0),
-				2,2));
-				
-		connection.add(new JPanel(),new GridBagConstraints(
-				0,4,1,1,0,1,
-				GridBagConstraints.WEST,
-				GridBagConstraints.VERTICAL,
-				new Insets(0, 0, 0, 0),
-				1,1));
-				
-		embDBMSRadioButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				raisePanel(EMBEDDED_DBMS_ID_STRING);
-			}
-		});
-
-		jdbcRadioButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				raisePanel(JDBC_ID_STRING);
-			}
-		});
-
-		odbcRadioButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				raisePanel(ODBC_ID_STRING);
-			}
-		});
-
-		accessRadioButton.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				raisePanel(ACCESS_FILE_ID_STRING);
-			}
-		});
-		return connection;
-	}
-
-	protected void raisePanel(String panelId) {
-		TitledBorder border = BorderFactory.createTitledBorder(panelId);
-		inputPanel.setBorder(border);
-		CardLayout cl = (CardLayout) (inputPanel.getLayout());
-		cl.show(inputPanel, panelId);
-		activePanel = panelId;
-	}
-
-	protected JPanel createSQLPane() {
-		sqlScriptLocationField = new JTextField();
-		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		JPanel panel = new JPanel(new GridBagLayout());
-		JPanel mainPanel = new JPanel(new GridBagLayout());
-		JLabel sqlFile = new JLabel("SQL File:");
-		JButton fileButton = new JButton("File...");
-		fileButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				getFileURL(sqlScriptLocationField, "sql", "SQL Scripts (*.sql)");
-			}
-		});
-		fileButton.setMnemonic('f');
-		fileButton.setSize(100, 100);
-		panel.add(sqlFile,new GridBagConstraints(
-				0,0,1,1,1.0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-
-		panel.add(sqlScriptLocationField,new GridBagConstraints(
-				0,1,1,1,1.0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets( 5, 2, 0, 5),
-				2,2));
-
-		buttonPanel.add(fileButton);
-
-		mainPanel.add(panel,new GridBagConstraints(
-				0,0,1,1,1.0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(0, 5, 0, 0),
-				2,2));
-				
-		mainPanel.add(buttonPanel,new GridBagConstraints(
-				0,1,1,1,1.0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 2, 0),
-				2,2));
-				
-		mainPanel.add(new JPanel(),new GridBagConstraints(
-				0,2,1,1,0,1,
-				GridBagConstraints.WEST,
-				GridBagConstraints.VERTICAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-				
-		return mainPanel;
-	}
-
-	protected JPanel createJDBCPane() {
-		jdbcUrlField = new JTextField();
-		jdbcUserField = new JTextField();
-		jdbcPasswordField = new JTextField();
-		jdbcDriverField = new JTextField();
-		JPanel pane = new JPanel(new GridBagLayout());
-
-		pane.add(new JLabel("URL: "),new GridBagConstraints(
-				0,0,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-
-		pane.add(jdbcUrlField,new GridBagConstraints(
-				1,0,1,1,1,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5),
-				2,2));
-
-		pane.add(new JLabel("Driver: "),new GridBagConstraints(
-				0,1,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-
-		pane.add(jdbcDriverField,new GridBagConstraints(
-				1,1,1,1,1,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5),
-				2,2));
-
-		pane.add(new JLabel("Username: "),new GridBagConstraints(
-				0,2,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-
-		pane.add(jdbcUserField,new GridBagConstraints(
-				1,2,1,1,1,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5),
-				2,2));
-
-		pane.add(new JLabel("Password: "),new GridBagConstraints(
-				0,3,1,0,0,
-				0,GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-
-		pane.add(jdbcPasswordField,new GridBagConstraints(
-				1,3,1,1,1,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5),
-				2,2));
-				
-		pane.add(new JPanel(),new GridBagConstraints(
-				0,4,1,2,0,1,
-				GridBagConstraints.WEST,
-				GridBagConstraints.VERTICAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-
-		return pane;
-	}
-
-	protected JPanel createODBCPane() {
-		odbcDataSourceNameField = new JTextField();
-		odbcUserField = new JTextField();
-		odbcPasswordField = new JTextField();
-		JPanel pane = new JPanel(new GridBagLayout());
-
-		pane.add(new JLabel("Data Name Source: "),new GridBagConstraints(
-				0,0,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-
-		pane.add(odbcDataSourceNameField,new GridBagConstraints(
-				1,0,1,1,1,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5),
-				2,2));
-
-		pane.add(new JLabel("Username: "),new GridBagConstraints(
-				0,1,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-
-		pane.add(odbcUserField,new GridBagConstraints(
-				1,1,1,1,1,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5),
-				2,2));
-
-		pane.add(new JLabel("Password: "),new GridBagConstraints(
-				0,2,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-
-		pane.add(odbcPasswordField,new GridBagConstraints(
-				1,2,1,1,1,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 5),
-				2,2));
-		pane.add(new JPanel(),new GridBagConstraints(
-				1,3,1,2,1,1,
-				GridBagConstraints.WEST,
-				GridBagConstraints.VERTICAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-		
-
-		return pane;
-
-	}
-
-	protected JPanel createAccessPane() {
-
-		accessUrlField = new JTextField();
-		accessUserField = new JTextField();
-		accessPasswordField = new JTextField();
-		JPanel pane = new JPanel(new GridBagLayout());
-		JButton fileButton = new JButton("File...");
-		fileButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				getFileURL(accessUrlField, "mdb", "Microsoft Access Databases (*.mdb)");
-			}
-		});
-		fileButton.setMnemonic('f');
-
-		pane.add(new JLabel("File Access Location: "),new GridBagConstraints(
-				0,0,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE,
-				new Insets(5, 5, 2, 0),
-				2,2));
-
-		pane.add(accessUrlField,new GridBagConstraints(
-				1,0,1,1,10,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 2, 0),
-				2,2));
-
-		pane.add(fileButton,new GridBagConstraints(
-				2,0,1,1,0,0,
-				GridBagConstraints.CENTER,
-				GridBagConstraints.NONE,
-				new Insets(5, 5, 2, 0),
-				2,2));
-		pane.add(new JLabel("Username: "),new GridBagConstraints(
-				0,1,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE,
-				new Insets(2, 5, 5, 0),
-				2,2));
-
-		pane.add(accessUserField,new GridBagConstraints(
-				1,1,1,1,10,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-
-		pane.add(new JLabel("Password: "),new GridBagConstraints(
-				0,2,1,1,0,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.NONE,
-				new Insets(5, 5, 5, 0),
-				2,2));
-
-		pane.add(accessPasswordField,new GridBagConstraints(
-				1,2,1,1,10,0,
-				GridBagConstraints.NORTHWEST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-				
-		pane.add(new JPanel(),new GridBagConstraints(
-				2,0,1,3,1,1,
-				GridBagConstraints.WEST,
-				GridBagConstraints.VERTICAL,
-				new Insets(5, 5, 5, 0),
-				2,2));
-		return pane;
-	}
+    protected void setCurrentPanel(WizardPanel panel) {
+        Container contentPane = this.getContentPane();
+        if(this.currentStep != null) {
+            contentPane.remove(this.currentStep);
+        }
+        this.currentStep = panel;
+        this.stepLabel.setText(panel.getTitle());
+        this.nextButton.setText(panel.getNextButtonText());
+        contentPane.add(panel,new GridBagConstraints(
+                0,1,1,1,1,1,
+                GridBagConstraints.CENTER,
+                GridBagConstraints.BOTH,
+                new Insets(0, 5, 5, 5),
+                2,2));
+    }
 
 	private void getFileURL(JTextField urlField, final String extension, final String description) {
 		JFileChooser openDialog;
@@ -570,189 +692,62 @@ public class DatabaseConnectionInformationView
 		return ACCESS_FILE_URL_PREFIX + fileLocation + ACCESS_FILE_URL_END;
 	}
 
-	public boolean areControlsChanged() {
-		DatabaseInfo info = conceptualSchema.getDatabaseInfo();
-		if (activePanel.equals(JDBC_ID_STRING)) {
-			if (!jdbcUrlField.getText().equals(info.getURL())) {
-				return true;
-			}
-			else if (!jdbcUserField.getText().equals(info.getUserName())) {
-				return true;
-			}
-			else if (!jdbcPasswordField.getText().equals(info.getPassword())) {
-				return true;
-			}
-			else if (!jdbcDriverField.getText().equals(info.getDriverClass())) {
-				return true;
-			}
-			return false;
-		} 
-		
-		if (activePanel.equals(ODBC_ID_STRING)) {
-			// use JDBC URL for ODBC DSN ("jdbc:odbc:DSN")
-			String odbcDataSourceName = ODBC_PREFIX + odbcDataSourceNameField.getText();
-			if (!odbcDataSourceName.equals(info.getURL())) {
-				return true;
-			}
-			else if (!info.getDriverClass().equals(JDBC_ODBC_BRIDGE_DRIVER)) {
-				return true;
-			}
-			else if (!odbcUserField.getText().equals(info.getUserName())) {
-				return true;
-			}
-			else if (!odbcPasswordField.getText().equals(info.getPassword())) {
-				return true;
-			}
-			return false;
-		} 
-		
-		if (activePanel.equals(EMBEDDED_DBMS_ID_STRING)) {
-			if (!sqlScriptLocationField.getText().equals(info.getEmbeddedSQLLocation())) {
-				return true;
-			}
-			DatabaseInfo embedInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
-			
-			if (!info.getDriverClass().equals(embedInfo.getDriverClass())){
-				
-				return true;
-			}
-			
-			else if (!info.getPassword().equals(embedInfo.getPassword())){
-				return true;
-			}
-			
-			else if (!info.getUserName().equals( embedInfo.getUserName())){
-				return true;
-			}
-			
-			else if(!info.getURL().equals(embedInfo.getURL())){
-				return true;
-			}
-			
-			return false;
-		} 
-		
-		if (activePanel.equals(ACCESS_FILE_ID_STRING)) {
-			if (!createAccessFileURL(accessUrlField.getText()).equals(info.getURL())) {
-				return true;
-			}
-			else if (!info.getDriverClass().equals(JDBC_ODBC_BRIDGE_DRIVER)) {
-				return true;
-			}
-			else if (!info.getPassword().equals(accessPasswordField.getText())){
-				return true;
-			}
-			else if (!info.getUserName().equals(accessUserField.getText())){
-				return true;
-			}
-			return false;
-		}
-
-		return false;
-	}
-
-	public void copyFromControls() throws MalformedURLException {
-		DatabaseInfo info = new DatabaseInfo();
-		if (activePanel.equals(JDBC_ID_STRING)) {
-			info.setUrl(jdbcUrlField.getText());
-			info.setUserName(jdbcUserField.getText());
-			info.setPassword(jdbcPasswordField.getText());
-			info.setDriverClass(jdbcDriverField.getText());
-			info.setEmbeddedSQLLocation((String) null);
-		} 
-
-		else if (activePanel.equals(EMBEDDED_DBMS_ID_STRING)) {
-			DatabaseInfo embedInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
-			info.setUrl(embedInfo.getURL());
-			info.setUserName(embedInfo.getUserName());
-			info.setPassword(embedInfo.getPassword());
-			info.setDriverClass(embedInfo.getDriverClass());
-            info.setEmbeddedSQLLocation(new URL("file:\\" + sqlScriptLocationField.getText()));
-		} 
-
-		else if (activePanel.equals(ACCESS_FILE_ID_STRING)) {
-			info.setDriverClass(JDBC_ODBC_BRIDGE_DRIVER);
-			info.setUrl(createAccessFileURL(accessUrlField.getText()));
-			info.setUserName(accessUserField.getText());
-			info.setPassword(accessPasswordField.getText());
-			info.setEmbeddedSQLLocation((String) null);
-		} 
-
-		else if (activePanel.equals(ODBC_ID_STRING)) {
-			info.setDriverClass(JDBC_ODBC_BRIDGE_DRIVER);
-			info.setUrl(ODBC_PREFIX + odbcDataSourceNameField.getText());
-			info.setUserName(odbcUserField.getText());
-			info.setPassword(odbcPasswordField.getText());
-			info.setEmbeddedSQLLocation((String) null);
-		}
-		this.conceptualSchema.setDatabaseInfo(info);
-	}
-
-	public void copyToControls(DatabaseInfo info) {
-		if( info == null || info.getURL() == null ) {
-		    this.sqlScriptLocationField.setText("");
-		    raisePanel(EMBEDDED_DBMS_ID_STRING);
-		    return;
-		}
-		if(info.getURL().equals(DatabaseInfo.getEmbeddedDatabaseInfo().getURL())) {
-			copyEmbeddedDataToControls(info);
-			this.embDBMSRadioButton.setSelected(true);
-			raisePanel(EMBEDDED_DBMS_ID_STRING);
-		} else if(info.getDriverClass().equals(JDBC_ODBC_BRIDGE_DRIVER)) {
-			if(info.getURL().indexOf(';') == -1){ // a semicolon is not allowed in DSN names
-				copyODBCDataToControls(info);
-				this.odbcRadioButton.setSelected(true);
-				raisePanel(ODBC_ID_STRING);
-			} 
-			else { // but always in the access file URLs
-				copyAccessDataToControls(info);
-				this.accessRadioButton.setSelected(true);
-				raisePanel(ACCESS_FILE_ID_STRING);
-			}
-		} 
-		else {
-			copyJDBCDataToControls(info);
-			this.jdbcRadioButton.setSelected(true);
-			raisePanel(JDBC_ID_STRING);
-		}
-	}
-
-	private void copyJDBCDataToControls(DatabaseInfo info) {
-		this.jdbcUrlField.setText(info.getURL());
-		this.jdbcDriverField.setText(info.getDriverClass());
-		this.jdbcUserField.setText(info.getUserName());
-		this.jdbcPasswordField.setText(info.getPassword());
-	}
-
-	private void copyAccessDataToControls(DatabaseInfo info) {
-		int start = ACCESS_FILE_URL_PREFIX.length();
-		int end = info.getURL().length() - ACCESS_FILE_URL_END.length();
-		this.accessUrlField.setText(info.getURL().substring(start, end));
-	}
-
-	private void copyODBCDataToControls(DatabaseInfo info) {
-		int start = ODBC_PREFIX.length();
-		this.odbcDataSourceNameField.setText(info.getURL().substring(start));
-		this.odbcPasswordField.setText(info.getPassword());
-		this.odbcUserField.setText(info.getUserName());
-	}
-
-	private void copyEmbeddedDataToControls(DatabaseInfo info) {
-		this.sqlScriptLocationField.setText(info.getEmbeddedSQLLocation().getPath());
-	}
-
+//	public void copyToControls(DatabaseInfo info) {
+//		if( info == null || info.getURL() == null ) {
+//		    this.sqlScriptLocationField.setText("");
+//		    raisePanel(EMBEDDED_DBMS_ID_STRING);
+//		    return;
+//		}
+//		if(info.getURL().equals(DatabaseInfo.getEmbeddedDatabaseInfo().getURL())) {
+//			copyEmbeddedDataToControls(info);
+//			raisePanel(EMBEDDED_DBMS_ID_STRING);
+//		} else if(info.getDriverClass().equals(JDBC_ODBC_BRIDGE_DRIVER)) {
+//			if(info.getURL().indexOf(';') == -1){ // a semicolon is not allowed in DSN names
+//				copyODBCDataToControls(info);
+//				raisePanel(ODBC_ID_STRING);
+//			} 
+//			else { // but always in the access file URLs
+//				copyAccessDataToControls(info);
+//				raisePanel(ACCESS_FILE_ID_STRING);
+//			}
+//		} 
+//		else {
+//			copyJDBCDataToControls(info);
+//			raisePanel(JDBC_ID_STRING);
+//		}
+//	}
+//
+//	private void copyAccessDataToControls(DatabaseInfo info) {
+//		int start = ACCESS_FILE_URL_PREFIX.length();
+//		int end = info.getURL().length() - ACCESS_FILE_URL_END.length();
+//		this.accessUrlField.setText(info.getURL().substring(start, end));
+//	}
+//
+//	private void copyODBCDataToControls(DatabaseInfo info) {
+//		int start = ODBC_PREFIX.length();
+//		this.odbcDataSourceNameField.setText(info.getURL().substring(start));
+//		this.odbcPasswordField.setText(info.getPassword());
+//		this.odbcUserField.setText(info.getUserName());
+//	}
+//
 	public void processEvent(Event event) {
 		ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
         this.conceptualSchema = changeEvent.getConceptualSchema();
         DatabaseInfo databaseInfo = this.conceptualSchema.getDatabaseInfo();
-        copyToControls(databaseInfo);
 	}
 	
 	public void hide() {
 		super.hide();
+		if(this.connection.isConnected()) {
+			try {
+                this.connection.disconnect();
+            } catch (DatabaseException e) {
+            	ErrorDialog.showError(this,e,"Database not closed properly");
+            }
+		}
+	    setCurrentPanel(this.dbTypePanel);
 		ConfigurationManager.storePlacement(
 			"DatabaseConnectionInformationView",
 			this);
 	}
-
 }

@@ -31,6 +31,7 @@ import java.util.Enumeration;
 /**
  * @todo support joins or drop the option to select multiple table/column pairs.
  * 		 getSqlTableName() returns only the first at the moment
+ * @todo add session management for the layout
  */
 public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 
@@ -200,7 +201,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
                     "Selected Keys:",
                     keyedTableListPanel,
                     removeButton));
-        leftPane.setDividerLocation(200);
+        leftPane.setDividerLocation(100);
         leftPane.setOneTouchExpandable(true);
         leftPane.setResizeWeight(0);
 
