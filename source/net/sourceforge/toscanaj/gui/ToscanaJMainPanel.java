@@ -174,9 +174,14 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         DatabaseConnection.initialize(broker);
 
         // register all image writers we want to support
-        org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
-        org.tockit.canvas.imagewriter.JimiImageWriter.initialize();
-        
+        try {
+			org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
+        } catch (Throwable t) {
+        	// do nothing, we just don't support SVG
+        }
+        // the next one is part of JDK 1.4, so it should give us JPG and PNG all the time
+       	org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
+
         // set the default diagram export options: auto mode, no format defined yet, no size
         // if there is no format, we don't set the settings, which causes the menu items to be unavailable 
         Iterator it = GraphicFormatRegistry.getIterator();
