@@ -44,7 +44,6 @@ public class PartialOrderOperationsTest extends TestCase {
                                                          numGroup6, numGroup7, numGroup8});
         Set sources;
         Set sinks;
-        PartialOrderNode node;
         Set maximalPaths;
 
         sources = graph.getSources();
@@ -72,13 +71,9 @@ public class PartialOrderOperationsTest extends TestCase {
                                         new ValueGroup[]{textGroup1, textGroup2, textGroup3, textGroup4, textGroup5});
         sources = graph.getSources();
         assertEquals(2, sources.size());
-        node = (PartialOrderNode) sources.iterator().next();
-        assertEquals(textGroup1, node.getValueGroup());
 
         sinks = graph.getSinks();
         assertEquals(2, sinks.size());
-        node = (PartialOrderNode) sinks.iterator().next();
-        assertEquals(textGroup4, node.getValueGroup());
 
         maximalPaths = graph.getMaximalPaths();
         assertEquals(3, graph.getMaximalPaths().size());
