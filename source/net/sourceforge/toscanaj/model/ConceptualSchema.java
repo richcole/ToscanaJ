@@ -107,7 +107,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         Element retVal = new Element(CONCEPTUAL_SCHEMA_ELEMENT_NAME);
         retVal.setAttribute(VERSION_ATTRIBUTE_NAME, VERSION_ATTRIBUTE_VALUE);
         if (description != null) {
-            retVal.addContent(description);
+            retVal.addContent(description.detach());
         }
         if (databaseInfo != null) {
             retVal.addContent(databaseInfo.toXML());

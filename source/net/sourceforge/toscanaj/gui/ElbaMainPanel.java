@@ -106,10 +106,11 @@ public class ElbaMainPanel
 	private XMLEditorDialog schemaDescriptionView;
 	private JMenuItem dumpSQLMenuItem;
 	private JMenuItem dumpStatisticalDataMenuItem;
-	private SaveFileAction saveFileAction;
+	private SaveFileAction saveAsFileAction;
     private ArrayList scaleGenerators;
     private JButton newDiagramButton;
     private JPanel toolbar;
+    private SaveConceptualSchemaActivity saveActivity;
 
 	public ElbaMainPanel() {
 		super("Elba");
@@ -444,23 +445,22 @@ public class ElbaMainPanel
 	public void createMenuBar() {
 		final DiagramView diagramView = diagramEditingView.getDiagramView();
 
-		SaveConceptualSchemaActivity saveActivity =
-			new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
-		this.saveFileAction =
+        saveActivity = new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
+		this.saveAsFileAction =
 			new SaveFileAction(
 				this,
 				saveActivity,
-				KeyEvent.VK_S,
-				KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-		this.saveFileAction.setPostSaveActivity(new SimpleActivity(){
+				KeyEvent.VK_A,
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
+		this.saveAsFileAction.setPostSaveActivity(new SimpleActivity(){
 			public boolean doActivity() throws Exception {
-				currentFile = saveFileAction.getLastFileUsed().getPath();
-				addFileToMRUList(saveFileAction.getLastFileUsed());
+				currentFile = saveAsFileAction.getLastFileUsed().getPath();
+				addFileToMRUList(saveAsFileAction.getLastFileUsed());
 				conceptualSchema.dataSaved();
                 return true;
             }
 		});
-		this.saveFileAction.setPreSaveActivity(new SimpleActivity() {
+		this.saveAsFileAction.setPreSaveActivity(new SimpleActivity() {
 			public boolean doActivity() throws Exception {
                 return databaseWellDefined();
             }
@@ -491,6 +491,7 @@ public class ElbaMainPanel
 				KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
 
 		JMenuItem newMenuItem = new JMenuItem("New");
+		newMenuItem.setMnemonic(KeyEvent.VK_N);
 		newMenuItem.addActionListener(newAction);
 		fileMenu.add(newMenuItem);
 
@@ -505,14 +506,37 @@ public class ElbaMainPanel
 				KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 
 		JMenuItem openMenuItem = new JMenuItem("Open...");
+	    openMenuItem.setMnemonic(KeyEvent.VK_O);
+	    openMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 		openMenuItem.addActionListener(openFileAction);
 		fileMenu.add(openMenuItem);
 
-		JMenuItem saveMenuItem = new JMenuItem("Save...");
-		saveMenuItem.addActionListener(saveFileAction);
-		fileMenu.add(saveMenuItem);
+	    mruMenu = new JMenu("Reopen");
+	    mruMenu.setMnemonic(KeyEvent.VK_R);
+	    recreateMruMenu();
+	    fileMenu.add(mruMenu);
+
+	    fileMenu.addSeparator();
+
+	    JMenuItem saveMenuItem = new JMenuItem("Save");
+	    saveMenuItem.setMnemonic(KeyEvent.VK_S);
+	    saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+	    saveMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	saveFile();
+            }
+	    });
+	    fileMenu.add(saveMenuItem);
+
+	    JMenuItem saveAsMenuItem = new JMenuItem("Save As...");
+	    saveAsMenuItem.setMnemonic(KeyEvent.VK_A);
+	    saveAsMenuItem.addActionListener(saveAsFileAction);
+	    fileMenu.add(saveAsMenuItem);
+
+	    fileMenu.addSeparator();
 
 		JMenuItem importCSCMenuItem = new JMenuItem("Import CSC File...");
+	    importCSCMenuItem.setMnemonic(KeyEvent.VK_I);
 		importCSCMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				importCSC();
@@ -520,15 +544,12 @@ public class ElbaMainPanel
 		});
 		fileMenu.add(importCSCMenuItem);
 
-		mruMenu = new JMenu("Reopen");
-		recreateMruMenu();
-		fileMenu.add(mruMenu);
-
 		fileMenu.addSeparator();
 
 		// --- file exit item ---
 		JMenuItem exitMenuItem;
 		exitMenuItem = new JMenuItem("Exit");
+	    exitMenuItem.setMnemonic(KeyEvent.VK_X);
 		exitMenuItem.addActionListener(
 			new SimpleAction(
 				this,
@@ -542,6 +563,7 @@ public class ElbaMainPanel
 		viewMenu.setMnemonic(KeyEvent.VK_V);
 		ButtonGroup fontSizeGroup = new ButtonGroup();
 		JMenu setMinLabelSizeSubMenu = new JMenu("Set minimum label size");
+	    setMinLabelSizeSubMenu.setMnemonic(KeyEvent.VK_S);
 		JMenuItem fontRangeMenuItem = new JRadioButtonMenuItem("None");
 		fontSizeGroup.add(fontRangeMenuItem);
 		fontRangeMenuItem.addActionListener(new ActionListener() {
@@ -733,7 +755,7 @@ public class ElbaMainPanel
 			int returnValue = showFileChangedDialog();
 			if (returnValue == 0) {
 				// save
-				boolean result = this.saveFileAction.saveFile();
+				boolean result = this.saveAsFileAction.saveFile();
 				if (result) {
 					closeOk = true;
 				} else {
@@ -981,6 +1003,19 @@ public class ElbaMainPanel
 		} catch (Exception e) {
 			ErrorDialog.showError(this, e, "Could not export file");
 			return;
+		}
+	}
+	
+	private void saveFile() {
+		if(this.currentFile == null) {
+			this.saveAsFileAction.saveFile();
+		} else {
+			try {
+                saveActivity.processFile(new File(this.currentFile));
+                this.conceptualSchema.dataSaved();
+            } catch (Exception e) {
+            	ErrorDialog.showError(this,e,"Saving file failed");
+            }			
 		}
 	}
 

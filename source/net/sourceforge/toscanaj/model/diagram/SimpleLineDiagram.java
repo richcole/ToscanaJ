@@ -68,7 +68,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         Element retVal = new Element(DIAGRAM_ELEMENT_NAME);
         retVal.setAttribute(TITLE_ATTRIBUTE_NAME, title);
         if (description != null) {
-            retVal.addContent(description);
+            retVal.addContent(description.detach());
         }
         for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
             DiagramNode node = (DiagramNode) iterator.next();

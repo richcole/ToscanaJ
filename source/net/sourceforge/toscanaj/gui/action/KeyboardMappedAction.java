@@ -15,10 +15,8 @@ public abstract class KeyboardMappedAction extends AbstractAction {
     protected Frame frame;
 
     /**
-     *  @note
-     *     If you don't want to specify mnemonics
-     *     then use the other constructor.
-     * @todo if you want another conmbination then write another constructor.
+     * @todo check why keystroke and mnemonic don't work anymore, remove extra
+     * setting code in Elba and maybe elsewhere
      */
     public KeyboardMappedAction(
             Frame frame,
