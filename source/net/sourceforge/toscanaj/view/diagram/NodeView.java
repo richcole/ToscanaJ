@@ -242,4 +242,8 @@ public class NodeView extends CanvasItem {
     public boolean hasAutoRaise() {
         return false;
     }
+
+    public DiagramView getDiagramView() {
+        return diagramView;
+    }
 }

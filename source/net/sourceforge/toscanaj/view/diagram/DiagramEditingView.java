@@ -9,6 +9,8 @@ import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.controller.diagram.NodeMovementEventListener;
+import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,8 +39,6 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         diagramListModel = new DefaultListModel();
         final JList listView = new JList(diagramListModel);
         fillDiagramListView();
-
-        diagramView = new DiagramView();
         MouseListener mouseListener = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -48,6 +48,13 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
             }
         };
         listView.addMouseListener(mouseListener);
+
+        diagramView = new DiagramView();
+        diagramView.getController().getEventBroker().subscribe(
+                new NodeMovementEventListener(),
+                CanvasItemDraggedEvent.class,
+                NodeView.class
+        );
 
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, listView, diagramView);
         splitPane.setOneTouchExpandable(true);

@@ -56,7 +56,10 @@ public class LineView extends CanvasItem {
         Paint oldPaint = graphics.getPaint();
         Stroke oldStroke = graphics.getStroke();
         int selectionLineWidth = diagramSchema.getSelectionLineWidth();
-        if (this.selectionState == NodeView.NO_SELECTION) {
+        if (this.diagramLine.getFromNode().getY() > this.diagramLine.getToNode().getY()) {
+            graphics.setPaint(Color.red);
+            graphics.setStroke(new BasicStroke(3));
+        } else if (this.selectionState == NodeView.NO_SELECTION) {
             graphics.setPaint(diagramSchema.getLineColor());
             graphics.setStroke(new BasicStroke(1));
         } else if (this.selectionState == NodeView.SELECTED_IDEAL) {

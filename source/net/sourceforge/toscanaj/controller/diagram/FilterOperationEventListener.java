@@ -4,7 +4,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.controller;
+package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
