@@ -14,7 +14,7 @@ import java.sql.Types;
 ///     should give extra information like their size
 
 public class SQLTypeMapper {
-    public static final String getTypeName(int sqlType) {
+    public static final String getTypeDescription(int sqlType) {
         switch (sqlType) {
             case Types.ARRAY:
                 return "Array";
@@ -78,6 +78,73 @@ public class SQLTypeMapper {
                 return "Variable Sized Character Array";
             default:
                 return "Unknown Type (" + sqlType + ")";
+        }
+    }
+
+    public static final String getSQLName(int sqlType) {
+        switch (sqlType) {
+            case Types.ARRAY:
+                return "array";
+            case Types.BIGINT:
+                return "bigint";
+            case Types.BINARY:
+                return "binary";
+            case Types.BIT:
+                return "bit";
+            case Types.BLOB:
+                return "blob";
+            case Types.BOOLEAN:
+                return "boolean";
+            case Types.CHAR:
+                return "char";
+            case Types.CLOB:
+                return "clob";
+            case Types.DATALINK:
+                return "datalink";
+            case Types.DATE:
+                return "date";
+            case Types.DECIMAL:
+                return "decimal";
+            case Types.DISTINCT:
+                return "distinct";
+            case Types.DOUBLE:
+                return "double";
+            case Types.FLOAT:
+                return "float";
+            case Types.INTEGER:
+                return "integer";
+            case Types.JAVA_OBJECT:
+                return "java_object";
+            case Types.LONGVARBINARY:
+                return "longvarbinary";
+            case Types.LONGVARCHAR:
+                return "longvarchar";
+            case Types.NULL:
+                return "null";
+            case Types.NUMERIC:
+                return "numeric";
+            case Types.OTHER:
+                return "other";
+            case Types.REAL:
+                return "real";
+            case Types.REF:
+                return "ref";
+            case Types.SMALLINT:
+                return "smallint";
+            case Types.STRUCT:
+                return "struct";
+            case Types.TIME:
+                return "time";
+            case Types.TIMESTAMP:
+                return "timestamp";
+            case Types.TINYINT:
+                return "tinyint";
+            case Types.VARBINARY:
+                return "varbinary";
+            case Types.VARCHAR:
+                return "varchar";
+            default:
+                throw new RuntimeException("Unknown SQL type: " + sqlType);
         }
     }
 }

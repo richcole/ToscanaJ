@@ -20,6 +20,7 @@ public class AllTests extends TestCase {
         TestSuite suite = new TestSuite();
         suite.addTest(net.sourceforge.toscanaj.controller.cernato.tests.AllTests.suite());
         suite.addTest(net.sourceforge.toscanaj.controller.fca.tests.AllTests.suite());
+        suite.addTest(net.sourceforge.toscanaj.controller.db.tests.AllTestControllerDB.suite());
         return suite;
     }
 

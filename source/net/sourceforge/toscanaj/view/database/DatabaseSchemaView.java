@@ -241,7 +241,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
         public String toString() {
             return column.getName()
                 + ": "
-                + SQLTypeMapper.getTypeName(column.getType());
+                + SQLTypeMapper.getTypeDescription(column.getType());
         }
 
         public Column getColumn() {
@@ -273,7 +273,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
     }
 
     public void processEvent(Event e) {
-        if (e instanceof NewConceptualSchemaEvent || e instanceof ConceptualSchemaLoadedEvent) {
+        if (e instanceof ConceptualSchemaChangeEvent) {
         	ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
             this.dbScheme = csce.getConceptualSchema().getDatabaseSchema();
             updateTableViews();

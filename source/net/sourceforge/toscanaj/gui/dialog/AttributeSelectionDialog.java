@@ -79,7 +79,7 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
         }
 
         public String toString() {
-            return column.getName() + ": " + SQLTypeMapper.getTypeName(column.getType());
+            return column.getName() + ": " + SQLTypeMapper.getTypeDescription(column.getType());
         }
 
         public Column getColumn() {

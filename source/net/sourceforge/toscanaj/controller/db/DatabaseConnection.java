@@ -247,6 +247,9 @@ public class DatabaseConnection implements EventBrokerListener {
         return executeQuery(statement);
     }
 
+	/**
+	 * @todo use String[] instead of Vector for the rows
+	 */
     public List executeQuery(String statement) throws DatabaseException {
         List result = new LinkedList();
         ResultSet resultSet = null;

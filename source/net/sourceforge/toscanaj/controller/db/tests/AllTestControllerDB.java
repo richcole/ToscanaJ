@@ -19,6 +19,7 @@ public class AllTestControllerDB extends TestCase {
     public static Test suite() {
         TestSuite suite = new TestSuite();
         suite.addTest(DBConnectionEmbeddTest.suite());
+        suite.addTest(DumpSqlScriptTest.suite());
         return suite;
     }
 

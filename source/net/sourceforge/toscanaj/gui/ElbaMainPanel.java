@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.DataDump;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.db.DumpSqlScript;
 import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
@@ -411,6 +412,10 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                             "Can not connect to the database:\n" + ex.getMessage());
                 }
             }
+            if(this.dumpSQLMenuItem != null) {
+	            this.dumpSQLMenuItem.setEnabled(this.databaseConnection.isConnected());
+	            this.dumpStatisticalDataMenuItem.setEnabled(this.databaseConnection.isConnected());
+            }
         }
     }
 
@@ -525,6 +530,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     private void exportSQLScript(File file) {
         try {
             FileOutputStream outputStream = new FileOutputStream(file);
+            DumpSqlScript.dumpSqlScript(this.databaseConnection, outputStream);
             outputStream.close();
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Could not export file");
