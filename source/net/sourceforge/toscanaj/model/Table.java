@@ -25,13 +25,18 @@ public class Table implements XML_Serializable {
     private Column key;
     private EventBroker broker;
     private List columns;
-    private static final String TABLE_ELEMENT_NAME = "table";
-    private static final String TABLE_NAME_ATTRIBUTE_NAME = "name";
+    public static final String TABLE_ELEMENT_NAME = "table";
+    public static final String TABLE_NAME_ATTRIBUTE_NAME = "name";
 
     public Table(EventBroker broker, String name) {
         this.columns = new ArrayList();
         this.broker = broker;
         this.name = name;
+    }
+
+    public Table(EventBroker broker, Element elem) throws XML_SyntaxError {
+        this(broker, "");
+        readXML(elem);
     }
 
     public Element toXML() {
@@ -48,7 +53,19 @@ public class Table implements XML_Serializable {
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {
-        throw new XML_SyntaxError("Not yet implemented");
+        if(!elem.getName().equals(TABLE_ELEMENT_NAME)){
+            throw new XML_SyntaxError("Expected Element: " + TABLE_ELEMENT_NAME);
+        }
+        name = elem.getAttribute(TABLE_NAME_ATTRIBUTE_NAME).toString();
+        if (name == null){
+            throw new XML_SyntaxError("Expected Attribute " +
+                    TABLE_NAME_ATTRIBUTE_NAME + " for Element " + TABLE_ELEMENT_NAME);
+        }
+        List columnElems=elem.getChildren(Column.COLUMN_ELEMENT_NAME);
+        for (Iterator iterator = columnElems.iterator(); iterator.hasNext();) {
+            Element element = (Element) iterator.next();
+            columns.add(new Column(element));
+        }
     }
 
     public void addColumn(Column column) {

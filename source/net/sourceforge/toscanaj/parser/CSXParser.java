@@ -39,7 +39,7 @@ import java.util.List;
 /**
  * This class reads a CSX file and does nothing with it except complaining.
  *
- * @TODO: make code more stable and give more error messages.
+ * @ToDo: make code more stable and give more error messages.
  */
 public class CSXParser {
     /**
@@ -114,6 +114,13 @@ public class CSXParser {
                 new DOMBuilder("org.jdom.adapters.XercesDOMAdapter");
         _Document = builder.build(w3cdoc);
 
+        Element element=_Document.getRootElement();
+        if(element.getName().equals("conceptualSchema")){
+            if(element.getAttributeValue("version").equals("TJ0.6")){
+                _Schema = new ConceptualSchema(eventBroker, element);
+                return _Schema;
+            }
+        }
         // create data structure
         _Schema = new ConceptualSchema(eventBroker);
 

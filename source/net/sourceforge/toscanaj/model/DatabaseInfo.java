@@ -47,7 +47,7 @@ public class DatabaseInfo implements XML_Serializable {
     private String driverClass = null;
 
     private static final String TABLE_ELEMENT_NAME = "table";
-    private static final String DATABASE_CONNECTION_ELEMENT_NAME = "databaseConnection";
+    public static final String DATABASE_CONNECTION_ELEMENT_NAME = "databaseConnection";
     private static final String EMBEDDED_SOURCE_ELEMENT_NAME = "embed";
     private static final String URL_SOURCE_ELEMENT_NAME = "url";
     private static final String DRIVER_CLASS_ATTRIBUTE_NAME = "driver";
@@ -233,7 +233,17 @@ public class DatabaseInfo implements XML_Serializable {
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {
-        throw new XML_SyntaxError("Not yet implemented");
+        XML_Helper.checkName(DATABASE_CONNECTION_ELEMENT_NAME, elem);
+        if (XML_Helper.contains(elem, EMBEDDED_SOURCE_ELEMENT_NAME)) {
+            embeddedSQLPath=XML_Helper.getAttribute(elem,EMBEDDED_URL_ATTRIBUTE_NAME).toString();
+        } else {
+            sourceURL=XML_Helper.mustbe(URL_SOURCE_ELEMENT_NAME,elem).getText();
+            driverClass=XML_Helper.getAttribute(elem, DRIVER_CLASS_ATTRIBUTE_NAME).toString();
+            userName=XML_Helper.getAttribute(elem, USERNAME_ATTRIBUTE_NAME).toString();
+            password=XML_Helper.getAttribute(elem, PASSWORD_ATTRIBUTE_NAME).toString();
+        }
+        table=XML_Helper.mustbe(TABLE_ELEMENT_NAME, elem).getContent().toString();
+        objectKey= XML_Helper.mustbe(OBJECT_KEY_ELEMENT_NAME,elem).getContent().toString();
     }
 
     /**

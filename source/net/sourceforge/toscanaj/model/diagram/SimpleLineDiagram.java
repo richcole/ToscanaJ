@@ -50,8 +50,6 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     private boolean coordinateSystemChecked = false;
 
     private Element description = null;
-    private static final String DIAGRAM_ELEMENT_NAME = "diagram";
-    private static final String TITLE_ATTRIBUTE_NAME = "title";
 
     /**
      * The default constructor creates a diagram with just nothing in it at all.

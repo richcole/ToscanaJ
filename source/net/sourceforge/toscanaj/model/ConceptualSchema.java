@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.model;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -61,6 +62,10 @@ public class ConceptualSchema implements XML_Serializable, DiagramCollection {
      * True if the schema contains at least one diagram with description.
      */
     private boolean hasDiagramDescription = false;
+    private static final String CONCEPTUAL_SCHEMA_ELEMENT_NAME = "conceptualSchema";
+    private static final String VERSION_ATTRIBUTE_NAME = "version";
+    private static final String VERSION_ATTRIBUTE_VALUE = "TJ0.6";
+    private static final String DESCRIPTION_ELEMENT_NAME = "description";
 
     /**
      * Creates an empty schema.
@@ -80,8 +85,8 @@ public class ConceptualSchema implements XML_Serializable, DiagramCollection {
     }
 
     public Element toXML() {
-        Element retVal = new Element("conceptualSchema");
-        retVal.setAttribute("version", "TJ0.6");
+        Element retVal = new Element(CONCEPTUAL_SCHEMA_ELEMENT_NAME);
+        retVal.setAttribute(VERSION_ATTRIBUTE_NAME, VERSION_ATTRIBUTE_VALUE);
         retVal.addContent(description);
         retVal.addContent(databaseInfo.toXML());
         retVal.addContent(dbScheme.toXML());
@@ -93,8 +98,24 @@ public class ConceptualSchema implements XML_Serializable, DiagramCollection {
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {
-        throw new XML_SyntaxError("Not yet implemented");
+        XML_Helper.checkName(CONCEPTUAL_SCHEMA_ELEMENT_NAME, elem);
+        description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
+        databaseInfo = new DatabaseInfo(
+                XML_Helper.mustbe(DatabaseInfo.DATABASE_CONNECTION_ELEMENT_NAME, elem)
+        );
+        if(XML_Helper.contains(elem, DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME)){
+            dbScheme = new DatabaseSchema(eventBroker, elem.getChild(DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME));
+        } else {
+            dbScheme = new DatabaseSchema(eventBroker);
+        }
+        List diagramElems = elem.getChildren(Diagram2D.DIAGRAM_ELEMENT_NAME);
+        for (Iterator iterator = diagramElems.iterator(); iterator.hasNext();) {
+            Element element = (Element) iterator.next();
+            diagrams.add(new SimpleLineDiagram(element));
+        }
+
     }
+
 
     /**
      * Deletes all schema content, rendering the schema empty.

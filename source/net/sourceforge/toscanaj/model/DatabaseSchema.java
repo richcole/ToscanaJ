@@ -28,13 +28,18 @@ public class DatabaseSchema implements XML_Serializable, BrokerEventListener {
 
     EventBroker broker;
     List tables;
-    private static final String DATABASE_SCHEMA_ELEMENT_NAME = "databaseSchema";
+    public static final String DATABASE_SCHEMA_ELEMENT_NAME = "databaseSchema";
 
     public DatabaseSchema(EventBroker broker) {
         this.tables = new ArrayList();
         this.broker = broker;
         this.broker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
         this.broker.subscribe(this, DatabaseModifiedEvent.class, Object.class);
+    }
+
+    public DatabaseSchema(EventBroker broker, Element elem) throws XML_SyntaxError {
+        this(broker);
+        readXML(elem);
     }
 
     public Element toXML() {
@@ -47,7 +52,12 @@ public class DatabaseSchema implements XML_Serializable, BrokerEventListener {
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {
-        throw new XML_SyntaxError("Not yet implemented");
+        XML_Helper.checkName(DATABASE_SCHEMA_ELEMENT_NAME, elem);
+        List tableElems = elem.getChildren(Table.TABLE_ELEMENT_NAME);
+        for (Iterator iterator = tableElems.iterator(); iterator.hasNext();) {
+            Element element = (Element) iterator.next();
+            tables.add(new Table(broker, element));
+        }
     }
 
     void addTable(Table table) {
@@ -67,13 +77,13 @@ public class DatabaseSchema implements XML_Serializable, BrokerEventListener {
         STD_Iterator it = new STD_Iterator(connection.getTableNames());
 
         this.tables.clear();
-        for(it.reset();!it.atEnd();it.next()) {
-            String tableName = (String)it.val();
-            Table  table = new Table(broker, tableName); //@todo get key name
+        for (it.reset(); !it.atEnd(); it.next()) {
+            String tableName = (String) it.val();
+            Table table = new Table(broker, tableName); //@todo get key name
             STD_Iterator colIt = new STD_Iterator(
-                connection.getColumns(tableName)
+                    connection.getColumns(tableName)
             );
-            for(colIt.reset(); !colIt.atEnd(); colIt.next()) {
+            for (colIt.reset(); !colIt.atEnd(); colIt.next()) {
                 table.addColumn((Column) colIt.val());
             }
             addTable(table);
@@ -82,11 +92,11 @@ public class DatabaseSchema implements XML_Serializable, BrokerEventListener {
     }
 
     public void processEvent(Event e) {
-        if ( e instanceof DatabaseConnectedEvent ) {
+        if (e instanceof DatabaseConnectedEvent) {
             DatabaseConnectedEvent event = (DatabaseConnectedEvent) e;
             readFromDBConnection(event.getConnection());
         }
-        if ( e instanceof DatabaseModifiedEvent ) {
+        if (e instanceof DatabaseModifiedEvent) {
             DatabaseModifiedEvent event = (DatabaseModifiedEvent) e;
             readFromDBConnection(event.getConnection());
         }
