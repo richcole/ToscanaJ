@@ -118,15 +118,25 @@ public class ObjectLabelView extends LabelView {
         DiagramNode node = this.labelInfo.getNode();
         ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
         if ((query == null) || (query == ListQuery.KeyListQuery)) {
-            contents = new ArrayList();
-            Iterator it = this.diagramView.getConceptInterpreter().getObjectSetIterator(node.getConcept(), context);
-            while (it.hasNext()) {
-                Object o = it.next();
-                contents.add(o);
+            int objectCount = this.diagramView.getConceptInterpreter().getObjectCount(node.getConcept(), context);
+            if( objectCount != 0) {
+	            contents = new ArrayList();
+	            Iterator it = this.diagramView.getConceptInterpreter().getObjectSetIterator(node.getConcept(), context);
+	            while (it.hasNext()) {
+	                Object o = it.next();
+	                contents.add(o);
+	            }
+            } else {
+                contents = null;
             }
         } else if (query == AggregateQuery.CountQuery) {
-            contents = new ArrayList();
-            contents.add(new Integer(this.diagramView.getConceptInterpreter().getObjectCount(node.getConcept(), context)));
+            int objectCount = this.diagramView.getConceptInterpreter().getObjectCount(node.getConcept(), context);
+            if( objectCount != 0) {
+		        contents = new ArrayList();
+		        contents.add(new Integer(objectCount));
+            } else {
+            	contents = null;
+            }
         } else {
             DatabaseConnectedConceptInterpreter conceptInterpreter =
                     (DatabaseConnectedConceptInterpreter) this.diagramView.getConceptInterpreter();
