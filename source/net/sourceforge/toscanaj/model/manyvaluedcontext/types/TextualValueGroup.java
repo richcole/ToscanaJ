@@ -23,7 +23,6 @@ public class TextualValueGroup implements WritableScaleColumn {
     public TextualValueGroup(TextualType type, String name, String id) {
         this.type = type;
         this.name = name;
-        type.addValueGroup(this, id);
     }
 
     public String getName() {

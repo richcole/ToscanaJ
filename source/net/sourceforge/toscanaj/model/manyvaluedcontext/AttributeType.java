@@ -11,7 +11,6 @@ import org.jdom.Element;
 
 public interface AttributeType {
 	String getName();
-    Scale[] getScales();
     AttributeValue[] getValueRange();
     boolean isValidValue(AttributeValue valueToTest);
     

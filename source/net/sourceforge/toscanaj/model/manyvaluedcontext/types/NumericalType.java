@@ -10,7 +10,6 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext.types;
 import org.jdom.Element;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
@@ -27,14 +26,6 @@ public class NumericalType extends TypeImplementation {
         super(name);
     }
     
-    public void addValueGroup(ScaleColumn column, String id) {
-        if (column instanceof NumericalValueGroup) {
-            scale.addColumn(column, id);
-            return;
-        }
-        throw new RuntimeException("Wrong value group type");
-    }
-
 	public void setMinimumValue(double minValue) {
 		this.minValue = minValue;
 	}

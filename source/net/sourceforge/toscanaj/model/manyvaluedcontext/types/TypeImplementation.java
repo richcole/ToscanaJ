@@ -9,15 +9,12 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext.types;
 
 import org.jdom.Element;
 
-import net.sourceforge.toscanaj.model.manyvaluedcontext.Scale;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableAttributeType;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 public abstract class TypeImplementation implements WritableAttributeType, XMLizable {
-
 	public static final String CLASS_ATTRIBUTE_NAME = "class";
 	public static final String VALUE_ELEMENT_NAME = "value";
 	
@@ -26,15 +23,12 @@ public abstract class TypeImplementation implements WritableAttributeType, XMLiz
 	private static final String NAME_ATTRIBUTE_NAME = "name";
 	
     protected String name;
-    protected Scale scale;
 
     public TypeImplementation(String name) {
         this.name = name;
-        this.scale = new ScaleImplementation(name);
     }
     
     public TypeImplementation(Element element) throws XMLSyntaxError {
-    	this.scale = new ScaleImplementation(name); /// @todo name is not initialized here
     	readXML(element);
     }
     
@@ -42,10 +36,6 @@ public abstract class TypeImplementation implements WritableAttributeType, XMLiz
         return name;
     }
 
-    public Scale[] getScales() {
-        return new Scale[]{this.scale};
-    }
-    
     public String toString(){
     	return getName();
     }

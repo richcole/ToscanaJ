@@ -27,7 +27,6 @@ public class NumericalValueGroup implements ScaleColumn {
         this.minIncluded = minIncluded;
         this.max = max;
         this.maxIncluded = maxIncluded;
-        type.addValueGroup(this, id);
     }
 
     public String getName() {

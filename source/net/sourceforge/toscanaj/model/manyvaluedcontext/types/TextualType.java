@@ -15,7 +15,6 @@ import java.util.List;
 import org.jdom.Element;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 
@@ -29,14 +28,6 @@ public class TextualType extends TypeImplementation {
     
     public TextualType(Element elem) throws XMLSyntaxError {
     	super(elem);
-    }
-
-    public void addValueGroup(ScaleColumn column, String id) {
-        if (column instanceof TextualValueGroup) {
-            scale.addColumn(column, id);
-            return;
-        }
-        throw new RuntimeException("Wrong value group type");
     }
 
 	public void addValue(TextualValue textualValue) {

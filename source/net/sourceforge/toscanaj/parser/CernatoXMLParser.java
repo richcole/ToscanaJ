@@ -26,6 +26,12 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * @todo extract proper model for Cernato XML, put it into Tockit
+ * 
+ * Older versions of this code might be helpful -- it was Cernato-only at the
+ * beginning.
+ */
 public class CernatoXMLParser {
     public static CernatoModel importCernatoXMLFile(File cernatoXMLFile)
             throws DataFormatException, JDOMException, IOException {
@@ -96,6 +102,7 @@ public class CernatoXMLParser {
                 Element valueElement = (Element) iterator2.next();
                 group.addValue(new TextualValue(valueElement.getText()));
             }
+            model.addValueGroup(newType, group, groupId);
         }
         types.put(id, newType);
         model.getContext().add(newType);
@@ -147,7 +154,8 @@ public class CernatoXMLParser {
             boolean minIncluded = valueGroupElement.getChild("lower_border").getAttributeValue("included").equals("yes");
             double max = Double.parseDouble(valueGroupElement.getChild("upper_border").getText());
             boolean maxIncluded = valueGroupElement.getChild("upper_border").getAttributeValue("included").equals("yes");
-            new NumericalValueGroup(newType, groupName, groupId, min, minIncluded, max, maxIncluded);
+            NumericalValueGroup valueGroup = new NumericalValueGroup(newType, groupName, groupId, min, minIncluded, max, maxIncluded);
+            model.addValueGroup(newType, valueGroup, groupId);
         }
         types.put(id, newType);
         model.getContext().add(newType);
@@ -231,10 +239,11 @@ public class CernatoXMLParser {
             List criteriaElems = viewElem.getChildren("criterion");
             for (Iterator iterator2 = criteriaElems.iterator(); iterator2.hasNext();) {
                 Element criterionElem = (Element) iterator2.next();
-                ManyValuedAttributeImplementation property = (ManyValuedAttributeImplementation) properties.get(criterionElem.getChild("property_ref").
-                        getAttributeValue("property"));
-                ScaleColumn valgroup = property.getType().getScales()[0].getColumn(criterionElem.getChild("value_group_ref").
-                        getAttributeValue("value_group"));
+                ManyValuedAttributeImplementation property = 
+                		(ManyValuedAttributeImplementation) properties.get(criterionElem.getChild("property_ref").
+                														                 getAttributeValue("property"));
+                ScaleColumn valgroup = model.getValueGroup(property.getType(), 
+                		criterionElem.getChild("value_group_ref").getAttributeValue("value_group"));
                 view.addCriterion(new Criterion(property, valgroup));
             }
             model.getViews().add(view);
