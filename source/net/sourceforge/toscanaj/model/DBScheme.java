@@ -15,6 +15,7 @@ import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.gui.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.gui.events.DBSchemeChangedEvent;
+import net.sourceforge.toscanaj.gui.events.DatabaseModifiedEvent;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ public class DBScheme implements BrokerEventListener {
         this.tables = new ArrayList();
         this.broker = broker;
         this.broker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
+        this.broker.subscribe(this, DatabaseModifiedEvent.class, Object.class);
     }
 
     void addTable(Table table) {
@@ -43,7 +45,6 @@ public class DBScheme implements BrokerEventListener {
 
         for (Iterator it = connection.getTableNames().iterator(); it.hasNext();) {
             String tableName = (String) it.next();
-            System.out.println("Table Name:" + tableName);
         }
 
         STD_Iterator it = new STD_Iterator(connection.getTableNames());
@@ -51,25 +52,25 @@ public class DBScheme implements BrokerEventListener {
         this.tables.clear();
         for(it.reset();!it.atEnd();it.next()) {
             String tableName = (String)it.val();
-            System.out.println("tableName: " + tableName);
             Table  table = new Table(tableName, ""); //@todo get key name
             STD_Iterator colIt = new STD_Iterator(
                 connection.getColumnNames(tableName)
             );
-            for(colIt.reset(); !it.atEnd(); it.next()) {
-                table.addColumn(new Column((String)it.val()));
+            for(colIt.reset(); !colIt.atEnd(); colIt.next()) {
+                table.addColumn(new Column((String)colIt.val()));
             }
             addTable(table);
         }
         broker.processEvent(new DBSchemeChangedEvent(this, this));
-        System.out.println("DBSchemeChangedEvent...");
     }
 
     public void processEvent(Event e) {
-        System.out.println("Processing event in DBScheme...");
         if ( e instanceof DatabaseConnectedEvent ) {
-            System.out.println("   -> was a DatabaseConnectedEvent");
             DatabaseConnectedEvent event = (DatabaseConnectedEvent) e;
+            readFromDBConnection(event.getConnection());
+        }
+        if ( e instanceof DatabaseModifiedEvent ) {
+            DatabaseModifiedEvent event = (DatabaseModifiedEvent) e;
             readFromDBConnection(event.getConnection());
         }
     }

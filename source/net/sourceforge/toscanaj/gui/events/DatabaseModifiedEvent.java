@@ -11,13 +11,13 @@ package net.sourceforge.toscanaj.gui.events;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.controller.db.DBConnection;
 
-public class DatabaseConnectedEvent implements Event {
+public class DatabaseModifiedEvent implements Event {
 
     private Object source;
 
     private DBConnection connection;
 
-    public DatabaseConnectedEvent(Object source, DBConnection connection) {
+    public DatabaseModifiedEvent(Object source, DBConnection connection) {
         this.source = source;
         this.connection = connection;
     }

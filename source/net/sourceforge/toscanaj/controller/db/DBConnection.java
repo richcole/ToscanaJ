@@ -10,6 +10,7 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.gui.events.DatabaseConnectedEvent;
+import net.sourceforge.toscanaj.gui.events.DatabaseModifiedEvent;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -65,9 +66,9 @@ public class DBConnection {
      *
      * @TODO Throw exceptions instead of just printing them.
      */
-    public DBConnection(EventBroker broker, String url, String account, String password) throws DatabaseException {
+    public DBConnection(EventBroker broker, String url, String driver, String account, String password) throws DatabaseException {
         this.broker = broker;
-        connect(url, account, password);
+        connect(url, driver, account, password);
     }
 
     public DBConnection(EventBroker broker, Connection connection) {
@@ -86,7 +87,7 @@ public class DBConnection {
         if(this.isConnected()) {
             disconnect();
         }
-        connect(info.getURL(), info.getUserName(), info.getPassword());
+        connect(info.getURL(), info.getDriverClass(), info.getUserName(), info.getPassword());
     }
 
     public void disconnect() throws DatabaseException {
@@ -102,19 +103,22 @@ public class DBConnection {
         return jdbcConnection != null;
     }
 
-    public void connect(String url, String account, String password) throws DatabaseException {
-        jdbcConnection = getConnection(url, account, password);
+    public void connect(String url, String driverName, String account, String password) throws DatabaseException {
+        jdbcConnection = getConnection(url, driverName, account, password);
         broker.processEvent(new DatabaseConnectedEvent(this, this));
     }
 
-    private static Connection getConnection(String url, String account, String password) throws DatabaseException {
+    private static Connection getConnection(String url, String driverName, String account, String password) throws DatabaseException {
         try {
+            Class.forName(driverName);
             Driver driver = DriverManager.getDriver(url);
             if (driver == null) {
                 throw new DatabaseException("Could not locate JDBC Driver class for the url:\n" + url);
             }
         } catch (SQLException e) {
             throw new DatabaseException("Error locating JDBC Driver class for the url:\n" + url, e);
+        } catch (ClassNotFoundException e) {
+            throw new DatabaseException("The class for '" + url + "' couldn't be loaded", e);
         }
 
         Connection connection = null;
@@ -146,6 +150,7 @@ public class DBConnection {
         }
         // submit the SQL
         executeSQLAsString(sqlCommand, sqlURL.toString());
+        this.broker.processEvent(new DatabaseModifiedEvent(this, this));
     }
 
     public void executeSQLAsString(String sqlCommand, String descr) throws DatabaseException {
@@ -358,7 +363,7 @@ public class DBConnection {
 
         try {
             DatabaseMetaData dmd = jdbcConnection.getMetaData();
-            ResultSet rs = dmd.getTables(null, null, null, tableTypes);
+            ResultSet rs = dmd.getTables(null, null, "%", tableTypes);
             while (rs.next()) {
                 result.add(rs.getString(3));
             }
@@ -504,7 +509,7 @@ public class DBConnection {
             System.exit(1);
         }
 
-        DBConnection test = new DBConnection(new EventBroker(), args[0], "", "");
+        DBConnection test = new DBConnection(new EventBroker(), args[0], "", "", "");
 
         // print the tables
         System.out.println("The tables:\n-----------");

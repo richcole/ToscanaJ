@@ -25,7 +25,7 @@ public class DBConnectionEmbeddTest extends TestCase {
         return new TestSuite(DBConnectionEmbeddTest.class);
     }
 
-    DBConnectionEmbeddTest(String testName) {
+    public DBConnectionEmbeddTest(String testName) {
         super(testName);
     };
 
@@ -38,13 +38,14 @@ public class DBConnectionEmbeddTest extends TestCase {
             DatabaseInfo info = DatabaseInfo.getEmbeddedDatabaseInfo();
 
             DBConnection connection = new DBConnection(new EventBroker());
+
             connection.connect(info);
             connection.executeSQLAsString(SQLCommand, "EmbedDBConnectionTestSQL");
 
             assertEquals(1, connection.getTableNames().size());
 
         } catch (DatabaseException e) {
-            fail("Exception raised while initializing embedded database");
+            fail("DB Exception: " + e.getMessage());
         }
 
     }

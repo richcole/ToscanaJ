@@ -104,7 +104,6 @@ public class SchemeView extends JPanel implements BrokerEventListener
 
     public void processEvent(Event e) {
 
-        System.out.println("DBSchemeChangedEvent received");
         if ( e instanceof DBSchemeChangedEvent ) {
             DBSchemeChangedEvent event = (DBSchemeChangedEvent) e;
             this.dbScheme = event.getDBScheme();
@@ -114,7 +113,6 @@ public class SchemeView extends JPanel implements BrokerEventListener
             STD_Iterator it = new STD_Iterator(dbScheme.getTables());
             for(it.reset(); !it.atEnd(); it.next()) {
                 Table table = (Table)it.val();
-                System.out.println("Add Table - " + table.getName());
                 availableTableList.add(0, new TableInfo(table));
             }
         }
