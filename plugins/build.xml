@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Deploy Plugins" default="dist" basedir=".">
+	<description>
+		Compile and deploy all plugins
+	</description>
+
+	<!-- TODO have to change the way we get mainApp stuff -->
+	<property name="mainApp.libs.dir" value="../libs"/>
+	<property name="mainApp.classes" value="../build/release"/>
+	<property name="mainApp.dist.dir" value="../dist"/>
+	<property name="pluginArchitecture.classes" value="../libs/pluginArchitecture.jar"/>	
+	
+	<!-- set plugins dist directory, relative to main program's dist directory -->
+	<property name="plugins.dist.dir" value="${mainApp.dist.dir}"/>
+
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+	  <classpath>
+	    <pathelement location="${mainApp.libs.dir}/ant-contrib.jar"/>
+	  </classpath>
+	</taskdef>
+
+	<path id="${plugins.paths}">
+        <dirset dir="${basedir}">
+			<patternset>
+				<include name="*"/>
+			</patternset>	        
+        </dirset>
+	</path>	
+
+	<target name="clean">
+	    <foreach target="_cleanPlugin" param="plugin.dir">
+	    	<path refid="${plugins.paths}"/>
+		</foreach>
+	</target>
+	
+	<target name="dist">
+		<mkdir dir="${plugins.dist.dir}"/>
+	    <foreach target="_pluginDist" param="plugin.dir">
+	    	<path refid="${plugins.paths}"/>
+	    </foreach>
+	</target>
+	
+	<target name="_pluginDist">
+		<basename property="plugin.dir.name" file="${plugin.dir}"/>
+		<ant antfile="${basedir}/buildPlugin.xml" dir="${plugin.dir}" target="dist" inheritall="false">
+			<property name="plugin.name" value="${plugin.dir.name}Plugin"/>
+			<property name="plugin.dist.dir.name" value="${plugin.dir.name}"/>
+			<property name="mainApp.classes" value="../${mainApp.classes}"/>
+			<property name="mainApp.libs.dir" value="../${mainApp.libs.dir}"/>
+			<property name="pluginArchitecture.classes" value="../${pluginArchitecture.classes}"/>
+		</ant>
+		<copy todir="${plugins.dist.dir}">
+			<fileset dir="${plugin.dir}/dist">
+				<include name="*.zip"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="_cleanPlugin">
+		<ant antfile="${basedir}/buildPlugin.xml" dir="${plugin.dir}" target="clean">
+			<property name="plugin.name" value="${plugin.dir}Plugin"/>
+		</ant>
+	</target>	
+
+</project>
