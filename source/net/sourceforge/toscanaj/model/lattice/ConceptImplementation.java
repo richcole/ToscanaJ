@@ -260,7 +260,11 @@ public class ConceptImplementation implements Concept {
         while (contingentIterator.hasNext()) {
             Object obj = contingentIterator.next();
             if(obj instanceof XMLizable) {
-                contingentElem.addContent(((XMLizable)obj).toXML());
+                Element element = ((XMLizable)obj).toXML();
+                // @todo this is a hack to keep the old syntax, which distinguishes objects and attributes
+                // should be changed for a 2.0 version
+                element.setName(newElementName);
+                contingentElem.addContent(element);
             } else {
                 Element newElem = new Element(newElementName);
                 newElem.addContent(obj.toString());
@@ -499,7 +503,7 @@ public class ConceptImplementation implements Concept {
         List attributes = attributeContingentElem.getChildren(ATTRIBUTE_ELEMENT_NAME);
         for (Iterator iterator = attributes.iterator(); iterator.hasNext();) {
             Element attrElem = (Element) iterator.next();
-            this.attributeContingent.add(new FCAElementImplementation(attrElem.getText(), attrElem.getChild(DESCRIPTION_ELEMENT_NAME)));
+            this.attributeContingent.add(new FCAElementImplementation(attrElem));
         }
         this.filter.add(this);
         this.ideal.add(this);

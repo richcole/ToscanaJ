@@ -122,7 +122,11 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable, 
 
 	public void readXML(Element elem) throws XMLSyntaxError {
 		this.description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
-        // first check for old-style syntax
+        String contextPositionAttribute = elem.getAttributeValue(CONTEXT_POSITION_ATTRIBUT_NAME);
+        if(contextPositionAttribute != null) {
+            this.contextPosition = Integer.parseInt(contextPositionAttribute);
+        }
+        // now check for old-style syntax and parse that instead if found
         if(elem.getChild(DATA_ELEMENT_NAME) == null) {
             this.data = elem.getText();
             return;
@@ -139,10 +143,6 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable, 
 				throw new XMLSyntaxError("Initialization of object of type " + className + "failed.", e);
 			}
 		}
-        String contextPositionAttribute = elem.getAttributeValue(CONTEXT_POSITION_ATTRIBUT_NAME);
-        if(contextPositionAttribute != null) {
-            this.contextPosition = Integer.parseInt(contextPositionAttribute);
-        }
 	}
 
     /**

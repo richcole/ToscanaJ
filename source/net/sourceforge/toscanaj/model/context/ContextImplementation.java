@@ -155,8 +155,16 @@ public class ContextImplementation implements ListsContext {
         int pos = 0;
         for (Iterator it = this.objects.iterator(); it.hasNext(); ) {
             Object object = it.next();
-            if(object instanceof FCAElementImplementation) {
-                ((FCAElementImplementation)object).setContextPosition(pos);
+            if(object instanceof WritableFCAElement) {
+                ((WritableFCAElement)object).setContextPosition(pos);
+            }
+            pos++;
+        }
+        pos = 0;
+        for (Iterator it = this.attributes.iterator(); it.hasNext(); ) {
+            Object object = it.next();
+            if(object instanceof WritableFCAElement) {
+                ((WritableFCAElement)object).setContextPosition(pos);
             }
             pos++;
         }
