@@ -29,14 +29,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.Box;
@@ -83,9 +86,14 @@ import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.model.diagram.WriteableDiagram2D;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
@@ -1058,6 +1066,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
     private void saveFile() {
+    	ensureObjectSetConsistency();
+    	 
         if (this.currentFile == null) {
             this.saveAsFileAction.saveFile();
         } else {
@@ -1069,8 +1079,55 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             }
         }
     }
+	
+	/**
+	 * @todo this is only an intermediate hack, it will be superflous once everything gets mapped 
+	 *       into the main context
+	 */
+	private void ensureObjectSetConsistency() {
+		Set allObjects = new HashSet();
+		for (Iterator diagIt = this.conceptualSchema.getDiagramsIterator(); diagIt.hasNext();) {
+            Diagram2D diagram = (Diagram2D) diagIt.next();
+            Concept concept = diagram.getTopConcept();
+            for (Iterator concIt = concept.getExtentIterator(); concIt.hasNext();) {
+                Object object = concIt.next();
+                allObjects.add(object);
+            }
+        }
+        
+		for (Iterator diagIt = this.conceptualSchema.getDiagramsIterator(); diagIt.hasNext();) {
+			WriteableDiagram2D diagram = (WriteableDiagram2D) diagIt.next();
+			
+			ConceptImplementation concept = (ConceptImplementation) diagram.getTopConcept();
+			if(concept.getExtentSize() == allObjects.size()) {
+				continue;			
+			}
+			
+			Set difference = new HashSet(allObjects);
+			for (Iterator extIt = concept.getExtentIterator(); extIt.hasNext();) {
+                Object object = extIt.next();
+                difference.remove(object);
+            }
+            
+			if(concept.getAttributeContingentSize() != 0) {
+				DiagramNode topNode = diagram.getNodeForConcept(concept);
+				double x = topNode.getX();
+				double y = topNode.getY() - 10;
+				concept = new ConceptImplementation();
+				DiagramNode newTop = new DiagramNode(diagram,"new top", new Point2D.Double(x,y), concept, 
+				                                     null, new LabelInfo(),null);
+				diagram.addNode(newTop);
+				diagram.addLine(newTop, topNode);
+			}
+			
+			for (Iterator diffIt = difference.iterator(); diffIt.hasNext();) {
+                Object object = (Object) diffIt.next();
+                concept.addObject(object);
+            }
+		}
+    }
 
-	protected void showNumericInputDialog(WritableManyValuedAttribute attribute,
+    protected void showNumericInputDialog(WritableManyValuedAttribute attribute,
 												WritableFCAObject obj) {
 		WritableManyValuedContext context = this.conceptualSchema.getManyValuedContext();
         AttributeValue relationship = context.getRelationship(obj,attribute);

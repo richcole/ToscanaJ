@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.diagram;
 
+import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
 
@@ -18,6 +19,8 @@ import java.util.Iterator;
  * Interface for getting diagram related information.
  *
  * @todo remove index based access, even though this means giving write access in some way
+ * @todo make interface smaller
+ * @todo remove constants from interface
  */
 
 public interface Diagram2D extends XMLizable {
@@ -55,6 +58,13 @@ public interface Diagram2D extends XMLizable {
     DiagramNode getNode(int nodeNumber);
 
     DiagramNode getNode(String identifier);
+    
+    /**
+     * Finds the node representing the concept given.
+     * 
+     * Returns null if no such node exists in this diagram.
+     */
+    DiagramNode getNodeForConcept(Concept concept);
 
     /**
      * Returns the list of all nodes in the diagram.
@@ -107,4 +117,22 @@ public interface Diagram2D extends XMLizable {
      * concept.
      */
     boolean isHasseDiagram();
+
+	/**
+	 * Finds the top concept in the underlying lattice.
+	 * 
+	 * @todo check where this might be used instead of doing the same thing multiple times
+	 * 
+	 * @throws IllegalStateException if the diagram has no nodes or is not a lattice.
+	 */
+	Concept getTopConcept();
+
+	/**
+	 * Finds the bottom concept in the underlying lattice.
+	 * 
+	 * @todo check where this might be used instead of doing the same thing multiple times
+	 * 
+	 * @throws IllegalStateException if the diagram has no nodes or is not a lattice.
+	 */
+	Concept getBottomConcept();
 }

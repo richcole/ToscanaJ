@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.model.events.DiagramChangedEvent;
+import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
@@ -220,6 +221,19 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         throw new RuntimeException("No diagram node with id '" + identifier + "' found.");
     }
 
+	public DiagramNode getNodeForConcept(Concept concept) {
+		if (!coordinateSystemChecked) {
+			checkCoordinateSystem();
+		}
+		for (Iterator nodeIt = this.nodes.iterator(); nodeIt.hasNext();) {
+            DiagramNode node = (DiagramNode) nodeIt.next();
+            if(node.getConcept() == concept) {
+            	return node;
+            }
+        }
+		return null;
+	}
+
     /**
      * Implements Diagram2D.getLine(int).
      */
@@ -341,4 +355,46 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 	public void setEventBroker(EventBroker eventBroker) {
 		this.eventBroker = eventBroker;
 	}
+
+	/**
+	 * @todo check if we have a lattice
+	 */
+    public Concept getTopConcept() {
+    	if(this.nodes == null || this.nodes.size() == 0) {
+    		throw new IllegalStateException("Diagram has no nodes");
+    	}
+    	DiagramNode node = (DiagramNode) this.nodes.get(0);
+		Concept top = node.getConcept();
+		while(top.getUpset().size() > 1) {
+			Iterator it = top.getUpset().iterator();
+			Concept upper = (Concept) it.next();
+			if(upper != top) {
+				top = upper;
+			} else {
+				top = (Concept) it.next();
+			}
+		}
+		return top;
+    }
+
+	/**
+	 * @todo check if we have a lattice
+	 */
+    public Concept getBottomConcept() {
+		if(this.nodes == null || this.nodes.size() == 0) {
+			throw new IllegalStateException("Diagram has no nodes");
+		}
+		DiagramNode node = (DiagramNode) this.nodes.get(0);
+		Concept bottom = node.getConcept();
+		while(bottom.getDownset().size() > 1) {
+			Iterator it = bottom.getDownset().iterator();
+			Concept lower = (Concept) it.next();
+			if(lower != bottom) {
+				bottom = lower;
+			} else {
+				bottom = (Concept) it.next();
+			}
+		}
+		return bottom;
+    }
 }
