@@ -121,22 +121,32 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
      * Returns true if the diagram is in the list of displayed diagrams.
      */
     public boolean isInCurrent(DiagramReference diagram) {
-        return isInCurrent(this.diagrams.indexOf(diagram));
+    	for(int i = this.currStartPosition; i < this.firstFutureDiagramPosition; i++) {
+    		if(this.diagrams.get(i) == diagram) {
+    			return true;
+    		}
+    	}
+    	return false;
     }
 
     public boolean isInCurrent(int elementPosition) {
-        return elementPosition >= currStartPosition && currStartPosition >= 0 && elementPosition < firstFutureDiagramPosition;
+    	return isInCurrent((DiagramReference) this.diagrams.get(elementPosition));
     }
 
     /**
      * Returns true if the diagram is in the list of diagrams still to be visited.
      */
     public boolean isInFuture(DiagramReference diagram) {
-        return isInFuture(diagrams.indexOf(diagram));
+		for(int i = this.firstFutureDiagramPosition; i < this.diagrams.size(); i++) {
+			if(this.diagrams.get(i) == diagram) {
+				return true;
+			}
+		}
+		return false;
     }
 
     public boolean isInFuture(int elementPosition) {
-        return elementPosition >= firstFutureDiagramPosition;
+        return isInFuture((DiagramReference) this.diagrams.get(elementPosition));
     }
 
     public boolean hasFutureDiagrams() {
