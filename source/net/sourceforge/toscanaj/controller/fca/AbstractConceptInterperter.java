@@ -279,10 +279,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                         return null;
                     }
                     if (objectCount != expectedSize) {
-                        boolean oldMode = context.getObjectDisplayMode();
-                        context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
-                        int fullExtent = getObjectCount(concept.getTopConcept(), context);
-                        context.setObjectDisplayMode(oldMode);
+                        int fullExtent = getExtentSize(concept.getTopConcept(), context);
                         NumberFormat format = DecimalFormat.getPercentInstance();
                         format.setMaximumFractionDigits(2);
                         String returnValue = format.format(objectCount/(double)fullExtent);
@@ -294,13 +291,10 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
             }
         	int objectCount = getObjectCount(concept, context);
 			if( objectCount != 0) {
-				boolean oldMode = context.getObjectDisplayMode();
-				context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
-				int fullExtent = getObjectCount(concept.getTopConcept(), context);
-				context.setObjectDisplayMode(oldMode);
+				int fullExtent = getExtentSize(concept.getTopConcept(), context);
 				NumberFormat format = DecimalFormat.getPercentInstance();
 				format.setMaximumFractionDigits(2);
-				String objectValue = format.format(objectCount/(double)fullExtent) + " %";
+				String objectValue = format.format(objectCount/(double)fullExtent);
                 return new Object[]{getObject(objectValue, concept, context)};				
 			} else {
 				return null;
