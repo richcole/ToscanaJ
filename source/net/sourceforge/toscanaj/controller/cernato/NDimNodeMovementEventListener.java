@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.controller.cernato;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
@@ -26,7 +27,7 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
         CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
         NodeView nodeView = (NodeView) dragEvent.getSubject();
         DiagramView diagramView = nodeView.getDiagramView();
-        Diagram2D diagram = diagramView.getDiagram();
+        NDimDiagram diagram = (NDimDiagram) diagramView.getDiagram();
         DiagramNode node = nodeView.getDiagramNode();
         if (!(node instanceof NDimDiagramNode)) {
             throw new RuntimeException("NDimNodeMovementEventListener usable only for NDimDiagramNodes");
@@ -44,7 +45,7 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
         for (int i = 0; i < diffUpperNeighbours.length; i++) {
             sumCoord += diffUpperNeighbours[i];
         }
-        Iterator baseIt = ndimNode.getBase().iterator();
+        Iterator baseIt = diagram.getBase().iterator();
         for (int i = 0; i < diffUpperNeighbours.length; i++) {
             double v = diffUpperNeighbours[i];
             Point2D baseVec = (Point2D) baseIt.next();

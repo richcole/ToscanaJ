@@ -13,31 +13,25 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.awt.geom.Point2D;
 import java.util.Iterator;
-import java.util.Vector;
 
 /**
  * Implements a diagram node using an n-dimensional space and projection onto the plane.
  *
  * The original position is used as an offset, in case the node gets positioned directly. Theoretically
  * one could change the ndimVector instead.
- * @todo do we want that?
+ * @todo do we want that? Probably we should add at least some way to reset the
+ *       offset
  */
 public class NDimDiagramNode extends DiagramNode {
     private double[] ndimVector;
-    private Vector base;
+    private NDimDiagram diagram;
 
-    public NDimDiagramNode(String identifier, double[] ndimVector, Concept concept,
+    public NDimDiagramNode(NDimDiagram diagram, String identifier, double[] ndimVector, Concept concept,
                            LabelInfo attributeLabel, LabelInfo objectLabel,
-                           DiagramNode outerNode, Vector base) {
+                           DiagramNode outerNode) {
         super(identifier, new Point2D.Double(0, 0), concept, attributeLabel, objectLabel, outerNode);
         this.ndimVector = ndimVector;
-        this.base = base;
-    }
-
-    public NDimDiagramNode(DiagramNode other, double[] ndimVector, Vector base) {
-        super(other);
-        this.ndimVector = ndimVector;
-        this.base = base;
+        this.diagram = diagram;
     }
 
     public Point2D getPosition() {
@@ -47,7 +41,7 @@ public class NDimDiagramNode extends DiagramNode {
 
     protected Point2D getProjectedPosition() {
         Point2D pos = new Point2D.Double(0, 0);
-        Iterator baseIt = base.iterator();
+        Iterator baseIt = this.diagram.getBase().iterator();
         for (int i = 0; i < ndimVector.length; i++) {
             double v = ndimVector[i];
             Point2D baseVec = (Point2D) baseIt.next();
@@ -68,9 +62,5 @@ public class NDimDiagramNode extends DiagramNode {
 
     public void setNdimVector(double[] ndimVector) {
         this.ndimVector = ndimVector;
-    }
-
-    public Vector getBase() {
-        return base;
     }
 }

@@ -15,6 +15,7 @@ import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 
 import java.awt.geom.Point2D;
@@ -28,10 +29,10 @@ public abstract class NDimLayoutOperations {
 
     public static final Diagram2D createDiagram(Lattice lattice, String title,
                                                 DimensionCreationStrategy dimensionStrategy) {
-        SimpleLineDiagram diagram = new SimpleLineDiagram();
-        diagram.setTitle(title);
         Vector dimensions = dimensionStrategy.calculateDimensions(lattice);
         Vector base = createBase(dimensions);
+        NDimDiagram diagram = new NDimDiagram(base);
+        diagram.setTitle(title);
         Concept[] concepts = lattice.getConcepts();
         Hashtable nodemap = new Hashtable();
         double[] topVector = null;
@@ -46,8 +47,8 @@ public abstract class NDimLayoutOperations {
             if (concept.isTop()) {
                 topVector = ndimVector;
             }
-            DiagramNode node = new NDimDiagramNode(String.valueOf(i), ndimVector, concept,
-                    new LabelInfo(), new LabelInfo(), null, base);
+            DiagramNode node = new NDimDiagramNode(diagram, String.valueOf(i), ndimVector, concept,
+                    								new LabelInfo(), new LabelInfo(), null);
             nodemap.put(concept, node);
             diagram.addNode(node);
         }
