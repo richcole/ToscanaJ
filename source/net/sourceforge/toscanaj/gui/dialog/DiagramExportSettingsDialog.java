@@ -1,4 +1,4 @@
-package net.sourceforge.toscanaj.view.dialogs;
+package net.sourceforge.toscanaj.gui.dialog;
 
 import net.sourceforge.toscanaj.canvas.imagewriter.DiagramExportSettings;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormat;

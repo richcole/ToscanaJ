@@ -2,7 +2,7 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
-import net.sourceforge.toscanaj.view.dialogs.DescriptionViewer;
+import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

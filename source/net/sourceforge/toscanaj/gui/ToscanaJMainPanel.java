@@ -1,4 +1,4 @@
-package net.sourceforge.toscanaj;
+package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.canvas.imagewriter.DiagramExportSettings;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormat;
@@ -15,12 +15,12 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
-import net.sourceforge.toscanaj.view.DiagramOrganiser;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
-import net.sourceforge.toscanaj.view.dialogs.DescriptionViewer;
-import net.sourceforge.toscanaj.view.dialogs.DiagramExportSettingsDialog;
-import net.sourceforge.toscanaj.view.dialogs.ErrorDialog;
+import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
+import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.ToscanaJ;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,12 +41,8 @@ import org.jdom.Element;
  *  This class provides the main GUI panel with menus and a toolbar
  *  for ToscanaJ.
  */
-public class MainPanel extends JFrame implements ActionListener, ChangeObserver {
-    /**
-     * The version name used in the about dialog.
-     */
-    static private final String VersionString = "CVS Build";
-    
+public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeObserver {
+
     /**
      * The maximum number of files in the most recently used files list.
      */
@@ -153,7 +149,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     /**
      * Simple initialisation constructor.
      */
-    public MainPanel() {
+    public ToscanaJMainPanel() {
         super("ToscanaJ");
         // register all image writers we want to support
         net.sourceforge.toscanaj.canvas.imagewriter.BatikImageWriter.initialize();
@@ -172,7 +168,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         // we are the parent window for anything database viewers / report generators want to display
         DatabaseViewerManager.setParentComponent(this);
         // restore the old MRU list
-        mruList = ConfigurationManager.fetchStringList("mainPanel", "mruFiles", MaxMruFiles);
+        mruList = ConfigurationManager.fetchStringList("ToscanaJMainPanel", "mruFiles", MaxMruFiles);
         // set up the menu for the MRU files
         recreateMruMenu();
         // if we have at least one MRU file try to open it
@@ -183,10 +179,16 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
             }
         }
         // restore the last image export position
-        String lastImage = ConfigurationManager.fetchString("mainPanel", "lastImageExport", null);
+        String lastImage = ConfigurationManager.fetchString("ToscanaJMainPanel", "lastImageExport", null);
         if (lastImage != null) {
             this.lastImageExportFile = new File(lastImage);
         }
+
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                closeMainPanel();
+            }
+        });
     }
 
     /**
@@ -194,7 +196,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      *
      * Used when opening ToscanaJ with a file name on the command line.
      */
-    public MainPanel(String schemaFileURL) {
+    public ToscanaJMainPanel(String schemaFileURL) {
         // do the normal initialisation first
         this();
         // open the file
@@ -234,8 +236,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
         setContentPane(contentPane);
         // restore old position
-        ConfigurationManager.restorePlacement("mainPanel", this, new Rectangle(10, 10, 600, 450));
-        int div = ConfigurationManager.fetchInt("mainPanel", "divider", 200);
+        ConfigurationManager.restorePlacement("ToscanaJMainPanel", this, new Rectangle(10, 10, 600, 450));
+        int div = ConfigurationManager.fetchInt("ToscanaJMainPanel", "divider", 200);
         splitPane.setDividerLocation(div);
     }
 
@@ -598,13 +600,13 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      */
     private void closeMainPanel() {
         // store current position
-        ConfigurationManager.storePlacement("mainPanel", this);
-        ConfigurationManager.storeInt("mainPanel", "divider", splitPane.getDividerLocation());
+        ConfigurationManager.storePlacement("ToscanaJMainPanel", this);
+        ConfigurationManager.storeInt("ToscanaJMainPanel", "divider", splitPane.getDividerLocation());
         // save the MRU list
-        ConfigurationManager.storeStringList("mainPanel", "mruFiles", this.mruList);
+        ConfigurationManager.storeStringList("ToscanaJMainPanel", "mruFiles", this.mruList);
         // store last image export position
         if (this.lastImageExportFile != null) {
-            ConfigurationManager.storeString("mainPanel", "lastImageExport", this.lastImageExportFile.getPath());
+            ConfigurationManager.storeString("ToscanaJMainPanel", "lastImageExport", this.lastImageExportFile.getPath());
         }
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
@@ -878,30 +880,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
     protected void showAboutDialog() {
         JOptionPane.showMessageDialog(this,
-                "This is ToscanaJ " + VersionString + ".\n\n" +
+                "This is ToscanaJ " + ToscanaJ.VersionString + ".\n\n" +
                 "Copyright (c) DSTC Pty Ltd\n\n" +
                 "See http://toscanaj.sourceforge.net for more information.",
                 "About ToscanaJ",
                 JOptionPane.PLAIN_MESSAGE);
     }
 
-    /**
-     *  Main method for running the program
-     */
-    public static void main(String[] args) {
-        final MainPanel mainWindow;
-        if (args.length == 1) {
-            mainWindow = new MainPanel(args[0]);
-        } else {
-            mainWindow = new MainPanel();
-        }
-
-        mainWindow.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                mainWindow.closeMainPanel();
-            }
-        });
-
-        mainWindow.setVisible(true);
-    }
 }

@@ -1,4 +1,4 @@
-package net.sourceforge.toscanaj.view;
+package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
@@ -54,9 +54,9 @@ public class DiagramOrganiser extends JPanel {
         JScrollPane availableDiagramsPanel = new JScrollPane();
         JScrollPane selectedDiagramsPanel = new JScrollPane();
         availableDiagramsListview = new JList();
-        availableDiagramsListview.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        availableDiagramsListview.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         selectedDiagramsListview = new DiagramHistoryView(DiagramController.getController().getDiagramHistory());
-        selectedDiagramsListview.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        selectedDiagramsListview.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // label the buttons
         addButton.setText("Add Selected");

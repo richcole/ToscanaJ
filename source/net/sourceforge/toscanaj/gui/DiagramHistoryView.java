@@ -1,4 +1,4 @@
-package net.sourceforge.toscanaj.view;
+package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 
@@ -45,7 +45,7 @@ public class DiagramHistoryView extends JList
                 setBackground(list.getSelectionBackground());
                 setForeground(list.getSelectionForeground());
                 if (list.hasFocus()) {
-                    setBorder(new javax.swing.border.LineBorder(java.awt.Color.yellow));
+                    setBorder(new javax.swing.border.LineBorder(Color.yellow));
                 } else {
                     setBorder(null);
                 }
