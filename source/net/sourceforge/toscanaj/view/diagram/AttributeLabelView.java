@@ -75,6 +75,7 @@ public class AttributeLabelView extends LabelView {
         int i = 0;
         while(i < position) {
         	attributeContingentIterator.next();
+        	i++;
         }
         return attributeContingentIterator.next();
     }
