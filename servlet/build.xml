@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ToscanaJServlet" default="war" basedir="..">
+	<property name="src.dir" value="servlet/source"/>
+	<property name="toscanajSource.dir" value="source"/>
+	<property name="libs.dir" value="libs"/>
+	<property name="servletLibs.dir" value="servlet/libs"/>
+	<property name="toscanajBuild.dir" value="build/dev"/>
+	<property name="servletBuild.dir" value="servlet/build/dev"/>
+	<property name="inputData.dir" value="examples/sql/pctest"/>
+
+	<path id="project.libs.class.path">
+		<fileset dir="${libs.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${libs.dir}">
+			<include name="**/*.zip"/>
+		</fileset>
+		<fileset dir="${servletLibs.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<path id="project.dev.class.path">
+		<pathelement path="${classpath}"/>
+		<pathelement path="${toscanajBuild.dir}"/>
+		<pathelement path="${servletBuild.dir}"/>
+        <pathelement path="servlet/libs/servlet.jar"/>
+		<path refid="project.libs.class.path"/>
+		<fileset dir="${libs.dir}/testing">
+			<include name="**/*.zip"/>
+		</fileset>
+	</path>
+
+	<target name="war" depends="compile">
+		<war warfile="ToscanaJServlet.war" webxml="servlet/web.xml">
+			<fileset dir="${servletBuild.dir}">
+				<include name="data/**"/>
+			</fileset>
+			<lib dir="${servletBuild.dir}">
+				<include name="toscanaj.jar"/>
+			</lib>
+			<lib dir="${libs.dir}">
+				<include name="*.jar"/>
+			</lib>
+			<classes dir="${servletBuild.dir}">
+				<include name="**/*.class"/>
+			</classes>
+		</war>
+	</target>
+		
+	<target name="compile" depends="prepare">
+		<javac srcdir="${src.dir}" destdir="${servletBuild.dir}" debug="on" optimize="off" deprecation="on"
+			target="1.4" source="1.4">
+			<classpath refid="project.dev.class.path"/>
+		</javac>
+	</target>
+
+	<target name="prepare">
+		<ant antfile="${toscanajSource.dir}/build.xml" target="compile" inheritAll="false">
+		</ant>
+		<mkdir dir="${servletBuild.dir}"/>
+		<jar jarfile="${servletBuild.dir}/toscanaj.jar" basedir="${toscanajBuild.dir}"/>
+		<mkdir dir="${servletBuild.dir}/data"/>
+		<copy todir="${servletBuild.dir}/data">
+			<fileset dir="${inputData.dir}"/>
+		</copy>
+	</target>
+</project>

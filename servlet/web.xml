@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+    <servlet>
+        <servlet-name>
+            ToscanaJServlet
+        </servlet-name>
+        <servlet-class>
+            org.tockit.toscanaj.servlet.ToscanaJServlet
+        </servlet-class>
+        <init-param>
+            <param-name>schemaFile</param-name>
+            <param-value>C:\Program Files\Apache Software Foundation\Tomcat 5.5\webapps\ToscanaJServlet\data\pctest.csx</param-value>
+        </init-param>
+        <init-param>
+            <param-name>baseURL</param-name>
+            <param-value>http://localhost:8080/ToscanaJServlet/servlet</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet>
+        <servlet-name>
+            ToscanaJDiagrams
+        </servlet-name>
+        <servlet-class>
+            org.tockit.toscanaj.servlet.ToscanaJDiagrams
+        </servlet-class>
+        <init-param>
+            <param-name>schemaFile</param-name>
+            <param-value>C:\Program Files\Apache Software Foundation\Tomcat 5.5\webapps\ToscanaJServlet\data\pctest.csx</param-value>
+        </init-param>
+        <init-param>
+            <param-name>baseURL</param-name>
+            <param-value>http://localhost:8080/ToscanaJServlet/servlet</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>
+            ToscanaJServlet
+        </servlet-name>
+        <url-pattern>
+            /servlet
+        </url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>
+            ToscanaJDiagrams
+        </servlet-name>
+        <url-pattern>
+            /servlet/ToscanaJDiagrams
+        </url-pattern>
+    </servlet-mapping>
+
+    <session-config>
+      <session-timeout>30</session-timeout>    <!-- 30 minutes -->
+    </session-config>
+
+</web-app>

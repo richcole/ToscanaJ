@@ -14,10 +14,12 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.parser.CSXParser;
+import net.sourceforge.toscanaj.parser.DataFormatException;
 
 import org.tockit.events.EventBroker;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 public class GlobalVariables {
@@ -41,15 +43,10 @@ public class GlobalVariables {
 		return conceptInterpreter;
 	}
 
-	public static void initialize(File schemaFile, String servletUrl) {
+	public static void initialize(File schemaFile, String servletUrl) throws IOException, DataFormatException, Exception {
 		GlobalVariables.servletUrl = servletUrl;
 		diagramSchema = DiagramSchema.getCurrentSchema();
-		try {
-			conceptualSchema = CSXParser.parse(new EventBroker(), schemaFile);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		conceptualSchema = CSXParser.parse(new EventBroker(), schemaFile);
 		DatabaseInfo databaseInfo = conceptualSchema.getDatabaseInfo();
 		conceptInterpreter = new DatabaseConnectedConceptInterpreter(databaseInfo);
 

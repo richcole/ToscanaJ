@@ -65,7 +65,11 @@ public class ToscanaJDiagrams extends HttpServlet {
 			}
 			File schemaFile = new File(inputFile);
 			
-			GlobalVariables.initialize(schemaFile, servletUrl);
+			try {
+				GlobalVariables.initialize(schemaFile, servletUrl);
+			} catch (Exception e) {
+				throw new ServletException("Can not initialize servlet", e);
+			}
 		}
     }
 

@@ -7,18 +7,28 @@
  */
 package org.tockit.toscanaj.servlet;
 
-import net.sourceforge.toscanaj.model.database.*;
-import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.diagram.*;
-import org.tockit.events.EventBroker;
-import net.sourceforge.toscanaj.controller.fca.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.model.database.Query;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.io.*;
-import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import org.tockit.events.EventBroker;
 
 public class ToscanaJServlet extends HttpServlet {
 
@@ -42,7 +52,11 @@ public class ToscanaJServlet extends HttpServlet {
 			}
 			File schemaFile = new File(inputFile);
 			
-			GlobalVariables.initialize(schemaFile, servletUrl);
+			try {
+				GlobalVariables.initialize(schemaFile, servletUrl);
+			} catch (Exception e) {
+				throw new ServletException("Can not initialize servlet", e);
+			}
 		}
 	}
 
