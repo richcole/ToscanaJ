@@ -35,8 +35,8 @@ Specific for Elba:
 ==================
 - Elba can now connect to Excel files directly, using a new option in the DB
   connection dialog. This avoids having to set up a data source manually. Please
-  note that ODBC connections to Excel files work only in some cases (if you know
-  the conditions, please mail information to toscanaj-developers@lists.sf.net).
+  note that ODBC connections to Excel files work only in some cases (you need to
+  define named ranges).
 - before creating a speed optimized system Elba will check if the schema has
   been saved.
 - Elba warns before creating a speed optimized system that this changes the
