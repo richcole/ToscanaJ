@@ -35,10 +35,7 @@ public class DecimalValue extends AbstractValue {
         return this.value;
     }
     
-    public boolean equals(Object other) {
-        if(!(this.getClass() == other.getClass())) {
-            return false;
-        }
+    public boolean sameTypeEquals(Object other) {
         DecimalValue otherValue = (DecimalValue) other;
         return otherValue.value == this.value;
     }

@@ -31,10 +31,7 @@ public class StringValue extends AbstractValue {
         return this.value.compareTo(otherValue.value) < 0;
     }
 
-    public boolean equals(Object other) {
-        if(!(this.getClass() == other.getClass())) {
-            return false;
-        }
+    public boolean sameTypeEquals(Object other) {
         StringValue otherValue = (StringValue) other;
         return otherValue.value.equals(this.value);
     }

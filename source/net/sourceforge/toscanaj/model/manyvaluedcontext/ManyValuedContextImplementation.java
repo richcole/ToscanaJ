@@ -104,7 +104,11 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 
     public void setRelationship(FCAElement object, ManyValuedAttribute attribute, Value value) {
         Hashtable row = (Hashtable) this.relation.get(object);
-        row.put(attribute, value);
+        if(value == null) {
+        	row.remove(attribute);
+        } else {
+        	row.put(attribute, value);
+        }
     }
 
     public Value getRelationship(FCAElement object, ManyValuedAttribute attribute) {

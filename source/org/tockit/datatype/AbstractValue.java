@@ -32,7 +32,22 @@ public abstract class AbstractValue implements Value {
         return getDisplayString();
     }
 
-    // force overriding these
-    public abstract boolean equals(Object other);
+    /**
+     * This implementation just checks the basics (not null, same type) and
+     * then delegates to the abstract sameTypeEquals(Object).
+     */
+    public final boolean equals(Object other) {
+    	if(other == null) {
+    		return false;
+    	}
+        if(!(this.getClass() == other.getClass())) {
+            return false;
+        }
+    	return sameTypeEquals(other);
+    }
+
+    protected abstract boolean sameTypeEquals(Object other);
+
+	// force overriding hashCode()
     public abstract int hashCode();
 }

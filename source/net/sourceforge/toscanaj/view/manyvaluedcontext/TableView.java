@@ -56,7 +56,11 @@ public class TableView extends JTable {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			FCAElement object = getObjectForRow(rowIndex);
 			ManyValuedAttribute attribute = getAttributeForColumn(columnIndex);
-			return context.getRelationship(object, attribute).getDisplayString();
+			Value relationship = context.getRelationship(object, attribute);
+			if(relationship == null) {
+				return null;
+			}
+			return relationship.getDisplayString();
 		}
 
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
