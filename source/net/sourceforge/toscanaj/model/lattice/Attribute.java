@@ -33,4 +33,12 @@ public class Attribute {
     public String toString() {
         return this.data.toString();
     }
+
+	public void setData(String data) {
+		this.data = data;
+	}
+
+	public void setDescription(Element description) {
+		this.description = description;
+	}
 }
