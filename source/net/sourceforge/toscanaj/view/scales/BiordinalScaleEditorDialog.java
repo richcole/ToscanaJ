@@ -84,22 +84,22 @@ public class BiordinalScaleEditorDialog extends JDialog {
 
 	private JPanel makeTitlePane() {
 		this.titleEditor.addKeyListener(new KeyListener(){
-			private void validateTextField(){
-				if(titleEditor.getText().equals("") || leftPanel.getDividersList().getModel().getSize()==0 || rightPanel.getDividersList().getModel().getSize()==0){
-					createButton.setEnabled(false);
-				}else{
-					createButton.setEnabled(true);
-				}
-			}
 			public void keyTyped(KeyEvent e) {
-				validateTextField();
+				setCreateButtonState();
 			}
 			public void keyReleased(KeyEvent e) {
-				validateTextField();
+				setCreateButtonState();
 			}
 			public void keyPressed(KeyEvent e) {}		
 		});
 		return new LabeledPanel("Title:", this.titleEditor, false);
+	}
+	
+	protected void setCreateButtonState() {
+		System.out.println("here");
+		createButton.setEnabled(!titleEditor.getText().equals("") && 
+								leftPanel.getDividersList().getModel().getSize()!=0 && 
+								rightPanel.getDividersList().getModel().getSize()!=0);
 	}
   
 	private JPanel makeSelectionPane(DatabaseSchema databaseSchema, DatabaseConnection connection) {
@@ -108,6 +108,21 @@ public class BiordinalScaleEditorDialog extends JDialog {
 
 		this.leftPanel = new OrdinalScaleGeneratorPanel(databaseSchema, connection);
 		this.rightPanel = new OrdinalScaleGeneratorPanel(databaseSchema, connection);
+		
+		ListDataListener listener = new ListDataListener() {
+			public void contentsChanged(ListDataEvent e) {
+				setCreateButtonState();
+			}
+			public void intervalAdded(ListDataEvent e) {
+				setCreateButtonState();
+			}
+			public void intervalRemoved(ListDataEvent e) {
+				setCreateButtonState();
+			}
+		};
+		
+		this.leftPanel.addDividerListListener(listener);
+		this.rightPanel.addDividerListListener(listener);
 				
 		selectionPane.add(leftPanel,new GridBagConstraints(
 					0,0,1,1,1,1,
@@ -166,7 +181,10 @@ public class BiordinalScaleEditorDialog extends JDialog {
 	}
 
 	public Context createContext() {
-		return new ContextImplementation("Not yet implemented");
+		ContextImplementation firstContext = 
+						(ContextImplementation) this.leftPanel.createContext("left");
+		Context secondContext = this.rightPanel.createContext("right");
+		return firstContext.createProduct(secondContext, this.titleEditor.getText());
 	}
 	
 	private class UpdateButtonForCorrectModelStateListDataListener implements ListDataListener {

@@ -233,6 +233,10 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 		layoutPanel();
 		fillControls();
 	}
+	
+	public void addDividerListListener(ListDataListener listener) {
+		this.dividersModel.addListDataListener(listener);	
+	}
 
 	private void layoutPanel() {
 		setLayout(new GridBagLayout());

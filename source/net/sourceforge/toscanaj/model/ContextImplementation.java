@@ -52,7 +52,7 @@ public class ContextImplementation implements Context {
 		this.name = name;
 	}
 	
-	public Context combine(Context other, String title) {
+	public Context createSum(Context other, String title) {
 		ContextImplementation context = new ContextImplementation(title);
 		ArrayList objects = (ArrayList) context.getObjects();
 		ArrayList attributes = (ArrayList) context.getAttributes();
@@ -87,6 +87,52 @@ public class ContextImplementation implements Context {
 				if(this.getRelation().contains(object,attribute) ||
 				   other.getRelation().contains(object,attribute)) {
 					relation.insert(object,attribute);
+				}
+			}
+		}
+		return context;
+	}
+
+	/**
+	 * @todo this is not a good place, since we assume SQL strings here
+	 */
+	public Context createProduct(Context other, String title) {
+		ContextImplementation context = new ContextImplementation(title);
+		ArrayList objects = (ArrayList) context.getObjects();
+		ArrayList attributes = (ArrayList) context.getAttributes();
+		BinaryRelationImplementation relation = context.getRelationImplementation();
+		
+		Iterator attrIt = this.getAttributes().iterator();
+		while (attrIt.hasNext()) {
+			Object attribute = (Object) attrIt.next();
+			attributes.add(attribute);
+		}
+		attrIt = other.getAttributes().iterator();
+		while (attrIt.hasNext()) {
+			Object attribute = (Object) attrIt.next();
+			attributes.add(attribute);
+		}
+		Iterator objIt = this.getObjects().iterator();
+		while (objIt.hasNext()) {
+			String objectL = (String) objIt.next();
+			Iterator objIt2 = other.getObjects().iterator();
+			while (objIt2.hasNext()) {
+				String objectR = (String) objIt2.next();
+				String newObject = "(" + objectL + ") AND (" + objectR + ")";
+				objects.add(newObject);
+				attrIt = this.getAttributes().iterator();
+				while (attrIt.hasNext()) {
+					Object attribute = (Object) attrIt.next();
+					if(this.getRelation().contains(objectL, attribute)) {
+						relation.insert(newObject, attribute);
+					}
+				}
+				attrIt = other.getAttributes().iterator();
+				while (attrIt.hasNext()) {
+					Object attribute = (Object) attrIt.next();
+					if(other.getRelation().contains(objectR, attribute)) {
+						relation.insert(newObject, attribute);
+					}
 				}
 			}
 		}
