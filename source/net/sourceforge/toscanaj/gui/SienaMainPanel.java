@@ -314,6 +314,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		List objectList = (List) conceptualSchema.getManyValuedContext().getObjects();
 		WritableFCAObject object = (WritableFCAObject) objectList.get(row);
 		ObjectDialog objectDialog = new ObjectDialog(tFrame, object);
+		this.conceptualSchema.getManyValuedContext().update();
 		this.tableView.updateSize();
 		this.rowHeader.updateSize();
 	}
@@ -324,6 +325,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		WritableManyValuedAttribute attribute = (WritableManyValuedAttribute) manyValuedAttributeList.get(column);
 		PropertiesDialog attributeDialog = new PropertiesDialog(tFrame, attribute, 
 					conceptualSchema.getManyValuedContext());
+		this.conceptualSchema.getManyValuedContext().update();
 		this.tableView.updateSize();
 		this.colHeader.updateSize();
 	}
@@ -343,7 +345,12 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		addAttributeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				WritableManyValuedContext manyValuedContext = conceptualSchema.getManyValuedContext();
-				AttributeType firstType = (AttributeType) manyValuedContext.getTypes().iterator().next();
+				AttributeType firstType;
+				if (manyValuedContext.getTypes().isEmpty()) {
+					firstType = null;
+				} else {
+					firstType = (AttributeType) manyValuedContext.getTypes().iterator().next();
+				}
 				manyValuedContext.add(new ManyValuedAttributeImplementation(firstType,""));
 				editAttribute(manyValuedContext.getAttributes().size() - 1);
 			}

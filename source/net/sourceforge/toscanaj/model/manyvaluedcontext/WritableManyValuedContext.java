@@ -17,4 +17,5 @@ public interface WritableManyValuedContext extends ManyValuedContext {
     void remove(ManyValuedAttribute attribute);
     void remove(AttributeType type);
     void setRelationship(FCAObject object, ManyValuedAttribute attribute, AttributeValue value);
+    void update();
 }
