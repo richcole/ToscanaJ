@@ -216,26 +216,21 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 	public static void registerImageWriters() {
 		// register all image writers we want to support -- order is relevant since applied
 		// in the export dialog
+
+		// the next one is part of JDK 1.4, so it should give us JPG and PNG all the time
+		org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
+		
+		// the others are optional -- so we don't need the JARs unless the feature is wanted
 		try {
 			org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
 		} catch (Throwable t) {
 			// do nothing, we just don't support SVG
 		}
 		try {
-			org.tockit.canvas.imagewriter.PDFImageWriter.initialize();
+			org.tockit.canvas.imagewriter.FreeHepImageWriter.initialize();
 		} catch (Throwable t) {
-			// do nothing, we just don't support PDF
+			// do nothing, we just don't support the formats
 		}
-		if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "allowEpsExport", 0) == 1) {
-			try {
-				org.tockit.canvas.imagewriter.PostscriptImageWriter.initialize();
-			} catch (Throwable t) {
-				// do nothing, we just don't support EPS
-			}
-		}
-		
-		// the next one is part of JDK 1.4, so it should give us JPG and PNG all the time
-		org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
 	}
 
     /**

@@ -1,2 +1,2 @@
 Main-Class: net/sourceforge/toscanaj/ToscanaJ
-Class-Path: libs/jdom.jar libs/batik-awt-util.jar libs/batik-dom.jar libs/batik-svggen.jar libs/batik-util.jar libs/batik-xml.jar libs/hsqldb.jar libs/canvas.jar libs/events.jar libs/iText.jar libs/postscriptwriter.zip
+Class-Path: libs/jdom.jar libs/batik-awt-util.jar libs/batik-dom.jar libs/batik-svggen.jar libs/batik-util.jar libs/batik-xml.jar libs/hsqldb.jar libs/canvas.jar libs/events.jar libs/freehep-pdfpatch.zip libs/freehep-base.jar libs/freehep-graphicsio-emf.jar libs/freehep-graphics2d.jar libs/freehep-graphicsio-pdf.jar libs/freehep-graphicsio-ppm.jar libs/freehep-graphicsio-ps.jar libs/freehep-graphicsio.jar
