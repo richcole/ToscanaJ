@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -212,17 +212,19 @@ public class DatabaseViewerManager {
         return this.dbConnection;
     }
 
-    public static List getObjectViewNames() {
+    public static List getObjectViewNames(DatabaseRetrievedObject object) {
         List retVal = new LinkedList();
-        Iterator it = objectViewerRegistry.iterator();
-        while (it.hasNext()) {
-            DatabaseViewerManager manager = (DatabaseViewerManager) it.next();
-            retVal.add(manager.screenName);
+        if( object.hasKey() ) {
+            Iterator it = objectViewerRegistry.iterator();
+            while (it.hasNext()) {
+                DatabaseViewerManager manager = (DatabaseViewerManager) it.next();
+                retVal.add(manager.screenName);
+            }
         }
         return retVal;
     }
 
-    public static List getObjectListViewNames() {
+    public static List getObjectListViewNames(DatabaseRetrievedObject object) {
         List retVal = new LinkedList();
         Iterator it = objectListViewerRegistry.iterator();
         while (it.hasNext()) {

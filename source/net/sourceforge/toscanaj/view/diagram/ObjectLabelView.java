@@ -162,18 +162,14 @@ public class ObjectLabelView extends LabelView {
     }
 
     public void openPopupMenu(Point2D canvasPosition, Point2D screenPosition) {
-        final int itemHit = getItemAtPosition(canvasPosition);
-        // find available queries
-        List queries = Query.getQueries();
-        // find available object views if list is displayed
-        List objectViewNames;
-        if (this.query instanceof DatabaseListQuery) {
-            objectViewNames = DatabaseViewerManager.getObjectViewNames();
-        } else { // no views for aggregates or distinct lists
-            objectViewNames = new LinkedList();
+        int itemHit = getItemAtPosition(canvasPosition);
+        if( itemHit == -1 ) {
+            return;
         }
-        // find available object list views
-        List objectListViewNames = DatabaseViewerManager.getObjectListViewNames();
+        final DatabaseRetrievedObject object = getObject(itemHit);
+        List queries = Query.getQueries();
+        List objectViewNames = DatabaseViewerManager.getObjectViewNames(object);
+        List objectListViewNames = DatabaseViewerManager.getObjectListViewNames(object);
         if (queries.size() + objectViewNames.size() + objectListViewNames.size() == 0) { // nothing to display
             return;
         }
@@ -203,7 +199,7 @@ public class ObjectLabelView extends LabelView {
                 menuItem = new JMenuItem(objectViewName);
                 menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        DatabaseViewerManager.showObject(objectViewName, getObject(itemHit));
+                        DatabaseViewerManager.showObject(objectViewName, object);
                     }
                 });
                 objectViewMenu.add(menuItem);
@@ -218,7 +214,7 @@ public class ObjectLabelView extends LabelView {
                 menuItem = new JMenuItem(objectListViewName);
                 menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        DatabaseViewerManager.showObjectList(objectListViewName, getObject(itemHit));
+                        DatabaseViewerManager.showObjectList(objectListViewName, object);
                     }
                 });
                 objectListViewMenu.add(menuItem);
