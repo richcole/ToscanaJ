@@ -146,10 +146,6 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 				break;
 			}
 		}
-		/// @todo remove workaround for a bug in swing ver. < 1.3rel03
-		if (unkeyedTableList.size() == 0) {
-			displayTable(null);
-		}
 	}
 
 	private void removeKeyedTable(Table table) {
