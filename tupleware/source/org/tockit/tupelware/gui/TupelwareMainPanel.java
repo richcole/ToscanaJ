@@ -25,6 +25,7 @@ import org.tockit.tupelware.model.TupelSet;
 import org.tockit.tupelware.scaling.TupelScaling;
 import org.tockit.tupelware.source.TupelSource;
 import org.tockit.tupelware.source.text.TextSource;
+import org.tockit.tupelware.sql.query.SqlQueryEngine;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -184,20 +185,8 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 		JMenu tuplesMenu = new JMenu("Tuples");
 		tuplesMenu.setMnemonic('t');
 		
-		final TupelSource source = new TextSource();
-		final JFrame parent = this;
-		JMenuItem loadTuples = new JMenuItem("Load from tab-delimited data...");
-		loadTuples.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e) {
-            	source.show(parent,lastFileRead);
-            	tupels = source.getTupels();
-            	objectIndices = source.getObjectIndices();
-            	lastFileRead = source.getSelectedFile();
-				fillTable();     
-				conceptualSchema = new ConceptualSchema(eventBroker);   
-            }
-		});
-		tuplesMenu.add(loadTuples);
+        addTupelSourceMenuItem(tuplesMenu, this, new TextSource());
+        addTupelSourceMenuItem(tuplesMenu, this, new SqlQueryEngine());
 
 		menuBar.add(tuplesMenu);
 
@@ -220,6 +209,7 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
+        final Component parent = this;
 		JMenuItem aboutItem = new JMenuItem("About Tupelware...");
 		aboutItem.setMnemonic(KeyEvent.VK_A);
 		aboutItem.addActionListener(new ActionListener() {
@@ -232,6 +222,28 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(helpMenu);
+    }
+
+    private void addTupelSourceMenuItem(JMenu tuplesMenu,
+                                        final JFrame parent,
+                                        final TupelSource source) {
+        JMenuItem menuItem = new JMenuItem(source.getMenuName());
+        menuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                source.show(parent,lastFileRead);
+                if(source.getTupels() == null) {
+                    return;
+                }
+                tupels = source.getTupels();
+                objectIndices = source.getObjectIndices();
+                if(source.getSelectedFile() != null) {
+                    lastFileRead = source.getSelectedFile();
+                }
+                fillTable();     
+                conceptualSchema = new ConceptualSchema(eventBroker);   
+            }
+        });
+        tuplesMenu.add(menuItem);
     }
 
 	private void fillTable() {
