@@ -780,7 +780,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             boolean entriesAdded = false;
             Element description = this.conceptualSchema.getDescription();
             if (description != null) {
-                JMenuItem descItem = new JMenuItem("Schema Description...");
+                JMenuItem descItem = new JMenuItem("System Description...");
                 descItem.setMnemonic(KeyEvent.VK_S);
                 descItem.setAccelerator(KeyStroke.getKeyStroke(
                         KeyEvent.VK_F1, 0));

@@ -214,7 +214,7 @@ public class ElbaMainPanel
                 this,
                 conceptualSchema,
                 eventBroker);
-        schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
+        schemaDescriptionView = new XMLEditorDialog(this, "System description");
         toolbar = new JPanel(new GridBagLayout());
         newDiagramButton = new JButton("New Diagram...");
         newDiagramButton.addActionListener(new ActionListener() {
@@ -223,7 +223,7 @@ public class ElbaMainPanel
             }
         });
 
-        JButton schemaDescriptionButton = new JButton("Schema Description...");
+        JButton schemaDescriptionButton = new JButton("System Description...");
         schemaDescriptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 schemaDescriptionView.setContent(
