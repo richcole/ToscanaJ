@@ -235,6 +235,8 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
      * Build the GUI.
      */
     private void buildPanel() {
+        diagramView = new DiagramView();
+
         createActions();
         buildMenuBar();
         setJMenuBar(menubar);
@@ -244,7 +246,6 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
         DiagramController controller = DiagramController.getController();
-        diagramView = new DiagramView();
         /// @todo move the subscriptions into the handlers
         EventBroker diagramEventBroker = diagramView.getController().getEventBroker();
         diagramEventBroker.subscribe(
@@ -475,32 +476,82 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         if (ConfigurationManager.fetchInt("ToscanaJMainPanel", "offerGradientOptions", 0) == 1) {
             viewMenu.addSeparator();
             ButtonGroup colorGradientGroup = new ButtonGroup();
-            JRadioButtonMenuItem showAllMenuItem = new JRadioButtonMenuItem("Use colors for exact matches");
-            showAllMenuItem.setMnemonic(KeyEvent.VK_C);
-            showAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+            JRadioButtonMenuItem showExactMenuItem = new JRadioButtonMenuItem("Use colors for exact matches");
+            showExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK));
-            showAllMenuItem.addActionListener(new ActionListener() {
+            showExactMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     diagramView.getDiagramSchema().setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT);
                     diagramView.update(this);
                 }
             });
-            colorGradientGroup.add(showAllMenuItem);
-            viewMenu.add(showAllMenuItem);
+            colorGradientGroup.add(showExactMenuItem);
+            viewMenu.add(showExactMenuItem);
 
-            JRadioButtonMenuItem showExactMenuItem = new JRadioButtonMenuItem("Use colors for all matches");
-            showExactMenuItem.setMnemonic(KeyEvent.VK_T);
-            showExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+            JRadioButtonMenuItem showAllMenuItem = new JRadioButtonMenuItem("Use colors for all matches");
+            showAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
-            showExactMenuItem.setSelected(true);
-            showExactMenuItem.addActionListener(new ActionListener() {
+            showAllMenuItem.setSelected(true);
+            showAllMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     diagramView.getDiagramSchema().setGradientType(DiagramSchema.GRADIENT_TYPE_EXTENT);
                     diagramView.update(this);
                 }
             });
-            colorGradientGroup.add(showExactMenuItem);
-            viewMenu.add(showExactMenuItem);
+            colorGradientGroup.add(showAllMenuItem);
+            viewMenu.add(showAllMenuItem);
+        }
+
+        if (ConfigurationManager.fetchInt("ToscanaJMainPanel", "offerNodeSizeScalingOptions", 0) == 1) {
+            viewMenu.addSeparator();
+            ButtonGroup nodeSizeScalingGroup = new ButtonGroup();
+            JRadioButtonMenuItem nodeSizeExactMenuItem = new JRadioButtonMenuItem("Change node sizes with number of exact matches");
+            nodeSizeExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                    KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+            nodeSizeExactMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    diagramView.getDiagramSchema().setNodeSizeScalingType(DiagramSchema.NODE_SIZE_SCALING_CONTINGENT);
+                    diagramView.update(this);
+                }
+            });
+            nodeSizeScalingGroup.add(nodeSizeExactMenuItem);
+            viewMenu.add(nodeSizeExactMenuItem);
+
+            JRadioButtonMenuItem nodeSizeAllMenuItem = new JRadioButtonMenuItem("Change node sizes with number of all matches");
+            nodeSizeAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                    KeyEvent.VK_N, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+            nodeSizeAllMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    diagramView.getDiagramSchema().setNodeSizeScalingType(DiagramSchema.NODE_SIZE_SCALING_EXTENT);
+                    diagramView.update(this);
+                }
+            });
+            nodeSizeScalingGroup.add(nodeSizeAllMenuItem);
+            viewMenu.add(nodeSizeAllMenuItem);
+
+            JRadioButtonMenuItem nodeSizeFixedMenuItem = new JRadioButtonMenuItem("Fixed node sizes");
+            nodeSizeFixedMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    diagramView.getDiagramSchema().setNodeSizeScalingType(DiagramSchema.NODE_SIZE_SCALING_NONE);
+                    diagramView.update(this);
+                }
+            });
+            nodeSizeScalingGroup.add(nodeSizeFixedMenuItem);
+            viewMenu.add(nodeSizeFixedMenuItem);
+            
+            switch (diagramView.getDiagramSchema().getNodeSizeScalingType()) {
+                case DiagramSchema.NODE_SIZE_SCALING_CONTINGENT:
+                    nodeSizeExactMenuItem.setSelected(true);
+                    break;
+                case DiagramSchema.NODE_SIZE_SCALING_EXTENT:
+                    nodeSizeAllMenuItem.setSelected(true);
+                    break;
+                case DiagramSchema.NODE_SIZE_SCALING_NONE:
+                    nodeSizeFixedMenuItem.setSelected(true);
+                    break;
+                default:
+                	System.err.println("Unknown case for DiagramSchema.getNodeSizeScalingType() encountered in ToscanaJMainPanel");
+            }
         }
 
         // menu radio buttons group:
