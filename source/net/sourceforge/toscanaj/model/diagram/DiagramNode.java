@@ -102,7 +102,7 @@ public class DiagramNode {
     }
 
     /**
-     * Get the x coordinatein the model space.
+     * Get the x coordinate in the model space.
      */
     public double getX() {
        return position.getX();
@@ -175,6 +175,8 @@ public class DiagramNode {
      * Debug output.
      */
     public String toString() {
-      return "X = " + position.getX() + " Y = " + position.getY();
+        String retVal = "pos = (" + this.getX() + ", " + this.getY() +")\n";
+        retVal += "size = (" + this.getRadiusX() + ", " + this.getRadiusX() +")\n";
+        return retVal;
     }
 }

@@ -16,31 +16,27 @@ public class SimpleLineDiagram implements Diagram2D
     /**
      * The list of DiagramObserver implementations currently observing changes.
      */
-    private List diagramObserver = null;
+    private List diagramObserver = new LinkedList();
 
     /**
      * The title used for this diagram.
      */
-    private String title;
+    private String title = new String();
 
     /**
      * The list of nodes in the diagram.
      */
-    private List nodes;
+    private List nodes = new LinkedList();
 
     /**
      * The list of lines in the diagram.
      */
-    private List lines;
+    private List lines = new LinkedList();
 
     /**
      * The default constructor creates a diagram with just nothing in it at all.
      */
     public SimpleLineDiagram() {
-        title = "";
-        nodes = new LinkedList();
-        lines = new LinkedList();
-        diagramObserver = new LinkedList();
     }
 
     /**
@@ -76,10 +72,9 @@ public class SimpleLineDiagram implements Diagram2D
      */
     public Rectangle2D getBounds() {
         double minX = Double.MAX_VALUE;
-        double maxX = Double.MIN_VALUE;
+        double maxX = -Double.MAX_VALUE;
         double minY = Double.MAX_VALUE;
-        double maxY = Double.MIN_VALUE;
-
+        double maxY = -Double.MAX_VALUE;
         for( int i = 0; i < this.nodes.size(); i++ ) {
             Point2D p = ((DiagramNode)this.nodes.get( i )).getPosition();
             double x = p.getX();

@@ -4,6 +4,7 @@ import net.sourceforge.toscanaj.model.diagram.AttributeLabelInfo;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.ObjectLabelInfo;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 
@@ -505,9 +506,9 @@ public class DiagramController implements ChangeObservable {
             // we have only a flat diagram left
             return getSimpleDiagram(0);
         }
-        // else recurse
-
-        return getNestedDiagram(pos-1);
+        // else created nested diagram recursively
+        DiagramReference ref = (DiagramReference)history.currentDiagrams.get(pos);
+        return new NestedLineDiagram(getNestedDiagram(pos-1), ref.getDiagram());
     }
 
     /**

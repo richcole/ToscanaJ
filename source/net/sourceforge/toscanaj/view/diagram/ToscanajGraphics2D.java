@@ -233,13 +233,13 @@ public class ToscanajGraphics2D {
      */
     public void drawFilledEllipse(Point2D center, double radiusX, double radiusY, Paint fill, Paint border) {
         Paint oldPaint = graphics.getPaint();
-        Ellipse2D circle = new Ellipse2D.Double( projectX(center.getX()) - radiusX,
+        Ellipse2D ellipse = new Ellipse2D.Double( projectX(center.getX()) - radiusX,
                                                  projectY(center.getY()) - radiusY,
                                                  radiusX * 2, radiusY * 2 );
         graphics.setPaint(fill);
-        graphics.fill(circle);
+        graphics.fill(ellipse);
         graphics.setPaint(border);
-        graphics.draw(circle);
+        graphics.draw(ellipse);
         graphics.setPaint(oldPaint);
     }
 

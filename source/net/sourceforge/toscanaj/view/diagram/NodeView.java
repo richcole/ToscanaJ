@@ -3,6 +3,7 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
 import java.awt.Color;
@@ -101,11 +102,17 @@ public class NodeView extends CanvasItem {
     public void draw(ToscanajGraphics2D g) {
         if(diagramNode != null) {
             Paint oldPaint = g.getGraphics2D().getPaint();
-            float rel = (float) this.diagramNode.getConcept().getExtentSizeRelative();
-            Color nodeColor = new Color( (int)(topColor.getRed()*rel + bottomColor.getRed()*(1-rel)),
-                                         (int)(topColor.getGreen()*rel + bottomColor.getGreen()*(1-rel)),
-                                         (int)(topColor.getBlue()*rel + bottomColor.getBlue()*(1-rel)),
-                                         (int)(topColor.getAlpha()*rel + bottomColor.getAlpha()*(1-rel)) );
+            Color nodeColor;
+            if(diagramNode instanceof NestedDiagramNode) {
+                nodeColor = Color.white;
+            }
+            else {
+                float rel = (float) this.diagramNode.getConcept().getExtentSizeRelative();
+                nodeColor = new Color( (int)(topColor.getRed()*rel + bottomColor.getRed()*(1-rel)),
+                                       (int)(topColor.getGreen()*rel + bottomColor.getGreen()*(1-rel)),
+                                       (int)(topColor.getBlue()*rel + bottomColor.getBlue()*(1-rel)),
+                                       (int)(topColor.getAlpha()*rel + bottomColor.getAlpha()*(1-rel)) );
+            }
             g.drawFilledEllipse( diagramNode.getPosition(), diagramNode.getRadiusX(), diagramNode.getRadiusY(),
                                  nodeColor, circleColor );
             g.getGraphics2D().setPaint(oldPaint);

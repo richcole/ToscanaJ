@@ -4,10 +4,12 @@ import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.DrawingCanvas;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
+import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.view.diagram.LabelView;
@@ -161,13 +163,26 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
      *
      * This will automatically cause a repaint of the view.
      */
-    public void showDiagram(SimpleLineDiagram diagram ) {
+    public void showDiagram(SimpleLineDiagram diagram) {
         this.diagram = diagram;
         clearCanvas();
         if(diagram == null) {
             repaint();
             return;
         }
+        if(diagram instanceof NestedLineDiagram) {
+            addDiagram((NestedLineDiagram)diagram);
+        }
+        else {
+            addDiagram(diagram);
+        }
+        repaint();
+    }
+
+    /**
+     * Adds a simple non-nested line diagram to the canvas.
+     */
+    private void addDiagram(SimpleLineDiagram diagram) {
         // add all lines to the canvas
         for( int i = 0; i < diagram.getNumberOfLines(); i++ ) {
             DiagramLine dl = diagram.getLine(i);
@@ -196,7 +211,45 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
                 labelView.addObserver(this);
             }
         }
-        repaint();
+    }
+
+    /**
+     * Adds a nested line diagram to the canvas.
+     */
+    private void addDiagram(NestedLineDiagram diagram) {
+        // add all outer lines to the canvas
+        for( int i = 0; i < diagram.getNumberOfLines(); i++ ) {
+            DiagramLine dl = diagram.getLine(i);
+            addCanvasItem( new LineView(dl) );
+        }
+        // add all outer nodes to the canvas
+        for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
+            DiagramNode node = diagram.getNode(i);
+            NodeView nodeView = new NodeView(node);
+            addCanvasItem( nodeView );
+        }
+        // add all outer labels to the canvas
+        for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
+            DiagramNode node = diagram.getNode(i);
+            NodeView nodeView = new NodeView(node);
+            LabelInfo attrLabelInfo = diagram.getAttributeLabel( i );
+            if( attrLabelInfo != null ) {
+                LabelView labelView = new AttributeLabelView( this, attrLabelInfo );
+                addCanvasItem( labelView );
+                labelView.addObserver(this);
+            }
+            LabelInfo objLabelInfo = diagram.getObjectLabel( i );
+            if( objLabelInfo != null ) {
+                LabelView labelView = new ObjectLabelView( this, objLabelInfo );
+                addCanvasItem( labelView );
+                labelView.addObserver(this);
+            }
+        }
+        // recurse for the inner diagrams
+        for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
+            NestedDiagramNode node = (NestedDiagramNode)diagram.getNode(i);
+            addDiagram((SimpleLineDiagram)node.getInnerDiagram());
+        }
     }
 
     /**
