@@ -101,16 +101,16 @@ public class DiagramHistoryTest extends TestCase {
         diagramHistory.addDiagram(diagram);
     }
 
-    private void addDiagrams(int count){
-        for(int i=count; --i>=0;){
+    private void addDiagrams(int count) {
+        for (int i = count; --i >= 0;) {
             addDiagram();
         }
     }
 
-    public void testReset(){
+    public void testReset() {
         addDiagrams(2);
         assertEquals(false, diagramHistory.isEmpty());
-        assertTrue(diagramHistory.getNumberOfCurrentDiagrams()>0);
+        assertTrue(diagramHistory.getNumberOfCurrentDiagrams() > 0);
         diagramHistory.reset();
         assertTrue(diagramHistory.isEmpty());
         assertEquals(0, diagramHistory.getSize());
@@ -181,14 +181,14 @@ public class DiagramHistoryTest extends TestCase {
         }
     }
 
-    public void testGetCurrentDiagramSize(){
+    public void testGetCurrentDiagramSize() {
         assertEquals(0, diagramHistory.getNumberOfCurrentDiagrams());
         addDiagram();
         diagramHistory.removeLastDiagram();
         assertEquals(0, diagramHistory.getNumberOfCurrentDiagrams());
     }
 
-    public void testBackForEmptyDiagram(){
+    public void testBackForEmptyDiagram() {
         assertEquals(0, diagramHistory.getSize());
         try {
             diagramHistory.back();
@@ -198,7 +198,7 @@ public class DiagramHistoryTest extends TestCase {
         }
     }
 
-    public void testBackWithoutNesting(){
+    public void testBackWithoutNesting() {
         addDiagrams(2);
         assertEquals(0, diagramHistory.getFirstCurrentDiagramPosition());
 
@@ -211,7 +211,7 @@ public class DiagramHistoryTest extends TestCase {
         assertEquals(0, diagramHistory.getFirstCurrentDiagramPosition());
     }
 
-    public void testBackWithNesting(){
+    public void testBackWithNesting() {
         addDiagrams(3);
         diagramHistory.next(null);
         diagramHistory.setNestingLevel(1);
@@ -231,7 +231,7 @@ public class DiagramHistoryTest extends TestCase {
         assertEquals(0, diagramHistory.getFirstCurrentDiagramPosition());
     }
 
-    public void testCanMoveUp(){
+    public void testCanMoveUp() {
         assertTrue(diagramHistory.isEmpty());
         assertEquals(false, diagramHistory.canMoveUp());
         addDiagram();
@@ -253,7 +253,7 @@ public class DiagramHistoryTest extends TestCase {
 
     }
 
-    public void testAddDiagramSideEffects(){
+    public void testAddDiagramSideEffects() {
         addDiagram();
         diagramHistory.setNestingLevel(1);
         addDiagram();

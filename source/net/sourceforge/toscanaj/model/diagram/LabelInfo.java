@@ -18,8 +18,7 @@ import java.util.Vector;
  * This class encapsulates all information needed to paint a label.
  */
 
-public class LabelInfo implements ChangeObservable
-{
+public class LabelInfo implements ChangeObservable {
     /**
      * List of LabelObserver implementations currently observing the instance.
      */
@@ -72,9 +71,8 @@ public class LabelInfo implements ChangeObservable
      * The node is used for finding the position for the diagram line and to
      * access the concept with the information on the contingents (strings).
      */
-    public LabelInfo()
-    {
-        this.offset = new Point2D.Double( 0, 0 );
+    public LabelInfo() {
+        this.offset = new Point2D.Double(0, 0);
         this.backgroundColor = Color.white;
         this.textColor = Color.black;
         this.textAlignment = ALIGNLEFT;
@@ -85,15 +83,15 @@ public class LabelInfo implements ChangeObservable
      * The copy constructor makes a deep copy without the observers.
      */
     public LabelInfo(LabelInfo other) {
-        this.offset = (Point2D)other.offset.clone();
-        this.backgroundColor = new Color( other.backgroundColor.getRed(),
-                                          other.backgroundColor.getGreen(),
-                                          other.backgroundColor.getBlue(),
-                                          other.backgroundColor.getAlpha() );
-        this.textColor = new Color( other.textColor.getRed(),
-                                    other.textColor.getGreen(),
-                                    other.textColor.getBlue(),
-                                    other.textColor.getAlpha() );
+        this.offset = (Point2D) other.offset.clone();
+        this.backgroundColor = new Color(other.backgroundColor.getRed(),
+                other.backgroundColor.getGreen(),
+                other.backgroundColor.getBlue(),
+                other.backgroundColor.getAlpha());
+        this.textColor = new Color(other.textColor.getRed(),
+                other.textColor.getGreen(),
+                other.textColor.getBlue(),
+                other.textColor.getAlpha());
         this.textAlignment = other.textAlignment;
         labelObservers = new Vector();
     }
@@ -117,8 +115,7 @@ public class LabelInfo implements ChangeObservable
     /**
      * Returns the current offset.
      */
-    public Point2D getOffset()
-    {
+    public Point2D getOffset() {
         return this.offset;
     }
 
@@ -131,8 +128,7 @@ public class LabelInfo implements ChangeObservable
      * top edge if the offset is (0,0). The object labels are below the points,
      * contacting them at the bottom.
      */
-    public void setOffset( Point2D offset )
-    {
+    public void setOffset(Point2D offset) {
         this.offset = offset;
         emitChangeSignal();
     }
@@ -140,23 +136,21 @@ public class LabelInfo implements ChangeObservable
     /**
      * A convenience method mapping to setOffset(Point2D).
      */
-    public void setOffset( double x, double y ) {
-        setOffset(new Point2D.Double(x,y));
+    public void setOffset(double x, double y) {
+        setOffset(new Point2D.Double(x, y));
     }
 
     /**
      * Returns the current background color.
      */
-    public Color getBackgroundColor()
-    {
+    public Color getBackgroundColor() {
         return this.backgroundColor;
     }
 
     /**
      * Sets the background color.
      */
-    public void setBackgroundColor( Color color )
-    {
+    public void setBackgroundColor(Color color) {
         this.backgroundColor = color;
         emitChangeSignal();
     }
@@ -164,16 +158,14 @@ public class LabelInfo implements ChangeObservable
     /**
      * Returns the current text color.
      */
-    public Color getTextColor()
-    {
+    public Color getTextColor() {
         return this.textColor;
     }
 
     /**
      * Sets the text color.
      */
-    public void setTextColor( Color color )
-    {
+    public void setTextColor(Color color) {
         this.textColor = color;
         emitChangeSignal();
     }
@@ -181,16 +173,14 @@ public class LabelInfo implements ChangeObservable
     /**
      * Returns the current text alignment.
      */
-    public int getTextAlignment()
-    {
+    public int getTextAlignment() {
         return this.textAlignment;
     }
 
     /**
      * Sets the alignment of the text.
      */
-    public void setTextAligment( int alignment )
-    {
+    public void setTextAligment(int alignment) {
         this.textAlignment = alignment;
         emitChangeSignal();
     }
@@ -198,25 +188,25 @@ public class LabelInfo implements ChangeObservable
     /**
      * Method to add an observer.
      */
-    public void addObserver(ChangeObserver observer){
+    public void addObserver(ChangeObserver observer) {
         this.labelObservers.addElement(observer);
     }
 
     /**
      * Method to remove an observer.
      */
-    public void removeObserver(ChangeObserver observer){
+    public void removeObserver(ChangeObserver observer) {
         this.labelObservers.remove(observer);
     }
 
     /**
      * Notifies all observes about a change.
      */
-    private void emitChangeSignal(){
-        if(labelObservers != null){
+    private void emitChangeSignal() {
+        if (labelObservers != null) {
             Iterator iterator = labelObservers.iterator();
-            while(iterator.hasNext()) {
-                ((ChangeObserver)iterator.next()).update(this);
+            while (iterator.hasNext()) {
+                ((ChangeObserver) iterator.next()).update(this);
             }
         }
     }

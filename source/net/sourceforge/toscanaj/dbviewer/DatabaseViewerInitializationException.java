@@ -6,8 +6,7 @@
  */
 package net.sourceforge.toscanaj.dbviewer;
 
-public class DatabaseViewerInitializationException extends Exception
-{
+public class DatabaseViewerInitializationException extends Exception {
     /**
      * This can be used to get the original Exception.
      */

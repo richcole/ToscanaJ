@@ -6,8 +6,6 @@
  */
 package net.sourceforge.toscanaj.canvas;
 
-import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -77,7 +75,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
          */
         private Point2D point;
 
-         /**
+        /**
          * Creates a new task for sending a message.
          */
         public BackgroundSingleClickTask(DrawingCanvas target, Point2D point) {
@@ -102,7 +100,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * Flag to prevent label from being moved when just clicked on
      */
     private boolean dragMode = false;
-    
+
     /**
      * This is true if a popup might have been opened as reaction on a mouse press
      * event.
@@ -174,7 +172,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
         this.screenTransform = transform;
     }
 
-    protected AffineTransform getScreenTransform(){
+    protected AffineTransform getScreenTransform() {
         return screenTransform;
     }
 
@@ -280,20 +278,15 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * @TODO Use system double click timing instead of hard-coded 300ms
      */
     public void mouseReleased(MouseEvent e) {
-        if ( popupOpen )
-        {
+        if (popupOpen) {
             popupOpen = false;
             return; // nothing to do, we react only on normal clicks
         }
-        if(e.isPopupTrigger()) 
-        {
+        if (e.isPopupTrigger()) {
             Point2D point = getUserCoords(e.getPoint());
-            if(this.selectedCanvasItem != null) 
-            {
+            if (this.selectedCanvasItem != null) {
                 this.selectedCanvasItem.openPopupMenu(e, point);
-            }
-            else
-            {
+            } else {
                 openBackgroundPopupMenu(e, point);
             }
             popupOpen = true;
@@ -405,18 +398,14 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
                 break;
             }
         }
-        if(e.isPopupTrigger()) 
-        {
-            if(this.selectedCanvasItem != null) 
-            {
+        if (e.isPopupTrigger()) {
+            if (this.selectedCanvasItem != null) {
                 this.selectedCanvasItem.openPopupMenu(e, point);
-            }
-            else
-            {
+            } else {
                 openBackgroundPopupMenu(e, point);
             }
         }
-        this.popupOpen = e.isPopupTrigger(); 
+        this.popupOpen = e.isPopupTrigger();
     }
 
     private Point2D getUserCoords(Point2D inPoint) {
@@ -461,7 +450,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * This callback will be executed when the background was clicked once.
      *
      * This can be overwritten in subclasses to get effects, the default
-     * implementation does nothing. 
+     * implementation does nothing.
      */
     protected void backgroundSingleClicked(Point2D point) {
     }
@@ -474,7 +463,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      */
     protected void backgroundDoubleClicked(Point2D point) {
     }
-    
+
     /**
      * A callback for showing context menus on the background.
      */

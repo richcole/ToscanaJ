@@ -28,34 +28,34 @@ public class NestedLineDiagram extends SimpleLineDiagram {
      * The level gives the depth of nesting for this diagram, starting with one
      * for a diagram on top level.
      */
-    public NestedLineDiagram(Diagram2D outerDiagram, Diagram2D innerDiagram ) {
+    public NestedLineDiagram(Diagram2D outerDiagram, Diagram2D innerDiagram) {
         float scale = 1.2f * calculateNeededScaling(outerDiagram, innerDiagram);
         Hashtable nodeMap = new Hashtable();
         HashSet concepts = new HashSet(); // stores all concepts involved
 //        long start = System.currentTimeMillis();
-        for(int i=0; i < outerDiagram.getNumberOfNodes(); i++ ) {
+        for (int i = 0; i < outerDiagram.getNumberOfNodes(); i++) {
             DiagramNode oldNode = outerDiagram.getNode(i);
             NestedDiagramNode node = new NestedDiagramNode(oldNode, innerDiagram, scale,
-                                                           !oldNode.getConcept().isTop() );
+                    !oldNode.getConcept().isTop());
             this.addNode(node);
-            nodeMap.put(oldNode,node);
+            nodeMap.put(oldNode, node);
         }
-  //      long end = System.currentTimeMillis();
+        //      long end = System.currentTimeMillis();
 
- //       System.out.println("creating nodes"+(end-start));
- //       start = end;
+        //       System.out.println("creating nodes"+(end-start));
+        //       start = end;
 
-        for(int i=0; i < outerDiagram.getNumberOfLines(); i++ ) {
+        for (int i = 0; i < outerDiagram.getNumberOfLines(); i++) {
             DiagramLine oldLine = outerDiagram.getLine(i);
-            NestedDiagramNode from = (NestedDiagramNode)nodeMap.get(oldLine.getFromNode());
-            NestedDiagramNode to = (NestedDiagramNode)nodeMap.get(oldLine.getToNode());
-            this.addLine(from,to);
+            NestedDiagramNode from = (NestedDiagramNode) nodeMap.get(oldLine.getFromNode());
+            NestedDiagramNode to = (NestedDiagramNode) nodeMap.get(oldLine.getToNode());
+            this.addLine(from, to);
             // add edges between inner nodes of two outer nodes
-            for(int j=0; j < innerDiagram.getNumberOfNodes(); j++ ) {
+            for (int j = 0; j < innerDiagram.getNumberOfNodes(); j++) {
                 AbstractConceptImplementation concept1 =
-                          (AbstractConceptImplementation) from.getInnerDiagram().getNode(j).getConcept();
+                        (AbstractConceptImplementation) from.getInnerDiagram().getNode(j).getConcept();
                 AbstractConceptImplementation concept2 =
-                          (AbstractConceptImplementation) to.getInnerDiagram().getNode(j).getConcept();
+                        (AbstractConceptImplementation) to.getInnerDiagram().getNode(j).getConcept();
                 concept1.addSubConcept(concept2);
                 concept2.addSuperConcept(concept1);
                 concepts.add(concept1);
@@ -67,8 +67,8 @@ public class NestedLineDiagram extends SimpleLineDiagram {
         //start = end;
         // build transitive closures for each concept
         Iterator it = concepts.iterator();
-        while(it.hasNext()) {
-            AbstractConceptImplementation cur = (AbstractConceptImplementation)it.next();
+        while (it.hasNext()) {
+            AbstractConceptImplementation cur = (AbstractConceptImplementation) it.next();
             cur.buildClosures();
         }
 //        end = System.currentTimeMillis();
@@ -99,18 +99,18 @@ public class NestedLineDiagram extends SimpleLineDiagram {
     protected float calculateNeededScaling(Diagram2D outerDiagram, Diagram2D innerDiagram) {
         // if we have only one node we just don't scale at all (we can make this node as
         // big as we want, if there is no node we shouldn't be called at all
-        if(outerDiagram.getNumberOfNodes() < 2) {
+        if (outerDiagram.getNumberOfNodes() < 2) {
             return 1;
         }
         // first find minimal distance between nodes in the outer diagram
         float minDist = Float.MAX_VALUE;
         // compare first n-1 nodes to all after them
-        for(int i=0; i < outerDiagram.getNumberOfNodes() - 1; i++ ) {
-            for(int j=i+1; j < outerDiagram.getNumberOfNodes(); j++ ) {
+        for (int i = 0; i < outerDiagram.getNumberOfNodes() - 1; i++) {
+            for (int j = i + 1; j < outerDiagram.getNumberOfNodes(); j++) {
                 DiagramNode node1 = outerDiagram.getNode(i);
                 DiagramNode node2 = outerDiagram.getNode(j);
-                float dist = (float)node1.getPosition().distance(node2.getPosition());
-                if(dist < minDist) {
+                float dist = (float) node1.getPosition().distance(node2.getPosition());
+                if (dist < minDist) {
                     minDist = dist;
                 }
             }
@@ -119,11 +119,10 @@ public class NestedLineDiagram extends SimpleLineDiagram {
         // now we know how big we could draw circles in the outer diagram
         // the scaling we still need relates to the size of the inner diagram
         Rectangle2D rect = innerDiagram.getBounds();
-        if(rect.getWidth() > rect.getHeight()) {
-            return (float)rect.getWidth() / minDist;
-        }
-        else {
-            return (float)rect.getHeight() / minDist;
+        if (rect.getWidth() > rect.getHeight()) {
+            return (float) rect.getWidth() / minDist;
+        } else {
+            return (float) rect.getHeight() / minDist;
         }
     }
 }

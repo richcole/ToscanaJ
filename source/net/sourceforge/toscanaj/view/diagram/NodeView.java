@@ -12,11 +12,7 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -81,7 +77,7 @@ public class NodeView extends CanvasItem {
      *
      * The DiagramView is used for the callback when a node was selected.
      */
-    public NodeView(DiagramNode diagramNode, DiagramView diagramView){
+    public NodeView(DiagramNode diagramNode, DiagramView diagramView) {
         this.diagramNode = diagramNode;
         this.diagramView = diagramView;
         this.filterConcept = diagramNode.getConcept();
@@ -99,7 +95,7 @@ public class NodeView extends CanvasItem {
      * @TODO Find a better solution, maybe allowing zooming multiple steps at
      *       once.
      */
-    public NodeView(DiagramNode diagramNode, DiagramView diagramView, Concept filterConcept){
+    public NodeView(DiagramNode diagramNode, DiagramView diagramView, Concept filterConcept) {
         this.diagramNode = diagramNode;
         this.diagramView = diagramView;
         this.filterConcept = filterConcept;
@@ -109,35 +105,31 @@ public class NodeView extends CanvasItem {
      * Draws the node as circle.
      */
     public void draw(Graphics2D graphics) {
-        if(diagramNode == null) {
+        if (diagramNode == null) {
             return;
         }
         DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
         Paint oldPaint = graphics.getPaint();
         Color nodeColor;
         Color circleColor = diagramSchema.getCircleColor();
-        if(diagramNode instanceof NestedDiagramNode) {
+        if (diagramNode instanceof NestedDiagramNode) {
             nodeColor = diagramSchema.getNestedDiagramNodeColor();
-        }
-        else {
+        } else {
             nodeColor = diagramSchema.getGradientColor(calculateRelativeSize(diagramSchema));
         }
         Stroke oldStroke = graphics.getStroke();
         int selectionLineWidth = diagramSchema.getSelectionLineWidth();
-        if(this.selectionState != NO_SELECTION) {
-            if(this.selectionState == SELECTED_DIRECTLY) {
+        if (this.selectionState != NO_SELECTION) {
+            if (this.selectionState == SELECTED_DIRECTLY) {
                 graphics.setStroke(new BasicStroke(selectionLineWidth));
                 circleColor = diagramSchema.getCircleSelectionColor();
-            }
-            else if(this.selectionState == SELECTED_IDEAL) {
+            } else if (this.selectionState == SELECTED_IDEAL) {
                 graphics.setStroke(new BasicStroke(selectionLineWidth));
                 circleColor = diagramSchema.getCircleIdealColor();
-            }
-            else if(this.selectionState == SELECTED_FILTER) {
+            } else if (this.selectionState == SELECTED_FILTER) {
                 graphics.setStroke(new BasicStroke(selectionLineWidth));
                 circleColor = diagramSchema.getCircleFilterColor();
-            }
-            else if(this.selectionState == NOT_SELECTED) {
+            } else if (this.selectionState == NOT_SELECTED) {
                 // lighten
                 nodeColor = diagramSchema.fadeOut(nodeColor);
                 circleColor = diagramSchema.fadeOut(circleColor);
@@ -145,9 +137,9 @@ public class NodeView extends CanvasItem {
         }
 
         Ellipse2D ellipse = new Ellipse2D.Double(
-                                    diagramNode.getPosition().getX() - diagramNode.getRadiusX(),
-                                    diagramNode.getPosition().getY() - diagramNode.getRadiusY(),
-                                    diagramNode.getRadiusX() * 2, diagramNode.getRadiusY() * 2 );
+                diagramNode.getPosition().getX() - diagramNode.getRadiusX(),
+                diagramNode.getPosition().getY() - diagramNode.getRadiusY(),
+                diagramNode.getRadiusX() * 2, diagramNode.getRadiusY() * 2);
         graphics.setPaint(nodeColor);
         graphics.fill(ellipse);
         graphics.setPaint(circleColor);
@@ -162,21 +154,18 @@ public class NodeView extends CanvasItem {
 
     private double calculateRelativeSize(DiagramSchema diagramSchema) {
         double relativeSize;
-        if(diagramSchema.getGradientReference() == DiagramSchema.GRADIENT_REFERENCE_DIAGRAM) {
-            if(diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
-                relativeSize = calcRate((double)this.diagramNode.getConcept().getExtentSize(),
-                        (double)DiagramController.getController().getNumberOfCurrentObjects());
+        if (diagramSchema.getGradientReference() == DiagramSchema.GRADIENT_REFERENCE_DIAGRAM) {
+            if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
+                relativeSize = calcRate((double) this.diagramNode.getConcept().getExtentSize(),
+                        (double) DiagramController.getController().getNumberOfCurrentObjects());
+            } else {
+                relativeSize = calcRate((double) this.diagramNode.getConcept().getObjectContingentSize(),
+                        (double) DiagramController.getController().getMaximalObjectContingentSize());
             }
-            else {
-                relativeSize = calcRate((double)this.diagramNode.getConcept().getObjectContingentSize() ,
-                           (double)DiagramController.getController().getMaximalObjectContingentSize());
-            }
-        }
-        else {
-            if(diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
+        } else {
+            if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
                 relativeSize = this.diagramNode.getConcept().getExtentSize();
-            }
-            else {
+            } else {
                 /// @todo Check if this one can be avoided -- it is pretty useless
                 relativeSize = this.diagramNode.getConcept().getObjectContingentSize();
             }
@@ -186,7 +175,7 @@ public class NodeView extends CanvasItem {
     }
 
     private double calcRate(double extentSize, double denom) {
-        if(denom==0){
+        if (denom == 0) {
             return 0;
         }
         return extentSize / denom;
@@ -201,8 +190,8 @@ public class NodeView extends CanvasItem {
     public boolean containsPoint(Point2D point) {
         double deltaX = point.getX() - diagramNode.getPosition().getX();
         double deltaY = point.getY() - diagramNode.getPosition().getY();
-        double sqDist = deltaX*deltaX + deltaY*deltaY;
-        double sqRadius = diagramNode.getRadiusX()*diagramNode.getRadiusY();
+        double sqDist = deltaX * deltaX + deltaY * deltaY;
+        double sqRadius = diagramNode.getRadiusX() * diagramNode.getRadiusY();
         return sqDist <= sqRadius;
     }
 
@@ -212,11 +201,11 @@ public class NodeView extends CanvasItem {
     public void singleClicked(Point2D point) {
         List conceptList = new ArrayList();
         DiagramNode node = this.diagramNode;
-        if( node instanceof NestedDiagramNode ) {
+        if (node instanceof NestedDiagramNode) {
             NestedDiagramNode ndNode = (NestedDiagramNode) node;
             node = ndNode.getInnerDiagram().getNode(0);
         }
-        while( node != null ) {
+        while (node != null) {
             conceptList.add(node.getConcept());
             node = node.getOuterNode();
         }
@@ -239,7 +228,7 @@ public class NodeView extends CanvasItem {
         double y = center.getY();
         double rx = this.diagramNode.getRadiusX();
         double ry = this.diagramNode.getRadiusY();
-        return new Rectangle2D.Double(x-rx, y-ry, 2*rx, 2*ry);
+        return new Rectangle2D.Double(x - rx, y - ry, 2 * rx, 2 * ry);
     }
 
     /**
@@ -248,22 +237,22 @@ public class NodeView extends CanvasItem {
      * @see #getSelectionState()
      */
     public void setSelectedConcepts(List concepts) {
-        if((concepts == null) || (concepts.size() == 0)) {
+        if ((concepts == null) || (concepts.size() == 0)) {
             this.selectionState = NO_SELECTION;
             return;
         }
         Iterator it = concepts.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Concept concept = (Concept) it.next();
-            if(this.diagramNode.getConcept() == concept) {
+            if (this.diagramNode.getConcept() == concept) {
                 this.selectionState = SELECTED_DIRECTLY;
                 return;
             }
-            if(this.diagramNode.getConcept().hasSuperConcept(concept)) {
+            if (this.diagramNode.getConcept().hasSuperConcept(concept)) {
                 this.selectionState = SELECTED_IDEAL;
                 return;
             }
-            if(this.diagramNode.getConcept().hasSubConcept(concept)) {
+            if (this.diagramNode.getConcept().hasSubConcept(concept)) {
                 this.selectionState = SELECTED_FILTER;
                 return;
             }

@@ -11,13 +11,10 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
+import org.jdom.Element;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Vector;
-
-import org.jdom.Element;
 
 /**
  * This is the main interface for the data structures.
@@ -55,7 +52,7 @@ public class ConceptualSchema {
      * The XML (XHTML) describing the schema (or null if not found).
      */
     private Element description = null;
-    
+
     /**
      * True if the schema contains at least one diagram with description.
      */
@@ -64,8 +61,7 @@ public class ConceptualSchema {
     /**
      * Creates an empty schema.
      */
-    public ConceptualSchema()
-    {
+    public ConceptualSchema() {
         useDatabase = false;
         databaseInfo = null;
         diagrams = new Vector();
@@ -75,16 +71,14 @@ public class ConceptualSchema {
     /**
      * Returns true if a database should be used.
      */
-    public boolean usesDatabase()
-    {
+    public boolean usesDatabase() {
         return useDatabase;
     }
 
     /**
      * Sets the flag if a database should be used.
      */
-    public void setUseDatabase( boolean flag )
-    {
+    public void setUseDatabase(boolean flag) {
         useDatabase = flag;
     }
 
@@ -93,29 +87,28 @@ public class ConceptualSchema {
      *
      * The return value is null if no database is defined in the schema.
      */
-    public DatabaseInfo getDatabaseInfo()
-    {
+    public DatabaseInfo getDatabaseInfo() {
         return databaseInfo;
     }
 
     /**
      * Sets the database information for the schema.
      */
-    public void setDatabaseInfo( DatabaseInfo databaseInfo ) throws DatabaseException {
+    public void setDatabaseInfo(DatabaseInfo databaseInfo) throws DatabaseException {
         this.databaseInfo = databaseInfo;
-        if(databaseInfo == null) {
+        if (databaseInfo == null) {
             return;
         }
         DBConnection conn = new DBConnection(this.databaseInfo.getSource(), this.databaseInfo.getUserName(),
-                                             this.databaseInfo.getPassword());
+                this.databaseInfo.getPassword());
         // update all concepts
         Iterator diagIt = this.diagrams.iterator();
-        while(diagIt.hasNext()) {
-            SimpleLineDiagram cur = (SimpleLineDiagram)diagIt.next();
-            for(int i=0; i < cur.getNumberOfNodes(); i++) {
+        while (diagIt.hasNext()) {
+            SimpleLineDiagram cur = (SimpleLineDiagram) diagIt.next();
+            for (int i = 0; i < cur.getNumberOfNodes(); i++) {
                 Concept con = cur.getNode(i).getConcept();
-                if(con instanceof DatabaseConnectedConcept) {
-                    ((DatabaseConnectedConcept) con).setDatabase(this.databaseInfo,conn);
+                if (con instanceof DatabaseConnectedConcept) {
+                    ((DatabaseConnectedConcept) con).setDatabase(this.databaseInfo, conn);
                 }
             }
         }
@@ -124,28 +117,26 @@ public class ConceptualSchema {
     /**
      * Returns the number of diagrams available.
      */
-    public int getNumberOfDiagrams()
-    {
+    public int getNumberOfDiagrams() {
         return diagrams.size();
     }
 
     /**
      * Returns a diagram from the list using the index.
      */
-    public SimpleLineDiagram getDiagram( int number )
-    {
-        return (SimpleLineDiagram)diagrams.get( number );
+    public SimpleLineDiagram getDiagram(int number) {
+        return (SimpleLineDiagram) diagrams.get(number);
     }
 
     /**
      * Returns a diagram from the list using the diagram title as key.
      */
-    public SimpleLineDiagram getDiagram( String title ) {
+    public SimpleLineDiagram getDiagram(String title) {
         SimpleLineDiagram retVal = null;
         Iterator it = this.diagrams.iterator();
-        while( it.hasNext() ) {
+        while (it.hasNext()) {
             SimpleLineDiagram cur = (SimpleLineDiagram) it.next();
-            if( cur.getTitle().equals( title ) ) {
+            if (cur.getTitle().equals(title)) {
                 retVal = cur;
                 break;
             }
@@ -158,28 +149,23 @@ public class ConceptualSchema {
      *
      * The new diagram will be the last one.
      */
-    public void addDiagram( SimpleLineDiagram diagram )
-    {
-        diagrams.add( diagram );
+    public void addDiagram(SimpleLineDiagram diagram) {
+        diagrams.add(diagram);
     }
-    
-    public void setDescription( Element description )
-    {
+
+    public void setDescription(Element description) {
         this.description = description;
     }
-    
-    public Element getDescription()
-    {
+
+    public Element getDescription() {
         return this.description;
     }
-    
-    public void setHasDiagramDescription(boolean flag)
-    {
+
+    public void setHasDiagramDescription(boolean flag) {
         this.hasDiagramDescription = flag;
     }
-    
-    public boolean hasDiagramDescription()
-    {
+
+    public boolean hasDiagramDescription() {
         return this.hasDiagramDescription;
     }
 }

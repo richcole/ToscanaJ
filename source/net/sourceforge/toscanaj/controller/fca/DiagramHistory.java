@@ -203,7 +203,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         return firstFutureDiagramPosition - currStartPosition;
     }
 
-    public int getFirstCurrentDiagramPosition(){
+    public int getFirstCurrentDiagramPosition() {
         return currStartPosition;
     }
 
@@ -265,7 +265,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         if (isInCurrent(lastPosition)) {
             firstFutureDiagramPosition--;
             if (currStartPosition >= firstFutureDiagramPosition) {
-                currStartPosition = Math.max(firstFutureDiagramPosition-1, 0);
+                currStartPosition = Math.max(firstFutureDiagramPosition - 1, 0);
             }
         }
         diagrams.remove(lastPosition);
@@ -315,10 +315,10 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
             return;
         }
         getReferenceAt(currStartPosition).setZoomedConcept(zoomedConcept);
-        if( shouldChangeCurrentStartDiagram()){
+        if (shouldChangeCurrentStartDiagram()) {
             currStartPosition++;
         }
-        if(hasFutureDiagrams()){
+        if (hasFutureDiagrams()) {
             firstFutureDiagramPosition++;
         }
 
@@ -327,7 +327,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     }
 
     private boolean shouldChangeCurrentStartDiagram() {
-        return currStartPosition>0 || (getNumberOfCurrentDiagrams()>getNestingLevel());
+        return currStartPosition > 0 || (getNumberOfCurrentDiagrams() > getNestingLevel());
     }
 
     public void back() {
@@ -414,7 +414,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     }
 
     public boolean canMoveUp() {
-        return hasPastDiagrams() || (getFirstCurrentDiagramPosition()==0 && getNumberOfCurrentDiagrams()>1);
+        return hasPastDiagrams() || (getFirstCurrentDiagramPosition() == 0 && getNumberOfCurrentDiagrams() > 1);
     }
 
 

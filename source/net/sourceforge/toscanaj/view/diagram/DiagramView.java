@@ -15,11 +15,10 @@ import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.MouseEvent;
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
@@ -39,10 +38,10 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
      */
     private Diagram2D diagram = null;
 
-    class ResizeListener extends ComponentAdapter{
+    class ResizeListener extends ComponentAdapter {
         public void componentResized(ComponentEvent e) {
-             requestScreenTransformUpdate();
-             repaint();
+            requestScreenTransformUpdate();
+            repaint();
         }
     }
 
@@ -69,7 +68,7 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
      */
     public void update(Object source) {
         if (source instanceof DiagramController ||
-            source instanceof DiagramHistory) {
+                source instanceof DiagramHistory) {
             showDiagram((SimpleLineDiagram) DiagramController.getController().getCurrentDiagram());
         } else {
             requestScreenTransformUpdate();
@@ -78,11 +77,9 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     }
 
 
-
-
     private boolean screenTransformDirty = false;
 
-    protected boolean isScreenTransformDirty(){
+    protected boolean isScreenTransformDirty() {
         return screenTransformDirty;
     }
 
@@ -94,7 +91,7 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
 
         // fill the background (without transform)
         g2d.setPaint(DiagramSchema.getDiagramSchema().getBackgroundColor());
-        g2d.fill(new Rectangle2D.Double(0,0,getWidth(),getHeight()));
+        g2d.fill(new Rectangle2D.Double(0, 0, getWidth(), getHeight()));
 
         if (diagram == null) {
             return;

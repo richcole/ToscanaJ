@@ -11,7 +11,7 @@ package net.sourceforge.toscanaj.observer;
  *
  * Needed due to the typical Java problems.
  */
-public interface ChangeObservable{
+public interface ChangeObservable {
     /**
      * Method to add an observer.
      */

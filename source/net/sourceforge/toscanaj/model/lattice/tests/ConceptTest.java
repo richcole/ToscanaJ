@@ -7,10 +7,10 @@
 package net.sourceforge.toscanaj.model.lattice.tests;
 
 import junit.framework.TestCase;
-import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.Query;
-import net.sourceforge.toscanaj.model.ObjectNumberQuery;
 import net.sourceforge.toscanaj.model.ObjectListQuery;
+import net.sourceforge.toscanaj.model.ObjectNumberQuery;
+import net.sourceforge.toscanaj.model.Query;
+import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.util.List;
 

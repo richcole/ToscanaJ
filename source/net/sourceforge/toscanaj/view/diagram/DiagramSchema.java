@@ -6,9 +6,9 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import java.awt.*;
-
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+
+import java.awt.*;
 
 /**
  * DiagramSchema will hold the palette colors, line widths and similar information
@@ -67,39 +67,39 @@ public class DiagramSchema {
     /**
      * The color used for the top of the gradient.
      */
-    private Color topColor =  new Color(0,0,150);
+    private Color topColor = new Color(0, 0, 150);
 
     /**
      * The color used for the bottom of the gradient.
      */
-    private Color bottomColor = new Color(255,255,150);
+    private Color bottomColor = new Color(255, 255, 150);
 
     /**
      * The color for the circles around the nodes.
      */
-    private Color circleColor = new Color(0,0,0);
+    private Color circleColor = new Color(0, 0, 0);
 
     /**
      * The color for lines between nodes.
      */
-    private Color lineColor = new Color(0,0,0);
+    private Color lineColor = new Color(0, 0, 0);
 
     /**
      * The color for the circles around the node with the selected concept.
      */
-    private Color circleSelectionColor = new Color(255,0,0);
+    private Color circleSelectionColor = new Color(255, 0, 0);
 
     /**
      * The color for the circles around the nodes in the ideal of the selected.
      * concept.
      */
-    private Color circleIdealColor = new Color(0,0,0);
+    private Color circleIdealColor = new Color(0, 0, 0);
 
     /**
      * The color for the circles around the nodes in the filter of the selected.
      * concept.
      */
-    private Color circleFilterColor = new Color(0,0,0);
+    private Color circleFilterColor = new Color(0, 0, 0);
 
     /**
      * The gradient type set.
@@ -114,7 +114,7 @@ public class DiagramSchema {
      * @see #setGradientReference(int)
      */
     private int gradientReference = GRADIENT_REFERENCE_SCHEMA;
-    
+
     private int selectionLineWidth = 3;
 
     private String labelFontName = "SansSerif";
@@ -125,43 +125,39 @@ public class DiagramSchema {
      * Default constructor.
      */
     private DiagramSchema() {
-        background = ConfigurationManager.fetchColor("diagramSchema","backgroundColor",background);
-        topColor = ConfigurationManager.fetchColor("diagramSchema","topColor",topColor);
-        bottomColor = ConfigurationManager.fetchColor("diagramSchema","bottomColor",bottomColor);
-        foreground = ConfigurationManager.fetchColor("diagramSchema","foregroundColor",foreground);
-        nestedDiagramNodeColor = ConfigurationManager.fetchColor("diagramSchema","nestedDiagramNodeColor",nestedDiagramNodeColor);
-        circleColor = ConfigurationManager.fetchColor("diagramSchema","circleColor",circleColor);
-        lineColor = ConfigurationManager.fetchColor("diagramSchema","lineColor",lineColor);
-        circleSelectionColor = ConfigurationManager.fetchColor("diagramSchema","circleSelectionColor",circleSelectionColor);
-        circleIdealColor = ConfigurationManager.fetchColor("diagramSchema","circleIdealColor",circleIdealColor);
-        circleFilterColor = ConfigurationManager.fetchColor("diagramSchema","circleFilterColor",circleFilterColor);
-        fadeOut = ConfigurationManager.fetchFloat("diagramSchema","fadeOutValue",fadeOut);
-        String propVal = ConfigurationManager.fetchString("diagramSchema","gradientType","extent");
+        background = ConfigurationManager.fetchColor("diagramSchema", "backgroundColor", background);
+        topColor = ConfigurationManager.fetchColor("diagramSchema", "topColor", topColor);
+        bottomColor = ConfigurationManager.fetchColor("diagramSchema", "bottomColor", bottomColor);
+        foreground = ConfigurationManager.fetchColor("diagramSchema", "foregroundColor", foreground);
+        nestedDiagramNodeColor = ConfigurationManager.fetchColor("diagramSchema", "nestedDiagramNodeColor", nestedDiagramNodeColor);
+        circleColor = ConfigurationManager.fetchColor("diagramSchema", "circleColor", circleColor);
+        lineColor = ConfigurationManager.fetchColor("diagramSchema", "lineColor", lineColor);
+        circleSelectionColor = ConfigurationManager.fetchColor("diagramSchema", "circleSelectionColor", circleSelectionColor);
+        circleIdealColor = ConfigurationManager.fetchColor("diagramSchema", "circleIdealColor", circleIdealColor);
+        circleFilterColor = ConfigurationManager.fetchColor("diagramSchema", "circleFilterColor", circleFilterColor);
+        fadeOut = ConfigurationManager.fetchFloat("diagramSchema", "fadeOutValue", fadeOut);
+        String propVal = ConfigurationManager.fetchString("diagramSchema", "gradientType", "extent");
         propVal = propVal.toLowerCase();
-        if(propVal.equals("extent")) {
+        if (propVal.equals("extent")) {
             gradientType = GRADIENT_TYPE_EXTENT;
-        }
-        else if(propVal.equals("contingent")) {
+        } else if (propVal.equals("contingent")) {
             gradientType = GRADIENT_TYPE_CONTINGENT;
-        }
-        else {
+        } else {
             System.err.println("Caught unknown gradient type for DiagramSchema: " + propVal);
             System.err.println("-- using default");
         }
-        propVal = ConfigurationManager.fetchString("diagramSchema","gradientReference","diagram");
+        propVal = ConfigurationManager.fetchString("diagramSchema", "gradientReference", "diagram");
         propVal = propVal.toLowerCase();
-        if(propVal.equals("diagram")) {
+        if (propVal.equals("diagram")) {
             gradientReference = GRADIENT_REFERENCE_DIAGRAM;
-        }
-        else if(propVal.equals("schema")) {
+        } else if (propVal.equals("schema")) {
             gradientReference = GRADIENT_REFERENCE_SCHEMA;
-        }
-        else {
+        } else {
             System.err.println("Caught unknown gradient reference for DiagramSchema: " + propVal);
             System.err.println("-- using default");
         }
-        selectionLineWidth = ConfigurationManager.fetchInt("diagramSchema","selectionLineWidth",
-                                                           selectionLineWidth);
+        selectionLineWidth = ConfigurationManager.fetchInt("diagramSchema", "selectionLineWidth",
+                selectionLineWidth);
         labelFontName = ConfigurationManager.fetchString("diagramSchema", "labelFontName", labelFontName);
         labelFontSize = ConfigurationManager.fetchInt("diagramSchema", "labelFontSize", labelFontSize);
     }
@@ -210,13 +206,13 @@ public class DiagramSchema {
      * interpolation otherwise.
      */
     public Color getGradientColor(double position) {
-        if( position < 0 || position > 1) {
+        if (position < 0 || position > 1) {
             throw new IllegalArgumentException("Gradient position not in [0,1]");
         }
-        return new Color( (int)(topColor.getRed()*position + bottomColor.getRed()*(1-position)),
-                          (int)(topColor.getGreen()*position + bottomColor.getGreen()*(1-position)),
-                          (int)(topColor.getBlue()*position + bottomColor.getBlue()*(1-position)),
-                          (int)(topColor.getAlpha()*position + bottomColor.getAlpha()*(1-position)) );
+        return new Color((int) (topColor.getRed() * position + bottomColor.getRed() * (1 - position)),
+                (int) (topColor.getGreen() * position + bottomColor.getGreen() * (1 - position)),
+                (int) (topColor.getBlue() * position + bottomColor.getBlue() * (1 - position)),
+                (int) (topColor.getAlpha() * position + bottomColor.getAlpha() * (1 - position)));
     }
 
     /**
@@ -326,7 +322,7 @@ public class DiagramSchema {
      * @throws IllegalArgumentException  If argument is not one of the two allowed values.
      */
     public void setGradientType(int gradientType) {
-        if(gradientType != GRADIENT_TYPE_EXTENT  &&  gradientType != GRADIENT_TYPE_CONTINGENT ) {
+        if (gradientType != GRADIENT_TYPE_EXTENT && gradientType != GRADIENT_TYPE_CONTINGENT) {
             throw new IllegalArgumentException("Unknown value for gradient type");
         }
         this.gradientType = gradientType;
@@ -340,8 +336,8 @@ public class DiagramSchema {
      * compare it to the full set of objects in the schema.
      */
     public void setGradientReference(int gradientReference) {
-        if( gradientReference != GRADIENT_REFERENCE_DIAGRAM  &&
-            gradientReference != GRADIENT_REFERENCE_SCHEMA ) {
+        if (gradientReference != GRADIENT_REFERENCE_DIAGRAM &&
+                gradientReference != GRADIENT_REFERENCE_SCHEMA) {
             throw new IllegalArgumentException("Unknown value for gradient type");
         }
         this.gradientReference = gradientReference;
@@ -362,9 +358,9 @@ public class DiagramSchema {
      * the returned colors for the non-highlighted part.
      */
     public Color fadeOut(Color original) {
-        return new Color( (int)(original.getRed()*(1-fadeOut) + 255*fadeOut),
-                          (int)(original.getGreen()*(1-fadeOut) + 255*fadeOut),
-                          (int)(original.getBlue()*(1-fadeOut) + 255*fadeOut),
-                          (int)(original.getAlpha()*(1-fadeOut) + 255*fadeOut) );
+        return new Color((int) (original.getRed() * (1 - fadeOut) + 255 * fadeOut),
+                (int) (original.getGreen() * (1 - fadeOut) + 255 * fadeOut),
+                (int) (original.getBlue() * (1 - fadeOut) + 255 * fadeOut),
+                (int) (original.getAlpha() * (1 - fadeOut) + 255 * fadeOut));
     }
 }

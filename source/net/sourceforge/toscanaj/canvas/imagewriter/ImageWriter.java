@@ -31,5 +31,5 @@ public interface ImageWriter {
      * Saves the canvas using the settings to the file.
      */
     void exportGraphic(DrawingCanvas canvas, DiagramExportSettings settings, File outputFile)
-           throws ImageGenerationException;
+            throws ImageGenerationException;
 }

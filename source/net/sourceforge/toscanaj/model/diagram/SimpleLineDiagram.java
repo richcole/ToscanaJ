@@ -6,13 +6,13 @@
  */
 package net.sourceforge.toscanaj.model.diagram;
 
+import org.jdom.Element;
+
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.jdom.Element;
 
 /**
  * This class is an abstraction of all diagram related information.
@@ -26,8 +26,7 @@ import org.jdom.Element;
  * will be pointing downwards when reading.
  */
 
-public class SimpleLineDiagram implements WriteableDiagram2D
-{
+public class SimpleLineDiagram implements WriteableDiagram2D {
     /**
      * The title used for this diagram.
      */
@@ -47,7 +46,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D
      * This is set to true once we determined the direction of the y-axis.
      */
     private boolean coordinateSystemChecked = false;
-    
+
     private Element description = null;
 
     /**
@@ -66,7 +65,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D
     /**
      * Change the title of the diagram.
      */
-    public void setTitle( String title ) {
+    public void setTitle(String title) {
         this.title = title;
     }
 
@@ -88,34 +87,34 @@ public class SimpleLineDiagram implements WriteableDiagram2D
      * Calculates a rectangle that includes all points.
      */
     public Rectangle2D getBounds() {
-        if(!coordinateSystemChecked) {
+        if (!coordinateSystemChecked) {
             checkCoordinateSystem();
         }
         double minX = Double.MAX_VALUE;
         double maxX = -Double.MAX_VALUE;
         double minY = Double.MAX_VALUE;
         double maxY = -Double.MAX_VALUE;
-        for( int i = 0; i < this.nodes.size(); i++ ) {
-            DiagramNode node = (DiagramNode)this.nodes.get( i );
+        for (int i = 0; i < this.nodes.size(); i++) {
+            DiagramNode node = (DiagramNode) this.nodes.get(i);
             double x = node.getX();
             double y = node.getY();
             double rx = node.getRadiusX();
             double ry = node.getRadiusY();
 
-            if( x-rx < minX ) {
-                minX = x-rx;
+            if (x - rx < minX) {
+                minX = x - rx;
             }
-            if( x+rx > maxX ) {
-                maxX = x+rx;
+            if (x + rx > maxX) {
+                maxX = x + rx;
             }
-            if( y-ry < minY ) {
-                minY = y-ry;
+            if (y - ry < minY) {
+                minY = y - ry;
             }
-            if( y+ry > maxY ) {
-                maxY = y+ry;
+            if (y + ry > maxY) {
+                maxY = y + ry;
             }
         }
-        return new Rectangle2D.Double( minX, minY, maxX - minX, maxY - minY );
+        return new Rectangle2D.Double(minX, minY, maxX - minX, maxY - minY);
     }
 
     /**
@@ -123,18 +122,18 @@ public class SimpleLineDiagram implements WriteableDiagram2D
      *
      * Numbers start with zero.
      */
-    public DiagramNode getNode( int nodeNumber ) {
-        if(!coordinateSystemChecked) {
+    public DiagramNode getNode(int nodeNumber) {
+        if (!coordinateSystemChecked) {
             checkCoordinateSystem();
         }
-        return (DiagramNode)this.nodes.get(nodeNumber);
+        return (DiagramNode) this.nodes.get(nodeNumber);
     }
 
     /**
      * Implements Diagram2D.getLine(int).
      */
-    public DiagramLine getLine( int lineNumber ) {
-        return (DiagramLine)this.lines.get(lineNumber);
+    public DiagramLine getLine(int lineNumber) {
+        return (DiagramLine) this.lines.get(lineNumber);
     }
 
     /**
@@ -151,8 +150,8 @@ public class SimpleLineDiagram implements WriteableDiagram2D
      *
      * Numbers start with zero.
      */
-    public Point2D getFromPosition( int lineNumber ) {
-        DiagramLine line = (DiagramLine)this.lines.get(lineNumber);
+    public Point2D getFromPosition(int lineNumber) {
+        DiagramLine line = (DiagramLine) this.lines.get(lineNumber);
         return line.getFromPosition();
     }
 
@@ -161,43 +160,43 @@ public class SimpleLineDiagram implements WriteableDiagram2D
      *
      * Numbers start with zero.
      */
-    public Point2D getToPosition( int lineNumber ) {
-        DiagramLine line = (DiagramLine)this.lines.get(lineNumber);
+    public Point2D getToPosition(int lineNumber) {
+        DiagramLine line = (DiagramLine) this.lines.get(lineNumber);
         return line.getToPosition();
     }
 
     /**
      * Adds a line to the diagram (at the end of the list).
      */
-    public void addLine( DiagramNode from, DiagramNode to ) {
-        this.lines.add( new DiagramLine( from, to ) );
+    public void addLine(DiagramNode from, DiagramNode to) {
+        this.lines.add(new DiagramLine(from, to));
     }
 
     /**
      * Returns the information on the object label of the diagram.
      */
-    public LabelInfo getObjectLabel( int nodeNumber ) {
-        return ((DiagramNode)this.nodes.get(nodeNumber)).getObjectLabelInfo();
+    public LabelInfo getObjectLabel(int nodeNumber) {
+        return ((DiagramNode) this.nodes.get(nodeNumber)).getObjectLabelInfo();
     }
 
     /**
      * Returns the information on the attribute label of the diagram.
      */
-    public LabelInfo getAttributeLabel( int nodeNumber ) {
-        return ((DiagramNode)this.nodes.get(nodeNumber)).getAttributeLabelInfo();
+    public LabelInfo getAttributeLabel(int nodeNumber) {
+        return ((DiagramNode) this.nodes.get(nodeNumber)).getAttributeLabelInfo();
     }
 
     /**
      * Makes sure the y-coordinates increase in the downward direction.
      */
     protected void checkCoordinateSystem() {
-        if(this.nodes.size() > 1) { // no point in checking direction otherwise
+        if (this.nodes.size() > 1) { // no point in checking direction otherwise
             DiagramNode topNode = (DiagramNode) this.nodes.get(0);
             DiagramNode otherNode = (DiagramNode) this.nodes.get(1);
-            if(topNode.getY() > otherNode.getY()) {
+            if (topNode.getY() > otherNode.getY()) {
                 // inverse coordinates (mirror using x-axis)
                 Iterator it = this.nodes.iterator();
-                while(it.hasNext()) {
+                while (it.hasNext()) {
                     DiagramNode node = (DiagramNode) it.next();
                     node.invertY();
                 }
@@ -205,11 +204,11 @@ public class SimpleLineDiagram implements WriteableDiagram2D
         }
         this.coordinateSystemChecked = true;
     }
-    
+
     public void setDescription(Element desc) {
         this.description = desc;
     }
-    
+
     public Element getDescription() {
         return this.description;
     }

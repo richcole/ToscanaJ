@@ -13,7 +13,7 @@ package net.sourceforge.toscanaj.observer;
  * inheritance or mixin classes. This observer can be used for simple update
  * notifications without passing additional information.
  */
-public interface ChangeObserver{
+public interface ChangeObserver {
     /**
      * Callback for getting notice on changes.
      */

@@ -56,22 +56,19 @@ public class LineView extends CanvasItem {
         Paint oldPaint = graphics.getPaint();
         Stroke oldStroke = graphics.getStroke();
         int selectionLineWidth = diagramSchema.getSelectionLineWidth();
-        if(this.selectionState == NodeView.NO_SELECTION) {
+        if (this.selectionState == NodeView.NO_SELECTION) {
             graphics.setPaint(diagramSchema.getLineColor());
             graphics.setStroke(new BasicStroke(1));
-        }
-        else if(this.selectionState == NodeView.SELECTED_IDEAL) {
+        } else if (this.selectionState == NodeView.SELECTED_IDEAL) {
             graphics.setPaint(diagramSchema.getCircleIdealColor());
             graphics.setStroke(new BasicStroke(selectionLineWidth));
-        }
-        else if(this.selectionState == NodeView.SELECTED_FILTER) {
+        } else if (this.selectionState == NodeView.SELECTED_FILTER) {
             graphics.setPaint(diagramSchema.getCircleFilterColor());
             graphics.setStroke(new BasicStroke(selectionLineWidth));
-        }
-        else if(this.selectionState == NodeView.NOT_SELECTED) {
+        } else if (this.selectionState == NodeView.NOT_SELECTED) {
             graphics.setPaint(diagramSchema.fadeOut(diagramSchema.getLineColor()));
         }
-        graphics.draw(new Line2D.Double(from,to));
+        graphics.draw(new Line2D.Double(from, to));
         graphics.setPaint(oldPaint);
         graphics.setStroke(oldStroke);
     }
@@ -90,23 +87,21 @@ public class LineView extends CanvasItem {
         Point2D from = diagramLine.getFromPosition();
         Point2D to = diagramLine.getToPosition();
         double x,y,w,h;
-        if( from.getX() < to.getX() ) {
+        if (from.getX() < to.getX()) {
             x = from.getX();
             w = to.getX() - x;
-        }
-        else {
+        } else {
             x = to.getX();
             w = from.getX() - x;
         }
-        if( from.getY() < to.getY() ) {
+        if (from.getY() < to.getY()) {
             y = from.getY();
             h = to.getY() - y;
-        }
-        else {
+        } else {
             y = to.getY();
             h = from.getY() - y;
         }
-        return new Rectangle2D.Double(x,y,w,h);
+        return new Rectangle2D.Double(x, y, w, h);
     }
 
     /**
@@ -116,20 +111,20 @@ public class LineView extends CanvasItem {
      * @see NodeView.setSelectedConcept(Concept)
      */
     public void setSelectedConcepts(List concepts) {
-        if((concepts == null) || (concepts.size() == 0)) {
+        if ((concepts == null) || (concepts.size() == 0)) {
             this.selectionState = NodeView.NO_SELECTION;
             return;
         }
         Iterator it = concepts.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Concept concept = (Concept) it.next();
             Concept from = this.diagramLine.getFromNode().getConcept();
-            if((from == concept) || (from.hasSuperConcept(concept)) ) {
+            if ((from == concept) || (from.hasSuperConcept(concept))) {
                 this.selectionState = NodeView.SELECTED_IDEAL;
                 return;
             }
             Concept to = this.diagramLine.getToNode().getConcept();
-            if((to == concept) || (to.hasSubConcept(concept)) ) {
+            if ((to == concept) || (to.hasSubConcept(concept))) {
                 this.selectionState = NodeView.SELECTED_FILTER;
                 return;
             }

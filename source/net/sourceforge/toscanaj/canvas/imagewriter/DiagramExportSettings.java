@@ -74,7 +74,7 @@ public class DiagramExportSettings {
     /**
      * Get the current image format
      */
-    public GraphicFormat getGraphicFormat(){
+    public GraphicFormat getGraphicFormat() {
         return this.format;
     }
 
@@ -104,7 +104,7 @@ public class DiagramExportSettings {
      */
     public String toString() {
         String retVal = "DiagramExportSettings[ Size: (" + this.width + ", " + this.height + "), Format: " + this.format;
-        if(this.autoMode) {
+        if (this.autoMode) {
             retVal += " (AUTO)";
         }
         retVal += "]\n";

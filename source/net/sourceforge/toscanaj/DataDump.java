@@ -54,33 +54,30 @@ public class DataDump {
         ConceptualSchema schema = null;
         try {
             schema = CSXParser.parse(file);
-        }
-        catch(DataFormatException e) {
+        } catch (DataFormatException e) {
             System.err.println("Could not parse input.");
             System.err.println("- " + e.getMessage());
-            if(e.getOriginal() != null) {
+            if (e.getOriginal() != null) {
                 System.err.println("Detail:");
                 System.err.println("- " + e.getOriginal().getMessage());
             }
             System.exit(2);
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             System.err.println("Could not parse input.");
             System.err.println("- " + e.getMessage());
             System.exit(2);
         }
         // create concept for filtering if needed
         DatabaseConnectedConcept filterConcept = null;
-        if(filterClause != null) {
-            if(!schema.usesDatabase()) {
+        if (filterClause != null) {
+            if (!schema.usesDatabase()) {
                 System.err.println("Filter can only applied to conceptual schemas that use a DB connection.");
                 System.exit(6);
             }
             try {
                 filterConcept = new DatabaseConnectedConcept(schema.getDatabaseInfo(),
-                                            new DBConnection(schema.getDatabaseInfo().getSource(), "", "") );
-            }
-            catch (Exception e) {
+                        new DBConnection(schema.getDatabaseInfo().getSource(), "", ""));
+            } catch (Exception e) {
                 System.err.println("Couldn't create filter for database");
                 System.exit(4);
             }
@@ -89,16 +86,15 @@ public class DataDump {
         // create output structure
         Document output = new Document(new Element("csxDump"));
         // dump all diagrams
-        for(int diag = 0; diag < schema.getNumberOfDiagrams(); diag++) {
-            dumpDiagram( filterDiagram(schema.getDiagram(diag), filterConcept),
-                         output.getRootElement(), includeLists);
+        for (int diag = 0; diag < schema.getNumberOfDiagrams(); diag++) {
+            dumpDiagram(filterDiagram(schema.getDiagram(diag), filterConcept),
+                    output.getRootElement(), includeLists);
         }
         // write XML to stdout
         XMLOutputter outputter = new XMLOutputter("    ", true);
         try {
-            outputter.output(output,System.out);
-        }
-        catch(Exception e) {
+            outputter.output(output, System.out);
+        } catch (Exception e) {
             System.err.println("Could not write output.");
             e.printStackTrace();
             System.exit(5);
@@ -111,8 +107,8 @@ public class DataDump {
     protected static void dumpDiagram(Diagram2D diagram, Element targetElement, boolean includeLists) {
         Element diagElem = new Element("diagram");
         targetElement.addContent(diagElem);
-        diagElem.addAttribute("title",diagram.getTitle());
-        for(int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
+        diagElem.addAttribute("title", diagram.getTitle());
+        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             Concept cur = diagram.getNode(i).getConcept();
 
             Element conceptElem = new Element("concept");
@@ -134,10 +130,10 @@ public class DataDump {
             objContElem.addAttribute("size", Integer.toString(cur.getObjectContingentSize()));
             conceptElem.addContent(objContElem);
 
-            if(includeLists) {
+            if (includeLists) {
                 Iterator it;
                 it = cur.getIntentIterator();
-                while(it.hasNext()) {
+                while (it.hasNext()) {
                     String name = (String) it.next();
                     Element newElem = new Element("attribute");
                     newElem.addContent(name);
@@ -145,7 +141,7 @@ public class DataDump {
                 }
 
                 it = cur.getExtentIterator();
-                while(it.hasNext()) {
+                while (it.hasNext()) {
                     String name = (String) it.next();
                     Element newElem = new Element("object");
                     newElem.addContent(name);
@@ -153,7 +149,7 @@ public class DataDump {
                 }
 
                 it = cur.getAttributeContingentIterator();
-                while(it.hasNext()) {
+                while (it.hasNext()) {
                     String name = (String) it.next();
                     Element newElem = new Element("attribute");
                     newElem.addContent(name);
@@ -161,7 +157,7 @@ public class DataDump {
                 }
 
                 it = cur.getObjectContingentIterator();
-                while(it.hasNext()) {
+                while (it.hasNext()) {
                     String name = (String) it.next();
                     Element newElem = new Element("object");
                     newElem.addContent(name);
@@ -183,43 +179,42 @@ public class DataDump {
         Hashtable nodeMap = new Hashtable();
 
         retVal.setTitle(inputDiagram.getTitle());
-        for(int i = 0; i<inputDiagram.getNumberOfNodes(); i++) {
+        for (int i = 0; i < inputDiagram.getNumberOfNodes(); i++) {
             DiagramNode oldNode = inputDiagram.getNode(i);
             DiagramNode newNode;
-            if(filterConcept == null) {
-                newNode = new DiagramNode( oldNode.getPosition(),
-                                           oldNode.getConcept(),
-                                           oldNode.getAttributeLabelInfo(),
-                                           oldNode.getObjectLabelInfo(),
-                                           null);
-            }
-            else {
-                newNode = new DiagramNode( oldNode.getPosition(),
-                                           oldNode.getConcept().filterByContingent(filterConcept),
-                                           oldNode.getAttributeLabelInfo(),
-                                           oldNode.getObjectLabelInfo(),
-                                           null);
+            if (filterConcept == null) {
+                newNode = new DiagramNode(oldNode.getPosition(),
+                        oldNode.getConcept(),
+                        oldNode.getAttributeLabelInfo(),
+                        oldNode.getObjectLabelInfo(),
+                        null);
+            } else {
+                newNode = new DiagramNode(oldNode.getPosition(),
+                        oldNode.getConcept().filterByContingent(filterConcept),
+                        oldNode.getAttributeLabelInfo(),
+                        oldNode.getObjectLabelInfo(),
+                        null);
             }
             retVal.addNode(newNode);
-            nodeMap.put(oldNode,newNode);
+            nodeMap.put(oldNode, newNode);
         }
-        for(int i = 0; i < inputDiagram.getNumberOfLines(); i++) {
+        for (int i = 0; i < inputDiagram.getNumberOfLines(); i++) {
             DiagramLine line = inputDiagram.getLine(i);
             DiagramNode from = (DiagramNode) nodeMap.get(line.getFromNode());
             DiagramNode to = (DiagramNode) nodeMap.get(line.getToNode());
-            retVal.addLine( from, to );
+            retVal.addLine(from, to);
 
             // add direct neighbours to concepts
             AbstractConceptImplementation concept1 =
-                             (AbstractConceptImplementation) from.getConcept();
+                    (AbstractConceptImplementation) from.getConcept();
             AbstractConceptImplementation concept2 =
-                             (AbstractConceptImplementation) to.getConcept();
+                    (AbstractConceptImplementation) to.getConcept();
             concept1.addSubConcept(concept2);
             concept2.addSuperConcept(concept1);
         }
 
         // build transitive closures for each concept
-        for(int i = 0; i < retVal.getNumberOfNodes(); i++) {
+        for (int i = 0; i < retVal.getNumberOfNodes(); i++) {
             ((AbstractConceptImplementation) retVal.getNode(i).getConcept()).buildClosures();
         }
 
@@ -247,33 +242,29 @@ public class DataDump {
         boolean includeLists = false;
         String filename = null;
         String filterClause = null;
-        for(int i = 0; i < args.length; i++ ) {
-            if(args[i].equals("-include-lists")) {
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-include-lists")) {
                 includeLists = true;
-            }
-            else if(args[i].equals("-help") || args[i].equals("-?")) {
+            } else if (args[i].equals("-help") || args[i].equals("-?")) {
                 printUsage(System.out);
                 System.exit(0);
-            }
-            else if(args[i].equals("-filter")) {
-                if(i == args.length -1) {
+            } else if (args[i].equals("-filter")) {
+                if (i == args.length - 1) {
                     System.err.println("No filter clause given for '-filter' option");
                     printUsage(System.err);
                     System.exit(1);
                 }
                 i++;
                 filterClause = "(" + args[i] + ")";
-            }
-            else if(args[i].charAt(0)!='-') {
+            } else if (args[i].charAt(0) != '-') {
                 filename = args[i];
-            }
-            else {
+            } else {
                 System.err.println("Unknown parameter");
                 printUsage(System.err);
                 System.exit(1);
             }
         }
-        if(filename == null) {
+        if (filename == null) {
             System.err.println("No file name given");
             printUsage(System.err);
             System.exit(1);

@@ -6,16 +6,18 @@
  */
 package net.sourceforge.toscanaj.gui;
 
+import net.sourceforge.toscanaj.ToscanaJ;
 import net.sourceforge.toscanaj.canvas.imagewriter.DiagramExportSettings;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormat;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormatRegistry;
 import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
+import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
@@ -23,10 +25,7 @@ import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
-import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
-import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
-import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-import net.sourceforge.toscanaj.ToscanaJ;
+import org.jdom.Element;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,8 +39,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-
-import org.jdom.Element;
 
 /**
  *  This class provides the main GUI panel with menus and a toolbar
@@ -255,7 +252,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         };
         this.openFileAction.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_O));
         this.openFileAction.putValue(Action.ACCELERATOR_KEY,
-                                     KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+                KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 
         this.exportDiagramAction = new AbstractAction("Export Diagram...") {
             public void actionPerformed(ActionEvent e) {
@@ -264,7 +261,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         };
         this.exportDiagramAction.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_E));
         this.exportDiagramAction.putValue(Action.ACCELERATOR_KEY,
-                                          KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+                KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
         this.exportDiagramAction.setEnabled(false);
 
         this.goBackAction = new AbstractAction("Go Back one Diagram") {
@@ -274,7 +271,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         };
         this.goBackAction.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_B));
         this.goBackAction.putValue(Action.ACCELERATOR_KEY,
-                                          KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.ALT_MASK));
+                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.ALT_MASK));
         this.goBackAction.setEnabled(false);
 
         /// @todo Change all the other actions into Actions.
@@ -306,7 +303,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
             this.exportDiagramSetupMenuItem = new JMenuItem("Export Diagram Setup...");
             this.exportDiagramSetupMenuItem.setMnemonic(KeyEvent.VK_S);
             this.exportDiagramSetupMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                                                    KeyEvent.VK_E, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+                    KeyEvent.VK_E, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
             this.exportDiagramSetupMenuItem.addActionListener(this);
             fileMenu.add(exportDiagramSetupMenuItem);
         }
@@ -444,21 +441,21 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 count++;
                 String name = query.getName();
                 JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);
-                for(int i = 0; i < name.length(); i++) {
+                for (int i = 0; i < name.length(); i++) {
                     char c = name.toLowerCase().charAt(i);
-                    if( (allowedChars.indexOf(c) != -1)  && (usedChars.indexOf(c) == -1) ) {
+                    if ((allowedChars.indexOf(c) != -1) && (usedChars.indexOf(c) == -1)) {
                         menuItem.setMnemonic(KeyEvent.VK_A + allowedChars.indexOf(c));
                         usedChars += c;
                         break;
                     }
                 }
-                if(count<10) { // first ones get their number (starting with 1)
+                if (count < 10) { // first ones get their number (starting with 1)
                     menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                                                     KeyEvent.VK_0 + count, ActionEvent.ALT_MASK));
+                            KeyEvent.VK_0 + count, ActionEvent.ALT_MASK));
                 }
-                if(count==10) { // tenth gets the zero
+                if (count == 10) { // tenth gets the zero
                     menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                                                     KeyEvent.VK_0, ActionEvent.ALT_MASK));
+                            KeyEvent.VK_0, ActionEvent.ALT_MASK));
                 } // others don't get an accelerator
                 menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
@@ -474,7 +471,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 }
             }
         }
-        
+
         // create a help menu
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
@@ -482,14 +479,14 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         menubar.add(helpMenu);
 
         // add description entries if available
-        if( this.conceptualSchema != null ) {
+        if (this.conceptualSchema != null) {
             boolean entriesAdded = false;
             Element description = this.conceptualSchema.getDescription();
-            if( description != null ) {
+            if (description != null) {
                 JMenuItem descItem = new JMenuItem("Schema Description");
                 descItem.setMnemonic(KeyEvent.VK_S);
                 descItem.setAccelerator(KeyStroke.getKeyStroke(
-                                                     KeyEvent.VK_F1, 0));
+                        KeyEvent.VK_F1, 0));
                 descItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         showSchemaDescription();
@@ -498,11 +495,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 helpMenu.add(descItem);
                 entriesAdded = true;
             }
-            if( this.conceptualSchema.hasDiagramDescription() ) {
+            if (this.conceptualSchema.hasDiagramDescription()) {
                 diagramDescriptionMenuItem = new JMenuItem("Diagram Description");
                 diagramDescriptionMenuItem.setMnemonic(KeyEvent.VK_D);
                 diagramDescriptionMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                                                     KeyEvent.VK_F1, ActionEvent.SHIFT_MASK));
+                        KeyEvent.VK_F1, ActionEvent.SHIFT_MASK));
                 diagramDescriptionMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         showDiagramDescription();
@@ -512,11 +509,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 helpMenu.add(diagramDescriptionMenuItem);
                 entriesAdded = true;
             }
-            if( entriesAdded ){
+            if (entriesAdded) {
                 helpMenu.addSeparator();
             }
         }
-        
+
         JMenuItem aboutItem = new JMenuItem("About ToscanaJ");
         aboutItem.setMnemonic(KeyEvent.VK_A);
         aboutItem.addActionListener(new ActionListener() {
@@ -539,9 +536,9 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 
         toolbar.add(this.openFileAction);
         toolbar.add(this.goBackAction);
-        
+
         toolbar.add(Box.createHorizontalGlue());
-        
+
         schemaDescriptionButton = new JButton(" About Schema... ");
         schemaDescriptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -587,14 +584,13 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 (diagContr.getDiagramHistory().getSize() != 0) &&
                 (this.diagramExportSettings != null));
         this.goBackAction.setEnabled(diagContr.undoIsPossible());
-        if((this.diagramDescriptionButton != null) && (this.diagramDescriptionMenuItem != null)) {
+        if ((this.diagramDescriptionButton != null) && (this.diagramDescriptionMenuItem != null)) {
             Diagram2D curDiag = diagContr.getCurrentDiagram();
-            if(curDiag != null) {
+            if (curDiag != null) {
                 Element diagDesc = curDiag.getDescription();
                 this.diagramDescriptionButton.setEnabled(diagDesc != null);
                 this.diagramDescriptionMenuItem.setEnabled(diagDesc != null);
-            }
-            else {
+            } else {
                 this.diagramDescriptionButton.setEnabled(false);
                 this.diagramDescriptionMenuItem.setEnabled(false);
             }
@@ -693,8 +689,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         // store current file
         try {
             this.currentFile = schemaFile.getCanonicalPath();
-        }
-        catch (IOException e) { // could not resolve canonical path
+        } catch (IOException e) { // could not resolve canonical path
             e.printStackTrace();
             this.currentFile = schemaFile.getAbsolutePath();
             /// @todo what could be done here?
@@ -728,16 +723,14 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         // enable relevant buttons and menus
         fileIsOpen = true;
         resetButtons(fileIsOpen);
-        if(conceptualSchema.getDescription() != null) {
+        if (conceptualSchema.getDescription() != null) {
             schemaDescriptionButton.setVisible(true);
-        }
-        else {
+        } else {
             schemaDescriptionButton.setVisible(false);
         }
-        if(conceptualSchema.hasDiagramDescription()) {
+        if (conceptualSchema.hasDiagramDescription()) {
             diagramDescriptionButton.setVisible(true);
-        }
-        else {
+        } else {
             diagramDescriptionButton.setVisible(false);
         }
 
@@ -875,7 +868,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
             }
         }
     }
-    
+
     protected void showSchemaDescription() {
         DescriptionViewer.show(this, this.conceptualSchema.getDescription());
     }

@@ -91,7 +91,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         this.objectClause = clause;
         // if we get a null here (no clause for this one), we can initialize without
         // asking the DB
-        if(clause == null) {
+        if (clause == null) {
             this.objects = new LinkedList(); // empty list
             this.numObjects = 0; // no objects
         }
@@ -115,11 +115,10 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * Implements AbstractConceptImplementation.getObjectContingentSize().
      */
     public int getObjectContingentSize() {
-        if( numObjects == -1 ) {
-            if( objects != null ) {
+        if (numObjects == -1) {
+            if (objects != null) {
                 numObjects = objects.size();
-            }
-            else {
+            } else {
                 // we don't know the answer yet, ask DB
                 try {
                     String query = this.dbInfo.getCountQuery() + " WHERE " + this.objectClause;
@@ -129,15 +128,13 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                         query += " AND " + item;
                     }
                     query += ";";
-                    this.numObjects = this.connection.queryNumber(query,1);
-                }
-                catch (DatabaseException e) {
+                    this.numObjects = this.connection.queryNumber(query, 1);
+                } catch (DatabaseException e) {
                     /// @TODO Find something useful to do here.
-                    if(e.getOriginal()!=null) {
+                    if (e.getOriginal() != null) {
                         System.err.println(e.getMessage());
                         e.getOriginal().printStackTrace();
-                    }
-                    else {
+                    } else {
                         e.printStackTrace(System.err);
                     }
                 }
@@ -159,9 +156,9 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     public Iterator getObjectContingentIterator() {
         // fetch object names if we don't have them -- they will be stored once
         // we have queried them
-        if( this.objects == null ) {
+        if (this.objects == null) {
             objects = new LinkedList();
-            if( this.objectClause != null ) {
+            if (this.objectClause != null) {
                 try {
                     String query = this.dbInfo.getQuery() + " WHERE " + this.objectClause;
                     Iterator iter = this.filterClauses.iterator();
@@ -170,15 +167,13 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                         query += " AND " + item;
                     }
                     query += ";";
-                    objects = this.connection.queryColumn(query,1);
-                }
-                catch (DatabaseException e) {
+                    objects = this.connection.queryColumn(query, 1);
+                } catch (DatabaseException e) {
                     /// @TODO Find something useful to do here.
-                    if(e.getOriginal()!=null) {
+                    if (e.getOriginal() != null) {
                         System.err.println(e.getMessage());
                         e.getOriginal().printStackTrace();
-                    }
-                    else {
+                    } else {
                         e.printStackTrace(System.err);
                     }
                 }
@@ -191,34 +186,31 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * Implements Concept.executeQuery(Query, boolean).
      */
     public List executeQuery(Query query, boolean contingentOnly) {
-        if( query instanceof ObjectListQuery ) {
+        if (query instanceof ObjectListQuery) {
             DatabaseInfo.DatabaseQuery dbQuery = dbInfo.createListQuery(query.getName(), "", false);
-            dbQuery.insertQueryColumn("ObjectList",null/*will not call DecimalFormat*/,null,"*");
+            dbQuery.insertQueryColumn("ObjectList", null/*will not call DecimalFormat*/, null, "*");
             return executeDatabaseQuery(dbQuery, contingentOnly);
-        }
-        else if( query instanceof ObjectNumberQuery ) {
+        } else if (query instanceof ObjectNumberQuery) {
             DatabaseInfo.DatabaseQuery dbQuery = dbInfo.createAggregateQuery(query.getName(), "");
-            dbQuery.insertQueryColumn("Count",null/*will not call DecimalFormat*/,null,"count(*)");
+            dbQuery.insertQueryColumn("Count", null/*will not call DecimalFormat*/, null, "count(*)");
             List res = executeDatabaseQuery(dbQuery, contingentOnly);
-            if(res.size()==1){
-                int count= 0;
+            if (res.size() == 1) {
+                int count = 0;
                 try {
                     count = Integer.parseInt(res.get(0).toString());
-                    if(count==0){
+                    if (count == 0) {
                         res.clear();
                     }
                 } catch (NumberFormatException e) {
-                    throw new RuntimeException("Can't parse result of count: "+e.getMessage());
+                    throw new RuntimeException("Can't parse result of count: " + e.getMessage());
                 }
-            }else{
-                throw new RuntimeException("Unexpected result size from count query: "+res.size());
+            } else {
+                throw new RuntimeException("Unexpected result size from count query: " + res.size());
             }
             return res;
-        }
-        else if( query instanceof DatabaseInfo.DatabaseQuery ) {
-            return executeDatabaseQuery((DatabaseInfo.DatabaseQuery)query, contingentOnly);
-        }
-        else {
+        } else if (query instanceof DatabaseInfo.DatabaseQuery) {
+            return executeDatabaseQuery((DatabaseInfo.DatabaseQuery) query, contingentOnly);
+        } else {
             throw new RuntimeException("Unknown Query type");
         }
     }
@@ -229,13 +221,12 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         // either: there is a contingent in this concept or we query extent and we
         // have subconcepts (at least one should have a contingent, otherwise this
         // concept shouldn't exist)
-        if( this.objectClause != null || (!contingentOnly && this.ideal.size() != 1) ) {
+        if (this.objectClause != null || (!contingentOnly && this.ideal.size() != 1)) {
             String whereClause = constructWhereClause(contingentOnly);
             try {
                 retVal = this.connection.executeQuery(dbQuery, whereClause);
 
-            }
-            catch (DatabaseException e) {
+            } catch (DatabaseException e) {
                 handleDBException(e);
             }
         }
@@ -244,34 +235,31 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
 
     private void handleDBException(DatabaseException e) {
         /// @TODO Find something useful to do here.
-        if(e.getOriginal()!=null) {
+        if (e.getOriginal() != null) {
             System.err.println(e.getMessage());
             e.getOriginal().printStackTrace();
-        }
-        else {
+        } else {
             e.printStackTrace(System.err);
         }
     }
 
     public String constructWhereClause(boolean contingentOnly) {
         String whereClause = " WHERE (";
-        if(contingentOnly) {
+        if (contingentOnly) {
             // use only the local clause (we assume there is one)
             whereClause += this.objectClause;
-        }
-        else {
+        } else {
             // aggregate all clauses from the downset
             Iterator iter = this.ideal.iterator();
             boolean first = true;
             while (iter.hasNext()) {
                 DatabaseConnectedConcept concept = (DatabaseConnectedConcept) iter.next();
-                if(concept.objectClause == null) {
+                if (concept.objectClause == null) {
                     continue;
                 }
-                if(first) {
+                if (first) {
                     first = false;
-                }
-                else {
+                } else {
                     whereClause += " OR ";
                 }
                 whereClause += concept.objectClause;
@@ -296,14 +284,12 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     public Concept filterByExtent(Concept other) {
         DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo, this.connection);
         retVal.attributeContingent.addAll(this.attributeContingent);
-        if(other == null) {
+        if (other == null) {
             retVal.setObjectClause(this.objectClause);
-        }
-        else {
-            if(this.objectClause == null) {
+        } else {
+            if (this.objectClause == null) {
                 retVal.setObjectClause(null);
-            }
-            else {
+            } else {
                 retVal.objectClause = this.objectClause;
             }
             DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
@@ -311,21 +297,20 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             String newFilterClause = "(";
             boolean first = true;
             Iterator it = otherDB.ideal.iterator();
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 DatabaseConnectedConcept cur = (DatabaseConnectedConcept) it.next();
-                if(cur.objectClause == null) {
+                if (cur.objectClause == null) {
                     continue;
                 }
-                if(!first) {
-                    newFilterClause = newFilterClause + " OR " ;
-                }
-                else {
+                if (!first) {
+                    newFilterClause = newFilterClause + " OR ";
+                } else {
                     first = false;
                 }
                 newFilterClause = newFilterClause + cur.objectClause;
             }
             newFilterClause += ")";
-            if(!first) { // don't do anything if we are still waiting for the first (i.e. we have none)
+            if (!first) { // don't do anything if we are still waiting for the first (i.e. we have none)
                 retVal.filterClauses.add(newFilterClause);
             }
         }
@@ -338,15 +323,13 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     public Concept filterByContingent(Concept other) {
         DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo, this.connection);
         retVal.attributeContingent.addAll(this.attributeContingent);
-        if(other == null) {
+        if (other == null) {
             retVal.setObjectClause(this.objectClause);
-        }
-        else {
+        } else {
             DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
-            if( (this.objectClause == null) || (otherDB.objectClause == null) ) {
+            if ((this.objectClause == null) || (otherDB.objectClause == null)) {
                 retVal.setObjectClause(null);
-            }
-            else {
+            } else {
                 retVal.setObjectClause(this.objectClause);
             }
             retVal.filterClauses.addAll(otherDB.filterClauses);
@@ -365,15 +348,14 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         boolean first = true;
         Iterator iter = this.ideal.iterator();
         while (iter.hasNext()) {
-            DatabaseConnectedConcept item = (DatabaseConnectedConcept)iter.next();
-            if(item.objectClause == null) {
+            DatabaseConnectedConcept item = (DatabaseConnectedConcept) iter.next();
+            if (item.objectClause == null) {
                 continue;
             }
-            if(first) {
+            if (first) {
                 clause += item.objectClause;
                 first = false;
-            }
-            else {
+            } else {
                 clause += " OR " + item.objectClause;
             }
         }

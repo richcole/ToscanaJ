@@ -58,13 +58,13 @@ public class GraphicFormatRegistry {
      */
     static public GraphicFormat getTypeByExtension(String fileName) {
         int lastDot = fileName.lastIndexOf('.');
-        String extension = fileName.substring(lastDot+1);
+        String extension = fileName.substring(lastDot + 1);
         Iterator it = formats.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             GraphicFormat format = (GraphicFormat) it.next();
             String[] extensions = format.getExtensions();
-            for(int i = 0; i < extensions.length; i++) {
-                if(extension.equals(extensions[i])) {
+            for (int i = 0; i < extensions.length; i++) {
+                if (extension.equals(extensions[i])) {
                     return format;
                 }
             }

@@ -27,7 +27,7 @@ public class ErrorDialog {
      */
     private ErrorDialog(JFrame frame, String title, String msg) {
         JOptionPane.showMessageDialog(frame,
-                    msg, title, JOptionPane.ERROR_MESSAGE);
+                msg, title, JOptionPane.ERROR_MESSAGE);
     }
 
     /**
@@ -37,7 +37,7 @@ public class ErrorDialog {
      * based on the original exception thrown.
      */
     private ErrorDialog(JFrame frame, Throwable e, String title) {
-        showDetailedErrorMsg(frame, e, title, e.getMessage() );
+        showDetailedErrorMsg(frame, e, title, e.getMessage());
     }
 
     /**
@@ -57,33 +57,31 @@ public class ErrorDialog {
     private void showDetailedErrorMsg(JFrame frame, Throwable e, String title, String errorMsg) {
         ///@TODO an interface is requird for all toscanaJ exceptions
         Exception original = null;
-        if( e instanceof ImageGenerationException) {
-            original = ((ImageGenerationException)e).getOriginal();
+        if (e instanceof ImageGenerationException) {
+            original = ((ImageGenerationException) e).getOriginal();
+        } else if (e instanceof DataFormatException) {
+            original = ((DataFormatException) e).getOriginal();
+        } else if (e instanceof DatabaseException) {
+            original = ((DatabaseException) e).getOriginal();
         }
-        else if( e instanceof DataFormatException) {
-            original = ((DataFormatException)e).getOriginal();
-        }
-        else if( e instanceof DatabaseException) {
-            original = ((DatabaseException)e).getOriginal();
-        }
-        if( original == null ) {
+        if (original == null) {
             new ErrorDialog(frame, title, errorMsg);
             return;
         }
         Object[] options = {"OK", "Details"};
         int n = JOptionPane.showOptionDialog(frame,
-                                            errorMsg,
-                                            title,
-                                            JOptionPane.OK_CANCEL_OPTION,
-                                            JOptionPane.ERROR_MESSAGE,
-                                            null,
-                                            options,
-                                            options[0]);
-        if(n == 1) {
+                errorMsg,
+                title,
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.ERROR_MESSAGE,
+                null,
+                options,
+                options[0]);
+        if (n == 1) {
             JOptionPane.showMessageDialog(frame,
-                                            original.getMessage(),
-                                            title,
-                                            JOptionPane.ERROR_MESSAGE);
+                    original.getMessage(),
+                    title,
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -111,6 +109,6 @@ public class ErrorDialog {
      * based on original exception thrown
      */
     public static void showError(JFrame frame, Throwable e, String title, String errorMsg) {
-        new ErrorDialog(frame, e, title, errorMsg );
+        new ErrorDialog(frame, e, title, errorMsg);
     }
 }

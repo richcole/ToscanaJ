@@ -22,8 +22,7 @@ import java.util.*;
  * buildClosures() can be called to extent this to the full sub-/superconcept
  * relation.
  */
-public abstract class AbstractConceptImplementation implements Concept
-{
+public abstract class AbstractConceptImplementation implements Concept {
     protected static List makeList() {
         return new ArrayList();
     }
@@ -46,13 +45,12 @@ public abstract class AbstractConceptImplementation implements Concept
         /**
          * We start with the iterator of all concepts that we want to visit.
          */
-        AttributeIterator( Iterator main ) {
+        AttributeIterator(Iterator main) {
             this.mainIterator = main;
-            if( main.hasNext() ) {
+            if (main.hasNext()) {
                 Concept first = (Concept) main.next();
                 this.secondaryIterator = first.getAttributeContingentIterator();
-            }
-            else {
+            } else {
                 this.secondaryIterator = null;
             }
         }
@@ -64,7 +62,7 @@ public abstract class AbstractConceptImplementation implements Concept
         public boolean hasNext() {
             // make sure that we point to the next object, even if there are
             // empty contingents coming ahead
-            while( ! this.secondaryIterator.hasNext() &&  this.mainIterator.hasNext() ) {
+            while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
                 // go to next concept
                 Concept next = (Concept) this.mainIterator.next();
                 this.secondaryIterator = next.getAttributeContingentIterator();
@@ -76,30 +74,30 @@ public abstract class AbstractConceptImplementation implements Concept
          * Returns the next attribute.
          */
         public Object next() {
-            if( this.secondaryIterator == null ) {
+            if (this.secondaryIterator == null) {
                 throw new NoSuchElementException();
             }
             // Assume: secIt not null
-            if( ! this.secondaryIterator.hasNext() && ! this.mainIterator.hasNext() ) {
+            if (!this.secondaryIterator.hasNext() && !this.mainIterator.hasNext()) {
                 // we were already finished
                 throw new NoSuchElementException();
             }
             // make sure that we point to the next attribute, even if there are
             // empty contingents coming ahead
-            while( ! this.secondaryIterator.hasNext() &&  this.mainIterator.hasNext() ) {
+            while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
                 // go to next concept
                 Concept next = (Concept) this.mainIterator.next();
                 this.secondaryIterator = next.getAttributeContingentIterator();
             }
             return this.secondaryIterator.next();
-         }
+        }
 
-         /**
-          * Throws UnsupportedOperationException.
-          */
-         public void remove() {
+        /**
+         * Throws UnsupportedOperationException.
+         */
+        public void remove() {
             throw new UnsupportedOperationException();
-         }
+        }
     }
 
     /**
@@ -120,13 +118,12 @@ public abstract class AbstractConceptImplementation implements Concept
         /**
          * We start with the iterator of all concepts that we want to visit.
          */
-        ObjectIterator( Iterator main ) {
+        ObjectIterator(Iterator main) {
             this.mainIterator = main;
-            if( main.hasNext() ) {
+            if (main.hasNext()) {
                 Concept first = (Concept) main.next();
                 this.secondaryIterator = first.getObjectContingentIterator();
-            }
-            else {
+            } else {
                 this.secondaryIterator = null;
             }
         }
@@ -138,7 +135,7 @@ public abstract class AbstractConceptImplementation implements Concept
         public boolean hasNext() {
             // make sure that we point to the next object, even if there are
             // empty contingents coming ahead
-            while( ! this.secondaryIterator.hasNext() &&  this.mainIterator.hasNext() ) {
+            while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
                 // go to next concept
                 Concept next = (Concept) this.mainIterator.next();
                 this.secondaryIterator = next.getObjectContingentIterator();
@@ -150,30 +147,30 @@ public abstract class AbstractConceptImplementation implements Concept
          * Returns the next object.
          */
         public Object next() {
-            if( this.secondaryIterator == null ) {
+            if (this.secondaryIterator == null) {
                 throw new NoSuchElementException();
             }
             // Assume: secIt not null
-            if( ! this.secondaryIterator.hasNext() && ! this.mainIterator.hasNext() ) {
+            if (!this.secondaryIterator.hasNext() && !this.mainIterator.hasNext()) {
                 // we were already finished
                 throw new NoSuchElementException();
             }
             // make sure that we point to the next object, even if there are
             // empty contingents coming ahead
-            while( ! this.secondaryIterator.hasNext() &&  this.mainIterator.hasNext() ) {
+            while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
                 // go to next concept
                 Concept next = (Concept) this.mainIterator.next();
                 this.secondaryIterator = next.getObjectContingentIterator();
             }
             return this.secondaryIterator.next();
-         }
+        }
 
-         /**
-          * Throws UnsupportedOperationException.
-          */
-         public void remove() {
+        /**
+         * Throws UnsupportedOperationException.
+         */
+        public void remove() {
             throw new UnsupportedOperationException();
-         }
+        }
     }
 
     /**
@@ -211,23 +208,23 @@ public abstract class AbstractConceptImplementation implements Concept
      */
     public AbstractConceptImplementation() {
         this.filter = new HashSet();
-        this.filter.add( this );
+        this.filter.add(this);
         this.ideal = new HashSet();
-        this.ideal.add( this );
+        this.ideal.add(this);
     }
 
     /**
      * Adds a concept to the filter.
      */
-    public void addSuperConcept( Concept superConcept ) {
-        this.filter.add( superConcept );
+    public void addSuperConcept(Concept superConcept) {
+        this.filter.add(superConcept);
     }
 
     /**
      * Adds a concept to the ideal.
      */
-    public void addSubConcept( Concept superConcept ) {
-        this.ideal.add( superConcept );
+    public void addSubConcept(Concept superConcept) {
+        this.ideal.add(superConcept);
     }
 
     /**
@@ -241,31 +238,31 @@ public abstract class AbstractConceptImplementation implements Concept
     public void buildClosures() {
         List idealList = new LinkedList(ideal);
         Set idealSet = new HashSet(ideal);
-        while(!idealList.isEmpty()) {
+        while (!idealList.isEmpty()) {
             AbstractConceptImplementation other = (AbstractConceptImplementation) idealList.remove(0);
             Iterator it = other.ideal.iterator();
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 Object trans = it.next();
-                if(idealSet.add(trans) ) {
+                if (idealSet.add(trans)) {
                     idealList.add(trans);
                 }
             }
         }
-        ideal=idealSet;
+        ideal = idealSet;
 
         Set filterSet = new HashSet(filter);
         List filterList = new LinkedList(filter);
-        while(!filterList.isEmpty()) {
+        while (!filterList.isEmpty()) {
             AbstractConceptImplementation other = (AbstractConceptImplementation) filterList.remove(0);
             Iterator it = other.filter.iterator();
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 Object trans = it.next();
-                if(filterSet.add(trans) ) {
+                if (filterSet.add(trans)) {
                     filterList.add(trans);
                 }
             }
         }
-        filter=filterSet;
+        filter = filterSet;
     }
 
     /**
@@ -276,10 +273,10 @@ public abstract class AbstractConceptImplementation implements Concept
     public boolean isRealised() {
         int extentSize = this.getExtentSize();
         Iterator it = this.ideal.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Concept cur = (Concept) it.next();
-            if(cur != this) {
-                if(cur.getExtentSize() == extentSize) {
+            if (cur != this) {
+                if (cur.getExtentSize() == extentSize) {
                     return false;
                 }
             }
@@ -291,10 +288,10 @@ public abstract class AbstractConceptImplementation implements Concept
      * Calculates the intent size based on the contingent sizes in the filter.
      */
     public int getIntentSize() {
-        if(intentSize < 0) { // not yet calculated
+        if (intentSize < 0) { // not yet calculated
             intentSize = 0;
             Iterator it = filter.iterator();
-            while( it.hasNext() ) {
+            while (it.hasNext()) {
                 Concept cur = (Concept) it.next();
                 intentSize += cur.getAttributeContingentSize();
             }
@@ -306,17 +303,17 @@ public abstract class AbstractConceptImplementation implements Concept
      * Calculates the relative intent size.
      */
     public double getIntentSizeRelative() {
-        return getIntentSize() / (double)getNumberOfAttributes();
+        return getIntentSize() / (double) getNumberOfAttributes();
     }
 
     /**
      * Calculates the extent size based on the contingent sizes in the ideal.
      */
     public int getExtentSize() {
-        if(extentSize < 0 ) { // not yet calculated
+        if (extentSize < 0) { // not yet calculated
             extentSize = 0;
             Iterator it = ideal.iterator();
-            while( it.hasNext() ) {
+            while (it.hasNext()) {
                 Concept cur = (Concept) it.next();
                 extentSize += cur.getObjectContingentSize();
             }
@@ -328,35 +325,35 @@ public abstract class AbstractConceptImplementation implements Concept
      * Calculates the relative extent size.
      */
     public double getExtentSizeRelative() {
-        return getExtentSize() / (double)getNumberOfObjects();
+        return getExtentSize() / (double) getNumberOfObjects();
     }
 
     /**
      * Iterates over all attribute contingents in the filter.
      */
     public Iterator getIntentIterator() {
-        return new AttributeIterator( this.filter.iterator() );
+        return new AttributeIterator(this.filter.iterator());
     }
 
     /**
      * Iterates over all object contingents in the ideal.
      */
     public Iterator getExtentIterator() {
-        return new ObjectIterator( this.ideal.iterator() );
+        return new ObjectIterator(this.ideal.iterator());
     }
 
     /**
      * Calculates the relative attribute contingent size.
      */
     public double getAttributeContingentSizeRelative() {
-        return getAttributeContingentSize() / (double)getNumberOfAttributes();
+        return getAttributeContingentSize() / (double) getNumberOfAttributes();
     }
 
     /**
      * Calculates the relative object contingent size.
      */
     public double getObjectContingentSizeRelative() {
-        return getObjectContingentSize() / (double)getNumberOfObjects();
+        return getObjectContingentSize() / (double) getNumberOfObjects();
     }
 
     /**
@@ -366,14 +363,14 @@ public abstract class AbstractConceptImplementation implements Concept
      */
     private int getNumberOfObjects() {
         AbstractConceptImplementation cur = this;
-        while(cur.filter.size() != 1) {
+        while (cur.filter.size() != 1) {
             // there is another concept in the filter which is not this
             // (this is always the first) ==> go up
             // The concept itself is in the filter, too -- we have to avoid
             // infinite recursion here
             Iterator it = cur.filter.iterator();
             Object next = cur;
-            while(cur == next) { // we know there has to be a next()
+            while (cur == next) { // we know there has to be a next()
                 next = it.next();
             }
             cur = (AbstractConceptImplementation) next;
@@ -389,14 +386,14 @@ public abstract class AbstractConceptImplementation implements Concept
      */
     private int getNumberOfAttributes() {
         AbstractConceptImplementation cur = this;
-        while(cur.ideal.size() != 1) {
+        while (cur.ideal.size() != 1) {
             // there is another concept in the ideal which is not this
             // (this is always the first) ==> go down
             // The concept itself is in the filter, too -- we have to avoid
             // infinite recursion here
             Iterator it = cur.ideal.iterator();
             Object next = cur;
-            while(cur == next) { // we know there has to be a next()
+            while (cur == next) { // we know there has to be a next()
                 next = it.next();
             }
             cur = (AbstractConceptImplementation) next;

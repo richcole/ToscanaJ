@@ -117,7 +117,7 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
             List retVal = new LinkedList();
             int size = contingentOnly ? this.getObjectContingentSize() : this.getExtentSize();
 
-            if(size >0){
+            if (size > 0) {
                 Vector item = new Vector(2);
                 item.add(0, null);
                 item.add(1, new Integer(size).toString());

@@ -12,8 +12,8 @@ import com.sun.jimi.core.JimiWriter;
 import net.sourceforge.toscanaj.canvas.DrawingCanvas;
 
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,6 +34,7 @@ public class JimiImageWriter implements ImageWriter {
         public String getName() {
             return "Portable Network Graphics";
         }
+
         /**
          * Implements GraphicFormat.getExtensions().
          */
@@ -42,6 +43,7 @@ public class JimiImageWriter implements ImageWriter {
             retVal[0] = "png";
             return retVal;
         }
+
         /**
          * Implements GraphicFormat.getWriter().
          */
@@ -60,6 +62,7 @@ public class JimiImageWriter implements ImageWriter {
         public String getName() {
             return "Joint Picture Expert Group";
         }
+
         /**
          * Implements GraphicFormat.getExtensions().
          */
@@ -69,6 +72,7 @@ public class JimiImageWriter implements ImageWriter {
             retVal[1] = "jpeg";
             return retVal;
         }
+
         /**
          * Implements GraphicFormat.getWriter().
          */
@@ -101,59 +105,50 @@ public class JimiImageWriter implements ImageWriter {
      * Saves the canvas using the settings to the file.
      */
     public void exportGraphic(DrawingCanvas canvas, DiagramExportSettings settings, File outputFile)
-           throws ImageGenerationException {
-        if( settings.usesAutoMode() ) {
+            throws ImageGenerationException {
+        if (settings.usesAutoMode()) {
             // update information
             settings.setImageSize(canvas.getWidth(), canvas.getHeight());
         }
         // determine dummy name for Jimi
         String jimiName = null;
-        if( settings.getGraphicFormat() instanceof GraphicFormatPNG ) {
+        if (settings.getGraphicFormat() instanceof GraphicFormatPNG) {
             jimiName = "dummy.png";
-        }
-        else if( settings.getGraphicFormat() instanceof GraphicFormatJPG ) {
+        } else if (settings.getGraphicFormat() instanceof GraphicFormatJPG) {
             jimiName = "dummy.jpg";
-        }
-        else {
+        } else {
             throw new ImageGenerationException("Something went really wrong, call the doctor!");
         }
         // use Jimi
-        Image image = new BufferedImage( settings.getImageWidth(), settings.getImageHeight(),
-                                         BufferedImage.TYPE_INT_ARGB);
+        Image image = new BufferedImage(settings.getImageWidth(), settings.getImageHeight(),
+                BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics2D = (Graphics2D) image.getGraphics();
 
         Rectangle2D bounds = new Rectangle2D.Double(
-                                    0, 0, settings.getImageWidth(), settings.getImageHeight() );
+                0, 0, settings.getImageWidth(), settings.getImageHeight());
 
         graphics2D.setPaint(canvas.getBackground());
         graphics2D.fill(bounds);
 
-        AffineTransform transform =  canvas.scaleToFit(graphics2D, bounds);
+        AffineTransform transform = canvas.scaleToFit(graphics2D, bounds);
         graphics2D.transform(transform);
         // paint all items on canvas
         canvas.paintCanvas(graphics2D);
-        try
-        {
+        try {
             JimiWriter writer = Jimi.createJimiWriter(jimiName);
             writer.setSource(image);
             FileOutputStream outStream = new FileOutputStream(outputFile);
             writer.putImage(outStream);
             outStream.close();
-        }
-        catch( JimiException e )
-        {
-            throw new ImageGenerationException( "Error while generating '" +
-                outputFile.getPath() + "' - Jimi error " , e );
-        }
-        catch( FileNotFoundException e )
-        {
-            throw new ImageGenerationException( "Error while generating '" +
-                outputFile.getPath() + "' - not found " , e );
-        }
-        catch( IOException e )
-        {
-            throw new ImageGenerationException( "Error while generating '" +
-                outputFile.getPath() + "' - IO problem "  , e );
+        } catch (JimiException e) {
+            throw new ImageGenerationException("Error while generating '" +
+                    outputFile.getPath() + "' - Jimi error ", e);
+        } catch (FileNotFoundException e) {
+            throw new ImageGenerationException("Error while generating '" +
+                    outputFile.getPath() + "' - not found ", e);
+        } catch (IOException e) {
+            throw new ImageGenerationException("Error while generating '" +
+                    outputFile.getPath() + "' - IO problem ", e);
         }
     }
 }

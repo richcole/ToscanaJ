@@ -36,14 +36,14 @@ public class DiagramLine {
      * Returns the starting node in a Diagram in which DiagramLine object will be connecting.
      */
     public DiagramNode getFromNode() {
-    return this.fromNode;
+        return this.fromNode;
     }
 
     /**
      * Returns the end node in a Diagram in which DiagramLine object will be connecting.
      */
     public DiagramNode getToNode() {
-    return this.toNode;
+        return this.toNode;
     }
 
     /**
@@ -84,6 +84,6 @@ public class DiagramLine {
     public double getLength() {
         double dx = this.toNode.getX() - this.fromNode.getX();
         double dy = this.toNode.getY() - this.fromNode.getY();
-        return Math.sqrt(dx*dx + dy*dy);
+        return Math.sqrt(dx * dx + dy * dy);
     }
 }

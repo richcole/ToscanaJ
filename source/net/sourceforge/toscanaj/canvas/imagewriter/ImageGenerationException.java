@@ -14,8 +14,7 @@ package net.sourceforge.toscanaj.canvas.imagewriter;
  *
  * @todo build hierarchy for this.
  */
-public class ImageGenerationException extends Exception
-{
+public class ImageGenerationException extends Exception {
     /**
      * This can be used to get the original Exception.
      */

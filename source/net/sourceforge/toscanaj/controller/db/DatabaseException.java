@@ -14,8 +14,7 @@ package net.sourceforge.toscanaj.controller.db;
  *
  * @todo build hierarchy for this.
  */
-public class DatabaseException extends Exception
-{
+public class DatabaseException extends Exception {
     /**
      * This can be used to get the original Exception.
      */

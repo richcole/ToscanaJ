@@ -34,8 +34,8 @@ public class DatabaseConnectedConceptTest extends ConceptTest {
 
         public List executeQuery(DatabaseInfo.DatabaseQuery query, String whereClause) throws DatabaseException {
             List list = new ArrayList();
-            if(query.getQueryHead().toLowerCase().indexOf("count")!=-1){
-                 list.add("0");
+            if (query.getQueryHead().toLowerCase().indexOf("count") != -1) {
+                list.add("0");
             }
             return list;
         }

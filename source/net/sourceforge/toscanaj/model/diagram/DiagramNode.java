@@ -49,25 +49,25 @@ public class DiagramNode {
      * The layout information for the attribute label.
      */
     protected LabelInfo objectLabel;
-    
+
     protected DiagramNode outerNode;
 
-    public DiagramNode(Point2D position, Concept concept, 
+    public DiagramNode(Point2D position, Concept concept,
                        LabelInfo attributeLabel, LabelInfo objectLabel,
-                       DiagramNode outerNode){
+                       DiagramNode outerNode) {
         this.position = position;
         this.concept = concept;
         this.attributeLabel = attributeLabel;
-        if(attributeLabel != null) {
+        if (attributeLabel != null) {
             attributeLabel.attachNode(this);
         }
         this.objectLabel = objectLabel;
-        if(objectLabel != null) {
+        if (objectLabel != null) {
             objectLabel.attachNode(this);
         }
         this.outerNode = outerNode;
     }
-    
+
     public DiagramNode getOuterNode() {
         return outerNode;
     }
@@ -80,18 +80,16 @@ public class DiagramNode {
     public DiagramNode(DiagramNode other) {
         this.position = (Point2D) other.position.clone();
         this.concept = other.concept;
-        if(this.attributeLabel != null) {
+        if (this.attributeLabel != null) {
             this.attributeLabel = new LabelInfo(other.attributeLabel);
             this.attributeLabel.attachNode(this);
-        }
-        else {
+        } else {
             this.attributeLabel = null;
         }
-        if(this.objectLabel != null) {
+        if (this.objectLabel != null) {
             this.objectLabel = new LabelInfo(other.objectLabel);
             this.objectLabel.attachNode(this);
-        }
-        else {
+        } else {
             this.objectLabel = null;
         }
     }
@@ -99,21 +97,21 @@ public class DiagramNode {
     /**
      * Get the current node position.
      */
-    public Point2D getPosition(){
+    public Point2D getPosition() {
         return position;
     }
 
     /**
      * Set the node position in the model space.
      */
-    public void setPosition(Point2D position){
-       this.position = position;
+    public void setPosition(Point2D position) {
+        this.position = position;
     }
 
     /**
      * Get the concept for this node.
      */
-    public Concept getConcept(){
+    public Concept getConcept() {
         return concept;
     }
 
@@ -121,7 +119,7 @@ public class DiagramNode {
      * Get the x coordinate in the model space.
      */
     public double getX() {
-       return position.getX();
+        return position.getX();
     }
 
     /**
@@ -135,10 +133,9 @@ public class DiagramNode {
      * Get the horizontal radius used for this node.
      */
     public double getRadiusX() {
-        if(this.concept.isRealised()) {
+        if (this.concept.isRealised()) {
             return RADIUS;
-        }
-        else {
+        } else {
             return RADIUS / 3;
         }
     }
@@ -147,10 +144,9 @@ public class DiagramNode {
      * Get the vertical radius used for this node.
      */
     public double getRadiusY() {
-        if(this.concept.isRealised()) {
+        if (this.concept.isRealised()) {
             return RADIUS;
-        }
-        else {
+        } else {
             return RADIUS / 3;
         }
     }
@@ -196,10 +192,10 @@ public class DiagramNode {
      */
     public void invertY() {
         this.position.setLocation(this.position.getX(), -this.position.getY());
-        this.attributeLabel.setOffset( this.attributeLabel.getOffset().getX(),
-                                       -this.attributeLabel.getOffset().getY() );
-        this.objectLabel.setOffset( this.objectLabel.getOffset().getX(),
-                                    -this.objectLabel.getOffset().getY() );
+        this.attributeLabel.setOffset(this.attributeLabel.getOffset().getX(),
+                -this.attributeLabel.getOffset().getY());
+        this.objectLabel.setOffset(this.objectLabel.getOffset().getX(),
+                -this.objectLabel.getOffset().getY());
     }
 
     /**
@@ -207,8 +203,8 @@ public class DiagramNode {
      */
     public String toString() {
         String retVal = "DiagramNode:\n";
-        retVal+= "- Pos : (" + getX() + "," + getY() + ")\n";
-        retVal+= "- Size: (" + getRadiusX() + "," + getRadiusY() + ")\n";
+        retVal += "- Pos : (" + getX() + "," + getY() + ")\n";
+        retVal += "- Size: (" + getRadiusX() + "," + getRadiusY() + ")\n";
         return retVal;
     }
 }

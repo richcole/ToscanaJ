@@ -58,15 +58,12 @@
 
 package net.sourceforge.toscanaj.util;
 
-import java.lang.Exception;
-import java.lang.Object;
 
 /**
  * An iterator ranges over a sequence of values.
  */
-public interface Iterator 
-  extends Cloneable 
-{
+public interface Iterator
+        extends Cloneable {
     /**
      * returns true if the set ranged over by this iterator contains
      * the value x.
@@ -89,7 +86,7 @@ public interface Iterator
      * Return the value refered to by this iterator. If the iterator
      * refers to the end of the list then throw an exception.
      */
-    public  Object val() throws PreconditionFailedException;
+    public Object val() throws PreconditionFailedException;
 
     /**
      * returns true if the set ranged over by this iterator contains
@@ -101,7 +98,7 @@ public interface Iterator
      * Return the number of objects in the sequence refered to by
      * this iterator.
      */
-    public int  count() throws Exception;
+    public int count() throws Exception;
 
     /**
      * Make a copy of the iterator. The copy will refer to the same element

@@ -13,8 +13,8 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -34,6 +34,7 @@ public class BatikImageWriter implements ImageWriter {
         public String getName() {
             return "Scalable Vector Graphics";
         }
+
         /**
          * Implements GraphicFormat.getExtensions().
          */
@@ -42,6 +43,7 @@ public class BatikImageWriter implements ImageWriter {
             retVal[0] = "svg";
             return retVal;
         }
+
         /**
          * Implements GraphicFormat.getWriter().
          */
@@ -73,24 +75,24 @@ public class BatikImageWriter implements ImageWriter {
      * Saves the canvas using the settings to the file.
      */
     public void exportGraphic(DrawingCanvas canvas, DiagramExportSettings settings, File outputFile)
-           throws ImageGenerationException {
-        if( settings.usesAutoMode() ) {
+            throws ImageGenerationException {
+        if (settings.usesAutoMode()) {
             // update information
             settings.setImageSize(canvas.getWidth(), canvas.getHeight());
         }
         // use Batik
         // Get a DOMImplementation
         DOMImplementation domImpl =
-            GenericDOMImplementation.getDOMImplementation();
+                GenericDOMImplementation.getDOMImplementation();
 
         // Create an instance of org.w3c.dom.Document
         Document document = domImpl.createDocument(null, "svg", null);
 
         // Create an instance of the SVG Generator
         SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-        svgGenerator.setSVGCanvasSize(new Dimension(settings.getImageWidth(),settings.getImageHeight()));
+        svgGenerator.setSVGCanvasSize(new Dimension(settings.getImageWidth(), settings.getImageHeight()));
         Rectangle2D bounds = new Rectangle2D.Double(
-                                    0, 0, settings.getImageWidth(), settings.getImageHeight() );
+                0, 0, settings.getImageWidth(), settings.getImageHeight());
 
         svgGenerator.setPaint(canvas.getBackground());
         svgGenerator.fill(bounds);
@@ -109,10 +111,9 @@ public class BatikImageWriter implements ImageWriter {
             Writer out = new OutputStreamWriter(outStream, "UTF-8");
             svgGenerator.stream(out, useCSS);
             outStream.close();
-        }
-        catch(Exception e) {
-            throw new ImageGenerationException( "Error while generating '" +
-                outputFile.getPath() + "' - writing SVG error: "  + e.getMessage(), e );
+        } catch (Exception e) {
+            throw new ImageGenerationException("Error while generating '" +
+                    outputFile.getPath() + "' - writing SVG error: " + e.getMessage(), e);
         }
     }
 }

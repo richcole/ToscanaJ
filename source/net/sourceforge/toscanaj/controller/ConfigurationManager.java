@@ -6,7 +6,6 @@
  */
 package net.sourceforge.toscanaj.controller;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,11 +36,9 @@ public class ConfigurationManager {
             FileInputStream in = new FileInputStream("toscanaj.prop");
             properties.load(in);
             in.close();
-        }
-        catch(FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             // we will just use the defaults
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             // nothing we can do here, just print the stack trace
             e.printStackTrace();
         }
@@ -61,8 +58,7 @@ public class ConfigurationManager {
             FileOutputStream out = new FileOutputStream("toscanaj.prop");
             properties.store(out, "--- ToscanaJ settings ---");
             out.close();
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             // nothing useful we can do here, just print the stack trace
             e.printStackTrace();
         }
@@ -85,13 +81,12 @@ public class ConfigurationManager {
      */
     static public void restorePlacement(String section, Window window, Rectangle defaultPlacement) {
         try {
-            int x = Integer.parseInt(properties.getProperty(section+"-x"));
-            int y = Integer.parseInt(properties.getProperty(section+"-y"));
-            int w = Integer.parseInt(properties.getProperty(section+"-width"));
-            int h = Integer.parseInt(properties.getProperty(section+"-height"));
-            window.setBounds(x,y,w,h);
-        }
-        catch(NumberFormatException e) {
+            int x = Integer.parseInt(properties.getProperty(section + "-x"));
+            int y = Integer.parseInt(properties.getProperty(section + "-y"));
+            int w = Integer.parseInt(properties.getProperty(section + "-width"));
+            int h = Integer.parseInt(properties.getProperty(section + "-height"));
+            window.setBounds(x, y, w, h);
+        } catch (NumberFormatException e) {
             // use default
             window.setBounds(defaultPlacement);
         }
@@ -110,11 +105,9 @@ public class ConfigurationManager {
     static public int fetchInt(String section, String key, int defaultValue) {
         try {
             return Integer.parseInt(properties.getProperty(section + "-" + key));
-        }
-        catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return defaultValue;
-        }
-        catch(NullPointerException e) {
+        } catch (NullPointerException e) {
             return defaultValue;
         }
     }
@@ -132,11 +125,9 @@ public class ConfigurationManager {
     static public float fetchFloat(String section, String key, float defaultValue) {
         try {
             return Float.parseFloat(properties.getProperty(section + "-" + key));
-        }
-        catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return defaultValue;
-        }
-        catch(NullPointerException e) {
+        } catch (NullPointerException e) {
             return defaultValue;
         }
     }
@@ -161,7 +152,7 @@ public class ConfigurationManager {
     static public void storeStringList(String section, String key, List list) {
         Iterator it = list.iterator();
         int index = 1;
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             String cur = (String) it.next();
             properties.setProperty(section + "-" + key + "-" + index, cur);
             index++;
@@ -176,9 +167,9 @@ public class ConfigurationManager {
      */
     static public List fetchStringList(String section, String key, int maxItems) {
         List retVal = new LinkedList();
-        for(int i = 1; i <= maxItems; i++) {
+        for (int i = 1; i <= maxItems; i++) {
             String cur = properties.getProperty(section + "-" + key + "-" + i);
-            if(cur != null) {
+            if (cur != null) {
                 retVal.add(cur);
             }
         }
@@ -197,14 +188,12 @@ public class ConfigurationManager {
      */
     static public Color fetchColor(String section, String key, Color defaultValue) {
         String propVal = properties.getProperty(section + "-" + key);
-        if( propVal == null ) {
+        if (propVal == null) {
             return defaultValue;
-        }
-        else {
+        } else {
             try {
                 return Color.decode(propVal);
-            }
-            catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 System.err.println(e.getMessage());
                 return defaultValue;
             }

@@ -18,7 +18,7 @@ public interface WriteableDiagram2D extends Diagram2D {
      * Change the title of the diagram.
      */
     public void setTitle(String title);
-    
+
     /**
      * Gives the diagram a description.
      */

@@ -48,8 +48,8 @@ public abstract class CanvasItem implements ChangeObservable {
      */
     protected void notifyObservers() {
         Iterator it = this.observers.iterator();
-        while(it.hasNext()) {
-            ChangeObserver observer = (ChangeObserver)it.next();
+        while (it.hasNext()) {
+            ChangeObserver observer = (ChangeObserver) it.next();
             observer.update(this);
         }
     }

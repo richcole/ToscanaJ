@@ -11,10 +11,10 @@ package net.sourceforge.toscanaj.dbviewer;
  *
  * @todo this documentation is outdated, the elements have been renamed and
  * moved (conceptualSchema/context/databaseConnection/views/object(List)?View),
- * this includes the multi-item views now (formerly reports), templates can 
+ * this includes the multi-item views now (formerly reports), templates can
  * always be given internally or externally, the call is showView(String),
  * table and key come from the manager directly.
- * 
+ *
  * This interface offers a simple way to add database viewers into ToscanaJ.
  * The viewer and its options will be defined in the CSX file by giving a
  * <viewer> element directly in the <conceptualSchema>. Multiple viewers
@@ -93,14 +93,13 @@ package net.sourceforge.toscanaj.dbviewer;
  * key is really a key). Each Vector will contain a number of Strings: one for each column
  * queried, in the same order as the field names in the list given. How you display the
  * results is your problem ;-)
- *   
+ *
  * Check the implementations in the net.sourceforge.toscanaj.dbviewer package for some
  * complete examples.
  */
-public interface DatabaseViewer
-{
+public interface DatabaseViewer {
     void initialize(DatabaseViewerManager manager)
-        throws DatabaseViewerInitializationException;
-    
+            throws DatabaseViewerInitializationException;
+
     void showView(String whereClause);
 }
