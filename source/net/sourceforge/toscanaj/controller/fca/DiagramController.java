@@ -277,9 +277,15 @@ public class DiagramController implements ChangeObservable {
 
     /**
      * Returns true if an undo step can be made.
+     *
+     * This is only true if we have past diagrams, if we have nesting we can
+     * call back() but the user should not be allowed to, since this changes
+     * nesting levels but is not an undo.
+     *
+     * @see back()
      */
     public boolean undoIsPossible() {
-        return history.pastDiagrams.size() + history.currentDiagrams.size() > 1;
+        return !history.pastDiagrams.isEmpty();
     }
 
     /**
@@ -363,7 +369,7 @@ public class DiagramController implements ChangeObservable {
             return;
         }
         // no future diagrams, check if we can undo
-        if( undoIsPossible() ) {
+        if( history.pastDiagrams.size() + history.currentDiagrams.size() > 1 ) {
             back();
             history.futureDiagrams.remove(0);
             history.fireIntervalRemoved(history.getSize(),history.getSize());
@@ -437,25 +443,28 @@ public class DiagramController implements ChangeObservable {
     /**
      * Goes one step back in the history.
      *
-     * This is the undo operation for next().
-     *
-     * @TODO This does not allow going back trom nested to flat mode -- change.
+     * This is the undo operation for next(). If we have multiple current diagrams
+     * but no past diagrams left this will reduce the nesting level by one until
+     * new diagrams are added.
      *
      * @see next()
+     * @see undoIsPossible()
      */
     public void back() {
-        if(history.pastDiagrams.isEmpty()) {
-            throw new NoSuchElementException("No visited diagram left");
+        if(history.pastDiagrams.size() + history.currentDiagrams.size() < 2) {
+            throw new NoSuchElementException("No diagram left to go back to.");
         }
         int lastPos = history.currentDiagrams.size() - 1;
         if( lastPos == this.nestingLevel ) { // we have our nesting level
-            history.futureDiagrams.add(0,history.currentDiagrams.get(
-                                       history.currentDiagrams.size()-1));
-            history.currentDiagrams.remove(history.currentDiagrams.size()-1);
+            history.futureDiagrams.add(0,history.currentDiagrams.get(lastPos));
+            history.currentDiagrams.remove(lastPos);
         }
-        history.currentDiagrams.add(0,history.pastDiagrams.get(
-                                    history.pastDiagrams.size()-1));
-        history.pastDiagrams.remove(history.pastDiagrams.size()-1);
+        if( !history.pastDiagrams.isEmpty() ) {
+            // we have something to go back to, otherwise we just lose nesting
+            history.currentDiagrams.add(0,history.pastDiagrams.get(
+                                        history.pastDiagrams.size()-1));
+            history.pastDiagrams.remove(history.pastDiagrams.size()-1);
+        }
         history.fireContentsChanged(0,history.getSize()-1);
         notifyObservers();
     }
