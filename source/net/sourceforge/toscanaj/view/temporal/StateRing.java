@@ -15,22 +15,35 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.ExtraCanvasItemFactory;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import net.sourceforge.toscanaj.view.diagram.NodeView;
 
 import org.jdom.Element;
 import org.tockit.canvas.CanvasItem;
 import org.tockit.util.ColorStringConverter;
 
 public class StateRing extends CanvasItem implements XMLizable {
-    private NodeView nodeView;
+    private static class Factory implements ExtraCanvasItemFactory {
+        public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) {
+            System.out.println("Here SR");
+            return null;
+        }
+    }
+    
+    static {
+        SimpleLineDiagram.registerExtraCanvasItemFactory("stateRing", new Factory());
+    }
+   
+    private DiagramNode node;
 	private Color baseColor;
     private double timePos;
     private AnimationTimeController timeController;
 	
-    public StateRing(NodeView nodeView, Color color, double timePos, AnimationTimeController timeController) {
-    	this.nodeView = nodeView;
+    public StateRing(DiagramNode node, Color color, double timePos, AnimationTimeController timeController) {
+    	this.node = node;
     	this.baseColor = color;
     	this.timePos = timePos;
     	this.timeController = timeController;
@@ -44,9 +57,9 @@ public class StateRing extends CanvasItem implements XMLizable {
 
     	Paint oldPaint = g.getPaint();
 
-        Rectangle2D nodeBounds = this.nodeView.getCanvasBounds(g);
-        Ellipse2D ellipse = new Ellipse2D.Double(nodeBounds.getX(), nodeBounds.getY(),
-                                       			 nodeBounds.getWidth(), nodeBounds.getHeight());
+        Rectangle2D bounds = getCanvasBounds(g);
+        Ellipse2D ellipse = new Ellipse2D.Double(bounds.getX(), bounds.getY(),
+                                       			 bounds.getWidth(), bounds.getHeight());
     	
         g.setPaint(color);
         g.fill(ellipse);
@@ -78,16 +91,21 @@ public class StateRing extends CanvasItem implements XMLizable {
     }
 
     public Point2D getPosition() {
-        return this.nodeView.getPosition();
+        return this.node.getPosition();
     }
 
     public Rectangle2D getCanvasBounds(Graphics2D g) {
-    	return this.nodeView.getCanvasBounds(g);
+        Point2D center = this.node.getPosition();
+        double x = center.getX();
+        double y = center.getY();
+        double rx = node.getRadiusX();
+        double ry = node.getRadiusY();
+        return new Rectangle2D.Double(x - rx, y - ry, 2 * rx + 3, 2 * ry + 3);
     }
 
     public Element toXML() {
         Element result = new Element("stateRing");
-        result.setAttribute("nodeView",nodeView.getDiagramNode().getIdentifier());
+        result.setAttribute("nodeView",node.getIdentifier());
         result.setAttribute("color", ColorStringConverter.colorToString(this.baseColor));
         return result;
     }

@@ -20,16 +20,38 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.ExtraCanvasItemFactory;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import net.sourceforge.toscanaj.view.diagram.NodeView;
 
 import org.jdom.Element;
+import org.tockit.canvas.CanvasItem;
 import org.tockit.canvas.MovableCanvasItem;
 
 public class TransitionArrow extends MovableCanvasItem implements XMLizable {
-    protected NodeView startNodeView;
-    protected NodeView endNodeView;
+    private static class Factory implements ExtraCanvasItemFactory {
+        public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) {
+//            NodeView start = diagram.getNode(element.getAttributeValue("from"));
+            return null;
+//            Element result = new Element(getTagName());
+//            result.setAttribute("from", startNodeView.getDiagramNode().getIdentifier());
+//            result.setAttribute("to", endNodeView.getDiagramNode().getIdentifier());
+//            Element offsetElem = new Element("offset");
+//            offsetElem.setAttribute("x", String.valueOf(manualOffset.getX()));
+//            offsetElem.setAttribute("y", String.valueOf(manualOffset.getY()));
+//            result.addContent(offsetElem);
+//            result.addContent(this.style.toXML());
+        }
+    }
+    
+    static {
+        SimpleLineDiagram.registerExtraCanvasItemFactory("transitionArrow", new Factory());
+    }
+   
+    protected DiagramNode startNode;
+    protected DiagramNode endNode;
     protected Rectangle2D bounds;
     protected Point2D shiftVector = new Point2D.Double();
     protected Point2D manualOffset = new Point2D.Double();
@@ -39,9 +61,9 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
 	
     private Shape currentShape;
     
-    public TransitionArrow(NodeView startNodeView, NodeView endNodeView, ArrowStyle style, double timePos, AnimationTimeController timeController) {
-    	this.startNodeView = startNodeView;
-    	this.endNodeView = endNodeView;
+    public TransitionArrow(DiagramNode startNode, DiagramNode endNode, ArrowStyle style, double timePos, AnimationTimeController timeController) {
+    	this.startNode = startNode;
+    	this.endNode = endNode;
     	this.style = style;
     	this.timePos = timePos;
     	this.timeController = timeController;
@@ -51,7 +73,7 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     }
 
     public void draw(Graphics2D g) {
-    	if(this.startNodeView == this.endNodeView) {
+    	if(this.startNode == this.endNode) {
     		return;
     	}
 
@@ -178,10 +200,10 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     }
 
     private void updateShiftVector() {
-        double xDiff = this.endNodeView.getPosition().getX() -
-                        this.startNodeView.getPosition().getX();
-        double yDiff = this.endNodeView.getPosition().getY() -
-                        this.startNodeView.getPosition().getY();
+        double xDiff = this.endNode.getPosition().getX() -
+                        this.startNode.getPosition().getX();
+        double yDiff = this.endNode.getPosition().getY() -
+                        this.startNode.getPosition().getY();
         double shiftDist = 10.0;
         double factor = shiftDist / Math.sqrt(xDiff * xDiff + yDiff * yDiff);
         this.shiftVector = new Point2D.Double(yDiff * factor, -xDiff * factor);
@@ -191,30 +213,30 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
      * @todo start and end positions should consider node radius
      */
     protected double getStartX() {
-        double x = this.startNodeView.getPosition().getX();
+        double x = this.startNode.getPosition().getX();
         return x + 
-               this.style.getRelativeLength() * (this.endNodeView.getPosition().getX() - x) + 
+               this.style.getRelativeLength() * (this.endNode.getPosition().getX() - x) + 
                this.shiftVector.getX();
     }
 
     protected double getStartY() {
-        double y = this.startNodeView.getPosition().getY();
+        double y = this.startNode.getPosition().getY();
         return y + 
-               this.style.getRelativeLength() * (this.endNodeView.getPosition().getY() - y) +
+               this.style.getRelativeLength() * (this.endNode.getPosition().getY() - y) +
                this.shiftVector.getY();
     }
 
     protected double getEndX() {
-        double x = this.endNodeView.getPosition().getX();
+        double x = this.endNode.getPosition().getX();
         return x + 
-               this.style.getRelativeLength() * (this.startNodeView.getPosition().getX() - x) +
+               this.style.getRelativeLength() * (this.startNode.getPosition().getX() - x) +
                this.shiftVector.getX();
     }
 
     protected double getEndY() {
-        double y = this.endNodeView.getPosition().getY();
+        double y = this.endNode.getPosition().getY();
         return y + 
-               this.style.getRelativeLength() * (this.startNodeView.getPosition().getY() - y) +
+               this.style.getRelativeLength() * (this.startNode.getPosition().getY() - y) +
                this.shiftVector.getY();
     }
 
@@ -225,8 +247,8 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
 
     public Element toXML() {
         Element result = new Element(getTagName());
-        result.setAttribute("from", startNodeView.getDiagramNode().getIdentifier());
-        result.setAttribute("to", endNodeView.getDiagramNode().getIdentifier());
+        result.setAttribute("from", startNode.getIdentifier());
+        result.setAttribute("to", endNode.getIdentifier());
         Element offsetElem = new Element("offset");
         offsetElem.setAttribute("x", String.valueOf(manualOffset.getX()));
         offsetElem.setAttribute("y", String.valueOf(manualOffset.getY()));
@@ -240,5 +262,6 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
+        // done in Factory -- can't be done without access to diagram
     }
 }

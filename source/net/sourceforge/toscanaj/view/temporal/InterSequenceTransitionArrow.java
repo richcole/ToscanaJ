@@ -12,18 +12,32 @@ import java.awt.GradientPaint;
 import java.awt.Paint;
 
 import org.jdom.Element;
+import org.tockit.canvas.CanvasItem;
 import org.tockit.util.ColorStringConverter;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
-import net.sourceforge.toscanaj.view.diagram.NodeView;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.ExtraCanvasItemFactory;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 
 public class InterSequenceTransitionArrow extends TransitionArrow {
-	protected Color endColor;
+    private static class Factory implements ExtraCanvasItemFactory {
+        public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) {
+            System.out.println("Here ISTA");
+            return null;
+        }
+    }
+
+    static {
+        SimpleLineDiagram.registerExtraCanvasItemFactory("intersequenceTransitionArrow", new Factory());
+    }
+
+    protected Color endColor;
 	
-    public InterSequenceTransitionArrow(NodeView startNodeView, NodeView endNodeView, 
+    public InterSequenceTransitionArrow(DiagramNode startNode, DiagramNode endNode, 
                                          ArrowStyle style, Color secondColor, double timePos, 
                                          AnimationTimeController timeController) {
-        super(startNodeView, endNodeView, style, timePos, timeController);
+        super(startNode, endNode, style, timePos, timeController);
     	this.endColor = secondColor;
     }
 

@@ -24,7 +24,6 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -63,7 +62,6 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
-import net.sourceforge.toscanaj.view.diagram.NodeView;
 import net.sourceforge.toscanaj.view.scales.NumberField;
 import net.sourceforge.toscanaj.view.temporal.ArrowStyle;
 import net.sourceforge.toscanaj.view.temporal.InterSequenceTransitionArrow;
@@ -126,7 +124,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     private JButton startSteppingButton;
     private JButton removeTransitionsButton;
     private boolean animating;
-	
+    
 	public TemporalControlsPanel(DiagramView diagramView, 
     						   DiagramExportSettings diagramExportSettings, EventBroker eventBroker) {
 	  	super();
@@ -722,7 +720,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         }
 
         List objectSequences = calculateObjectSequences();
-        Hashtable nodeViewMap = createNodeViewMap();
         Iterator seqIt = objectSequences.iterator();
         Iterator seqValIt = this.sequenceValues.iterator();
         int styleNum = 0;
@@ -736,7 +733,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                 this.lastAnimationTime = 0;
             }
             if(selectedSequence == null || selectedSequence == curSequenceValue) {
-                addTransitions(sequence, styles[styleNum], nodeViewMap, highlightStates);
+                addTransitions(sequence, styles[styleNum], highlightStates);
             }
             styleNum = (styleNum + 1) % styles.length;
         }
@@ -756,7 +753,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         }
 
         List objectSequences = calculateObjectSequences();
-        Hashtable nodeViewMap = createNodeViewMap();
         Iterator seqIt = objectSequences.iterator();
         Iterator seqValIt = this.sequenceValues.iterator();
         int seqNum = 0;
@@ -768,14 +764,14 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 
             if(lastSequence != null) {
                 Color nextColor = styles[seqNum % styles.length].getColor();
-                NodeView endViewLast = findObjectConceptView((FCAObject) lastSequence.get(lastSequence.size()-1), nodeViewMap);
-                NodeView startViewNew = findObjectConceptView((FCAObject) sequence.get(0), nodeViewMap);
-                if(endViewLast == null) {
+                DiagramNode endLast = findObjectConceptNode((FCAObject) lastSequence.get(lastSequence.size()-1));
+                DiagramNode startNew = findObjectConceptNode((FCAObject) sequence.get(0));
+                if(endLast == null) {
                 	continue;
                 }
-                if(endViewLast != startViewNew) {
+                if(endLast != startNew) {
                     SimpleLineDiagram diagram = (SimpleLineDiagram) this.diagramView.getDiagram();
-                    diagram.addExtraCanvasItem(new InterSequenceTransitionArrow(endViewLast, startViewNew,
+                    diagram.addExtraCanvasItem(new InterSequenceTransitionArrow(endLast, startNew,
                                                style, nextColor, seqNum * seqLength + 0.5,
                                                this.timeController));
                 }
@@ -788,51 +784,40 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                 this.lastAnimationTime = 0;
             }
             if(selectedSequence == null || selectedSequence == curSequenceValue) {
-                addTransitions(sequence, style, 
-                               nodeViewMap, highlightStates, seqNum * seqLength);
+                addTransitions(sequence, style, highlightStates, seqNum * seqLength);
             }
             seqNum++;
             lastSequence = sequence;
         }
     }
 
-    private Hashtable createNodeViewMap() {
-    	Hashtable retVal = new Hashtable();
-    	Iterator it = this.diagramView.getCanvasItemsByType(NodeView.class).iterator();
-    	while (it.hasNext()) {
-            NodeView view = (NodeView) it.next();
-            retVal.put(view.getDiagramNode(), view);
-        }
-        return retVal;
-    }
-    
-    private void addTransitions(List sequence, ArrowStyle style, Hashtable nodeViewMap, boolean highlightStates) {
-    	addTransitions(sequence, style, nodeViewMap, highlightStates, 0);
+    private void addTransitions(List sequence, ArrowStyle style, boolean highlightStates) {
+    	addTransitions(sequence, style, highlightStates, 0);
     }
 
-    private void addTransitions(List sequence, ArrowStyle style, Hashtable nodeViewMap, boolean highlightStates, int countStart) {
+    private void addTransitions(List sequence, ArrowStyle style, boolean highlightStates, int countStart) {
         SimpleLineDiagram diagram = (SimpleLineDiagram) this.diagramView.getDiagram();
-    	NodeView oldView = null;
+        DiagramNode oldNode = null;
     	Iterator objectIt = sequence.iterator();
     	int count = countStart;
     	objLoop: while (objectIt.hasNext()) {
     		count++;
             FCAObject object = (FCAObject) objectIt.next();
-    	    NodeView curView = findObjectConceptView(object, nodeViewMap);
-    	    if(curView == null) {
+    	    DiagramNode curNode = findObjectConceptNode(object);
+    	    if(curNode == null) {
     	    	continue;
     	    }
     	    if(highlightStates) {
-    	        diagram.addExtraCanvasItem(new StateRing(curView, style.getColor(), count, this.timeController));
+    	        diagram.addExtraCanvasItem(new StateRing(curNode, style.getColor(), count, this.timeController));
     	    }
-    	    if(oldView != null && oldView != curView) {
-                diagram.addExtraCanvasItem(new TransitionArrow(oldView, curView, style, count - 0.5, this.timeController));
+    	    if(oldNode != null && oldNode != curNode) {
+                diagram.addExtraCanvasItem(new TransitionArrow(oldNode, curNode, style, count - 0.5, this.timeController));
     	    }
-    	    oldView = curView;
+    	    oldNode = curNode;
         }
     }
 
-	private NodeView findObjectConceptView(FCAObject object, Hashtable nodeViewMap) {
+	private DiagramNode findObjectConceptNode(FCAObject object) {
 	    Iterator nodeIt = this.diagramView.getDiagram().getNodes();
 	    while (nodeIt.hasNext()) {
 	        DiagramNode node = (DiagramNode) nodeIt.next();
@@ -840,7 +825,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	        while (objIt.hasNext()) {
 	            FCAObject contObj = (FCAObject) objIt.next();
 	            if(contObj.equals(object)) {
-	            	return (NodeView) nodeViewMap.get(node);
+	            	return node;
 	            }
 	        }
 	    }
