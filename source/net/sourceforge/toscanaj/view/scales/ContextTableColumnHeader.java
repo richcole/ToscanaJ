@@ -212,40 +212,6 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
         updateSize();
     }
     
-
-	/**
-	  * To display the dialog asking for the object or attribute input name
-	  * 
-	  * @todo write custom dialog for this to avoid internationalization
-	  * problem (JOptionPane buttons do get translated in JDKs), to get rid of
-	  * the cancel button and to control the setEnabled() state of the buttons.
-	  * 
-	  * @param title The title of the dialog
-	  * @param thingToAdd The string of the element to be added, either an
-	  * "object" or "attribute" during renaming or the title during creation.
-	  * @param currentTextValue The value of the current string.
-	  * To be used in the formatting of the text message prompt in the JDialog
-	  * @return The name of the object/ attribute
-	  */
-	private String showTextInputDialog(
-		String title,
-		String thingToAdd,
-		String currentTextValue) {
-		String inputValue = "";
-		do {
-			inputValue =
-				(String) JOptionPane.showInputDialog(
-					dialog,
-					"Please input the name of the " + thingToAdd + ": ",
-					title,
-					JOptionPane.PLAIN_MESSAGE,
-					null,
-					null,
-					currentTextValue);
-		} while (inputValue != null && inputValue.trim().equals(""));
-		return inputValue;
-	}
-
 	protected boolean collectionContainsString(
 		String value,
 		Collection collection) {
@@ -344,12 +310,9 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 		String inputValue = "";
 		do {
 			Attribute attr = (Attribute) attributeList.get(num);
-			inputValue =
-				showTextInputDialog(
-					"Rename Attribute",
-					"attribute",
-					attr.toString());
-			if (inputValue != null && !inputValue.trim().equals("")) {
+			InputTextDialog dialog = new InputTextDialog(this.dialog, "Rename Attribute", "attribute", attr.toString());
+			if (!dialog.isCancelled()) {
+				inputValue = dialog.getInput();
 				if (!collectionContainsString(inputValue, attributeList)) {
 					Attribute attribute = (Attribute) attributeList.get(num);
 					attribute.setData(inputValue);
@@ -364,7 +327,8 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 						"Attribute exists",
 						JOptionPane.ERROR_MESSAGE);
 				}
-			} else {
+			}
+			else {
 				break;
 			}
 		} while (collectionContainsString(inputValue, attributeList));
