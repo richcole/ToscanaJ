@@ -1,7 +1,7 @@
 This folder contains libraries from other projects and parties. For 3rd party libraries a license is provided
 as a LICENSE.* file, please read these files. At the moment it contains:
 
-canvas.jar, events.jar, relations.jar: 
+canvas.jar, events.jar, relations.jar, pluginArchitecture.jar: 
   part of our Tockit project (http://www.tockit.org, same licence as ToscanaJ)
 
 jdom.jar: 
@@ -17,3 +17,6 @@ freehep-*.jar:
   FreeHEP Graphic export libraries from their 1.2.1 release. Requires a patch which is in freehep-pdfpath.zip.
   The patch file has to be in the classpath before the other FreeHEP files. (http://java.freehep.org/, license
   in LICENSE.freehep)
+  
+ant-contrib.jar
+  Ant extras - used in plugins deployment, 0.3 (http://sourceforge.net/projects/ant-contrib/, license in LICENSE-ant-contrib.txt)
