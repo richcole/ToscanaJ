@@ -7,6 +7,9 @@ Affecting different programs:
   (an extra <description>) is generated anymore.
 - Bugfix: mixed content in <attribute> (as the <description>) does not cause problems
   with whitespace in the labels anymore.
+- Bugfix: selecting graphic export formats works properly now. In older versions always
+  the first export format for a particular format was selected, even if multiple options
+  existed.
 
 Specific for ToscanaJ:
 ======================

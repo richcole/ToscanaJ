@@ -110,16 +110,14 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 			int rv = saveDialog.showSaveDialog(frame);
 			if (rv == JFileChooser.APPROVE_OPTION) {
 				File selectedFile = saveDialog.getSelectedFile();
-				FileFilter fileFilter = saveDialog.getFileFilter();
-				if(fileFilter instanceof ExtensionFileFilter) {
-					ExtensionFileFilter extFileFilter = (ExtensionFileFilter) fileFilter;
+				ExtensionFileFilter extFileFilter = (ExtensionFileFilter) saveDialog.getFileFilter();
+
+				if (selectedFile.getName().indexOf('.') == -1) {
 					String[] extensions = extFileFilter.getExtensions();
-					if (selectedFile.getName().indexOf('.') == -1) {
-						selectedFile = new File(selectedFile.getAbsolutePath() + "." + extensions[0]);
-					}
+					selectedFile = new File(selectedFile.getAbsolutePath() + "." + extensions[0]);
 				}
 				
-				GraphicFormat gFormat =	GraphicFormatRegistry.getTypeByExtension(selectedFile);
+				GraphicFormat gFormat =	GraphicFormatRegistry.getTypeByName(extFileFilter.getFileTypeName());
 				if (gFormat != null) {
 					this.diagramExportSettings.setGraphicFormat(gFormat);
 				} else {
