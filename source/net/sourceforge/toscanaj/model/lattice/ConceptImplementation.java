@@ -37,8 +37,8 @@ public class ConceptImplementation implements Concept {
     public static final String ATTRIBUTE_ELEMENT_NAME = "attribute";
     public static final String DESCRIPTION_ELEMENT_NAME = "description";
 
-    private Set attributeContingent = new HashSet();
-    private Set objectContingent = new HashSet();
+    private Set attributeContingent = new TreeSet();
+    private Set objectContingent = new TreeSet();
 
     protected static List makeList() {
         return new ArrayList();

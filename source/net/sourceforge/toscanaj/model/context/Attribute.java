@@ -13,7 +13,7 @@ import org.jdom.Element;
  * @todo both FCAObject and Attribute could be unified to a class DomainObject -- since 
  *       everything is dual they should not be distinguished.
  */
-public class Attribute {
+public class Attribute implements Comparable {
     private Object data;
     private Element description;
 
@@ -50,4 +50,13 @@ public class Attribute {
 	public void setDescription(Element description) {
 		this.description = description;
 	}
+
+    public int compareTo(Object o) {
+    	Attribute other = (Attribute) o;
+    	if(this.data instanceof Comparable) {
+    		Comparable comparableData = (Comparable) this.data;
+    		return comparableData.compareTo(other.data);
+    	}
+        return this.hashCode() - other.hashCode();
+    }
 }

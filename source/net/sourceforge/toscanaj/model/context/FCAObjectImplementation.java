@@ -46,4 +46,13 @@ public class FCAObjectImplementation implements WritableFCAObject {
 	public void setDescription(Element description) {
 		this.description = description;
 	}
+
+	public int compareTo(Object o) {
+		FCAObject other = (FCAObject) o;
+		if(this.data instanceof Comparable) {
+			Comparable comparableData = (Comparable) this.data;
+			return comparableData.compareTo(other.getData());
+		}
+		return this.hashCode() - other.hashCode();
+	}
 }

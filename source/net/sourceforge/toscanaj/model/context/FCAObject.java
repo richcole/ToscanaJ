@@ -7,6 +7,6 @@
  */
 package net.sourceforge.toscanaj.model.context;
 
-public interface FCAObject {
+public interface FCAObject extends Comparable {
     Object getData();
 }
