@@ -140,6 +140,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
      */
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         AffineTransform oldTransform = g2d.getTransform();
 
         // fill the background (without transform)
