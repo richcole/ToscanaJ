@@ -19,7 +19,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.LabelView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
-import net.sourceforge.toscanaj.view.dialogs.DiagramExportSettingsDialog;
+import net.sourceforge.toscanaj.view.dialogs.DiagramExportDialog;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -259,13 +259,13 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         ButtonGroup exportDiagramGroup = new ButtonGroup();
         // auto export
         this.autoExportDiagramMenuItem = new JRadioButtonMenuItem("Auto");
+        this.autoExportDiagramMenuItem.setSelected(true);
         this.autoExportDiagramMenuItem.setMnemonic(KeyEvent.VK_E);
         this.autoExportDiagramMenuItem.addActionListener(this);
         this.setupDiagramMenuItem.add(autoExportDiagramMenuItem);
         exportDiagramGroup.add(this.autoExportDiagramMenuItem);
         //manual export
         this.manualExportDiagramMenuItem = new JRadioButtonMenuItem("Manual");
-        this.manualExportDiagramMenuItem.setSelected(true);
         this.manualExportDiagramMenuItem.setMnemonic(KeyEvent.VK_E);
         this.manualExportDiagramMenuItem.addActionListener(this);
         this.setupDiagramMenuItem.add(manualExportDiagramMenuItem);
@@ -641,14 +641,14 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
     private boolean showDiagramExportDialog() {
         if(diagramExportSettings != null) {
-            DiagramExportSettingsDialog.initialize(this, diagramExportSettings.getImageWidth(), diagramExportSettings.getImageHeight());
+            DiagramExportDialog.initialize(this, diagramExportSettings.getImageWidth(), diagramExportSettings.getImageHeight());
         } else {
-            DiagramExportSettingsDialog.initialize(this, diagramView.getWidth(), diagramView.getHeight());
+            DiagramExportDialog.initialize(this, diagramView.getWidth(), diagramView.getHeight());
         }
-        if(DiagramExportSettingsDialog.showDialog(this)) {
-            this.diagramExportSettings = new DiagramExportSettings(  DiagramExportSettingsDialog.getImageFormat(),
-                                                                      DiagramExportSettingsDialog.getImageWidth(),
-                                                                      DiagramExportSettingsDialog.getImageHeight() );
+        if(DiagramExportDialog.showDialog(this)) {
+            this.diagramExportSettings = new DiagramExportSettings(  DiagramExportDialog.getImageFormat(),
+                                                                      DiagramExportDialog.getImageWidth(),
+                                                                      DiagramExportDialog.getImageHeight() );
             return true;
         }
         return false;
