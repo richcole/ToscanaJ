@@ -35,23 +35,23 @@ public class BurmeisterParser {
             BurmeisterContext context = new BurmeisterContext(curLine);
 
             // get context size
-            curLine = in.readLine();
+            curLine = getNextNonEmptyLine(in);
             int numberOfObjects = Integer.parseInt(curLine);
-            curLine = in.readLine();
+            curLine = getNextNonEmptyLine(in);
             int numberOfAttributes = Integer.parseInt(curLine);
 
             // grab objects and attributes, store additional arrays to get indizes
             Collection objects = context.getObjects();
             Object[] objectArray = new Object[numberOfObjects];
             for(int i = 0; i<numberOfObjects; i++) {
-                curLine = in.readLine();
+                curLine = getNextNonEmptyLine(in);
                 objects.add(curLine);
                 objectArray[i] = curLine;
             }
             Collection attributes = context.getAttributes();
             Attribute[] attributeArray = new Attribute[numberOfAttributes];
             for(int i = 0; i<numberOfAttributes; i++) {
-                curLine = in.readLine();
+                curLine = getNextNonEmptyLine(in);
                 Attribute attribute = new Attribute(curLine, null);
                 attributes.add(attribute);
                 attributeArray[i] = attribute;
@@ -60,7 +60,7 @@ public class BurmeisterParser {
             // process relation
             BinaryRelationImplementation relation = (BinaryRelationImplementation) context.getRelation();
             for(int i = 0; i<numberOfObjects; i++) {
-                curLine = in.readLine();
+                curLine = getNextNonEmptyLine(in);
                 for(int j = 0; j<numberOfAttributes; j++) {
                     char c = curLine.charAt(j);
                     if(c == 'x' || c == 'X') {
@@ -73,5 +73,13 @@ public class BurmeisterParser {
         } catch (IOException e) {
             throw new DataFormatException("Error reading input file", e);
         }
+    }
+
+    private static String getNextNonEmptyLine(BufferedReader in) throws IOException {
+        String curLine;
+        do {
+            curLine = in.readLine();
+        } while(curLine.equals(""));
+        return curLine;
     }
 }
