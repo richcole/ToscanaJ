@@ -15,6 +15,20 @@ If you want to use another DBMS, you have to change the driver and the url, too.
 Refer to the documentation of your DBMS which class and URL scheme to use.
 -->
 <conceptualSchema version="1.0" askDatabase="true">
+    <description>
+        <html>
+            <head>
+                <title>PC-Test</title>
+            </head>
+            <body>
+                <h1>The PC-Test example</h1>
+                This is a classic example for using Toscana. It has been ported
+                and translated to be a part of the ToscanaJ distribution, the data
+                is still based on an old test of 486 PCs from a German computer
+                magazine.
+            </body>
+        </html>
+    </description>
 	<database>
 		<url driver="com.mckoi.JDBCDriver" user="user" password="password">jdbc:mckoi://localhost/</url>
 		<table>PCTest</table>
@@ -189,9 +203,9 @@ Price: $$$price%%%
 		<object id="124">diskmark&gt;90 and diskmark&lt;=120 AND dosmark&gt;=90</object>
 		<object id="125">diskmark&gt;120 AND dosmark&gt;=80 and dosmark&lt;90</object>
 		<object id="126">diskmark&gt;120 AND dosmark&gt;=90</object>
-		<object id="127">directsales=Yes and dealer=No</object>
-		<object id="128">directsales=No and dealer=Yes</object>
-		<object id="129">directsales=Yes and dealer=Yes</object>
+		<object id="127">directsales=1 and dealer=0</object>
+		<object id="128">directsales=0 and dealer=1</object>
+		<object id="129">directsales=1 and dealer=1</object>
 		<object id="130">typeCase = 'Desktop'</object>
 		<object id="131">typeCase = 'Slimline'</object>
 		<object id="132">typeCase = 'Small-footprint'</object>
@@ -378,7 +392,7 @@ Price: $$$price%%%
 		<attribute id="72">&gt; 90</attribute>
 		<attribute id="73">&gt; 120</attribute>
 		<attribute id="74">direct sales</attribute>
-		<attribute id="75">only directsales</attribute>
+		<attribute id="75">only direct sales</attribute>
 		<attribute id="76">shops</attribute>
 		<attribute id="77">only shops</attribute>
 		<attribute id="78">both forms</attribute>
