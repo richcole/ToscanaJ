@@ -192,9 +192,10 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
                 XMLOutputter outputter = new XMLOutputter();
                 outputter.setOmitDeclaration(true);
                 this.textArea.setText(outputter.outputString(this.template.getChild("html")));
-                this.show();
             } catch (DatabaseException e) {
                 this.textArea.setText("Failed to query database:\n" + e.getMessage() + "\n" + e.getOriginal().getMessage());
+            } finally {
+                this.show();
             }
         }
     }
