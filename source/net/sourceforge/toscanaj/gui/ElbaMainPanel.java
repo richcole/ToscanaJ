@@ -85,14 +85,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     private JMenuItem dumpSQLMenuItem;
     private JMenuItem dumpStatisticalDataMenuItem;
 
-    public class PrepareToSaveActivity implements SimpleActivity {
-
-        public boolean doActivity() throws Exception {
-            //return prepareToSave();
-            return true;
-        }
-    }
-
     public ElbaMainPanel() {
         super("Elba");
 
@@ -101,7 +93,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         this.databaseConnection = new DatabaseConnection(eventBroker);
         DatabaseConnection.setConnection(this.databaseConnection);
 
-        this.eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+        this.eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
         this.eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class);
 
         createViews();
@@ -270,7 +262,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                         )
                 )
         );
-//        saveActivity.setPrepareActivity(new PrepareToSaveActivity());
         fileMenu.add(saveMenuItem);
 
         JMenuItem importCSCMenuItem = new JMenuItem("Import CSC File...");
