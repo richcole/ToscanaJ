@@ -73,14 +73,14 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
         private Element template = null;
 
         public HTMLDatabaseViewDialog(Frame frame, DatabaseViewerManager viewerManager)
-                throws DatabaseViewerInitializationException {
+                throws DatabaseViewerException {
             super(frame, "View Item", true);
             this.viewerManager = viewerManager;
 			this.setModal(false);
             this.template = viewerManager.getTemplate();
 
             if (template == null) {
-                throw new DatabaseViewerInitializationException("HTMLDatabaseViewer needs <template> in definition");
+                throw new DatabaseViewerException("HTMLDatabaseViewer needs <template> in definition");
             }
 
             // find <repeat> and non-repeat <field>s first
@@ -91,7 +91,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
                 queue.addAll(elem.getChildren());
                 if (elem.getName().equals("repeat")) {
                     if (repeatElement != null) {
-                        throw new DatabaseViewerInitializationException("Two repeat sections found in template.");
+                        throw new DatabaseViewerException("Two repeat sections found in template.");
                     }
                     repeatElement = elem;
                     repetitionBlock = (Element) elem.clone();
@@ -231,7 +231,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
 			dialog = new HTMLDatabaseViewDialog(parentWindow, this.manager);
             preferences.restoreWindowPlacement(dialog, new Rectangle(100, 100, 350, 300));
 			dialog.showView(whereClause);
-		} catch (DatabaseViewerInitializationException e) {
+		} catch (DatabaseViewerException e) {
 			ErrorDialog.showError(parentWindow,e,"Viewer could not be initialized");
 		}
     }

@@ -66,19 +66,19 @@ public class SimpleDatabaseViewer extends PagingDatabaseViewer {
 	        }
 	    }
 	
-	    public Component getComponent() throws DatabaseViewerInitializationException {
+	    public Component getComponent() throws DatabaseViewerException {
 	        DatabaseViewerManager viewerManager = getManager();
 	        String openDelimiter = (String) viewerManager.getParameters().get("openDelimiter");
 	        if (openDelimiter == null) {
-	            throw new DatabaseViewerInitializationException("Open delimiter not defined");
+	            throw new DatabaseViewerException("Open delimiter not defined");
 	        }
 	        String closeDelimiter = (String) viewerManager.getParameters().get("closeDelimiter");
 	        if (closeDelimiter == null) {
-	            throw new DatabaseViewerInitializationException("Close delimiter not defined");
+	            throw new DatabaseViewerException("Close delimiter not defined");
 	        }
 	        String template = viewerManager.getTemplateString();
 	        if (template == null) {
-	            throw new DatabaseViewerInitializationException("No template found");
+	            throw new DatabaseViewerException("No template found");
 	        }
 	        while (template.indexOf(openDelimiter) != -1) {
 	            textFragments.add(template.substring(0, template.indexOf(openDelimiter)));

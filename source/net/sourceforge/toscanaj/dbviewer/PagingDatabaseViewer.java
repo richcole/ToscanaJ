@@ -44,7 +44,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
     
 	protected interface PageViewPanel {
 		void showItem(String keyValue);
-		Component getComponent() throws DatabaseViewerInitializationException;
+		Component getComponent() throws DatabaseViewerException;
 	}
 	
     private DatabaseViewerManager viewerManager;
@@ -88,7 +88,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         }
 
         public PagingDatabaseViewerDialog(Frame frame)
-                throws DatabaseViewerInitializationException {
+                throws DatabaseViewerException {
             super(frame, "View Items", false);
             this.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent e) {
@@ -197,7 +197,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         }
     }
 
-    protected abstract PageViewPanel createPanel() throws DatabaseViewerInitializationException;
+    protected abstract PageViewPanel createPanel() throws DatabaseViewerException;
 
     protected DatabaseViewerManager getManager() {
         return this.viewerManager;
@@ -218,7 +218,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
 			dialog = new PagingDatabaseViewerDialog(parentWindow);
             preferences.restoreWindowPlacement(dialog, new Rectangle(100, 100, 350, 300));
 			dialog.showView(whereClause);
-		} catch (DatabaseViewerInitializationException e) {
+		} catch (DatabaseViewerException e) {
 			ErrorDialog.showError(parentWindow,e,"Viewer could not be initialized");
 		}
     }

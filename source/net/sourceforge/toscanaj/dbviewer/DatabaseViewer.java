@@ -101,7 +101,7 @@ package net.sourceforge.toscanaj.dbviewer;
  */
 public interface DatabaseViewer {
     void initialize(DatabaseViewerManager manager)
-            throws DatabaseViewerInitializationException;
+            throws DatabaseViewerException;
 
     void showView(String whereClause);
 }

@@ -76,20 +76,20 @@ public class DatabaseViewerManager implements XMLizable {
     private static final String PLUGIN_LOCATION = preferences.get("pluginDirectory", "plugins");
 
     public DatabaseViewerManager(Element viewerDefinition, DatabaseInfo databaseInfo, DatabaseConnection connection)
-            throws DatabaseViewerInitializationException {
+            throws DatabaseViewerException {
         this.databaseInfo = databaseInfo;
         this.dbConnection = connection;
         try {
             readXML(viewerDefinition);
         } catch (XMLSyntaxError xmlSyntaxError) {
-            throw new DatabaseViewerInitializationException("XML Syntax error in viewer definition.", xmlSyntaxError);
+            throw new DatabaseViewerException("XML Syntax error in viewer definition.", xmlSyntaxError);
         }
         registerViewer(viewerDefinition.getAttributeValue(CLASS_ATTRIBUTE_NAME), viewerDefinition.getName());
     }
 
-    private void registerViewer(String className, String viewerType) throws DatabaseViewerInitializationException {
+    private void registerViewer(String className, String viewerType) throws DatabaseViewerException {
         if (className == null) {
-            throw new DatabaseViewerInitializationException("Could not find class attribute on <" +
+            throw new DatabaseViewerException("Could not find class attribute on <" +
                     viewerType + ">");
         }
         Class viewerClass;
@@ -100,16 +100,16 @@ public class DatabaseViewerManager implements XMLizable {
             try {
                 viewerClass = Class.forName(className);
             } catch (ClassNotFoundException e1) {
-                throw new DatabaseViewerInitializationException("Could not find class '" + className + "' -- possible cause: missing plugin");
+                throw new DatabaseViewerException("Could not find class '" + className + "' -- possible cause: missing plugin");
             }
         }
         try {
             viewer = (DatabaseViewer) viewerClass.newInstance();
             viewer.initialize(this);
         } catch (InstantiationException e) {
-            throw new DatabaseViewerInitializationException("Could not instantiate class '" + className + "'");
+            throw new DatabaseViewerException("Could not instantiate class '" + className + "'");
         } catch (IllegalAccessException e) {
-            throw new DatabaseViewerInitializationException("Could not access class '" + className + "'");
+            throw new DatabaseViewerException("Could not access class '" + className + "'");
         }
         if (viewerType.equals(OBJECT_VIEW_ELEMENT_NAME)) {
             objectViewerRegistry.add(this);
@@ -118,7 +118,7 @@ public class DatabaseViewerManager implements XMLizable {
         } else if (viewerType.equals(ATTTRIBUTE_VIEW_ELEMENT_NAME)) {
             attributeViewerRegistry.add(this);
         } else {
-            throw new DatabaseViewerInitializationException("Unknown viewer type: <" + viewerType + ">");
+            throw new DatabaseViewerException("Unknown viewer type: <" + viewerType + ">");
         }
     }
 
@@ -357,7 +357,7 @@ public class DatabaseViewerManager implements XMLizable {
     }
 
     public static void listsReadXML(Element parentElem, DatabaseInfo databaseInfo, DatabaseConnection connection)
-            throws DatabaseViewerInitializationException {
+            throws DatabaseViewerException {
         for (Iterator iterator = parentElem.getChildren(OBJECT_VIEW_ELEMENT_NAME).iterator(); iterator.hasNext();) {
             Element element = (Element) iterator.next();
             new DatabaseViewerManager(element, databaseInfo, connection);

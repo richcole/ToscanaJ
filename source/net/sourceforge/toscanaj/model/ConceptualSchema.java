@@ -11,7 +11,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DirectConceptInterpreter;
-import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
+import net.sourceforge.toscanaj.dbviewer.DatabaseViewerException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
@@ -210,7 +210,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
         if (viewsElem != null) {
             try {
                 DatabaseViewerManager.listsReadXML(viewsElem, databaseInfo, DatabaseConnection.getConnection());
-            } catch (DatabaseViewerInitializationException e) {
+            } catch (DatabaseViewerException e) {
                 throw new XMLSyntaxError("Could not initialize database viewer.", e);
             }
         }

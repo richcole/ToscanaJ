@@ -58,13 +58,13 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
         // initialization has to be done separately, so we can use the dynamic class loading mechanism
     }
 
-    public void initialize(DatabaseViewerManager manager) throws DatabaseViewerInitializationException {
+    public void initialize(DatabaseViewerManager manager) throws DatabaseViewerException {
         this.viewerManager = manager;
 
         // @todo need errorchecking on columnName here
         String columnName = (String) viewerManager.getParameters().get("columnName");
         if(columnName == null) {
-            throw new DatabaseViewerInitializationException("Parameter 'columnName' not given.");
+            throw new DatabaseViewerException("Parameter 'columnName' not given.");
         }
         fieldNames.add(columnName);
     }

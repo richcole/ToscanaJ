@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.dbviewer;
 
-public class DatabaseViewerInitializationException extends Exception {
+public class DatabaseViewerException extends Exception {
     /**
      * This can be used to get the original Exception.
      */
@@ -16,21 +16,21 @@ public class DatabaseViewerInitializationException extends Exception {
     /**
      * Constructs an exception without detail message.
      */
-    public DatabaseViewerInitializationException() {
+    public DatabaseViewerException() {
         super();
     }
 
     /**
      * Constructs an exception with detail message.
      */
-    public DatabaseViewerInitializationException(String s) {
+    public DatabaseViewerException(String s) {
         super(s);
     }
 
     /**
      * Constructs an exception with detail message and embedded exception.
      */
-    public DatabaseViewerInitializationException(String s, Exception e) {
+    public DatabaseViewerException(String s, Exception e) {
         super(s);
         exception = e;
     }

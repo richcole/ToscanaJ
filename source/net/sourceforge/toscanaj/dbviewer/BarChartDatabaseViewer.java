@@ -29,7 +29,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 		private List columnDefSQL, columnDefDisplay, panels;
 		private List columnDefLineCol, columnDefMinCol, columnDefMaxCol;
 
-	    public Component getComponent() throws DatabaseViewerInitializationException {
+	    public Component getComponent() throws DatabaseViewerException {
 	
 	        columnDefSQL = new ArrayList();
 	        columnDefDisplay = new ArrayList();
@@ -46,12 +46,12 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	        for (Iterator iterator = columnElements.iterator(); iterator.hasNext();) {
 	            Element columnElement = (Element) iterator.next();
 	            if (columnElement.getAttributeValue("sqlname") == null) {
-	                throw new DatabaseViewerInitializationException();
+	                throw new DatabaseViewerException();
 	            } else {
 	                columnDefSQL.add(columnElement.getAttributeValue("sqlname"));
 	            }
 	            if (columnElement.getAttributeValue("displayname") == null) {
-	                throw new DatabaseViewerInitializationException();
+	                throw new DatabaseViewerException();
 	            } else {
 	                columnDefDisplay.add(columnElement.getAttributeValue("displayname"));
 	            }

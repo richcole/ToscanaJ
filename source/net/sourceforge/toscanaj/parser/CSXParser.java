@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.parser;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
+import net.sourceforge.toscanaj.dbviewer.DatabaseViewerException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
@@ -177,7 +177,7 @@ public class CSXParser {
             Element viewerElem = (Element) it.next();
             try {
                 new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection());
-            } catch (DatabaseViewerInitializationException e) {
+            } catch (DatabaseViewerException e) {
                 throw new DataFormatException("A database viewer could not be initialized.", e);
             }
         }
@@ -191,7 +191,7 @@ public class CSXParser {
             Element viewerElem = (Element) it.next();
             try {
                 new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection());
-            } catch (DatabaseViewerInitializationException e) {
+            } catch (DatabaseViewerException e) {
                 throw new DataFormatException("A database viewer could not be initialized.", e);
             }
         }
@@ -205,7 +205,7 @@ public class CSXParser {
             Element viewerElem = (Element) it.next();
             try {
                 new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection());
-            } catch (DatabaseViewerInitializationException e) {
+            } catch (DatabaseViewerException e) {
                 throw new DataFormatException("A database viewer could not be initialized.", e);
             }
         }
