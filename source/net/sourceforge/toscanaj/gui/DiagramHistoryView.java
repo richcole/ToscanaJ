@@ -66,7 +66,7 @@ public class DiagramHistoryView extends JList{
             } else if (history.isInFuture(diagram)) {
                 setFont(font.deriveFont(Font.ITALIC));
             } else {
-                setFont(font);
+                setFont(font.deriveFont(Font.PLAIN));
             }
             return this;
         }
