@@ -514,7 +514,6 @@ public class ConceptImplementation implements Concept {
     }
     
     public void replaceObject (Object objectToReplace, Object newObject) {
-    	// @todo make sure new object is inserted at the same position where old one was
     	this.objectContingent.remove(objectToReplace);
     	this.objectContingent.add(newObject);
     }
