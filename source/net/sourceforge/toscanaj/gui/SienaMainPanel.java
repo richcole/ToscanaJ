@@ -296,7 +296,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	protected Component createContextEditingView() {
 		rowHeader = new RowHeader(this.conceptualSchema.getManyValuedContext());
 		colHeader = new ColumnHeader(this.conceptualSchema.getManyValuedContext());
-		tableView = new TableView(this.conceptualSchema.getManyValuedContext(),colHeader, rowHeader);
+		tableView = new TableView(this.conceptualSchema.getManyValuedContext());
 		tableView.addMouseListener(getTableViewMouseListener());
 				
 		colHeader.addMouseListener(new MouseAdapter() {

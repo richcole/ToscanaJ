@@ -132,9 +132,6 @@ public class BrowserLauncher {
 	/** The kAnyTransactionID AppleEvent code */
 	private static Integer kAnyTransactionID;
 
-	/** The linkage object required for JDirect 3 on Mac OS X. */
-	private static Object linkage;
-	
 	/** JVM constant for MRJ 2.0 */
 	private static final int MRJ_2_0 = 0;
 	
@@ -326,7 +323,10 @@ public class BrowserLauncher {
 			    try {
 					Class linker = Class.forName("com.apple.mrj.jdirect.Linker");
 					Constructor constructor = linker.getConstructor(new Class[]{ Class.class });
-					linkage = constructor.newInstance(new Object[] { BrowserLauncher.class });
+                    // @todo I removed an assignment to a private static member here since that wasn't used
+                    // keeping the constructor call to make sure we don't miss any side effects of it. Probably
+                    // this whole MRJ_3_0 case could be removed.
+					constructor.newInstance(new Object[] { BrowserLauncher.class });
 				} catch (ClassNotFoundException cnfe) {
 					errorMessage = cnfe.getMessage();
 					return false;

@@ -37,15 +37,11 @@ public class TableView extends JComponent implements Scrollable{
 	private static final Color BORDER_COLOR = Color.BLACK;
 	
 	private ManyValuedContext context;
-	private ColumnHeader colHeader;
-	private RowHeader rowHeader;
 	private SelectedCell selectedCell;
 	
-	public TableView(ManyValuedContext context,ColumnHeader colHeader, RowHeader rowHeader){
+	public TableView(ManyValuedContext context){
 		super();
 		this.context = context;
-		this.colHeader = colHeader;
-		this.rowHeader = rowHeader;
 		this.selectedCell = new SelectedCell(0,0);
 		updateSize();
 	}
