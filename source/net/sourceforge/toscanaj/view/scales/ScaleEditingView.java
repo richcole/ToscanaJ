@@ -6,6 +6,8 @@ import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.Column;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Table;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,7 +34,6 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
 
         setName("ScalesEditingView");
 
-
         diagramView = new JPanel();
 
         leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, makeTableColumnsView(), makeScalesView());
@@ -42,6 +43,8 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);
+
+        eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
     }
 
     static class TableColumnPair {
@@ -62,21 +65,9 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
         JComponent tableColumnListView;
 
         tableColumnListModel = new DefaultListModel();
-
-        tableColumnListModel.removeAllElements();
-        java.util.List tables = conceptualSchema.getDbScheme().getTables();
-        for (Iterator tableIterator = tables.iterator(); tableIterator.hasNext();) {
-            Table table = (Table) tableIterator.next();
-            java.util.List columns = table.getColumns();
-            for (Iterator columnsIterator = columns.iterator(); columnsIterator.hasNext();) {
-                Column column = (Column) columnsIterator.next();
-                tableColumnListModel.addElement(new TableColumnPair(table, column));
-            }
-        }
+        fillTableColumnsList();
 
         final JList listView = new JList(tableColumnListModel);
-
-
         MouseListener mouseListener = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -84,8 +75,6 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
                 }
             }
         };
-
-
         listView.addMouseListener(mouseListener);
 
         JPanel tableColumnPane = new JPanel();
@@ -111,19 +100,23 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
         return tableColumnListView;
     }
 
-    private JComponent makeScalesView() {
-        scalesListModel = new DefaultListModel();
-
-        scalesListModel.removeAllElements();
+    private void fillTableColumnsList() {
+        tableColumnListModel.removeAllElements();
         java.util.List tables = conceptualSchema.getDbScheme().getTables();
         for (Iterator tableIterator = tables.iterator(); tableIterator.hasNext();) {
             Table table = (Table) tableIterator.next();
             java.util.List columns = table.getColumns();
             for (Iterator columnsIterator = columns.iterator(); columnsIterator.hasNext();) {
                 Column column = (Column) columnsIterator.next();
-                scalesListModel.addElement(new TableColumnPair(table, column));
+                tableColumnListModel.addElement(new TableColumnPair(table, column));
             }
         }
+    }
+
+    private JComponent makeScalesView() {
+        scalesListModel = new DefaultListModel();
+
+        fillScalesList();
 
         final JList listView = new JList(scalesListModel);
 
@@ -149,8 +142,19 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
         return scalesPane;
     }
 
-    public void processEvent(Event e) {
+    private void fillScalesList() {
+        scalesListModel.removeAllElements();
+        for (int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
+            SimpleLineDiagram diagram = (SimpleLineDiagram) conceptualSchema.getDiagram(i);
+            scalesListModel.addElement(diagram.getTitle());
+        }
+    }
 
+    public void processEvent(Event event) {
+        ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
+        conceptualSchema = changeEvent.getConceptualSchema();
+        fillTableColumnsList();
+        fillScalesList();
     }
 
     public void setHorizontalDividerLocation(int location) {
