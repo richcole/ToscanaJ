@@ -749,7 +749,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		Iterator it = this.context.getObjects().iterator();
 		while (it.hasNext()) {
 			String clause = (String) it.next();
-			String query = "SELECT count(*) FROM " + dbinfo.getTableName() + 
+			String query = "SELECT count(*) FROM " + dbinfo.getSQLTableName() + 
 			                  " WHERE (" + clause + ");";
 			try {
 				sumCounts += this.databaseConnection.queryInt(query, 1);
@@ -768,7 +768,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 			Iterator it2 = validClauses.iterator();
 			while (it2.hasNext()) {
 				String otherClause = (String) it2.next();
-				String query = "SELECT count(*) FROM " + dbinfo.getTableName() +
+				String query = "SELECT count(*) FROM " + dbinfo.getSQLTableName() +
 				               " WHERE (" + clause + ") AND (" + otherClause + ");";
 				try {
 					int count = this.databaseConnection.queryInt(query, 1);
@@ -785,7 +785,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 
 		// check if disjunction of all contingents covers the data set
 		if(problems.isEmpty()) { // doesn't make sense if we have problems so far
-			String query = "SELECT count(*) FROM " + dbinfo.getTableName() + ";";
+			String query = "SELECT count(*) FROM " + dbinfo.getSQLTableName() + ";";
 			try {
 				int count = this.databaseConnection.queryInt(query, 1);
 				if(count != sumCounts) {

@@ -583,8 +583,8 @@ public class DatabaseConnectionInformationView extends JDialog
             return null;
         }
         void updateContents() {
-            String table = conceptualSchema.getDatabaseInfo().getTableName();
-            String key = conceptualSchema.getDatabaseInfo().getKey();
+            String table = databaseInfo.getDisplayTableName();
+            String key = databaseInfo.getKey();
             if(table != null && key != null) {
         		tableView.setKey(table, key);
         	}
@@ -717,7 +717,11 @@ public class DatabaseConnectionInformationView extends JDialog
         this.currentStep = panel;
         this.stepLabel.setText(panel.getTitle());
         this.nextButton.setText(panel.getNextButtonText());
-        panel.updateContents();
+        try {
+	        panel.updateContents();
+        } catch (Exception e) {
+            ErrorDialog.showError(this, e, "Internal problem");
+        }
         contentPane.add(panel,new GridBagConstraints(
                 0,1,1,1,1,1,
                 GridBagConstraints.CENTER,
@@ -770,7 +774,11 @@ public class DatabaseConnectionInformationView extends JDialog
         	this.databaseInfo = new DatabaseInfo();
         }
         if(this.currentStep != null) {
-        	this.currentStep.updateContents();
+        	try {
+        		this.currentStep.updateContents();
+        	} catch (Exception e) {
+        		ErrorDialog.showError(this, e, "Internal problem");
+        	}
         }
 	}
 	

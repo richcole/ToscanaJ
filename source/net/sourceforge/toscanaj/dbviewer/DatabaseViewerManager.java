@@ -244,7 +244,7 @@ public class DatabaseViewerManager implements XMLizable {
         if (this.tableName != null) {
             return this.tableName;
         } else {
-            return this.databaseInfo.getTableName();
+            return this.databaseInfo.getSQLTableName();
         }
     }
 

@@ -44,7 +44,7 @@ public class ListQuery extends Query {
                 retValue += ", ";
             }
         }
-        retValue += " FROM " + info.getTableName() + " ";
+        retValue += " FROM " + info.getSQLTableName() + " ";
         return retValue;
     }
 

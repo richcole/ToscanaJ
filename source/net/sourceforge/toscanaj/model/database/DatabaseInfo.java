@@ -200,8 +200,12 @@ public class DatabaseInfo implements XMLizable {
         this.table = table;
     }
 
-    public String getTableName() {
+    public String getSQLTableName() {
         return "\"" + this.table + "\"";
+    }
+
+    public String getDisplayTableName() {
+        return this.table;
     }
 
     /**

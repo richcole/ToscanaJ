@@ -78,7 +78,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
             return 0;
         }
         DatabaseConnection connection = DatabaseConnection.getConnection();
-        String statement = "SELECT count(*) FROM " + databaseInfo.getTableName() + " " + whereClause;
+        String statement = "SELECT count(*) FROM " + databaseInfo.getSQLTableName() + " " + whereClause;
         return connection.queryInt(statement, 1);
     }
 
