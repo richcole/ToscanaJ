@@ -101,11 +101,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      */
     protected int firstItem = 0;
 
-    /**
-     * The width reserved for the scrollbar to the right.
-     */
-    protected float currentScrollBarWidth = 0;
-    
     protected boolean scrollbarShown = false;
 
     /**
@@ -124,9 +119,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     protected static final DragMode RESIZING = new DragMode();
     protected static final DragMode MOVING = new DragMode();
     protected static final DragMode SCROLLING = new DragMode();
-    
-    private float potentialScrollBarWidth;
 
+	private float currentScrollBarWidth;
+    
 	public interface LabelFactory {
     	LabelView createLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label);
     	Class getLabelClass();
@@ -250,22 +245,15 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         graphics.setPaint(backgroundColor);
         graphics.fill(rect);
         graphics.setPaint(textColor);
-        graphics.draw(rect);
 
-		float textWidth;
-        int numItems = this.getNumberOfEntries();
-        if (numItems > MIN_DISPLAY_LINES) {
-        	textWidth = (float)lw - currentScrollBarWidth;
-        } else {
-            textWidth = (float)lw;
-        }
+		float textWidth = (float) lw;
         
         // draw the contents
  		for (int i = this.firstItem; i < this.firstItem + this.displayLines; i++) {
 			TextLayout cur;
- 			if(i == this.firstItem && i != 0 && !this.scrollbarShown) {
+ 			if(i == this.firstItem && i != 0 && !scrollbarVisible()) {
  				cur = getMoreEntriesTextLayout(this.firstItem + 1, graphics.getFontRenderContext());
-			} else if(i == this.firstItem + this.displayLines - 1 && i != this.getNumberOfEntries() - 1  && !this.scrollbarShown) {
+			} else if(i == this.firstItem + this.displayLines - 1 && i != this.getNumberOfEntries() - 1  && !scrollbarVisible()) {
 				cur = getMoreEntriesTextLayout(this.getNumberOfEntries() - i, graphics.getFontRenderContext());
 			} else {
 				cur = getTextLayoutForEntry(i, graphics.getFontRenderContext());
@@ -288,8 +276,18 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         }
 
         // draw the scroller elements when needed
-        if (numItems > MIN_DISPLAY_LINES && this.scrollbarShown) {
-            // first a line separating the scrollbar from the rest
+        int numItems = this.getNumberOfEntries();
+        if (scrollbarVisible()) {
+            FontRenderContext fontRenderContext = graphics.getFontRenderContext();
+    		TextLayout mLayout = new TextLayout("M", this.font, fontRenderContext);
+    		this.currentScrollBarWidth = (float) mLayout.getBounds().getWidth();
+
+    		// cover text under the scrollbar
+            graphics.setPaint(backgroundColor);
+    		graphics.fill(new Rectangle2D.Double(xPos + lw - this.currentScrollBarWidth, yPos,
+                    							this.currentScrollBarWidth, lh));
+    		// draw a line separating the scrollbar from the rest
+            graphics.setPaint(textColor);
             graphics.draw(new Line2D.Double(xPos + lw - this.currentScrollBarWidth, yPos,
                     xPos + lw - this.currentScrollBarWidth, yPos + lh));
             // calculate a size for the scroll buttons
@@ -348,30 +346,30 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
                     (this.lineHeight - height) / 2,
                     width, height));
         }
+        
+        // draw the frame for the label
+        graphics.setPaint(textColor);
+        graphics.draw(rect);
 
         // restore old settings
         graphics.setPaint(oldPaint);
         graphics.setFont(oldFont);
     }
 
-    public void updateBounds(Graphics2D graphics) {
+    private boolean scrollbarVisible() {
+    	return (this.getNumberOfEntries() > MIN_DISPLAY_LINES) && this.scrollbarShown;
+    }
+
+	public void updateBounds(Graphics2D graphics) {
 		if (this.getNumberOfEntries() == 0) {
 			this.rect = null;
 		}
 
         FontRenderContext fontRenderContext = graphics.getFontRenderContext();
 
-		// find some basic values used
-		TextLayout mLayout = new TextLayout("M", this.font, fontRenderContext);
-		this.potentialScrollBarWidth = (float) mLayout.getBounds().getWidth();
-		if (this.getNumberOfEntries() > MIN_DISPLAY_LINES && this.scrollbarShown) {
-			this.currentScrollBarWidth = potentialScrollBarWidth;
-		} else {
-			this.currentScrollBarWidth = 0;
-		}
-		
 		// margin is something dependend on the font, but the detailed choice is a bit
 		// arbitrary
+		TextLayout mLayout = new TextLayout("M", this.font, fontRenderContext);
 		this.textmargin = mLayout.getLeading() + mLayout.getDescent();
         
         // find the size and position
@@ -424,7 +422,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
             y = y + radius;
             yPos = y + this.labelInfo.getOffset().getY();
         }
-		this.rect = new Rectangle2D.Double(xPos, yPos, lw + this.currentScrollBarWidth, lh);
+		this.rect = new Rectangle2D.Double(xPos, yPos, lw, lh);
     }
 
     private float getFullHeight(TextLayout layout) {
@@ -453,7 +451,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     	DiagramNode node=this.labelInfo.getNode();
 		double rectX = this.rect.getX();
 		double y = getConnectorStartPosition().getY();
-		double lw = rect.getWidth() - this.currentScrollBarWidth;
+		double lw = rect.getWidth();
     	double endY = y + this.labelInfo.getOffset().getY();
 		if(rectX>node.getX()){
 			return new Point2D.Double(rectX, endY);
@@ -543,7 +541,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     }
     
     public void startDrag(Point2D from, Point2D to) {
-        if (from.getX() >= this.rect.getMaxX() - this.currentScrollBarWidth) {
+        if (scrollbarVisible() && (from.getX() >= this.rect.getMaxX() - this.currentScrollBarWidth)) {
             // we have a click on the scrollbar, calculate the line hit
             int lineHit = (int) ((from.getY() - this.rect.getY()) / this.lineHeight);
             if (lineHit == this.displayLines - 1) { // it is on the resize handle
@@ -575,7 +573,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      * Handles scrolling of the items.
      */
     public void processClickEvent(Point2D pos) {
-        if (pos.getX() < this.rect.getMaxX() - this.currentScrollBarWidth) {
+        if (scrollbarVisible() && (pos.getX() < this.rect.getMaxX() - this.currentScrollBarWidth)) {
             // not a click on the scrollbar
             return;
         }
@@ -625,11 +623,11 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     	if (stroke instanceof BasicStroke) {
     		double w = ((BasicStroke) stroke).getLineWidth();
     		return new Rectangle2D.Double(this.rect.getX() - w/2, this.rect.getY() - w/2,
-										   this.rect.getWidth() + w + this.potentialScrollBarWidth - this.currentScrollBarWidth, 
+										   this.rect.getWidth() + w, 
 										   this.rect.getHeight() + w);
     	}
 		return new Rectangle2D.Double(this.rect.getX(), this.rect.getY(),
-									   this.rect.getWidth() + this.potentialScrollBarWidth - this.currentScrollBarWidth, 
+									   this.rect.getWidth(), 
 									   this.rect.getHeight());
     }
 
@@ -641,8 +639,12 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      * on the scrollbar or the position is not on the label), -1 will be returned.
      */
     public int getIndexOfPosition(Point2D pos) {
-        if (pos.getX() > this.rect.getMaxX() - this.currentScrollBarWidth) {
-            // a click on the scrollbar or to the right
+        if (pos.getX() > this.rect.getMaxX()) {
+            // a click on the right of the label
+            return -1;
+        }
+        if (scrollbarVisible() &&(pos.getX() > this.rect.getMaxX() - this.currentScrollBarWidth)) {
+            // a click on the scrollbar
             return -1;
         }
         if (pos.getX() < this.rect.getMinX()) {
