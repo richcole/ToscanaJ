@@ -58,12 +58,12 @@ public class ToscanaJServlet extends HttpServlet {
 	protected void doPost(
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse)
-		throws ServletException, IOException {
+		throws IOException {
 		doGet(httpServletRequest, httpServletResponse);
 	}
 
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-		throws ServletException, IOException {
+		throws IOException {
 		PrintWriter out = resp.getWriter();
 
 		HttpSession session = req.getSession();

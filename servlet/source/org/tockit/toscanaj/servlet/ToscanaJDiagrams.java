@@ -75,7 +75,7 @@ public class ToscanaJDiagrams extends HttpServlet {
 
     public void doPost(HttpServletRequest httpServletRequest, 
     		HttpServletResponse httpServletResponse) 
-    		throws ServletException, IOException 
+    		throws IOException 
     {
     		
     	// call doGet
@@ -85,7 +85,7 @@ public class ToscanaJDiagrams extends HttpServlet {
 
     public void doGet (HttpServletRequest req, 
     		HttpServletResponse resp) 
-    		throws ServletException, IOException
+    		throws IOException
     {
     	
 		System.out.println("ToscanaJDiagrams: doGet");		
