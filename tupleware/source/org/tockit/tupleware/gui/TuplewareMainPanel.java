@@ -30,7 +30,6 @@ import org.tockit.tupleware.model.TupleSet;
 import org.tockit.tupleware.scaling.TupleScaling;
 import org.tockit.tupleware.source.TupleSource;
 import org.tockit.tupleware.source.TupleSourceRegistry;
-import org.tockit.tupleware.source.sql.SqlQueryEngine;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -197,7 +196,6 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
 		JMenu tuplesMenu = new JMenu("Tuples");
 		tuplesMenu.setMnemonic('t');
 		
-        addTupleSourceMenuItem(tuplesMenu, this, new SqlQueryEngine());
 		Iterator tupleSources = TupleSourceRegistry.getTupleSources().iterator();
 		while (tupleSources.hasNext()) {
 			TupleSource curSource = (TupleSource) tupleSources.next();
