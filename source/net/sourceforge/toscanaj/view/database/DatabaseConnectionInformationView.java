@@ -114,20 +114,15 @@ public class DatabaseConnectionInformationView
 		JPanel connection = createConnectionPanel();
 		JPanel tableView = new DatabaseSchemaView(eventBroker);
 		tabbedPane.addTab(
-			"Connections",
+			"Step 1: Select Connection",
 			null,
 			connection,
 			"Database Connections");
-		tabbedPane.addTab("Tables", null, tableView, "Tables View");
+		tabbedPane.addTab("Step 2: Select Key", null, tableView, "Tables View");
+		
 		JButton connectButton = new JButton();
 		SimpleAction action = new SimpleAction(frame, "Connect");
 		action.add(new SaveControlActivity());
-		action.add(new SimpleActivity() {
-			public boolean doActivity() throws Exception {
-				hide();
-				return true;
-			}
-		});
 		connectButton.setAction(action);
 
 		JButton closeButton = new JButton("Close Dialog");
