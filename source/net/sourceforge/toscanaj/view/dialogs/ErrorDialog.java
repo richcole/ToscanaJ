@@ -50,27 +50,30 @@ public class ErrorDialog {
      * error message if required.
      */
     private void showDetailedErrorMsg(JFrame frame, Exception e, String title, String errorMsg) {
-        Object[] options = {"OK", "Details"};
-        int n = JOptionPane.showOptionDialog(frame,
-                                            errorMsg,
-                                            title,
-                                            JOptionPane.OK_CANCEL_OPTION,
-                                            JOptionPane.ERROR_MESSAGE,
-                                            null,
-                                            options,
-                                            options[0]);
-        if(n == 1) {
-            String error = e.getMessage();
-            if( e instanceof ImageGenerationException) {
-                Exception original = ((ImageGenerationException)e).getOriginal();
-                if( original != null ) {
-                    error = error + "\n" + original.getMessage();
-                }
+        ///@TODO an interface is requird for all toscanaJ exceptions
+        if( e instanceof ImageGenerationException) {
+            Exception original = ((ImageGenerationException)e).getOriginal();
+            if( original == null ) {
+                new ErrorDialog(frame, title, errorMsg);
+                return;
             }
-            JOptionPane.showMessageDialog(frame,
-            error,
-            title,
-            JOptionPane.ERROR_MESSAGE);
+            Object[] options = {"OK", "Details"};
+            int n = JOptionPane.showOptionDialog(frame,
+                                                errorMsg,
+                                                title,
+                                                JOptionPane.OK_CANCEL_OPTION,
+                                                JOptionPane.ERROR_MESSAGE,
+                                                null,
+                                                options,
+                                                options[0]);
+            if(n == 1) {
+                JOptionPane.showMessageDialog(frame,
+                                                original.getMessage(),
+                                                title,
+                                                JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            new ErrorDialog(frame, title, errorMsg);
         }
     }
 
