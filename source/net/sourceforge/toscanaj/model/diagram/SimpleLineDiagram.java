@@ -34,8 +34,12 @@ import java.util.List;
  * usual mathematical system) or downwards (the usual computer coordinates). The
  * first call to getNode() or getBounds() will make sure that the coordinates
  * will be pointing downwards when reading.
+ * 
+ * @todo use IdPool to create identifiers for nodes. Either need 
+ * to add this to addNode or, better still, add a factory method 
+ * for DiagramNode creation, this method should then be also
+ * responsible for creating, checking identifiers.
  */
-
 public class SimpleLineDiagram implements WriteableDiagram2D {
 	protected EventBroker eventBroker;
 	
@@ -85,8 +89,6 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 	 * identifiers are unique within each diagram - it should be ok to 
 	 * keep the same identifiers for nodes in a copied diagram.
 	 * - making "almost" deep copy of a Concept, see notes in makeDiagramNodeCopy method.
-	 * 
-	 * @todo use IdPool to get identifiers.
      */
     public SimpleLineDiagram (Diagram2D diagram) {
 		coordinateSystemChecked = false;
