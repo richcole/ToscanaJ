@@ -143,8 +143,9 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
             FCAElementImplementation resultAttribute;
             DiagramNode node = result.getNode("" + attribute.getPoint().getNumber());
 
-            if(attributeMap.getLabel(attribute.getIdentifier()) != null) {
-                resultAttribute = new FCAElementImplementation(attributeMap.getLabel(attribute.getIdentifier()));
+            FormattedString label = attributeMap.getLabel(attribute.getIdentifier());
+            if(label != null) {
+                resultAttribute = new FCAElementImplementation(label.getContent());
             } else {
                 resultAttribute = new FCAElementImplementation(attribute.getIdentifier());
             }
