@@ -25,12 +25,15 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.JComponent;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
+
+import org.tockit.util.ListSet;
 
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
@@ -40,6 +43,9 @@ import net.sourceforge.toscanaj.model.context.WritableFCAObject;
 
 public class ContextTableRowHeader extends JComponent implements Scrollable {
 	private ContextTableEditorDialog dialog;
+    /**
+     * @todo remove and use object list from context instead.
+     */
 	private WritableFCAObject[] objects;
 	
 	public ContextTableRowHeader (ContextTableEditorDialog dialog) {
@@ -191,7 +197,33 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 							removeObject(pos.getRow());
 						}
 					});
-					popupMenu.add(rename);
+                    JMenu sortMenu = new JMenu("Move before");
+                    for (int i = 0; i < objects.length; i++) {
+                        if(i == pos.getRow() || i == pos.getRow() + 1) {
+                            continue;
+                        }
+                        final WritableFCAObject object = objects[i];
+                        JMenuItem menuItem = new JMenuItem(object.toString());
+                        menuItem.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                moveObject(pos.getRow(), object);
+                            }
+                        });
+                        sortMenu.add(menuItem);
+                    }
+                    popupMenu.add(sortMenu);
+                    
+                    if(pos.getRow() != objects.length - 1) {
+                        JMenuItem menuItem = new JMenuItem("Move to end");
+                        menuItem.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                moveObject(pos.getRow(), null);
+                            }
+                        });
+                        popupMenu.add(menuItem);
+                    }
+                    
+                    popupMenu.add(rename);
 					popupMenu.add(remove);
                     popupMenu.show(dialog.getScrollPane(), e.getX() + getX(), e.getY() + getY() + ContextTableView.CELL_HEIGHT);
 			}
@@ -222,7 +254,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 				}
 
 				if (pos.getCol() == 0) {
-						renameObject(pos.getRow());
+				    renameObject(pos.getRow());
 				} 
 			}
 		};
@@ -291,6 +323,24 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 		repaint();
 	}
 	
+
+    private void moveObject(int from, WritableFCAObject target) {
+        ListSet objectList = this.dialog.getContext().getObjectList();
+        if(target != null) {
+            int targetPos = objectList.indexOf(target);
+            if(from < targetPos) {
+                targetPos --;
+            }
+            Object movingObject = objectList.remove(from);
+            objectList.add(targetPos, movingObject);
+        } else {
+            Object movingObject = objectList.remove(from);
+            objectList.add(movingObject);
+        }
+        calculateNewSize();
+        this.dialog.repaint();
+    }
+    
 	protected boolean collectionContainsString(
 		String value,
 		Object[] objects) {
