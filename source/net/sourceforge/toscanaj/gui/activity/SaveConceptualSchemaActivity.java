@@ -42,4 +42,12 @@ public class SaveConceptualSchemaActivity implements FileActivity, EventBrokerLi
         }
 
     }
+
+    public String[] getExtensions() {
+        return new String[]{"csx"};
+    }
+
+    public String getDescription() {
+        return "Conceptual Schema";
+    }
 }

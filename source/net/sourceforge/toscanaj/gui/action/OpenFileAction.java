@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.gui.action;
 import net.sourceforge.toscanaj.gui.activity.FileActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -94,6 +95,9 @@ public class OpenFileAction extends KeyboardMappedAction {
             } else {
                 openDialog = new JFileChooser(System.getProperty("user.dir"));
             }
+            openDialog.setFileFilter(new ExtensionFileFilter(
+                                                this.openActivity.getExtensions(),
+                                                this.openActivity.getDescription()));
 
             if (openDialog.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = openDialog.getSelectedFile();

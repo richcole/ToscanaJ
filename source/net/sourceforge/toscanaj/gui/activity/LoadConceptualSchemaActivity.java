@@ -44,4 +44,12 @@ public class LoadConceptualSchemaActivity implements FileActivity {
 	public void setTestOpenOkActivity(SimpleActivity testOpenOkActivity) {
 		this.testOpenOkActivity = testOpenOkActivity;
 	}
+	
+    public String[] getExtensions() {
+        return new String[]{"csx"};
+    }
+    
+    public String getDescription() {
+        return "Conceptual Schema";
+    }
 }
