@@ -281,14 +281,14 @@ public class DatabaseConnectionInformationView extends JDialog
     class JdbcConnectionPanel extends ConnectionPanel {
         private JTextField urlField;
         private JTextField userNameField;
-        private JTextField passwordField;
+        private JPasswordField passwordField;
         private JTextField driverField;
 
     	JdbcConnectionPanel() {
             super();
     	    urlField = new JTextField();
     	    userNameField = new JTextField();
-    	    passwordField = new JTextField();
+    	    passwordField = new JPasswordField();
     	    driverField = new JTextField();
 
             updateContents();
@@ -375,7 +375,7 @@ public class DatabaseConnectionInformationView extends JDialog
         boolean executeStep() {
 			databaseInfo.setUrl(urlField.getText());
             databaseInfo.setUserName(userNameField.getText());
-            databaseInfo.setPassword(passwordField.getText());
+            databaseInfo.setPassword(passwordField.getPassword().toString());
             databaseInfo.setDriverClass(driverField.getText());
             databaseInfo.setEmbeddedSQLLocation((String) null);
             return connectDatabase();
@@ -385,13 +385,13 @@ public class DatabaseConnectionInformationView extends JDialog
     class OdbcConnectionPanel extends ConnectionPanel {
         private JTextField dataSourceNameField;
         private JTextField userNameField;
-        private JTextField passwordField;
+        private JPasswordField passwordField;
 
     	OdbcConnectionPanel() {
             super();
     	    dataSourceNameField = new JTextField();
     	    userNameField = new JTextField();
-    	    passwordField = new JTextField();
+    	    passwordField = new JPasswordField();
 
             updateContents();
 
@@ -456,7 +456,7 @@ public class DatabaseConnectionInformationView extends JDialog
             }
         }
         boolean executeStep() {
-            databaseInfo.setOdbcDataSource(dataSourceNameField.getText(), userNameField.getText(), passwordField.getText());
+            databaseInfo.setOdbcDataSource(dataSourceNameField.getText(), userNameField.getText(), passwordField.getPassword().toString());
             return connectDatabase();
         }
     }
@@ -464,13 +464,13 @@ public class DatabaseConnectionInformationView extends JDialog
     class AccessFileConnectionPanel extends ConnectionPanel {
         private JTextField fileUrlField;
         private JTextField userNameField;
-        private JTextField passwordField;
+        private JPasswordField passwordField;
 
     	AccessFileConnectionPanel() {
             super();
     	    fileUrlField = new JTextField();
     	    userNameField = new JTextField();
-    	    passwordField = new JTextField();
+    	    passwordField = new JPasswordField();
 
     	    JButton fileButton = new JButton("Browse...");
     	    fileButton.addActionListener(new ActionListener() {
@@ -550,7 +550,7 @@ public class DatabaseConnectionInformationView extends JDialog
             }
         }
         boolean executeStep() {
-            databaseInfo.setAccessFileInfo(fileUrlField.getText(), userNameField.getText(), passwordField.getText());
+            databaseInfo.setAccessFileInfo(fileUrlField.getText(), userNameField.getText(), passwordField.getPassword().toString());
             return connectDatabase();
         }
     }
