@@ -133,11 +133,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
             return;
         }
         if (diagram instanceof NestedLineDiagram) {
-            addDiagram((NestedLineDiagram) diagram);
-        } else if(diagram instanceof SimpleLineDiagram){
-            addDiagram((SimpleLineDiagram)diagram);
-        } else{
-            throw new RuntimeException("Unexpected type of diagram");
+            addNestedLineDiagram((NestedLineDiagram) diagram);
+        } else {
+            addDiagram(diagram);
         }
         requestScreenTransformUpdate();
         repaint();
@@ -153,19 +151,13 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * If the filter concept is non-null all nodes created will use this for
      * filter operations.
      */
-    private void addDiagram(SimpleLineDiagram diagram) {
-        // add all lines to the canvas
-        for (int i = 0; i < diagram.getNumberOfLines(); i++) {
-            DiagramLine dl = diagram.getLine(i);
-            addCanvasItem(new LineView(dl));
-        }
-        // add all nodes to the canvas
-        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
-            DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node, this);
-            addCanvasItem(nodeView);
-        }
-        // add all labels to the canvas
+    private void addDiagram(Diagram2D diagram) {
+        addDiagramLinesToCanvas(diagram);
+        addDiagramNodesToCanvas(diagram);
+        addDiagramLabelsToCanvas(diagram);
+    }
+
+    private void addDiagramLabelsToCanvas(Diagram2D diagram) {
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
             if (attrLabelInfo != null) {
@@ -182,40 +174,34 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
     }
 
-    /**
-     * Adds a nested line diagram to the canvas.
-     */
-    private void addDiagram(NestedLineDiagram diagram) {
-        // add all outer lines to the canvas
+    private void addDiagramLinesToCanvas(Diagram2D diagram) {
         for (int i = 0; i < diagram.getNumberOfLines(); i++) {
             DiagramLine dl = diagram.getLine(i);
             addCanvasItem(new LineView(dl));
         }
-        // add all outer nodes to the canvas
+    }
+
+    /**
+     * Adds a nested line diagram to the canvas.
+     */
+    private void addNestedLineDiagram(NestedLineDiagram diagram) {
+        // add the outer diagram lines/nodes
+        addDiagramLinesToCanvas(diagram);
+        addDiagramNodesToCanvas(diagram);
+        // recurse for the inner diagrams
+        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
+            NestedDiagramNode node = (NestedDiagramNode) diagram.getNode(i);
+            addDiagram(node.getInnerDiagram());
+        }
+        // add all outer labels to the canvas
+        addDiagramLabelsToCanvas(diagram);
+    }
+
+    private void addDiagramNodesToCanvas(Diagram2D diagram) {
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
             NodeView nodeView = new NodeView(node, this);
             addCanvasItem(nodeView);
-        }
-        // recurse for the inner diagrams
-        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
-            NestedDiagramNode node = (NestedDiagramNode) diagram.getNode(i);
-            addDiagram((SimpleLineDiagram) node.getInnerDiagram());
-        }
-        // add all outer labels to the canvas
-        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
-            LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
-            if (attrLabelInfo != null) {
-                LabelView labelView = new AttributeLabelView(this, attrLabelInfo);
-                addCanvasItem(labelView);
-                labelView.addObserver(this);
-            }
-            LabelInfo objLabelInfo = diagram.getObjectLabel(i);
-            if (objLabelInfo != null) {
-                LabelView labelView = new ObjectLabelView(this, objLabelInfo);
-                addCanvasItem(labelView);
-                labelView.addObserver(this);
-            }
         }
     }
 
