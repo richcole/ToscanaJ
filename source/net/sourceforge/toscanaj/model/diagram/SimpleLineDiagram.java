@@ -83,7 +83,6 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 	 * keep the same identifiers for nodes in a copied diagram.
 	 * - making "almost" deep copy of a Concept, see notes in makeDiagramNodeCopy method.
 	 * 
-	 * @todo Need to make a deep copy of Concepts.
 	 * @todo use IdPool to get identifiers.
      */
     public SimpleLineDiagram (Diagram2D diagram) {
