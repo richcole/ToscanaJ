@@ -7,26 +7,27 @@
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.UIManager;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 
@@ -39,72 +40,13 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
  * @todo break messages that are too long into multiple lines
  */
 
-public class ErrorDialog extends JDialog implements ClipboardOwner{
-	private JButton closeButton, copyToClipboardButton;
+public class ErrorDialog extends JDialog{
 	private static final String CONFIGURATION_SECTION_NAME = "ErrorDialog";
 	private static final int MINIMUM_WIDTH = 400;
-	private static final int MINIMUM_HEIGHT = 500;
-	private static final int DEFAULT_X_POS = 50;
-	private static final int DEFAULT_Y_POS = 50;
-
-    /**
-     * Constructor to show a simple error message
-     */
-    private ErrorDialog(Component component, String title, String msg) {
-		super(JOptionPane.getFrameForComponent(component),title,true);
-		JPanel mainPanel = new JPanel(new BorderLayout());
-		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
-		this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
-		mainPanel.add(createErrorLogScrollPane(msg),BorderLayout.CENTER);
-		mainPanel.add(createButtonsPanel(msg), BorderLayout.SOUTH);
-		setContentPane(mainPanel);
-		setVisible(true);
-    }
-    
-	private JScrollPane createErrorLogScrollPane(String msg){
-		JTextArea textArea = new JTextArea(msg);
-		textArea.setEditable(false);
-		JScrollPane scrollPane = new JScrollPane(textArea);
-		return scrollPane;
-	}
-	
-	private JPanel createButtonsPanel(String msg) {
-		JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		final String errorMsg = msg;
-		closeButton = new JButton("Close");
-		closeButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				closeDialog();			
-			}		
-		});
-		copyToClipboardButton = new JButton("Copy to Clipboard");
-		copyToClipboardButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				StringSelection comments = new StringSelection(errorMsg);
-				Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				systemClipboard.setContents(comments,null);
-				closeDialog();
-			}		
-		});
-		buttonsPanel.add(closeButton);
-		buttonsPanel.add(copyToClipboardButton);
-		return buttonsPanel;
-	}
-	
-	private void closeDialog(){
-		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
-		dispose();
-	}
-	
-    /**
-     * Constructor to show an error message based on exception thrown.
-     *
-     * The user has the choice to view more detail of the error
-     * based on the original exception thrown.
-     */
-    private ErrorDialog(Component component, Throwable e, String title) {
-        showDetailedErrorMessage(component, e, title);
-    }
+	private static final int MINIMUM_HEIGHT = 300;
+	private static final int DEFAULT_X_POS = 250;
+	private static final int DEFAULT_Y_POS = 150;
+	private boolean isDetailedExceptionsShown, onFirstExecute;
 
     /**
      * Constructor to show a simple error message.
@@ -113,69 +55,166 @@ public class ErrorDialog extends JDialog implements ClipboardOwner{
      * based on the original exception thrown.
      */
     private ErrorDialog(Component component, Throwable e, String title, String errorMsg) {
-        showDetailedErrorMsg(component, e, title, errorMsg);
-    }
-    
-    private void showDetailedErrorMessage(Component component, Throwable e, String title) {
-        //original one
-		Throwable original = e.getCause();
-		if (original == null) {
-			showLastErrorMessage(component, e, title);
-			return;
-		}        
-        Object[] options = {"OK", "Details"};
-        int n = JOptionPane.showOptionDialog(component,
-                e.getMessage(),
-                title,
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                null,
-                options,
-                options[0]);
-        if (n == 1) {
-            ErrorDialog.showError(component, original, title, original.getMessage());
-        }
+		super(JOptionPane.getFrameForComponent(component), title, true);
+		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
+				this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
+
+		this.isDetailedExceptionsShown = false;
+		this.onFirstExecute = true;
+		this.getContentPane().setLayout(new GridBagLayout());
+		
+		Component detailedPanel = createErrorLogPanel(e.getCause());	
+		this.getContentPane().add(createErrorMsgPanel(e, errorMsg), new GridBagConstraints(
+		0,
+		0,
+		1,
+		1,
+		1,
+		0,
+		GridBagConstraints.WEST,
+		GridBagConstraints.HORIZONTAL,
+		new Insets(5, 5, 0, 5),
+		0,
+		0));
+		this.getContentPane().add(createButtonsPanel(e, detailedPanel), new GridBagConstraints(
+		0,
+		1,
+		1,
+		1,
+		1,
+		0,
+		GridBagConstraints.EAST,
+		GridBagConstraints.VERTICAL,
+		new Insets(0, 5, 0, 5),
+		0,
+		0));
+		this.getContentPane().add(detailedPanel, new GridBagConstraints(
+		0,
+		2,
+		1,
+		1,
+		1,
+		1,
+		GridBagConstraints.CENTER,
+		GridBagConstraints.BOTH,
+		new Insets(0, 5, 0, 5),
+		0,
+		0));
+		pack();
+		show();
     }
 
-    private void showLastErrorMessage(Component component, Throwable e, String title) {
-        Object[] options = {"OK", "Details"};
-        int n = JOptionPane.showOptionDialog(component,
-                e.getMessage(),
-                title,
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                null,
-                options,
-                options[0]);
-        if (n == 1) {
-        	StringWriter stackTraceWriter = new StringWriter();
-        	e.printStackTrace(new PrintWriter(stackTraceWriter));
-            ErrorDialog.showError(component, title, stackTraceWriter.toString());
-        }
-    }
+	private JPanel createErrorMsgPanel(Throwable e, String extraMessage) {
+		if(extraMessage==null){
+			extraMessage = e.getMessage();
+		}
+		
+		JLabel simpleErrorLabel = new JLabel(extraMessage,UIManager.getIcon("OptionPane.errorIcon"),JLabel.LEFT);
+		JPanel simpleErrorMsgPanel = new JPanel(new GridBagLayout());
+		simpleErrorMsgPanel.setSize(400,150);
+		
+		simpleErrorMsgPanel.add(simpleErrorLabel, new GridBagConstraints(
+		0,
+		0,
+		1,
+		1,
+		1,
+		0,
+		GridBagConstraints.WEST,
+		GridBagConstraints.HORIZONTAL,
+		new Insets(0, 5, 0, 5),
+		0,
+		0));
+		
+		return simpleErrorMsgPanel;
+	}
 
-    private void showDetailedErrorMsg(Component component, Throwable e, String title, String extraMessage) {
-        Object[] options = {"OK", "Details"};
-        int n = JOptionPane.showOptionDialog(component,
-                extraMessage,
-                title,
-                JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                null,
-                options,
-                options[0]);
-        if (n == 1) {
-            ErrorDialog.showError(component, e, title);
-        }
-    }
+	private JPanel createButtonsPanel(
+		final Throwable exception,final Component detailedPanel) {
+		final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+		
+		JButton okButton = new JButton("OK");
+		okButton.setMnemonic(KeyEvent.VK_O);
+		okButton.setFocusable(true);
+		okButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				closeDialog();			
+			}		
+		});
 
-    /**
-     * Show a simple error message.
-     */
-    public static void showError(Component component, String title, String errorMsg) {
-        new ErrorDialog(component, title, errorMsg);
-    }
-
+		final JButton detailButton = new JButton("Details >>>");
+		final JDialog errorDialog = this;
+		detailButton.setFocusable(false);
+		detailButton.setMnemonic(KeyEvent.VK_D);
+		detailButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				int width = errorDialog.getWidth();
+				updateDetailButton(detailButton);
+				detailedPanel.setVisible(!isDetailedExceptionsShown);
+				errorDialog.pack();
+				errorDialog.setSize(new Dimension(width, errorDialog.getHeight()));
+				errorDialog.validate();
+			}		
+		});
+		buttonsPanel.add(detailButton);
+		buttonsPanel.add(okButton);
+		buttonsPanel.setSize(400,50);
+		
+		return buttonsPanel;
+	}
+	
+	private String createErrorLog(Throwable e) {
+		String lineBreak = System.getProperty("line.separator");
+		String returnString = "";
+		String stackTrace = "";
+		String exceptionName = e.getClass().getName();
+		String exceptionMsg =e.getMessage();
+		
+		while(e.getCause()!=null){
+			stackTrace += e.getMessage()+lineBreak;
+			e = e.getCause();			
+		}
+		if(e.getCause() == null){
+			//stack trace
+			 StringWriter stackTraceWriter = new StringWriter();
+			 e.printStackTrace(new PrintWriter(stackTraceWriter));		
+			 stackTrace += stackTraceWriter.toString();	
+		}
+		returnString += exceptionName
+			+ exceptionMsg
+			+ lineBreak
+			+ lineBreak
+			+ "Caused by:"
+			+ lineBreak
+			+ stackTrace;
+		return returnString;
+	}
+	private Component createErrorLogPanel(Throwable e) {
+		JTextArea textArea = new JTextArea(createErrorLog(e),20,50);
+		textArea.setEditable(false);
+		JScrollPane scrollPane = new JScrollPane(textArea);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setVisible(isDetailedExceptionsShown);
+		return scrollPane;	
+	}
+	
+	private void updateDetailButton(JButton detailButton){
+		String closeDetailString = "<<< Details";
+		String openDetailString = "Details >>>";
+		if(isDetailedExceptionsShown){
+			detailButton.setText(closeDetailString);
+			isDetailedExceptionsShown = false;
+		}else if(isDetailedExceptionsShown !=true && onFirstExecute==true){
+			detailButton.setText(closeDetailString);
+			isDetailedExceptionsShown = false;
+			onFirstExecute = false;
+		}else{
+			detailButton.setText(openDetailString);
+			isDetailedExceptionsShown = true;
+		}
+	}
+	
     /**
      * Show an error message using exception thrown
      *
@@ -183,7 +222,7 @@ public class ErrorDialog extends JDialog implements ClipboardOwner{
      * based on original exception thrown
      */
     public static void showError(Component component, Throwable e, String title) {
-        new ErrorDialog(component, e, title);
+		new ErrorDialog(component, e, title, null);  
     }
 
     /**
@@ -195,9 +234,10 @@ public class ErrorDialog extends JDialog implements ClipboardOwner{
     public static void showError(Component component, Throwable e, String title, String errorMsg) {
         new ErrorDialog(component, e, title, errorMsg);
     }
-	/**
-	 * Implement for Clipboard feature. Don't have to do anything
-	 */
-	public void lostOwnership(Clipboard clipboard, Transferable contents) {
+	
+	private void closeDialog(){
+		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
+		dispose();
 	}
 }
+
