@@ -84,6 +84,22 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
                 <objectListView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML Report...">
                     <template url="views/listView.html"/>
                 </objectListView>
+                <!-- Dos and Disk Benchmarks with Price -->
+                <objectListView class="net.sourceforge.toscanaj.dbviewer.BarChartDatabaseViewer" name="Benchmark View...">
+                    <template>
+                        <column sqlname="dosmark"   displayname="Dos Benchmark"     mincolor="#00ffff" maxcolor="#ff00ff" linecolor="#ff0000"/>
+                        <column sqlname="diskmark"  displayname="Disk Benchmark"    mincolor="#00ffff" maxcolor="#ff00ff" linecolor="#ff0000"/>
+                        <column sqlname="price"     displayname="Price"             mincolor="#ff0000" maxcolor="#ffff00" linecolor="#ffffff"/>
+                    </template>
+                </objectListView>
+                <!-- Video and Graphics with Price -->
+                <objectListView class="net.sourceforge.toscanaj.dbviewer.BarChartDatabaseViewer" name="Video/Graphics View...">
+                    <template>
+                        <column sqlname="video"     displayname="Video"     mincolor="#00ffff" maxcolor="#ff00ff" linecolor="#ff0000"/>
+                        <column sqlname="graphics"  displayname="Graphics"  mincolor="#00ffff" maxcolor="#ff00ff" linecolor="#ff0000"/>
+                        <column sqlname="price"     displayname="Price"     mincolor="#ff0000" maxcolor="#ffff00" linecolor="#ffffff"/>
+                    </template>
+                </objectListView>
             </views>
         </databaseConnection>
 		<object id="1">price&gt;=5000</object>
