@@ -12,8 +12,10 @@ import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+
+import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.DOMBuilder;
+import org.jdom.input.SAXBuilder;
 
 import javax.swing.*;
 import java.awt.*;
@@ -199,9 +201,8 @@ public class DatabaseViewerManager implements XMLizable {
         if (urlAttr != null) {
             try {
                 URL url = new URL(DatabaseViewerManager.baseURL, urlAttr);
-                DOMBuilder builder =
-                        new DOMBuilder("org.jdom.adapters.XercesDOMAdapter");
-                org.jdom.Document doc = builder.build(url);
+                SAXBuilder parser = new SAXBuilder();
+                Document doc= parser.build(url);
                 Element root = doc.getRootElement();
                 root.detach();
                 elem.addContent(root);

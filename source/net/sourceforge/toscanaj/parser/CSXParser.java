@@ -26,8 +26,7 @@ import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.adapters.DOMAdapter;
-import org.jdom.input.DOMBuilder;
+import org.jdom.input.SAXBuilder;
 import org.tockit.events.EventBroker;
 
 import java.awt.*;
@@ -103,14 +102,8 @@ public class CSXParser {
         FileInputStream in;
         in = new FileInputStream(csxFile);
 
-        // parse schema with Xerxes
-        DOMAdapter domAdapter = new org.jdom.adapters.XercesDOMAdapter();
-        org.w3c.dom.Document w3cdoc = domAdapter.getDocument(in, false);
-
-        // create JDOM document
-        DOMBuilder builder =
-                new DOMBuilder("org.jdom.adapters.XercesDOMAdapter");
-        _Document = builder.build(w3cdoc);
+        SAXBuilder parser = new SAXBuilder();
+        _Document = parser.build(in);
 
         _BaseURL = csxFile.toURL();
         DatabaseInfo.baseURL = _BaseURL;
