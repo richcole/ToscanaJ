@@ -59,15 +59,15 @@ public class SaveFileAction extends KeyboardMappedAction {
         }
 
         if (result) {
-            if (previousFile != null) {
-                saveDialog = new CheckDuplicateFileChooser(previousFile);
-                
-            } else {
-                saveDialog = new CheckDuplicateFileChooser(new File(System.getProperty("user.dir")));
-            }
 			String[] csxExtension = {"csx"};
 			ExtensionFileFilter csxFileFilter = new ExtensionFileFilter(csxExtension,"Conceptual Schema");
-			saveDialog.addChoosableFileFilter(csxFileFilter);
+			ExtensionFileFilter[] filterArray = { csxFileFilter };
+            if (previousFile != null) {
+                saveDialog = new CheckDuplicateFileChooser(previousFile, filterArray);
+                
+            } else {
+                saveDialog = new CheckDuplicateFileChooser(new File(System.getProperty("user.dir")), filterArray);
+            }
 			
             if (saveDialog.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = saveDialog.getSelectedFile();

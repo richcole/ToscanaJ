@@ -19,8 +19,15 @@ import javax.swing.filechooser.FileFilter;
  * 
  */
 public class CheckDuplicateFileChooser extends JFileChooser{
-		public CheckDuplicateFileChooser(File selectedFile){
+		public CheckDuplicateFileChooser(File selectedFile, ExtensionFileFilter[] filterArray){
 			super(selectedFile);
+			ExtensionFileFilter filter;
+			for(int i = 0;i< filterArray.length; i++){
+				filter = filterArray[i];
+				if(filter!=null){
+					addChoosableFileFilter(filter);
+				}
+			}
 		}
 		public void approveSelection(){
 			File selectedFile = getSelectedFile();

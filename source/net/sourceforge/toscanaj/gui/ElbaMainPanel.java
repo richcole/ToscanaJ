@@ -15,8 +15,10 @@ import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.*;
+import net.sourceforge.toscanaj.gui.dialog.CheckDuplicateFileChooser;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExportStatisticalDataSettingsDialog;
+import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
@@ -503,11 +505,14 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         }
 
         final JFileChooser saveDialog;
+		String[] extension = {"xml"};
+		ExtensionFileFilter fileFilter = new ExtensionFileFilter(extension,"XML Files");
+		ExtensionFileFilter[] filterArray = { fileFilter };
         if (this.currentFile != null) {
             // use position of last file for dialog
-            saveDialog = new JFileChooser(this.currentFile);
+            saveDialog = new CheckDuplicateFileChooser(new File(this.currentFile), filterArray);
         } else {
-            saveDialog = new JFileChooser(System.getProperty("user.dir"));
+            saveDialog = new CheckDuplicateFileChooser(new File(System.getProperty("user.dir")), filterArray);
         }
         saveDialog.setApproveButtonText("Export");
         int rv = saveDialog.showSaveDialog(this);
@@ -534,11 +539,14 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
     private void exportSQLScript() {
         final JFileChooser saveDialog;
+		String[] extension = {"sql"};
+		ExtensionFileFilter fileFilter = new ExtensionFileFilter(extension,"SQL Scripts");
+		ExtensionFileFilter[] filterArray = { fileFilter };
         if (this.currentFile != null) {
             // use position of last file for dialog
-            saveDialog = new JFileChooser(this.currentFile);
+            saveDialog = new CheckDuplicateFileChooser(new File(this.currentFile), filterArray);
         } else {
-            saveDialog = new JFileChooser(System.getProperty("user.dir"));
+            saveDialog = new CheckDuplicateFileChooser(new File(System.getProperty("user.dir")), filterArray);
         }
         saveDialog.setApproveButtonText("Export");
         int rv = saveDialog.showSaveDialog(this);
