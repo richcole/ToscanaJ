@@ -40,10 +40,4 @@ public class LineView extends CanvasItem {
     public boolean containsPoint(Point2D point) {
         return false;
     }
-
-    /**
-     * A line is not currently moveable.
-     */
-    public void moveBy(double deltaX, double deltaY) {
-    }
 }

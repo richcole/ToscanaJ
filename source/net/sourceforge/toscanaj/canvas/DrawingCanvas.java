@@ -79,29 +79,44 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     }
 
     /**
-     * Not used yet.
+     * Not used -- mouse clicks are handled as press/release combinations.
      */
     public void mouseClicked(MouseEvent e){
-      //System.out.println("mouseClicked");
     }
 
     /**
-     * Resets the diagram from dragging mode back into normal mode.
+     * Handles mouse release events.
+     *
+     * Resets the diagram from dragging mode back into normal mode or calls
+     * clicked() or doubleClicked() on the CanvasItem hit.
      */
     public void mouseReleased(MouseEvent e) {
-        dragMode = false;
+        if(dragMode) {
+            dragMode = false;
+        }
+        else {
+            if(selectedCanvasItem == null) {
+                return;
+            }
+            if(e.getClickCount() == 1) {
+                selectedCanvasItem.clicked(e.getPoint());
+            }
+            else if(e.getClickCount() == 2) {
+                selectedCanvasItem.doubleClicked(e.getPoint());
+            }
+        }
         selectedCanvasItem = null;
     }
 
     /**
-     * Not used yet.
+     * Not used.
      */
     public void mouseEntered(MouseEvent e) {
       //System.out.println("mouseEntered");
     }
 
     /**
-     * Not used yet.
+     * Not used.
      */
     public void mouseExited(MouseEvent e) {
       //System.out.println("mouseExited");
@@ -120,14 +135,14 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     }
 
     /**
-     * Not used yet.
+     * Not used.
      */
     public void mouseMoved(MouseEvent e) {
       //System.out.println("mouseMoved");
     }
 
     /**
-     * Starts the process of dragging a label.
+     * Finds, raises and stores the canvas item hit.
      */
     public void mousePressed(MouseEvent e) {
         ListIterator it = this.canvasItems.listIterator(this.canvasItems.size());
@@ -135,7 +150,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
             CanvasItem cur = (CanvasItem) it.previous();
             Point2D point = this.graphics.inverseProject(e.getPoint());
             if(cur.containsPoint(point)) {
-                // store the CanvasItem needed for moving
+                // store the CanvasItem hit
                 this.selectedCanvasItem = cur;
                 this.lastMousePos = e.getPoint();
                 // raise the item

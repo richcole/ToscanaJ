@@ -58,8 +58,8 @@ public class NodeView extends CanvasItem {
     }
 
     /**
-     * A node is not currently moveable.
+     * @TODO write
      */
-    public void moveBy(double deltaX, double deltaY) {
+    public void doubleClicked(Point2D point) {
     }
 }

@@ -11,7 +11,6 @@ import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
  * can be moved.
  */
 public abstract class CanvasItem {
-
     /**
      * draw method called to draw canvas item
      */
@@ -24,6 +23,25 @@ public abstract class CanvasItem {
 
     /**
      * Moves the label by the given distance.
+     *
+     * Unless it is overwritten in a derived class this will do nothing.
      */
-    public abstract void moveBy(double deltaX, double deltaY);
+    public void moveBy(double deltaX, double deltaY) {
+    }
+
+    /**
+     * Callback for getting notification about single clicks.
+     *
+     * Unless it is overwritten in a derived class this will do nothing.
+     */
+    public void clicked(Point2D point) {
+    }
+
+    /**
+     * Callback for getting notification about double clicks.
+     *
+     * Unless it is overwritten in a derived class this will do nothing.
+     */
+    public void doubleClicked(Point2D point) {
+    }
 }
