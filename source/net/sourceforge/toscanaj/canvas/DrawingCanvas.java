@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * DrawingCanvas controls all the updating of CanvasItems contained in a DiagramView
@@ -30,6 +32,64 @@ import java.util.ListIterator;
  */
 
 public class DrawingCanvas extends JComponent implements MouseListener, MouseMotionListener, Printable {
+    /**
+     * Sends a click event to a canvas item.
+     *
+     * @see DrawingCanvas.mouseReleaseEvent(MouseEvent)
+     */
+    private class CanvasItemClickTask extends TimerTask {
+        /**
+         * The message recipient.
+         */
+        private CanvasItem target;
+        /**
+         * The position transmitted with the message.
+         */
+        private Point2D point;
+        /**
+         * Creates a new task for sending a message.
+         */
+        public CanvasItemClickTask(CanvasItem target, Point2D point) {
+            this.target = target;
+            this.point = point;
+        }
+        /**
+         * Sends the message.
+         */
+        public void run() {
+            target.clicked(point);
+        }
+    }
+
+    /**
+     * Sends a background click event to a canvas.
+     *
+     * @see DrawingCanvas.mouseReleaseEvent(MouseEvent)
+     */
+    private class BackgroundClickTask extends TimerTask {
+        /**
+         * The message recipient.
+         */
+        private DrawingCanvas target;
+        /**
+         * The position transmitted with the message.
+         */
+        private Point2D point;
+        /**
+         * Creates a new task for sending a message.
+         */
+        public BackgroundClickTask(DrawingCanvas target, Point2D point) {
+            this.target = target;
+            this.point = point;
+        }
+        /**
+         * Sends the message.
+         */
+        public void run() {
+            target.backgroundClicked(point);
+        }
+    }
+
     /**
      * Used to indicate that no graphic format has been set.
      */
@@ -89,6 +149,11 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * This is done to avoid resizing while the mouse is dragged.
      */
     private Rectangle2D canvasSize = null;
+
+    /**
+     * A timer to distinguish between single and double clicks.
+     */
+    private Timer doubleClickTimer = null;
 
     /**
      * Paints the canvas including all CanvasItems on it.
@@ -211,7 +276,13 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * Handles mouse release events.
      *
      * Resets the diagram from dragging mode back into normal mode or calls
-     * clicked() or doubleClicked() on the CanvasItem hit.
+     * clicked() or doubleClicked() on the CanvasItem hit. If no item was hit
+     * backgroundClicked() or backgroundDoubleClicked() on the canvas is
+     * called.
+     *
+     * Clicked() will only be send if it is not a double click.
+     *
+     * @TODO Use system double click timing instead of hard-coded 200ms
      */
     public void mouseReleased(MouseEvent e) {
         if(dragMode) {
@@ -221,17 +292,21 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
         else {
             if(selectedCanvasItem == null) {
                 if(e.getClickCount() == 1) {
-                    backgroundClicked(e.getPoint());
+                    this.doubleClickTimer = new Timer();
+                    this.doubleClickTimer.schedule( new BackgroundClickTask( this, e.getPoint() ),  200 );
                 }
                 else if(e.getClickCount() == 2) {
+                    this.doubleClickTimer.cancel();
                     backgroundDoubleClicked(e.getPoint());
                 }
                 return;
             }
             if(e.getClickCount() == 1) {
-                selectedCanvasItem.clicked(e.getPoint());
+                this.doubleClickTimer = new Timer();
+                this.doubleClickTimer.schedule( new CanvasItemClickTask( this.selectedCanvasItem, e.getPoint() ),  200 );
             }
             else if(e.getClickCount() == 2) {
+                this.doubleClickTimer.cancel();
                 selectedCanvasItem.doubleClicked(e.getPoint());
             }
         }
