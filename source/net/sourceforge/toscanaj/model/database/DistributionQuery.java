@@ -48,16 +48,21 @@ public class DistributionQuery extends Query {
         return retValue;
     }
 
-	/**
-	 * This method is not yet implemented since we don't support general distribution queries 
-	 * yet. The class exists solely to define a consistent frame for the percent query, adding
-	 * proper support for distribution queries is more tricky: we will need to somehow query for
-	 * the same values on the top element and the current element, which requires knowledge of
-	 * the top. Do we want to do this? Do we want to keep the percent version like this?
-	 * 
-	 * @todo implement/change/whatever 
-	 */
-    public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) {
-    	throw new RuntimeException("Not yet implemented");
+    public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values, Vector referenceValues) {
+		if (values.get(0).toString().equals("0")) {
+			return null;
+		}
+		///@todo this is all a bit brute force -> be smarter
+		Vector relativeValues = new Vector(values.size());
+		Iterator valIt = values.iterator();
+		Iterator refIt = referenceValues.iterator();
+		while(valIt.hasNext() && refIt.hasNext()) {
+			String value = valIt.next().toString();
+			String refVal = refIt.next().toString();
+			relativeValues.add(new Double(Double.parseDouble(value) / Double.parseDouble(refVal)));
+		}
+		String displayString = this.formatResults(relativeValues, 1);
+		DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
+		return retVal;
     }
 }

@@ -202,6 +202,9 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
       <queryField separator=" - " format="$0.00">MIN(price)</queryField>
       <queryField format="$0.00">MAX(price)</queryField>
     </aggregateQuery>
+    <distributionQuery name="Average Price (relative)">
+      <queryField format="0.00 %">AVG(price)</queryField>
+    </distributionQuery>
   </queries>
   <diagram title="Prices for 486/66 PCs">
     <description>

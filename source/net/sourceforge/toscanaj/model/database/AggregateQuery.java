@@ -48,7 +48,7 @@ public class AggregateQuery extends Query {
         return retValue;
     }
 
-    public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) {
+    public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values, Vector referenceValues) {
         if (values.get(0).toString().equals("0")) {
             return null;
         }

@@ -150,5 +150,10 @@ public abstract class Query implements XMLizable {
 
     abstract public String getQueryHead();
 
-    abstract public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values);
+	/**
+	 * @param whereClause       The SQL WHERE clause to query.
+	 * @param values            The query results to turn into objects
+	 * @param referenceValues   The reference values that can be used for relative results, usually the same values for the top node 
+	 */
+    abstract public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values, Vector referenceValues);
 }

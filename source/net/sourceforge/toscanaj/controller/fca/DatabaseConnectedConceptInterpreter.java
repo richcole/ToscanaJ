@@ -267,29 +267,46 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         if (concept.getObjectContingentSize() != 0 ||
                 ((objectDisplayMode == ConceptInterpretationContext.EXTENT) && !concept.isBottom())
         ) {
-            String whereClause = WhereClauseGenerator.createWhereClause(concept,
-                    context.getDiagramHistory(),
-                    context.getNestingConcepts(),
-                    objectDisplayMode,
-                    filterMode);
-            return execute(query, whereClause);
+			String whereClause = WhereClauseGenerator.createWhereClause(concept,
+					context.getDiagramHistory(),
+					context.getNestingConcepts(),
+					objectDisplayMode,
+					filterMode);
+			Concept top = concept;
+			while(top.getUpset().size() > 1) {
+				Iterator it = top.getUpset().iterator();
+				Concept upper = (Concept) it.next();
+				if(upper != top) {
+					top = upper;
+				} else {
+					top = (Concept) it.next();
+				}
+			}
+			String referenceWhereClause = WhereClauseGenerator.createWhereClause(top,
+					context.getDiagramHistory(),
+					context.getNestingConcepts(),
+					ConceptInterpretationContext.EXTENT,
+					filterMode);
+            return execute(query, whereClause, referenceWhereClause);
         } else {
             return new ArrayList();
         }
     }
 
-    private List execute(Query query, String whereClause) {
+    private List execute(Query query, String whereClause, String referenceWhereClause) {
         List retVal = new ArrayList();
         if (whereClause != null) {
         	String statement = query.getQueryHead() + whereClause;
             try {
                 // submit the query
                 List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
+                List referenceResults = DatabaseConnection.getConnection().executeQuery(query.getQueryHead() + referenceWhereClause);
+                Vector reference = (Vector) referenceResults.iterator().next();
                 Iterator it = queryResults.iterator();
                 while (it.hasNext()) {
                     Vector item = (Vector) it.next();
                     DatabaseRetrievedObject object =
-                            query.createDatabaseRetrievedObject(whereClause, item);
+                            query.createDatabaseRetrievedObject(whereClause, item, reference);
                     if (object != null) {
                         retVal.add(object);
                     }

@@ -48,7 +48,7 @@ public class ListQuery extends Query {
         return retValue;
     }
 
-    public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) {
+    public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values, Vector referenceValues) {
         String displayString = this.formatResults(values, 1);
         DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
         retVal.setKey(values.get(0));

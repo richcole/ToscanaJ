@@ -188,6 +188,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
                     this.queries.add(new ListQuery(databaseInfo, queryElem));
                 } else if (queryElem.getName().equals(DistinctListQuery.QUERY_ELEMENT_NAME)) {
                     this.queries.add(new DistinctListQuery(databaseInfo, queryElem));
+				} else if (queryElem.getName().equals(DistributionQuery.QUERY_ELEMENT_NAME)) {
+					this.queries.add(new DistributionQuery(databaseInfo, queryElem));
                 }
             }
         } else {

@@ -45,7 +45,7 @@ public class DistinctListQuery extends Query {
         return retValue;
     }
 
-    public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) {
+    public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values, Vector referenceValues) {
         String displayString = this.formatResults(values, 0);
         DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
         String specialWhereClause = whereClause.substring(0, whereClause.lastIndexOf(';'));
