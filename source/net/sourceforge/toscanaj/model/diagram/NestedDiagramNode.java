@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.model.diagram;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
@@ -28,6 +29,12 @@ public class NestedDiagramNode extends DiagramNode {
      * Determines how much the outer diagram gets scaled.
      */
     private final static double OUTER_SCALE_FACTOR = 3.0;
+    
+    private Ellipse2D ellipse;
+    
+    private static final double EXTRA_ELLIPSE_SCALING = 1.1;
+    
+    private static final double MAX_TALLNESS_RATIO = 4;
 
     /**
      * Creates a new diagram node by copying the information from the given
@@ -54,7 +61,7 @@ public class NestedDiagramNode extends DiagramNode {
                 new LabelInfo(outerNode.getAttributeLabelInfo()), null,
                 outerNode.getOuterNode());
                 
-        double innerScale = scale / OUTER_SCALE_FACTOR;
+        double innerScale = (scale / OUTER_SCALE_FACTOR) * EXTRA_ELLIPSE_SCALING;
                 
         // scale attribute label position
         this.attributeLabel.setOffset(new Point2D.Double(this.attributeLabel.getOffset().getX(),
@@ -100,6 +107,8 @@ public class NestedDiagramNode extends DiagramNode {
         }
 
         this.innerDiagram = newDiag;
+        
+        calculateEllipse();
     }
 
     /**
@@ -109,35 +118,84 @@ public class NestedDiagramNode extends DiagramNode {
         return this.innerDiagram;
     }
 
-    /**
-     * Calculates the x-extension of this node.
-     *
-     * This is based on the bounds of the inner diagram.
-     */
     public double getRadiusX() {
-        Rectangle2D bounds = this.innerDiagram.getBounds();
-        if (bounds.getHeight() > 2 * bounds.getWidth()) {
-            return bounds.getHeight() / 3.4;
-        } else {
-            return bounds.getWidth() / 1.7;
-        }
+    	return this.ellipse.getWidth()/2;
     }
 
-    /**
-     * Calculates the y-extension of this node.
-     *
-     * This is based on the bounds of the inner diagram.
-     */
     public double getRadiusY() {
-        Rectangle2D bounds = this.innerDiagram.getBounds();
-        if (bounds.getWidth() > 2 * bounds.getHeight()) {
-            return bounds.getWidth() / 3.4;
-        } else {
-            return bounds.getHeight() / 1.7;
-        }
+        return this.ellipse.getHeight()/2;
     }
 
     public List getConceptNestingList() {
         return innerDiagram.getNode(0).getConceptNestingList();
+    }
+    
+    /**
+     * Calculates the ellipse we should use.
+     * 
+     * The basic algorithm goes like this: 1) find the center of the bounding
+     * rectangle as center of the ellipse 2) set the two radii as half the
+     * width/height of the rectangle 3) iterate through each node and check if
+     * they are outside or outside the ellipse, if outside, rescale the ellipse
+     * so they are on the boundary
+     *
+     * The last step is based on the formula that
+     *
+     *    (x/rx) ^2 + (y/ry)^2 = 1
+     *
+     * for each point (x,y) on the ellipse with radii (rx,ry) in (0,0).
+     *
+     * If the left hand part is larger than 1, the point is on the outside, if
+     * it is less than one, it is on the inside.
+     * 
+     * The x and y coordinates are shifted a bit away from the center to
+     * accommodate for the radii of the inner nodes. This means the actual point
+     * tested is the farmost corner of the bounding rectangle of the inner node
+     * instead of the node center.
+     */
+    private void calculateEllipse() {
+        // (1) find the center of the bounding rectangle as center of the ellipse
+        Rectangle2D bounds = this.innerDiagram.getBounds();
+        double cx = bounds.getCenterX();
+        double cy = bounds.getCenterY();
+
+        // (2) set two initial radii that are never too big
+        double rx = bounds.getWidth()/2;
+        double ry = bounds.getHeight()/2;
+        
+        // (2b) we don't want too longish ellipses
+        if(ry > rx * MAX_TALLNESS_RATIO) {
+        	rx = ry / MAX_TALLNESS_RATIO;
+        }
+
+        // (3) check all inner nodes if they are inside
+        for(int i = 0; i < this.innerDiagram.getNumberOfNodes(); i++) {
+        	DiagramNode node = this.innerDiagram.getNode(i);
+        	double x = node.getX() - cx;
+        	double y = node.getY() - cy;
+            if( x > 0 ) {
+                x += node.getRadiusX();
+            } else {
+                x -= node.getRadiusX();
+            }
+            if( y > 0 ) {
+                y += node.getRadiusY();
+            } else {
+                y -= node.getRadiusY();
+            }
+            double val = x * x / (rx * rx) + y * y / (ry * ry);
+            if(val > 1) { // point outside the ellipse
+            	double scale = Math.sqrt(val);
+            	rx *= scale;
+            	ry *= scale;
+            }
+        }
+        
+        // add a bit
+        rx *= EXTRA_ELLIPSE_SCALING;
+        ry *= EXTRA_ELLIPSE_SCALING;
+		
+		// done -- store results
+		this.ellipse = new Ellipse2D.Double(cx - rx, cy - ry, 2 * rx, 2 * ry);
     }
 }
