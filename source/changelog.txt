@@ -41,6 +41,8 @@ Specific for Elba:
 
 Specific for Siena (still not fully complete):
 ==============================================
+- added import of object-attribute lists (similar to ConExp: a list of objects
+  with their attributes in lines of the form "obj:attr1;attr2;...").
 
 Other new experimental features:
 ================================
