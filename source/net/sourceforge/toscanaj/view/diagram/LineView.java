@@ -38,6 +38,7 @@ public class LineView extends CanvasItem {
     
     private Color showRatioColor;
     private float fontSize;
+    private boolean dynamicLineWidth;
 
     /**
      * Creates a view for the given DiagramLine.
@@ -48,6 +49,7 @@ public class LineView extends CanvasItem {
         this.toView = toView;
         this.showRatioColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioColor", null);
         this.fontSize = ConfigurationManager.fetchFloat("LineView", "labelFontSize", 8);
+        this.dynamicLineWidth = ConfigurationManager.fetchString("LineView", "lineWidth", "").equals("extentRatio");
     }
 
     /**
@@ -60,22 +62,27 @@ public class LineView extends CanvasItem {
         Paint oldPaint = graphics.getPaint();
         Stroke oldStroke = graphics.getStroke();
         int selectionLineWidth = diagramSchema.getSelectionLineWidth();
+        float lineWidth = 1;
         if (this.diagramLine.getFromNode().getY() > this.diagramLine.getToNode().getY()) {
             graphics.setPaint(Color.red);
-            graphics.setStroke(new BasicStroke(3));
+            lineWidth = 3;
         } else if (this.getSelectionState() == DiagramView.NO_SELECTION) {
             graphics.setPaint(diagramSchema.getLineColor());
-            graphics.setStroke(new BasicStroke(1));
+            lineWidth = 1;
         } else if (this.getSelectionState() == DiagramView.SELECTED_IDEAL) {
             graphics.setPaint(diagramSchema.getCircleIdealColor());
-            graphics.setStroke(new BasicStroke(selectionLineWidth));
+            lineWidth = selectionLineWidth;
         } else if (this.getSelectionState() == DiagramView.SELECTED_FILTER) {
             graphics.setPaint(diagramSchema.getCircleFilterColor());
-            graphics.setStroke(new BasicStroke(selectionLineWidth));
+			lineWidth = selectionLineWidth;
         } else if (this.getSelectionState() == DiagramView.NOT_SELECTED) {
             graphics.setPaint(diagramSchema.fadeOut(diagramSchema.getLineColor()));
-            graphics.setStroke(new BasicStroke(1));
+			lineWidth = 1;
         }
+        if(this.dynamicLineWidth) {
+        	lineWidth *= 7 * getExtentRatio();
+        }
+		graphics.setStroke(new BasicStroke(lineWidth));
         graphics.draw(new Line2D.Double(from, to));
         graphics.setPaint(oldPaint);
         graphics.setStroke(oldStroke);
@@ -90,27 +97,17 @@ public class LineView extends CanvasItem {
         Font oldFont = graphics.getFont();
         AffineTransform oldTransform = graphics.getTransform();
 
-		DiagramView diagramView = this.fromView.getDiagramView();
-		ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
-		ConceptInterpretationContext interpretationContext = this.fromView.getConceptInterpretationContext();
 
 		Point2D from = diagramLine.getFromPosition();
 		Point2D to = diagramLine.getToPosition();
-		int startExtent = interpreter.getExtentSize(this.fromView.getDiagramNode().getConcept(),interpretationContext);
-		int endExtent = interpreter.getExtentSize(this.toView.getDiagramNode().getConcept(),interpretationContext);
-        double ratioInPercent;
-        if(startExtent == 0) {
-			ratioInPercent = 1.0;
-        } else {
-			ratioInPercent = (double)endExtent / (double)startExtent;
-        }
+		double ratio = getExtentRatio();
 
 		DecimalFormat format = new DecimalFormat("#.## %");
-		String formattedNumber = format.format(ratioInPercent);
+		String formattedNumber = format.format(ratio);
         double x = (from.getX() + to.getX()) / 2; 
         double y = (from.getY() + to.getY()) / 2;
         
-        Font font = diagramView.getFont().deriveFont(fontSize);
+        Font font = this.fromView.getDiagramView().getFont().deriveFont(fontSize);
         graphics.setFont(font);
 		FontRenderContext frc = graphics.getFontRenderContext();
 		TextLayout layout = new TextLayout(formattedNumber, font, frc);
@@ -132,6 +129,21 @@ public class LineView extends CanvasItem {
         graphics.setTransform(oldTransform);
         graphics.setPaint(oldPaint);
     }
+
+	private double getExtentRatio() {
+		DiagramView diagramView = this.fromView.getDiagramView();
+		ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
+		ConceptInterpretationContext interpretationContext = this.fromView.getConceptInterpretationContext();
+		int startExtent = interpreter.getExtentSize(this.fromView.getDiagramNode().getConcept(),interpretationContext);
+		int endExtent = interpreter.getExtentSize(this.toView.getDiagramNode().getConcept(),interpretationContext);
+		double ratioInPercent;
+		if(startExtent == 0) {
+			ratioInPercent = 1.0;
+		} else {
+			ratioInPercent = (double)endExtent / (double)startExtent;
+		}
+		return ratioInPercent;
+	}
 
     /**
      * Returns always false since we assume the line to have no width.
