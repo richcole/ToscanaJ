@@ -36,7 +36,7 @@ public class DumpSqlScriptTest extends TestCase {
             DatabaseConnection connection = new DatabaseConnection(new EventBroker());
 
             connection.connect(info);
-            connection.executeSQLAsString(SQL_SCRIPT, "DumpSqlScriptTest");
+            connection.executeSQLAsString(SQL_SCRIPT);
             
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             DumpSqlScript.dumpSqlScript(connection, outputStream);

@@ -36,7 +36,7 @@ public class DBConnectionEmbeddTest extends TestCase {
             DatabaseConnection connection = new DatabaseConnection(new EventBroker());
 
             connection.connect(info);
-            connection.executeSQLAsString(SQLCommand, "EmbedDBConnectionTestSQL");
+            connection.executeSQLAsString(SQLCommand);
 
             assertEquals(1, connection.getTableNames().size());
 
