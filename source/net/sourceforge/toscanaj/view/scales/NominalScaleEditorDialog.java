@@ -573,6 +573,7 @@ public class NominalScaleEditorDialog extends JDialog {
             Object selectedItem = this.attributeListView.getSelectedValues()[i];
             this.attributeListModel.removeElement(selectedItem);
         }
+        fillAvailableValueList();
     }
 
     private void fillControls() {
