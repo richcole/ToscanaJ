@@ -114,11 +114,13 @@ public class ContextImplementation implements Context {
 		}
 		Iterator objIt = this.getObjects().iterator();
 		while (objIt.hasNext()) {
-			String objectL = (String) objIt.next();
+			FCAObject objectL = (FCAObject) objIt.next();
 			Iterator objIt2 = other.getObjects().iterator();
 			while (objIt2.hasNext()) {
-				String objectR = (String) objIt2.next();
-				String newObject = "(" + objectL + ") AND (" + objectR + ")";
+				FCAObject objectR = (FCAObject) objIt2.next();
+				String newObjectData = "(" + objectL.getData().toString() 
+									+ ") AND (" + objectR.getData().toString() + ")";
+				FCAObject newObject = new FCAObjectImplementation(newObjectData);
 				objects.add(newObject);
 				attrIt = this.getAttributes().iterator();
 				while (attrIt.hasNext()) {
