@@ -22,6 +22,10 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	private ContextImplementation context;
 	private ContextTableView tableView;
 	private DatabaseConnection databaseConnection;
+	private static final int MINIMUM_WIDTH = 550;
+	private static final int MINIMUM_HEIGHT = 500;
+	private static final int DEFAULT_X_POS = 250;
+	private static final int DEFAULT_Y_POS = 100;
 
 	private JTextField scaleTitleField;
 	private JPanel buttonsPane;
@@ -43,21 +47,26 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	private void createView() {
 		setModal(true);
 		setTitle("Context Table Scale Generator");
-		ConfigurationManager.restorePlacement(
-			"ContextTableScaleEditorDialog",
-			this,
-			new Rectangle(250, 100, 500, 400));
-		getContentPane().setLayout(new GridBagLayout());
-
+		ConfigurationManager.restorePlacement("ContextTableScaleEditorDialog", 
+			this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
+		// to enforce the minimum size during resizing of the JDialog
+		addComponentListener( new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				int width = getWidth();
+				int height = getHeight();
+				if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
+				if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
+				setSize(width, height);
+			}
+		});
+		
 		createTitlePane();
-
 		tableView = new ContextTableView(context);
 		scrollpane = new JScrollPane(tableView);
-
 		scrollpane.addMouseListener(getMouseListener(context, tableView));
-
 		createButtonsPane();
-
+		
+		getContentPane().setLayout(new GridBagLayout());
 		getContentPane().add(
 			titlePane,
 			new GridBagConstraints(
@@ -310,8 +319,6 @@ public class ContextTableScaleEditorDialog extends JDialog {
 				final ArrayList objectsArrayList =
 					(ArrayList) context.getObjects();
 					
-					System.out.println("xP:"+xP);
-					System.out.println("yP:"+yP);
 				if (e.getButton() == 1) {
 					if (e.getClickCount() == 2) {
 						//User clicks within the table
