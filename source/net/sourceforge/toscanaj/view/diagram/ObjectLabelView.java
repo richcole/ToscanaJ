@@ -3,6 +3,8 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 
+import net.sourceforge.toscanaj.view.dialogs.DatabaseViewer;
+
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
@@ -136,9 +138,8 @@ public class ObjectLabelView extends LabelView {
             // a doubleClick on the scrollbar
             return;
         }
-        // calculate the line hit
         int lineHit = (int)((pos.getY()-this.rect.getY())/this.lineHeight);
-        System.out.println(this.queryKeyValues.get(lineHit));
-        System.out.println(this.queryDisplayStrings.get(lineHit));
+        int itemHit = lineHit + this.firstItem;
+        DatabaseViewer.showDialog(this.queryKeyValues.get(itemHit).toString());
     }
 }

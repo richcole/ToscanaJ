@@ -231,15 +231,24 @@ public class DatabaseInfo
      *
      * This can be a view, too.
      */
-    public void setTable( String table ) {
+    public void setTableName( String table ) {
         this.table = table;
     }
 
+    public String getTableName()
+    {
+        return this.table;
+    }
+    
     /**
      * Sets the key we use in queries.
      */
     public void setKey( String key ) {
         this.objectKey = key;
+    }
+    
+    public String getKey() {
+        return this.objectKey;
     }
 
     /**

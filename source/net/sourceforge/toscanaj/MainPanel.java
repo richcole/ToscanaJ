@@ -9,6 +9,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.DatabaseViewerSetup;
 import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
@@ -17,6 +18,7 @@ import net.sourceforge.toscanaj.view.DiagramOrganiser;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
+import net.sourceforge.toscanaj.view.dialogs.DatabaseViewer;
 import net.sourceforge.toscanaj.view.dialogs.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.view.dialogs.ErrorDialog;
 
@@ -566,15 +568,9 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         if (e.getKeyChar() == 'f') {
             if (this.filterAllMenuItem.isSelected()) {
                 this.filterExactMenuItem.setSelected(true);
-                // testing only
-                diagramSchema.setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT);
-                // ^^^^^^^^^^^^
                 DiagramController.getController().setFilterMethod(DiagramController.FILTER_CONTINGENT);
             } else {
                 this.filterAllMenuItem.setSelected(true);
-                // testing only
-                diagramSchema.setGradientType(DiagramSchema.GRADIENT_TYPE_EXTENT);
-                // ^^^^^^^^^^^^
                 DiagramController.getController().setFilterMethod(DiagramController.FILTER_EXTENT);
             }
         }
@@ -660,7 +656,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
                     stillTrying = false;
                 } else {
                     try {
-                        conceptualSchema.setDatabaseInformation(dbInfo);
+                        conceptualSchema.setDatabaseInfo(dbInfo);
                         stillTrying = false;
                     } catch (DatabaseException e) {
                         ErrorDialog.showError(this, e, "Database could not be opened", e.getMessage());
@@ -673,6 +669,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         diagramOrganiser.setConceptualSchema(conceptualSchema);
         DiagramController.getController().reset();
         DiagramController.getController().addObserver(this.diagramView);
+
+        DatabaseViewer.initialize(this, DatabaseViewerSetup.getViewerSetup(0));
 
         // enable relevant buttons and menus
         fileIsOpen = true;

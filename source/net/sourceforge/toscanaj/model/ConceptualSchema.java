@@ -101,7 +101,7 @@ public class ConceptualSchema {
     /**
      * Sets the database information for the schema.
      */
-    public void setDatabaseInformation( DatabaseInfo databaseInfo ) throws DatabaseException {
+    public void setDatabaseInfo( DatabaseInfo databaseInfo ) throws DatabaseException {
         this.databaseInfo = databaseInfo;
         if(databaseInfo == null) {
             return;

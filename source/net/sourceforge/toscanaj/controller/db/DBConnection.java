@@ -6,6 +6,7 @@ import net.sourceforge.toscanaj.model.DatabaseInfo;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.sql.*;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -13,9 +14,6 @@ import java.util.Vector;
 /**
  * This class facilitates connection to and communication with a database
  * via JDBC.
- *
- * Currently it is hard-coded to use the JDBC-ODBC bridge from sun, this might
- * change later.
  */
 public class DBConnection
 {
@@ -154,6 +152,63 @@ public class DBConnection
                 Vector item = new Vector(2);
                 item.add(0,resultSet.getString(1));
                 item.add(1,query.formatResults(resultSet));
+                result.add(item);
+            }
+        }
+        catch( SQLException se ) {
+            throw new DatabaseException("An error occured while querying the database.", se);
+        }
+        finally {
+            try {
+                if(resultSet != null) {
+                    resultSet.close();
+                }
+                if(stmt != null) {
+                    stmt.close();
+                }
+            }
+            catch(SQLException e) {
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Expects a list of field names and a where clause and returns all matches.
+     *
+     * The return value is a list (matching rows) of vectors (fields).
+     */
+    public List executeQuery(List fields, String tableName, String whereClause) throws DatabaseException {
+        ResultSet resultSet = null;
+        Statement stmt = null;
+        List result = new LinkedList();
+
+        String statement = "SELECT ";
+        Iterator it = fields.iterator();
+        while(it.hasNext()) 
+        {
+            String field = (String) it.next();
+            statement += field;
+            if(it.hasNext())
+            {
+                statement += ", ";
+            }
+        }
+        statement += " FROM " + tableName + " " + whereClause;
+
+        // submit the query
+        try {
+            stmt = con.createStatement();
+            printLogMessage(System.currentTimeMillis() + ": Executing query: " + statement);
+            resultSet = stmt.executeQuery(statement);
+            printLogMessage(System.currentTimeMillis() + ": done.");
+            int numberColumns = resultSet.getMetaData().getColumnCount();
+            while(resultSet.next()) {
+                Vector item = new Vector(numberColumns);
+                for( int i = 0; i < numberColumns; i++ )
+                {
+                    item.add(i,resultSet.getString(i+1));
+                }
                 result.add(item);
             }
         }

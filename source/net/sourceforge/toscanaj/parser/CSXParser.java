@@ -4,6 +4,7 @@ import net.sourceforge.toscanaj.controller.db.DBConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.DatabaseViewerSetup;
 import net.sourceforge.toscanaj.model.ObjectListQuery;
 import net.sourceforge.toscanaj.model.ObjectNumberQuery;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
@@ -106,6 +107,7 @@ public class CSXParser
 
         // parse the different sections
         parseDatabaseInformation();
+        parseDatabaseViewerSetups();
         parseContext();
         parseDiagrams();
 
@@ -133,7 +135,7 @@ public class CSXParser
                 else {
                     dbInfo = null;
                 }
-                _Schema.setDatabaseInformation(dbInfo);
+                _Schema.setDatabaseInfo(dbInfo);
             }
             catch (DatabaseException e) {
                 throw new DataFormatException("Could not open database.", e.getOriginal());
@@ -142,6 +144,16 @@ public class CSXParser
         else{
             _Schema.addQuery(new ObjectNumberQuery("Number of Objects"));
             _Schema.addQuery(new ObjectListQuery("List of Objects"));
+        }
+    }
+
+    private static void parseDatabaseViewerSetups()
+        throws DataFormatException
+    {
+        // check if database should be used and fetch the data if needed
+        Element viewerElem = _Document.getRootElement().getChild("viewer");
+        if(viewerElem != null) {
+            new DatabaseViewerSetup(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection);
         }
     }
 
@@ -500,7 +512,7 @@ public class CSXParser
         if( elem == null ) {
             throw new DataFormatException("No <table> given for <database>");
         }
-        dbInfo.setTable( elem.getText() );
+        dbInfo.setTableName( elem.getText() );
         elem = dbElement.getChild("key");
         if( elem == null ) {
             throw new DataFormatException("<table> but not <key> given in <database> element");

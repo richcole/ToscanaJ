@@ -65,7 +65,7 @@ public class ConfigurationManager {
     /**
      * Stores the size and position of a window.
      */
-    static public void storePlacement(String section, JFrame window) {
+    static public void storePlacement(String section, Window window) {
         properties.setProperty(section + "-x", String.valueOf(window.getX()));
         properties.setProperty(section + "-y", String.valueOf(window.getY()));
         properties.setProperty(section + "-width", String.valueOf(window.getWidth()));
@@ -77,7 +77,7 @@ public class ConfigurationManager {
      *
      * If the configuration could not be found or is broken this will do nothing.
      */
-    static public void restorePlacement(String section, JFrame window, Rectangle defaultPlacement) {
+    static public void restorePlacement(String section, Window window, Rectangle defaultPlacement) {
         try {
             int x = Integer.parseInt(properties.getProperty(section+"-x"));
             int y = Integer.parseInt(properties.getProperty(section+"-y"));
