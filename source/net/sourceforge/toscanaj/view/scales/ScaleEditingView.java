@@ -135,7 +135,6 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
                 int[] selections = listView.getSelectedIndices();
                 for (int i = selections.length - 1; i >= 0;  i--) {
                     int selection = selections[i];
-                    System.out.println(selection);
                     conceptualSchema.removeDiagram(selection);
                 }
             }
