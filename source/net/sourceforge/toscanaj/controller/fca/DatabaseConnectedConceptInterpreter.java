@@ -13,8 +13,10 @@ import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
+import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
+
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
@@ -25,20 +27,17 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 
     private Hashtable extentSizes = new Hashtable();
     private Hashtable contingentSizes = new Hashtable();
+    
+    private ListQuery listQuery = null;
 
     public DatabaseConnectedConceptInterpreter(DatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
+        this.listQuery = new ListQuery(databaseInfo, "", "");
+        this.listQuery.insertQueryColumn("", null, "", databaseInfo.getKey());
     }
 
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
-        boolean displayMode = context.getObjectDisplayMode();
-        if (displayMode == ConceptInterpretationContext.CONTINGENT) {
-            return concept.getObjectContingentIterator();
-        } else if (displayMode == ConceptInterpretationContext.EXTENT) {
-            return concept.getExtentIterator();
-        } else {
-            throw new RuntimeException("Can't happen");
-        }
+    	return executeQuery(this.listQuery, concept, context).iterator();
     }
 
     public Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context) {
