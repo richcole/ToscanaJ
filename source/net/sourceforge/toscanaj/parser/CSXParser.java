@@ -148,8 +148,8 @@ public class CSXParser {
         // check if database should be used and fetch the data if needed
         Element dbElem = contextElem.getChild("databaseConnection");
         if (dbElem == null) {
-            _Schema.addQuery(ListQuery.KeyListQuery);
             _Schema.addQuery(AggregateQuery.CountQuery);
+            _Schema.addQuery(ListQuery.KeyListQuery);
             return;
         }
         DatabaseInfo dbInfo = new DatabaseInfo();
