@@ -21,6 +21,7 @@ import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.canvas.imagewriter.ImageGenerationException;
 
+import java.awt.Frame;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -34,11 +35,10 @@ import java.util.Iterator;
 import java.util.Properties;
 
 public class ExportDiagramAction extends KeyboardMappedAction {
-
 	private File lastImageExportFile;
 	private DiagramExportSettings diagramExportSettings;
 	private DiagramView diagramView;
-	private JFrame frame;
+	private Frame frame;
 	 
 	
 	/**
@@ -48,7 +48,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 	 * @todo if you want another conmbination then write another constructor.
 	 */
 	public ExportDiagramAction (
-			JFrame frame,
+			Frame frame,
 			DiagramExportSettings diagExpSettings,
 			DiagramView diagramView) {
 		super(frame, "Export Diagram...");
@@ -59,7 +59,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 	}
 
 	public ExportDiagramAction (
-			JFrame frame,
+			Frame frame,
 			DiagramExportSettings diagExpSettings,
 			DiagramView diagramView,
 			int mnemonic,
@@ -77,18 +77,16 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 	}
 
 	public void exportImage() {
-		if (DiagramController.getController().getDiagramHistory().getSize() != 0) {
-			if (this.lastImageExportFile == null) {
-				this.lastImageExportFile =
-					new File(System.getProperty("user.dir"));
-			}
-		
-			if(this.diagramExportSettings.usesAutoMode()) {
-				exportImageWithAutoMode();
-			} else {
-				exportImageWithManualMode();
-			}
-		}
+	    if (this.lastImageExportFile == null) {
+	        this.lastImageExportFile =
+	            new File(System.getProperty("user.dir"));
+	    }
+
+	    if(this.diagramExportSettings.usesAutoMode()) {
+	        exportImageWithAutoMode();
+	    } else {
+	        exportImageWithManualMode();
+	    }
 	}
 	
 	private void exportImageWithAutoMode() {
@@ -173,21 +171,27 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 		try {
 			// Get title of the current diagram
 			String title = "";
+			String description = "";
 			String lineSeparator = System.getProperty("line.separator");
-			DiagramHistory diagramHistory = DiagramController.getController().getDiagramHistory(); 
-			int numCurDiag = diagramHistory.getNumberOfCurrentDiagrams();
-			int firstCurrentPos = diagramHistory.getFirstCurrentDiagramPosition();
-			for(int i=0; i<numCurDiag; i++) { 
-				title += diagramHistory.getElementAt(i+firstCurrentPos).toString();
-				if( i < numCurDiag-1 ){
-				title += " / ";
-				}
-				if ( (i == numCurDiag-1) && numCurDiag >1) {
-					title += " ( Outer diagram / Inner diagram )";
-				}
-			}			
-			// Get description of the diagrams
-			String description = DiagramController.getController().getDiagramHistory().getTextualDescription();
+			DiagramController diagramController = DiagramController.getController();
+		    DiagramHistory diagramHistory = diagramController.getDiagramHistory();
+			if(diagramHistory.getNumberOfCurrentDiagrams() != 0) {
+				int numCurDiag = diagramHistory.getNumberOfCurrentDiagrams();
+				int firstCurrentPos = diagramHistory.getFirstCurrentDiagramPosition();
+				for(int i=0; i<numCurDiag; i++) { 
+					title += diagramHistory.getElementAt(i+firstCurrentPos).toString();
+					if( i < numCurDiag-1 ){
+					title += " / ";
+					}
+					if ( (i == numCurDiag-1) && numCurDiag >1) {
+						title += " ( Outer diagram / Inner diagram )";
+					}
+				}			
+				// Get description of the diagrams
+				description = diagramController.getDiagramHistory().getTextualDescription();
+			} else {
+				title = this.diagramView.getDiagram().getTitle();
+			}
 			// Set title and desc in properties
 			Properties metadata = new Properties();
 			metadata.setProperty("title", title);
@@ -208,7 +212,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 						DateFormat dateFormatter = DateFormat.getDateTimeInstance();
 						out.println("as at "+dateFormatter.format(new Date(System.currentTimeMillis()))+" is(are): ");
 						out.println();
-						out.println(DiagramController.getController().getDiagramHistory().getTextualDescription());
+						out.println(description);
 						out.close();
 					}catch(IOException e){
 						ErrorDialog.showError(frame, e.getMessage(), "Exporting text file error");
@@ -219,7 +223,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 					String header ="The diagram(s) you have viewed for the resulting image:\n"
 					+selectedFile.getAbsolutePath()+"\n"
 					+"as at "+dateFormatter.format(new Date(System.currentTimeMillis()))+" is(are): \n";
-					StringSelection comments = new StringSelection(header+"\n"+DiagramController.getController().getDiagramHistory().getTextualDescription());
+					StringSelection comments = new StringSelection(header + "\n" + description);
 					Clipboard systemClipboard = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
 					systemClipboard.setContents(comments,null);
 				}

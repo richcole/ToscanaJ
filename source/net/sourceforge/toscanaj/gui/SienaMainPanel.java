@@ -15,15 +15,18 @@ import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
+import net.sourceforge.toscanaj.gui.action.ExportDiagramAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.CloseMainPanelActivity;
 import net.sourceforge.toscanaj.gui.activity.SaveConceptualSchemaActivity;
+import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.TemporalMainDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
+import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.cernato.View;
 import net.sourceforge.toscanaj.model.cernato.ViewContext;
@@ -35,9 +38,12 @@ import net.sourceforge.toscanaj.parser.BurmeisterParser;
 import net.sourceforge.toscanaj.parser.CernatoXMLParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
+import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.cernato.NDimDiagramEditingView;
 
 import org.jdom.JDOMException;
+import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -74,15 +80,30 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     /**
      * Views
      */
-    private DiagramEditingView diagramView;
+    private DiagramEditingView diagramEditingView;
     private String currentFile = null;
     private TemporalMainDialog temporalControls;
+    private DiagramExportSettings diagramExportSettings;
+    private ExportDiagramAction exportDiagramAction;
 
     public SienaMainPanel() {
         super("Siena");
 
         eventBroker = new EventBroker();
         conceptualSchema = new ConceptualSchema(eventBroker);
+
+        // register all image writers we want to support
+        try {
+            org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
+        } catch (Throwable t) {
+            // do nothing, we just don't support SVG
+        }
+        org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
+
+        Iterator it = GraphicFormatRegistry.getIterator();
+        if (it.hasNext()) {
+            this.diagramExportSettings = new DiagramExportSettings();
+        }
 
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
 
@@ -94,7 +115,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 new Rectangle(100, 100, 500, 400));
 
 		if(ConfigurationManager.fetchInt("SienaTemporalControls", "enabled", 0) == 1) {
-		    temporalControls = new TemporalMainDialog(this, this.diagramView.getDiagramView(), eventBroker);
+		    temporalControls = new TemporalMainDialog(this, this.diagramEditingView.getDiagramView(), eventBroker);
 		    ConfigurationManager.restorePlacement("SienaTemporalControls", temporalControls, 
 		    		new Rectangle(350,350,420,350));
 		    temporalControls.show();
@@ -108,9 +129,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
     public void createViews() {
-        diagramView = new NDimDiagramEditingView(conceptualSchema, eventBroker);
-        diagramView.setDividerLocation(ConfigurationManager.fetchInt("SienaMainPanel", "diagramViewDivider", 200));
-        setContentPane(diagramView);
+        diagramEditingView = new NDimDiagramEditingView(conceptualSchema, eventBroker);
+        diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
+        								this, DisplayedDiagramChangedEvent.class, Object.class);
+        diagramEditingView.setDividerLocation(ConfigurationManager.fetchInt("SienaMainPanel", "diagramViewDivider", 200));
+        setContentPane(diagramEditingView);
     }
 
 
@@ -160,6 +183,30 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         fileMenu.add(saveMenuItem);
 
         fileMenu.addSeparator();
+        
+        // we add the export options only if we can export at all
+        /// @todo reduce duplicate code with ToscanaJMainPanel
+        if (this.diagramExportSettings != null) {
+            Frame frame = JOptionPane.getFrameForComponent(this);
+            exportDiagramAction = new ExportDiagramAction(frame, this.diagramExportSettings,
+                                       this.diagramEditingView.getDiagramView(), KeyEvent.VK_E, 
+                                       KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+            fileMenu.add(exportDiagramAction);
+            exportDiagramAction.setEnabled(false);
+
+            // create the export diagram save options submenu
+            JMenuItem exportDiagramSetupMenuItem = new JMenuItem("Export Diagram Setup...");
+            exportDiagramSetupMenuItem.setMnemonic(KeyEvent.VK_S);
+            exportDiagramSetupMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                    KeyEvent.VK_E, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+            exportDiagramSetupMenuItem.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    showImageExportOptions();
+                }
+            });
+            fileMenu.add(exportDiagramSetupMenuItem);
+            fileMenu.addSeparator();
+        }
 
         // --- file exit item ---
         JMenuItem exitMenuItem;
@@ -192,6 +239,18 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(helpMenu);
+    }
+
+    protected void showImageExportOptions() {
+    	DiagramView diagramView = this.diagramEditingView.getDiagramView();
+        if (this.diagramExportSettings.usesAutoMode()) {
+            this.diagramExportSettings.setImageSize(diagramView.getWidth(), diagramView.getHeight());
+        }
+        DiagramExportSettingsDialog.initialize(this, this.diagramExportSettings);
+        boolean changesDone = DiagramExportSettingsDialog.showDialog(this);
+        if (changesDone) {
+            this.exportDiagramAction.exportImage();
+        }
     }
 
     private void importCernatoXML() {
@@ -325,7 +384,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         // store current position
         ConfigurationManager.storePlacement("SienaMainPanel", this);
         ConfigurationManager.storeInt("SienaMainPanel", "diagramViewDivider",
-                diagramView.getDividerLocation()
+                diagramEditingView.getDividerLocation()
         );
         if(temporalControls != null) {
         	ConfigurationManager.storePlacement("SienaTemporalControls", temporalControls);
@@ -339,5 +398,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
             conceptualSchema = schemaEvent.getConceptualSchema();
         }
+        this.exportDiagramAction.setEnabled(
+                (this.diagramEditingView.getDiagramView().getDiagram() != null) &&
+                (this.diagramExportSettings != null));
     }
 }

@@ -7,11 +7,12 @@
  */
 package net.sourceforge.toscanaj.gui.action;
 
+import java.awt.Frame;
 import javax.swing.*;
 
 public abstract class KeyboardMappedAction extends AbstractAction {
 
-    protected JFrame frame;
+    protected Frame frame;
 
     /**
      *  @note
@@ -20,7 +21,7 @@ public abstract class KeyboardMappedAction extends AbstractAction {
      * @todo if you want another conmbination then write another constructor.
      */
     public KeyboardMappedAction(
-            JFrame frame,
+            Frame frame,
             String displayName, int mnemonic,
             KeyStroke keystroke) {
         this(frame, displayName);
@@ -28,7 +29,7 @@ public abstract class KeyboardMappedAction extends AbstractAction {
         this.putValue(Action.ACCELERATOR_KEY, keystroke);
     }
 
-    public KeyboardMappedAction(JFrame frame, String displayName) {
+    public KeyboardMappedAction(Frame frame, String displayName) {
         super(displayName);
         this.frame = frame;
     }
