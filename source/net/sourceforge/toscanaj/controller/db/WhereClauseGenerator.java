@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -25,23 +25,10 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
                 first = false;
             }
         } else {
-            // aggregate all clauses from the downset
-            Iterator iter = forConcept.getDownset().iterator();
-            while (iter.hasNext()) {
-                DatabaseConnectedConcept otherConcept = (DatabaseConnectedConcept) iter.next();
-                if (!otherConcept.hasObjectClause()) {
-                    continue;
-                }
-                if (first) {
-                    first = false;
-                    whereClause += " (";
-                } else {
-                    whereClause += " OR ";
-                }
-                whereClause += otherConcept.getObjectClause();
-            }
-            if (!first) {
-                whereClause += ") ";
+            String extendClause = forConcept.getExtendClause();
+            if(extendClause != null) {
+                whereClause += extendClause;
+                first = false;
             }
         }
 

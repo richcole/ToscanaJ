@@ -239,34 +239,15 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     public Concept filterByExtent(Concept other) {
         DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo);
         retVal.attributeContingent.addAll(this.attributeContingent);
-        if (other == null) {
-            retVal.setObjectClause(this.objectClause);
-        } else {
-            if (this.objectClause == null) {
+        retVal.setObjectClause(this.objectClause);
+        if (other != null) {
+            DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
+            if (otherDB.objectClause == null) {
+                // nothing to query
                 retVal.setObjectClause(null);
             } else {
-                retVal.setObjectClause(this.objectClause);
-            }
-            DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
-            retVal.filterClauses.addAll(otherDB.filterClauses);
-            String newFilterClause = "(";
-            boolean first = true;
-            Iterator it = otherDB.ideal.iterator();
-            while (it.hasNext()) {
-                DatabaseConnectedConcept cur = (DatabaseConnectedConcept) it.next();
-                if (cur.objectClause == null) {
-                    continue;
-                }
-                if (!first) {
-                    newFilterClause = newFilterClause + " OR ";
-                } else {
-                    first = false;
-                }
-                newFilterClause = newFilterClause + cur.objectClause;
-            }
-            newFilterClause += ")";
-            if (!first) { // don't do anything if we are still waiting for the first (i.e. we have none)
-                retVal.filterClauses.add(newFilterClause);
+                retVal.filterClauses.add(otherDB.getExtendClause());
+                retVal.filterClauses.addAll(otherDB.filterClauses);
             }
         }
         return retVal;
@@ -278,14 +259,13 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     public Concept filterByContingent(Concept other) {
         DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo);
         retVal.attributeContingent.addAll(this.attributeContingent);
-        if (other == null) {
-            retVal.setObjectClause(this.objectClause);
-        } else {
+        retVal.setObjectClause(this.objectClause);
+        if (other != null) {
             DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
             if (otherDB.objectClause == null) {
+                // nothing to query
                 retVal.setObjectClause(null);
             } else {
-                retVal.setObjectClause(this.objectClause);
                 retVal.filterClauses.add(otherDB.objectClause);
                 retVal.filterClauses.addAll(otherDB.filterClauses);
             }
@@ -299,6 +279,12 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     public Concept getCollapsedConcept() {
         DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo);
         retVal.attributeContingent.addAll(this.attributeContingent);
+        retVal.setObjectClause(getExtendClause());
+        retVal.filterClauses.addAll(this.filterClauses);
+        return retVal;
+    }
+
+    public String getExtendClause() {
         String clause = "(";
         boolean first = true;
         Iterator iter = this.ideal.iterator();
@@ -315,9 +301,10 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             }
         }
         clause += ")";
-        retVal.setObjectClause(clause);
-        retVal.filterClauses.addAll(this.filterClauses);
-        return retVal;
+        if(first) { // nothing found
+            return null;
+        }
+        return clause;
     }
 
     public Set getFilterClauses() {
