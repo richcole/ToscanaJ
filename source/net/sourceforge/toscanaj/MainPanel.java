@@ -8,6 +8,7 @@ import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.DiagramOrganiser;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import net.sourceforge.toscanaj.view.diagram.LabelView;
 import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
 
 import java.awt.*;
@@ -362,8 +363,10 @@ public class MainPanel extends JFrame implements ActionListener {
 
         // menu DIAGRAM
         if (actionSource == this.showExactMenuItem) {
+            this.diagramView.setDisplayType(LabelView.DISPLAY_NUMBER);
         }
         if (actionSource == this.showAllMenuItem) {
+            this.diagramView.setDisplayType(LabelView.DISPLAY_LIST);
         }
         if (actionSource == this.filterExactMenuItem) {
         }

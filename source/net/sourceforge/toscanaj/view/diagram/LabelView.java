@@ -19,6 +19,27 @@ import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
  */
 public class LabelView extends CanvasItem implements ChangeObserver {
     /**
+     * A constant used to set the labels to display the number of objects.
+     *
+     * @see setDisplayType(int)
+     */
+    static public int DISPLAY_NUMBER = 0;
+
+    /**
+     * A constant used to set the labels to display the list of objects.
+     *
+     * @see setDisplayType(int)
+     */
+    static public int DISPLAY_LIST = 1;
+
+    /**
+     * Stores the type of information we want to display.
+     *
+     * @see setDisplayType(int)
+     */
+    private int displayType = DISPLAY_LIST;
+
+    /**
      * Label current width.
      */
     private double width;
@@ -74,6 +95,19 @@ public class LabelView extends CanvasItem implements ChangeObserver {
         this.placement = placement;
         _labelInfo = label;
         _labelInfo.addObserver(this);
+    }
+
+    /**
+     * Sets the type of information displayed by the label: the number or the list
+     * of objects.
+     *
+     * This method accepts the values DISPLAY_NUMBER and DISPLAY_LIST, everything
+     * else is ignored.
+     */
+    public void setDisplayType(int type) {
+        this.displayType = type;
+        System.out.println("Type: "+type);
+        update(this);
     }
 
     /**
@@ -163,41 +197,65 @@ public class LabelView extends CanvasItem implements ChangeObserver {
         // draw the label itself
         tg.drawFilledRectangle(xPos, yPos, lw, lh, _labelInfo.getBackgroundColor(), _labelInfo.getTextColor() );
 
-        // draw the text
-        if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT )
-        {
-            Iterator it = _labelInfo.getEntryIterator();
-            int j = 0;
-            while(it.hasNext()) {
-                String cur = it.next().toString();
-                tg.drawString( cur ,xPos, yPos, fm.getLeading() +
-                                                fm.getDescent(), fm.getAscent() +
-                                                fm.getLeading() + j * fm.getHeight() );
-                j++;
+        if(this.displayType == DISPLAY_LIST) {
+            // draw the object names
+            if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT )
+            {
+                Iterator it = _labelInfo.getEntryIterator();
+                int j = 0;
+                while(it.hasNext()) {
+                    String cur = it.next().toString();
+                    tg.drawString( cur ,xPos, yPos, fm.getLeading() +
+                                                    fm.getDescent(), fm.getAscent() +
+                                                    fm.getLeading() + j * fm.getHeight() );
+                    j++;
+                }
             }
-        }
-        else if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER )
-        {
-            Iterator it = _labelInfo.getEntryIterator();
-            int j = 0;
-            while(it.hasNext()) {
-                String cur = it.next().toString();
-                tg.drawString( cur , xPos, yPos,
-                        (int)(fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(cur))/2  ),
-                        fm.getAscent() + fm.getLeading() + j * fm.getHeight() );
-                j++;
-            }
-        }
-        else if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT )
-        {
-            Iterator it = _labelInfo.getEntryIterator();
-            int j = 0;
-            while(it.hasNext()) {
-                String cur = it.next().toString();
-                tg.drawString( cur ,xPos ,yPos ,
-                            (int)(-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(cur)),
+            else if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER )
+            {
+                Iterator it = _labelInfo.getEntryIterator();
+                int j = 0;
+                while(it.hasNext()) {
+                    String cur = it.next().toString();
+                    tg.drawString( cur , xPos, yPos,
+                            (int)(fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(cur))/2  ),
                             fm.getAscent() + fm.getLeading() + j * fm.getHeight() );
-                j++;
+                    j++;
+                }
+            }
+            else if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT )
+            {
+                Iterator it = _labelInfo.getEntryIterator();
+                int j = 0;
+                while(it.hasNext()) {
+                    String cur = it.next().toString();
+                    tg.drawString( cur ,xPos ,yPos ,
+                                (int)(-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(cur)),
+                                fm.getAscent() + fm.getLeading() + j * fm.getHeight() );
+                    j++;
+                }
+            }
+        }
+        else {
+            // draw the number
+            String num = String.valueOf(_labelInfo.getNumberOfEntries());
+            if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT )
+            {
+                tg.drawString( num ,xPos, yPos, fm.getLeading() +
+                                                fm.getDescent(), fm.getAscent() +
+                                                fm.getLeading() );
+            }
+            else if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER )
+            {
+                tg.drawString( num , xPos, yPos,
+                        (int)(fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(num))/2  ),
+                        fm.getAscent() + fm.getLeading() );
+            }
+            else if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT )
+            {
+                tg.drawString( num ,xPos ,yPos ,
+                            (int)(-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(num)),
+                            fm.getAscent() + fm.getLeading() );
             }
         }
 
@@ -211,21 +269,28 @@ public class LabelView extends CanvasItem implements ChangeObserver {
      * The width is calculated as the maximum string width plus two times the
      * leading and the descent from the font metrics. When drawing the text the
      * horizontal position should be the left edge of the label plus one times
-     * thetwo values (FontMetrics::getLeading() and FontMetrics::getDescent()).
+     * the two values (FontMetrics::getLeading() and FontMetrics::getDescent()).
      */
     public double getWidth( FontMetrics fontMetrics )
     {
         double result = 0;
 
-        // find maximum width of string
-        Iterator it = _labelInfo.getEntryIterator();
-        while(it.hasNext()) {
-            String cur = it.next().toString();
-            double w = fontMetrics.stringWidth( cur );
-            if( w > result )
-            {
-                result = w;
+        if(this.displayType == DISPLAY_LIST) {
+            // find maximum width of string
+            Iterator it = _labelInfo.getEntryIterator();
+            while(it.hasNext()) {
+                String cur = it.next().toString();
+                double w = fontMetrics.stringWidth( cur );
+                if( w > result )
+                {
+                    result = w;
+                }
             }
+        }
+        else {
+            // find width of number
+            String num = String.valueOf(_labelInfo.getNumberOfEntries());
+            result = fontMetrics.stringWidth( num );
         }
 
         // add two leadings and two descents to have some spacing on the left
@@ -240,7 +305,12 @@ public class LabelView extends CanvasItem implements ChangeObserver {
      */
     public int getHeight( FontMetrics fontMetrics )
     {
-        return _labelInfo.getNumberOfEntries() * fontMetrics.getHeight();
+        if( this.displayType == DISPLAY_LIST ) {
+            return _labelInfo.getNumberOfEntries() * fontMetrics.getHeight();
+        }
+        else {
+            return fontMetrics.getHeight();
+        }
     }
 
     /**

@@ -194,10 +194,27 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
             LabelInfo objLabelInfo = diagram.getObjectLabel( i );
             if( objLabelInfo != null ) {
                 LabelView labelView = new LabelView( this, LabelView.BELOW, objLabelInfo );
+                labelView.setDisplayType(LabelView.DISPLAY_NUMBER);
                 addCanvasItem( labelView );
                 labelView.addObserver(this);
             }
         }
         repaint();
+    }
+
+    /**
+     * Sets the display type on all labels in the diagram.
+     *
+     * @see LabelView.setDisplayType(int)
+     */
+    public void setDisplayType(int type) {
+        Iterator it = this.canvasItems.iterator();
+        while( it.hasNext() ) {
+            CanvasItem cur = (CanvasItem) it.next();
+            if(cur instanceof LabelView) {
+                LabelView lv = (LabelView) cur;
+                lv.setDisplayType(type);
+            }
+        }
     }
 }
