@@ -133,6 +133,9 @@ public class DiagramOrganiser extends JPanel {
 		selectedDiagramsListview.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				int index = selectedDiagramsListview.getSelectedIndex();
+				if (index == -1) {
+					return;
+				}
 				DiagramHistory diagramHistory = DiagramController.getController().getDiagramHistory();
 				DiagramReference diagramReference = diagramHistory.getReferenceAt(index); 
 				eventBroker.processEvent(new DiagramClickedEvent(diagramReference));            	
@@ -143,10 +146,10 @@ public class DiagramOrganiser extends JPanel {
         availableDiagramsListview.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
 				int index = availableDiagramsListview.getSelectedIndex();
-				Diagram2D diagram = schema.getDiagram(index);
-                if (diagram == null) {
+                if (index == -1) {
                     addButton.setEnabled(false);
                 } else {
+					Diagram2D diagram = schema.getDiagram(index);
 					eventBroker.processEvent(new DiagramClickedEvent(new DiagramReference(diagram, null)));
 					selectedDiagramsListview.setSelectedIndices(new int[0]);
                     addButton.setEnabled(true);
