@@ -168,9 +168,12 @@ public class CernatoXMLParser {
             List cellElems = rowElem.getChildren("cell");
             for (Iterator iterator2 = cellElems.iterator(); iterator2.hasNext();) {
                 Element cellElem = (Element) iterator2.next();
+                String content = cellElem.getText();
+                if(content == null || content.length() == 0) { // empty cell
+                	continue;
+                }
                 String propertyid = cellElem.getAttributeValue("property");
                 Property property = (Property) properties.get(propertyid);
-                String content = cellElem.getText();
                 if (property.getType() instanceof TextualType) {
                     model.getContext().setRelationship(object, property, new TextualValue(content));
                 } else if (property.getType() instanceof NumericalType) {
