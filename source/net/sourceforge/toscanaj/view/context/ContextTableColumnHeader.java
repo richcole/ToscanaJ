@@ -22,6 +22,7 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JComponent;
@@ -34,6 +35,7 @@ import javax.swing.ToolTipManager;
 
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.ContextImplementation;
 
 public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	private ContextTableEditorDialog dialog;
@@ -250,24 +252,41 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	private void renameAttribute(int num) {
 		String inputValue = "";
 		do {
-			Attribute attr = this.attributes[num];
-			InputTextDialog dialog = new InputTextDialog(this.dialog, "Rename Attribute", "attribute", attr.toString());
+			Attribute oldAttr = this.attributes[num];
+			InputTextDialog dialog = new InputTextDialog(this.dialog, "Rename Attribute", "attribute", oldAttr.toString());
 			if (!dialog.isCancelled()) {
-				inputValue = dialog.getInput();
-				if (!this.dialog.collectionContainsString(inputValue, this.attributes)) {
-					this.attributes[num].setData(inputValue);
-					repaint();
-					inputValue = "";
-				} else {
-					JOptionPane.showMessageDialog(
-						this,
-						"An attribute named '"
-							+ inputValue
-							+ "' already exist. Please enter a different name.",
-						"Attribute exists",
-						JOptionPane.ERROR_MESSAGE);
-				}
-			}
+                inputValue = dialog.getInput();
+                if (!this.dialog.collectionContainsString(inputValue, this.attributes)) {
+                    ContextImplementation context = this.dialog.getContext();
+                    Set attributes = context.getAttributes();
+                    Attribute newAttr = new Attribute(inputValue);
+                    attributes.remove(oldAttr);
+                    if(attributes instanceof List) {
+                        List attributesList = (List) attributes;
+                        attributesList.add(num, newAttr);
+                    } else {
+                        attributes.add(newAttr);
+                    }
+                    for (Iterator iter = context.getObjects().iterator(); iter.hasNext(); ) {
+                        Object object = iter.next();
+                        if(context.getRelation().contains(object,oldAttr)) {
+                            context.getRelationImplementation().insert(object,newAttr);
+                            context.getRelationImplementation().remove(object,oldAttr);
+                        }
+                    }
+                    calculateNewSize();
+                    repaint();
+                    inputValue = "";
+                } else {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "An object named '"
+                            + inputValue
+                            + "' already exist. Please enter a different name.",
+                            "Object exists",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
 			else {
 				break;
 			}
