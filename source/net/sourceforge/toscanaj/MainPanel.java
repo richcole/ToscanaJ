@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.DiagramOrganiser;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.LabelView;
+import net.sourceforge.toscanaj.view.diagram.NodeView;
 import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
 
 import java.awt.*;
@@ -25,23 +26,24 @@ import java.io.IOException;
 
 import java.util.Vector;
 
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JRadioButtonMenuItem;
 import javax.swing.ButtonGroup;
-import javax.swing.JMenuBar;
-import javax.swing.KeyStroke;
-import javax.swing.JFrame;
-import javax.swing.JToolBar;
-import javax.swing.JButton;
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JColorChooser;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSplitPane;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 
 /**
  *  This class provides the main GUI panel with menus and a toolbar
@@ -51,6 +53,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
     private JToolBar toolbar = null;
     private JMenuBar menubar = null;
+
     /**
      * switches debug mode
      */
@@ -70,13 +73,14 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     // DIAGRAM menu
     private JMenuItem backMenuItem = null;
 
-    private ButtonGroup documentsDisplayGroup = null;
-    private JRadioButtonMenuItem showAllMenuItem = null;
-    private JRadioButtonMenuItem showExactMenuItem = null;
-
     private ButtonGroup documentsFilterGroup = null;
     private JRadioButtonMenuItem filterAllMenuItem = null;
     private JRadioButtonMenuItem filterExactMenuItem = null;
+
+    // view menu
+    private ButtonGroup documentsDisplayGroup = null;
+    private JRadioButtonMenuItem showAllMenuItem = null;
+    private JRadioButtonMenuItem showExactMenuItem = null;
 
     private ButtonGroup labelContentGroup = null;
     private JRadioButtonMenuItem numDocMenuItem = null;
@@ -84,7 +88,10 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
     private JCheckBoxMenuItem percDistMenuItem = null;
 
-    private int currentSelectedIndex;
+    // view->color menu
+    private JMenuItem circleColorMenuItem = null;
+    private JMenuItem topColorMenuItem = null;
+    private JMenuItem bottomColorMenuItem = null;
 
     /**
      * The main model member.
@@ -305,6 +312,26 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         percDistMenuItem.addActionListener(this);
         percDistMenuItem.setState(false);
         viewMenu.add(percDistMenuItem);
+
+        // separator
+        viewMenu.addSeparator();
+
+        // create the Color submenu
+        JMenu colorMenu = new JMenu("Color");
+        colorMenu.setMnemonic(KeyEvent.VK_V);
+        viewMenu.add(colorMenu);
+
+        this.circleColorMenuItem = new JMenuItem("Circles...");
+        this.circleColorMenuItem.addActionListener(this);
+        colorMenu.add(circleColorMenuItem);
+
+        this.topColorMenuItem = new JMenuItem("Top...");
+        this.topColorMenuItem.addActionListener(this);
+        colorMenu.add(topColorMenuItem);
+
+        this.bottomColorMenuItem = new JMenuItem("Bottom...");
+        this.bottomColorMenuItem.addActionListener(this);
+        colorMenu.add(bottomColorMenuItem);
     }
 
 
@@ -413,6 +440,29 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
             (actionSource == this.backMenuItem) )
         {
             DiagramController.getController().back();
+        }
+
+        // the color entries
+        if( actionSource == this.circleColorMenuItem ) {
+            Color newColor = JColorChooser.showDialog(this, "Change circle color", NodeView.getCircleColor());
+            if(newColor != null) {
+                NodeView.setCircleColor(newColor);
+            }
+            repaint();
+        }
+        if( actionSource == this.topColorMenuItem ) {
+            Color newColor = JColorChooser.showDialog(this, "Change gradient color", NodeView.getTopColor());
+            if(newColor != null) {
+                NodeView.setTopColor(newColor);
+            }
+            repaint();
+        }
+        if( actionSource == this.bottomColorMenuItem ) {
+            Color newColor = JColorChooser.showDialog(this, "Change gradient color", NodeView.getBottomColor());
+            if(newColor != null) {
+                NodeView.setBottomColor(newColor);
+            }
+            repaint();
         }
     }
 

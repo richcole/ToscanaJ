@@ -16,12 +16,27 @@ import java.awt.geom.Point2D;
 
 public class NodeView extends CanvasItem {
     /**
+     * The color used for the top of the gradient.
+     */
+    static protected Color topColor =  new Color(0,0,150);
+
+    /**
+     * The colort used for the bottom of the gradient;
+     */
+    static protected Color bottomColor = new Color(255,255,150);
+
+    /**
+     * The Color for the circles around the nodes.
+     */
+    static protected Color circleColor = new Color(0,0,0);
+
+    /**
      * Store the node model for this view
      */
     private DiagramNode diagramNode = null;
 
     /**
-     * Stores the grpahic environment.
+     * Stores the graphic environment.
      *
      * This is done since the radius in DiagramNode is not stored in model
      * coordinates due to Toscanas weird scaling behaviour.
@@ -30,6 +45,48 @@ public class NodeView extends CanvasItem {
      * the radius somewhere else (global options?).
      */
     private ToscanajGraphics2D graphics;
+
+    /**
+     * Changes the top color of the gradient.
+     */
+    static public void setTopColor(Color topColor) {
+        NodeView.topColor = topColor;
+    }
+
+    /**
+     * Changes the bottom color of the gradient.
+     */
+    static public void setBottomColor(Color bottomColor) {
+        NodeView.bottomColor = bottomColor;
+    }
+
+    /**
+     * Changes the color of the circles around the nodes.
+     */
+    static public void setCircleColor(Color circleColor) {
+        NodeView.circleColor = circleColor;
+    }
+
+    /**
+     * Returns the top color of the gradient.
+     */
+    static public Color getTopColor() {
+        return NodeView.topColor;
+    }
+
+    /**
+     * Returns the bottom color of the gradient.
+     */
+    static public Color getBottomColor() {
+        return NodeView.bottomColor;
+    }
+
+    /**
+     * Returns the color of the circles around the nodes.
+     */
+    static public Color getCircleColor() {
+        return NodeView.circleColor;
+    }
 
     /**
      * Construct a nodeView for a Node
@@ -45,13 +102,10 @@ public class NodeView extends CanvasItem {
         if(diagramNode != null) {
             Paint oldPaint = g.getGraphics2D().getPaint();
             float rel = (float) this.diagramNode.getConcept().getExtentSizeRelative();
-            Color c1 = new Color(0,0,150);
-            Color c2 = new Color(255,255,150);
-            Color circleColor = new Color(0,0,0);
-            Color nodeColor = new Color( (int)(c1.getRed()*rel + c2.getRed()*(1-rel)),
-                                         (int)(c1.getGreen()*rel + c2.getGreen()*(1-rel)),
-                                         (int)(c1.getBlue()*rel + c2.getBlue()*(1-rel)),
-                                         (int)(c1.getAlpha()*rel + c2.getAlpha()*(1-rel)) );
+            Color nodeColor = new Color( (int)(topColor.getRed()*rel + bottomColor.getRed()*(1-rel)),
+                                         (int)(topColor.getGreen()*rel + bottomColor.getGreen()*(1-rel)),
+                                         (int)(topColor.getBlue()*rel + bottomColor.getBlue()*(1-rel)),
+                                         (int)(topColor.getAlpha()*rel + bottomColor.getAlpha()*(1-rel)) );
             g.drawCircle( diagramNode.getPosition(), diagramNode.getRadius(),
                           nodeColor, circleColor );
             g.getGraphics2D().setPaint(oldPaint);
