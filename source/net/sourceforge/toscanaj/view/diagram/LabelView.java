@@ -116,6 +116,10 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         this.diagramView = diagramView;
         this.labelInfo = label;
         this.labelInfo.addObserver(this);
+        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
+        String fontName = diagramSchema.getLabelFontName();
+        int fontSize = diagramSchema.getLabelFontSize();
+        this.font = new Font(fontName, Font.PLAIN, fontSize);
     }
 
     /**

@@ -111,6 +111,10 @@ public class DiagramSchema {
     
     private int selectionLineWidth = 3;
 
+    private String labelFontName = "SansSerif";
+
+    private int labelFontSize = 10;
+
     /**
      * Default constructor.
      */
@@ -152,6 +156,8 @@ public class DiagramSchema {
         }
         selectionLineWidth = ConfigurationManager.fetchInt("diagramSchema","selectionLineWidth",
                                                            selectionLineWidth);
+        labelFontName = ConfigurationManager.fetchString("diagramSchema", "labelFontName", labelFontName);
+        labelFontSize = ConfigurationManager.fetchInt("diagramSchema", "labelFontSize", labelFontSize);
     }
 
     /**
@@ -333,6 +339,14 @@ public class DiagramSchema {
             throw new IllegalArgumentException("Unknown value for gradient type");
         }
         this.gradientReference = gradientReference;
+    }
+
+    public String getLabelFontName() {
+        return this.labelFontName;
+    }
+
+    public int getLabelFontSize() {
+        return this.labelFontSize;
     }
 
     /**
