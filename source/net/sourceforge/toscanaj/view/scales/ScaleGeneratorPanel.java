@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
@@ -103,38 +104,42 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
             generatorButton.setEnabled(false);
             generatorButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Context context =
-                		   generator.generateScale(selectionSource.getSelectedTableColumnPairs(),
-                           conceptualSchema, databaseConnection);
-                    Diagram2D returnValue = null;
-                    Lattice lattice = null;
-                    if(context!=null){
-						LatticeGenerator lgen = new GantersAlgorithm();
-						lattice = lgen.createLattice(context);
-						returnValue = NDimLayoutOperations.createDiagram(
-									  lattice, context.getName(), 
-									  new DefaultDimensionStrategy());
-						if (null != returnValue) {
-						   Diagram2D diagramWithSameTitle = null;
-						   int indexOfExistingDiagram = -1;
-						   for(int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
-							   if(conceptualSchema.getDiagram(i).getTitle().equalsIgnoreCase(returnValue.getTitle())) {
-								   diagramWithSameTitle = conceptualSchema.getDiagram(i);
-								   indexOfExistingDiagram = i; 
+                	try {
+	                    Context context =
+	                		   generator.generateScale(selectionSource.getSelectedTableColumnPairs(),
+	                           conceptualSchema, databaseConnection);
+	                    Diagram2D returnValue = null;
+	                    Lattice lattice = null;
+	                    if(context!=null){
+							LatticeGenerator lgen = new GantersAlgorithm();
+							lattice = lgen.createLattice(context);
+							returnValue = NDimLayoutOperations.createDiagram(
+										  lattice, context.getName(), 
+										  new DefaultDimensionStrategy());
+							if (null != returnValue) {
+							   Diagram2D diagramWithSameTitle = null;
+							   int indexOfExistingDiagram = -1;
+							   for(int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
+								   if(conceptualSchema.getDiagram(i).getTitle().equalsIgnoreCase(returnValue.getTitle())) {
+									   diagramWithSameTitle = conceptualSchema.getDiagram(i);
+									   indexOfExistingDiagram = i; 
+								   }
+							   }
+							   if(diagramWithSameTitle != null) {
+									   int rv = showTitleExistsDialog(returnValue);
+									   if(rv==JOptionPane.OK_OPTION){
+										   replaceTitle(returnValue, diagramWithSameTitle, indexOfExistingDiagram);
+									   }else if(rv==JOptionPane.CANCEL_OPTION){
+										   renameTitle(returnValue, diagramWithSameTitle);
+									   }		
+							   }else{
+								   conceptualSchema.addDiagram(returnValue);
 							   }
 						   }
-						   if(diagramWithSameTitle != null) {
-								   int rv = showTitleExistsDialog(returnValue);
-								   if(rv==JOptionPane.OK_OPTION){
-									   replaceTitle(returnValue, diagramWithSameTitle, indexOfExistingDiagram);
-								   }else if(rv==JOptionPane.CANCEL_OPTION){
-									   renameTitle(returnValue, diagramWithSameTitle);
-								   }		
-						   }else{
-							   conceptualSchema.addDiagram(returnValue);
-						   }
-					   }
-                    }
+	                    }
+            	    } catch (Exception exc) {
+            	        ErrorDialog.showError(parent, exc, "Scale generation failed");
+            	    }
                 }
 				private void replaceTitle(Diagram2D returnValue, Diagram2D diagramWithSameTitle, int indexOfExistingDiagram) {
 					conceptualSchema.addDiagram(returnValue);
