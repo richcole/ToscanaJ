@@ -15,14 +15,18 @@ import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.DiagramCollection;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.events.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 
 public class DiagramEditingView extends JPanel implements EventListener {
     private DiagramCollection conceptualSchema;
@@ -32,6 +36,7 @@ public class DiagramEditingView extends JPanel implements EventListener {
     private NodeMovementEventListener nodeMovementEventListener = new NodeMovementEventListener();
     private SetMovementEventListener idealMovementEventListener = new IdealMovementEventListener();
     private FilterMovementEventListener filterMovementEventListener = new FilterMovementEventListener();
+    private static final double ZOOM_FACTOR = 1.1;
 
     /**
      * Construct an instance of this view
@@ -60,6 +65,21 @@ public class DiagramEditingView extends JPanel implements EventListener {
         String[] movementNames = {"Node", "Ideal", "Filter"};
         JComboBox movementChooser = new JComboBox(movementNames);
         toolPanel.add(movementChooser);
+        toolPanel.add(new JLabel("Zoom:"));
+        JButton zoomInButton = new JButton("+");
+        zoomInButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                zoomIntoDiagram();
+            }
+        });
+        toolPanel.add(zoomInButton);
+        JButton zoomOutButton = new JButton("-");
+        zoomOutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                zoomOutOfDiagram();
+            }
+        });
+        toolPanel.add(zoomOutButton);
 
         diagramView = new DiagramView();
         DirectConceptInterpreter interpreter = new DirectConceptInterpreter();
@@ -109,6 +129,26 @@ public class DiagramEditingView extends JPanel implements EventListener {
         diagramViewPanel.add(toolPanel, BorderLayout.NORTH);
         diagramViewPanel.add(diagramView, BorderLayout.CENTER);
         return diagramViewPanel;
+    }
+
+    private void zoomIntoDiagram() {
+        changeZoom(ZOOM_FACTOR);
+    }
+
+    private void zoomOutOfDiagram() {
+        changeZoom(1/ZOOM_FACTOR);
+    }
+
+    private void changeZoom(double zoomFactor) {
+        Diagram2D diagram = this.diagramView.getDiagram();
+        Iterator nodesIt = diagram.getNodes();
+        while (nodesIt.hasNext()) {
+            DiagramNode diagramNode = (DiagramNode) nodesIt.next();
+            Point2D pos = diagramNode.getPosition();
+            diagramNode.setPosition(new Point2D.Double(pos.getX() * zoomFactor, pos.getY() * zoomFactor));
+        }
+        this.diagramView.requestScreenTransformUpdate();
+        this.diagramView.repaint();
     }
 
     private JComponent makeDiagramListView() {
