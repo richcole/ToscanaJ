@@ -15,15 +15,19 @@ import net.sourceforge.toscanaj.gui.action.*;
 import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.events.*;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.ToscanaJ;
+import net.sourceforge.toscanaj.parser.CernatoXMLParser;
+import net.sourceforge.toscanaj.parser.DataFormatException;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 
 /// @todo check if the file we save to exists, warn if it does
 public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
@@ -166,7 +170,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
     }
 
     private void importCernatoXML(File file) {
-        this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         // store current file
         try {
             this.currentFile = file.getCanonicalPath();
@@ -175,6 +178,17 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
             this.currentFile = file.getAbsolutePath();
             /// @todo what could be done here?
         }
+        CernatoModel inputModel;
+        try {
+            inputModel = CernatoXMLParser.importCernatoXMLFile(file);
+        } catch (FileNotFoundException e) {
+            ErrorDialog.showError(this, e, "Could not find file");
+            return;
+        } catch (DataFormatException e) {
+            ErrorDialog.showError(this, e, "Could not parse file");
+            return;
+        }
+        this.conceptualSchema = new ConceptualSchema(this.eventBroker);
     }
 
     protected void showAboutDialog() {
