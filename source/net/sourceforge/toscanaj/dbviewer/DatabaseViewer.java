@@ -25,7 +25,15 @@ package net.sourceforge.toscanaj.dbviewer;
  *
  * The DatabaseViewer interface is very simple to implement. Just write a default
  * constructor, some initialization code in initialize(DatabaseViewerManager)
- * which should at least store the manager and then you have to implement
+ * which should at least store the manager. You can throw a
+ * DatabaseViewerInitializationException if something fails here. There is a version
+ * of this exception taking a String and another Exception, this way you can pass
+ * additional information to the outside, e.g. if you can not open a file, give a
+ * message like "Could not open file." and the IOException or whatever you got,
+ * this way the details of the original problem (message and stack trace) can be
+ * retrieved.
+ *
+ * Afterwards you have to implement
  * showObject(String), which gets the ID of the object to display. All other information
  * can be get from DatabaseViewerManager.
  *
@@ -64,7 +72,8 @@ package net.sourceforge.toscanaj.dbviewer;
  * }
  * catch(DatabaseException e) {
  *     // try to handle the problem, note that DatabaseException.getOriginal() gives the
- *     // SQL exception if the query failed
+ *     // SQL exception if the query failed -- often you will have a chance to display
+ *     // the error instead of the object
  * }
  *
  * The results variable will hold a List of Vectors. Each item in the list will represent
@@ -78,7 +87,8 @@ package net.sourceforge.toscanaj.dbviewer;
  */
 public interface DatabaseViewer
 {
-    void initialize(DatabaseViewerManager manager);
+    void initialize(DatabaseViewerManager manager)
+        throws DatabaseViewerInitializationException;
     
     void showObject(String objectKey);
 }

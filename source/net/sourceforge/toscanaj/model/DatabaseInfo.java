@@ -128,7 +128,10 @@ public class DatabaseInfo
         };
     };
 
-    protected class AggregateQuery extends DatabaseQuery {
+    /**
+     * @todo This one is public only to use RTTI in ObjectLabelView. Ugly. Fix.
+     */
+    public class AggregateQuery extends DatabaseQuery {
 
         public AggregateQuery(String name, String header) {
             super(name, header);

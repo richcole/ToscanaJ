@@ -16,22 +16,25 @@ import java.util.LinkedList;
 
 import org.jdom.Element;
 
-public class DatabaseViewerManager
+/**
+ * @todo this is the same stuff as the viewer manager -- reuse!
+ */
+public class DatabaseReportGeneratorManager
 {
     private static Component parentComponent = null;
-    private static List viewerRegistry = new LinkedList();
-    private DatabaseViewer viewer = null;
+    private static List generatorRegistry = new LinkedList();
+    private DatabaseReportGenerator reportGenerator = null;
     private String screenName = null;
     private Element template = null;
     private Dictionary parameters = new Hashtable();
     private DatabaseInfo databaseInfo;
     private DBConnection dbConnection;
-    public DatabaseViewerManager(Element viewerDefinition, DatabaseInfo databaseInfo, DBConnection connection)
+    public DatabaseReportGeneratorManager(Element reportDefinition, DatabaseInfo databaseInfo, DBConnection connection)
             throws DatabaseViewerInitializationException
     {
-        screenName = viewerDefinition.getAttributeValue("name");
-        template = viewerDefinition.getChild("template");
-        List parameterElems = viewerDefinition.getChildren("parameter");
+        screenName = reportDefinition.getAttributeValue("name");
+        template = reportDefinition.getChild("template");
+        List parameterElems = reportDefinition.getChildren("parameter");
         Iterator it = parameterElems.iterator();
         while(it.hasNext())
         {
@@ -40,17 +43,17 @@ public class DatabaseViewerManager
         }
         this.databaseInfo = databaseInfo;
         this.dbConnection = connection;
-        // register the viewer object as last step, after all info has been set (which is used by the viewer)
-        String className = viewerDefinition.getAttributeValue("class");
+        // register the object as last step, after all info has been set (which is used by the generator)
+        String className = reportDefinition.getAttributeValue("class");
         if( className == null )
         {
-            throw new DatabaseViewerInitializationException("Could not find class attribute on <viewer>");
+            throw new DatabaseViewerInitializationException("Could not find class attribute on <report>");
         }
         try
         {
-            Class viewerClass = Class.forName(className);
-            viewer = (DatabaseViewer)viewerClass.newInstance();
-            viewer.initialize(this); 
+            Class reportGeneratorClass = Class.forName(className);
+            reportGenerator = (DatabaseReportGenerator)reportGeneratorClass.newInstance();
+            reportGenerator.initialize(this); 
         }
         catch( ClassNotFoundException e )
         {
@@ -64,20 +67,20 @@ public class DatabaseViewerManager
         {
             throw new DatabaseViewerInitializationException("Could not access class '" + className + "'");
         }
-        viewerRegistry.add(this);
+        generatorRegistry.add(this);
     }
     public static void setParentComponent(Component parentComponent)
     {
-        DatabaseViewerManager.parentComponent = parentComponent;
+        DatabaseReportGeneratorManager.parentComponent = parentComponent;
     }
     public static Frame getParentWindow()
     {
         return JOptionPane.getFrameForComponent( parentComponent );
     }        
-    public static void showObject(int viewerID, String objectKey)
+    public static void showReport(int generatorID, String whereClause)
     {
-        DatabaseViewerManager manager = (DatabaseViewerManager) viewerRegistry.get(viewerID);
-        manager.viewer.showObject(objectKey);
+        DatabaseReportGeneratorManager manager = (DatabaseReportGeneratorManager) generatorRegistry.get(generatorID);
+        manager.reportGenerator.showReport(whereClause);
     }
     public Element getTemplate()
     {

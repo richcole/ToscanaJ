@@ -247,7 +247,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         }
     }
 
-    private String constructWhereClause(boolean contingentOnly) {
+    public String constructWhereClause(boolean contingentOnly) {
         String whereClause = " WHERE (";
         if(contingentOnly) {
             // use only the local clause (we assume there is one)

@@ -32,7 +32,6 @@ import java.util.Vector;
  * a nice way you might get weird indentation in the dialog.
  *
  * @todo add a "template" parameter for giving the template as URL to a text file
- * @todo JTextArea is not what we want -- at least not editable
  */
 public class SimpleDatabaseViewer implements DatabaseViewer
 {
@@ -74,14 +73,24 @@ public class SimpleDatabaseViewer implements DatabaseViewer
         }
 
         public SimpleDatabaseViewerDialog( Frame frame, DatabaseViewerManager viewerManager)
+            throws DatabaseViewerInitializationException
         {
             super( frame, "View Item", true );
 
             this.viewerManager = viewerManager;
 
             String openDelimiter = (String) viewerManager.getParameters().get("openDelimiter");
+            if( openDelimiter == null ) {
+                throw new DatabaseViewerInitializationException("Open delimiter not defined");
+            }
             String closeDelimiter = (String) viewerManager.getParameters().get("closeDelimiter");
+            if( closeDelimiter == null ) {
+                throw new DatabaseViewerInitializationException("Close delimiter not defined");
+            }
             String template = viewerManager.getTemplateString();
+            if( template == null ) {
+                throw new DatabaseViewerInitializationException("No template found");
+            }
             while( template.indexOf(openDelimiter) != -1 )
             {
                 textFragments.add(template.substring(0, template.indexOf(openDelimiter)));
@@ -125,6 +134,7 @@ public class SimpleDatabaseViewer implements DatabaseViewer
     }
 
     public void initialize(DatabaseViewerManager manager)
+        throws DatabaseViewerInitializationException
     {
         this.dialog = new SimpleDatabaseViewerDialog( manager.getParentWindow(), manager );
         ConfigurationManager.restorePlacement("SimpleDatabaseViewerDialog", dialog, new Rectangle(100,100,150,150));

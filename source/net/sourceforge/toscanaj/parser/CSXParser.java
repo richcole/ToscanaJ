@@ -2,7 +2,9 @@ package net.sourceforge.toscanaj.parser;
 
 import net.sourceforge.toscanaj.controller.db.DBConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.dbviewer.DatabaseReportGeneratorManager;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.ObjectListQuery;
@@ -87,7 +89,7 @@ public class CSXParser
      * The code might also have problems when namespaces are used.
      */
     public static ConceptualSchema parse( File csxFile )
-            throws FileNotFoundException, IOException, DataFormatException
+            throws FileNotFoundException, IOException, DataFormatException, Exception
     {
         // open stream on file
         FileInputStream in;
@@ -108,6 +110,7 @@ public class CSXParser
         // parse the different sections
         parseDatabaseInformation();
         parseDatabaseViewerSetups();
+        parseDatabaseReportSetups();
         parseContext();
         parseDiagrams();
 
@@ -150,10 +153,38 @@ public class CSXParser
     private static void parseDatabaseViewerSetups()
         throws DataFormatException
     {
-        // check if database should be used and fetch the data if needed
-        Element viewerElem = _Document.getRootElement().getChild("viewer");
-        if(viewerElem != null) {
-            new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection);
+        List viewerElems = _Document.getRootElement().getChildren("viewer");
+        Iterator it = viewerElems.iterator();
+        while( it.hasNext() )
+        {
+            Element viewerElem = (Element) it.next();
+            try
+            {
+                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection);
+            }
+            catch( DatabaseViewerInitializationException e )
+            {
+                throw new DataFormatException("A database viewer could not be initialized.", e);
+            }
+        }
+    }
+
+    private static void parseDatabaseReportSetups()
+        throws DataFormatException
+    {
+        List reportElems = _Document.getRootElement().getChildren("report");
+        Iterator it = reportElems.iterator();
+        while( it.hasNext() )
+        {
+            Element reportElem = (Element) it.next();
+            try
+            {
+                new DatabaseReportGeneratorManager(reportElem, _Schema.getDatabaseInfo(), _DatabaseConnection);
+            }
+            catch( DatabaseViewerInitializationException e )
+            {
+                throw new DataFormatException("A database viewer could not be initialized.", e);
+            }
         }
     }
 

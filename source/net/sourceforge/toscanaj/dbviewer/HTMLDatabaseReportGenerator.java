@@ -28,33 +28,41 @@ import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 
 /**
- * Shows an object using HTML.
+ * Shows a report using HTML.
  *
- * A definition for this viewer looks like this:
- * <viewer class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer"
- *         name="Show object..."/>
+ * A definition for this report generator looks like this:
+ * <report class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseReportGenerator"
+ *         name="Show objects..."/>
  *     <parameter name="template" value="/some/file/somewhere.html"/>
- * </viewer>
+ * </report>
  *
- * The input file will be loaded and displayed as an HTML page. All
- * occurances of entries like <field name="givenName"/> will be filled
+ * The input file will be loaded and displayed as an HTML page. 
+ *
+ * There has to be a section in the HTML marked with <repeat>...</repeat>
+ * which is the part that shall repeated for each item displayed. All
+ * occurances of entries like <field name="givenName"/> within that will be 
+ * filled
  * with the content of the field for the object and changed into <span>s.
  */
-public class HTMLDatabaseViewer implements DatabaseViewer
+public class HTMLDatabaseReportGenerator implements DatabaseReportGenerator
 {
-    private class HTMLDatabaseViewerDialog extends JDialog
+    private class HTMLDatabaseReportDialog extends JDialog
     {
-        private DatabaseViewerManager viewerManager;
+        private DatabaseReportGeneratorManager viewerManager;
 
         private JEditorPane textArea;
 
+        private Element repeatElement = null;
+        
+        private Element repetitionBlock = null;
+        
         private List fieldElements = new LinkedList();
 
         private List fieldNames = new LinkedList();
 
         private Document document;
 
-        public HTMLDatabaseViewerDialog( Frame frame, DatabaseViewerManager viewerManager)
+        public HTMLDatabaseReportDialog( Frame frame, DatabaseReportGeneratorManager viewerManager)
                 throws DatabaseViewerInitializationException
         {
             super( frame, "View Item", true );
@@ -95,6 +103,20 @@ public class HTMLDatabaseViewer implements DatabaseViewer
             {
                 Element elem = (Element) queue.remove(0);
                 queue.addAll(elem.getChildren());
+                if(elem.getName().equals("repeat"))
+                {
+                    repeatElement = elem;
+                    repetitionBlock = (Element)elem.clone();
+                    /// @todo find some way to neutralize <repeat>
+                }
+            }
+
+            queue = new LinkedList();
+            queue.add(repetitionBlock);
+            while(!queue.isEmpty())
+            {
+                Element elem = (Element) queue.remove(0);
+                queue.addAll(elem.getChildren());
                 if(elem.getName().equals("field"))
                 {
                     fieldElements.add(elem);
@@ -107,7 +129,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer
             final JButton closeButton = new JButton("Close");
             closeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    ConfigurationManager.storePlacement("HTMLDatabaseViewerDialog", dialog);
+                    ConfigurationManager.storePlacement("HTMLDatabaseReportDialog", dialog);
                     dialog.setVisible(false);
                 }
             });
@@ -133,22 +155,29 @@ public class HTMLDatabaseViewer implements DatabaseViewer
             contentPane.add( buttonPane, BorderLayout.SOUTH );
         }
 
-        private void showObject(String objectKey)
+        private void showReport(String whereClause)
         {
             try
             {
                 List results = this.viewerManager.getConnection().executeQuery(fieldNames,
                                                                              viewerManager.getDatabaseInfo().getTableName(),
-                                                                             "WHERE " + viewerManager.getDatabaseInfo().getKey() +
-                                                                                        "='" + objectKey + "';");
-                Vector fields = (Vector)results.get(0);
-                Iterator itFields = fields.iterator();
-                Iterator itElems = fieldElements.iterator();
-                while( itFields.hasNext() )
+                                                                             whereClause);
+                /// @todo remove all content, not just children
+                repeatElement.removeChildren();
+                Iterator it = results.iterator();
+                while(it.hasNext()) 
                 {
-                    String result = (String) itFields.next();
-                    Element fieldElem = (Element) itElems.next();
-                    fieldElem.setText(result);
+                    Vector fields = (Vector)it.next();
+                    Iterator itFields = fields.iterator();
+                    Iterator itElems = fieldElements.iterator();
+                    while( itFields.hasNext() )
+                    {
+                        String result = (String) itFields.next();
+                        Element fieldElem = (Element) itElems.next();
+                        fieldElem.setText(result);
+                    }
+                    /// @todo only the content of repetitionBlock should be added (but _all_ content, not just elements)
+                    repeatElement.addContent((Element)repetitionBlock.clone());
                 }
                 XMLOutputter outputter = new XMLOutputter();
                 outputter.setOmitDeclaration(true);
@@ -161,30 +190,30 @@ public class HTMLDatabaseViewer implements DatabaseViewer
         }
     }
 
-    private HTMLDatabaseViewerDialog dialog;
+    private HTMLDatabaseReportDialog dialog;
 
-    public HTMLDatabaseViewer()
+    public HTMLDatabaseReportGenerator()
     {
         // initialization has to be done separately, so we can use the dynamic class loading mechanism
     }
 
-    public void initialize(DatabaseViewerManager manager)
+    public void initialize(DatabaseReportGeneratorManager manager)
         throws DatabaseViewerInitializationException
     {
-        this.dialog = new HTMLDatabaseViewerDialog( manager.getParentWindow(), manager );
-        ConfigurationManager.restorePlacement("HTMLDatabaseViewerDialog", dialog, new Rectangle(100,100,150,150));
+        this.dialog = new HTMLDatabaseReportDialog( manager.getParentWindow(), manager );
+        ConfigurationManager.restorePlacement("HTMLDatabaseReportDialog", dialog, new Rectangle(100,100,150,150));
     }
 
-    public void showObject(String objectKey)
+    public void showReport(String whereClause)
     {
         if( this.dialog != null )
         {
-            this.dialog.showObject(objectKey);
+            this.dialog.showReport(whereClause);
             this.dialog.setVisible(true);
         }
         else
         {
-            System.err.println( "HTMLDatabaseViewerDialog has to be initialize(..)d " +
+            System.err.println( "HTMLDatabaseReportDialog has to be initialize(..)d " +
                                 "before showDialog(..) is called." );
         }
     }

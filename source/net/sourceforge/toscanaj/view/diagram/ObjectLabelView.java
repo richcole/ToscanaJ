@@ -1,9 +1,11 @@
 package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.dbviewer.DatabaseReportGeneratorManager;
 
 import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -138,12 +140,16 @@ public class ObjectLabelView extends LabelView {
             // a doubleClick on the scrollbar
             return;
         }
-        if(!(this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.ListQuery)) {
-            return;
-            /// @todo Get rid of RTTI here.
+        /// @todo Get rid of RTTI here.
+        if(this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.ListQuery) {
+            int lineHit = (int)((pos.getY()-this.rect.getY())/this.lineHeight);
+            int itemHit = lineHit + this.firstItem;
+            DatabaseViewerManager.showObject(0,this.queryKeyValues.get(itemHit).toString());
         }
-        int lineHit = (int)((pos.getY()-this.rect.getY())/this.lineHeight);
-        int itemHit = lineHit + this.firstItem;
-        DatabaseViewerManager.showObject(0,this.queryKeyValues.get(itemHit).toString());
+        if(this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.AggregateQuery) {
+            DatabaseConnectedConcept concept = (DatabaseConnectedConcept) this.labelInfo.getNode().getConcept();
+            DatabaseReportGeneratorManager.showReport(0,concept.constructWhereClause(this.showOnlyContingent));
+        }
+        return;
     }
 }

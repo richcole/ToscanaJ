@@ -8,6 +8,7 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.dbviewer.DatabaseReportGeneratorManager;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.Query;
@@ -161,8 +162,9 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         DiagramController.getController().addObserver(this);
         // add listener for keys
         this.addKeyListener(this);
-        // we are the parent window for anything database viewers want to display
+        // we are the parent window for anything database viewers / report generators want to display
         DatabaseViewerManager.setParentComponent(this);
+        DatabaseReportGeneratorManager.setParentComponent(this);
         // restore the old MRU list
         mruList = ConfigurationManager.fetchStringList("mainPanel", "mruFiles", MaxMruFiles);
         // set up the menu for the MRU files
@@ -641,8 +643,10 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n" + e.getMessage());
             return;
         } catch (DataFormatException e) {
-            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n" + e.getMessage() + 
-                                  "\n" + ((DataFormatException)e).getOriginal().getMessage());
+            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n" + e.getMessage());
+            return;
+        } catch (Exception e) {
+            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n" + e.getMessage());
             return;
         }
 
