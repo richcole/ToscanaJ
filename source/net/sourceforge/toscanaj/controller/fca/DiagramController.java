@@ -314,6 +314,7 @@ public class DiagramController implements ChangeObservable {
     public void addDiagram(Diagram2D diagram){
         if(history.currentDiagrams.size() <= this.nestingLevel) {
             history.currentDiagrams.add(new DiagramReference(diagram,null));
+            notifyObservers();
         }
         else {
             history.futureDiagrams.add(new DiagramReference(diagram,null));
@@ -322,7 +323,6 @@ public class DiagramController implements ChangeObservable {
                       history.currentDiagrams.size() +
                       history.futureDiagrams.size() - 1;
         history.fireIntervalAdded(lastPos,lastPos);
-        notifyObservers();
     }
 
     /**
@@ -349,7 +349,6 @@ public class DiagramController implements ChangeObservable {
         if( pos < history.futureDiagrams.size()) {
             history.futureDiagrams.remove(pos);
             history.fireIntervalAdded(position,position);
-            notifyObservers();
             return;
         }
         throw new NoSuchElementException("Tried to remove diagram beyond range");
@@ -366,7 +365,6 @@ public class DiagramController implements ChangeObservable {
         if( !history.futureDiagrams.isEmpty() ) {
             history.futureDiagrams.remove(history.futureDiagrams.size()-1);
             history.fireIntervalRemoved(history.getSize(),history.getSize());
-            notifyObservers();
             return;
         }
         // no future diagrams, check if we can undo
@@ -374,7 +372,6 @@ public class DiagramController implements ChangeObservable {
             back();
             history.futureDiagrams.remove(0);
             history.fireIntervalRemoved(history.getSize(),history.getSize());
-            notifyObservers();
             return;
         }
         // no future diagrams, no undo -- do we have at least one diagram?
@@ -598,7 +595,9 @@ public class DiagramController implements ChangeObservable {
     }
 
     /**
-     * Notifies all observers of an update.
+     * Notifies all observers of an update that changes the current diagram.
+     *
+     * This should not be called if the changes affect only future diagrams.
      */
     protected void notifyObservers() {
         Iterator it = this.observers.iterator();
