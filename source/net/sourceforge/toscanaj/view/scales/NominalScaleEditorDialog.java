@@ -31,6 +31,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Iterator;
 import java.util.List;
@@ -53,6 +57,7 @@ public class NominalScaleEditorDialog extends JDialog {
     private DatabaseSchema databaseSchema;
     private JButton andButton;
     private JButton orButton;
+    private JButton notButton;
     
 	private static final String CONFIGURATION_SECTION_NAME = "NominalScaleEditorDialog";
 	private static final int MINIMUM_WIDTH = 500;
@@ -66,31 +71,70 @@ public class NominalScaleEditorDialog extends JDialog {
     	String getClosedAttributeLabel();
     }
     
+    private interface ColumnValue {
+    	String getValue();
+    	String getSqlClause(Column column);
+    	Font deriveFont(Font f);
+    }
+    
+    private class OrdinaryColumnValue implements ColumnValue {
+    	private String value;
+    	public OrdinaryColumnValue (String value) {
+    		this.value = value;
+    	}
+		public String getValue() {
+			return this.value;
+		}
+		public String getSqlClause(Column column) {
+			if(column.getType() == Types.VARCHAR) {
+				return " = '" + this.value + "'";
+			} else {
+				return " = " + this.value;
+			}
+		}
+		public Font deriveFont(Font f) {
+			return f;
+		}
+    }    
+
+	private class NullColumnValue implements ColumnValue {
+		private String value;
+		public NullColumnValue (String value) {
+			this.value = value;
+		}
+		public String getValue() {
+			return this.value;
+		}
+		public String getSqlClause(Column column) {
+			return " IS " + this.value;
+		}
+		public Font deriveFont(Font f) {
+			Font resFont = f.deriveFont(Font.ITALIC);
+			return resFont;
+		}
+	}
+
     private static class TableColumnValueTriple implements SqlFragment{
     	private TableColumnPair tableColumnPair;
-    	private String value;
-    	public TableColumnValueTriple(TableColumnPair tableColumnPair, String value) {
+    	private ColumnValue colValue;
+    	public TableColumnValueTriple(TableColumnPair tableColumnPair, ColumnValue colVallue) {
     		this.tableColumnPair = tableColumnPair;
-    		this.value = value;
+    		this.colValue = colVallue;
     	}
         public TableColumnPair getTableColumnPair() {
             return tableColumnPair;
         }
         public String getValue() {
-            return value;
+            return colValue.getValue();
         }
         public String toString() {
         	return this.getSqlClause();
         }
         public String getAttributeLabel() {
-            return this.value;
+            return this.colValue.getValue();
         }
         public String getSqlClause() {
-        	if(tableColumnPair.getColumn().getType() == Types.VARCHAR) {
-            	return this.tableColumnPair.getSqlExpression() + " = '" + this.value + "'";
-        	} else {
-				return this.tableColumnPair.getSqlExpression() + " = " + this.value;
-        	}
+			return this.tableColumnPair.getSqlExpression() + this.colValue.getSqlClause(tableColumnPair.getColumn());
         }
         public String getClosedAttributeLabel() {
             return this.getAttributeLabel();
@@ -183,6 +227,42 @@ public class NominalScaleEditorDialog extends JDialog {
             return "(" + this.getAttributeLabel() + ")";
         }
     }
+
+	private static class Negation implements SqlFragment {
+		private SqlFragment sqlFragment;
+		public Negation(SqlFragment sqlFragment) {
+			this.sqlFragment = sqlFragment;
+		}
+
+		public String getAttributeLabel() {
+			return "NOT " + this.sqlFragment.getClosedAttributeLabel();
+		}
+
+		public String getSqlClause() {
+			return "NOT (" + this.sqlFragment.getSqlClause() + ")";
+		}
+
+		public String toString() {
+			return getSqlClause();
+		}
+
+		public String getClosedAttributeLabel() {
+			return "(" + this.getAttributeLabel() + ")";
+		}
+	}
+	
+	private class ColumnValuesListRenderer extends DefaultListCellRenderer {
+		public Component getListCellRendererComponent(JList list, Object value, 
+										int index,	boolean isSelected, 
+										boolean cellHasFocus) {
+			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			ColumnValue colValue = (ColumnValue) value;
+			setText(colValue.getValue());
+			setFont(colValue.deriveFont(list.getFont()));
+			return this;
+		}
+		
+	}
 
     public NominalScaleEditorDialog(Frame owner, DatabaseConnection databaseConnection,
                                      DatabaseSchema databaseSchema) {
@@ -283,6 +363,7 @@ public class NominalScaleEditorDialog extends JDialog {
         JPanel tablePane = new JPanel(new GridBagLayout());
         this.columnValuesListModel = new DefaultListModel();
         this.columnValuesListView = new JList(columnValuesListModel);
+		this.columnValuesListView.setCellRenderer(new ColumnValuesListRenderer());
         this.columnValuesListView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
@@ -291,6 +372,7 @@ public class NominalScaleEditorDialog extends JDialog {
                 }
             }
         });
+        
         JPanel moveButtonPane = new JPanel(new GridLayout(2, 1));
         JButton addButton = new JButton(">");
         addButton.addActionListener(new ActionListener() {
@@ -333,6 +415,14 @@ public class NominalScaleEditorDialog extends JDialog {
                 createDisjunction();
             }
         });
+        
+        this.notButton = new JButton("NOT");
+        this.notButton.setEnabled(false);
+        this.notButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				createNegation();
+			}
+        });
 
         
         combinationButtonPanel.add(this.andButton,
@@ -353,6 +443,15 @@ public class NominalScaleEditorDialog extends JDialog {
                         0, 0
                 )
         );
+		combinationButtonPanel.add(this.notButton,
+				new GridBagConstraints(
+						2, 0, 1, 1, 1, 0,
+						GridBagConstraints.CENTER,
+						GridBagConstraints.HORIZONTAL,
+						new Insets(5, 5, 5, 5),
+						0, 0
+				)
+		);
         
         tablePane.add(new LabeledPanel("Columns", this.columnChooser, false),
                 new GridBagConstraints(
@@ -445,6 +544,8 @@ public class NominalScaleEditorDialog extends JDialog {
 				boolean combinationPossible = attributeListView.getSelectedIndices().length >= 2;
                 andButton.setEnabled(combinationPossible);
                 orButton.setEnabled(combinationPossible);
+                boolean onlyOneItemSelected = attributeListView.getSelectedIndices().length == 1;
+                notButton.setEnabled(onlyOneItemSelected);
             }
 		});
         pack();
@@ -458,7 +559,7 @@ public class NominalScaleEditorDialog extends JDialog {
 	
     private void addValuesToSelection() {
         for (int i = this.columnValuesListView.getSelectedValues().length - 1; i >= 0; i--) {
-            String value = (String)this.columnValuesListView.getSelectedValues()[i];
+			ColumnValue value = (ColumnValue)this.columnValuesListView.getSelectedValues()[i];
             this.attributeListModel.addElement(new TableColumnValueTriple(this.selectedTableColumnPair, value));
         }
         fillAvailableValueList();
@@ -498,16 +599,23 @@ public class NominalScaleEditorDialog extends JDialog {
             String query = "SELECT DISTINCT " + selectedTableColumnPair.getSqlExpression() + " FROM " +
                     selectedTableColumnPair.getTable().getSqlExpression() + ";";
             resultSet = databaseConnection.queryColumn(query, 1);
-            for (Iterator it = resultSet.iterator(); it.hasNext();) {
+			Iterator it = resultSet.iterator();
+			if (it.hasNext()) {
+				if (checkIfColumnAllowsNullValues()) {
+					this.columnValuesListModel.addElement(new NullColumnValue("NULL"));
+				}
+			}
+            while ( it.hasNext()) {
             	String value = (String) it.next();
             	if(!valueSelected(selectedTableColumnPair, value)) {
-                	this.columnValuesListModel.addElement(value);
+                	this.columnValuesListModel.addElement(new OrdinaryColumnValue(value));
             	}
             }
         } catch (DatabaseException e) {
             ErrorDialog.showError(this, e, "Database query failed");
         }
     }
+
     
     private boolean valueSelected(TableColumnPair tabCol, String value) {
     	for(int i = 0; i < this.attributeListModel.size(); i++) {
@@ -578,6 +686,56 @@ public class NominalScaleEditorDialog extends JDialog {
 		this.attributeListModel.add(pos, new Disjunction(selectedFragments));
 		fillAvailableValueList();
     }
+
+	private void createNegation() {
+		int pos = this.attributeListView.getSelectedIndex();
+		SqlFragment sqlFragment = (SqlFragment) this.attributeListView.getSelectedValue();
+		this.attributeListModel.removeElement(sqlFragment);
+		this.attributeListModel.add(pos, new Negation(sqlFragment));
+		fillAvailableValueList();
+	}
+
+	private boolean checkIfColumnAllowsNullValues()
+												throws DatabaseException {
+		boolean columnAllowsNulls = true;
+		DatabaseMetaData dbMetadata = databaseConnection.getDatabaseMetaData();
+		try {
+			String tableName = selectedTableColumnPair.getTable().getDisplayName();
+			String colName = selectedTableColumnPair.getColumn().getDisplayName(); 
+			ResultSet rs = dbMetadata.getColumns(null, null, tableName, colName);
+			while (rs.next()) {
+				ResultSetMetaData cur = rs.getMetaData();
+				String curTableName = "";
+				String curColName = "";
+				String curIsNullable = "";
+				for (int i = 1; i <= cur.getColumnCount(); i++) {
+					if (cur.getColumnName(i).equals("TABLE_NAME")) {
+						curTableName = rs.getString(i);									
+					}
+					if (cur.getColumnName(i).equals("COLUMN_NAME")) {
+						curColName = rs.getString(i);
+					}
+					if (cur.getColumnName(i).equals("IS_NULLABLE")){
+						curIsNullable = rs.getString(i);
+					}
+				}
+				if ( (curTableName.equals(tableName)) && (curColName.equals(colName)) ) {
+					// check now if column allows NULL values. This is tricky
+					// as JDBC doesn't return very good values, here is a sniplet from
+					// javadoc:
+					// "NO" means column definitely does not allow NULL values; 
+					// "YES" means the column might allow NULL values. 
+					// An empty string means nobody knows.
+					if (curIsNullable.equals("NO")) {
+						columnAllowsNulls = false;
+					}
+				}
+			}
+		} catch (SQLException e1) {
+			ErrorDialog.showError(this, e1, "Database query failed");
+		}
+		return columnAllowsNulls;
+	}
 
 	private class UpdateButtonForCorrectModelStateListDataListener implements ListDataListener {
 			private final JButton actionButton;
