@@ -233,7 +233,7 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
         if (dialog != null) {
             dialog.setLocationRelativeTo(comp);
             ConfigurationManager.restorePlacement("DiagramExportSettingsDialog", dialog,
-                    new Rectangle(50, 50, 350, 160));
+                    new Rectangle(50, 50, 350, 200));
             dialog.setVisible(true);
         } else {
             System.err.println("DiagramExportSettingsDialog has to be initialize(..)d " +
