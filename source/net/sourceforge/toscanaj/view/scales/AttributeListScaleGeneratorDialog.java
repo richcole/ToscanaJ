@@ -99,7 +99,7 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				1,
 				GridBagConstraints.CENTER,
 				GridBagConstraints.BOTH,
-				new Insets(5, 5, 5, 5),
+				new Insets(5, 5, 0, 5),
 				0,
 				0));
 		getContentPane().add(
