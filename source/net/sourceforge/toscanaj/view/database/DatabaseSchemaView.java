@@ -37,6 +37,8 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
     private JList unkeyedTableListPanel;
     private JList keyedTableListPanel;
     private JList columnsPanel;
+    private JSplitPane splitPane;
+    private JSplitPane leftPane;
 
     private RemoveTableKeyAction removeTableAction;
 
@@ -178,13 +180,12 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
         this.removeTableAction = new RemoveTableKeyAction("Remove Key");
         JButton removeButton = new JButton(removeTableAction);
 
-        JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+        leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                              new LabeledScrollPaneView("Available Tables:",unkeyedTableListPanel),
                                              new LabeledScrollPaneView("Selected Keys:", keyedTableListPanel, removeButton));
         leftPane.setOneTouchExpandable(true);
         leftPane.setResizeWeight(0);
 
-        JSplitPane splitPane;
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                    leftPane,
                                    new LabeledScrollPaneView("Available Object Keys:", columnsPanel));
@@ -286,5 +287,21 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
         this.keyedTableList.clear();
         this.unkeyedTableList.clear();
         this.columnsList.clear();
+    }
+
+    public void setHorizontalDividerLocation(int location) {
+        splitPane.setDividerLocation(location);
+    }
+
+    public int getHorizontalDividerLocation() {
+        return splitPane.getDividerLocation();
+    }
+
+    public void setVerticalDividerLocation(int location) {
+        leftPane.setDividerLocation(location);
+    }
+
+    public int getVerticalDividerLocation() {
+        return leftPane.getDividerLocation();
     }
 }

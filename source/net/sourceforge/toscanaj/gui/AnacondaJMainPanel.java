@@ -56,6 +56,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
      * Views
      */
     private PanelStackView mainView;
+    private DatabaseSchemaView databaseSchemaView;
     private ScaleEditingView scaleView;
     private DiagramEditingView diagramView;
 
@@ -97,7 +98,11 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         DatabaseConnectionInformationView connectionInformationView =
             new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);
 
-        JPanel tableView = new DatabaseSchemaView(this, eventBroker);
+        databaseSchemaView = new DatabaseSchemaView(this, eventBroker);
+        databaseSchemaView.setHorizontalDividerLocation(
+                            ConfigurationManager.fetchInt("AnacondaJMainPanel", "databaseSchemaViewHorizontalDivider", 200));
+        databaseSchemaView.setVerticalDividerLocation(
+                            ConfigurationManager.fetchInt("AnacondaJMainPanel", "databaseSchemaViewVerticalDivider", 300));
 
         scaleView = new ScaleEditingView(this, conceptualSchema, eventBroker);
         scaleView.setHorizontalDividerLocation(
@@ -109,7 +114,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "diagramViewDivider", 200));
 
         mainView.addView("Connection", connectionInformationView);
-        mainView.addView("Tables", tableView);
+        mainView.addView("Tables", databaseSchemaView);
         mainView.addView("Scales", scaleView);
         mainView.addView("Diagrams", diagramView);
         setContentPane(mainView);
@@ -207,6 +212,12 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         ConfigurationManager.storePlacement("AnacondaJMainPanel", this);
         ConfigurationManager.storeInt("AnacondaJMainPanel", "mainPanelDivider",
                 mainView.getDividerLocation()
+        );
+        ConfigurationManager.storeInt("AnacondaJMainPanel", "databaseSchemaViewHorizontalDivider",
+                databaseSchemaView.getHorizontalDividerLocation()
+        );
+        ConfigurationManager.storeInt("AnacondaJMainPanel", "databaseSchemaViewVerticalDivider",
+                databaseSchemaView.getVerticalDividerLocation()
         );
         ConfigurationManager.storeInt("AnacondaJMainPanel", "scaleViewHorizontalDivider",
                 scaleView.getHorizontalDividerLocation()
