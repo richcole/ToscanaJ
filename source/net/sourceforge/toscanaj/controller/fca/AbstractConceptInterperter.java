@@ -263,8 +263,9 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                 }
                 NumberFormat format = DecimalFormat.getNumberInstance();
                 format.setMaximumFractionDigits(1);
-                String returnValue = objectCount + " [exp: " + format.format(expectedSize) + "]";
-                return new Object[]{getObject(returnValue, concept, context)}; 
+                String expectedValue = "[exp: " + format.format(expectedSize) + "]";
+                return new Object[]{getObject(""+objectCount, concept, context),
+                                    getObject(expectedValue, concept, context)}; 
             } else {
                 return executeObjectCountQuery(concept, context);
             }
@@ -284,9 +285,10 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                         context.setObjectDisplayMode(oldMode);
                         NumberFormat format = DecimalFormat.getPercentInstance();
                         format.setMaximumFractionDigits(2);
-                        String returnValue = format.format(objectCount/(double)fullExtent) + 
-                                                " [exp: " + format.format(expectedSize/(double)fullExtent) + "]";
-                        return new Object[]{getObject(returnValue, concept, context)};              
+                        String returnValue = format.format(objectCount/(double)fullExtent);
+                        String expectedValue = "[exp: " + format.format(expectedSize/(double)fullExtent) + "]";
+                        return new Object[]{getObject(returnValue, concept, context),
+                                            getObject(expectedValue, concept, context)};              
                     } // else fall back into normal behaviour
                 } // else fall back into normal behaviour
             }
