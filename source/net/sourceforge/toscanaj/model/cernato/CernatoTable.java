@@ -50,5 +50,5 @@ public class CernatoTable implements ManyValuedContext {
     public AttributeValue getRelationship(FCAObject object, ManyValuedAttribute attribute) {
         Hashtable row = (Hashtable) relation.get(object);
         return (AttributeValue) row.get(attribute);
-    }
+    }	
 }

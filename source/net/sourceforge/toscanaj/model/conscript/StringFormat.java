@@ -59,6 +59,8 @@ public class StringFormat {
 		this.clipbox = clipbox;
 		
 	}
+	public StringFormat(){
+	}
 
 	/**
 	 * Returns the clipbox.
