@@ -416,7 +416,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
          *       though I could not find another way to get this. Try again...
          */
         if (this.conceptualSchema != null) {
-            Iterator it = this.conceptualSchema.getQueries();
+            Iterator it = Query.getQueries().iterator();
             boolean first = true;
             String allowedChars = "abcdefghijklmnopqrstuvwxyz";
             String usedChars = "ax";
@@ -712,6 +712,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         }
 
         DatabaseViewerManager.resetRegistry();
+        Query.clearQueries();
         try {
             conceptualSchema = CSXParser.parse(schemaFile);
         } catch (FileNotFoundException e) {

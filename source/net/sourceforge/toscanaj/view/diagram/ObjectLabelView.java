@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Vector;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -169,58 +170,80 @@ public class ObjectLabelView extends LabelView {
     
     public void openPopupMenu(MouseEvent event, Point2D pos) {
         int itemHit = getItemAtPosition(pos);
-        List viewNames;
+        // find available queries
+        List queries = Query.getQueries();
+        // find available object views if list is displayed
+        List objectViewNames;
         if(this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.ListQuery)
         {
-            viewNames = DatabaseViewerManager.getObjectViewNames();
+            objectViewNames = DatabaseViewerManager.getObjectViewNames();
         }
         else
         { // no views for aggregates
-            viewNames = new LinkedList();
+            objectViewNames = new LinkedList();
         }
-        List reportNames = DatabaseViewerManager.getObjectListViewNames();
-        if( viewNames.size() + reportNames.size() == 0 )
+        // find available object list views
+        List objectListViewNames = DatabaseViewerManager.getObjectListViewNames();
+        if( queries.size() + objectViewNames.size() + objectListViewNames.size() == 0 )
         { // nothing to display
             return;
         }
+        // create the menu
         popupMenu = new JPopupMenu();
         JMenuItem menuItem;
-        if( viewNames.size() != 0 )
+        if( queries.size() != 0 )
         {
-            final String objectKey = this.queryKeyValues.get(itemHit).toString();
-            Iterator it = viewNames.iterator();
+            JMenu queryMenu = new JMenu("Change label");
+            Iterator it = queries.iterator();
             while(it.hasNext())
             {
-                final String viewName = (String) it.next();
-                menuItem= new JMenuItem(viewName);
+                final Query query = (Query) it.next();
+                menuItem= new JMenuItem(query.getName());
                 menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        DatabaseViewerManager.showObject(viewName, objectKey);    
+                        setQuery(query);
                     }
                 });
-                popupMenu.add(menuItem);
+                queryMenu.add(menuItem);
             }
+            popupMenu.add(queryMenu);
         }
-        if( reportNames.size() != 0 )
+        if( objectViewNames.size() != 0 )
         {
-            if( viewNames.size() != 0 )
+            JMenu objectViewMenu = new JMenu("View object");
+            final String objectKey = this.queryKeyValues.get(itemHit).toString();
+            Iterator it = objectViewNames.iterator();
+            while(it.hasNext())
             {
-                popupMenu.addSeparator();
+                final String objectViewName = (String) it.next();
+                menuItem= new JMenuItem(objectViewName);
+                menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        DatabaseViewerManager.showObject(objectViewName, objectKey);    
+                    }
+                });
+                objectViewMenu.add(menuItem);
             }
+            popupMenu.add(objectViewMenu);
+        }
+        if( objectListViewNames.size() != 0 )
+        {
+            JMenu objectListViewMenu = new JMenu("View summary");
             DatabaseConnectedConcept concept = (DatabaseConnectedConcept) this.labelInfo.getNode().getConcept();
             final String whereClause = concept.constructWhereClause(this.showOnlyContingent);
-            Iterator it = reportNames.iterator();
+            Iterator it = objectListViewNames.iterator();
             while(it.hasNext())
             {
-                final String viewName = (String) it.next();
-                menuItem= new JMenuItem(viewName);
+                final String objectListViewName = (String) it.next();
+                menuItem= new JMenuItem(objectListViewName);
                 menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        DatabaseViewerManager.showObjectList(viewName, whereClause);    
+                        DatabaseViewerManager.showObjectList(objectListViewName, whereClause);    
                     }
                 });
-                popupMenu.add(menuItem);
+                objectListViewMenu.add(menuItem);
             }
+            popupMenu.add(objectListViewMenu);
         }
         popupMenu.show(this.diagramView,event.getX(),event.getY());
     }

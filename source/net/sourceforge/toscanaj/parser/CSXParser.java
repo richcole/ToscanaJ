@@ -167,8 +167,8 @@ public class CSXParser
             }
         }
         else{
-            _Schema.addQuery(new ObjectNumberQuery("Number of Objects"));
-            _Schema.addQuery(new ObjectListQuery("List of Objects"));
+            new ObjectNumberQuery("Number of Objects");
+            new ObjectListQuery("List of Objects");
         }
     }
 
@@ -572,10 +572,8 @@ public class CSXParser
             // add default queries
             DatabaseInfo.DatabaseQuery query = dbInfo.createAggregateQuery("Number of Objects", "");
             query.insertQueryColumn("Count","0",null,"count(*)");
-            _Schema.addQuery(query);
             query = dbInfo.createListQuery("List of Objects", "", false);
             query.insertQueryColumn("Object Name", null, null, keyName);
-            _Schema.addQuery(query);
         }
         if(queryElem != null) {
             Iterator it = queryElem.getChildren("listQuery").iterator();
@@ -597,7 +595,6 @@ public class CSXParser
                     String sql = curCol.getText();
                     query.insertQueryColumn(colName, format, separator, sql);
                 }
-                _Schema.addQuery(query);
             }
             it = queryElem.getChildren("aggregateQuery").iterator();
             while(it.hasNext()) {
@@ -616,7 +613,6 @@ public class CSXParser
                     String sql = curCol.getText();
                     query.insertQueryColumn(colName, format, separator, sql);
                 }
-                _Schema.addQuery(query);
             }
         }
     }

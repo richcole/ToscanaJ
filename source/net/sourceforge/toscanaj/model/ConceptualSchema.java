@@ -46,11 +46,6 @@ public class ConceptualSchema {
     private Vector diagrams;
 
     /**
-     * The list of queries that can be made for objects.
-     */
-    private List queries = new LinkedList();
-    
-    /**
      * The XML (XHTML) describing the schema (or null if not found).
      */
     private Element description = null;
@@ -69,20 +64,6 @@ public class ConceptualSchema {
         databaseInfo = null;
         diagrams = new Vector();
         hasDiagramDescription = false;
-    }
-
-    /**
-     * Returns an iterator on the queries.
-     */
-    public Iterator getQueries() {
-        return this.queries.iterator();
-    }
-
-    /**
-     * Adds a query to the schema.
-     */
-    public void addQuery(Query query) {
-        this.queries.add(query);
     }
 
     /**
