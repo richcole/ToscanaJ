@@ -74,9 +74,8 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
 
         public HTMLDatabaseViewDialog(Frame frame, DatabaseViewerManager viewerManager)
                 throws DatabaseViewerException {
-            super(frame, "View Item", true);
+            super(frame, "View Item", false);
             this.viewerManager = viewerManager;
-			this.setModal(false);
             this.template = viewerManager.getTemplate();
 
             if (template == null) {
