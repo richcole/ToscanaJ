@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -32,7 +31,7 @@ import org.tockit.swing.preferences.ExtendedPreferences;
 public class DiagramSchema implements Comparable {
     public static ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramSchema.class);
 
-    private static TreeSet schemas = new TreeSet();
+    private static ArrayList schemas = new ArrayList();
 
     private static DiagramSchema currentSchema;
     
