@@ -104,15 +104,18 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
             addDiagram((NestedLineDiagram)diagram);
         }
         else {
-            addDiagram(diagram);
+            addDiagram(diagram, null);
         }
         repaint();
     }
 
     /**
      * Adds a simple non-nested line diagram to the canvas.
+     *
+     * If the filter concept is non-null all nodes created will use this for
+     * filter operations.
      */
-    private void addDiagram(SimpleLineDiagram diagram) {
+    private void addDiagram(SimpleLineDiagram diagram, Concept filterConcept) {
         // add all lines to the canvas
         for( int i = 0; i < diagram.getNumberOfLines(); i++ ) {
             DiagramLine dl = diagram.getLine(i);
@@ -121,13 +124,17 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         // add all nodes to the canvas
         for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
             DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node, this);
+            NodeView nodeView;
+            if(filterConcept == null) {
+                nodeView = new NodeView(node, this);
+            }
+            else {
+                nodeView = new NodeView(node, this, filterConcept);
+            }
             addCanvasItem( nodeView );
         }
         // add all labels to the canvas
         for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
-            DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node, this);
             LabelInfo attrLabelInfo = diagram.getAttributeLabel( i );
             if( attrLabelInfo != null ) {
                 LabelView labelView = new AttributeLabelView( this, attrLabelInfo );
@@ -161,7 +168,7 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         // recurse for the inner diagrams
         for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
             NestedDiagramNode node = (NestedDiagramNode)diagram.getNode(i);
-            addDiagram((SimpleLineDiagram)node.getInnerDiagram());
+            addDiagram((SimpleLineDiagram)node.getInnerDiagram(),node.getConcept());
         }
         // add all outer labels to the canvas
         for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {

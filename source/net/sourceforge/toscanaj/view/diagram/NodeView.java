@@ -67,6 +67,11 @@ public class NodeView extends CanvasItem {
     private DiagramView diagramView = null;
 
     /**
+     * The concept we want to use for filtering if the node is double-clicked.
+     */
+    private Concept filterConcept = null;
+
+    /**
      * Stores the selection state.
      *
      * @see getSelectionState()
@@ -81,6 +86,25 @@ public class NodeView extends CanvasItem {
     public NodeView(DiagramNode diagramNode, DiagramView diagramView){
         this.diagramNode = diagramNode;
         this.diagramView = diagramView;
+        this.filterConcept = diagramNode.getConcept();
+    }
+
+    /**
+     * Construct a nodeView for a Node.
+     *
+     * The DiagramView is used for the callback when a node was selected. The
+     * additional concept will be the concept returned on a double click, used
+     * instead of the concept attached to this node.
+     *
+     * This is a hack to get zooming in nested diagrams to work properly.
+     *
+     * @TODO Find a better solution, maybe allowing zooming multiple steps at
+     *       once.
+     */
+    public NodeView(DiagramNode diagramNode, DiagramView diagramView, Concept filterConcept){
+        this.diagramNode = diagramNode;
+        this.diagramView = diagramView;
+        this.filterConcept = filterConcept;
     }
 
     /**
@@ -168,10 +192,10 @@ public class NodeView extends CanvasItem {
     }
 
     /**
-     * Implements CanvasItem.doubleClicked(Point2D) and starts a zooming operation.
+     * Implements CanvasItem.doubleClicked(Point2D) and starts a filter operation.
      */
     public void doubleClicked(Point2D point) {
-        DiagramController.getController().next(diagramNode.getConcept());
+        DiagramController.getController().next(this.filterConcept);
     }
 
     /**
