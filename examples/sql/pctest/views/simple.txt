@@ -1,2 +1,2 @@
-Name:  $"PCname"$
-Price: $"price"$
+Name:  $PCname$
+Price: $price$
