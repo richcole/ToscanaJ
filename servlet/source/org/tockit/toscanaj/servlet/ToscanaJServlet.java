@@ -132,6 +132,7 @@ public class ToscanaJServlet extends HttpServlet {
                     query = (Query) conceptualSchema.getQueries().get(0);
                 }
             }
+            //out.println(diagramParameter + " " + queryParameter);
             printConceptList(diagramNumber, conceptParameter, query, diagramHistory, out);
         }
 //        else if(diagramParameter != null) {
@@ -166,61 +167,28 @@ public class ToscanaJServlet extends HttpServlet {
         out.println("<meta http-equiv=\"Expires\" content=\"0\">");
         out.println("<meta http-equiv=\"Pragma\" content=\"no-cache;\">");
 
-        out.println("<style>");
-        out.println("all.clsMenuItemNS, .clsMenuItemIE{text-decoration: none; font: bold 12px Arial; color: white; cursor: hand; z-index:100}");
-        out.println("#MainTable A:hover {color: yellow;}");
-        out.println("</style>");
-
-        out.println("<script language=\"JavaScript\">");
-
-        out.println("//Top Nav Bar I v2.1- By Constantin Kuznetsov Jr. (script@esolutiononline.com)");
-        out.println("//Modified by Dynamic Drive for NS6/Opera6 compatibility and code streamlining March 4th, 2002");
-        out.println("//Visit http://www.dynamicdrive.com for this script");
-
-        out.println("var keepstatic=1");
-        out.println("var menucolor=\"#297A01\"");
-        out.println("var submenuwidth=150");
-
-        out.println("</script>");
-
         out.println("</head><body>");
 
-        out.println("<SCRIPT LANGUAGE=\"JavaScript\" SRC=\"./javascript/menu.js\"></SCRIPT>");
+        out.println("<table bgcolor=\"#297A01\"><tr><td>");
 
-        out.println("<SCRIPT LANGUAGE=\"JavaScript\">");
-        out.println("function showToolbar()");
-        out.println("{");
-
-        out.println(" menu = new Menu();");
-        out.println(" menu.addItem(\"querytype\", \"Change Query\", \"Change Query\",  null, null);");
+        out.println("<form name=\"myForm2\" method=\"get\" action=\"" + SERVLET_URL + "\">");
+        out.println("<input type=\"hidden\" name=\"diagram\" value=\"" + diagramNumber + "\">");
+        out.println("<input type=\"hidden\" name=\"concept\" value=\"" + nodeId + "\">");
+        out.println("<select name=\"query\">");
 
         Iterator queryIterator = conceptualSchema.getQueries().iterator();
         int i = 0;
+
         while (queryIterator.hasNext()) {
             Query curQuery = (Query) queryIterator.next();
-            out.println("menu.addSubItem(\"querytype\", \"" + curQuery.getName() + "\", \"" + curQuery.getName() + "\", \"" + SERVLET_URL + "?diagram=" + diagramNumber + "&amp;concept=" + nodeId +
-                        "&amp;query=" + i + "\", \"\");");
-//            out.println("<li><a class=\"one\" href=\"" + SERVLET_URL + "?diagram=" + diagramNumber + "&amp;concept=" + nodeId +
-//                        "&amp;query=" + i + "\">" + curQuery.getName() + "</a></li>");
+            out.println("<option value=\"" + i + "\">" + curQuery.getName() + "</option>");
             i++;
         }
 
-        out.println(" menu.showMenu();");
-        out.println("}");
-        out.println("</SCRIPT>");
-
-        out.println("<script language=\"JavaScript\">");
-        out.println("showToolbar();");
-        out.println("</script>");
-        out.println("<script language=\"JavaScript\">");
-        out.println("function UpdateIt(){");
-        out.println("if (ie&&keepstatic&&!opr6)");
-        out.println("document.all[\"MainTable\"].style.top = document.body.scrollTop;");
-        out.println("setTimeout(\"UpdateIt()\", 200);");
-        out.println("}");
-        out.println("UpdateIt();");
-        out.println("</script>");
-
+        out.println("</select>");
+        out.println("<input type=\"submit\" value=\"Change Query\">");
+        out.println("</form>");
+        out.println("</td></tr></table>");
 
         out.println("<h2>Result of query '" + query.getName() + "':</h1>");
         Concept concept = getConcept(diagramNumber, nodeId);
@@ -493,61 +461,27 @@ public class ToscanaJServlet extends HttpServlet {
 //        out.println("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"./css/style.css\"><title>ToscanaJServlet</title>");
         out.println("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"./css/style.css\">");
 
-        out.println("<style>");
-        out.println("all.clsMenuItemNS, .clsMenuItemIE{text-decoration: none; font: bold 12px Arial; color: white; cursor: hand; z-index:1}");
-        out.println("embed { z-index: -100; }");
-        out.println("#MainTable A:hover {color: yellow;}");
-        out.println("</style>");
-
-        out.println("<script language=\"JavaScript\">");
-
-        out.println("//Top Nav Bar I v2.1- By Constantin Kuznetsov Jr. (script@esolutiononline.com)");
-        out.println("//Modified by Dynamic Drive for NS6/Opera6 compatibility and code streamlining March 4th, 2002");
-        out.println("//Visit http://www.dynamicdrive.com for this script");
-
-        out.println("var keepstatic=1");
-        out.println("var menucolor=\"#0B70A2\"");
-        out.println("var submenuwidth=150");
-
-        out.println("</script>");
         out.println("</head><body>");
-        out.println("<SCRIPT LANGUAGE=\"JavaScript\" SRC=\"./javascript/menu.js\"></SCRIPT>");
-
-        out.println("<SCRIPT LANGUAGE=\"JavaScript\">");
-        out.println("function showToolbar()");
-        out.println("{");
-
-        out.println(" menu = new Menu();");
-        out.println(" menu.addItem(\"listofdiagrams\", \"Display All Diagrams\", \"All Diagrams\",  null, null);");
-        out.println("var url2 = \"\";");
-        out.println("url2 += \"&x=\";");
-        out.println("url2 += screen.width;");
-        out.println("url2 += \"&y=\";");
-        out.println("url2 += screen.height;");
 
         int numberOfDiagrams = conceptualSchema.getNumberOfDiagrams();
+
+        out.println("<table bgcolor=\"#0B70A2\" width=\"2000\"><tr><td>");
+
+        out.println("<form name=\"myForm\" method=\"get\" action=\"" + SERVLET_URL + "\">");
+        out.println("<select name=\"diagram\">");
+
         for(int i = 0; i<numberOfDiagrams; i++) {
             Diagram2D diagram = conceptualSchema.getDiagram(i);
-            out.println("menu.addSubItem(\"listofdiagrams\", \"" + diagram.getTitle() + "\", \"" + diagram.getTitle() + "\", \"" + SERVLET_URL + "?diagram=" + i + "\"" + "+url2, \"_self\");");
+            out.println("<option value=\"" + i + "\">" + diagram.getTitle() + "</option>");
+//            out.println("menu.addSubItem(\"listofdiagrams\", \"" + diagram.getTitle() + "\", \"" + diagram.getTitle() + "\", \"" + SERVLET_URL + "?diagram=" + i + "\"" + "+url2, \"_self\");");
 //            out.println("menu.addSubItem(\"listofdiagrams\", \"" + diagram.getTitle() + "\", \"" + diagram.getTitle() + "\", \"" + SERVLET_URL + "?diagram=" + i + "\"" + "+url2, \"_self\");");
         }
 
+        out.println("</select>");
+        out.println("<input type=\"submit\" value=\"Show Diagram\">");
+        out.println("</form>");
+        out.println("</td></tr></table>");
 
-        out.println(" menu.showMenu();");
-        out.println("}");
-        out.println("</SCRIPT>");
-
-        out.println("<script language=\"JavaScript\">");
-        out.println("showToolbar();");
-        out.println("</script>");
-        out.println("<script language=\"JavaScript\">");
-        out.println("function UpdateIt(){");
-        out.println("if (ie&&keepstatic&&!opr6)");
-        out.println("document.all[\"MainTable\"].style.top = document.body.scrollTop;");
-        out.println("setTimeout(\"UpdateIt()\", 200);");
-        out.println("}");
-        out.println("UpdateIt();");
-        out.println("</script>");
         out.println("<br><br><center><table><tr>" +
                 "<td valign=\"center\"><embed type=\"image/svg-xml\" " +
                 "width=\"" + 1024 * 0.7 + "\" height=\"" + 768 * 0.8 + "\" pluginspace=\"http://www.adobe.com/svg/viewer/install/\" " +
@@ -576,61 +510,33 @@ public class ToscanaJServlet extends HttpServlet {
     private void printDiagramList(PrintWriter out) {
 //        out.println("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"./css/style.css\"><title>ToscanaJServlet</title>");
         out.println("<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"./css/style.css\">");
-
-        out.println("<style>");
-        out.println("all.clsMenuItemNS, .clsMenuItemIE{text-decoration: none; font: bold 12px Arial; color: white; cursor: hand; z-index:1}");
-        out.println("#MainTable A:hover {color: yellow;}");
-        out.println("</style>");
-
-        out.println("<script language=\"JavaScript\">");
-
-        out.println("//Top Nav Bar I v2.1- By Constantin Kuznetsov Jr. (script@esolutiononline.com)");
-        out.println("//Modified by Dynamic Drive for NS6/Opera6 compatibility and code streamlining March 4th, 2002");
-        out.println("//Visit http://www.dynamicdrive.com for this script");
-
-        out.println("var keepstatic=1");
-        out.println("var menucolor=\"#0B70A2\"");
-        out.println("var submenuwidth=150");
-
+        out.println("<script language=\"javascript\">");
+        out.println("function fillForm() {");
+        out.println("   myForm.x.value = screen.width;");
+        out.println("   myForm.y.value = screen.height;");
+        out.println("}");
         out.println("</script>");
         out.println("</head><body>");
-        out.println("<SCRIPT LANGUAGE=\"JavaScript\" SRC=\"./javascript/menu.js\"></SCRIPT>");
-
-        out.println("<SCRIPT LANGUAGE=\"JavaScript\">");
-        out.println("function showToolbar()");
-        out.println("{");
-
-        out.println(" menu = new Menu();");
-        out.println(" menu.addItem(\"listofdiagrams\", \"Display All Diagrams\", \"All Diagrams\",  null, null);");
-        out.println("var url2 = \"\";");
-        out.println("url2 += \"&x=\";");
-        out.println("url2 += screen.width;");
-        out.println("url2 += \"&y=\";");
-        out.println("url2 += screen.height;");
-
         int numberOfDiagrams = conceptualSchema.getNumberOfDiagrams();
+
+        out.println("<table bgcolor=\"#0B70A2\" height=\"20\" width=\"2000\"><tr><td>");
+        out.println("<form name=\"myForm\" method=\"get\" action=\"" + SERVLET_URL + "\">");
+        out.println("<select name=\"diagram\">");
+
         for(int i = 0; i<numberOfDiagrams; i++) {
             Diagram2D diagram = conceptualSchema.getDiagram(i);
-            out.println("menu.addSubItem(\"listofdiagrams\", \"" + diagram.getTitle() + "\", \"" + diagram.getTitle() + "\", \"" + SERVLET_URL + "?diagram=" + i + "\"" + "+url2, \"_self\");");
+            out.println("<option value=\"" + i + "\">" + diagram.getTitle() + "</option>");
+//            out.println("menu.addSubItem(\"listofdiagrams\", \"" + diagram.getTitle() + "\", \"" + diagram.getTitle() + "\", \"" + SERVLET_URL + "?diagram=" + i + "\"" + "+url2, \"_self\");");
 //            out.println("menu.addSubItem(\"listofdiagrams\", \"" + diagram.getTitle() + "\", \"" + diagram.getTitle() + "\", \"" + SERVLET_URL + "?diagram=" + i + "\"" + "+url2, \"_self\");");
         }
 
-
-        out.println(" menu.showMenu();");
-        out.println("}");
-        out.println("</SCRIPT>");
-
-        out.println("<script language=\"JavaScript\">");
-        out.println("showToolbar();");
-        out.println("</script>");
-        out.println("<script language=\"JavaScript\">");
-        out.println("function UpdateIt(){");
-        out.println("if (ie&&keepstatic&&!opr6)");
-        out.println("document.all[\"MainTable\"].style.top = document.body.scrollTop;");
-        out.println("setTimeout(\"UpdateIt()\", 200);");
-        out.println("}");
-        out.println("UpdateIt();");
-        out.println("</script>");
+        out.println("</select>");
+        out.println("<input type=\"hidden\" name=\"x\">");
+        out.println("<input type=\"hidden\" name=\"y\">");
+        out.println("<input type=\"submit\" value=\"Show Diagram\">");
+        out.println("</form>");
+        out.println("<script language=\"javascript\">fillForm();</script>");
+        out.println("</td></tr></table>");
         out.println("<br><br><center><table><tr><td align=\"center\" width=\"75\" height=\"400\"></td>" +
                 "<td valign=\"center\"><embed type=\"image/svg-xml\" " +
                 "width=\"350\" height=\"200\" pluginspace=\"http://www.adobe.com/svg/viewer/install/\" " +
