@@ -7,13 +7,16 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import org.tockit.canvas.CanvasItem;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.text.DecimalFormat;
 
 /**
  * Draws a line between two points, representing a DiagramLine in the model.
@@ -26,6 +29,8 @@ public class LineView extends CanvasItem {
 
     private NodeView fromView;
     private NodeView toView;
+    
+    private boolean showRatios;
 
     /**
      * Creates a view for the given DiagramLine.
@@ -34,6 +39,7 @@ public class LineView extends CanvasItem {
         this.diagramLine = diagramLine;
         this.fromView = fromView;
         this.toView = toView;
+        this.showRatios = (ConfigurationManager.fetchInt("LineView", "showExtentRatios", 0) == 1);
     }
 
     /**
@@ -65,6 +71,36 @@ public class LineView extends CanvasItem {
         graphics.draw(new Line2D.Double(from, to));
         graphics.setPaint(oldPaint);
         graphics.setStroke(oldStroke);
+        
+        if(this.showRatios) {
+            drawExtentRatio(graphics);
+        }
+    }
+
+    private void drawExtentRatio(Graphics2D graphics) {
+        Font oldFont = graphics.getFont();
+        AffineTransform oldTransform = graphics.getTransform();
+
+		Point2D from = diagramLine.getFromPosition();
+		Point2D to = diagramLine.getToPosition();
+        int startExtent = this.fromView.getDiagramNode().getConcept().getExtentSize();
+        int endExtent   = this.toView.  getDiagramNode().getConcept().getExtentSize();
+        double ratioInPercent = (double)endExtent / (double)startExtent;
+
+		DecimalFormat format = new DecimalFormat("#.## %");
+		String formattedNumber = format.format(ratioInPercent);
+        double x = (from.getX() + to.getX()) / 2; 
+        double y = (from.getY() + to.getY()) / 2;
+        
+        Font font = fromView.getDiagramView().getFont();
+        graphics.setFont(font);
+		graphics.transform(AffineTransform.getTranslateInstance(x,y));
+		graphics.transform(AffineTransform.getRotateInstance(Math.atan2(to.getY() - from.getY(), to.getX() - from.getX())));
+		double xOffset = -font.getStringBounds(formattedNumber, graphics.getFontRenderContext()).getCenterX();
+        graphics.drawString(formattedNumber, (float)xOffset, -1);
+
+        graphics.setFont(oldFont); 
+        graphics.setTransform(oldTransform);
     }
 
     /**

@@ -197,13 +197,13 @@ public class ToscanaJServlet extends HttpServlet {
 
         out.println("<h2>Result of query '" + query.getName() + "':</h1>");
         Concept concept = getConcept(diagramNumber, nodeId);
-        Iterator objIterator = conceptInterpreter.executeQuery(query,
-                                                    concept,
-                                                    new ConceptInterpretationContext(diagramHistory,new EventBroker())).iterator();
         out.println("<ul>");
-        while (objIterator.hasNext()) {
-            String object = objIterator.next().toString();
-            out.println("<li>" + object + "</li>");
+		Object[] contents = conceptInterpreter.executeQuery(query,
+													concept,
+													new ConceptInterpretationContext(diagramHistory,new EventBroker()));
+		for (int j = 0; j < contents.length; j++) {
+			String object = contents[i].toString();
+			out.println("<li>" + object + "</li>");
         }
         out.println("</ul>");
 //        out.println("<h2>Change query:</h2>");
