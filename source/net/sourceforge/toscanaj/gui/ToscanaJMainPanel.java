@@ -471,9 +471,9 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         this.showAllMenuItem.addActionListener(this);
         documentsDisplayGroup.add(this.showAllMenuItem);
         viewMenu.add(this.showAllMenuItem);
-        viewMenu.addSeparator();
 
         if (ConfigurationManager.fetchInt("ToscanaJMainPanel", "offerGradientOptions", 0) == 1) {
+            viewMenu.addSeparator();
             ButtonGroup colorGradientGroup = new ButtonGroup();
             JRadioButtonMenuItem showAllMenuItem = new JRadioButtonMenuItem("Use colors for exact matches");
             showAllMenuItem.setMnemonic(KeyEvent.VK_C);
