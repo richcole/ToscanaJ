@@ -67,6 +67,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListen
     private DatabaseSchemaView databaseSchemaView;
     private ScaleEditingView scaleView;
     private DiagramEditingView diagramView;
+    private DatabaseConnectionInformationView connectionInformationView;
 
     public class PrepareToSaveActivity implements SimpleActivity {
 
@@ -113,7 +114,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListen
         mainView = new PanelStackView(this);
         mainView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "mainPanelDivider", 200));
 
-        DatabaseConnectionInformationView connectionInformationView =
+        connectionInformationView =
                 new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);
 
         databaseSchemaView = new DatabaseSchemaView(this, eventBroker);
@@ -131,7 +132,6 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListen
         diagramView = new DiagramEditingView(this, conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "diagramViewDivider", 200));
 
-        mainView.addView("Connection", connectionInformationView);
         mainView.addView("Tables", databaseSchemaView);
         mainView.addView("Scales", scaleView);
         mainView.addView("Diagrams", diagramView);
@@ -149,13 +149,6 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListen
         fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(fileMenu);
-
-        // --- help menu ---
-        // create a help menu
-        helpMenu = new JMenu("Help");
-        helpMenu.setMnemonic(KeyEvent.VK_H);
-        menuBar.add(Box.createHorizontalGlue());
-        menuBar.add(helpMenu);
 
         SimpleAction newAction = new SimpleAction(
                 this,
@@ -204,6 +197,14 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListen
 //        saveActivity.setPrepareActivity(new PrepareToSaveActivity());
         fileMenu.add(saveMenuItem);
 
+        JMenuItem dbConnectionMenuItem = new JMenuItem("Database connection...");
+        dbConnectionMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                connectionInformationView.show();
+            }
+        });
+        fileMenu.add(dbConnectionMenuItem);
+
         mruMenu = new JMenu("Reopen");
         recreateMruMenu();
         fileMenu.add(mruMenu);
@@ -224,6 +225,13 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListen
                 )
         );
         fileMenu.add(exitMenuItem);
+
+        // --- help menu ---
+        // create a help menu
+        helpMenu = new JMenu("Help");
+        helpMenu.setMnemonic(KeyEvent.VK_H);
+        menuBar.add(Box.createHorizontalGlue());
+        menuBar.add(helpMenu);
     }
 
     private void openSchemaFile(File schemaFile) {

@@ -1,5 +1,3 @@
-package net.sourceforge.toscanaj.view.database;
-
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
  * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
@@ -7,8 +5,10 @@ package net.sourceforge.toscanaj.view.database;
  *
  * $Id$
  */
+package net.sourceforge.toscanaj.view.database;
 
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
@@ -20,11 +20,13 @@ import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
- * @todo this should be a dialog since it will be rarely used
+ * @todo the buttons are stupid, there should be a cancel button and an ok button, maybe "apply" as third
  */
-public class DatabaseConnectionInformationView extends JPanel implements EventListener {
+public class DatabaseConnectionInformationView extends JDialog implements EventListener {
     protected DatabaseInfo info;
 
     private DatabaseConnectEvent databaseConnectEvent;
@@ -45,11 +47,10 @@ public class DatabaseConnectionInformationView extends JPanel implements EventLi
      * Construct an instance of this view
      */
     public DatabaseConnectionInformationView(JFrame frame, DatabaseInfo databaseInfo, EventBroker eventBroker) {
-        super();
-        setLayout(new BorderLayout());
+        super(frame, "Database connection");
+        Container contentPane = this.getContentPane();
+        contentPane.setLayout(new BorderLayout());
         this.info = databaseInfo;
-
-        setName("DatabaseConnectionInformationView");
 
         JLabel urlLabel = new JLabel("Url:");
         JLabel driverLabel = new JLabel("Driver:");
@@ -68,7 +69,14 @@ public class DatabaseConnectionInformationView extends JPanel implements EventLi
         action.add(new EmitEventActivity(eventBroker, databaseConnectEvent));
         connectButton.setAction(action);
 
-        JPanel buttonPane = new JPanel(new BorderLayout());
+        JButton closeButton = new JButton("Close Dialog");
+        closeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                hide();
+            }
+        });
+
+        JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JPanel pane = new JPanel(new GridLayout(0, 2));
 
         pane.add(urlLabel);
@@ -80,10 +88,14 @@ public class DatabaseConnectionInformationView extends JPanel implements EventLi
         pane.add(passwordLabel);
         pane.add(passwordField);
 
-        buttonPane.add(connectButton, BorderLayout.EAST);
+        buttonPane.add(connectButton);
+        buttonPane.add(closeButton);
 
-        add(pane, BorderLayout.CENTER);
-        add(buttonPane, BorderLayout.SOUTH);
+        contentPane.add(pane, BorderLayout.CENTER);
+        contentPane.add(buttonPane, BorderLayout.SOUTH);
+
+        ConfigurationManager.restorePlacement("DatabaseConnectionInformationView", this,
+                                              new Rectangle(100,100,300,200));
 
         eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class);
     }
@@ -127,5 +139,10 @@ public class DatabaseConnectionInformationView extends JPanel implements EventLi
 
     public void setInfo(DatabaseInfo info) {
         copyToControls(info);
+    }
+
+    public void hide() {
+        super.hide();
+        ConfigurationManager.storePlacement("DatabaseConnectionInformationView", this);
     }
 }
