@@ -8,10 +8,9 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.model.ContextImplementation;
 
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 import java.awt.*;
 
 public class ContextTableScaleEditorDialog extends JDialog {
@@ -20,6 +19,8 @@ public class ContextTableScaleEditorDialog extends JDialog {
     private DatabaseConnection databaseConnection;
 
     private JTextField scaleTitleField;
+    
+    private JPanel buttonsPanel;
 
     public ContextTableScaleEditorDialog(Frame owner, DatabaseConnection databaseConnection) {
         super(owner);
@@ -36,6 +37,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
         JPanel titlePane = new JPanel(new GridBagLayout());
         JLabel titleLabel = new JLabel("Title:");
         this.scaleTitleField = new JTextField();
+        
         titlePane.add(
                 titleLabel,
                 new GridBagConstraints(
@@ -57,23 +59,35 @@ public class ContextTableScaleEditorDialog extends JDialog {
                 )
         );
 
-        TableModel dataModel = new AbstractTableModel() {
-            public int getColumnCount() {
-                return 10;
-            }
+		ContextImplementation context = new ContextImplementation();
+		String o1 = "one";
+		String o2 = "two";
+		String o3 = "three";
+		String o4 = "four";
+		String a1 = "Aone";
+		String a2 = "Atwo";
+		String a3 = "Athree alsfdjsa dlfj sadlkdjg salgdkj jkhsf";
 
-            public int getRowCount() {
-                return 10;
-            }
+		context.getObjects().add(o1);
+		context.getObjects().add(o2);
+		context.getObjects().add(o3);
+		context.getObjects().add(o4);
 
-            public Object getValueAt(int row, int col) {
-                return new Integer(row * col);
-            }
-        };
-        JTable table = new JTable(dataModel);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        JScrollPane scrollpane = new JScrollPane(table);
+		context.getAttributes().add(a1);
+		context.getAttributes().add(a2);
+		context.getAttributes().add(a3);
+		
+		context.getRelationImplementation().insert(o1,a1);
+		context.getRelationImplementation().insert(o1,a2);
+		context.getRelationImplementation().insert(o2,a2);
+		context.getRelationImplementation().insert(o3,a3);
+		context.getRelationImplementation().insert(o4,a3);
 
+		ContextTableView tableView = new ContextTableView(context);
+        JScrollPane scrollpane = new JScrollPane(tableView);
+		
+		createButtonsPanel();
+		
         getContentPane().add(
                 titlePane,
                 new GridBagConstraints(
@@ -94,10 +108,68 @@ public class ContextTableScaleEditorDialog extends JDialog {
                         0, 0
                 )
         );
-
+		getContentPane().add(
+				buttonsPanel,
+				new GridBagConstraints(
+						0, 2, 1, 1, 1, 1,
+						GridBagConstraints.CENTER,
+						GridBagConstraints.BOTH,
+						new Insets(5, 5, 5, 5),
+						0, 0
+				)
+		);
         pack();
     }
-
+	
+	private void createButtonsPanel(){
+		buttonsPanel = new JPanel(new GridBagLayout());
+		JButton addObj = new JButton("  Add Object ");	
+		JButton addAttr = new JButton("  Add Attribute ");
+		JButton cancel= new JButton("  Cancel ");
+		JButton create = new JButton("  Create ");
+				
+		buttonsPanel.add(
+			   addObj,
+			   new GridBagConstraints(
+					   0, 0, 1, 1, 1, 0,
+					   GridBagConstraints.WEST,
+					   GridBagConstraints.HORIZONTAL,
+					   new Insets(0, 5, 5, 5),
+					   0, 0
+			   )
+	   );
+	   buttonsPanel.add(
+			   addAttr,
+			   new GridBagConstraints(
+					   1, 0, 1, 1, 1, 0,
+					   GridBagConstraints.WEST,
+					   GridBagConstraints.BOTH,
+					   new Insets(0, 5, 5, 5),
+					   0, 0
+			   )
+	   );
+	   buttonsPanel.add(
+			  cancel,
+			  new GridBagConstraints(
+					  2, 0, 1, 1, 1, 0,
+					  GridBagConstraints.EAST,
+					  GridBagConstraints.HORIZONTAL,
+					  new Insets(0, 5, 5, 5),
+					  0, 0
+			  )
+	  );
+	  buttonsPanel.add(
+			  create,
+			  new GridBagConstraints(
+					  3, 0, 1, 1, 1, 0,
+					  GridBagConstraints.EAST,
+					  GridBagConstraints.BOTH,
+					  new Insets(0, 5, 5, 5),
+					  0, 0
+			  )
+	  );	   
+	}
+	
     public boolean execute() {
         result = false;
         show();

@@ -7,16 +7,13 @@
  */
 package net.sourceforge.toscanaj.model;
 
-import net.sourceforge.toscanaj.model.BinaryRelation;
-import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
-import net.sourceforge.toscanaj.model.Context;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 
 public class ContextImplementation implements Context {
-    private Collection objects = new HashSet();
-    private Collection attributes = new HashSet();
+    private Collection objects = new ArrayList();
+    private Collection attributes = new ArrayList();
     private BinaryRelationImplementation relation = new BinaryRelationImplementation();
 
     public ContextImplementation() {
