@@ -26,13 +26,12 @@ import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
+import org.jdom.input.DOMBuilder;
 import org.tockit.events.EventBroker;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
@@ -99,12 +98,8 @@ public class CSXParser {
             File csxFile)
             throws FileNotFoundException, IOException, DataFormatException, Exception {
         try {
-	        // open stream on file
-	        FileInputStream in;
-	        in = new FileInputStream(csxFile);
-	
-	        SAXBuilder parser = new SAXBuilder();
-	        _Document = parser.build(in);
+	        DOMBuilder parser = new DOMBuilder();
+	        _Document = parser.build(csxFile);
 	
 	        _BaseURL = csxFile.toURL();
 	        DatabaseInfo.baseURL = _BaseURL;
