@@ -135,7 +135,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
 	        for (Iterator iterator = queries.iterator(); iterator.hasNext();) {
 	            Query query = (Query) iterator.next();
 	            if(query != ListQuery.KEY_LIST_QUERY && 
-	            				query != AggregateQuery.COUNT_QUERY) {
+	            				query != AggregateQuery.COUNT_QUERY &&
+	            				query != AggregateQuery.PERCENT_QUERY ) {
 	            	queriesElement.addContent(query.toXML());
 	            }
 	        }
