@@ -44,7 +44,7 @@ public class DiagramReference {
         return this.filterConcept;
     }
 
-    public void setZoomedConcept(Concept filterConcept) {
+    public void setFilterConcept(Concept filterConcept) {
         this.filterConcept = filterConcept;
     }
 
@@ -53,5 +53,23 @@ public class DiagramReference {
      */
     public String toString() {
         return diagram.getTitle();
+    }
+    
+    public boolean equals(Object other) {
+        if(other.getClass() != this.getClass()) {
+        	return false;
+        }
+        DiagramReference otherReference = (DiagramReference) other;
+		if(otherReference.diagram != this.diagram) {
+			return false;
+		}
+		if(otherReference.filterConcept != this.filterConcept) {
+			return false;
+		}
+        return true;
+    }
+    
+    public int hashCode() {
+    	return diagram.hashCode() + 47*filterConcept.hashCode();
     }
 }

@@ -255,7 +255,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         if (!canPerformNext()) {
             throw new RuntimeException("No next diagram to go to");
         }
-        getReferenceAt(currStartPosition).setZoomedConcept(zoomedConcept);
+        getReferenceAt(currStartPosition).setFilterConcept(zoomedConcept);
         if (shouldChangeCurrentStartDiagram()) {
             currStartPosition++;
         }

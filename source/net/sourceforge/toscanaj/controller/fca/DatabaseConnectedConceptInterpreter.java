@@ -372,4 +372,8 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     public int getExtentSize(Concept concept, ConceptInterpretationContext context) {
         return getCount(concept, context, ConceptInterpretationContext.EXTENT);
     }
+
+	public void clearCache() {
+		this.contingentSizes.clear();
+	}
 }

@@ -31,6 +31,7 @@ import org.jdom.Element;
 import org.tockit.canvas.CanvasBackground;
 import org.tockit.canvas.events.CanvasItemActivatedEvent;
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
+import org.tockit.canvas.events.CanvasItemEvent;
 import org.tockit.canvas.events.CanvasItemSelectedEvent;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.events.Event;
@@ -326,13 +327,52 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         this.diagramPreview.setMinimumFontSize(8.0);
         this.diagramPreview.setMinimumSize(minimumSize);
         
+        /// @todo clean/restructure/outsource some of this if we keep it
         broker.subscribe(new EventBrokerListener() {
+			class FilterChangeHandler implements EventBrokerListener {
+				private DiagramReference diagramReference;
+				FilterChangeHandler(DiagramReference diagramReference) {
+					this.diagramReference = diagramReference;
+				}
+				public void processEvent(Event e) {
+					CanvasItemEvent itemEvent = null;
+					try {
+						itemEvent = (CanvasItemEvent) e;
+					} catch (ClassCastException e1) {
+						throw new RuntimeException(getClass().getName() +
+								" has to be subscribed to CanvasItemEvents only");
+					}
+					NodeView nodeView = null;
+					try {
+						nodeView = (NodeView) itemEvent.getItem();
+					} catch (ClassCastException e1) {
+						throw new RuntimeException(getClass().getName() +
+								" has to be subscribed to events from NodeViews only");
+					}
+					diagramPreview.setSelectedConcepts(nodeView.getDiagramNode().getConceptNestingList());
+					this.diagramReference.setFilterConcept(nodeView.getDiagramNode().getConcept());
+					/// @todo evil hack, creates weird dependencies
+					if(diagramView.getConceptInterpreter() instanceof DatabaseConnectedConceptInterpreter) {
+						DatabaseConnectedConceptInterpreter dbint = 
+									(DatabaseConnectedConceptInterpreter) diagramView.getConceptInterpreter();
+						dbint.clearCache();
+					} 
+					diagramView.showDiagram(diagramView.getDiagram());
+				}
+			}
+			FilterChangeHandler selectionListener;
 			public void processEvent(Event e) {
 				DiagramReference diagramReference = ((DiagramClickedEvent)e).getDiagramReference();
 				diagramPreview.showDiagram(diagramReference.getDiagram());
 				Concept zoomedConcept = diagramReference.getFilterConcept();
+				EventBroker canvasBroker = diagramPreview.getController().getEventBroker();
+				if(selectionListener != null) {
+					canvasBroker.removeSubscriptions(selectionListener);
+				}
 				if(zoomedConcept != null) {
-					diagramPreview.setSelectedConcepts(new Concept[]{zoomedConcept});				
+					diagramPreview.setSelectedConcepts(new Concept[]{zoomedConcept});
+					selectionListener = new FilterChangeHandler(diagramReference);
+					canvasBroker.subscribe(selectionListener,CanvasItemSelectedEvent.class,NodeView.class);
 				}
 			}
 		}, DiagramClickedEvent.class, DiagramReference.class);
