@@ -499,6 +499,11 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 
 	/**
 	  * To display the dialog asking for the object or attribute input name
+	  * 
+	  * @todo write custom dialog for this to avoid internationalization
+	  * problem (JOptionPane buttons do get translated in JDKs), to get rid of
+	  * the cancel button and to control the setEnabled() state of the buttons.
+	  * 
 	  * @param title The title of the dialog
 	  * @param thingToAdd The string of the element to be added, either an
 	  * "object" or "attribute" during renaming or the title during creation.
