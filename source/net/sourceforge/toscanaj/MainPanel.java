@@ -88,6 +88,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      */
     private JSplitPane splitPane = null;
 
+    /**
+     * Stores the divider position when the diagram organizer is hidden.
+     */
+    private int dividerPosition = 0;
+
     // buttons list
     private JButton openButton = null;
     private JButton backButton = null;
@@ -667,6 +672,18 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         if (e.getKeyChar() == '1') {
             this.nestingLevel1MenuItem.setSelected(true);
             DiagramController.getController().setNestingLevel(1);
+        }
+        if (e.getKeyChar() == 'o') {
+            // divider location starts with 1 on Windows, we give some more to be sure
+            if(this.splitPane.getDividerLocation() > 5) {
+                this.dividerPosition = this.splitPane.getDividerLocation();
+                this.splitPane.setDividerLocation(0);
+                // this ensures that the toggle button on the divider still can be used
+                this.splitPane.setLastDividerLocation(this.dividerPosition);
+            }
+            else {
+                this.splitPane.setDividerLocation(this.dividerPosition);
+            }
         }
         if (e.getKeyChar() == 's') {
             if(this.showAllMenuItem.isSelected()) {
