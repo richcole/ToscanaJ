@@ -11,12 +11,15 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import org.tockit.swing.preferences.ExtendedPreferences;
+import org.tockit.util.ListSet;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
+import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.WritableFCAElement;
+import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 
 import java.awt.*;
@@ -205,17 +208,30 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 	public Context createContext() {
 		ContextImplementation firstContext = 
 						(ContextImplementation) this.leftPanel.createContext("left");
-		extendAttributeNames(firstContext.getAttributes(), leftPanel.getColumn().getDisplayName());
-		Context secondContext = this.rightPanel.createContext("right");
-		extendAttributeNames(secondContext.getAttributes(), rightPanel.getColumn().getDisplayName());
+		extendAttributeNames(firstContext, leftPanel.getColumn().getDisplayName());
+		ContextImplementation secondContext =
+                        (ContextImplementation) this.rightPanel.createContext("right");
+		extendAttributeNames(secondContext, rightPanel.getColumn().getDisplayName());
 		return firstContext.createProduct(secondContext, this.titleEditor.getText());
 	}
 	
-	private void extendAttributeNames(Collection attributes, String colName) {
+	private void extendAttributeNames(ContextImplementation context, String colName) {
+        Collection objects = context.getObjects();
+        ListSet attributes = context.getAttributeList();
+        BinaryRelationImplementation relation = context.getRelationImplementation();
 		Iterator it = attributes.iterator();
 		while (it.hasNext()) {
-            WritableFCAElement attribute = (WritableFCAElement) it.next();
-			attribute.setData(colName + " " + attribute.toString());
+            FCAElement attribute = (FCAElement) it.next();
+            FCAElementImplementation newAttribute = 
+                        new FCAElementImplementation(colName + " " + attribute.toString());
+            for (Iterator iter = objects.iterator(); iter.hasNext(); ) {
+                FCAElement object = (FCAElement) iter.next();
+                if(relation.contains(object, attribute)) {
+                    relation.remove(object, attribute);
+                    relation.insert(object, newAttribute);
+                }
+            }
+            attributes.set(attributes.indexOf(attribute), newAttribute);
 		}
 	}
 
