@@ -61,11 +61,13 @@ public class DiagramEditingView extends JPanel implements EventListener {
         JPanel diagramViewPanel = new JPanel(new BorderLayout());
 
         diagramView = new DiagramView();
+        EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
         DirectConceptInterpreter interpreter = new DirectConceptInterpreter();
         ConceptInterpretationContext interpretationContext =
-                    new ConceptInterpretationContext(new DiagramHistory(),diagramView.getController().getEventBroker());
+                    new ConceptInterpretationContext(new DiagramHistory(),canvasEventBroker);
         diagramView.setConceptInterpreter(interpreter);
         diagramView.setConceptInterpretationContext(interpretationContext);
+        new LabelDragEventHandler(canvasEventBroker);
 
         JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         createMovementManipulators(toolPanel);
