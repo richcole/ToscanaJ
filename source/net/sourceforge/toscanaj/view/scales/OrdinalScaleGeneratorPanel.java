@@ -306,7 +306,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 			} else {
 				int min = this.connection.queryInt(minQu,1);
 				int max = this.connection.queryInt(maxQu,1);
-				int avg = this.connection.queryInt(avgQu,1);
+				double avg = this.connection.queryDouble(avgQu,1);
 				this.minLabel.setText("Min: "+createFormattedNumberString(min));
 				this.maxLabel.setText("Max: "+createFormattedNumberString(max));
 				this.avgLabel.setText("Average: "+ createFormattedNumberString(avg));
