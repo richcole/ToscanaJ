@@ -27,7 +27,11 @@ public class TableColumnPair {
         return column;
     }
 
-    public String toString() {
-        return table.getDisplayName() + "." + column.getDisplayName();
-    }
+	public String getSqlExpression() {
+		return table.getSqlExpression() + "." + column.getSqlExpression();
+	}
+
+	public String toString() {
+		return table.getDisplayName() + "." + column.getDisplayName();
+	}
 }

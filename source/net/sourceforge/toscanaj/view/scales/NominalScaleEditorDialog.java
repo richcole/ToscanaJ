@@ -87,9 +87,9 @@ public class NominalScaleEditorDialog extends JDialog {
         }
         public String getSqlClause() {
         	if(tableColumnPair.getColumn().getType() == Types.VARCHAR) {
-            	return this.tableColumnPair.toString() + " = '" + this.value + "'";
+            	return this.tableColumnPair.getSqlExpression() + " = '" + this.value + "'";
         	} else {
-				return this.tableColumnPair.toString() + " = " + this.value;
+				return this.tableColumnPair.getSqlExpression() + " = " + this.value;
         	}
         }
         public String getClosedAttributeLabel() {
