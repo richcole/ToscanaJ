@@ -92,12 +92,12 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     public ElbaMainPanel() {
         super("Elba");
 
-        eventBroker = new EventBroker();
-        conceptualSchema = new ConceptualSchema(eventBroker);
-        databaseConnection = new DatabaseConnection(eventBroker);
+        this.eventBroker = new EventBroker();
+        this.conceptualSchema = new ConceptualSchema(eventBroker);
+        this.databaseConnection = new DatabaseConnection(eventBroker);
 
-        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
-        eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class);
+        this.eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+        this.eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class);
 
         createViews();
 
