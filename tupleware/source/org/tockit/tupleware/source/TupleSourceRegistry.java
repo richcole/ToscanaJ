@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.tockit.tupleware.source.cli.CommandLineSource;
 import org.tockit.tupleware.source.sql.SqlQueryEngine;
 import org.tockit.tupleware.source.text.TextSource;
 
@@ -20,8 +21,9 @@ public class TupleSourceRegistry {
 	private static List tupleSources = new ArrayList();
 	
 	static {
-		registerTupleSource( new TextSource());
-		registerTupleSource( new SqlQueryEngine());
+		registerTupleSource(new TextSource());
+		registerTupleSource(new SqlQueryEngine());
+        registerTupleSource(new CommandLineSource());
 	}
 	
 	private TupleSourceRegistry() {
