@@ -32,6 +32,8 @@ public class DatabaseInfo
     private String userName = null;
 
     private String password = null;
+    
+    private String embeddedSQLLocation = null;
 
     public static abstract class DatabaseQuery extends Query {
         public class Column {
@@ -255,6 +257,14 @@ public class DatabaseInfo
     
     public String getKey() {
         return this.objectKey;
+    }
+
+    public void setEmbeddedSQLLocation( String location ) {
+        this.embeddedSQLLocation = location;
+    }
+    
+    public String getEmbeddedSQLLocation() {
+        return this.embeddedSQLLocation;
     }
 
     /**

@@ -24,10 +24,8 @@ import org.jdom.input.DOMBuilder;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -150,6 +148,17 @@ public class CSXParser
                     parseDBInfo(dbInfo, dbElem);
                     /// @TODO Shouldn't this be in the main panel?
                     _DatabaseConnection = new DBConnection(dbInfo.getSource(), dbInfo.getUserName(), dbInfo.getPassword());
+                    String urlString = dbInfo.getEmbeddedSQLLocation();
+                    if(urlString != null) {
+                        URL sqlURL;
+                        try {
+                            sqlURL = new URL(_BaseURL, urlString);
+                        }
+                        catch( MalformedURLException e ) {
+                            throw new DataFormatException("Could not create URL for database: " + urlString);
+                        }
+                        _DatabaseConnection.executeScript(sqlURL);
+                    }
                     _Schema.setDatabaseInfo(dbInfo);
                     Element viewsElem = dbElem.getChild("views");
                     if( viewsElem != null ) {
@@ -534,12 +543,35 @@ public class CSXParser
     {
         // try to find the different possible information
         Element urlElem = dbElement.getChild("url");
-        if( urlElem == null ) {
-            throw new DataFormatException("<url> expected in <databaseConnection> element.");
+        Element embedElem = dbElement.getChild("embed");
+        if( (urlElem == null) && (embedElem == null) ) {
+            throw new DataFormatException("Either <url> or <embed> expected in <databaseConnection> element.");
+        }
+        if( (urlElem != null) && (embedElem != null) ) {
+            throw new DataFormatException("Only one of <url> and <embed> expected in <databaseConnection> element.");
+        }
+        
+        String url;
+        String driver;
+        String username;
+        String password;
+        String embeddedDB;
+        if( urlElem != null ) {
+            url = urlElem.getText();
+            driver = urlElem.getAttributeValue("driver");
+            username = urlElem.getAttributeValue("user");
+            password = urlElem.getAttributeValue("password");
+            embeddedDB = null;
+        }
+        else {
+            url = "jdbc:hsqldb:.";
+            driver = "org.hsqldb.jdbcDriver";
+            username = "sa";
+            password = "";
+            embeddedDB = embedElem.getAttributeValue("url");
         }
 
-        dbInfo.setUrl(urlElem.getText());
-        String driver = urlElem.getAttributeValue("driver");
+        dbInfo.setUrl(url);
         if( driver != null ) {
             // try to load the driver
             try {
@@ -550,18 +582,19 @@ public class CSXParser
                                 driver + "\" as database driver.");
             }
         }
-        dbInfo.setUserName(urlElem.getAttributeValue("user"));
-        dbInfo.setPassword(urlElem.getAttributeValue("password"));
-
+        dbInfo.setUserName(username);
+        dbInfo.setPassword(password);
+        dbInfo.setEmbeddedSQLLocation(embeddedDB);
+        
         // let's try to find the query
         Element elem = dbElement.getChild("table");
         if( elem == null ) {
-            throw new DataFormatException("No <table> given for <databaseConenction>");
+            throw new DataFormatException("No <table> given for <databaseConnection>");
         }
         dbInfo.setTableName( elem.getText() );
         elem = dbElement.getChild("key");
         if( elem == null ) {
-            throw new DataFormatException("<table> but not <key> given in <databaseConenction> element");
+            throw new DataFormatException("<table> but not <key> given in <databaseConnection> element");
         }
         String keyName = elem.getText();
         dbInfo.setKey(keyName);

@@ -3,8 +3,8 @@ package net.sourceforge.toscanaj.controller.db;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
+import java.net.URL;
 import java.sql.*;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -89,6 +89,35 @@ public class DBConnection
         return connection;
     }
 
+    /**
+     * Loads an SQL script into the database.
+     */
+    public void executeScript(URL sqlURL) throws DatabaseException {
+        String sqlCommand = "";
+        try {
+            BufferedReader in = new BufferedReader(
+                                    new InputStreamReader(sqlURL.openStream()));
+            String inputLine;
+            while( (inputLine = in.readLine()) != null ) {
+                sqlCommand += inputLine;
+            }
+        }
+        catch( Exception e ) {
+            throw new DatabaseException("Could not read SQL script.", e);
+        }
+        // submit the SQL
+        Statement stmt;
+        try {
+            stmt = con.createStatement();
+            printLogMessage(System.currentTimeMillis() + ": Submitting script: " + sqlURL.toString());
+            stmt.execute(sqlCommand);
+            printLogMessage(System.currentTimeMillis() + ": done.");
+        }
+        catch( SQLException se ) {
+            throw new DatabaseException("An error occured while processing the DB script.", se);
+        }
+    }
+    
     /**
      * Retrieves a specific column from a query as a list of strings.
      */
