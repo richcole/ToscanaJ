@@ -2,6 +2,7 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
+import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
@@ -120,26 +121,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
             }
         });
 
-        JPanel listViewPane = new JPanel();
-        listViewPane.setLayout(new GridBagLayout());
-        listViewPane.add(new JLabel("Diagrams:"),
-                new GridBagConstraints(
-                        0, 0, 1, 1, 1.0, 0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.HORIZONTAL,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
-        listViewPane.add(new JScrollPane(listView),
-                new GridBagConstraints(
-                        0, 1, 1, 1, 1.0, 1.0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.BOTH,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
-
-        return listViewPane;
+        return new LabeledScrollPaneView("Diagrams:", listView);
     }
 
     private void showDiagram(int index) {

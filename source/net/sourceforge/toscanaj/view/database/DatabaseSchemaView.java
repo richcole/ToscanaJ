@@ -9,6 +9,7 @@
 package net.sourceforge.toscanaj.view.database;
 
 import net.sourceforge.toscanaj.gui.PanelStackView;
+import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
 import net.sourceforge.toscanaj.model.events.TableChangedEvent;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
@@ -157,12 +158,6 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
 
     public DatabaseSchemaView(JFrame frame, EventBroker broker) {
         super(new GridLayout(0, 1));
-        JPanel leftPane = new JPanel(new GridBagLayout());
-        JPanel rightPane = new JPanel(new GridBagLayout());
-
-        JScrollPane leftTopPane = new JScrollPane();
-        JScrollPane leftBottomPane = new JScrollPane();
-        JScrollPane rightTopPane = new JScrollPane();
 
         this.unkeyedTableList = new DefaultListModel();
         this.keyedTableList = new DefaultListModel();
@@ -180,13 +175,8 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
                 new ColumnSelectionListener()
         );
 
-        leftTopPane.getViewport().add(unkeyedTableListPanel, null);
-        leftBottomPane.getViewport().add(keyedTableListPanel, null);
-        rightTopPane.getViewport().add(columnsPanel, null);
-
-        // --- Left Pane ---
-
-        leftPane.add(new JLabel("Available Tables:"),
+        JPanel lowerLeftPane = new JPanel(new GridBagLayout());
+        lowerLeftPane.add(new JLabel("Selected Tables:"),
                 new GridBagConstraints(
                         0, 0, 1, 1, 1.0, 0,
                         GridBagConstraints.CENTER,
@@ -194,25 +184,9 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
                         new Insets(5, 5, 5, 5),
                         5, 5)
         );
-        leftPane.add(leftTopPane,
+        lowerLeftPane.add(keyedTableListPanel,
                 new GridBagConstraints(
                         0, 1, 1, 1, 1.0, 1.0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.BOTH,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
-        leftPane.add(new JLabel("Selected Tables:"),
-                new GridBagConstraints(
-                        0, 2, 1, 1, 1.0, 0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.HORIZONTAL,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
-        leftPane.add(leftBottomPane,
-                new GridBagConstraints(
-                        0, 3, 1, 1, 1.0, 1.0,
                         GridBagConstraints.CENTER,
                         GridBagConstraints.BOTH,
                         new Insets(5, 5, 5, 5),
@@ -220,36 +194,25 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
         );
 
         this.removeTableAction = new RemoveTableKeyAction("Remove Selected Table");
-        leftPane.add(new JButton(removeTableAction),
+        lowerLeftPane.add(new JButton(removeTableAction),
                 new GridBagConstraints(
-                        0, 4, 1, 1, 1.0, 1.0,
+                        0, 2, 1, 1, 1.0, 0,
                         GridBagConstraints.CENTER,
                         GridBagConstraints.HORIZONTAL,
                         new Insets(5, 5, 5, 5),
                         5, 5)
         );
 
-        // --- Right Pane ---
-
-        rightPane.add(new JLabel("Select Object Key:"),
-                new GridBagConstraints(
-                        0, 0, 1, 1, 1.0, 0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.HORIZONTAL,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
-        rightPane.add(rightTopPane,
-                new GridBagConstraints(
-                        0, 1, 1, 1, 1.0, 1.0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.BOTH,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
+        JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+                                             new LabeledScrollPaneView("Available Tables:",unkeyedTableListPanel),
+                                             lowerLeftPane);
+        leftPane.setOneTouchExpandable(true);
+        leftPane.setResizeWeight(0);
 
         JSplitPane splitPane;
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, rightPane);
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                                   leftPane,
+                                   new LabeledScrollPaneView("Select Object Key:", columnsPanel));
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);

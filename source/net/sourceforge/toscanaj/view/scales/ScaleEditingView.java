@@ -10,6 +10,7 @@ import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -44,7 +45,8 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
         setName("ScalesEditingView");
         setLayout(new BorderLayout());
 
-        leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, makeTableColumnsView(), makeScalesView());
+        LabeledScrollPaneView columnListView = new LabeledScrollPaneView("Available Columns:", makeTableColumnListView());
+        leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, columnListView, makeScalesView());
         leftPane.setOneTouchExpandable(true);
 
         scaleGeneratorPanel = makeScaleGeneratorPane();
@@ -68,29 +70,6 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
             ret[i] = (TableColumnPair) tableColumnListModel.get(selections[i]);
         }
         return ret;
-    }
-
-    private JComponent makeTableColumnsView() {
-        JPanel tableColumnPane = new JPanel();
-        tableColumnPane.setLayout(new GridBagLayout());
-        tableColumnPane.add(new JLabel("Available Columns:"),
-                new GridBagConstraints(
-                        0, 0, 1, 1, 1.0, 0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.HORIZONTAL,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
-        tableColumnPane.add(new JScrollPane(makeTableColumnListView()),
-                new GridBagConstraints(
-                        0, 1, 1, 1, 1.0, 1.0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.BOTH,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
-
-        return tableColumnPane;
     }
 
     private JComponent makeTableColumnListView() {
