@@ -13,7 +13,6 @@ package net.sourceforge.toscanaj.gui;
  */ 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -344,8 +343,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		this.colHeader.updateSize();
 	}
 
-	private Component createContextToolbar() {
-		JPanel retVal = new JPanel(new FlowLayout(FlowLayout.LEFT));
+	private JToolBar createContextToolbar() {
+		JToolBar retVal = new JToolBar();
 		final JButton addObjectButton = new JButton("Add object...");
 		addObjectButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
