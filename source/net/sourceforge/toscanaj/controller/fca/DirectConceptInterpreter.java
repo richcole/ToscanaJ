@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.controller.fca;
 
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
-import net.sourceforge.toscanaj.model.database.DistributionQuery;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -301,7 +300,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
 			} else {
 				return null;
 			}
-		} else if (query == DistributionQuery.PERCENT_QUERY) {
+		} else if (query == AggregateQuery.PERCENT_QUERY) {
 			int objectCount = getObjectCount(concept, context);
 			if( objectCount != 0) {
 				Concept top = concept;

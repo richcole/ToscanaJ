@@ -18,6 +18,7 @@ public class AggregateQuery extends Query {
     public static final String QUERY_ELEMENT_NAME = "aggregateQuery";
 
     public static final AggregateQuery COUNT_QUERY = new AggregateQuery(null, "Count", "fake");
+	public static final AggregateQuery PERCENT_QUERY = new AggregateQuery(null, "Distribution of Objects", "fake");
 
     public AggregateQuery(DatabaseInfo info, String name, String header) {
         super(name, header);
@@ -52,12 +53,43 @@ public class AggregateQuery extends Query {
         if (values.get(0).toString().equals("0")) {
             return null;
         }
-        String displayString = this.formatResults(values, 1);
+        Vector valuesToUse;
+        if(this.doesNeedReferenceValues()) {
+			///@todo this is all a bit brute force -> be smarter
+			valuesToUse = new Vector(values.size());
+			Iterator valIt = values.iterator();
+			Iterator refIt = referenceValues.iterator();
+			Iterator fieldIt = this.fieldList.iterator();
+
+			// skip the first extra field, putting the value straight into the results
+			valuesToUse.add(valIt.next());
+			refIt.next();
+			
+			while(valIt.hasNext() && refIt.hasNext()) {
+				String value = valIt.next().toString();
+				String refVal = refIt.next().toString();
+				QueryField field = (QueryField) fieldIt.next();
+				if(field.isRelative()) {
+					valuesToUse.add(new Double(Double.parseDouble(value) / Double.parseDouble(refVal)));
+				} else {
+					valuesToUse.add(value);
+				}
+			}
+        } else {
+        	valuesToUse = values;
+        }
+        String displayString = this.formatResults(valuesToUse, 1);
         DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
         return retVal;
     }
 
     public boolean doesNeedReferenceValues() {
+    	for (Iterator iter = this.fieldList.iterator(); iter.hasNext();) {
+            QueryField field = (QueryField) iter.next();
+            if(field.isRelative()) {
+            	return true;
+            }
+        }
         return false;
     }
 }

@@ -125,13 +125,18 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
     <aggregateQuery name="Average Price">
       <queryField format="$ 0.00">AVG(&quot;price&quot;)</queryField>
     </aggregateQuery>
+    <aggregateQuery name="Average Price (relative)">
+      <queryField format="$ 0.00" separator=" (">AVG(&quot;price&quot;)</queryField>
+      <queryField format="0.00 %" relative="true" separator=")">AVG(&quot;price&quot;)</queryField>
+    </aggregateQuery>
     <aggregateQuery name="Min/Max Prices">
       <queryField separator=" - " format="$0.00">MIN(&quot;price&quot;)</queryField>
       <queryField format="$0.00">MAX(&quot;price&quot;)</queryField>
     </aggregateQuery>
-    <distributionQuery name="Average Price (relative)">
-      <queryField format="0.00 %">AVG(&quot;price&quot;)</queryField>
-    </distributionQuery>
+    <aggregateQuery name="Counts (relative)">
+      <queryField separator=" (">count(*)</queryField>
+      <queryField format="0.00 %" relative="true" separator=")">count(*)</queryField>
+    </aggregateQuery>
   </queries>
   <diagram title="Prices for 486/66 PCs">
     <description>

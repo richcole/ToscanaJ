@@ -514,10 +514,10 @@ public class CSXParser {
                 queryElem.getAttributeValue("dropDefaults").equals("false")) {
             // add default queries
             Query query = dbInfo.createAggregateQuery("Number of Objects", "");
-            query.insertQueryColumn("Count", "0", null, "count(*)");
+            query.insertQueryColumn("Count", "0", null, "count(*)", false);
             _Schema.addQuery(query);
             query = dbInfo.createListQuery("List of Objects", "", false);
-            query.insertQueryColumn("Object Name", null, null, keyName);
+            query.insertQueryColumn("Object Name", null, null, keyName, false);
             _Schema.addQuery(query);
         }
         if (queryElem != null) {
@@ -538,7 +538,7 @@ public class CSXParser {
                     String format = curCol.getAttributeValue("format");
                     String separator = curCol.getAttributeValue("separator");
                     String sql = curCol.getText();
-                    query.insertQueryColumn(colName, format, separator, sql);
+                    query.insertQueryColumn(colName, format, separator, sql, false);
                 }
                 _Schema.addQuery(query);
             }
@@ -557,7 +557,7 @@ public class CSXParser {
                     String format = curCol.getAttributeValue("format");
                     String separator = curCol.getAttributeValue("separator");
                     String sql = curCol.getText();
-                    query.insertQueryColumn(colName, format, separator, sql);
+                    query.insertQueryColumn(colName, format, separator, sql, false);
                 }
                 _Schema.addQuery(query);
             }

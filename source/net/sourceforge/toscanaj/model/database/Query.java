@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Vector;
 
 public abstract class Query implements XMLizable {
+    private static final String QUERY_FIELD_IS_RELATIVE_ATTRIBUTE_NAME = "relative";
     private static final String QUERY_NAME_ATTRIBUTE_NAME = "name";
     private static final String QUERY_HEAD_ATTRIBUTE_NAME = "head";
     private static final String QUERY_FIELD_ELEMENT_NAME = "queryField";
@@ -31,12 +32,14 @@ public abstract class Query implements XMLizable {
         private String format;
         private String separator;
         private String queryPart;
+        private boolean isRelative;
 
-        public QueryField(String name, String format, String separator, String queryPart) {
+        public QueryField(String name, String format, String separator, String queryPart, boolean isRelative) {
             this.name = name;
             this.format = format;
             this.separator = separator;
             this.queryPart = queryPart;
+            this.isRelative = isRelative;
         }
 
         public String getName() {
@@ -53,6 +56,10 @@ public abstract class Query implements XMLizable {
 
         public String getQueryPart() {
             return queryPart;
+        }
+        
+        public boolean isRelative() {
+        	return this.isRelative;
         }
     }
 
@@ -95,7 +102,8 @@ public abstract class Query implements XMLizable {
                     queryFieldElement.getAttributeValue(QUERY_FIELD_NAME_ATTRIBUTE_NAME),
                     queryFieldElement.getAttributeValue(QUERY_FIELD_FORMAT_ATTRIBUTE_NAME),
                     queryFieldElement.getAttributeValue(QUERY_FIELD_SEPARATOR_ATTRIBUTE_NAME),
-                    queryFieldElement.getText()
+                    queryFieldElement.getText(),
+                    "true".equals(queryFieldElement.getAttributeValue(QUERY_FIELD_IS_RELATIVE_ATTRIBUTE_NAME))
             );
             this.fieldList.add(field);
         }
@@ -106,8 +114,8 @@ public abstract class Query implements XMLizable {
     }
 
     public void insertQueryColumn(String columnName, String columnFormat,
-                                  String separator, String queryPart) {
-        QueryField field = new QueryField(columnName, columnFormat, separator, queryPart);
+                                  String separator, String queryPart, boolean isRelative) {
+        QueryField field = new QueryField(columnName, columnFormat, separator, queryPart, isRelative);
         fieldList.add(field);
     }
 

@@ -14,7 +14,6 @@ import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationConte
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
-import net.sourceforge.toscanaj.model.database.DistributionQuery;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -37,7 +36,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     public DatabaseConnectedConceptInterpreter(DatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
         this.listQuery = new ListQuery(databaseInfo, "", "");
-        this.listQuery.insertQueryColumn("", null, "", databaseInfo.getKey().getSqlExpression());
+        this.listQuery.insertQueryColumn("", null, "", databaseInfo.getKey().getSqlExpression(), false);
     }
 
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
@@ -295,7 +294,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 			} else {
 				return null;
 			}
-		} else if (query == DistributionQuery.PERCENT_QUERY) {
+		} else if (query == AggregateQuery.PERCENT_QUERY) {
 			int objectCount = getObjectCount(concept, context);
 			if( objectCount != 0) {
 				Concept top = concept;
