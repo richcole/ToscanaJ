@@ -1,0 +1,7 @@
+This directory can contain plugins for ToscanaJ. Using plugins allows
+to add extra functionality into ToscanaJ which is not required for all
+systems and would increase the size of the original download signifi-
+cantly. To add a plugin just extract its contents into this folder,
+using the directory structure provided by the plugin.
+
+At the moment ToscanaJ supports plugins for database viewers. 

@@ -1,0 +1,14 @@
+This directory can contain additional database drivers which are
+loaded automatically if specified by a particular CSX file. To add
+a driver to ToscanaJ, make a subdirectory in this directory and put
+the corresponding driver into it -- either as JAR file or the classes
+themself.
+
+Note that the subdirectory is required, JAR files in this directory
+will not be scanned.
+
+You can speed up the loading if you add a file "driver.txt" with the
+name of the driver class you want to load in it. In that case ToscanaJ
+does not need to check all files in a JAR if they are the driver, which
+is expensive (the class has to be loaded and reflection has to be used
+to see if it implements the Driver interface).

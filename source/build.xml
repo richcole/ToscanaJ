@@ -109,6 +109,8 @@
 		<copy todir="${dist.dir}/${dist.name}">
 			<fileset dir="${src.dir}">
 				<include name="*.txt"/>
+				<exclude name="databaseDrivers.txt"/>
+				<exclude name="plugins.txt"/>
 				<include name="*.bat"/>
 				<include name="*.sh"/>
 				<include name="toscanaj.prop"/>
@@ -116,8 +118,20 @@
 		</copy>
 		<!-- add some empty dirs to tell people where to put stuff -->
 		<mkdir dir="${dist.dir}/${dist.name}/dbDrivers"/>
+		<copy todir="${dist.dir}/${dist.name}/dbDrivers">
+			<fileset dir="${src.dir}">
+				<include name="databaseDrivers.txt"/>
+			</fileset>
+		</copy>
 		<mkdir dir="${dist.dir}/${dist.name}/plugins"/>
+		<copy todir="${dist.dir}/${dist.name}/plugins">
+			<fileset dir="${src.dir}">
+				<include name="plugins.txt"/>
+			</fileset>
+		</copy>
 		<fixcrlf srcDir="${dist.dir}/${dist.name}" eol="crlf" includes="*.txt, *.bat, toscanaj.prop"/>
+		<fixcrlf srcDir="${dist.dir}/${dist.name}/dbDrivers" eol="crlf" includes="databaseDrivers.txt"/>
+		<fixcrlf srcDir="${dist.dir}/${dist.name}/plugins" eol="crlf" includes="plugins.txt"/>
 		<fixcrlf srcDir="${dist.dir}/${dist.name}" eol="lf" includes="*.sh"/>
     </target>
 	<target name="dist" depends="makeReleaseJar,copyFiles,zipFile">
