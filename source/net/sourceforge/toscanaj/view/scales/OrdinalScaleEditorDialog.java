@@ -10,12 +10,21 @@ package net.sourceforge.toscanaj.view.scales;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
+
+import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
+import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.ContextImplementation;
+import net.sourceforge.toscanaj.model.database.Column;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 public class OrdinalScaleEditorDialog extends JDialog {
     boolean result;
@@ -30,13 +39,166 @@ public class OrdinalScaleEditorDialog extends JDialog {
     public static final int INTEGER = 0;
     public static final int FLOAT = 1;
     public static final int UNSUPPORTED = -1;
+    private Column column;
+    
+    private static interface ContextGenerator {
+    	Context createContext(String name, List dividers, Column column);
+    }
+    
+    private static abstract class SingleDimensionScaleGenerator implements ContextGenerator {
+    	public Context createContext(String name, List dividers, Column column) {
+    	    ContextImplementation context = new ContextImplementation();
+			context.setName(name);
+	        for (int i = -1; i < dividers.size(); i++) {
+	            String object = createSQLClause(column.getName(), dividers, i);
+	            String attributeName = createAttributeName(dividers, i);
+	            context.getObjects().add(object);
+	            if(attributeName != null) {
+	                context.getAttributes().add(new Attribute(attributeName));
+	            }
+	            Iterator it = context.getAttributes().iterator();
+	            while (it.hasNext()) {
+	                Attribute attribute = (Attribute) it.next();
+	                context.getRelationImplementation().insert(object,attribute);
+	            }
+	        }
+	        return context;
+    	}
 
-    public OrdinalScaleEditorDialog(Frame owner, String scaleName, int scaleType) {
+        public String createAttributeName(List dividers, int i) {
+            if(i == -1){
+                return null;
+            }
+            return getForwardSymbol() + String.valueOf(dividers.get(getPosition(i, dividers.size())));
+        }
+
+        public String createSQLClause(String columnName, List dividers, int i) {
+            if(i == -1) {
+                return "(" + columnName + getBackwardSymbol() + String.valueOf(dividers.get(getPosition(0, dividers.size()))) + ")";
+            }
+            String retVal = "(" + columnName + getForwardSymbol() + String.valueOf(dividers.get(getPosition(i, dividers.size()))) + ")";
+            if (i < dividers.size() - 1) {
+                retVal += " AND (" + columnName + getBackwardSymbol() + String.valueOf(dividers.get(getPosition(i + 1, dividers.size()))) + ")";
+            }
+            return retVal;
+        }
+
+        protected abstract int getPosition(int i, int max);
+        protected abstract String getForwardSymbol();
+        protected abstract String getBackwardSymbol();
+
+    } 
+    
+    private static class IncreasingExclusiveGenerator extends SingleDimensionScaleGenerator {
+        public String toString() {
+	        return "increasing, exclude bounds";
+        }
+        protected int getPosition(int i, int max) {
+            return i;
+        }
+        protected String getForwardSymbol() {
+            return ">";
+        }
+        protected String getBackwardSymbol() {
+            return "<=";
+        }
+    }
+
+    private static class IncreasingInclusiveGenerator extends SingleDimensionScaleGenerator {
+        public String toString() {
+        	return "increasing, include bounds";
+        }
+        protected int getPosition(int i, int max) {
+            return i;
+        }
+        protected String getForwardSymbol() {
+            return ">=";
+        }
+        protected String getBackwardSymbol() {
+            return "<";
+        }
+    }
+
+    private static class DecreasingExclusiveGenerator extends SingleDimensionScaleGenerator {
+        public String toString() {
+        	return "decreasing, exclude bounds";
+        }
+        protected int getPosition(int i, int max) {
+            return max - i -1;
+        }
+        protected String getForwardSymbol() {
+            return "<";
+        }
+        protected String getBackwardSymbol() {
+            return ">=";
+        }
+    }
+
+    private static class DecreasingInclusiveGenerator extends SingleDimensionScaleGenerator {
+        public String toString() {
+        	return "decreasing, include bounds";
+        }
+        protected int getPosition(int i, int max) {
+            return max - i -1;
+        }
+        protected String getForwardSymbol() {
+            return "<=";
+        }
+        protected String getBackwardSymbol() {
+            return ">";
+        }
+    }
+
+	/**
+	 * @todo there is another case, which mirrors this but puts the equals on
+	 * the other direction ==> implement.
+	 */
+    private static class InterordinalGenerator implements ContextGenerator {
+        public Context createContext(String name, List dividers, Column column) {
+            ContextImplementation context = new ContextImplementation();
+            context.setName(name);
+            int numDiv = dividers.size();
+            Attribute[] upwardsAttributes = new Attribute[numDiv];
+            Attribute[] downwardsAttributes = new Attribute[numDiv];
+            for (int i = 0; i < numDiv; i++) {
+                upwardsAttributes[i] = new Attribute(">= " + dividers.get(i));
+                downwardsAttributes[i] = new Attribute("< " + dividers.get(i));
+                context.getAttributes().add(upwardsAttributes[i]);
+                context.getAttributes().add(downwardsAttributes[i]);
+            }
+            BinaryRelationImplementation relation = context.getRelationImplementation();
+            for (int i = -1; i < numDiv; i++) {
+                String object;
+            	if( i == -1) {
+            	    object = column.getName() + " " + downwardsAttributes[i+1];
+            	} else if (i == numDiv - 1) {
+            	    object = column.getName() + " " + upwardsAttributes[i];
+            	} else {
+            	    object = column.getName() + " " + upwardsAttributes[i] + " AND " +
+            	    		 column.getName() + " " + downwardsAttributes[i+1];
+            	}
+            	for(int j = 0; j <= i; j++) {
+            		relation.insert(object, upwardsAttributes[j]);
+            	}
+            	for(int j = i + 1; j < numDiv; j++ ) {
+            	    relation.insert(object, downwardsAttributes[j]);
+            	}
+            	context.getObjects().add(object);
+            }
+            return context;
+        }
+        public String toString() {
+        	return "both";
+        }
+    }
+
+    public OrdinalScaleEditorDialog(Frame owner, Column column, int scaleType) {
         super(owner);
       	setSize(400,600);
       	setLocation(200,100);
+      	this.column = column;
         this.scaleType = scaleType;
-        layoutDialog(scaleName);
+        layoutDialog(column.getName());
         pack();
     }
 
@@ -103,14 +265,22 @@ public class OrdinalScaleEditorDialog extends JDialog {
 		));
 		
 		
-		mainPane.add(makeButtonsPane(), new GridBagConstraints(
-					0,3,2,1,1.0,0,
-					GridBagConstraints.NORTHWEST,
-					GridBagConstraints .HORIZONTAL,
-					new Insets(2,2,2,2),
-					2,2
-		));
-		
+        mainPane.add(makeTypeOptionPane(), new GridBagConstraints(
+                    0,3,2,1,1.0,0,
+                    GridBagConstraints.CENTER,
+                    GridBagConstraints .HORIZONTAL,
+                    new Insets(2,2,2,2),
+                    2,2
+        ));
+
+        mainPane.add(makeButtonsPane(), new GridBagConstraints(
+                    0,4,2,1,1.0,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints .HORIZONTAL,
+                    new Insets(2,2,2,2),
+                    2,2
+        ));
+
 		setContentPane(mainPane);
 
     }
@@ -344,6 +514,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
     }
 
     private DefaultListModel dividersModel;
+    private JComboBox typeChooser;
 
     public void addDelimiter(double value) {
         int i;
@@ -394,7 +565,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
                 result = true;
             }
         });
-        
+
 
         buttonPane.add(okButton);
 
@@ -407,6 +578,20 @@ public class OrdinalScaleEditorDialog extends JDialog {
         });
         buttonPane.add(cancelButton);
         return buttonPane;
+    }
+
+    private JPanel makeTypeOptionPane() {
+        JPanel pane = new JPanel(new BorderLayout());
+        JLabel label = new JLabel("Type of scale: ");
+        this.typeChooser = new JComboBox(new ContextGenerator[]{
+        		new IncreasingExclusiveGenerator(),
+        		new IncreasingInclusiveGenerator(),
+        		new DecreasingExclusiveGenerator(),
+        		new DecreasingInclusiveGenerator(),
+        		new InterordinalGenerator()} );
+        pane.add(label, BorderLayout.WEST);
+        pane.add(this.typeChooser, BorderLayout.CENTER);
+        return pane;
     }
 
     private boolean isScaleCorrect() {
@@ -435,5 +620,10 @@ public class OrdinalScaleEditorDialog extends JDialog {
         public void intervalRemoved(ListDataEvent e) {
             updateStateOfOkButton();
         }
+    }
+
+    public Context createContext() {
+		ContextGenerator generator = (ContextGenerator) this.typeChooser.getSelectedItem();
+        return generator.createContext(getDiagramTitle(), getDividers(), this.column);
     }
 }

@@ -32,7 +32,7 @@ public class OrdinalScaleEditorDialogTest extends TestCase {
         Column column = new Column("Column", java.sql.Types.DOUBLE, table);
         table.addColumn(column);
         OrdinalScaleEditorDialog dialog = new OrdinalScaleEditorDialog(
-                null, column.getName(), OrdinalScaleEditorDialog.FLOAT
+                null, column, OrdinalScaleEditorDialog.FLOAT
         );
         dialog.addDelimiter(1.);
 
