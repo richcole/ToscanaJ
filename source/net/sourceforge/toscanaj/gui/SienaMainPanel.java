@@ -376,28 +376,21 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     protected MouseListener getTableViewMouseListener() {
 		MouseListener mouseListener = new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				if (e.getButton() == MouseEvent.BUTTON1) {
-					double x = e.getPoint().getX();
-					double y = e.getPoint().getY();
-					Point p = new Point(x,y);
-					tableView.setSelectedCell(new TableView.SelectedCell(p.getCol(), p.getRow()));
-				} 
+				double x = e.getPoint().getX();
+				double y = e.getPoint().getY();
+				Point p = new Point(x,y);
+				tableView.setSelectedCell(new TableView.SelectedCell(p.getCol(), p.getRow()));
 				
 				if(e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1){
-					double x = e.getPoint().getX();
-					double y = e.getPoint().getY();
-					Point p = new Point(x,y);
 					WritableManyValuedContext context = conceptualSchema.getManyValuedContext();
                     ArrayList propertyList = (ArrayList)context.getAttributes();
 					WritableManyValuedAttribute attribute = (WritableManyValuedAttribute)
 															propertyList.get(p.getRow());
 					ArrayList objectList = (ArrayList) context.getObjects();
 					WritableFCAObject obj = (WritableFCAObject)objectList.get(p.getCol());
-					double xPos = e.getPoint().getX();
-					double yPos = e.getPoint().getY();
 					
 					if(attribute.getType() instanceof TextualType){
-						showPopupMenu(xPos,yPos, attribute, obj);
+						showPopupMenu(x + tableView.getX(), y + tableView.getY(), attribute, obj);
 					}
 					else {
 						showNumericInputDialog(attribute, obj);
