@@ -20,6 +20,9 @@ Siena (still not fully complete):
   edited, but this is not finished and will not affect anything yet)
 - transition arrow styles have extra option to change the width of
   the border line
+- three query types are allowed: count, list, distribution (as in
+  the ToscanaJ defaults)
+  
 
 Other new experimental features:
 ================================

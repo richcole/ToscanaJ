@@ -10,8 +10,6 @@ package net.sourceforge.toscanaj.gui;
 /** 
  * @todo this class is too big in many senses, most noticably in the fact that it knows about
  * way too much stuff
- * 
- * @todo the context editor is broken since we don't use lists anymore
  */ 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -87,6 +85,9 @@ import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAObject;
 import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAObject;
+import net.sourceforge.toscanaj.model.database.AggregateQuery;
+import net.sourceforge.toscanaj.model.database.ListQuery;
+import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -189,6 +190,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	private RowHeader rowHeader;
 	private ColumnHeader colHeader;
     private JLabel temporalControlsLabel;
+    private JRadioButtonMenuItem showExactMenuItem;
+    private JRadioButtonMenuItem showAllMenuItem;
 	
 	public SienaMainPanel(boolean loadLastFile) {
         super(WINDOW_TITLE);
@@ -404,11 +407,13 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	}
 
     public void createMenuBar() {
-
-        // --- menu bar ---
-        menuBar = new JMenuBar();
-        setJMenuBar(menuBar);
-
+        if (menuBar == null) {
+            menuBar = new JMenuBar();
+            setJMenuBar(menuBar);
+        } else {
+            menuBar.removeAll();
+        }
+        
         // --- file menu ---
         fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
@@ -576,6 +581,71 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
+
+        ButtonGroup documentsDisplayGroup = new ButtonGroup();
+        this.showExactMenuItem = new JRadioButtonMenuItem("Show only exact matches");
+        this.showExactMenuItem.setMnemonic(KeyEvent.VK_X);
+        this.showExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+        this.showExactMenuItem.setSelected(true);
+        this.showExactMenuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                diagramEditingView.getDiagramView().setDisplayType(true);
+            }
+        }); 
+        documentsDisplayGroup.add(this.showExactMenuItem);
+        viewMenu.add(this.showExactMenuItem);
+
+        this.showAllMenuItem = new JRadioButtonMenuItem("Show all matches");
+        this.showAllMenuItem.setMnemonic(KeyEvent.VK_A);
+        this.showAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_S, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+        this.showAllMenuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                diagramEditingView.getDiagramView().setDisplayType(false);
+            }
+        }); 
+        documentsDisplayGroup.add(this.showAllMenuItem);
+        viewMenu.add(this.showAllMenuItem);
+        
+        viewMenu.addSeparator();
+
+        final JCheckBoxMenuItem showAttributeLabels =
+            new JCheckBoxMenuItem("Show Attribute Labels");
+        showAttributeLabels.setMnemonic(KeyEvent.VK_A);
+        showAttributeLabels.setSelected(true);
+        showAttributeLabels.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean newState = !AttributeLabelView.allAreHidden();
+                showAttributeLabels.setSelected(!newState);
+                AttributeLabelView.setAllHidden(newState);
+                diagramView.repaint();
+            }
+        });
+        viewMenu.add(showAttributeLabels);
+
+        final JCheckBoxMenuItem showObjectLabels =
+            new JCheckBoxMenuItem("Show Object Labels");
+        showObjectLabels.setMnemonic(KeyEvent.VK_O);
+        showObjectLabels.setSelected(true);
+        showObjectLabels.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean newState = !ObjectLabelView.allAreHidden();
+                showObjectLabels.setSelected(!newState);
+                ObjectLabelView.setAllHidden(newState);
+                diagramView.repaint();
+            }
+        });
+        viewMenu.add(showObjectLabels);
+
+        ButtonGroup labelContentGroup = new ButtonGroup();
+        viewMenu.addSeparator();
+        addQueryMenuItem(AggregateQuery.COUNT_QUERY, viewMenu, labelContentGroup, KeyEvent.VK_C);
+        addQueryMenuItem(ListQuery.KEY_LIST_QUERY, viewMenu, labelContentGroup, KeyEvent.VK_L);
+        addQueryMenuItem(AggregateQuery.PERCENT_QUERY, viewMenu, labelContentGroup, KeyEvent.VK_D);
+        
+        viewMenu.addSeparator();
+        
         ButtonGroup fontSizeGroup = new ButtonGroup();
         JMenu setMinLabelSizeSubMenu = new JMenu("Set minimum label size");
         setMinLabelSizeSubMenu.setMnemonic(KeyEvent.VK_S);
@@ -609,34 +679,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             setMinLabelSizeSubMenu.add(fontRangeMenuItem);
         }
         viewMenu.add(setMinLabelSizeSubMenu);
-
-        final JCheckBoxMenuItem showAttributeLabels =
-            new JCheckBoxMenuItem("Show Attribute Labels");
-        showAttributeLabels.setMnemonic(KeyEvent.VK_A);
-        showAttributeLabels.setSelected(true);
-        showAttributeLabels.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                boolean newState = !AttributeLabelView.allAreHidden();
-                showAttributeLabels.setSelected(!newState);
-                AttributeLabelView.setAllHidden(newState);
-                diagramView.repaint();
-            }
-        });
-        viewMenu.add(showAttributeLabels);
-
-        final JCheckBoxMenuItem showObjectLabels =
-            new JCheckBoxMenuItem("Show Object Labels");
-        showObjectLabels.setMnemonic(KeyEvent.VK_O);
-        showObjectLabels.setSelected(true);
-        showObjectLabels.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                boolean newState = !ObjectLabelView.allAreHidden();
-                showObjectLabels.setSelected(!newState);
-                ObjectLabelView.setAllHidden(newState);
-                diagramView.repaint();
-            }
-        });
-        viewMenu.add(showObjectLabels);
 
         JMenu colorModeMenu = new JMenu("Color mode");
         ButtonGroup colorModeGroup = new ButtonGroup();
@@ -733,6 +775,23 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(helpMenu);
     }
+    private void addQueryMenuItem(final Query query, JMenu viewMenu, ButtonGroup labelContentGroup, int mnemonic) {
+        String name = query.getName();
+        JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);
+        menuItem.setMnemonic(mnemonic);
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                diagramEditingView.getDiagramView().setQuery(query);
+            }
+        });
+        if(labelContentGroup.getSelection() == null) {
+            menuItem.setSelected(true);
+            diagramEditingView.getDiagramView().setQuery(query);
+        }
+        labelContentGroup.add(menuItem);
+        viewMenu.add(menuItem);
+    }
+
     private void importCernatoXML() {
         final JFileChooser openDialog;
         if (this.lastCernatoFile != null) {
@@ -1066,6 +1125,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                     ((schemaFile.getName()).length() - 4))
                     + " - "
                     + WINDOW_TITLE);
+            createMenuBar();
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(
                 this,

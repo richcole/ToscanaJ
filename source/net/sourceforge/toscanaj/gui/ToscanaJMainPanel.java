@@ -671,66 +671,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
         }
 
-		JMenu colorModeMenu = new JMenu("Color mode");
-		ButtonGroup colorModeGroup = new ButtonGroup();
-		
-		colorModeColorMenuItem = new JRadioButtonMenuItem("Color");
-		colorModeColorMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-                setColorChanger(new NullColorChanger());
-            }
-		});
-		colorModeGroup.add(colorModeColorMenuItem);
-		colorModeMenu.add(colorModeColorMenuItem);
-
-		colorModeGrayscaleMenuItem = new JRadioButtonMenuItem("Grayscale");
-		colorModeGrayscaleMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-                setColorChanger(new GrayscaleColorChanger());
-            }
-		});
-		colorModeGroup.add(colorModeGrayscaleMenuItem);
-		colorModeMenu.add(colorModeGrayscaleMenuItem);
-
-        colorModeWhiteNodesMenuItem = new JRadioButtonMenuItem("White nodes");
-        colorModeWhiteNodesMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setColorChanger(new WhiteAndBlackColorChanger());
-            }
-        });
-        colorModeGroup.add(colorModeWhiteNodesMenuItem);
-        colorModeMenu.add(colorModeWhiteNodesMenuItem);
-
-        colorModeBlackNodesMenuItem = new JRadioButtonMenuItem("Black nodes");
-        colorModeBlackNodesMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setColorChanger(new BlackAndWhiteColorChanger());
-            }
-        });
-        colorModeGroup.add(colorModeBlackNodesMenuItem);
-        colorModeMenu.add(colorModeBlackNodesMenuItem);
-
-		String colorMode = preferences.get(CONFIGURATION_KEY_COLOR_MODE, null);
-        if(CONFIGURATION_VALUE_COLOR_MODE_COLOR.equals(colorMode)) {
-            colorModeColorMenuItem.setSelected(true);
-            setColorChanger(new NullColorChanger());
-        } else if(CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE.equals(colorMode)) {
-            colorModeGrayscaleMenuItem.setSelected(true);
-            setColorChanger(new GrayscaleColorChanger());
-        } else if(CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES.equals(colorMode)) {
-            colorModeWhiteNodesMenuItem.setSelected(true);
-            setColorChanger(new WhiteAndBlackColorChanger());
-        } else if(CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES.equals(colorMode)) {
-            colorModeBlackNodesMenuItem.setSelected(true);
-            setColorChanger(new BlackAndWhiteColorChanger());
-        } else {
-            System.err.println("Unknown color mode setting, using color");
-            colorModeColorMenuItem.setSelected(true);
-            setColorChanger(new NullColorChanger());
-        } 
-
-		viewMenu.add(colorModeMenu);
-
         if (preferences.getBoolean("offerNodeSizeScalingOptions", false)) {
             viewMenu.addSeparator();
             ButtonGroup nodeSizeScalingGroup = new ButtonGroup();
@@ -828,8 +768,10 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     }
                 }
             }
+            
 			viewMenu.addSeparator();
-			ButtonGroup fontSizeGroup = new ButtonGroup();
+
+            ButtonGroup fontSizeGroup = new ButtonGroup();
 		  	JMenu setMinLabelSizeSubMenu = new JMenu("Set minimum label size");
 			JMenuItem fontRangeMenuItem = new JRadioButtonMenuItem("None");
 			fontSizeGroup.add(fontRangeMenuItem);
@@ -862,6 +804,65 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 			}			
 		    viewMenu.add(setMinLabelSizeSubMenu);
         }
+        
+        JMenu colorModeMenu = new JMenu("Color mode");
+        ButtonGroup colorModeGroup = new ButtonGroup();
+        
+        colorModeColorMenuItem = new JRadioButtonMenuItem("Color");
+        colorModeColorMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setColorChanger(new NullColorChanger());
+            }
+        });
+        colorModeGroup.add(colorModeColorMenuItem);
+        colorModeMenu.add(colorModeColorMenuItem);
+
+        colorModeGrayscaleMenuItem = new JRadioButtonMenuItem("Grayscale");
+        colorModeGrayscaleMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setColorChanger(new GrayscaleColorChanger());
+            }
+        });
+        colorModeGroup.add(colorModeGrayscaleMenuItem);
+        colorModeMenu.add(colorModeGrayscaleMenuItem);
+
+        colorModeWhiteNodesMenuItem = new JRadioButtonMenuItem("White nodes");
+        colorModeWhiteNodesMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setColorChanger(new WhiteAndBlackColorChanger());
+            }
+        });
+        colorModeGroup.add(colorModeWhiteNodesMenuItem);
+        colorModeMenu.add(colorModeWhiteNodesMenuItem);
+
+        colorModeBlackNodesMenuItem = new JRadioButtonMenuItem("Black nodes");
+        colorModeBlackNodesMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setColorChanger(new BlackAndWhiteColorChanger());
+            }
+        });
+        colorModeGroup.add(colorModeBlackNodesMenuItem);
+        colorModeMenu.add(colorModeBlackNodesMenuItem);
+
+        String colorMode = preferences.get(CONFIGURATION_KEY_COLOR_MODE, null);
+        if(CONFIGURATION_VALUE_COLOR_MODE_COLOR.equals(colorMode)) {
+            colorModeColorMenuItem.setSelected(true);
+            setColorChanger(new NullColorChanger());
+        } else if(CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE.equals(colorMode)) {
+            colorModeGrayscaleMenuItem.setSelected(true);
+            setColorChanger(new GrayscaleColorChanger());
+        } else if(CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES.equals(colorMode)) {
+            colorModeWhiteNodesMenuItem.setSelected(true);
+            setColorChanger(new WhiteAndBlackColorChanger());
+        } else if(CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES.equals(colorMode)) {
+            colorModeBlackNodesMenuItem.setSelected(true);
+            setColorChanger(new BlackAndWhiteColorChanger());
+        } else {
+            System.err.println("Unknown color mode setting, using color");
+            colorModeColorMenuItem.setSelected(true);
+            setColorChanger(new NullColorChanger());
+        } 
+        viewMenu.add(colorModeMenu);
         
         viewMenu.addSeparator();
         
