@@ -46,7 +46,7 @@ public class DiagramEditingView extends JPanel implements EventListener {
     /**
      * Construct an instance of this view
      */
-    public DiagramEditingView(JFrame frame, DiagramCollection conceptualSchema, EventBroker eventBroker) {
+    public DiagramEditingView(DiagramCollection conceptualSchema, EventBroker eventBroker) {
         super();
         setLayout(new BorderLayout());
         this.conceptualSchema = conceptualSchema;
@@ -62,7 +62,7 @@ public class DiagramEditingView extends JPanel implements EventListener {
         eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
     }
 
-    private JPanel makeDiagramViewPanel() {
+    protected JPanel makeDiagramViewPanel() {
         JPanel diagramViewPanel = new JPanel(new BorderLayout());
 
         diagramView = new DiagramView();
@@ -162,7 +162,7 @@ public class DiagramEditingView extends JPanel implements EventListener {
         this.diagramView.repaint();
     }
 
-    private JComponent makeDiagramListView() {
+    protected JComponent makeDiagramListView() {
         diagramListModel = new DefaultListModel();
         final JList listView = new JList(diagramListModel);
         final JButton removeButton = new JButton("Remove");
@@ -217,5 +217,9 @@ public class DiagramEditingView extends JPanel implements EventListener {
 
     public int getDividerLocation() {
         return splitPane.getDividerLocation();
+    }
+
+    public Diagram2D getDiagramDisplayed() {
+        return diagramView.getDiagram();
     }
 }

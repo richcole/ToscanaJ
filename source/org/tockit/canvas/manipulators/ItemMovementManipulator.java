@@ -26,7 +26,7 @@ public class ItemMovementManipulator implements EventListener {
     }
 
     public ItemMovementManipulator(Canvas canvas, Class itemType, EventBroker eventBroker) {
-        if (!eventBroker.extendsOrImplements(itemType, MovableCanvasItem.class)) {
+        if (!EventBroker.extendsOrImplements(itemType, MovableCanvasItem.class)) {
             throw new RuntimeException("ItemMovementManipulator can only be subscribed to MovableCanvasItem or subtypes");
         }
         eventBroker.subscribe(this, CanvasItemDraggedEvent.class, itemType);

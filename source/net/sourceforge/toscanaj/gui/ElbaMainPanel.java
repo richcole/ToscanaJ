@@ -143,7 +143,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventListener {
         scaleView.setVerticalDividerLocation(
                 ConfigurationManager.fetchInt("ElbaMainPanel", "scaleViewVerticalDivider", 300));
 
-        diagramView = new DiagramEditingView(this, conceptualSchema, eventBroker);
+        diagramView = new DiagramEditingView(conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("ElbaMainPanel", "diagramViewDivider", 200));
 
         mainView.addView("Tables", databaseSchemaView);

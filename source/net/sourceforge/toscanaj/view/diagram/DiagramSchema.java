@@ -293,7 +293,7 @@ public class DiagramSchema {
     /**
      * Set the line color to new color.
      */
-    public void setLineColor(Color LineColor) {
+    public void setLineColor(Color lineColor) {
         this.lineColor = lineColor;
     }
 

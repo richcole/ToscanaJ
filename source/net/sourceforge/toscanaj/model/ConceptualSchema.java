@@ -250,6 +250,11 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
 
+    public void removeDiagram(Diagram2D diagram) {
+        diagrams.remove(diagram);
+        eventBroker.processEvent(new DiagramListChangeEvent(this, this));
+    }
+
     public void setDescription(Element description) {
         if (description != null) {
             this.description = (Element) description.clone();

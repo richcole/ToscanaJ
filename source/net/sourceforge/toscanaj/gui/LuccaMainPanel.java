@@ -8,6 +8,9 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
+import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.action.OpenFileAction;
@@ -17,6 +20,10 @@ import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.model.lattice.LatticeImplementation;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
@@ -25,6 +32,8 @@ import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
+import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
+import net.sourceforge.toscanaj.view.diagram.cernato.NDimDiagramEditingView;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventListener;
@@ -64,6 +73,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventListener {
     private JMenu mruMenu;
     private JMenu editMenu;
     private JMenu helpMenu;
+    private JToolBar toolBar;
 
     private List mruList = new LinkedList();
     private String currentFile = null;
@@ -71,8 +81,10 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventListener {
     /**
      * Views
      */
+    private DiagramEditingView diagramView;
     private DatabaseConnectionInformationView connectionInformationView;
     private XMLEditorDialog schemaDescriptionView;
+    private static final DimensionCreationStrategy DimensionStrategy = new DefaultDimensionStrategy();
 
     public LuccaMainPanel() {
         super("Lucca");
@@ -96,6 +108,9 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventListener {
         }
 
         createMenuBar();
+        createToolBar();
+
+        createLayout();
 
         ConfigurationManager.restorePlacement("LuccaMainPanel", this,
                 new Rectangle(100, 100, 500, 400));
@@ -107,7 +122,58 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventListener {
         });
     }
 
+    private void createLayout() {
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(toolBar, BorderLayout.NORTH);
+        mainPanel.add(diagramView, BorderLayout.CENTER);
+        setContentPane(mainPanel);
+    }
+
+    private void createToolBar() {
+        toolBar = new JToolBar();
+        JButton newDiagramButton = new JButton("New Diagram");
+        newDiagramButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                createNewDiagram();
+            }
+        });
+        toolBar.add(newDiagramButton);
+
+        JButton insertAttributeButton = new JButton("Insert Attribute");
+        insertAttributeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                insertAttribute();
+            }
+        });
+        toolBar.add(insertAttributeButton);
+    }
+
+    private void insertAttribute() {
+        String result = JOptionPane.showInputDialog(this, "Please enter a SQL expression.",
+                                                    "Enter expression", JOptionPane.OK_CANCEL_OPTION);
+        if(result != null) {
+        }
+    }
+
+    private void createNewDiagram() {
+        String result = JOptionPane.showInputDialog(this, "Please enter a name for the new diagram.",
+                                                    "Enter name", JOptionPane.OK_CANCEL_OPTION);
+        if(result != null) {
+            ConceptImplementation concept = new ConceptImplementation();
+            LatticeImplementation lattice = new LatticeImplementation();
+            lattice.addConcept(concept);
+            addDiagram(lattice, result);
+        }
+    }
+
+    private void addDiagram(Lattice lattice, String name) {
+        Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, name, DimensionStrategy);
+        conceptualSchema.addDiagram(diagram);
+    }
+
     public void createViews() {
+        diagramView = new NDimDiagramEditingView(conceptualSchema, eventBroker);
+        diagramView.setDividerLocation(ConfigurationManager.fetchInt("LuccaMainPanel", "diagramViewDivider", 200));
         connectionInformationView =
                 new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);
 
@@ -280,6 +346,9 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventListener {
         // store current position
         ConfigurationManager.storePlacement("LuccaMainPanel", this);
         ConfigurationManager.storeStringList("LuccaMainPanel", "mruFiles", this.mruList);
+        ConfigurationManager.storeInt("LuccaMainPanel", "diagramViewDivider",
+                diagramView.getDividerLocation()
+        );
         ConfigurationManager.saveConfiguration();
         System.exit(0);
     }

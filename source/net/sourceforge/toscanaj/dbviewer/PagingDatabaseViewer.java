@@ -207,7 +207,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
     public void initialize(DatabaseViewerManager manager)
             throws DatabaseViewerInitializationException {
         this.viewerManager = manager;
-        this.dialog = new PagingDatabaseViewerDialog(manager.getParentWindow());
+        this.dialog = new PagingDatabaseViewerDialog(DatabaseViewerManager.getParentWindow());
         ConfigurationManager.restorePlacement("PagingDatabaseViewerDialog", dialog, new Rectangle(100, 100, 350, 300));
     }
 

@@ -218,7 +218,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
 
     public void initialize(DatabaseViewerManager manager)
             throws DatabaseViewerInitializationException {
-        this.dialog = new HTMLDatabaseViewDialog(manager.getParentWindow(), manager);
+        this.dialog = new HTMLDatabaseViewDialog(DatabaseViewerManager.getParentWindow(), manager);
         ConfigurationManager.restorePlacement("HTMLDatabaseViewDialog", dialog, new Rectangle(100, 100, 350, 300));
     }
 

@@ -97,7 +97,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
     }
 
     public void createViews() {
-        diagramView = new NDimDiagramEditingView(this, conceptualSchema, eventBroker);
+        diagramView = new NDimDiagramEditingView(conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("SienaMainPanel", "diagramViewDivider", 200));
         setContentPane(diagramView);
     }

@@ -21,8 +21,8 @@ import java.awt.event.ActionListener;
 public class NDimDiagramEditingView extends DiagramEditingView {
     protected NDimNodeMovementEventListener ndimMovementEventListener;
 
-    public NDimDiagramEditingView(JFrame frame, DiagramCollection conceptualSchema, EventBroker eventBroker) {
-        super(frame, conceptualSchema, eventBroker);
+    public NDimDiagramEditingView(DiagramCollection conceptualSchema, EventBroker eventBroker) {
+        super(conceptualSchema, eventBroker);
     }
 
     protected void createMovementManipulators(JPanel toolPanel) {

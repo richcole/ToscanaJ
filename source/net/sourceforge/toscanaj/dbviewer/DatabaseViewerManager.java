@@ -202,7 +202,7 @@ public class DatabaseViewerManager implements XMLizable {
         String urlAttr = elem.getAttributeValue("url");
         if (urlAttr != null) {
             try {
-                URL url = new URL(this.baseURL, urlAttr);
+                URL url = new URL(DatabaseViewerManager.baseURL, urlAttr);
                 DOMBuilder builder =
                         new DOMBuilder("org.jdom.adapters.XercesDOMAdapter");
                 org.jdom.Document doc = builder.build(url);
@@ -225,7 +225,7 @@ public class DatabaseViewerManager implements XMLizable {
         if (urlAttr != null) {
             String result = "";
             try {
-                URL url = new URL(this.baseURL, urlAttr);
+                URL url = new URL(DatabaseViewerManager.baseURL, urlAttr);
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                 String line = reader.readLine();
                 while (line != null) {
