@@ -156,17 +156,30 @@ public class DatabaseConnection implements EventBrokerListener {
         if ((driverName == null) || (driverName.equals(""))) {
             throw new DatabaseException("No driver given for connecting to the database");
         }
-		// @todo location of dbdrivers should be read from config manager
-		String dbDriversDir = System.getProperty("user.dir") + File.separator + "dbdrivers";
-		DatabaseDriverLoader.Error[] errors = DatabaseDriverLoader.loadDrivers(new File(dbDriversDir));
-		for (int i = 0; i < errors.length; i++) {
-			DatabaseDriverLoader.Error error = errors[i];
-			error.getException().printStackTrace();
-			// @todo need to figure out how to deal with exceptions better - 
-			// we probably want to notify a user about all errors at once rather
-			// then having him/her to fix each error one by one.
-			throw new DatabaseException("Error locating JDBC Driver class for the url:\n" + url, error.getException());
+		try {
+			Class.forName(driverName);
+			Driver driver = DriverManager.getDriver(url);
+			if (driver == null) {
+				// @todo location of dbdrivers should be read from config manager
+				String dbDriversDir = System.getProperty("user.dir") + File.separator + "dbdrivers";
+				DatabaseDriverLoader.Error[] errors = DatabaseDriverLoader.loadDrivers(new File(dbDriversDir));
+				for (int i = 0; i < errors.length; i++) {
+					DatabaseDriverLoader.Error error = errors[i];
+					error.getException().printStackTrace();
+					// @todo need to figure out how to deal with exceptions better - 
+					// we probably want to notify a user about all errors at once rather
+					// then having him/her to fix each error one by one.
+					throw new DatabaseException("Error locating JDBC Driver class for the url:\n" + url, error.getException());
+				}
+				//throw new DatabaseException("Could not locate JDBC Driver class for the url:\n" + url);
+			}
+		} catch (SQLException e) {
+			throw new DatabaseException("Error locating JDBC Driver class for the url:\n" + url, e);
+		} catch (ClassNotFoundException e) {
+			throw new DatabaseException("The class for '" + url + "' couldn't be loaded", e);
 		}
+        
+        
 
         Connection connection = null;
 
