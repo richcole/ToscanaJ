@@ -67,6 +67,7 @@ public class DatabaseConnectionInformationView extends JDialog
 	private KeySelectPanel keySelectPanel;
     private DatabaseTypePanel dbTypePanel;
     private DatabaseSchema databaseSchema;
+    private boolean newConnectionSet;
     
     abstract class WizardPanel extends JPanel {
     	WizardPanel() {
@@ -256,7 +257,7 @@ public class DatabaseConnectionInformationView extends JDialog
             databaseInfo.setPassword(embedInfo.getPassword());
             databaseInfo.setDriverClass(embedInfo.getDriverClass());
             try {
-                databaseInfo.setEmbeddedSQLLocation(new URL("file:\\" + scriptLocationField.getText()));
+                databaseInfo.setEmbeddedSQLLocation(new URL("file://" + scriptLocationField.getText()));
             } catch (MalformedURLException e) {
             	ErrorDialog.showError(this,e,"URL invalid");
             	return false;
@@ -694,6 +695,7 @@ public class DatabaseConnectionInformationView extends JDialog
         if(nextPanel == null) {
             hide();
             this.conceptualSchema.setDatabaseInfo(this.databaseInfo);
+            this.newConnectionSet = true;
         } else {
         	setCurrentPanel(nextPanel);
         }
@@ -772,5 +774,14 @@ public class DatabaseConnectionInformationView extends JDialog
 		ConfigurationManager.storePlacement(
 			"DatabaseConnectionInformationView",
 			this);
+	}
+	
+	public void show() {
+		this.newConnectionSet = false;
+		super.show();
+	}
+	
+	public boolean newConnectionWasSet() {
+		return this.newConnectionSet;
 	}
 }
