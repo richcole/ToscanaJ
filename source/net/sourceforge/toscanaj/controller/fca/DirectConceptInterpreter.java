@@ -13,7 +13,6 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeSet;
 
 
 public class DirectConceptInterpreter extends AbstractConceptInterperter
@@ -120,7 +119,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
     }
 
     private Set calculateExtent(Concept concept, ConceptInterpretationContext context) {
-        TreeSet retVal = new TreeSet();
+        HashSet retVal = new HashSet();
         Iterator extentContingentIterator = concept.getExtentIterator();
         while (extentContingentIterator.hasNext()) {
             Object o = extentContingentIterator.next();
