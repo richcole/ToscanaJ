@@ -247,6 +247,12 @@ public class DiagramView extends Canvas implements ChangeObserver {
                     addDiagram(ndNode.getInnerDiagram(), context.getNestedContext(concept));
                 }
             }
+            /**
+             * Inititalize the contingent sizes to allow contingent gradients to work properly on first draw.
+             *
+             * @todo this is not a nice place to do this, find something better
+             */
+            conceptInterpreter.getObjectCount(node.getConcept(), context);
         }
     }
 

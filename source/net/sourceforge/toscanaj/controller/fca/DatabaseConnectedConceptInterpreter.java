@@ -105,6 +105,13 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         return concept.getAttributeContingentSize();
     }
 
+    /**
+     * Gives the relation of the contingent size of the concept given and the largest contingent size queried in the
+     * given context up to now.
+     *
+     * Note that it is not ensured that all contingent sizes have been queried before this call, this is up to the
+     * caller.
+     */
     public double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context, int reference) {
         try {
             int contingentSize = getCount(concept, context, ConceptInterpretationContext.CONTINGENT);
@@ -124,7 +131,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     /**
-     * @todo this assumes the cache is up-to-date. Ensure it is.
+     * This returns the maximal contingent found up to now.
      */
     private int getMaximalContingentSize() {
         int maxVal = 0;
