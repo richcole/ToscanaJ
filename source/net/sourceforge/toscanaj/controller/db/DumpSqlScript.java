@@ -31,7 +31,7 @@ public class DumpSqlScript {
 		Iterator tableNamesIt = connection.getTableNames().iterator();
 		while (tableNamesIt.hasNext()) {
             String tableName = (String) tableNamesIt.next();
-            out.println("CREATE TABLE " + tableName + "(");
+            out.println("CREATE TABLE " + getQuotedIdentifier(tableName) + " (");
             Table table = new Table(new EventBroker(), tableName);
             
             Vector columns = connection.getColumns(table);
@@ -39,7 +39,7 @@ public class DumpSqlScript {
             while (columnIt.hasNext()) {
                 Column column = (Column) columnIt.next();
                 String typeName = SQLTypeMapper.getSQLName(column.getType());
-                out.print("  " + column.getName() + " " + typeName);
+                out.print("  " + getQuotedIdentifier(column.getName()) + " " + typeName);
                 if(columnIt.hasNext()) {
                 	out.println(",");
                 } else {
@@ -49,10 +49,10 @@ public class DumpSqlScript {
 		    out.println(");");
 		    out.println();
 		    
-			Iterator rowIt = connection.executeQuery("SELECT * FROM " + tableName + ";").iterator();
+			Iterator rowIt = connection.executeQuery("SELECT * FROM " + getQuotedIdentifier(tableName) + ";").iterator();
 			while (rowIt.hasNext()) {
                 Vector rowResults = (Vector) rowIt.next();
-                out.print("INSERT INTO " + tableName + " VALUES (");
+                out.print("INSERT INTO " + getQuotedIdentifier(tableName) + " VALUES (");
                 
                 Iterator resultIt = rowResults.iterator();
                 while (resultIt.hasNext()) {
@@ -66,7 +66,7 @@ public class DumpSqlScript {
                             out.print(result);
                         } catch(NumberFormatException e) {
                             // doesn't seem to be a number, better put it in quotes
-                            out.print("'" + getEscapedString(result) + "'");
+                            out.print(getQuotedValueString(result));
                         }
                     }
                     if(resultIt.hasNext()) {
@@ -78,16 +78,31 @@ public class DumpSqlScript {
         }
 	}
 	
-    private static String getEscapedString(String result) {
-        String retVal = "";
-        for(int i = 0; i < result.length(); i++) {
-        	char curChar = result.charAt(i);
-            if(curChar == '\'') {
-        		retVal += "\'\'";
-        	} else {
-        		retVal += curChar;
-        	}
-        }
-        return retVal;
-    }
+	private static String getQuotedIdentifier(String identifier) {
+		String retVal = "\"";
+		for(int i = 0; i < identifier.length(); i++) {
+			char curChar = identifier.charAt(i);
+			if(curChar == '\"') {
+				retVal += "\"\"";
+			} else {
+				retVal += curChar;
+			}
+		}
+		retVal += "\"";
+		return retVal;
+	}
+	
+	private static String getQuotedValueString(String value) {
+		String retVal = "'";
+		for(int i = 0; i < value.length(); i++) {
+			char curChar = value.charAt(i);
+			if(curChar == '\'') {
+				retVal += "\'\'";
+			} else {
+				retVal += curChar;
+			}
+		}
+		retVal += "'";
+		return retVal;
+	}
 }
