@@ -24,6 +24,7 @@ public class Table implements XMLizable {
     private static final String SUPPRESS_ESCAPING_ATTRIBUTE_NAME = "suppressEscaping";
     private boolean suppressEscaping = false;
     public static final String STANDARD_SQL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_";
+    public static final String STANDARD_SQL_FIRST_CHAR = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private String name;
 
     private Column key;
@@ -151,9 +152,15 @@ public class Table implements XMLizable {
     public static boolean quotingIsNeeded(String identifier) {
 		for(int i = 0; i < identifier.length(); i++) {
 			char curChar = identifier.charAt(i);
-			if(STANDARD_SQL_CHARS.indexOf(curChar) == -1) {
-				return true;
-			}
+            if(i == 0) {
+                if(STANDARD_SQL_FIRST_CHAR.indexOf(curChar) == -1) {
+                    return true;
+                }
+            } else {
+                if(STANDARD_SQL_CHARS.indexOf(curChar) == -1) {
+                    return true;
+                }
+            }
 		}
         return false;
     }
