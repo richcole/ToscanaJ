@@ -78,7 +78,12 @@ public class DatabaseInfo implements XMLizable {
      * Creates a new Query that will query a list.
      */
     public DatabaseQuery createListQuery(String name, String header, boolean isDistinct) {
-        return new DatabaseListQuery(this, name, header, isDistinct);
+        if( isDistinct ) {
+            return new DatabaseDistinctListQuery(this, name, header);
+        }
+        else {
+            return new DatabaseListQuery(this, name, header);
+        }
     }
 
     /**

@@ -9,17 +9,16 @@ package net.sourceforge.toscanaj.model.database;
 
 import java.util.Iterator;
 
-public class DatabaseListQuery extends DatabaseQuery {
+public class DatabaseDistinctListQuery extends DatabaseQuery {
     private DatabaseInfo info;
 
-    public DatabaseListQuery(DatabaseInfo info, String name, String header) {
+    public DatabaseDistinctListQuery(DatabaseInfo info, String name, String header) {
         super(name, header);
         this.info = info;
     }
 
     public String getQueryHead() {
-        String retValue = "SELECT ";
-        retValue += info.getKey() + ", ";
+        String retValue = "SELECT DISTINCT 'n/a', ";
         Iterator it = columnList.iterator();
         while (it.hasNext()) {
             Column col = (Column) it.next();
