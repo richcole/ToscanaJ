@@ -482,8 +482,10 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
         ConfigurationManager.storePlacement(CONFIGURATION_SECTION, this);
         ConfigurationManager.storeInt(CONFIGURATION_SECTION, CONFIGURATION_ENTRY_DIVIDER, 
                                       diagramEditingView.getDividerLocation());
-        ConfigurationManager.storeString(CONFIGURATION_SECTION, CONFIGURATION_ENTRY_LAST_FILE, 
-                                      this.lastFileRead.getAbsolutePath());
+		if (this.lastFileRead != null) {                                      
+			ConfigurationManager.storeString(CONFIGURATION_SECTION, CONFIGURATION_ENTRY_LAST_FILE, 
+										  this.lastFileRead.getAbsolutePath());
+		}
         ConfigurationManager.saveConfiguration();
         System.exit(0);
     }
