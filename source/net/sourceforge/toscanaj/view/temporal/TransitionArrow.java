@@ -18,6 +18,7 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D;
 
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.CanvasItem;
@@ -29,6 +30,7 @@ public class TransitionArrow extends CanvasItem {
 	private Color color;
 	private static Shape arrowHead;
 	private Rectangle2D bounds;
+    private Point2D shiftVector = new Point2D.Double();
 	
 	static {
 		arrowHead = createArrowHead();
@@ -55,6 +57,7 @@ public class TransitionArrow extends CanvasItem {
     	if(this.startNodeView == this.endNodeView) {
     		return;
     	}
+    	updateShiftVector();
     	
     	Paint oldPaint = g.getPaint();
     	Stroke oldStroke = g.getStroke();
@@ -72,7 +75,7 @@ public class TransitionArrow extends CanvasItem {
     	g.setStroke(oldStroke);
     	g.setTransform(oldTransform);
     }
-
+    
     public boolean containsPoint(Point2D point) {
         return false;
     }
@@ -109,23 +112,41 @@ public class TransitionArrow extends CanvasItem {
         this.bounds = new Rectangle2D.Double(x,y,width,height);
     }
 
+    private void updateShiftVector() {
+        double xDiff = this.endNodeView.getPosition().getX() -
+                        this.startNodeView.getPosition().getX();
+        double yDiff = this.endNodeView.getPosition().getY() -
+                        this.startNodeView.getPosition().getY();
+        double shiftDist = 10.0;
+        double factor = shiftDist / Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+        this.shiftVector = new Point2D.Double(yDiff * factor, -xDiff * factor);
+    }
+
     protected double getStartX() {
         double x = this.startNodeView.getPosition().getX();
-        return x + SHORTENING_FACTOR * (this.endNodeView.getPosition().getX() - x);
+        return x + 
+               SHORTENING_FACTOR * (this.endNodeView.getPosition().getX() - x) + 
+               this.shiftVector.getX();
     }
 
     protected double getStartY() {
         double y = this.startNodeView.getPosition().getY();
-        return y + SHORTENING_FACTOR * (this.endNodeView.getPosition().getY() - y) - 10;
+        return y + 
+               SHORTENING_FACTOR * (this.endNodeView.getPosition().getY() - y) +
+               this.shiftVector.getY();
     }
 
     protected double getEndX() {
         double x = this.endNodeView.getPosition().getX();
-        return x + SHORTENING_FACTOR * (this.startNodeView.getPosition().getX() - x);
+        return x + 
+               SHORTENING_FACTOR * (this.startNodeView.getPosition().getX() - x) +
+               this.shiftVector.getX();
     }
 
     protected double getEndY() {
         double y = this.endNodeView.getPosition().getY();
-        return y + SHORTENING_FACTOR * (this.startNodeView.getPosition().getY() - y) - 10;
+        return y + 
+               SHORTENING_FACTOR * (this.startNodeView.getPosition().getY() - y) +
+               this.shiftVector.getY();
     }
 }
