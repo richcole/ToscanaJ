@@ -13,7 +13,7 @@ import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.diagram.*;
-import net.sourceforge.toscanaj.events.EventBroker;
+import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.controller.fca.*;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
@@ -279,7 +279,7 @@ public class ToscanaJServlet extends HttpServlet {
                 List attrList = new ArrayList();
                 while (attrIt.hasNext()) {
                     Attribute attribute = (Attribute) attrIt.next();
-                    attrList.add(attribute.getName());
+                    attrList.add(attribute.getData().toString());
                 }
                 double maxLabelWidth = getWidth(fm, attrList);
                 int maxLabelHeight = getHeight(fm);
@@ -304,19 +304,19 @@ public class ToscanaJServlet extends HttpServlet {
                     Attribute attribute = (Attribute) attrIt.next();
                     if (textAlignment == 1) {
                         out.println("<text font-family=\"" + FONT_FAMILY + "\" font-size=\"" + FONT_SIZE + "\" x=\"" + (addXPos((pos.getX() + offset.getX())) - (0.5 * maxLabelWidth)) + "\" y=\"" + addYPos((pos.getY() + offset.getY() - 12.0 )) + "\" style=\"fill:RGB(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")\" >");
-                        String attributeName = attribute.getName();
+                        String attributeName = attribute.getData().toString();
                         out.println(escapeEntities(attributeName));
                         out.println("</text>");
                     }
                     else if (textAlignment == 2) {
                         out.println("<text font-family=\"" + FONT_FAMILY + "\" font-size=\"" + FONT_SIZE + "\" x=\"" + (addXPos((pos.getX() + offset.getX())) - (0.65 * maxLabelWidth)) + "\" y=\"" + addYPos((pos.getY() + offset.getY() - 12.0 )) + "\" style=\"fill:RGB(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")\" >");
-                        String attributeName = attribute.getName();
+                        String attributeName = attribute.getData().toString();
                         out.println(escapeEntities(attributeName));
                         out.println("</text>");
                     }
                     else {
                         out.println("<text font-family=\"" + FONT_FAMILY + "\" font-size=\"" + FONT_SIZE + "\" x=\"" + (addXPos((pos.getX() + offset.getX())) - (0.35 * maxLabelWidth)) + "\" y=\"" + addYPos((pos.getY() + offset.getY() - 12.0 )) + "\" style=\"fill:RGB(" + textColor.getRed() + "," + textColor.getGreen() + "," + textColor.getBlue() + ")\" >");
-                        String attributeName = attribute.getName();
+                        String attributeName = attribute.getData().toString();
                         out.println(escapeEntities(attributeName));
                         out.println("</text>");
                     }
