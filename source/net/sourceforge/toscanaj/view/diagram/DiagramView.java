@@ -212,29 +212,6 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     }
 
     /**
-     * Toggles if object labels should display percentual distribution.
-     *
-     * If off only absolute numbers will be displayed when displaying numbers,
-     * otherwise the percentage of the full object set will be added in
-     * parentheses.
-     *
-     * @see LabelView.setShowPercentage(boolean)
-     */
-    public void setShowPercentage(boolean toggle) {
-        // change existing labels
-        Iterator it = this.canvasItems.iterator();
-        while( it.hasNext() ) {
-            CanvasItem cur = (CanvasItem) it.next();
-            if(cur instanceof ObjectLabelView) {
-                ObjectLabelView lv = (ObjectLabelView) cur;
-                lv.setShowPercentage(toggle);
-            }
-        }
-        // set new default
-        ObjectLabelView.setDefaultShowPercentage(toggle);
-    }
-
-    /**
      * Sets the selected concept.
      *
      * The selected concept and its filter and ideal will be highlighted on

@@ -122,8 +122,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
     private JRadioButtonMenuItem showAllMenuItem = null;
     private JRadioButtonMenuItem showExactMenuItem = null;
 
-    private JCheckBoxMenuItem percDistMenuItem = null;
-
     // view->color menu
     private JMenuItem circleColorMenuItem = null;
     private JMenuItem topColorMenuItem = null;
@@ -438,15 +436,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             viewMenu.addSeparator();
         }
 
-        // menu item PERCENTUAL DISTRIBUTION
-        percDistMenuItem = new JCheckBoxMenuItem("Percentual Distribution");
-        percDistMenuItem.addActionListener(this);
-        percDistMenuItem.setState(false);
-        viewMenu.add(percDistMenuItem);
-
-        // separator
-        viewMenu.addSeparator();
-
         // create the Color submenu
         JMenu colorMenu = new JMenu("Color");
         colorMenu.setMnemonic(KeyEvent.VK_V);
@@ -496,7 +485,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         this.showExactMenuItem.setEnabled (isOpen);
         this.filterExactMenuItem.setEnabled (isOpen);
         this.filterAllMenuItem.setEnabled (isOpen);
-        this.percDistMenuItem.setEnabled (isOpen);
     }
 
     /**
@@ -606,18 +594,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             updateLabelViews();
             return;
         }
-        if (actionSource == this.percDistMenuItem) {
-            this.diagramView.setShowPercentage(this.percDistMenuItem.getState());
-            // testing only
-            if(this.percDistMenuItem.getState()) {
-                DiagramSchema.getDiagramSchema().setGradientReference(DiagramSchema.GRADIENT_REFERENCE_SCHEMA);
-            }
-            else {
-                DiagramSchema.getDiagramSchema().setGradientReference(DiagramSchema.GRADIENT_REFERENCE_DIAGRAM);
-            }
-            // ^^^^^^^^^^^^
-            return;
-        }
 
         // the color entries
         if( actionSource == this.circleColorMenuItem ) {
@@ -719,18 +695,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             }
             updateLabelViews();
         }
-        if (e.getKeyChar() == '%') {
-            this.percDistMenuItem.setState(!this.percDistMenuItem.getState());
-            this.diagramView.setShowPercentage(this.percDistMenuItem.getState());
-            // testing only
-            if(this.percDistMenuItem.getState()) {
-                DiagramSchema.getDiagramSchema().setGradientReference(DiagramSchema.GRADIENT_REFERENCE_SCHEMA);
-            }
-            else {
-                DiagramSchema.getDiagramSchema().setGradientReference(DiagramSchema.GRADIENT_REFERENCE_DIAGRAM);
-            }
-            // ^^^^^^^^^^^^
-        }
     }
 
     /**
@@ -799,7 +763,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         }
         diagramView.showDiagram(null);
         updateLabelViews();
-        diagramView.setShowPercentage(this.percDistMenuItem.isSelected());
         diagramOrganiser.setConceptualSchema(conceptualSchema);
         DiagramController.getController().reset();
         DiagramController.getController().addObserver(this.diagramView);

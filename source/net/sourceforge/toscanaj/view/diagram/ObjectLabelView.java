@@ -24,11 +24,6 @@ public class ObjectLabelView extends LabelView {
     static private boolean defaultShowContingentOnly = true;
 
     /**
-     * Sets the default value for showing percentual distribution or not.
-     */
-    static private boolean defaultShowPercentage = false;
-
-    /**
      * Sets the default query used for new labels.
      */
     static private Query defaultQuery = null;
@@ -49,7 +44,6 @@ public class ObjectLabelView extends LabelView {
     public ObjectLabelView( DiagramView diagramView, LabelInfo label ) {
         super(diagramView,label);
         setDisplayType(defaultShowContingentOnly);
-        setShowPercentage(defaultShowPercentage);
         setQuery(defaultQuery);
     }
 
@@ -89,14 +83,6 @@ public class ObjectLabelView extends LabelView {
      */
     static public void setDefaultQuery(Query query) {
         ObjectLabelView.defaultQuery = query;
-    }
-
-    /**
-     * Changes the startup behaviour of new labels on showing percentual
-     * distribution or not.
-     */
-    static public void setDefaultShowPercentage(boolean toggle) {
-        ObjectLabelView.defaultShowPercentage = toggle;
     }
 
     /**

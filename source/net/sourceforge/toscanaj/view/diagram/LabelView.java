@@ -63,11 +63,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     private Font font = new Font("Arial", Font.PLAIN, 10);
 
     /**
-     * Stores if percentual distribution should be shown behind numbers.
-     */
-    protected boolean showPercentage = false;
-
-    /**
      * Stores if we display contingents or extent/intent.
      *
      * If set to true we show only the attribute or object contingent (depending
@@ -136,15 +131,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         else {
             this.displayLines = this.getNumberOfEntries();
         }
-        update(this);
-    }
-
-    /**
-     * If toggled to true the label will display the percentual distribution
-     * behind the number of entries.
-     */
-    public void setShowPercentage(boolean toggle) {
-        this.showPercentage = toggle;
         update(this);
     }
 
