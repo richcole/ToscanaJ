@@ -7,8 +7,6 @@
  */
 package net.sourceforge.toscanaj;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -29,10 +27,16 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.SpinnerNumberModel;
 
+import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
+import org.tockit.events.EventBrokerListener;
 
+import net.sourceforge.toscanaj.controller.cernato.NDimNodeMovementEventListener;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.controller.fca.DirectConceptInterpreter;
@@ -42,17 +46,51 @@ import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
-import net.sourceforge.toscanaj.model.database.ListQuery;
+import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
-import net.sourceforge.toscanaj.model.diagram.WriteableDiagram2D;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.parser.BurmeisterParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
-import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
+import net.sourceforge.toscanaj.view.diagram.NodeView;
 
 public class Factorizer {
+	static class Factorization {
+		Set attributes;
+		Diagram2D firstFactor;
+		Diagram2D secondFactor;
+		Diagram2D nestedDiagram;
+		
+		Factorization(Context fullContext, Set factorAttributes) {
+			this.attributes = factorAttributes;
+			LatticeGenerator lgen = new GantersAlgorithm();
+					
+			Context context1 = makeContextCopy(fullContext);
+			context1.getAttributes().retainAll(attributes);
+			Lattice lattice1 = lgen.createLattice(context1);
+			this.firstFactor = NDimLayoutOperations.createDiagram(lattice1, fullContext.getName(), new DefaultDimensionStrategy());
+					
+			Context context2 = makeContextCopy(fullContext);
+			context2.getAttributes().removeAll(attributes);
+			Lattice lattice2 = lgen.createLattice(context2);
+			this.secondFactor = NDimLayoutOperations.createDiagram(lattice2, fullContext.getName(), new DefaultDimensionStrategy());
+
+			updateNestedDiagram();
+		}
+
+		void updateNestedDiagram() {
+			this.nestedDiagram = new NestedLineDiagram(this.firstFactor, this.secondFactor);
+		}
+		
+		public String toString() {
+			int numOuterConcepts = firstFactor.getNumberOfNodes();
+			int numInnerConcepts = secondFactor.getNumberOfNodes();
+			return attributes.toString() + " (" + numOuterConcepts + "*" + 
+														   numInnerConcepts + "=" +
+														   numOuterConcepts * numInnerConcepts + ")";
+		}
+	}
 
 	public static void main(String[] args) throws FileNotFoundException, DataFormatException {
 		JFileChooser fileChooser = new JFileChooser();
@@ -82,33 +120,59 @@ public class Factorizer {
 		List retVal = new ArrayList();
 		for (Iterator it = subsets.iterator(); it.hasNext();) {
 			Set set = (Set) it.next();
-			retVal.add(createFactorizedDiagram(context, set));
+			retVal.add(new Factorization(context, set));
 		}
 		return retVal;
 	}
 
 	private static void showResults(List diagrams) {
 		JFrame mainWindow = new JFrame("Factorizer");
-		BorderLayout layout = new BorderLayout();
-		Container contentPane = mainWindow.getContentPane();
-		contentPane.setLayout(layout);
 
+		final JTabbedPane mainPane = new JTabbedPane();
 		final JList listView = new JList(diagrams.toArray());
 		JScrollPane scrollPane = new JScrollPane(listView);
-		contentPane.add(scrollPane, BorderLayout.WEST);
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, mainPane);
+		mainWindow.getContentPane().add(splitPane);
 
-		final DiagramView diagramView = new DiagramView();
-		diagramView.setConceptInterpreter(new DirectConceptInterpreter());
-		diagramView.setConceptInterpretationContext(new ConceptInterpretationContext(new DiagramHistory(), new EventBroker()));
-		diagramView.setQuery(ListQuery.KEY_LIST_QUERY);
-		diagramView.setMinimumFontSize(8.0);
-		ObjectLabelView.setAllHidden(true);
-		contentPane.add(diagramView, BorderLayout.CENTER);
+		final DiagramView firstDiagramView = new DiagramView();
+		firstDiagramView.setConceptInterpreter(new DirectConceptInterpreter());
+		firstDiagramView.setConceptInterpretationContext(new ConceptInterpretationContext(new DiagramHistory(), new EventBroker()));
+		firstDiagramView.setQuery(AggregateQuery.COUNT_QUERY);
+
+		final DiagramView secondDiagramView = new DiagramView();
+		secondDiagramView.setConceptInterpreter(new DirectConceptInterpreter());
+		secondDiagramView.setConceptInterpretationContext(new ConceptInterpretationContext(new DiagramHistory(), new EventBroker()));
+		secondDiagramView.setQuery(AggregateQuery.COUNT_QUERY);
+
+		final DiagramView nestedDiagramView = new DiagramView();
+		nestedDiagramView.setConceptInterpreter(new DirectConceptInterpreter());
+		nestedDiagramView.setConceptInterpretationContext(new ConceptInterpretationContext(new DiagramHistory(), new EventBroker()));
+		nestedDiagramView.setQuery(AggregateQuery.COUNT_QUERY);
+
+		mainPane.add(firstDiagramView,"Factor 1");
+		mainPane.add(secondDiagramView,"Factor 2");
+		mainPane.add(nestedDiagramView,"Nested");
 
 		listView.addMouseListener(new MouseAdapter() {
+			class MoveAndUpdateListener implements EventBrokerListener {
+				NDimNodeMovementEventListener nodeListener = new NDimNodeMovementEventListener();
+				Factorization currentFactorization;
+				public void processEvent(Event e) {
+					nodeListener.processEvent(e);
+					currentFactorization.updateNestedDiagram();
+					nestedDiagramView.showDiagram(currentFactorization.nestedDiagram);
+				}
+			}
+			MoveAndUpdateListener moveAndUpdateListener = new MoveAndUpdateListener();
 			public void mouseClicked(MouseEvent e) {
-				Diagram2D diagram = (Diagram2D) listView.getSelectedValue();
-				diagramView.showDiagram(diagram);
+				final Factorization factorization = (Factorization) listView.getSelectedValue();
+				this.moveAndUpdateListener.currentFactorization = factorization;
+				
+				firstDiagramView.showDiagram(factorization.firstFactor);
+				firstDiagramView.getController().getEventBroker().subscribe(moveAndUpdateListener, CanvasItemDraggedEvent.class, NodeView.class);
+				secondDiagramView.showDiagram(factorization.secondFactor);
+				secondDiagramView.getController().getEventBroker().subscribe(moveAndUpdateListener, CanvasItemDraggedEvent.class, NodeView.class);
+				nestedDiagramView.showDiagram(factorization.nestedDiagram);
 			}
 		});
 
@@ -120,28 +184,6 @@ public class Factorizer {
 				System.exit(0);
 			}
 		});
-	}
-
-	public static Diagram2D createFactorizedDiagram(final Context context, Set set) {
-		LatticeGenerator lgen = new GantersAlgorithm();
-				
-		Context context1 = makeContextCopy(context);
-		context1.getAttributes().retainAll(set);
-		Lattice lattice1 = lgen.createLattice(context1);
-		Diagram2D diagram1 = NDimLayoutOperations.createDiagram(lattice1, context.getName(), new DefaultDimensionStrategy());
-				
-		Context context2 = makeContextCopy(context);
-		context2.getAttributes().removeAll(set);
-		Lattice lattice2 = lgen.createLattice(context2);
-		Diagram2D diagram2 = NDimLayoutOperations.createDiagram(lattice2, context.getName(), new DefaultDimensionStrategy());
-				
-		WriteableDiagram2D nestedDiagram = new NestedLineDiagram(diagram1, diagram2);
-		int numOuterConcepts = lattice1.getConcepts().length;
-		int numInnerConcepts = lattice2.getConcepts().length;
-		nestedDiagram.setTitle(set.toString() + " (" + numOuterConcepts + "*" + 
-													   numInnerConcepts + "=" +
-													   numOuterConcepts * numInnerConcepts + ")");
-		return nestedDiagram;
 	}
 
 	protected static Context makeContextCopy(Context context) {
