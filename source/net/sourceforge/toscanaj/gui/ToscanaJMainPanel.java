@@ -73,7 +73,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
     private static final String WINDOW_TITLE = "ToscanaJ";
 
-    private static final ExtendedPreferences preferences = (ExtendedPreferences) ExtendedPreferences.userNodeForPackageEx(ToscanaJMainPanel.class).node("ToscanaJ");
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(ToscanaJMainPanel.class);
     
     private static final String CONFIGURATION_KEY_COLOR_MODE = "colorMode";
     private static final String CONFIGURATION_VALUE_COLOR_MODE_COLOR = "color";

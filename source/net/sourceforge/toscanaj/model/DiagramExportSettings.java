@@ -9,8 +9,8 @@ package net.sourceforge.toscanaj.model;
 
 import java.io.File;
 import java.util.Iterator;
+import java.util.prefs.Preferences;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 
 import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
@@ -18,12 +18,12 @@ import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 /**
  * Copy from org.tockit.canvas.imagewriter to use ConfigurationManager.
  * 
- * @todo move ConfigurationManager or similar functionality into Tockit\
- * and use this instead. At the moment everything is duplicated.
+ * @todo move this back into canvas package -- it was duplicated due to the
+ * use of the now deprecated ConfigurationManager. The code has been changed
+ * already, the class just needs to move.
  */
 public class DiagramExportSettings extends org.tockit.canvas.imagewriter.DiagramExportSettings {
-
-	private static final String CONFIGURATION_SECTION_NAME = "DiagramExportSettings";
+	private static final Preferences preferences = Preferences.userNodeForPackage(DiagramExportSettings.class);
 
     private static final String CONFIGURATION_AUTO_MODE_ENTRY = "autoMode";
 	private static final String CONFIGURATION_IMAGE_HEIGHT_ENTRY = "imageHeight";
@@ -74,7 +74,7 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
 	 */
 	public DiagramExportSettings() {
 		super(null,0,0,false);
-		String lastImage = ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, CONFIGURATION_LAST_EXPORT_FILE_ENTRY, null);
+		String lastImage = preferences.get(CONFIGURATION_LAST_EXPORT_FILE_ENTRY, null);
 		if (lastImage != null) {
 			this.format = GraphicFormatRegistry.getTypeByExtension(lastImage);
 			this.lastImageExportFile = new File(lastImage);
@@ -87,20 +87,20 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
 			// can't find last image, so set last image file to null.
 			this.lastImageExportFile = null; 
 		}
-		this.width = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_IMAGE_WIDTH_ENTRY, 500);
+		this.width = preferences.getInt(CONFIGURATION_IMAGE_WIDTH_ENTRY, 500);
 		
-		this.height = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_IMAGE_HEIGHT_ENTRY, 400);
-		int exportAutoMode = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_AUTO_MODE_ENTRY, 1); 
+		this.height = preferences.getInt(CONFIGURATION_IMAGE_HEIGHT_ENTRY, 400);
+		int exportAutoMode = preferences.getInt(CONFIGURATION_AUTO_MODE_ENTRY, 1); 
 		this.autoMode = true;
 		if( exportAutoMode == 0 ) {
 			this.autoMode = false;
 		}	
-		int saveCommentsToFileTrue = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_COMMENTS_TO_FILE_ENTRY, 0);
+		int saveCommentsToFileTrue = preferences.getInt(CONFIGURATION_COMMENTS_TO_FILE_ENTRY, 0);
 		this.saveCommentsToFile = false;
 		if( saveCommentsToFileTrue == 1) {
 			this.saveCommentsToFile= true;	 
 		}
-		int saveCommentsToClipboardTrue = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_COMMENTS_TO_CLIPBOARD_ENTRY, 0);
+		int saveCommentsToClipboardTrue = preferences.getInt(CONFIGURATION_COMMENTS_TO_CLIPBOARD_ENTRY, 0);
 		this.saveCommentsToClipboard= false;
 		if( saveCommentsToClipboardTrue == 1 ){
 			this.saveCommentsToClipboard= true;
@@ -122,7 +122,7 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
         this.autoMode = autoMode;
 		this.saveCommentsToFile= false;
 		this.saveCommentsToClipboard= false;
-		String lastImage = ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, CONFIGURATION_LAST_EXPORT_FILE_ENTRY, null);
+		String lastImage = preferences.get(CONFIGURATION_LAST_EXPORT_FILE_ENTRY, null);
 		this.lastImageExportFile = new File(lastImage);  
     }
 
@@ -139,8 +139,8 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
     public void setImageSize(int width, int height) {
         this.width = width;
         this.height = height;
-		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_IMAGE_WIDTH_ENTRY, width);
-		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_IMAGE_HEIGHT_ENTRY, height);
+		preferences.putInt(CONFIGURATION_IMAGE_WIDTH_ENTRY, width);
+		preferences.putInt(CONFIGURATION_IMAGE_HEIGHT_ENTRY, height);
     }
 
     /**
@@ -155,7 +155,7 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
 		if( mode == false ) {
 			exportAutoMode = 0;
 		}
-		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_AUTO_MODE_ENTRY, exportAutoMode); 
+		preferences.putInt(CONFIGURATION_AUTO_MODE_ENTRY, exportAutoMode); 
     }
     
     /**
@@ -223,7 +223,7 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
 		if(saveToFile == true){
 			saveFile = 1;
 		}
-		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_COMMENTS_TO_FILE_ENTRY,saveFile);
+		preferences.putInt(CONFIGURATION_COMMENTS_TO_FILE_ENTRY,saveFile);
 	}
 
 	/**
@@ -236,7 +236,7 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
 		if(saveCommentToClipboard == true){
 			saveToClipboard = 1;
 		}
-		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_COMMENTS_TO_CLIPBOARD_ENTRY, saveToClipboard);
+		preferences.putInt(CONFIGURATION_COMMENTS_TO_CLIPBOARD_ENTRY, saveToClipboard);
 	}
 
 	/**
@@ -253,7 +253,7 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
 	 */
 	public void setLastImageExportFile(File lastImageExportFile) {
 		this.lastImageExportFile = lastImageExportFile;
-		ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, CONFIGURATION_LAST_EXPORT_FILE_ENTRY, lastImageExportFile.getAbsolutePath());
+		preferences.put(CONFIGURATION_LAST_EXPORT_FILE_ENTRY, lastImageExportFile.getAbsolutePath());
 	}
 
 }

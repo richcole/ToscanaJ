@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
+import org.tockit.swing.ExtendedPreferences;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -26,6 +26,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class DescriptionViewer {
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DescriptionViewer.class); 
+    
     private static URL baseURL;
 
     private static class ViewerDialog extends JDialog {
@@ -91,7 +93,7 @@ public class DescriptionViewer {
         }
         
         private void closeDialog() {
-            ConfigurationManager.storePlacement("DescriptionViewerDialog", this);
+            preferences.storeWindowPlacement(this);
             this.setVisible(false);
         }
 
@@ -147,7 +149,7 @@ public class DescriptionViewer {
 
     public static void show(Frame parent, Element description) {
         ViewerDialog dialog = new ViewerDialog(parent);
-        ConfigurationManager.restorePlacement("DescriptionViewerDialog", dialog, new Rectangle(100, 100, 300, 300));
+        preferences.restoreWindowPlacement(dialog, new Rectangle(100, 100, 300, 300));
         dialog.showDescription(description, baseURL);
         dialog.setVisible(true);
     }

@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.view.database;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
@@ -23,6 +22,7 @@ import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
+import org.tockit.swing.ExtendedPreferences;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -44,6 +44,8 @@ import java.net.MalformedURLException;
  */
 public class DatabaseConnectionInformationView extends JDialog
 												implements EventBrokerListener {
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DatabaseConnectionInformationView.class);
+                                                    
 	private static final String JDBC_ID_STRING = "JDBC";
 	private static final String EMBEDDED_DBMS_ID_STRING = "Embedded DBMS";
 	private static final String ODBC_ID_STRING = "ODBC Source";
@@ -648,10 +650,7 @@ public class DatabaseConnectionInformationView extends JDialog
 				
 		setCurrentPanel(this.dbTypePanel);
 				
-		ConfigurationManager.restorePlacement(
-			"DatabaseConnectionInformationView",
-			this,
-			new Rectangle(100, 100, MINIMUM_WIDTH, MINIMUM_WIDTH));
+		preferences.restoreWindowPlacement(this, new Rectangle(100, 100, MINIMUM_WIDTH, MINIMUM_WIDTH));
 
 	    eventBroker.subscribe(
 	        this,
@@ -804,9 +803,7 @@ public class DatabaseConnectionInformationView extends JDialog
             }
 		}
 	    setCurrentPanel(this.dbTypePanel);
-		ConfigurationManager.storePlacement(
-			"DatabaseConnectionInformationView",
-			this);
+		preferences.storeWindowPlacement(this);
 	}
 	
 	public void show() {

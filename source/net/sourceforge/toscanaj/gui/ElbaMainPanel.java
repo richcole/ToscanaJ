@@ -82,7 +82,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     private static final String WINDOW_TITLE = "Elba";
     private static final int MaxMruFiles = 8;
 
-    private static final ExtendedPreferences preferences = (ExtendedPreferences) ExtendedPreferences.userNodeForPackageEx(ElbaMainPanel.class).node("Elba");
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(ElbaMainPanel.class);
 
     /**
      *  Main Controllers

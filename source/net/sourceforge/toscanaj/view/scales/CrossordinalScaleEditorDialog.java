@@ -10,7 +10,8 @@ package net.sourceforge.toscanaj.view.scales;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import org.tockit.swing.ExtendedPreferences;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.model.context.Attribute;
@@ -36,29 +37,27 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 
 	private OrdinalScaleGeneratorPanel leftPanel, rightPanel;
 		
-	private static final String CONFIGURATION_SECTION_NAME = "BiordinalScaleEditorDialog";
+	private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(CrossordinalScaleEditorDialog.class);
 	private static final int MINIMUM_WIDTH = 800;
 	private static final int MINIMUM_HEIGHT = 500;
-	private static final int DEFAULT_X_POS = 10;
-	private static final int DEFAULT_Y_POS = 10;
+	private static final Rectangle DEFAULT_PLACEMENT = new Rectangle(10, 10, MINIMUM_WIDTH, MINIMUM_HEIGHT);
 
 	public CrossordinalScaleEditorDialog(Frame owner, DatabaseSchema databaseSchema, DatabaseConnection connection) {
 		super(owner);
-		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
-			this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
-			//	to enforce the minimum size during resizing of the JDialog
-			 addComponentListener( new ComponentAdapter() {
-				 public void componentResized(ComponentEvent e) {
-					 int width = getWidth();
-					 int height = getHeight();
-					 if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
-					 if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
-					 setSize(width, height);
-				 }
-				 public void componentShown(ComponentEvent e) {
-					 componentResized(e);
-				 }
-			 });
+		preferences.restoreWindowPlacement(this, DEFAULT_PLACEMENT); 
+		//	to enforce the minimum size during resizing of the JDialog
+		 addComponentListener( new ComponentAdapter() {
+			 public void componentResized(ComponentEvent e) {
+				 int width = getWidth();
+				 int height = getHeight();
+				 if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
+				 if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
+				 setSize(width, height);
+			 }
+			 public void componentShown(ComponentEvent e) {
+				 componentResized(e);
+			 }
+		 });
 		
 		layoutDialog(databaseSchema, connection);
 	}
@@ -191,7 +190,7 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 	}
 	
 	private void closeDialog(boolean result) {
-		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
+		preferences.storeWindowPlacement(this);
 		dispose();
 		this.result = result;
 	}

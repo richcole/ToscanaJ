@@ -10,7 +10,8 @@ package net.sourceforge.toscanaj.view.scales;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import org.tockit.swing.ExtendedPreferences;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.model.context.Context;
@@ -25,13 +26,11 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class OrdinalScaleEditorDialog extends JDialog {
-    boolean result;
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(OrdinalScaleEditorDialog.class);
 	
-	private static final String CONFIGURATION_SECTION_NAME = "OrdinalScaleEditorDialog";
 	private static final int MINIMUM_WIDTH = 400;
 	private static final int MINIMUM_HEIGHT = 600;
-	private static final int DEFAULT_X_POS = 200;
-	private static final int DEFAULT_Y_POS = 100;
+	private static final Rectangle DEFAULT_PLACEMENT = new Rectangle(200,100,MINIMUM_WIDTH, MINIMUM_HEIGHT);
     
     private JTextField titleEditor = new JTextField();
     private JButton okButton; 
@@ -39,13 +38,14 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
     private DatabaseSchema databaseSchema;
     private DatabaseConnection connection;
+
+    private boolean result;
       
     public OrdinalScaleEditorDialog(Frame owner, DatabaseSchema databaseSchema, DatabaseConnection connection) {
         super(owner);
        	this.databaseSchema = databaseSchema;
       	this.connection = connection;
-		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
-		this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
+        preferences.restoreWindowPlacement(this, DEFAULT_PLACEMENT);
 		//	to enforce the minimum size during resizing of the JDialog
 		 addComponentListener( new ComponentAdapter() {
 			 public void componentResized(ComponentEvent e) {
@@ -161,7 +161,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
     }
 	
 	private void closeDialog(boolean res) {
-		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
+        preferences.storeWindowPlacement(this);
 		dispose();
 		this.result = res;
 	}

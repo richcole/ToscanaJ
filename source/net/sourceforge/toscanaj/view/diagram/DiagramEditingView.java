@@ -7,13 +7,7 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import net
-    .sourceforge
-    .toscanaj
-    .controller
-    .cernato
-    .NDimNodeMovementEventListener;
+import net.sourceforge.toscanaj.controller.cernato.NDimNodeMovementEventListener;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
@@ -48,6 +42,7 @@ import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
+import org.tockit.swing.ExtendedPreferences;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -64,7 +59,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private static final int DEFAULT_GRID_SIZE = 15;
     private static final String[] FULL_MOVEMENT_OPTION_NAMES = {"NDim", "Node", "Ideal", "Filter"};
     private static final String[] SIMPLE_MOVEMENT_OPTION_NAMES = {"Node", "Ideal", "Filter"};
-    private static final String CONFIGURATION_SECTION_NAME = "DiagramEditingView";
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramEditingView.class);
     private ConceptualSchema conceptualSchema;
     private DefaultListModel diagramListModel;
     private JSplitPane splitPane;
@@ -634,24 +629,16 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     }
     
     public void saveConfigurationSettings() {
-    	ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME,"useGrid",new Boolean(this.gridEnabledCheckBox.isSelected()).toString());
-		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME,"gridCellHeight",(int) this.diagramView.getGridCellHeight());
-		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME,"gridCellWidth",(int) this.diagramView.getGridCellWidth());
+        preferences.putBoolean("useGrid", this.gridEnabledCheckBox.isSelected());
+        preferences.putDouble("gridCellHeight", this.diagramView.getGridCellHeight());
+        preferences.putDouble("gridCellWidth", this.diagramView.getGridCellWidth());
     }
     
     public void loadConfigurationSettings() {
-    	String useGrid = ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME,"useGrid","false");
-		boolean use = false;
-    	if(useGrid.trim().equalsIgnoreCase("true")){
-    		use = true;
-    	}
-    	if(use) {
-			int cellWidth = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME,"gridCellWidth",DEFAULT_GRID_SIZE);
-			int cellHeight = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME,"gridCellWidth",DEFAULT_GRID_SIZE);
-			this.diagramView.setGrid(cellWidth, cellHeight);	
-    	}else{
-			this.diagramView.setGrid(DEFAULT_GRID_SIZE, DEFAULT_GRID_SIZE);
-    	}
+		boolean use = preferences.getBoolean("useGrid",false);
+		double cellWidth = preferences.getDouble("gridCellWidth",DEFAULT_GRID_SIZE);
+		double cellHeight = preferences.getDouble("gridCellWidth",DEFAULT_GRID_SIZE);
+		this.diagramView.setGrid(cellWidth, cellHeight);	
 		this.diagramView.setGridEnabled(use);
 		this.gridEnabledCheckBox.setSelected(use);
 		this.gridEnabledCheckBox.setEnabled(use);

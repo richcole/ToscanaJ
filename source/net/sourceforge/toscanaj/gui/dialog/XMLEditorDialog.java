@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.io.StringReader;
 
 public class XMLEditorDialog extends JDialog {
-	private static final ExtendedPreferences preferences = (ExtendedPreferences) ExtendedPreferences.userNodeForPackageEx(XMLEditorDialog.class).node("XMLEditorDialog");
+	private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(XMLEditorDialog.class);
     
 	private JTextArea textPane = new JTextArea();
     private JLabel statusBar = new JLabel();

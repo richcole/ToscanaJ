@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.NormedIntervalSource;
@@ -22,12 +21,15 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.prefs.Preferences;
 
 /**
  * class DiagramNode holds details on node position and size
  */
 
 public class NodeView extends CanvasItem {
+    private static final Preferences preferences = Preferences.userNodeForPackage(NodeView.class);
+    
     /**
      * Store the node model for this view
      */
@@ -114,7 +116,7 @@ public class NodeView extends CanvasItem {
         graphics.fill(ellipse);
         graphics.setPaint(circleColor);
         graphics.draw(ellipse);
-        if (ConfigurationManager.fetchInt("NodeView", "displayVectors", 0) != 0) {
+        if (preferences.getBoolean("displayCoordinates", false)) {
             String vector;
             if (diagramNode instanceof NDimDiagramNode) {
                 NDimDiagramNode node = (NDimDiagramNode) diagramNode;

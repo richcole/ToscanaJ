@@ -19,10 +19,10 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import javax.swing.JOptionPane;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
@@ -44,6 +44,8 @@ import org.tockit.plugin.PluginClassLoader;
  *       fix that
  */
 public class DatabaseViewerManager implements XMLizable {
+    private final static Preferences preferences = Preferences.userNodeForPackage(DatabaseViewerManager.class);
+    
     /// @todo look for a better way to get the parent
     private static Component parentComponent = null;
     private static List objectViewerRegistry = new LinkedList();
@@ -71,7 +73,7 @@ public class DatabaseViewerManager implements XMLizable {
     private static final String PARAMETER_NAME_ATTRIBUTE_NAME = "name";
     private static final String PARAMETER_VALUE_ATTRIBUTE_NAME = "value";
     
-    private static final String PLUGIN_LOCATION = ConfigurationManager.fetchString("DatabaseViewerManager", "pluginDirectory", "plugins");
+    private static final String PLUGIN_LOCATION = preferences.get("pluginDirectory", "plugins");
 
     public DatabaseViewerManager(Element viewerDefinition, DatabaseInfo databaseInfo, DatabaseConnection connection)
             throws DatabaseViewerInitializationException {

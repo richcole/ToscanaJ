@@ -1,13 +1,13 @@
 package net.sourceforge.toscanaj.view.scales;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
-
 import java.awt.*;
 import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
+
+import org.tockit.swing.ExtendedPreferences;
 
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
@@ -17,8 +17,8 @@ import javax.swing.table.TableCellEditor;
  * $Id$
  */
 public class AttributeListScaleGeneratorDialog extends JDialog {
+	private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(AttributeListScaleGeneratorDialog.class);
 
-	private static final String CONFIGURATION_SECTION_NAME = "AttributeListScaleGeneratorDialog";
 	private static final int MINIMUM_WIDTH = 550;
 	private static final int MINIMUM_HEIGHT = 400;
 	private static final int DEFAULT_X_POS = 50;
@@ -42,8 +42,7 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 
 	private void createView() {
 		setTitle("Attribute List");
-		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
-			this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
+		preferences.restoreWindowPlacement(this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
 		
 		// to enforce the minimum size during resizing of the JDialog
 		addComponentListener( new ComponentAdapter() {
@@ -321,7 +320,7 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 	}
 	
 	private void closeDialog(boolean result) {
-		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
+        preferences.storeWindowPlacement(this);
 		this.result = result;
 		setVisible(false);
 	}

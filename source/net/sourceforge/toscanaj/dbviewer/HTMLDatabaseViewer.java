@@ -7,12 +7,12 @@
  */
 package net.sourceforge.toscanaj.dbviewer;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
+import org.tockit.swing.ExtendedPreferences;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,6 +50,8 @@ import java.util.Vector;
  * attribute.
  */
 public class HTMLDatabaseViewer implements DatabaseViewer {
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(HTMLDatabaseViewer.class);
+    
 	private DatabaseViewerManager manager;
     private class HTMLDatabaseViewDialog extends JDialog {
         private DatabaseViewerManager viewerManager;
@@ -154,7 +156,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
         }
 
         protected void closeDialog() {
-            ConfigurationManager.storePlacement("HTMLDatabaseViewDialog", this);
+            preferences.storeWindowPlacement(this);
             this.dispose();
         }
 
@@ -227,10 +229,8 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
 		Frame parentWindow = DatabaseViewerManager.getParentWindow();
 		HTMLDatabaseViewDialog dialog;
 		try {
-			dialog =
-				new HTMLDatabaseViewDialog(parentWindow,
-					                       this.manager);
-			ConfigurationManager.restorePlacement("HTMLDatabaseViewDialog", dialog, new Rectangle(100, 100, 350, 300));
+			dialog = new HTMLDatabaseViewDialog(parentWindow, this.manager);
+            preferences.restoreWindowPlacement(dialog, new Rectangle(100, 100, 350, 300));
 			dialog.showView(whereClause);
 		} catch (DatabaseViewerInitializationException e) {
 			ErrorDialog.showError(parentWindow,e,"Viewer could not be initialized");

@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.controller.db;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
@@ -24,9 +23,7 @@ import org.tockit.plugin.*;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.net.URL;
 import java.sql.*;
 import java.util.ArrayList;
@@ -35,6 +32,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
 /**
  * This class facilitates connection to and communication with a database
@@ -45,7 +45,8 @@ import java.util.Vector;
  */
 public class DatabaseConnection implements EventBrokerListener {
 	private static final String DEFAULT_DATABASE_DRIVER_LOCATION = "dbdrivers";
-    private static final String CONFIGURATION_SECTION = "DatabaseConnection";
+    private static final Preferences preferences = Preferences.userNodeForPackage(DatabaseConnection.class);
+    
 
     /**
      * The JDBC database connection we use.
@@ -55,43 +56,14 @@ public class DatabaseConnection implements EventBrokerListener {
 
     static private DatabaseConnection singleton = null;
 
-    /**
-     * If set to something else than null we will print log entries into this
-     * stream.
-     */
-    static private PrintStream logger;
+    private final static Logger logger = Logger.getLogger(DatabaseConnection.class.getName());
+    
 	private Type type;
 
     private long lastStatementStartTime;
 
-    /**
-     * Initializes the logger from the system configuration.
-     * 
-     * @todo move to the JDK 1.4 logging API
-     */
-    static {
-        setUpLogging();
-    }
-
     static public void initialize(EventBroker eventBroker) {
         singleton = new DatabaseConnection(eventBroker);
-    }
-
-    private static void setUpLogging() {
-        String log = ConfigurationManager.fetchString(CONFIGURATION_SECTION, "logger", "");
-        PrintStream result = null; // we need indirection since the compiler doesn't grok it otherwise
-        if (log.length() != 0) {
-            if (log.equals("-")) {
-                result = System.out;
-            } else {
-                try {
-                    result = new PrintStream(new FileOutputStream(log));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        logger = result;
     }
 
     static public DatabaseConnection getConnection() {
@@ -141,7 +113,7 @@ public class DatabaseConnection implements EventBrokerListener {
         try {
             jdbcConnection.close();
             jdbcConnection = null;
-            printLogMessage("Disconnected");
+            logger.fine("Disconnected");
         } catch (SQLException e) {
             throw new DatabaseException("Could not disconnect from the database.", e);
         }
@@ -168,13 +140,11 @@ public class DatabaseConnection implements EventBrokerListener {
 		try {
 			Class.forName(driverName);
 		} catch (ClassNotFoundException e) {
-            String dbDriverLocation = ConfigurationManager.fetchString(CONFIGURATION_SECTION, "driverDirectory", DEFAULT_DATABASE_DRIVER_LOCATION);
+            String dbDriverLocation = preferences.get("driverDirectory", DEFAULT_DATABASE_DRIVER_LOCATION);
             DatabaseDriverLoader.Error[] errors = DatabaseDriverLoader.loadDrivers(new File(dbDriverLocation));
-            if(logger != null) {
-                for (int i = 0; i < errors.length; i++) {
-                    DatabaseDriverLoader.Error error = errors[i];
-                    error.getException().printStackTrace(logger);
-                }
+            for (int i = 0; i < errors.length; i++) {
+                DatabaseDriverLoader.Error error = errors[i];
+                logger.log(Level.WARNING, "Error when loading database drivers", error.getException());
             }
 		}
         
@@ -185,7 +155,7 @@ public class DatabaseConnection implements EventBrokerListener {
         // connect to the DB
         try {
             connection = DriverManager.getConnection(url, account, password);
-            printLogMessage("Created new DB connection to " + url);
+            logger.fine("Created new DB connection to " + url);
         } catch (SQLException se) {
             throw new DatabaseException("An error occured connecting to the database", se);
         }
@@ -197,7 +167,7 @@ public class DatabaseConnection implements EventBrokerListener {
      */
     public void executeScript(URL sqlURL) throws DatabaseException {
     	// we have to concatenate a couple of lines sometimes since the SQL commands don't have to be on one line
-        printLogMessage(System.currentTimeMillis() + ": Submitting script: " + sqlURL.toString());
+        logger.fine(System.currentTimeMillis() + ": Submitting script: " + sqlURL.toString());
         String sqlCommand = "";
         try {
             BufferedReader in = new BufferedReader(
@@ -213,7 +183,7 @@ public class DatabaseConnection implements EventBrokerListener {
         } catch (Exception e) {
             throw new DatabaseException("Could not read SQL script from URL '" + sqlURL.toString() + "'.", e);
         }
-        printLogMessage(System.currentTimeMillis() + ": done.");
+        logger.fine(System.currentTimeMillis() + ": done.");
         this.broker.processEvent(new DatabaseModifiedEvent(this, this));
     }
 
@@ -590,15 +560,6 @@ public class DatabaseConnection implements EventBrokerListener {
         return result;
     }
 
-    /**
-     * Puts debug output to the logger, if it is not null.
-     */
-    private static void printLogMessage(String message) {
-        if (logger != null) {
-            logger.println(message);
-        }
-    }
-
     public void processEvent(Event e) {
         if (e instanceof DatabaseConnectEvent) {
             DatabaseConnectEvent event = (DatabaseConnectEvent) e;
@@ -682,12 +643,12 @@ public class DatabaseConnection implements EventBrokerListener {
 
 	private void logStatementStart(String statement) {
         this.lastStatementStartTime = System.currentTimeMillis();
-        printLogMessage(lastStatementStartTime + ": Executing statement: " + statement);
+        logger.fine(lastStatementStartTime + ": Executing statement: " + statement);
 	}
 
 	private void logStatementEnd() {
 		long statementStopTime = System.currentTimeMillis();
-        printLogMessage(statementStopTime + ": done (" + (statementStopTime - this.lastStatementStartTime) + " ms).");
+        logger.fine(statementStopTime + ": done (" + (statementStopTime - this.lastStatementStartTime) + " ms).");
 	}
 
 	public DatabaseMetaData getDatabaseMetaData () throws DatabaseException {

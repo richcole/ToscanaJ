@@ -7,11 +7,11 @@
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.model.DiagramExportSettings;
 
 import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
+import org.tockit.swing.ExtendedPreferences;
 
 import javax.swing.*;
 
@@ -33,6 +33,8 @@ import java.util.Iterator;
  * retrieved with the methods getFormat(), getWidth() and getHeight().
  */
 public class DiagramExportSettingsDialog extends JDialog implements ActionListener {
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramExportSettingsDialog.class);
+    
     /**
      * The instance used.
      */
@@ -219,7 +221,7 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
 
     protected void closeDialog() {
         DiagramExportSettingsDialog.dialog.setVisible(false);
-        ConfigurationManager.storePlacement("DiagramExportSettingsDialog", this);
+        preferences.storeWindowPlacement(this);
         
     }
 
@@ -255,8 +257,8 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
     public static boolean showDialog(Component comp) {
         if (dialog != null) {
             dialog.setLocationRelativeTo(comp);
-            ConfigurationManager.restorePlacement("DiagramExportSettingsDialog", dialog,
-                    new Rectangle(50, 50, 350, 200));
+            preferences.restoreWindowPlacement(dialog,
+                                               new Rectangle(50, 50, 350, 200));
             dialog.setVisible(true);
         } else {
             System.err.println("DiagramExportSettingsDialog has to be initialize(..)d " +

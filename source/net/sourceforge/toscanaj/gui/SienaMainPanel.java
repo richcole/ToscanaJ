@@ -141,7 +141,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private static final String WINDOW_TITLE = "Siena";
     private static final int MaxMruFiles = 8;
     
-    private static final ExtendedPreferences preferences = (ExtendedPreferences) ExtendedPreferences.userNodeForPackageEx(SienaMainPanel.class).node("Siena");
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(SienaMainPanel.class);
 
     /**
      *  Main Controllers

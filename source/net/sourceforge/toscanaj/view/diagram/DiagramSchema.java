@@ -21,7 +21,7 @@ import org.tockit.swing.ExtendedPreferences;
  * This class uses a Singleton design pattern.
  */
 public class DiagramSchema {
-    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForPackageEx(DiagramSchema.class);
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramSchema.class);
 
     /**
      * The amount of fade out for unselected nodes.

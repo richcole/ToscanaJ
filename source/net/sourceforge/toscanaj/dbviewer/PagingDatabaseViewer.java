@@ -7,11 +7,13 @@
  */
 package net.sourceforge.toscanaj.dbviewer;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
 import javax.swing.*;
+
+import org.tockit.swing.ExtendedPreferences;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +40,8 @@ import java.util.Vector;
  * getting the table and object key information.
  */
 abstract public class PagingDatabaseViewer implements DatabaseViewer {
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(PagingDatabaseViewer.class);
+    
 	protected interface PageViewPanel {
 		void showItem(String keyValue);
 		Component getComponent() throws DatabaseViewerInitializationException;
@@ -152,7 +156,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
 
 
         protected void closeDialog() {
-            ConfigurationManager.storePlacement("PagingDatabaseViewerDialog", this);
+            preferences.storeWindowPlacement(this);
             this.dispose();
         }
 
@@ -213,9 +217,8 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
 		Frame parentWindow = DatabaseViewerManager.getParentWindow();
 		PagingDatabaseViewerDialog dialog;
 		try {
-			dialog =
-				new PagingDatabaseViewerDialog(parentWindow);
-			ConfigurationManager.restorePlacement("PagingDatabaseViewerDialog", dialog, new Rectangle(100, 100, 350, 300));
+			dialog = new PagingDatabaseViewerDialog(parentWindow);
+            preferences.restoreWindowPlacement(dialog, new Rectangle(100, 100, 350, 300));
 			dialog.showView(whereClause);
 		} catch (DatabaseViewerInitializationException e) {
 			ErrorDialog.showError(parentWindow,e,"Viewer could not be initialized");

@@ -30,7 +30,7 @@ import java.text.DecimalFormat;
  * Draws a line between two points, representing a DiagramLine in the model.
  */
 public class LineView extends CanvasItem {
-    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForPackageEx(LineView.class);
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(LineView.class);
     
 	private static class NonRealizedConceptGroupingMode{};
 	

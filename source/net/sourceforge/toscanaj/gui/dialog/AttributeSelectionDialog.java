@@ -14,8 +14,8 @@ import javax.swing.event.ListSelectionListener;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
+import org.tockit.swing.ExtendedPreferences;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
@@ -30,6 +30,8 @@ import java.sql.Types;
 import java.util.Iterator;
 
 public class AttributeSelectionDialog extends JDialog implements EventBrokerListener {
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(AttributeSelectionDialog.class);
+    
     private static final String ID_BOOLEAN_SELECTOR = "boolean selector";
     private static final String ID_INTERVAL_SELECTOR = "interval selector";
     private static final String ID_NAME_SELECTOR = "name set selector";
@@ -179,12 +181,11 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
         this.eventBroker = eventBroker;
         init();
         eventBroker.subscribe(this, DatabaseConnectEvent.class, Object.class);
-        int divPos = ConfigurationManager.fetchInt("AttributeSelectionDialog", "verticalDivider", 100);
+        int divPos = preferences.getInt("verticalDivider", 100);
         listSplitPane.setDividerLocation(divPos);
-        divPos = ConfigurationManager.fetchInt("AttributeSelectionDialog", "horizontalDivider", 100);
+        divPos = preferences.getInt("horizontalDivider", 100);
         mainSplitPane.setDividerLocation(divPos);
-        ConfigurationManager.restorePlacement("AttributeSelectionDialog", this,
-                                              new Rectangle(100, 100, 300, 200));
+        preferences.restoreWindowPlacement(this, new Rectangle(100, 100, 300, 200));
     }
 
     public void init() {
@@ -248,8 +249,8 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
 
     public void hide() {
         super.hide();
-        ConfigurationManager.storeInt("AttributeSelectionDialog", "verticalDivider", listSplitPane.getDividerLocation());
-        ConfigurationManager.storeInt("AttributeSelectionDialog", "horizontalDivider", mainSplitPane.getDividerLocation());
-        ConfigurationManager.storePlacement("AttributeSelectionDialog", this);
+        preferences.putInt("verticalDivider", listSplitPane.getDividerLocation());
+        preferences.putInt("horizontalDivider", mainSplitPane.getDividerLocation());
+        preferences.storeWindowPlacement(this);
     }
 }

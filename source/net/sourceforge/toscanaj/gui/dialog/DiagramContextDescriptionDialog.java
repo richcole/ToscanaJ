@@ -17,14 +17,16 @@ import javax.swing.*;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
+import org.tockit.swing.ExtendedPreferences;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 
 public class DiagramContextDescriptionDialog extends JDialog 
 					implements ClipboardOwner, EventBrokerListener {
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramContextDescriptionDialog.class);
+                        
 	private JTextArea contentTextArea;
 	/**
 	 * Construct the layout
@@ -77,14 +79,14 @@ public class DiagramContextDescriptionDialog extends JDialog
 	}
 	
 	public void showDescription() {
-		ConfigurationManager.restorePlacement("DiagramContextDescriptionDialog", this, new Rectangle(150, 150, 350, 350));
+		preferences.restoreWindowPlacement(this, new Rectangle(150, 150, 350, 350));
 		this.contentTextArea.setText(DiagramController.getController().getDiagramHistory().getTextualDescription());
 		this.setVisible(true);
 	}
 	
 	public void close() { 
 		final DiagramContextDescriptionDialog dialog = this;
-		ConfigurationManager.storePlacement("DiagramContextDescriptionDialog", dialog);
+        preferences.storeWindowPlacement(dialog);
 		this.setVisible(false);
 	}
 

@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
@@ -21,6 +20,8 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import org.tockit.swing.ExtendedPreferences;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -40,6 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class NominalScaleEditorDialog extends JDialog {
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(NominalScaleEditorDialog.class);
     private boolean result;
 
     private TableColumnPair selectedTableColumnPair;
@@ -59,11 +61,9 @@ public class NominalScaleEditorDialog extends JDialog {
     private JButton orButton;
     private JButton notButton;
     
-	private static final String CONFIGURATION_SECTION_NAME = "NominalScaleEditorDialog";
 	private static final int MINIMUM_WIDTH = 500;
 	private static final int MINIMUM_HEIGHT = 300;
-	private static final int DEFAULT_X_POS = 10;
-	private static final int DEFAULT_Y_POS = 10;
+	private static final Rectangle DEFAULT_PLACEMENT = new Rectangle(10,10,MINIMUM_WIDTH, MINIMUM_HEIGHT);
 	
     public interface SqlFragment {
     	String getAttributeLabel();
@@ -270,8 +270,7 @@ public class NominalScaleEditorDialog extends JDialog {
         this.databaseConnection = databaseConnection;
         this.databaseSchema = databaseSchema;
 
-		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
-		this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
+        preferences.restoreWindowPlacement(this, DEFAULT_PLACEMENT);
 		//	to enforce the minimum size during resizing of the JDialog
 		 addComponentListener( new ComponentAdapter() {
 			 public void componentResized(ComponentEvent e) {
@@ -556,7 +555,7 @@ public class NominalScaleEditorDialog extends JDialog {
     }
     
 	private void closeDialog(boolean res) {
-		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
+        preferences.storeWindowPlacement(this);
 		result = res;
 		hide();
 	}

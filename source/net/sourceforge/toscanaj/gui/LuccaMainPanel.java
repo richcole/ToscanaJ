@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.gui;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
@@ -37,6 +36,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
+import org.tockit.swing.ExtendedPreferences;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,8 +52,9 @@ import java.util.ListIterator;
 /// @todo check if the file we save to exists, warn if it does
 
 public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
-    static private final int MaxMruFiles = 8;
+    private static final int MaxMruFiles = 8;
 	private static final String WINDOW_TITLE = "Lucca";
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(LuccaMainPanel.class);
 
     /**
      *  Main Controllers
@@ -102,7 +103,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         createViews();
 
-        mruList = ConfigurationManager.fetchStringList("LuccaMainPanel", "mruFiles", MaxMruFiles);
+        mruList = preferences.getStringList("mruFiles");
         // if we have at least one MRU file try to open it
         if (this.mruList.size() > 0) {
             File schemaFile = new File((String) mruList.get(mruList.size() - 1));
@@ -116,8 +117,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         createLayout();
 
-        ConfigurationManager.restorePlacement("LuccaMainPanel", this,
-                new Rectangle(10, 10, 900, 700));
+        preferences.restoreWindowPlacement(this, new Rectangle(10, 10, 900, 700));
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -174,7 +174,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     public void createViews() {
         diagramView = new DiagramEditingView(this, conceptualSchema, eventBroker);
-        diagramView.setDividerLocation(ConfigurationManager.fetchInt("LuccaMainPanel", "diagramViewDivider", 200));
+        diagramView.setDividerLocation(preferences.getInt("diagramViewDivider", 200));
         connectionInformationView =
                 new DatabaseConnectionInformationView(this, conceptualSchema, eventBroker);
 
@@ -405,12 +405,9 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     public void closeMainPanel() {
         // store current position
-        ConfigurationManager.storePlacement("LuccaMainPanel", this);
-        ConfigurationManager.storeStringList("LuccaMainPanel", "mruFiles", this.mruList);
-        ConfigurationManager.storeInt("LuccaMainPanel", "diagramViewDivider",
-                diagramView.getDividerLocation()
-        );
-        ConfigurationManager.saveConfiguration();
+        preferences.storeWindowPlacement(this);
+        preferences.putStringList("mruFiles", this.mruList);
+        preferences.putInt("diagramViewDivider", diagramView.getDividerLocation());
         System.exit(0);
     }
 

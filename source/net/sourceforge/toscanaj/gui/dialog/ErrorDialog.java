@@ -29,7 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import org.tockit.swing.ExtendedPreferences;
 
 /**
  * This is a generic class to handle error messages.
@@ -41,12 +41,11 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
  */
 
 public class ErrorDialog extends JDialog{
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(ErrorDialog.class);
+    private static final Rectangle DEFAULT_PLACEMENT = new Rectangle(250, 150, 400, 300);
+
 	private static final String ERROR_MESSAGE_INDENT = "    ";
-	private static final String CONFIGURATION_SECTION_NAME = "ErrorDialog";
-	private static final int MINIMUM_WIDTH = 400;
-	private static final int MINIMUM_HEIGHT = 300;
-	private static final int DEFAULT_X_POS = 250;
-	private static final int DEFAULT_Y_POS = 150;
+
 	private boolean isDetailedExceptionsShown, onFirstExecute;
 
     /**
@@ -57,8 +56,7 @@ public class ErrorDialog extends JDialog{
      */
     private ErrorDialog(Component component, Throwable e, String title, String errorMsg) {
 		super(JOptionPane.getFrameForComponent(component), title, true);
-		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
-				this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
+        preferences.restoreWindowPlacement(this, DEFAULT_PLACEMENT);
 
 		this.isDetailedExceptionsShown = false;
 		this.onFirstExecute = true;
@@ -217,7 +215,7 @@ public class ErrorDialog extends JDialog{
     }
 	
 	private void closeDialog(){
-		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
+        preferences.storeWindowPlacement(this);
 		dispose();
 	}
 }

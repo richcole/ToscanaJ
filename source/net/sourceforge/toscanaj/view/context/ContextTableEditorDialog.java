@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.view.context;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.gui.dialog.*;
@@ -26,6 +25,7 @@ import org.jdom.Element;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
+import org.tockit.swing.ExtendedPreferences;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @todo introduce OderedContext interface or something similar to get rid of
+ * @todo introduce OrderedContext interface or something similar to get rid of
  * the casts knowing about the internals of the ContextImplementation
  * 
  * @todo use dynamic cell widths
@@ -42,9 +42,8 @@ import java.util.Set;
  * @todo avoid completely recreating the whole view each time the table changes
  */
 public class ContextTableEditorDialog extends JDialog implements EventBrokerListener {
-
-	private static final String CONFIGURATION_SECTION_NAME =
-		"ContextTableEditorDialog";
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(ContextTableEditorDialog.class);
+    
 	private static final int MINIMUM_WIDTH = 700;
 	private static final int MINIMUM_HEIGHT = 500;
 	private static final int DEFAULT_X_POS = 50;
@@ -107,14 +106,12 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 
 	private void createView() {
 		setTitle("Context Table");
-		ConfigurationManager.restorePlacement(
-			CONFIGURATION_SECTION_NAME,
-			this,
-			new Rectangle(
-				DEFAULT_X_POS,
-				DEFAULT_Y_POS,
-				MINIMUM_WIDTH,
-				MINIMUM_HEIGHT));
+		preferences.restoreWindowPlacement(this,
+                                			new Rectangle(
+                                				DEFAULT_X_POS,
+                                				DEFAULT_Y_POS,
+                                				MINIMUM_WIDTH,
+                                				MINIMUM_HEIGHT));
 		onFirstLoad = true;
 		// to enforce the minimum size during resizing of the JDialog
 		addComponentListener(new ComponentAdapter() {
@@ -572,7 +569,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 	}
 
 	private void closeDialog(boolean result) {
-		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, this);
+		preferences.storeWindowPlacement(this);
 		this.context.setName(this.scaleTitleField.getText());
 		this.result = result;
 		setVisible(false);
