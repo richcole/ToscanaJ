@@ -200,7 +200,11 @@ public class DataDump {
             } else {
                 newNode = new DiagramNode("filtered:" + oldNode.getIdentifier(),
                         oldNode.getPosition(),
+                        /// @todo fix this using concept interpreter
+                        /*
                         oldNode.getConcept().filterByContingent(filterConcept),
+                        */
+                        oldNode.getConcept(),
                         oldNode.getAttributeLabelInfo(),
                         oldNode.getObjectLabelInfo(),
                         null);

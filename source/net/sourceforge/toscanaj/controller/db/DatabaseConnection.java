@@ -579,8 +579,6 @@ public class DatabaseConnection implements BrokerEventListener {
                         (String) views.get(i)));
             }
         }
-
-
     }
 }
 

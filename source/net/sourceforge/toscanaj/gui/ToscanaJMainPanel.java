@@ -247,10 +247,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         contentPane.setLayout(new BorderLayout());
 
         DiagramController controller = DiagramController.getController();
-        diagramView = new DiagramView(controller.getDefaultInterpreter(DatabaseConnection.getConnection()),
-                                      new ConceptInterpretationContext(controller.getDiagramHistory(),
-                                                                       ConceptInterpretationContext.CONTINGENT,
-                                                                       ConceptInterpretationContext.EXTENT));
+        diagramView = new DiagramView();
         diagramView.getController().getEventBroker().subscribe(
                 new FilterOperationEventListener(controller),
                 CanvasItemActivatedEvent.class,
@@ -803,6 +800,12 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         }
 
         diagramView.showDiagram(null);
+        DiagramController controller = DiagramController.getController();
+        diagramView.setConceptInterpreter(controller.getDefaultInterpreter(DatabaseConnection.getConnection(),
+                                                                           conceptualSchema.getDatabaseInfo()));
+        diagramView.setConceptInterpretationContext(new ConceptInterpretationContext(controller.getDiagramHistory(),
+                                                                                     ConceptInterpretationContext.CONTINGENT,
+                                                                                     ConceptInterpretationContext.EXTENT) );
         updateLabelViews();
         diagramOrganiser.setConceptualSchema(conceptualSchema);
         DiagramController.getController().reset();

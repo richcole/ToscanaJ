@@ -77,11 +77,10 @@ public class DiagramView extends Canvas implements ChangeObserver {
     /**
      * Creates a new view displaying an empty digram (i.e. nothing at all).
      */
-    public DiagramView(ConceptInterpreter conceptInterpreter,
-                       ConceptInterpretationContext conceptInterpretationContext) {
+    public DiagramView() {
         super();
-        this.conceptInterpreter = conceptInterpreter;
-        this.conceptInterpretationContext = conceptInterpretationContext;
+        this.conceptInterpreter = null;
+        this.conceptInterpretationContext = null;
         addComponentListener(new ResizeListener());
         getBackgroundItem().setPaint(DiagramSchema.getDiagramSchema().getBackgroundColor());
     }

@@ -110,25 +110,36 @@ public class NodeView extends CanvasItem {
      * */
 
     private double calculateRelativeSize(DiagramSchema diagramSchema) {
-        double relativeSize;
         if (diagramSchema.getGradientReference() == DiagramSchema.GRADIENT_REFERENCE_DIAGRAM) {
             if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
-                relativeSize = calcRate((double) this.diagramNode.getConcept().getExtentSize(),
-                        (double) DiagramController.getController().getNumberOfCurrentObjects());
+                return diagramView.getConceptInterpreter().getRelativeExtentSize(
+                                        this.diagramNode.getConcept(),
+                                        diagramView.getConceptInterpretationContext(),
+                                        ConceptInterpreter.REFERENCE_DIAGRAM
+                        );
             } else {
-                relativeSize = calcRate((double) this.diagramNode.getConcept().getObjectContingentSize(),
-                        (double) DiagramController.getController().getMaximalObjectContingentSize());
+                return diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
+                                        this.diagramNode.getConcept(),
+                                        diagramView.getConceptInterpretationContext(),
+                                        ConceptInterpreter.REFERENCE_DIAGRAM
+                        );
             }
         } else {
             if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
-                relativeSize = this.diagramNode.getConcept().getExtentSize();
+                return diagramView.getConceptInterpreter().getRelativeExtentSize(
+                                        this.diagramNode.getConcept(),
+                                        diagramView.getConceptInterpretationContext(),
+                                        ConceptInterpreter.REFERENCE_SCHEMA
+                        );
             } else {
                 /// @todo Check if this one can be avoided -- it is pretty useless
-                relativeSize = this.diagramNode.getConcept().getObjectContingentSize();
+                return diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
+                                        this.diagramNode.getConcept(),
+                                        diagramView.getConceptInterpretationContext(),
+                                        ConceptInterpreter.REFERENCE_SCHEMA
+                        );
             }
-            relativeSize = relativeSize / DiagramController.getController().getNumberOfObjects();
         }
-        return relativeSize;
     }
 
     private double calcRate(double extentSize, double denom) {

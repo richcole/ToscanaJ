@@ -73,10 +73,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         toolPanel.add(movementChooser);
 
         DiagramController controller = DiagramController.getController();
-        diagramView = new DiagramView(controller.getDefaultInterpreter(null),
-                                      new ConceptInterpretationContext(controller.getDiagramHistory(),
-                                                                       ConceptInterpretationContext.CONTINGENT,
-                                                                       ConceptInterpretationContext.EXTENT));
+        diagramView = new DiagramView();
         final EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
         canvasEventBroker.subscribe(
                 nodeMovementEventListener,

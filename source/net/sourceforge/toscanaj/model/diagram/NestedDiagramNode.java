@@ -62,7 +62,7 @@ public class NestedDiagramNode extends DiagramNode {
             DiagramNode oldNode = innerDiagram.getNode(i);
             Point2D newPos = new Point2D.Double(oldNode.getX() + offset.getX(),
                     oldNode.getY() + offset.getY());
-            Concept newConcept = oldNode.getConcept().filterByContingent(outerNode.getConcept());
+            Concept newConcept = oldNode.getConcept();
             LabelInfo newAttrLabel;
             if (dropAttributeLabels) {
                 newAttrLabel = null;

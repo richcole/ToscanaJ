@@ -37,6 +37,9 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
  */
 
 public interface ConceptInterpreter {
+    int REFERENCE_DIAGRAM = 0;
+    int REFERENCE_SCHEMA = 1;
+
     /** @note is Dependent on displayMode and filterMode */
     Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context);
 
@@ -50,8 +53,8 @@ public interface ConceptInterpreter {
     int  getAttributeCount(Concept concept, ConceptInterpretationContext context);
 
     /** @note these are independent of displayMode and dependent on filterMode */
-    double getRelativeIntentSize(Concept concept, ConceptInterpretationContext context);
+    double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context, int reference);
 
     /** @note these are independent of displayMode and dependent on filterMode */
-    double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context);
+    double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context, int reference);
 }

@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collection;
 
 /**
  * Offers read access to information about a concept in a Formal Concept
@@ -50,21 +51,9 @@ public interface Concept extends XMLizable {
     int getIntentSize();
 
     /**
-     * Returns the size of the intent relative to the number of attributes in
-     * the diagram.
-     */
-    double getIntentSizeRelative();
-
-    /**
      * Returns the size of the extent.
      */
     int getExtentSize();
-
-    /**
-     * Returns the size of the extent relative to the number of objects in the
-     * diagram.
-     */
-    double getExtentSizeRelative();
 
     /**
      * Returns the size of the attribute contingent.
@@ -72,25 +61,9 @@ public interface Concept extends XMLizable {
     int getAttributeContingentSize();
 
     /**
-     * Returns the size of the attribute contingent relative to all attributes
-     * in the diagram.
-     *
-     * This will always be between 0 and 1.
-     */
-    double getAttributeContingentSizeRelative();
-
-    /**
      * Returns the size of the object contingent.
      */
     int getObjectContingentSize();
-
-    /**
-     * Returns the size of the object contingent relative to all objects in
-     * the current diagram.
-     *
-     * This will always be between 0 and 1.
-     */
-    double getObjectContingentSizeRelative();
 
     /**
      * Returns an iterator returning the attributes from the intent.
@@ -125,38 +98,6 @@ public interface Concept extends XMLizable {
     Iterator getObjectContingentIterator();
 
     /**
-     * Returns the concept that is using only objects from the other concepts
-     * extent.
-     *
-     * This is at the moment not necessarily a concept in the sense of FCA: the
-     * concept returned might be not realised in the diagram we currently have
-     * (not realised as in Toscana 2/3).
-     *
-     * If the other concept is null, a copy of the original concept will be returned.
-     */
-    Concept filterByExtent(Concept other);
-
-    /**
-     * Returns the concept that is using only objects from the other concepts
-     * object contingent.
-     *
-     * This is at the moment not necessarily a concept in the sense of FCA: the
-     * concept returned might be not realised in the diagram we currently have
-     * (not realised as in Toscana 2/3).
-     *
-     * If the other concept is null, a copy of the original concept will be returned.
-     */
-    Concept filterByContingent(Concept other);
-
-    /**
-     * Returns a cocept which represent a concept with the same extent and intent
-     * but without having any neighbours.
-     *
-     * Basically this collapses the ideal of the concept into a single concept.
-     */
-    Concept getCollapsedConcept();
-
-    /**
      * Returns true iff this is the top concept.
      */
     boolean isTop();
@@ -175,4 +116,8 @@ public interface Concept extends XMLizable {
      * Returns true iff the given concept is a subconcept of the object.
      */
     boolean hasSubConcept(Concept concept);
+
+    Collection getDownset();
+
+    Collection getUpset();
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.controller.fca;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
@@ -28,29 +29,6 @@ import java.util.List;
  * a JList for displaying purposes.
  */
 public class DiagramController implements ChangeObservable {
-
-
-    /**
-     * Constant for setFilterMethod(int).
-     *
-     * @see #setFilterMethod(int)
-     */
-    static public int FILTER_CONTINGENT = 0;
-
-    /**
-     * Constant for setFilterMethod(int).
-     *
-     * @see #setFilterMethod(int)
-     */
-    static public int FILTER_EXTENT = 1;
-
-    /**
-     * Stores how to filter when zooming.
-     *
-     * @see #setFilterMethod(int)
-     */
-    private int filterMethod = FILTER_EXTENT;
-
     /**
      * Stores the only instance of this class.
      */
@@ -215,113 +193,7 @@ public class DiagramController implements ChangeObservable {
      * of current diagrams.
      */
     protected Diagram2D getSimpleDiagram(int pos) {
-        Diagram2D diag = history.getCurrentDiagram(pos);
-
-        SimpleLineDiagram retVal = new SimpleLineDiagram();
-        Concept filter = calculateFilterFromPastDiagrams();
-        Hashtable nodeMap = new Hashtable();
-
-        retVal.setTitle(diag.getTitle());
-        retVal.setDescription(diag.getDescription());
-        for (int i = 0; i < diag.getNumberOfNodes(); i++) {
-            DiagramNode oldNode = diag.getNode(i);
-            DiagramNode newNode = makeDiagramNode(oldNode, filter);
-            retVal.addNode(newNode);
-            nodeMap.put(oldNode, newNode);
-
-            int contSize = newNode.getConcept().getObjectContingentSize();
-            this.numberOfCurrentObjects = this.numberOfCurrentObjects + contSize;
-            if (contSize > this.maxContingentSize) {
-                this.maxContingentSize = contSize;
-            }
-        }
-        for (int i = 0; i < diag.getNumberOfLines(); i++) {
-            DiagramLine line = diag.getLine(i);
-            DiagramNode from = (DiagramNode) nodeMap.get(line.getFromNode());
-            DiagramNode to = (DiagramNode) nodeMap.get(line.getToNode());
-            retVal.addLine(from, to);
-
-            // add direct neighbours to concepts
-            AbstractConceptImplementation concept1 =
-                    (AbstractConceptImplementation) from.getConcept();
-            AbstractConceptImplementation concept2 =
-                    (AbstractConceptImplementation) to.getConcept();
-            concept1.addSubConcept(concept2);
-            concept2.addSuperConcept(concept1);
-        }
-
-        // build transitive closures for each concept
-        for (int i = 0; i < retVal.getNumberOfNodes(); i++) {
-            ((AbstractConceptImplementation) retVal.getNode(i).getConcept()).buildClosures();
-        }
-
-        return retVal;
-    }
-
-
-    /**
-     * Creates a new node by filtering the old one.
-     *
-     * The way of filtering is defined by the filterMethod member, set with setFilterMethod(int)
-     */
-
-    private DiagramNode makeDiagramNode(DiagramNode oldNode, Concept filter) {
-        Concept concept = null;
-        if (filter == null) {
-            concept = oldNode.getConcept();
-        } else if (this.filterMethod == FILTER_CONTINGENT) {
-            concept = oldNode.getConcept().filterByContingent(filter);
-        } else if (this.filterMethod == FILTER_EXTENT) {
-            concept = oldNode.getConcept().filterByExtent(filter);
-        } else {
-            throwUnknownFilterError();
-        }
-
-        return new DiagramNode("filtered:" + oldNode.getIdentifier(),
-                oldNode.getPosition(),
-                concept,
-                oldNode.getAttributeLabelInfo(),
-                oldNode.getObjectLabelInfo(),
-                oldNode.getOuterNode());
-    }
-
-    private static void throwUnknownFilterError() {
-        throw new RuntimeException("Unknown filter method");
-    }
-
-    /**
-     * Calculates the filter from all past diagrams.
-     */
-
-    static class FilterCalculatorVisitor implements DiagramHistory.ConceptVisitor {
-        Concept filter = null;
-        int filterMethod;
-
-        FilterCalculatorVisitor(int filterMethod) {
-            this.filterMethod = filterMethod;
-        }
-
-        public void visitConcept(Concept concept) {
-            if (filter == null) {
-                filter = concept;
-            } else if (filterMethod == DiagramController.FILTER_CONTINGENT) {
-                filter = concept.filterByContingent(filter);
-            } else if (filterMethod == DiagramController.FILTER_EXTENT) {
-                filter = concept.getCollapsedConcept().filterByExtent(filter);
-            } else {
-                throwUnknownFilterError();
-            }
-        }
-
-        public Concept getFilter() {
-            return filter;
-        }
-    }
-
-    private Concept calculateFilterFromPastDiagrams() {
-        FilterCalculatorVisitor filterCalculator = new FilterCalculatorVisitor(this.filterMethod);
-        history.visitZoomedConcepts(filterCalculator);
-        return filterCalculator.getFilter();
+        return history.getCurrentDiagram(pos);
     }
 
     /**
@@ -394,7 +266,7 @@ public class DiagramController implements ChangeObservable {
         }
     }
 
-    public ConceptInterpreter getDefaultInterpreter(DatabaseConnection databaseConnection) {
-        return new DatabaseConnectedConceptInterpreter( databaseConnection );
+    public ConceptInterpreter getDefaultInterpreter(DatabaseConnection databaseConnection, DatabaseInfo databaseInfo) {
+        return new DatabaseConnectedConceptInterpreter( databaseConnection, databaseInfo );
     }
 }

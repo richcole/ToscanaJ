@@ -20,6 +20,7 @@ import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import java.util.*;
 
 import org.jdom.Element;
+import util.CollectionFactory;
 
 /**
  * Implements a concept whose objects are stored in a relational database.
@@ -36,20 +37,6 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     private Set attributeContingent = new HashSet();
 
     /**
-     * Stores the object names as Java Strings, fetched on only demand.
-     */
-    private Set objects = null;
-
-    /**
-     * Stores the number of objects in the contingent.
-     *
-     * This is set to -1 first (unknown), it will be either explicitely queried when the
-     * size is needed before anyone asks for the names, or it will be set to the
-     * size of the objects list when we created the list.
-     */
-    private int numObjects = -1;
-
-    /**
      * Stores the where clause for finding the object contingent in the database.
      *
      * This is only the part that comes from the current diagram, the rest is
@@ -59,14 +46,6 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      */
     private String objectClause = null;
 
-    /**
-     * Stores all clauses used to filter into the current concept.
-     *
-     * @see #objectClause
-     *
-     * @todo This should be removed later.
-     */
-    private Set filterClauses = new HashSet();
     private static final String OBJECT_ELEMENT_NAME = "object";
 
     /**
@@ -126,12 +105,6 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      */
     public void setObjectClause(String clause) {
         this.objectClause = clause;
-        // if we get a null here (no clause for this one), we can initialize without
-        // asking the DB
-        if (clause == null) {
-            this.objects = new HashSet(); // empty list
-            this.numObjects = 0; // no objects
-        }
     }
 
     /**
@@ -163,36 +136,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * Implements AbstractConceptImplementation.getObjectContingentSize().
      */
     public int getObjectContingentSize() {
-        if (numObjects == -1) {
-            if (objects != null) {
-                numObjects = objects.size();
-            } else {
-                // we don't know the answer yet, ask DB
-                try {
-                    this.numObjects = DatabaseConnection.getConnection().queryNumber(calculateContingentQuery(), 1);
-                } catch (DatabaseException e) {
-                    /// @TODO Find something useful to do here.
-                    if (e.getOriginal() != null) {
-                        System.err.println(e.getMessage());
-                        e.getOriginal().printStackTrace();
-                    } else {
-                        e.printStackTrace(System.err);
-                    }
-                }
-            }
-        }
-        return this.numObjects;
-    }
-
-    private String calculateContingentQuery() {
-        String query = this.dbInfo.getCountQuery() + " WHERE " + this.objectClause;
-        Iterator iter = this.filterClauses.iterator();
-        while (iter.hasNext()) {
-            Object item = iter.next();
-            query += " AND " + item;
-        }
-        query += ";";
-        return query;
+        return 1;
     }
 
     /**
@@ -202,86 +146,10 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         return this.attributeContingent.iterator();
     }
 
-    /**
-     * Implements AbstractConceptImplementation.getObjectContingentIterator().
-     */
     public Iterator getObjectContingentIterator() {
-        return getObjectContingent().iterator();
-    }
-
-    private Collection getObjectContingent() {
-        // fetch object names if we don't have them -- they will be stored once
-        // we have queried them
-        if (this.objects == null) {
-            objects = new HashSet();
-            if (this.objectClause != null) {
-                try {
-                    objects.addAll(DatabaseConnection.getConnection().queryColumn(calculateContingentQuery(), 1));
-                } catch (DatabaseException e) {
-                    /// @TODO Find something useful to do here.
-                    if (e.getOriginal() != null) {
-                        System.err.println(e.getMessage());
-                        e.getOriginal().printStackTrace();
-                    } else {
-                        e.printStackTrace(System.err);
-                    }
-                }
-            }
-        }
-        return objects;
-    }
-
-    /**
-     * Implements Concept.filterByExtent(Concept).
-     *
-     * The other concept is assumed to be a DatabaseConnectedConcept.
-     */
-    public Concept filterByExtent(Concept other) {
-        DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo);
-        retVal.attributeContingent.addAll(this.attributeContingent);
-        retVal.setObjectClause(this.objectClause);
-        if (other != null) {
-            DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
-            if (otherDB.objectClause == null) {
-                // nothing to query
-                retVal.setObjectClause(null);
-            } else {
-                retVal.filterClauses.add(otherDB.getExtentClause());
-                retVal.filterClauses.addAll(otherDB.filterClauses);
-            }
-        }
-        return retVal;
-    }
-
-    /**
-     * Implements Concept.filterByContingent(Concept).
-     */
-    public Concept filterByContingent(Concept other) {
-        DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo);
-        retVal.attributeContingent.addAll(this.attributeContingent);
-        retVal.setObjectClause(this.objectClause);
-        if (other != null) {
-            DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
-            if (otherDB.objectClause == null) {
-                // nothing to query
-                retVal.setObjectClause(null);
-            } else {
-                retVal.filterClauses.add(otherDB.objectClause);
-                retVal.filterClauses.addAll(otherDB.filterClauses);
-            }
-        }
-        return retVal;
-    }
-
-    /**
-     * Implements Concept.getCollapsedConcept().
-     */
-    public Concept getCollapsedConcept() {
-        DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo);
-        retVal.attributeContingent.addAll(this.attributeContingent);
-        retVal.setObjectClause(getExtentClause());
-        retVal.filterClauses.addAll(this.filterClauses);
-        return retVal;
+        Set objects = CollectionFactory.createDefaultSet();
+        objects.add(this.objectClause);
+        return objects.iterator();
     }
 
     public String getExtentClause() {
@@ -305,9 +173,5 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             return null;
         }
         return clause;
-    }
-
-    public Set getFilterClauses() {
-        return filterClauses;
     }
 }
