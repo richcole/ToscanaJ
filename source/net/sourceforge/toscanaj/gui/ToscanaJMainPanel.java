@@ -176,14 +176,14 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         // register all image writers we want to support
         org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
         org.tockit.canvas.imagewriter.JimiImageWriter.initialize();
-        // set the default diagram export options: the very first format, auto mode, we can't get the size here
+        
+        // set the default diagram export options: auto mode, no format defined yet, no size
+        // if there is no format, we don't set the settings, which causes the menu items to be unavailable 
         Iterator it = GraphicFormatRegistry.getIterator();
-
-        // if we have at least one format we use it, if not the settings stay null and the export options should
-        // not be enabled
         if (it.hasNext()) {
             this.diagramExportSettings = new DiagramExportSettings(null, 0, 0, true);
         }
+
         // then build the panel (order is important for checking if we want export options)
         buildPanel();
         // listen to changes on DiagramController
