@@ -125,7 +125,10 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
 	        Element queriesElement = new Element(QUERIES_ELEMENT_NAME);
 	        for (Iterator iterator = queries.iterator(); iterator.hasNext();) {
 	            Query query = (Query) iterator.next();
-	            queriesElement.addContent(query.toXML());
+	            if(query != ListQuery.KEY_LIST_QUERY && 
+	            				query != AggregateQuery.COUNT_QUERY) {
+	            	queriesElement.addContent(query.toXML());
+	            }
 	        }
 	        retVal.addContent(queriesElement);
         }
