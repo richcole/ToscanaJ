@@ -60,6 +60,14 @@ public class ConfigurationManager {
             FileOutputStream out = new FileOutputStream("toscanaj.prop");
             properties.store(out, "--- ToscanaJ settings ---");
             out.close();
+		} catch (FileNotFoundException e) {
+			// this most likely means we have a read-only file system, 
+			// which we just ignore. The elaborated detail of exception 
+			// hierarchies are another fabulous aspect of the quality
+			// of the core libraries :-(
+			System.out.println("Could not write session information, most likely" +
+				"since running on a read-only file system. Session management" +
+				"is disabled.");
         } catch (Exception e) {
             // nothing useful we can do here, just print the stack trace
             e.printStackTrace();
