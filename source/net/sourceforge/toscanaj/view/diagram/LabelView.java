@@ -386,4 +386,17 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         this.labelInfo.setOffset(this.labelInfo.getOffset().getX() + deltaX,
                                  this.labelInfo.getOffset().getY() + deltaY );
     }
+
+    /**
+     * Switches the mode for this label between displaying number or list.
+     */
+    public void doubleClicked(Point2D pos) {
+        if(this.displayType == LabelView.DISPLAY_LIST) {
+            this.displayType = LabelView.DISPLAY_NUMBER;
+        }
+        else {
+            this.displayType = LabelView.DISPLAY_LIST;
+        }
+        notifyObservers();
+    }
 }
