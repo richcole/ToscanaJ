@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.diagram.SelectionChangedEvent;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.database.DatabaseQuery;
 import net.sourceforge.toscanaj.model.diagram.*;
@@ -277,6 +278,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
                 nv.setSelectedConcepts(concepts);
             }
         }
+        getController().getEventBroker().processEvent(new SelectionChangedEvent(this));
         repaint();
     }
 

@@ -13,6 +13,9 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.diagram.SelectionChangedEvent;
+import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.Event;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -29,7 +32,7 @@ import java.util.List;
  * which are distinguished by position (above vs. below the node) and default
  * display type (list vs. number).
  */
-abstract public class LabelView extends CanvasItem implements ChangeObserver {
+abstract public class LabelView extends CanvasItem implements ChangeObserver, BrokerEventListener {
     /**
      * Used when the label should be drawn above the given point.
      *
@@ -126,6 +129,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         int fontSize = diagramSchema.getLabelFontSize();
         this.font = new Font(fontName, Font.PLAIN, fontSize);
         updateEntries();
+        diagramView.getController().getEventBroker().subscribe(this, SelectionChangedEvent.class, Object.class);
     }
 
     public void updateEntries() {
@@ -554,4 +558,24 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     abstract protected int getNumberOfEntries();
 
     abstract protected Iterator getEntryIterator();
+
+    private void nodeSelectionChanged() {
+        if ( highlightedInFilter() &&
+             ( (nodeView.getSelectionState() == DiagramView.SELECTED_FILTER) ||
+               (nodeView.getSelectionState() == DiagramView.SELECTED_DIRECTLY) )
+           ) {
+            this.diagramView.raiseItem(this);
+        }
+
+        if ( highlightedInIdeal() &&
+             ( (nodeView.getSelectionState() == DiagramView.SELECTED_IDEAL) ||
+               (nodeView.getSelectionState() == DiagramView.SELECTED_DIRECTLY) )
+           ) {
+            this.diagramView.raiseItem(this);
+        }
+    }
+
+    public void processEvent(Event e) {
+        nodeSelectionChanged();
+    }
 }
