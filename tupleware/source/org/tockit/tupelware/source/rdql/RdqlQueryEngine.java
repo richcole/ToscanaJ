@@ -11,8 +11,8 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
+import org.tockit.tupelware.model.TupelSet;
 
-import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFReader;
@@ -32,37 +32,26 @@ public class RdqlQueryEngine {
 	private RdqlQueryEngine () {	
 	}
 
-	public static void executeQuery(String queryString, Model model) {
+	public static TupelSet executeQuery(String queryString, Model model) {
 		Query query = new Query(queryString) ;
-		query.setSource(model);
-		
-		List queryVars = query.getResultVars();
-		System.out.println("Query vars: " + queryVars);
-		List triplePatterns = query.getTriplePatterns();
-		System.out.println("Triple patterns: " + triplePatterns);
-		Iterator it = triplePatterns.iterator();
-		while (it.hasNext()) {
-			Triple triple = (Triple) it.next();
-			System.out.println("triple pattern: " + triple);
-			System.out.println("\tobject: " + triple.getObject());
-			System.out.println("\tpredicate: " + triple.getPredicate());
-			System.out.println("\tsubject: " + triple.getSubject());
-		}
-		
+		List resultVars = query.getResultVars();
+		TupelSet resTupelSet = new TupelSet(
+							(String[]) resultVars.toArray(new String[resultVars.size()]));
+		query.setSource(model);	
 		QueryExecution qe = new QueryEngine(query) ;
-		QueryResults results = qe.exec() ;
-		List resultVars = results.getResultVars();
-		System.out.println("RESULT VARS: " + resultVars);
+		QueryResults results = qe.exec();
 		for ( Iterator iter = results ; iter.hasNext() ; ) {
-			ResultBinding cur = (ResultBinding)iter.next() ;
-			System.out.println("res binding: " + cur);
-			Object obj_A = cur.get("a") ;
-			// obj will be a Jena object: resource, property or RDFNode.
-			Object obj_B = cur.get("b") ;
-			Object obj_C = cur.get("c") ;
-			System.out.println("\t" + obj_A + "\timplements\t" + obj_C + "\tis-a\t" + obj_B);
+			ResultBinding resBinding = (ResultBinding)iter.next() ;
+			Object[] tupel = new Object[resultVars.size()];
+			for (int i = 0; i < resultVars.size(); i++) {
+				String  queryVar = (String) resultVars.get(i);
+				Object obj = resBinding.get(queryVar);
+				tupel[i] = obj;				
+			} 
+			resTupelSet.addTupel(tupel);
 		}
 		results.close() ;
+		return resTupelSet;
 	}
 	
 	public static void main (String[] args) {
@@ -98,7 +87,18 @@ public class RdqlQueryEngine {
 							"(?c, <is-a>, ?b)";
 		System.out.println("Query: " + queryString);
 
-		RdqlQueryEngine.executeQuery(queryString, model);
+		TupelSet tupelSet = RdqlQueryEngine.executeQuery(queryString, model);
+		Iterator it = tupelSet.getTupels().iterator();
+		System.out.println("TUPEL SET: ");
+		while (it.hasNext()) {
+			Object[] element = (Object[]) it.next();
+			System.out.print("---");
+			for (int i = 0; i < element.length; i++) {
+				Object object = element[i];
+				System.out.print(object + ", ");
+			}
+			System.out.println();
+		}
 		
 		System.out.println("finished");
 	}
