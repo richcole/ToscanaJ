@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo.Type;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
@@ -72,7 +73,7 @@ public class DatabaseConnectionInformationView extends JDialog
     private DatabaseTypePanel dbTypePanel;
 
     boolean newConnectionSet;
-    
+
     abstract class WizardPanel extends JPanel {
     	WizardPanel() {
     		super();
@@ -611,6 +612,7 @@ public class DatabaseConnectionInformationView extends JDialog
 		this.conceptualSchema = conceptualSchema;
 		this.internalBroker = new EventBroker();
 		this.databaseInfo = new DatabaseInfo();
+        new DatabaseSchema(internalBroker); // at the moment needed for event processing
 		this.connection = new DatabaseConnection(internalBroker);
 	
         initializePanels();
