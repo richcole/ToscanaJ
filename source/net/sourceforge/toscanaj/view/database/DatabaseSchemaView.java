@@ -18,7 +18,6 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.events.TableChangedEvent;
-import net.sourceforge.toscanaj.util.STD_Iterator;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -168,10 +167,10 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		columnsList.clear();
 
 		if (table != null) {
-			STD_Iterator it = new STD_Iterator(table.getColumns());
-			for (it.reset(); !it.atEnd(); it.next()) {
-				columnsList.addElement(new ColumnInfo((Column) it.val()));
-			}
+            for (Iterator it = table.getColumns().iterator(); it.hasNext(); ) {
+                Column column = (Column) it.next();
+                columnsList.addElement(column);
+            }
 		}
 	}
 
@@ -317,10 +316,10 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 			return;
 		}
 
-		STD_Iterator it = new STD_Iterator(dbScheme.getTables());
-		for (it.reset(); !it.atEnd(); it.next()) {
-			updateViewOfTable((Table) it.val());
-		}
+        for (Iterator it = dbScheme.getTables().iterator(); it.hasNext(); ) {
+            Table table = (Table) it.next();
+            updateViewOfTable(table);
+        }
 	}
 
 	private void updateViewOfTable(Table table) {
