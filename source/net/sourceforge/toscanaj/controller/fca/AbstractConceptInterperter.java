@@ -242,7 +242,9 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 			if(context.getNestingContexts().size() == 0) {
 				return executeObjectCountQuery(concept, context);
 			}
-			DeviationValuesRef deviationValues = calculateExpectedSize(concept, context, context.getObjectDisplayMode()); 
+			DeviationValuesRef deviationValues =
+                    calculateExpectedSize(concept, context, 
+                            context.getObjectDisplayMode() == ConceptInterpretationContext.EXTENT); 
 			double expectedSize = deviationValues.getExpectedSize();
 			int objectCount = getObjectCount(concept, context); 
 			if ((objectCount == 0) && (expectedSize == 0.0)) {
