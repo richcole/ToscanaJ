@@ -523,6 +523,11 @@ public class CSCParser {
             
             while(! tokenizer.done()) {
             	this.currentSectionParser = identifySectionParser(tokenizer);
+				if(this.currentSectionParser == null) {
+					// first round and we don't grok it
+					throw new RuntimeException("The specified file is not a" +
+												"CSC file.");
+				}
             	try {
             		Object result = this.currentSectionParser.parse(tokenizer);
             		if(result instanceof Diagram2D) {
