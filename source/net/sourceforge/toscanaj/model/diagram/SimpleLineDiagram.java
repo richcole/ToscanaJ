@@ -505,9 +505,5 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 		}
 		return bottom;
     }
-    
-    public IdPool getIdPool () {
-    	return this.idPool;
-    }
-    
+        
 }

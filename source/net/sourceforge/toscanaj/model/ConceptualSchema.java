@@ -70,13 +70,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
      * The XML (XHTML) describing the schema (or null if not found).
      */
     private Element description = null;
-
-    /**
-     * True if the schema contains at least one diagram with description.
-     * 
-     * @todo remove this member in favour of just-in-time checks. This shouldn't be too expensive, no need for caching.
-     */
-    private boolean hasDiagramDescription = false;
+   
     private static final String CONCEPTUAL_SCHEMA_ELEMENT_NAME = "conceptualSchema";
     private static final String VERSION_ATTRIBUTE_NAME = "version";
     private static final String VERSION_ATTRIBUTE_VALUE = "TJ1.0";
@@ -217,7 +211,6 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
     protected void reset() {
         databaseInfo = null;
         diagrams = new Vector();
-        hasDiagramDescription = false;
     }
 
     /**
@@ -283,9 +276,6 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
 			WriteableDiagram2D wd2d = (WriteableDiagram2D) diagram;
 			wd2d.setEventBroker(this.eventBroker);        	
         }
-        if(diagram.getDescription() != null) {
-        	this.hasDiagramDescription = true;
-        }
 		markDataDirty();
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
@@ -293,29 +283,15 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
     public void removeDiagram(int diagramIndex) {
         diagrams.remove(diagramIndex);
 		markDataDirty();
-		checkForDescriptions();
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
 
 	public void removeDiagram(Diagram2D diagram) {
         diagrams.remove(diagram);
 		markDataDirty();
-		checkForDescriptions();
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
     
-	private void checkForDescriptions() {
-		Iterator it = this.diagrams.iterator();
-		this.hasDiagramDescription = false;
-		while (it.hasNext()) {
-			Diagram2D diagram = (Diagram2D) it.next();
-			if(diagram.getDescription() != null) {
-				this.hasDiagramDescription = true;
-				return;
-			}
-		}		
-	}
-
     public void exchangeDiagrams(int from, int to){
 		Diagram2D indexDiagram = (Diagram2D)diagrams.get( from );
 		Diagram2D diagram = (Diagram2D)diagrams.get( to );
@@ -350,13 +326,15 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
         return this.description;
     }
 
-    public void setHasDiagramDescription(boolean flag) {
-		markDataDirty();
-        this.hasDiagramDescription = flag;
-    }
-
     public boolean hasDiagramDescription() {
-        return this.hasDiagramDescription;
+		Iterator it = this.diagrams.iterator();
+		while (it.hasNext()) {
+			Diagram2D diagram = (Diagram2D) it.next();
+			if(diagram.getDescription() != null) {
+				return true;
+			}
+		}		
+        return false;
     }
 
     public DatabaseSchema getDatabaseSchema() {

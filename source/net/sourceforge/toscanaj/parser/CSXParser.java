@@ -273,7 +273,6 @@ public class CSXParser {
             Element descElem = diagElem.getChild("description");
             if (descElem != null) {
                 diagram.setDescription(descElem.detach());
-                _Schema.setHasDiagramDescription(true);
             }
 
             // build a list of concepts (as points in the diagram and as
