@@ -217,7 +217,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         Font oldFont = graphics.getFont();
 
 		graphics.setFont(this.font);
-        FontMetrics fm = graphics.getFontMetrics();
+        FontMetrics fm = getFontMetrics(graphics);
 
         // find the size and position
         updateBounds(graphics);
@@ -351,6 +351,10 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         // restore old settings
         graphics.setPaint(oldPaint);
         graphics.setFont(oldFont);
+    }
+
+    private FontMetrics getFontMetrics(Graphics2D graphics) {
+        return graphics.getFontMetrics(this.font);
     }
 
     public void updateBounds(Graphics2D graphics) {
@@ -584,7 +588,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      */
     public Rectangle2D getLabelBounds(Graphics2D graphics) {
         // get the font metrics
-        FontMetrics fm = graphics.getFontMetrics();
+        FontMetrics fm = getFontMetrics(graphics);
 
         // find the size and position
         DiagramNode node = this.labelInfo.getNode();
