@@ -4,7 +4,6 @@ import net.sourceforge.toscanaj.controller.db.DBConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.dbviewer.DatabaseReportGeneratorManager;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.ObjectListQuery;
@@ -118,7 +117,6 @@ public class CSXParser
 
         // parse the different sections
         parseDescription();
-        parseDatabaseInformation();
         parseContext();
         parseDiagrams();
 
@@ -138,11 +136,11 @@ public class CSXParser
     /**
      * Parses the database section of the file.
      */
-    private static void parseDatabaseInformation()
+    private static void parseDatabaseInformation(Element contextElem)
         throws DataFormatException
     {
         // check if database should be used and fetch the data if needed
-        Element dbElem = _Document.getRootElement().getChild("database");
+        Element dbElem = contextElem.getChild("databaseConnection");
         if(dbElem != null) {
             _Schema.setUseDatabase( true );
             DatabaseInfo dbInfo;
@@ -203,7 +201,7 @@ public class CSXParser
             Element viewerElem = (Element) it.next();
             try
             {
-                new DatabaseReportGeneratorManager(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection);
+                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection, _BaseURL);
             }
             catch( DatabaseViewerInitializationException e )
             {
@@ -216,10 +214,18 @@ public class CSXParser
      * Parses the context in the file.
      */
     private static void parseContext()
+            throws DataFormatException
     {
+        Element contextElem = _Document.getRootElement().getChild("context");
+        if( contextElem == null ) {
+            throw new DataFormatException("No <context> defined");
+        }
+        
+        // parse the database connection if given
+        parseDatabaseInformation(contextElem);
+
         // build hashtable for objects
-        List elements = _Document.getRootElement()
-                                    .getChild("context").getChildren("object");
+        List elements = contextElem.getChildren("object");
         _Objects = new Hashtable( elements.size() );
 
         Iterator it = elements.iterator();
@@ -594,15 +600,9 @@ public class CSXParser
             query = dbInfo.createListQuery("List of Objects", "", false);
             query.insertQueryColumn("Object Name", null, null, keyName);
             _Schema.addQuery(query);
-
-/**
- *          @todo use this version once it works
-            _Schema.addQuery(new ObjectNumberQuery("Number of Objects"));
-            _Schema.addQuery(new ObjectListQuery("List of Objects"));
-*/
         }
         if(queryElem != null) {
-            Iterator it = queryElem.getChildren("list").iterator();
+            Iterator it = queryElem.getChildren("listQuery").iterator();
             while(it.hasNext()) {
                 Element cur = (Element) it.next();
                 /// @todo add error handling
@@ -623,7 +623,7 @@ public class CSXParser
                 }
                 _Schema.addQuery(query);
             }
-            it = queryElem.getChildren("aggregate").iterator();
+            it = queryElem.getChildren("aggregateQuery").iterator();
             while(it.hasNext()) {
                 Element cur = (Element) it.next();
                 /// @todo add error handling

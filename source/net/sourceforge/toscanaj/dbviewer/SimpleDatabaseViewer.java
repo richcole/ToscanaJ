@@ -17,21 +17,23 @@ import java.util.Vector;
  * Shows an object in a simple dialog.
  *
  * A definition for this viewer looks like this:
- * <viewer class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer"
+ * <objectView class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer"
  *         name="Show object..."/>
  *     <parameter name="openDelimiter" value="!!"/>
  *     <parameter name="closeDelimiter" value="§§"/>
  *     <template>Name: !!name§§
  * Type: !!type§§
  * Size: !!size§§</template>
- * </viewer>
+ * </objectView>
  *
  * Here the three fields "name", "type" and "size" will be queried and the
  * template will be filled with the results and then displayed in a dialog.
  * Note that the whitespace will be copied, too -- if you format your XML in
  * a nice way you might get weird indentation in the dialog.
  *
- * @todo add a "template" parameter for giving the template as URL to a text file
+ * Only one item will be displayed, any but the first item will be ignored.
+ *
+ * @todo Add something to handle multiple results.
  */
 public class SimpleDatabaseViewer implements DatabaseViewer
 {
@@ -45,14 +47,13 @@ public class SimpleDatabaseViewer implements DatabaseViewer
 
         private List fieldNames = new LinkedList();
 
-        private void showObject(String objectKey)
+        private void showView(String whereClause)
         {
             try
             {
                 List results = this.viewerManager.getConnection().executeQuery(fieldNames,
                                                                              viewerManager.getTableName(),
-                                                                             "WHERE " + viewerManager.getKeyName() +
-                                                                                        "='" + objectKey + "';");
+                                                                             whereClause);
                 Vector fields = (Vector)results.get(0);
                 Iterator itText = textFragments.iterator();
                 Iterator itFields = fields.iterator();
@@ -140,17 +141,17 @@ public class SimpleDatabaseViewer implements DatabaseViewer
         ConfigurationManager.restorePlacement("SimpleDatabaseViewerDialog", dialog, new Rectangle(100,100,150,150));
     }
 
-    public void showObject(String objectKey)
+    public void showView(String whereClause)
     {
         if( this.dialog != null )
         {
-            this.dialog.showObject(objectKey);
+            this.dialog.showView(whereClause);
             this.dialog.setVisible(true);
         }
         else
         {
             System.err.println( "SimpleDatabaseViewerDialog has to be initialize(..)d " +
-                                "before showDialog(..) is called." );
+                                "before showView(..) is called." );
         }
     }
 }

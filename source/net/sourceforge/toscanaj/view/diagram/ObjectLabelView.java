@@ -1,7 +1,6 @@
 package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.dbviewer.DatabaseReportGeneratorManager;
 
 import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -149,7 +148,7 @@ public class ObjectLabelView extends LabelView {
         }
         /// @todo Get rid of RTTI here.
         if(this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.ListQuery) {
-            if(DatabaseViewerManager.getNumberOfViews() == 0)
+            if(DatabaseViewerManager.getNumberOfObjectViews() == 0)
             {
                 return;
             }
@@ -158,12 +157,12 @@ public class ObjectLabelView extends LabelView {
             DatabaseViewerManager.showObject(0,this.queryKeyValues.get(itemHit).toString());
         }
         if(this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.AggregateQuery) {
-            if(DatabaseReportGeneratorManager.getNumberOfReports() == 0)
+            if(DatabaseViewerManager.getNumberOfObjectListViews() == 0)
             {
                 return;
             }
             DatabaseConnectedConcept concept = (DatabaseConnectedConcept) this.labelInfo.getNode().getConcept();
-            DatabaseReportGeneratorManager.showReport(0,concept.constructWhereClause(this.showOnlyContingent));
+            DatabaseViewerManager.showObjectList(0,concept.constructWhereClause(this.showOnlyContingent));
         }
         return;
     }
@@ -173,13 +172,13 @@ public class ObjectLabelView extends LabelView {
         List viewNames;
         if(this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.ListQuery)
         {
-            viewNames = DatabaseViewerManager.getViewNames();
+            viewNames = DatabaseViewerManager.getObjectViewNames();
         }
         else
         { // no views for aggregates
             viewNames = new LinkedList();
         }
-        List reportNames = DatabaseReportGeneratorManager.getReportNames();
+        List reportNames = DatabaseViewerManager.getObjectListViewNames();
         if( viewNames.size() + reportNames.size() == 0 )
         { // nothing to display
             return;
@@ -213,11 +212,11 @@ public class ObjectLabelView extends LabelView {
             Iterator it = reportNames.iterator();
             while(it.hasNext())
             {
-                final String reportName = (String) it.next();
-                menuItem= new JMenuItem(reportName);
+                final String viewName = (String) it.next();
+                menuItem= new JMenuItem(viewName);
                 menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        DatabaseReportGeneratorManager.showReport(reportName, whereClause);    
+                        DatabaseViewerManager.showObjectList(viewName, whereClause);    
                     }
                 });
                 popupMenu.add(menuItem);

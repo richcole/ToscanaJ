@@ -21,7 +21,8 @@ import org.jdom.input.DOMBuilder;
 public class DatabaseViewerManager
 {
     private static Component parentComponent = null;
-    private static List viewerRegistry = new LinkedList();
+    private static List objectViewerRegistry = new LinkedList();
+    private static List objectListViewerRegistry = new LinkedList();
     private DatabaseViewer viewer = null;
     private String screenName = null;
     private String tableName = null;
@@ -52,7 +53,8 @@ public class DatabaseViewerManager
         String className = viewerDefinition.getAttributeValue("class");
         if( className == null )
         {
-            throw new DatabaseViewerInitializationException("Could not find class attribute on <viewer>");
+            throw new DatabaseViewerInitializationException("Could not find class attribute on <" + 
+                            viewerDefinition.getName() + ">");
         }
         try
         {
@@ -72,7 +74,15 @@ public class DatabaseViewerManager
         {
             throw new DatabaseViewerInitializationException("Could not access class '" + className + "'");
         }
-        viewerRegistry.add(this);
+        if( viewerDefinition.getName().equals("objectView") ) {
+            objectViewerRegistry.add(this);
+        }
+        else if( viewerDefinition.getName().equals("objectListView") ) {
+            objectListViewerRegistry.add(this);
+        }
+        else {
+            throw new DatabaseViewerInitializationException("Unknown viewer type: <" + viewerDefinition.getName() + ">");
+        }
     }
     public static void setParentComponent(Component parentComponent)
     {
@@ -84,17 +94,35 @@ public class DatabaseViewerManager
     }        
     public static void showObject(int viewerID, String objectKey)
     {
-        DatabaseViewerManager manager = (DatabaseViewerManager) viewerRegistry.get(viewerID);
-        manager.viewer.showObject(objectKey);
+        DatabaseViewerManager manager = (DatabaseViewerManager) objectViewerRegistry.get(viewerID);
+        DatabaseViewer viewer = manager.viewer;
+        viewer.showView("WHERE " + manager.getKeyName() + " = '" + objectKey + "'");
     }
     public static void showObject(String viewName, String objectKey)
     {
-        for(int i = 0; i<viewerRegistry.size(); i++)
+        for(int i = 0; i<objectViewerRegistry.size(); i++)
         {
-            DatabaseViewerManager manager = (DatabaseViewerManager) viewerRegistry.get(i);
+            DatabaseViewerManager manager = (DatabaseViewerManager) objectViewerRegistry.get(i);
             if(manager.screenName.equals(viewName))
             {
-                manager.viewer.showObject(objectKey);
+                DatabaseViewer viewer = manager.viewer;
+                viewer.showView("WHERE " + manager.getKeyName() + " = '" + objectKey + "'");
+            }
+        }
+    }
+    public static void showObjectList(int viewerID, String whereClause)
+    {
+        DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(viewerID);
+        manager.viewer.showView(whereClause);
+    }
+    public static void showObjectList(String viewName, String whereClause)
+    {
+        for(int i = 0; i<objectListViewerRegistry.size(); i++)
+        {
+            DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(i);
+            if(manager.screenName.equals(viewName))
+            {
+                manager.viewer.showView(whereClause);
             }
         }
     }
@@ -145,7 +173,6 @@ public class DatabaseViewerManager
             e.printStackTrace();
         }
         return elem;
-        /// @todo implement
     }
     protected String loadText(Element elem) {
         String urlAttr = elem.getAttributeValue("url");
@@ -181,10 +208,10 @@ public class DatabaseViewerManager
     {
         return this.dbConnection;
     }
-    public static List getViewNames()
+    public static List getObjectViewNames()
     {
         List retVal = new LinkedList();
-        Iterator it = viewerRegistry.iterator();
+        Iterator it = objectViewerRegistry.iterator();
         while(it.hasNext())
         {
             DatabaseViewerManager manager = (DatabaseViewerManager) it.next();
@@ -192,12 +219,28 @@ public class DatabaseViewerManager
         }
         return retVal;
     }
-    public static int getNumberOfViews()
+    public static List getObjectListViewNames()
     {
-        return viewerRegistry.size();
+        List retVal = new LinkedList();
+        Iterator it = objectListViewerRegistry.iterator();
+        while(it.hasNext())
+        {
+            DatabaseViewerManager manager = (DatabaseViewerManager) it.next();
+            retVal.add(manager.screenName);
+        }
+        return retVal;
+    }
+    public static int getNumberOfObjectViews()
+    {
+        return objectViewerRegistry.size();
+    }
+    public static int getNumberOfObjectListViews()
+    {
+        return objectListViewerRegistry.size();
     }
     public static void resetRegistry()
     {
-        viewerRegistry.clear();
+        objectViewerRegistry.clear();
+        objectListViewerRegistry.clear();
     }
 }

@@ -8,7 +8,6 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.dbviewer.DatabaseReportGeneratorManager;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.Query;
@@ -19,7 +18,6 @@ import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.DiagramOrganiser;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
-import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
 import net.sourceforge.toscanaj.view.dialogs.DescriptionViewer;
 import net.sourceforge.toscanaj.view.dialogs.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.view.dialogs.ErrorDialog;
@@ -176,7 +174,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         this.addKeyListener(this);
         // we are the parent window for anything database viewers / report generators want to display
         DatabaseViewerManager.setParentComponent(this);
-        DatabaseReportGeneratorManager.setParentComponent(this);
         // restore the old MRU list
         mruList = ConfigurationManager.fetchStringList("mainPanel", "mruFiles", MaxMruFiles);
         // set up the menu for the MRU files
@@ -535,7 +532,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         
         toolbar.add(Box.createHorizontalGlue());
         
-        schemaDescriptionButton = new JButton(" Schema Description... ");
+        schemaDescriptionButton = new JButton(" About Schema... ");
         schemaDescriptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showSchemaDescription();
@@ -544,7 +541,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         schemaDescriptionButton.setVisible(false);
         toolbar.add(schemaDescriptionButton);
 
-        diagramDescriptionButton = new JButton(" Diagram Description... ");
+        diagramDescriptionButton = new JButton(" About Diagram... ");
         diagramDescriptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showDiagramDescription();
@@ -773,7 +770,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      */
     protected void openSchemaFile(File schemaFile) {
         DatabaseViewerManager.resetRegistry();
-        DatabaseReportGeneratorManager.resetRegistry();
         try {
             conceptualSchema = CSXParser.parse(schemaFile);
         } catch (FileNotFoundException e) {
@@ -791,25 +787,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             return;
         }
 
-        // if database should be used, but is not given --> ask user
-        if (conceptualSchema.usesDatabase() &&
-                (conceptualSchema.getDatabaseInfo() == null)) {
-            boolean stillTrying = true;
-            DatabaseChooser.initialize(this, new DatabaseInfo());
-            while (stillTrying) {
-                DatabaseInfo dbInfo = DatabaseChooser.showDialog(this);
-                if (dbInfo == null) {
-                    stillTrying = false;
-                } else {
-                    try {
-                        conceptualSchema.setDatabaseInfo(dbInfo);
-                        stillTrying = false;
-                    } catch (DatabaseException e) {
-                        ErrorDialog.showError(this, e, "Database could not be opened", e.getMessage());
-                    }
-                }
-            }
-        }
         diagramView.showDiagram(null);
         updateLabelViews();
         diagramOrganiser.setConceptualSchema(conceptualSchema);

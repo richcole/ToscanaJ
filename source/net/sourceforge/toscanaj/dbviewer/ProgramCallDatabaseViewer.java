@@ -19,12 +19,12 @@ import java.util.Vector;
  * Calls an external program as database viewer.
  *
  * A definition for this viewer looks like this:
- * <viewer class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer"
+ * <objectView class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer"
  *         name="Start external viewer..."/>
  *     <parameter name="openDelimiter" value="%"/>
  *     <parameter name="closeDelimiter" value="%"/>
  *     <parameter name="commandLine" value="browser %descriptionUrl%"/>
- * </viewer> 
+ * </objectView> 
  * 
  * In the example the program called "browser" will be started with the content
  * of the field "descriptionUrl". The delimiters define how the fields are
@@ -33,7 +33,12 @@ import java.util.Vector;
  *
  * Note: the external program is at the moment started in the same thread, the
  * UI will block as long as the external program runs.
+ *
+ * Only the first object in the view will be used for a program call, the others
+ * will be ignored.
+ *
  * @todo Start external program in new thread, we don't need the output anyway.
+ * @todo Handle multiple results somehow.
  */
 public class ProgramCallDatabaseViewer implements DatabaseViewer
 {
@@ -65,15 +70,14 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer
         textFragments.add(commandLine);
     }
     
-    public void showObject(String objectKey)
+    public void showView(String whereClause)
     {
         String command = "";
         try
         {
             List results = this.viewerManager.getConnection().executeQuery(fieldNames,
                                                                          viewerManager.getTableName(), 
-                                                                         "WHERE " + viewerManager.getKeyName() + 
-                                                                                    "='" + objectKey + "';");
+                                                                         whereClause);
             Vector fields = (Vector)results.get(0);
             Iterator itText = textFragments.iterator();
             Iterator itFields = fields.iterator();

@@ -28,65 +28,107 @@ import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 
 /**
- * Shows an object using HTML.
+ * Shows a report using HTML.
  *
  * A definition for this viewer looks like this:
- * <viewer class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer"
- *         name="Show object..."/>
- *     <parameter name="template" value="/some/file/somewhere.html"/>
- * </viewer>
+ * <objectListView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseReportGenerator"
+ *         name="Show objects..."/>
+ *     <template url="somedir/somefile.html"/>
+ * </objectListView>
  *
- * The input file will be loaded and displayed as an HTML page. All
- * occurances of entries like <field name="givenName"/> will be filled
+ * The input file will be loaded and displayed as an HTML page. 
+ *
+ * There has to be a section in the HTML marked with <repeat>...</repeat>
+ * which is the part that shall repeated for each item displayed. All
+ * occurances of entries like <field name="givenName"/> within that will be 
+ * filled
  * with the content of the field for the object and changed into <span>s.
+ *
+ * Fields without the <repeat> section can be used for aggregates, e.g. you can
+ * do sums or averages with them. If the whole template has no repeat, the viewer
+ * can be used as viewer for single items using <objectView>.
+ *
+ * The <template> element can contain <html> directly instead of using the "url"
+ * attribute.
  */
 public class HTMLDatabaseViewer implements DatabaseViewer
 {
-    private class HTMLDatabaseViewerDialog extends JDialog
+    private class HTMLDatabaseViewDialog extends JDialog
     {
         private DatabaseViewerManager viewerManager;
 
         private JEditorPane textArea;
 
-        private List fieldElements = new LinkedList();
+        private Element repeatElement = null;
+        
+        private Element repetitionBlock = null;
+        
+        private List singleFieldElements = new LinkedList();
 
-        private List fieldNames = new LinkedList();
+        private List singleFieldNames = new LinkedList();
 
-        /// @todo use just an Element instead -- no need to have a document
-        private Document document;
+        private List repeatedFieldElements = new LinkedList();
 
-        public HTMLDatabaseViewerDialog( Frame frame, DatabaseViewerManager viewerManager)
+        private List repeatedFieldNames = new LinkedList();
+
+        private Element template = null;
+
+        public HTMLDatabaseViewDialog( Frame frame, DatabaseViewerManager viewerManager)
                 throws DatabaseViewerInitializationException
         {
             super( frame, "View Item", true );
 
             this.viewerManager = viewerManager;
 
-            this.document = new Document((Element)viewerManager.getTemplate().getChild("html").clone());
-
-            if(this.document.getRootElement() == null) {
-                throw new DatabaseViewerInitializationException("Could not find <html> in the template");
-            }
+            this.template = viewerManager.getTemplate();
             
+            // find <repeat> and non-repeat <field>s first
             List queue = new LinkedList();
-            queue.add(this.document.getRootElement());
+            queue.add(this.template.getChild("html"));
             while(!queue.isEmpty())
             {
                 Element elem = (Element) queue.remove(0);
                 queue.addAll(elem.getChildren());
+                if(elem.getName().equals("repeat"))
+                {
+                    if(repeatElement != null) {
+                        throw new DatabaseViewerInitializationException("Two repeat sections found in template.");
+                    }
+                    repeatElement = elem;
+                    repetitionBlock = (Element)elem.clone();
+                    /// @todo find some way to neutralize <repeat>
+                }
                 if(elem.getName().equals("field"))
                 {
-                    fieldElements.add(elem);
-                    fieldNames.add(elem.getAttributeValue("content"));
+                    singleFieldElements.add(elem);
+                    singleFieldNames.add(elem.getAttributeValue("content"));
                     elem.setName("span");
                     elem.removeAttribute("content");
+                }
+            }
+
+            // find repeated fields
+            if(repeatElement != null) {
+                queue = new LinkedList();
+                queue.add(repetitionBlock);
+                while(!queue.isEmpty())
+                {
+                    Element elem = (Element) queue.remove(0);
+                    queue.addAll(elem.getChildren());
+                    if(elem.getName().equals("field"))
+                    {
+                        repeatedFieldElements.add(elem);
+                        repeatedFieldNames.add(elem.getAttributeValue("content"));
+                        elem.setName("span");
+                        elem.removeAttribute("content");
+                    }
                 }
             }
 
             final JButton closeButton = new JButton("Close");
             closeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    ConfigurationManager.storePlacement("HTMLDatabaseViewerDialog", dialog);
+                    ConfigurationManager.storePlacement("HTMLDatabaseViewDialog", dialog);
                     dialog.setVisible(false);
                 }
             });
@@ -112,26 +154,46 @@ public class HTMLDatabaseViewer implements DatabaseViewer
             contentPane.add( buttonPane, BorderLayout.SOUTH );
         }
 
-        private void showObject(String objectKey)
+        private void showView(String whereClause)
         {
             try
             {
-                List results = this.viewerManager.getConnection().executeQuery(fieldNames,
+                List results = this.viewerManager.getConnection().executeQuery(singleFieldNames,
                                                                              viewerManager.getTableName(),
-                                                                             "WHERE " + viewerManager.getKeyName() +
-                                                                                        "='" + objectKey + "';");
+                                                                             whereClause);
                 Vector fields = (Vector)results.get(0);
                 Iterator itFields = fields.iterator();
-                Iterator itElems = fieldElements.iterator();
+                Iterator itElems = singleFieldElements.iterator();
                 while( itFields.hasNext() )
                 {
                     String result = (String) itFields.next();
                     Element fieldElem = (Element) itElems.next();
                     fieldElem.setText(result);
                 }
+                if(repeatElement != null) {
+                    results = this.viewerManager.getConnection().executeQuery(repeatedFieldNames,
+                                                                                 viewerManager.getTableName(),
+                                                                                 whereClause);
+                    repeatElement.setContent(null);
+                    Iterator it = results.iterator();
+                    while(it.hasNext()) 
+                    {
+                        fields = (Vector)it.next();
+                        itFields = fields.iterator();
+                        itElems = repeatedFieldElements.iterator();
+                        while( itFields.hasNext() )
+                        {
+                            String result = (String) itFields.next();
+                            Element fieldElem = (Element) itElems.next();
+                            fieldElem.setText(result);
+                        }
+                        /// @todo only the content of repetitionBlock should be added (but _all_ content, not just elements)
+                        repeatElement.addContent((Element)repetitionBlock.clone());
+                    }
+                }
                 XMLOutputter outputter = new XMLOutputter();
                 outputter.setOmitDeclaration(true);
-                this.textArea.setText(outputter.outputString(this.document));
+                this.textArea.setText(outputter.outputString(this.template.getChild("html")));
             }
             catch (DatabaseException e)
             {
@@ -140,7 +202,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer
         }
     }
 
-    private HTMLDatabaseViewerDialog dialog;
+    private HTMLDatabaseViewDialog dialog;
 
     public HTMLDatabaseViewer()
     {
@@ -150,20 +212,20 @@ public class HTMLDatabaseViewer implements DatabaseViewer
     public void initialize(DatabaseViewerManager manager)
         throws DatabaseViewerInitializationException
     {
-        this.dialog = new HTMLDatabaseViewerDialog( manager.getParentWindow(), manager );
-        ConfigurationManager.restorePlacement("HTMLDatabaseViewerDialog", dialog, new Rectangle(100,100,150,150));
+        this.dialog = new HTMLDatabaseViewDialog( manager.getParentWindow(), manager );
+        ConfigurationManager.restorePlacement("HTMLDatabaseViewDialog", dialog, new Rectangle(100,100,150,150));
     }
 
-    public void showObject(String objectKey)
+    public void showView(String whereClause)
     {
         if( this.dialog != null )
         {
-            this.dialog.showObject(objectKey);
+            this.dialog.showView(whereClause);
             this.dialog.setVisible(true);
         }
         else
         {
-            System.err.println( "HTMLDatabaseViewerDialog has to be initialize(..)d " +
+            System.err.println( "HTMLDatabaseViewDialog has to be initialize(..)d " +
                                 "before showDialog(..) is called." );
         }
     }
