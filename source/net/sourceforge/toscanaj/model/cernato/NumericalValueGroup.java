@@ -7,9 +7,11 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 import net.sourceforge.toscanaj.model.order.Ordered;
 
-public class NumericalValueGroup implements ValueGroup {
+public class NumericalValueGroup implements ScaleColumn {
     private NumericalType type;
     private String name;
     private double min;
@@ -32,7 +34,7 @@ public class NumericalValueGroup implements ValueGroup {
         return name;
     }
 
-    public boolean containsValue(Value value) {
+    public boolean containsValue(AttributeValue value) {
         if (!(value instanceof NumericalValue)) {
             return false;
         }
@@ -53,11 +55,11 @@ public class NumericalValueGroup implements ValueGroup {
         return true;
     }
 
-    public boolean isSuperSetOf(ValueGroup otherGroup) {
-        if (!(otherGroup instanceof NumericalValueGroup)) {
+    public boolean isSuperSetOf(ScaleColumn otherColumn) {
+        if (!(otherColumn instanceof NumericalValueGroup)) {
             return false;
         }
-        NumericalValueGroup otherNVGroup = (NumericalValueGroup) otherGroup;
+        NumericalValueGroup otherNVGroup = (NumericalValueGroup) otherColumn;
         if (otherNVGroup.type != type) {
             return false;
         }

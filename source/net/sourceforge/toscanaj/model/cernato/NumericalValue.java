@@ -7,7 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
-public class NumericalValue implements Value {
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
+
+public class NumericalValue implements AttributeValue {
     private double value;
 
     public NumericalValue(double value) {

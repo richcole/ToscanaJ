@@ -12,12 +12,17 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 
-public class ManyValuedContext {
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
+
+public class CernatoTable implements ManyValuedContext {
     private List objects = new ArrayList();
     private List properties = new ArrayList();
     private Hashtable relation = new Hashtable();
 
-    public ManyValuedContext() {
+    public CernatoTable() {
     }
 
     public void add(FCAObject object) {
@@ -29,21 +34,21 @@ public class ManyValuedContext {
         return objects;
     }
 
-    public void add(Property property) {
-        properties.add(property);
+    public void add(ManyValuedAttribute attribute) {
+        properties.add(attribute);
     }
 
-    public Collection getProperties() {
+    public Collection getAttributes() {
         return properties;
     }
 
-    public void setRelationship(FCAObject object, Property property, Value value) {
+    public void setRelationship(FCAObject object, ManyValuedAttribute attribute, AttributeValue value) {
         Hashtable row = (Hashtable) relation.get(object);
-        row.put(property, value);
+        row.put(attribute, value);
     }
 
-    public Value getRelationship(FCAObject object, Property property) {
+    public AttributeValue getRelationship(FCAObject object, ManyValuedAttribute attribute) {
         Hashtable row = (Hashtable) relation.get(object);
-        return (Value) row.get(property);
+        return (AttributeValue) row.get(attribute);
     }
 }

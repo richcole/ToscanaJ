@@ -7,14 +7,16 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
+
 public class NumericalType extends TypeImplementation {
     public NumericalType(String name) {
         super(name);
     }
 
-    public void addValueGroup(ValueGroup group, String id) {
-        if (group instanceof NumericalValueGroup) {
-            valueGroups.put(id, group);
+    public void addValueGroup(ScaleColumn column, String id) {
+        if (column instanceof NumericalValueGroup) {
+            scale.addColumn(column, id);
             return;
         }
         throw new RuntimeException("Wrong value group type");

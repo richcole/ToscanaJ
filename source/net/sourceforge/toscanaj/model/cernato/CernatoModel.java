@@ -13,14 +13,14 @@ import java.util.Vector;
  * @todo this is pretty much a hack since the class exposes its member in a writable fashion
  */
 public class CernatoModel {
-    private ManyValuedContext context = new ManyValuedContext();
+    private CernatoTable context = new CernatoTable();
     private Vector types = new Vector();
     private Vector views = new Vector();
 
     public CernatoModel() {
     }
 
-    public ManyValuedContext getContext() {
+    public CernatoTable getContext() {
         return context;
     }
 

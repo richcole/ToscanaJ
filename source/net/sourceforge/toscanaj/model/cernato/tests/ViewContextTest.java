@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.cernato.Criterion;
-import net.sourceforge.toscanaj.model.cernato.FCAObject;
+import net.sourceforge.toscanaj.model.cernato.CernatoObject;
 import net.sourceforge.toscanaj.model.cernato.View;
 import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
@@ -42,7 +42,7 @@ public class ViewContextTest extends TestCase {
         Collection objects = scaledContext.getObjects();
         Collection attributes = scaledContext.getAttributes();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
-            FCAObject object = (FCAObject) it1.next();
+            CernatoObject object = (CernatoObject) it1.next();
             for (Iterator it2 = attributes.iterator(); it2.hasNext();) {
                 Attribute attribute = (Attribute) it2.next();
                 Criterion criterion = (Criterion) attribute.getData();

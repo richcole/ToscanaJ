@@ -8,6 +8,9 @@
 package net.sourceforge.toscanaj.parser;
 
 import net.sourceforge.toscanaj.model.cernato.*;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -128,7 +131,7 @@ public class CernatoXMLParser {
             String id = propElem.getAttributeValue("id");
             String name = propElem.getChild("name").getText();
             String typeref = propElem.getChild("type_ref").getAttributeValue("type");
-            Property property = new Property((Type) types.get(typeref), name);
+            Property property = new Property((AttributeType) types.get(typeref), name);
             properties.put(id, property);
             model.getContext().add(property);
         }
@@ -145,7 +148,7 @@ public class CernatoXMLParser {
             Element objElem = (Element) iterator.next();
             String id = objElem.getAttributeValue("id");
             String name = objElem.getChild("name").getText();
-            FCAObject object = new FCAObject(name);
+            CernatoObject object = new CernatoObject(name);
             objects.put(id, object);
             model.getContext().add(object);
         }
@@ -161,7 +164,7 @@ public class CernatoXMLParser {
         for (Iterator iterator = rowElems.iterator(); iterator.hasNext();) {
             Element rowElem = (Element) iterator.next();
             String objectid = rowElem.getAttributeValue("object");
-            FCAObject object = (FCAObject) objects.get(objectid);
+            CernatoObject object = (CernatoObject) objects.get(objectid);
             List cellElems = rowElem.getChildren("cell");
             for (Iterator iterator2 = cellElems.iterator(); iterator2.hasNext();) {
                 Element cellElem = (Element) iterator2.next();
@@ -193,7 +196,7 @@ public class CernatoXMLParser {
                 Element criterionElem = (Element) iterator2.next();
                 Property property = (Property) properties.get(criterionElem.getChild("property_ref").
                         getAttributeValue("property"));
-                ValueGroup valgroup = property.getType().getValueGroup(criterionElem.getChild("value_group_ref").
+                ScaleColumn valgroup = property.getType().getScales()[0].getColumn(criterionElem.getChild("value_group_ref").
                         getAttributeValue("value_group"));
                 view.addCriterion(new Criterion(property, valgroup));
             }

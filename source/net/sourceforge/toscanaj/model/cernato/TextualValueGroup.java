@@ -7,13 +7,15 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 import net.sourceforge.toscanaj.model.order.Ordered;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class TextualValueGroup implements ValueGroup {
+public class TextualValueGroup implements ScaleColumn {
     private TextualType type;
     private String name;
     private List values = new ArrayList();
@@ -28,7 +30,7 @@ public class TextualValueGroup implements ValueGroup {
         return name;
     }
 
-    public void addValue(Value value) {
+    public void addValue(AttributeValue value) {
         if (value instanceof TextualValue) {
             TextualValue textVal = (TextualValue) value;
             values.add(textVal.getDisplayString());
@@ -37,7 +39,7 @@ public class TextualValueGroup implements ValueGroup {
         throw new RuntimeException("Wrong value type for textual value group");
     }
 
-    public boolean containsValue(Value value) {
+    public boolean containsValue(AttributeValue value) {
         if (value instanceof TextualValue) {
             TextualValue textVal = (TextualValue) value;
             return values.contains(textVal.getDisplayString());
@@ -45,7 +47,7 @@ public class TextualValueGroup implements ValueGroup {
         return false;
     }
 
-    public boolean isSuperSetOf(ValueGroup otherGroup) {
+    public boolean isSuperSetOf(ScaleColumn otherGroup) {
         if (!(otherGroup instanceof TextualValueGroup)) {
             return false;
         }

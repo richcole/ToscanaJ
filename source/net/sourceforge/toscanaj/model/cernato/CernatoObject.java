@@ -7,10 +7,12 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
-public class FCAObject {
+import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
+
+public class CernatoObject implements FCAObject {
     private String name;
 
-    public FCAObject(String name) {
+    public CernatoObject(String name) {
         this.name = name;
     }
 

@@ -5,8 +5,8 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-public interface Value {
+public interface AttributeValue {
     String getDisplayString();
 }

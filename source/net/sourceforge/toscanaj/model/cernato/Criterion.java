@@ -7,13 +7,14 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 import net.sourceforge.toscanaj.model.order.Ordered;
 
 public class Criterion implements Ordered {
     private Property property;
-    private ValueGroup valueGroup;
+    private ScaleColumn valueGroup;
 
-    public Criterion(Property property, ValueGroup valueGroup) {
+    public Criterion(Property property, ScaleColumn valueGroup) {
         this.valueGroup = valueGroup;
         this.property = property;
     }
@@ -22,7 +23,7 @@ public class Criterion implements Ordered {
         return property;
     }
 
-    public ValueGroup getValueGroup() {
+    public ScaleColumn getValueGroup() {
         return valueGroup;
     }
 

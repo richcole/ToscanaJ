@@ -7,26 +7,28 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
-import java.util.Collection;
-import java.util.Hashtable;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.Scale;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
 
-public abstract class TypeImplementation implements Type {
+public abstract class TypeImplementation implements AttributeType {
     protected String name;
-    protected Hashtable valueGroups = new Hashtable();
+    protected Scale scale;
 
     public TypeImplementation(String name) {
         this.name = name;
+        this.scale = new ScaleImplementation(name);
     }
 
     public String getName() {
         return name;
     }
 
-    public ValueGroup getValueGroup(String id) {
-        return (ValueGroup) valueGroups.get(id);
+    public Scale[] getScales() {
+        return new Scale[]{this.scale};
     }
-
-    public Collection getValueGroups() {
-        return valueGroups.values();
+    
+    public AttributeValue[] getValueRange() {
+        return null;
     }
 }

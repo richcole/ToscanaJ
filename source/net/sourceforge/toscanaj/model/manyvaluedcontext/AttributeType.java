@@ -5,14 +5,10 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-import net.sourceforge.toscanaj.model.order.Ordered;
-
-public interface ValueGroup extends Ordered {
+public interface AttributeType {
     String getName();
-
-    boolean containsValue(Value value);
-
-    boolean isSuperSetOf(ValueGroup otherGroup);
+    Scale[] getScales();
+    AttributeValue[] getValueRange();
 }

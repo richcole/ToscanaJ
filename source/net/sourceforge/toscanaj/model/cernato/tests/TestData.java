@@ -35,13 +35,13 @@ public class TestData {
     public static Property Property4;
     public static Property Property5;
     public static Property Property6;
-    public static FCAObject Object1;
-    public static FCAObject Object2;
-    public static FCAObject Object3;
-    public static FCAObject Object4;
-    public static FCAObject Object5;
-    public static FCAObject Object6;
-    public static FCAObject Object7;
+    public static CernatoObject Object1;
+    public static CernatoObject Object2;
+    public static CernatoObject Object3;
+    public static CernatoObject Object4;
+    public static CernatoObject Object5;
+    public static CernatoObject Object6;
+    public static CernatoObject Object7;
     public static View View1;
     public static View View2;
     public static View View3;
@@ -85,7 +85,7 @@ public class TestData {
         Model.getTypes().add(TextType1);
         Model.getTypes().add(TextType2);
 
-        ManyValuedContext context = Model.getContext();
+        CernatoTable context = Model.getContext();
 
         Property1 = new Property(NumType1, "prop1");
         Property2 = new Property(NumType1, "prop2");
@@ -101,13 +101,13 @@ public class TestData {
         context.add(Property5);
         context.add(Property6);
 
-        Object1 = new FCAObject("object1");
-        Object2 = new FCAObject("object2");
-        Object3 = new FCAObject("object3");
-        Object4 = new FCAObject("object4");
-        Object5 = new FCAObject("object5");
-        Object6 = new FCAObject("object6");
-        Object7 = new FCAObject("object7");
+        Object1 = new CernatoObject("object1");
+        Object2 = new CernatoObject("object2");
+        Object3 = new CernatoObject("object3");
+        Object4 = new CernatoObject("object4");
+        Object5 = new CernatoObject("object5");
+        Object6 = new CernatoObject("object6");
+        Object7 = new CernatoObject("object7");
 
         context.add(Object1);
         context.add(Object2);
@@ -425,7 +425,7 @@ public class TestData {
         ScaledRelation.put(Object7, propMap);
     }
 
-    static boolean isInScaledRelation(FCAObject object, Criterion criterion) {
+    static boolean isInScaledRelation(CernatoObject object, Criterion criterion) {
         Hashtable propMap = (Hashtable) ScaledRelation.get(object);
         if (propMap == null) {
             return false;

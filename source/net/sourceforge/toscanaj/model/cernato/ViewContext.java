@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.model.cernato;
 import net.sourceforge.toscanaj.model.BinaryRelation;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -22,10 +23,10 @@ public class ViewContext implements Context {
 
     private class ScalingRelation implements BinaryRelation {
         public boolean contains(Object domainObject, Object rangeObject) {
-            if (!(domainObject instanceof FCAObject)) {
+            if (!(domainObject instanceof CernatoObject)) {
                 return false;
             }
-            FCAObject fcaObject = (FCAObject) domainObject;
+            CernatoObject fcaObject = (CernatoObject) domainObject;
             if (!(rangeObject instanceof Attribute)) {
                 return false;
             }
@@ -34,7 +35,7 @@ public class ViewContext implements Context {
                 return false;
             }
             Criterion criterion = (Criterion) attribute.getData();
-            Value relationValue = model.getContext().getRelationship(fcaObject, criterion.getProperty());
+            AttributeValue relationValue = model.getContext().getRelationship(fcaObject, criterion.getProperty());
             return criterion.getValueGroup().containsValue(relationValue);
         }
     }

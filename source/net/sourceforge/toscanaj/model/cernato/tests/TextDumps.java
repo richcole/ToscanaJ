@@ -14,15 +14,16 @@ import net.sourceforge.toscanaj.model.cernato.*;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
 
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
 
 public class TextDumps {
-    public static final void dump(ManyValuedContext context, PrintStream stream) {
+    public static final void dump(CernatoTable context, PrintStream stream) {
         Collection objects = context.getObjects();
-        Collection properties = context.getProperties();
+        Collection properties = context.getAttributes();
         stream.print("\t");
         for (Iterator iterator = properties.iterator(); iterator.hasNext();) {
             Property property = (Property) iterator.next();
@@ -38,7 +39,7 @@ public class TextDumps {
         stream.print("\t");
         for (Iterator iterator = properties.iterator(); iterator.hasNext();) {
             Property property = (Property) iterator.next();
-            Type type = property.getType();
+            AttributeType type = property.getType();
             if (type instanceof TextualType) {
                 stream.print("T\t");
             } else {
@@ -48,7 +49,7 @@ public class TextDumps {
         }
         stream.println();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
-            FCAObject object = (FCAObject) it1.next();
+            CernatoObject object = (CernatoObject) it1.next();
             stream.print(object.getName() + "\t");
             for (Iterator it2 = properties.iterator(); it2.hasNext();) {
                 Property property = (Property) it2.next();
@@ -77,7 +78,7 @@ public class TextDumps {
         }
         stream.println();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
-            FCAObject object = (FCAObject) it1.next();
+            CernatoObject object = (CernatoObject) it1.next();
             stream.print(object.getName() + "\t");
             for (Iterator it2 = attributes.iterator(); it2.hasNext();) {
                 Criterion criterion = (Criterion) it2.next();
@@ -97,7 +98,7 @@ public class TextDumps {
             stream.print(concept + "[objectContingent: {");
             Iterator extIt = concept.getObjectContingentIterator();
             while (extIt.hasNext()) {
-                FCAObject obj = (FCAObject) extIt.next();
+                CernatoObject obj = (CernatoObject) extIt.next();
                 stream.print(obj.getName());
                 if (extIt.hasNext()) {
                     stream.print(", ");

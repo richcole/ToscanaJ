@@ -5,16 +5,9 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-import java.util.Collection;
-
-public interface Type {
+public interface ManyValuedAttribute {
+    AttributeType getType();
     String getName();
-
-    void addValueGroup(ValueGroup group, String id);
-
-    ValueGroup getValueGroup(String id);
-
-    Collection getValueGroups();
 }

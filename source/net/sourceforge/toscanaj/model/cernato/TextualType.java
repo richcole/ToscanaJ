@@ -7,14 +7,16 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
+
 public class TextualType extends TypeImplementation {
     public TextualType(String name) {
         super(name);
     }
 
-    public void addValueGroup(ValueGroup group, String id) {
-        if (group instanceof TextualValueGroup) {
-            valueGroups.put(id, group);
+    public void addValueGroup(ScaleColumn column, String id) {
+        if (column instanceof TextualValueGroup) {
+            scale.addColumn(column, id);
             return;
         }
         throw new RuntimeException("Wrong value group type");

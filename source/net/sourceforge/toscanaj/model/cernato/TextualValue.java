@@ -7,7 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
-public class TextualValue implements Value {
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
+
+public class TextualValue implements AttributeValue {
     private String value;
 
     public TextualValue(String value) {
