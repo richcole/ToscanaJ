@@ -7,8 +7,7 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.*;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -115,8 +114,9 @@ public class ObjectLabelView extends LabelView {
             DiagramNode node = this.labelInfo.getNode();
             DatabaseConnectedConcept concept = (DatabaseConnectedConcept) node.getConcept();
             ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
-            contents =
-                   this.diagramView.getConceptInterpreter().executeQuery(query, concept, context);
+            DatabaseConnectedConceptInterpreter conceptInterpreter =
+                                (DatabaseConnectedConceptInterpreter) this.diagramView.getConceptInterpreter();
+            contents = conceptInterpreter.executeQuery(query, concept, context);
         }
     }
 

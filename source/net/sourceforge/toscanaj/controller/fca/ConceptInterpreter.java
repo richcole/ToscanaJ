@@ -60,6 +60,4 @@ public interface ConceptInterpreter {
     double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context, int reference);
 
     boolean isRealized(Concept concept, ConceptInterpretationContext context);
-
-    List executeQuery(Query query, Concept concept, ConceptInterpretationContext context);
 }

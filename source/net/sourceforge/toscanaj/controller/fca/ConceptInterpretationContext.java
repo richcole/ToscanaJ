@@ -15,8 +15,6 @@ import util.CollectionFactory;
 
 import java.util.List;
 
-/// @todo add observer pattern or event listening
-
 public class ConceptInterpretationContext implements ChangeObserver {
     /** Constant value which may be used to set displayMode or filterMode */
     public static final boolean CONTINGENT = true;
@@ -33,6 +31,8 @@ public class ConceptInterpretationContext implements ChangeObserver {
 
     private List nestingConcepts = CollectionFactory.createDefaultList();
 
+    /// @todo use something else than diagramHistory as first parameter -- not useful in anything but Toscana, even not
+    /// in Anaconda
     public ConceptInterpretationContext(DiagramHistory diagramHistory, EventBroker eventBroker) {
         this.diagramHistory = diagramHistory;
         this.objectDisplayMode = CONTINGENT;
