@@ -28,7 +28,8 @@ import java.util.*;
 public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, EventBrokerListener {
     private DatabaseInfo databaseInfo;
 
-    private Hashtable contingentSizes = new Hashtable();
+	private Hashtable contingentSizes = new Hashtable();
+	private Hashtable extentSizes = new Hashtable();
     
     private ListQuery listQuery = null;
 
@@ -50,23 +51,13 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     public int getObjectCount(Concept concept, ConceptInterpretationContext context) {
-        return getCount(concept, context, context.getObjectDisplayMode());
+		if (context.getObjectDisplayMode() == ConceptInterpretationContext.CONTINGENT) {
+			return getObjectContingentSize(concept, context);
+		} else {
+			return getExtentSize(concept,context);
+		}
     }
 
-    private int getCount(Concept concept, ConceptInterpretationContext context, boolean countType) {
-        if (countType == ConceptInterpretationContext.CONTINGENT) {
-        	return getObjectContingentSize(concept, context);
-        } else {
-        	int retVal = 0;
-        	Iterator it = concept.getDownset().iterator();
-        	while (it.hasNext()) {
-                Concept subconcept = (Concept) it.next();
-                retVal += getObjectContingentSize(subconcept, context);
-            }
-            return retVal;
-        }
-    }
-    
     public int getObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
     	try {
 			Hashtable sizes = getContingentSizesCache(context);
@@ -96,18 +87,31 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         return connection.queryInt(statement, 1);
     }
 
-    private Hashtable getContingentSizesCache(ConceptInterpretationContext context) {
-        Hashtable retVal = (Hashtable) contingentSizes.get(context);
-        if (retVal == null) {
-            retVal = new Hashtable();
-            contingentSizes.put(context, retVal);
-            /// @todo can we get around this by being smarter about the hashcodes ???
-            context.getEventBroker().subscribe(this,
-                    ConceptInterpretationContextChangedEvent.class,
-                    ConceptInterpretationContext.class);
-        }
-        return retVal;
-    }
+	private Hashtable getContingentSizesCache(ConceptInterpretationContext context) {
+		Hashtable retVal = (Hashtable) contingentSizes.get(context);
+		if (retVal == null) {
+			retVal = new Hashtable();
+			contingentSizes.put(context, retVal);
+			/// @todo can we get around this by being smarter about the hashcodes ???
+			context.getEventBroker().subscribe(this,
+					ConceptInterpretationContextChangedEvent.class,
+					ConceptInterpretationContext.class);
+		}
+		return retVal;
+	}
+
+	private Hashtable getExtentSizesCache(ConceptInterpretationContext context) {
+		Hashtable retVal = (Hashtable) this.extentSizes.get(context);
+		if (retVal == null) {
+			retVal = new Hashtable();
+			extentSizes.put(context, retVal);
+			/// @todo can we get around this by being smarter about the hashcodes ???
+			context.getEventBroker().subscribe(this,
+					ConceptInterpretationContextChangedEvent.class,
+					ConceptInterpretationContext.class);
+		}
+		return retVal;
+	}
 
     public int getAttributeCount(Concept concept, ConceptInterpretationContext context) {
         return concept.getAttributeContingentSize();
@@ -121,7 +125,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
      * caller.
      */
     public double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
-        int contingentSize = getCount(concept, context, ConceptInterpretationContext.CONTINGENT);
+        int contingentSize = getObjectContingentSize(concept, context);
         if (contingentSize == 0) {
             return 0; //avoids division by zero
         }
@@ -146,7 +150,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     public double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context) {
-        int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
+        int extentSize = getExtentSize(concept, context);
         if (extentSize == 0) {
             return 0; //avoids division by zero
         }
@@ -171,7 +175,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
             compareConcept = other;
         }
         return (double) extentSize /
-                (double) getCount(compareConcept, compareContext, ConceptInterpretationContext.EXTENT);
+                (double) getExtentSize(compareConcept, compareContext);
     }
 
     public boolean isRealized(Concept concept, ConceptInterpretationContext context) {
@@ -180,13 +184,13 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 
     	// first we check the inner diagram if anything below the concept has the same extent
     	// size (iff any subconcept has the same extent size, the concept is not realized) 
-        int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
+        int extentSize = getExtentSize(concept, context);
         for (Iterator iterator = concept.getDownset().iterator(); iterator.hasNext();) {
             Concept otherConcept = (Concept) iterator.next();
             if (otherConcept == concept) {
                 continue;
             }
-            int otherExtentSize = getCount(otherConcept, context, ConceptInterpretationContext.EXTENT);
+            int otherExtentSize = getExtentSize(otherConcept, context);
             if (otherExtentSize == extentSize) {
                 return false;
             }
@@ -208,7 +212,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                         List nesting = otherContext.getNestingConcepts();
                         if (nesting.size() != 0) {
                             if (nesting.get(nesting.size() - 1).equals(otherConcept)) {
-                                int otherExtentSize = getCount(concept, otherContext, ConceptInterpretationContext.EXTENT);
+                                int otherExtentSize = getExtentSize(concept, otherContext);
                                 if (otherExtentSize == extentSize) {
                                     return false;
                                 }
@@ -222,7 +226,8 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     private void clearCaches(ConceptInterpretationContext context) {
-        contingentSizes.remove(context);
+		this.contingentSizes.remove(context);
+		this.extentSizes.remove(context);
     }
 
     public void processEvent(Event e) {
@@ -359,11 +364,49 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     							    sqlStatement , e);
     }
 
-    public int getExtentSize(Concept concept, ConceptInterpretationContext context) {
-        return getCount(concept, context, ConceptInterpretationContext.EXTENT);
+	public int getExtentSize(Concept concept, ConceptInterpretationContext context) {
+		Hashtable sizes = getExtentSizesCache(context);
+		Integer cacheVal = (Integer) sizes.get(concept);
+		if (cacheVal != null) {
+			return cacheVal.intValue();
+		}
+		int count = calculateExtentSize(concept, context);
+		sizes.put(concept, new Integer(count));
+		return count;
+	}
+
+    private int calculateExtentSize(Concept concept, ConceptInterpretationContext context) {
+        List outerConcepts = context.getNestingConcepts();
+        if(outerConcepts.size() > 1) {
+        	throw new RuntimeException("multiple levels of nesting not yet supported");
+        }
+        if(outerConcepts.size() == 1) {
+        	int retVal = 0;
+        	Concept outerConcept = (Concept) outerConcepts.get(0);
+        	ConceptInterpretationContext parentContext = (ConceptInterpretationContext) context.getNestingContexts().get(0);
+        	for(Iterator it = outerConcept.getDownset().iterator(); it.hasNext(); ) {
+        		Concept currentOuterConcept = (Concept) it.next();
+        		ConceptInterpretationContext currentContext = parentContext.createNestedContext(currentOuterConcept);
+        		retVal += getLocalObjectContingentSize(concept, currentContext);
+        	}
+        	return retVal;
+        } else {
+        	return getLocalObjectContingentSize(concept, context);
+        }
     }
 
+    private int getLocalObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
+        int retVal = 0;
+        Iterator it = concept.getDownset().iterator();
+        while (it.hasNext()) {
+        	Concept subconcept = (Concept) it.next();
+        	retVal += getObjectContingentSize(subconcept, context);
+        }
+        return retVal;
+    }
+    
 	public void clearCache() {
 		this.contingentSizes.clear();
+		this.extentSizes.clear();
 	}
 }
