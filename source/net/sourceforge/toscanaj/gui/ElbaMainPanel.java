@@ -186,7 +186,12 @@ public class ElbaMainPanel
 		JButton databaseConnectionButton = new JButton("Database Connection");
 		databaseConnectionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				disconnectDatabase();
 				connectionInformationView.show();
+				if(!connectionInformationView.newConnectionWasSet()) {
+					// reconnect to the old connection
+					connectDatabase();
+				}
 			}
 		});
 
@@ -602,18 +607,7 @@ public class ElbaMainPanel
 	protected void connectDatabase() {
 	    this.dumpStatisticalDataMenuItem.setEnabled(false);
 	    this.dumpSQLMenuItem.setEnabled(false);
-		if (databaseConnection.isConnected()) {
-			try {
-				databaseConnection.disconnect();
-			} catch (DatabaseException ex) {
-				ErrorDialog.showError(
-					this,
-					ex,
-					"Closing database error",
-					"Some error closing the old database:\n" + ex.getMessage());
-				return;
-			}
-		}
+        disconnectDatabase();
 		DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
 		if (databaseInformation != null
 			&& databaseInformation.getDriverClass() != null
@@ -636,6 +630,20 @@ public class ElbaMainPanel
 		    this.dumpSQLMenuItem.setEnabled(true);
 		}
 	}
+
+    protected void disconnectDatabase() {
+        if (databaseConnection.isConnected()) {
+        	try {
+        		databaseConnection.disconnect();
+        	} catch (DatabaseException ex) {
+        		ErrorDialog.showError(
+        			this,
+        			ex,
+        			"Closing database error",
+        			"Some error closing the old database:\n" + ex.getMessage());
+        	}
+        }
+    }
 
 	private void addFileToMRUList(File file) {
 		try {

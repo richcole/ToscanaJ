@@ -597,7 +597,7 @@ public class DatabaseConnectionInformationView extends JDialog
 	public DatabaseConnectionInformationView(JFrame frame,
 												ConceptualSchema conceptualSchema,
 												EventBroker eventBroker) {
-		super(frame, "Database connection");
+		super(frame, "Database connection", true);
 		this.conceptualSchema = conceptualSchema;
 		this.internalBroker = new EventBroker();
 		this.databaseInfo = new DatabaseInfo();
