@@ -9,14 +9,6 @@ jdom.jar:
 
 hsqldb.jar: 
   HSQL Database Engine, version 1.7.1.b (http://hsqldb.sourceforge.net/, license in LICENSE.hsqldb.html)
-
-batik-*.jar: 
-  Batik SVG library (http://xml.apache.org/batik/, licence in LICENSE.batik)
-  
-freehep-*.jar:
-  FreeHEP Graphic export libraries from their 1.2.1 release. Requires a patch which is in freehep-pdfpath.zip.
-  The patch file has to be in the classpath before the other FreeHEP files. (http://java.freehep.org/, license
-  in LICENSE.freehep)
-  
+ 
 ant-contrib.jar
   Ant extras - used in plugins deployment, 0.3 (http://sourceforge.net/projects/ant-contrib/, license in LICENSE-ant-contrib.txt)
