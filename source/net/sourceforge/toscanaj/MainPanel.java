@@ -40,14 +40,8 @@ import javax.swing.JSplitPane;
 /**
  *  This class provides the main GUI panel with menus and a toolbar
  *  for ToscanaJ.
- *
- *  28/03/2001
- *
- *  @author Nataliya Roberts, Thomas Tilley
- *
  */
 public class MainPanel extends JFrame implements ActionListener {
-
 
   private JToolBar toolbar = null;
   private JMenuBar menubar = null;
@@ -57,47 +51,34 @@ public class MainPanel extends JFrame implements ActionListener {
   public static boolean debug = false;
 
       // buttons list
-  private JButton newButton      = null;
   private JButton openButton     = null;
-  private JButton saveButton     = null;
-  private JButton contentsButton = null;
 
 
     // menu items list
     // FILE menu
-  private JMenuItem newMenuItem		= null;
   private JMenuItem openMenuItem		= null;
-  private JMenuItem closeMenuItem		= null;
-  private JMenuItem saveMenuItem		= null;
-  private JMenuItem saveAsMenuItem	= null;
-  private JMenuItem printPrevMenuItem	= null;
   private JMenuItem printMenuItem		= null;
   private JMenuItem printSetupMenuItem= null;
   private JMenuItem exitMenuItem		= null;
 
-  // THEMES menu
-  private JMenuItem zoomOutMenuItem	= null;
-  private JMenuItem managMenuItem		= null;
-
   // DIAGRAM menu
-  private	ButtonGroup diagrGroup1		= null;
-  private	ButtonGroup diagrGroup2		= null;
-  private JMenuItem redrawMenuItem	= null;
-  private JRadioButtonMenuItem exDocMenuItem		= null;
-  private JRadioButtonMenuItem spDocMenuItem		= null;
-  private JRadioButtonMenuItem allDocMenuItem	= null;
-  private JMenuItem numDocMenuItem	= null;
-  private JMenuItem percDistMenuItem	= null;
-  private JMenuItem listDocMenuItem	= null;
-  private JMenuItem moveLabMenuItem	= null;
+  private ButtonGroup documentsDisplayGroup = null;
+  private JRadioButtonMenuItem showAllMenuItem		= null;
+  private JRadioButtonMenuItem showExactMenuItem		= null;
+
+  private ButtonGroup documentsFilterGroup = null;
+  private JRadioButtonMenuItem filterAllMenuItem		= null;
+  private JRadioButtonMenuItem filterExactMenuItem		= null;
+
+  private ButtonGroup labelContentGroup = null;
+  private JMenuItem numDocMenuItem = null;
+  private JMenuItem percDistMenuItem = null;
+  private JMenuItem listDocMenuItem = null;
 
   private int currentSelectedIndex;
 
   // icon images
   private static final String OPEN_ICON          = "open.gif";
-  private static final String NEW_ICON           = "new.gif";
-  private static final String SAVE_ICON          = "save.gif";
-  private static final String SAVE_ICON_DISABLED = "saveDisabled.gif";
   private static final String CONTENTS_ICON      = "contents.gif";
   private static final String CLEAR_ICON          = "clear.gif";
 
@@ -158,11 +139,10 @@ public class MainPanel extends JFrame implements ActionListener {
      * Build the GUI.
      */
     private void buildPanel() {
-
         buildMenuBar();
         setJMenuBar(menubar);
 
-        buildToolBar();
+        // buildToolBar();
 
         //Lay out the content pane.
         JPanel contentPane = new JPanel();
@@ -189,13 +169,10 @@ public class MainPanel extends JFrame implements ActionListener {
         contentPane.setPreferredSize(new Dimension(550, 400));
     }
 
-
     /**
      *  build the MenuBar
      */
-
     private void buildMenuBar() {
-
         // create menu bar
 
         menubar = new JMenuBar();
@@ -205,18 +182,9 @@ public class MainPanel extends JFrame implements ActionListener {
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menubar.add(fileMenu);
 
-        // menu item NEW
-        newMenuItem = new JMenuItem("New",
-                        new ImageIcon(IMAGE_PATH + NEW_ICON));
-        newMenuItem.setMnemonic(KeyEvent.VK_N);
-        newMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                    KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-        newMenuItem.addActionListener(this);
-        fileMenu.add(newMenuItem);
-
         // menu item OPEN
-        openMenuItem = new JMenuItem("Open...",
-                        new ImageIcon(IMAGE_PATH + OPEN_ICON));
+        openMenuItem = new JMenuItem("Open...");
+                        //new ImageIcon(IMAGE_PATH + OPEN_ICON));
         openMenuItem.setMnemonic(KeyEvent.VK_O);
         openMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                  KeyEvent.VK_O, ActionEvent.CTRL_MASK));
@@ -225,12 +193,6 @@ public class MainPanel extends JFrame implements ActionListener {
 
         // separator
         fileMenu.addSeparator();
-
-        // menu item PRINT PREVIEW
-        printPrevMenuItem = new JMenuItem("Print Preview");
-        printPrevMenuItem.addActionListener(this);
-        printPrevMenuItem.setEnabled(fileIsOpen);
-        fileMenu.add(printPrevMenuItem);
 
         // menu item PRINT
         printMenuItem = new JMenuItem("Print");
@@ -266,95 +228,65 @@ public class MainPanel extends JFrame implements ActionListener {
         exitMenuItem.addActionListener(this);
         fileMenu.add(exitMenuItem);
 
-        // create the THEMES menu
-        JMenu themesMenu = new JMenu("Themes");
-        themesMenu.setMnemonic(KeyEvent.VK_T);
-        menubar.add(themesMenu);
-
-        // menu item ZOOM OUT
-        zoomOutMenuItem = new JMenuItem("Zoom Out");
-        zoomOutMenuItem.addActionListener(this);
-        zoomOutMenuItem.setEnabled(fileIsOpen);
-        themesMenu.add(zoomOutMenuItem);
-
-        // separator
-        themesMenu.addSeparator();
-
-        // menu item MANAGER
-        managMenuItem = new JMenuItem("Manager");
-        managMenuItem.addActionListener(this);
-        managMenuItem.setEnabled(fileIsOpen);
-        themesMenu.add(managMenuItem);
-
         // create the DIAGRAM menu
         JMenu diagrMenu = new JMenu("Diagram");
         diagrMenu.setMnemonic(KeyEvent.VK_D);
         menubar.add(diagrMenu);
 
+        // menu radio buttons group:
+        this.documentsDisplayGroup = new ButtonGroup();
 
-        // menu item REDRAW
-        redrawMenuItem = new JMenuItem("Redraw");
-        redrawMenuItem.addActionListener(this);
-        //redrawMenuItem.setEnabled(fileIsOpen);
-        diagrMenu.add(redrawMenuItem);
+        this.showExactMenuItem = new JRadioButtonMenuItem("Show only exact matches");
+        this.showExactMenuItem.setSelected(true);
+        this.showExactMenuItem.addActionListener(this);
+        documentsDisplayGroup.add(this.showExactMenuItem);
+        diagrMenu.add(this.showExactMenuItem);
+
+        this.showAllMenuItem = new JRadioButtonMenuItem("Show all matches");
+        this.showAllMenuItem.addActionListener(this);
+        documentsDisplayGroup.add(this.showAllMenuItem);
+        diagrMenu.add(this.showAllMenuItem);
 
         // separator
         diagrMenu.addSeparator();
 
         // menu radio buttons group:
-        diagrGroup1 = new ButtonGroup();
+        this.documentsFilterGroup = new ButtonGroup();
 
-        // radio button menu item EXACT DOCUMENTS
+        this.filterExactMenuItem = new JRadioButtonMenuItem("Filter: use only exact matches");
+        this.filterExactMenuItem.addActionListener(this);
+        documentsFilterGroup.add(this.filterExactMenuItem);
+        diagrMenu.add(this.filterExactMenuItem);
 
-        // set checked by default. maybe this default should
-        // be handled differently?....
-        // use ButtonModel?
-
-        exDocMenuItem = new JRadioButtonMenuItem("Exact Documents");
-        exDocMenuItem.setSelected(true);
-        exDocMenuItem.addActionListener(this);
-        diagrGroup1.add(exDocMenuItem);
-        diagrMenu.add(exDocMenuItem);
-
-        // radio button menu item SPECIAL DOCUMENTS
-        spDocMenuItem = new JRadioButtonMenuItem("Special Documents");
-        spDocMenuItem.addActionListener(this);
-        diagrGroup1.add(spDocMenuItem);
-        diagrMenu.add(spDocMenuItem);
-
-        // radio button menu item ALL DOCUMENTS
-        allDocMenuItem = new JRadioButtonMenuItem("All Documents");
-        allDocMenuItem.addActionListener(this);
-        diagrGroup1.add(allDocMenuItem);
-        diagrMenu.add(allDocMenuItem);
+        this.filterAllMenuItem = new JRadioButtonMenuItem("Filter: use all matches");
+        this.filterAllMenuItem.setSelected(true);
+        this.filterAllMenuItem.addActionListener(this);
+        documentsFilterGroup.add(this.filterAllMenuItem);
+        diagrMenu.add(this.filterAllMenuItem);
 
         // separator
         diagrMenu.addSeparator();
 
         // menu radio buttons group:
-        diagrGroup2 = new ButtonGroup();
+        this.labelContentGroup = new ButtonGroup();
 
         // radio button menu item NUMBER OF DOCUMENTS
-
-        // this item is checked by default. not sure
-        // how to hadle this in ActionListener :(
-
         numDocMenuItem = new JRadioButtonMenuItem("Number Of Documents");
         numDocMenuItem.setSelected(true);
         numDocMenuItem.addActionListener(this);
-        diagrGroup2.add(numDocMenuItem);
+        labelContentGroup.add(numDocMenuItem);
         diagrMenu.add(numDocMenuItem);
 
-        // radio button menu item PERCEPTUAL DISTRIBUTION
+        // radio button menu item PERCENTUAL DISTRIBUTION
         percDistMenuItem = new JRadioButtonMenuItem("Percentual Distribution");
         percDistMenuItem.addActionListener(this);
-        diagrGroup2.add(percDistMenuItem);
+        labelContentGroup.add(percDistMenuItem);
         diagrMenu.add(percDistMenuItem);
 
         // radio button menu item LIST OF DOCUMENTS
         listDocMenuItem = new JRadioButtonMenuItem("List Of Documents");
         listDocMenuItem.addActionListener(this);
-        diagrGroup2.add(listDocMenuItem);
+        labelContentGroup.add(listDocMenuItem);
         diagrMenu.add(listDocMenuItem);
     }
 
@@ -367,33 +299,11 @@ public class MainPanel extends JFrame implements ActionListener {
         toolbar = new JToolBar();
         toolbar.setFloatable(true);
 
-        // New button
-        newButton = new JButton(new ImageIcon(IMAGE_PATH + NEW_ICON));
-        newButton.setToolTipText("New");
-        newButton.addActionListener(this);
-        toolbar.add(newButton);
-
         // Open button
         openButton = new JButton(new ImageIcon(IMAGE_PATH + OPEN_ICON));
         openButton.setToolTipText("Open");
         openButton.addActionListener(this);
         toolbar.add(openButton);
-
-        // Save button
-        saveButton = new JButton(new ImageIcon(IMAGE_PATH + SAVE_ICON));
-        saveButton.setToolTipText("Save");
-        saveButton.addActionListener(this);
-        saveButton.setEnabled(fileIsOpen);
-        toolbar.add(saveButton);
-
-        // add separator
-        toolbar.addSeparator();
-
-        // Contents button
-        contentsButton = new JButton(new ImageIcon(IMAGE_PATH + CONTENTS_ICON));
-        contentsButton.setToolTipText("Contents");
-        contentsButton.addActionListener(this);
-        toolbar.add(contentsButton);
     }
 
     /**
@@ -401,34 +311,18 @@ public class MainPanel extends JFrame implements ActionListener {
      * on boolean isOpen (referring to the face if any file/s is
      * open ).
      */
-
-    public void resetButtons ( boolean isOpen) {
-
+    public void resetButtons(boolean isOpen) {
         // menues
-
-        //closeMenuItem.setEnabled (isOpen);
-        //saveMenuItem.setEnabled (isOpen);
-        //saveAsMenuItem.setEnabled (isOpen);
-
-        printPrevMenuItem.setEnabled (isOpen);
         printMenuItem.setEnabled (isOpen);
         printSetupMenuItem.setEnabled (isOpen);
 
-        zoomOutMenuItem.setEnabled(isOpen);
-        managMenuItem.setEnabled(isOpen);
-
-
-        redrawMenuItem.setEnabled (isOpen);
-        exDocMenuItem.setEnabled (isOpen);
-        spDocMenuItem.setEnabled (isOpen);
-        allDocMenuItem.setEnabled (isOpen);
+        this.showAllMenuItem.setEnabled (isOpen);
+        this.showAllMenuItem.setEnabled (isOpen);
+        this.filterExactMenuItem.setEnabled (isOpen);
+        this.filterAllMenuItem.setEnabled (isOpen);
         numDocMenuItem.setEnabled (isOpen);
         percDistMenuItem.setEnabled (isOpen);
         listDocMenuItem.setEnabled (isOpen);
-        //moveLabMenuItem.setEnabled (isOpen);
-
-        // buttons
-        //saveButton.setEnabled (isOpen);
     }
 
     /**
@@ -445,39 +339,15 @@ public class MainPanel extends JFrame implements ActionListener {
         //System.out.println ("action command = " + ae.getActionCommand());
 
         // Button actions
-        if (actionSource == newButton) {
-            System.out.println("Action for new button");	//stub
-        }
         if (actionSource == openButton) {
             openSchema();
-        }
-        if (actionSource == saveButton) {
-            System.out.println("Action for save button"); // stub
-        }
-        if (actionSource == contentsButton) {
-            System.out.println("Action for contents button"); // stub
         }
 
         // Menus actions
 
         // menu FILE
-        if (actionSource == newMenuItem) {
-            System.out.println("Action for menu item: new "); // stub
-        }
         if (actionSource == openMenuItem) {
             openSchema();
-        }
-        if (actionSource == closeMenuItem) {
-            System.out.println("Action for menu item: close "); // stub
-        }
-        if (actionSource == saveMenuItem) {
-            System.out.println("Action for menu item: save "); // stub
-        }
-        if (actionSource == saveAsMenuItem) {
-            System.out.println("Action for menu item: saveAs "); // stub
-        }
-        if (actionSource == printPrevMenuItem) {
-            System.out.println("Action for menu item: Print Preview "); // stub
         }
         if (actionSource == printMenuItem) {
             System.out.println("Action for menu item: Print "); // stub
@@ -490,39 +360,15 @@ public class MainPanel extends JFrame implements ActionListener {
             closeMainPanel();
         }
 
-        // menu THEMES
-        if (actionSource == zoomOutMenuItem) {
-            System.out.println("Action for menu item: Zoom Out "); // stub
-        }
-        if (actionSource == managMenuItem) {
-            System.out.println("Action for menu item: Manager "); // stub
-            chooseDiagramView();
-        }
-
         // menu DIAGRAM
-        /*
-        if (actionSource == diagrGroup1) {
-            System.out.println("GOT diagrGroup1 action!!!");
+        if (actionSource == this.showExactMenuItem) {
         }
-        */
-        if (actionSource == redrawMenuItem) {
-            // this one is checked by default
-            System.out.println("Acton for menu item: Redraw ");
+        if (actionSource == this.showAllMenuItem) {
         }
-
-        // radio group 1
-        if (actionSource == exDocMenuItem) {
-            System.out.println("Acton for menu group: Exact Documents ");
+        if (actionSource == this.filterExactMenuItem) {
         }
-        if (actionSource == spDocMenuItem) {
-            System.out.println("Acton for menu group: Special Documents ");
+        if (actionSource == this.filterAllMenuItem) {
         }
-        if (actionSource == allDocMenuItem) {
-            System.out.println("Acton for menu group: All Documents ");
-        }
-        // end of radio group 1
-
-        // radio group 2
         if (actionSource == numDocMenuItem) {
             System.out.println("Acton for menu group: Number Of Documents ");
         }
@@ -531,11 +377,6 @@ public class MainPanel extends JFrame implements ActionListener {
         }
         if (actionSource == listDocMenuItem) {
             System.out.println("Acton for menu group: List Of Documents ");
-        }
-        // end of radio group 2
-
-        if (actionSource == moveLabMenuItem) {
-            System.out.println("Acton for menu group: Move Labels");
         }
     }
 
@@ -613,68 +454,8 @@ public class MainPanel extends JFrame implements ActionListener {
     }
 
     /**
-     * Select different diagram view
+     *  Main method for running the program
      */
-    public void chooseDiagramView(){
-        // shouldn't need this check as relevant menu should
-        // be disabled if there is no schema open
-        if (conceptualSchema == null)
-            return;
-        int diagrNum = conceptualSchema.getNumberOfDiagrams();
-        Vector diagrVector = new Vector (diagrNum);
-        for (int i = 0; i < diagrNum; i++) {
-            SimpleLineDiagram diagram = conceptualSchema.getDiagram(i);
-            String diagrTitle = diagram.getTitle();
-            diagrVector.addElement (diagrTitle);
-        }
-
-        // popup dialog window
-        final JList list = new JList(diagrVector);
-        list.setSelectedIndex(currentSelectedIndex);
-        String title = "Choose SimpleLineDiagram Veiew";
-        JFrame f = new JFrame(title);
-                f.addWindowListener(new WindowAdapter() {
-                    public void windowClosing(WindowEvent e) {
-                         System.exit(0);
-                    }
-                });
-        final JDialog chooseDialog = new JDialog (f, title);
-        chooseDialog.setLocationRelativeTo(f);
-
-        //buttons
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener( new ActionListener() {
-            public void actionPerformed (ActionEvent e) {
-                chooseDialog.setVisible(false);
-            }
-        });
-        JButton okButton = new JButton("OK");
-        okButton.addActionListener( new ActionListener() {
-            public void actionPerformed (ActionEvent e) {
-                currentSelectedIndex = list.getSelectedIndex();
-                diagramView.showDiagram( conceptualSchema.getDiagram( currentSelectedIndex ) );
-                chooseDialog.setVisible(false);
-            }
-        });
-        JPanel buttonPane = new JPanel (new GridLayout(1,2));
-        buttonPane.add(cancelButton);
-        buttonPane.add(okButton);
-
-        // contentPane
-        Container contentPane = chooseDialog.getContentPane();
-        contentPane.setLayout(new BorderLayout());
-        contentPane.add(list, BorderLayout.CENTER);
-        contentPane.add(buttonPane, BorderLayout.SOUTH);
-        chooseDialog.pack();
-        chooseDialog.setVisible(true);
-
-
-    }
-
-    /**
-     *  main method for testing
-     */
-
     public static void main(String [] args) {
         MainPanel test;
         if(args.length == 1) {
