@@ -3,12 +3,12 @@
 <head>
   <meta content="text/html; charset=ISO-8859-1"
  http-equiv="content-type">
-  <title>Setting up Tockit in Eclipse</title>
+  <title>Setting up ToscanaJ in Eclipse</title>
 </head>
 <body>
-<h1>Setting up Eclipse to compile and run Tockit code</h1>
+<h1>Setting up Eclipse to compile and run ToscanaJ code</h1>
 This is written based on Eclipse 3.0. Other versions of Eclipse might
-differ slightly. Some bits are a bit tedious, but we haven't automoted
+differ slightly. Some bits are a bit tedious, but we haven't automated
 it yet.<br>
 <h2>Getting the Sources</h2>
 <ul>
@@ -17,7 +17,7 @@ it yet.<br>
     <li>call File-&gt;New-&gt;Project...</li>
     <li>select "Java Project" on the first page of the wizard<br>
     </li>
-    <li>set a name (e.g. "Tockit") on the second page, chose a
+    <li>set a name (e.g. "ToscanaJ") on the second page, chose a
 different location if you wnant to, ignore the project layout settings</li>
     <li>Finish the wizard and change perspective if asked</li>
   </ul>
@@ -38,21 +38,21 @@ symbol and "CVS" label)<br>
     <li>enter the following values:</li>
     <ul>
       <li>Host: cvs.sf.net</li>
-      <li>Repository path: /cvsroot/tockit</li>
+      <li>Repository path: /cvsroot/toscanaj</li>
       <li>User: anonymous</li>
       <li>Password: <span style="font-style: italic;">&lt;empty&gt;</span></li>
       <li>Connection type: pserver (with default port)</li>
     </ul>
   </ul>
-  <li>Checkout the "java" module from Tockit:</li>
+  <li>Checkout the "source", "libs" and "examples" modules:</li>
   <ul>
     <li>open the treeview for the newly created repository</li>
     <li>open the "HEAD" branch</li>
-    <li>locate the "java" module in there, open the context menu for
-this</li>
+    <li>locate the three modules in there, select them all and open the context menu for
+them</li>
     <li>select "Check Out As..." from the menu</li>
     <li>select "Check out into an existing project" in the wizard</li>
-    <li>on the next page select your Tockit project, leave everything
+    <li>on the next page select your ToscanaJ project, leave everything
 else as is</li>
     <li>on the page asking for a tag select "HEAD" and click "Finish"<br>
     </li>
@@ -62,7 +62,7 @@ else as is</li>
 <ul>
   <li>change back to the Java perspective (there should be a selection
 "Java" in the top right of Eclipse)</li>
-  <li>open the context menu of your Tockit project</li>
+  <li>open the context menu of your ToscanaJ project</li>
   <li>select "Properties" from the menu</li>
   <li>select "Java Build Path" from the list</li>
   <li>go to the "Source" tab and remove the existing entry</li>
@@ -70,8 +70,7 @@ else as is</li>
     <li>click "Add Folder..."</li>
   </ul>
   <ul>
-    <li>check every directory named "source" (most are all three levels
-down from the "java" folder, plugins are deeper), click Ok</li>
+    <li>check the directory named "source", click Ok</li>
   </ul>
   <ul>
     <li>select the "Browse..." button for the output folder</li>
@@ -85,7 +84,7 @@ down from the "java" folder, plugins are deeper), click Ok</li>
   <li>change to the libraries tab</li>
   <ul>
     <li>click the "Add JARs..." button</li>
-    <li>select all Jars in the Tockit project (you can use Ctrl for
+    <li>select all Jars in the libs folder and subfolders (you can use Ctrl for
 multiple selection)</li>
     <li>click Ok for the selection</li>
   </ul>
@@ -132,21 +131,14 @@ Distributions are created using Ant. An easy way to create a
 distribution of a library or application in Eclipse is this:<br>
 <ul>
   <li>within the Java Perspective in the Package Explorer open the
-"java" folder below the list of JAR files (not the packages)</li>
-  <li>search for the folder containing the library or application</li>
-  <li>it should contain a file "build.xml" (at the time of writing
-Crepe still misses it)</li>
-  <li>call its context menu, from there Ant-&gt;Ant Build (the one
-without the dots)</li>
-  <li>note that there are some dependencies, e.g. to build "canvas" you
-need to build "events" and "swing" first.<br>
-  </li>
-  <li>that will create a new JAR file in "java/libraries/jar" for the
-libraries and a program distribution in a directory called "dist" below
+"source" folder</li>
+  <li>it should contain a file "build.xml"</li>
+  <li>call its context menu, from there Ant-&gt;Ant Build with the dots</li>
+  <li>select the "dist" target</li>
+  <li>that will create a new program distribution in a directory called "dist" below
 the application directory for the applications. Note that Eclipse might
 need an explicit refreshment in the Package Explorer to show the change
-("Refresh" from the context menu on the parent folder)<br>
-  </li>
+("Refresh" from the context menu on the parent folder)</li>
 </ul>
 </body>
 </html>
