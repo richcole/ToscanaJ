@@ -575,6 +575,12 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         final DiagramView diagramView =
             this.diagramEditingView.getDiagramView();
 
+        JMenu editMenu = new JMenu("Edit");
+        editMenu.setMnemonic(KeyEvent.VK_E);
+        editMenu.add(diagramView.getUndoManager().getUndoAction());
+        editMenu.add(diagramView.getUndoManager().getRedoAction());
+        menuBar.add(editMenu);
+        
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
 
