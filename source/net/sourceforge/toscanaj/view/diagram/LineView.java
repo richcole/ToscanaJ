@@ -28,6 +28,13 @@ import java.text.DecimalFormat;
  * Draws a line between two points, representing a DiagramLine in the model.
  */
 public class LineView extends CanvasItem {
+	private static class NonRealizedConceptGroupingMode{};
+	
+	public static final NonRealizedConceptGroupingMode NO_GROUPING = new NonRealizedConceptGroupingMode();
+	public static final NonRealizedConceptGroupingMode COLORED_LINES_GROUPING = new NonRealizedConceptGroupingMode();
+	
+	private NonRealizedConceptGroupingMode groupingMode = NO_GROUPING;
+	
     private static final double LABEL_MARGIN = 2;
 
     /**
@@ -58,6 +65,9 @@ public class LineView extends CanvasItem {
 		this.showRatioFillColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioFillColor", this.showRatioFillColor);
         this.fontSize = ConfigurationManager.fetchFloat("LineView", "labelFontSize", 6);
         this.dynamicLineWidth = ConfigurationManager.fetchString("LineView", "lineWidth", "").equals("extentRatio");
+        if(ConfigurationManager.fetchString("LineView", "nonRealizedConceptGrouping", "").equals("coloredLines")) {
+        	this.groupingMode = COLORED_LINES_GROUPING;
+        }
     }
 
     /**
@@ -69,41 +79,84 @@ public class LineView extends CanvasItem {
         Point2D to = diagramLine.getToPosition();
         Paint oldPaint = graphics.getPaint();
         Stroke oldStroke = graphics.getStroke();
-        int selectionLineWidth = diagramSchema.getSelectionLineWidth();
-        float lineWidth = 1;
-        if (this.diagramLine.getFromNode().getY() > this.diagramLine.getToNode().getY()) {
-            graphics.setPaint(Color.red);
-            lineWidth = 3;
-        } else if (this.getSelectionState() == DiagramView.NO_SELECTION) {
-            graphics.setPaint(diagramSchema.getLineColor());
-            lineWidth = 1;
-        } else if (this.getSelectionState() == DiagramView.SELECTED_IDEAL) {
-            graphics.setPaint(diagramSchema.getCircleIdealColor());
-            lineWidth = selectionLineWidth;
-        } else if (this.getSelectionState() == DiagramView.SELECTED_FILTER) {
-            graphics.setPaint(diagramSchema.getCircleFilterColor());
-			lineWidth = selectionLineWidth;
-        } else if (this.getSelectionState() == DiagramView.NOT_SELECTED) {
-            graphics.setPaint(diagramSchema.fadeOut(diagramSchema.getLineColor()));
-			lineWidth = 1;
-        }
-        if(this.dynamicLineWidth) {
-        	lineWidth *= 7 * getExtentRatio();
-        	if(lineWidth < 0) {
-        		lineWidth = Float.MIN_VALUE;
-        	}
-        }
-		graphics.setStroke(new BasicStroke(lineWidth));
-        graphics.draw(new Line2D.Double(from, to));
+
+		double extentRatio;
+		DiagramView diagramView = this.fromView.getDiagramView();
+		ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
+		ConceptInterpretationContext interpretationContext = this.fromView.getConceptInterpretationContext();
+		Concept upperConcept = this.fromView.getDiagramNode().getConcept();
+		Concept lowerConcept = this.toView.getDiagramNode().getConcept();
+		int upperExtent = interpreter.getExtentSize(upperConcept,interpretationContext);
+		int lowerExtent = interpreter.getExtentSize(lowerConcept,interpretationContext);
+		if(upperExtent == 0) {
+			extentRatio = 1;
+		} else {
+			extentRatio = (double)lowerExtent / (double)upperExtent;
+		}
+
+		int selectionLineWidth = diagramSchema.getSelectionLineWidth();
+		Color lineColor = null;
+		float strokeWidth = 1;
+		if (this.diagramLine.getFromNode().getY() > this.diagramLine.getToNode().getY()) {
+			lineColor = Color.red;
+			strokeWidth = 3;
+		} else if (this.getSelectionState() == DiagramView.NO_SELECTION) {
+			lineColor = diagramSchema.getLineColor();
+			strokeWidth = 1;
+		} else if (this.getSelectionState() == DiagramView.SELECTED_IDEAL) {
+			lineColor = diagramSchema.getCircleIdealColor();
+			strokeWidth = selectionLineWidth;
+		} else if (this.getSelectionState() == DiagramView.SELECTED_FILTER) {
+			lineColor = diagramSchema.getCircleFilterColor();
+			strokeWidth = selectionLineWidth;
+		} else if (this.getSelectionState() == DiagramView.NOT_SELECTED) {
+			lineColor = diagramSchema.fadeOut(diagramSchema.getLineColor());
+			strokeWidth = 1;
+		}
+
+		if(extentRatio == 1 && this.groupingMode == COLORED_LINES_GROUPING) {
+			double gradientPosition = interpreter.getRelativeExtentSize(upperConcept,interpretationContext, ConceptInterpreter.REFERENCE_DIAGRAM);
+            Color fillColor = diagramSchema.getGradientColor(gradientPosition);
+			if (this.getSelectionState() == DiagramView.NOT_SELECTED) {
+				fillColor = diagramSchema.fadeOut(fillColor);
+				strokeWidth = 1;
+			}
+
+			double lineLength = this.fromView.getPosition().distance(this.toView.getPosition());
+            double lineWidth = this.fromView.getRadiusX();
+            Rectangle2D line = new Rectangle2D.Double(0, -strokeWidth/2, lineLength, lineWidth);
+            
+            AffineTransform oldTransform = graphics.getTransform();
+			graphics.transform(AffineTransform.getTranslateInstance(from.getX(), from.getY()));
+            graphics.transform(AffineTransform.getRotateInstance(Math.atan2(to.getY() - from.getY(), to.getX() - from.getX())));
+            graphics.setPaint(fillColor);
+            graphics.fill(line);
+            graphics.setPaint(lineColor);
+			graphics.setStroke(new BasicStroke(1));
+            graphics.draw(line);
+            
+            graphics.setTransform(oldTransform);
+		} else {
+			if(this.dynamicLineWidth) {
+				strokeWidth *= 7 * extentRatio;
+				if(strokeWidth < 0) {
+					strokeWidth = Float.MIN_VALUE;
+				}
+			}
+			graphics.setPaint(lineColor);
+			graphics.setStroke(new BasicStroke(strokeWidth));
+			graphics.draw(new Line2D.Double(from, to));
+		}
+
         graphics.setPaint(oldPaint);
         graphics.setStroke(oldStroke);
         
         if(this.useExtentLabels) {
-            drawExtentRatio(graphics);
+            drawExtentRatio(graphics, extentRatio);
         }
     }
 
-    private void drawExtentRatio(Graphics2D graphics) {
+    private void drawExtentRatio(Graphics2D graphics, double ratio) {
     	Paint oldPaint = graphics.getPaint();
         Font oldFont = graphics.getFont();
         AffineTransform oldTransform = graphics.getTransform();
@@ -111,9 +164,8 @@ public class LineView extends CanvasItem {
 
 		Point2D from = diagramLine.getFromPosition();
 		Point2D to = diagramLine.getToPosition();
-		double ratio = getExtentRatio();
 		
-		if(ratio < 0) {
+		if(ratio == 1) {
 			return;
 		}
 
@@ -156,23 +208,6 @@ public class LineView extends CanvasItem {
 		Rectangle2D filledRectangle = new Rectangle2D.Double(labelRectangle.getX(), labelRectangle.getY(),
 		                                                     filledWidth, labelRectangle.getHeight());
 		graphics.fill(filledRectangle);		
-	}
-
-	/**
-	 * @return double |ext(toConcept)| / |ext(fromConcept)| if the upper concept is realized. Negative otherwise.
-	 */
-	private double getExtentRatio() {
-		DiagramView diagramView = this.fromView.getDiagramView();
-		ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
-		ConceptInterpretationContext interpretationContext = this.fromView.getConceptInterpretationContext();
-		Concept upperConcept = this.fromView.getDiagramNode().getConcept();
-		if(!interpreter.isRealized(upperConcept,interpretationContext)) {
-			return -1;
-		}
-		Concept lowerConcept = this.toView.getDiagramNode().getConcept();
-		int upperExtent = interpreter.getExtentSize(upperConcept,interpretationContext);
-		int lowerExtent = interpreter.getExtentSize(lowerConcept,interpretationContext);
-		return (double)lowerExtent / (double)upperExtent;
 	}
 
     /**

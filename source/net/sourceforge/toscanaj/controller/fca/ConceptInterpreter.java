@@ -37,6 +37,7 @@ import java.util.Iterator;
  * 
  * @todo it might be better not to have the objectDisplayMode but two methods for extent/contingent instead. This allows more caching
  *       since the context would be the same more often.
+ * @todo remove the REFERENCE_SCHEMA, it doesn't work anyway and probably noone needs it
  */
 
 public interface ConceptInterpreter {

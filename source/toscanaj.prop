@@ -51,3 +51,4 @@ ToscanaJMainPanel-mruFiles-1=./examples/sql/pctest/pctest.csx
 # LineView-showExtentRatioFillColor=[the color used to get a filling into the label background, indicating the ratio, defaults to #ffcccc]
 # LineView-labelFontSize=[if lines have labels, this is the font size in points. Defaults to 6pt]
 # LineView-lineWidth=[if set to "extentRatio", the line width will vary with the extent size differences]
+# LineView-nonRealizedConceptGrouping=[if set to "coloredLines", all non-realized nodes will be connected to the realized one with the same extent]
