@@ -70,6 +70,16 @@ public class DBConnection {
         con = connection;
     }
 
+    /**
+     *  Create a connection that isn't connected.
+     */
+    public DBConnection() {
+    }
+
+    public void connect(DatabaseInfo info) throws DatabaseException {
+        con = getConnection(info.getURL(), info.getUserName(), info.getPassword());
+    }
+
     private static Connection getConnection(String url, String account, String password) throws DatabaseException {
         try {
             Driver driver = DriverManager.getDriver(url);

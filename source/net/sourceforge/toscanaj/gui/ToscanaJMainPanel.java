@@ -76,6 +76,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
      */
     private JSplitPane splitPane = null;
 
+    private DBConnection databaseConnection = new DBConnection();
+
+    /**
+     * The database connection
+     */
     /**
      * Stores the divider position when the diagram organizer is hidden.
      */
@@ -721,7 +726,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         DatabaseViewerManager.resetRegistry();
         Query.clearQueries();
         try {
-            conceptualSchema = CSXParser.parse(schemaFile);
+            conceptualSchema = CSXParser.parse(schemaFile, databaseConnection);
+            databaseConnection.connect(conceptualSchema.getDatabaseInfo());
+            if (conceptualSchema.getSQLURL() != null) {
+                databaseConnection.executeScript(conceptualSchema.getSQLURL());
+            }
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(this, e, "File access error", e.getMessage());
             return;
@@ -731,29 +740,14 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         } catch (DataFormatException e) {
             ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n" + e.getMessage());
             return;
+        } catch (DatabaseException e) {
+            ErrorDialog.showError(this, e, "Error initializing database connection", "Error report:\n" + e.getMessage());
+            return;
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n" + e.getMessage());
             e.printStackTrace();
             return;
         }
-        /* needs outsourcing dbconnection first
-        try {
-            DatabaseInfo dbInfo = conceptualSchema.getDatabaseInfo();
-            DBConnection databaseConnection = new DBConnection(dbInfo.getURL(), dbInfo.getUserName(), dbInfo.getPassword());
-            String urlString = dbInfo.getEmbeddedSQLLocation();
-            if (urlString != null) {
-                URL sqlURL;
-                try {
-                    sqlURL = new URL(schemaFile.toURL(), urlString);
-                } catch (MalformedURLException e) {
-                    ErrorDialog.showError(this, e, "Opening DB failed", "Could not create URL for SQL script:\n" + e.getMessage());
-                }
-                databaseConnection.executeScript(sqlURL);
-            }
-        } catch (DatabaseException e) {
-            ErrorDialog.showError(this, e, "Opening DB failed", "Some error happened when opening the database:\n" + e.getMessage());
-        }
-         */
 
         diagramView.showDiagram(null);
         updateLabelViews();

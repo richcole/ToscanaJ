@@ -1,7 +1,10 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import net.sourceforge.toscanaj.controller.db.DBConnection;
 import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.CloseMainPanelActivity;
@@ -19,10 +22,20 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class AnacondaJMainPanel extends JFrame implements MainPanel {
+public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEventListener {
+
+
+
+    /**
+     *  Model
+     */
     private ConceptualSchema conceptualSchema = new ConceptualSchema();
 
+    /**
+     *  Main Controllers
+     */
     private EventBroker eventBroker = new EventBroker();
+    private DBConnection databaseConnection = new DBConnection();
 
     /**
      * Controls
@@ -44,16 +57,12 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel {
         }
     }
 
-    private class BroadcastConceptualSchemaChangeActivity implements SimpleActivity {
-        public boolean doActivity() throws Exception {
-            eventBroker.processEvent(new ConceptualSchemaChangeEvent(conceptualSchema));
-            return true;
-        }
-    }
-
-
     public AnacondaJMainPanel() {
         super("AnacondaJMainPanel");
+
+        eventBroker.subscribe(this,
+                              ConceptualSchemaChangeEvent.class,
+                              Object.class );
 
         createViews();
         createMenuBar();
@@ -72,10 +81,10 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel {
         mainView = new PanelStackView(this);
         mainView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "divider", 200));
         DatabaseConnectionInformationView connectionInformationView =
-                                new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo());
+            new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo());
         eventBroker.subscribe(connectionInformationView,
-                              "net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent",
-                              "net.sourceforge.toscanaj.model.ConceptualSchema" );
+                              ConceptualSchemaChangeEvent.class,
+                              Object.class );
         JPanel tableView = new JPanel();
         tableView.setBackground(Color.black);
         JPanel scaleView = new JPanel();
@@ -110,7 +119,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel {
 
         SimpleAction newAction = new SimpleAction(
                 this,
-                new NewConceptualSchemaActivity(conceptualSchema),
+                new NewConceptualSchemaActivity(eventBroker),
                 "New",
                 KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(
@@ -118,7 +127,6 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel {
                         ActionEvent.CTRL_MASK
                 )
         );
-        newAction.add(new BroadcastConceptualSchemaChangeActivity());
 
         JMenuItem newMenuItem = new JMenuItem("New");
         newMenuItem.addActionListener(newAction);
@@ -126,14 +134,13 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel {
 
         OpenFileAction openFileAction = new OpenFileAction(
                 this,
-                new LoadConceptualSchemaActivity(conceptualSchema),
+                new LoadConceptualSchemaActivity(eventBroker, databaseConnection),
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(
                         KeyEvent.VK_O,
                         ActionEvent.CTRL_MASK
                 )
         );
-        openFileAction.addPostOpenActivity(new BroadcastConceptualSchemaChangeActivity());
 
         JMenuItem openMenuItem = new JMenuItem("Open...");
         openMenuItem.addActionListener(openFileAction);
@@ -186,5 +193,12 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel {
         );
         ConfigurationManager.saveConfiguration();
         System.exit(0);
+    }
+
+    public void processEvent(Event e) {
+        if ( e instanceof ConceptualSchemaChangeEvent ) {
+            ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
+            conceptualSchema = schemaEvent.getConceptualSchema();
+        }
     }
 }

@@ -9,24 +9,28 @@ package net.sourceforge.toscanaj.gui.activity;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
+import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent;
 
 import java.io.File;
 
 public class LoadConceptualSchemaActivity implements FileActivity {
-    private ConceptualSchema conceptualSchema;
+    private EventBroker broker;
+    private DBConnection databaseConnection;
 
-    public LoadConceptualSchemaActivity(ConceptualSchema conceptualSchema) {
-        this.conceptualSchema = conceptualSchema;
+    public LoadConceptualSchemaActivity(EventBroker broker, DBConnection databaseConnection) {
+        this.broker = broker;
+        this.databaseConnection = databaseConnection;
     }
 
     public void processFile(File file) throws Exception {
-        ConceptualSchema newSchema = null;
         try {
-            newSchema = CSXParser.parse(file);
+            ConceptualSchema newSchema = CSXParser.parse(file, databaseConnection);
+            broker.processEvent(new ConceptualSchemaChangeEvent(this, newSchema));
         } catch (DataFormatException e) {
             throw e;
         }
-        conceptualSchema.copyContents(newSchema);
     }
 
     public boolean prepareToProcess() throws Exception {

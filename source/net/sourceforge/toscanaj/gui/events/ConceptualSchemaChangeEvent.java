@@ -10,14 +10,16 @@ import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 
 public class ConceptualSchemaChangeEvent implements Event {
-    private ConceptualSchema source;
+    private ConceptualSchema schema;
+    private Object source;
 
-    public ConceptualSchemaChangeEvent(ConceptualSchema source) {
+    public ConceptualSchemaChangeEvent(Object source, ConceptualSchema schema) {
+        this.schema = schema;
         this.source = source;
     }
 
     public ConceptualSchema getConceptualSchema() {
-        return source;
+        return schema;
     }
 
     public Object getSource() {

@@ -16,6 +16,7 @@ import org.jdom.Element;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.List;
+import java.net.URL;
 
 import util.CollectionFactory;
 
@@ -31,6 +32,11 @@ public class ConceptualSchema {
      * The database information.
      */
     private DatabaseInfo databaseInfo;
+
+    /**
+     * An SQL file with with to prime the database
+     */
+    URL  SQLURL;
 
     /**
      * List of scales
@@ -169,5 +175,13 @@ public class ConceptualSchema {
 
     public boolean hasDiagramDescription() {
         return this.hasDiagramDescription;
+    }
+
+    public URL getSQLURL() {
+        return SQLURL;
+    }
+
+    public void setSQLURL(URL SQLURL) {
+        this.SQLURL = SQLURL;
     }
 }

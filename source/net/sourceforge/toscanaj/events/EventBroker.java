@@ -34,6 +34,8 @@ import java.util.Iterator;
  * a new object implementing the Event interface. Currently this still happens
  * synchronously, i.e. all listeners to this type of event will be called
  * before the method returns.
+ *
+ * @todo extend source type so that it can be null, indicating match every possible source ???
  */
 public class EventBroker implements BrokerEventListener {
     /**
@@ -77,6 +79,7 @@ public class EventBroker implements BrokerEventListener {
      * It avoids having to catch the ClassNotFoundExceptions by turning them into RuntimeExceptions.
      *
      * @see subscribe(BrokerEventListener, Class, Class)
+     *
      */
     public void subscribe(BrokerEventListener listener, String eventTypeName, String sourceTypeName) {
         Class eventType = null;

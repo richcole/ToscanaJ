@@ -52,8 +52,9 @@ public class DataDump {
     protected static void dumpData(File file, String filterClause, boolean includeLists) {
         // parse input
         ConceptualSchema schema = null;
+        DBConnection databaseConnection = new DBConnection();
         try {
-            schema = CSXParser.parse(file);
+            schema = CSXParser.parse(file, databaseConnection);
         } catch (DataFormatException e) {
             System.err.println("Could not parse input.");
             System.err.println("- " + e.getMessage());

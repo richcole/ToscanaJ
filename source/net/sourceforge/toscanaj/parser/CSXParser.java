@@ -51,7 +51,7 @@ public class CSXParser {
      * The database connection is created here and attached to each concept
      * if a database is used.
      */
-    private static DBConnection _DatabaseConnection = null;
+    // remove: private static DBConnection _DatabaseConnection = null;
 
     /**
      * Stores the JDOM document used.
@@ -94,7 +94,7 @@ public class CSXParser {
      *
      * The code might also have problems when namespaces are used.
      */
-    public static ConceptualSchema parse(File csxFile)
+    public static ConceptualSchema parse(File csxFile, DBConnection databaseConnection)
             throws FileNotFoundException, IOException, DataFormatException, Exception {
         // open stream on file
         FileInputStream in;
@@ -116,8 +116,8 @@ public class CSXParser {
 
         // parse the different sections
         parseDescription();
-        parseContext();
-        parseDiagrams();
+        parseContext(databaseConnection);
+        parseDiagrams(databaseConnection);
 
         return _Schema;
     }
@@ -134,7 +134,7 @@ public class CSXParser {
     /**
      * Parses the database section of the file.
      */
-    private static void parseDatabaseInformation(Element contextElem)
+    private static void parseDatabaseInformation(Element contextElem, DBConnection databaseConnection)
             throws DataFormatException {
         // check if database should be used and fetch the data if needed
         Element dbElem = contextElem.getChild("databaseConnection");
@@ -143,52 +143,53 @@ public class CSXParser {
         }
         DatabaseInfo dbInfo = new DatabaseInfo();
         parseDBInfo(dbInfo, dbElem);
-        _Schema.setDatabaseInfo(dbInfo);
         try {
+            _Schema.setDatabaseInfo(dbInfo);
             /// @TODO Shouldn't this be in the main panel?
-            _DatabaseConnection = new DBConnection(dbInfo.getURL(), dbInfo.getUserName(), dbInfo.getPassword());
+            // remove: _DatabaseConnection = new DBConnection(dbInfo.getURL(), dbInfo.getUserName(), dbInfo.getPassword());
             String urlString = dbInfo.getEmbeddedSQLLocation();
             if (urlString != null) {
-                URL sqlURL;
+                URL SQLURL;
                 try {
-                    sqlURL = new URL(_BaseURL, urlString);
+                    SQLURL = new URL(_BaseURL, urlString);
                 } catch (MalformedURLException e) {
                     throw new DataFormatException("Could not create URL for database: " + urlString);
                 }
-                _DatabaseConnection.executeScript(sqlURL);
+                _Schema.setSQLURL(SQLURL);
+                // send to MainPanel: _DatabaseConnection.executeScript(sqlURL);
             }
         } catch (DatabaseException e) {
             throw new DataFormatException("Could not open database.", e.getOriginal());
         }
         Element viewsElem = dbElem.getChild("views");
         if (viewsElem != null) {
-            parseDatabaseObjectViewerSetups(viewsElem);
-            parseDatabaseObjectListViewerSetups(viewsElem);
+            parseDatabaseObjectViewerSetups(viewsElem, databaseConnection);
+            parseDatabaseObjectListViewerSetups(viewsElem, databaseConnection);
         }
     }
 
-    private static void parseDatabaseObjectViewerSetups(Element viewsElem)
+    private static void parseDatabaseObjectViewerSetups(Element viewsElem, DBConnection databaseConnection)
             throws DataFormatException {
         List viewerElems = viewsElem.getChildren("objectView");
         Iterator it = viewerElems.iterator();
         while (it.hasNext()) {
             Element viewerElem = (Element) it.next();
             try {
-                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection, _BaseURL);
+                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), databaseConnection, _BaseURL);
             } catch (DatabaseViewerInitializationException e) {
                 throw new DataFormatException("A database viewer could not be initialized.", e);
             }
         }
     }
 
-    private static void parseDatabaseObjectListViewerSetups(Element viewsElem)
+    private static void parseDatabaseObjectListViewerSetups(Element viewsElem, DBConnection databaseConnection)
             throws DataFormatException {
         List viewerElems = viewsElem.getChildren("objectListView");
         Iterator it = viewerElems.iterator();
         while (it.hasNext()) {
             Element viewerElem = (Element) it.next();
             try {
-                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection, _BaseURL);
+                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), databaseConnection, _BaseURL);
             } catch (DatabaseViewerInitializationException e) {
                 throw new DataFormatException("A database viewer could not be initialized.", e);
             }
@@ -198,7 +199,7 @@ public class CSXParser {
     /**
      * Parses the context in the file.
      */
-    private static void parseContext()
+    private static void parseContext(DBConnection databaseConnection)
             throws DataFormatException {
         Element contextElem = _Document.getRootElement().getChild("context");
         if (contextElem == null) {
@@ -206,7 +207,7 @@ public class CSXParser {
         }
 
         // parse the database connection if given
-        parseDatabaseInformation(contextElem);
+        parseDatabaseInformation(contextElem, databaseConnection);
 
         // build hashtable for objects
         List elements = contextElem.getChildren("object");
@@ -242,7 +243,7 @@ public class CSXParser {
     /**
      * Parses the diagrams in the file.
      */
-    private static void parseDiagrams() throws DataFormatException {
+    private static void parseDiagrams(DBConnection databaseConnection) throws DataFormatException {
         // find and store diagrams
         List elements = _Document.getRootElement().getChildren("diagram");
         Iterator it = elements.iterator();
@@ -281,7 +282,7 @@ public class CSXParser {
                 }
 
                 // create the concept
-                Concept concept = parseDBConcept(conceptElem);
+                Concept concept = parseDBConcept(conceptElem, databaseConnection);
 
                 // parse the label layout information if needed
                 LabelInfo objLabel = new LabelInfo();
@@ -346,11 +347,11 @@ public class CSXParser {
      * Creates a concept for DB access from the information in the given
      * XML element.
      */
-    private static Concept parseDBConcept(Element conceptElem) {
+    private static Concept parseDBConcept(Element conceptElem, DBConnection databaseConnection) {
         // create the concept
         DatabaseConnectedConcept concept =
                 new DatabaseConnectedConcept(_Schema.getDatabaseInfo(),
-                        _DatabaseConnection);
+                        databaseConnection);
 
         // get the object contingent
         Element contElem = conceptElem.getChild("objectContingent");
