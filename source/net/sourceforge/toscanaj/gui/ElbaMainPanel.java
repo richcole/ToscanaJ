@@ -106,6 +106,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         this.eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class);
 
         createViews();
+        createMenuBar();
 
         mruList = ConfigurationManager.fetchStringList("ElbaMainPanel", "mruFiles", MaxMruFiles);
         // if we have at least one MRU file try to open it
@@ -115,8 +116,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 openSchemaFile(schemaFile);
             }
         }
-
-        createMenuBar();
 
         ConfigurationManager.restorePlacement("ElbaMainPanel", this,
                 new Rectangle(100, 100, 500, 400));
@@ -373,15 +372,9 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             ConceptualSchemaLoadedEvent loadEvent = (ConceptualSchemaLoadedEvent) e;
             File schemaFile = loadEvent.getFile();
             addFileToMRUList(schemaFile);
-            schemaDescriptionView.setContent(conceptualSchema.getDescription());
-            if(conceptualSchema.getDatabaseInfo() == null) {
-            	DatabaseInfo info = new DatabaseInfo();
-            	conceptualSchema.setDatabaseInfo(info);
+            if(schemaDescriptionView != null) {
+            	schemaDescriptionView.setContent(conceptualSchema.getDescription());
             }
-        }
-        if (e instanceof NewConceptualSchemaEvent) {
-            DatabaseInfo info = new DatabaseInfo();
-            conceptualSchema.setDatabaseInfo(info);
         }
         if (e instanceof DatabaseInfoChangedEvent || e instanceof NewConceptualSchemaEvent ||
             e instanceof ConceptualSchemaLoadedEvent) {

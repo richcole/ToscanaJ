@@ -158,11 +158,11 @@ public class DatabaseConnectionInformationView
 			"DatabaseConnectionInformationView",
 			this,
 			new Rectangle(100, 100, 300, 600));
-		eventBroker.subscribe(
-			this,
-			DatabaseInfoChangedEvent.class,
-			Object.class);
 
+	    eventBroker.subscribe(
+	        this,
+	        DatabaseInfoChangedEvent.class,
+	        Object.class);
 	}
 
 	public JPanel createConnectionPanel() {
