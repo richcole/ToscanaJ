@@ -36,9 +36,6 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 
 	private OrdinalScaleGeneratorPanel leftPanel, rightPanel;
 		
-	public static final int INTEGER = 0;
-	public static final int FLOAT = 1;
-	public static final int UNSUPPORTED = -1;
 	private static final String CONFIGURATION_SECTION_NAME = "BiordinalScaleEditorDialog";
 	private static final int MINIMUM_WIDTH = 800;
 	private static final int MINIMUM_HEIGHT = 500;

@@ -615,21 +615,21 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 	public static int determineDataType(int columnType) {
 		switch (columnType) {
 			case Types.DOUBLE:
-				return OrdinalScaleEditorDialog.FLOAT;
+				return OrdinalScaleGeneratorPanel.FLOAT;
 			case Types.FLOAT:
-				return OrdinalScaleEditorDialog.FLOAT;
+				return OrdinalScaleGeneratorPanel.FLOAT;
 			case Types.REAL:
-				return OrdinalScaleEditorDialog.FLOAT;
+				return OrdinalScaleGeneratorPanel.FLOAT;
 			case Types.BIGINT:
-				return OrdinalScaleEditorDialog.INTEGER;
+				return OrdinalScaleGeneratorPanel.INTEGER;
 			case Types.INTEGER:
-				return OrdinalScaleEditorDialog.INTEGER;
+				return OrdinalScaleGeneratorPanel.INTEGER;
 			case Types.SMALLINT:
-				return OrdinalScaleEditorDialog.INTEGER;
+				return OrdinalScaleGeneratorPanel.INTEGER;
 			case Types.TINYINT:
-				return OrdinalScaleEditorDialog.INTEGER;
+				return OrdinalScaleGeneratorPanel.INTEGER;
 			default:
-				return OrdinalScaleEditorDialog.UNSUPPORTED;
+				return OrdinalScaleGeneratorPanel.UNSUPPORTED;
 		}
 	}
 	

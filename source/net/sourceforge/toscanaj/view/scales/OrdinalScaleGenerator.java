@@ -31,7 +31,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
             return false;
         }
         int columnType = columns[0].getColumn().getType();
-        if (OrdinalScaleEditorDialog.determineDataType(columnType) == OrdinalScaleEditorDialog.UNSUPPORTED) {
+        if (OrdinalScaleGeneratorPanel.determineDataType(columnType) == OrdinalScaleGeneratorPanel.UNSUPPORTED) {
             return false;
         } else {
             return true;
