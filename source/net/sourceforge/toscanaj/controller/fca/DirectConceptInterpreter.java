@@ -13,45 +13,18 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.Hashtable;
 import java.util.TreeSet;
 
-///@todo this class does not allow nesting and filtering at the moment (or does it?)
 
 public class DirectConceptInterpreter extends AbstractConceptInterperter
 										implements ConceptInterpreter {
-    private Hashtable contingents = new Hashtable();
-    private Hashtable extents = new Hashtable();
-
+											
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
         if (context.getObjectDisplayMode() == ConceptInterpretationContext.CONTINGENT) {
-			//return getContingent(concept, context).iterator();
-			Hashtable contextContingents = (Hashtable) contingents.get(context);
-			if (contextContingents == null) {
-				contextContingents = new Hashtable();
-				contingents.put(context, contextContingents);
-			}
-		  	Set contingent = (Set) contingents.get(concept);
-			if (contingent == null) {
-	            contingent = calculateContingent(concept, context);
-	            contextContingents.put(concept, contingent);
-			}
+	        Set contingent = calculateContingent(concept, context);
 			return contingent.iterator();
         } else {
-            //return getExtent(concept, context).iterator();
-			if(context == null) {
-				throw new RuntimeException("Missing context on call to getExtent(..)");
-			}
-			Hashtable contextExtents = (Hashtable) extents.get(context);
-			if (contextExtents == null) {
-				contextExtents = new Hashtable();
-				extents.put(context, contextExtents);
-			}
-			Set extent = (Set) contextExtents.get(concept);
-			if (extent == null) {
-				extent = calculateExtent(concept, context);
-				contextExtents.put(concept, extent);
-			}
+			Set extent = calculateExtent(concept, context);
             return extent.iterator();
         }
     }
