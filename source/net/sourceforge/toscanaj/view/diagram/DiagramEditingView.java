@@ -55,7 +55,7 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 
 public class DiagramEditingView extends JPanel implements EventBrokerListener {
-    private static final double GRID_SIZE_CHANGE_FACTOR = 1.2;
+    private static final double GRID_SIZE_CHANGE_FACTOR = 1.2599210498948731647672106072782;
     private static final int DEFAULT_GRID_SIZE = 15;
     private static final String[] FULL_MOVEMENT_OPTION_NAMES = {"NDim", "Node", "Ideal", "Filter"};
     private static final String[] SIMPLE_MOVEMENT_OPTION_NAMES = {"Node", "Ideal", "Filter"};

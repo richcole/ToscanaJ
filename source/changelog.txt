@@ -3,6 +3,8 @@ program suite:
 
 Affecting different programs:
 =============================
+- grid size now changes with a factor of third root of two. This means after
+  three refinements the nodes are all on a grid location again
 
 Specific for ToscanaJ:
 ======================
