@@ -37,7 +37,10 @@ public class CanvasBackground extends CanvasItem {
     public void draw(Graphics2D g) {
         if( paint != null ) {
             g.setPaint(paint);
-            g.fill(g.getClipBounds());
+            Rectangle clipBounds = g.getClipBounds();
+            if (clipBounds != null) {
+				g.fill(clipBounds);
+			}
         }
     }
 
