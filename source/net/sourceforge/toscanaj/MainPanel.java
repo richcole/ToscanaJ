@@ -82,11 +82,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      */
     private JSplitPane splitPane = null;
 
-    /**
-     * switches debug mode
-     */
-    public static boolean debug = false;
-
     // buttons list
     private JButton openButton = null;
     private JButton backButton = null;
@@ -773,27 +768,20 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      *  Main method for running the program
      */
     public static void main(String [] args) {
-        final MainPanel test;
+        final MainPanel mainWindow;
         if(args.length == 1) {
-          test = new MainPanel(args[0]);
-        } else if(args.length == 2) {
-          if(args[1].equals("-debug")) {
-            test = new MainPanel(args[0]);
-            debug = true;
-          } else {
-            System.err.println("\nCommand line arguments: <schemaFile> <-debug>");
-            return;
-          }
-        } else {
-          test = new MainPanel();
+            mainWindow = new MainPanel(args[0]);
+        }
+        else {
+            mainWindow = new MainPanel();
         }
 
-        test.addWindowListener(new WindowAdapter() {
+        mainWindow.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                test.closeMainPanel();
+                mainWindow.closeMainPanel();
             }
         });
 
-        test.setVisible(true);
+        mainWindow.setVisible(true);
     }
 }
