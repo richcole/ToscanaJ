@@ -102,7 +102,6 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     	
     	Paint oldPaint = g.getPaint();
         Stroke oldStroke = g.getStroke();
-        g.setStroke(new BasicStroke(1));
         
         Shape arrow = getArrowShape(this.style, length);
         
@@ -114,8 +113,11 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
 
         g.setPaint(paint);
         g.fill(currentShape);
-        g.setPaint(calculatePaint(length, Color.BLACK));
-        g.draw(currentShape);
+        if(this.style.getBorderWidth() != 0) {
+            g.setStroke(new BasicStroke(this.style.getBorderWidth()));
+            g.setPaint(calculatePaint(length, Color.BLACK));
+            g.draw(currentShape);
+        }
     	
         g.setStroke(oldStroke);
     	g.setPaint(oldPaint);

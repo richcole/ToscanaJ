@@ -171,8 +171,11 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                         g2d.setPaint(style.getColor());
                         g2d.translate(this.getWidth() * 0.95, this.getHeight() / 2);
                         g2d.fill(arrow);
-                        g2d.setPaint(Color.BLACK);
-                        g2d.draw(arrow);
+                        if(style.getBorderWidth() != 0) {
+                            g2d.setStroke(new BasicStroke(style.getBorderWidth()));
+                            g2d.setPaint(Color.BLACK);
+                            g2d.draw(arrow);
+                        }
                         
                         g2d.setPaint(oldPaint);
                         g2d.setStroke(oldStroke);
@@ -195,10 +198,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                 ArrowStyle style = (ArrowStyle) model.getElementAt(index);
                 ArrowStyle newStyle = ArrowStyleChooser.showDialog(listView, "Edit arrow style", style);
                 if(newStyle != null) {
-                    style.setColor(newStyle.getColor());
-                    style.setStroke(newStyle.getStroke());
-                    style.setHeadLength(newStyle.getHeadLength());
-                    style.setHeadWidth(newStyle.getHeadWidth());
+                    style.copyValues(newStyle);
                     diagramView.repaint();
                 }
             } 

@@ -72,6 +72,8 @@ public class ArrowStyleChooser extends JComponent {
 
     private JSlider strokeWidthSlider;
 
+    private  static final int BORDER_WIDTH_SCALE = 5;
+
     public ArrowStyleChooser(ArrowStyle initialStyle) {
         this.style = new ArrowStyle(initialStyle);
         
@@ -93,8 +95,11 @@ public class ArrowStyleChooser extends JComponent {
                 g2d.setPaint(style.getColor());
                 g2d.translate(this.getWidth() * 0.95, this.getHeight() / 2);
                 g2d.fill(arrow);
-                g2d.setPaint(Color.BLACK);
-                g2d.draw(arrow);
+                if(style.getBorderWidth() != 0) {
+                    g2d.setStroke(new BasicStroke(style.getBorderWidth()));
+                    g2d.setPaint(Color.BLACK);
+                    g2d.draw(arrow);
+                }
                         
                 g2d.setPaint(oldPaint);
                 g2d.setStroke(oldStroke);
@@ -177,6 +182,18 @@ public class ArrowStyleChooser extends JComponent {
                 repaint();
             }
         });
+
+        // the next line has a little extra bit to fix rounding problems (cast to int rounds down)
+        final JSlider borderWidthSlider = new JSlider(0,50,(int) (this.style.getBorderWidth() * BORDER_WIDTH_SCALE + 0.01f));
+        borderWidthSlider.setMajorTickSpacing(5);
+        borderWidthSlider.setMinorTickSpacing(1);
+        borderWidthSlider.setPaintTicks(true);
+        borderWidthSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                style.setBorderWidth(((float)borderWidthSlider.getValue())/BORDER_WIDTH_SCALE);
+                repaint();
+            }
+        });
         
         GridBagConstraints labelconstraints = new GridBagConstraints();
         labelconstraints.gridx = 0;
@@ -200,6 +217,10 @@ public class ArrowStyleChooser extends JComponent {
         retVal.add(new JLabel("Line Width:"), labelconstraints);
         retVal.add(strokeWidthSlider, controlconstraints);
         
+        controlconstraints.gridy++;
+        retVal.add(new JLabel("Border Width:"), labelconstraints);
+        retVal.add(borderWidthSlider, controlconstraints);
+
         controlconstraints.gridy++;
         controlconstraints.weighty = 1;
         controlconstraints.fill = GridBagConstraints.BOTH;

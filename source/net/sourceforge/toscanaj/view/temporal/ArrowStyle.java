@@ -22,20 +22,23 @@ public class ArrowStyle implements XMLizable {
 	private static final int DEFAULT_ARROW_HEADLENGTH = 20;
 	private static final int DEFAULT_ARROW_HEADWIDTH = 14;
 	private static final int DEFAULT_ARROW_WIDTH = 4;
+	private static final float DEFAULT_BORDER_WIDTH = 0.2f;
 	private Color color;
     private BasicStroke stroke;
     private double headWidth;
     private double headLength;
     private double relativeLength;
+    private float borderWidth;
     
     public ArrowStyle(Color color, BasicStroke stroke, 
                       double headWidth, double headLength,
-                      double relativeLength) {
+                      double relativeLength, float borderWidth) {
         this.color = color;
         this.stroke = stroke;
         this.headWidth = headWidth;
         this.headLength = headLength;
         this.relativeLength = relativeLength;
+        this.borderWidth = borderWidth;
     }
     
     public ArrowStyle(ArrowStyle style) {
@@ -44,15 +47,25 @@ public class ArrowStyle implements XMLizable {
         this.headWidth = style.headWidth;
         this.headLength = style.headLength;
         this.relativeLength = style.relativeLength;
+        this.borderWidth = style.borderWidth;
     }
 
+    public void copyValues(ArrowStyle style) {
+        this.setColor(style.getColor());
+        this.setStroke(style.getStroke());
+        this.setHeadLength(style.getHeadLength());
+        this.setHeadWidth(style.getHeadWidth());
+        this.setRelativeLength(style.relativeLength);
+        this.setBorderWidth(style.borderWidth);
+    }
+    
     public ArrowStyle(Element element) {
         readXML(element);
     }
     
     public static ArrowStyle createDefaultArrowStyle(Color color){
     	BasicStroke stroke = new BasicStroke(DEFAULT_ARROW_WIDTH, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
-		return new ArrowStyle(color, stroke, DEFAULT_ARROW_HEADWIDTH, DEFAULT_ARROW_HEADLENGTH, DEFAULT_ARROW_RELATIVE_LENGTH); 
+		return new ArrowStyle(color, stroke, DEFAULT_ARROW_HEADWIDTH, DEFAULT_ARROW_HEADLENGTH, DEFAULT_ARROW_RELATIVE_LENGTH, DEFAULT_BORDER_WIDTH); 
     }
 
     public Color getColor() {
@@ -107,6 +120,7 @@ public class ArrowStyle implements XMLizable {
         result.setAttribute("headWidth", "" + this.headWidth);
         result.setAttribute("headLength", "" + this.headLength);
         result.setAttribute("relativeLength", "" + this.relativeLength);
+        result.setAttribute("borderWidth", "" + this.borderWidth);
         return result;
     }
 
@@ -123,6 +137,7 @@ public class ArrowStyle implements XMLizable {
         this.headWidth = Double.parseDouble(elem.getAttributeValue("headWidth"));
         this.headLength =Double.parseDouble(elem.getAttributeValue("headLength"));
         this.relativeLength = Double.parseDouble(elem.getAttributeValue("relativeLength"));
+        this.borderWidth = Integer.parseInt(elem.getAttributeValue("borderWidth"));
     }
 
     private String serializeFloatArray(float[] array) {
@@ -150,5 +165,13 @@ public class ArrowStyle implements XMLizable {
             array[i] = Float.parseFloat(tokenizer.nextToken());
         }
         return array;
+    }
+
+    public float getBorderWidth() {
+        return this.borderWidth;
+    }
+
+    public void setBorderWidth(float borderWidth) {
+        this.borderWidth = borderWidth;
     }
 }
