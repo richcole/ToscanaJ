@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.gui.dialog;
+package net.sourceforge.toscanaj.gui.temporal;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -43,6 +43,7 @@ import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.model.context.FCAObject;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
@@ -58,7 +59,7 @@ import net.sourceforge.toscanaj.view.temporal.InterSequenceTransitionArrow;
 import net.sourceforge.toscanaj.view.temporal.StateRing;
 import net.sourceforge.toscanaj.view.temporal.TransitionArrow;
 
-public class TemporalMainDialog extends JPanel implements EventBrokerListener {
+public class TemporalControlsPanel extends JPanel implements EventBrokerListener {
 	private static final Insets DEFAULT_SPACER_INSETS = new Insets(0,0,10,0);
 	private static final Insets DEFAULT_BUTTON_INSETS = new Insets(2,16,2,16);
 	private static final Insets DEFAULT_LABEL_INSETS = new Insets(2,2,2,2);
@@ -98,7 +99,7 @@ public class TemporalMainDialog extends JPanel implements EventBrokerListener {
     private JLabel stepPositionLabel;
     private JButton startSteppingButton;
 	
-	public TemporalMainDialog(DiagramView diagramView, 
+	public TemporalControlsPanel(DiagramView diagramView, 
     						   DiagramExportSettings diagramExportSettings, EventBroker eventBroker) {
 	  	super();
 	  	

@@ -81,7 +81,7 @@ import net.sourceforge.toscanaj.gui.activity.SaveConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
-import net.sourceforge.toscanaj.gui.dialog.TemporalMainDialog;
+import net.sourceforge.toscanaj.gui.temporal.TemporalControlsPanel;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
@@ -161,7 +161,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private DiagramEditingView diagramEditingView;
     private List mruList = new LinkedList();
     private String currentFile = null;
-    private TemporalMainDialog temporalControls;
+    private TemporalControlsPanel temporalControls;
     private DiagramExportSettings diagramExportSettings;
     private ExportDiagramAction exportDiagramAction;
     private File lastCSCFile;
@@ -259,7 +259,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		mainPanel.setSelectedIndex(0);
 		if (ConfigurationManager.fetchInt("SienaTemporalControls", "enabled", 0) == 1) {
 			temporalControls =
-				new TemporalMainDialog(
+				new TemporalControlsPanel(
 					this.diagramEditingView.getDiagramView(),
 					diagramExportSettings,
 					eventBroker);
