@@ -144,6 +144,9 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                     } while (other == concept);
                     concept = other;
                 }
+                if(extentSize == 0) {
+                    return 0; //avoids division by zero
+                }
                 return (double)extentSize/(double)getCount(concept, context, ConceptInterpretationContext.EXTENT);
             }
             else {
