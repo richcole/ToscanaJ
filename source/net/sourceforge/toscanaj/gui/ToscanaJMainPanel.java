@@ -887,6 +887,12 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                 boolean okClicked = ToscanaJPreferences.showPreferences(parent);
                 if(okClicked) {
                     setDiagramSchema(DiagramSchema.getDefaultSchema());
+                    // at least the line grouping for the equivalence classes need 
+                    // a full update of the diagram
+                    diagramView.showDiagram(diagramView.getDiagram());
+                    if(diagramPreview != null) {
+                        diagramPreview.showDiagram(diagramPreview.getDiagram());
+                    }
                     buildMenuBar();
                 }
             }
