@@ -375,7 +375,7 @@ public class DatabaseConnectionInformationView extends JDialog
         boolean executeStep() {
 			databaseInfo.setUrl(urlField.getText());
             databaseInfo.setUserName(userNameField.getText());
-            databaseInfo.setPassword(passwordField.getPassword().toString());
+            databaseInfo.setPassword(new String(passwordField.getPassword()));
             databaseInfo.setDriverClass(driverField.getText());
             databaseInfo.setEmbeddedSQLLocation((String) null);
             return connectDatabase();
@@ -456,7 +456,7 @@ public class DatabaseConnectionInformationView extends JDialog
             }
         }
         boolean executeStep() {
-            databaseInfo.setOdbcDataSource(dataSourceNameField.getText(), userNameField.getText(), passwordField.getPassword().toString());
+            databaseInfo.setOdbcDataSource(dataSourceNameField.getText(), userNameField.getText(), new String(passwordField.getPassword()));
             return connectDatabase();
         }
     }
@@ -550,7 +550,7 @@ public class DatabaseConnectionInformationView extends JDialog
             }
         }
         boolean executeStep() {
-            databaseInfo.setAccessFileInfo(fileUrlField.getText(), userNameField.getText(), passwordField.getPassword().toString());
+            databaseInfo.setAccessFileInfo(fileUrlField.getText(), userNameField.getText(), new String(passwordField.getPassword()));
             return connectDatabase();
         }
     }
