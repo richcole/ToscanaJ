@@ -58,6 +58,20 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     static protected final int BELOW = 1;
 
     /**
+     * Gives the minimum number of display lines possible.
+     *
+     * @see displayLines
+     */
+    protected static final int MIN_DISPLAY_LINES = 3;
+
+    /**
+     * Gives the number of display lines used on a new label.
+     *
+     * @see displayLines
+     */
+    protected static final int DEFAULT_DISPLAY_LINES = 4;
+
+    /**
      * Stores the type of information we want to display.
      *
      * @see setDisplayType(int)
@@ -108,6 +122,31 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     private DiagramView diagramView = null;
 
     /**
+     * The current display size in lines.
+     *
+     * This is the number of items currently displayed.
+     */
+    protected int displayLines = DEFAULT_DISPLAY_LINES;
+
+    /**
+     * The first item displayed in the list.
+     *
+     * This is used if the number of displayed lines is smaller than the number
+     * of items to display to determine the top element in the displayed part.
+     */
+    protected int firstItem = 0;
+
+    /**
+     * The width reserved for the scrollbar to the right.
+     */
+    protected int scrollbarWidth = 0;
+
+    /**
+     * The height of a single line in the view.
+     */
+    protected int lineHeight = 0;
+
+    /**
      * Creates a view for the given label information.
      */
     public LabelView( DiagramView diagramView, LabelInfo label ) {
@@ -123,6 +162,12 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     public void setDisplayType(int type, boolean contingentOnly) {
         this.displayType = type;
         this.showOnlyContingent = contingentOnly;
+        if( this.labelInfo.getNumberOfEntries(this.showOnlyContingent) > DEFAULT_DISPLAY_LINES ) {
+            this.displayLines = DEFAULT_DISPLAY_LINES;
+        }
+        else {
+            this.displayLines = this.labelInfo.getNumberOfEntries(this.showOnlyContingent);
+        }
         update(this);
     }
 
@@ -190,7 +235,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     public void draw(Graphics2D graphics)
     {
         // we draw only if we have content to draw
-        if(this.labelInfo.getNumberOfEntries(this.showOnlyContingent) == 0) {
+        if(this.displayLines == 0) {
             return;
         }
         // remember some settings to restore them later
@@ -247,41 +292,62 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
 
         if(this.displayType == DISPLAY_LIST) {
             // draw the object names
-            if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT )
-            {
-                Iterator it = this.labelInfo.getEntryIterator(this.showOnlyContingent);
-                int j = 0;
-                while(it.hasNext()) {
-                    String cur = it.next().toString();
-                    graphics.drawString( cur,
-                                         (float)xPos + fm.getLeading() + fm.getDescent(),
-                                         (float)yPos + fm.getAscent() + fm.getLeading() + j * fm.getHeight() );
-                    j++;
+            Iterator it = this.labelInfo.getEntryIterator(this.showOnlyContingent);
+            int numItem = 0;
+            while(it.hasNext()) {
+                String cur = it.next().toString();
+                if(numItem >= this.firstItem) {
+                    int curPos = numItem - this.firstItem;
+                    if(curPos < this.displayLines) {
+                        if(this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT) {
+                            graphics.drawString( cur,
+                                    (float)xPos + fm.getLeading() + fm.getDescent(),
+                                    (float)yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight() );
+                        }
+                        else if(this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER) {
+                            graphics.drawString( cur,
+                                    (float)(xPos + (fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(cur))/2 )),
+                                    (float)yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight() );
+                        }
+                        else if(this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT) {
+                            graphics.drawString( cur,
+                                    (float)(xPos + (-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(cur))),
+                                    (float)yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight() );
+                        }
+                        else {
+                            throw new RuntimeException("Unknown label alignment.");
+                        }
+                    }
                 }
+                numItem++;
             }
-            else if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER )
-            {
-                Iterator it = this.labelInfo.getEntryIterator(this.showOnlyContingent);
-                int j = 0;
-                while(it.hasNext()) {
-                    String cur = it.next().toString();
-                    graphics.drawString( cur,
-                            (float)(xPos + (fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(cur))/2 )),
-                            (float)yPos + fm.getAscent() + fm.getLeading() + j * fm.getHeight() );
-                    j++;
+            int numItems = this.labelInfo.getNumberOfEntries(this.showOnlyContingent);
+            // draw the scroller elements when needed
+            if(numItems > MIN_DISPLAY_LINES) {
+                if(this.firstItem != 0) {
+                    graphics.setPaint(Color.gray);
                 }
-            }
-            else if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT )
-            {
-                Iterator it = this.labelInfo.getEntryIterator(this.showOnlyContingent);
-                int j = 0;
-                while(it.hasNext()) {
-                    String cur = it.next().toString();
-                    graphics.drawString( cur,
-                                (float)(xPos + (-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(cur))),
-                                (float)yPos + fm.getAscent() + fm.getLeading() + j * fm.getHeight() );
-                    j++;
+                else {
+                    graphics.setPaint(Color.lightGray);
                 }
+                graphics.drawString("^",
+                                (float)(xPos + lw - this.scrollbarWidth),
+                                (float)yPos + fm.getAscent() + fm.getLeading() );
+                if(this.firstItem + this.displayLines < numItems) {
+                    graphics.setPaint(Color.gray);
+                }
+                else {
+                    graphics.setPaint(Color.lightGray);
+                }
+                graphics.drawString("v",
+                                (float)(xPos + lw - this.scrollbarWidth),
+                                (float)yPos + fm.getAscent() + fm.getLeading() +
+                                                           (this.displayLines - 2) * fm.getHeight() );
+                graphics.setPaint(Color.gray);
+                graphics.drawString("/",
+                                (float)(xPos + lw - this.scrollbarWidth),
+                                (float)yPos + fm.getAscent() + fm.getLeading() +
+                                                           (this.displayLines - 1) * fm.getHeight() );
             }
         }
         else {
@@ -345,6 +411,13 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
             return 0;
         }
 
+        if(this.labelInfo.getNumberOfEntries(this.showOnlyContingent) > MIN_DISPLAY_LINES) {
+            this.scrollbarWidth = fontMetrics.stringWidth("M");
+        }
+        else {
+            this.scrollbarWidth = 0;
+        }
+
         double result = 0;
 
         if(this.displayType == DISPLAY_LIST) {
@@ -358,6 +431,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
                     result = w;
                 }
             }
+            // add scrollbar width if needed
+            result += this.scrollbarWidth;
         }
         else {
             // find width of number
@@ -377,8 +452,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      */
     public int getHeight( FontMetrics fontMetrics )
     {
+        this.lineHeight = fontMetrics.getHeight();
         if( this.displayType == DISPLAY_LIST ) {
-            return this.labelInfo.getNumberOfEntries(this.showOnlyContingent) * fontMetrics.getHeight();
+            return this.displayLines * fontMetrics.getHeight();
         }
         else {
             return fontMetrics.getHeight();
@@ -396,11 +472,73 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     }
 
     /**
-     * Moves the label by the given distance.
+     * Moves or resizes the label, depending on where the drag event occured.
      */
-    public void moveBy(double deltaX, double deltaY) {
-        this.labelInfo.setOffset(this.labelInfo.getOffset().getX() + deltaX,
-                                 this.labelInfo.getOffset().getY() + deltaY );
+    public void dragged(Point2D from, Point2D to) {
+        if( (this.displayType == LabelView.DISPLAY_LIST) &&
+            (from.getX() >= this.rect.getMaxX() - this.scrollbarWidth) ) {
+            // we have a click on the scrollbar, calculate the line hit
+            int lineHit = (int)((from.getY()-this.rect.getY())/this.lineHeight);
+            if(lineHit == this.displayLines - 1) { // it is on the resize handle
+                // calculate the line hit by the new mouse position
+                int newLine = (int)((to.getY()-this.rect.getY())/this.lineHeight);
+                // check if it is above/below
+                if(newLine > lineHit) {
+                    if(this.displayLines < this.labelInfo.getNumberOfEntries(this.showOnlyContingent)) {
+                        this.displayLines++;
+                        if(this.firstItem + this.displayLines >
+                                        this.labelInfo.getNumberOfEntries(this.showOnlyContingent)) {
+                            this.firstItem--;
+                        }
+                        notifyObservers();
+                    }
+                }
+                else if(newLine < lineHit) {
+                    if(this.displayLines > MIN_DISPLAY_LINES) {
+                        this.displayLines--;
+                        notifyObservers();
+                    }
+                }
+            } // otherwise do nothing
+        }
+        else {
+            // move
+            double deltaX = to.getX() - from.getX();
+            double deltaY = to.getY() - from.getY();
+            this.labelInfo.setOffset(this.labelInfo.getOffset().getX() + deltaX,
+                                     this.labelInfo.getOffset().getY() + deltaY );
+        }
+    }
+
+    /**
+     * Handles scrolling of the items.
+     */
+    public void clicked(Point2D pos) {
+        if(this.displayType != LabelView.DISPLAY_LIST) {
+            // nothing to do if not in list mode
+            return;
+        }
+        if(pos.getX() < this.rect.getMaxX() - this.scrollbarWidth) {
+            // not a click on the scrollbar
+            return;
+        }
+        // calculate the line hit
+        int lineHit = (int)((pos.getY()-this.rect.getY())/this.lineHeight);
+        if(lineHit == 0) {
+            // scroll up
+            if(this.firstItem != 0) {
+                this.firstItem--;
+            }
+            this.notifyObservers();
+        }
+        else if(lineHit == this.displayLines - 2) {
+            // scroll down
+            if(this.firstItem != this.labelInfo.getNumberOfEntries(this.showOnlyContingent) -
+                                 this.displayLines ) {
+                this.firstItem++;
+            }
+            this.notifyObservers();
+        }
     }
 
     /**
@@ -408,7 +546,15 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      */
     public void doubleClicked(Point2D pos) {
         if(this.displayType == LabelView.DISPLAY_LIST) {
-            this.displayType = LabelView.DISPLAY_NUMBER;
+            if(pos.getX() < this.rect.getMaxX() - this.scrollbarWidth) {
+                // not on the scrollbar
+                this.displayType = LabelView.DISPLAY_NUMBER;
+            }
+            else {
+                // do two single clicks
+                clicked(pos);
+                clicked(pos);
+            }
         }
         else {
             this.displayType = LabelView.DISPLAY_LIST;
@@ -417,7 +563,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     }
 
     /**
-     * Calculates the rectangle around label and its connection line.
+     * Calculates the rectangle around label.
      */
     public Rectangle2D getCanvasBounds(Graphics2D graphics) {
         // get the font metrics

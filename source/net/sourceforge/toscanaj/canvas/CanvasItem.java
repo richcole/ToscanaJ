@@ -59,20 +59,12 @@ public abstract class CanvasItem implements ChangeObservable {
     public abstract boolean containsPoint(Point2D point);
 
     /**
-     * Moves the label by the given distance.
+     * Reacts on a mouse movement between the two positions while the left button
+     * is pressed.
      *
      * Unless it is overwritten in a derived class this will do nothing.
      */
-    public void moveBy(double deltaX, double deltaY) {
-    }
-
-    /**
-     * Moves the label by the given vector.
-     *
-     * This is a convenience method calling moveBy(double, double).
-     */
-    public void moveBy(Point2D dist) {
-        moveBy(dist.getX(), dist.getY());
+    public void dragged(Point2D from, Point2D to) {
     }
 
     /**

@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -290,7 +291,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      *
      * Clicked() will only be send if it is not a double click.
      *
-     * @TODO Use system double click timing instead of hard-coded 200ms
+     * @TODO Use system double click timing instead of hard-coded 300ms
      */
     public void mouseReleased(MouseEvent e) {
         if(dragMode) {
@@ -298,24 +299,32 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
             repaint();
         }
         else {
+            Point2D modelPos = null;
+            try {
+                modelPos = this.transform.inverseTransform(e.getPoint(), null);
+            }
+            catch( NoninvertibleTransformException ex ) {
+                ex.printStackTrace();
+                throw new RuntimeException("Internal error: noninvertible transform encountered");
+            }
             if(selectedCanvasItem == null) {
                 if(e.getClickCount() == 1) {
                     this.doubleClickTimer = new Timer();
-                    this.doubleClickTimer.schedule( new BackgroundClickTask( this, e.getPoint() ),  200 );
+                    this.doubleClickTimer.schedule( new BackgroundClickTask( this, modelPos ),  300 );
                 }
                 else if(e.getClickCount() == 2) {
                     this.doubleClickTimer.cancel();
-                    backgroundDoubleClicked(e.getPoint());
+                    backgroundDoubleClicked(modelPos);
                 }
                 return;
             }
             if(e.getClickCount() == 1) {
                 this.doubleClickTimer = new Timer();
-                this.doubleClickTimer.schedule( new CanvasItemClickTask( this.selectedCanvasItem, e.getPoint() ),  200 );
+                this.doubleClickTimer.schedule( new CanvasItemClickTask( this.selectedCanvasItem, modelPos ),  300 );
             }
             else if(e.getClickCount() == 2) {
                 this.doubleClickTimer.cancel();
-                selectedCanvasItem.doubleClicked(e.getPoint());
+                selectedCanvasItem.doubleClicked(modelPos);
             }
         }
         selectedCanvasItem = null;
@@ -355,12 +364,12 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
                 mousePosTr = (Point2D)this.transform.inverseTransform(e.getPoint(), null);
                 lastMousePosTr = (Point2D)this.transform.inverseTransform(lastMousePos, null);
             }
-            catch (Exception ex ) {
+            catch(NoninvertibleTransformException ex) {
                 //this should not happen
                 ex.printStackTrace();
+                throw new RuntimeException("Internal error: noninvertible transformation found.");
             }
-            selectedCanvasItem.moveBy( mousePosTr.getX() - lastMousePosTr.getX(),
-                                       mousePosTr.getY() - lastMousePosTr.getY() );
+            selectedCanvasItem.dragged( lastMousePosTr, mousePosTr );
             lastMousePos = e.getPoint();
         }
     }
