@@ -93,11 +93,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
     private JRadioButtonMenuItem showAllMenuItem = null;
     private JRadioButtonMenuItem showExactMenuItem = null;
 
-    // view->color menu
-    private JMenuItem circleColorMenuItem = null;
-    private JMenuItem topColorMenuItem = null;
-    private JMenuItem bottomColorMenuItem = null;
-
     /**
      * The main model member.
      */
@@ -400,27 +395,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
                     diagramView.setQuery(query);
                 }
             }
-
-            // separator
-            viewMenu.addSeparator();
         }
-
-        // create the Color submenu
-        JMenu colorMenu = new JMenu("Color");
-        colorMenu.setMnemonic(KeyEvent.VK_V);
-        viewMenu.add(colorMenu);
-
-        this.circleColorMenuItem = new JMenuItem("Circles...");
-        this.circleColorMenuItem.addActionListener(this);
-        colorMenu.add(circleColorMenuItem);
-
-        this.topColorMenuItem = new JMenuItem("Top...");
-        this.topColorMenuItem.addActionListener(this);
-        colorMenu.add(topColorMenuItem);
-
-        this.bottomColorMenuItem = new JMenuItem("Bottom...");
-        this.bottomColorMenuItem.addActionListener(this);
-        colorMenu.add(bottomColorMenuItem);
 
         this.menubar.updateUI();
     }
@@ -561,32 +536,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         if ((actionSource == this.showExactMenuItem) ||
                 (actionSource == this.showAllMenuItem)) {
             updateLabelViews();
-            return;
-        }
-
-        // the color entries
-        if (actionSource == this.circleColorMenuItem) {
-            Color newColor = JColorChooser.showDialog(this, "Change circle color", diagramSchema.getCircleColor());
-            if (newColor != null) {
-                diagramSchema.setCircleColor(newColor);
-            }
-            repaint();
-            return;
-        }
-        if (actionSource == this.topColorMenuItem) {
-            Color newColor = JColorChooser.showDialog(this, "Change gradient color", diagramSchema.getTopColor());
-            if (newColor != null) {
-                diagramSchema.setTopColor(newColor);
-            }
-            repaint();
-            return;
-        }
-        if (actionSource == this.bottomColorMenuItem) {
-            Color newColor = JColorChooser.showDialog(this, "Change gradient color", diagramSchema.getBottomColor());
-            if (newColor != null) {
-                diagramSchema.setBottomColor(newColor);
-            }
-            repaint();
             return;
         }
     }
