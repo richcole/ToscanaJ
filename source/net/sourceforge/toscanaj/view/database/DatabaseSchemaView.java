@@ -46,10 +46,10 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
         }
 
         public void actionPerformed(ActionEvent event) {
-            int[] selectedColumns = columnsPanel.getSelectedIndices();
-            for (int i = 0; i < selectedColumns.length; ++i) {
+            int[] selectedList = keyedTableListPanel.getSelectedIndices();
+            for (int i = 0; i < selectedList.length; ++i) {
                 KeyTableInfo info = (KeyTableInfo)
-                        unkeyedTableList.elementAt(selectedColumns[i]);
+                        keyedTableList.elementAt(selectedList[i]);
                 info.getTable().setKey(null);
             }
         }
@@ -114,13 +114,6 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
 
     public void setObjectKey(Table table, Column key) {
         table.setKey(key);
-        if (key == null) {
-            keyedTableList.removeElement(table);
-            unkeyedTableList.add(0, new TableInfo(table));
-        } else {
-            removeUnkeyedTable(table);
-            addKeyedTable(table);
-        }
     }
 
     private void addKeyedTable(Table table) {
@@ -305,7 +298,7 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
         }
 
         public String toString() {
-            if ( table.getKey() == null) {
+            if (table.getKey() == null) {
                 return table.getName() + ":" + "??? No key what's the story";
             }
             return table.getName() + ":" + table.getKey().getName();
@@ -352,7 +345,8 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
     }
 
     private void clear() {
+        this.keyedTableList.clear();
         this.unkeyedTableList.clear();
-        this.unkeyedTableList.clear();
+        this.columnsList.clear();
     }
 }
