@@ -145,10 +145,14 @@ public class DBConnection {
             throw new DatabaseException("Could not read SQL script.", e);
         }
         // submit the SQL
+        executeSQLAsString(sqlCommand, sqlURL.toString());
+    }
+
+    public void executeSQLAsString(String sqlCommand, String descr) throws DatabaseException {
         Statement stmt;
         try {
             stmt = jdbcConnection.createStatement();
-            printLogMessage(System.currentTimeMillis() + ": Submitting script: " + sqlURL.toString());
+            printLogMessage(System.currentTimeMillis() + ": Submitting script: " + descr);
             stmt.execute(sqlCommand);
             printLogMessage(System.currentTimeMillis() + ": done.");
         } catch (SQLException se) {

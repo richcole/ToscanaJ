@@ -11,8 +11,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.events.tests.EventBrokerTest;
 
-public class AllTests extends TestCase {
-    public AllTests(String s) {
+public class AllTestControllerDB extends TestCase {
+    public AllTestControllerDB(String s) {
         super(s);
     }
 

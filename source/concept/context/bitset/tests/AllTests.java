@@ -6,7 +6,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 /**
- * JUnit test case for AllTests
+ * JUnit test case for AllTestControllerDB
  */
 
 public class AllTests extends TestCaseMo {

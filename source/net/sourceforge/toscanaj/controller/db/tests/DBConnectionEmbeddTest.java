@@ -17,6 +17,8 @@ import net.sourceforge.toscanaj.controller.db.DBConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 
+import java.net.URL;
+
 public class DBConnectionEmbeddTest extends TestCase {
 
     public static Test suite() {
@@ -27,6 +29,9 @@ public class DBConnectionEmbeddTest extends TestCase {
         super(testName);
     };
 
+    static String SQLCommand =
+        "create table student (name VARCHAR(20), age INTEGER, height INTEGER);";
+
     public void testDBConnectionEmbedd1() {
 
         try {
@@ -34,8 +39,14 @@ public class DBConnectionEmbeddTest extends TestCase {
 
             DBConnection connection = new DBConnection(new EventBroker());
             connection.connect(info);
+            connection.executeSQLAsString(SQLCommand, "EmbedDBConnectionTestSQL");
+
+            assertEquals(1, connection.getTableNames().size());
+
         } catch (DatabaseException e) {
+            fail("Exception raised while initializing embedded database");
         }
+
     }
 
 }
