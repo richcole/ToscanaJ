@@ -298,29 +298,29 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                 retVal.setObjectClause(null);
             }
             else {
-                DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
                 retVal.objectClause = this.objectClause;
-                retVal.filterClauses.addAll(otherDB.filterClauses);
-                String newFilterClause = "(";
-                boolean first = true;
-                Iterator it = otherDB.ideal.iterator();
-                while(it.hasNext()) {
-                    DatabaseConnectedConcept cur = (DatabaseConnectedConcept) it.next();
-                    if(cur.objectClause == null) {
-                        continue;
-                    }
-                    if(!first) {
-                        newFilterClause = newFilterClause + " OR " ;
-                    }
-                    else {
-                        first = false;
-                    }
-                    newFilterClause = newFilterClause + cur.objectClause;
+            }
+            DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
+            retVal.filterClauses.addAll(otherDB.filterClauses);
+            String newFilterClause = "(";
+            boolean first = true;
+            Iterator it = otherDB.ideal.iterator();
+            while(it.hasNext()) {
+                DatabaseConnectedConcept cur = (DatabaseConnectedConcept) it.next();
+                if(cur.objectClause == null) {
+                    continue;
                 }
-                newFilterClause += ")";
-                if(!first) { // don't do anything if we are still waiting for the first (i.e. we have none)
-                    retVal.filterClauses.add(newFilterClause);
+                if(!first) {
+                    newFilterClause = newFilterClause + " OR " ;
                 }
+                else {
+                    first = false;
+                }
+                newFilterClause = newFilterClause + cur.objectClause;
+            }
+            newFilterClause += ")";
+            if(!first) { // don't do anything if we are still waiting for the first (i.e. we have none)
+                retVal.filterClauses.add(newFilterClause);
             }
         }
         return retVal;
@@ -342,9 +342,9 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             }
             else {
                 retVal.setObjectClause(this.objectClause);
-                retVal.filterClauses.addAll(otherDB.filterClauses);
-                retVal.filterClauses.add(otherDB.objectClause);
             }
+            retVal.filterClauses.addAll(otherDB.filterClauses);
+            retVal.filterClauses.add(otherDB.objectClause);
         }
         return retVal;
     }
