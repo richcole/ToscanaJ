@@ -79,7 +79,6 @@ public class NestedDiagramNode extends DiagramNode {
             DiagramNode oldNode = innerDiagram.getNode(i);
             Point2D newPos = new Point2D.Double(oldNode.getX()/innerScale + offset.getX(),
                     oldNode.getY()/innerScale + offset.getY());
-            Concept newConcept = oldNode.getConcept();
             LabelInfo newAttrLabel;
             if (dropAttributeLabels) {
                 newAttrLabel = null;
@@ -88,7 +87,7 @@ public class NestedDiagramNode extends DiagramNode {
             }
             LabelInfo newObjLabel = new LabelInfo(oldNode.getObjectLabelInfo());
             DiagramNode newNode = new DiagramNode(newDiag, outerNode.getIdentifier() + " x " + oldNode.getIdentifier(),
-                    newPos, newConcept, newAttrLabel, newObjLabel, this, oldNode.getRadiusX()/innerScale, oldNode.getRadiusY()/innerScale);
+                    newPos, oldNode.getConcept(), newAttrLabel, newObjLabel, this, oldNode.getRadiusX()/innerScale, oldNode.getRadiusY()/innerScale);
             nodeMap.put(oldNode, newNode);
             newDiag.addNode(newNode);
         }
