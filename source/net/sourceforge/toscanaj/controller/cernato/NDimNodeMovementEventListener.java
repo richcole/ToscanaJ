@@ -40,6 +40,21 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
         Point2D curPos = ndimNode.getPosition();
         double diffX = toPos.getX() - curPos.getX();
         double diffY = toPos.getY() - curPos.getY();
+        moveNodes(diagram, ndimNode, diffX, diffY);
+        if(!diagram.isHasseDiagram()) {
+            moveNodes(diagram, ndimNode, -diffX, -diffY);
+        }
+        if (dragEvent instanceof CanvasItemDroppedEvent) {
+            diagramView.requestScreenTransformUpdate();
+        }
+        diagramView.repaint();
+    }
+
+    public void moveNodes(
+        NDimDiagram diagram,
+        NDimDiagramNode ndimNode,
+        double diffX,
+        double diffY) {
         double[] diffUpperNeighbours = findUpperNeighbourDiff(diagram, ndimNode);
         double sumCoord = 0;
         for (int i = 0; i < diffUpperNeighbours.length; i++) {
@@ -52,10 +67,6 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
             baseVec.setLocation(baseVec.getX() + diffX * v / (sumCoord + ndimNode.getNdimVector()[i]),
                     baseVec.getY() + diffY * v / (sumCoord + ndimNode.getNdimVector()[i]));
         }
-        if (dragEvent instanceof CanvasItemDroppedEvent) {
-            diagramView.requestScreenTransformUpdate();
-        }
-        diagramView.repaint();
     }
 
     private double[] findUpperNeighbourDiff(Diagram2D diagram, NDimDiagramNode node) {
