@@ -131,7 +131,7 @@ import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
-import org.tockit.swing.ExtendedPreferences;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 /**
  * @todo make sure all changes to the context will propagate to make the schema dirty.

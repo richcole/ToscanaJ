@@ -42,7 +42,7 @@ import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
-import org.tockit.swing.ExtendedPreferences;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;

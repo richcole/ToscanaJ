@@ -10,7 +10,7 @@ package net.sourceforge.toscanaj.view.scales;
 import javax.swing.*;
 import javax.swing.event.*;
 
-import org.tockit.swing.ExtendedPreferences;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.gui.LabeledPanel;

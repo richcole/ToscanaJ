@@ -12,7 +12,7 @@ import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-import org.tockit.swing.ExtendedPreferences;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;

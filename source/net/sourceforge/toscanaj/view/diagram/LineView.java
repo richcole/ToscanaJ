@@ -14,7 +14,7 @@ import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import org.tockit.canvas.CanvasItem;
-import org.tockit.swing.ExtendedPreferences;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;

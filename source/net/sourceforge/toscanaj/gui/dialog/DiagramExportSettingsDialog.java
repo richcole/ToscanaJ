@@ -11,7 +11,7 @@ import net.sourceforge.toscanaj.model.DiagramExportSettings;
 
 import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
-import org.tockit.swing.ExtendedPreferences;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 import javax.swing.*;
 

@@ -25,7 +25,7 @@ import org.jdom.Element;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
-import org.tockit.swing.ExtendedPreferences;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 import java.awt.*;
 import java.awt.event.*;

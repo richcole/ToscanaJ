@@ -12,7 +12,7 @@ import net.sourceforge.toscanaj.util.gradients.*;
 
 import java.awt.*;
 
-import org.tockit.swing.ExtendedPreferences;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 /**
  * DiagramSchema will hold the palette colors, line widths and similar information

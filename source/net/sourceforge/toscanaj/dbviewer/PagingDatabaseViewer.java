@@ -12,7 +12,7 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
 import javax.swing.*;
 
-import org.tockit.swing.ExtendedPreferences;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

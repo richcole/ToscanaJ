@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.gui.dialog;
 
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.tockit.swing.ExtendedPreferences;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
