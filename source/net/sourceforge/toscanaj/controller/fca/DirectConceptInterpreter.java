@@ -91,10 +91,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
             };
         }
         context.getDiagramHistory().visitZoomedConcepts(visitor);
-        for (Iterator iterator = toRemove.iterator(); iterator.hasNext();) {
-            Object o = iterator.next();
-            currentSet.remove(o);
-        }
+        currentSet.removeAll(toRemove);
     }
 
     private void nestObjects(TreeSet currentSet, ConceptInterpretationContext context, boolean contingentOnly) {
@@ -122,10 +119,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
                     toRemove.add(o);
                 }
             }
-            for (Iterator iterator = toRemove.iterator(); iterator.hasNext();) {
-                Object o = iterator.next();
-				currentSet.remove(o);
-            }
+			currentSet.removeAll(toRemove);
         }
     }
 
