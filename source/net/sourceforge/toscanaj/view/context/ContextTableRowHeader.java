@@ -199,9 +199,6 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 					});
                     JMenu sortMenu = new JMenu("Move before");
                     for (int i = 0; i < objects.length; i++) {
-                        if(i == pos.getRow() || i == pos.getRow() + 1) {
-                            continue;
-                        }
                         final WritableFCAObject object = objects[i];
                         JMenuItem menuItem = new JMenuItem(object.toString());
                         menuItem.addActionListener(new ActionListener() {
@@ -209,6 +206,9 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
                                 moveObject(pos.getRow(), object);
                             }
                         });
+                        if(i == pos.getRow() || i == pos.getRow() + 1) {
+                            menuItem.setEnabled(false);
+                        }
                         sortMenu.add(menuItem);
                     }
                     popupMenu.add(sortMenu);

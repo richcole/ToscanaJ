@@ -34,9 +34,6 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @todo introduce OrderedContext interface or something similar to get rid of
- * the casts knowing about the internals of the ContextImplementation
- * 
  * @todo use dynamic cell widths
  * 
  * @todo avoid completely recreating the whole view each time the table changes

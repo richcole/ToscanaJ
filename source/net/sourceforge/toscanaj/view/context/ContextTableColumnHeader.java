@@ -26,12 +26,15 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.JComponent;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
+
+import org.tockit.util.ListSet;
 
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.model.context.Attribute;
@@ -202,7 +205,34 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 				MouseEvent e,
 				final ContextTableView.Position pos) {
 					JPopupMenu popupMenu = new JPopupMenu();
-					JMenuItem rename = new JMenuItem("Rename Attribute");
+                    
+                    JMenu sortMenu = new JMenu("Move before");
+                    for (int i = 0; i < attributes.length; i++) {
+                        final Attribute attribute = attributes[i];
+                        JMenuItem menuItem = new JMenuItem(attribute.toString());
+                        menuItem.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                moveAttribute(pos.getCol(), attribute);
+                            }
+                        });
+                        if(i == pos.getCol() || i == pos.getCol() + 1) {
+                            menuItem.setEnabled(false);
+                        }
+                        sortMenu.add(menuItem);
+                    }
+                    popupMenu.add(sortMenu);
+                    
+                    if(pos.getCol() != attributes.length - 1) {
+                        JMenuItem menuItem = new JMenuItem("Move to end");
+                        menuItem.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                moveAttribute(pos.getCol(), null);
+                            }
+                        });
+                        popupMenu.add(menuItem);
+                    }
+                    
+                    JMenuItem rename = new JMenuItem("Rename Attribute");
 					rename.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
 							renameAttribute(pos.getCol());
@@ -294,4 +324,20 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 		repaint();
 	}
 
+    private void moveAttribute(int from, Attribute target) {
+        ListSet attributeList = this.dialog.getContext().getAttributeList();
+        if(target != null) {
+            int targetPos = attributeList.indexOf(target);
+            if(from < targetPos) {
+                targetPos --;
+            }
+            Object movingAttribute = attributeList.remove(from);
+            attributeList.add(targetPos, movingAttribute);
+        } else {
+            Object movingAttribute = attributeList.remove(from);
+            attributeList.add(movingAttribute);
+        }
+        calculateNewSize();
+        this.dialog.repaint();
+    }    
 }
