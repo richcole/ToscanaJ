@@ -314,15 +314,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         this.openFileAction.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_O));
         this.openFileAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-
-		// restore the last image export position
-		String lastImage = ConfigurationManager.fetchString("ToscanaJMainPanel", "lastImageExport", null);
-		File lastImageExportFile = null;
-		if (lastImage != null) {
-			lastImageExportFile = new File(lastImage);
-		}
-        this.exportDiagramAction = new ExportDiagramAction( this, 
-        		lastImageExportFile, this.diagramExportSettings, this.diagramView, 
+		this.exportDiagramAction = new ExportDiagramAction( this, 
+        		this.diagramExportSettings, this.diagramView, 
         		KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
         this.exportDiagramAction.setEnabled(false);
         this.goBackAction = new AbstractAction("Go Back one Diagram") {
@@ -802,11 +795,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         ConfigurationManager.storeInt("ToscanaJMainPanel", "divider", splitPane.getDividerLocation());
         // save the MRU list
         ConfigurationManager.storeStringList("ToscanaJMainPanel", "mruFiles", this.mruList);
-        // store last image export position
-        File lastImageExportFile = this.exportDiagramAction.getLastImageExportFile();
-        if ( lastImageExportFile != null) {
-            ConfigurationManager.storeString("ToscanaJMainPanel", "lastImageExport", lastImageExportFile.getPath());
-        }
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
 

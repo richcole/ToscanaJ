@@ -49,11 +49,10 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 	 */
 	public ExportDiagramAction (
 			JFrame frame,
-			File lastFile,
 			DiagramExportSettings diagExpSettings,
 			DiagramView diagramView) {
 		super(frame, "Export Diagram...");
-		this.lastImageExportFile = lastFile;
+		this.lastImageExportFile = diagExpSettings.getLastImageExportFile();
 		this.diagramExportSettings = diagExpSettings;
 		this.diagramView = diagramView;
 		this.frame = frame;
@@ -61,14 +60,13 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 
 	public ExportDiagramAction (
 			JFrame frame,
-			File lastFile,
 			DiagramExportSettings diagExpSettings,
 			DiagramView diagramView,
 			int mnemonic,
 			KeyStroke keystroke
 			) {
 		super(frame, "Export Diagram...", mnemonic, keystroke);
-		this.lastImageExportFile = lastFile;
+		this.lastImageExportFile = diagExpSettings.getLastImageExportFile();
 		this.diagramExportSettings = diagExpSettings;
 		this.diagramView = diagramView;
 		this.frame = frame;
@@ -234,7 +232,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 				"Not enough memory available to export\n"
 					+ "the diagram in this size");
 		}
-		this.lastImageExportFile = selectedFile;
+		this.diagramExportSettings.setLastImageExportFile(selectedFile);
 		}
 	
 	/**
@@ -297,8 +295,5 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 			super.approveSelection();
 		}
 	}
-	
-	public File getLastImageExportFile() {
-		return lastImageExportFile;
-	}
+
 }

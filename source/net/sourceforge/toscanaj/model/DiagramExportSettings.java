@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.model;
 
+import java.io.File;
 import java.util.Iterator;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
@@ -29,7 +30,7 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
 	private static final String CONFIGURATION_IMAGE_WIDTH_ENTRY = "imageWidth";
 	private static final String CONFIGURATION_COMMENTS_TO_CLIPBOARD_ENTRY = "saveCommentsToClipboard";
 	private static final String CONFIGURATION_COMMENTS_TO_FILE_ENTRY = "saveCommentsToFile";
-
+	private static final String CONFIGURATION_LAST_EXPORT_FILE_ENTRY = "lastImageExport";
 	/**
      * Stores the type of graphic format to be used.
      */
@@ -61,6 +62,11 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
 	private boolean saveCommentsToClipboard;
 
 	/**
+	 * Stores the last exported file
+	 */
+	private File lastImageExportFile;
+
+	/**
 	 * Initialisation constructor.
 	 *
 	 * If autoMode is set, the other values will be overwritten each time a
@@ -68,15 +74,18 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
 	 */
 	public DiagramExportSettings() {
 		super(null,0,0,false);
-		String lastImage = ConfigurationManager.fetchString("ToscanaJMainPanel", "lastImageExport", null);
+		String lastImage = ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, CONFIGURATION_LAST_EXPORT_FILE_ENTRY, null);
 		if (lastImage != null) {
 			this.format = GraphicFormatRegistry.getTypeByExtension(lastImage);
+			this.lastImageExportFile = new File(lastImage);
 		} else { 
 		//no last image file so we get the first format from the graphic format registry
 			Iterator formatIterator = GraphicFormatRegistry.getIterator();
 			if (formatIterator.hasNext()){
 				this.format = (GraphicFormat) formatIterator.next();	
-			} 
+			}
+			// can't find last image, so set last image file to null.
+			this.lastImageExportFile = null; 
 		}
 		this.width = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_IMAGE_WIDTH_ENTRY, 500);
 		
@@ -113,6 +122,8 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
         this.autoMode = autoMode;
 		this.saveCommentsToFile= false;
 		this.saveCommentsToClipboard= false;
+		String lastImage = ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, CONFIGURATION_LAST_EXPORT_FILE_ENTRY, null);
+		this.lastImageExportFile = null;  
     }
 
     /**
@@ -226,6 +237,23 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
 			saveToClipboard = 1;
 		}
 		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_COMMENTS_TO_CLIPBOARD_ENTRY, saveToClipboard);
+	}
+
+	/**
+	 * Gets the last exported image File.
+	 * @return File
+	 */
+	public File getLastImageExportFile() {
+		return lastImageExportFile;
+	}
+
+	/**
+	 * Sets the last exported image file.
+	 * @param lastImageExportFile The lastImageExportFile to set
+	 */
+	public void setLastImageExportFile(File lastImageExportFile) {
+		this.lastImageExportFile = lastImageExportFile;
+		ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, CONFIGURATION_LAST_EXPORT_FILE_ENTRY, lastImageExportFile.getAbsolutePath());
 	}
 
 }
