@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.Table;
 import net.sourceforge.toscanaj.model.Column;
+import net.sourceforge.toscanaj.events.EventBroker;
 
 import java.util.NoSuchElementException;
 
@@ -28,7 +29,7 @@ public class TableTest extends TestCase {
     }
 
     public void testAddColumns(){
-        Table table = new Table("Table", "Id");
+        Table table = new Table(new EventBroker(), "Table");
         table.addColumn(new Column("Second"));
 
     }
