@@ -112,6 +112,20 @@ public class ConfigurationManager {
     }
 
     /**
+     * Stores a String value.
+     */
+    static public void storeString(String section, String key, String value) {
+        properties.setProperty(section + "-" + key, value);
+    }
+
+    /**
+     * Retrieves a String value.
+     */
+    static public String fetchString(String section, String key, String defaultValue) {
+        return properties.getProperty(section + "-" + key, defaultValue);
+    }
+
+    /**
      * Stores a list of strings.
      */
     static public void storeStringList(String section, String key, List list) {

@@ -179,6 +179,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         DiagramController.getController().addObserver(this);
         // restore the old MRU list
         mruList = ConfigurationManager.fetchStringList("mainPanel", "mruFiles", MaxMruFiles);
+        // restore the last image export position
+        String lastImage = ConfigurationManager.fetchString("mainPanel","lastImageExport",null);
+        if(lastImage != null ) {
+            this.lastImageExportFile = new File(lastImage);
+        }
     }
 
     /**
@@ -226,7 +231,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
         setContentPane( contentPane );
         // restore old position
-        ConfigurationManager.restorePlacement("mainWindow",this, new Rectangle(10,10,600,450));
+        ConfigurationManager.restorePlacement("mainPanel",this, new Rectangle(10,10,600,450));
         int div = ConfigurationManager.fetchInt("mainPanel","divider",400);
         splitPane.setDividerLocation(div);
     }
@@ -476,10 +481,12 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      */
     private void closeMainPanel () {
         // store current position
-        ConfigurationManager.storePlacement("mainWindow",this);
+        ConfigurationManager.storePlacement("mainPanel",this);
         ConfigurationManager.storeInt("mainPanel","divider",splitPane.getDividerLocation());
         // save the MRU list
         ConfigurationManager.storeStringList("mainPanel","mruFiles",this.mruList);
+        // store last image export position
+        ConfigurationManager.storeString("mainPanel","lastImageExport",this.lastImageExportFile.getPath());
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
         System.exit(0);
