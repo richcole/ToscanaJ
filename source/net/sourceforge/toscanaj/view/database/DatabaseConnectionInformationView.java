@@ -6,6 +6,7 @@ import net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.events.EventBroker;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +26,51 @@ public class DatabaseConnectionInformationView extends JPanel implements BrokerE
             copyFromControls(info);
             return true;
         }
+    }
+
+    /**
+     * Construct an instance of this view
+     */
+    public DatabaseConnectionInformationView(JFrame frame, DatabaseInfo databaseInfo, EventBroker eventBroker) {
+        super();
+        setLayout(new BorderLayout());
+        this.info = databaseInfo;
+
+        setName("DatabaseConnectionInformationView");
+
+        JLabel urlLabel = new JLabel("Url:");
+        JLabel driverLabel = new JLabel("Driver:");
+        JLabel userLabel = new JLabel("Username:");
+        JLabel passwordLabel = new JLabel("Password:");
+
+        urlField = new JTextField();
+        driverField = new JTextField();
+        userField = new JTextField();
+        passwordField = new JTextField();
+
+        JButton connectButton = new JButton();
+        SimpleAction action = new SimpleAction(frame, "Connect");
+        action.add(new SaveControlActivity());
+        connectButton.setAction(action);
+
+        JPanel buttonPane = new JPanel(new BorderLayout());
+        JPanel pane = new JPanel(new GridLayout(0, 2));
+
+        pane.add(urlLabel);
+        pane.add(urlField);
+        pane.add(driverLabel);
+        pane.add(driverField);
+        pane.add(userLabel);
+        pane.add(userField);
+        pane.add(passwordLabel);
+        pane.add(passwordField);
+
+        buttonPane.add(connectButton, BorderLayout.EAST);
+
+        add(pane, BorderLayout.CENTER);
+        add(buttonPane, BorderLayout.SOUTH);
+
+        eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class );
     }
 
     public boolean areControlsChanged() {
@@ -63,50 +109,7 @@ public class DatabaseConnectionInformationView extends JPanel implements BrokerE
         copyToControls(changeEvent.getConceptualSchema().getDatabaseInfo());
     }
 
-    /**
-     * Construct an instance of this view
-     */
-    public DatabaseConnectionInformationView(JFrame frame, DatabaseInfo databaseInfo) {
-        super();
-        setLayout(new BorderLayout());
-        this.info = databaseInfo;
-
-        setName("DatabaseConnectionInformationView");
-
-        JLabel urlLabel = new JLabel("Url:");
-        JLabel driverLabel = new JLabel("Driver:");
-        JLabel userLabel = new JLabel("Username:");
-        JLabel passwordLabel = new JLabel("Password:");
-
-        urlField = new JTextField();
-        driverField = new JTextField();
-        userField = new JTextField();
-        passwordField = new JTextField();
-
-        JButton connectButton = new JButton();
-        SimpleAction action = new SimpleAction(frame, "Connect");
-        action.add(new SaveControlActivity());
-        connectButton.setAction(action);
-
-        JPanel buttonPane = new JPanel(new BorderLayout());
-        JPanel pane = new JPanel(new GridLayout(0, 2));
-
-        pane.add(urlLabel);
-        pane.add(urlField);
-        pane.add(driverLabel);
-        pane.add(driverField);
-        pane.add(userLabel);
-        pane.add(userField);
-        pane.add(passwordLabel);
-        pane.add(passwordField);
-
-        buttonPane.add(connectButton, BorderLayout.EAST);
-
-        add(pane, BorderLayout.CENTER);
-        add(buttonPane, BorderLayout.SOUTH);
-    };
-
     public void setInfo(DatabaseInfo info) {
         copyToControls(info);
-    };
+    }
 }

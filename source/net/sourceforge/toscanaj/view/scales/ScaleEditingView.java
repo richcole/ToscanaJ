@@ -2,6 +2,7 @@ package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.Column;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Table;
@@ -24,7 +25,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
     /**
      * Construct an instance of this view
      */
-    public ScaleEditingView(JFrame frame, ConceptualSchema conceptualSchema) {
+    public ScaleEditingView(JFrame frame, ConceptualSchema conceptualSchema, EventBroker eventBroker) {
         super();
         setLayout(new BorderLayout());
         this.conceptualSchema = conceptualSchema;

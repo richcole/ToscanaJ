@@ -94,24 +94,18 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         mainView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "mainPanelDivider", 200));
 
         DatabaseConnectionInformationView connectionInformationView =
-            new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo());
-        eventBroker.subscribe(connectionInformationView,
-                              ConceptualSchemaChangeEvent.class,
-                              Object.class );
+            new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);
 
         JPanel tableView = new SchemeView(this, eventBroker);
 
-        scaleView = new ScaleEditingView(this, conceptualSchema);
+        scaleView = new ScaleEditingView(this, conceptualSchema, eventBroker);
         scaleView.setHorizontalDividerLocation(
                             ConfigurationManager.fetchInt("AnacondaJMainPanel", "scaleViewHorizontalDivider", 200));
         scaleView.setVerticalDividerLocation(
                             ConfigurationManager.fetchInt("AnacondaJMainPanel", "scaleViewVerticalDivider", 300));
 
-        diagramView = new DiagramEditingView(this, conceptualSchema);
+        diagramView = new DiagramEditingView(this, conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "diagramViewDivider", 200));
-        eventBroker.subscribe(diagramView,
-                              ConceptualSchemaChangeEvent.class,
-                              Object.class );
 
         mainView.addView("Connection", connectionInformationView);
         mainView.addView("Tables", tableView);

@@ -33,7 +33,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
     /**
      * Construct an instance of this view
      */
-    public DiagramEditingView(JFrame frame, ConceptualSchema conceptualSchema) {
+    public DiagramEditingView(JFrame frame, ConceptualSchema conceptualSchema, EventBroker eventBroker) {
         super();
         setLayout(new BorderLayout());
         this.conceptualSchema = conceptualSchema;
@@ -106,6 +106,8 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);
+
+        eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class );
     }
 
     private void showDiagram(int index) {
