@@ -8,13 +8,13 @@
 package net.sourceforge.toscanaj.events;
 
 public class StandardEvent implements Event {
-    private Object source;
+    private Object subject;
 
-    public StandardEvent(Object source) {
-        this.source = source;
+    public StandardEvent(Object subject) {
+        this.subject = subject;
     }
 
     public Object getSubject() {
-        return source;
+        return subject;
     }
 }
