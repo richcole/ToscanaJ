@@ -62,6 +62,7 @@ public class ToscanaJ {
         if(cl.hasOption("reset")) {
             try {
                 ToscanaJPreferences.removeSettings();
+                System.out.println("User preferences reset.");
             } catch (BackingStoreException exception) {
                 System.err.println("Problem encountered removing preferences:");
                 exception.printStackTrace();
