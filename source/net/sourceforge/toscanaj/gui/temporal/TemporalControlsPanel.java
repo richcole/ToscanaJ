@@ -130,6 +130,11 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	  	super();
 	  	
 	  	this.diagramView = diagramView;
+        
+        // make sure the factories for the extra canvas items are loaded
+        TransitionArrow.registerFactory();
+        InterSequenceTransitionArrow.registerFactory();
+        StateRing.registerFactory();
 	  	
         eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
         diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, DiagramView.class);

@@ -33,7 +33,7 @@ public class StateRing extends CanvasItem implements XMLizable {
         }
     }
     
-    static {
+    public static void registerFactory() {
         SimpleLineDiagram.registerExtraCanvasItemFactory("stateRing", new Factory());
     }
    

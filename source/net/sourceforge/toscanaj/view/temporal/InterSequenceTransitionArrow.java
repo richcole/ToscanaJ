@@ -28,7 +28,7 @@ public class InterSequenceTransitionArrow extends TransitionArrow {
         }
     }
 
-    static {
+    public static void registerFactory() {
         SimpleLineDiagram.registerExtraCanvasItemFactory("intersequenceTransitionArrow", new Factory());
     }
 

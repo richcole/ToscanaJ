@@ -70,7 +70,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     
     private IdPool idPool = new IdPool();
     
-    private static HashMap extraCanvasItemTypes = new HashMap();
+    private static HashMap extraCanvasItemFactories = new HashMap();
     private List extraCanvasItems = new ArrayList();
 
     /**
@@ -191,12 +191,16 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
             DiagramLine line = (DiagramLine) iterator.next();
             retVal.addContent(line.toXML());
         }
-        for (Iterator iter = this.extraCanvasItems.iterator(); iter.hasNext();) {
-            CanvasItem item = (CanvasItem) iter.next();
-            if(item instanceof XMLizable) {
-                XMLizable xmlItem = (XMLizable) item;
-                retVal.addContent(xmlItem.toXML());
+        if(!this.extraCanvasItems.isEmpty()) {
+            Element extraItemElem = new Element("extraCanvasItems");
+            for (Iterator iter = this.extraCanvasItems.iterator(); iter.hasNext();) {
+                CanvasItem item = (CanvasItem) iter.next();
+                if(item instanceof XMLizable) {
+                    XMLizable xmlItem = (XMLizable) item;
+                    extraItemElem.addContent(xmlItem.toXML());
+                }
             }
+            retVal.addContent(extraItemElem);
         }
         return retVal;
     }
@@ -241,6 +245,18 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
             ((ConceptImplementation) node.getConcept()).buildClosures();
         }
         coordinateSystemChecked = false;
+        
+        Element extraItemElem = elem.getChild("extraCanvasItems");
+        if(extraItemElem != null) {
+            List children = extraItemElem.getChildren();
+            for (Iterator iter = children.iterator(); iter.hasNext(); ) {
+                Element child = (Element) iter.next();
+                ExtraCanvasItemFactory factory = (ExtraCanvasItemFactory) extraCanvasItemFactories.get(child.getName());
+                if (factory != null) {
+	                this.extraCanvasItems.add(factory.createCanvasItem(this, child));
+                }
+            }
+        }
     }
 
     protected DiagramNode createNewDiagramNode(Element diagramNode) throws XMLSyntaxError {
@@ -520,8 +536,8 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 		return bottom;
     }
 
-    public static void registerExtraCanvasItemType(String tagName, Class type) {
-        extraCanvasItemTypes.put(tagName, type);
+    public static void registerExtraCanvasItemFactory(String tagName, ExtraCanvasItemFactory factory) {
+        extraCanvasItemFactories.put(tagName, factory);
     }
     
     public void addExtraCanvasItem(CanvasItem item) {

@@ -32,21 +32,26 @@ import org.tockit.canvas.MovableCanvasItem;
 
 public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     private static class Factory implements ExtraCanvasItemFactory {
-        public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) {
-//            NodeView start = diagram.getNode(element.getAttributeValue("from"));
-            return null;
-//            Element result = new Element(getTagName());
-//            result.setAttribute("from", startNodeView.getDiagramNode().getIdentifier());
-//            result.setAttribute("to", endNodeView.getDiagramNode().getIdentifier());
-//            Element offsetElem = new Element("offset");
-//            offsetElem.setAttribute("x", String.valueOf(manualOffset.getX()));
-//            offsetElem.setAttribute("y", String.valueOf(manualOffset.getY()));
-//            result.addContent(offsetElem);
-//            result.addContent(this.style.toXML());
+        public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) throws XMLSyntaxError {
+            TransitionArrow retVal = new TransitionArrow();
+            retVal.timeController = new AnimationTimeController(Double.MAX_VALUE, 0, Double.MAX_VALUE, 0, 1);
+            retVal.timeController.setCurrentTime(Double.MAX_VALUE/2);
+            retVal.startNode = diagram.getNode(element.getAttributeValue("from"));
+            retVal.endNode = diagram.getNode(element.getAttributeValue("to"));
+            Element offsetElem = element.getChild("offset");
+            double offsetX = Double.parseDouble(offsetElem.getAttributeValue("x"));
+            double offsetY = Double.parseDouble(offsetElem.getAttributeValue("y"));
+            retVal.manualOffset = new Point2D.Double(offsetX, offsetY);
+            retVal.style = new ArrowStyle(element.getChild("arrowStyle"));
+
+            retVal.updateShiftVector();        
+            retVal.calculateBounds();
+            
+            return retVal;
         }
     }
     
-    static {
+    public static void registerFactory() {
         SimpleLineDiagram.registerExtraCanvasItemFactory("transitionArrow", new Factory());
     }
    
@@ -70,6 +75,9 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
 
 		updateShiftVector();    	
     	calculateBounds();
+    }
+
+    private TransitionArrow() {
     }
 
     public void draw(Graphics2D g) {
