@@ -120,7 +120,7 @@
 	<target name="dist" depends="makeReleaseJar,copyFiles,zipFile">
 	</target>
 	<target name="zipFile">
-		<zip destfile="${dist.dir}/${dist.name}-bin.zip">
+		<zip destfile="${dist.dir}/${dist.name}.zip">
 			<fileset dir="${dist.dir}">
 				<include name="${dist.name}/**"/>
 			</fileset>
@@ -129,17 +129,17 @@
     <target name="splitDist" depends="makeReleaseJar,copyFiles,zipSplitFiles">
 	</target>
     <target name="zipSplitFiles">
-		<zip destfile="${dist.dir}/${dist.name}-core-bin.zip">
+		<zip destfile="${dist.dir}/${dist.name}-core.zip">
 			<fileset dir="${dist.dir}">
                 <include name="${dist.name}/*"/>
 			</fileset>
 		</zip>
-		<zip destfile="${dist.dir}/${dist.name}-libs-bin.zip">
+		<zip destfile="${dist.dir}/${dist.name}-libs.zip">
 			<fileset dir="${dist.dir}">
                 <include name="${dist.name}/libs/**"/>
 			</fileset>
 		</zip>
-		<zip destfile="${dist.dir}/${dist.name}-examples-bin.zip">
+		<zip destfile="${dist.dir}/${dist.name}-examples.zip">
 			<fileset dir="${dist.dir}">
                 <include name="${dist.name}/examples/**"/>
             </fileset>
