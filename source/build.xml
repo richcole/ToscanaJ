@@ -67,8 +67,8 @@
 		</copy>
 		<copy todir="${dist.dir}/${dist.name}/examples">
 			<fileset dir="${examples.dir}">
-				<include name="nodb"/>
-				<include name="sql"/>
+				<include name="nodb/**"/>
+				<include name="sql/**"/>
 			</fileset>
 		</copy>
 		<copy todir="${dist.dir}/${dist.name}">
@@ -104,22 +104,22 @@
 				<include name="${dist.name}/*.sh"/>
 			</tarfileset>
 			<tarfileset dir="${dist.dir}">
-                                <include name="${dist.name}/*"/>
+                <include name="${dist.name}/*"/>
 			</tarfileset>
 		</tar>
 		<gzip src="${dist.dir}/${dist.name}-core-bin.tar" zipfile="${dist.dir}/${dist.name}-core-bin.tgz"/>
 		<delete file="${dist.dir}/${dist.name}-libs-bin.tar"/>
 		<tar tarfile="${dist.dir}/${dist.name}-libs-bin.tar">
 			<tarfileset dir="${dist.dir}">
-                                <include name="${dist.name}/libs/**"/>
+                <include name="${dist.name}/libs/**"/>
 			</tarfileset>
 		</tar>
 		<gzip src="${dist.dir}/${dist.name}-libs-bin.tar" zipfile="${dist.dir}/${dist.name}-libs-bin.tgz"/>
 		<delete file="${dist.dir}/${dist.name}-examples-bin.tar"/>
 		<tar tarfile="${dist.dir}/${dist.name}-examples-bin.tar">
 			<tarfileset dir="${dist.dir}">
-                                <include name="${dist.name}/examples/**"/>
-			</tarfileset>
+                <include name="${dist.name}/examples/**"/>
+            </tarfileset>
 		</tar>
 		<gzip src="${dist.dir}/${dist.name}-examples-bin.tar" zipfile="${dist.dir}/${dist.name}-examples-bin.tgz"/>
         </target>
