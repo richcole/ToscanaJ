@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
@@ -97,7 +98,11 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
             menuItem = new JMenuItem(objectListViewName);
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    DatabaseViewerManager.showObjectList(objectListViewName, object);
+                    try {
+					    DatabaseViewerManager.showObjectList(objectListViewName, object);
+                    } catch (Throwable t) {
+                        ErrorDialog.showError(diagramView, t, "Database View Failed", "Opening the database view failed.");
+                    }
                 }
             });
             objectListViewMenu.add(menuItem);
@@ -114,7 +119,11 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
             menuItem = new JMenuItem(objectViewName);
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    DatabaseViewerManager.showObject(objectViewName, object);
+                	try {
+                    	DatabaseViewerManager.showObject(objectViewName, object);
+                	} catch (Throwable t) {
+                		ErrorDialog.showError(diagramView, t, "Database View Failed", "Opening the database view failed.");
+                	}
                 }
             });
             objectViewMenu.add(menuItem);
