@@ -8,9 +8,12 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.gui.CanvasFeedbackMessage;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
-import org.tockit.canvas.events.CanvasItemEvent;
+
+import org.tockit.canvas.Canvas;
+import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
@@ -22,12 +25,12 @@ public class FilterOperationEventListener implements EventBrokerListener {
     }
 
     public void processEvent(Event e) {
-        CanvasItemEvent itemEvent = null;
+        CanvasItemEventWithPosition itemEvent = null;
         try {
-            itemEvent = (CanvasItemEvent) e;
+            itemEvent = (CanvasItemEventWithPosition) e;
         } catch (ClassCastException e1) {
             throw new RuntimeException(getClass().getName() +
-                    " has to be subscribed to CanvasItemEvents only");
+                    " has to be subscribed to CanvasItemEventWithPositions only");
         }
         NodeView nodeView = null;
         try {
@@ -39,6 +42,9 @@ public class FilterOperationEventListener implements EventBrokerListener {
         Concept filterConcept = nodeView.getDiagramNode().getFilterConcept();
         if(filterConcept.getExtentSize() != 0) {
         	controller.next(filterConcept);
+        } else {
+        	Canvas canvas = nodeView.getDiagramView();
+        	new CanvasFeedbackMessage("No objects would be left", canvas, itemEvent.getCanvasPosition());
         }
     }
 }
