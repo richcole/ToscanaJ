@@ -186,7 +186,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	private ColumnHeader colHeader;
     private JLabel temporalControlsLabel;
 	
-	public SienaMainPanel() {
+	public SienaMainPanel(boolean loadLastFile) {
         super(WINDOW_TITLE);
 
         eventBroker = new EventBroker();
@@ -208,7 +208,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         mruList = preferences.getStringList("mruFiles");
 
         // if we have at least one MRU file try to open it
-        if (this.mruList.size() > 0) {
+        if (loadLastFile && this.mruList.size() > 0) {
             File schemaFile =
                 new File((String) mruList.get(mruList.size() - 1));
             if (schemaFile.canRead()) {

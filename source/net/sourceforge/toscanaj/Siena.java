@@ -18,14 +18,17 @@ public class Siena {
     public static void main(String[] args) {
 		ToscanaJ.testJavaVersion();
         ToscanaJ.loadPlugins();
-        final SienaMainPanel mainWindow;
-        mainWindow = new SienaMainPanel();
+        SienaMainPanel mainWindow = null;
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if( (arg.compareToIgnoreCase("-importCernatoXML") == 0) && (i < args.length - 1) ){
-            	mainWindow.importCernatoXML(new File(args[i+1]));
+                mainWindow = new SienaMainPanel(false);
+                mainWindow.importCernatoXML(new File(args[i+1]));
             	i++;
             }
+        }
+        if(mainWindow == null) {
+            mainWindow = new SienaMainPanel(true);
         }
         mainWindow.setVisible(true);
     }
