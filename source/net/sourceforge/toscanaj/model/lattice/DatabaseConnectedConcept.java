@@ -27,7 +27,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     /**
      * Stores the attributes as Java Objects.
      */
-    private List attributes = new LinkedList();
+    private List attributeContingent = new LinkedList();
 
     /**
      * Stores the object names as Java Strings, fetched on only demand.
@@ -68,14 +68,14 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * Adds an attribute to the attribute contingent.
      */
     public void addAttribute(Object attribute) {
-        this.attributes.add(attribute);
+        this.attributeContingent.add(attribute);
     }
 
     /**
      * Implements AbstractConceptImplementation.getAttributeContingentSize().
      */
     public int getAttributeContingentSize() {
-        return this.attributes.size();
+        return this.attributeContingent.size();
     }
 
     /**
@@ -107,7 +107,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * Implements AbstractConceptImplementation.getAttributeContingentIterator().
      */
     public Iterator getAttributeContingentIterator() {
-        return this.attributes.iterator();
+        return this.attributeContingent.iterator();
     }
 
     /**
@@ -142,17 +142,26 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
 
     /**
      * Implements Concept.filterByExtent(Concept).
+     *
+     * The other concept is assumed to be a DatabaseConnectedConcept.
      */
     public Concept filterByExtent(Concept other) {
-        /// @TODO Implement this properly
-        return this;
+        if(other == null) {
+            return this;
+        }
+        DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
+        DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo, this.connection);
+        retVal.setObjectClause("(" + this.objectClause + ") AND (" + otherDB.objectClause + ")");
+        retVal.attributeContingent.addAll(this.attributeContingent);
+        return retVal;
     }
 
     /**
      * Implements Concept.filterByContingent(Concept).
+     *
+     * @TODO implement
      */
     public Concept filterByContingent(Concept other) {
-        /// @TODO Implement this properly
         return this;
     }
 }
