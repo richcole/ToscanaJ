@@ -72,6 +72,7 @@ package net.sourceforge.toscanaj.dbviewer;
  *                      window for ToscanaJ). Can be null.
  *
  * A typical query will look like this:
+ * 
  * // we assume fieldNames contains all column names whose values we want to get
  * // manager holds the DatabaseViewerManager
  * // objectKey is the parameter from showObject(String)

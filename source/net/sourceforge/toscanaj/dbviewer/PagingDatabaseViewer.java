@@ -22,26 +22,19 @@ import java.util.List;
 import java.util.Vector;
 
 /**
- * Shows an object in a simple dialog.
- *
- * A definition for this viewer looks like this:
- * <objectView class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer"
- *         name="Show object..."/>
- *     <parameter name="openDelimiter" value="!!"/>
- *     <parameter name="closeDelimiter" value="§§"/>
- *     <template>Name: !!name§§
- * Type: !!type§§
- * Size: !!size§§</template>
- * </objectView>
- *
- * Here the three fields "name", "type" and "size" will be queried and the
- * template will be filled with the results and then displayed in a dialog.
- * Note that the whitespace will be copied, too -- if you format your XML in
- * a nice way you might get weird indentation in the dialog.
- *
- * Only one item will be displayed at a time, but navigation is made via
- * buttons along the bottom of the Dialog.
- *
+ * This abstract class gives a framework for implementing database viewers with
+ * paging buttons.
+ * 
+ * If a specific database viewer can handle only one item at a time, this class
+ * can be used to add a set of buttons to navigate through the items given.
+ * These buttons implement going to the first, previous, next and last item. In
+ * addition a label shows the current position and the total number of items.
+ * 
+ * To use this class derive from it and implement the two abstract methods. The
+ * getPanel() method has to return the Swing component used in your viewer,
+ * while the showItem(String) should cause your viewer to show the item for the
+ * specific object key given. See the documentation of DatabaseViewer about
+ * getting the table and object key information.
  */
 abstract public class PagingDatabaseViewer implements DatabaseViewer {
     private DatabaseViewerManager viewerManager;

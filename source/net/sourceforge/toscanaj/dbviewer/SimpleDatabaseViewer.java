@@ -33,10 +33,8 @@ import java.util.Vector;
  * template will be filled with the results and then displayed in a dialog.
  * Note that the whitespace will be copied, too -- if you format your XML in
  * a nice way you might get weird indentation in the dialog.
- *
- * Only one item will be displayed, any but the first item will be ignored.
- *
- * @todo Add something to handle multiple results.
+ * 
+ * If multiple items have to be displayed, paging buttons will be used.
  */
 public class SimpleDatabaseViewer extends PagingDatabaseViewer {
     private JTextArea textArea;
