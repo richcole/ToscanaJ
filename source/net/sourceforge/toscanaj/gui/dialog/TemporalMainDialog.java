@@ -179,28 +179,28 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
             }
         });
         
-        firstStepButton = new JButton(" << ");
+        firstStepButton = new JButton("<<");
         firstStepButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 gotoFirstStep();
             }
         });
 
-        previousStepButton = new JButton(" < ");
+        previousStepButton = new JButton("<");
         previousStepButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 gotoPreviousStep();
             }
         });
 
-        nextStepButton = new JButton(" > ");
+        nextStepButton = new JButton(">");
         nextStepButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 gotoNextStep();
             }
         });
 
-        lastStepButton = new JButton(" >> ");
+        lastStepButton = new JButton(">>");
         lastStepButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 gotoLastStep();
@@ -324,6 +324,9 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 
         timelineColumnChooser.setModel(new DefaultComboBoxModel(attributes));
         timelineColumnChooser.setEnabled(enabled);
+        if(context != null) {
+			timelineColumnChooser.setSelectedIndex(Math.min(attributes.length - 1, 1));
+        }
 
 		calculateValueLists();        
         fillSequenceChooser();
