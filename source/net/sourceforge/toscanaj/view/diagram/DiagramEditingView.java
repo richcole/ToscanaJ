@@ -95,7 +95,6 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
             }
         });
         toolPanel.add(zoomOutButton);
-
         diagramViewPanel.add(toolPanel, BorderLayout.NORTH);
         diagramViewPanel.add(diagramView, BorderLayout.CENTER);
         return diagramViewPanel;
@@ -168,14 +167,62 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     protected JComponent makeDiagramListView() {
         diagramListModel = new DefaultListModel();
         final JList listView = new JList(diagramListModel);
+		final JButton upButton=new JButton("Up");
+		final JButton downButton=new JButton("Down");
         final JButton removeButton = new JButton("Remove");
+        JPanel buttonsPane = new JPanel(new GridBagLayout());
+        JPanel upDownButtonPane = new JPanel(new GridBagLayout());
+        upDownButtonPane.add(upButton, new GridBagConstraints(
+					        0, 0, 1, 1, 1.0, 0,
+							GridBagConstraints.CENTER,
+							GridBagConstraints.HORIZONTAL,
+							new Insets(1, 1, 1, 1),
+							2, 2)
+		);
+		upDownButtonPane.add(downButton, new GridBagConstraints(
+							1, 0, 1, 1, 1.0, 0,
+							GridBagConstraints.CENTER,
+							GridBagConstraints.HORIZONTAL,
+							new Insets(1, 1, 1, 1),
+							2, 2)
+		);
+		buttonsPane.add(upDownButtonPane,new GridBagConstraints(
+							0, 0, 1, 1, 1.0, 0,
+							GridBagConstraints.CENTER,
+							GridBagConstraints.HORIZONTAL,
+							new Insets(1, 1, 1, 1),
+							2, 2)
+		);
+		buttonsPane.add(removeButton,new GridBagConstraints(
+							0, 1, 1, 1, 1.0, 0,
+							GridBagConstraints.CENTER,
+							GridBagConstraints.HORIZONTAL,
+							new Insets(1, 1, 1, 1),
+							2, 2)
+		);
+		
+		
+        upButton.setEnabled(false);
+        downButton.setEnabled(false);
         removeButton.setEnabled(false);
         listView.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         fillDiagramListView();
         listView.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
-                    removeButton.setEnabled(listView.getSelectedIndex() != -1);
+                	if(listView.getSelectedIndex()==0 ){
+                		upButton.setEnabled(false);
+						downButton.setEnabled(listView.getSelectedIndex() != -1);						
+                	}
+                	else if(listView.getSelectedIndex()+1 == listView.getModel().getSize()){
+						downButton.setEnabled(false);
+						upButton.setEnabled(listView.getSelectedIndex() != -1);
+                	}
+					else{
+						upButton.setEnabled(listView.getSelectedIndex() != -1);
+						downButton.setEnabled(listView.getSelectedIndex() != -1);
+					}
+					removeButton.setEnabled(listView.getSelectedIndex() != -1);
                     int[] selections = listView.getSelectedIndices();
                     if (selections.length == 1) {
                         diagramView.showDiagram(conceptualSchema.getDiagram(selections[0]));
@@ -194,8 +241,27 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 }
             }
         });
-
-        return new LabeledScrollPaneView("Diagrams:", listView, removeButton);
+        
+		upButton.addActionListener(new ActionListener() {
+			 public void actionPerformed(ActionEvent e) {
+			 	int index = listView.getSelectedIndex();
+				 if(index!=-1){
+				 	conceptualSchema.exchangeDiagram(index , index - 1);
+				 	listView.setSelectedIndex(index-1);
+				 }
+			 }
+		 });
+			 
+		downButton.addActionListener(new ActionListener() {
+			 public void actionPerformed(ActionEvent e) {
+				int index = listView.getSelectedIndex();
+				if(index!=-1){
+				   conceptualSchema.exchangeDiagram(index , index + 1);
+				   listView.setSelectedIndex(index+1);
+				}
+			 }
+		 });
+        return new LabeledScrollPaneView("Diagrams:", listView, buttonsPane);
     }
 
     protected void fillDiagramListView() {

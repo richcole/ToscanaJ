@@ -19,4 +19,7 @@ public interface DiagramCollection {
     void addDiagram(Diagram2D diagram);
 
     void removeDiagram(int diagramIndex);
+    
+    void exchangeDiagram(int index, int position);
+    
 }

@@ -14,7 +14,7 @@ public class LabeledScrollPaneView extends JPanel {
     public LabeledScrollPaneView(String label, Component contentView) {
         this(label, contentView, null);
     }
-
+    
     public LabeledScrollPaneView(String label, Component contentView, Component extraComponent) {
         super();
         setLayout(new GridBagLayout());
@@ -31,16 +31,17 @@ public class LabeledScrollPaneView extends JPanel {
                         0, 1, 1, 1, 1.0, 1.0,
                         GridBagConstraints.CENTER,
                         GridBagConstraints.BOTH,
-                        new Insets(5, 5, 5, 5),
+                        new Insets(2, 5, 2, 5),
                         5, 5)
         );
+        
         if (extraComponent != null) {
             add(extraComponent,
                     new GridBagConstraints(
                             0, 2, 1, 1, 1.0, 0,
                             GridBagConstraints.CENTER,
                             GridBagConstraints.HORIZONTAL,
-                            new Insets(5, 5, 5, 5),
+                            new Insets(2, 5, 2, 5),
                             5, 5)
             );
         }

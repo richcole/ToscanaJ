@@ -240,7 +240,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         }
         return retVal;
     }
-
+    
     /**
      * Adds a diagram to the schema.
      *
@@ -260,6 +260,15 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         diagrams.remove(diagram);
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
+    
+    public void exchangeDiagram(int index, int position){
+		Diagram2D indexDiagram = (Diagram2D)diagrams.get( index );
+		Diagram2D diagram = (Diagram2D)diagrams.get( position );
+		diagrams.setElementAt(indexDiagram,position);
+		diagrams.setElementAt(diagram,index);  
+		eventBroker.processEvent(new DiagramListChangeEvent(this, this));	
+    }
+    
 
     public void setDescription(Element description) {
         if (description != null) {
