@@ -54,6 +54,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
      * Views
      */
     private PanelStackView mainView;
+    private ScaleEditingView scaleView;
     private DiagramEditingView diagramView;
 
     public class PrepareToSaveActivity implements SimpleActivity {
@@ -99,11 +100,12 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
                               Object.class );
 
         JPanel tableView = new SchemeView(this, eventBroker);
-//        JPanel tableView = new JPanel();
-//        tableView.setBackground(Color.black);
 
-        JPanel scaleView = new ScaleEditingView(this, conceptualSchema);
-        scaleView.setBackground(Color.green);
+        scaleView = new ScaleEditingView(this, conceptualSchema);
+        scaleView.setHorizontalDividerLocation(
+                            ConfigurationManager.fetchInt("AnacondaJMainPanel", "scaleViewHorizontalDivider", 200));
+        scaleView.setVerticalDividerLocation(
+                            ConfigurationManager.fetchInt("AnacondaJMainPanel", "scaleViewVerticalDivider", 300));
 
         diagramView = new DiagramEditingView(this, conceptualSchema);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "diagramViewDivider", 200));
@@ -210,6 +212,12 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         ConfigurationManager.storePlacement("AnacondaJMainPanel", this);
         ConfigurationManager.storeInt("AnacondaJMainPanel", "mainPanelDivider",
                 mainView.getDividerLocation()
+        );
+        ConfigurationManager.storeInt("AnacondaJMainPanel", "scaleViewHorizontalDivider",
+                scaleView.getHorizontalDividerLocation()
+        );
+        ConfigurationManager.storeInt("AnacondaJMainPanel", "scaleViewVerticalDivider",
+                scaleView.getVerticalDividerLocation()
         );
         ConfigurationManager.storeInt("AnacondaJMainPanel", "diagramViewDivider",
                 diagramView.getDividerLocation()

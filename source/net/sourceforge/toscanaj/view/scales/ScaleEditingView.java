@@ -1,31 +1,24 @@
 package net.sourceforge.toscanaj.view.scales;
 
-import net.sourceforge.toscanaj.gui.action.SimpleAction;
-import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
-import net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent;
-import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.Table;
-import net.sourceforge.toscanaj.model.Column;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.controller.fca.DiagramController;
-import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import net.sourceforge.toscanaj.model.Column;
+import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.Table;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Observable;
-import java.util.Observer;
+import java.awt.event.MouseListener;
 import java.util.Iterator;
 
 public class ScaleEditingView extends JPanel implements BrokerEventListener {
     private ConceptualSchema conceptualSchema;
-    private DefaultListModel columnListModel;
+    private DefaultListModel tableColumnListModel;
+    private DefaultListModel scalesListModel;
     private JSplitPane splitPane;
+    private JSplitPane leftPane;
     private JPanel diagramView;
 
     /**
@@ -41,8 +34,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
 
         diagramView = new JPanel();
 
-        JList scalesList = new JList();
-        JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, makeTableColumnsView(), scalesList);
+        leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, makeTableColumnsView(), makeScalesView());
         leftPane.setOneTouchExpandable(true);
 
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, diagramView);
@@ -51,7 +43,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
         add(splitPane);
     }
 
-    static class TableColumnPair{
+    static class TableColumnPair {
         Table table;
         Column column;
 
@@ -61,27 +53,27 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
         }
 
         public String toString() {
-            return table.getName()+":"+column.getName();
+            return table.getName() + ":" + column.getName();
         }
     }
 
     private JComponent makeTableColumnsView() {
         JComponent tableColumnListView;
 
-        columnListModel = new DefaultListModel();
+        tableColumnListModel = new DefaultListModel();
 
-        columnListModel.removeAllElements();
+        tableColumnListModel.removeAllElements();
         java.util.List tables = conceptualSchema.getDbScheme().getTables();
         for (Iterator tableIterator = tables.iterator(); tableIterator.hasNext();) {
             Table table = (Table) tableIterator.next();
             java.util.List columns = table.getColumns();
             for (Iterator columnsIterator = columns.iterator(); columnsIterator.hasNext();) {
                 Column column = (Column) columnsIterator.next();
-                columnListModel.addElement(new TableColumnPair(table,  column));
+                tableColumnListModel.addElement(new TableColumnPair(table, column));
             }
         }
 
-        final JList listView = new JList(columnListModel);
+        final JList listView = new JList(tableColumnListModel);
 
 
         MouseListener mouseListener = new MouseAdapter() {
@@ -93,41 +85,86 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
         };
 
 
-
         listView.addMouseListener(mouseListener);
 
-        JPanel tableColumnPane= new JPanel();
+        JPanel tableColumnPane = new JPanel();
         tableColumnPane.setLayout(new GridBagLayout());
         tableColumnPane.add(new JLabel("Selected tables"),
-                  new GridBagConstraints(
-                  0, 0, 1, 1, 1.0, 0,
-                  GridBagConstraints.CENTER,
-                  GridBagConstraints.HORIZONTAL,
-                  new Insets(5, 5, 5, 5),
-                  5, 5)
+                new GridBagConstraints(
+                        0, 0, 1, 1, 1.0, 0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL,
+                        new Insets(5, 5, 5, 5),
+                        5, 5)
         );
         tableColumnPane.add(new JScrollPane(listView),
                 new GridBagConstraints(
-                  0, 1, 1, 1, 1.0, 1.0,
-                  GridBagConstraints.CENTER,
-                  GridBagConstraints.BOTH,
-                  new Insets(5, 5, 5, 5),
-                  5, 5)
-);
+                        0, 1, 1, 1, 1.0, 1.0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.BOTH,
+                        new Insets(5, 5, 5, 5),
+                        5, 5)
+        );
 
         tableColumnListView = tableColumnPane;
         return tableColumnListView;
+    }
+
+    private JComponent makeScalesView() {
+        scalesListModel = new DefaultListModel();
+
+        scalesListModel.removeAllElements();
+        java.util.List tables = conceptualSchema.getDbScheme().getTables();
+        for (Iterator tableIterator = tables.iterator(); tableIterator.hasNext();) {
+            Table table = (Table) tableIterator.next();
+            java.util.List columns = table.getColumns();
+            for (Iterator columnsIterator = columns.iterator(); columnsIterator.hasNext();) {
+                Column column = (Column) columnsIterator.next();
+                scalesListModel.addElement(new TableColumnPair(table, column));
+            }
+        }
+
+        final JList listView = new JList(scalesListModel);
+
+        JPanel scalesPane = new JPanel();
+        scalesPane.setLayout(new GridBagLayout());
+        scalesPane.add(new JLabel("Scales in schema:"),
+                new GridBagConstraints(
+                        0, 0, 1, 1, 1.0, 0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL,
+                        new Insets(5, 5, 5, 5),
+                        5, 5)
+        );
+        scalesPane.add(new JScrollPane(listView),
+                new GridBagConstraints(
+                        0, 1, 1, 1, 1.0, 1.0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.BOTH,
+                        new Insets(5, 5, 5, 5),
+                        5, 5)
+        );
+
+        return scalesPane;
     }
 
     public void processEvent(Event e) {
 
     }
 
-    public void setDividerLocation(int location) {
+    public void setHorizontalDividerLocation(int location) {
         splitPane.setDividerLocation(location);
     }
 
-    public int getDividerLocation() {
+    public int getHorizontalDividerLocation() {
         return splitPane.getDividerLocation();
+    }
+
+    public void setVerticalDividerLocation(int location) {
+        leftPane.setDividerLocation(location);
+    }
+
+    public int getVerticalDividerLocation() {
+        return leftPane.getDividerLocation();
     }
 }
