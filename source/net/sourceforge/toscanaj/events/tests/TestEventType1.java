@@ -16,7 +16,7 @@ public class TestEventType1 implements Event {
         this.source = source;
     }
 
-    public Object getSource() {
+    public Object getSubject() {
         return source;
     }
 }

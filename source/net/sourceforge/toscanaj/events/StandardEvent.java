@@ -14,7 +14,7 @@ public class StandardEvent implements Event {
         this.source = source;
     }
 
-    public Object getSource() {
+    public Object getSubject() {
         return source;
     }
 }

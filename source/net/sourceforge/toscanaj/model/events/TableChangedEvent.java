@@ -23,7 +23,7 @@ public class TableChangedEvent implements Event {
         return table;
     }
 
-    public Object getSource() {
+    public Object getSubject() {
         return source;
     }
 }

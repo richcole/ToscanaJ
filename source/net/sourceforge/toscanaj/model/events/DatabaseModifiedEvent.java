@@ -21,7 +21,7 @@ public class DatabaseModifiedEvent implements Event {
         this.connection = connection;
     }
 
-    public Object getSource() {
+    public Object getSubject() {
         return source;
     }
 

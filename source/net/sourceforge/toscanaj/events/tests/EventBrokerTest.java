@@ -20,7 +20,7 @@ public class EventBrokerTest extends TestCase {
         return new TestSuite(EventBrokerTest.class);
     }
 
-    static class TestListener implements BrokerEventListener {
+    static class TestListener implements EventListener {
         public ExpectationCounter eventCounter = new ExpectationCounter("processEvents()");
 
         public TestListener() {

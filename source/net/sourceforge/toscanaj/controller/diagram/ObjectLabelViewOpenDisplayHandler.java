@@ -9,12 +9,12 @@ package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.canvas.events.CanvasItemEventWithPosition;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.EventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 
-public class ObjectLabelViewOpenDisplayHandler implements BrokerEventListener {
+public class ObjectLabelViewOpenDisplayHandler implements EventListener {
     public void processEvent(Event e) {
         CanvasItemEventWithPosition itemEvent = null;
         try {

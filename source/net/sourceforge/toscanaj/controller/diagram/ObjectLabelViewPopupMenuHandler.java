@@ -22,7 +22,7 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.List;
 
-public class ObjectLabelViewPopupMenuHandler implements BrokerEventListener {
+public class ObjectLabelViewPopupMenuHandler implements EventListener {
     private DiagramView diagramView;
     private List queries;
 

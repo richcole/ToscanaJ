@@ -23,7 +23,7 @@ public class ConceptualSchemaChangeEvent implements Event {
         return schema;
     }
 
-    public Object getSource() {
+    public Object getSubject() {
         return source;
     }
 }

@@ -14,7 +14,7 @@ import net.sourceforge.toscanaj.util.xmlize.XMLWriter;
 
 import java.io.File;
 
-public class SaveConceptualSchemaActivity implements FileActivity, BrokerEventListener {
+public class SaveConceptualSchemaActivity implements FileActivity, EventListener {
     private ConceptualSchema conceptualSchema;
     private EventBroker eventBroker;
 

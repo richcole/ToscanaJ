@@ -21,7 +21,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
+public class DatabaseSchemaView extends JPanel implements EventListener {
 
     DefaultListModel unkeyedTableList;
     DefaultListModel keyedTableList;

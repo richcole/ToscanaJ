@@ -9,11 +9,11 @@ package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.canvas.events.CanvasItemEvent;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
-import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.EventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 
-public class FilterOperationEventListener implements BrokerEventListener {
+public class FilterOperationEventListener implements EventListener {
     private DiagramController controller;
 
     public FilterOperationEventListener(DiagramController controller) {

@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.events.*;
+import net.sourceforge.toscanaj.events.EventListener;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
@@ -24,7 +25,7 @@ import java.util.*;
  * This class facilitates connection to and communication with a database
  * via JDBC.
  */
-public class DatabaseConnection implements BrokerEventListener {
+public class DatabaseConnection implements EventListener {
     /**
      * The JDBC database connection we use.
      */

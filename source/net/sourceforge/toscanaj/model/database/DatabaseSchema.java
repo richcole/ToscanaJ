@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.model.database;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.events.*;
+import net.sourceforge.toscanaj.events.EventListener;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
 import net.sourceforge.toscanaj.util.STD_Iterator;
@@ -18,7 +19,7 @@ import org.jdom.Element;
 
 import java.util.*;
 
-public class DatabaseSchema implements XMLizable, BrokerEventListener {
+public class DatabaseSchema implements XMLizable, EventListener {
 
     EventBroker broker;
     List tables;
@@ -63,17 +64,11 @@ public class DatabaseSchema implements XMLizable, BrokerEventListener {
     }
 
     public void readFromDBConnection(DatabaseConnection connection) {
-
-        for (Iterator it = connection.getTableNames().iterator(); it.hasNext();) {
-            String tableName = (String) it.next();
-        }
-
         STD_Iterator it = new STD_Iterator(connection.getTableNames());
-
         this.tables.clear();
         for (it.reset(); !it.atEnd(); it.next()) {
             String tableName = (String) it.val();
-            Table table = new Table(broker, tableName); //@todo get key name
+            Table table = new Table(broker, tableName); ///@todo get key name
             STD_Iterator colIt = new STD_Iterator(
                     connection.getColumns(table)
             );

@@ -24,7 +24,7 @@ public class DatabaseSchemaChangedEvent implements Event {
         return dbScheme;
     }
 
-    public Object getSource() {
+    public Object getSubject() {
         return source;
     }
 }

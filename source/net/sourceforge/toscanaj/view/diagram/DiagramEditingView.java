@@ -24,7 +24,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class DiagramEditingView extends JPanel implements BrokerEventListener {
+public class DiagramEditingView extends JPanel implements EventListener {
     private DiagramCollection conceptualSchema;
     private DefaultListModel diagramListModel;
     private JSplitPane splitPane;

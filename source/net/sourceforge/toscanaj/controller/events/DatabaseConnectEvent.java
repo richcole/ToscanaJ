@@ -20,7 +20,7 @@ public class DatabaseConnectEvent implements Event {
         this.info = info;
     }
 
-    public Object getSource() {
+    public Object getSubject() {
         return source;
     }
 

@@ -25,7 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 
-public class ScaleEditingView extends JPanel implements BrokerEventListener, TableColumnPairsSelectionSource {
+public class ScaleEditingView extends JPanel implements EventListener, TableColumnPairsSelectionSource {
     private ConceptualSchema conceptualSchema;
     private DefaultListModel tableColumnListModel;
     private DefaultListModel scalesListModel;

@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
-import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.EventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
@@ -17,10 +17,10 @@ import net.sourceforge.toscanaj.view.diagram.NodeView;
 
 import java.awt.geom.Point2D;
 
-public abstract class SetMovementEventListener implements BrokerEventListener {
+public abstract class SetMovementEventListener implements EventListener {
     public void processEvent(Event e) {
         CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
-        NodeView nodeView = (NodeView) dragEvent.getSource();
+        NodeView nodeView = (NodeView) dragEvent.getSubject();
         DiagramNode node = nodeView.getDiagramNode();
         Point2D toPosition = dragEvent.getCanvasToPosition();
         Point2D fromPosition = dragEvent.getCanvasFromPosition();

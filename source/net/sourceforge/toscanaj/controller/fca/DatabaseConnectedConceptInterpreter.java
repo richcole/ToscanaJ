@@ -9,14 +9,14 @@ package net.sourceforge.toscanaj.controller.fca;
 
 import net.sourceforge.toscanaj.controller.db.*;
 import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
-import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.EventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.util.*;
 
-public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, BrokerEventListener {
+public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, EventListener {
 
     private DatabaseConnection databaseConnection;
 
@@ -170,7 +170,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     public void processEvent(Event e) {
-        clearCaches((ConceptInterpretationContext) e.getSource());
+        clearCaches((ConceptInterpretationContext) e.getSubject());
     }
 
     public List executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {

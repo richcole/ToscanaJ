@@ -33,7 +33,7 @@ abstract public class CanvasItemEvent implements Event {
     /**
      * Implements Event.getSource() by returning the item attached to this event.
      */
-    public Object getSource() {
+    public Object getSubject() {
         return item;
     }
 }

@@ -14,7 +14,7 @@ package net.sourceforge.toscanaj.events;
  */
 public interface Event {
     /**
-     * The source of the event, it must not be null.
+     * The subject of the event, it must not be null.
      */
-    Object getSource();
+    Object getSubject();
 }

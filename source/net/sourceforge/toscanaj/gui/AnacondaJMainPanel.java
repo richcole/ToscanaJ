@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.events.EventListener;
 import net.sourceforge.toscanaj.gui.action.*;
 import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
@@ -34,7 +35,7 @@ import java.util.*;
 import java.util.List;
 
 /// @todo check if the file we save to exists, warn if it does
-public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEventListener {
+public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListener {
     static private final int MaxMruFiles = 8;
 
     /**

@@ -15,12 +15,12 @@ import java.util.*;
  * This is the central class of the Tockit event processing model. It takes
  * new events on the processEvent(Event) method and distributes them to
  * event listeners that are subscribed to this broker using
- * subscribe(BrokerEventListener, Class, Class).
+ * subscribe(EventListener, Class, Class).
  *
  * On subscription one can give two possible filter options, one to specify
  * which type of events one is interested in, the other specifies the type
- * of source. An example of usage would be subscribing to only selection
- * events on rectangles on a canvas.
+ * of object one cares about. An example of usage would be subscribing to
+ * only selection events on rectangles on a canvas.
  *
  * Brokers can subscribe to other brokers since they implement the listener
  * interface. This way a set of event handling contexts can be created where
@@ -40,9 +40,9 @@ import java.util.*;
  *
  * @todo probably it would be a better idea to process events one by one, i.e.
  * caching new events until the old ones have been processed, which means adding
- * an event queue to this class.
+ * an event queue to this class. Update documentation above.
  */
-public class EventBroker implements BrokerEventListener {
+public class EventBroker implements EventListener {
     /**
      * Stores the list of subscriptions.
      */
@@ -88,11 +88,11 @@ public class EventBroker implements BrokerEventListener {
      *
      * After subscription the listener will receive every event
      * extending or implementing the given eventType (which can
-     * be a class or an interface) which comes from a source that
-     * extends or implements the given source type (given as class
+     * be a class or an interface) which involves a subject that
+     * extends or implements the given subject type (given as class
      * or interface).
      */
-    public void subscribe(BrokerEventListener listener, Class eventType, Class sourceType) {
+    public void subscribe(EventListener listener, Class eventType, Class subjectType) {
         try {
             Class eventClass = Class.forName(PACKAGE_NAME + ".Event");
             if (!implementsInterface(eventType, eventClass)) {
@@ -101,7 +101,7 @@ public class EventBroker implements BrokerEventListener {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Internal error in EventBroker, class Event not found");
         }
-        newSubscriptions.add(new EventSubscription(listener, eventType, sourceType));
+        newSubscriptions.add(new EventSubscription(listener, eventType, subjectType));
     }
 
     /**
@@ -109,7 +109,7 @@ public class EventBroker implements BrokerEventListener {
      *
      * Afterwards the listener will not receive any events anymore.
      */
-    public void removeSubscriptions(BrokerEventListener listener) {
+    public void removeSubscriptions(EventListener listener) {
         updateSubscriptions();
         numberOfSubscriptionIterators++;
         for (Iterator iterator = subscriptions.iterator(); iterator.hasNext();) {
@@ -137,21 +137,21 @@ public class EventBroker implements BrokerEventListener {
      * Distributes a new event to the listeners.
      *
      * The given event will be sent to all listeners that are interested in this
-     * type of event from the given source.
+     * type of event from the given subject.
      *
-     * If the source of the event (Event.getSource()) is not defined (i.e. null) a
+     * If the subject of the event (Event.getSource()) is not defined (i.e. null) a
      * RuntimeException will be thrown.
      */
     public void processEvent(Event event) {
         updateSubscriptions();
-        if (event.getSource() == null) {
-            throw new RuntimeException("Event needs source to be processed, null not allowed.");
+        if (event.getSubject() == null) {
+            throw new RuntimeException("Event needs subject to be processed, null not allowed.");
         }
         numberOfSubscriptionIterators++;
         for (Iterator iterator = subscriptions.iterator(); iterator.hasNext();) {
             EventSubscription subscription = (EventSubscription) iterator.next();
             if (extendsOrImplements(event.getClass(), subscription.getEventType()) &&
-                    extendsOrImplements(event.getSource().getClass(), subscription.getSourceType())) {
+                    extendsOrImplements(event.getSubject().getClass(), subscription.getSubjectType())) {
                 subscription.getListener().processEvent(event);
             }
         }

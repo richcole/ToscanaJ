@@ -14,9 +14,9 @@ package net.sourceforge.toscanaj.events;
  * and will get called on processEvent(Event) whenever an event matching the
  * subscription criteria passes the broker.
  *
- * @see EventBroker.subscribe(BrokerEventListener, Class, Class)
+ * @see EventBroker.subscribe(EventListener, Class, Class)
  */
-public interface BrokerEventListener {
+public interface EventListener {
     /**
      * The callback for receiving events.
      */

@@ -17,29 +17,29 @@ class EventSubscription {
     /**
      * The listener interested in events.
      */
-    private BrokerEventListener listener;
+    private EventListener listener;
     /**
      * The type of event that should be passed.
      */
     private Class eventType;
     /**
-     * The filter on sources.
+     * The filter on subjects.
      */
-    private Class sourceType;
+    private Class subjectType;
 
     /**
      * Creates a new subscription object with the given parameters.
      */
-    public EventSubscription(BrokerEventListener listener, Class eventType, Class sourceType) {
+    public EventSubscription(EventListener listener, Class eventType, Class subjectType) {
         this.listener = listener;
         this.eventType = eventType;
-        this.sourceType = sourceType;
+        this.subjectType = subjectType;
     }
 
     /**
      * Returns the listener that shall receive the events.
      */
-    public BrokerEventListener getListener() {
+    public EventListener getListener() {
         return listener;
     }
 
@@ -51,9 +51,9 @@ class EventSubscription {
     }
 
     /**
-     * Gives the type of sources from which the listener wants to get events.
+     * Gives the type of subjects from which the listener wants to get events.
      */
-    public Class getSourceType() {
-        return sourceType;
+    public Class getSubjectType() {
+        return subjectType;
     }
 }

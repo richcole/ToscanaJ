@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.events.EventListener;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -22,7 +23,7 @@ import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.List;
 
-public class ScaleGeneratorPanel extends JPanel implements BrokerEventListener {
+public class ScaleGeneratorPanel extends JPanel implements EventListener {
     private List scaleGenerators = null;
     private JFrame parentFrame;
     ConceptualSchema conceptualSchema;

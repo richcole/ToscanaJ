@@ -14,7 +14,7 @@ public class TestEventType3 implements TestEventInterface {
         this.source = source;
     }
 
-    public Object getSource() {
+    public Object getSubject() {
         return source;
     }
 }

@@ -9,11 +9,11 @@ package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.events.CanvasItemEvent;
-import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.EventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 
-public class HighlightRemovalOperationEventListener implements BrokerEventListener {
+public class HighlightRemovalOperationEventListener implements EventListener {
     private DiagramView diagramView;
 
     public HighlightRemovalOperationEventListener(DiagramView diagramView) {

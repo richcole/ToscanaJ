@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.controller.diagram.SelectionChangedEvent;
-import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.EventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -26,7 +26,7 @@ import java.util.Iterator;
  * which are distinguished by position (above vs. below the node) and default
  * display type (list vs. number).
  */
-abstract public class LabelView extends CanvasItem implements ChangeObserver, BrokerEventListener {
+abstract public class LabelView extends CanvasItem implements ChangeObserver, EventListener {
     /**
      * Used when the label should be drawn above the given point.
      *

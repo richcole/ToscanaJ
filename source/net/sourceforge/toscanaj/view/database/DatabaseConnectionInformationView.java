@@ -24,7 +24,7 @@ import java.awt.*;
 /**
  * @todo this should be a dialog since it will be rarely used
  */
-public class DatabaseConnectionInformationView extends JPanel implements BrokerEventListener {
+public class DatabaseConnectionInformationView extends JPanel implements EventListener {
     protected DatabaseInfo info;
 
     private DatabaseConnectEvent databaseConnectEvent;
