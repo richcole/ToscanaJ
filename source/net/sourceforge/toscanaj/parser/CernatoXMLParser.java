@@ -14,7 +14,7 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
+import org.jdom.input.DOMBuilder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,7 +29,7 @@ public class CernatoXMLParser {
         FileInputStream in;
         in = new FileInputStream(cernatoXMLFile);
 
-        SAXBuilder parser = new SAXBuilder();
+        DOMBuilder parser = new DOMBuilder();
         Document document = parser.build(in);
 
         Element rootElement = document.getRootElement();
