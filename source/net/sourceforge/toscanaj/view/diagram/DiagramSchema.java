@@ -301,6 +301,9 @@ public class DiagramSchema implements Comparable {
         return schema;
     }
 
+    /**
+     * @todo the default values are duplicated in the restore(ExtendedPreferences) method -- remove
+     */
     private static DiagramSchema getDefaultSchema() {
         DiagramSchema schema = new DiagramSchema();
         schema.name = "Default";
@@ -322,6 +325,7 @@ public class DiagramSchema implements Comparable {
         schema.gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
         schema.defaultLineWidth = 1;
         schema.selectionLineWidth = 3;
+        schema.nodeStrokeWidth = 1;
         schema.labelFont = new Font("SansSerif", Font.PLAIN, 10);
         schema.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_FIXED;
         schema.arrowStyles = new ArrowStyle[] {
