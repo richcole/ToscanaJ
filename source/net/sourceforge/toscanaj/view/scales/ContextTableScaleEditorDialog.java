@@ -9,13 +9,9 @@ package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
-import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
-import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.ContextImplementation;
-import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -23,15 +19,12 @@ import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import javax.swing.*;
 
-import org.jdom.Element;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -648,114 +641,12 @@ public class ContextTableScaleEditorDialog
 			getInput();
 		}
 	}
-
+	
 	protected void checkConsistency() {
-		List problems = new ArrayList();
-		DatabaseInfo dbinfo = this.conceptualSchema.getDatabaseInfo();
-		int sumCounts = 0;
-		List validClauses = new ArrayList();
-
-		// check if all objects are WHERE clauses
-		Iterator it = this.context.getObjects().iterator();
-		while (it.hasNext()) {
-			String clause = (String) it.next();
-			String query =
-				"SELECT count(*) FROM "
-					+ dbinfo.getTable().getSqlExpression()
-					+ " WHERE ("
-					+ clause
-					+ ");";
-			try {
-				sumCounts += this.databaseConnection.queryInt(query, 1);
-				validClauses.add(clause);
-			} catch (DatabaseException e) {
-				problems.add(
-					"Object '"
-						+ clause
-						+ "' is not a valid clause for the database.\n"
-						+ "The database returned:\n\t"
-						+ e.getCause().getMessage());
-			}
-		}
-
-		// check if all conjunctions are empty
-		if (problems.isEmpty()) {
-			it = this.context.getObjects().iterator();
-			while (it.hasNext()) {
-				String clause = (String) it.next();
-				validClauses.remove(clause);
-				Iterator it2 = validClauses.iterator();
-				while (it2.hasNext()) {
-					String otherClause = (String) it2.next();
-					String query =
-						"SELECT count(*) FROM "
-							+ dbinfo.getTable().getSqlExpression()
-							+ " WHERE ("
-							+ clause
-							+ ") AND ("
-							+ otherClause
-							+ ");";
-					try {
-						int count = this.databaseConnection.queryInt(query, 1);
-						if (count != 0) {
-							problems.add(
-								"Object clauses '"
-									+ clause
-									+ "' and '"
-									+ otherClause
-									+ "' overlap.");
-						}
-					} catch (DatabaseException e) {
-						// should not happen
-						ErrorDialog.showError(this,e,"Error querying the database");
-					}
-				}
-			}
-		}
-
-		// check if disjunction of all contingents covers the data set
-		if (problems.isEmpty()) {
-			// doesn't make sense if we have problems so far
-			String query =
-				"SELECT count(*) FROM " + dbinfo.getTable().getSqlExpression() + ";";
-			try {
-				int count = this.databaseConnection.queryInt(query, 1);
-				if (count != sumCounts) {
-					problems.add("Object clauses do not cover database.");
-				}
-			} catch (DatabaseException e) {
-				// should not happen
-				throw new RuntimeException("Failed to query the database.", e);
-			}
-		}
-
-		// give feedback
-		if (problems.isEmpty()) {
-			JOptionPane.showMessageDialog(
-				this,
-				"No problems found",
-				"Objects correct",
-				JOptionPane.INFORMATION_MESSAGE);
-		} else {
-			// show problems
-			Iterator strIt = problems.iterator();
-			Element problemDescription = new Element("description");
-			Element htmlElement = new Element("html");
-			htmlElement.addContent(
-				new Element("title").addContent("Consistency problems"));
-			problemDescription.addContent(htmlElement);
-			Element body = new Element("body");
-			htmlElement.addContent(body);
-			body.addContent(new Element("h1").addContent("Problems found:"));
-			while (strIt.hasNext()) {
-				String problem = (String) strIt.next();
-				body.addContent(new Element("pre").addContent(problem));
-			}
-			Frame frame = JOptionPane.getFrameForComponent(this);
-			DescriptionViewer.show(frame, problemDescription);
-		}
+		ContextConsistencyChecker.checkConsistency(this.conceptualSchema, this.context,
+													this.databaseConnection, this);
 	}
-
+	
 	public void processEvent(Event e) {
 		if (e instanceof ConceptualSchemaChangeEvent) {
 			ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;

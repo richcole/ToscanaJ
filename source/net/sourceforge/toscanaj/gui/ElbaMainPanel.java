@@ -1226,5 +1226,5 @@ public class ElbaMainPanel
             // reconnect to the old connection
             connectDatabase();
         }
-    }
+    }    
 }
