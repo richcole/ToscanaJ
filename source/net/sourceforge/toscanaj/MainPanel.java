@@ -739,8 +739,18 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
             {
                 this.lastImageExportFile = saveDialog.getSelectedFile();
                 if( this.diagramExportSettings.usesAutoMode() ) {
-                    this.diagramExportSettings.setGraphicFormat(
-                                     GraphicFormatRegistry.getTypeByExtension(saveDialog.getSelectedFile()));
+                    GraphicFormat format = GraphicFormatRegistry.getTypeByExtension(saveDialog.getSelectedFile());
+                    if(format != null) {
+                        this.diagramExportSettings.setGraphicFormat(format);
+                    }
+                    else {
+                        JOptionPane.showMessageDialog(this,
+                                            "Sorry, no type with this extension known.\n" +
+                                            "Please use either another extension or try\n" +
+                                            "manual settings.",
+                                            "Export failed",
+                                            JOptionPane.ERROR_MESSAGE);
+                    }
                 }
                 try {
                     this.diagramExportSettings.getGraphicFormat().getWriter().exportGraphic(
