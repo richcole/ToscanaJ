@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.controller.fca.tests;
 
+import java.sql.Types;
+
 import org.tockit.events.EventBroker;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
@@ -15,7 +17,9 @@ import net.sourceforge.toscanaj.controller.db.tests.MockDBConnection;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
@@ -104,6 +108,9 @@ public class DatabaseConnectedConceptInterpreterTest extends TestCase {
         throws DatabaseException {
         DatabaseConnection databaseConnection = new MockDBConnection();
         DatabaseInfo dbInfo = new DatabaseInfo();
+        Table testTable = new Table("testing");
+        dbInfo.setTable(testTable);
+        dbInfo.setKey(new Column("testing",Types.VARCHAR,testTable));
         DatabaseConnection.setConnection(databaseConnection);
         DatabaseConnectedConceptInterpreter interpreter = new DatabaseConnectedConceptInterpreter(dbInfo);
         return interpreter;
