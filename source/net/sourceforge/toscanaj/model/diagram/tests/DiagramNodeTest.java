@@ -39,7 +39,7 @@ public class DiagramNodeTest extends TestCase {
         Element xmlDesc = node.toXML();
 
         try {
-            DiagramNode other = new DiagramNode(xmlDesc);
+            DiagramNode other = new DiagramNode(new SimpleLineDiagram(), xmlDesc);
             assertEquals(node, other);
         } catch (XMLSyntaxError error) {
             fail(error.toString());

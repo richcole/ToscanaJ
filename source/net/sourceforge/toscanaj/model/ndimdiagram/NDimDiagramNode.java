@@ -39,8 +39,7 @@ public class NDimDiagramNode extends DiagramNode {
     }
     
     public NDimDiagramNode(NDimDiagram nDimDiagram, Element diagramNode) throws XMLSyntaxError {
-    	super(diagramNode);
-    	this.diagram = nDimDiagram;
+    	super(nDimDiagram, diagramNode);
     	Element ndimPosElem = diagramNode.getChild("ndimVector");
     	List coordElems = ndimPosElem.getChildren("coordinate");
         Iterator it = coordElems.iterator();

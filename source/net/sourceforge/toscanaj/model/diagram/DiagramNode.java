@@ -96,8 +96,9 @@ public class DiagramNode implements XMLizable {
         this.radiusY = radiusY;
     }
 
-    public DiagramNode(Element element) throws XMLSyntaxError {
+    public DiagramNode(WriteableDiagram2D diagram, Element element) throws XMLSyntaxError {
         readXML(element);
+        this.diagram = diagram;
     }
 
     public Element toXML() {

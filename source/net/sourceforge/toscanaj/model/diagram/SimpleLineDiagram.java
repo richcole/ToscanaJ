@@ -121,7 +121,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     }
 
     protected DiagramNode createNewDiagramNode(Element diagramNode) throws XMLSyntaxError {
-        return new DiagramNode(diagramNode);
+        return new DiagramNode(this, diagramNode);
     }
 
     /**
