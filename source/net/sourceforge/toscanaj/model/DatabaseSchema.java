@@ -55,10 +55,10 @@ public class DatabaseSchema implements BrokerEventListener {
             String tableName = (String)it.val();
             Table  table = new Table(broker, tableName); //@todo get key name
             STD_Iterator colIt = new STD_Iterator(
-                connection.getColumnNames(tableName)
+                connection.getColumns(tableName)
             );
             for(colIt.reset(); !colIt.atEnd(); colIt.next()) {
-                table.addColumn(new Column((String)colIt.val(), Types.INTEGER));
+                table.addColumn((Column) colIt.val());
             }
             addTable(table);
         }

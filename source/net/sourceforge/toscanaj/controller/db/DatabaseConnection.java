@@ -8,6 +8,7 @@ package net.sourceforge.toscanaj.controller.db;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.Column;
 import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
@@ -424,13 +425,45 @@ public class DatabaseConnection implements BrokerEventListener {
         return result;
     }
 
+    int translateSQLType(String sqlType) {
+        return Types.INTEGER;
+    };
+
     /**
-     * Returns a String vector containing the column names for the
-     * specified table.
+     * Returns a list of column objects.
      *
      * The parameter view can be either a table or a view.
      */
-    public Vector getColumnNames(String table) {
+    public Vector getColumns(String table) {
+        Vector result = new Vector();
+
+        try {
+            DatabaseMetaData dmd = jdbcConnection.getMetaData();
+            ResultSet rs = dmd.getColumns(null, null, table, null);
+            while (rs.next()) {
+                result.add(new Column(
+                        rs.getString(4),
+                        rs.getInt(5))
+                );
+            }
+        } catch (SQLException ex) {
+            System.err.println("\n--- SQLException caught ---\n");
+            while (ex != null) {
+                System.err.println("Message:   "
+                        + ex.getMessage());
+                System.err.println("SQLState:  "
+                        + ex.getSQLState());
+                System.err.println("ErrorCode: "
+                        + ex.getErrorCode());
+                ex = ex.getNextException();
+                System.err.println();
+            }
+        }
+
+        return result;
+    }
+
+    public Vector getColumns(String table, String column) {
         Vector result = new Vector();
 
         try {
@@ -544,10 +577,11 @@ public class DatabaseConnection implements BrokerEventListener {
         // print out each table
         for (int i = 0; i < tables.size(); i++) {
             System.out.println("========== " + tables.get(i) + " ==========");
-            Vector columns = test.getColumnNames((String) tables.get(i));
+            Vector columns = test.getColumns((String) tables.get(i));
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {
-                System.out.println("----- " + columns.get(j) + " -----");
+                Column column = (Column) columns.get(j);
+                System.out.println("----- " + column.getName() + " -----");
                 // and querying the contents
                 System.out.println(test.getColumn((String) columns.get(j),
                         (String) tables.get(i)));
@@ -563,12 +597,13 @@ public class DatabaseConnection implements BrokerEventListener {
         // print out each view
         for (int i = 0; i < views.size(); i++) {
             System.out.println("========== " + views.get(i) + " ==========");
-            Vector columns = test.getColumnNames((String) views.get(i));
+            Vector columns = test.getColumns((String) views.get(i));
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {
-                System.out.println("----- " + columns.get(j) + " -----");
+                Column column = (Column) columns.get(j);
+                System.out.println("----- " + column.getName() + " -----");
                 // and querying the contents
-                System.out.println(test.getColumn((String) columns.get(j),
+                System.out.println(test.getColumn(column.getName(),
                         (String) views.get(i)));
             }
         }

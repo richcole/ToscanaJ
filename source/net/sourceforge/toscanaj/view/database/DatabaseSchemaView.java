@@ -230,7 +230,7 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
         }
 
         public String toString() {
-            return column.getName();
+            return column.getName() + ":" + column.getType();
         }
 
         public Column getColumn() {
