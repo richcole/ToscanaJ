@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.parser;
 import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAObject;
 import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
 
 import java.io.*;
@@ -44,11 +45,12 @@ public class BurmeisterParser {
 
             // grab objects and attributes, store additional arrays to get indizes
             Collection objects = context.getObjects();
-            Object[] objectArray = new Object[numberOfObjects];
+            FCAObject[] objectArray = new FCAObject[numberOfObjects];
             for (int i = 0; i < numberOfObjects; i++) {
                 curLine = getNextNonEmptyLine(in);
-                objects.add(new FCAObjectImplementation(curLine));
-                objectArray[i] = curLine;
+                FCAObjectImplementation object = new FCAObjectImplementation(curLine);
+                objects.add(object);
+                objectArray[i] = object;
             }
             Collection attributes = context.getAttributes();
             Attribute[] attributeArray = new Attribute[numberOfAttributes];
