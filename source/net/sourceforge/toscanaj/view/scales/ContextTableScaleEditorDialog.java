@@ -93,7 +93,7 @@ public class ContextTableScaleEditorDialog
 		this.databaseConnection = databaseConnection;
 		this.contextTableScaleEditorDialog = this;
 		this.context = context;
-
+		
 		createView();
 
 		eventBroker.subscribe(

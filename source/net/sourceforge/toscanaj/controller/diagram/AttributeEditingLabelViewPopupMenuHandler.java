@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
+import net.sourceforge.toscanaj.view.scales.InputTextDialog;
 
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
@@ -68,8 +69,23 @@ public class AttributeEditingLabelViewPopupMenuHandler implements EventBrokerLis
 				attribute.setDescription(xmlEditorDialog.getContent());
 			}
 		});
+		
+		JMenuItem contextMenuItem = new JMenuItem("Rename attribute...");
+		final String currentValue =  attribute.getData().toString();
+		contextMenuItem.addActionListener(new ActionListener () {
+			public void actionPerformed(ActionEvent event) {
+				InputTextDialog dialog = new InputTextDialog(JOptionPane.getFrameForComponent(diagramView), 
+														     "Rename Attribute", "attribute", currentValue);
+				if (!dialog.isCancelled()) {
+					String newValue = dialog.getInput();
+					attribute.setData(newValue);
+					diagramView.repaint();
+				}
+			}
+		});
 		JPopupMenu popupMenu = new JPopupMenu();
 		popupMenu.add(menuItem);
+		popupMenu.add(contextMenuItem);
 		
 		List attributeViewNames = DatabaseViewerManager.getAttributeViewNames();
 		if (!attributeViewNames.isEmpty()) { 
