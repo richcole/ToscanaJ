@@ -84,33 +84,23 @@ public class DescriptionViewer
             Element elem = description.getChild("externalHTML");
             if(elem != null) {
                 String urlAttr = elem.getAttributeValue("url");
-                String fileAttr = elem.getAttributeValue("file");
                 if(urlAttr != null) {
                     HTMLDocument doc = (HTMLDocument) this.textArea.getDocument();
                     doc.setBase(baseURL);
-                    try {
-                        this.textArea.setPage(urlAttr);
-                    }
-                    catch (IOException e) {
-                        this.textArea.setText("Could not open url \"" + urlAttr +"\":" + e.getMessage());
-                    }
-                    return;
-                }
-                if(fileAttr != null) {
                     URL url;
                     try {
-                        url = new URL(baseURL, fileAttr);
+                        url = new URL(baseURL, urlAttr);
                         this.textArea.setPage(url);
                     }
                     catch (MalformedURLException e) {
-                        this.textArea.setText("Could not create url for file '" + fileAttr +"'");
+                        this.textArea.setText("Could not parse the url '" + urlAttr +"':" + e.getMessage());
                     }
                     catch (IOException e) {
-                        this.textArea.setText("Could not open file \"" + fileAttr +"\":" + e.getMessage());
+                        this.textArea.setText("Could not open url '" + urlAttr +"':" + e.getMessage());
                     }
                     return;
                 }
-                this.textArea.setText("Could neither find \"url\" nor \"file\" attribute on &lt;externalHTML&gt;");
+                this.textArea.setText("Could not find \"url\" attribute on &lt;externalHTML&gt;");
                 return;
             }
             elem = description.getChild("html");
