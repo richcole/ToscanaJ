@@ -11,10 +11,10 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Vector;
 
-public class DatabaseAggregateQuery extends DatabaseQuery {
+public class AggregateQuery extends Query {
     private DatabaseInfo info;
 
-    public DatabaseAggregateQuery(DatabaseInfo info, String name, String header) {
+    public AggregateQuery(DatabaseInfo info, String name, String header) {
         super(name, header);
         this.info = info;
     }
@@ -22,10 +22,10 @@ public class DatabaseAggregateQuery extends DatabaseQuery {
     public String getQueryHead() {
         // this gives an additional column replacing the key (used only in lists)
         String retValue = "SELECT count(*),";
-        Iterator it = columnList.iterator();
+        Iterator it = fieldList.iterator();
         while (it.hasNext()) {
-            Column col = (Column) it.next();
-            retValue += col.queryPart;
+            QueryField field = (QueryField) it.next();
+            retValue += field.getQueryPart();
             if (it.hasNext()) {
                 retValue += ", ";
             }

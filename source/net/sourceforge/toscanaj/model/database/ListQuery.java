@@ -11,10 +11,10 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Vector;
 
-public class DatabaseListQuery extends DatabaseQuery {
+public class ListQuery extends Query {
     private DatabaseInfo info;
 
-    public DatabaseListQuery(DatabaseInfo info, String name, String header) {
+    public ListQuery(DatabaseInfo info, String name, String header) {
         super(name, header);
         this.info = info;
     }
@@ -22,10 +22,10 @@ public class DatabaseListQuery extends DatabaseQuery {
     public String getQueryHead() {
         String retValue = "SELECT ";
         retValue += info.getKey() + ", ";
-        Iterator it = columnList.iterator();
+        Iterator it = fieldList.iterator();
         while (it.hasNext()) {
-            Column col = (Column) it.next();
-            retValue += col.queryPart;
+            QueryField field = (QueryField) it.next();
+            retValue += field.getQueryPart();
             if (it.hasNext()) {
                 retValue += ", ";
             }

@@ -10,8 +10,7 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
-import net.sourceforge.toscanaj.model.database.DatabaseQuery;
-import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
+import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -34,12 +33,12 @@ public class ObjectLabelView extends LabelView {
     /**
      * Sets the default query used for new labels.
      */
-    static private DatabaseQuery defaultQuery = null;
+    static private Query defaultQuery = null;
 
     /**
      * Stores the query we currently use.
      */
-    private DatabaseQuery query = null;
+    private Query query = null;
 
     private List queryResults = null;
 
@@ -76,7 +75,7 @@ public class ObjectLabelView extends LabelView {
     /**
      * Sets the default query for new labels.
      */
-    static public void setDefaultQuery(DatabaseQuery query) {
+    static public void setDefaultQuery(Query query) {
         ObjectLabelView.defaultQuery = query;
     }
 
@@ -89,7 +88,7 @@ public class ObjectLabelView extends LabelView {
 
     /**
      */
-    public void setQuery(DatabaseQuery query) {
+    public void setQuery(Query query) {
         this.query = query;
         doQuery();
         if (this.getNumberOfEntries() > DEFAULT_DISPLAY_LINES) {

@@ -21,6 +21,7 @@ import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseQuery;
+import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
@@ -467,7 +468,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
             String usedChars = "ax";
             int count = 0;
             while (it.hasNext()) {
-                final DatabaseQuery query = (DatabaseQuery) it.next();
+                final Query query = (Query) it.next();
                 count++;
                 String name = query.getName();
                 JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);

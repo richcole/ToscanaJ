@@ -67,19 +67,19 @@ public class DatabaseInfo implements XMLizable {
     /**
      * Creates a new Query that will query a list.
      */
-    public DatabaseQuery createListQuery(String name, String header, boolean isDistinct) {
+    public Query createListQuery(String name, String header, boolean isDistinct) {
         if (isDistinct) {
-            return new DatabaseDistinctListQuery(this, name, header);
+            return new DistinctListQuery(this, name, header);
         } else {
-            return new DatabaseListQuery(this, name, header);
+            return new ListQuery(this, name, header);
         }
     }
 
     /**
      * Creates a new Query that will query a single number as aggregate.
      */
-    public DatabaseQuery createAggregateQuery(String name, String header) {
-        return new DatabaseAggregateQuery(this, name, header);
+    public Query createAggregateQuery(String name, String header) {
+        return new AggregateQuery(this, name, header);
     }
 
     /**
