@@ -71,8 +71,8 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer
         try
         {
             List results = this.viewerManager.getConnection().executeQuery(fieldNames,
-                                                                         viewerManager.getDatabaseInfo().getTableName(), 
-                                                                         "WHERE " + viewerManager.getDatabaseInfo().getKey() + 
+                                                                         viewerManager.getTableName(), 
+                                                                         "WHERE " + viewerManager.getKeyName() + 
                                                                                     "='" + objectKey + "';");
             Vector fields = (Vector)results.get(0);
             Iterator itText = textFragments.iterator();

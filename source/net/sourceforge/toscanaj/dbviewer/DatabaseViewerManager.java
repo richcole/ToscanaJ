@@ -22,6 +22,8 @@ public class DatabaseViewerManager
     private static List viewerRegistry = new LinkedList();
     private DatabaseViewer viewer = null;
     private String screenName = null;
+    private String tableName = null;
+    private String keyName = null;
     private Element template = null;
     private Dictionary parameters = new Hashtable();
     private DatabaseInfo databaseInfo;
@@ -31,6 +33,8 @@ public class DatabaseViewerManager
     {
         screenName = viewerDefinition.getAttributeValue("name");
         template = viewerDefinition.getChild("template");
+        tableName = viewerDefinition.getChildText("table");
+        keyName = viewerDefinition.getChildText("key");
         List parameterElems = viewerDefinition.getChildren("parameter");
         Iterator it = parameterElems.iterator();
         while(it.hasNext())
@@ -106,9 +110,23 @@ public class DatabaseViewerManager
     {
         return this.parameters;
     }
-    public DatabaseInfo getDatabaseInfo()
+    public String getTableName()
     {
-        return this.databaseInfo;
+        if( this.tableName != null ) {
+            return this.tableName;
+        }
+        else {
+            return this.databaseInfo.getTableName();
+        }
+    }
+    public String getKeyName()
+    {
+        if( this.keyName != null ) {
+            return this.keyName;
+        }
+        else {
+            return this.databaseInfo.getKey();
+        }
     }
     public DBConnection getConnection()
     {
