@@ -862,6 +862,28 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         JMenuItem preferencesMenuItem = new JMenuItem("Preferences...");
         preferencesMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                if(!preferences.getBoolean("hidePreferencesWarning", false)) {
+                    Object[] options = {"Return",
+                                        "Change Preferences",
+                                        "Disable Warning"};
+                    int retVal = JOptionPane.showOptionDialog(parent,
+                        "Changing the preferences might affect the behaviour of the" +
+                        "program in unexpected ways.\n" +
+                        "You can restore the original" +
+                        "settings by running ToscanaJ with the \"-reset\" option.",
+                        "Entering preferences",
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.WARNING_MESSAGE,
+                        null,
+                        options,
+                        options[0]);
+                    if(retVal == 0) {
+                        return;
+                    }
+                    if(retVal == 2) {
+                        preferences.putBoolean("hidePreferencesWarning", true);
+                    }
+                }
                 boolean okClicked = ToscanaJPreferences.showPreferences(parent);
                 if(okClicked) {
                     setDiagramSchema(DiagramSchema.getDefaultSchema());
