@@ -1,0 +1,152 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Setting up Tockit in Eclipse</title>
+</head>
+<body>
+<h1>Setting up Eclipse to compile and run Tockit code</h1>
+This is written based on Eclipse 3.0. Other versions of Eclipse might
+differ slightly. Some bits are a bit tedious, but we haven't automoted
+it yet.<br>
+<h2>Getting the Sources</h2>
+<ul>
+  <li>Create a new Java project:</li>
+  <ul>
+    <li>call File-&gt;New-&gt;Project...</li>
+    <li>select "Java Project" on the first page of the wizard<br>
+    </li>
+    <li>set a name (e.g. "Tockit") on the second page, chose a
+different location if you wnant to, ignore the project layout settings</li>
+    <li>Finish the wizard and change perspective if asked</li>
+  </ul>
+  <li>Go to the CVS Repository Exploring Perspective:</li>
+  <ul>
+    <li>call Window-&gt;Open Perspective-&gt;Other...</li>
+    <li>select "CVS Repository Exploring" and click OK<br>
+    </li>
+  </ul>
+  <li>Connect to the CVS repository:</li>
+  <ul>
+    <li>above the tree view on the left hand side ("CVS Repositories")
+click on the "Add CVS Repository" button (yellow cylinder with plus
+symbol and "CVS" label)<br>
+    </li>
+  </ul>
+  <ul>
+    <li>enter the following values:</li>
+    <ul>
+      <li>Host: cvs.sf.net</li>
+      <li>Repository path: /cvsroot/tockit</li>
+      <li>User: anonymous</li>
+      <li>Password: <span style="font-style: italic;">&lt;empty&gt;</span></li>
+      <li>Connection type: pserver (with default port)</li>
+    </ul>
+  </ul>
+  <li>Checkout the "java" module from Tockit:</li>
+  <ul>
+    <li>open the treeview for the newly created repository</li>
+    <li>open the "HEAD" branch</li>
+    <li>locate the "java" module in there, open the context menu for
+this</li>
+    <li>select "Check Out As..." from the menu</li>
+    <li>select "Check out into an existing project" in the wizard</li>
+    <li>on the next page select your Tockit project, leave everything
+else as is</li>
+    <li>on the page asking for a tag select "HEAD" and click "Finish"<br>
+    </li>
+  </ul>
+</ul>
+<h2>Configuring the Project</h2>
+<ul>
+  <li>change back to the Java perspective (there should be a selection
+"Java" in the top right of Eclipse)</li>
+  <li>open the context menu of your Tockit project</li>
+  <li>select "Properties" from the menu</li>
+  <li>select "Java Build Path" from the list</li>
+  <li>go to the "Source" tab and remove the existing entry</li>
+  <ul>
+    <li>click "Add Folder..."</li>
+  </ul>
+  <ul>
+    <li>check every directory named "source" (most are all three levels
+down from the "java" folder, plugins are deeper), click Ok</li>
+  </ul>
+  <ul>
+    <li>select the "Browse..." button for the output folder</li>
+  </ul>
+  <ul>
+    <li>select your project dir</li>
+  </ul>
+  <ul>
+    <li>create a new folder called "bin" and click Ok</li>
+  </ul>
+  <li>change to the libraries tab</li>
+  <ul>
+    <li>click the "Add JARs..." button</li>
+    <li>select all Jars in the Tockit project (you can use Ctrl for
+multiple selection)</li>
+    <li>click Ok for the selection</li>
+  </ul>
+  <li>switch to the "Java Compiler" settings on the left</li>
+  <ul>
+    <li>apply the changes so far when asked</li>
+    <li>also click Yes on the question about removing the old generated
+resources</li>
+    <li>change the settings to "Use project settings"</li>
+    <li>go to the "Compliance and Classfiles" tab</li>
+    <li>set the "Compiler compliance level", the "Generated .class
+files compatibility" and the "Source compatibility" all to "1.4" (the
+first should be set, to change the latter you have to remove the
+checkbox "Use default compliance settings")</li>
+    <li>alternatively: make the changes in the workspace settings
+instead (do this if you do not plan to develop for any JRE/JDK below
+1.4 at all)<br>
+    </li>
+  </ul>
+  <li>click Ok for the properties dialog</li>
+  <>allow a rebuild and wait it to finish<br>
+  </>
+</ul>
+<h2>Running and Debugging the Applications</h2>
+Running and debugging share the configurations, but you need one per
+application. For each application do this:<br>
+<ul>
+  <li>call Run-&gt;Run...</li>
+  <li>select "Java Application" on the left</li>
+  <li>Click "New"</li>
+  <li>name the new configuration</li>
+  <li>make sure the right project is selected (otherwise hit "Browse.."
+and change)</li>
+  <li>click the "Search...." button for the main class</li>
+  <li>enter the name of the application, the corresponding main class
+should be found</li>
+  <li>click "Run" to test it (the configuration will be automatically
+saved)</li>
+</ul>
+To debug just call Run-&gt;Debug... on the same configuration<br>
+<h2>Creating Distributions<br>
+</h2>
+Distributions are created using Ant. An easy way to create a
+distribution of a library or application in Eclipse is this:<br>
+<ul>
+  <li>within the Java Perspective in the Package Explorer open the
+"java" folder below the list of JAR files (not the packages)</li>
+  <li>search for the folder containing the library or application</li>
+  <li>it should contain a file "build.xml" (at the time of writing
+Crepe still misses it)</li>
+  <li>call its context menu, from there Ant-&gt;Ant Build (the one
+without the dots)</li>
+  <li>note that there are some dependencies, e.g. to build "canvas" you
+need to build "events" and "swing" first.<br>
+  </li>
+  <li>that will create a new JAR file in "java/libraries/jar" for the
+libraries and a program distribution in a directory called "dist" below
+the application directory for the applications. Note that Eclipse might
+need an explicit refreshment in the Package Explorer to show the change
+("Refresh" from the context menu on the parent folder)<br>
+  </li>
+</ul>
+</body>
+</html>
