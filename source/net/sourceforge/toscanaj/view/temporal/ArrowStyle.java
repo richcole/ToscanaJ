@@ -19,7 +19,11 @@ import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 
 public class ArrowStyle implements XMLizable {
-    private Color color;
+    private static final double DEFAULT_ARROW_RELATIVE_LENGTH = 0.75;
+	private static final int DEFAULT_ARROW_HEADLENGTH = 20;
+	private static final int DEFAULT_ARROW_HEADWIDTH = 14;
+	private static final int DEFAULT_ARROW_WIDTH = 4;
+	private Color color;
     private BasicStroke stroke;
     private double headWidth;
     private double headLength;
@@ -45,6 +49,11 @@ public class ArrowStyle implements XMLizable {
 
     public ArrowStyle(Element element) throws XMLSyntaxError {
         readXML(element);
+    }
+    
+    public static ArrowStyle createDefaultArrowStyle(Color color){
+    	BasicStroke stroke = new BasicStroke(DEFAULT_ARROW_WIDTH, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+		return new ArrowStyle(color, stroke, DEFAULT_ARROW_HEADWIDTH, DEFAULT_ARROW_HEADLENGTH, DEFAULT_ARROW_RELATIVE_LENGTH); 
     }
 
     public Color getColor() {

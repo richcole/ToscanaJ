@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.gui.temporal;
 
 import java.awt.*;
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -82,16 +81,16 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	private static final Insets DEFAULT_FIELD_INSETS = new Insets(2,20,2,2);
 
     private ArrowStyle[] styles = new ArrowStyle[] {
-        new ArrowStyle(Color.RED, new BasicStroke(4), 14, 20, 0.75),
-        new ArrowStyle(Color.BLUE, new BasicStroke(4), 14, 20, 0.75),
-        new ArrowStyle(Color.GREEN, new BasicStroke(4), 14, 20, 0.75),
-        new ArrowStyle(Color.CYAN, new BasicStroke(4), 14, 20, 0.75),
-        new ArrowStyle(Color.GRAY, new BasicStroke(4), 14, 20, 0.75),
-        new ArrowStyle(Color.MAGENTA, new BasicStroke(4), 14, 20, 0.75),
-        new ArrowStyle(Color.ORANGE, new BasicStroke(4), 14, 20, 0.75),
-        new ArrowStyle(Color.PINK, new BasicStroke(4), 14, 20, 0.75),
-        new ArrowStyle(Color.BLACK, new BasicStroke(4), 14, 20, 0.75),
-        new ArrowStyle(Color.YELLOW, new BasicStroke(4), 14, 20, 0.75)
+        ArrowStyle.createDefaultArrowStyle(Color.RED),
+        ArrowStyle.createDefaultArrowStyle(Color.BLUE),
+        ArrowStyle.createDefaultArrowStyle(Color.GREEN),
+        ArrowStyle.createDefaultArrowStyle(Color.CYAN),
+        ArrowStyle.createDefaultArrowStyle(Color.GRAY),
+        ArrowStyle.createDefaultArrowStyle(Color.MAGENTA),
+        ArrowStyle.createDefaultArrowStyle(Color.ORANGE),
+        ArrowStyle.createDefaultArrowStyle(Color.PINK),
+        ArrowStyle.createDefaultArrowStyle(Color.BLACK),
+        ArrowStyle.createDefaultArrowStyle(Color.YELLOW)
     };
 
     private ManyValuedContext context;

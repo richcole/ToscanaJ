@@ -147,7 +147,7 @@ public class ArrowStyleChooser extends JComponent {
         int buttonHeight = 30;
         for (int i = 0; i < DASH_STYLES.length; i++) {
             float[] dashStyle = DASH_STYLES[i];
-            final StrokeButton button = new StrokeButton(new BasicStroke(5, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10, dashStyle, 0));
+            final StrokeButton button = new StrokeButton(new BasicStroke(5, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, dashStyle, 0));
             button.setPreferredSize(new Dimension(buttonWidth,buttonHeight));
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
