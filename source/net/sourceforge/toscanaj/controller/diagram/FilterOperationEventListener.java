@@ -46,12 +46,13 @@ public class FilterOperationEventListener implements EventBrokerListener {
         ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
         boolean oldDisplayMode = context.getObjectDisplayMode();
         context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
-        if(interpreter.getObjectCount(filterConcept, context) != 0) {
+        int extent = interpreter.getObjectCount(filterConcept, context);
+        context.setObjectDisplayMode(oldDisplayMode);
+        if(extent != 0) {
         	controller.next(filterConcept);
         } else {
         	Canvas canvas = nodeView.getDiagramView();
         	new CanvasFeedbackMessage("No objects would be left", canvas, itemEvent.getCanvasPosition());
         }
-        context.setObjectDisplayMode(oldDisplayMode);
     }
 }
