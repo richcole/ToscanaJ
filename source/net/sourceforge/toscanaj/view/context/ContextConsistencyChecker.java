@@ -42,7 +42,7 @@ public class ContextConsistencyChecker {
 		// check if all objects are WHERE clauses
 		Iterator it = context.getObjects().iterator();
 		while (it.hasNext()) {
-			String clause = (String) it.next();
+			String clause = it.next().toString();
 			String query =
 				"SELECT count(*) FROM "
 					+ dbinfo.getTable().getSqlExpression()
@@ -66,7 +66,7 @@ public class ContextConsistencyChecker {
 		if (problems.isEmpty()) {
 			it = context.getObjects().iterator();
 			while (it.hasNext()) {
-				String clause = (String) it.next();
+				String clause = it.next().toString();
 				validClauses.remove(clause);
 				Iterator it2 = validClauses.iterator();
 				while (it2.hasNext()) {

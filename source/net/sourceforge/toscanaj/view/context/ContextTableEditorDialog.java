@@ -651,33 +651,37 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 	}
 	
 	protected void checkConsistency() {
-		List problems = ContextConsistencyChecker.checkConsistency(this.conceptualSchema, this.context,
-													this.databaseConnection, this);
-		// give feedback
-		if (problems.isEmpty()) {
-			JOptionPane.showMessageDialog(
-				this,
-				"No problems found",
-				"Objects correct",
-				JOptionPane.INFORMATION_MESSAGE);
-		} else {
-			// show problems
-			Iterator strIt = problems.iterator();
-			Element problemDescription = new Element("description");
-			Element htmlElement = new Element("html");
-			htmlElement.addContent(
-				new Element("title").addContent("Consistency problems"));
-			problemDescription.addContent(htmlElement);
-			Element body = new Element("body");
-			htmlElement.addContent(body);
-			body.addContent(new Element("h1").addContent("Problems found:"));
-			while (strIt.hasNext()) {
-				String problem = (String) strIt.next();
-				body.addContent(new Element("pre").addContent(problem));
-			}
-			Frame frame = JOptionPane.getFrameForComponent(this);
-			DescriptionViewer.show(frame, problemDescription);
-		}												
+		try {
+			List problems = ContextConsistencyChecker.checkConsistency(this.conceptualSchema, this.context,
+														this.databaseConnection, this);
+			// give feedback
+			if (problems.isEmpty()) {
+				JOptionPane.showMessageDialog(
+					this,
+					"No problems found",
+					"Objects correct",
+					JOptionPane.INFORMATION_MESSAGE);
+			} else {
+				// show problems
+				Iterator strIt = problems.iterator();
+				Element problemDescription = new Element("description");
+				Element htmlElement = new Element("html");
+				htmlElement.addContent(
+					new Element("title").addContent("Consistency problems"));
+				problemDescription.addContent(htmlElement);
+				Element body = new Element("body");
+				htmlElement.addContent(body);
+				body.addContent(new Element("h1").addContent("Problems found:"));
+				while (strIt.hasNext()) {
+					String problem = (String) strIt.next();
+					body.addContent(new Element("pre").addContent(problem));
+				}
+				Frame frame = JOptionPane.getFrameForComponent(this);
+				DescriptionViewer.show(frame, problemDescription);
+			}												
+		} catch (Throwable t) {
+			ErrorDialog.showError(this, t, "Internal error");
+		}
 	}
 	
 	public void processEvent(Event e) {
