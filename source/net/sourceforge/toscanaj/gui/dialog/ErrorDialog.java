@@ -69,7 +69,7 @@ public class ErrorDialog extends JDialog{
 					GridBagConstraints.HORIZONTAL,
 					new Insets(5, 5, 0, 5),
 					0, 0));
-		this.getContentPane().add(createButtonsPanel(e, detailedPanel), new GridBagConstraints(
+		this.getContentPane().add(createButtonsPanel(detailedPanel), new GridBagConstraints(
 					0, 1, 1, 1,	1, 0,
 					GridBagConstraints.EAST,
 					GridBagConstraints.VERTICAL,
@@ -103,9 +103,8 @@ public class ErrorDialog extends JDialog{
 		return simpleErrorMsgPanel;
 	}
 
-	private JPanel createButtonsPanel(
-		final Throwable exception,final Component detailedPanel) {
-		final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+	private JPanel createButtonsPanel(final Component detailedPanel) {
+		JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		
 		JButton okButton = new JButton("OK");
 		okButton.setMnemonic(KeyEvent.VK_O);
