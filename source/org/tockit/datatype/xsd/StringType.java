@@ -21,7 +21,7 @@ import org.tockit.datatype.Value;
 
 
 public class StringType extends AbstractDatatype {
-    private StringType();
+    private StringType(){};
     
     public static StringType createUnrestrictedType() {
         return new StringType();
