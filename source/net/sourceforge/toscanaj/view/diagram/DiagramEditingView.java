@@ -67,6 +67,11 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
 
         diagramView = new DiagramView();
         final EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
+        canvasEventBroker.subscribe(
+                nodeMovementEventListener,
+                CanvasItemDraggedEvent.class,
+                NodeView.class
+        );
         movementChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JComboBox combobox = (JComboBox) e.getSource();
