@@ -44,6 +44,9 @@ public class ObjectAttributeListParser {
 
             String curLine = in.readLine();
             while(curLine != null) {
+            	if(curLine.indexOf(':') == -1) {
+                    throw new DataFormatException("Input file contains line without colon");
+            	}
                 // using the tokenizer allows for quotes and escapes
                 StringTokenizer tokenizer = new StringTokenizer(curLine,':','"','\\');
                 String objectText = tokenizer.nextToken();
@@ -57,7 +60,9 @@ public class ObjectAttributeListParser {
                     attributes.add(attribute);
                     relation.insert(object, attribute);
                 }
-            	curLine = in.readLine();
+            	do {
+                	curLine = in.readLine();
+            	} while(curLine != null && curLine.length() == 0);
             }
 
             return context;
