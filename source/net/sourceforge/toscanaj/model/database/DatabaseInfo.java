@@ -86,8 +86,6 @@ public class DatabaseInfo implements XMLizable {
 
     /**
      * Creates an empty instance.
-     *
-     * Type is set to TYPE_UNDEFINED, the strings are all null.
      */
     public DatabaseInfo() {
     }
@@ -147,30 +145,6 @@ public class DatabaseInfo implements XMLizable {
     }
 
     /**
-     * Returns the query string used for getting the objects.
-     *
-     * This should be always of the form "SELECT x FROM y" where x is the key
-     * and y the table used. The where clauses will be added at the end.
-     *
-     * @deprecated
-     */
-    public String getQuery() {
-        return "SELECT " + this.objectKey + " FROM " + this.table + " ";
-    }
-
-    /**
-     * Returns the query string used for counting the objects.
-     *
-     * This should be always of the form "SELECT count(*) FROM x" where x is the
-     * table used. The where clauses will be added at the end.
-     *
-     * @deprecated
-     */
-    public String getCountQuery() {
-        return "SELECT count(*) FROM " + this.table + " ";
-    }
-
-    /**
      * Sets the given URL as DB connecion point.
      */
     public void setUrl(String url) {
@@ -224,13 +198,22 @@ public class DatabaseInfo implements XMLizable {
     }
 
     public void setEmbeddedSQLLocation(String relativePath) {
-    	if(relativePath == null) {
-    		this.embeddedSQLLocation = null;
-    		this.embeddedSQLPath = null;
-    	} else {
-	        this.embeddedSQLLocation = resolveLocation(relativePath);
-	        this.embeddedSQLPath = relativePath;
-    	}
+        if(relativePath == null) {
+            this.embeddedSQLLocation = null;
+            this.embeddedSQLPath = null;
+        } else {
+            this.embeddedSQLLocation = resolveLocation(relativePath);
+            this.embeddedSQLPath = relativePath;
+        }
+    }
+
+    public void setEmbeddedSQLLocation(URL url) {
+        this.embeddedSQLLocation = url;
+        if(url == null) {
+        	this.embeddedSQLPath = null;
+        } else {
+        	this.embeddedSQLPath = url.getPath();
+        }
     }
 
     private URL resolveLocation(String relativePath) {

@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.parser;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
@@ -154,11 +153,7 @@ public class CSXParser {
         }
         DatabaseInfo dbInfo = new DatabaseInfo();
         parseDBInfo(dbInfo, dbElem);
-        try {
-            _Schema.setDatabaseInfo(dbInfo);
-        } catch (DatabaseException e) {
-            throw new DataFormatException("Could not open database.", e);
-        }
+        _Schema.setDatabaseInfo(dbInfo);
         Element viewsElem = dbElem.getChild("views");
         if (viewsElem != null) {
             parseDatabaseObjectViewerSetups(viewsElem);

@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.model;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.database.*;
@@ -210,7 +209,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     /**
      * Sets the database information for the schema.
      */
-    public void setDatabaseInfo(DatabaseInfo databaseInfo) throws DatabaseException {
+    public void setDatabaseInfo(DatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
         eventBroker.processEvent(new DatabaseInfoChangedEvent(this, this, databaseInfo));
     }

@@ -133,7 +133,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         mainView.setDividerLocation(ConfigurationManager.fetchInt("ElbaMainPanel", "mainPanelDivider", 200));
 
         connectionInformationView =
-                new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);
+                new DatabaseConnectionInformationView(this, conceptualSchema, eventBroker);
 
         schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
 
@@ -374,6 +374,14 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             File schemaFile = loadEvent.getFile();
             addFileToMRUList(schemaFile);
             schemaDescriptionView.setContent(conceptualSchema.getDescription());
+            if(conceptualSchema.getDatabaseInfo() == null) {
+            	DatabaseInfo info = new DatabaseInfo();
+            	conceptualSchema.setDatabaseInfo(info);
+            }
+        }
+        if (e instanceof NewConceptualSchemaEvent) {
+            DatabaseInfo info = new DatabaseInfo();
+            conceptualSchema.setDatabaseInfo(info);
         }
         if (e instanceof DatabaseInfoChangedEvent || e instanceof NewConceptualSchemaEvent ||
             e instanceof ConceptualSchemaLoadedEvent) {
@@ -387,7 +395,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 }
             }
             DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
-            if (databaseInformation != null && databaseInformation.getDriverClass() != null && 
+            if( databaseInformation != null &&
+            	databaseInformation.getDriverClass() != null && 
                 databaseInformation.getURL() != null) {
                 try {
                     databaseConnection.connect(databaseInformation);

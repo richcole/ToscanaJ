@@ -8,13 +8,13 @@
 package net.sourceforge.toscanaj.view.database;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
-import net.sourceforge.toscanaj.gui.activity.EmitEventActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
+import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
+
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -28,6 +28,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class DatabaseConnectionInformationView
 	extends JDialog
@@ -51,9 +53,7 @@ public class DatabaseConnectionInformationView
 	private static final int MINIMUM_WIDTH = 400;
 	private static final int MINIMUM_HEIGHT = 500;
 	
-	protected DatabaseInfo info;
-
-	private DatabaseConnectEvent databaseConnectEvent;
+	protected ConceptualSchema conceptualSchema;
 
 	private File openedDatabaseFile = null;
 
@@ -77,10 +77,10 @@ public class DatabaseConnectionInformationView
 	private JRadioButton jdbcRadioButton;
 	private JRadioButton accessRadioButton;
 	private JRadioButton odbcRadioButton;
-
+	
 	class SaveControlActivity implements SimpleActivity {
 		public boolean doActivity() throws Exception {
-			copyFromControls(info);
+			copyFromControls();
 			return true;
 		}
 	}
@@ -89,17 +89,14 @@ public class DatabaseConnectionInformationView
 	 * Construct an instance of this view
 	 */
 	public DatabaseConnectionInformationView(
-		JFrame frame,
-		DatabaseInfo databaseInfo,
-		EventBroker eventBroker) {
+											JFrame frame,
+											ConceptualSchema conceptualSchema,
+											final EventBroker eventBroker) {
 		super(frame, "Database connection");
+		this.conceptualSchema = conceptualSchema;
+		
 		Container contentPane = this.getContentPane();
 		contentPane.setLayout(new GridBagLayout());
-		if (databaseInfo != null) {
-			this.info = databaseInfo;
-		} else {
-			this.info = new DatabaseInfo();
-		}
 		
 		addComponentListener( new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
@@ -123,10 +120,8 @@ public class DatabaseConnectionInformationView
 			"Database Connections");
 		tabbedPane.addTab("Tables", null, tableView, "Tables View");
 		JButton connectButton = new JButton();
-		databaseConnectEvent = new DatabaseConnectEvent(this, this.info);
 		SimpleAction action = new SimpleAction(frame, "Connect");
 		action.add(new SaveControlActivity());
-		action.add(new EmitEventActivity(eventBroker, databaseConnectEvent));
 		action.add(new SimpleActivity() {
 			public boolean doActivity() throws Exception {
 				hide();
@@ -566,6 +561,7 @@ public class DatabaseConnectionInformationView
 	}
 
 	public boolean areControlsChanged() {
+		DatabaseInfo info = conceptualSchema.getDatabaseInfo();
 		if (activePanel.equals(JDBC_ID_STRING)) {
 			if (!jdbcUrlField.getText().equals(info.getURL())) {
 				return true;
@@ -645,13 +641,14 @@ public class DatabaseConnectionInformationView
 		return false;
 	}
 
-	public void copyFromControls(DatabaseInfo info) {
+	public void copyFromControls() throws MalformedURLException {
+		DatabaseInfo info = new DatabaseInfo();
 		if (activePanel.equals(JDBC_ID_STRING)) {
 			info.setUrl(jdbcUrlField.getText());
 			info.setUserName(jdbcUserField.getText());
 			info.setPassword(jdbcPasswordField.getText());
 			info.setDriverClass(jdbcDriverField.getText());
-			info.setEmbeddedSQLLocation(null);
+			info.setEmbeddedSQLLocation((String) null);
 		} 
 
 		else if (activePanel.equals(EMBEDDED_DBMS_ID_STRING)) {
@@ -660,7 +657,7 @@ public class DatabaseConnectionInformationView
 			info.setUserName(embedInfo.getUserName());
 			info.setPassword(embedInfo.getPassword());
 			info.setDriverClass(embedInfo.getDriverClass());
-			info.setEmbeddedSQLLocation(sqlScriptLocationField.getText());
+            info.setEmbeddedSQLLocation(new URL("file:\\" + sqlScriptLocationField.getText()));
 		} 
 
 		else if (activePanel.equals(ACCESS_FILE_ID_STRING)) {
@@ -668,7 +665,7 @@ public class DatabaseConnectionInformationView
 			info.setUrl(createAccessFileURL(accessUrlField.getText()));
 			info.setUserName(accessUserField.getText());
 			info.setPassword(accessPasswordField.getText());
-			info.setEmbeddedSQLLocation(null);
+			info.setEmbeddedSQLLocation((String) null);
 		} 
 
 		else if (activePanel.equals(ODBC_ID_STRING)) {
@@ -676,11 +673,17 @@ public class DatabaseConnectionInformationView
 			info.setUrl(ODBC_PREFIX + odbcDataSourceNameField.getText());
 			info.setUserName(odbcUserField.getText());
 			info.setPassword(odbcPasswordField.getText());
-			info.setEmbeddedSQLLocation(null);
+			info.setEmbeddedSQLLocation((String) null);
 		}
+		this.conceptualSchema.setDatabaseInfo(info);
 	}
 
 	public void copyToControls(DatabaseInfo info) {
+		if( info == null || info.getURL() == null ) {
+		    this.sqlScriptLocationField.setText("");
+		    raisePanel(EMBEDDED_DBMS_ID_STRING);
+		    return;
+		}
 		if(info.getURL().equals(DatabaseInfo.getEmbeddedDatabaseInfo().getURL())) {
 			copyEmbeddedDataToControls(info);
 			this.embDBMSRadioButton.setSelected(true);
@@ -705,12 +708,10 @@ public class DatabaseConnectionInformationView
 	}
 
 	private void copyJDBCDataToControls(DatabaseInfo info) {
-		
 		this.jdbcUrlField.setText(info.getURL());
 		this.jdbcDriverField.setText(info.getDriverClass());
 		this.jdbcUserField.setText(info.getUserName());
 		this.jdbcPasswordField.setText(info.getPassword());
-		
 	}
 
 	private void copyAccessDataToControls(DatabaseInfo info) {
@@ -724,7 +725,6 @@ public class DatabaseConnectionInformationView
 		this.odbcDataSourceNameField.setText(info.getURL().substring(start));
 		this.odbcPasswordField.setText(info.getPassword());
 		this.odbcUserField.setText(info.getUserName());
-		
 	}
 
 	private void copyEmbeddedDataToControls(DatabaseInfo info) {
@@ -732,17 +732,12 @@ public class DatabaseConnectionInformationView
 	}
 
 	public void processEvent(Event event) {
-		ConceptualSchemaChangeEvent changeEvent =
-			(ConceptualSchemaChangeEvent) event;
-		        copyToControls(changeEvent.getConceptualSchema().getDatabaseInfo());
-		databaseConnectEvent.setInfo(
-			changeEvent.getConceptualSchema().getDatabaseInfo());
+		ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
+        ConceptualSchema conceptualSchema = changeEvent.getConceptualSchema();
+        DatabaseInfo databaseInfo = conceptualSchema.getDatabaseInfo();
+        copyToControls(databaseInfo);
 	}
 	
-	    public void setInfo(DatabaseInfo info) {
-	        copyToControls(info);
-	    }
-
 	public void hide() {
 		super.hide();
 		ConfigurationManager.storePlacement(
