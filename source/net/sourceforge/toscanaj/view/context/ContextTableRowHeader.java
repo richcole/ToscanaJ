@@ -32,6 +32,7 @@ import javax.swing.ToolTipManager;
 
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.model.context.FCAObject;
+import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAObject;
 
 public class ContextTableRowHeader extends JComponent implements Scrollable {
@@ -232,12 +233,8 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 	}
 	
 	protected boolean addObject(String newObjectName){
-		if (!collectionContainsString(newObjectName, this.objects)) {
-			this.dialog.getContext().getObjects().add(newObjectName);
-			return true;
-		} else {
-			return false;
-		}
+		WritableFCAObject object = new FCAObjectImplementation(newObjectName);
+		return	this.dialog.getContext().getObjects().add(object);
 	}
 	
 	private void renameObject(int num) {

@@ -8,6 +8,8 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
+import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAObject;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
@@ -67,7 +69,8 @@ public class ObjectEditingLabelViewPopupMenuHandler implements EventBrokerListen
 				if (!dialog.isCancelled()) {
 					String newValue = dialog.getInput();
 					ConceptImplementation concept = (ConceptImplementation) labelView.getNodeView().getDiagramNode().getConcept();
-					concept.replaceObject(object, newValue);
+					WritableFCAObject newObject = new FCAObjectImplementation(newValue);
+					concept.replaceObject(object, newObject);
 					labelView.updateEntries();
 				}
 			}

@@ -15,6 +15,7 @@ import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAObject;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -29,7 +30,6 @@ import org.tockit.events.EventBrokerListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -607,12 +607,12 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		int objectPos,
 		int attributePos) {
 			
-		// @todo the next two lines are hacks to get around
-		// Set vs List problem in Concept interface. Need to fix interface.
-		List objectList = new LinkedList((Set) this.context.getObjects());
-		List attributeList = new LinkedList ((Set) this.context.getAttributes());
-		Object object = objectList.get(objectPos);
-		Attribute attribute = (Attribute) attributeList.get(attributePos);
+		Set objectsSet = this.context.getObjects();
+		WritableFCAObject[] objects = (WritableFCAObject[]) objectsSet.toArray(new WritableFCAObject[objectsSet.size()]);
+		Set attributesSet = this.context.getAttributes();
+		Attribute[] attributes = (Attribute[]) attributesSet.toArray(new Attribute[attributesSet.size()]);
+		WritableFCAObject object = objects[objectPos];
+		Attribute attribute = attributes[attributePos];
 		if (context.getRelationImplementation().contains(object, attribute)) {
 			context.getRelationImplementation().remove(object, attribute);
 		} else {

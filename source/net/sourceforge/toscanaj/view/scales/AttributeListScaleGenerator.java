@@ -7,6 +7,8 @@ import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAObject;
 
 import java.awt.Frame;
 import java.util.ArrayList;
@@ -59,26 +61,28 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 		
 		boolean useAllCombi = scaleDialog.getUseAllCombinations();
 				for (int i = 0; i < Math.pow(2,dimensions); i++) {
-			String object = "";
+			String objectData = "";
 			List relatedAttributes = new ArrayList();
 			for(int j = 0; j < dimensions; j++) {
 				if( j != 0 ) {
-					object += " AND ";
+					objectData += " AND ";
 				}
 				if( (i & (1 << j)) == 0 ) {
-					object += " NOT ";
+					objectData += " NOT ";
 				} else {
 					relatedAttributes.add(attributes[j]);
 				}
-				object += "(" + tableData[j][1] + ")";
+				objectData += "(" + tableData[j][1] + ")";
 			}
+
+		WritableFCAObject object = new FCAObjectImplementation(objectData);
 
 		if(useAllCombi){
 			context.getObjects().add(object);
 			Iterator it = relatedAttributes.iterator();
 			while (it.hasNext()) {
 				Attribute attrib = (Attribute) it.next();
-				relation.insert(object, attrib);
+				relation.insert(objectData, attrib);
 			}
 		}else{
 			try{
@@ -87,7 +91,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 					"SELECT count (*) FROM "
 						+ scheme.getDatabaseInfo().getTable().getSqlExpression()
 						+ " WHERE ( "
-						+ object
+						+ objectData
 						+ " );",
 					1);
 				if( result != 0 ){
@@ -95,7 +99,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 					Iterator it = relatedAttributes.iterator();
 					while (it.hasNext()) {
 						Attribute attrib = (Attribute) it.next();
-						relation.insert(object, attrib);
+						relation.insert(objectData, attrib);
 					}
 				}	
 			}catch(DatabaseException e) {
