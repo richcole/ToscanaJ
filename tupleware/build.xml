@@ -19,11 +19,6 @@
     <property name="tupleware.class" value="org.tockit.tupleware.Tupleware"/>
 	<property name="plugins.dir" value="plugins"/>
 
-  	<!-- IMPORTANT! We assume the source and libs of ToscanaJ in these spots. -->
-  	<!-- BIG TODO: move all resued code into Tockit -->
-  	<property name="toscanaj.classes" value="${libs.dir}/ToscanaJ.jar"/>
-
-
     <path id="project.dev.class.path">
         <pathelement path="${classpath}"/>
         <pathelement path="${build.dev.dir}"/>
@@ -116,7 +111,6 @@
 			<property name="mainApp.classes" value="../${build.release.dir}"/>
 			<property name="mainApp.dist.dir" value="../${dist.base.dir}"/>
 			<property name="pluginArchitecture.classes" value="../${libs.dir}/pluginArchitecture.jar"/>			
-			<property name="toscanaj.classes" value="../${toscanaj.classes}"/>			
 		</ant>
 	</target>
 
@@ -126,7 +120,6 @@
 			<property name="mainApp.classes" value="../${build.dev.dir}"/>
 			<property name="mainApp.dist.dir" value="../${dist.base.dir}"/>
 			<property name="pluginArchitecture.classes" value="../${libs.dir}/pluginArchitecture.jar"/>
-			<property name="toscanaj.classes" value="../${toscanaj.classes}"/>
 		</ant>
 	</target>
 	

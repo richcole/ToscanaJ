@@ -34,13 +34,13 @@
 	<!-- where to find compiled classes from the main application -->
 	<property name="mainApp.classes" value="../../build/dev"/>
 
-	<!-- where to find plugins architecture classes (in it is not 
+	<!-- where to find libs used by main App. We may use the same 
+		libraries, for example: canvas or events. -->
+	<property name="mainApp.libs.dir" value="../../libs"/>
+
+	<!-- where to find plugins architecture classes (if it is not 
 		included in mainApp.classes path) -->
 	<property name="pluginArchitecture.classes" value="../../libs/pluginArchitecture.jar"/>
-
-	<!-- where to find code that we use in ToscanaJ -->
-	<!-- TODO: once all reused code is moved into tockit - change this -->
-	<property name="toscanaj.classes" value="../../libs/ToscanaJ.jar"/>
 
 	<!-- Shouldn't need to change anything from now on -->
 	
@@ -56,7 +56,12 @@
         <pathelement path="${plugin.build.dir}"/>
         <pathelement path="${mainApp.classes}"/>
         <pathelement path="${pluginArchitecture.classes}"/>
-        <pathelement path="${toscanaj.classes}"/>
+        <fileset dir="${mainApp.libs.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${mainApp.libs.dir}">
+            <include name="**/*.zip"/>
+        </fileset>
         <fileset dir="${plugin.libs.dir}">
             <include name="**/*.jar"/>
         </fileset>
