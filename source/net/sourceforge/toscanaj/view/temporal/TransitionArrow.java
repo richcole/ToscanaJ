@@ -64,7 +64,9 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
    
     protected DiagramNode startNode;
     protected DiagramNode endNode;
-    protected Rectangle2D bounds;
+    protected Rectangle2D bounds = new Rectangle2D.Double();
+    protected Point2D startPoint = new Point2D.Double();
+    protected Point2D endPoint = new Point2D.Double();
     protected Point2D shiftVector = new Point2D.Double();
     protected Point2D manualOffset = new Point2D.Double();
     protected double timePos;
@@ -92,13 +94,14 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     		return;
     	}
 
-        double startX = getStartX();
-        double startY = getStartY();
-        double endX = getEndX();
-        double endY = getEndY();
+    	calculateBounds();
+    	
+        double startX = this.startPoint.getX();
+        double startY = this.startPoint.getY();
+        double endX = this.endPoint.getX();
+        double endY = this.endPoint.getY();
 
-        float length = (float) Math.sqrt((startX - endX) * (startX - endX) +
-                                          (startY - endY) * (startY - endY));
+        float length = (float) this.startPoint.distance(this.endPoint);
 
         Paint paint = calculatePaint(length, this.style.getColor());
         if(paint == null) { // nothing to draw
@@ -115,8 +118,8 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
         
 		AffineTransform shapeTransform = new AffineTransform();        
 		shapeTransform.translate(this.manualOffset.getX(), this.manualOffset.getY());
-		shapeTransform.translate(startX, startY);
-		shapeTransform.rotate(Math.atan2(startY - endY, startX - endX));
+		shapeTransform.translate(endX, endY);
+		shapeTransform.rotate(Math.atan2(endY - startY, endX - startX));
 		this.currentShape = shapeTransform.createTransformedShape(arrow);
 
         g.setPaint(paint);
@@ -192,27 +195,45 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     }
 
     protected void calculateBounds() {
-        double x1 = getStartX();
-        double y1 = getStartY();
-        double x2 = getEndX();
-        double y2 = getEndY();
+        double startX = this.startNode.getPosition().getX() + this.shiftVector.getX();
+		double startY = this.startNode.getPosition().getY() + this.shiftVector.getY();
+		double endX = this.endNode.getPosition().getX() + this.shiftVector.getX();
+		double endY = this.endNode.getPosition().getY() + this.shiftVector.getY();
+		
+		double dx = endX-startX;
+		double dy = endY-startY;
+		
+		if(dx == 0) {
+			startY += this.startNode.getRadiusY() * Math.signum(dy);
+			endY -= this.endNode.getRadiusY() * Math.signum(dy);
+		} else {
+			double angle = Math.atan2(dy,dx);
+			startX += this.startNode.getRadiusX() * Math.cos(angle);
+			startY += this.startNode.getRadiusY() * Math.sin(angle);
+			endX -= this.endNode.getRadiusX() * Math.cos(angle);
+			endY -= this.endNode.getRadiusY() * Math.sin(angle);
+		}
         
+        this.startPoint.setLocation(startX, startY);
+        this.endPoint.setLocation(endX, endY);
+		
         double x,y,width,height;
-        if(x2 > x1) {
-            x = x1;
-            width = x2 - x1;
+        if(endX > startX) {
+            x = startX;
+            width = endX - startX;
         } else {
-            x = x2;
-            width = x1 - x2;
+            x = endX;
+            width = startX - endX;
         }
-        if(y2 > y1) {
-            y = y1;
-            height = y2 - y1;
+        if(endY > startY) {
+            y = startY;
+            height = endY - startY;
         } else {
-            y = y2;
-            height = y1 - y2;
+            y = endY;
+            height = startY - endY;
         }
-        this.bounds = new Rectangle2D.Double(x + this.manualOffset.getX(),y + this.manualOffset.getY(),width,height);
+        
+        this.bounds.setFrame(x + this.manualOffset.getX(),y + this.manualOffset.getY(),width,height);
     }
 
     private void updateShiftVector() {
@@ -223,37 +244,6 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
         double shiftDist = 10.0;
         double factor = shiftDist / Math.sqrt(xDiff * xDiff + yDiff * yDiff);
         this.shiftVector = new Point2D.Double(yDiff * factor, -xDiff * factor);
-    }
-
-    /**
-     * @todo start and end positions should consider node radius
-     */
-    protected double getStartX() {
-        double x = this.startNode.getPosition().getX();
-        return x + 
-               this.style.getRelativeLength() * (this.endNode.getPosition().getX() - x) + 
-               this.shiftVector.getX();
-    }
-
-    protected double getStartY() {
-        double y = this.startNode.getPosition().getY();
-        return y + 
-               this.style.getRelativeLength() * (this.endNode.getPosition().getY() - y) +
-               this.shiftVector.getY();
-    }
-
-    protected double getEndX() {
-        double x = this.endNode.getPosition().getX();
-        return x + 
-               this.style.getRelativeLength() * (this.startNode.getPosition().getX() - x) +
-               this.shiftVector.getX();
-    }
-
-    protected double getEndY() {
-        double y = this.endNode.getPosition().getY();
-        return y + 
-               this.style.getRelativeLength() * (this.startNode.getPosition().getY() - y) +
-               this.shiftVector.getY();
     }
 
     public void setPosition(Point2D newPosition) {

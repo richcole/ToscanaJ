@@ -26,6 +26,8 @@ Specific for Elba:
 
 Specific for Siena (still not fully complete):
 ==============================================
+- transition arrows now have more sensible lengths
+- better placement of state markers for temporal animations
 
 Other new experimental features:
 ================================

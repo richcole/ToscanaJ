@@ -36,7 +36,9 @@ public class StateRing extends CanvasItem implements XMLizable {
         SimpleLineDiagram.registerExtraCanvasItemFactory("stateRing", new Factory());
     }
    
-    private DiagramNode node;
+	private static final double EXTRA_RADIUS = 2;
+
+	private DiagramNode node;
 	private Color baseColor;
     private double timePos;
     private AnimationTimeController timeController;
@@ -97,9 +99,9 @@ public class StateRing extends CanvasItem implements XMLizable {
         Point2D center = this.node.getPosition();
         double x = center.getX();
         double y = center.getY();
-        double rx = node.getRadiusX();
-        double ry = node.getRadiusY();
-        return new Rectangle2D.Double(x - rx, y - ry, 2 * rx + 3, 2 * ry + 3);
+        double rx = node.getRadiusX() + EXTRA_RADIUS;
+        double ry = node.getRadiusY() + EXTRA_RADIUS;
+        return new Rectangle2D.Double(x - rx, y - ry, 2 * rx, 2 * ry);
     }
 
     public Element toXML() {

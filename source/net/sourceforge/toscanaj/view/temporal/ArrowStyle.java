@@ -21,17 +21,15 @@ public class ArrowStyle {
     private BasicStroke stroke = new BasicStroke(4, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
     private double headWidth = 14;
     private double headLength = 20;
-    private double relativeLength = 0.75;
     private float borderWidth = 0.2f;
     
     public ArrowStyle(Color color, BasicStroke stroke, 
                       double headWidth, double headLength,
-                      double relativeLength, float borderWidth) {
+                      float borderWidth) {
         this.color = color;
         this.stroke = stroke;
         this.headWidth = headWidth;
         this.headLength = headLength;
-        this.relativeLength = relativeLength;
         this.borderWidth = borderWidth;
     }
     
@@ -44,7 +42,6 @@ public class ArrowStyle {
         this.stroke = style.stroke;
         this.headWidth = style.headWidth;
         this.headLength = style.headLength;
-        this.relativeLength = style.relativeLength;
         this.borderWidth = style.borderWidth;
     }
 
@@ -53,7 +50,6 @@ public class ArrowStyle {
         this.setStroke(style.getStroke());
         this.setHeadLength(style.getHeadLength());
         this.setHeadWidth(style.getHeadWidth());
-        this.setRelativeLength(style.relativeLength);
         this.setBorderWidth(style.borderWidth);
     }
     
@@ -70,7 +66,6 @@ public class ArrowStyle {
         this.stroke = new BasicStroke(lineWidth, endCap, lineJoin, miterLimit, dashArray, dashPhase);
         this.headWidth = prefs.getDouble("headWidth", this.headWidth);
         this.headLength = prefs.getDouble("headLength", this.headLength);
-        this.relativeLength = prefs.getDouble("relativeLength", this.relativeLength);
         this.borderWidth = prefs.getFloat("borderWidth", this.borderWidth);
     }
     
@@ -90,10 +85,6 @@ public class ArrowStyle {
         return this.stroke;
     }
     
-    public double getRelativeLength() {
-        return this.relativeLength;
-    }
-    
     public void setColor(Color color) {
         this.color = color;
     }
@@ -104,10 +95,6 @@ public class ArrowStyle {
 
     public void setHeadWidth(double headWidth) {
         this.headWidth = headWidth;
-    }
-
-    public void setRelativeLength(double relativeLength) {
-        this.relativeLength = relativeLength;
     }
 
     public void setStroke(BasicStroke stroke) {
@@ -160,7 +147,6 @@ public class ArrowStyle {
         prefs.putFloat("stroke-dashPhase", this.stroke.getDashPhase());
         prefs.putDouble("headWidth", this.headWidth);
         prefs.putDouble("headLength", this.headLength);
-        prefs.putDouble("relativeLength", this.relativeLength);
         prefs.putFloat("borderWidth", this.borderWidth);
     }
 }
