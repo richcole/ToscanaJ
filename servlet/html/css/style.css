@@ -1,0 +1,53 @@
+h1 {
+	FONT-SIZE: small;
+	font-family: verdana, arial;
+	font-weight: bolder;
+	text-align: left;
+	TEXT-DECORATION: NONE 
+}
+h2 {
+	FONT-SIZE: small;
+	font-family: verdana, arial;
+	font-weight: bolder;
+	text-align: left;
+	TEXT-DECORATION: NONE 
+}
+body {
+	FONT-SIZE: x-small;
+	font-family: verdana, arial;
+	font-weight: bolder;
+	text-align: left;
+	TEXT-DECORATION: NONE 
+}
+a.one:active 
+{ 
+	FONT-SIZE: xx-small;
+	font-family: verdana, arial;
+	font-weight: bolder;
+	color: blue;
+	TEXT-DECORATION: NONE 
+}
+a.one:link 
+{ 
+	FONT-SIZE: xx-small;
+	font-family: verdana, arial;
+	font-weight: bolder;
+	color: blue;
+	TEXT-DECORATION: NONE 
+}
+a.one:visited 
+{ 
+	FONT-SIZE: xx-small;
+	font-family: verdana, arial;
+	font-weight: bolder;
+	color: blue;
+	TEXT-DECORATION: NONE 
+}
+a.one:hover 
+{ 
+	FONT-SIZE: xx-small;
+	font-family: verdana, arial;
+	font-weight: bolder;
+	COLOR: "BLUE"; 
+	TEXT-DECORATION: UNDERLINE 
+}

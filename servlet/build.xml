@@ -7,6 +7,7 @@
 	<property name="toscanajBuild.dir" value="build/dev"/>
 	<property name="servletBuild.dir" value="servlet/build/dev"/>
 	<property name="inputData.dir" value="examples/sql/pctest"/>
+	<property name="html.dir" value="servlet/html"/>
 
 	<path id="project.libs.class.path">
 		<fileset dir="${libs.dir}">
@@ -35,6 +36,9 @@
 		<war warfile="ToscanaJServlet.war" webxml="servlet/web.xml">
 			<fileset dir="${servletBuild.dir}">
 				<include name="data/**"/>
+			</fileset>
+			<fileset dir="${html.dir}">
+				<include name="**"/>
 			</fileset>
 			<lib dir="${servletBuild.dir}">
 				<include name="toscanaj.jar"/>
