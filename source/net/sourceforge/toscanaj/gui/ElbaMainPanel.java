@@ -423,7 +423,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
     public void closeMainPanel() {
         // store current position
-
+		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, this);
         ConfigurationManager.storeFloat(CONFIGURATION_SECTION_NAME, "minLabelFontSize", 
         							    (float)this.diagramEditingView.getDiagramView().getMinimumFontSize());
         ConfigurationManager.storeStringList(CONFIGURATION_SECTION_NAME, "mruFiles", this.mruList);
