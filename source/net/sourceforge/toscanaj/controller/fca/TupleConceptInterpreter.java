@@ -12,13 +12,16 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
 
 import org.jdom.Element;
+import org.tockit.relations.model.Relation;
+import org.tockit.relations.model.RelationImplementation;
+import org.tockit.relations.model.Tuple;
+import org.tockit.relations.operations.PickColumnsOperation;
 
 
 public class TupleConceptInterpreter extends AbstractConceptInterperter
@@ -32,60 +35,50 @@ public class TupleConceptInterpreter extends AbstractConceptInterperter
 	}
 											
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
+    	Set baseSet;
         if (context.getObjectDisplayMode() == ConceptInterpretationContext.CONTINGENT) {
-	        Set contingent = calculateContingent(concept, context);
-			return contingent.iterator();
+	        baseSet = calculateContingent(concept, context);
         } else {
-			Set extent = calculateExtent(concept, context);
-            return extent.iterator();
+			baseSet = calculateExtent(concept, context);
         }
+        return projectSet(baseSet).iterator();
+    }
+
+    private Set projectSet(Set baseSet) {
+    	if(baseSet.size() == 0) {
+    		return baseSet;
+    	}
+    	Relation relation = RelationImplementation.fromSet(baseSet);
+    	return PickColumnsOperation.pickColumns(relation, this.objectColumns).toSet();
     }
 
     protected int calculateContingentSize(Concept concept, ConceptInterpretationContext context) {
     	Set contingent = calculateContingent(concept, context);
-    	return contingent.size();
+    	return projectSet(contingent).size();
     }
 
 	protected int calculateExtentSize(Concept concept, ConceptInterpretationContext context) {
 		Set extent = calculateExtent(concept, context);
-		return extent.size();
+		return projectSet(extent).size();
 	}
 
-    private Set calculateContingent(Concept concept, ConceptInterpretationContext context) {
-        TreeSet retVal = getObjectSet(concept.getObjectContingentIterator());
-        nestObjects(retVal, context, true);
-        filterObjects(retVal, context);
-        return retVal;
-    }
+	private Set calculateContingent(Concept concept, ConceptInterpretationContext context) {
+		Set retVal = getObjectSet(concept.getObjectContingentIterator());
+		nestObjects(retVal, context, true);
+		filterObjects(retVal, context);
+		return retVal;
+	}
 
-    private TreeSet getObjectSet(Iterator objectContingentIterator) {
-        TreeSet retVal = new TreeSet();
-        while (objectContingentIterator.hasNext()) {
-            String object = getObject(objectContingentIterator.next().toString());
-            retVal.add(object);
-        }
-        return retVal;
-    }
+	private Set getObjectSet(Iterator objectContingentIterator) {
+		Set retVal = new HashSet();
+		while (objectContingentIterator.hasNext()) {
+			Object object = Tuple.fromString(objectContingentIterator.next().toString());
+			retVal.add(object);
+		}
+		return retVal;
+	}
 
-    private String getObject(String serialForm) {
-        StringTokenizer tokenizer = new StringTokenizer(serialForm, " ");
-        String[] tokens = new String[tokenizer.countTokens()];
-        int pos = 0;
-        while(tokenizer.hasMoreTokens()) {
-        	tokens[pos] = tokenizer.nextToken();
-        	pos++;
-        }
-        String object = "";
-        for (int i = 0; i < this.objectColumns.length; i++) {
-        	if(i != 0) {
-        		object += " ";
-        	}
-			object += tokens[this.objectColumns[i]];
-        }
-        return object;
-    }
-
-    private void filterObjects(final TreeSet currentSet, ConceptInterpretationContext context) {
+    private void filterObjects(final Set currentSet, ConceptInterpretationContext context) {
         DiagramHistory.ConceptVisitor visitor;
         if (context.getFilterMode() == ConceptInterpretationContext.EXTENT) {
             visitor = new DiagramHistory.ConceptVisitor() {
@@ -103,7 +96,7 @@ public class TupleConceptInterpreter extends AbstractConceptInterperter
         context.getDiagramHistory().visitZoomedConcepts(visitor);
     }
 
-    private void nestObjects(TreeSet currentSet, ConceptInterpretationContext context, boolean contingentOnly) {
+    private void nestObjects(Set currentSet, ConceptInterpretationContext context, boolean contingentOnly) {
         Iterator mainIt = context.getNestingConcepts().iterator();
         while (mainIt.hasNext()) {
             Concept concept = (Concept) mainIt.next();
@@ -117,12 +110,12 @@ public class TupleConceptInterpreter extends AbstractConceptInterperter
         }
     }
 
-    private Set calculateExtent(Concept concept, ConceptInterpretationContext context) {
-        TreeSet retVal = getObjectSet(concept.getExtentIterator());
-        nestObjects(retVal, context, false);
-        filterObjects(retVal, context);
-        return retVal;
-    }
+	private Set calculateExtent(Concept concept, ConceptInterpretationContext context) {
+		Set retVal = getObjectSet(concept.getExtentIterator());
+		nestObjects(retVal, context, false);
+		filterObjects(retVal, context);
+		return retVal;
+	}
     
 	protected Object getObject(String value, Concept concept, ConceptInterpretationContext context) {
 		return value;
