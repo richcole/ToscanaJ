@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!-- this is partly outdated -->
+<sourceStructure>
+	<package name="net">
+		<package name="sourceforge">
+			<package name="toscanaj">
+				<description>
+					Only the main application is here.
+				</description>
+				<package name="canvas">
+					<description>
+						Generic classes for a drawing canvas
+					</description>
+				</package>
+				<package name="controller">
+					<description>
+						Different controllers
+					</description>
+					<package name="db">
+						<description>
+							Database connectivity
+						</description>
+					</package>
+					<package name="fca">
+						<description>
+							Controllers for the FCA model
+						</description>
+					</package>
+				</package>
+                <package name="events">
+                    <description>
+                        Classes for handling events, based on a publish/subscribe pattern
+                    </description>
+                </package>
+				<package name="model">
+					<description>
+						All model related classes
+					</description>
+					<package name="diagram">
+						<description>
+							Classes for implementing the diagrams from FCA
+						</description>
+					</package>
+					<package name="lattice">
+						<description>
+							Lattice related classes
+						</description>
+					</package>
+				</package>
+				<package name="parser">
+					<description>
+						The parser for the input files
+					</description>
+				</package>
+				<package name="view">
+					<description>
+						All view related classes
+					</description>
+					<package name="diagram">
+						<description>
+							Classes for displaying the diagrams
+						</description>
+					</package>
+					<package name="dialogs">
+						<description>
+							Dialogs for the GUI
+						</description>
+					</package>
+				</package>
+			</package>
+		</package>
+	</package>
+</sourceStructure>
+
+<!-- copy and paste stuff
+	<package name="">
+		<description>
+		</description>
+	</package>
+-->

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD Simplified DocBook XML V4.1.2.5//EN"
+"http://www.oasis-open.org/docbook/xml/simple/4.1.2.5/sdocbook.dtd">
+<!-- $id$ --><article>
+  <title><literal>ToscanaJ</literal> 1.0 User Manual</title>
+
+  <section>
+    <title>Introduction</title>
+	  <section>
+	    <title>The Problem of Understanding Data</title>
+	  </section>
+	  <section>
+	    <title>Conceptual Knowledge Processing</title>
+	  </section>
+	  <section>
+	    <title>Solutions offered by CKP</title>
+	  </section>
+  </section>
+
+  <section>
+    <title>Line Diagrams and Formal Concepts</title>
+	  <section>
+	    <title>Hasse Diagrams</title>
+	  </section>
+	  <section>
+	    <title>Label Contents</title>
+	  </section>
+	  <section>
+	    <title>Additional Information in the Diagrams</title>
+	  </section>
+  </section>
+
+  <section>
+    <title>Operations on Line Diagrams</title>
+	  <section>
+	    <title>Nesting Diagrams</title>
+	  </section>
+	  <section>
+	    <title>Filtering the Object Set</title>
+	  </section>
+	  <section>
+	    <title>Accessing Descriptions</title>
+	  </section>
+	  <section>
+	    <title>Additional Analysis Information</title>
+	  </section>
+  </section>
+
+  <section>
+    <title>Viewing Information from a Database</title>
+	  <section>
+	    <title>Database Specific Label Contents</title>
+	  </section>
+	  <section>
+	    <title>Views on Specific Objects</title>
+	  </section>
+	  <section>
+	    <title>Reporting on Object Sets</title>
+	  </section>
+  </section>
+
+  <section>
+    <title>Printing and Exporting Diagrams</title>
+	  <section>
+	    <title>Printing Diagrams</title>
+	  </section>
+	  <section>
+	    <title>Export of Diagrams as Graphics</title>
+	  </section>
+	  <section>
+	    <title>Using the Analysis History</title>
+	  </section>
+  </section>
+</article>
