@@ -17,3 +17,8 @@ iText.jar:
   iText PDF library for Java, version 0.98 (http://itext.sourceforge.net, licence in LICENCE.iText)
   NOTE: this needs a patch at the moment, which is supplied with the Tockit jars. It is important that the
         canvas.jar is in front of iText.jar in the classpath
+        
+postscriptwriter.zip:
+  A Graphics2D implementation for exporting EPS/PS, grabbed out of the CVS from http://www.arakhne.org on
+  May 1st 2003 (as part of the Netedit code, which was then reduced to just the required classes). The ZIP
+  contains the source, which is LGPLed.

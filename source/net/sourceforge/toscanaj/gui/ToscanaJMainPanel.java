@@ -170,28 +170,14 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         conceptualSchema = new ConceptualSchema(broker);
         DatabaseConnection.initialize(broker);
 
-        // register all image writers we want to support -- order is relevant since applied
-        // in the export dialog
-		try {
-			org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
-		} catch (Throwable t) {
-			// do nothing, we just don't support SVG
-		}
-		try {
-			org.tockit.canvas.imagewriter.PDFImageWriter.initialize();
-		} catch (Throwable t) {
-			// do nothing, we just don't support PDF
-		}
+		registerImageWriters();
 
-        // the next one is part of JDK 1.4, so it should give us JPG and PNG all the time
-       	org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
-
-        // set the default diagram export options: auto mode, no format defined yet, no size
-        // if there is no format, we don't set the settings, which causes the menu items to be unavailable 
-        Iterator it = GraphicFormatRegistry.getIterator();
-        if (it.hasNext()) {
+		// set the default diagram export options: auto mode, no format defined yet, no size
+		// if there is no format, we don't set the settings, which causes the menu items to be unavailable 
+		Iterator it = GraphicFormatRegistry.getIterator();
+		if (it.hasNext()) {
 			this.diagramExportSettings = new DiagramExportSettings();
-        }
+		}
 
         // then build the panel (order is important for checking if we want export options)
         buildPanel();
@@ -217,6 +203,32 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             }
         });
     }
+
+	/** 
+	 * @todo stuff like this should be in an abstract base class shared with Elba and Siena.
+	 */
+	public static void registerImageWriters() {
+		// register all image writers we want to support -- order is relevant since applied
+		// in the export dialog
+		try {
+			org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
+		} catch (Throwable t) {
+			// do nothing, we just don't support SVG
+		}
+		try {
+			org.tockit.canvas.imagewriter.PDFImageWriter.initialize();
+		} catch (Throwable t) {
+			// do nothing, we just don't support PDF
+		}
+		try {
+			org.tockit.canvas.imagewriter.PostscriptImageWriter.initialize();
+		} catch (Throwable t) {
+			// do nothing, we just don't support EPS
+		}
+		
+		// the next one is part of JDK 1.4, so it should give us JPG and PNG all the time
+		org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
+	}
 
     /**
      * This constructor opens the file given as url in the parameter.

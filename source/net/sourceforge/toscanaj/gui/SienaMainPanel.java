@@ -121,12 +121,7 @@ public class SienaMainPanel
         conceptualSchema = new ConceptualSchema(eventBroker);
 
         // register all image writers we want to support
-        try {
-            org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
-        } catch (Throwable t) {
-            // do nothing, we just don't support SVG
-        }
-        org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
+        ToscanaJMainPanel.registerImageWriters();
 
         Iterator it = GraphicFormatRegistry.getIterator();
         if (it.hasNext()) {

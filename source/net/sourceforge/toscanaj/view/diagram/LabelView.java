@@ -17,6 +17,8 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
 import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineMetrics;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
@@ -101,12 +103,12 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     /**
      * The width reserved for the scrollbar to the right.
      */
-    protected int scrollbarWidth = 0;
+    protected double scrollbarWidth = 0;
 
     /**
      * The height of a single line in the view.
      */
-    protected int lineHeight = 0;
+    protected double lineHeight = 0;
 
     protected Vector observers = new Vector();
     
@@ -217,7 +219,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         Font oldFont = graphics.getFont();
 
 		graphics.setFont(this.font);
-        FontMetrics fm = getFontMetrics(graphics);
 
         // find the size and position
         updateBounds(graphics);
@@ -255,7 +256,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         } else {
             textWidth = lw;
         }
-
+        
         // draw the object names
         Iterator it = this.getEntryIterator();
         int numItem = 0;
@@ -264,14 +265,18 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
             if (numItem >= this.firstItem) {
                 int curPos = numItem - this.firstItem;
                 if (curPos < this.displayLines) {
+                	/// @todo check out getBounds() on TextLayout. JavaDoc of getStringBounds() seems to indicate
+                	/// we should use that instead.
+					LineMetrics lm = this.font.getLineMetrics(cur,graphics.getFontRenderContext());
+					double curWidth = this.font.getStringBounds(cur, graphics.getFontRenderContext()).getWidth();
                 	double textX;
-                	double textY = yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight();
+                	double textY = yPos + lm.getAscent() + lm.getLeading() + curPos * lm.getHeight();
                     if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT) {
-						textX = (float) xPos + fm.getLeading() + fm.getDescent();
+						textX = (float) xPos + lm.getLeading() + lm.getDescent();
                     } else if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER) {
-                        textX = (float) (xPos + (fm.getLeading() / 2 + fm.getDescent() / 2 + (textWidth - fm.stringWidth(cur)) / 2));
+                        textX = (float) (xPos + (lm.getLeading() / 2 + lm.getDescent() / 2 + (textWidth - curWidth) / 2));
                     } else if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT) {
-                        textX = (float) (xPos + (-fm.getLeading() - fm.getDescent() + textWidth - fm.stringWidth(cur)));
+                        textX = (float) (xPos + (-lm.getLeading() - lm.getDescent() + textWidth - curWidth));
                     } else {
                         throw new RuntimeException("Unknown label alignment.");
                     }
@@ -353,12 +358,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         graphics.setFont(oldFont);
     }
 
-    private FontMetrics getFontMetrics(Graphics2D graphics) {
-        return graphics.getFontMetrics(this.font);
-    }
-
     public void updateBounds(Graphics2D graphics) {
-        this.rect = getLabelBounds(graphics);
+        this.rect = getLabelBounds(graphics.getFontRenderContext());
     }
     
     Point2D getConnectorStartPosition() {
@@ -420,13 +421,13 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      * horizontal position should be the left edge of the label plus one times
      * the two values (FontMetrics::getLeading() and FontMetrics::getDescent()).
      */
-    public double getWidth(FontMetrics fontMetrics) {
+    public double getWidth(FontRenderContext frc) {
         if (this.getNumberOfEntries() == 0) {
             return 0;
         }
 
         if (this.getNumberOfEntries() > MIN_DISPLAY_LINES) {
-            this.scrollbarWidth = fontMetrics.stringWidth("M");
+            this.scrollbarWidth = this.font.getStringBounds("M",frc).getWidth();
         } else {
             this.scrollbarWidth = 0;
         }
@@ -437,7 +438,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         Iterator it = this.getEntryIterator();
         while (it.hasNext()) {
             String cur = it.next().toString();
-            double w = fontMetrics.stringWidth(cur);
+            double w = this.font.getStringBounds(cur,frc).getWidth();
             if (w > result) {
                 result = w;
             }
@@ -447,7 +448,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 
         // add two leadings and two descents to have some spacing on the left
         // and right side
-        result += 2 * fontMetrics.getLeading() + 2 * fontMetrics.getDescent();
+		LineMetrics lineMetrics = this.font.getLineMetrics("M",frc);
+        result += 2 * lineMetrics.getLeading() + 2 * lineMetrics.getDescent();
 
         return result;
     }
@@ -455,9 +457,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     /**
      * Calculates the height of the label given a specific font metric.
      */
-    public int getHeight(FontMetrics fontMetrics) {
-        this.lineHeight = fontMetrics.getHeight();
-        return this.displayLines * fontMetrics.getHeight();
+    public double getHeight(FontRenderContext frc) {
+		LineMetrics lineMetrics = this.font.getLineMetrics("",frc);
+        return this.displayLines * lineMetrics.getHeight();
     }
 
     /**
@@ -494,7 +496,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     	    }
   	    } else if(this.dragMode == SCROLLING) {
     	    // User wants to drag the scrollbar
-    	    int scrollbarHeight = (this.displayLines - 3) * this.lineHeight;
+    	    double scrollbarHeight = (this.displayLines - 3) * this.lineHeight;
     	    double scrollbarYToPos = to.getY() - this.rect.getY() - this.lineHeight;
     	    double relativePos = scrollbarYToPos / scrollbarHeight;
     	    int newLinePos = (int) (relativePos * (getNumberOfEntries() - this.displayLines));
@@ -563,7 +565,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
             this.notifyObservers();
         }
 		else if( (lineHit >= 1) && (lineHit <= this.displayLines - 3) ){
-        	int scrollbarHeight = (this.displayLines - 3) * this.lineHeight;
+        	double scrollbarHeight = (this.displayLines - 3) * this.lineHeight;
 			double scale = scrollbarHeight / (double) getNumberOfEntries();
 			//get coordinate of top pos of scroll handle
 			double topPosOfScrollHandle = this.rect.getY() + this.lineHeight + 
@@ -586,16 +588,13 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     /**
      * Calculates the rectangle around the label, without the stroke.
      */
-    public Rectangle2D getLabelBounds(Graphics2D graphics) {
-        // get the font metrics
-        FontMetrics fm = getFontMetrics(graphics);
-
+    public Rectangle2D getLabelBounds(FontRenderContext frc) {
         // find the size and position
         DiagramNode node = this.labelInfo.getNode();
         double x = node.getX();
         double y = node.getY();
-        double lw = getWidth(fm);
-        double lh = getHeight(fm);
+        double lw = getWidth(frc);
+        double lh = getHeight(frc);
         double xPos = x - lw / 2 + this.labelInfo.getOffset().getX();
         double radius = nodeView.getRadiusY();
         double yPos;
@@ -611,7 +610,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 
     public Rectangle2D getCanvasBounds(Graphics2D graphics) {
     	Stroke stroke = graphics.getStroke();
-        Rectangle2D labelBounds = getLabelBounds(graphics);
+        Rectangle2D labelBounds = getLabelBounds(graphics.getFontRenderContext());
     	if (stroke instanceof BasicStroke) {
     		double w = ((BasicStroke) stroke).getLineWidth();
     		return new Rectangle2D.Double(labelBounds.getX() - w/2, labelBounds.getY() - w/2,
