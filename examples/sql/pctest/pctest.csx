@@ -20,7 +20,7 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
     </description>
 	<context>
         <databaseConnection>
-            <url driver="com.mckoi.JDBCDriver" user="user" password="password">jdbc:mckoi://localhost/</url>
+            <embed url="pctest.sql"/>
             <table>PCTest</table>
             <key>PCname</key>
             <queries dropDefaults="false">
