@@ -435,10 +435,6 @@ public class DatabaseConnection implements EventBrokerListener {
         return result;
     }
 
-    int translateSQLType(String sqlType) {
-        return Types.INTEGER;
-    };
-
     /**
      * Returns a list of column objects.
      *
