@@ -35,6 +35,9 @@ public class ConceptualSchema {
      */
     private DatabaseInfo databaseInfo;
 
+    /**
+     * The event broker for administering the conceptual scheme events.
+     */
     EventBroker broker;
 
     /**
@@ -50,7 +53,7 @@ public class ConceptualSchema {
     /**
      * List of tables and views in the database
      */
-    private List tables;
+    private DBScheme dbScheme;
 
     /**
      * The list of diagrams.
@@ -72,6 +75,7 @@ public class ConceptualSchema {
      */
     public ConceptualSchema(EventBroker broker) {
         this.broker = broker;
+        this.dbScheme = new DBScheme();
         reset();
     }
 
@@ -204,5 +208,9 @@ public class ConceptualSchema {
 
     public void setSQLURL(URL SQLURL) {
         this.SQLURL = SQLURL;
+    }
+
+    public DBScheme getDbScheme() {
+        return dbScheme;
     }
 }
