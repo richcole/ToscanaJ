@@ -752,7 +752,7 @@ public class ElbaMainPanel
         JMenu toolMenu = new JMenu("Tools");
         toolMenu.setMnemonic(KeyEvent.VK_T);
         dumpStatisticalDataMenuItem =
-            new JMenuItem("Export Realised Scales...");
+            new JMenuItem("Export Realized Scales...");
         dumpStatisticalDataMenuItem.setMnemonic(KeyEvent.VK_S);
         dumpStatisticalDataMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
