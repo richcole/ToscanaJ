@@ -1,9 +1,9 @@
-ToscanaJ 0.4 Readme File
+ToscanaJ 0.5 Readme File
 ========================
 
 What is it?
 -----------
-A fourth release of the Java reimplementation of the
+A fifth release of the Java reimplementation of the
 classic Formal Concept Analysis tool named "Toscana".
 
 It is open sourced under a BSD-style licence (see the text
@@ -51,13 +51,16 @@ then you can just double-click the JAR file in the explorer.
 
 What can I do with ToscanaJ?
 ----------------------------
-ToscanaJ should open an example on startup, unfortunately
-the only examples not using a database we have at the moment
-are in German, if you want to try the database version you 
-can find an English example with the SQL script for creating
-the database in examples/sql/pctest. There is a readme text
-in the directory examples/sql that explains how to set up the
-database example, more will hopefully come soon.
+ToscanaJ should open an example on startup, which is a data from 
+a PC test that will be loaded into the internal database engine.
+There is a readme text in the directory examples/sql that explains 
+how to set up the database example for other database engines.
+
+The data is rather old but it still should be able to show you 
+how a Toscana system does work. If you have a newer system in the
+old Toscana 2/3 format that might be distributed please tell us,
+we would be happy to port it and add it into the distribution.
+
 Double click on one of the diagram titles on the left side to 
 open your first diagram. You can add multiple diagrams to the 
 list of selected diagrams this way. 
@@ -106,15 +109,12 @@ Changes in ToscanaJ 0.4:
 - diagrams in history list can be reordered by dragging
 - PCTest example is available in English and as SQL
 
-Are there other examples?
--------------------------
-The current distribution contains the same example as Access
-database. To use this you have to create an ODBC data source
-name (DSN) pointing to the "pctest.mdb" file in the examples
-directory. The data set is the same but this demonstrates how
-to use an ODBC/JDBC connection and how to define extra views
-for SQL aggregates.
-
+Changes in ToscanaJ 0.5:
+- embedded HypersonicSQL into the program as internal
+  database engine
+- label content can be changed on a per-label basis from
+  the context menu
+- enhanced highlighting in nested diagrams
 
 How do I create examples?
 -------------------------
