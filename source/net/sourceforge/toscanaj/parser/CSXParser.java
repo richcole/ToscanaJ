@@ -155,6 +155,7 @@ public class CSXParser {
         if (dbElem == null) {
             _Schema.addQuery(AggregateQuery.COUNT_QUERY);
             _Schema.addQuery(ListQuery.KEY_LIST_QUERY);
+			_Schema.addQuery(AggregateQuery.PERCENT_QUERY);
             return;
         }
         DatabaseInfo dbInfo = new DatabaseInfo();
