@@ -39,22 +39,20 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
 			</aggregate>
 		</queries>
 	</database>
-        <viewer class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML View">
+        <viewer class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML View...">
                 <parameter name="template" value="/home/pbecker/temp/objectView.html"/>
         </viewer>
-        <viewer class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer" name="Short View">
+        <viewer class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer" name="Short View...">
                 <parameter name="openDelimiter" value="$$$"/>
                 <parameter name="closeDelimiter" value="%%%"/>
-                <template>Name:  $$$PCname%%%
-Price: $$$price%%%
-                </template>
+                <template url="views/simple.txt"/>
         </viewer>
-        <viewer class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer" name="External View">
+        <viewer class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer" name="External View...">
                 <parameter name="openDelimiter" value="$$$"/>
                 <parameter name="closeDelimiter" value="%%%"/>
                 <parameter name="commandLine" value="echo $$$PCname%%%"/>
         </viewer>
-        <report class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseReportGenerator" name="HTML Report">
+        <report class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseReportGenerator" name="HTML Report...">
                 <parameter name="template" value="/home/pbecker/temp/report.html"/>
         </report>
 	<context>
@@ -441,7 +439,16 @@ Price: $$$price%%%
 		<attribute id="132" name="ISA Bus"/>
 		<attribute id="133" name="EISA Bus"/>
 		<attribute id="134" name="Local Bus"/>
-		<attribute id="135" name="Motherboard"/>
+		<attribute id="135" name="Motherboard">
+            <description>
+                <html>
+                    <body>
+                        <h1>Motherboard</h1>
+                        The graphic chipset is located directly on the motherboard.
+                    </body>
+                </html>
+            </description>
+        </attribute>
 		<attribute id="136" name="MCA"/>
 		<attribute id="137" name="VESA Local Bus"/>
 		<attribute id="138" name="Proprietary Local Bus"/>
