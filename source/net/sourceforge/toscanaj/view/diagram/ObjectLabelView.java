@@ -142,24 +142,32 @@ public class ObjectLabelView extends LabelView {
         if(!conceptInterpreter.isRealized(concept, context)) {
         	this.contents = null;
         } else if (query == ListQuery.KEY_LIST_QUERY) {
-            int objectCount = conceptInterpreter.getObjectCount(concept, context);
-            if( objectCount != 0) {
-	            contents = new ArrayList();
-	            Iterator it = conceptInterpreter.getObjectSetIterator(concept, context);
-	            while (it.hasNext()) {
-	                Object o = it.next();
-	                contents.add(o);
-	            }
-            } else {
-                contents = null;
+            try{
+                int objectCount = conceptInterpreter.getObjectCount(concept, context);
+                if( objectCount != 0) {
+                    contents = new ArrayList();
+                    Iterator it = conceptInterpreter.getObjectSetIterator(concept, context);
+                    while (it.hasNext()) {
+                        Object o = it.next();
+                        contents.add(o);
+                    }
+                } else {
+                    contents = null;
+                }
+            } catch (Exception e) {
+                ErrorDialog.showError(this.diagramView, e, "Getting object list failed");
             }
         } else if (query == AggregateQuery.COUNT_QUERY) {
-            int objectCount = conceptInterpreter.getObjectCount(concept, context);
-            if( objectCount != 0) {
-		        contents = new ArrayList();
-		        contents.add(new Integer(objectCount));
-            } else {
-            	contents = null;
+            try{
+                int objectCount = conceptInterpreter.getObjectCount(concept, context);
+                if( objectCount != 0) {
+                    contents = new ArrayList();
+                    contents.add(new Integer(objectCount));
+                } else {
+                    contents = null;
+                }
+            } catch (Exception e) {
+                ErrorDialog.showError(this.diagramView, e, "Getting object count failed");
             }
         } else {
             DatabaseConnectedConceptInterpreter dbConceptInterpreter =
