@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Column;
+import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
@@ -29,6 +30,7 @@ import java.awt.event.ActionListener;
 import java.util.Iterator;
 
 public class ScaleEditingView extends JPanel implements EventBrokerListener, TableColumnPairsSelectionSource {
+	private EventBroker eventBroker;
     private ConceptualSchema conceptualSchema;
     private DefaultListModel tableColumnListModel;
     private DefaultListModel scalesListModel;
@@ -57,7 +59,11 @@ public class ScaleEditingView extends JPanel implements EventBrokerListener, Tab
             DatabaseConnection databaseConnection) {
         super();
         this.parentFrame = frame;
+        this.eventBroker = eventBroker;
         this.conceptualSchema = conceptualSchema;
+        if(this.conceptualSchema.getDatabaseSchema() == null) {
+            this.conceptualSchema.setDatabaseSchema(new DatabaseSchema(eventBroker));
+        }
 
         setName("ScalesEditingView");
         setLayout(new BorderLayout());
@@ -116,7 +122,7 @@ public class ScaleEditingView extends JPanel implements EventBrokerListener, Tab
 
     private void fillTableColumnsList() {
         tableColumnListModel.removeAllElements();
-        java.util.List tables = conceptualSchema.getDbScheme().getTables();
+        java.util.List tables = conceptualSchema.getDatabaseSchema().getTables();
         for (Iterator tableIterator = tables.iterator(); tableIterator.hasNext();) {
             Table table = (Table) tableIterator.next();
             java.util.List columns = table.getColumns();
@@ -166,6 +172,9 @@ public class ScaleEditingView extends JPanel implements EventBrokerListener, Tab
         ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
         if (event instanceof NewConceptualSchemaEvent) {
             conceptualSchema = changeEvent.getConceptualSchema();
+            if(this.conceptualSchema.getDatabaseSchema() == null) {
+                this.conceptualSchema.setDatabaseSchema(new DatabaseSchema(this.eventBroker));
+            }
             fillTableColumnsList();
         }
         fillScalesList();
