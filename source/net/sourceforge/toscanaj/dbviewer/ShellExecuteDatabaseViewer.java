@@ -9,10 +9,12 @@ package net.sourceforge.toscanaj.dbviewer;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 /**
  * Calls an external program as database viewer. Ideally program called is the program
@@ -31,23 +33,24 @@ import java.util.Vector;
  *         name="Start external viewer...">
  *     <parameter name="columnName" value="URL"/>
  * </objectView>
+ * 
+ * This definition will look for the URL to open the file in the column named "URL".
+ * The parameter 'columnName' is mandatory and has to point to a column which contains
+ * a location for each object.
  *
- *
- * Note: the external program is at the moment started in the same thread, the
- * UI will block as long as the external program runs.
  *
  * Only the first object in the view will be used for a program call, the others
  * will be ignored.
  *
  * Relevant SourceForge Tracker url:
- * https://sourceforge.net/tracker/?func=detail&atid=418907&aid=630314&group_id=37081
+ * http://sourceforge.net/tracker/?func=detail&atid=418907&aid=630314&group_id=37081
  *  
  * @todo Handle multiple results somehow.
  */
 public class ShellExecuteDatabaseViewer implements DatabaseViewer {
-    private DatabaseViewerManager viewerManager = null;
-
-    private String columnName;
+    final static Logger logger = Logger.getLogger(ShellExecuteDatabaseViewer.class.getName());
+    
+    private DatabaseViewerManager viewerManager;
 
     private List fieldNames = new LinkedList();
 
@@ -55,11 +58,14 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
         // initialization has to be done separately, so we can use the dynamic class loading mechanism
     }
 
-    public void initialize(DatabaseViewerManager manager) {
+    public void initialize(DatabaseViewerManager manager) throws DatabaseViewerInitializationException {
         this.viewerManager = manager;
 
         // @todo need errorchecking on columnName here
-        columnName = (String) viewerManager.getParameters().get("columnName");
+        String columnName = (String) viewerManager.getParameters().get("columnName");
+        if(columnName == null) {
+            throw new DatabaseViewerInitializationException("Parameter 'columnName' not given.");
+        }
         fieldNames.add(columnName);
     }
 
@@ -71,7 +77,7 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
                     whereClause);
             Vector fields = (Vector) results.get(0);
             Iterator itFields = fields.iterator();
-            while (itFields.hasNext()) { // we assume length(textFragements) = length(results) + 1
+            while (itFields.hasNext()) {
                 String result = (String) itFields.next();
 				resourceLocation += result;
             }
@@ -79,10 +85,17 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
         	/// @todo maybe we should introduce a proper DatabaseViewerException in the signature
             throw new RuntimeException("Failed to query database.", e);
         }
-        try {
-			BrowserLauncher.openURL(resourceLocation);
-        } catch (Exception e) {
-            throw new RuntimeException("There was a problem running external viewer",e);
-        }
+        final String finalResourceLocation = resourceLocation;
+        Runnable external = new Runnable() {
+            public void run() {
+                try {
+                    BrowserLauncher.openURL(finalResourceLocation);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    logger.severe("Launching external program failed: " + e.getMessage());
+                }
+            }
+        };
+        new Thread(external).run();
     }
 }
