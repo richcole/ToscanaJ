@@ -66,6 +66,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 
 	public Dimension calculateNewSize() {
 		Set objectsSet = this.dialog.getContext().getObjects();
+		
 		this.objects = (WritableFCAObject[]) objectsSet.toArray(new WritableFCAObject[objectsSet.size()]);
 		int numRow = this.objects.length + 1;
 		return new Dimension(ContextTableView.CELL_WIDTH + 1, numRow * ContextTableView.CELL_HEIGHT + 1);

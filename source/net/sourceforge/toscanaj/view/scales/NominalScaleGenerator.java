@@ -14,6 +14,8 @@ import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAObject;
 
 public class NominalScaleGenerator implements ScaleGenerator {
 	private Frame parent;
@@ -47,7 +49,7 @@ public class NominalScaleGenerator implements ScaleGenerator {
 
 		for (int i = 0; i < values.length; i++) {
 		    NominalScaleEditorDialog.SqlFragment sqlFrag = (NominalScaleEditorDialog.SqlFragment) values[i];
-			String object = sqlFrag.getSqlClause();
+			WritableFCAObject object = new FCAObjectImplementation(sqlFrag.getSqlClause());
 			String attributeName = sqlFrag.getAttributeLabel();
 			Attribute attribute = new Attribute(attributeName);
 
@@ -62,7 +64,8 @@ public class NominalScaleGenerator implements ScaleGenerator {
 			}
 		}
 		
-		context.getObjects().add(topNodeClause);
+		WritableFCAObject topNodeObject = new FCAObjectImplementation(topNodeClause);
+		context.getObjects().add(topNodeObject);
 		
 		return context;
 	}
