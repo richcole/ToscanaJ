@@ -69,7 +69,7 @@ import java.util.Properties;
  *
  * @todo store view settings (contingent/extent labels/gradient) in session management
  */
-public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeObserver, ClipboardOwner {
+public class ToscanaJMainPanel extends JFrame implements ChangeObserver, ClipboardOwner {
 
     /**
      * The central event broker for the main panel
@@ -375,7 +375,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
             this.exportDiagramSetupMenuItem.setMnemonic(KeyEvent.VK_S);
             this.exportDiagramSetupMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                     KeyEvent.VK_E, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
-            this.exportDiagramSetupMenuItem.addActionListener(this);
+            this.exportDiagramSetupMenuItem.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					showImageExportOptions();
+				}
+            });
             fileMenu.add(exportDiagramSetupMenuItem);
         }
 
@@ -387,13 +391,22 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         printMenuItem.setMnemonic(KeyEvent.VK_P);
         printMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_P, ActionEvent.CTRL_MASK));
-        printMenuItem.addActionListener(this);
+        printMenuItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				printDiagram();
+			}
+		});
         printMenuItem.setEnabled(false);
         fileMenu.add(printMenuItem);
 
         // menu item PRINT SETUP
         printSetupMenuItem = new JMenuItem("Print Setup...");
-        printSetupMenuItem.addActionListener(this);
+        printSetupMenuItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				pageFormat = PrinterJob.getPrinterJob().pageDialog(pageFormat);
+		  		printDiagram();
+			}
+		});
         printSetupMenuItem.setEnabled(true);
         fileMenu.add(printSetupMenuItem);
 
@@ -412,7 +425,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_F4, ActionEvent.ALT_MASK));
-        exitMenuItem.addActionListener(this);
+        exitMenuItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				closeMainPanel();
+			}
+		});
         fileMenu.add(exitMenuItem);
 
         // create the DIAGRAM menu
@@ -428,7 +445,12 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         this.filterExactMenuItem.setMnemonic(KeyEvent.VK_X);
         this.filterExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_F, ActionEvent.CTRL_MASK));
-        this.filterExactMenuItem.addActionListener(this);
+        this.filterExactMenuItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				diagramView.setFilterMode(ConceptInterpretationContext.CONTINGENT);
+				updateLabelViews();
+			}
+		});
         documentsFilterGroup.add(this.filterExactMenuItem);
         diagrMenu.add(this.filterExactMenuItem);
         this.filterAllMenuItem = new JRadioButtonMenuItem("Filter: use all matches");
@@ -436,7 +458,12 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 KeyEvent.VK_F, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
         this.filterAllMenuItem.setMnemonic(KeyEvent.VK_A);
         this.filterAllMenuItem.setSelected(true);
-        this.filterAllMenuItem.addActionListener(this);
+        this.filterAllMenuItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				diagramView.setFilterMode(ConceptInterpretationContext.EXTENT);
+		  		updateLabelViews();
+			}
+		});
         documentsFilterGroup.add(this.filterAllMenuItem);
         diagrMenu.add(this.filterAllMenuItem);
 
@@ -449,7 +476,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         this.noNestingMenuItem.setMnemonic(KeyEvent.VK_F);
         this.noNestingMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_1, ActionEvent.CTRL_MASK));
-        this.noNestingMenuItem.addActionListener(this);
+        this.noNestingMenuItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				DiagramController.getController().setNestingLevel(0);
+			}
+		});        
         this.noNestingMenuItem.setSelected(true);
         nestingGroup.add(noNestingMenuItem);
         diagrMenu.add(noNestingMenuItem);
@@ -457,7 +488,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         this.nestingLevel1MenuItem.setMnemonic(KeyEvent.VK_N);
         this.nestingLevel1MenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_2, ActionEvent.CTRL_MASK));
-        this.nestingLevel1MenuItem.addActionListener(this);
+        this.nestingLevel1MenuItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				DiagramController.getController().setNestingLevel(1);
+			}
+		}); 
         nestingGroup.add(nestingLevel1MenuItem);
         diagrMenu.add(nestingLevel1MenuItem);
 
@@ -472,7 +507,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         this.showExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         this.showExactMenuItem.setSelected(true);
-        this.showExactMenuItem.addActionListener(this);
+        this.showExactMenuItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				updateLabelViews();
+			}
+		}); 
         documentsDisplayGroup.add(this.showExactMenuItem);
         viewMenu.add(this.showExactMenuItem);
 
@@ -480,7 +519,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         this.showAllMenuItem.setMnemonic(KeyEvent.VK_A);
         this.showAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_S, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
-        this.showAllMenuItem.addActionListener(this);
+        this.showAllMenuItem.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				updateLabelViews();
+			}
+		}); 
         documentsDisplayGroup.add(this.showAllMenuItem);
         viewMenu.add(this.showAllMenuItem);
 
@@ -788,56 +831,6 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         }
         System.exit(0);
     }
-
-    public void actionPerformed(ActionEvent ae) {
-        Object actionSource = ae.getSource();
-        if (actionSource == exportDiagramSetupMenuItem) {
-            showImageExportOptions();
-            return;
-        }
-        if (actionSource == printMenuItem) {
-            printDiagram();
-            return;
-        }
-        if (actionSource == printSetupMenuItem) {
-            pageFormat = PrinterJob.getPrinterJob().pageDialog(pageFormat);
-            printDiagram();
-            return;
-        }
-        if (actionSource == exitMenuItem) {
-            closeMainPanel();
-            return;
-        }
-
-        // diagram view
-        if (actionSource == this.filterExactMenuItem) {
-            diagramView.setFilterMode(ConceptInterpretationContext.CONTINGENT);
-            updateLabelViews();
-            return;
-        }
-        if (actionSource == this.filterAllMenuItem) {
-            diagramView.setFilterMode(ConceptInterpretationContext.EXTENT);
-            updateLabelViews();
-            return;
-        }
-        // nesting
-        if (actionSource == this.noNestingMenuItem) {
-            DiagramController.getController().setNestingLevel(0);
-            return;
-        }
-        if (actionSource == this.nestingLevel1MenuItem) {
-            DiagramController.getController().setNestingLevel(1);
-            return;
-        }
-
-        // view menu
-        if ((actionSource == this.showExactMenuItem) ||
-                (actionSource == this.showAllMenuItem)) {
-            updateLabelViews();
-            return;
-        }
-    }
-
 
     /**
      * Open a schema using the file open dialog.
