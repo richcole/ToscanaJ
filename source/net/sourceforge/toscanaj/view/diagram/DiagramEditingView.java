@@ -518,7 +518,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 				int index = listView.getSelectedIndex();
 				if (index != -1) {
 					Diagram2D diagram = conceptualSchema.getDiagram(index);
-					Diagram2D copiedDiagram = copyDiagram(diagram, "Copy of " + diagram.getTitle());
+					Diagram2D copiedDiagram = copyDiagram(diagram);
 					if (copiedDiagram != null) {
 						conceptualSchema.addDiagram(copiedDiagram);
 						int pos = diagramListModel.indexOf(copiedDiagram.getTitle());
@@ -628,10 +628,10 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     }
 
 	/**
-	 * @todo we only support copying of SimpleLineDiagrams implementation
-	 * of Diagram2D
+	 * Assumptions:
+	 * implementation used for Diagram2D is SimpleLineDiagram implementation
 	 */    
-    private Diagram2D copyDiagram (Diagram2D diagram, String copiedDiagramTitle) {
+    private Diagram2D copyDiagram (Diagram2D diagram) {
     	
     	// @todo error message is not helpfull here as user can't do
     	// anything to rectify the situation, however, need
@@ -643,7 +643,36 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 					"Error copying diagram", JOptionPane.ERROR_MESSAGE);
 			return null;
     	}
-    	Diagram2D copy = new SimpleLineDiagram(diagram, copiedDiagramTitle);
+		String copiedDiagramTitle = createCopiedDiagramTitle(diagram.getTitle());
+		Diagram2D foundDiagram = conceptualSchema.getDiagram(copiedDiagramTitle);
+		while (foundDiagram != null) {
+			copiedDiagramTitle = createCopiedDiagramTitle(foundDiagram.getTitle());
+			foundDiagram = conceptualSchema.getDiagram(copiedDiagramTitle);
+		}
+		
+		SimpleLineDiagram copy = new SimpleLineDiagram(diagram);
+    	copy.setTitle(copiedDiagramTitle);
 		return copy;
     }
+
+	private String createCopiedDiagramTitle(String diagramTitle) {
+		String copiedDiagramTitle = diagramTitle + " (" + 1 + ")";
+		if (diagramTitle.lastIndexOf(")") > 0) {
+			int index1 = diagramTitle.lastIndexOf("(");
+			int index2 = diagramTitle.lastIndexOf(")");
+			if ( (index1 > 0) && (index2 > 0) ) {
+				String numStr = diagramTitle.substring(index1 + 1, index2);
+				String baseStr = diagramTitle.substring(0, index1 ).trim();
+				try {
+					Integer num = new Integer (numStr);
+					copiedDiagramTitle = baseStr + " (" + (num.intValue() + 1) + ")";     	
+				}
+				catch (NumberFormatException e) {
+					// ignore this exception because if whatever is in parenthesis
+					// is not a number - we don't want to increment it then.
+				}
+			}
+		}
+		return copiedDiagramTitle;
+	}
 }

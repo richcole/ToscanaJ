@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.diagram;
 
+import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.events.DiagramChangedEvent;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
@@ -74,27 +75,30 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      * A copy constructor creating a duplicate of given diagram
      * Makes a deep copy.
      * 
-     * Assumptions: 
+     * Assumptions:
+     * Assuming that ConceptImplementation is used for Concept interface. 
 	 * When making a copy of the diagram node, copying all properties, except:
-	 * -  concept, which should be ok since we probably want both nodes 
-	 * corresponding to the same concept anyway.
 	 * - identifier. Assumption is that if we are copying diagrams and 
 	 * identifiers are unique within each diagram - it should be ok to 
 	 * keep the same identifiers for nodes in a copied diagram.
+	 * - making "almost" deep copy of a Concept, see notes in makeDiagramNodeCopy method.
 	 * 
 	 * @todo Need to make a deep copy of Concepts.
+	 * @todo use IdPool to get identifiers.
      */
-    public SimpleLineDiagram (Diagram2D diagram, String newTitle) {
+    public SimpleLineDiagram (Diagram2D diagram) {
 		coordinateSystemChecked = false;
 		
 		Hashtable oldToNewNodeMapping = new Hashtable();
     	
-    	this.title = newTitle;
+    	this.title = diagram.getTitle();
     	
     	Iterator diagramNodes = diagram.getNodes();
     	while (diagramNodes.hasNext()) {
 			DiagramNode curNode = (DiagramNode) diagramNodes.next();
-			//DiagramNode copiedNode = new DiagramNode(curNode);
+			// we are not using DiagramNode copy constructor here for copying 
+			// nodes because it doesn't offer deep copy of a Concept, using 
+			// makeDiagramNodeCopy() method instead.
 			DiagramNode copiedNode = makeDiagramNodeCopy(curNode);
 			this.nodes.add(copiedNode);
 			oldToNewNodeMapping.put(curNode, copiedNode);
@@ -107,16 +111,43 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 			DiagramNode copiedToNode = (DiagramNode) oldToNewNodeMapping.get(curLine.getToNode());
 			DiagramLine copiedLine = new DiagramLine(copiedFromNode,copiedToNode, this);
 			this.lines.add(copiedLine);
+			ConceptImplementation subConcept = (ConceptImplementation) copiedToNode.getConcept();
+			ConceptImplementation superConcept = (ConceptImplementation) copiedFromNode.getConcept();
+			subConcept.addSuperConcept(superConcept);
+			superConcept.addSubConcept(subConcept);
+		}
+		
+		Iterator it = this.getNodes();
+		while (it.hasNext()) {
+			DiagramNode curNode = (DiagramNode) it.next();
+			((ConceptImplementation) curNode.getConcept()).buildClosures();
 		}
     }
 
 	/**
-	 * Make a deep copy of the node, copying all properties, except
-	 * concept and identifier. 
+	 * Make a deep copy of the node, copying all properties, with 
+	 * the following exceptions:
+	 *  - concept: we do attempt to do a deep copy, however, at the moment Obects
+	 * in objectContingent are not recreated due to inability to do so.
+	 * - identifier: at the moment just copy the same identifier over.
 	 */
     private DiagramNode makeDiagramNodeCopy (DiagramNode node) {   	
+
 		Point2D position = (Point2D) node.getPosition().clone();
-		Concept concept = node.getConcept();
+		
+		Concept originalNodeConcept = node.getConcept();
+		ConceptImplementation concept = new ConceptImplementation();
+		Iterator attrIterator = originalNodeConcept.getAttributeContingentIterator();
+		while (attrIterator.hasNext()) {
+			Attribute curAttr = (Attribute) attrIterator.next();
+			concept.addAttribute(new Attribute(curAttr.getData()));
+		}
+		Iterator objIterator = originalNodeConcept.getObjectContingentIterator();
+		while (objIterator.hasNext()) {
+			Object curObj = (Object) objIterator.next();
+			concept.addObject(curObj);
+		}
+		
 		LabelInfo attributeLabelInfo = new LabelInfo(node.getAttributeLabelInfo());
 		LabelInfo objectLabelInfo = new LabelInfo(node.getObjectLabelInfo());
 
