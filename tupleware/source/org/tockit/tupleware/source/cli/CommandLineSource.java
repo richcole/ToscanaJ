@@ -17,15 +17,15 @@ import javax.swing.JOptionPane;
 
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
+import org.tockit.relations.model.Relation;
 import org.tockit.tupleware.gui.IndexSelectionDialog;
-import org.tockit.tupleware.model.TupleSet;
 import org.tockit.tupleware.source.TupleSource;
 import org.tockit.tupleware.source.text.TabDelimitedParser;
 
 
 public class CommandLineSource implements TupleSource {
 	private int[] objectIndices;
-	private TupleSet tuples;
+	private Relation tuples;
 		
 	public void show(JFrame parent, File lastLocation) {
         String command = JOptionPane.showInputDialog(parent, "Please enter command to call:", 
@@ -68,7 +68,7 @@ public class CommandLineSource implements TupleSource {
             }
             this.tuples = TabDelimitedParser.parseTabDelimitedTuples(new StringReader(out.toString()));
 
-            IndexSelectionDialog dialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getVariableNames());
+            IndexSelectionDialog dialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getDimensionNames());
             dialog.show();
             this.objectIndices = dialog.getSelectedIndices();
         } catch (Exception e) {
@@ -84,7 +84,7 @@ public class CommandLineSource implements TupleSource {
         return null;
     }
 
-    public TupleSet getTuples() {
+    public Relation getTuples() {
         return this.tuples;
     }
 

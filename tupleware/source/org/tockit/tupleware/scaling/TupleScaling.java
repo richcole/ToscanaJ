@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.tockit.events.EventBroker;
-import org.tockit.tupleware.model.TupleSet;
+import org.tockit.relations.model.Relation;
 import org.tockit.tupleware.source.text.TabDelimitedParser;
 
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
@@ -71,10 +71,10 @@ public class TupleScaling {
      * Each binary relation for the contexts is the projection of the tuples onto the dimension
      * given by the objectPosition parameter and one other.
      */
-    public static ConceptualSchema scaleTuples(TupleSet tuples, int objectPosition) {
+    public static ConceptualSchema scaleTuples(Relation tuples, int objectPosition) {
         ConceptualSchema schema = new ConceptualSchema(new EventBroker());
 
-        String[] variableNames = tuples.getVariableNames();
+        String[] variableNames = tuples.getDimensionNames();
         for (int i = 0; i < variableNames.length; i++) {
             if(i == objectPosition) {
                 continue;
@@ -91,7 +91,7 @@ public class TupleScaling {
      * The objectIndices parameter defines the objects, the attributeIndices parameter
      * the attributes. They incide iff they cooccur in a tuple.
      */    
-    public static Diagram2D scaleTuples(TupleSet tuples, int[] objectIndices, int[] attributeIndices) {
+    public static Diagram2D scaleTuples(Relation tuples, int[] objectIndices, int[] attributeIndices) {
         Map tupleObjectMap = new HashMap();
         Map valueAttributeMap = new HashMap();
         ContextImplementation context = new ContextImplementation("Tuples");
@@ -113,7 +113,7 @@ public class TupleScaling {
             context.getRelationImplementation().insert(tupleObjectMap.get(objectValues), valueAttributeMap.get(attributeValues));
         }
         Lattice lattice = new GantersAlgorithm().createLattice(context);
-        String[] variableNames = tuples.getVariableNames();
+        String[] variableNames = tuples.getDimensionNames();
         String diagName = createCrossproductName(selectSubset(variableNames, attributeIndices));
         Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, diagName, new DefaultDimensionStrategy());
         return diagram;
@@ -146,7 +146,7 @@ public class TupleScaling {
         } else {
             objectPos = 0;
         }
-        TupleSet input = TabDelimitedParser.parseTabDelimitedTuples(new FileReader(new File(args[0])));
+        Relation input = TabDelimitedParser.parseTabDelimitedTuples(new FileReader(new File(args[0])));
         ConceptualSchema result = scaleTuples(input, objectPos);
         XMLWriter.write(new File(args[1]), result);
     }

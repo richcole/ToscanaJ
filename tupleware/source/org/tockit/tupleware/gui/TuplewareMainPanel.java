@@ -35,7 +35,7 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 import org.tockit.plugin.PluginLoader;
-import org.tockit.tupleware.model.TupleSet;
+import org.tockit.relations.model.Relation;
 import org.tockit.tupleware.scaling.TupleScaling;
 import org.tockit.tupleware.source.TupleSource;
 import org.tockit.tupleware.source.TupleSourceRegistry;
@@ -66,7 +66,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
      *  Model
      */
     private ConceptualSchema conceptualSchema;
-    private TupleSet tuples;
+    private Relation tuples;
 
     private DiagramExportSettings diagramExportSettings;
     private ExportDiagramAction exportDiagramAction;
@@ -162,7 +162,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
     }
 
     private void createNewDiagram() {
-        IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tuples.getVariableNames());
+        IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tuples.getDimensionNames());
         dialog.show();
         int[] attributeIndices = dialog.getSelectedIndices();
         Diagram2D diagram = TupleScaling.scaleTuples(this.tuples, this.objectIndices, attributeIndices);
@@ -416,8 +416,8 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 			try {
 				this.lastFileRead = saveDialog.getSelectedFile();
 				BufferedWriter writer = new BufferedWriter(new FileWriter(this.lastFileRead));
-				for (int i = 0; i < this.tuples.getVariableNames().length; i++) {
-                    String name = this.tuples.getVariableNames()[i];
+				for (int i = 0; i < this.tuples.getDimensionNames().length; i++) {
+                    String name = this.tuples.getDimensionNames()[i];
                     if(i!=0) {
                     	writer.write('\t');
                     }
@@ -465,7 +465,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
     }
 
 	private void fillTable() {
-        Object[][] data = new Object[this.tuples.getTuples().size()][this.tuples.getVariableNames().length];
+        Object[][] data = new Object[this.tuples.getTuples().size()][this.tuples.getDimensionNames().length];
         int row = 0;
         for (Iterator iter = this.tuples.getTuples().iterator(); iter.hasNext();) {
             Object[] tuple = (Object[]) iter.next();
@@ -474,7 +474,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
             }
             row ++;
         }
-        this.tupleTable.setModel(new DefaultTableModel(data, this.tuples.getVariableNames()));
+        this.tupleTable.setModel(new DefaultTableModel(data, this.tuples.getDimensionNames()));
     }
 
     public void closeMainPanel() {

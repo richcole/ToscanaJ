@@ -19,7 +19,8 @@ import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileFilter;
 
 import org.tockit.events.EventBroker;
-import org.tockit.tupleware.model.TupleSet;
+import org.tockit.relations.model.Relation;
+import org.tockit.relations.model.Tuple;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -62,7 +63,7 @@ public class DatabaseConnectionDialog extends JDialog {
     private AccessFileConnectionPanel accessDbPanel;
     private SqlQueryPanel sqlQueryPanel;
 
-    private TupleSet tuples;
+    private Relation tuples;
 
     private Frame owner;
     
@@ -575,13 +576,13 @@ public class DatabaseConnectionDialog extends JDialog {
 				for (int i = 0; i < numberColumns; i++) {
                     names[i] = metaData.getColumnLabel(i + 1);
                 }
-				tuples = new TupleSet(names);
+				tuples = new Relation(names);
 				while (resultSet.next()) {
 					Object[] tuple = new Object[numberColumns];
 					for (int i = 0; i < numberColumns; i++) {
 						tuple[i] = resultSet.getObject(i + 1);
 					}
-					tuples.addTuple(tuple);
+					tuples.addTuple(new Tuple(tuple));
 				}
 				connection.disconnect();
                 return true;
@@ -772,7 +773,7 @@ public class DatabaseConnectionDialog extends JDialog {
 		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,	this);
 	}
 
-    public TupleSet getTuples() {
+    public Relation getTuples() {
         return this.tuples;
     }
     

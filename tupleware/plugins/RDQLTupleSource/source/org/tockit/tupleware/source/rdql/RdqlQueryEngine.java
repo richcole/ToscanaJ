@@ -13,13 +13,13 @@ import javax.swing.JFrame;
 
 import org.tockit.plugin.Plugin;
 import org.tockit.tupleware.gui.IndexSelectionDialog;
-import org.tockit.tupleware.model.TupleSet;
+import org.tockit.relations.model.Relation;
 import org.tockit.tupleware.source.TupleSource;
 import org.tockit.tupleware.source.TupleSourceRegistry;
 
 public class RdqlQueryEngine implements TupleSource, Plugin {
 	private int[] objectIndices;
-	private TupleSet tupleSet;
+	private Relation tupleSet;
 	private File selectedFile;
 
 	public String getMenuName() {
@@ -32,13 +32,13 @@ public class RdqlQueryEngine implements TupleSource, Plugin {
 		this.tupleSet = rdfQueryDialog.getTuples();
 		System.out.println("GOT TUPLE SET: " + this.tupleSet);
 		if(this.tupleSet != null) {
-			IndexSelectionDialog objectSetDialog = new IndexSelectionDialog(parent, "Select object set", this.tupleSet.getVariableNames());
+			IndexSelectionDialog objectSetDialog = new IndexSelectionDialog(parent, "Select object set", this.tupleSet.getDimensionNames());
 			objectSetDialog.show();
 			this.objectIndices = objectSetDialog.getSelectedIndices();
 		}
 	}
 
-	public TupleSet getTuples() {
+	public Relation getTuples() {
 		return tupleSet;
 	}
 
@@ -53,5 +53,4 @@ public class RdqlQueryEngine implements TupleSource, Plugin {
 	public void load() {
 		TupleSourceRegistry.registerTupleSource(this);
 	}
-	
 }

@@ -17,7 +17,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.tockit.tupleware.model.TupleSet;
+import org.tockit.relations.model.Relation;
+import org.tockit.relations.model.Tuple;
 
 
 /**
@@ -35,8 +36,8 @@ public class TabDelimitedParser {
      * 
      * @return a Set of Object[] representing the tuples parsed
      */
-    public static TupleSet parseTabDelimitedTuples(Reader input) throws IOException {
-        TupleSet retVal = null;
+    public static Relation parseTabDelimitedTuples(Reader input) throws IOException {
+        Relation retVal = null;
         BufferedReader buffReader = new BufferedReader(input);
         int lineNum = 0;
         while(true) {
@@ -57,10 +58,10 @@ public class TabDelimitedParser {
                 i++;
             }
             if(retVal == null) {
-                retVal = new TupleSet(tuple); 
+                retVal = new Relation(tuple); 
             } else {
             	try {
-					retVal.addTuple(tuple);
+					retVal.addTuple(new Tuple(tuple));
 	           	} catch(IllegalArgumentException e) {
 	           		throw new IOException("Illegal tuple in line #" + lineNum);
 	           	}
@@ -70,14 +71,14 @@ public class TabDelimitedParser {
     }
     
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        TupleSet result = parseTabDelimitedTuples(new FileReader(new File(args[0])));
+        Relation result = parseTabDelimitedTuples(new FileReader(new File(args[0])));
         System.out.println("Vars:");
-        System.out.println(TupleSet.toString(result.getVariableNames()));
+        System.out.println(new Tuple(result.getDimensionNames()).toString());
         System.out.println("Tuples:");
         Set tuples = result.getTuples();
         for (Iterator iter = tuples.iterator(); iter.hasNext();) {
-            Object[] tuple = (Object[]) iter.next();
-            System.out.println(TupleSet.toString(tuple));
+            Tuple tuple = (Tuple) iter.next();
+            System.out.println(tuple.toString());
         }
     }
 }

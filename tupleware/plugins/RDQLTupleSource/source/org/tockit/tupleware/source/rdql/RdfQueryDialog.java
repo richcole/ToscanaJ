@@ -36,7 +36,8 @@ import javax.swing.filechooser.FileFilter;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
-import org.tockit.tupleware.model.TupleSet;
+import org.tockit.relations.model.Relation;
+import org.tockit.relations.model.Tuple;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdql.Query;
@@ -57,7 +58,7 @@ public class RdfQueryDialog extends JDialog {
 	private JButton nextButton;
 	
 	private Model rdfModel;
-	private TupleSet tupleSet;
+	private Relation tupleSet;
 
 	abstract class WizardPanel extends JPanel {
 		WizardPanel() {
@@ -187,7 +188,7 @@ public class RdfQueryDialog extends JDialog {
 
 				Query query = new Query(queryString) ;
 				List resultVars = query.getResultVars();
-				tupleSet = new TupleSet(
+				tupleSet = new Relation(
 									(String[]) resultVars.toArray(new String[resultVars.size()]));
 				QueryResults results = RdfQueryUtil.executeRDQL(rdfModel, query);
 				for ( Iterator iter = results ; iter.hasNext() ; ) {
@@ -198,7 +199,7 @@ public class RdfQueryDialog extends JDialog {
 						Object obj = resBinding.get(queryVar);
 						tuple[i] = obj;				
 					} 
-					tupleSet.addTuple(tuple);
+					tupleSet.addTuple(new Tuple(tuple));
 				}
 				results.close() ;
 				return true;
@@ -383,7 +384,7 @@ public class RdfQueryDialog extends JDialog {
 		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,	this);
 	}
 
-	public TupleSet getTuples() {
+	public Relation getTuples() {
 		return this.tupleSet;
 	}
 

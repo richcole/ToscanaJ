@@ -11,15 +11,15 @@ import java.io.File;
 
 import javax.swing.JFrame;
 
+import org.tockit.relations.model.Relation;
 import org.tockit.tupleware.gui.IndexSelectionDialog;
-import org.tockit.tupleware.model.TupleSet;
 import org.tockit.tupleware.source.TupleSource;
 
 
 public class SqlQueryEngine implements TupleSource {
     private File lastFile;
     private int[] objectIndices;
-    private TupleSet tuples;
+    private Relation tuples;
 
     public String getMenuName() {
         return "Query from database...";
@@ -30,14 +30,14 @@ public class SqlQueryEngine implements TupleSource {
         connectionDialog.show();
         this.tuples = connectionDialog.getTuples();
         if(this.tuples != null) {
-            IndexSelectionDialog objectSetDialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getVariableNames());
+            IndexSelectionDialog objectSetDialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getDimensionNames());
             objectSetDialog.show();
             this.objectIndices = objectSetDialog.getSelectedIndices();
             this.lastFile = connectionDialog.getLastFile();
         }
     }
 
-    public TupleSet getTuples() {
+    public Relation getTuples() {
         return this.tuples;
     }
 

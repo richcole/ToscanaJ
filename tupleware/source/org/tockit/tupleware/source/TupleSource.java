@@ -11,7 +11,7 @@ import java.io.File;
 
 import javax.swing.JFrame;
 
-import org.tockit.tupleware.model.TupleSet;
+import org.tockit.relations.model.Relation;
 
 
 /**
@@ -36,7 +36,7 @@ public interface TupleSource {
      * 
      * @pre show() has been called
      */
-	TupleSet getTuples();
+	Relation getTuples();
     
     /**
      * Returns the indices making up the object (as a crossproduct).
