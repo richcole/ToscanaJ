@@ -57,7 +57,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     /**
      * List of tables and views in the database
      */
-    private DatabaseSchema dbScheme;
+    private DatabaseSchema databaseSchema;
 
     /**
      * The list of diagrams.
@@ -85,14 +85,12 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
      */
     public ConceptualSchema(EventBroker broker) {
         this.eventBroker = broker;
-        this.dbScheme = new DatabaseSchema(broker);
         reset();
         eventBroker.processEvent(new NewConceptualSchemaEvent(this, this));
     }
 
     public ConceptualSchema(EventBroker eventBroker, Element element) throws XMLSyntaxError {
         this.eventBroker = eventBroker;
-        this.dbScheme = new DatabaseSchema(eventBroker);
         reset();
         readXML(element);
         eventBroker.processEvent(new NewConceptualSchemaEvent(this, this));
@@ -107,8 +105,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         if (databaseInfo != null) {
             retVal.addContent(databaseInfo.toXML());
         }
-        if (dbScheme != null) {
-            retVal.addContent(dbScheme.toXML());
+        if (databaseSchema != null) {
+            retVal.addContent(databaseSchema.toXML());
         }
         if (DatabaseViewerManager.getNumberOfObjectListViews() != 0 ||
                 DatabaseViewerManager.getNumberOfObjectViews() != 0) {
@@ -116,12 +114,14 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
             DatabaseViewerManager.listsToXML(viewsElem);
             retVal.addContent(viewsElem);
         }
-        Element queriesElement = new Element(QUERIES_ELEMENT_NAME);
-        for (Iterator iterator = queries.iterator(); iterator.hasNext();) {
-            Query query = (Query) iterator.next();
-            queriesElement.addContent(query.toXML());
+        if (this.queries.size() != 0) {
+	        Element queriesElement = new Element(QUERIES_ELEMENT_NAME);
+	        for (Iterator iterator = queries.iterator(); iterator.hasNext();) {
+	            Query query = (Query) iterator.next();
+	            queriesElement.addContent(query.toXML());
+	        }
+	        retVal.addContent(queriesElement);
         }
-        retVal.addContent(queriesElement);
         for (int i = 0; i < diagrams.size(); i++) {
             Diagram2D d = (Diagram2D) diagrams.elementAt(i);
             retVal.addContent(d.toXML());
@@ -140,9 +140,9 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         if (XMLHelper.contains(elem, DatabaseInfo.DATABASE_CONNECTION_ELEMENT_NAME)) {
             databaseInfo = new DatabaseInfo(elem.getChild(DatabaseInfo.DATABASE_CONNECTION_ELEMENT_NAME));
             if (XMLHelper.contains(elem, DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME)) {
-                dbScheme = new DatabaseSchema(eventBroker, elem.getChild(DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME));
+                databaseSchema = new DatabaseSchema(eventBroker, elem.getChild(DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME));
             } else {
-                dbScheme = new DatabaseSchema(eventBroker);
+                databaseSchema = new DatabaseSchema(eventBroker);
             }
         }
         /// @todo change this once DatabaseViewers are one the schema itself
@@ -168,6 +168,9 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
                     this.queries.add(new DistinctListQuery(databaseInfo, queryElem));
                 }
             }
+        } else {
+        	queries.add(AggregateQuery.CountQuery);
+        	queries.add(ListQuery.KeyListQuery);
         }
         List diagramElems = elem.getChildren(Diagram2D.DIAGRAM_ELEMENT_NAME);
         for (Iterator iterator = diagramElems.iterator(); iterator.hasNext();) {
@@ -275,8 +278,12 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         return this.hasDiagramDescription;
     }
 
-    public DatabaseSchema getDbScheme() {
-        return dbScheme;
+    public DatabaseSchema getDatabaseSchema() {
+        return databaseSchema;
+    }
+
+    public void setDatabaseSchema(DatabaseSchema schema) {
+        this.databaseSchema = schema;
     }
 
     public List getQueries() {
