@@ -461,7 +461,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // create a help menu
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
-        /// @todo add a spacing here to get the help to the right edge of the screen
+        menubar.add(Box.createHorizontalGlue());
         menubar.add(helpMenu);
 
         // add description entry if available
