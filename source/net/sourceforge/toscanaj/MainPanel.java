@@ -19,6 +19,7 @@ import net.sourceforge.toscanaj.view.DiagramOrganiser;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
+import net.sourceforge.toscanaj.view.dialogs.DescriptionViewer;
 import net.sourceforge.toscanaj.view.dialogs.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.view.dialogs.ErrorDialog;
 
@@ -35,11 +36,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.jdom.Element;
+
 /**
  *  This class provides the main GUI panel with menus and a toolbar
  *  for ToscanaJ.
  */
 public class MainPanel extends JFrame implements ActionListener, ChangeObserver, KeyListener {
+    /**
+     * The version name used in the about dialog.
+     */
+    static private final String VersionString = "CVS Build";
+    
     /**
      * The maximum number of files in the most recently used files list.
      */
@@ -263,13 +271,17 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             // menu item export diagram
             exportDiagramMenuItem = new JMenuItem("Export Diagram...");
             exportDiagramMenuItem.setMnemonic(KeyEvent.VK_E);
+            exportDiagramMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                                                    KeyEvent.VK_E, ActionEvent.CTRL_MASK));
             exportDiagramMenuItem.addActionListener(this);
             exportDiagramMenuItem.setEnabled(false);
             fileMenu.add(exportDiagramMenuItem);
 
             // create the export diagram save options submenu
             this.exportDiagramSetupMenuItem = new JMenuItem("Export Diagram Setup...");
-            this.exportDiagramSetupMenuItem.setMnemonic(KeyEvent.VK_E);
+            this.exportDiagramSetupMenuItem.setMnemonic(KeyEvent.VK_S);
+            this.exportDiagramSetupMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                                                    KeyEvent.VK_E, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
             this.exportDiagramSetupMenuItem.addActionListener(this);
             fileMenu.add(exportDiagramSetupMenuItem);
         }
@@ -307,7 +319,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_F4, ActionEvent.ALT_MASK));
-        exitMenuItem.setMnemonic(KeyEvent.VK_E);
         exitMenuItem.addActionListener(this);
         fileMenu.add(exitMenuItem);
 
@@ -317,6 +328,9 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         menubar.add(diagrMenu);
 
         this.backMenuItem = new JMenuItem("Go Back one Diagram");
+        this.backMenuItem.setMnemonic(KeyEvent.VK_B);
+        this.backMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                                     KeyEvent.VK_LEFT, ActionEvent.ALT_MASK));
         this.backMenuItem.addActionListener(this);
         this.backMenuItem.setEnabled(false);
         diagrMenu.add(backMenuItem);
@@ -328,11 +342,17 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         ButtonGroup documentsFilterGroup = new ButtonGroup();
 
         this.filterExactMenuItem = new JRadioButtonMenuItem("Filter: use only exact matches");
+        this.filterExactMenuItem.setMnemonic(KeyEvent.VK_X);
+        this.filterExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_F, ActionEvent.CTRL_MASK));
         this.filterExactMenuItem.addActionListener(this);
         documentsFilterGroup.add(this.filterExactMenuItem);
         diagrMenu.add(this.filterExactMenuItem);
 
         this.filterAllMenuItem = new JRadioButtonMenuItem("Filter: use all matches");
+        this.filterAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_F, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+        this.filterAllMenuItem.setMnemonic(KeyEvent.VK_A);
         this.filterAllMenuItem.setSelected(true);
         this.filterAllMenuItem.addActionListener(this);
         documentsFilterGroup.add(this.filterAllMenuItem);
@@ -345,12 +365,18 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         ButtonGroup nestingGroup = new ButtonGroup();
 
         this.noNestingMenuItem = new JRadioButtonMenuItem("No nesting of diagrams");
+        this.noNestingMenuItem.setMnemonic(KeyEvent.VK_N);
+        this.noNestingMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_0, ActionEvent.CTRL_MASK));
         this.noNestingMenuItem.addActionListener(this);
         this.noNestingMenuItem.setSelected(true);
         nestingGroup.add(noNestingMenuItem);
         diagrMenu.add(noNestingMenuItem);
 
         this.nestingLevel1MenuItem = new JRadioButtonMenuItem("One level of nesting");
+        this.nestingLevel1MenuItem.setMnemonic(KeyEvent.VK_O);
+        this.nestingLevel1MenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_1, ActionEvent.CTRL_MASK));
         this.nestingLevel1MenuItem.addActionListener(this);
         nestingGroup.add(nestingLevel1MenuItem);
         diagrMenu.add(nestingLevel1MenuItem);
@@ -364,12 +390,18 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         ButtonGroup documentsDisplayGroup = new ButtonGroup();
 
         this.showExactMenuItem = new JRadioButtonMenuItem("Show only exact matches");
+        this.showExactMenuItem.setMnemonic(KeyEvent.VK_X);
+        this.showExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         this.showExactMenuItem.setSelected(true);
         this.showExactMenuItem.addActionListener(this);
         documentsDisplayGroup.add(this.showExactMenuItem);
         viewMenu.add(this.showExactMenuItem);
 
         this.showAllMenuItem = new JRadioButtonMenuItem("Show all matches");
+        this.showAllMenuItem.setMnemonic(KeyEvent.VK_A);
+        this.showAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_S, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
         this.showAllMenuItem.addActionListener(this);
         documentsDisplayGroup.add(this.showAllMenuItem);
         viewMenu.add(this.showAllMenuItem);
@@ -380,13 +412,37 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // menu radio buttons group:
         ButtonGroup labelContentGroup = new ButtonGroup();
 
+        /**
+         * @todo doing arithmetics on the KeyEvent constants is probably not the proper thing to do,
+         *       though I could not find another way to get this. Try again...
+         */
         if (this.conceptualSchema != null) {
             Iterator it = this.conceptualSchema.getQueries();
             boolean first = true;
+            String allowedChars = "abcdefghijklmnopqrstuvwxyz";
+            String usedChars = "ax";
+            int count = 0;
             while (it.hasNext()) {
                 final Query query = (Query) it.next();
+                count++;
                 String name = query.getName();
                 JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);
+                for(int i = 0; i < name.length(); i++) {
+                    char c = name.toLowerCase().charAt(i);
+                    if( (allowedChars.indexOf(c) != -1)  && (usedChars.indexOf(c) == -1) ) {
+                        menuItem.setMnemonic(KeyEvent.VK_A + allowedChars.indexOf(c));
+                        usedChars += c;
+                        break;
+                    }
+                }
+                if(count<10) { // first ones get their number (starting with 1)
+                    menuItem.setAccelerator(KeyStroke.getKeyStroke(
+                                                     KeyEvent.VK_0 + count, ActionEvent.ALT_MASK));
+                }
+                if(count==10) { // tenth gets the zero
+                    menuItem.setAccelerator(KeyStroke.getKeyStroke(
+                                                     KeyEvent.VK_0, ActionEvent.ALT_MASK));
+                } // others don't get an accelerator
                 menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         diagramView.setQuery(query);
@@ -401,6 +457,39 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
                 }
             }
         }
+        
+        // create a help menu
+        JMenu helpMenu = new JMenu("Help");
+        helpMenu.setMnemonic(KeyEvent.VK_H);
+        /// @todo add a spacing here to get the help to the right edge of the screen
+        menubar.add(helpMenu);
+
+        // add description entry if available
+        if( this.conceptualSchema != null ) {
+            Element description = this.conceptualSchema.getDescription();
+            if( description != null ) {
+                JMenuItem descItem = new JMenuItem("Schema Description");
+                descItem.setMnemonic(KeyEvent.VK_D);
+                descItem.setAccelerator(KeyStroke.getKeyStroke(
+                                                     KeyEvent.VK_F1, 0));
+                descItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        showSchemaDescription();
+                    }
+                });
+                helpMenu.add(descItem);
+                helpMenu.addSeparator();
+            }
+        }
+        
+        JMenuItem aboutItem = new JMenuItem("About ToscanaJ");
+        aboutItem.setMnemonic(KeyEvent.VK_A);
+        aboutItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showAboutDialog();
+            }
+        });
+        helpMenu.add(aboutItem);
 
         this.menubar.updateUI();
     }
@@ -508,16 +597,10 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
 
         // diagram view
         if (actionSource == this.filterExactMenuItem) {
-            // testing only
-            diagramSchema.setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT);
-            // ^^^^^^^^^^^^
             DiagramController.getController().setFilterMethod(DiagramController.FILTER_CONTINGENT);
             return;
         }
         if (actionSource == this.filterAllMenuItem) {
-            // testing only
-            diagramSchema.setGradientType(DiagramSchema.GRADIENT_TYPE_EXTENT);
-            // ^^^^^^^^^^^^
             DiagramController.getController().setFilterMethod(DiagramController.FILTER_EXTENT);
             return;
         }
@@ -559,9 +642,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
 
     /**
      * We do some things if keys were typed when the diagram view has the focus.
+     *
+     * @todo This does not work at the moment since the diagram view never has focus, even not
+     *       after clicking on it --> fix.
      */
     public void keyTyped(KeyEvent e) {
-        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
         if (e.getKeyChar() == 'e') {
             exportImage();
         }
@@ -692,6 +777,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
 
         // store current file
         this.currentFile = schemaFile.getPath();
+        // tell the viewer about it (so relative links can be resolved)
+        DescriptionViewer.setBaseLocation(schemaFile.getPath());
 
         // recreate the menus
         buildMenuBar();
@@ -813,6 +900,19 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
                 }
             }
         }
+    }
+    
+    protected void showSchemaDescription() {
+        DescriptionViewer.show(this, this.conceptualSchema.getDescription());
+    }
+
+    protected void showAboutDialog() {
+        JOptionPane.showMessageDialog(this,
+                "This is ToscanaJ " + VersionString + ".\n\n" +
+                "Copyright (c) DSTC Pty Ltd\n\n" +
+                "See http://toscanaj.sourceforge.net for more information.",
+                "About ToscanaJ",
+                JOptionPane.PLAIN_MESSAGE);
     }
 
     /**

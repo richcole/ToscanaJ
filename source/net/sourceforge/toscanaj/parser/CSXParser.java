@@ -108,6 +108,7 @@ public class CSXParser
         _Schema = new ConceptualSchema();
 
         // parse the different sections
+        parseDescription();
         parseDatabaseInformation();
         parseDatabaseViewerSetups();
         parseDatabaseReportSetups();
@@ -115,6 +116,16 @@ public class CSXParser
         parseDiagrams();
 
         return _Schema;
+    }
+    
+    /**
+     * Parses the HTML description of the schema (if available).
+     */
+    private static void parseDescription()
+        throws DataFormatException
+    {
+        Element descElem = _Document.getRootElement().getChild("description");
+        _Schema.setDescription(descElem);
     }
 
     /**

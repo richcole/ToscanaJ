@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import org.jdom.Element;
+
 /**
  * This is the main interface for the data structures.
  *
@@ -47,6 +49,11 @@ public class ConceptualSchema {
      * The list of queries that can be made for objects.
      */
     private List queries = new LinkedList();
+    
+    /**
+     * The XML (XHTML) describing the schema (or null if not found).
+     */
+    private Element description = null;
 
     /**
      * Creates an empty schema.
@@ -161,5 +168,15 @@ public class ConceptualSchema {
     public void addDiagram( SimpleLineDiagram diagram )
     {
         diagrams.add( diagram );
+    }
+    
+    public void setDescription( Element description )
+    {
+        this.description = description;
+    }
+    
+    public Element getDescription()
+    {
+        return this.description;
     }
 }
