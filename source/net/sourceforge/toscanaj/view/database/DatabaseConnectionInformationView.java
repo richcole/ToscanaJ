@@ -647,9 +647,9 @@ public class DatabaseConnectionInformationView extends JDialog
                     new Insets(0, 15, 5, 5),
                     2,2));
 
-            this.add(new JPanel(),new GridBagConstraints(
+            this.add(new JLabel("Note: this works only with some Excel files"),new GridBagConstraints(
                     0,7,1,1,1,1,
-                    GridBagConstraints.WEST,
+                    GridBagConstraints.SOUTHWEST,
                     GridBagConstraints.VERTICAL,
                     new Insets(5, 5, 5, 5),
                     2,2));
