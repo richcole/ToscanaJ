@@ -51,6 +51,10 @@ public class NDimDiagramNode extends DiagramNode {
             this.ndimVector[i] = Double.parseDouble(coordElem.getTextNormalize());
             i++;
         }
+        // change full 2d position (which has been saved) into offset again
+        double x = super.getPosition().getX() - this.getProjectedPosition().getX();
+        double y = super.getPosition().getY() - this.getProjectedPosition().getY();
+        this.position.setLocation(x,y);
     }
 
     public Element toXML() {

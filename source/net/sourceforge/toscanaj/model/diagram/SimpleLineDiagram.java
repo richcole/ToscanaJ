@@ -61,9 +61,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     }
 
     public SimpleLineDiagram(Element element) throws XMLSyntaxError {
-        coordinateSystemChecked = true; // don't check while we still build the diagram
         readXML(element);
-        coordinateSystemChecked = false;
     }
 
     public Element toXML() {
@@ -84,6 +82,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
+        coordinateSystemChecked = true; // don't check while we still build the diagram
         XMLHelper.checkName(DIAGRAM_ELEMENT_NAME, elem);
         title = XMLHelper.getAttribute(elem, TITLE_ATTRIBUTE_NAME).getValue();
         description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
@@ -114,6 +113,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
             DiagramNode node = (DiagramNode) iterator.next();
             ((ConceptImplementation) node.getConcept()).buildClosures();
         }
+        coordinateSystemChecked = false;
     }
 
     protected DiagramNode createNewDiagramNode(Element diagramNode) throws XMLSyntaxError {

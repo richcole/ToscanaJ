@@ -25,7 +25,6 @@ public class NDimDiagram extends SimpleLineDiagram {
     }
 
     public NDimDiagram(Element element) throws XMLSyntaxError {
-        super(element);
         this.base = new Vector();
         Element baseElem = element.getChild("projectionBase");
         Iterator it = baseElem.getChildren("vector").iterator();
@@ -35,6 +34,7 @@ public class NDimDiagram extends SimpleLineDiagram {
             double y = Double.parseDouble(vecElem.getAttributeValue("y"));
             this.base.add(new Point2D.Double(x,y));
         }
+        super.readXML(element); // do this last, since the ndim nodes rely on the initialized base
     }
     
     public Element toXML() {
