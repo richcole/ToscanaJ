@@ -509,6 +509,25 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
             }
             this.notifyObservers();
         }
+		else if( (lineHit >= 1) && (lineHit <= this.displayLines - 3) ){
+        	int scrollbarHeight = (this.displayLines - 3) * this.lineHeight;
+			double scale = scrollbarHeight / (double) getNumberOfEntries();
+			//get coordinate of top pos of scroll handle
+			double topPosOfScrollHandle = this.rect.getY() + this.lineHeight + 
+			                               this.firstItem * scale;
+        	double bottomPosOfScrollHandle = topPosOfScrollHandle + 
+        	                                  this.displayLines * scale;
+        	
+        	if( pos.getY() < topPosOfScrollHandle){ //user clicks above scrollbar
+        		this.firstItem -= this.displayLines;
+        		ensureFirstItemBounds();
+        		notifyObservers();
+			}else if ( pos.getY() > bottomPosOfScrollHandle ){ //user clicks below scrollbar
+        		this.firstItem += this.displayLines;
+        		ensureFirstItemBounds();
+				notifyObservers();
+        	}
+        } 
     }
 
     /**
