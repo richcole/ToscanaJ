@@ -25,12 +25,14 @@ import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
+import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.diagram.WriteableDiagram2D;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -69,6 +71,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 	private JButton zoomInButton;
 	private JButton zoomOutButton;
     private JComboBox movementChooser;
+    private JButton editDiagramDescButton;
 
     /**
      * Construct an instance of this view
@@ -132,7 +135,16 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         });
         editContextButton.setEnabled(false);
         toolPanel.add(editContextButton);
-
+		
+		editDiagramDescButton = new JButton("Edit Diagram Description...");
+		editDiagramDescButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				editDiagramDescription();
+			}
+		});
+		editDiagramDescButton.setEnabled(false);
+		toolPanel.add(editDiagramDescButton);
+		
         diagramViewPanel.add(toolPanel, BorderLayout.NORTH);
         diagramViewPanel.add(diagramView, BorderLayout.CENTER);
         return diagramViewPanel;
@@ -263,7 +275,17 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     		this.diagramView.showDiagram(diagram);
     	}
     }
-
+	
+	protected void editDiagramDescription(){
+		WriteableDiagram2D currentDiagram = (WriteableDiagram2D) this.diagramView.getDiagram();
+		if(currentDiagram!=null){
+			XMLEditorDialog diagramDescriptionEditor = new XMLEditorDialog(null,"Diagram description editor");
+			diagramDescriptionEditor.setContent(currentDiagram.getDescription());
+			diagramDescriptionEditor.show();
+			currentDiagram.setDescription(diagramDescriptionEditor.getContent());
+		}
+	}
+	
     protected JComponent makeDiagramListView() {
         diagramListModel = new DefaultListModel();
         final JList listView = new JList(diagramListModel);
@@ -396,6 +418,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		this.zoomInButton.setEnabled(diagramAvailable);
 		this.zoomOutButton.setEnabled(diagramAvailable);
 		this.editContextButton.setEnabled(diagramAvailable);
+		this.editDiagramDescButton.setEnabled(diagramAvailable);
 		if(movementChooser != null) {
 			setMovementManipulators();
 		}
