@@ -70,6 +70,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     private static final String VERSION_ATTRIBUTE_VALUE = "TJ0.6";
     private static final String DESCRIPTION_ELEMENT_NAME = "description";
     private static final String VIEWS_ELEMENT_NAME = "views";
+    private static final String QUERIES_ELEMENT_NAME = "queries";
 
     /**
      * Creates an empty schema.
@@ -95,15 +96,21 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         retVal.addContent(description);
         retVal.addContent(databaseInfo.toXML());
         retVal.addContent(dbScheme.toXML());
-        for (int i = 0; i < diagrams.size(); i++) {
-            Diagram2D d = (Diagram2D) diagrams.elementAt(i);
-            retVal.addContent(d.toXML());
-        }
         if(DatabaseViewerManager.getNumberOfObjectListViews() != 0 ||
            DatabaseViewerManager.getNumberOfObjectViews() != 0 ) {
             Element viewsElem = new Element(VIEWS_ELEMENT_NAME);
             DatabaseViewerManager.listsToXML(viewsElem);
             retVal.addContent(viewsElem);
+        }
+        Element queriesElement = new Element(QUERIES_ELEMENT_NAME);
+        for (Iterator iterator = queries.iterator(); iterator.hasNext();) {
+            Query query = (Query) iterator.next();
+            queriesElement.addContent(query.toXML());
+        }
+        retVal.addContent(queriesElement);
+        for (int i = 0; i < diagrams.size(); i++) {
+            Diagram2D d = (Diagram2D) diagrams.elementAt(i);
+            retVal.addContent(d.toXML());
         }
         return retVal;
     }
@@ -119,12 +126,6 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         } else {
             dbScheme = new DatabaseSchema(eventBroker);
         }
-        List diagramElems = elem.getChildren(Diagram2D.DIAGRAM_ELEMENT_NAME);
-        for (Iterator iterator = diagramElems.iterator(); iterator.hasNext();) {
-            Element element = (Element) iterator.next();
-            SimpleLineDiagram diagram = new SimpleLineDiagram(element);
-            diagrams.add(diagram);
-        }
         /// @todo change this once DatabaseViewers are one the schema itself
         Element viewsElem = elem.getChild(VIEWS_ELEMENT_NAME);
         if(viewsElem != null) {
@@ -135,6 +136,27 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
                 e.printStackTrace();
                 throw new XMLSyntaxError("Could not initialize database viewer.");
             }
+        }
+        Element queriesElem = elem.getChild(QUERIES_ELEMENT_NAME);
+        if (queriesElem != null) {
+            for (Iterator iterator = queriesElem.getChildren().iterator(); iterator.hasNext();) {
+                Element queryElem = (Element) iterator.next();
+                if(queryElem.getName().equals(AggregateQuery.QUERY_ELEMENT_NAME)) {
+                    this.queries.add(new AggregateQuery(databaseInfo, queryElem));
+                }
+                else if(queryElem.getName().equals(ListQuery.QUERY_ELEMENT_NAME)) {
+                    this.queries.add(new ListQuery(databaseInfo, queryElem));
+                }
+                else if(queryElem.getName().equals(DistinctListQuery.QUERY_ELEMENT_NAME)) {
+                    this.queries.add(new DistinctListQuery(databaseInfo, queryElem));
+                }
+            }
+        }
+        List diagramElems = elem.getChildren(Diagram2D.DIAGRAM_ELEMENT_NAME);
+        for (Iterator iterator = diagramElems.iterator(); iterator.hasNext();) {
+            Element element = (Element) iterator.next();
+            SimpleLineDiagram diagram = new SimpleLineDiagram(element);
+            diagrams.add(diagram);
         }
     }
 

@@ -486,7 +486,7 @@ public class ConceptImplementation implements Concept {
         List objects = objectContingentElem.getChildren(OBJECT_ELEMENT_NAME);
         for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
             Element objElem = (Element) iterator.next();
-            this.objectContingent.add(objElem);
+            this.objectContingent.add(objElem.getText());
         }
         Element attributeContingentElem = XMLHelper.mustbe(ATTRIBUTE_CONTINGENT_ELEMENT_NAME, elem);
         List attributes = attributeContingentElem.getChildren(ATTRIBUTE_ELEMENT_NAME);
@@ -494,6 +494,8 @@ public class ConceptImplementation implements Concept {
             Element attrElem = (Element) iterator.next();
             this.attributeContingent.add(new Attribute(attrElem.getText(), attrElem.getChild(DESCRIPTION_ELEMENT_NAME)));
         }
+        this.filter.add(this);
+        this.ideal.add(this);
     }
 
     public void addObject(Object object) {

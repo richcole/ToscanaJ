@@ -114,17 +114,20 @@ public class CSXParser {
         if (element.getName().equals("conceptualSchema")) {
             if (element.getAttributeValue("version").equals("TJ0.6")) {
                 _Schema = new ConceptualSchema(eventBroker, element);
-                return _Schema;
+            }
+            else {
+                // create data structure
+                _Schema = new ConceptualSchema(eventBroker);
+
+                // parse the different sections
+                parseDescription();
+                parseContext();
+                parseDiagrams();
             }
         }
-        // create data structure
-        _Schema = new ConceptualSchema(eventBroker);
-
-        // parse the different sections
-        parseDescription();
-        parseContext();
-        parseDiagrams();
-
+        else {
+            throw new DataFormatException("Root element name is not <conceptualSchema>");
+        }
         eventBroker.processEvent(new ConceptualSchemaLoadedEvent(CSXParser.class, _Schema, csxFile));
 
         return _Schema;

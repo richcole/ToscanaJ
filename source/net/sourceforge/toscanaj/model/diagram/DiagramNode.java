@@ -119,9 +119,11 @@ public class DiagramNode implements XMLizable {
         );
         if (XMLHelper.contains(elem, ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)) {
             attributeLabel = new LabelInfo(elem.getChild(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME));
+            attributeLabel.attachNode(this);
         }
         if (XMLHelper.contains(elem, OBJECT_LABEL_STYLE_ELEMENT_NAME)) {
             objectLabel = new LabelInfo(elem.getChild(OBJECT_LABEL_STYLE_ELEMENT_NAME));
+            objectLabel.attachNode(this);
         }
         concept = new ConceptImplementation(
                 XMLHelper.mustbe(ConceptImplementation.CONCEPT_ELEMENT_NAME, elem)

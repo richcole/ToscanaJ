@@ -7,15 +7,29 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
+import org.jdom.Element;
+
 import java.util.Iterator;
 import java.util.Vector;
 
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+
 public class DistinctListQuery extends Query {
     private DatabaseInfo info;
+    public static final String QUERY_ELEMENT_NAME = "distinctListQuery";
 
     public DistinctListQuery(DatabaseInfo info, String name, String header) {
         super(name, header);
         this.info = info;
+    }
+
+    public DistinctListQuery(DatabaseInfo info, Element element) throws XMLSyntaxError {
+        super(element);
+        this.info = info;
+    }
+
+    protected String getElementName() {
+        return QUERY_ELEMENT_NAME;
     }
 
     public String getQueryHead() {

@@ -23,6 +23,12 @@ public abstract class XMLHelper {
         return elem;
     }
 
+    static public void addOptionalAttribute(Element target, String attributeName, String attributeValue) {
+        if(attributeName != null && attributeValue != null) {
+            target.setAttribute(attributeName, attributeValue);
+        }
+    }
+
     static public Element mustbe(String name, Element parent)
             throws XMLSyntaxError {
         Element child = parent.getChild(name);
