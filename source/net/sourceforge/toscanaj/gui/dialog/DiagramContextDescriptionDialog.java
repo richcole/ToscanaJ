@@ -30,7 +30,7 @@ public class DiagramContextDescriptionDialog extends JDialog
 	 * Construct the layout
 	 */
 	public DiagramContextDescriptionDialog(JFrame parent, EventBroker broker){
-		super(parent, "Diagram Context Description");
+		super(parent, "Analysis History");
 		final DiagramContextDescriptionDialog dialog = this;
 		
 		broker.subscribe(this, DisplayedDiagramChangedEvent.class, Object.class);
