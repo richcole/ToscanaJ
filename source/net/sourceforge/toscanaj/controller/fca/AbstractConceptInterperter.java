@@ -28,11 +28,14 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 	private Hashtable extentSizes = new Hashtable();
     
     public static final double[] SIGNIFICANCE_LEVELS = new double[]{
-        0.10, 0.05, 0.025, 0.01, 0.005, 0.001
+        0.25, 0.20, 0.15, 0.10, 0.05, 0.025, 0.02, 0.01, 0.005, 0.0025, 0.001, 0.0005
     };
     
+    /**
+     * Chi square values come from http://www.ncat.edu/~warrack/chisquaretable.pdf
+     */
     public static final double[] CHI_SQUARE_CRITICAL_VALUES = new double[]{
-        2.706, 3.841, 5.024, 6.635, 7.88, 10.828        
+        1.32, 1.64, 2.07, 2.71, 3.84, 5.02, 5.41, 6.63, 7.88, 9.14, 10.83, 12.12        
     };
 
     /**
