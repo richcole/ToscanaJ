@@ -40,7 +40,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         }
     }
 
-    private int determineDataType(int columnType) {
+    public static int determineDataType(int columnType) {
         switch (columnType) {
             case Types.DOUBLE:
                 return OrdinalScaleEditorDialog.FLOAT;
@@ -67,7 +67,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         if(scaleType == OrdinalScaleEditorDialog.UNSUPPORTED) {
         	throw new RuntimeException("Unsupported scale type");
         }
-        OrdinalScaleEditorDialog scaleDialog = new OrdinalScaleEditorDialog(parent, column, scaleType);
+        OrdinalScaleEditorDialog scaleDialog = new OrdinalScaleEditorDialog(parent, scheme.getDatabaseSchema(), column, scaleType);
         if (!scaleDialog.execute()) {
             return null;
         }

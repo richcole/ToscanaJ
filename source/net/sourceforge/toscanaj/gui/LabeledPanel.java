@@ -31,7 +31,7 @@ public class LabeledPanel extends JPanel {
                         0, 0, 1, 1, 1.0, 0,
                         GridBagConstraints.CENTER,
                         GridBagConstraints.HORIZONTAL,
-                        new Insets(5, 5, 5, 5),
+                        new Insets(0, 5, 5, 5),
                         5, 5)
         );
 		if(scrollable) {
@@ -60,7 +60,7 @@ public class LabeledPanel extends JPanel {
                             0, 2, 1, 1, 1.0, 0,
                             GridBagConstraints.CENTER,
                             GridBagConstraints.HORIZONTAL,
-                            new Insets(2, 5, 2, 5),
+                            new Insets(2, 5, 2, 0),
                             5, 5)
             );
         }

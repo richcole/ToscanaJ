@@ -11,6 +11,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.database.Column;
+import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.util.CollectionFactory;
 import net.sourceforge.toscanaj.view.scales.OrdinalScaleEditorDialog;
@@ -32,7 +33,7 @@ public class OrdinalScaleEditorDialogTest extends TestCase {
         Column column = new Column("Column", java.sql.Types.DOUBLE, table);
         table.addColumn(column);
         OrdinalScaleEditorDialog dialog = new OrdinalScaleEditorDialog(
-                null, column, OrdinalScaleEditorDialog.FLOAT
+                null, new DatabaseSchema(new EventBroker()), column, OrdinalScaleEditorDialog.FLOAT
         );
         dialog.addDelimiter(1.);
 

@@ -8,13 +8,15 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.*;
 
+import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.database.Column;
+import net.sourceforge.toscanaj.model.database.DatabaseSchema;
+import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import java.awt.*;
@@ -40,6 +42,8 @@ public class OrdinalScaleEditorDialog extends JDialog {
     public static final int FLOAT = 1;
     public static final int UNSUPPORTED = -1;
     private Column column;
+    private JComboBox columnChooser;
+    private DatabaseSchema databaseSchema;
     
     private static interface ContextGenerator {
     	Context createContext(String name, List dividers, Column column);
@@ -216,13 +220,15 @@ public class OrdinalScaleEditorDialog extends JDialog {
         }
     }
 
-    public OrdinalScaleEditorDialog(Frame owner, Column column, int scaleType) {
+    public OrdinalScaleEditorDialog(Frame owner, DatabaseSchema databaseSchema, Column column, int scaleType) {
         super(owner);
       	setSize(400,600);
       	setLocation(200,100);
       	this.column = column;
+      	this.databaseSchema = databaseSchema;
         this.scaleType = scaleType;
-        layoutDialog(column.getName());
+        layoutDialog();
+        fillControls();
         pack();
     }
 
@@ -232,56 +238,39 @@ public class OrdinalScaleEditorDialog extends JDialog {
         return result;
     }
 
-    private void layoutDialog(String scaleName) {
+    private void layoutDialog() {
         setModal(true);
         setTitle("Ordinal scale editor");
         JPanel mainPane = new JPanel(new GridBagLayout());
         
-		JPanel titlePane = new JPanel(new GridBagLayout());
-        titleEditor.setText(scaleName + " (ordinal)");
-		this.titleEditor.addKeyListener(new KeyListener(){
-			private void validateTextField(){
-				if(titleEditor.getText().equals("") || dividersList.getModel().getSize()==0){
-					okButton.setEnabled(false);
-				}else{
-					okButton.setEnabled(true);
-				}
-			}
-			public void keyTyped(KeyEvent e) {
-				validateTextField();
-			}
-			public void keyReleased(KeyEvent e) {
-				validateTextField();
-			}
-			public void keyPressed(KeyEvent e) {}		
-		});
-        JLabel title = new JLabel("Title");
-        titlePane.add(title, new GridBagConstraints(
-        					0,0,1,1,0,0,
-        					GridBagConstraints.NORTHWEST,
-        					GridBagConstraints.NONE,
-        					new Insets(2,2,2,2),
-        					2,2      
-        ));
-        
-		titlePane.add(titleEditor, new GridBagConstraints(
-							 0,1,1,1,1.0,0,
-							 GridBagConstraints.WEST,
-							 GridBagConstraints.HORIZONTAL,
-							 new Insets(2,2,2,2),
-							 2,2      
-		 ));
-        
-        mainPane.add(titlePane,new GridBagConstraints(
-					0,0,2,1,1.0,0,
+        mainPane.add(makeTitlePane(),new GridBagConstraints(
+					0,0,1,1,1.0,0,
 					GridBagConstraints.NORTHWEST,
 					GridBagConstraints.HORIZONTAL,
 					new Insets(2,2,2,2),
 					2,2
 		));
 		
-		mainPane.add(makeCenterPane(), new GridBagConstraints(
-					0,1,1,1,1.0,1.0,
+        mainPane.add(makeColumnChooserPane(),
+                new GridBagConstraints(
+                        0, 1, 1, 1, 1, 0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL,
+                        new Insets(2, 2, 2, 2),
+                        0, 0
+                )
+        );
+
+        mainPane.add(makeTypeOptionPane(), new GridBagConstraints(
+                    0,2,1,1,1.0,0,
+                    GridBagConstraints.CENTER,
+                    GridBagConstraints .HORIZONTAL,
+                    new Insets(2,2,2,2),
+                    2,2
+        ));
+
+		mainPane.add(makeDividerPane(), new GridBagConstraints(
+					0,3,1,1,1.0,1.0,
 					GridBagConstraints.NORTHWEST,
 					GridBagConstraints .BOTH,
 					new Insets(2,2,2,0),
@@ -289,16 +278,8 @@ public class OrdinalScaleEditorDialog extends JDialog {
 		));
 		
 		
-        mainPane.add(makeTypeOptionPane(), new GridBagConstraints(
-                    0,3,2,1,1.0,0,
-                    GridBagConstraints.CENTER,
-                    GridBagConstraints .HORIZONTAL,
-                    new Insets(2,2,2,2),
-                    2,2
-        ));
-
         mainPane.add(makeButtonsPane(), new GridBagConstraints(
-                    0,4,2,1,1.0,0,
+                    0,4,1,1,1.0,0,
                     GridBagConstraints.NORTHWEST,
                     GridBagConstraints .HORIZONTAL,
                     new Insets(2,2,2,2),
@@ -309,7 +290,41 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
     }
 
-	protected JPanel makeCenterPane() {
+    private JPanel makeTitlePane() {
+        this.titleEditor.addKeyListener(new KeyListener(){
+        	private void validateTextField(){
+        		if(titleEditor.getText().equals("") || dividersList.getModel().getSize()==0){
+        			okButton.setEnabled(false);
+        		}else{
+        			okButton.setEnabled(true);
+        		}
+        	}
+        	public void keyTyped(KeyEvent e) {
+        		validateTextField();
+        	}
+        	public void keyReleased(KeyEvent e) {
+        		validateTextField();
+        	}
+        	public void keyPressed(KeyEvent e) {}		
+        });
+        return new LabeledPanel("Title:", this.titleEditor, false);
+    }
+
+    private JPanel makeColumnChooserPane() {
+        this.columnChooser = new JComboBox();
+        this.columnChooser.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                JComboBox cb = (JComboBox) e.getSource();
+                if(column != cb.getSelectedItem()) {
+                    column = ((TableColumnPair) cb.getSelectedItem()).getColumn();
+                }
+            }
+        });
+
+        return new LabeledPanel("Column:", this.columnChooser, false);
+    }
+
+	protected JPanel makeDividerPane() {
 		JPanel dividerPane = new JPanel(new GridBagLayout());
 		dividersModel = new DefaultListModel();
 		
@@ -436,12 +451,25 @@ public class OrdinalScaleEditorDialog extends JDialog {
 					new Insets(2,2,2,2),
 					2,2
 		));
+		centerPane.setBorder(BorderFactory.createEtchedBorder());
 		
-		TitledBorder titledBorder = BorderFactory.createTitledBorder("Divider");
-		titledBorder.setTitleJustification(TitledBorder.RIGHT);
-		centerPane.setBorder(titledBorder);
-		return centerPane;
+		return new LabeledPanel("Dividers:", centerPane, false);
 	}
+
+    private void fillControls() {
+        this.columnChooser.removeAllItems();
+        List tables = this.databaseSchema.getTables();
+        for (Iterator tableIterator = tables.iterator(); tableIterator.hasNext();) {
+            Table table = (Table) tableIterator.next();
+            List columns = table.getColumns();
+            for (Iterator columnsIterator = columns.iterator(); columnsIterator.hasNext();) {
+                Column column = (Column) columnsIterator.next();
+                if(OrdinalScaleGenerator.determineDataType(column.getType()) != UNSUPPORTED) {
+                	this.columnChooser.addItem(new TableColumnPair(table, column));
+                }
+            }
+        }
+    }
 
     public void removeDivider(int i) {
         dividersModel.removeElementAt(i);
@@ -605,8 +633,6 @@ public class OrdinalScaleEditorDialog extends JDialog {
     }
 
     private JPanel makeTypeOptionPane() {
-        JPanel pane = new JPanel(new BorderLayout());
-        JLabel label = new JLabel("Type of scale: ");
         this.typeChooser = new JComboBox(new ContextGenerator[]{
         		new IncreasingExclusiveGenerator(),
         		new IncreasingInclusiveGenerator(),
@@ -614,9 +640,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
         		new DecreasingInclusiveGenerator(),
 	            new Type1InterordinalGenerator(),
     		    new Type2InterordinalGenerator()} );
-        pane.add(label, BorderLayout.WEST);
-        pane.add(this.typeChooser, BorderLayout.CENTER);
-        return pane;
+        return new LabeledPanel("Type:", this.typeChooser, false);
     }
 
     private boolean isScaleCorrect() {
