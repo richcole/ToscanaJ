@@ -34,7 +34,12 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
     public static final double[] CHI_SQUARE_CRITICAL_VALUES = new double[]{
         2.706, 3.841, 5.024, 6.635, 7.88, 10.828        
     };
-	
+
+    /**
+     * A good reference for the chi square stuff is:
+     * 
+     *   Manning and Schuetze: Foundations of Natural Language Processing, 3rd ed., 5.3.3
+     */	
 	private class DeviationValuesRef {
 		private int numberOfAllObjectsInDiagram;
         private int neutralSize;
