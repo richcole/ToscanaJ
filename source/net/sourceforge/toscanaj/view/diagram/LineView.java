@@ -11,6 +11,8 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+
 import org.tockit.canvas.CanvasItem;
 
 import java.awt.*;
@@ -83,6 +85,9 @@ public class LineView extends CanvasItem {
         }
         if(this.dynamicLineWidth) {
         	lineWidth *= 7 * getExtentRatio();
+        	if(lineWidth < 0) {
+        		lineWidth = Float.MIN_VALUE;
+        	}
         }
 		graphics.setStroke(new BasicStroke(lineWidth));
         graphics.draw(new Line2D.Double(from, to));
@@ -103,6 +108,10 @@ public class LineView extends CanvasItem {
 		Point2D from = diagramLine.getFromPosition();
 		Point2D to = diagramLine.getToPosition();
 		double ratio = getExtentRatio();
+		
+		if(ratio < 0) {
+			return;
+		}
 
 		DecimalFormat format = new DecimalFormat("#.## %");
 		String formattedNumber = format.format(ratio);
@@ -145,19 +154,21 @@ public class LineView extends CanvasItem {
 		graphics.fill(filledRectangle);		
 	}
 
+	/**
+	 * @return double |ext(toConcept)| / |ext(fromConcept)| if the upper concept is realized. Negative otherwise.
+	 */
 	private double getExtentRatio() {
 		DiagramView diagramView = this.fromView.getDiagramView();
 		ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
 		ConceptInterpretationContext interpretationContext = this.fromView.getConceptInterpretationContext();
-		int startExtent = interpreter.getExtentSize(this.fromView.getDiagramNode().getConcept(),interpretationContext);
-		int endExtent = interpreter.getExtentSize(this.toView.getDiagramNode().getConcept(),interpretationContext);
-		double ratioInPercent;
-		if(startExtent == 0) {
-			ratioInPercent = 1.0;
-		} else {
-			ratioInPercent = (double)endExtent / (double)startExtent;
+		Concept upperConcept = this.fromView.getDiagramNode().getConcept();
+		if(!interpreter.isRealized(upperConcept,interpretationContext)) {
+			return -1;
 		}
-		return ratioInPercent;
+		Concept lowerConcept = this.toView.getDiagramNode().getConcept();
+		int upperExtent = interpreter.getExtentSize(upperConcept,interpretationContext);
+		int lowerExtent = interpreter.getExtentSize(lowerConcept,interpretationContext);
+		return (double)lowerExtent / (double)upperExtent;
 	}
 
     /**
