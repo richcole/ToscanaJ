@@ -6,7 +6,7 @@
  */
 package net.sourceforge.toscanaj;
 
-import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
@@ -54,7 +54,7 @@ public class DataDump {
         // parse input
         ConceptualSchema schema = null;
         EventBroker broker = new EventBroker();
-        DBConnection databaseConnection = new DBConnection(broker);
+        DatabaseConnection databaseConnection = new DatabaseConnection(broker);
         try {
             schema = CSXParser.parse(new EventBroker(), file, databaseConnection);
         } catch (DataFormatException e) {
@@ -72,10 +72,11 @@ public class DataDump {
         }
         // create concept for filtering if needed
         DatabaseConnectedConcept filterConcept = null;
+        /// @todo don't generate multiple connections, instead send the same connection object.
         if (filterClause != null) {
             try {
                 filterConcept = new DatabaseConnectedConcept(schema.getDatabaseInfo(),
-                        new DBConnection(broker, schema.getDatabaseInfo().getURL(), "", ""));
+                        new DatabaseConnection(broker, schema.getDatabaseInfo().getURL(), "", "", ""));
             } catch (Exception e) {
                 System.err.println("Couldn't create filter for database");
                 System.exit(4);
