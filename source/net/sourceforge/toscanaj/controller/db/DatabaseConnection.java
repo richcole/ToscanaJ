@@ -534,13 +534,13 @@ public class DatabaseConnection implements EventBrokerListener {
      * which kind of DB you use the function ;-)
      */
     public static void main(String[] args) throws DatabaseException {
-        if (args.length != 1) {
+        if (args.length != 2) {
             System.err.println(
-                    "Usage: DatabaseConnection [JDBC database url]");
+                    "Usage: DatabaseConnection [JDBC driver class] [JDBC database url]");
             System.exit(1);
         }
 
-        DatabaseConnection test = new DatabaseConnection(new EventBroker(), args[0], "", "", "");
+        DatabaseConnection test = new DatabaseConnection(new EventBroker(), args[1], args[0], "", "");
 
         // print the tables
         System.out.println("The tables:\n-----------");
@@ -561,7 +561,7 @@ public class DatabaseConnection implements EventBrokerListener {
                 Column column = (Column) columns.get(j);
                 System.out.println("----- " + column.getName() + " -----");
                 // and querying the contents
-                System.out.println(test.getColumn((String) columns.get(j),
+                System.out.println(test.getColumn(column.getName(),
                         (String) tables.get(i)));
             }
         }
