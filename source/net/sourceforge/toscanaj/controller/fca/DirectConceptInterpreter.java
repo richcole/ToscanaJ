@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.controller.fca;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -34,7 +35,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
     }
 
     private Set calculateContingent(Concept concept, ConceptInterpretationContext context) {
-		TreeSet retVal = new TreeSet();
+		HashSet retVal = new HashSet();
         Iterator objectContingentIterator = concept.getObjectContingentIterator();
         while (objectContingentIterator.hasNext()) {
             Object o = objectContingentIterator.next();
@@ -45,7 +46,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
         return retVal;
     }
 
-    private void filterObjects(final TreeSet currentSet, ConceptInterpretationContext context) {
+    private void filterObjects(final Set currentSet, ConceptInterpretationContext context) {
         DiagramHistory.ConceptVisitor visitor;
         if (context.getFilterMode() == ConceptInterpretationContext.EXTENT) {
             visitor = new DiagramHistory.ConceptVisitor() {
@@ -91,7 +92,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
         context.getDiagramHistory().visitZoomedConcepts(visitor);
     }
 
-    private void nestObjects(TreeSet currentSet, ConceptInterpretationContext context, boolean contingentOnly) {
+    private void nestObjects(Set currentSet, ConceptInterpretationContext context, boolean contingentOnly) {
         Iterator mainIt = context.getNestingConcepts().iterator();
         while (mainIt.hasNext()) {
             Concept concept = (Concept) mainIt.next();
