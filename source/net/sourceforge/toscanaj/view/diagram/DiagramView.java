@@ -228,6 +228,8 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         }
         // set new default
         ObjectLabelView.setDefaultDisplayType(contingentOnly);
+        requestScreenTransformUpdate();
+        repaint();
     }
 
     /**
@@ -266,6 +268,7 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
                 lv.setQuery(query);
             }
         }
+        requestScreenTransformUpdate();
         repaint();
         // set the value for new ones
         ObjectLabelView.setDefaultQuery(query);
