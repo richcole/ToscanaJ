@@ -217,7 +217,7 @@ public class ElbaMainPanel
 			}
 		});
 
-		JButton schemaDescriptionButton = new JButton("Schema Description");
+		JButton schemaDescriptionButton = new JButton("Schema Description...");
 		schemaDescriptionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				schemaDescriptionView.setContent(
@@ -228,7 +228,7 @@ public class ElbaMainPanel
 			}
 		});
 
-		JButton databaseConnectionButton = new JButton("Database Connection");
+		JButton databaseConnectionButton = new JButton("Database Connection...");
 		databaseConnectionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showDatabaseConnectionDialog();
@@ -720,7 +720,7 @@ public class ElbaMainPanel
 		helpMenu.setMnemonic(KeyEvent.VK_H);
 
 		final JFrame parent = this;
-		JMenuItem aboutItem = new JMenuItem("About Elba");
+		JMenuItem aboutItem = new JMenuItem("About Elba...");
 		aboutItem.setMnemonic(KeyEvent.VK_A);
 		aboutItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

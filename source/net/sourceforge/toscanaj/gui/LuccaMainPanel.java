@@ -135,7 +135,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     private void createToolBar() {
         toolBar = new JToolBar();
-        JButton newDiagramButton = new JButton("New Diagram");
+        JButton newDiagramButton = new JButton("New Diagram...");
         newDiagramButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 createNewDiagram();
@@ -143,7 +143,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
         });
         toolBar.add(newDiagramButton);
 
-        JButton insertAttributeButton = new JButton("Insert Attribute");
+        JButton insertAttributeButton = new JButton("Insert Attribute...");
         insertAttributeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 insertAttribute();
@@ -310,7 +310,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
         editMenu.setMnemonic(KeyEvent.VK_E);
         menuBar.add(editMenu);
 
-        JMenuItem editSchemaDescriptionMenuItem = new JMenuItem("Schema Description");
+        JMenuItem editSchemaDescriptionMenuItem = new JMenuItem("Schema Description...");
         editSchemaDescriptionMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 schemaDescriptionView.setContent(conceptualSchema.getDescription());
@@ -326,7 +326,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
 		final JFrame parent = this;
-		JMenuItem aboutItem = new JMenuItem("About Lucca");
+		JMenuItem aboutItem = new JMenuItem("About Lucca...");
 		aboutItem.setMnemonic(KeyEvent.VK_A);
 		aboutItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

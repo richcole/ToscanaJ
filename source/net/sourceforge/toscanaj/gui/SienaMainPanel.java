@@ -412,7 +412,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
 		final JFrame parent = this;
-		JMenuItem aboutItem = new JMenuItem("About Siena");
+		JMenuItem aboutItem = new JMenuItem("About Siena...");
 		aboutItem.setMnemonic(KeyEvent.VK_A);
 		aboutItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

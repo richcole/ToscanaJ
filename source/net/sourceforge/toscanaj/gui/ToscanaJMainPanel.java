@@ -734,7 +734,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             boolean entriesAdded = false;
             Element description = this.conceptualSchema.getDescription();
             if (description != null) {
-                JMenuItem descItem = new JMenuItem("Schema Description");
+                JMenuItem descItem = new JMenuItem("Schema Description...");
                 descItem.setMnemonic(KeyEvent.VK_S);
                 descItem.setAccelerator(KeyStroke.getKeyStroke(
                         KeyEvent.VK_F1, 0));
@@ -747,7 +747,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                 entriesAdded = true;
             }
             if (this.conceptualSchema.hasDiagramDescription()) {
-                diagramDescriptionMenuItem = new JMenuItem("Diagram Description");
+                diagramDescriptionMenuItem = new JMenuItem("Diagram Description...");
                 diagramDescriptionMenuItem.setMnemonic(KeyEvent.VK_D);
                 diagramDescriptionMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                         KeyEvent.VK_F1, ActionEvent.SHIFT_MASK));
@@ -765,7 +765,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             }
         }
         final JFrame parent = this;
-        JMenuItem aboutItem = new JMenuItem("About ToscanaJ");
+        JMenuItem aboutItem = new JMenuItem("About ToscanaJ...");
         aboutItem.setMnemonic(KeyEvent.VK_A);
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
