@@ -5,10 +5,11 @@ import java.awt.geom.Point2D;
 import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
 /**
- * abstract class to draw 2D graph items. CanvasItem will have a concept of depth
- * for re-drawing, and hold the point that an item is positioned.
+ * Abstract class to draw 2D graph items.
+ *
+ * CanvasItems can be put on a DrawingCanvas where they will have a z-order and
+ * can be moved.
  */
-
 public abstract class CanvasItem {
 
     /**
