@@ -31,6 +31,9 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
         if (!(node instanceof NDimDiagramNode)) {
             throw new RuntimeException("NDimNodeMovementEventListener usable only for NDimDiagramNodes");
         }
+        if (node.getConcept().getUpset().size() == 1) {
+        	return; // we don't move the top node
+        }
         NDimDiagramNode ndimNode = (NDimDiagramNode) node;
         Point2D toPos = dragEvent.getCanvasToPosition();
         Point2D curPos = ndimNode.getPosition();
