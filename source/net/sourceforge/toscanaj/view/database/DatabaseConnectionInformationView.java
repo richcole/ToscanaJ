@@ -33,7 +33,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * @todo at the moment we connect and then disconnect instead of passing the
@@ -257,7 +256,7 @@ public class DatabaseConnectionInformationView extends JDialog
             databaseInfo.setPassword(embedInfo.getPassword());
             databaseInfo.setDriverClass(embedInfo.getDriverClass());
             try {
-                databaseInfo.setEmbeddedSQLLocation(new URL("file://" + scriptLocationField.getText()));
+                databaseInfo.setEmbeddedSQLLocation(new File(scriptLocationField.getText()).toURL());
             } catch (MalformedURLException e) {
             	ErrorDialog.showError(this,e,"URL invalid");
             	return false;
@@ -760,7 +759,12 @@ public class DatabaseConnectionInformationView extends JDialog
 	public void processEvent(Event event) {
 		ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
         this.conceptualSchema = changeEvent.getConceptualSchema();
-        this.databaseInfo = this.conceptualSchema.getDatabaseInfo();
+        DatabaseInfo existingInfo = this.conceptualSchema.getDatabaseInfo();
+        if(existingInfo != null) {
+        	this.databaseInfo = existingInfo;
+        } else {
+        	this.databaseInfo = new DatabaseInfo();
+        }
         if(this.currentStep != null) {
         	this.currentStep.updateContents();
         }
