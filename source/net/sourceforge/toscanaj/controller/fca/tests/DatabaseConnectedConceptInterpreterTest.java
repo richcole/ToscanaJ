@@ -16,6 +16,7 @@ import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 import junit.framework.Test;
@@ -46,7 +47,7 @@ public class DatabaseConnectedConceptInterpreterTest extends TestCase {
         ConceptInterpretationContext context2 = new ConceptInterpretationContext(history1, new EventBroker());
         context2.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
         DiagramHistory history2 = new DiagramHistory();
-        ConceptInterpretationContext context3 = new ConceptInterpretationContext(history1, new EventBroker());
+        ConceptInterpretationContext context3 = new ConceptInterpretationContext(history2, new EventBroker());
 
         ConceptImplementation concept1 = new ConceptImplementation();
         concept1.addObject("dummy clause to get queries to be created");
@@ -76,20 +77,22 @@ public class DatabaseConnectedConceptInterpreterTest extends TestCase {
         interpreter.getObjectCount(concept4, context1.createNestedContext(concept1));
         checkAssertion(dbConnection.queryNumberCallCounter == 8);
 
+		history2.addDiagram(new SimpleLineDiagram());
+		
         interpreter.getObjectCount(concept1, context1);
         checkAssertion(dbConnection.queryNumberCallCounter == 8);
         interpreter.getObjectCount(concept1, context2);
         checkAssertion(dbConnection.queryNumberCallCounter == 8);
         interpreter.getObjectCount(concept1, context3);
-        checkAssertion(dbConnection.queryNumberCallCounter == 8);
+        checkAssertion(dbConnection.queryNumberCallCounter == 9);
         interpreter.getObjectCount(concept2, context1);
-        checkAssertion(dbConnection.queryNumberCallCounter == 8);
+        checkAssertion(dbConnection.queryNumberCallCounter == 9);
         interpreter.getObjectCount(concept2, context3);
-        checkAssertion(dbConnection.queryNumberCallCounter == 8);
+        checkAssertion(dbConnection.queryNumberCallCounter == 10);
         interpreter.getObjectCount(concept3, context2);
-        checkAssertion(dbConnection.queryNumberCallCounter == 8);
+        checkAssertion(dbConnection.queryNumberCallCounter == 10);
         interpreter.getObjectCount(concept3, context3);
-        checkAssertion(dbConnection.queryNumberCallCounter == 8);
+        checkAssertion(dbConnection.queryNumberCallCounter == 11);
         /// @todo the next test would be useful to succeed, which would require introducing
         /// value indentity on the interpretation contexts. It would keep ToscanaJ from
         /// requerying whenever a nested diagram gets revisited.
