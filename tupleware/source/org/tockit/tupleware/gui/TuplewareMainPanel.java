@@ -25,6 +25,7 @@ import org.tockit.tupleware.model.TupleSet;
 import org.tockit.tupleware.scaling.TupleScaling;
 import org.tockit.tupleware.source.TupleSource;
 import org.tockit.tupleware.source.text.TextSource;
+import org.tockit.tupleware.source.rdql.RdqlQueryEngine;
 import org.tockit.tupleware.source.sql.SqlQueryEngine;
 
 import java.awt.*;
@@ -189,6 +190,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
 		
         addTupleSourceMenuItem(tuplesMenu, this, new TextSource());
         addTupleSourceMenuItem(tuplesMenu, this, new SqlQueryEngine());
+		addTupleSourceMenuItem(tuplesMenu, this, new RdqlQueryEngine());
 
 		menuBar.add(tuplesMenu);
 
