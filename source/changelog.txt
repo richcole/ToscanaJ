@@ -8,6 +8,8 @@ Affecting different programs:
 
 Specific for ToscanaJ:
 ======================
+- the database viewer for opening documents (ShellExectuteDatabaseViewewr) now
+  starts external programs in a separate Thread, thus not blocking the UI anymore
 
 Specific for Elba:
 ==================
