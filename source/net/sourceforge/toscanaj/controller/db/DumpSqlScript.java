@@ -75,6 +75,11 @@ public class DumpSqlScript {
                 }
                 out.println(");");
             }		    
+
+            if(tableNamesIt.hasNext()) {
+				out.println();
+				out.println();
+            }
         }
 	}
 	
