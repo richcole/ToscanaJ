@@ -15,6 +15,7 @@ import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -62,6 +63,7 @@ public class ScaleEditingView extends JPanel implements EventBrokerListener, Tab
 
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
         eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
+        eventBroker.subscribe(this, DatabaseModifiedEvent.class, Object.class);
     }
 
     private ScaleGeneratorPanel makeScaleGeneratorPane(

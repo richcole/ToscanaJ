@@ -436,47 +436,47 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
     public void processEvent(Event e) {
         if (e instanceof ConceptualSchemaChangeEvent) {
-            // set schema in any change event, sometimes the order of the events is wrong
-            /// @todo make sure the events come in the proper order
             ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
-            conceptualSchema = schemaEvent.getConceptualSchema();
-        }
-		if (e instanceof NewConceptualSchemaEvent) {
-            DatabaseViewerManager.resetRegistry();
+            ConceptualSchema newConceptualSchema = schemaEvent.getConceptualSchema();
+            if(newConceptualSchema != this.conceptualSchema || e instanceof NewConceptualSchemaEvent) {
+            	this.conceptualSchema = newConceptualSchema;
+                if(schemaDescriptionView != null) {
+                    schemaDescriptionView.setContent(conceptualSchema.getDescription());
+                }
+                DatabaseViewerManager.resetRegistry();
+                connectDatabase();
+            }
         }
         if (e instanceof ConceptualSchemaLoadedEvent) {
             ConceptualSchemaLoadedEvent loadEvent = (ConceptualSchemaLoadedEvent) e;
             File schemaFile = loadEvent.getFile();
             addFileToMRUList(schemaFile);
-            if(schemaDescriptionView != null) {
-            	schemaDescriptionView.setContent(conceptualSchema.getDescription());
+        }
+    }
+
+    protected void connectDatabase() {
+        if (databaseConnection.isConnected()) {
+            try {
+                databaseConnection.disconnect();
+            } catch (DatabaseException ex) {
+                ErrorDialog.showError(this, ex, "Closing database error",
+                        "Some error closing the old database:\n" + ex.getMessage());
+                return;
             }
         }
-        if (e instanceof DatabaseInfoChangedEvent || e instanceof NewConceptualSchemaEvent ||
-            e instanceof ConceptualSchemaLoadedEvent) {
-            if (databaseConnection.isConnected()) {
-                try {
-                    databaseConnection.disconnect();
-                } catch (DatabaseException ex) {
-                    ErrorDialog.showError(this, ex, "Closing database error",
-                            "Some error closing the old database:\n" + ex.getMessage());
-                    return;
+        DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
+        if( databaseInformation != null &&
+            databaseInformation.getDriverClass() != null &&
+            databaseInformation.getURL() != null) {
+            try {
+                databaseConnection.connect(databaseInformation);
+                URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
+                if (location != null) {
+                    databaseConnection.executeScript(location);
                 }
-            }
-            DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
-            if( databaseInformation != null &&
-            	databaseInformation.getDriverClass() != null && 
-                databaseInformation.getURL() != null) {
-                try {
-                    databaseConnection.connect(databaseInformation);
-                    URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
-                    if (location != null) {
-                        databaseConnection.executeScript(location);
-                    }
-                } catch (DatabaseException ex) {
-                    ErrorDialog.showError(this, ex, "DB Connection failed",
-                            "Can not connect to the database:\n" + ex.getMessage());
-                }
+            } catch (DatabaseException ex) {
+                ErrorDialog.showError(this, ex, "DB Connection failed",
+                        "Can not connect to the database:\n" + ex.getMessage());
             }
         }
     }
