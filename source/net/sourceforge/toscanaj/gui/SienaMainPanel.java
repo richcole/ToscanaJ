@@ -127,6 +127,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ColumnHeader;
+import net.sourceforge.toscanaj.view.manyvaluedcontext.CreateScaleDialog;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ObjectDialog;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ManyValuedAttributeDialog;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.RowHeader;
@@ -350,10 +351,19 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 			}
 		});
 
+        final Frame parent = this;
 		final JButton createDiagramButton = new JButton("Create Diagram...");
 		createDiagramButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(createDiagramButton,"Not yet implemented");
+                CreateScaleDialog dialog = new CreateScaleDialog(parent, conceptualSchema.getManyValuedContext());
+                View result = dialog.execute();
+                if(result != null) {
+                    addDiagram(
+                        conceptualSchema,
+                        new ViewContext(conceptualSchema.getManyValuedContext(), result),
+                        result.getName(),
+                        new CernatoDimensionStrategy());
+                }
 			}
 		});
 		
