@@ -339,8 +339,8 @@ public class ContextTableScaleEditorDialog extends JDialog {
 
 	private void createButtonsPane() {
 		buttonsPane = new JPanel(new GridBagLayout());
-		JButton addObjButton = new JButton(" Add Object ");
-		JButton addAttrButton = new JButton(" Add Attribute ");
+		JButton addObjButton = new JButton(" Add Objects ");
+		JButton addAttrButton = new JButton(" Add Attributes ");
 		this.createButton = new JButton(" Create ");
 		createButton.setEnabled((scaleTitleField.getText()!=null && 
 						!scaleTitleField.getText().equals("")));
