@@ -10,14 +10,16 @@ package net.sourceforge.toscanaj.model.context;
 
 import java.util.Set;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
+
+import org.tockit.util.ListSet;
+import org.tockit.util.ListSetImplementation;
 
 /**
  * @todo hide access to collections and relation by playing man in the middle.
  */
-public class ContextImplementation implements Context {
-    private Set objects = new LinkedHashSet();
-    private Set attributes = new LinkedHashSet();
+public class ContextImplementation implements ListsContext {
+    private ListSet objects = new ListSetImplementation();
+    private ListSet attributes = new ListSetImplementation();
     private BinaryRelationImplementation relation = new BinaryRelationImplementation();
     private String name = null;
 
@@ -140,4 +142,12 @@ public class ContextImplementation implements Context {
 		}
 		return context;
 	}
+
+    public ListSet getObjectList() {
+        return this.objects;
+    }
+
+    public ListSet getAttributeList() {
+        return this.attributes;
+    }
 }
