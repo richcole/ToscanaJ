@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.gui.dialog;
 
 import java.awt.Component;
+import java.util.prefs.BackingStoreException;
 
 import net.sourceforge.toscanaj.gui.ToscanaJMainPanel;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
@@ -126,5 +127,18 @@ public class ToscanaJPreferences {
             panel.applyChanges();
         }
         return okClicked;
+    }
+    
+    public static final void removeSettings() throws BackingStoreException {
+        for (int i = 0; i < SECTIONS.length; i++) {
+            ConfigurationSection section = SECTIONS[i];
+            for (int j = 0; j < section.getSubsections().length; j++) {
+                ConfigurationSubsection subsection = section.getSubsections()[j];
+                for (int k = 0; k < subsection.getEntries().length; k++) {
+                    ConfigurationEntry entry = subsection.getEntries()[k];
+                    ExtendedPreferences.removeBranch(entry.getNode());
+                }
+            }
+        }
     }
 }

@@ -9,13 +9,23 @@ package net.sourceforge.toscanaj;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.tockit.plugin.PluginLoader;
 
 import net.sourceforge.toscanaj.gui.ToscanaJMainPanel;
+import net.sourceforge.toscanaj.gui.dialog.ToscanaJPreferences;
 
 public class ToscanaJ {
     /**
@@ -30,13 +40,52 @@ public class ToscanaJ {
     	testJavaVersion();
         loadPlugins();
         final ToscanaJMainPanel mainWindow;
-        if (args.length == 1) {
-            mainWindow = new ToscanaJMainPanel(args[0]);
+        Options options = new Options();
+        options.addOption("reset", false, "Resets all preferences for the current user and exit");
+        options.addOption("help", false, "Show this command line summary and exit");
+        CommandLineParser parser = new BasicParser();
+        CommandLine cl = null;
+        try {
+            cl = parser.parse(options,args);
+        } catch (ParseException e) {
+            showUsage(options, System.err);
+            System.exit(1);
+        }
+        if(cl.getArgs().length > 1) {
+            showUsage(options, System.err);
+            System.exit(1);
+        }
+        if(cl.hasOption("help")) {
+            showUsage(options, System.out);
+            System.exit(0);
+        }
+        if(cl.hasOption("reset")) {
+            try {
+                ToscanaJPreferences.removeSettings();
+            } catch (BackingStoreException exception) {
+                System.err.println("Problem encountered removing preferences:");
+                exception.printStackTrace();
+            }
+            System.exit(0);
+        }
+        if (cl.getArgs().length == 1) {
+            mainWindow = new ToscanaJMainPanel(cl.getArgs()[0]);
         } else {
             mainWindow = new ToscanaJMainPanel();
         }
 
         mainWindow.setVisible(true);
+    }
+
+    private static void showUsage(Options options, PrintStream stream) {
+        stream.println("Usage:");
+        stream.println("  ToscanaJ [Options] [File]");
+        stream.println();
+        stream.println("where [File] is one optional file to open and [Options] can be:");
+        for (Iterator iter = options.getOptions().iterator(); iter.hasNext(); ) {
+            Option option = (Option) iter.next();
+            stream.println("  " + option.getOpt() + ": " + option.getDescription());
+        }
     }
 
     /**

@@ -1304,6 +1304,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 				"This program is part of ToscanaJ " + ToscanaJ.VersionString + ".\n\n" +
 				"Copyright (c) DSTC Pty Ltd, Technische Universität Darmstadt and the\n" +
 				"University of Queensland\n\n" +
+                "This product includes software developed by the " +
+                "Apache Software Foundation (http://www.apache.org/).\n\n" +
 				"See http://toscanaj.sourceforge.net for more information.",
 				"About this program",
 				JOptionPane.PLAIN_MESSAGE);
