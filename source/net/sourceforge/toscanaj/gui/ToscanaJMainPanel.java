@@ -231,9 +231,10 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
      */
     private void buildPanel() {
         diagramView = new DiagramView();
-		//set the minimum font size of the label into diagramView from the properties file
-		int minLabelFontSize = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "minLabelFontSize", 
-															 (int)this.diagramView.getMinimumFontSize());
+		// set the minimum font size of the label into diagramView from the properties file
+        // this has to happen before the menu gets created, since the menu uses the information
+		float minLabelFontSize = ConfigurationManager.fetchFloat(CONFIGURATION_SECTION_NAME, "minLabelFontSize", 
+															   (float)this.diagramView.getMinimumFontSize());
 		diagramView.setMinimumFontSize(minLabelFontSize);
 
         createActions();
@@ -835,7 +836,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         // save the MRU list
         ConfigurationManager.storeStringList(CONFIGURATION_SECTION_NAME, "mruFiles", this.mruList);
         // store the minimum label size
-		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, "minLabelFontSize", (int)this.diagramView.getMinimumFontSize());
+		ConfigurationManager.storeFloat(CONFIGURATION_SECTION_NAME, "minLabelFontSize", (float)this.diagramView.getMinimumFontSize());
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
 

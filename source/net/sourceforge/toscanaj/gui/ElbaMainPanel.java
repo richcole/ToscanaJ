@@ -32,6 +32,7 @@ import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
+import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.SqlClauseLabelView;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingViewDialog;
 
@@ -52,6 +53,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
+    private static final String CONFIGURATION_SECTION_NAME = "ElbaMainPanel";
     static private final int MaxMruFiles = 8;
     
     /**
@@ -81,7 +83,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
      * Views
      */
     private ScaleEditingViewDialog scaleEditingViewDialog;
-    private DiagramEditingView diagramView;
+    private DiagramEditingView diagramEditingView;
     private DatabaseConnectionInformationView connectionInformationView;
     private XMLEditorDialog schemaDescriptionView;
     private JMenuItem dumpSQLMenuItem;
@@ -99,9 +101,15 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         this.eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class);
 
         createViews();
-        createMenuBar();
+        // this has to happen before the menu gets created, since the menu uses the information
+        DiagramView diagramView = this.diagramEditingView.getDiagramView();
+        float minLabelFontSize = ConfigurationManager.fetchFloat(CONFIGURATION_SECTION_NAME, "minLabelFontSize",
+                                                               (float)diagramView.getMinimumFontSize());
+        diagramView.setMinimumFontSize(minLabelFontSize);
 
-        mruList = ConfigurationManager.fetchStringList("ElbaMainPanel", "mruFiles", MaxMruFiles);
+        createMenuBar();
+		                                                    
+        mruList = ConfigurationManager.fetchStringList(CONFIGURATION_SECTION_NAME, "mruFiles", MaxMruFiles);
         // if we have at least one MRU file try to open it
         if (this.mruList.size() > 0) {
             File schemaFile = new File((String) mruList.get(mruList.size() - 1));
@@ -110,7 +118,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             }
         }
 
-        ConfigurationManager.restorePlacement("ElbaMainPanel", this,
+        ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, this,
                 new Rectangle(100, 100, 500, 400));
 
         this.addWindowListener(new WindowAdapter() {
@@ -187,9 +195,9 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         
       
         
-        diagramView = new DiagramEditingView(conceptualSchema, eventBroker);
-        diagramView.setDividerLocation(ConfigurationManager.fetchInt("ElbaMainPanel", "diagramViewDivider", 200));
-        diagramView.getDiagramView().setObjectLabelFactory(SqlClauseLabelView.getFactory());
+        diagramEditingView = new DiagramEditingView(conceptualSchema, eventBroker);
+        diagramEditingView.setDividerLocation(ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "diagramViewDivider", 200));
+        diagramEditingView.getDiagramView().setObjectLabelFactory(SqlClauseLabelView.getFactory());
 		
 		
 		mainView.add(buttonPane, new GridBagConstraints(
@@ -199,7 +207,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 						new Insets(2,2,2,2),
 						2,2)
 		);
-		mainView.add(diagramView, new GridBagConstraints(
+		mainView.add(diagramEditingView, new GridBagConstraints(
 						0,1,1,1,1,1,
 						GridBagConstraints.WEST,
 						GridBagConstraints.BOTH,
@@ -211,6 +219,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
 
     public void createMenuBar() {
+    	final DiagramView diagramView = diagramEditingView.getDiagramView();
 
         // --- menu bar ---
         menuBar = new JMenuBar();
@@ -296,6 +305,42 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         );
         fileMenu.add(exitMenuItem);
         
+        JMenu viewMenu = new JMenu("View");
+        viewMenu.setMnemonic(KeyEvent.VK_V);
+        ButtonGroup fontSizeGroup = new ButtonGroup();
+        JMenu setMinLabelSizeSubMenu = new JMenu("Set minimum label size");
+        JMenuItem fontRangeMenuItem = new JRadioButtonMenuItem("None");
+        fontSizeGroup.add(fontRangeMenuItem);
+        fontRangeMenuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                JMenuItem source = (JMenuItem) e.getSource();
+                diagramView.setMinimumFontSize(0);
+                source.setSelected(true);
+            }
+        });
+        fontRangeMenuItem.setSelected(true);
+        setMinLabelSizeSubMenu.add(fontRangeMenuItem);
+        int fontRange = 6; //min font size
+        while(fontRange<26){
+            fontRangeMenuItem = new JRadioButtonMenuItem(fontRange+"");
+            fontSizeGroup.add(fontRangeMenuItem);
+            fontRangeMenuItem.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+                    JMenuItem source = (JMenuItem) e.getSource();
+                    int newFontSize = Integer.parseInt(source.getText());
+                    diagramView.setMinimumFontSize(newFontSize);
+                    source.setSelected(true);
+                }
+            });
+            if(diagramView.getMinimumFontSize() == fontRange){
+                fontRangeMenuItem.setSelected(true);
+            }
+            fontRange+=2;
+            setMinLabelSizeSubMenu.add(fontRangeMenuItem);
+        }
+        viewMenu.add(setMinLabelSizeSubMenu);
+        menuBar.add(viewMenu);
+
         JMenu toolMenu = new JMenu("Tools");
         toolMenu.setMnemonic(KeyEvent.VK_T);
         dumpStatisticalDataMenuItem = new JMenuItem("Export Statistical Data...");
@@ -379,9 +424,11 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     public void closeMainPanel() {
         // store current position
 
-        ConfigurationManager.storeStringList("ElbaMainPanel", "mruFiles", this.mruList);
-        ConfigurationManager.storeInt("ElbaMainPanel", "diagramViewDivider",
-                diagramView.getDividerLocation()
+        ConfigurationManager.storeFloat(CONFIGURATION_SECTION_NAME, "minLabelFontSize", 
+        							    (float)this.diagramEditingView.getDiagramView().getMinimumFontSize());
+        ConfigurationManager.storeStringList(CONFIGURATION_SECTION_NAME, "mruFiles", this.mruList);
+        ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, "diagramViewDivider",
+                diagramEditingView.getDividerLocation()
         );
         ConfigurationManager.saveConfiguration();
         System.exit(0);
