@@ -64,52 +64,6 @@ public abstract class CanvasItem implements ChangeObservable {
     public abstract boolean containsPoint(Point2D point);
 
     /**
-     * Reacts on a mouse movement between the two positions while the left button
-     * is pressed.
-     *
-     * Unless it is overwritten in a derived class this will do nothing.
-     */
-    public void dragged(Point2D from, Point2D to) {
-    }
-
-    /**
-     * Callback for getting notification about any click.
-     *
-     * Unless it is overwritten in a derived class this will do nothing.
-     * Use this method only if you don't distinguish between single and
-     * double clicks, otherwise you should use the more specific methods
-     * singleClicked(Point2D) and doubleClicked(Point2D).
-     */
-    public void clicked(Point2D point) {
-    }
-
-    /**
-     * Callback for getting notification about single clicks.
-     *
-     * Unless it is overwritten in a derived class this will do nothing.
-     */
-    public void singleClicked(Point2D point) {
-    }
-
-    /**
-     * Callback for getting notification about double clicks.
-     *
-     * Unless it is overwritten in a derived class this will do nothing.
-     */
-    public void doubleClicked(Point2D point) {
-    }
-
-    /**
-     * Callback for opening context menus.
-     *
-     * Unless it is overwritten in a derived class this will do nothing. It
-     * will be called whenever a popup was requested on that item (e.g. by
-     * clicking with the second mouse button on Windows).
-     */
-    public void openPopupMenu(Point2D canvasPosition, Point2D screenPosition) {
-    }
-
-    /**
      * Returns the rectangular bounds of the canvas item.
      */
     abstract public Rectangle2D getCanvasBounds(Graphics2D g);

@@ -106,7 +106,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
         } else {
             Point2D modelPos = null;
             modelPos = canvas.getCanvasCoordinates(screenPos);
-            selectedCanvasItem.clicked(modelPos);
             this.eventBroker.processEvent(
                     new CanvasItemClickedEvent(this.selectedCanvasItem,modelPos,screenPos));
             if (e.getClickCount() == 1) {
@@ -116,7 +115,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
                                 modelPos, screenPos, eventBroker), 300);
             } else if (e.getClickCount() == 2) {
                 this.doubleClickTimer.cancel();
-                selectedCanvasItem.doubleClicked(modelPos);
                 this.eventBroker.processEvent(
                         new CanvasItemActivatedEvent(selectedCanvasItem, modelPos, screenPos));
             }
@@ -152,7 +150,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
             Point2D lastMousePosTr = null;
             mousePosTr = canvas.getCanvasCoordinates(mousePos);
             lastMousePosTr = canvas.getCanvasCoordinates(lastMousePos);
-            selectedCanvasItem.dragged(lastMousePosTr, mousePosTr);
             this.eventBroker.processEvent(new CanvasItemDraggedEvent(
                     this.selectedCanvasItem,
                     lastMousePosTr, lastMousePos,
@@ -179,7 +176,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
     }
 
     private void handlePopupRequest(Point2D canvasPos, Point screenPos) {
-        this.selectedCanvasItem.openPopupMenu(canvasPos, screenPos);
         this.eventBroker.processEvent(new CanvasItemContextMenuRequestEvent(
                 this.selectedCanvasItem, canvasPos, screenPos));
     }
