@@ -12,12 +12,8 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DumpSqlScript;
-import net
-    .sourceforge
-    .toscanaj
-    .controller
-    .diagram
-    .SqlClauseEditingLabelViewPopupMenuHandler;
+import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
+import net.sourceforge.toscanaj.controller.diagram.SqlClauseEditingLabelViewPopupMenuHandler;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
@@ -39,11 +35,13 @@ import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.parser.CSCParser;
 import net.sourceforge.toscanaj.parser.CSXParser;
@@ -119,7 +117,8 @@ public class ElbaMainPanel
     private DatabaseConnectionInformationView connectionInformationView;
     private XMLEditorDialog schemaDescriptionView;
     private JMenuItem dumpSQLMenuItem;
-    private JMenuItem dumpStatisticalDataMenuItem;
+	private JMenuItem dumpStatisticalDataMenuItem;
+	private JMenuItem createOptimizedSystemMenuItem;
     private SaveFileAction saveAsFileAction;
     private List scaleGenerators;
     private JButton newDiagramButton;
@@ -767,16 +766,25 @@ public class ElbaMainPanel
             }
         });
         dumpStatisticalDataMenuItem.setEnabled(false);
-        toolMenu.add(dumpStatisticalDataMenuItem);
-        dumpSQLMenuItem = new JMenuItem("Export Database as SQL...");
-        dumpSQLMenuItem.setMnemonic(KeyEvent.VK_D);
-        dumpSQLMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                exportSQLScript();
-            }
-        });
-        dumpSQLMenuItem.setEnabled(false);
-        toolMenu.add(dumpSQLMenuItem);
+		toolMenu.add(dumpStatisticalDataMenuItem);
+		dumpSQLMenuItem = new JMenuItem("Export Database as SQL...");
+		dumpSQLMenuItem.setMnemonic(KeyEvent.VK_D);
+		dumpSQLMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				exportSQLScript();
+			}
+		});
+		dumpSQLMenuItem.setEnabled(false);
+		toolMenu.add(dumpSQLMenuItem);
+		createOptimizedSystemMenuItem = new JMenuItem("Create Speed Optimized System...");
+		createOptimizedSystemMenuItem.setMnemonic(KeyEvent.VK_O);
+		createOptimizedSystemMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				createSpeedOptimizedSystem();
+			}
+		});
+		createOptimizedSystemMenuItem.setEnabled(false);
+        toolMenu.add(createOptimizedSystemMenuItem);
         
         toolMenu.addSeparator();
         
@@ -1008,6 +1016,7 @@ public class ElbaMainPanel
     protected void connectDatabase() {
         this.dumpStatisticalDataMenuItem.setEnabled(false);
         this.dumpSQLMenuItem.setEnabled(false);
+        this.createOptimizedSystemMenuItem.setEnabled(false);
         disconnectDatabase();
         DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
         if (databaseInformation != null
@@ -1030,6 +1039,7 @@ public class ElbaMainPanel
             }
             this.dumpStatisticalDataMenuItem.setEnabled(true);
             this.dumpSQLMenuItem.setEnabled(true);
+			this.createOptimizedSystemMenuItem.setEnabled(true);
         }
     }
 
@@ -1228,6 +1238,59 @@ public class ElbaMainPanel
             file.delete();
             return;
         }
+    }
+    
+    /**
+     * @todo this could be in its own function object -- with a test class for it
+     * 
+     * @todo at the moment this works on the same table. The reason for this is that we would have to
+     *       adjust all WHERE expressions in the UPDATEs otherwise, since they would have to find the
+     *       source table. This means understanding more SQL than we do at the moment, since all column
+     *       identifiers would have to be found and replaced. Textual replacements would not be sufficient
+     *       since column names could appear in other contexts, e.g. as values. 
+     * 
+     * @todo we could check if we run on the embedded DB and offer to save the SQL script in case that
+     *       is true.
+     */
+    private void createSpeedOptimizedSystem() {
+    	/// @todo do we want to call the consistency check here?
+    	
+    	DatabaseInfo databaseInfo = this.conceptualSchema.getDatabaseInfo();
+		String tableName = databaseInfo.getTable().getSqlExpression();
+
+        try {
+			for (int i = 0; i < this.conceptualSchema.getNumberOfDiagrams(); i++) {
+				String columnName = "__diagram" + i + "__";
+				try {
+					databaseConnection.executeQuery("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " INTEGER;");
+				} catch (DatabaseException e) {
+					// that is ok, we just had this column before
+				}
+				Diagram2D diagram = this.conceptualSchema.getDiagram(i);
+				Iterator nodeIt = diagram.getNodes();
+				int contingentCount = 0;
+				while (nodeIt.hasNext()) {
+	                DiagramNode node = (DiagramNode) nodeIt.next();
+	                ConceptImplementation concept = (ConceptImplementation) node.getConcept();
+	                if(concept.getObjectContingentSize() != 0) {
+						String oldWhereClause = WhereClauseGenerator.createClause(concept.getObjectContingentIterator());
+						String newWhereClause = columnName + " = " + contingentCount;
+                        databaseConnection.executeQuery("UPDATE " + tableName + 
+														" SET " + newWhereClause +
+														" WHERE " + oldWhereClause + ";");
+						concept.removeObjectContingent();
+						concept.addObject(newWhereClause);
+						contingentCount ++;
+	                }
+	            }
+			}
+		} catch (DatabaseException e) {
+			ErrorDialog.showError(this, e, "Error updating table");
+			return;
+		}
+    	
+    	/// @todo it is not really obvious in the UI what is going on -- this is just a hack to get things going
+    	saveAsFileAction.actionPerformed(null);
     }
 
     private void saveFile() {

@@ -557,4 +557,8 @@ public class ConceptImplementation implements Concept {
         }
         return false;
     }
+
+    public void removeObjectContingent() {
+    	this.objectContingent.clear();
+    }
 }

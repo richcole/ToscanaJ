@@ -64,7 +64,7 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
         return createClause(concept.getExtentIterator());
     }
 
-    static private String createClause(Iterator objectIterator) {
+    static public String createClause(Iterator objectIterator) {
         if (!objectIterator.hasNext()) {
             return null;
         } else {
