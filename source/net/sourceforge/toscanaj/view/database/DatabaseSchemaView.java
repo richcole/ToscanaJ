@@ -27,6 +27,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.Enumeration;
+import java.util.Iterator;
 
 /**
  * @todo support joins or drop the option to select multiple table/column pairs.
@@ -361,5 +362,22 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
             return element.getKey().getName();
         }
         return null;
+    }
+    
+    public void setKey(String tableName, String key) {
+    	DefaultListModel list = this.unkeyedTableList;
+    	for(int i = 0; i < list.size(); i++) {
+    		Table table = ((TableInfo) list.get(i)).getTable();
+    		if(table.getName().equals(tableName)) {
+    			Iterator colIt = table.getColumns().iterator();
+    			while (colIt.hasNext()) {
+                    Column col = (Column) colIt.next();
+                    if(col.getName().equals(key)) {
+                        removeUnkeyedTable(table);
+                        table.setKey(col);
+                    }
+                } 
+    		}
+    	}
     }
 }

@@ -583,7 +583,11 @@ public class DatabaseConnectionInformationView extends JDialog
             return null;
         }
         void updateContents() {
-        	// not needed, we do this via the broker (@todo could be changed)
+            String table = conceptualSchema.getDatabaseInfo().getTableName();
+            String key = conceptualSchema.getDatabaseInfo().getKey();
+            if(table != null && key != null) {
+        		tableView.setKey(table, key);
+        	}
         }
     }
 
