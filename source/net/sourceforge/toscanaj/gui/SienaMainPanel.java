@@ -13,6 +13,7 @@ package net.sourceforge.toscanaj.gui;
  */ 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -57,6 +58,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
@@ -237,22 +239,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             this,
             new Rectangle(10, 10, 900, 700));
 
-        if (ConfigurationManager
-            .fetchInt("SienaTemporalControls", "enabled", 0)
-            == 1) {
-            temporalControls =
-                new TemporalMainDialog(
-                    this,
-                    this.diagramEditingView.getDiagramView(),
-                    diagramExportSettings,
-                    eventBroker);
-            ConfigurationManager.restorePlacement(
-                "SienaTemporalControls",
-                temporalControls,
-                new Rectangle(350, 350, 420, 350));
-            temporalControls.show();
-        }
-
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 closeMainPanel();
@@ -271,7 +257,21 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		JTabbedPane mainPanel = new JTabbedPane();
 		mainPanel.addTab("Context", createContextEditingView());
 		mainPanel.setSelectedIndex(0);
-		mainPanel.addTab("Diagrams", this.diagramEditingView);
+		if (ConfigurationManager.fetchInt("SienaTemporalControls", "enabled", 0) == 1) {
+			temporalControls =
+				new TemporalMainDialog(
+					this.diagramEditingView.getDiagramView(),
+					diagramExportSettings,
+					eventBroker);
+			JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+												  this.diagramEditingView, temporalControls);
+			splitPane.setOneTouchExpandable(true);
+			splitPane.setResizeWeight(1.0);
+			this.diagramEditingView.setPreferredSize(new Dimension(500,500));
+			mainPanel.addTab("Diagrams", splitPane);
+		} else {
+			mainPanel.addTab("Diagrams", this.diagramEditingView);
+		}
 
 		getContentPane().add(mainPanel);
 	}
@@ -898,11 +898,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             "SienaMainPanel",
             "diagramViewDivider",
             diagramEditingView.getDividerLocation());
-        if (temporalControls != null) {
-            ConfigurationManager.storePlacement(
-                "SienaTemporalControls",
-                temporalControls);
-        }
         ConfigurationManager.saveConfiguration();
         System.exit(0);
     }

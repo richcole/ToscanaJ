@@ -8,11 +8,10 @@
 package net.sourceforge.toscanaj.gui.dialog;
 
 import java.awt.Color;
-import java.awt.Container;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -28,12 +27,11 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.border.BevelBorder;
+import javax.swing.border.TitledBorder;
 
 import org.tockit.canvas.events.CanvasDrawnEvent;
 import org.tockit.canvas.imagewriter.GraphicFormat;
@@ -60,8 +58,16 @@ import net.sourceforge.toscanaj.view.temporal.InterSequenceTransitionArrow;
 import net.sourceforge.toscanaj.view.temporal.StateRing;
 import net.sourceforge.toscanaj.view.temporal.TransitionArrow;
 
-public class TemporalMainDialog extends JDialog implements EventBrokerListener {
+public class TemporalMainDialog extends JPanel implements EventBrokerListener {
+	private static final Insets DEFAULT_SPACER_INSETS = new Insets(0,0,10,0);
+	private static final Insets DEFAULT_BUTTON_INSETS = new Insets(2,16,2,16);
+	private static final Insets DEFAULT_LABEL_INSETS = new Insets(2,2,2,2);
+	private static final Insets DEFAULT_FIELD_INSETS = new Insets(2,20,2,2);
 	private static final String TRANSITION_LAYER_NAME = "transitions";
+
+	private static final Color[] COLORS = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.CYAN, Color.GRAY, Color.MAGENTA,
+														 Color.ORANGE, Color.PINK, Color.BLACK, Color.YELLOW};
+
     private ManyValuedContext context;
     private EventBroker eventBroker;
     private JComboBox sequenceColumnChooser;
@@ -73,8 +79,6 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private DiagramView diagramView;
     private AnimationTimeController timeController;
     
-    private static final Color[] COLORS = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.CYAN, Color.GRAY, Color.MAGENTA,
-                                                         Color.ORANGE, Color.PINK, Color.BLACK, Color.YELLOW};
     private double targetTime;
     private double lastAnimationTime;
     private int currentStep;
@@ -94,10 +98,9 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private JLabel stepPositionLabel;
     private JButton startSteppingButton;
 	
-    public TemporalMainDialog(Frame frame, DiagramView diagramView, 
+	public TemporalMainDialog(DiagramView diagramView, 
     						   DiagramExportSettings diagramExportSettings, EventBroker eventBroker) {
-	  	super(frame, "Temporal Controls", false);
-	  	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+	  	super();
 	  	
 	  	this.diagramView = diagramView;
 	  	this.eventBroker = eventBroker;
@@ -115,198 +118,242 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     }
     
     private void buildGUI() {
-        JLabel sequenceColumnLabel = new JLabel("Sequence Column:");
-        sequenceColumnChooser = new JComboBox();
-        sequenceColumnChooser.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	calculateValueLists();
-                fillSequenceChooser();
-            }
-        });
-
-        JLabel timelineLabel = new JLabel("Timeline Column:");
-        timelineColumnChooser = new JComboBox();
-        timelineColumnChooser.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                calculateValueLists();
-                fillSequenceChooser();
-            }
-        });
-
-        JLabel sequenceLabel = new JLabel("Sequence:");
-        sequenceToShowChooser = new JComboBox();
-
-        addStaticTransitionsButton = new JButton("Show Transitions");
+        addStaticTransitionsButton = new JButton("Show all transitions");
         addStaticTransitionsButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 addFixedTransitions();
             }
         });
 
-        startSteppingButton = new JButton("Start Stepping");
+        startSteppingButton = new JButton("Start stepping");
         startSteppingButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 startStepping();
             }
         });
 
-        JLabel speedLabel = new JLabel("Speed (ms/step):");
-        speedField = new NumberField(10,NumberField.INTEGER);
-        speedField.setText("200");
-        JLabel fadeInLabel = new JLabel("Fade-in steps:");
-        fadeInField= new NumberField(10,NumberField.FLOAT);
-        fadeInField.setText("1");
-        JLabel holdLabel = new JLabel("Hold steps:");
-        holdField= new NumberField(10,NumberField.FLOAT);
-        holdField.setText("1");
-        JLabel fadeOutLabel = new JLabel("Fade-out steps:");
-        fadeOutField = new NumberField(10,NumberField.FLOAT);
-        fadeOutField.setText("5");
-        
-        serializeSequencesBox = new JCheckBox("Serialize Sequences"); 
-        
-        animateTransitionsButton = new JButton("Animate Transitions");
+        animateTransitionsButton = new JButton("Animate transitions");
         animateTransitionsButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 addAnimatedTransitions();
             }
         });
 
-        exportImagesButton = new JButton("Export Images");
+        exportImagesButton = new JButton("Export all steps as images");
         exportImagesButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 exportImages();
             }
         });
         
-        firstStepButton = new JButton("<<");
-        firstStepButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e) {
-                gotoFirstStep();
-            }
-        });
-
-        previousStepButton = new JButton("<");
-        previousStepButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e) {
-                gotoPreviousStep();
-            }
-        });
-
-        nextStepButton = new JButton(">");
-        nextStepButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e) {
-                gotoNextStep();
-            }
-        });
-
-        lastStepButton = new JButton(">>");
-        lastStepButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e) {
-                gotoLastStep();
-            }
-        });
-        
-        stepPositionLabel = new JLabel("0/0");
-        
-        JPanel stepPanel = new JPanel(new GridBagLayout());
-        stepPanel.add(firstStepButton, new GridBagConstraints(0, 0, 1, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
-                                                        new Insets(2,2,2,2), 20, 0));
-        stepPanel.add(previousStepButton, new GridBagConstraints(1, 0, 1, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
-                                                        new Insets(2,2,2,2), 20, 0));
-        stepPanel.add(nextStepButton, new GridBagConstraints(2, 0, 1, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
-                                                        new Insets(2,2,2,2), 20, 0));
-        stepPanel.add(lastStepButton, new GridBagConstraints(3, 0, 1, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
-                                                        new Insets(2,2,2,2), 20, 0));
-        stepPanel.add(stepPositionLabel, new GridBagConstraints(4, 0, 1, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
-                                                        new Insets(2,2,2,2), 50, 0));
-		stepPanel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
-        
-
-
-        Container contentPane = this.getContentPane();
-        GridBagLayout layout = new GridBagLayout();
-        contentPane.setLayout(layout);
+        this.setLayout(new GridBagLayout());
 
 		int row = 0;
-        contentPane.add(sequenceColumnLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        contentPane.add(sequenceColumnChooser, new GridBagConstraints(2, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
+		this.add(new JLabel("Temporal Controls"), new GridBagConstraints(0, row, 1, 1, 1, 0,
+														GridBagConstraints.NORTH, GridBagConstraints.NONE,
+														new Insets(2,2,10,2), 0, 0));
+		row++;
+		this.add(addStaticTransitionsButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
+														GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+														DEFAULT_BUTTON_INSETS, 0, 0));
+		row++;
+		this.add(exportImagesButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
+														GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+														DEFAULT_BUTTON_INSETS, 0, 0));
+		row++;
+		this.add(animateTransitionsButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
+														GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+														DEFAULT_BUTTON_INSETS, 0, 0));
+		row++;
+		this.add(startSteppingButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
+														GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+														DEFAULT_BUTTON_INSETS, 0, 0));
+		row++;
+		this.add(new JPanel(), new GridBagConstraints(0, row, 1, 1, 1, 0,
+														GridBagConstraints.WEST, GridBagConstraints.BOTH,
+														DEFAULT_SPACER_INSETS, 0, 0));
+		row++;
+		this.add(createStepPanel(), new GridBagConstraints(0, row, 1, 1, 1, 0,
+														GridBagConstraints.CENTER, GridBagConstraints.NONE,
+														DEFAULT_SPACER_INSETS, 0, 0));
         row++;
-        contentPane.add(timelineLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        contentPane.add(timelineColumnChooser, new GridBagConstraints(2, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(sequenceLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        contentPane.add(sequenceToShowChooser, new GridBagConstraints(2, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(serializeSequencesBox, new GridBagConstraints(0, row, 4, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
-                                                        new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(addStaticTransitionsButton, new GridBagConstraints(0, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        contentPane.add(startSteppingButton, new GridBagConstraints(2, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(stepPanel, new GridBagConstraints(0, row, 4, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
-                                                        new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(speedLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        contentPane.add(speedField, new GridBagConstraints(2, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(fadeInLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        contentPane.add(fadeInField, new GridBagConstraints(2, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(holdLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        contentPane.add(holdField, new GridBagConstraints(2, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(fadeOutLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        contentPane.add(fadeOutField, new GridBagConstraints(2, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
-                                                        new Insets(2,2,2,2), 0, 0));
-        row++;
-        contentPane.add(animateTransitionsButton, new GridBagConstraints(0, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
-                                                        new Insets(2,2,2,2), 0, 0));
-        contentPane.add(exportImagesButton, new GridBagConstraints(2, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
-                                                        new Insets(2,2,2,2), 0, 0));
-
-        this.pack();
+		this.add(createBasicSettingsPanel(), new GridBagConstraints(0, row, 1, 1, 1, 0,
+														GridBagConstraints.WEST, GridBagConstraints.BOTH,
+														DEFAULT_SPACER_INSETS, 0, 0));
+		row++;
+		this.add(createAnimationsSettingsPanel(), new GridBagConstraints(0, row, 1, 1, 1, 0,
+														GridBagConstraints.WEST, GridBagConstraints.BOTH,
+														DEFAULT_SPACER_INSETS, 0, 0));
+		row++;
+		this.add(new JPanel(), new GridBagConstraints(0, row, 1, 1, 1, 1,
+														GridBagConstraints.WEST, GridBagConstraints.BOTH,
+														DEFAULT_LABEL_INSETS, 0, 0));
     }
+
+	private JPanel createBasicSettingsPanel() {
+		JLabel sequenceColumnLabel = new JLabel("Sequence Column:");
+		sequenceColumnChooser = new JComboBox();
+		sequenceColumnChooser.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		    	calculateValueLists();
+		        fillSequenceChooser();
+		    }
+		});
+		
+		JLabel timelineLabel = new JLabel("Timeline Column:");
+		timelineColumnChooser = new JComboBox();
+		timelineColumnChooser.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        calculateValueLists();
+		        fillSequenceChooser();
+		    }
+		});
+		
+		JLabel sequenceLabel = new JLabel("Sequence:");
+		sequenceToShowChooser = new JComboBox();
+		
+		serializeSequencesBox = new JCheckBox("Serialize when stepping/animating"); 
+		
+		JPanel basicSettingsPanel = new JPanel(new GridBagLayout());
+		int r = 0;
+		basicSettingsPanel.add(sequenceColumnLabel, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_LABEL_INSETS, 0, 0));
+		r++;
+		basicSettingsPanel.add(sequenceColumnChooser, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_FIELD_INSETS, 0, 0));
+		r++;
+		basicSettingsPanel.add(timelineLabel, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_LABEL_INSETS, 0, 0));
+		r++;
+		basicSettingsPanel.add(timelineColumnChooser, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_FIELD_INSETS, 0, 0));
+		r++;
+		basicSettingsPanel.add(sequenceLabel, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_LABEL_INSETS, 0, 0));
+		r++;
+		basicSettingsPanel.add(sequenceToShowChooser, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_FIELD_INSETS, 0, 0));
+		r++;
+		basicSettingsPanel.add(serializeSequencesBox, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.CENTER, GridBagConstraints.NONE,
+														new Insets(2,2,2,2), 0, 0));
+		basicSettingsPanel.setBorder(createTitledBorder("Data settings"));
+		return basicSettingsPanel;
+	}
+
+	private JPanel createAnimationsSettingsPanel() {
+		JLabel speedLabel = new JLabel("Speed (ms/step):");
+		speedField = new NumberField(10,NumberField.INTEGER);
+		speedField.setText("200");
+		JLabel fadeInLabel = new JLabel("Fade-in steps:");
+		fadeInField= new NumberField(10,NumberField.FLOAT);
+		fadeInField.setText("1");
+		JLabel holdLabel = new JLabel("Hold steps:");
+		holdField= new NumberField(10,NumberField.FLOAT);
+		holdField.setText("1");
+		JLabel fadeOutLabel = new JLabel("Fade-out steps:");
+		fadeOutField = new NumberField(10,NumberField.FLOAT);
+		fadeOutField.setText("5");
+		
+		JPanel animationSettingsPanel = new JPanel(new GridBagLayout());
+		int r = 0;
+		animationSettingsPanel.add(speedLabel, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_LABEL_INSETS, 0, 0));
+		r++;
+		animationSettingsPanel.add(speedField, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_FIELD_INSETS, 0, 0));
+		r++;
+		animationSettingsPanel.add(fadeInLabel, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_LABEL_INSETS, 0, 0));
+		r++;
+		animationSettingsPanel.add(fadeInField, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_FIELD_INSETS, 0, 0));
+		r++;
+		animationSettingsPanel.add(holdLabel, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_LABEL_INSETS, 0, 0));
+		r++;
+		animationSettingsPanel.add(holdField, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_FIELD_INSETS, 0, 0));
+		r++;
+		animationSettingsPanel.add(fadeOutLabel, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_LABEL_INSETS, 0, 0));
+		r++;
+		animationSettingsPanel.add(fadeOutField, new GridBagConstraints(0, r, 1, 1, 1, 0,
+														GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+														DEFAULT_FIELD_INSETS, 0, 0));
+		animationSettingsPanel.setBorder(createTitledBorder("Animation controls"));
+		return animationSettingsPanel;
+	}
+
+	private JPanel createStepPanel() {
+		firstStepButton = new JButton("<<");
+		firstStepButton.addActionListener(new ActionListener(){
+		    public void actionPerformed(ActionEvent e) {
+		        gotoFirstStep();
+		    }
+		});
+		
+		previousStepButton = new JButton("<");
+		previousStepButton.addActionListener(new ActionListener(){
+		    public void actionPerformed(ActionEvent e) {
+		        gotoPreviousStep();
+		    }
+		});
+		
+		nextStepButton = new JButton(">");
+		nextStepButton.addActionListener(new ActionListener(){
+		    public void actionPerformed(ActionEvent e) {
+		        gotoNextStep();
+		    }
+		});
+		
+		lastStepButton = new JButton(">>");
+		lastStepButton.addActionListener(new ActionListener(){
+		    public void actionPerformed(ActionEvent e) {
+		        gotoLastStep();
+		    }
+		});
+		
+		stepPositionLabel = new JLabel("0/0");
+		
+		JPanel stepPanel = new JPanel(new GridBagLayout());
+		stepPanel.add(firstStepButton, new GridBagConstraints(0, 0, 1, 1, 1, 0,
+		                                                GridBagConstraints.CENTER, GridBagConstraints.NONE,
+		                                                new Insets(2,2,2,2), 5, 0));
+		stepPanel.add(previousStepButton, new GridBagConstraints(1, 0, 1, 1, 1, 0,
+		                                                GridBagConstraints.CENTER, GridBagConstraints.NONE,
+		                                                new Insets(2,2,2,2), 5, 0));
+		stepPanel.add(nextStepButton, new GridBagConstraints(2, 0, 1, 1, 1, 0,
+		                                                GridBagConstraints.CENTER, GridBagConstraints.NONE,
+		                                                new Insets(2,2,2,2), 5, 0));
+		stepPanel.add(lastStepButton, new GridBagConstraints(3, 0, 1, 1, 1, 0,
+		                                                GridBagConstraints.CENTER, GridBagConstraints.NONE,
+		                                                new Insets(2,2,2,2), 5, 0));
+		stepPanel.add(stepPositionLabel, new GridBagConstraints(4, 0, 1, 1, 1, 0,
+		                                                GridBagConstraints.CENTER, GridBagConstraints.NONE,
+		                                                new Insets(2,2,2,2), 5, 0));
+		stepPanel.setBorder(createTitledBorder("Step controls"));
+		return stepPanel;
+	}
+
+	private TitledBorder createTitledBorder(String title) {
+		return BorderFactory.createTitledBorder(
+												BorderFactory.createLineBorder(SystemColor.controlDkShadow),
+												title);
+	}
     
     private void fillGUI() {
         Object[] attributes;
@@ -498,7 +545,6 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
             ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
             this.context = csce.getConceptualSchema().getManyValuedContext();
             fillGUI();
-            pack();
         }
         if(e instanceof DisplayedDiagramChangedEvent) {
             disableStepControls();
