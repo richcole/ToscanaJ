@@ -209,13 +209,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 				return null;
 			}
 		} else if (query == AggregateQuery.COUNT_QUERY) {
-			int objectCount = getObjectCount(concept, context);
-			retVal = new Object[1];
-			if( objectCount != 0) {
-				retVal[0] = getObject(Integer.toString(objectCount), concept, context);
-			} else {
-				return null;
-			}
+			retVal = executeObjectCountQuery(concept, context);
 		} else if (query == AggregateQuery.PERCENT_QUERY) {
 			int objectCount = getObjectCount(concept, context);
 			retVal = new Object[1];
@@ -234,15 +228,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 		} else if (query == AggregateQuery.DEVIATION_QUERY) {
 			retVal = new Object[1];
 			if(context.getNestingContexts().size() == 0) {
-				// @todo or should we reexecute the query with AggregateQuery.COUNT_QUERY?
-				int objectCount = getObjectCount(concept, context);
-				retVal = new Object[1];
-				if( objectCount != 0) {
-					retVal[0] = getObject(Integer.toString(objectCount), concept, context);
-					return retVal;
-				} else {
-					return null;
-				}
+				retVal = executeObjectCountQuery(concept, context);
 			}
 			boolean displayMode = context.getObjectDisplayMode();
 			int neutralSize;
@@ -264,6 +250,9 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 			if ((objectCount == 0) && (expectedSize == 0.0)) {
 				return null;
 			}
+			if (objectCount == expectedSize) {
+				return executeObjectCountQuery(concept, context);
+			}
 			NumberFormat format = DecimalFormat.getNumberInstance();
 			format.setMaximumFractionDigits(1);
 			String returnValue = objectCount + " (expected: " + format.format(expectedSize) + ")";
@@ -272,6 +261,18 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 			return handleNonDefaultQuery(query, concept, context);
 		}
 		return retVal;
+	}
+	
+	private Object[] executeObjectCountQuery (Concept concept, ConceptInterpretationContext context) {
+		int objectCount = getObjectCount(concept, context);
+		if( objectCount != 0) {
+			Object[] retVal = new Object[1];
+			retVal[0] = getObject(Integer.toString(objectCount), concept, context);
+			return retVal;
+		} else {
+			return null;
+		}
+		
 	}
 
 	/**
