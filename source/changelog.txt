@@ -23,6 +23,8 @@ Specific for Elba:
 ==================
 - bugfix: export object and attribute lists with Tools->Export Realized 
   Scales... works again
+- bugfix: most recently used files are available even if loading the last
+  one failed
 
 Specific for Siena (still not fully complete):
 ==============================================
@@ -41,6 +43,8 @@ Specific for Siena (still not fully complete):
   visible (some repaints missing) and the standard settings for the
   grayscale and black&white are not yet adjusted -- this can be done by
   the user and will be remembered.
+- bugfix: most recently used files are available even if loading the last
+  one failed
   
 
 Other new experimental features:
