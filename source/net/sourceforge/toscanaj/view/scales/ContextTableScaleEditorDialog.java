@@ -19,20 +19,21 @@ import java.util.ArrayList;
 
 public class ContextTableScaleEditorDialog extends JDialog {
 
-	private boolean result;
-	private ContextImplementation context;
-	private ContextTableView tableView;
-	private DatabaseConnection databaseConnection;
 	private static final int MINIMUM_WIDTH = 550;
 	private static final int MINIMUM_HEIGHT = 500;
 	private static final int DEFAULT_X_POS = 250;
 	private static final int DEFAULT_Y_POS = 100;
 
+	private ContextTableScaleEditorDialog contextTableScaleEditorDialog;
+	private ContextImplementation context;
+	private ContextTableView tableView;
+	private DatabaseConnection databaseConnection;
+
+	private boolean result;
+
 	private JTextField scaleTitleField;
 	private JButton createButton;
-	private JPanel buttonsPane;
-	private JPanel titlePane;
-	private ContextTableScaleEditorDialog contextTableScaleEditorDialog;
+	private JPanel buttonsPane, titlePane;
 	private JScrollPane scrollpane;
 
 	public ContextTableScaleEditorDialog(
@@ -64,9 +65,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		});
 		
 		createTitlePane();
-		tableView = new ContextTableView(context, this);
-		scrollpane = new JScrollPane(tableView);
-		tableView.addMouseListener(getMouseListener(tableView));
+		createTablePane();
 		createButtonsPane();
 
 		getContentPane().setLayout(new GridBagLayout());
@@ -112,6 +111,12 @@ public class ContextTableScaleEditorDialog extends JDialog {
 				new Insets(1, 5, 5, 5),
 				0,
 				0));
+	}
+
+	private void createTablePane() {
+		tableView = new ContextTableView(context, this);
+		scrollpane = new JScrollPane(tableView);
+		tableView.addMouseListener(getMouseListener(tableView));
 	}
 
 	private void createTitlePane() {
@@ -499,9 +504,6 @@ public class ContextTableScaleEditorDialog extends JDialog {
 								Attribute attribute = (Attribute) attributeArrayList.get(pos.getCol() - 1);
 								Attribute object =	(Attribute) objectsArrayList.get(pos.getRow() - 1);
 								changeRelationImplementation(object, attribute);
-//								String attribute = (String) attributeArrayList.get(pos.getCol() - 1);
-//								String object =	(String) objectsArrayList.get(pos.getRow() - 1);
-//								changeRelationImplementation(object, attribute);
 							}
 						}
 					}
@@ -526,7 +528,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					inputValue = inputValue.trim();
 					if(!objectOrAttributeIsDuplicated(inputValue, objectsArrayList, null)){
 						objectsArrayList.remove(yP - 1);
-						objectsArrayList.add(yP - 1, inputValue);
+						objectsArrayList.add(yP - 1, new Attribute(inputValue));
 						scrollpane.updateUI();
 						inputValue ="";
 					}else{
@@ -546,7 +548,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					inputValue = inputValue.trim();
 					if(!objectOrAttributeIsDuplicated(inputValue, null, attributeArrayList)){
 						attributeArrayList.remove(xP - 1);
-						attributeArrayList.add(xP - 1, inputValue);
+						attributeArrayList.add(xP - 1, new Attribute(inputValue));
 						scrollpane.updateUI();
 						inputValue = "";
 					}else{
