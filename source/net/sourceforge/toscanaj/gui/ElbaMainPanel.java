@@ -470,6 +470,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
         openDialog.setApproveButtonText("Import");
+        openDialog.setFileFilter(new ExtensionFileFilter(new String[]{"csc"}, "Conscript Files"));
         int rv = openDialog.showOpenDialog(this);
         if (rv != JFileChooser.APPROVE_OPTION) {
             return;
