@@ -3,11 +3,14 @@ package net.sourceforge.toscanaj.view.dialogs;
 import net.sourceforge.toscanaj.canvas.imagewriter.DiagramExportSettings;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormat;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormatRegistry;
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Iterator;
 
 /**
@@ -42,16 +45,19 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
      */
     private DiagramExportSettingsDialog(Frame frame, DiagramExportSettings settings) {
         super(frame, true);
+        JLabel modeLabel = new JLabel();
+        modeLabel.setText("Mode:");
+
         ButtonGroup manualOrAuto = new ButtonGroup();
 
-        manual = new JRadioButton("Manual");
-        manual.addActionListener(this);
-        manual.setSelected(!settings.usesAutoMode());
-        manualOrAuto.add(manual);
         auto = new JRadioButton("Auto");
         auto.addActionListener(this);
         auto.setSelected(settings.usesAutoMode());
         manualOrAuto.add(auto);
+        manual = new JRadioButton("Manual");
+        manual.addActionListener(this);
+        manual.setSelected(!settings.usesAutoMode());
+        manualOrAuto.add(manual);
 
         JLabel formatLabel = new JLabel();
         formatLabel.setText("Format:");
@@ -85,7 +91,13 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 diagramSettings = null;
-                DiagramExportSettingsDialog.dialog.setVisible(false);
+                closeDialog();
+            }
+        });
+
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                closeDialog();
             }
         });
 
@@ -96,35 +108,49 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
                                                              Integer.parseInt(widthField.getText()),
                                                              Integer.parseInt(heightField.getText()),
                                                              auto.isSelected() );
-                DiagramExportSettingsDialog.dialog.setVisible(false);
+                closeDialog();
             }
         });
         getRootPane().setDefaultButton(okButton);
-
+        
+        JPanel buttonPanel = new JPanel();
+        GridBagLayout buttonLayout = new GridBagLayout();
+        buttonPanel.setLayout(buttonLayout);
+        buttonPanel.add(cancelButton, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0
+            ,GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 1, 0));
+        buttonPanel.add(okButton, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0
+            ,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 1, 0));
 
         GridBagLayout gridBagLayout = new GridBagLayout();
         this.getContentPane().setLayout(gridBagLayout);
-        this.getContentPane().add(manual, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
-            ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 20), 200, 0));
+        this.getContentPane().add(modeLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
+            ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 20), 0, 0));
         this.getContentPane().add(auto, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 20), 0, 0));
-        this.getContentPane().add(formatSelector, new GridBagConstraints(1, 1, 1, 1, 1.0, 0.0
-            ,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 200, 0));
+        this.getContentPane().add(manual, new GridBagConstraints(2, 0, 1, 1, 0.0, 0.0
+            ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 20), 0, 0));
         this.getContentPane().add(formatLabel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 20), 0, 0));
+        this.getContentPane().add(formatSelector, new GridBagConstraints(1, 1, 3, 1, 1.0, 0.0
+            ,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 200, 0));
         this.getContentPane().add(widthLabel, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 20), 0, 0));
+        this.getContentPane().add(widthField, new GridBagConstraints(1, 2, 3, 1, 1.0, 0.0
+            ,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 200, 0));
         this.getContentPane().add(heightLabel, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 20), 0, 0));
-        this.getContentPane().add(widthField, new GridBagConstraints(1, 2, 1, 1, 1.0, 0.0
+        this.getContentPane().add(heightField, new GridBagConstraints(1, 3, 3, 1, 1.0, 0.0
             ,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 200, 0));
-        this.getContentPane().add(heightField, new GridBagConstraints(1, 3, 1, 1, 1.0, 0.0
-            ,GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 200, 0));
-        this.getContentPane().add(cancelButton, new GridBagConstraints(0, 4, 1, 1, 1.0, 0.0
-            ,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 200, 0));
-        this.getContentPane().add(okButton, new GridBagConstraints(1, 4, 1, 1, 1.0, 0.0
-            ,GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 200, 0));
+        this.getContentPane().add(buttonPanel, new GridBagConstraints(0, 4, 4, 1, 1.0, 0.0
+            ,GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(0, 0, 0, 0), 1, 0));
+        this.getContentPane().add(new JPanel(), new GridBagConstraints(0, 5, 4, 1, 0.0, 1.0
+            ,GridBagConstraints.EAST, GridBagConstraints.VERTICAL, new Insets(0, 0, 0, 0), 0, 0));
         pack();
+    }
+    
+    protected void closeDialog() {
+        DiagramExportSettingsDialog.dialog.setVisible(false);
+        ConfigurationManager.storePlacement("DiagramExportSettingsDialog",this);
     }
 
     public void actionPerformed(ActionEvent a){
@@ -157,6 +183,8 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
         if( dialog != null )
         {
             dialog.setLocationRelativeTo(comp);
+            ConfigurationManager.restorePlacement("DiagramExportSettingsDialog",dialog,
+                                                  new Rectangle(50,50,335,160));
             dialog.setVisible(true);
         }
         else
