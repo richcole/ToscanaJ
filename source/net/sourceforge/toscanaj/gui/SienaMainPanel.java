@@ -39,9 +39,11 @@ import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.parser.BurmeisterParser;
 import net.sourceforge.toscanaj.parser.CernatoXMLParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
+import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
+import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 
 import org.jdom.JDOMException;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
@@ -241,6 +243,70 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 )
         );
         fileMenu.add(exitMenuItem);
+        
+        final DiagramView diagramView = this.diagramEditingView.getDiagramView();
+
+        JMenu viewMenu = new JMenu("View");
+        viewMenu.setMnemonic(KeyEvent.VK_V);
+        ButtonGroup fontSizeGroup = new ButtonGroup();
+        JMenu setMinLabelSizeSubMenu = new JMenu("Set minimum label size");
+        setMinLabelSizeSubMenu.setMnemonic(KeyEvent.VK_S);
+        JMenuItem fontRangeMenuItem = new JRadioButtonMenuItem("None");
+        fontSizeGroup.add(fontRangeMenuItem);
+        fontRangeMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JMenuItem source = (JMenuItem) e.getSource();
+                diagramView.setMinimumFontSize(0);
+                source.setSelected(true);
+            }
+        });
+        fontRangeMenuItem.setSelected(true);
+        setMinLabelSizeSubMenu.add(fontRangeMenuItem);
+        int fontRange = 6; //min font size
+        while (fontRange < 26) {
+            fontRangeMenuItem = new JRadioButtonMenuItem(fontRange + "");
+            fontSizeGroup.add(fontRangeMenuItem);
+            fontRangeMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JMenuItem source = (JMenuItem) e.getSource();
+                    int newFontSize = Integer.parseInt(source.getText());
+                    diagramView.setMinimumFontSize(newFontSize);
+                    source.setSelected(true);
+                }
+            });
+            if (diagramView.getMinimumFontSize() == fontRange) {
+                fontRangeMenuItem.setSelected(true);
+            }
+            fontRange += 2;
+            setMinLabelSizeSubMenu.add(fontRangeMenuItem);
+        }
+        viewMenu.add(setMinLabelSizeSubMenu);
+
+        final JCheckBoxMenuItem hideAttributeLabels = new JCheckBoxMenuItem("Hide Attribute Labels");
+        hideAttributeLabels.setMnemonic(KeyEvent.VK_A);
+        hideAttributeLabels.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean newState = !AttributeLabelView.allAreHidden();
+                hideAttributeLabels.setSelected(newState);
+                AttributeLabelView.setAllHidden(newState);
+                diagramView.repaint();
+            }
+        });
+        viewMenu.add(hideAttributeLabels);
+
+        final JCheckBoxMenuItem hideObjectLabels = new JCheckBoxMenuItem("Hide Object Labels");
+        hideObjectLabels.setMnemonic(KeyEvent.VK_O);
+        hideObjectLabels.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean newState = !ObjectLabelView.allAreHidden();
+                hideObjectLabels.setSelected(newState);
+                ObjectLabelView.setAllHidden(newState);
+                diagramView.repaint();
+            }
+        });
+        viewMenu.add(hideObjectLabels);
+
+        menuBar.add(viewMenu);
 
         // --- help menu ---
         // create a help menu
