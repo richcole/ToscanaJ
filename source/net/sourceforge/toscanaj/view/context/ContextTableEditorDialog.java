@@ -41,9 +41,7 @@ import java.util.Set;
  * 
  * @todo avoid completely recreating the whole view each time the table changes
  */
-public class ContextTableEditorDialog
-	extends JDialog
-	implements EventBrokerListener {
+public class ContextTableEditorDialog extends JDialog implements EventBrokerListener {
 
 	private static final String CONFIGURATION_SECTION_NAME =
 		"ContextTableEditorDialog";
@@ -397,8 +395,8 @@ public class ContextTableEditorDialog
 		tableView = new ContextTableView(context, this);
 		tableView.addMouseListener(getMouseListener(tableView));
 				
-		this.rowHeader = new ContextTableRowHeader(context, this);
-		this.colHeader = new ContextTableColumnHeader(context, this);
+		this.rowHeader = new ContextTableRowHeader(this);
+		this.colHeader = new ContextTableColumnHeader(this);
 		
 		scrollpane = new JScrollPane(tableView);
 		scrollpane.setColumnHeaderView(colHeader);
@@ -709,8 +707,8 @@ public class ContextTableEditorDialog
 	public void setContext(ContextImplementation context) {
 		this.context = context;
 		this.tableView.setContext(context);
-		this.colHeader.setContext(context);
-		this.rowHeader.setContext(context);
+		this.colHeader.updateSize();
+		this.rowHeader.updateSize();
 		this.scaleTitleField.setText(context.getName());
 	}
 	

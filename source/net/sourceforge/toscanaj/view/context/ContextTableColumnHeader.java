@@ -35,15 +35,12 @@ import javax.swing.ToolTipManager;
 
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.model.context.Attribute;
-import net.sourceforge.toscanaj.model.context.ContextImplementation;
 
 public class ContextTableColumnHeader extends JComponent implements Scrollable {
-	private ContextImplementation context;
 	private ContextTableEditorDialog dialog;
 
-	public ContextTableColumnHeader(ContextImplementation context, ContextTableEditorDialog dialog) {
+	public ContextTableColumnHeader(ContextTableEditorDialog dialog) {
 		super();
-		this.context = context;
 		this.dialog = dialog;
 		addMouseListener(createMouseListener());
 		setVisible(true);
@@ -66,14 +63,14 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	}
 
 	public Dimension calculateNewSize() {
-		int numCol = this.context.getAttributes().size()+1;
-		int numRow = this.context.getObjects().size()+1;
+		int numCol = this.dialog.getContext().getAttributes().size()+1;
+		int numRow = this.dialog.getContext().getObjects().size()+1;
 		return new Dimension(numCol * ContextTableView.CELL_WIDTH + 1, numRow * ContextTableView.CELL_HEIGHT + 1);
 	}
 
 	protected void drawColumnHeader(Graphics2D g2d) {
 		g2d.setPaint(ContextTableView.TABLE_HEADER_COLOR);
-		Iterator attrIt = this.context.getAttributes().iterator();
+		Iterator attrIt = this.dialog.getContext().getAttributes().iterator();
 		int col = 0;
 		while (attrIt.hasNext()) {
 			Object attribute = attrIt.next();
@@ -124,7 +121,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	public String getToolTipText(MouseEvent e) {
 		String tooltipText = null;
 
-		ArrayList attributeArrayList = (ArrayList) context.getAttributes();
+		ArrayList attributeArrayList = (ArrayList) dialog.getContext().getAttributes();
 		ContextTableView.Position pos = getTablePosition(e.getX(), e.getY());
 
 		if (pos != null) {
@@ -139,15 +136,11 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	protected ContextTableView.Position getTablePosition(int xLoc, int yLoc) {
 		int col = xLoc / getCellWidth();
 		int row = yLoc / getCellHeight();
-		if ((col > this.context.getAttributes().size() )
-			|| (row > this.context.getObjects().size() )) {
+		if ((col > this.dialog.getContext().getAttributes().size() )
+			|| (row > this.dialog.getContext().getObjects().size() )) {
 			return null;
 		}
 		return new ContextTableView.Position(row, col);
-	}
-	
-	public ContextImplementation getModel() {
-		return this.context;
 	}
 	
     public Dimension getPreferredScrollableViewportSize() {
@@ -181,15 +174,6 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
     	this.setPreferredSize(calculateNewSize());
     }
     
-    public ContextImplementation getContext() {
-        return context;
-    }
-
-    public void setContext(ContextImplementation context) {
-        this.context = context;
-        updateSize();
-    }
-    
 	protected boolean collectionContainsString(
 		String value,
 		Collection collection) {
@@ -204,14 +188,14 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	}
 	
 	private void removeAttribute(int pos) {
-		List attributes = (List) this.context.getAttributes();
+		List attributes = (List) this.dialog.getContext().getAttributes();
 		attributes.remove(pos);
 		repaint();
 	}
 	
 	protected boolean addAttribute(String newAttributeName) {
-		if (!collectionContainsString(newAttributeName, context.getAttributes())) {
-			context.getAttributes().add(new Attribute(newAttributeName));
+		if (!collectionContainsString(newAttributeName, dialog.getContext().getAttributes())) {
+			dialog.getContext().getAttributes().add(new Attribute(newAttributeName));
 			return true;
 		} else {
 			return false;
@@ -284,7 +268,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	}
 	
 	private void renameAttribute(int num) {
-		List attributeList = (List) this.context.getAttributes();
+		List attributeList = (List) this.dialog.getContext().getAttributes();
 		String inputValue = "";
 		do {
 			Attribute attr = (Attribute) attributeList.get(num);
