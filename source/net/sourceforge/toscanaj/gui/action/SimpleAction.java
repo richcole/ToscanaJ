@@ -2,6 +2,7 @@ package net.sourceforge.toscanaj.gui.action;
 
 import net.sourceforge.toscanaj.model.XML_Reader;
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

@@ -1,7 +1,7 @@
 package net.sourceforge.toscanaj.view.database;
 
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
-import net.sourceforge.toscanaj.gui.action.SimpleActivity;
+import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 
 import javax.swing.*;

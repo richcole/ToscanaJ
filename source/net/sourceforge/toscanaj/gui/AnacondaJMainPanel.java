@@ -1,38 +1,40 @@
 package net.sourceforge.toscanaj.gui;
 
-import net.sourceforge.toscanaj.model.ConceptualSchema;
-
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-
-import net.sourceforge.toscanaj.gui.action.*;
-
+import net.sourceforge.toscanaj.gui.action.SimpleAction;
+import net.sourceforge.toscanaj.gui.action.OpenFileAction;
+import net.sourceforge.toscanaj.gui.activity.CloseMainPanelActivity;
+import net.sourceforge.toscanaj.gui.activity.NewConceptualSchemaActivity;
+import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
+import net.sourceforge.toscanaj.gui.activity.LoadConceptualSchemaActivity;
+import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-public class AnacondaJMainPanel extends JFrame
-{
+public class AnacondaJMainPanel extends JFrame implements MainPanel {
     private ConceptualSchema conceptualSchema = new ConceptualSchema();
 
     /**
      * Controls
      */
     private JMenuBar menuBar;
-    private JMenu    helpMenu;
-    private JMenu    fileMenu;
+    private JMenu helpMenu;
+    private JMenu fileMenu;
 
     /**
      * Views
      */
     private PanelStackView mainView;
 
-    public class PrepareToSaveActivity implements SimpleActivity
-    {
+    public class PrepareToSaveActivity implements SimpleActivity {
 
-        public boolean doActivity() throws Exception
-        {
+        public boolean doActivity() throws Exception {
             //return prepareToSave();
             return true;
         }
@@ -55,8 +57,7 @@ public class AnacondaJMainPanel extends JFrame
         });
     }
 
-    public void createViews()
-    {
+    public void createViews() {
         mainView = new PanelStackView(this);
         mainView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "divider", 200));
         JPanel connectionInformationView = new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo());
@@ -93,12 +94,12 @@ public class AnacondaJMainPanel extends JFrame
         menuBar.add(helpMenu);
 
         // --- file new item ---
-        /*
-        JMenuItem newMenuItem = new JMenuItem("New...");
+        JMenuItem newMenuItem = new JMenuItem("New");
         newMenuItem.addActionListener(
                 new SimpleAction(
                         this,
-                        new AnacondaNewModelActivity(model, rightPane),
+                        new NewConceptualSchemaActivity(conceptualSchema),
+                        "New",
                         KeyEvent.VK_N,
                         KeyStroke.getKeyStroke(
                                 KeyEvent.VK_N,
@@ -113,7 +114,7 @@ public class AnacondaJMainPanel extends JFrame
         openMenuItem.addActionListener(
                 new OpenFileAction(
                         this,
-                        new AnacondaOpenFileActivity(conceptualSchema, this),
+                        new LoadConceptualSchemaActivity(conceptualSchema),
                         KeyEvent.VK_O,
                         KeyStroke.getKeyStroke(
                                 KeyEvent.VK_O,
@@ -123,6 +124,7 @@ public class AnacondaJMainPanel extends JFrame
         );
         fileMenu.add(openMenuItem);
 
+        /*
         JMenuItem saveMenuItem = new JMenuItem("Save...");
         AnacondaSaveFileActivity saveActivity =
             new AnacondaSaveFileActivity(conceptualSchema, this);
@@ -147,10 +149,10 @@ public class AnacondaJMainPanel extends JFrame
         exitMenuItem.addActionListener(
                 new SimpleAction(
                         this,
-                        new AnacondaQuitActivity(this),
-                        "!!!unnamed!!!", KeyEvent.VK_Q,
+                        new CloseMainPanelActivity(this),
+                        "Exit", KeyEvent.VK_X,
                         KeyStroke.getKeyStroke(
-                            KeyEvent.VK_F4, ActionEvent.ALT_MASK
+                                KeyEvent.VK_F4, ActionEvent.ALT_MASK
                         )
                 )
         );

@@ -35,7 +35,7 @@ public class ConceptualSchema {
     /**
      * List of scales
      */
-    private List scales = CollectionFactory.createDefaultList();
+    private List scales;
 
     /**
      * The list of diagrams.
@@ -56,9 +56,32 @@ public class ConceptualSchema {
      * Creates an empty schema.
      */
     public ConceptualSchema() {
+        reset();
+    }
+
+    /**
+     * Deletes all schema content, rendering the schema empty.
+     */
+    public void reset() {
         databaseInfo = null;
         diagrams = new Vector();
         hasDiagramDescription = false;
+        scales = CollectionFactory.createDefaultList();
+    }
+
+    /**
+     * Turns this schema into a copy of the other.
+     *
+     * @todo get rid of the exception
+     */
+    public void copyContents(ConceptualSchema otherSchema)
+        throws DatabaseException
+    {
+        reset();
+        setDatabaseInfo(otherSchema.getDatabaseInfo());
+        diagrams.addAll(otherSchema.diagrams);
+        setDescription(otherSchema.description);
+        scales.addAll(otherSchema.scales);
     }
 
     /**

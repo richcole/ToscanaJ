@@ -6,7 +6,7 @@
  * To change template for new interface use
  * Code Style | Class Templates options (Tools | IDE Options).
  */
-package net.sourceforge.toscanaj.gui.action;
+package net.sourceforge.toscanaj.gui.activity;
 
 import java.io.File;
 
