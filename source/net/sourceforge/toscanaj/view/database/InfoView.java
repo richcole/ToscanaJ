@@ -1,4 +1,4 @@
-package net.sourceforge.toscanaj.view.dialogs;
+package net.sourceforge.toscanaj.view.database;
 
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.Database;
