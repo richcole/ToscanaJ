@@ -404,16 +404,12 @@ public class CSCParser {
         private LabelInfo parseLabelInfo(String formattingString) {
         	LabelInfo retVal = new LabelInfo();
         	String[] nextSplit = extractFormattingStringSegment(formattingString);
-            String fontName = nextSplit[0];
             formattingString = nextSplit[1];
             nextSplit = extractFormattingStringSegment(formattingString);
-            String fontStyleString = nextSplit[0];
             formattingString = nextSplit[1];
             nextSplit = extractFormattingStringSegment(formattingString);
-            String fontColorString = nextSplit[0];
             formattingString = nextSplit[1];
             nextSplit = extractFormattingStringSegment(formattingString);
-            String fontSizeString = nextSplit[0];
             formattingString = nextSplit[1];
             nextSplit = extractFormattingStringSegment(formattingString);
             String offsetString = nextSplit[0];
@@ -422,7 +418,6 @@ public class CSCParser {
             String alignmentString = nextSplit[0];
             formattingString = nextSplit[1];
             nextSplit = extractFormattingStringSegment(formattingString);
-            String clipBoxString = nextSplit[0];
             formattingString = nextSplit[1];
             nextSplit = extractFormattingStringSegment(formattingString);
 			
