@@ -65,6 +65,7 @@ import java.util.ListIterator;
 public class ToscanaJMainPanel extends JFrame implements ChangeObserver, ClipboardOwner {
 
     private static final String CONFIGURATION_SECTION_NAME = "ToscanaJMainPanel";
+    private static final String WINDOW_TITLE = "ToscanaJ";
     /**
      * The central event broker for the main panel
      */
@@ -168,7 +169,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 	 * Simple initialisation constructor.
 	 */
     public ToscanaJMainPanel() {
-        super("ToscanaJ");
+        super(WINDOW_TITLE);
         broker = new EventBroker();
         conceptualSchema = new ConceptualSchema(broker);
         DatabaseConnection.initialize(broker);
@@ -914,6 +915,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     protected void openSchemaFile(File schemaFile) {
         // store current file
         try {
+			setTitle(schemaFile.getName().substring(0,((schemaFile.getName()).length()-4))+" - "+WINDOW_TITLE);
             this.currentFile = schemaFile.getCanonicalPath();
         } catch (IOException e) { // could not resolve canonical path
             e.printStackTrace();
