@@ -23,59 +23,57 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
     private boolean filterMode;
 
     private WhereClauseGenerator(String startClause, DiagramHistory filterDiagrams,
-                                 List outerConcepts, boolean filterMode) {
+                                 List outerConcepts, boolean displayMode, boolean filterMode) {
         try {
             createClauseStart(startClause);
-            addFilterPart(filterMode, filterDiagrams);
-            addNestingPart(outerConcepts);
+            addFilterPart(filterDiagrams, filterMode);
+            addNestingPart(outerConcepts, displayMode);
             clause += ";";
         } catch (NoClauseCreatedException e) {
             clause = null;
         }
     }
 
-    private void createClauseStart(String startClause) throws NoClauseCreatedException {
+    private void createClauseStart(String startClause) {
         if(startClause == null) {
             throw new NoClauseCreatedException();
         }
         this.clause = "WHERE " + startClause;
     }
 
-    private void addFilterPart(boolean filterMode, DiagramHistory filterDiagrams) {
+    private void addFilterPart(DiagramHistory filterDiagrams, boolean filterMode) {
         this.filterMode = filterMode;
         filterDiagrams.visitZoomedConcepts(this);
     }
 
-    private void addNestingPart(List outerConcepts) {
+    private void addNestingPart(List outerConcepts, boolean displayMode) {
         for (Iterator iterator = outerConcepts.iterator(); iterator.hasNext();) {
             DatabaseConnectedConcept concept = (DatabaseConnectedConcept) iterator.next();
-            if(concept.hasObjectClause()) {
-                clause += " AND " + concept.getObjectClause();
+            if(displayMode == ConceptInterpretationContext.CONTINGENT) {
+                addClausePart(concept.getObjectClause());
             }
             else {
-                throw new NoClauseCreatedException();
+                addClausePart(concept.getExtentClause());
             }
+        }
+    }
+
+    private void addClausePart(String clausePart) {
+        if(clausePart != null) {
+            clause += " AND " + clausePart;
+        }
+        else {
+            throw new NoClauseCreatedException();
         }
     }
 
     public void visitConcept(Concept concept) {
         DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
         if(filterMode == ConceptInterpretationContext.CONTINGENT) {
-            if(dbConcept.hasObjectClause()) {
-                clause += " AND " + dbConcept.getObjectClause();
-            }
-            else {
-                throw new NoClauseCreatedException();
-            }
+            addClausePart(dbConcept.getObjectClause());
         }
         else {
-            String extentClause = dbConcept.getExtentClause();
-            if(extentClause != null) {
-                clause += " AND " + extentClause;
-            }
-            else {
-                throw new NoClauseCreatedException();
-            }
+            addClausePart(dbConcept.getExtentClause());
         }
     }
 
@@ -87,9 +85,9 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
                                            List outerConcepts, boolean displayMode, boolean filterMode) {
         WhereClauseGenerator generator;
         if (displayMode == ConceptInterpretationContext.CONTINGENT) {
-            generator = new WhereClauseGenerator(forConcept.getObjectClause(), filterDiagrams, outerConcepts, filterMode);
+            generator = new WhereClauseGenerator(forConcept.getObjectClause(), filterDiagrams, outerConcepts, displayMode, filterMode);
         } else {
-            generator = new WhereClauseGenerator(forConcept.getExtentClause(), filterDiagrams, outerConcepts, filterMode);
+            generator = new WhereClauseGenerator(forConcept.getExtentClause(), filterDiagrams, outerConcepts, displayMode, filterMode);
         }
         return generator.getClause();
     }
