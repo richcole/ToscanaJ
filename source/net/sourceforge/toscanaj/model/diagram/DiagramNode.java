@@ -304,26 +304,4 @@ public class DiagramNode implements XMLizable {
         }
         return conceptList;
     }
-
-    public boolean equals(Object obj) {
-        if(!(obj instanceof DiagramNode)){
-            return false;
-        }
-        DiagramNode other = (DiagramNode)obj;
-        if(!this.getIdentifier().equals(other.getIdentifier())){
-            return false;
-        }
-        if(!this.getPosition().equals(other.getPosition())){
-            return false;
-        }
-/*
-        if(!this.getObjectLabelInfo().equals(other.getObjectLabelInfo())){
-            return false;'
-        }
-        */
-        if(!this.getAttributeLabelInfo().equals(other.getAttributeLabelInfo())){
-            return false;
-        }
-        return true;
-    }
 }

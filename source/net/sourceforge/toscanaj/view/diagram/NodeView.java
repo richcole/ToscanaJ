@@ -210,28 +210,37 @@ public class NodeView extends CanvasItem {
      *
      * @see #getSelectionState()
      */
-    public void setSelectedConcepts(List concepts) {
-        if ((concepts == null) || (concepts.size() == 0)) {
+    public void setSelectedConcepts(List selectedConcepts) {
+        if ((selectedConcepts == null) || (selectedConcepts.size() == 0)) {
             this.selectionState = DiagramView.NO_SELECTION;
             return;
         }
-        Iterator it = concepts.iterator();
+        this.selectionState = DiagramView.NOT_SELECTED;
+        List ourConcepts = getDiagramNode().getConceptNestingList();
+        Iterator it = selectedConcepts.iterator();
+        Iterator it2 = ourConcepts.iterator();
+        for(int i = 0; i<selectedConcepts.size() - ourConcepts.size(); i++) {
+            it.next();
+        }
         while (it.hasNext()) {
-            Concept concept = (Concept) it.next();
-            if (this.diagramNode.getConcept() == concept) {
-                this.selectionState = DiagramView.SELECTED_DIRECTLY;
-                return;
+            Concept selectedConcept = (Concept) it.next();
+            Concept ourConcept = (Concept) it2.next();
+            if (ourConcept == selectedConcept) {
+                if(this.selectionState == DiagramView.NOT_SELECTED) {
+                    this.selectionState = DiagramView.SELECTED_DIRECTLY;
+                }
             }
-            if (this.diagramNode.getConcept().hasSuperConcept(concept)) {
+            else if (ourConcept.hasSuperConcept(selectedConcept)) {
                 this.selectionState = DiagramView.SELECTED_IDEAL;
-                return;
             }
-            if (this.diagramNode.getConcept().hasSubConcept(concept)) {
+            else if (ourConcept.hasSubConcept(selectedConcept)) {
                 this.selectionState = DiagramView.SELECTED_FILTER;
+            }
+            else {
+                this.selectionState = DiagramView.NOT_SELECTED;
                 return;
             }
         }
-        this.selectionState = DiagramView.NOT_SELECTED;
         return;
     }
 

@@ -19,7 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * class DiagramLine draws a line between two points
+ * class DiagramLine drawsdsfdfs a line between two points
  */
 public class LineView extends CanvasItem {
     /**
@@ -27,18 +27,16 @@ public class LineView extends CanvasItem {
      */
     private DiagramLine diagramLine = null;
 
-    /**
-     * The current state of selection.
-     *
-     * @see setSelectedConcept(Concept)
-     */
-    private int selectionState = DiagramView.NO_SELECTION;
+    private NodeView fromView;
+    private NodeView toView;
 
     /**
      * Creates a view for the given DiagramLine.
      */
-    public LineView(DiagramLine diagramLine) {
+    public LineView(DiagramLine diagramLine, NodeView fromView, NodeView toView) {
         this.diagramLine = diagramLine;
+        this.fromView = fromView;
+        this.toView = toView;
     }
 
     /**
@@ -54,17 +52,18 @@ public class LineView extends CanvasItem {
         if (this.diagramLine.getFromNode().getY() > this.diagramLine.getToNode().getY()) {
             graphics.setPaint(Color.red);
             graphics.setStroke(new BasicStroke(3));
-        } else if (this.selectionState == DiagramView.NO_SELECTION) {
+        } else if (this.getSelectionState() == DiagramView.NO_SELECTION) {
             graphics.setPaint(diagramSchema.getLineColor());
             graphics.setStroke(new BasicStroke(1));
-        } else if (this.selectionState == DiagramView.SELECTED_IDEAL) {
+        } else if (this.getSelectionState() == DiagramView.SELECTED_IDEAL) {
             graphics.setPaint(diagramSchema.getCircleIdealColor());
             graphics.setStroke(new BasicStroke(selectionLineWidth));
-        } else if (this.selectionState == DiagramView.SELECTED_FILTER) {
+        } else if (this.getSelectionState() == DiagramView.SELECTED_FILTER) {
             graphics.setPaint(diagramSchema.getCircleFilterColor());
             graphics.setStroke(new BasicStroke(selectionLineWidth));
-        } else if (this.selectionState == DiagramView.NOT_SELECTED) {
+        } else if (this.getSelectionState() == DiagramView.NOT_SELECTED) {
             graphics.setPaint(diagramSchema.fadeOut(diagramSchema.getLineColor()));
+            graphics.setStroke(new BasicStroke(1));
         }
         graphics.draw(new Line2D.Double(from, to));
         graphics.setPaint(oldPaint);
@@ -102,41 +101,22 @@ public class LineView extends CanvasItem {
         return new Rectangle2D.Double(x, y, w, h);
     }
 
-    /**
-     * Checks if the line belongs to filter or ideal of the selected concepts
-     * and marks it appropriately.
-     *
-     * @see NodeView.setSelectedConcept(Concept)
-     */
-    public void setSelectedConcepts(List concepts) {
-        if ((concepts == null) || (concepts.size() == 0)) {
-            this.selectionState = DiagramView.NO_SELECTION;
-            return;
+    private int getSelectionState() {
+        if(this.fromView.getSelectionState() == DiagramView.NO_SELECTION) {
+            return DiagramView.NO_SELECTION;
         }
-        Iterator it = concepts.iterator();
-        while (it.hasNext()) {
-            Concept concept = (Concept) it.next();
-            Concept from = this.diagramLine.getFromNode().getConcept();
-            if ((from == concept) || (from.hasSuperConcept(concept))) {
-                this.selectionState = DiagramView.SELECTED_IDEAL;
-                return;
-            }
-            Concept to = this.diagramLine.getToNode().getConcept();
-            if ((to == concept) || (to.hasSubConcept(concept))) {
-                this.selectionState = DiagramView.SELECTED_FILTER;
-                return;
-            }
+        if(this.fromView.getSelectionState() == DiagramView.NOT_SELECTED) {
+            return DiagramView.NOT_SELECTED;
         }
-        this.selectionState = DiagramView.NOT_SELECTED;
-        return;
-    }
-
-    /**
-     * Returns the information if and how the node is selected.
-     *
-     * @see NodeView.getSelectionState()
-     */
-    public int getSelectionState() {
-        return this.selectionState;
+        if(this.toView.getSelectionState() == DiagramView.NOT_SELECTED) {
+            return DiagramView.NOT_SELECTED;
+        }
+        if(this.fromView.getSelectionState() == DiagramView.SELECTED_FILTER) {
+            return DiagramView.SELECTED_FILTER;
+        }
+        if(this.toView.getSelectionState() == DiagramView.SELECTED_IDEAL) {
+            return DiagramView.SELECTED_IDEAL;
+        }
+        return DiagramView.NOT_SELECTED;
     }
 }

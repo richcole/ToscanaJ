@@ -95,8 +95,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      */
     protected int displayLines = DEFAULT_DISPLAY_LINES;
 
-    private int selectionState = DiagramView.NO_SELECTION;
-
     /**
      * The first item displayed in the list.
      *
@@ -197,7 +195,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
             return;
         }
 
-        if (hideIfUnselected() && (this.selectionState == DiagramView.NOT_SELECTED)) {
+        if (hideIfUnselected() && (nodeView.getSelectionState() == DiagramView.NOT_SELECTED)) {
             return;
         }
 
@@ -241,7 +239,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         Color textColor = this.labelInfo.getTextColor();
         Color scrollbarColorDark = Color.gray;
         Color scrollbarColorLight = Color.lightGray;
-        if (this.selectionState == DiagramView.NOT_SELECTED) {
+        if (nodeView.getSelectionState() == DiagramView.NOT_SELECTED) {
             // lighten
             lineColor = diagramSchema.fadeOut(lineColor);
             backgroundColor = diagramSchema.fadeOut(backgroundColor);
@@ -423,7 +421,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         if (this.rect == null) {
             return false;
         }
-        if (hideIfUnselected() && (this.selectionState == DiagramView.NOT_SELECTED)) {
+        if (hideIfUnselected() && (nodeView.getSelectionState() == DiagramView.NOT_SELECTED)) {
             return false;
         }
         return this.rect.contains(point);
@@ -545,48 +543,12 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         return lineHit + this.firstItem;
     }
 
-    public void setSelectedConcepts(List concepts) {
-        if ((concepts == null) || (concepts.size() == 0)) {
-            this.selectionState = DiagramView.NO_SELECTION;
-            return;
-        }
-        Iterator it = concepts.iterator();
-        while (it.hasNext()) {
-            Concept selectedConcept = (Concept) it.next();
-            Concept ourConcept = this.labelInfo.getNode().getConcept();
-            if (ourConcept == selectedConcept) {
-                this.selectionState = DiagramView.SELECTED_DIRECTLY;
-                diagramView.raiseItem(this);
-                return;
-            } else if (highlightedInIdeal() && ourConcept.hasSuperConcept(selectedConcept)) {
-                this.selectionState = DiagramView.SELECTED_IDEAL;
-                diagramView.raiseItem(this);
-                return;
-            } else if (highlightedInFilter() && ourConcept.hasSubConcept(selectedConcept)) {
-                this.selectionState = DiagramView.SELECTED_FILTER;
-                diagramView.raiseItem(this);
-                return;
-            }
-        }
-        this.selectionState = DiagramView.NOT_SELECTED;
-        return;
-    }
-
     abstract protected boolean highlightedInIdeal();
 
     abstract protected boolean highlightedInFilter();
 
     protected boolean hideIfUnselected() {
         return false;
-    }
-
-    /**
-     * Returns the information if and how the label is selected.
-     *
-     * @see NodeView.setSelectedConcept(Concept)
-     */
-    public int getSelectionState() {
-        return this.selectionState;
     }
 
     abstract protected int getNumberOfEntries();

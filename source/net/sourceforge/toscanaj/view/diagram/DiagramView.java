@@ -28,6 +28,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Hashtable;
 
 /**
  * This class paints a diagram defined by the SimpleLineDiagram class.
@@ -202,21 +203,19 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * filter operations.
      */
     private void addDiagram(Diagram2D diagram, ConceptInterpretationContext context) {
-        addDiagramLinesToCanvas(diagram);
-        addDiagramNodesToCanvas(diagram, context);
-    }
-
-    private void addDiagramLinesToCanvas(Diagram2D diagram) {
-        for (int i = 0; i < diagram.getNumberOfLines(); i++) {
-            DiagramLine dl = diagram.getLine(i);
-            addCanvasItem(new LineView(dl));
-        }
-    }
-
-    private void addDiagramNodesToCanvas(Diagram2D diagram, ConceptInterpretationContext context) {
+        Hashtable nodeMap = new Hashtable();
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
             NodeView nodeView = new NodeView(node, this, context);
+            nodeMap.put(node,nodeView);
+        }
+        for (int i = 0; i < diagram.getNumberOfLines(); i++) {
+            DiagramLine dl = diagram.getLine(i);
+            addCanvasItem(new LineView(dl, (NodeView) nodeMap.get(dl.getFromNode()), (NodeView) nodeMap.get(dl.getToNode())));
+        }
+        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
+            DiagramNode node = diagram.getNode(i);
+            NodeView nodeView = (NodeView) nodeMap.get(node);
             addCanvasItem(nodeView);
             if (node instanceof NestedDiagramNode) {
                 Concept concept = node.getConcept();
@@ -276,14 +275,6 @@ public class DiagramView extends Canvas implements ChangeObserver {
             if (cur instanceof NodeView) {
                 NodeView nv = (NodeView) cur;
                 nv.setSelectedConcepts(concepts);
-            }
-            if (cur instanceof LabelView) {
-                LabelView lv = (LabelView) cur;
-                lv.setSelectedConcepts(concepts);
-            }
-            if (cur instanceof LineView) {
-                LineView lv = (LineView) cur;
-                lv.setSelectedConcepts(concepts);
             }
         }
         repaint();
