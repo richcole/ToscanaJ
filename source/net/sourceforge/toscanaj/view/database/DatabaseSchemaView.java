@@ -166,7 +166,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
         }
     };
 
-    public DatabaseSchemaView(JFrame frame, EventBroker broker) {
+    public DatabaseSchemaView(EventBroker broker) {
         super(new GridLayout(0, 1));
 
         this.unkeyedTableList = new DefaultListModel();

@@ -25,6 +25,8 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.File;
 
 public class DatabaseConnectionInformationView
@@ -45,6 +47,9 @@ public class DatabaseConnectionInformationView
 	private static final String EMBEDDED_DBMS_ID_STRING = "Embedded DBMS";
 	private static final String ODBC_ID_STRING = "ODBC Source";
 	private static final String ACCESS_FILE_ID_STRING = "Access File";
+	
+	private static final int MINIMUM_WIDTH = 400;
+	private static final int MINIMUM_HEIGHT = 500;
 	
 	protected DatabaseInfo info;
 
@@ -95,10 +100,22 @@ public class DatabaseConnectionInformationView
 		} else {
 			this.info = new DatabaseInfo();
 		}
-
+		
+		addComponentListener( new ComponentAdapter() {
+			public void componentResized(ComponentEvent e) {
+				int width = getWidth();
+				int height = getHeight();
+				if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
+				if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
+				setSize(width, height);
+			}
+			public void componentShown(ComponentEvent e) {
+				componentResized(e);
+			}
+		});
 		JTabbedPane tabbedPane = new JTabbedPane();
 		JPanel connection = createConnectionPanel();
-		JPanel tableView = new JPanel();
+		JPanel tableView = new DatabaseSchemaView(eventBroker);
 		tabbedPane.addTab(
 			"Connections",
 			null,

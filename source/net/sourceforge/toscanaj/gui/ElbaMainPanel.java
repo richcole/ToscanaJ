@@ -137,12 +137,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
         schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
 
-        databaseSchemaView = new DatabaseSchemaView(this, eventBroker);
-        databaseSchemaView.setHorizontalDividerLocation(
-                ConfigurationManager.fetchInt("ElbaMainPanel", "databaseSchemaViewHorizontalDivider", 200));
-        databaseSchemaView.setVerticalDividerLocation(
-                ConfigurationManager.fetchInt("ElbaMainPanel", "databaseSchemaViewVerticalDivider", 300));
-
         scaleView = new ScaleEditingView(this, conceptualSchema, eventBroker, databaseConnection);
         scaleView.setHorizontalDividerLocation(
                 ConfigurationManager.fetchInt("ElbaMainPanel", "scaleViewHorizontalDivider", 200));
@@ -152,7 +146,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         diagramView = new DiagramEditingView(conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("ElbaMainPanel", "diagramViewDivider", 200));
 
-        mainView.addView("Tables", databaseSchemaView);
         mainView.addView("Scales", scaleView);
         mainView.addView("Diagrams", diagramView);
         setContentPane(mainView);
@@ -355,12 +348,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 mainView.getDividerLocation()
         );
         ConfigurationManager.storeStringList("ElbaMainPanel", "mruFiles", this.mruList);
-        ConfigurationManager.storeInt("ElbaMainPanel", "databaseSchemaViewHorizontalDivider",
-                databaseSchemaView.getHorizontalDividerLocation()
-        );
-        ConfigurationManager.storeInt("ElbaMainPanel", "databaseSchemaViewVerticalDivider",
-                databaseSchemaView.getVerticalDividerLocation()
-        );
+
         ConfigurationManager.storeInt("ElbaMainPanel", "scaleViewHorizontalDivider",
                 scaleView.getHorizontalDividerLocation()
         );
