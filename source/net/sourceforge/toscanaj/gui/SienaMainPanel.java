@@ -23,9 +23,6 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
@@ -62,6 +59,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+import javax.swing.table.JTableHeader;
 
 import net.sourceforge.toscanaj.controller.cernato.CernatoDimensionStrategy;
 import net.sourceforge.toscanaj.controller.diagram.ObjectEditingLabelViewPopupMenuHandler;
@@ -129,8 +127,8 @@ import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
-import net.sourceforge.toscanaj.view.manyvaluedcontext.ColumnHeader;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.CreateScaleDialog;
+import net.sourceforge.toscanaj.view.manyvaluedcontext.TableRowHeaderResizer;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ObjectDialog;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ManyValuedAttributeDialog;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.RowHeader;
@@ -189,7 +187,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     
 	private TableView tableView;
 	private RowHeader rowHeader;
-	private ColumnHeader colHeader;
     private JLabel temporalControlsLabel;
     private JRadioButtonMenuItem showExactMenuItem;
     private JRadioButtonMenuItem showAllMenuItem;
@@ -283,34 +280,21 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	 */
 	protected Component createContextEditingView() {
 		rowHeader = new RowHeader(this.conceptualSchema.getManyValuedContext());
-		colHeader = new ColumnHeader(this.conceptualSchema.getManyValuedContext());
 		tableView = new TableView(this.conceptualSchema.getManyValuedContext());
-		tableView.addMouseListener(getTableViewMouseListener());
 				
-		colHeader.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-					int row = TableView.findRow(e.getPoint());
-                    editAttribute(row);
-				}
-			}
-		});
-
-		rowHeader.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-					int col = TableView.findCol(e.getPoint());
-                    editObject(col);
-				}
-			}
-		});
-
 		JScrollPane scrollPane = new JScrollPane(tableView);
-		scrollPane.setColumnHeaderView(colHeader);
 		scrollPane.setRowHeaderView(rowHeader);
 		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
+		JTableHeader corner = rowHeader.getTableHeader();
+        corner.setReorderingAllowed(false);
+        corner.setResizingAllowed(false);
+
+        scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, corner);
+
+        new TableRowHeaderResizer(scrollPane).setEnabled(true);
+        
 		JPanel retVal = new JPanel(new BorderLayout());
 		retVal.add(createContextToolbar(), BorderLayout.NORTH);
 		retVal.add(scrollPane, BorderLayout.CENTER);
@@ -323,8 +307,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		WritableFCAElement object = (WritableFCAElement) objectList.get(row);
 		new ObjectDialog(tFrame, object);
 		this.conceptualSchema.getManyValuedContext().update();
-		this.tableView.updateSize();
-		this.rowHeader.updateSize();
 	}
 
 	private void editAttribute(int column) {
@@ -333,8 +315,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		WritableManyValuedAttribute attribute = (WritableManyValuedAttribute) manyValuedAttributeList.get(column);
 		new ManyValuedAttributeDialog(tFrame, attribute,	conceptualSchema.getManyValuedContext());
 		this.conceptualSchema.getManyValuedContext().update();
-		this.tableView.updateSize();
-		this.colHeader.updateSize();
 	}
 
 	private JToolBar createContextToolbar() {
@@ -386,36 +366,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         return retVal;
     }
 
-    protected MouseListener getTableViewMouseListener() {
-		MouseListener mouseListener = new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-                int row = TableView.findRow(e.getPoint());
-                int col = TableView.findCol(e.getPoint());
-				tableView.setSelectedCell(new TableView.SelectedCell(col, row));
-				
-				if(e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1){
-					WritableManyValuedContext context = conceptualSchema.getManyValuedContext();
-                    List propertyList = (List)context.getAttributes();
-					WritableManyValuedAttribute attribute = (WritableManyValuedAttribute)
-															propertyList.get(row);
-					List objectList = (List) context.getObjects();
-					WritableFCAElement obj = (WritableFCAElement)objectList.get(col);
-					
-					if(attribute.getType() instanceof TextualType){
-						showPopupMenu(e.getPoint().getX(), 
-                                      e.getPoint().getY(), 
-                                      attribute, obj);
-					}
-					else {
-						showNumericInputDialog(attribute, obj);
-					}
-					tableView.repaint();
-				}
-			}
-		};
-		return mouseListener;
-	}
-
     public void createMenuBar() {
         if (menuBar == null) {
             menuBar = new JMenuBar();
@@ -443,7 +393,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 conceptualSchema.setManyValuedContext(new ManyValuedContextImplementation());
 				conceptualSchema.dataSaved();
                 rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
-                colHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
                 tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
                 return true;
             }
@@ -476,7 +425,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             public boolean doActivity() throws Exception {
                 updateWindowTitle();
                 rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
-                colHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
                 tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
                 return true;
             }
@@ -842,7 +790,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         addDiagrams(conceptualSchema, inputModel);
 		this.tableView.setManyValuedContext(inputModel.getContext());
 		this.rowHeader.setManyValuedContext(inputModel.getContext());
-		this.colHeader.setManyValuedContext(inputModel.getContext());
         
         this.currentFile = null;
         String filename =
@@ -1168,7 +1115,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 this.conceptualSchema.setManyValuedContext(createManyValuedContextFromDiagrams());
             }
             this.rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
-            this.colHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
             this.tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
             setCurrentFile(loadEvent.getFile());
         } else if (e instanceof NewConceptualSchemaEvent) {

@@ -1,102 +1,179 @@
 /*
- * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
- * Please read licence.txt in the toplevel source directory for licensing information.
- *
+ * Copyright Peter Becker (http://www.peterbecker.de). Please
+ * read licence.txt file provided with the distribution for
+ * licensing information.
+ * 
  * $Id$
  */
 package net.sourceforge.toscanaj.view.manyvaluedcontext;
 
-import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
+import java.awt.Insets;
 
-import javax.swing.JComponent;
+import javax.swing.BorderFactory;
+import javax.swing.JList;
+import javax.swing.JTable;
+import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.plaf.BorderUIResource;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 
 
+/**
+ * A row header for the many-valued context view.
+ * 
+ * Based on http://www.chka.de/swing/table/row-headers/JTable.html
+ */
+public class RowHeader extends JTable {
+	private final static TableCellRenderer CELL_RENDERER = new DefaultTableCellRenderer()
+	{
+	    protected Border noFocusBorder, focusBorder;
+	
+	    {
+	        setOpaque(true);
+	        setBorder(noFocusBorder);
+	    }
+	
+	    public void updateUI()
+	    {
+	        super.updateUI();
+	        Border cell = UIManager.getBorder("TableHeader.cellBorder");
+	        Border focus = UIManager.getBorder("Table.focusCellHighlightBorder");
+	
+	        focusBorder = new BorderUIResource.CompoundBorderUIResource(cell, focus);
+	 
+	        Insets i = focus.getBorderInsets(this);
+	
+	        noFocusBorder = new BorderUIResource.CompoundBorderUIResource
+	             (cell, BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right));
+	    }
+	
+	    public Component getListCellRendererComponent(JList list, Object value, 
+	        int index, boolean selected, boolean focused) 
+	    {
+	        if (list != null)
+	        {
+	            if (selected)
+	            {
+	                setBackground(list.getSelectionBackground());
+	                setForeground(list.getSelectionForeground());
+	            }
+	            else
+	            {
+	                setBackground(list.getBackground());
+	                setForeground(list.getForeground());
+	            }
+	
+	            setFont(list.getFont());
+	
+	            setEnabled(list.isEnabled());
+	        }
+	        else
+	        {
+	            setBackground(UIManager.getColor("TableHeader.background"));
+	            setForeground(UIManager.getColor("TableHeader.foreground"));
+	            setFont(UIManager.getFont("TableHeader.font"));
+	            setEnabled(true);
+	        }
+	
+	        if (focused)
+	            setBorder(focusBorder);
+	        else
+	            setBorder(noFocusBorder);
+	
+	        setValue(value);
+	 
+	        return this;
+	    }
+	
+	    public Component getTableCellRendererComponent(JTable table, Object value,
+	                       boolean selected, boolean focused, int row, int column)
+	    {
+	        if (table != null)
+	        {
+	            if (selected)
+	            {
+	                setBackground(table.getSelectionBackground());
+	                setForeground(table.getSelectionForeground());
+	            }
+	            else
+	            {
+	                setBackground(table.getBackground());
+	                setForeground(table.getForeground());
+	            }
+	
+	            setFont(table.getFont());
+	
+	            setEnabled(table.isEnabled());
+	        }
+	        else
+	        {
+	            setBackground(UIManager.getColor("TableHeader.background"));
+	            setForeground(UIManager.getColor("TableHeader.foreground"));
+	            setFont(UIManager.getFont("TableHeader.font"));
+	            setEnabled(true);
+	        }
+	        
+	        if (focused)
+	            setBorder(focusBorder);
+	        else
+	            setBorder(noFocusBorder);
+	
+	        setValue(value);
+	 
+	        return this;
+	    }
+	};
+	
+	private class RowHeaderModel extends AbstractTableModel {
+		private ManyValuedContext context;
 
-public class RowHeader extends JComponent{
-	private static final Color TEXT_COLOR = Color.BLACK;
-	private static final Color CELL_COLOR = Color.LIGHT_GRAY;
+		public RowHeaderModel(ManyValuedContext context) {
+			this.context = context;
+		}
 
-	private ManyValuedContext context;
+		public int getColumnCount() {
+			return 1;
+		}
+		
+		public String getColumnName(int column) {
+			return "";
+		}
+		
+		public int getRowCount() {
+			return this.context.getObjects().size();
+		}
+
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			FCAElement object = (FCAElement) this.context.getObjects().get(rowIndex);
+			return object;
+		}
+	}
+
 	
 	public RowHeader(ManyValuedContext context){
-		this.context = context;
-		updateSize();
-	}
-	
-	public void paintComponent(Graphics g){
-		
-		Graphics2D g2d = (Graphics2D)g;
-		Paint oldPaint = g2d.getPaint();
-		
-		int row = 0;
-		Iterator objectIt = this.context.getObjects().iterator();
-		while(objectIt.hasNext()){
-            if(row * TableView.CELL_HEIGHT > this.getHeight()) {
-                break;
-            }
-            if(row * TableView.CELL_HEIGHT >= this.getY()) {
-                FCAElement object = (FCAElement)objectIt.next();
-                drawCell(g2d , object.toString() , 0 , row * TableView.CELL_HEIGHT);
-            }
-			row += 1;
-		}
-		g2d.setPaint(oldPaint);
-	}
-	
-	protected void drawCell(Graphics2D g2d, String content, int x, int y) {
-		g2d.setPaint(CELL_COLOR);
-		g2d.fill( new Rectangle2D.Double(x , y , TableView.CELL_WIDTH, TableView.CELL_HEIGHT));
-		g2d.setPaint(TEXT_COLOR);
-		g2d.draw(new Rectangle2D.Double(x , y , TableView.CELL_WIDTH, TableView.CELL_HEIGHT));
-		
-		FontMetrics fontMetrics = g2d.getFontMetrics();
-		String newContent = reduceStringDisplayWidth(content, g2d);
-
-		g2d.drawString(newContent,
-		x + TableView.CELL_WIDTH / 2 - fontMetrics.stringWidth(newContent) / 2,
-		y + TableView.CELL_HEIGHT / 2 + fontMetrics.getMaxAscent() / 2);
-		
-	}
-	
-	protected String reduceStringDisplayWidth(String content, Graphics2D g2d) {
-		String newContent = content;
-		String tail = "...";
-		int stringWidth = g2d.getFontMetrics().stringWidth(newContent);
-		int tailWidth = g2d.getFontMetrics().stringWidth(tail);
-		if (stringWidth > (TableView.CELL_WIDTH - 10)) {
-			while ((stringWidth + tailWidth) > (TableView.CELL_WIDTH - 10)) {
-				newContent = newContent.substring(0, (newContent.length() - 1));
-				stringWidth = g2d.getFontMetrics().stringWidth(newContent);
-			}
-			newContent += tail;
-		}
-		return newContent;
-	}
-	
-	public void updateSize() {
-		this.setPreferredSize(calculateNewSize());
-		this.repaint();
-	}
-	
-	private Dimension calculateNewSize() {
-		int numRow = context.getObjects().size() + 1;
-		return new Dimension(TableView.CELL_WIDTH, numRow * TableView.CELL_HEIGHT + 1);
+		setManyValuedContext(context);
+		LookAndFeel.installColorsAndFont(this, "TableHeader.background", 
+							"TableHeader.foreground", "TableHeader.font");
+		setDefaultRenderer(Object.class, CELL_RENDERER);
+        updateSize();
 	}
 	
 	public void setManyValuedContext(ManyValuedContext context) {
-		this.context = context;
-		updateSize();
-		validate();
+		setModel(new RowHeaderModel(context));
+	}
+	
+	public void updateSize() {
+		Dimension d = getPreferredScrollableViewportSize();
+        d.width = getPreferredSize().width;
+        setPreferredScrollableViewportSize(d);
+        validate();
 	}
 }
