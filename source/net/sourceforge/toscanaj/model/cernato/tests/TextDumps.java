@@ -10,6 +10,9 @@ package net.sourceforge.toscanaj.model.cernato.tests;
 import net.sourceforge.toscanaj.model.cernato.*;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.BinaryRelation;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import java.io.PrintStream;
 import java.util.Collection;
@@ -55,7 +58,6 @@ public class TextDumps {
     }
 
     public static final void dump(CernatoModel model, View view, PrintStream stream) {
-        Collection criteria = view.getCriteria();
         stream.println(view.getName());
         for(int i = 0; i<view.getName().length(); i++) {
             stream.print("=");
@@ -84,6 +86,41 @@ public class TextDumps {
                 stream.print("\t");
             }
             stream.println();
+        }
+    }
+
+    public static final void dump(Lattice lattice) {
+        Concept[] concepts = lattice.getConcepts();
+        for (int i = 0; i < concepts.length; i++) {
+            Concept concept = concepts[i];
+            System.out.print(concept + "[objectContingent: {");
+            Iterator extIt = concept.getObjectContingentIterator();
+            while (extIt.hasNext()) {
+                FCAObject obj = (FCAObject) extIt.next();
+                System.out.print(obj.getName());
+                if(extIt.hasNext()) {
+                    System.out.print(", ");
+                }
+            }
+            System.out.print("}, attributeContingent: {");
+            Iterator intIt = concept.getAttributeContingentIterator();
+            while (intIt.hasNext()) {
+                Attribute attribute = (Attribute) intIt.next();
+                System.out.print(attribute.getName());
+                if(intIt.hasNext()) {
+                    System.out.print(", ");
+                }
+            }
+            System.out.print("}, subconcepts: {");
+            Iterator subIt = concept.getDownset().iterator();
+            while (subIt.hasNext()) {
+                Object subConcept = subIt.next();
+                System.out.print(subConcept);
+                if(subIt.hasNext()) {
+                    System.out.print(", ");
+                }
+            }
+            System.out.println("}]");
         }
     }
 }

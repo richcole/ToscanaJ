@@ -75,6 +75,9 @@ public class ConceptImplementation implements Concept {
          * yet.
          */
         public boolean hasNext() {
+            if(this.secondaryIterator == null) {
+                return false;
+            }
             // make sure that we point to the next object, even if there are
             // empty contingents coming ahead
             while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
@@ -148,6 +151,9 @@ public class ConceptImplementation implements Concept {
          * yet.
          */
         public boolean hasNext() {
+            if(this.secondaryIterator == null) {
+                return false;
+            }
             // make sure that we point to the next object, even if there are
             // empty contingents coming ahead
             while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
@@ -504,5 +510,13 @@ public class ConceptImplementation implements Concept {
 
     public void addAttribute(Attribute attribute) {
         this.attributeContingent.add(attribute);
+    }
+
+    public void removeObject(Object object) {
+        this.objectContingent.remove(object);
+    }
+
+    public void removeAttribute(Attribute attribute) {
+        this.attributeContingent.remove(attribute);
     }
 }

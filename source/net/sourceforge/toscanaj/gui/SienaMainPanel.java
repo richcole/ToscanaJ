@@ -237,10 +237,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
             }
             System.out.println("");
         }
-        System.out.println("Extents:");
-        System.out.println("========");
         LatticeGenerator lgen = new GantersAlgorithm();
         Lattice lattice = lgen.createLattice(new ViewContext(model, view));
+        System.out.println("Lattice:");
+        System.out.println("========");
+        TextDumps.dump(lattice);
         schema.addDiagram(diagram);
     }
 
