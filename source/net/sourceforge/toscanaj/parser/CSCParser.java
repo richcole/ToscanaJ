@@ -59,6 +59,7 @@ public class CSCParser {
         private BufferedReader inputReader;
         private String currentToken;
         private int currentLine = 1;
+        private boolean newLineStarted = true;
 
 		public CSCTokenizer(File file) throws IOException, DataFormatException {
 		    this.inputReader = new BufferedReader(new FileReader(file));
@@ -71,10 +72,12 @@ public class CSCParser {
 		
 		public void advance() throws IOException, DataFormatException {
 			int character;
+			this.newLineStarted = false;
 			do {
 				character = this.inputReader.read();
 				if(character == '\n') {
 					this.currentLine += 1;
+					this.newLineStarted = true;
 				}
 			} while(Character.isWhitespace((char)character));
 			this.currentToken = "";
@@ -132,6 +135,10 @@ public class CSCParser {
 		
         public int getCurrentLine() {
             return this.currentLine;
+        }
+        
+        public boolean newLineHasStarted() {
+        	return this.newLineStarted;
         }
     }
     
@@ -277,21 +284,23 @@ public class CSCParser {
             	
                 tokenizer.advance(); // ignore id of object
                 
-                int currentLine = tokenizer.currentLine;
                 String content = tokenizer.getCurrentToken();
                 tokenizer.advance();
                 
-                String formattingString = null;
-                if(tokenizer.currentLine == currentLine) {
+                LabelInfo labelInfo;
+                if(!tokenizer.newLineHasStarted()) {
                 	// still on the same line --> we have a formatting string
-                	formattingString = tokenizer.getCurrentToken();
+                	String formattingString = tokenizer.getCurrentToken();
                 	tokenizer.advance();
+                	
+                	labelInfo = parseLabelInfo(formattingString);
+                } else {
+                	labelInfo = new LabelInfo();
                 }
                 
                 ConceptImplementation concept = (ConceptImplementation) node.getConcept();
                 concept.addObject(content);
                 
-                LabelInfo labelInfo = new LabelInfo();
                 node.setObjectLabelInfo(labelInfo);
             }
             tokenizer.advance();
@@ -302,21 +311,22 @@ public class CSCParser {
 
                 tokenizer.advance(); // ignore id of attribute
 
-                int currentLine = tokenizer.currentLine;
                 String content = tokenizer.getCurrentToken();
                 tokenizer.advance();
 
-                String formattingString = null;
-                if(tokenizer.currentLine == currentLine) {
+                LabelInfo labelInfo;
+                if(!tokenizer.newLineHasStarted()) {
                     // still on the same line --> we have a formatting string
-                    formattingString = tokenizer.getCurrentToken();
+                    String formattingString = tokenizer.getCurrentToken();
                     tokenizer.advance();
+
+                    labelInfo = parseLabelInfo(formattingString);
+                } else {
+                    labelInfo = new LabelInfo();
                 }
 
                 ConceptImplementation concept = (ConceptImplementation) node.getConcept();
                 concept.addAttribute(new Attribute(content));
-
-                LabelInfo labelInfo = new LabelInfo();
                 node.setAttributeLabelInfo(labelInfo);
             }
             tokenizer.advance();
@@ -333,6 +343,76 @@ public class CSCParser {
             }
             
         	return diagram;
+        }
+        
+        private String[] extractFormattingStringSegment(String formattingString) {
+        	if(formattingString.length() == 0) {
+        		return new String[]{null,""};
+        	}
+        	String segment, rest;
+        	if(formattingString.startsWith("(")) {
+        		int parPos = formattingString.indexOf(')');
+        	    segment = formattingString.substring(1,parPos);
+        	    rest = formattingString.substring(parPos + 1);
+        	    int commaPos = rest.indexOf(',');
+        	    if(commaPos != -1) {
+        	        rest = rest.substring(commaPos + 1);
+        	    }
+        	} else {
+	            int commaPos = formattingString.indexOf(',');
+	            if(commaPos == -1) {
+	                segment = new String(formattingString);
+	                rest = "";
+	            } else {
+	            	segment = formattingString.substring(0,commaPos);
+	            	rest = formattingString.substring(commaPos + 1);
+	            }
+        	}
+            return new String[]{segment,rest};
+        }
+
+        private LabelInfo parseLabelInfo(String formattingString) {
+        	LabelInfo retVal = new LabelInfo();
+        	String[] nextSplit = extractFormattingStringSegment(formattingString);
+            String fontName = nextSplit[0];
+            formattingString = nextSplit[1];
+            nextSplit = extractFormattingStringSegment(formattingString);
+            String fontStyleString = nextSplit[0];
+            formattingString = nextSplit[1];
+            nextSplit = extractFormattingStringSegment(formattingString);
+            String fontColorString = nextSplit[0];
+            formattingString = nextSplit[1];
+            nextSplit = extractFormattingStringSegment(formattingString);
+            String fontSizeString = nextSplit[0];
+            formattingString = nextSplit[1];
+            nextSplit = extractFormattingStringSegment(formattingString);
+            String offsetString = nextSplit[0];
+            formattingString = nextSplit[1];
+            nextSplit = extractFormattingStringSegment(formattingString);
+            String alignmentString = nextSplit[0];
+            formattingString = nextSplit[1];
+            nextSplit = extractFormattingStringSegment(formattingString);
+            String clipBoxString = nextSplit[0];
+            formattingString = nextSplit[1];
+            nextSplit = extractFormattingStringSegment(formattingString);
+			
+			// we support only offset and alignment at the moment
+			if(offsetString != null && offsetString.length() != 0) {
+				int commaPos = offsetString.indexOf(',');
+				String xPart = offsetString.substring(0,commaPos);
+				String yPart = offsetString.substring(commaPos + 1);
+				retVal.setOffset(Double.parseDouble(xPart), -Double.parseDouble(yPart));
+			}
+			
+			if(alignmentString.indexOf('l') != -1) {
+				retVal.setTextAlignment(LabelInfo.ALIGNLEFT);
+			} else if(alignmentString.indexOf('r') != -1) {
+                retVal.setTextAlignment(LabelInfo.ALIGNRIGHT);
+            } else if(alignmentString.indexOf('c') != -1) {
+                retVal.setTextAlignment(LabelInfo.ALIGNCENTER);
+            }
+            
+            return retVal;
         }
     };
     protected static final CSCFileSectionParser STRING_MAP_SECTION = new CSCFileSectionParser("STRING_MAP");
