@@ -29,6 +29,9 @@ Specific for Siena (still not fully complete):
   the ToscanaJ defaults)
 - diagrams based on the Cernato import feature will use the same order
   in the labels as in the imported many-valued context
+- arrow styles are now maintained with the diagram color schema, and 
+  thus stored in the session management, i.e they are remembered when
+  closing and reopening Siena
   
 
 Other new experimental features:
