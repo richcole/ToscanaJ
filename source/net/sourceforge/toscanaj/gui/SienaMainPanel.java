@@ -778,10 +778,10 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         try {
             new CSCParser().importCSCFile(file, this.conceptualSchema);
         } catch (FileNotFoundException e) {
-            ErrorDialog.showError(this, e, "Could not find file");
+            ErrorDialog.showError(this, e, "Could not find file '" + file.getAbsolutePath() + "'");
             return;
         } catch (DataFormatException e) {
-            ErrorDialog.showError(this, e, "Could not parse file");
+            ErrorDialog.showError(this, e, "Could not parse file '" + file.getAbsolutePath() + "'");
             return;
         }
     }
