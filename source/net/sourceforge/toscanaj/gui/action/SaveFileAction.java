@@ -109,7 +109,7 @@ public class SaveFileAction extends KeyboardMappedAction {
 				}	
 			}
 			if (selectedFile != null && selectedFile.exists()) {
-				String warningMessage = "The image file '"	+ selectedFile.getName() + "' already exists.\nDo you want to overwrite the existing file?";
+				String warningMessage = "The file '"	+ selectedFile.getName() + "' already exists.\nDo you want to overwrite the existing file?";
 				int response =
 					JOptionPane.showOptionDialog(
 						this,
