@@ -44,6 +44,26 @@ public class ImageWriter {
      */
     static public void exportGraphic(DrawingCanvas canvas, DiagramExportSettings settings, File outputFile)
            throws ImageGenerationException {
+        String jimiName = null;
+        if( settings.usesAutoMode() ) {
+            // update information
+            settings.setImageSize(canvas.getWidth(), canvas.getHeight());
+            // use file name for Jimis auto-detect
+            jimiName = outputFile.getName();
+            // make sure that we get Batik if needed
+            if(outputFile.getName().endsWith(".svg")) {
+                settings.setGraphicFormat(DiagramExportSettings.FORMAT_SVG);
+            }
+        }
+        else {
+            // determine dummy name for Jimi
+            if( settings.getGraphicFormat() == DiagramExportSettings.FORMAT_PNG ) {
+                jimiName = "dummy.png";
+            }
+            else if( settings.getGraphicFormat() == DiagramExportSettings.FORMAT_JPG ) {
+                jimiName = "dummy.jpg";
+            }
+        }
         if( settings.getGraphicFormat() == DiagramExportSettings.FORMAT_SVG ) {
             // use Batik
             // Get a DOMImplementation
@@ -101,20 +121,10 @@ public class ImageWriter {
             canvas.paintCanvasItems(tgraphics);
             try
             {
-                JimiWriter writer;
-                if( settings.getGraphicFormat() == DiagramExportSettings.FORMAT_PNG ) {
-                    writer = Jimi.createJimiWriter( "dummy.png" );
-                }
-                else if( settings.getGraphicFormat() == DiagramExportSettings.FORMAT_JPG ) {
-                    writer = Jimi.createJimiWriter( "dummy.jpg" );
-                }
-                else {
-                    throw new ImageGenerationException( "Error while generating '" +
-                               outputFile.getPath() + "' - unknown graphic format" );
-                }
-                writer.setSource( image );
+                JimiWriter writer = Jimi.createJimiWriter(jimiName);
+                writer.setSource(image);
                 FileOutputStream outStream = new FileOutputStream(outputFile);
-                writer.putImage( outStream );
+                writer.putImage(outStream);
                 outStream.close();
             }
             catch( JimiException e )
