@@ -154,9 +154,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                                                         diagramView.getMinimumFontSize());
         diagramView.setMinimumFontSize(minLabelFontSize);
 
-        createMenuBar();
-
         mruList = preferences.getStringList("mruFiles");
+        createMenuBar();
         
         // if we have at least one MRU file try to open it
         if (this.mruList.size() > 0) {
