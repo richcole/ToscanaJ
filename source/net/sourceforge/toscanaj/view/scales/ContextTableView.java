@@ -27,8 +27,8 @@ public class ContextTableView extends JComponent {
 	private static final Color TABLE_HEADER_COLOR = Color.DARK_GRAY;
 	private static final Color TABLE_CELL_COLOR = Color.LIGHT_GRAY;
 	private Context context;
-	private static final int TABLE_WIDTH = 100;
-	private static final int TABLE_HEIGHT = 30;
+	private static final int CELL_WIDTH = 100;
+	private static final int CELL_HEIGHT = 30;
 	
 	
 	public ContextTableView(Context context) {
@@ -56,7 +56,7 @@ public class ContextTableView extends JComponent {
 		
 		int numCol = this.context.getAttributes().size() + 1;
 		int numRow = this.context.getObjects().size() + 1;
-		Dimension size = new Dimension(numCol * TABLE_WIDTH + 1, numRow * TABLE_HEIGHT + 1);
+		Dimension size = new Dimension(numCol * CELL_WIDTH + 1, numRow * CELL_HEIGHT + 1);
 		setMinimumSize(size);
 		setPreferredSize(size);
 		setMaximumSize(size);
@@ -74,7 +74,7 @@ public class ContextTableView extends JComponent {
 		int col = 1;
 		while(attrIt.hasNext()) {
 			Object attribute = attrIt.next();
-			drawCell(g2d, attribute.toString(), col * TABLE_WIDTH, 0);
+			drawCell(g2d, attribute.toString(), col * CELL_WIDTH, 0);
 			col += 1;
 		}
 	}
@@ -83,7 +83,7 @@ public class ContextTableView extends JComponent {
 		Font font = g2d.getFont();
 		g2d.setFont(font.deriveFont(Font.BOLD));		
 		g2d.setPaint(TABLE_HEADER_COLOR);
-		int y = row * TABLE_HEIGHT;
+		int y = row * CELL_HEIGHT;
 		drawCell(g2d, object.toString(), 0,y);
 		
 		g2d.setFont(font.deriveFont(Font.PLAIN));		
@@ -93,28 +93,36 @@ public class ContextTableView extends JComponent {
 		while(attrIt.hasNext()) {
 			Object attribute = attrIt.next();
 			if(this.context.getRelation().contains(object,attribute)) {
-				drawCell(g2d, "X", col * TABLE_WIDTH, y);
+				drawCell(g2d, "X", col * CELL_WIDTH, y);
 			} else {
-				drawCell(g2d, "", col * TABLE_WIDTH, y);
+				drawCell(g2d, "", col * CELL_WIDTH, y);
 			}
 			col += 1;
 		}
 	}
 
 	protected void drawCell(Graphics2D g2d, String content, int x, int y) {
-		g2d.fill(new Rectangle2D.Double(x,y,TABLE_WIDTH, TABLE_HEIGHT));
+		g2d.fill(new Rectangle2D.Double(x,y,CELL_WIDTH, CELL_HEIGHT));
 		Paint oldPaint = g2d.getPaint();
 		g2d.setPaint(TEXT_COLOR); 
-		g2d.draw(new Rectangle2D.Double(x,y,TABLE_WIDTH, TABLE_HEIGHT));
+		g2d.draw(new Rectangle2D.Double(x,y,CELL_WIDTH, CELL_HEIGHT));
 		
 		FontMetrics fontMetrics = g2d.getFontMetrics();
-		g2d.drawString(content, x + TABLE_WIDTH/2 - fontMetrics.stringWidth(content)/2, 
-		                        y + TABLE_HEIGHT/2 + fontMetrics.getMaxAscent()/2);
+		g2d.drawString(content, x + CELL_WIDTH/2 - fontMetrics.stringWidth(content)/2, 
+		                        y + CELL_HEIGHT/2 + fontMetrics.getMaxAscent()/2);
 		g2d.setPaint(oldPaint);
 	}
 	
 	protected void update(Context ctx){
 		this.context = ctx;
 		repaint();
+	}
+
+	public int getCellHeight() {
+		return CELL_HEIGHT;
+	}
+
+	public int getCellWidth() {
+		return CELL_WIDTH;
 	}
 }

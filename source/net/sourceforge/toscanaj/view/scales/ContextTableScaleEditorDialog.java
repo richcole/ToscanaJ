@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.model.ContextImplementation;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 public class ContextTableScaleEditorDialog extends JDialog {
     
@@ -47,6 +48,8 @@ public class ContextTableScaleEditorDialog extends JDialog {
 				
 		tableView = new ContextTableView(context);
         JScrollPane scrollpane = new JScrollPane(tableView);
+
+		scrollpane.addMouseListener(getMouseListener(context,tableView));
 		
 		createButtonsPane();
 		
@@ -219,7 +222,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		String o4 = "four";
 		String a1 = "Aone";
 		String a2 = "Atwo";
-		String a3 = "Athree alsfdjsa dlfj sadlkdjg salgdkj jkhsf";
+		String a3 = "Athree";
 
 		context.getObjects().add(o1);
 		context.getObjects().add(o2);
@@ -248,4 +251,54 @@ public class ContextTableScaleEditorDialog extends JDialog {
     public String getDiagramTitle() {
         return this.scaleTitleField.getText();
     }
+    
+	public MouseListener getMouseListener(final ContextImplementation context,
+													final ContextTableView tableView) {
+		MouseListener mouseListener = new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					ArrayList attributeArrayList = (ArrayList) context.getAttributes();
+					ArrayList objectsArrayList = (ArrayList) context.getObjects();
+					//User clicks within the table
+					if (e.getY()<= (objectsArrayList.size() + 1)* tableView.getCellHeight() && 
+								e.getX()<= (attributeArrayList.size() + 1)* tableView.getCellWidth()) {
+						//User clicks within the relation cell
+						if (e.getY() > tableView.getCellHeight()
+							&& e.getX() > tableView.getCellWidth()) {
+							String attribute = (String)attributeArrayList.get((e.getX()/tableView.getCellWidth())-1);
+										
+							String object = (String)objectsArrayList.get((e.getY()/tableView.getCellHeight())-1);
+							//Check if there is relation between the object and attribute
+							if(context.getRelationImplementation().contains(object , attribute)){
+								context.getRelationImplementation().remove( object , attribute);
+							}
+							else{
+								context.getRelationImplementation().insert( object , attribute );
+							}
+							tableView.update(context);
+														
+
+						} 
+						//User clicks on the first cell of the table
+						else if (
+							e.getY() < tableView.getCellHeight()
+								&& e.getX() < tableView.getCellWidth()) {
+						}
+						//User clicks on object or attribute cell 
+						else {
+						}
+
+					}
+					//User clicks out of table 
+					else {
+						System.out.println("Out Of Bounds");
+					}
+
+				}
+
+			}
+
+		};
+		return mouseListener;
+	}
 }
