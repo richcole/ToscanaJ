@@ -33,10 +33,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -80,7 +82,6 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.temporal.TemporalControlsPanel;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
@@ -104,17 +105,15 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttributeImple
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContextImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualValue;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.ViewContext;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 import net.sourceforge.toscanaj.parser.BurmeisterParser;
 import net.sourceforge.toscanaj.parser.CSCParser;
 import net.sourceforge.toscanaj.parser.CSXParser;
-import net.sourceforge.toscanaj.parser.CernatoXMLParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.parser.ObjectAttributeListParser;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
@@ -123,7 +122,6 @@ import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
-import net.sourceforge.toscanaj.view.manyvaluedcontext.CreateScaleDialog;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.TableRowHeaderResizer;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ObjectDialog;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ManyValuedAttributeDialog;
@@ -133,7 +131,18 @@ import net.sourceforge.toscanaj.view.manyvaluedcontext.TableView;
 import org.jdom.JDOMException;
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.imagewriter.DiagramExportSettings;
+import org.tockit.cernatoXML.model.CernatoModel;
+import org.tockit.cernatoXML.model.CernatoObject;
+import org.tockit.cernatoXML.model.CernatoTable;
+import org.tockit.cernatoXML.model.Criterion;
+import org.tockit.cernatoXML.model.Property;
+import org.tockit.cernatoXML.model.PropertyType;
+import org.tockit.cernatoXML.model.Value;
+import org.tockit.cernatoXML.model.View;
+import org.tockit.cernatoXML.model.ViewContext;
+import org.tockit.cernatoXML.parser.CernatoXMLParser;
 import org.tockit.context.model.BinaryRelation;
+import org.tockit.context.model.BinaryRelationImplementation;
 import org.tockit.context.model.Context;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -345,15 +354,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		final JButton createDiagramButton = new JButton("Create Diagram...");
 		createDiagramButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-                CreateScaleDialog dialog = new CreateScaleDialog(parent, conceptualSchema.getManyValuedContext());
-                View result = dialog.execute();
-                if(result != null) {
-                    addDiagram(
-                        conceptualSchema,
-                        new ViewContext(conceptualSchema.getManyValuedContext(), result),
-                        result.getName(),
-                        new CernatoDimensionStrategy());
-                }
+                /// @todo
 			}
 		});
 		
@@ -773,21 +774,19 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(this, e, "Could not find file");
             return;
-        } catch (IOException e) {
-            ErrorDialog.showError(this, e, "Could not read file");
-            return;
-        } catch (DataFormatException e) {
-            ErrorDialog.showError(this, e, "Could not parse file");
-            return;
         } catch (JDOMException e) {
             ErrorDialog.showError(this, e, "Error parsing the file");
             return;
+        } catch (org.tockit.cernatoXML.parser.DataFormatException e) {
+            ErrorDialog.showError(this, e, "Could not parse file");
+            return;
         }
         this.conceptualSchema = new ConceptualSchema(this.eventBroker);
-        this.conceptualSchema.setManyValuedContext(inputModel.getContext());
+        WritableManyValuedContext model = createManyValuedContext(inputModel);
+        this.conceptualSchema.setManyValuedContext(model);
         addDiagrams(conceptualSchema, inputModel);
-		this.tableView.setManyValuedContext(inputModel.getContext());
-		this.rowHeader.setManyValuedContext(inputModel.getContext());
+		this.tableView.setManyValuedContext(model);
+		this.rowHeader.setManyValuedContext(model);
         
         this.currentFile = null;
         String filename =
@@ -795,6 +794,86 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         setTitle(filename + " (Cernato import, unsaved) - " + WINDOW_TITLE);
 		validate();
 		repaint();
+    }
+
+    private WritableManyValuedContext createManyValuedContext(CernatoModel cernatoModel) {
+        ManyValuedContextImplementation result = new ManyValuedContextImplementation();
+        
+        CernatoTable cernatoContext = cernatoModel.getContext();
+        Vector types = cernatoModel.getTypes();
+        Map typeMap = new Hashtable();
+        for (Iterator it = types.iterator(); it.hasNext();) {
+            PropertyType cernatoType = (PropertyType) it.next();
+            Value[] valueRange = cernatoType.getValueRange();
+
+            AttributeType targetType;
+            if(cernatoType instanceof org.tockit.cernatoXML.model.NumericalType) {
+                org.tockit.cernatoXML.model.NumericalValue min = 
+                    (org.tockit.cernatoXML.model.NumericalValue) valueRange[0];
+                org.tockit.cernatoXML.model.NumericalValue max = 
+                    (org.tockit.cernatoXML.model.NumericalValue) valueRange[1];
+                
+                /// @todo we lack support for the number of decimals on the Cernato side
+                NumericalType numType = new NumericalType(cernatoType.getName());
+                numType.setMinimumValue(min.getValue());
+                numType.setMaximumValue(max.getValue());
+                targetType = numType;
+            } else if(cernatoType instanceof org.tockit.cernatoXML.model.TextualType) {
+                targetType = new TextualType(cernatoType.getName());
+                TextualType textType = new TextualType(cernatoType.getName());
+                for (int i = 0; i < valueRange.length; i++) {
+                    org.tockit.cernatoXML.model.TextualValue value = 
+                        (org.tockit.cernatoXML.model.TextualValue) valueRange[i];
+                    textType.addValue(new TextualValue(value.getDisplayString()));
+                }
+                targetType = textType;
+            } else {
+                throw new RuntimeException("Unknown Cernato type");
+            }
+            result.add(targetType);
+            typeMap.put(cernatoType, targetType);
+        }
+        Set properties = cernatoContext.getProperties();
+        Map attributeMap = new Hashtable();
+        for (Iterator it = properties.iterator(); it.hasNext();) {
+            Property property = (Property) it.next();
+            AttributeType attributeType = (AttributeType)typeMap.get(property.getType());
+            ManyValuedAttributeImplementation attribute = 
+                new ManyValuedAttributeImplementation(attributeType, property.getName());
+            result.add(attribute);
+            attributeMap.put(property, attribute);
+        }
+        Set objects = cernatoContext.getObjects();
+        Map objectMap = new Hashtable();
+        for (Iterator it = objects.iterator(); it.hasNext();) {
+            CernatoObject cernatoObject = (CernatoObject) it.next();
+            FCAElementImplementation targetObject = new FCAElementImplementation(cernatoObject.getName());
+            /// @todo the memo fields could be mapped into descriptions
+            result.add(targetObject);
+            objectMap.put(cernatoObject, targetObject);
+        }
+        for (Iterator objIt = objects.iterator(); objIt.hasNext();) {
+            CernatoObject cernatoObject = (CernatoObject) objIt.next();
+            for (Iterator propIt = properties.iterator(); propIt.hasNext();) {
+                Property property = (Property) propIt.next();
+                Value value = cernatoContext.getRelationship(cernatoObject, property);
+
+                FCAElement targetObject = (FCAElement) objectMap.get(cernatoObject);
+                ManyValuedAttribute attribute = (ManyValuedAttribute) attributeMap.get(property);
+                if(value instanceof org.tockit.cernatoXML.model.NumericalValue) {
+                    org.tockit.cernatoXML.model.NumericalValue numValue = 
+                        (org.tockit.cernatoXML.model.NumericalValue) value;
+                    result.setRelationship(targetObject, attribute, new NumericalValue(numValue.getValue()));
+                } else if(value instanceof org.tockit.cernatoXML.model.TextualValue) {
+                    org.tockit.cernatoXML.model.TextualValue textValue = 
+                        (org.tockit.cernatoXML.model.TextualValue) value;
+                    result.setRelationship(targetObject, attribute, new TextualValue(textValue.getDisplayString()));
+                } else {
+                    throw new RuntimeException("Unknown Cernato value");
+                }
+            }
+        }
+        return result;
     }
 
     private void importBurmeister() {
@@ -1041,9 +1120,31 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         Vector views = cernatoModel.getViews();
         for (Iterator iterator = views.iterator(); iterator.hasNext();) {
             View view = (View) iterator.next();
+            ViewContext viewContext = new ViewContext(cernatoModel.getContext(), view);
+            Context mappedContext = new ContextImplementation();
+            BinaryRelationImplementation mappedRelation = 
+                (BinaryRelationImplementation) mappedContext.getRelation();
+            Map objectMap = new Hashtable();
+            for (Iterator objIt = viewContext.getObjects().iterator(); objIt.hasNext();) {
+                CernatoObject object = (CernatoObject) objIt.next();
+                FCAElement newObject = new FCAElementImplementation(object);
+                mappedContext.getObjects().add(newObject);
+                objectMap.put(object, newObject);
+            }
+            for (Iterator attrIt = viewContext.getAttributes().iterator(); attrIt.hasNext();) {
+                Criterion criterion = (Criterion) attrIt.next();
+                FCAElement newAttribute = new FCAElementImplementation(criterion);
+                mappedContext.getAttributes().add(newAttribute);
+                for (Iterator objIt = viewContext.getObjects().iterator(); objIt.hasNext();) {
+                    CernatoObject object = (CernatoObject) objIt.next();
+                    if(viewContext.getRelation().contains(object, criterion)) {
+                        mappedRelation.insert(objectMap.get(object), newAttribute);
+                    }
+                }
+            }
             addDiagram(
                 schema,
-                new ViewContext(cernatoModel.getContext(), view),
+                mappedContext,
                 view.getName(),
                 new CernatoDimensionStrategy());
         }

@@ -17,12 +17,11 @@ import java.util.Vector;
 import org.tockit.context.model.BinaryRelation;
 import org.tockit.context.model.Context;
 
-import net.sourceforge.toscanaj.model.context.*;
 import net.sourceforge.toscanaj.model.lattice.*;
 
 public class GantersAlgorithm implements LatticeGenerator {
-    private FCAElement[] objects;
-	private FCAElement[] attributes;
+    private Object[] objects;
+	private Object[] attributes;
     private BitSet[] relation;
     
     private Hashtable intents;
@@ -50,10 +49,10 @@ public class GantersAlgorithm implements LatticeGenerator {
 	private BitSet[] createRelation(BinaryRelation relation) {
         BitSet[] retVal = new BitSet[this.objects.length];
         for (int i = 0; i < this.objects.length; i++) {
-			FCAElement object = this.objects[i];
+            Object object = this.objects[i];
 			BitSet derivation = new BitSet(this.attributes.length);
             for (int j = 0; j < this.attributes.length; j++) {
-				FCAElement attribute = this.attributes[j];
+                Object attribute = this.attributes[j];
 				if(relation.contains(object, attribute)) {
 					derivation.set(j);
                 }
@@ -66,13 +65,13 @@ public class GantersAlgorithm implements LatticeGenerator {
 	/**
 	 * This is similar to Collection.toArray(), but also checks for duplicates.
 	 */
-    public FCAElement[] createElementArray(Collection collection) {
-        FCAElement[] retVal = new FCAElement[collection.size()];
+    public Object[] createElementArray(Collection collection) {
+        Object[] retVal = new Object[collection.size()];
     	HashSet testSet = new HashSet();
     	Iterator it = collection.iterator();
     	int pos = 0;
     	while (it.hasNext()) {
-            FCAElement cur = (FCAElement) it.next();
+            Object cur = it.next();
             if(testSet.contains(cur)) {
             	throw new IllegalArgumentException("Context contains duplicate object or attribute");
             }
@@ -129,7 +128,7 @@ public class GantersAlgorithm implements LatticeGenerator {
             for (Iterator iterator = downset.iterator(); iterator.hasNext();) {
                 ConceptImplementation concept2 = (ConceptImplementation) iterator.next();
                 for (Iterator iterator2 = concept2.getObjectContingentIterator(); iterator2.hasNext();) {
-                    FCAElement object = (FCAElement) iterator2.next();
+                    Object object = iterator2.next();
                     concept.removeObject(object);
                 }
             }
@@ -138,7 +137,7 @@ public class GantersAlgorithm implements LatticeGenerator {
             for (Iterator iterator = upset.iterator(); iterator.hasNext();) {
                 ConceptImplementation concept2 = (ConceptImplementation) iterator.next();
                 for (Iterator iterator2 = concept2.getAttributeContingentIterator(); iterator2.hasNext();) {
-                    FCAElement attribute = (FCAElement) iterator2.next();
+                    Object attribute = iterator2.next();
                     concept.removeAttribute(attribute);
                 }
             }

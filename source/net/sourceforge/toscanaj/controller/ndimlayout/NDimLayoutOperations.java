@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.controller.ndimlayout;
 
-import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -41,7 +40,7 @@ public abstract class NDimLayoutOperations {
             double[] ndimVector = new double[dimensions.size()];
             Iterator attributes = concept.getIntentIterator();
             while (attributes.hasNext()) {
-                FCAElement attribute = (FCAElement) attributes.next();
+                Object attribute = attributes.next();
                 addVector(ndimVector, attribute, dimensions);
             }
             if (concept.isTop()) {
@@ -223,7 +222,7 @@ public abstract class NDimLayoutOperations {
         return base;
     }
 
-    private static void addVector(double[] ndimVector, FCAElement attribute, Vector dimensions) {
+    private static void addVector(double[] ndimVector, Object attribute, Vector dimensions) {
         int dimCount = 0;
         for (Iterator it = dimensions.iterator(); it.hasNext();) {
             Dimension dimension = (Dimension) it.next();

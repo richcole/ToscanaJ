@@ -19,7 +19,6 @@ public class AllTests extends TestCase {
     public static Test suite() {
         TestSuite suite = new TestSuite();
         suite.addTest(PartialOrderOperationsTest.suite());
-        suite.addTest(LayoutOperationsTest.suite());
         return suite;
     }
 

@@ -9,8 +9,6 @@ package net.sourceforge.toscanaj.model.ndimdiagram;
 
 import java.util.Vector;
 
-import net.sourceforge.toscanaj.model.context.FCAElement;
-
 public class Dimension {
     private Vector attributes;
 
@@ -18,7 +16,7 @@ public class Dimension {
         this.attributes = attributes;
     }
 
-    public boolean contains(FCAElement attribute) {
+    public boolean contains(Object attribute) {
         return attributes.contains(attribute);
     }
 }
