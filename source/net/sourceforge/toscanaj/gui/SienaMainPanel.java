@@ -415,13 +415,17 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 return checkForMissingSave();
             }
         };
-
         NewConceptualSchemaActivity newSchemaActivity =
             new NewConceptualSchemaActivity(eventBroker);
         newSchemaActivity.setPostNewActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
                 currentFile = null;
                 updateWindowTitle();
+                conceptualSchema.setManyValuedContext(new ManyValuedContextImplementation());
+				conceptualSchema.dataSaved();
+                rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
+                colHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
+                tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
                 return true;
             }
         });
