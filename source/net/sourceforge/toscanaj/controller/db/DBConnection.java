@@ -83,6 +83,9 @@ public class DBConnection {
     }
 
     public void connect(DatabaseInfo info) throws DatabaseException {
+        if(this.isConnected()) {
+            disconnect();
+        }
         connect(info.getURL(), info.getUserName(), info.getPassword());
     }
 

@@ -149,19 +149,6 @@ public class CSXParser {
         parseDBInfo(dbInfo, dbElem);
         try {
             _Schema.setDatabaseInfo(dbInfo);
-            /// @TODO Shouldn't this be in the main panel?
-            // remove: _DatabaseConnection = new DBConnection(dbInfo.getURL(), dbInfo.getUserName(), dbInfo.getPassword());
-            String urlString = dbInfo.getEmbeddedSQLLocation();
-            if (urlString != null) {
-                URL SQLURL;
-                try {
-                    SQLURL = new URL(_BaseURL, urlString);
-                } catch (MalformedURLException e) {
-                    throw new DataFormatException("Could not create URL for database: " + urlString);
-                }
-                _Schema.setSQLURL(SQLURL);
-                // send to MainPanel: _DatabaseConnection.executeScript(sqlURL);
-            }
         } catch (DatabaseException e) {
             throw new DataFormatException("Could not open database.", e.getOriginal());
         }
@@ -463,7 +450,7 @@ public class CSXParser {
         String driver;
         String username;
         String password;
-        String embeddedDB;
+        URL embeddedDB;
         if (urlElem != null) {
             url = urlElem.getText();
             driver = urlElem.getAttributeValue("driver");
@@ -475,7 +462,15 @@ public class CSXParser {
             driver = "org.hsqldb.jdbcDriver";
             username = "sa";
             password = "";
-            embeddedDB = embedElem.getAttributeValue("url");
+            String urlString = embedElem.getAttributeValue("url");
+            embeddedDB = null;
+            if (urlString != null) {
+                try {
+                    embeddedDB = new URL(_BaseURL, urlString);
+                } catch (MalformedURLException e) {
+                    throw new DataFormatException("Could not create URL for database: " + embeddedDB);
+                }
+            }
         }
 
         dbInfo.setUrl(url);

@@ -41,11 +41,6 @@ public class ConceptualSchema {
     EventBroker broker;
 
     /**
-     * An SQL file with with to prime the database
-     */
-    URL  SQLURL;
-
-    /**
      * List of scales
      */
     private List scales;
@@ -200,14 +195,6 @@ public class ConceptualSchema {
 
     public boolean hasDiagramDescription() {
         return this.hasDiagramDescription;
-    }
-
-    public URL getSQLURL() {
-        return SQLURL;
-    }
-
-    public void setSQLURL(URL SQLURL) {
-        this.SQLURL = SQLURL;
     }
 
     public DBScheme getDbScheme() {

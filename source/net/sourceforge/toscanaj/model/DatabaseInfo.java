@@ -12,6 +12,7 @@ import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.net.URL;
 
 /**
  * This class contains information how to connect to a database.
@@ -38,7 +39,7 @@ public class DatabaseInfo {
 
     private String password = null;
 
-    private String embeddedSQLLocation = null;
+    private URL embeddedSQLLocation = null;
 
     private String driverClass = null;
 
@@ -260,11 +261,11 @@ public class DatabaseInfo {
         return this.objectKey;
     }
 
-    public void setEmbeddedSQLLocation(String location) {
+    public void setEmbeddedSQLLocation(URL location) {
         this.embeddedSQLLocation = location;
     }
 
-    public String getEmbeddedSQLLocation() {
+    public URL getEmbeddedSQLLocation() {
         return this.embeddedSQLLocation;
     }
 

@@ -25,6 +25,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.URL;
 
 public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEventListener {
 
@@ -217,10 +218,20 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         if ( e instanceof ConceptualSchemaChangeEvent ) {
             ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
             conceptualSchema = schemaEvent.getConceptualSchema();
+            if (databaseConnection.isConnected()) {
+                try {
+                    databaseConnection.disconnect();
+                } catch (DatabaseException ex) {
+                    ErrorDialog.showError(this, ex, "Closing database error", "Some error closing the old database:\n" + ex.getMessage());
+                    ex.printStackTrace();
+                    return;
+                }
+            }
             try {
                 databaseConnection.connect(conceptualSchema.getDatabaseInfo());
-                if (conceptualSchema.getSQLURL() != null) {
-                    databaseConnection.executeScript(conceptualSchema.getSQLURL());
+                URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
+                if (location != null) {
+                    databaseConnection.executeScript(location);
                 }
             } catch (DatabaseException ex) {
                 ErrorDialog.showError(this, ex,  "DB Connection failed", "Can not connect to the database");

@@ -651,6 +651,16 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         }
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
+
+        if (databaseConnection.isConnected()) {
+            try {
+                databaseConnection.disconnect();
+            } catch (DatabaseException e) {
+                ErrorDialog.showError(this, e, "Closing database error", "Some error closing the old database:\n" + e.getMessage());
+                e.printStackTrace();
+                return;
+            }
+        }
         System.exit(0);
     }
 
@@ -750,8 +760,9 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         try {
             conceptualSchema = CSXParser.parse(broker, schemaFile, databaseConnection);
             databaseConnection.connect(conceptualSchema.getDatabaseInfo());
-            if (conceptualSchema.getSQLURL() != null) {
-                databaseConnection.executeScript(conceptualSchema.getSQLURL());
+            URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
+            if (location != null) {
+                databaseConnection.executeScript(location);
             }
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(this, e, "File access error", e.getMessage());
