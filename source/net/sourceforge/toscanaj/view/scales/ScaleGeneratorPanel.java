@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
+	private EventBroker eventBroker;
     private List scaleGenerators = null;
     ConceptualSchema conceptualSchema;
     TableColumnPairsSelectionSource selectionSource;
@@ -47,9 +48,10 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
             DatabaseConnection databaseConnection,
             EventBroker eventBroker) {
         super();
+        this.eventBroker = eventBroker;
         this.conceptualSchema = conceptualSchema;
         this.databaseConnection = databaseConnection;
-        fillGeneratorButtonsPane();
+        fillGeneratorButtonsPane(eventBroker);
 
         this.selectionSource = selectionSource;
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
@@ -70,7 +72,7 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
     private void fillScalesGenerators() {
         scaleGenerators.add(new OrdinalScaleGenerator(getParentFrame()));
         scaleGenerators.add(new NominalScaleGenerator(getParentFrame()));
-        scaleGenerators.add(new ContextTableScaleGenerator(getParentFrame()));
+        scaleGenerators.add(new ContextTableScaleGenerator(getParentFrame(), this.eventBroker));
     }
 	
 	private Frame getParentFrame() {
@@ -86,7 +88,7 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
 
     Map generatorButtonMap = CollectionFactory.createDefaultMap();
 
-    private void fillGeneratorButtonsPane() {
+    private void fillGeneratorButtonsPane(EventBroker eventBroker) {
         setLayout(new FlowLayout());
         removeAll();
         generatorButtonMap.clear();
@@ -202,7 +204,9 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
             ScaleGenerator scaleGenerator = (ScaleGenerator) scalesIterator.next();
             JComponent scaleComponent = getComponentForGenerator(scaleGenerator);
             if (null != scaleComponent) {
-                scaleComponent.setEnabled(scaleGenerator.canHandleColumns(selectedTableColumnPairs));
+                boolean enabled = scaleGenerator.canHandleColumns(selectedTableColumnPairs) &&
+                					this.conceptualSchema.getDatabaseInfo() != null;
+                scaleComponent.setEnabled(enabled);
             }
         }
     }

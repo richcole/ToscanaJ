@@ -8,13 +8,13 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
-import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -61,7 +61,7 @@ public class ScaleEditingView extends JPanel implements EventBrokerListener, Tab
         add(splitPane);
 
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
-        eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
+        eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
     }
 
     private ScaleGeneratorPanel makeScaleGeneratorPane(
@@ -115,14 +115,14 @@ public class ScaleEditingView extends JPanel implements EventBrokerListener, Tab
     }
 
     public void processEvent(Event event) {
-        ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
         if (event instanceof NewConceptualSchemaEvent) {
+            ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
             conceptualSchema = changeEvent.getConceptualSchema();
             if(this.conceptualSchema.getDatabaseSchema() == null) {
                 this.conceptualSchema.setDatabaseSchema(new DatabaseSchema(this.eventBroker));
             }
-            fillTableColumnsList();
         }
+        fillTableColumnsList();
     }
 
     public void setHorizontalDividerLocation(int location) {

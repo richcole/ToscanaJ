@@ -73,6 +73,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 	private JButton zoomOutButton;
     private JComboBox movementChooser;
     private JButton editDiagramDescButton;
+    protected ContextTableScaleEditorDialog contextEditingDialog;
 
     /**
      * Construct an instance of this view
@@ -88,6 +89,9 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);
+        
+        Frame frame = JOptionPane.getFrameForComponent(this);
+        this.contextEditingDialog = new ContextTableScaleEditorDialog(frame, this.conceptualSchema, this.databaseConnection, eventBroker);
 
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
         eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
@@ -266,13 +270,11 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     
     protected void editContext() {
         ContextImplementation context = (ContextImplementation) DiagramToContextConverter.getContext(this.diagramView.getDiagram());
-    	Frame frame = JOptionPane.getFrameForComponent(this);
-    	ContextTableScaleEditorDialog dialog = 
-    					new ContextTableScaleEditorDialog(frame, this.conceptualSchema, this.databaseConnection, context);
-    	if(dialog.execute()) {
+        contextEditingDialog.setContext(context);
+    	if(contextEditingDialog.execute()) {
     		/// @todo check for duplicate names
     		LatticeGenerator lgen = new GantersAlgorithm();
-    		context = dialog.getContext();
+    		context = contextEditingDialog.getContext();
     		Lattice lattice = lgen.createLattice(context);
     		Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, context.getName(), new DefaultDimensionStrategy());
     		this.conceptualSchema.replaceDiagram(this.diagramView.getDiagram(), diagram);

@@ -9,16 +9,19 @@ package net.sourceforge.toscanaj.view.scales;
 
 import java.awt.Frame;
 
+import org.tockit.events.EventBroker;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
-import net.sourceforge.toscanaj.model.database.Column;
 
 public class ContextTableScaleGenerator implements ScaleGenerator {
     private Frame parent;
+    private EventBroker eventBroker;
 
-    public ContextTableScaleGenerator(Frame parent) {
+    public ContextTableScaleGenerator(Frame parent, EventBroker eventBroker) {
         this.parent = parent;
+        this.eventBroker = eventBroker;
     }
 
     public String getScaleName() {
@@ -30,11 +33,11 @@ public class ContextTableScaleGenerator implements ScaleGenerator {
     }
 
     public Context generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
-        Column column = columns[0].getColumn();
         ContextTableScaleEditorDialog dialog = new ContextTableScaleEditorDialog(
                 parent,
                 scheme,
-                databaseConnection
+                databaseConnection,
+                eventBroker
         );
         if (!dialog.execute()) {
             return null;

@@ -25,7 +25,6 @@ public class ScaleEditingViewDialog extends JDialog {
 																	databaseConnection);
 		setBounds(100,50,800,600);											
 		setContentPane(scaleEditingView);
-
 	}
 
 }

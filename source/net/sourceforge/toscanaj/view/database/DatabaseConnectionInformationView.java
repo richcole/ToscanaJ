@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -157,6 +158,10 @@ public class DatabaseConnectionInformationView
 	    eventBroker.subscribe(
 	        this,
 	        DatabaseInfoChangedEvent.class,
+	        Object.class);
+	    eventBroker.subscribe(
+	        this,
+	        NewConceptualSchemaEvent.class,
 	        Object.class);
 	}
 
@@ -728,8 +733,8 @@ public class DatabaseConnectionInformationView
 
 	public void processEvent(Event event) {
 		ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
-        ConceptualSchema conceptualSchema = changeEvent.getConceptualSchema();
-        DatabaseInfo databaseInfo = conceptualSchema.getDatabaseInfo();
+        this.conceptualSchema = changeEvent.getConceptualSchema();
+        DatabaseInfo databaseInfo = this.conceptualSchema.getDatabaseInfo();
         copyToControls(databaseInfo);
 	}
 	

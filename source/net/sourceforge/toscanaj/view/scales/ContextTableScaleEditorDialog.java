@@ -14,11 +14,17 @@ import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import javax.swing.*;
 
 import org.jdom.Element;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventBrokerListener;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -27,7 +33,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-public class ContextTableScaleEditorDialog extends JDialog {
+public class ContextTableScaleEditorDialog extends JDialog implements EventBrokerListener {
 
 	private static final String CONFIGURATION_SECTION_NAME = "ContextTableEditorDialog";
     private static final int MINIMUM_WIDTH = 700;
@@ -49,18 +55,24 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	private JPanel buttonsPane, titlePane;
 	private JScrollPane scrollpane;
 
-    public ContextTableScaleEditorDialog(Frame owner, ConceptualSchema conceptualSchema, DatabaseConnection databaseConnection) {
-    	this(owner, conceptualSchema, databaseConnection, new ContextImplementation());
+    public ContextTableScaleEditorDialog(Frame owner, ConceptualSchema conceptualSchema, DatabaseConnection databaseConnection,
+    									  EventBroker eventBroker) {
+    	this(owner, conceptualSchema, databaseConnection, new ContextImplementation(), eventBroker);
     }
 
     public ContextTableScaleEditorDialog(Frame owner, ConceptualSchema conceptualSchema, 
-    									  DatabaseConnection databaseConnection, ContextImplementation context) {
+    									  DatabaseConnection databaseConnection, ContextImplementation context,
+    									  EventBroker eventBroker) {
         super(owner,true);
         this.conceptualSchema = conceptualSchema;
         this.databaseConnection = databaseConnection;
         this.contextTableScaleEditorDialog = this;
         this.context = context;
+        
         createView();
+        
+        eventBroker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
+    	eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
     }
 
 	private void createView() {
@@ -811,4 +823,13 @@ public class ContextTableScaleEditorDialog extends JDialog {
 			DescriptionViewer.show(frame,problemDescription);
 		}
 	}
+
+    public void processEvent(Event e) {
+    	ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
+    	this.conceptualSchema = csce.getConceptualSchema();
+    }
+    
+    public void setContext(ContextImplementation context) {
+        this.context = context;
+    }
 }
