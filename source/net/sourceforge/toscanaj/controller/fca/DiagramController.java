@@ -420,7 +420,7 @@ public class DiagramController implements ChangeObservable {
             // we don't have a diagram to display
             return null;
         }
-        return getNestedDiagram(history.currentDiagrams.size()-1);
+        return getNestedDiagram(history.currentDiagrams.size()-1, 1);
     }
 
     /**
@@ -501,14 +501,14 @@ public class DiagramController implements ChangeObservable {
      *
      * The parameter pos determines the position in the list of current diagrams.
      */
-    protected Diagram2D getNestedDiagram(int pos) {
+    protected Diagram2D getNestedDiagram(int pos, int level) {
         if(pos == 0) {
             // we have only a flat diagram left
             return getSimpleDiagram(0);
         }
         // else created nested diagram recursively
         DiagramReference ref = (DiagramReference)history.currentDiagrams.get(pos);
-        return new NestedLineDiagram(getNestedDiagram(pos-1), ref.getDiagram());
+        return new NestedLineDiagram(getNestedDiagram(pos-1, level+1), ref.getDiagram(), level);
     }
 
     /**

@@ -20,8 +20,10 @@ public class NestedLineDiagram extends SimpleLineDiagram {
      * Creates a new nested line diagram from the given two diagrams.
      *
      * The inner diagram will be nested in each node of the outer diagram.
+     * The level gives the depth of nesting for this diagram, starting with one
+     * for a diagram on top level.
      */
-    public NestedLineDiagram(Diagram2D outerDiagram, Diagram2D innerDiagram) {
+    public NestedLineDiagram(Diagram2D outerDiagram, Diagram2D innerDiagram, int level) {
         Rectangle2D innerBounds = innerDiagram.getBounds();
         double scale = (innerBounds.getWidth()+2*innerDiagram.getNode(0).getRadiusX()) /
                                       outerDiagram.getNode(0).getRadiusX();
@@ -30,7 +32,8 @@ public class NestedLineDiagram extends SimpleLineDiagram {
         for(int i=0; i < outerDiagram.getNumberOfNodes(); i++ ) {
             DiagramNode oldNode = outerDiagram.getNode(i);
             NestedDiagramNode node = new NestedDiagramNode(oldNode, innerDiagram, scale,
-                                                           !oldNode.getConcept().isTop() );
+                                                           !oldNode.getConcept().isTop(),
+                                                           level );
             this.addNode(node);
             nodeMap.put(oldNode,node);
         }
