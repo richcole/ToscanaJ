@@ -128,84 +128,168 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         new LabelClickEventHandler(canvasEventBroker);
         diagramView.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
-        JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        createMovementManipulators(toolPanel);
-
-        toolPanel.add(new JLabel("Zoom:"));
-        zoomInButton = new JButton("+");
-        zoomInButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                zoomIntoDiagram();
-            }
-        });
-        toolPanel.add(zoomInButton);
-        zoomOutButton = new JButton("-");
-        zoomOutButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                zoomOutOfDiagram();
-            }
-        });
-        toolPanel.add(zoomOutButton);
-
-        toolPanel.add(new JLabel("Grid:"));
-        gridIncreaseButton = new JButton("+");
-        gridIncreaseButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                diagramView.increaseGridSize();
-            }
-        });
-        gridIncreaseButton.setEnabled(false);
-        toolPanel.add(gridIncreaseButton);
-        gridDecreaseButton = new JButton("-");
-        gridDecreaseButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                diagramView.decreaseGridSize();
-            }
-        });
-        gridDecreaseButton.setEnabled(false);
-        toolPanel.add(gridDecreaseButton);
-        gridEnabledCheckBox = new JCheckBox("use");
-        gridEnabledCheckBox.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		boolean enabled = gridEnabledCheckBox.isSelected();
-        		gridIncreaseButton.setEnabled(enabled);
-        		gridDecreaseButton.setEnabled(enabled);
-        		diagramView.setGridEnabled(enabled);	
-            }
-        });
-        gridEnabledCheckBox.setSelected(false);
-        gridEnabledCheckBox.setEnabled(false);
-        toolPanel.add(gridEnabledCheckBox);
-
-        editContextButton = new JButton("Edit Context...");
-        editContextButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                editContext();
-            }
-        });
-        editContextButton.setEnabled(false);
-        toolPanel.add(editContextButton);
+        JPanel toolPanel = new JPanel(new GridBagLayout());
+		toolPanel.add(createMovementManipulators(), new GridBagConstraints(
+						0,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.HORIZONTAL,
+						new Insets(1, 5, 1, 1),
+						2,2));
+		toolPanel.add(createZoomPanel(), new GridBagConstraints(
+						1,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.HORIZONTAL,
+						new Insets(1, 1, 1, 1),
+						2,2));
+		toolPanel.add(createGridPanel(), new GridBagConstraints(
+						2,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.HORIZONTAL,
+						new Insets(1, 1, 1, 1),
+						2,2));
 		
-		editDiagramDescButton = new JButton("Edit Description...");
-		editDiagramDescButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				editDiagramDescription();
-			}
-		});
-		editDiagramDescButton.setEnabled(false);
-		toolPanel.add(editDiagramDescButton);
-		
+		toolPanel.add(createEditPanel(), new GridBagConstraints(
+						3,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.HORIZONTAL,
+						new Insets(1, 1, 1, 1),
+						2,2));
+		toolPanel.add(new JPanel(), new GridBagConstraints(
+						4,0,1,1,1,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.HORIZONTAL,
+						new Insets(1, 1, 1, 1),
+						2,2));
         diagramViewPanel.add(toolPanel, BorderLayout.NORTH);
         diagramViewPanel.add(diagramView, BorderLayout.CENTER);
 		loadConfigurationSettings();
         return diagramViewPanel;
     }
 
-    protected void createMovementManipulators(JPanel toolPanel) {
-        toolPanel.add(new JLabel("Movement:"));
+	protected JPanel createEditPanel() {
+		JPanel editPanel = new JPanel(new GridBagLayout());
+		editPanel.setBorder(BorderFactory.createTitledBorder("Edit"));
+		editContextButton = new JButton("Context...");
+		editContextButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        editContext();
+		    }
+		});
+		editContextButton.setEnabled(false);
+		editPanel.add(editContextButton, new GridBagConstraints(
+						0,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,
+						new Insets(0, 5, 5, 5),
+						2,2));
+		editDiagramDescButton = new JButton("Description...");
+		editDiagramDescButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				editDiagramDescription();
+			}
+		});
+		editDiagramDescButton.setEnabled(false);
+		editPanel.add(editDiagramDescButton, new GridBagConstraints(
+						1,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,
+						new Insets(0, 5, 5, 5),
+						2,2));
+		return editPanel;
+	}
+
+	protected JPanel createGridPanel() {
+		JPanel gridPanel = new JPanel(new GridBagLayout());
+		gridPanel.setBorder(BorderFactory.createTitledBorder("Grid"));
+		gridEnabledCheckBox = new JCheckBox("use");
+		gridEnabledCheckBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean enabled = gridEnabledCheckBox.isSelected();
+				gridIncreaseButton.setEnabled(enabled);
+				gridDecreaseButton.setEnabled(enabled);
+				diagramView.setGridEnabled(enabled);	
+			}
+		});
+		gridEnabledCheckBox.setSelected(false);
+		gridEnabledCheckBox.setEnabled(false);
+		gridPanel.add(gridEnabledCheckBox, new GridBagConstraints(
+						0,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,
+						new Insets(0, 5, 5, 5),
+						2,2));
+		gridIncreaseButton = new JButton("+");
+		gridIncreaseButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        diagramView.increaseGridSize();
+		    }
+		});
+		gridIncreaseButton.setEnabled(false);
+		gridPanel.add(gridIncreaseButton, new GridBagConstraints(
+						1,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,
+						new Insets(0, 5, 5, 5),
+						2,2));
+		gridDecreaseButton = new JButton("-");
+		gridDecreaseButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        diagramView.decreaseGridSize();
+		    }
+		});
+		gridDecreaseButton.setEnabled(false);
+		gridPanel.add(gridDecreaseButton, new GridBagConstraints(
+						2,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,
+						new Insets(0, 5, 5, 5),
+						2,2));
+		return gridPanel;
+	}
+
+	protected JPanel createZoomPanel() {
+		JPanel zoomPanel = new JPanel(new GridBagLayout());
+		zoomPanel.setBorder(BorderFactory.createTitledBorder("Zoom"));
+		zoomInButton = new JButton("+");
+		zoomInButton.setEnabled(false);
+		zoomInButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        zoomIntoDiagram();
+		    }
+		});
+		zoomPanel.add(zoomInButton, new GridBagConstraints(
+						0,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,
+						new Insets(0, 5, 5, 5),
+						2,2));
+		zoomOutButton = new JButton("-");
+		zoomOutButton.setEnabled(false);
+		zoomOutButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        zoomOutOfDiagram();
+		    }
+		});
+		zoomPanel.add(zoomOutButton, new GridBagConstraints(
+						1,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,
+						new Insets(0, 5, 5, 5),
+						2,2));
+		return zoomPanel;
+	}
+
+    protected JPanel createMovementManipulators() {
+        JPanel movementPanel = new JPanel(new GridBagLayout());
+		movementPanel.setBorder(BorderFactory.createTitledBorder("Movement"));        
         movementChooser = new JComboBox();
         setMovementManipulators();
-        toolPanel.add(movementChooser);
+		movementPanel.add(movementChooser, new GridBagConstraints(
+						0,0,1,1,0,0,
+						GridBagConstraints.NORTHWEST,
+						GridBagConstraints.NONE,
+						new Insets(0, 5, 5, 5),
+						2,2));
         movementChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JComboBox combobox = (JComboBox) e.getSource();
@@ -221,12 +305,14 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 }
             }
         });
+		return movementPanel;
     }
 
     protected void setMovementManipulators() {
         Diagram2D diagram = this.diagramView.getDiagram();
         if(diagram == null) {
         	movementChooser.setEnabled(false);
+        	movementChooser.setPreferredSize(new Dimension(60,25));
         } else {
         	movementChooser.setEnabled(true);
         	if (diagram instanceof NDimDiagram) {
