@@ -262,7 +262,14 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         
         // draw the contents
  		for (int i = this.firstItem; i < this.firstItem + this.displayLines; i++) {
-			TextLayout cur = getTextLayoutForEntry(i, graphics.getFontRenderContext());
+			TextLayout cur;
+ 			if(i == this.firstItem && i != 0 && !this.scrollbarShown) {
+ 				cur = getMoreEntriesTextLayout(this.firstItem + 1, graphics.getFontRenderContext());
+			} else if(i == this.firstItem + this.displayLines - 1 && i != this.getNumberOfEntries() - 1  && !this.scrollbarShown) {
+				cur = getMoreEntriesTextLayout(this.getNumberOfEntries() - i, graphics.getFontRenderContext());
+			} else {
+				cur = getTextLayoutForEntry(i, graphics.getFontRenderContext());
+			}
             int curPos = i - this.firstItem;
 			float curWidth = (float)cur.getBounds().getWidth() + 2 * this.textmargin;
         	float textX;
@@ -276,7 +283,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
                 throw new RuntimeException("Unknown label alignment.");
             }
 			textX += this.textmargin;
-			float textY = (float)yPos + curPos * this.lineHeight + cur.getAscent();
+			float textY = (float)yPos + curPos * this.lineHeight + cur.getAscent() + (this.lineHeight - getFullHeight(cur))/2;
             cur.draw(graphics, textX, textY);
         }
 
@@ -381,13 +388,31 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         	if (w > lw) {
         		lw = w;
         	}
-        	float h = cur.getLeading() + cur.getAscent() + cur.getDescent();
+        	float h = getFullHeight(cur);
         	if (h > this.lineHeight) {
         		this.lineHeight = h;
         	}
         }
-        lw += 2 * textmargin;
         
+        // check if we have at least one of the "...more entries..." markers and make sure
+        // we have enough width for them
+        if(this.displayLines < getNumberOfEntries()) {
+        	// first create a number with just nines and as many digits as the number of
+        	// entries in the label
+        	int res = getNumberOfEntries();
+        	int num = 9;
+        	while(res > 10) {
+        		res /= 10;
+        		num = num * 10 + 9;
+        	}
+            TextLayout layout = getMoreEntriesTextLayout(num, fontRenderContext);
+            if(layout.getBounds().getWidth() > lw) {
+            	lw = layout.getBounds().getWidth();
+            }
+        }
+        
+		lw += 2 * textmargin;
+
         double lh = this.displayLines * this.lineHeight;
         double xPos = x - lw / 2 + this.labelInfo.getOffset().getX();
         double radius = nodeView.getRadiusY();
@@ -400,6 +425,15 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
             yPos = y + this.labelInfo.getOffset().getY();
         }
 		this.rect = new Rectangle2D.Double(xPos, yPos, lw + this.currentScrollBarWidth, lh);
+    }
+
+    private float getFullHeight(TextLayout layout) {
+        return layout.getLeading() + layout.getAscent() + layout.getDescent();
+    }
+
+    private TextLayout getMoreEntriesTextLayout(int num, FontRenderContext fontRenderContext) {
+        Font newFont = this.font.deriveFont(Font.ITALIC, this.font.getSize() * 0.8f);
+        return new TextLayout("..." + num + " more...", newFont, fontRenderContext);
     }
     
     Point2D getConnectorStartPosition() {
