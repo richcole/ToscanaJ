@@ -364,19 +364,19 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // create the nesting submenu
         ButtonGroup nestingGroup = new ButtonGroup();
 
-        this.noNestingMenuItem = new JRadioButtonMenuItem("No nesting of diagrams");
-        this.noNestingMenuItem.setMnemonic(KeyEvent.VK_N);
+        this.noNestingMenuItem = new JRadioButtonMenuItem("Simple Diagram");
+        this.noNestingMenuItem.setMnemonic(KeyEvent.VK_S);
         this.noNestingMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_0, ActionEvent.CTRL_MASK));
+                KeyEvent.VK_1, ActionEvent.CTRL_MASK));
         this.noNestingMenuItem.addActionListener(this);
         this.noNestingMenuItem.setSelected(true);
         nestingGroup.add(noNestingMenuItem);
         diagrMenu.add(noNestingMenuItem);
 
-        this.nestingLevel1MenuItem = new JRadioButtonMenuItem("One level of nesting");
-        this.nestingLevel1MenuItem.setMnemonic(KeyEvent.VK_O);
+        this.nestingLevel1MenuItem = new JRadioButtonMenuItem("Nested Diagram");
+        this.nestingLevel1MenuItem.setMnemonic(KeyEvent.VK_N);
         this.nestingLevel1MenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_1, ActionEvent.CTRL_MASK));
+                KeyEvent.VK_2, ActionEvent.CTRL_MASK));
         this.nestingLevel1MenuItem.addActionListener(this);
         nestingGroup.add(nestingLevel1MenuItem);
         diagrMenu.add(nestingLevel1MenuItem);
