@@ -4,7 +4,9 @@ program suite:
 Affecting different programs:
 =============================
 - Bugfix: on re-reading a <description> of an attribute, no additional indirection
-  (an extra <description>) is generated anymore
+  (an extra <description>) is generated anymore.
+- Bugfix: mixed content in <attribute> (as the <description>) does not cause problems
+  with whitespace in the labels anymore.
 
 Specific for ToscanaJ:
 ======================
