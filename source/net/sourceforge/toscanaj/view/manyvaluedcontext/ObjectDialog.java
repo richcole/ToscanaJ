@@ -41,7 +41,7 @@ public class ObjectDialog extends JDialog{
 		pack();
 		this.parent = parent;
 		this.object = object;
-		show();
+		setVisible(true);
 	}
 
 	private void createView(String oldName) {
@@ -75,7 +75,7 @@ public class ObjectDialog extends JDialog{
 				if(!objectName.getText().equals("")){
 					object.setData(objectName.getText());
 					parent.validate();
-					hide();
+					setVisible(false);			
 				}
 				else{
 					JOptionPane.showMessageDialog(dialog,
@@ -88,7 +88,7 @@ public class ObjectDialog extends JDialog{
 		closeButton = new JButton("Close");
 		closeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				hide();			
+				setVisible(false);			
 			}
 		});
 

@@ -141,7 +141,7 @@ public class InputTextDialog extends JDialog {
 		});
 		setLocationRelativeTo(parent);
 		pack();
-		show();
+		setVisible(true);
 	}
     
     public String getInput () {

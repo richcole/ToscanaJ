@@ -325,7 +325,7 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 		setVisible(false);
 	}
 	public boolean execute() {
-		show();
+		setVisible(true);
 		return result;
 	}
 	

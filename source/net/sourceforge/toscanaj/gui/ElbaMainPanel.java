@@ -1200,7 +1200,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
     protected void showDatabaseConnectionDialog() {
         disconnectDatabase();
-        connectionInformationView.show();
+        connectionInformationView.setVisible(true);
         if (!connectionInformationView.newConnectionWasSet()) {
             // reconnect to the old connection
             connectDatabase();

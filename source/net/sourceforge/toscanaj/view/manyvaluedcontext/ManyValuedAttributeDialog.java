@@ -54,7 +54,7 @@ public class ManyValuedAttributeDialog extends JDialog{
 		this.context = context;
 		setContentPane(createView());
 		setSize(300,200);
-		show();
+		setVisible(true);
 	}
 	
 	protected JPanel createView(){
@@ -157,7 +157,7 @@ public class ManyValuedAttributeDialog extends JDialog{
 				//}
 				parent.validate();
 				//dispose();
-				hide();
+				setVisible(false);
 			}
 		});
 		cancelButton = new JButton("Cancel");

@@ -248,7 +248,7 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
     }
 
     public void hide() {
-        super.hide();
+        super.setVisible(false);
         preferences.putInt("verticalDivider", listSplitPane.getDividerLocation());
         preferences.putInt("horizontalDivider", mainSplitPane.getDividerLocation());
         preferences.storeWindowPlacement(this);
