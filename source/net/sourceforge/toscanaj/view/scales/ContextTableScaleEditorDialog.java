@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
+import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
@@ -646,11 +647,20 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
         List objectList = (List) this.context.getObjects();
         String inputValue = "";
         do{
-            String object = (String) objectList.get(num);
-            inputValue = showTextInputDialog("Rename Object", "object", object);
+            String oldName = (String) objectList.get(num);
+            inputValue = showTextInputDialog("Rename Object", "object", oldName);
             if (inputValue != null && !inputValue.trim().equals("")) {
                 if(!collectionContainsString(inputValue, objectList)) {
                     objectList.set(num, inputValue);
+                    BinaryRelationImplementation relation = this.context.getRelationImplementation();
+                    Iterator attrIt = this.context.getAttributes().iterator();
+                    while (attrIt.hasNext()) {
+                        Attribute attribute = (Attribute) attrIt.next();
+                        if(relation.contains(oldName, attribute)) {
+                        	relation.remove(oldName, attribute);
+                        	relation.insert(inputValue, attribute);
+                        }
+                    }
                     updateView();
                     inputValue = "";
                 } else {
