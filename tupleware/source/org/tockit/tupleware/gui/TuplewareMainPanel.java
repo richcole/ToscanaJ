@@ -178,6 +178,8 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
         fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(fileMenu);
+        
+        this.saveActivity = new SaveConceptualSchemaActivity(this.conceptualSchema, this.eventBroker);
 		
 		this.saveAsFileAction =
 			new SaveFileAction(
