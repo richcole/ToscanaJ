@@ -1,9 +1,9 @@
-ToscanaJ 0.2 Readme File
+ToscanaJ 0.4 Readme File
 ========================
 
 What is it?
 -----------
-A second release of the Java reimplementation of the
+A fourth release of the Java reimplementation of the
 classic Formal Concept Analysis tool named "Toscana".
 
 It is open sourced under a BSD-style licence (see the text
@@ -33,11 +33,9 @@ to create some common code base.
 
 What do I need to run ToscanaJ?
 -------------------------------
-You need a Java 2 runtime environment, i.e. any JRE or
-JDK with version number 1.2 or above. We develop with
-Suns JDK version 1.3.1 on Windows 2000, tests were made
-with different JDK 1.3.x on Windows NT and 98 plus 
-different Linux Systems.
+You need a Java runtime environment (JRE) or Java develop-
+ment kit (JDK), with version number 1.3 or above. We use
+1.3.1 and 1.4 on different Linux and Windows systems. 
 
 
 How do I start ToscanaJ?
@@ -54,13 +52,16 @@ then you can just double-click the JAR file in the explorer.
 What can I do with ToscanaJ?
 ----------------------------
 ToscanaJ should open an example on startup, unfortunately
-the only examples we have at the moment are in German, this
-will hopefully change soon. Double click on one of the diagram
-titles on the left side to open your first diagram. You can
-add multiple diagrams to the list of selected diagrams this
-way. Once you have an open diagram you can do the following
-things:
+the only examples not using a database we have at the moment
+are in German, if you want to try the database version you 
+can find an English example with the SQL script for creating
+the database in examples/sql/pctest. There is a howto that
+explains how to set up the example will hopefully change soon.
+Double click on one of the diagram titles on the left side to 
+open your first diagram. You can add multiple diagrams to the 
+list of selected diagrams this way. 
 
+Once you have an open diagram you can do the following things: 
 - move labels
 - double click the object labels to display their entries
 - double click them again to go back to the numbers
@@ -80,13 +81,29 @@ things:
 - export diagrams as bitmaps (PNG, JPG)
 - export diagrams as vector graphic (SVG)
 
-Added features in ToscanaJ 0.2:
+Changes in ToscanaJ 0.2:
 - connections can be made with all JDBC drivers instead of
   only the JDBC-ODBC bridge
 - labels are now resizable and scrollable
 - SQL aggregates can be defined in the CSX files to e.g.
   display an average price in the diagram
+- new class for querying the scales into a simple XML
+  format
+- bugfixes, cleanups
 
+Changes in ToscanaJ 0.3:
+- lots of bugfixes, speedups, refactoring
+- color options can be set using the properties file
+
+Changes in ToscanaJ 0.4:
+- a plugin API offers access to database elements, either
+  as forms with one item or as reports (list + summary),
+  some viewers are available (plain text, HTML, program
+  call)
+- descriptions in HTML can be added to schema, diagrams
+  and attributes
+- diagrams in history list can be reordered by dragging
+- PCTest example is available in English and as SQL
 
 Are there other examples?
 -------------------------
@@ -166,7 +183,7 @@ change.
 ===========================================================
 
 Enjoy!
-  The KVO team
+  The ToscanaJ team
 
 ===========================================================
 (1): http://www.int.gu.edu.au/kvo
