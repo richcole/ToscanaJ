@@ -1,6 +1,8 @@
 /*
- * Date: 14.04.2002
- * Time: 18:22:09
+ * Copyright DSTC Pty.Ltd. (http://www.dstc.com). Please read licence.txt in
+ * the toplevel source directory for licensing information.
+ *
+ * $Id$
  */
 package net.sourceforge.toscanaj.model.lattice.tests;
 
