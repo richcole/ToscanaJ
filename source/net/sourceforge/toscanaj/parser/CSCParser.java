@@ -38,6 +38,9 @@ public class CSCParser {
     private static final int TARGET_DIAGRAM_HEIGHT = 460;
     private static final int TARGET_DIAGRAM_WIDTH = 600;
     
+    /// @todo now we start hacking...
+    private static Hashtable sectionIdMap = new Hashtable();
+    
     protected static final class QueryMap {
     	public String name;
     	public Hashtable map = new Hashtable();
@@ -175,15 +178,23 @@ public class CSCParser {
 
     protected static final CSCFileSectionParser FORMAL_CONTEXT_SECTION = new CSCFileSectionParser("FORMAL_CONTEXT"){
         public Object parse(CSCTokenizer tokenizer) throws IOException, DataFormatException {
-            ContextImplementation context = new ContextImplementation(tokenizer.getCurrentToken());
             List objects = new ArrayList();
             List attributes = new ArrayList();
-
+			String contextTitle = tokenizer.getCurrentToken();
+            sectionIdMap.put(contextTitle,contextTitle);
+			
             while(!tokenizer.getCurrentToken().equals("OBJECTS")) { // ignore everything before the objects
+            	if(tokenizer.getCurrentToken().equals("TITLE")) {
+            	    tokenizer.advance();
+            	    sectionIdMap.put(tokenizer.getCurrentToken(), contextTitle);
+            	    contextTitle = tokenizer.getCurrentToken();
+            	}
                 tokenizer.advance();
             }
             tokenizer.advance(); // skip "OBJECTS"
 
+            ContextImplementation context = new ContextImplementation(contextTitle);
+            
             while(!tokenizer.getCurrentToken().equals("ATTRIBUTES")) { // find objects until attributes come
                 tokenizer.advance(); // skip number
                 tokenizer.advance(); // skip id
@@ -240,9 +251,11 @@ public class CSCParser {
         	if(tokenizer.getCurrentToken().equals("TITLE")) {
         		tokenizer.advance();
         		diagram.setTitle(tokenizer.getCurrentToken());
+        		sectionIdMap.put(diagram.getTitle(), identifier);
         		tokenizer.advance();
         	} else {
         	    diagram.setTitle(identifier);
+        	    sectionIdMap.put(identifier,identifier);
         	}
         	
             while(!tokenizer.getCurrentToken().equals("POINTS")) { // we ignore remark, special list and unitlength
@@ -443,6 +456,7 @@ public class CSCParser {
                /// @todo tupels should be send as a couple of tokens
                while(!tokenizer.getCurrentToken().equals(";")) {
                    String tupel = tokenizer.getCurrentToken();
+                   System.out.println(tupel);
                    tokenizer.advance();
                    tupel = tupel.substring(1,tupel.length()-1);
                    int commaPos = tupel.indexOf(',');
@@ -536,7 +550,7 @@ public class CSCParser {
                 Object result = iter.next();
                 if(result instanceof Diagram2D) {
                     Diagram2D diagram = (Diagram2D) result;
-                    insertDiagram(schema, diagram, (QueryMap) queryMaps.get(diagram.getTitle()));
+                    insertDiagram(schema, diagram, (QueryMap) queryMaps.get(sectionIdMap.get(diagram.getTitle())));
                     importedDiagrams.add(diagram.getTitle());
                 }
             }
@@ -551,7 +565,7 @@ public class CSCParser {
                     LatticeGenerator lgen = new GantersAlgorithm();
                     Lattice lattice = lgen.createLattice(context);
                     Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, context.getName(), new DefaultDimensionStrategy());
-                    insertDiagram(schema,diagram, (QueryMap) queryMaps.get(diagram.getTitle()));                	
+                    insertDiagram(schema,diagram, (QueryMap) queryMaps.get(sectionIdMap.get(diagram.getTitle())));                	
                 }
             }
         } catch (IOException e) {
