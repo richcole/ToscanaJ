@@ -55,7 +55,7 @@ public class DatabaseConnectionDialog extends JDialog {
     private JButton nextButton;
     private JLabel stepLabel;
     private WizardPanel currentStep;
-    private File openedDatabaseFile;
+    private File lastFile;
 
     private DatabaseTypePanel dbTypePanel;
 	private EmbeddedDbConnectionPanel embeddedDbPanel;
@@ -626,11 +626,12 @@ public class DatabaseConnectionDialog extends JDialog {
 	/**
 	 * Construct an instance of this view
 	 */
-	public DatabaseConnectionDialog(JFrame parent) {
+	public DatabaseConnectionDialog(JFrame parent, File lastFile) {
 		super(parent, "Database connection", true);
 		this.databaseInfo = new DatabaseInfo();
 		this.connection = new DatabaseConnection(new EventBroker());
         this.owner = parent;
+        this.lastFile = lastFile;
 		
         initializePanels();
 
@@ -751,8 +752,8 @@ public class DatabaseConnectionDialog extends JDialog {
 
 	private void getFileURL(JTextField urlField, final String extension, final String description) {
 		JFileChooser openDialog;
-		if (openedDatabaseFile != null) {
-			openDialog = new JFileChooser(openedDatabaseFile);
+		if (lastFile != null) {
+			openDialog = new JFileChooser(lastFile);
 		} else {
 			openDialog = new JFileChooser(System.getProperty("user.dir"));
 		}
@@ -775,8 +776,8 @@ public class DatabaseConnectionDialog extends JDialog {
 		});
 
 		if (openDialog.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-			openedDatabaseFile = openDialog.getSelectedFile();
-			String fileURL = openedDatabaseFile.getAbsolutePath();
+			lastFile = openDialog.getSelectedFile();
+			String fileURL = lastFile.getAbsolutePath();
 			urlField.setText(fileURL);
 		}
 	}
@@ -789,5 +790,9 @@ public class DatabaseConnectionDialog extends JDialog {
 
     public TupleSet getTuples() {
         return this.tuples;
+    }
+    
+    public File getLastFile() {
+    	return this.lastFile;
     }
 }

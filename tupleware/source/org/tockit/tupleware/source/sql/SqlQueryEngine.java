@@ -17,6 +17,7 @@ import org.tockit.tupleware.source.TupleSource;
 
 
 public class SqlQueryEngine implements TupleSource {
+    private File lastFile;
     private int[] objectIndices;
     private TupleSet tuples;
 
@@ -25,13 +26,14 @@ public class SqlQueryEngine implements TupleSource {
     }
 
     public void show(JFrame parent, File lastLocation) {
-        DatabaseConnectionDialog connectionDialog = new DatabaseConnectionDialog(parent);
+        DatabaseConnectionDialog connectionDialog = new DatabaseConnectionDialog(parent, lastLocation);
         connectionDialog.show();
         this.tuples = connectionDialog.getTuples();
         if(this.tuples != null) {
             IndexSelectionDialog objectSetDialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getVariableNames());
             objectSetDialog.show();
             this.objectIndices = objectSetDialog.getSelectedIndices();
+            this.lastFile = connectionDialog.getLastFile();
         }
     }
 
@@ -44,6 +46,6 @@ public class SqlQueryEngine implements TupleSource {
     }
 
     public File getSelectedFile() {
-        return null;
+        return this.lastFile;
     }
 }
