@@ -143,7 +143,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
     public Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme) {
         Assert.isTrue(canHandleColumns(columns));
         TableColumnPair pair = columns[0];
-        OrdinalScaleEditorDialog scaleDialog =  new OrdinalScaleEditorDialog(parent, pair);
+        OrdinalScaleEditorDialog scaleDialog =  new OrdinalScaleEditorDialog(parent, pair.getColumn());
         if(!scaleDialog.execute()){
             return null;
         }
