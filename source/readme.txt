@@ -46,7 +46,8 @@ make sure you are in the installation directory, it won't work
 from within another path. Alternatively you can start it direcly 
 with "java -jar ToscanaJ.jar". On Windows you can connect the 
 ".jar" extension with "javaw -jar", then you can just double-
-click the JAR file in the explorer.
+click the JAR file in the explorer. The same applies to the other
+".jar" files in the main directory.
 
 
 What can I do with ToscanaJ?

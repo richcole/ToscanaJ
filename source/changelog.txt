@@ -7,6 +7,8 @@ Affecting different programs:
   the right.
 - if a node collides with a line it is not connected to, it will be shown red instead
   of its normal color.
+- Elba and Siena have now an executable Jar file to start them. This allows starting
+  them without scripts if the graphical user interface allows starting Java files.
 
 Specific for ToscanaJ:
 ======================
