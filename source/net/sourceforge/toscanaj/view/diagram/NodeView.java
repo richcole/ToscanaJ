@@ -82,7 +82,7 @@ public class NodeView extends CanvasItem {
         if (diagramNode instanceof NestedDiagramNode) {
             nodeColor = diagramSchema.getNestedDiagramNodeColor();
         } else {
-            nodeColor = diagramSchema.getGradientColor(calculateRelativeSize(diagramSchema.getGradientType()));
+            nodeColor = diagramSchema.getDefaultGradient().getColor(calculateRelativeSize(diagramSchema.getGradientType()));
         	if( !isRealized() ) {
         		nodeColor = diagramSchema.getNotRealisedNodeColor(nodeColor);
         	}

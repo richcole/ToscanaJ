@@ -245,36 +245,21 @@ public class DiagramSchema {
         return background;
     }
 
-    /**
-     * Returns the top gradient color.
-     */
-    public Color getTopColor() {
-        return topColor;
-    }
-
-    /**
-     * Returns the bottem gradient color.
-     */
-    public Color getBottomColor() {
-        return bottomColor;
-    }
-
-    /**
-     * Returns a color on the gradient.
-     *
-     * The parameter has to be between 0 and 1 (otherwise an
-     * IllegalArgumentException will be thrown). The color returned will be the
-     * bottom color if the number is zero, the top color if it is one, some
-     * interpolation otherwise.
-     */
-    public Color getGradientColor(double position) {
-        if (position < 0 || position > 1) {
-            throw new IllegalArgumentException("Gradient position not in [0,1]");
-        }
-        return new Color((int) (topColor.getRed() * position + bottomColor.getRed() * (1 - position)),
-                (int) (topColor.getGreen() * position + bottomColor.getGreen() * (1 - position)),
-                (int) (topColor.getBlue() * position + bottomColor.getBlue() * (1 - position)),
-                (int) (topColor.getAlpha() * position + bottomColor.getAlpha() * (1 - position)));
+	/**
+	 * Returns a gradient to be used for the node colors.
+	 */
+    public LinearGradient getDefaultGradient() {
+    	return new LinearGradient() {
+            public Color getColor(double position) {
+				if (position < 0 || position > 1) {
+					throw new IllegalArgumentException("Gradient position not in [0,1]");
+				}
+				return new Color((int) (topColor.getRed() * position + bottomColor.getRed() * (1 - position)),
+						(int) (topColor.getGreen() * position + bottomColor.getGreen() * (1 - position)),
+						(int) (topColor.getBlue() * position + bottomColor.getBlue() * (1 - position)),
+						(int) (topColor.getAlpha() * position + bottomColor.getAlpha() * (1 - position)));
+            }
+    	};
     }
 
     /**
