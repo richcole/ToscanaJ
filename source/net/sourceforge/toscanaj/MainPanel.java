@@ -2,7 +2,7 @@ package net.sourceforge.toscanaj;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.model.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
@@ -107,11 +107,6 @@ public class MainPanel extends JFrame implements ActionListener {
   private ConceptualSchema conceptualSchema;
 
   /**
-   * The history of diagrams.
-   */
-   private DiagramHistory history;
-
-  /**
    * The diagram viewing area.
    */
   private DiagramView diagramView;
@@ -135,7 +130,6 @@ public class MainPanel extends JFrame implements ActionListener {
      */
     public MainPanel() {
         super("ToscanaJ");
-        this.history = new DiagramHistory();
         buildPanel();
         // try to set Windows LnF
         try {
@@ -175,7 +169,7 @@ public class MainPanel extends JFrame implements ActionListener {
         contentPane.setLayout(new BorderLayout());
 
         diagramView = new DiagramView();
-        diagramOrganiser = new DiagramOrganiser(this.conceptualSchema, this.history);
+        diagramOrganiser = new DiagramOrganiser(this.conceptualSchema);
 
         //Create a split pane with the two scroll panes in it.
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
@@ -610,7 +604,7 @@ public class MainPanel extends JFrame implements ActionListener {
         }
 
         diagramOrganiser.setConceptualSchema(conceptualSchema);
-        history.clear();
+        DiagramHistory.getDiagramHistory().clear();
 
         // if there is at least one diagram, open the first
         if( conceptualSchema.getNumberOfDiagrams() != 0 ) {

@@ -1,6 +1,6 @@
 package net.sourceforge.toscanaj.view;
 
-import net.sourceforge.toscanaj.model.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 
 import java.awt.Component;

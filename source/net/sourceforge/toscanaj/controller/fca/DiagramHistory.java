@@ -1,6 +1,7 @@
-package net.sourceforge.toscanaj.model;
+package net.sourceforge.toscanaj.controller.fca;
 
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.util.Iterator;
 import java.util.List;
@@ -12,8 +13,16 @@ import javax.swing.AbstractListModel;
 /**
  * A list of all diagrams that have been visited, are viewed at the moment or
  * are enlisted to be used later.
+ *
+ * This is implemented as singleton, use getDiagramHistory() to access the
+ * instance.
  */
 public class DiagramHistory extends AbstractListModel {
+    /**
+     * Stores the only instance of this class.
+     */
+    static private DiagramHistory singleton = new DiagramHistory();
+
     /**
      * Stores the diagrams that have already been visited.
      */
@@ -32,7 +41,14 @@ public class DiagramHistory extends AbstractListModel {
     /**
      * Creates an empty list of diagrams.
      */
-    public DiagramHistory() {
+    private DiagramHistory() {
+    }
+
+    /**
+     * Returns the only instance of this class.
+     */
+    static public DiagramHistory getDiagramHistory() {
+        return singleton;
     }
 
     /**
@@ -122,7 +138,7 @@ public class DiagramHistory extends AbstractListModel {
      * This is done by putting the outermost current one into the history and
      * getting a new one out of the list of future diagrams.
      */
-    public void next()
+    public void next(Concept zoomedConcept)
            throws NoSuchElementException
     {
         if(this.futureDiagrams.isEmpty()) {

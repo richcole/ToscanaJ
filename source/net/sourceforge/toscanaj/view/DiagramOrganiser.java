@@ -1,7 +1,7 @@
 package net.sourceforge.toscanaj.view;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 
 import net.sourceforge.toscanaj.view.DiagramHistoryView;
 
@@ -31,11 +31,6 @@ public class DiagramOrganiser extends JPanel {
     private ConceptualSchema schema;
 
     /**
-     * Stores the list model for the selected diagrams.
-     */
-    private DiagramHistory history;
-
-    /**
      * The listview for the available diagrams.
      */
     private JList availableDiagramsListview;
@@ -55,10 +50,9 @@ public class DiagramOrganiser extends JPanel {
      */
     private DiagramHistoryView selectedDiagramsListview;
 
-    public DiagramOrganiser(ConceptualSchema conceptualSchema, DiagramHistory diagramHistory) {
+    public DiagramOrganiser(ConceptualSchema conceptualSchema) {
         // store model
         this.schema = conceptualSchema;
-        this.history = diagramHistory;
 
         // create view components
         removeButton = new JButton();
@@ -67,7 +61,7 @@ public class DiagramOrganiser extends JPanel {
         JScrollPane selectedDiagramsPanel = new JScrollPane();
         availableDiagramsListview = new JList();
         availableDiagramsListview.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        selectedDiagramsListview = new DiagramHistoryView(history);
+        selectedDiagramsListview = new DiagramHistoryView(DiagramHistory.getDiagramHistory());
         selectedDiagramsListview.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
         // label the buttons
@@ -99,7 +93,7 @@ public class DiagramOrganiser extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 int index = availableDiagramsListview.getSelectedIndex();
                 if(index >= 0) {
-                    history.addFutureDiagram(schema.getDiagram(index));
+                    DiagramHistory.getDiagramHistory().addFutureDiagram(schema.getDiagram(index));
                 }
             }
         });
@@ -107,7 +101,7 @@ public class DiagramOrganiser extends JPanel {
         removeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int index = selectedDiagramsListview.getSelectedIndex();
-                history.removeDiagram(index);
+                DiagramHistory.getDiagramHistory().removeDiagram(index);
                 int size = selectedDiagramsListview.getModel().getSize();
                 if (size == 0) {
                     //clearSelection() will disable remove button
@@ -126,7 +120,7 @@ public class DiagramOrganiser extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int index = availableDiagramsListview.locationToIndex(e.getPoint());
-                    history.addFutureDiagram(schema.getDiagram(index));
+                    DiagramHistory.getDiagramHistory().addFutureDiagram(schema.getDiagram(index));
                 }
             }
         };
