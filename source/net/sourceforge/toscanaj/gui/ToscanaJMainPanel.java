@@ -72,11 +72,6 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
      */
     private JSplitPane splitPane = null;
 
-    /**
-     * Stores the divider position when the diagram organizer is hidden.
-     */
-    private int dividerPosition = 0;
-
     // the actions used in the UI
     private Action openFileAction;
     private Action exportDiagramAction;
@@ -662,7 +657,6 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 
     public void actionPerformed(ActionEvent ae) {
         Object actionSource = ae.getSource();
-        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
 
         if (actionSource == exportDiagramSetupMenuItem) {
             showImageExportOptions();
