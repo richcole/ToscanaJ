@@ -70,7 +70,7 @@ public class ConceptualSchema {
      */
     public ConceptualSchema(EventBroker broker) {
         this.broker = broker;
-        this.dbScheme = new DBScheme();
+        this.dbScheme = new DBScheme(broker);
         reset();
     }
 

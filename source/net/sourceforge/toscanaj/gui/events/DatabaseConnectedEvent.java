@@ -14,14 +14,20 @@ import net.sourceforge.toscanaj.controller.db.DBConnection;
 public class DatabaseConnectedEvent implements Event {
 
     private Object source;
+
     private DBConnection connection;
 
     public DatabaseConnectedEvent(Object source, DBConnection connection) {
         this.source = source;
         this.connection = connection;
+        System.out.println("DatabaseConnectedEvent created...");
     }
 
     public Object getSource() {
         return source;
+    }
+
+    public DBConnection getConnection() {
+        return connection;
     }
 }

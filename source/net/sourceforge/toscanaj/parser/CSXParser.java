@@ -458,10 +458,11 @@ public class CSXParser {
             password = urlElem.getAttributeValue("password");
             embeddedDB = null;
         } else {
-            url = "jdbc:hsqldb:.";
-            driver = "org.hsqldb.jdbcDriver";
-            username = "sa";
-            password = "";
+            DatabaseInfo tmpInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
+            url = tmpInfo.getURL();
+            driver = tmpInfo.getDriverClass();
+            username = tmpInfo.getUserName();
+            password = tmpInfo.getPassword();
             String urlString = embedElem.getAttributeValue("url");
             embeddedDB = null;
             if (urlString != null) {

@@ -9,12 +9,13 @@
 package net.sourceforge.toscanaj.model;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class Table {
 
     private String name;
     private String key;
-    private List   columns;
+    private List   columns = new ArrayList();
 
     public Table(String name, String key) {
         this.name = name;

@@ -43,6 +43,15 @@ public class DatabaseInfo {
 
     private String driverClass = null;
 
+    public static DatabaseInfo getEmbeddedDatabaseInfo() {
+        DatabaseInfo info = new DatabaseInfo();
+        info.setUrl("jdbc:hsqldb:.");
+        info.setDriverClass("org.hsqldb.jdbcDriver");
+        info.setUserName("sa");
+        info.setPassword("");
+        return info;
+    };
+
     public static abstract class DatabaseQuery extends Query {
         public class Column {
             String name;

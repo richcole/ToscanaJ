@@ -9,18 +9,27 @@
 package net.sourceforge.toscanaj.view.database;
 
 import net.sourceforge.toscanaj.gui.PanelStackView;
+import net.sourceforge.toscanaj.gui.events.DBSchemeChangedEvent;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.model.DBScheme;
+import net.sourceforge.toscanaj.model.Table;
+import net.sourceforge.toscanaj.util.STD_Iterator;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class SchemeView extends JPanel
+public class SchemeView extends JPanel implements BrokerEventListener
 {
 
-  JList availableTableListPanel;
-  JList selectedTableListPanel;
+    DefaultListModel availableTableList;
+    DefaultListModel selectedTableList;
 
-  public SchemeView(JFrame frame)
+    private DBScheme dbScheme;
+
+  public SchemeView(JFrame frame, EventBroker broker)
   {
       super(new GridLayout(0,1));
       JPanel leftPane = new JPanel(new GridBagLayout());
@@ -29,8 +38,11 @@ public class SchemeView extends JPanel
       JScrollPane leftTopPane = new JScrollPane();
       JScrollPane leftBottomPane = new JScrollPane();
 
-      availableTableListPanel = new JList();
-      selectedTableListPanel = new JList();
+      this.availableTableList = new DefaultListModel();
+      this.selectedTableList = new DefaultListModel();
+
+      JList availableTableListPanel = new JList(this.availableTableList);
+      JList selectedTableListPanel = new JList(this.selectedTableList);
 
       leftTopPane.getViewport().add(availableTableListPanel, null);
       leftBottomPane.getViewport().add(selectedTableListPanel, null);
@@ -73,6 +85,43 @@ public class SchemeView extends JPanel
       splitPane.setOneTouchExpandable(true);
       splitPane.setResizeWeight(0);
       add(splitPane);
+
+      broker.subscribe(this, DBSchemeChangedEvent.class, Object.class);
   }
 
+    class TableInfo {
+        Table table;
+
+        public TableInfo(Table table) {
+            this.table = table;
+        }
+
+        public String toString() {
+            return table.getName();
+        }
+    }
+
+
+    public void processEvent(Event e) {
+
+        System.out.println("DBSchemeChangedEvent received");
+        if ( e instanceof DBSchemeChangedEvent ) {
+            DBSchemeChangedEvent event = (DBSchemeChangedEvent) e;
+            this.dbScheme = event.getDBScheme();
+
+            clear();
+
+            STD_Iterator it = new STD_Iterator(dbScheme.getTables());
+            for(it.reset(); !it.atEnd(); it.next()) {
+                Table table = (Table)it.val();
+                System.out.println("Add Table - " + table.getName());
+                availableTableList.add(0, new TableInfo(table));
+            }
+        }
+    }
+
+    private void clear() {
+        this.availableTableList.clear();
+        this.availableTableList.clear();
+    }
 }

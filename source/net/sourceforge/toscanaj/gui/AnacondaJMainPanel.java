@@ -98,7 +98,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
                               ConceptualSchemaChangeEvent.class,
                               Object.class );
 
-        JPanel tableView = new SchemeView(this);
+        JPanel tableView = new SchemeView(this, eventBroker);
 //        JPanel tableView = new JPanel();
 //        tableView.setBackground(Color.black);
 
