@@ -226,10 +226,12 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		} catch (Throwable t) {
 			// do nothing, we just don't support PDF
 		}
-		try {
-			org.tockit.canvas.imagewriter.PostscriptImageWriter.initialize();
-		} catch (Throwable t) {
-			// do nothing, we just don't support EPS
+		if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "allowEpsExport", 0) == 1) {
+			try {
+				org.tockit.canvas.imagewriter.PostscriptImageWriter.initialize();
+			} catch (Throwable t) {
+				// do nothing, we just don't support EPS
+			}
 		}
 		
 		// the next one is part of JDK 1.4, so it should give us JPG and PNG all the time
