@@ -77,7 +77,14 @@
     <target name="prepareDist">
 		<mkdir dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}/${dist.name}"/>
+	</target>
+	<target name="makeDebugJar" depends="compile,prepareDist">
+		<jar jarfile="${dist.dir}/${dist.name}/${app.name}.jar" basedir="${build.dev.dir}" manifest="${src.dir}/manifest.mf"/>
+	</target>
+	<target name="makeReleaseJar" depends="compileRelease,prepareDist">
 		<jar jarfile="${dist.dir}/${dist.name}/${app.name}.jar" basedir="${build.release.dir}" manifest="${src.dir}/manifest.mf"/>
+	</target>
+	<target name="copyFiles">
         <!-- this copies all files in libs itself, but not the subdiretories ("testing") -->
 		<copy todir="${dist.dir}/${dist.name}/libs" includeEmptyDirs="no">
 			<fileset dir="${libs.dir}">
@@ -103,7 +110,7 @@
 		<fixcrlf srcDir="${dist.dir}/${dist.name}" eol="crlf" includes="*.txt, *.bat, toscanaj.prop"/>
 		<fixcrlf srcDir="${dist.dir}/${dist.name}" eol="lf" includes="*.sh"/>
     </target>
-	<target name="dist" depends="compileRelease,prepareDist,zipFile">
+	<target name="dist" depends="makeReleaseJar,copyFiles,zipFile">
 	</target>
 	<target name="zipFile">
 		<zip destfile="${dist.dir}/${dist.name}-bin.zip">
@@ -112,7 +119,7 @@
 			</fileset>
 		</zip>
 	</target>
-    <target name="splitDist" depends="compileRelease,prepareDist,zipSplitFiles">
+    <target name="splitDist" depends="makeReleaseJar,copyFiles,zipSplitFiles">
 	</target>
     <target name="zipSplitFiles">
 		<zip destfile="${dist.dir}/${dist.name}-core-bin.zip">
