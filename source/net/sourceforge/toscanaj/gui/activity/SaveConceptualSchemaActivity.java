@@ -18,11 +18,9 @@ import java.io.File;
 
 public class SaveConceptualSchemaActivity implements FileActivity, EventBrokerListener {
     private ConceptualSchema conceptualSchema;
-    private EventBroker eventBroker;
 
     public SaveConceptualSchemaActivity(ConceptualSchema conceptualSchema, EventBroker eventBroker) {
         this.conceptualSchema = conceptualSchema;
-        this.eventBroker = eventBroker;
         eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
 
     }

@@ -59,13 +59,9 @@ public class DiagramOrganiser extends JPanel {
      */
     private DiagramHistoryView selectedDiagramsListview;
     
-    private EventBroker eventBroker;
-
 	public DiagramOrganiser(DiagramCollection conceptualSchema, final EventBroker eventBroker) {
         // store model
         this.schema = conceptualSchema;
-        this.eventBroker = eventBroker;
-       	
 		
         // create view components
         removeButton = new JButton();

@@ -40,8 +40,6 @@ public class ToscanaJDiagrams extends HttpServlet {
 	private static double 	viewBoxY;
 	private static double 	viewBoxWidth;
 	private static double 	viewBoxHeight;
-	private static double 	width;
-	private static double 	height;
 	private static double	marginLeft;
 	private static double 	marginRight;
 	private static double 	marginTop;
@@ -92,24 +90,16 @@ public class ToscanaJDiagrams extends HttpServlet {
     	
 		System.out.println("ToscanaJDiagrams: doGet");		
 
-		// global variable initialisation		
-		width = Integer.parseInt(req.getParameter("x")) * 0.7;
-		height = Integer.parseInt(req.getParameter("y")) * 0.8;
-
 		// local variable declaration
 		DiagramHistory 	diagramHistory;
 		PrintWriter 	out;
 		HttpSession 	session;
-//		String 			conceptParameter;
-//		String 			filterConceptParameter;
 		String 			diagramParameter;
 		int			diagramNumber;
 
 		// local variable initialisation
         session 				= req.getSession();
 		out 					= resp.getWriter();
-//        conceptParameter 		= req.getParameter("concept");
-//        filterConceptParameter 	= req.getParameter("filterConcept");
         diagramParameter 		= req.getParameter("diagram");
         diagramHistory 			= (DiagramHistory) session.getAttribute("diagramHistory");
 		diagramNumber 			= Integer.parseInt(diagramParameter);

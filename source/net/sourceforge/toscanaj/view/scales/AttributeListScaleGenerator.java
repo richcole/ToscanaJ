@@ -41,7 +41,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
     }
 
     public Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection) {
-        AttributeListScaleGeneratorDialog scaleDialog = new AttributeListScaleGeneratorDialog(parent, scheme, databaseConnection);
+        AttributeListScaleGeneratorDialog scaleDialog = new AttributeListScaleGeneratorDialog(parent);
         if (!scaleDialog.execute()) {
             return null;
         }

@@ -27,8 +27,6 @@ public class DiagramOrganiserDnDController implements
 	
 	private JList destinationList;
 	
-	private DropTarget dropTarget;
-	
 	private DragSource newDiagramDragSource;
 
 	private DragSource diagramReorderDragSource;
@@ -56,9 +54,6 @@ public class DiagramOrganiserDnDController implements
 		this.diagramReorderDragSource = new DragSource();
 		this.diagramReorderDragSource.createDefaultDragGestureRecognizer(
 								this.destinationList,DnDConstants.ACTION_MOVE ,this);
-		
-		this.dropTarget = new DropTarget(
-								this.destinationList,DnDConstants.ACTION_COPY_OR_MOVE,this);
 	}
 	
 	

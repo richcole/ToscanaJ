@@ -1,8 +1,6 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.model.ConceptualSchema;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -28,9 +26,6 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 	private static final int DEFAULT_NUM_OF_COLS = 2;
 	private static final int DEFAULT_NUM_OF_ROWS = 1;
 
-	private ConceptualSchema conceptualSchema;
-	private DatabaseConnection databaseConnection;
-
 	private boolean result;
 	private boolean useAllCombinations;
 	
@@ -40,10 +35,8 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 	private JScrollPane scrollpane;
 	private JTable table;
 	
-	public AttributeListScaleGeneratorDialog(Frame owner, ConceptualSchema conceptualSchema,DatabaseConnection databaseConnection) {
+	public AttributeListScaleGeneratorDialog(Frame owner) {
 		super(owner,true);
-		this.conceptualSchema = conceptualSchema;
-		this.databaseConnection = databaseConnection;
 		createView();
 	}
 

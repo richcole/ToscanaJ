@@ -56,7 +56,6 @@ import net.sourceforge.toscanaj.view.scales.ContextTableScaleGenerator;
 import net.sourceforge.toscanaj.view.scales.CrossordinalScaleGenerator;
 import net.sourceforge.toscanaj.view.scales.NominalScaleGenerator;
 import net.sourceforge.toscanaj.view.scales.OrdinalScaleGenerator;
-import net.sourceforge.toscanaj.view.scales.ScaleEditingViewDialog;
 import net.sourceforge.toscanaj.view.scales.ScaleGenerator;
 
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
@@ -111,7 +110,6 @@ public class ElbaMainPanel
     /**
      * Views
      */
-    private ScaleEditingViewDialog scaleEditingViewDialog;
     private DiagramEditingView diagramEditingView;
     private DatabaseConnectionInformationView connectionInformationView;
     private XMLEditorDialog schemaDescriptionView;
@@ -202,14 +200,7 @@ public class ElbaMainPanel
 	 * GridBagLayout....
 	 */
     public void createViews() {
-        final JFrame frame = this;
         JPanel mainView = new JPanel(new GridBagLayout());
-        scaleEditingViewDialog =
-            new ScaleEditingViewDialog(
-                frame,
-                conceptualSchema,
-                eventBroker,
-                databaseConnection);
         connectionInformationView =
             new DatabaseConnectionInformationView(
                 this,

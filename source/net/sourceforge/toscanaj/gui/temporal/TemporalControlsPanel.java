@@ -70,7 +70,6 @@ public class TemporalControlsPanel extends JPanel implements EventBrokerListener
 														 Color.ORANGE, Color.PINK, Color.BLACK, Color.YELLOW};
 
     private ManyValuedContext context;
-    private EventBroker eventBroker;
     private JComboBox sequenceColumnChooser;
     private JComboBox timelineColumnChooser;
     private JButton addStaticTransitionsButton;
@@ -104,7 +103,6 @@ public class TemporalControlsPanel extends JPanel implements EventBrokerListener
 	  	super();
 	  	
 	  	this.diagramView = diagramView;
-	  	this.eventBroker = eventBroker;
 	  	
         eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
         diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, DiagramView.class);
