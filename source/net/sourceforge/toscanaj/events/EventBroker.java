@@ -30,46 +30,40 @@ import java.util.*;
  * from different components can be observed.
  *
  * To cause processing of an event one just calls processEvent(Event) with
- * a new object implementing the Event interface. Currently this still happens
- * synchronously, i.e. all listeners to this type of event will be called
- * before the method returns.
- *
- * Note: if subscription changes are requested while events are still processed,
- * the changes will only occur after the current event processing has been
- * finished, but before the next event after that will be processed.
- *
- * @todo probably it would be a better idea to process events one by one, i.e.
- * caching new events until the old ones have been processed, which means adding
- * an event queue to this class. Update documentation above.
+ * a new object implementing the Event interface. This will put the event at
+ * the end of an event queue which will instantly processed. This means events
+ * are processed synchronously if they are not enqueued while other events are
+ * processed. If you enqueue a new event while another is still being processed
+ * (i.e. as reaction on the first event), the new event will be processed after
+ * the processing of the first one has finished.
  */
 public class EventBroker implements EventListener {
+    private class SubscriptionEvent extends StandardEvent {
+        public SubscriptionEvent(Object subject) {
+            super(subject);
+        }
+    }
+
+    private class SubscriptionRemovalEvent extends StandardEvent {
+        public SubscriptionRemovalEvent(Object subject) {
+            super(subject);
+        }
+    }
+
     /**
      * Stores the list of subscriptions.
      */
     private List subscriptions = new ArrayList();
 
     /**
-     * Stores new subscriptions which shall be added to the subsription list.
-     *
-     * This is needed if a new subscription is made while an event is processed,
-     * otherwise a ConcurrentModificationException will be thrown.
+     * The event queue.
      */
-    private List newSubscriptions = new ArrayList();
+    private List eventQueue = new LinkedList();
 
     /**
-     * Stores subscriptions which shall be removed from the subsription list.
-     *
-     * This is needed if a new subscription is removed while an event is processed,
-     * otherwise a ConcurrentModificationException will be thrown.
+     * True if we are already processing some events.
      */
-    private List subscriptionsToRemove = new ArrayList();
-
-    /**
-     * This counts the number of iterators accessing the subscriptions list.
-     *
-     * This is used to avoid accessing the subscription list while someone is still iterating.
-     */
-    private int numberOfSubscriptionIterators = 0;
+    private boolean processingEvents = false;
 
     /**
      * We store the package of this class as constant since Class.getPackage()
@@ -101,7 +95,10 @@ public class EventBroker implements EventListener {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Internal error in EventBroker, class Event not found");
         }
-        newSubscriptions.add(new EventSubscription(listener, eventType, subjectType));
+        this.eventQueue.add(
+                new SubscriptionEvent(
+                        new EventSubscription(listener, eventType, subjectType)));
+        processEvents();
     }
 
     /**
@@ -110,27 +107,13 @@ public class EventBroker implements EventListener {
      * Afterwards the listener will not receive any events anymore.
      */
     public void removeSubscriptions(EventListener listener) {
-        updateSubscriptions();
-        numberOfSubscriptionIterators++;
         for (Iterator iterator = subscriptions.iterator(); iterator.hasNext();) {
             EventSubscription subscription = (EventSubscription) iterator.next();
             if (subscription.getListener().equals(listener)) {
-                subscriptionsToRemove.add(subscription);
+                this.eventQueue.add(new SubscriptionRemovalEvent(subscription));
             }
         }
-        numberOfSubscriptionIterators--;
-    }
-
-    /**
-     * Adds the new subscriptions to the main list.
-     */
-    private void updateSubscriptions() {
-        if(numberOfSubscriptionIterators == 0) {
-            subscriptions.addAll(newSubscriptions);
-            newSubscriptions.clear();
-            subscriptions.removeAll(subscriptionsToRemove);
-            subscriptionsToRemove.clear();
-        }
+        processEvents();
     }
 
     /**
@@ -141,13 +124,42 @@ public class EventBroker implements EventListener {
      *
      * If the subject of the event (Event.getSource()) is not defined (i.e. null) a
      * RuntimeException will be thrown.
+     *
+     * @todo check if we really want this limitation, a null subject could just be sent
+     *       to all listeners of the event type. This is consistent if one sees null as
+     *       universally typed.
      */
     public void processEvent(Event event) {
-        updateSubscriptions();
         if (event.getSubject() == null) {
             throw new RuntimeException("Event needs subject to be processed, null not allowed.");
         }
-        numberOfSubscriptionIterators++;
+        this.eventQueue.add(event);
+        processEvents();
+    }
+
+
+    /**
+     * Processes the current event queue until it is empty.
+     */
+    private void processEvents() {
+        if(processingEvents) {
+            return;
+        }
+        processingEvents = true;
+        while(!eventQueue.isEmpty()) {
+            Event event = (Event) eventQueue.remove(0);
+            if(event instanceof SubscriptionEvent) {
+                this.subscriptions.add(event.getSubject());
+            }
+            else if (event instanceof SubscriptionRemovalEvent) {
+                this.subscriptions.remove(event.getSubject());
+            }
+            processExternalEvent(event);
+        }
+        processingEvents = false;
+    }
+
+    private void processExternalEvent(Event event) {
         for (Iterator iterator = subscriptions.iterator(); iterator.hasNext();) {
             EventSubscription subscription = (EventSubscription) iterator.next();
             if (extendsOrImplements(event.getClass(), subscription.getEventType()) &&
@@ -155,7 +167,6 @@ public class EventBroker implements EventListener {
                 subscription.getListener().processEvent(event);
             }
         }
-        numberOfSubscriptionIterators--;
     }
 
     /**
