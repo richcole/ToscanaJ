@@ -965,8 +965,16 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         this.lastCSCFile = file;
         try {
             new CSCParser().importCSCFile(file, this.conceptualSchema);
-        } catch (DataFormatException e) {
-            ErrorDialog.showError(this, e, "Could not parse file '" + file.getAbsolutePath() + "'");
+        } catch (org.tockit.conscript.parser.DataFormatException e) {
+            ErrorDialog.showError(this, e, "Could not parse file");
+            return;
+        }
+        catch (Exception e) {
+            ErrorDialog.showError(this, e, "Could not parse file");
+            return;
+        }
+        catch (Error e) {
+            ErrorDialog.showError(this, e, "Could not parse file", "Could not parse CSC file");
             return;
         }
     }

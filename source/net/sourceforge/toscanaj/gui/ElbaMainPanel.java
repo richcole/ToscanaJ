@@ -159,6 +159,9 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         mruList = preferences.getStringList("mruFiles");
         createMenuBar();
         
+        this.lastCSCFile = new File(preferences.get("lastCSCFile", ""));
+        this.lastExportFile = new File(preferences.get("lastExportFile", ""));
+        
         // if we have at least one MRU file try to open it
         if (this.mruList.size() > 0) {
             File schemaFile =
@@ -835,7 +838,9 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         preferences.putDouble("minLabelFontSize",
                               this.diagramEditingView.getDiagramView().getMinimumFontSize());
         preferences.putStringList("mruFiles", this.mruList);
-        preferences.putInt("diagramViewDivider", diagramEditingView.getDividerLocation());
+        preferences.putInt("diagramViewDivider", this.diagramEditingView.getDividerLocation());
+        preferences.put("lastCSCFile", this.lastCSCFile.getAbsolutePath());
+        preferences.put("lastExportFile", this.lastExportFile.getAbsolutePath());
         this.diagramEditingView.saveConfigurationSettings();
         System.exit(0);
     }
@@ -985,7 +990,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     private void importCSC(File file) {
         try {
             new CSCParser().importCSCFile(file, this.conceptualSchema);
-        } catch (DataFormatException e) {
+        } catch (org.tockit.conscript.parser.DataFormatException e) {
             ErrorDialog.showError(this, e, "Could not parse file");
             return;
         }

@@ -5,6 +5,7 @@ Affecting different programs:
 =============================
 - grid size now changes with a factor of third root of two. This means after
   three refinements the nodes are all on a grid location again
+- CSC import is greatly enhanced, most importantly it supports include files now
 
 Specific for ToscanaJ:
 ======================
@@ -23,6 +24,8 @@ Specific for Elba:
   boxes (should be more intuitive)
 - after setting up the DB connection, a popup notifies the user about the
   success
+- bugfix: last CSC import and last export location are remembered between program
+  sessions
 
 Specific for Siena (still not fully complete):
 ==============================================
