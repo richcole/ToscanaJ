@@ -3,15 +3,19 @@
 This is an example conceptual schema for ToscanaJ.
 
 It is meant to be used together with a database as defined by the SQL script
-pctest.sql, which should have been provided along this file. A database based
-on this script has to run in a database system that is accessible through
-JDBC.
+pctest.sql, which should have been provided along this file. With the setup
+given this script will be loaded into the embedded database system.
 
-The current setup assumes McKoi is used as database management system. You can
-get McKoi from http://www.mckoi.com, it is a GPLed, Java-based database system.
-Check that the username and password at the beginning match your setup.
+If you want to use another DBMS, you have to change the definition from using
+the <embed> element into something like:
 
-If you want to use another DBMS, you have to change the driver and the url, too.
+   <url driver="sun.jdbc.odbc.JdbcOdbcDriver" user="user" password="secret">
+            jdbc:odbc:PCTest80
+   </url>
+   
+In this example the JDBC-ODBC bridge is used to connect to a data source named
+"PCTest80" with the given username/password combination.
+
 Refer to the documentation of your DBMS which class and URL scheme to use.
 -->
 <conceptualSchema version="TJ0.4">
@@ -24,10 +28,15 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
             <table>PCTest</table>
             <key>PCname</key>
             <queries dropDefaults="false">
-                <!-- distinct queries are not supported by some database systems, e.g. McKoi -->
+                <!-- distinct queries are not supported by some database systems, 
+                     e.g. the embedded HypersonicSQL or McKoi.
+                     You can add this code to query a list of all case types without
+                     duplicates if your database system supports the SQL keyword
+                     "DISTINCT".
                 <listQuery name="Cases" distinct="true">
                     <column>typeCase</column>
                 </listQuery>
+                -->
                 <listQuery name="Name with type of case" head="Case: ">
                     <column name="Case" separator=" - PC: ">typeCase</column>
                     <column name="Name">PCname</column>

@@ -5,24 +5,28 @@ example from a German computer magazine testing Intel80486 based PCs.
 Probably the data has suffered during the different ports of the
 database, but let's assume you won't buy any of them anyway.
 
+The example is set up to use the embedded database engine, you should
+be able to run it straight from an open ToscanaJ.
+
 You should be able to use this example with most database management
-systems, e.g. MySQL or PostGreSQL. It is set up at the moment for using
-McKoi, a GPLed, Java-based database engine, which can be found at this
-place:
+systems, e.g. MySQL or PostGreSQL.
 
-   http://www.mckoi.com
+If you want to use another system, you have to figure out how to access 
+it via JDBC, i.e. you have to find a JDBC driver, get its class name and 
+the URL to access your database. Once you have this information, go into
+the CSX file (e.g. "pctest.csx") and replace the element 
+//conceptualSchema/database/embed with an element with an <url> element
+that matches your setup. This element has to contain the JDBC URL for the
+database, it has to have an attribute "driver" giving the fully qualified
+name of the driver class and it can have the attributes "user" and 
+"password" for access control.
 
-Unless you are using another database engine anyway, we recommend using
-McKoi -- it is powerful enough, easy to use and free. If you want to use
-another system, you have to figure out how to access it via JDBC, i.e.
-you have to find a JDBC driver, get its class name and the URL to access
-your database. Once you have this information, go into the CSX file (e.g.
-"pctest.csx" and change the element //conceptualSchema/database/url to
-match your setup (that is the element <url> in <database> in 
-<conceptualSchema> which contains the class name for the driver, the
-username, the password and the connection URL).
-
-Here is a quick howto for setting up McKoi with the pctest example:
+Here is a quick howto for setting up another Open Source Java based RDBMS
+named McKoi (http://www.mckoi.com) with the pctest example:
+- change the <embed url="pctest.sql"/> in pctest.csx into this:
+    <url driver="com.mckoi.JDBCDriver" 
+         user="user" 
+         password="password">jdbc:mckoi://localhost/</url>
 - get McKoi and unzip it somewhere, this should create a directory
   like "mckoi0.93" (0.93 is the version at the time of writing)
 - go into that directory (and stay there for the next steps)
