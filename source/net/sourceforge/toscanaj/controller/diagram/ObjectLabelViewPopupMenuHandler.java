@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.canvas.events.CanvasItemEvent;
 import net.sourceforge.toscanaj.canvas.events.CanvasItemContextMenuRequestEvent;
+import net.sourceforge.toscanaj.canvas.events.CanvasItemEventWithPosition;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
@@ -38,12 +39,12 @@ public class ObjectLabelViewPopupMenuHandler implements BrokerEventListener {
     }
 
     public void processEvent(Event e) {
-        CanvasItemContextMenuRequestEvent itemEvent = null;
+        CanvasItemEventWithPosition itemEvent = null;
         try {
-            itemEvent = (CanvasItemContextMenuRequestEvent) e;
+            itemEvent = (CanvasItemEventWithPosition) e;
         } catch (ClassCastException e1) {
             throw new RuntimeException(getClass().getName() +
-                    " has to be subscribed to CanvasItemContextMenuRequestEvents only");
+                    " has to be subscribed to CanvasItemEventWithPositions only");
         }
         ObjectLabelView labelView = null;
         try {
