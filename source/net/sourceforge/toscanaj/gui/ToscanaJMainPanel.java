@@ -18,6 +18,7 @@ import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.gui.dialog.DiagramContextDescriptionDialog;
 import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.gui.action.ExportDiagramAction;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.Query;
@@ -32,35 +33,26 @@ import org.tockit.canvas.events.CanvasItemActivatedEvent;
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemSelectedEvent;
 import org.tockit.canvas.imagewriter.DiagramExportSettings;
-import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
-import org.tockit.canvas.imagewriter.ImageGenerationException;
 import org.tockit.events.EventBroker;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
-import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Properties;
 
 
 /**
@@ -100,7 +92,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
     // the actions used in the UI
     private Action openFileAction;
-    private Action exportDiagramAction;
+    private ExportDiagramAction exportDiagramAction;
     private Action goBackAction;
 
     // buttons list
@@ -161,11 +153,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     private String currentFile = null;
 
     /**
-     * Stores the last file where an image was exported to.
-     */
-    private File lastImageExportFile = null;
-
-    /**
      * The last setup for page format given by the user.
      */
     private PageFormat pageFormat = new PageFormat();
@@ -216,11 +203,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             if (schemaFile.canRead()) {
                 openSchemaFile(schemaFile);
             }
-        }
-        // restore the last image export position
-        String lastImage = ConfigurationManager.fetchString("ToscanaJMainPanel", "lastImageExport", null);
-        if (lastImage != null) {
-            this.lastImageExportFile = new File(lastImage);
         }
 
         this.addWindowListener(new WindowAdapter() {
@@ -332,14 +314,16 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         this.openFileAction.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_O));
         this.openFileAction.putValue(Action.ACCELERATOR_KEY,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-        this.exportDiagramAction = new AbstractAction("Export Diagram...") {
-            public void actionPerformed(ActionEvent e) {
-                exportImage();
-            }
-        };
-        this.exportDiagramAction.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_E));
-        this.exportDiagramAction.putValue(Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+
+		// restore the last image export position
+		String lastImage = ConfigurationManager.fetchString("ToscanaJMainPanel", "lastImageExport", null);
+		File lastImageExportFile = null;
+		if (lastImage != null) {
+			lastImageExportFile = new File(lastImage);
+		}
+        this.exportDiagramAction = new ExportDiagramAction( this, 
+        		lastImageExportFile, this.diagramExportSettings, this.diagramView, 
+        		KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
         this.exportDiagramAction.setEnabled(false);
         this.goBackAction = new AbstractAction("Go Back one Diagram") {
             public void actionPerformed(ActionEvent e) {
@@ -819,8 +803,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         // save the MRU list
         ConfigurationManager.storeStringList("ToscanaJMainPanel", "mruFiles", this.mruList);
         // store last image export position
-        if (this.lastImageExportFile != null) {
-            ConfigurationManager.storeString("ToscanaJMainPanel", "lastImageExport", this.lastImageExportFile.getPath());
+        File lastImageExportFile = this.exportDiagramAction.getLastImageExportFile();
+        if ( lastImageExportFile != null) {
+            ConfigurationManager.storeString("ToscanaJMainPanel", "lastImageExport", lastImageExportFile.getPath());
         }
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
@@ -996,277 +981,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     }
 
     /**
-     * Ask the user for a file name and then exports the current diagram as graphic to it.
-     *
-     * If there is no diagram to print we will just return.
-     *
-     * @see #showImageExportOptions()
-     */
-	protected void exportImage() {
-		if (DiagramController.getController().getDiagramHistory().getSize() != 0) {
-			if(this.diagramExportSettings.usesAutoMode()) {
-				exportImageWithAutoMode();
-			} else {
-				exportImageWithManualMode();
-			}
-		}
-    }
-
-	protected void exportImageWithAutoMode() {
-		if (this.lastImageExportFile == null) {
-			this.lastImageExportFile =
-				new File(System.getProperty("user.dir"));
-		}
-		final GraphicFormat graphicFormat = this.diagramExportSettings.getGraphicFormat();
-		if(graphicFormat==null){}
-		final DiagramExportSettings exportSettings= this.diagramExportSettings;
-		final JFileChooser saveDialog =
-			new JFileChooser(this.lastImageExportFile) {
-			public void approveSelection() {
-				File selectedFile = getSelectedFile();
-				if(selectedFile.getName().indexOf('.') == -1) { // check for extension
-					// add default
-					FileFilter filter = getFileFilter();
-					if(filter instanceof ExtensionFileFilter) {
-						ExtensionFileFilter extFileFilter = (ExtensionFileFilter) filter;
-						String[] extensions = extFileFilter.getExtensions();
-						selectedFile = new File(selectedFile.getAbsolutePath() + "."+extensions[0]);
-						setSelectedFile(selectedFile);
-					}	
-				}
-				if (selectedFile != null && selectedFile.exists()) {
-					String warningMessage = "The image file '"	+ selectedFile.getName() + "' already exists.\nDo you want to overwrite the existing file?";
-					if(exportSettings.getSaveCommentsToFile()==true) {
-						File textFile = new File(selectedFile.getAbsoluteFile()+".txt");
-						if(textFile.exists()) {
-						warningMessage = "The files '"	+ selectedFile.getName() + "' and '" + textFile.getName()+ "' already exist.\nDo you want to overwrite the existing files?";
-						}
-					}
-					int response =
-						JOptionPane.showOptionDialog(
-							this,
-							warningMessage,
-							"File Export Warning: File exists",
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.WARNING_MESSAGE,null,new Object[] {"Yes", "No"}, "No");
-					if (response != JOptionPane.YES_OPTION) {
-						return;
-					}
-				}
-				if(selectedFile!=null && !selectedFile.exists() && exportSettings.getSaveCommentsToFile()==true){
-					File textFile = new File(selectedFile.getAbsoluteFile()+".txt");
-					if(textFile.exists()) {
-						int response =
-							JOptionPane.showOptionDialog(
-								this,
-								"The text file '" + textFile.getName()
-								+ "' already exists.\n"
-								+"Do you want to overwrite the existing file?",
-								"File Export Warning: File exists",
-								JOptionPane.YES_NO_OPTION,
-								JOptionPane.WARNING_MESSAGE,null,new Object[] {"Yes", "No"}, "No");
-							if (response != JOptionPane.YES_OPTION) {
-								return;
-							}
-					}
-					
-				}
-				super.approveSelection();
-			}
-		};
-		FileFilter defaultFilter = saveDialog.getFileFilter();
-		Iterator formatIterator = GraphicFormatRegistry.getIterator();
-		while (formatIterator.hasNext()) {
-			GraphicFormat format = (GraphicFormat) formatIterator.next();
-			ExtensionFileFilter fileFilter = new ExtensionFileFilter(format.getExtensions(),format.getName());
-			saveDialog.addChoosableFileFilter(fileFilter);
-			if(format == this.diagramExportSettings.getGraphicFormat()) {
-				defaultFilter = fileFilter;
-			}
-		}
-		saveDialog.setFileFilter(defaultFilter);
-		boolean formatDefined;
-		do {
-			formatDefined = true;
-			int rv = saveDialog.showSaveDialog(this);
-			if (rv == JFileChooser.APPROVE_OPTION) {
-				File selectedFile = saveDialog.getSelectedFile();
-				FileFilter fileFilter = saveDialog.getFileFilter();
-				if(fileFilter instanceof ExtensionFileFilter) {
-					ExtensionFileFilter extFileFilter = (ExtensionFileFilter) fileFilter;
-					String[] extensions = extFileFilter.getExtensions();
-					if (selectedFile.getName().indexOf('.') == -1) {
-						selectedFile = new File(selectedFile.getAbsolutePath() + "." + extensions[0]);
-					}
-				}
-				GraphicFormat format =
-					GraphicFormatRegistry.getTypeByExtension(
-						selectedFile);
-				if (format != null) {
-					this.diagramExportSettings.setGraphicFormat(format);
-				} else {
-					if(selectedFile.getName().indexOf('.') != -1) {
-						JOptionPane.showMessageDialog(
-							this,
-							"Sorry, no type with this extension known.\n"
-								+ "Please use either another extension or try\n"
-								+ "manual settings.",
-							"Export failed",
-							JOptionPane.ERROR_MESSAGE);
-					} else {
-						JOptionPane.showMessageDialog(
-							this,
-							"No extension given.\n" +
-							"Please give an extension or pick a file type\n" +
-							"from the options.",
-							"Export failed",
-							JOptionPane.ERROR_MESSAGE);
-					}	
-					formatDefined = false;
-				}
-
-				if (formatDefined) {
-					exportImage(selectedFile);
-				}
-			}
-		} while (formatDefined == false);
-	}
-
-	protected void exportImage(File selectedFile){
-		try {
-			// Get title of the current diagram
-			String title = "";
-			String lineSeparator = System.getProperty("line.separator");
-			DiagramHistory diagramHistory = DiagramController.getController().getDiagramHistory(); 
-			int numCurDiag = diagramHistory.getNumberOfCurrentDiagrams();
-			int firstCurrentPos = diagramHistory.getFirstCurrentDiagramPosition();
-			for(int i=0; i<numCurDiag; i++) { 
-				title += diagramHistory.getElementAt(i+firstCurrentPos).toString();
-				if( i < numCurDiag-1 ){
-				title += " / ";
-				}
-				if ( (i == numCurDiag-1) && numCurDiag >1) {
-					title += " ( Outer diagram / Inner diagram )";
-				}
-			}			
-			
-			// Get description of the diagrams
-			String description = DiagramController.getController().getDiagramHistory().getTextualDescription();
-			
-			// Put title and desc in properties
-			Properties metadata = new Properties();
-			metadata.setProperty("title", title);
-			metadata.setProperty("description", description.trim());
-			this
-				.diagramExportSettings
-				.getGraphicFormat()
-				.getWriter()
-				.exportGraphic(
-				this.diagramView,
-				this.diagramExportSettings,
-				selectedFile,
-				metadata);
-				if(this.diagramExportSettings.getSaveCommentsToFile()==true){
-					try{
-						PrintWriter out = new PrintWriter(new FileWriter(new File(selectedFile.getAbsolutePath()+".txt")));
-						out.println("The diagram(s) you have viewed for the resulting image: "+System.getProperty("line.separator")+selectedFile.getAbsolutePath());
-						DateFormat dateFormatter = DateFormat.getDateTimeInstance();
-						out.println("as at "+dateFormatter.format(new Date(System.currentTimeMillis()))+" is(are): ");
-						out.println();
-						out.println(DiagramController.getController().getDiagramHistory().getTextualDescription());
-						out.close();
-					}catch(IOException e){
-						ErrorDialog.showError(this, e, "Exporting text file error");
-					}
-				}
-				if(this.diagramExportSettings.getSaveCommentToClipboard()==true){
-					DateFormat dateFormatter = DateFormat.getDateTimeInstance();
-					String header ="The diagram(s) you have viewed for the resulting image:\n"
-					+selectedFile.getAbsolutePath()+"\n"
-					+"as at "+dateFormatter.format(new Date(System.currentTimeMillis()))+" is(are): \n";
-					StringSelection comments = new StringSelection(header+"\n"+DiagramController.getController().getDiagramHistory().getTextualDescription());
-					Clipboard systemClipboard = getToolkit().getSystemClipboard();
-					systemClipboard.setContents(comments,ToscanaJMainPanel.this);
-				}
-		} catch (ImageGenerationException e) {
-			ErrorDialog.showError(this, e, "Exporting image error");
-		} catch (OutOfMemoryError e) {
-			ErrorDialog.showError(
-				this,
-				"Out of memory",
-				"Not enough memory available to export\n"
-					+ "the diagram in this size");
-		}
-		this.lastImageExportFile = selectedFile;
-	}
- 
-	protected void exportImageWithManualMode() {
-		if (this.lastImageExportFile == null) {
-			this.lastImageExportFile =
-				new File(System.getProperty("user.dir"));
-		}
-		final GraphicFormat format = this.diagramExportSettings.getGraphicFormat();
-		final DiagramExportSettings exportSettings = this.diagramExportSettings;
-		final JFileChooser saveDialog =
-			new JFileChooser(this.lastImageExportFile) {
-				public void approveSelection() {
-					File selectedFile = getSelectedFile();
-					if(selectedFile.getName().indexOf('.') == -1) { // check for extension
-						// add default
-						String[] extensions = format.getExtensions();
-						selectedFile = new File(selectedFile.getAbsolutePath() + "."+extensions[0]);
-						setSelectedFile(selectedFile);
-					}
-					if (selectedFile != null && selectedFile.exists()) {
-						String warningMessage = "The image file '"	+ selectedFile.getName() + "' already exists.\nDo you want to overwrite the existing file?";
-						if(exportSettings.getSaveCommentsToFile()==true) {
-							File textFile = new File(selectedFile.getAbsoluteFile()+".txt");
-							if(textFile.exists()) {
-								warningMessage = "The files '"	+ selectedFile.getName() + "' and '" + textFile.getName()+ "' already exist.\nDo you want to overwrite the existing files?";
-							}
-						}
-						int response =
-							JOptionPane.showOptionDialog(
-							this,
-							warningMessage,
-							"File Export Warning: File exists",
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.WARNING_MESSAGE,null,new Object[] {"Yes", "No"}, "No");
-						if (response != JOptionPane.YES_OPTION) {
-							return;
-						}
-					}
-					if(selectedFile!=null && !selectedFile.exists() && exportSettings.getSaveCommentsToFile()==true){
-						File textFile = new File(selectedFile.getAbsoluteFile()+".txt");
-						if(textFile.exists()) {
-							int response =
-								JOptionPane.showOptionDialog(
-								this,
-								"The text file '" + textFile.getName()
-								+ "' already exists.\n"
-								+"Do you want to overwrite the existing file?",
-								"File Export Warning: File exists",
-								JOptionPane.YES_NO_OPTION,
-								JOptionPane.WARNING_MESSAGE,null,new Object[] {"Yes", "No"}, "No");
-							if (response != JOptionPane.YES_OPTION) {
-								return;
-							}
-						}
-					}
-					super.approveSelection();
-				}
-			};
-		GraphicFormat currentFormat = diagramExportSettings.getGraphicFormat();
-		ExtensionFileFilter manualFileFilter = new ExtensionFileFilter(currentFormat.getExtensions(),currentFormat.getName());
-		saveDialog.addChoosableFileFilter(manualFileFilter);
-		int rv = saveDialog.showSaveDialog(this);
-		if (rv == JFileChooser.APPROVE_OPTION) {
-			File selectedFile = saveDialog.getSelectedFile();
-			exportImage(selectedFile);
-		}
-	}
- 
-    /**
      * Shows the dialog to change the image export options.
      *
      * If the dialog is closed by pressing ok, the settings will be stored and an
@@ -1277,11 +991,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             this.diagramExportSettings.setImageSize(this.diagramView.getWidth(), this.diagramView.getHeight());
         }
         DiagramExportSettingsDialog.initialize(this, this.diagramExportSettings);
-        DiagramExportSettings rv = DiagramExportSettingsDialog.showDialog(this);
-        if (rv != null) {
-            this.diagramExportSettings = rv;
-            // probably the user wants to export now -- just give him the chance if possible
-            exportImage();
+        boolean changesDone = DiagramExportSettingsDialog.showDialog(this);
+        if (changesDone) {
+            this.exportDiagramAction.exportImage();
         }
     }
 

@@ -40,7 +40,9 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
     /**
      * The data used.
      */
-    static private DiagramExportSettings diagramSettings = null;
+    private DiagramExportSettings diagramSettings;
+    
+    private boolean dialogCancelled = false;
 
     private JRadioButton manual;
     private JRadioButton auto;
@@ -58,52 +60,148 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
      */
     private DiagramExportSettingsDialog(Frame frame, DiagramExportSettings settings) {
         super(frame, "Export Diagram Setup", true);
-        JLabel modeLabel = new JLabel();
-        modeLabel.setText("Mode:");
+        
+        this.diagramSettings = settings;
+        
+		buildPanel();
 
-        ButtonGroup manualOrAuto = new ButtonGroup();
+		this.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				cancelDialog();
+			}
+		});
+    }
 
-        auto = new JRadioButton("Auto");
-        auto.addActionListener(this);
-        auto.setSelected(settings.usesAutoMode());
-        manualOrAuto.add(auto);
-        manual = new JRadioButton("Manual");
-        manual.addActionListener(this);
-        manual.setSelected(!settings.usesAutoMode());
-        manualOrAuto.add(manual);
+	private void buildPanel() {
+		JLabel modeLabel = new JLabel();
+		modeLabel.setText("Mode:");
+		JPanel modePanel = createModePanel();
+		
+		JLabel historyLabel = new JLabel();
+		historyLabel.setText("History: ");
+		JPanel historyPanel = createHistoryPanel();
+		
+		JPanel buttonPanel = createButtonPanel();
+		
+		GridBagLayout gridBagLayout = new GridBagLayout();
+		this.getContentPane().setLayout(gridBagLayout);
+		this.getContentPane().add(modeLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
+			   , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(-70, 5, 0, 15), 0, 0));
+		this.getContentPane().add(modePanel, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0
+					   , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 0, 0, 0), 200, 0));
+		this.getContentPane().add(historyLabel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
+			   , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(10, 5, 0, 15), 0, 0));
+		this.getContentPane().add(historyPanel, new GridBagConstraints(1, 1, 3, 1, 1.0, 0.0
+			   , GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 200, 0));
+		this.getContentPane().add(buttonPanel, new GridBagConstraints(0, 5, 4, 1, 1.0, 0.0
+				, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(10, 0, 0, 0), 1, 0));
+		this.getContentPane().add(new JPanel(), new GridBagConstraints(0, 6, 5, 1, 1.0, 1.0
+				, GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 1, 1));
+		pack();
+	}
 
-        formatLabel = new JLabel();
-        formatLabel.setText("Format:");
-		formatLabel.setEnabled(!settings.usesAutoMode());
-        formatSelector = new JComboBox();
-        Iterator it = GraphicFormatRegistry.getIterator();
-        while (it.hasNext()) {
-            formatSelector.addItem(it.next());
-        }
-        formatSelector.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-        GraphicFormat graphicFormat = settings.getGraphicFormat();
-        if(graphicFormat != null) {
+	private JPanel createButtonPanel() {
+		final JButton cancelButton = new JButton("Cancel");
+		cancelButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+				cancelDialog();
+		    }
+		});
+		
+		final JButton okButton = new JButton("OK");
+		okButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+		        diagramSettings.setGraphicFormat((GraphicFormat) formatSelector.getSelectedItem());
+		        diagramSettings.setImageSize(Integer.parseInt(widthField.getText()),
+						Integer.parseInt(heightField.getText()));
+		        diagramSettings.setAutoMode(auto.isSelected());
+		        if (saveToFileCheckBox.isSelected()) {
+					diagramSettings.setSaveCommentsToFile(true);
+				} else {
+					diagramSettings.setSaveCommentsToFile(false);
+				}
+				if (copyToClipboardCheckBox.isSelected()) {
+					diagramSettings.setSaveCommentToClipboard(true);
+				} else {
+					diagramSettings.setSaveCommentToClipboard(false);
+				}
+				
+		        closeDialog();
+		    }
+		});
+		getRootPane().setDefaultButton(okButton);
+		
+		JPanel buttonPanel = new JPanel();
+		GridBagLayout buttonLayout = new GridBagLayout();
+		buttonPanel.setLayout(buttonLayout);
+		buttonPanel.add(cancelButton, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+		        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 1, 0));
+		buttonPanel.add(okButton, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
+		        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 1, 0));
+		return buttonPanel;
+	}
+
+	protected void cancelDialog() {
+		this.dialogCancelled = true;
+		closeDialog();
+	}
+
+	private JPanel createHistoryPanel() {
+		JPanel historyPanel = new JPanel(new GridBagLayout());
+		historyPanel.setBorder(BorderFactory.createEtchedBorder());
+		saveToFileCheckBox = new JCheckBox("Save to file", this.diagramSettings.getSaveCommentsToFile());
+		copyToClipboardCheckBox = new JCheckBox("Copy to clipboard", this.diagramSettings.getSaveCommentToClipboard());
+		historyPanel.add(saveToFileCheckBox, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 0, 5), 200, 0));
+		historyPanel.add(copyToClipboardCheckBox, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
+				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 0, 5), 200, 0));
+		return historyPanel;
+	}
+
+	private JPanel createModePanel() {
+		ButtonGroup manualOrAuto = new ButtonGroup();
+		
+		auto = new JRadioButton("Auto");
+		auto.addActionListener(this);
+		auto.setSelected(this.diagramSettings.usesAutoMode());
+		manualOrAuto.add(auto);
+		manual = new JRadioButton("Manual");
+		manual.addActionListener(this);
+		manual.setSelected(!this.diagramSettings.usesAutoMode());
+		manualOrAuto.add(manual);
+		
+		formatLabel = new JLabel();
+		formatLabel.setText("Format:");
+		formatLabel.setEnabled(!this.diagramSettings.usesAutoMode());
+		formatSelector = new JComboBox();
+		Iterator it = GraphicFormatRegistry.getIterator();
+		while (it.hasNext()) {
+		    formatSelector.addItem(it.next());
+		}
+		formatSelector.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
+		GraphicFormat graphicFormat = this.diagramSettings.getGraphicFormat();
+		if(graphicFormat != null) {
 			formatSelector.setSelectedItem(graphicFormat);
-        }
-        formatSelector.setEnabled(!settings.usesAutoMode());
-       
-        widthLabel = new JLabel();
-        widthLabel.setText("Width:");
-		widthLabel.setEnabled(!settings.usesAutoMode());
-        widthField = new JTextField();
-        widthField.setText(String.valueOf(settings.getImageWidth()));
-        widthField.setEnabled(false);
-        widthField.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-        widthField.setEnabled(!settings.usesAutoMode());
-
-        heightLabel = new JLabel();
-        heightLabel.setText("Height:");
-		heightLabel.setEnabled(!settings.usesAutoMode());
-        heightField = new JTextField();
-        heightField.setText(String.valueOf(settings.getImageHeight()));
-        heightField.setEnabled(false);
-        heightField.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-        heightField.setEnabled(!settings.usesAutoMode());
+		}
+		formatSelector.setEnabled(!this.diagramSettings.usesAutoMode());
+		
+		widthLabel = new JLabel();
+		widthLabel.setText("Width:");
+		widthLabel.setEnabled(!this.diagramSettings.usesAutoMode());
+		widthField = new JTextField();
+		widthField.setText(String.valueOf(this.diagramSettings.getImageWidth()));
+		widthField.setEnabled(false);
+		widthField.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
+		widthField.setEnabled(!this.diagramSettings.usesAutoMode());
+		
+		heightLabel = new JLabel();
+		heightLabel.setText("Height:");
+		heightLabel.setEnabled(!this.diagramSettings.usesAutoMode());
+		heightField = new JTextField();
+		heightField.setText(String.valueOf(this.diagramSettings.getImageHeight()));
+		heightField.setEnabled(false);
+		heightField.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
+		heightField.setEnabled(!this.diagramSettings.usesAutoMode());
 		
 		//add the items of the same classification to a JPanel
 		JPanel modePanel = new JPanel(new GridBagLayout());
@@ -124,78 +222,8 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
 		  	GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(0, 5, 0, 20), 0, 0));
 		modePanel.add(heightField, new GridBagConstraints(1, 3, 2, 1, 1.0, 0.0,
 		 	GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 0, 0), 200, 0));		
-		
-		
-		JLabel historyLabel = new JLabel();
-		historyLabel.setText("History: ");
-		JPanel historyPanel = new JPanel(new GridBagLayout());
-		historyPanel.setBorder(BorderFactory.createEtchedBorder());
-		saveToFileCheckBox = new JCheckBox("Save to file", settings.getSaveCommentsToFile());
-		saveToFileCheckBox.setSelected(settings.getSaveCommentsToFile());
-		copyToClipboardCheckBox = new JCheckBox("Copy to clipboard", settings.getSaveCommentToClipboard());
-		copyToClipboardCheckBox.setSelected(settings.getSaveCommentToClipboard());
-		historyPanel.add(saveToFileCheckBox, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 0, 5), 200, 0));
-		historyPanel.add(copyToClipboardCheckBox, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
-				GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 0, 5), 200, 0));
-
-        //buttons
-        final JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                diagramSettings = null;
-                closeDialog();
-            }
-        });
-
-        this.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                closeDialog();
-            }
-        });
-        
-        final JButton okButton = new JButton("OK");
-        okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                diagramSettings = new DiagramExportSettings((GraphicFormat) formatSelector.getSelectedItem(),
-                        Integer.parseInt(widthField.getText()),
-                        Integer.parseInt(heightField.getText()),
-                        auto.isSelected());
-               	if (saveToFileCheckBox.isSelected()) {
-					diagramSettings.setSaveCommentsToFile(true);
-				}
-				if (copyToClipboardCheckBox.isSelected()) {
-					diagramSettings.setSaveCommentToClipboard(true);
-				}  
-                closeDialog();
-            }
-        });
-        getRootPane().setDefaultButton(okButton);
-		
-        JPanel buttonPanel = new JPanel();
-        GridBagLayout buttonLayout = new GridBagLayout();
-        buttonPanel.setLayout(buttonLayout);
-        buttonPanel.add(cancelButton, new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
-                GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 1, 0));
-        buttonPanel.add(okButton, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 1, 0));
-	
-		GridBagLayout gridBagLayout = new GridBagLayout();
-	   this.getContentPane().setLayout(gridBagLayout);
-	   this.getContentPane().add(modeLabel, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0
-			   , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(-70, 5, 0, 15), 0, 0));
-		this.getContentPane().add(modePanel, new GridBagConstraints(1, 0, 1, 1, 1.0, 0.0
-					   , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(5, 0, 0, 0), 200, 0));
-	   this.getContentPane().add(historyLabel, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
-			   , GridBagConstraints.WEST, GridBagConstraints.NONE, new Insets(10, 5, 0, 15), 0, 0));
-	   this.getContentPane().add(historyPanel, new GridBagConstraints(1, 1, 3, 1, 1.0, 0.0
-			   , GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, new Insets(10, 0, 0, 0), 200, 0));
-	   this.getContentPane().add(buttonPanel, new GridBagConstraints(0, 5, 4, 1, 1.0, 0.0
-				, GridBagConstraints.EAST, GridBagConstraints.NONE, new Insets(10, 0, 0, 0), 1, 0));
-	   this.getContentPane().add(new JPanel(), new GridBagConstraints(0, 6, 5, 1, 1.0, 1.0
-				, GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 1, 1));
-       pack();
-    }
+		return modePanel;
+	}
 
     protected void closeDialog() {
         DiagramExportSettingsDialog.dialog.setVisible(false);
@@ -228,8 +256,10 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
      * The argument should be null if you want the dialog to come up in
      * the center of the screen.  Otherwise, the argument should be the
      * component on top of which the dialog should appear.
+     * 
+     * The return value is true if the user pressed ok, false otherwise.
      */
-    public static DiagramExportSettings showDialog(Component comp) {
+    public static boolean showDialog(Component comp) {
         if (dialog != null) {
             dialog.setLocationRelativeTo(comp);
             ConfigurationManager.restorePlacement("DiagramExportSettingsDialog", dialog,
@@ -239,6 +269,6 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
             System.err.println("DiagramExportSettingsDialog has to be initialize(..)d " +
                     "before showDialog(..) is called.");
         }
-        return diagramSettings;
+        return !dialog.dialogCancelled;
     }
 }
