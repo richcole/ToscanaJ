@@ -21,6 +21,7 @@ import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Query;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
@@ -449,7 +450,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         viewMenu.add(this.showAllMenuItem);
         viewMenu.addSeparator();
 
-        if (ConfigurationManager.fetchInt("ToscanaJMainPanel","offerGradientOptions",0) == 1) {
+        if (ConfigurationManager.fetchInt("ToscanaJMainPanel", "offerGradientOptions", 0) == 1) {
             ButtonGroup colorGradientGroup = new ButtonGroup();
             JRadioButtonMenuItem showAllMenuItem = new JRadioButtonMenuItem("Use colors for exact matches");
             showAllMenuItem.setMnemonic(KeyEvent.VK_C);
@@ -457,7 +458,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK));
             showAllMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    diagramView.getDiagramSchema().setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT );
+                    diagramView.getDiagramSchema().setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT);
                     diagramView.update(this);
                 }
             });
@@ -477,7 +478,6 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
             });
             colorGradientGroup.add(showExactMenuItem);
             viewMenu.add(showExactMenuItem);
-            viewMenu.addSeparator();
         }
 
         // menu radio buttons group:
@@ -489,42 +489,45 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
          */
         if (this.conceptualSchema != null) {
             Iterator it = this.conceptualSchema.getQueries().iterator();
-            boolean first = true;
-            String allowedChars = "abcdefghijklmnopqrstuvwxyz";
-            String usedChars = "ax";
-            int count = 0;
-            while (it.hasNext()) {
-                final Query query = (Query) it.next();
-                count++;
-                String name = query.getName();
-                JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);
-                for (int i = 0; i < name.length(); i++) {
-                    char c = name.toLowerCase().charAt(i);
-                    if ((allowedChars.indexOf(c) != -1) && (usedChars.indexOf(c) == -1)) {
-                        menuItem.setMnemonic(KeyEvent.VK_A + allowedChars.indexOf(c));
-                        usedChars += c;
-                        break;
+            if (it.hasNext()) {
+                viewMenu.addSeparator();
+                boolean first = true;
+                String allowedChars = "abcdefghijklmnopqrstuvwxyz";
+                String usedChars = "ax";
+                int count = 0;
+                while (it.hasNext()) {
+                    final Query query = (Query) it.next();
+                    count++;
+                    String name = query.getName();
+                    JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);
+                    for (int i = 0; i < name.length(); i++) {
+                        char c = name.toLowerCase().charAt(i);
+                        if ((allowedChars.indexOf(c) != -1) && (usedChars.indexOf(c) == -1)) {
+                            menuItem.setMnemonic(KeyEvent.VK_A + allowedChars.indexOf(c));
+                            usedChars += c;
+                            break;
+                        }
                     }
-                }
-                if (count < 10) { // first ones get their number (starting with 1)
-                    menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                            KeyEvent.VK_0 + count, ActionEvent.ALT_MASK));
-                }
-                if (count == 10) { // tenth gets the zero
-                    menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                            KeyEvent.VK_0, ActionEvent.ALT_MASK));
-                } // others don't get an accelerator
-                menuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
+                    if (count < 10) { // first ones get their number (starting with 1)
+                        menuItem.setAccelerator(KeyStroke.getKeyStroke(
+                                KeyEvent.VK_0 + count, ActionEvent.ALT_MASK));
+                    }
+                    if (count == 10) { // tenth gets the zero
+                        menuItem.setAccelerator(KeyStroke.getKeyStroke(
+                                KeyEvent.VK_0, ActionEvent.ALT_MASK));
+                    } // others don't get an accelerator
+                    menuItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            diagramView.setQuery(query);
+                        }
+                    });
+                    labelContentGroup.add(menuItem);
+                    viewMenu.add(menuItem);
+                    if (first == true) {
+                        first = false;
+                        menuItem.setSelected(true);
                         diagramView.setQuery(query);
                     }
-                });
-                labelContentGroup.add(menuItem);
-                viewMenu.add(menuItem);
-                if (first == true) {
-                    first = false;
-                    menuItem.setSelected(true);
-                    diagramView.setQuery(query);
                 }
             }
         }
@@ -764,12 +767,16 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 return;
             }
         }
+        DatabaseInfo databaseInfo;
         try {
             conceptualSchema = CSXParser.parse(broker, schemaFile);
-            DatabaseConnection.getConnection().connect(conceptualSchema.getDatabaseInfo());
-            URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
-            if (location != null) {
-                DatabaseConnection.getConnection().executeScript(location);
+            databaseInfo = conceptualSchema.getDatabaseInfo();
+            if (databaseInfo != null) {
+                DatabaseConnection.getConnection().connect(databaseInfo);
+                URL location = databaseInfo.getEmbeddedSQLLocation();
+                if (location != null) {
+                    DatabaseConnection.getConnection().executeScript(location);
+                }
             }
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(this, e, "File access error", e.getMessage());
@@ -791,8 +798,12 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         }
         diagramView.showDiagram(null);
         DiagramController controller = DiagramController.getController();
-        DatabaseConnectedConceptInterpreter interpreter =
-                new DatabaseConnectedConceptInterpreter(conceptualSchema.getDatabaseInfo());
+        ConceptInterpreter interpreter = null;
+        if (databaseInfo != null) {
+            interpreter = new DatabaseConnectedConceptInterpreter(databaseInfo);
+        } else {
+            interpreter = new DirectConceptInterpreter();
+        }
         ConceptInterpretationContext interpretationContext = new ConceptInterpretationContext(controller.getDiagramHistory(),
                 broker);
         diagramView.setConceptInterpreter(interpreter);

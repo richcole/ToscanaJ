@@ -112,18 +112,20 @@ public class ObjectLabelView extends LabelView {
         /// @todo try to get the distinction of query/no query somehow out of here
         DiagramNode node = this.labelInfo.getNode();
         ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
-        if (query != null) {
-            DatabaseConnectedConceptInterpreter conceptInterpreter =
-                                (DatabaseConnectedConceptInterpreter) this.diagramView.getConceptInterpreter();
-            contents = conceptInterpreter.executeQuery(query, node.getConcept(), context);
-        }
-        else {
+        if ((query == null) || (query == ListQuery.KeyListQuery)) {
             contents = new ArrayList();
             Iterator it = this.diagramView.getConceptInterpreter().getObjectSetIterator(node.getConcept(), context);
             while (it.hasNext()) {
-                Object o = (Object) it.next();
+                Object o = it.next();
                 contents.add(o);
             }
+        } else if (query == AggregateQuery.CountQuery) {
+            contents = new ArrayList();
+            contents.add(new Integer(this.diagramView.getConceptInterpreter().getObjectCount(node.getConcept(), context)));
+        } else {
+            DatabaseConnectedConceptInterpreter conceptInterpreter =
+                                (DatabaseConnectedConceptInterpreter) this.diagramView.getConceptInterpreter();
+            contents = conceptInterpreter.executeQuery(query, node.getConcept(), context);
         }
     }
 

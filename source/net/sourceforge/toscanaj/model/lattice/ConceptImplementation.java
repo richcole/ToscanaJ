@@ -245,7 +245,7 @@ public class ConceptImplementation implements Concept {
     protected void fillAttributeContingentElement(Element attributeContingentElem) {
         Iterator attrIt = getAttributeContingentIterator();
         while (attrIt.hasNext()) {
-            Object o = (Object) attrIt.next();
+            Object o = attrIt.next();
             Element attribElem = new Element(ATTRIBUTE_ELEMENT_NAME);
             attribElem.addContent(o.toString());
             attributeContingentElem.addContent(attribElem);
@@ -255,7 +255,7 @@ public class ConceptImplementation implements Concept {
     protected void fillObjectContingentElement(Element objectContingentElem) {
         Iterator objIt = getObjectContingentIterator();
         while (objIt.hasNext()) {
-            Object o = (Object) objIt.next();
+            Object o = objIt.next();
             Element objectElem = new Element(OBJECT_ELEMENT_NAME);
             objectElem.addContent(o.toString());
             objectContingentElem.addContent(objectElem);

@@ -32,7 +32,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     /**
      * The database information.
      */
-    private DatabaseInfo databaseInfo;
+    private DatabaseInfo databaseInfo = null;
 
     /**
      * The event broker for administering the conceptual scheme events.
@@ -123,13 +123,13 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         } else {
             description = null;
         }
-        databaseInfo = new DatabaseInfo(
-                XMLHelper.mustbe(DatabaseInfo.DATABASE_CONNECTION_ELEMENT_NAME, elem)
-        );
-        if (XMLHelper.contains(elem, DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME)) {
-            dbScheme = new DatabaseSchema(eventBroker, elem.getChild(DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME));
-        } else {
-            dbScheme = new DatabaseSchema(eventBroker);
+        if (XMLHelper.contains(elem, DatabaseInfo.DATABASE_CONNECTION_ELEMENT_NAME)) {
+            databaseInfo = new DatabaseInfo(elem.getChild(DatabaseInfo.DATABASE_CONNECTION_ELEMENT_NAME));
+            if (XMLHelper.contains(elem, DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME)) {
+                dbScheme = new DatabaseSchema(eventBroker, elem.getChild(DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME));
+            } else {
+                dbScheme = new DatabaseSchema(eventBroker);
+            }
         }
         /// @todo change this once DatabaseViewers are one the schema itself
         Element viewsElem = elem.getChild(VIEWS_ELEMENT_NAME);
@@ -170,7 +170,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
      * Deletes all schema content, rendering the schema empty.
      */
     public void reset() {
-        databaseInfo = new DatabaseInfo();
+        databaseInfo = null;
         diagrams = new Vector();
         hasDiagramDescription = false;
         scales = CollectionFactory.createDefaultList();

@@ -43,12 +43,6 @@ public class CSXParser {
     private static ConceptualSchema _Schema;
 
     /**
-     * The database connection is created here and attached to each concept
-     * if a database is used.
-     */
-    // remove: private static DatabaseConnection _DatabaseConnection = null;
-
-    /**
      * Stores the JDOM document used.
      *
      * This is done to easily split the parse code in separate parts.
@@ -151,7 +145,9 @@ public class CSXParser {
         // check if database should be used and fetch the data if needed
         Element dbElem = contextElem.getChild("databaseConnection");
         if (dbElem == null) {
-            throw new DataFormatException("<databaseConnection> not defined in conceptual schema");
+            _Schema.addQuery(ListQuery.KeyListQuery);
+            _Schema.addQuery(AggregateQuery.CountQuery);
+            return;
         }
         DatabaseInfo dbInfo = new DatabaseInfo();
         parseDBInfo(dbInfo, dbElem);
