@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>ToscanaJ Release Howto</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+</head>
+<body>
+<h1>Release Howto for ToscanaJ</h1>
+<h2>Creating the distribution</h2>
+<h3>Creating the release branch</h3>
+As a first step the release branch in CVS should be created. The version
+on the trunk where the release branch starts should be tagged "ReleaseRoot#_#"
+and the branch itself "ReleaseBranch#_#" where the #_# stands for the version
+number, e.g. "1_0" for the first official release. At least the three modules
+<tt>source,</tt> <tt>libs</tt> and <tt>examples</tt> should be branched.
+<i>Note:</i> <i>older versions used a different naming scheme, ignore them.<br>
+</i>
+<h3>Checking out the release branch</h3>
+Once the branch has been made, check the three modules out into a new sandbox.<br>
+<h3>Changing the version numbers</h3>
+There are some version numbers to change. One is at the top of the <tt>build.xml</tt>
+file, a property called <tt>dist-name</tt>, which defines the name of the
+tarball and the directory in it. Another one is found as a static string
+called <tt>VersionString</tt> in <tt>net.sourceforge.toscanaj.ToscanaJ</tt>
+which is used in the about dialog. Commit the changes to the branch. <i>Note:
+check if AnacondaJ has a version by now.</i><br>
+<h3>Compiling</h3>
+Once everything has been changed you can just run the <tt>dist</tt> target
+in the build script to get the distribution. To be sure you can run<br>
+<pre>    ant clean dist<br></pre>
+which does a full rebuild. You should get a directory <tt>dist</tt> beneath
+the three modules from CVS which contains a directory for the new ToscanaJ
+version.<br>
+<h2>Testing</h2>
+We still lack a functional test suite, but the tarball created in the last
+step should at least be run by some persons on different platforms, using
+as many features as they can come up with. For distribution of the tarball
+some normal webspace should be used, do not use the file release system from
+sourceforge yet.<br>
+<h2>Release the program on SF</h2>
+These steps are needed to get the release into the file release system on
+Sourceforge:<br>
+<ol>
+  <li>upload the <tt>ToscanaJ*.tgz</tt> file into the <tt>incoming</tt> directory
+on <tt>upload.sf.net</tt> using anonymous ftp.</li>
+  <li>log into Sourceforge as a project administrator</li>
+  <li>go to the <tt>Admin</tt> section, select "Edit/Release Files" there</li>
+  <li>click "Add Release" on the "toscanaj" package</li>
+  <li>the release name is just the version number, e.g. "1.0"</li>
+  <li>add release notes and change log, submit (I typically use preformatted
+text)</li>
+  <li>add the uploaded file and submit</li>
+  <li>change the file settings to reflect the processor and file type (I
+go for "Any" and ".gz")</li>
+  <li>if someone monitors the package, send email</li>
+</ol>
+<h2>Announce release</h2>
+At the moment the program is announced in three places:<br>
+<ol>
+  <li>the Sourceforge news system (go into the <tt>News</tt> section and
+call "Submit" there)</li>
+  <li>Freshmeat</li>
+  <li>The FCA list (fca-list@aifb.uni-karlsruhe.de)<br>
+  </li>
+</ol>
+<br>
+</body>
+</html>
