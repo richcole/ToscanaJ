@@ -14,7 +14,8 @@ public class Lucca {
      *  Main method for running the program
      */
     public static void main(String[] args) {
-        final LuccaMainPanel mainWindow;
+		ToscanaJ.testJavaVersion();
+		final LuccaMainPanel mainWindow;
         mainWindow = new LuccaMainPanel();
         mainWindow.setVisible(true);
     }

@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj;
 
+import javax.swing.JOptionPane;
+
 import net.sourceforge.toscanaj.gui.ToscanaJMainPanel;
 
 public class ToscanaJ {
@@ -19,6 +21,7 @@ public class ToscanaJ {
      *  Main method for running the program
      */
     public static void main(String[] args) {
+    	testJavaVersion();
         final ToscanaJMainPanel mainWindow;
         if (args.length == 1) {
             mainWindow = new ToscanaJMainPanel(args[0]);
@@ -28,4 +31,19 @@ public class ToscanaJ {
 
         mainWindow.setVisible(true);
     }
+
+	/**
+	 * Tests if we are running at least JRE 1.4.0
+	 */
+	public static void testJavaVersion() {
+		String versionString = System.getProperty("java.class.version","44.0");
+		if("48.0".compareTo(versionString) > 0) {
+			JOptionPane.showMessageDialog(null,"This program requires a Java Runtime Environment\n" +
+				"with version number 1.4.0 or above.\n\n" +
+				"Up to date versions of Java can be found at\n" +
+				"http://java.sun.com.",
+				"Java installation too old", JOptionPane.ERROR_MESSAGE);
+			System.exit(1);
+		}
+	}
 }
