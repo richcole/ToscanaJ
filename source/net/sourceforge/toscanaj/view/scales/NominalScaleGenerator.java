@@ -20,6 +20,7 @@ import java.awt.geom.Point2D;
 
 public class NominalScaleGenerator implements ScaleGenerator {
     private JFrame parent;
+    /// @todo this should be calculated from the number of nodes (the more nodes the wider)
     private static final int DIAGRAM_WIDTH = 400;
 
     public NominalScaleGenerator(JFrame parent) {
