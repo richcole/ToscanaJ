@@ -8,12 +8,15 @@
 package net.sourceforge.toscanaj.controller.fca;
 
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.util.CollectionFactory;
 
 import javax.swing.*;
+
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -167,7 +170,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         return this.diagrams.get(position);
     }
 
-    private DiagramReference getReferenceAt(int elementPosition) {
+    public DiagramReference getReferenceAt(int elementPosition) {
         return (DiagramReference) getElementAt(elementPosition);
     }
 
@@ -425,5 +428,40 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         return hasPastDiagrams() || (getFirstCurrentDiagramPosition() == 0 && getNumberOfCurrentDiagrams() > 1);
     }
 
-
+	public String getTextualDescription() {
+		String comments= "";
+		String lineSeparator = System.getProperty("line.separator");
+		Diagram2D currentDiagram=null;
+		DiagramHistory diagramHistory = DiagramController.getController().getDiagramHistory();
+		int firstCurrentPos = diagramHistory.getFirstCurrentDiagramPosition();
+		if( firstCurrentPos > 1 ) {
+			comments+="Visited diagrams and selected attributes:" + lineSeparator;
+		} else if( firstCurrentPos == 1 ){
+			comments+="Visited diagram and selected attributes:" + lineSeparator;
+		}else{
+		//user has no visited diagrams. display nothing
+		}
+		for(int i=0; i <= firstCurrentPos - 1; i++) { 
+			DiagramHistory.DiagramReference diagramReference = diagramHistory.getReferenceAt(i);
+			comments+=(i+1) +") "+diagramReference.getDiagram().getTitle() + lineSeparator;
+			Concept concept = diagramReference.getZoomedConcept();
+			Iterator attrIt = concept.getIntentIterator();
+			while (attrIt.hasNext()) {
+				Attribute curAttr = (Attribute) attrIt.next();
+				comments += "   - " + curAttr.getData().toString() + lineSeparator;
+			}
+		}
+		int numCurDiag = diagramHistory.getNumberOfCurrentDiagrams(); 
+		comments += lineSeparator;
+		if( numCurDiag > 1 ) {
+			comments += "Current diagrams:" + lineSeparator;
+		} else {
+			comments += "Current diagram:" + lineSeparator;
+		}
+		for(int i=0; i<numCurDiag; i++) { 
+			comments+=(i+1) +") "+diagramHistory.getElementAt(i+firstCurrentPos).toString() + lineSeparator;
+		}
+		return comments;
+			
+	}
 }

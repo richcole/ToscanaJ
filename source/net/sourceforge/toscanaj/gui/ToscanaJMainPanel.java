@@ -45,8 +45,12 @@ import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -164,9 +168,9 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
      */
     private DiagramExportSettings diagramExportSettings = null;
 
-    /**
-     * Simple initialisation constructor.
-     */
+	/**
+	 * Simple initialisation constructor.
+	 */
     public ToscanaJMainPanel() {
         super("ToscanaJ");
         broker = new EventBroker();
@@ -1095,6 +1099,26 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 				this.diagramView,
 				this.diagramExportSettings,
 				selectedFile);
+				if(this.diagramExportSettings.getSaveCommentsToFile()==true){
+					/// @todo The text file might be overwritten without user interaction, check if it exists before overwriting
+					//write the textual description of the diagram view history to a text file
+				try{
+					PrintWriter out = new PrintWriter(new FileWriter(new File(selectedFile.getAbsolutePath()+".txt")));
+					out.println("The diagram(s) you have viewed for the resulting image: "+System.getProperty("line.separator")+selectedFile.getAbsolutePath());
+					DateFormat dateFormatter = DateFormat.getDateTimeInstance();
+					out.println("as at "+dateFormatter.format(new Date(System.currentTimeMillis()))+" is(are): ");
+					out.println();
+					out.println(DiagramController.getController().getDiagramHistory().getTextualDescription());
+					out.close();
+				}catch(IOException e){
+					ErrorDialog.showError(this, e, "Exporting text file error");
+				}
+				}
+				if(this.diagramExportSettings.getSaveCommentToClipboard()==true){
+					System.out.println("Save history comments to clipboard");
+					System.err.println("Not yet implemented");
+					//do the handling of adding the history comments the system clipboard here
+				}
 		} catch (ImageGenerationException e) {
 			ErrorDialog.showError(this, e, "Exporting image error");
 		} catch (OutOfMemoryError e) {
