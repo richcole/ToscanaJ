@@ -170,6 +170,7 @@ public class CSXParser {
         if (viewsElem != null) {
             parseDatabaseObjectViewerSetups(viewsElem);
             parseDatabaseObjectListViewerSetups(viewsElem);
+            parseDatabaseAttributeViewerSetups(viewsElem);
         }
     }
 
@@ -190,6 +191,20 @@ public class CSXParser {
     private static void parseDatabaseObjectListViewerSetups(Element viewsElem)
             throws DataFormatException {
         List viewerElems = viewsElem.getChildren("objectListView");
+        Iterator it = viewerElems.iterator();
+        while (it.hasNext()) {
+            Element viewerElem = (Element) it.next();
+            try {
+                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection());
+            } catch (DatabaseViewerInitializationException e) {
+                throw new DataFormatException("A database viewer could not be initialized.", e);
+            }
+        }
+    }
+
+    private static void parseDatabaseAttributeViewerSetups(Element viewsElem)
+            throws DataFormatException {
+        List viewerElems = viewsElem.getChildren("attributeView");
         Iterator it = viewerElems.iterator();
         while (it.hasNext()) {
             Element viewerElem = (Element) it.next();

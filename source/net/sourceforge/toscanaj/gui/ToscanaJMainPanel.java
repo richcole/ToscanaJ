@@ -24,10 +24,7 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
-import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
-import net.sourceforge.toscanaj.view.diagram.DiagramView;
-import net.sourceforge.toscanaj.view.diagram.NodeView;
-import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
+import net.sourceforge.toscanaj.view.diagram.*;
 import org.jdom.Element;
 import org.tockit.canvas.CanvasBackground;
 import org.tockit.canvas.events.CanvasItemActivatedEvent;
@@ -267,6 +264,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 new ObjectLabelViewOpenDisplayHandler(),
                 CanvasItemActivatedEvent.class,
                 ObjectLabelView.class
+        );
+        diagramEventBroker.subscribe(
+                new AttributeLabelViewPopupMenuHandler(diagramView, this.broker),
+                CanvasItemContextMenuRequestEvent.class,
+                AttributeLabelView.class
         );
         new LabelClickEventHandler(diagramEventBroker);
         new LabelDragEventHandler(diagramEventBroker);

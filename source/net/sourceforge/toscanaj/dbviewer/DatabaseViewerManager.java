@@ -42,6 +42,7 @@ public class DatabaseViewerManager implements XMLizable {
     private static Component parentComponent = null;
     private static List objectViewerRegistry = new LinkedList();
     private static List objectListViewerRegistry = new LinkedList();
+    private static List attributeViewerRegistry = new LinkedList();
     private DatabaseViewer viewer = null;
     private String screenName = null;
     private String tableName = null;
@@ -54,6 +55,7 @@ public class DatabaseViewerManager implements XMLizable {
     private static URL baseURL;
     private static final String OBJECT_VIEW_ELEMENT_NAME = "objectView";
     private static final String OBJECT_LIST_VIEW_ELEMENT_NAME = "objectListView";
+    private static final String ATTTRIBUTE_VIEW_ELEMENT_NAME = "attributeView";
     private static final String CLASS_ATTRIBUTE_NAME = "class";
     private static final String SCREEN_NAME_ATTRIBUTE_NAME = "name";
     private static final String TEMPLATE_ELEMENT_NAME = "template";
@@ -95,6 +97,8 @@ public class DatabaseViewerManager implements XMLizable {
             objectViewerRegistry.add(this);
         } else if (viewerType.equals(OBJECT_LIST_VIEW_ELEMENT_NAME)) {
             objectListViewerRegistry.add(this);
+        } else if (viewerType.equals(ATTTRIBUTE_VIEW_ELEMENT_NAME)) {
+            attributeViewerRegistry.add(this);
         } else {
             throw new DatabaseViewerInitializationException("Unknown viewer type: <" + viewerType + ">");
         }
@@ -154,6 +158,22 @@ public class DatabaseViewerManager implements XMLizable {
             DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(i);
             if (manager.screenName.equals(viewName)) {
                 manager.viewer.showView(object.getQueryWhereClause());
+            }
+        }
+    }
+
+    public static void showAttribute(int viewerID, String attribute) {
+            DatabaseViewerManager manager = (DatabaseViewerManager) attributeViewerRegistry.get(viewerID);
+            DatabaseViewer viewer = manager.viewer;
+            viewer.showView("WHERE " + manager.getKeyName() + " = '" + attribute + "'");
+    }
+
+    public static void showAttribute(String viewName, String attribute) {
+        for (int i = 0; i < attributeViewerRegistry.size(); i++) {
+            DatabaseViewerManager manager = (DatabaseViewerManager) attributeViewerRegistry.get(i);
+            if (manager.screenName.equals(viewName)) {
+                DatabaseViewer viewer = manager.viewer;
+                viewer.showView("WHERE " + manager.getKeyName() + " = '" + attribute + "'");
             }
         }
     }
@@ -274,12 +294,26 @@ public class DatabaseViewerManager implements XMLizable {
         return retVal;
     }
 
+    public static List getAttributeViewNames() {
+        List retVal = new LinkedList();
+        Iterator it = attributeViewerRegistry.iterator();
+        while (it.hasNext()) {
+            DatabaseViewerManager manager = (DatabaseViewerManager) it.next();
+            retVal.add(manager.screenName);
+        }
+        return retVal;
+    }
+
     public static int getNumberOfObjectViews() {
         return objectViewerRegistry.size();
     }
 
     public static int getNumberOfObjectListViews() {
         return objectListViewerRegistry.size();
+    }
+
+    public static int getNumberOfAttributeViews() {
+        return attributeViewerRegistry.size();
     }
 
     public static void resetRegistry() {

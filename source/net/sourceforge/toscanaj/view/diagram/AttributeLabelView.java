@@ -82,4 +82,16 @@ public class AttributeLabelView extends LabelView {
     protected boolean highlightedInFilter() {
         return true;
     }
+
+    public String getEntryAtPosition(Point2D canvasPosition) {
+        int i = getItemAtPosition(canvasPosition);
+        Iterator it = getEntryIterator();
+        String retVal = null;
+        while(i != -1) {
+            Attribute attr = (Attribute) it.next();
+            retVal = attr.getData().toString();
+            i--;
+        }
+        return retVal;
+    }
 }
