@@ -20,7 +20,7 @@ public class CrossordinalScaleGenerator implements ScaleGenerator{
         this.parent = parent;
     }
     public String getScaleName() {
-         return "Crossordinal Scale";
+         return "Grid Scale";
      }
 
      /// @todo should check type of column, too -- we need at least two versions for int and float values (should be

@@ -71,7 +71,7 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 
 	private void layoutDialog(DatabaseSchema databaseSchema, DatabaseConnection connection) {
 		setModal(true);
-		setTitle("Cross-ordinal scale editor");
+		setTitle("Grid scale editor");
 		JPanel mainPane = new JPanel(new GridBagLayout());
         
 		mainPane.add(makeTitlePane(),new GridBagConstraints(
