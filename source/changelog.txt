@@ -3,13 +3,15 @@ program suite:
 
 Affecting different programs:
 =============================
+- Bugfix: on re-reading a <description> of an attribute, no additional indirection
+  (an extra <description>) is generated anymore
 
 Specific for ToscanaJ:
 ======================
 
 Specific for Elba:
 ==================
-- The layout has been reset to the old version of 1.4, since ordinal scales
+- Bugfix: the layout has been reset to the old version of 1.4, since ordinal scales
   are not layed out in chains with the new approach.
 
 Specific for Siena (still not fully complete):

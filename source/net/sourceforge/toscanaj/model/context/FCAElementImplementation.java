@@ -27,7 +27,7 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable, 
 	private static final String DESCRIPTION_ELEMENT_NAME = "description";
 	private static final String DATA_ELEMENT_NAME = "data";
 	private static final String CLASS_ATTRIBUTE_NAME = "class";
-    private static final String CONTEXT_POSITION_ATTRIBUT_NAME = "contextPosition";
+    private static final String CONTEXT_POSITION_ATTRIBUTE_NAME = "contextPosition";
 
 	public FCAElementImplementation(Object data) {
 		this(data,null);
@@ -115,20 +115,20 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable, 
         // this is how we do it for now
         retVal.addContent(data.toString());
         if(this.contextPosition != -1) {
-            retVal.setAttribute(CONTEXT_POSITION_ATTRIBUT_NAME, String.valueOf(this.contextPosition));
+            retVal.setAttribute(CONTEXT_POSITION_ATTRIBUTE_NAME, String.valueOf(this.contextPosition));
         }
 		return retVal;
 	}
 
 	public void readXML(Element elem) throws XMLSyntaxError {
-		this.description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
-        String contextPositionAttribute = elem.getAttributeValue(CONTEXT_POSITION_ATTRIBUT_NAME);
+		this.description = (Element) elem.getChild(DESCRIPTION_ELEMENT_NAME).getChildren().get(0);
+        String contextPositionAttribute = elem.getAttributeValue(CONTEXT_POSITION_ATTRIBUTE_NAME);
         if(contextPositionAttribute != null) {
             this.contextPosition = Integer.parseInt(contextPositionAttribute);
         }
         // now check for old-style syntax and parse that instead if found
         if(elem.getChild(DATA_ELEMENT_NAME) == null) {
-            this.data = elem.getText();
+            this.data = elem.getTextTrim();
             return;
         }
 		Element dataElement = XMLHelper.getMandatoryChild(elem, DATA_ELEMENT_NAME);
