@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.controller.ndimlayout;
 
 import net.sourceforge.toscanaj.model.context.FCAElement;
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -28,7 +27,7 @@ public abstract class NDimLayoutOperations {
     private static final double BASE_X_STRETCH = 1;
 	private static final double BASE_X_SHEAR = 0.3;
 
-    public static final Diagram2D createDiagram(Lattice lattice, String title,
+    public static final NDimDiagram createDiagram(Lattice lattice, String title,
                                                 DimensionCreationStrategy dimensionStrategy) {
         Vector dimensions = dimensionStrategy.calculateDimensions(lattice);
         Vector base = createBase(dimensions.size());

@@ -25,16 +25,20 @@ import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.WriteableDiagram2D;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 import net.sourceforge.toscanaj.view.context.ContextTableEditorDialog;
 
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
@@ -52,7 +56,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
 
 public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private static final double GRID_SIZE_CHANGE_FACTOR = 1.2599210498948731647672106072782;
@@ -413,6 +420,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         ContextImplementation context = (ContextImplementation) DiagramToContextConverter.getContext(this.diagramView.getDiagram());
         contextEditingDialog.setContext(context);
     	if(contextEditingDialog.execute()) {
+    		Map attributeVectors = findVectorsForAttributes(this.diagramView.getDiagram());
     		LatticeGenerator lgen = new GantersAlgorithm();
     		context = contextEditingDialog.getContext();
     		Lattice lattice = lgen.createLattice(context);
@@ -431,12 +439,86 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 				}
     		} while (!ok);
     		
-    		Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, contextName, new DefaultDimensionStrategy());
+    		NDimDiagram diagram = NDimLayoutOperations.createDiagram(lattice, contextName, new DefaultDimensionStrategy());
+            assignOldVectors(diagram, attributeVectors);
     		this.conceptualSchema.replaceDiagram(this.diagramView.getDiagram(), diagram);
     		this.diagramView.showDiagram(diagram);
     	}
     }
 	
+    /**
+     * Assigns the given vectors to the irreducible nodes having the attributes.
+     * 
+     * Caution: we assume that there are no dimensions that are assigned to multiple
+     * irreducible nodes.
+     * 
+     * @param diagram the diagram to relayout
+     * @param attributeVectors a map from the attribute data to vectors (Point2D)
+     */
+	private void assignOldVectors(NDimDiagram diagram, Map attributeVectors) {
+        Vector base = diagram.getBase();
+        for (Iterator nodeIt = diagram.getNodes(); nodeIt.hasNext();) {
+            NDimDiagramNode node = (NDimDiagramNode) nodeIt.next();
+            Concept concept = node.getConcept();
+            if(concept.isMeetIrreducible()) {
+                double[] ndimVec = node.getNdimVector();
+                int dim = -1;
+                for (Iterator lineIt = diagram.getLines(); lineIt.hasNext(); ) {
+                    DiagramLine line = (DiagramLine) lineIt.next();
+                    if(line.getToNode() == node) {
+                        NDimDiagramNode parent = (NDimDiagramNode) line.getFromNode();
+                        double[] parentVec = parent.getNdimVector();
+                        for (int i = 0; i < parentVec.length; i++) {
+                            if(parentVec[i] < ndimVec[i]) {
+                                dim = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+                assert(dim != -1);
+                double projX = 0;
+                double projY = 0;
+                for (Iterator attrIt = concept.getAttributeContingentIterator(); 
+                        attrIt.hasNext();) {
+                    FCAElement attribute = (FCAElement) attrIt.next();
+                    Point2D vector = (Point2D) attributeVectors.get(attribute.getData());
+                    projX += vector.getX();
+                    projY += vector.getY();
+                }
+                base.set(dim, new Point2D.Double(projX,projY));
+            }
+        }
+    }
+
+    private Map findVectorsForAttributes(Diagram2D diagram) {
+		Map result = new Hashtable();
+		for (Iterator nodeIt = diagram.getNodes(); nodeIt.hasNext();) {
+			DiagramNode node = (DiagramNode) nodeIt.next();
+			Concept concept = node.getConcept();
+			if(concept.isMeetIrreducible()) {
+				Point2D nodePos = node.getPosition();
+				Point2D parentPos = null;
+				for (Iterator lineIt = diagram.getLines(); lineIt.hasNext(); ) {
+					DiagramLine line = (DiagramLine) lineIt.next();
+					if(line.getToNode() == node) {
+						parentPos = line.getFromPosition();
+						break;
+					}
+				}
+				int contSize = concept.getAttributeContingentSize();
+				Point2D vector = new Point2D.Double((nodePos.getX() - parentPos.getX())/contSize, 
+				                                    (nodePos.getY() - parentPos.getY())/contSize);
+				for (Iterator attrIt = concept.getAttributeContingentIterator(); 
+						attrIt.hasNext();) {
+					FCAElement attribute = (FCAElement) attrIt.next();
+					result.put(attribute.getData(), vector);
+				}
+			}
+		}
+		return result;
+	}
+
 	protected void editDiagramDescription(){
 		WriteableDiagram2D currentDiagram = (WriteableDiagram2D) this.diagramView.getDiagram();
 		if(currentDiagram!=null){
