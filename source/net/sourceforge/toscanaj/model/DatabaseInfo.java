@@ -9,33 +9,9 @@ import java.util.Iterator;
 public class DatabaseInfo
 {
     /**
-     * If this constant is used, the type of the database has not yet been
-     * defined.
-     */
-    public static final int TYPE_UNDEFINED = 0;
-
-    /**
-     * Use this constant to define/query a connection using a Data Source Name
-     * (DSN).
-     */
-    public static final int TYPE_DSN = 1;
-
-    /**
-     * Use this constant to define/query a connection using a path to access
-     * a file.
-     */
-    public static final int TYPE_FILE = 2;
-
-    /**
-     * The type of the database -- either TYPE_DSN or TYPE_FILE.
-     */
-    private int type = TYPE_UNDEFINED;
-
-    /**
      * The source where the database can be found.
      *
-     * If type is TYPE_DSN this is the name of a data source that should be
-     * defined in the system. Otherwise it is a filename.
+     * This is a JDBC url.
      */
     private String source = null;
 
@@ -68,24 +44,12 @@ public class DatabaseInfo
     }
 
     /**
-     * Returns the type of the database.
-     *
-     *  This is TYPE_DSN for DSN access, TYPE_FILE for file access or
-     *  TYPE_UNDEFINED if the type is not yet known.
-     */
-    public int getType()
-    {
-        return this.type;
-    }
-
-    /**
      * Returns the source where the database can be found.
      *
      * If type is TYPE_DSN this is the name of a data source that should be
      * defined in the system. If type is TYPE_FILE it is a filename.
      */
-    public String getSource()
-    {
+    public String getSource() {
         return this.source;
     }
 
@@ -95,8 +59,7 @@ public class DatabaseInfo
      * This should be always of the form "SELECT x FROM y" where x is the key
      * and y the table used. The where clauses will be added at the end.
      */
-    public String getQuery()
-    {
+    public String getQuery() {
         return "SELECT [" + this.objectKey + "] FROM [" + this.table + "] ";
     }
 
@@ -132,21 +95,10 @@ public class DatabaseInfo
     }
 
     /**
-     * Sets the database to use DSN access to the given DSN.
+     * Sets the given URL as DB connecion point.
      */
-    public void setDSN( String dsn )
-    {
-        this.type = TYPE_DSN;
-        this.source = dsn;
-    }
-
-    /**
-     * Sets the database to use file access to the given file.
-     */
-    public void setDatabaseFile( String file )
-    {
-        this.type = TYPE_FILE;
-        this.source = file;
+    public void setUrl( String url ) {
+        this.source = url;
     }
 
     /**
@@ -155,8 +107,7 @@ public class DatabaseInfo
      * This should be always of the form "SELECT x FROM y" where x is the key
      * and y the table used. The where clauses will be added at the end.
      */
-    public void setQuery( String sql )
-    {
+    public void setQuery( String sql ) {
         this.table = "not yet";
         this.objectKey = "implemented";
         /// @TODO Implement something that calculates table and key from the query string
@@ -168,8 +119,7 @@ public class DatabaseInfo
      * Both table and key name can be given with the square brackets often used
      * in SQL, but they don't have to.
      */
-    public void setQuery( String table, String key )
-    {
+    public void setQuery( String table, String key ) {
         this.table = table;
         while(this.table.charAt(0) == '[') {
             this.table = this.table.substring(1);
@@ -205,30 +155,13 @@ public class DatabaseInfo
     }
 
     /**
-     * Prints contents as String.
+     * Debugging info.
      */
-    public String toString()
-    {
-        String result = "DatabaseInfo";
+    public String toString() {
+        String result = "DatabaseInfo\n";
 
-        if( this.type == TYPE_DSN )
-        {
-            result += "(DSN): " + this.source + "\n" +
-                      "\t" + "key/table: " + this.objectKey + "/" +this.table;
-        }
-        else if( this.type == TYPE_FILE )
-        {
-            result += "(File): " + this.source + "\n" +
-                      "\t" + "key/table: " + this.objectKey + "/" +this.table;
-        }
-        else if( this.type == TYPE_UNDEFINED )
-        {
-            result += "(undefined)";
-        }
-        else
-        {
-            result += "(unknown)";
-        }
+        result += "\t" + "url: " + this.source + "\n" +
+                  "\t" + "key/table: " + this.objectKey + "/" +this.table;
 
         return result;
     }

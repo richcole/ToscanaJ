@@ -453,23 +453,50 @@ public class CSXParser
     private static void parseDBInfo(DatabaseInfo dbInfo, Element dbElement)
         throws DataFormatException
     {
-        // try to find a DSN first
-        Element elem = dbElement.getChild("dsn");
-        if( elem != null ) {
+        // try to find the different possible information
+        Element dsnElem = dbElement.getChild("dsn");
+        Element pathElem = dbElement.getChild("path");
+        Element urlElem = dbElement.getChild("url");
+        if( dsnElem != null ) {
+            if((pathElem != null) || (urlElem != null)) {
+                throw new DataFormatException("More than one of <dsn>, <path> and <url> given in <database> section.");
+            }
             // we have DSN, set it
-            dbInfo.setDSN(elem.getText());
+            dbInfo.setUrl("jdbc:odbc:" + dsnElem.getText());
+            // load the ODBC bridge
+            try {
+                Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+            }
+            catch( ClassNotFoundException e ) {
+                /// @todo Do we want to do something here?
+            }
+        }
+        else if( pathElem != null ) {
+            if(urlElem != null) {
+                throw new DataFormatException("More than one of <dsn>, <path> and <url> given in <database> section.");
+            }
+            // set path information
+            throw new DataFormatException("Sorry -- file access not yet supported.");
+        }
+        else if( urlElem != null ) {
+            // set the url directly
+            dbInfo.setUrl(urlElem.getText());
+            String driver = urlElem.getAttributeValue("driver");
+            if( driver != null ) {
+                // try to load the driver
+                try {
+                    Class.forName(driver);
+                }
+                catch( ClassNotFoundException e ) {
+                    /// @todo Do we want to do something here?
+                }
+            }
         }
         else {
-            // look for path information
-            elem = dbElement.getChild("path");
-            if( elem == null ) {
-                // since <database> was given we expected one of the two
-                throw new DataFormatException("Either <dsn> or <path> expected in <database> element");
-            }
-            dbInfo.setDatabaseFile(elem.getText());
+            throw new DataFormatException("One of <dsn>, <path> or <url> expected in <database> element.");
         }
         // let's try to find the query
-        elem = dbElement.getChild("query");
+        Element elem = dbElement.getChild("query");
         if( elem != null ) {
             // found query
             dbInfo.setQuery(elem.getText());

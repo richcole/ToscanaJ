@@ -10,6 +10,7 @@ import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.parser.CSXParser;
+import net.sourceforge.toscanaj.parser.DataFormatException;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -53,9 +54,18 @@ public class DataDump {
         try {
             schema = CSXParser.parse(file);
         }
+        catch(DataFormatException e) {
+            System.err.println("Could not parse input.");
+            System.err.println("- " + e.getMessage());
+            if(e.getOriginal() != null) {
+                System.err.println("Detail:");
+                System.err.println("- " + e.getOriginal().getMessage());
+            }
+            System.exit(2);
+        }
         catch(Exception e) {
             System.err.println("Could not parse input.");
-            e.printStackTrace();
+            System.err.println("- " + e.getMessage());
             System.exit(2);
         }
         // create concept for filtering if needed

@@ -16,12 +16,15 @@ import java.sql.*;
  */
 public class DBConnection
 {
-    // URL constructed from the source, account an password info
-    private String     dbURL;
-    private Connection con;
+    /**
+     * The URL to find the database.
+     */
+    private String dbURL;
 
-    // set the diver name for the JDBC-ODBC Bridge driver
-    private static final String JDBC_ODBC_BRIDGE = "sun.jdbc.odbc.JdbcOdbcDriver";
+    /**
+     * The JDBC database connection we use.
+     */
+    private Connection con;
 
     /**
      * If set to something else than null we will print log entries into this
@@ -58,25 +61,28 @@ public class DBConnection
      * This is a convenience function, it calls the full initialisation
      * constructor with empty username and password.
      */
-    public DBConnection(String source) throws DatabaseException {
-        this( source, "", "" );
+    public DBConnection(String url) throws DatabaseException {
+        this(url, "", "");
     }
 
     /**
-     *  This constructor takes the data source, an account name and a
-     *  password.
+     *  This constructor takes the data source as driver/url combination, an
+     *  account name and a password.
      *
      * @TODO Throw exceptions instead of just printing them.
      */
-    public DBConnection( String source, String account,	String password) throws DatabaseException {
+    public DBConnection(String url, String account, String password) throws DatabaseException {
         try {
-            Class.forName(JDBC_ODBC_BRIDGE);
+            Driver driver = DriverManager.getDriver(url);
+            if(driver == null) {
+                throw new DatabaseException("Could not locate JDBC Driver class for the url:\n" + url);
+            }
         }
-        catch (ClassNotFoundException cnfe) {
-            throw new DatabaseException("Could not locate JDBC Driver class", cnfe);
+        catch (SQLException e) {
+            throw new DatabaseException("Error locating JDBC Driver class for the url:\n" + url, e);
         }
 
-        dbURL = "jdbc:odbc:" + source;
+        this.dbURL = url;
 
         // connect to the DB
         try {
@@ -365,7 +371,7 @@ public class DBConnection
     public static void main (String [] args) throws DatabaseException {
         if( args.length != 1 ) {
             System.err.println(
-                        "Usage: DBConnection [ODBC database source name]" );
+                        "Usage: DBConnection [JDBC database url]" );
             System.exit( 1 );
         }
 

@@ -101,7 +101,7 @@ public class DatabaseChooser extends JDialog
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DatabaseChooser._databaseInfo = new DatabaseInfo();
-                _databaseInfo.setDSN( _dsnField.getText() );
+                _databaseInfo.setUrl( "jdbc:odbc:" + _dsnField.getText() );
                 _databaseInfo.setQuery( (String) _tableList.getSelectedValue(),
                                         (String) _keyList.getSelectedValue() );
                 DatabaseChooser._dialog.setVisible(false);
