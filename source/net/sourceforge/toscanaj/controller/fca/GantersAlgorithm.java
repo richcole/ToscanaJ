@@ -23,8 +23,7 @@ public class GantersAlgorithm implements LatticeGenerator {
         LatticeImplementation lattice = new LatticeImplementation();
         context = inputContext;
         Collection objectCol = context.getObjects();
-        objects = new Object[objectCol.size()];
-        objectCol.toArray(objects);
+        objects = createObjectArray(objectCol);
         intents = new Hashtable();
         extents = new Vector();
         findExtents();
@@ -32,6 +31,26 @@ public class GantersAlgorithm implements LatticeGenerator {
         connectConcepts(lattice);
         cleanContingents(lattice);
         return lattice;
+    }
+
+	/**
+	 * This is similar to Collection.toArray(), but also checks for duplicates.
+	 */
+    public Object[] createObjectArray(Collection objectCol) {
+    	Object[] retVal = new Object[objectCol.size()];
+    	HashSet testSet = new HashSet();
+    	Iterator it = objectCol.iterator();
+    	int pos = 0;
+    	while (it.hasNext()) {
+            Object cur = it.next();
+            if(testSet.contains(cur)) {
+            	throw new IllegalArgumentException("Context contains duplicate object");
+            }
+            retVal[pos] = cur;
+            testSet.add(cur);
+            pos++;
+        }
+        return retVal;
     }
 
     private void connectConcepts(LatticeImplementation lattice) {
