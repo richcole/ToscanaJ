@@ -557,7 +557,8 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 			}
 		}
 		catch (FileNotFoundException e) {
-			ErrorDialog.showError(this, e, "Error loading plugins");
+			/// @todo log this error in logger rather then printing stderr
+			System.err.println("Error loading plugins: " + e.getMessage());
 		}
 	}
 	
