@@ -475,7 +475,11 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         if (rv != JFileChooser.APPROVE_OPTION) {
             return;
         }
-        importCSC(openDialog.getSelectedFile());
+        try {
+        	importCSC(openDialog.getSelectedFile());
+        } catch(Exception e) {
+        	ErrorDialog.showError(this, e, "Import failed");
+        }
     }
 
     private void importCSC(File file) {
