@@ -7,13 +7,21 @@
  */
 package net.sourceforge.toscanaj.gui.temporal;
 
+import java.awt.*;
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Shape;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -56,6 +64,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import net.sourceforge.toscanaj.view.scales.NumberField;
+import net.sourceforge.toscanaj.view.temporal.ArrowStyle;
 import net.sourceforge.toscanaj.view.temporal.InterSequenceTransitionArrow;
 import net.sourceforge.toscanaj.view.temporal.StateRing;
 import net.sourceforge.toscanaj.view.temporal.TransitionArrow;
@@ -67,8 +76,19 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	private static final Insets DEFAULT_FIELD_INSETS = new Insets(2,20,2,2);
 	private static final String TRANSITION_LAYER_NAME = "transitions";
 
-	private static final Color[] COLORS = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.CYAN, Color.GRAY, Color.MAGENTA,
-														 Color.ORANGE, Color.PINK, Color.BLACK, Color.YELLOW};
+    private ArrowStyle[] styles = new ArrowStyle[] {
+//        new ArrowStyle(Color.RED, new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 10, new float[]{10,10,20,10}, 0), 14, 20, 0.75),
+        new ArrowStyle(Color.RED, new BasicStroke(4), 14, 20, 0.75),
+        new ArrowStyle(Color.BLUE, new BasicStroke(4), 14, 20, 0.75),
+        new ArrowStyle(Color.GREEN, new BasicStroke(4), 14, 20, 0.75),
+        new ArrowStyle(Color.CYAN, new BasicStroke(4), 14, 20, 0.75),
+        new ArrowStyle(Color.GRAY, new BasicStroke(4), 14, 20, 0.75),
+        new ArrowStyle(Color.MAGENTA, new BasicStroke(4), 14, 20, 0.75),
+        new ArrowStyle(Color.ORANGE, new BasicStroke(4), 14, 20, 0.75),
+        new ArrowStyle(Color.PINK, new BasicStroke(4), 14, 20, 0.75),
+        new ArrowStyle(Color.BLACK, new BasicStroke(4), 14, 20, 0.75),
+        new ArrowStyle(Color.YELLOW, new BasicStroke(4), 14, 20, 0.75)
+    };
 
     private ManyValuedContext context;
     private JComboBox sequenceColumnChooser;
@@ -120,10 +140,56 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     private void buildGUI() {
         this.addTab("Controls", createControlsPanel());
         this.addTab("Data", createBasicSettingsPanel());
+        this.addTab("Arrows", createArrowSettingsPanel());
         this.addTab("Options", createAnimationsSettingsPanel());
     }
 
-	private JPanel createControlsPanel() {
+	private Component createArrowSettingsPanel() {
+        final JList listView = new JList(styles);
+        listView.setCellRenderer(new ListCellRenderer() {
+            public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                final ArrowStyle style = (ArrowStyle) value;
+                JPanel retVal = new JPanel() {
+                    protected void paintComponent(Graphics g) {
+                        super.paintComponent(g);
+                        Graphics2D g2d = (Graphics2D) g;
+                        AffineTransform oldTransform = g2d.getTransform();
+                        Paint oldPaint = g2d.getPaint();
+                        
+                        Shape arrow = TransitionArrow.getArrowShape(style, this.getWidth() * 0.9);
+                        g2d.setPaint(style.getColor());
+                        g2d.translate(this.getWidth() * 0.95, this.getHeight() / 2);
+                        g2d.fill(arrow);
+                        
+                        g2d.setPaint(oldPaint);
+                        g2d.setTransform(oldTransform);
+                    }
+                };
+                Dimension size = new Dimension(150,30);
+                retVal.setMinimumSize(size);
+                retVal.setPreferredSize(size);
+                return retVal;
+            }
+        });
+        listView.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if(e.getClickCount() != 2) {
+                    return;
+                }
+                int index = listView.getSelectedIndex();
+                ListModel model = listView.getModel();
+                ArrowStyle style = (ArrowStyle) model.getElementAt(index);
+                Color newColor = JColorChooser.showDialog(listView, "Pick new color", style.getColor());
+                if(newColor != null) {
+                    style.setColor(newColor);
+                    diagramView.repaint();
+                }
+            } 
+        });
+        return new JScrollPane(listView);
+    }
+
+    private JPanel createControlsPanel() {
         addStaticTransitionsButton = new JButton("Show all transitions");
         addStaticTransitionsButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
@@ -152,29 +218,20 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             }
         });
 
+        GridBagConstraints buttonConstraints = 
+                new GridBagConstraints(0, GridBagConstraints.RELATIVE, 1, 1, 1, 0,
+                                       GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
+                                       DEFAULT_BUTTON_INSETS, 0, 0);
+
         JPanel panel = new JPanel(new GridBagLayout());
-        int row = 0;
-        panel.add(addStaticTransitionsButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
-														GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-														DEFAULT_BUTTON_INSETS, 0, 0));
-		row++;
-        panel.add(exportImagesButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
-														GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-														DEFAULT_BUTTON_INSETS, 0, 0));
-		row++;
-        panel.add(animateTransitionsButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
-														GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-														DEFAULT_BUTTON_INSETS, 0, 0));
-		row++;
-        panel.add(startSteppingButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
-														GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
-														DEFAULT_BUTTON_INSETS, 0, 0));
-        row++;
-        panel.add(createStepPanel(), new GridBagConstraints(0, row, 1, 1, 1, 0,
+        panel.add(addStaticTransitionsButton, buttonConstraints);
+        panel.add(exportImagesButton, buttonConstraints);
+        panel.add(animateTransitionsButton, buttonConstraints);
+        panel.add(startSteppingButton, buttonConstraints);
+        panel.add(createStepPanel(), new GridBagConstraints(0, GridBagConstraints.RELATIVE, 1, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         DEFAULT_SPACER_INSETS, 0, 0));
-        row++;
-        panel.add(new JPanel(), new GridBagConstraints(0, row, 1, 1, 1, 1,
+        panel.add(new JPanel(), new GridBagConstraints(0, GridBagConstraints.RELATIVE, 1, 1, 1, 1,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         DEFAULT_SPACER_INSETS, 0, 0));
         return panel;
@@ -633,7 +690,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         Hashtable nodeViewMap = createNodeViewMap();
         Iterator seqIt = objectSequences.iterator();
         Iterator seqValIt = this.sequenceValues.iterator();
-        int colNum = 0;
+        int styleNum = 0;
         boolean start = true;
         while (seqIt.hasNext()) {
             List sequence = (List) seqIt.next();
@@ -644,9 +701,9 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                 this.lastAnimationTime = 0;
             }
             if(selectedSequence == null || selectedSequence == curSequenceValue) {
-                addTransitions(sequence, COLORS[colNum], nodeViewMap, highlightStates);
+                addTransitions(sequence, styles[styleNum], nodeViewMap, highlightStates);
             }
-            colNum = (colNum + 1) % COLORS.length;
+            styleNum = (styleNum + 1) % styles.length;
         }
     }
 
@@ -677,12 +734,12 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         int seqNum = 0;
         int seqLength = this.timelineValues.size();
         List lastSequence = null;
-        Color color = null;
+        ArrowStyle style = null;
         while (seqIt.hasNext()) {
             List sequence = (List) seqIt.next();
 
             if(lastSequence != null) {
-                Color nextColor = COLORS[seqNum % COLORS.length];
+                Color nextColor = styles[seqNum % styles.length].getColor();
                 NodeView endViewLast = findObjectConceptView((FCAObject) lastSequence.get(lastSequence.size()-1), nodeViewMap);
                 NodeView startViewNew = findObjectConceptView((FCAObject) sequence.get(0), nodeViewMap);
                 if(endViewLast == null) {
@@ -691,20 +748,20 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                 if(endViewLast != startViewNew) {
 	                this.diagramView.addCanvasItem(
 	                            new InterSequenceTransitionArrow(endViewLast, startViewNew,
-	                                                             color, nextColor, seqNum * seqLength + 0.5,
+	                                                             style, nextColor, seqNum * seqLength + 0.5,
 	                                                             this.timeController),
 	                            TRANSITION_LAYER_NAME);
                 }
             }
 
-            color = COLORS[seqNum % COLORS.length];
+            style = styles[seqNum % styles.length];
             AttributeValue curSequenceValue = (AttributeValue) seqValIt.next();
             if(lastSequence == null) {
                 this.targetTime = newTargetTime;
                 this.lastAnimationTime = 0;
             }
             if(selectedSequence == null || selectedSequence == curSequenceValue) {
-                addTransitions(sequence, color, 
+                addTransitions(sequence, style, 
                                nodeViewMap, highlightStates, seqNum * seqLength);
             }
             seqNum++;
@@ -722,11 +779,11 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         return retVal;
     }
     
-    private void addTransitions(List sequence, Color color, Hashtable nodeViewMap, boolean highlightStates) {
-    	addTransitions(sequence, color, nodeViewMap, highlightStates, 0);
+    private void addTransitions(List sequence, ArrowStyle style, Hashtable nodeViewMap, boolean highlightStates) {
+    	addTransitions(sequence, style, nodeViewMap, highlightStates, 0);
     }
 
-    private void addTransitions(List sequence, Color color, Hashtable nodeViewMap, boolean highlightStates, int countStart) {
+    private void addTransitions(List sequence, ArrowStyle style, Hashtable nodeViewMap, boolean highlightStates, int countStart) {
     	NodeView oldView = null;
     	Iterator objectIt = sequence.iterator();
     	int count = countStart;
@@ -738,11 +795,11 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     	    	continue;
     	    }
     	    if(highlightStates) {
-    	        this.diagramView.addCanvasItem(new StateRing(curView, color, count, this.timeController),
+    	        this.diagramView.addCanvasItem(new StateRing(curView, style.getColor(), count, this.timeController),
     	                                       TRANSITION_LAYER_NAME);
     	    }
     	    if(oldView != null && oldView != curView) {
-    	        this.diagramView.addCanvasItem(new TransitionArrow(oldView, curView, color, count - 0.5, this.timeController),
+    	        this.diagramView.addCanvasItem(new TransitionArrow(oldView, curView, style, count - 0.5, this.timeController),
     	                                       TRANSITION_LAYER_NAME);
     	    }
     	    oldView = curView;

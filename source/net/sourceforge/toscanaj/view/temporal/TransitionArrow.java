@@ -54,8 +54,6 @@ public class TransitionArrow extends MovableCanvasItem {
         double endX = getEndX();
         double endY = getEndY();
 
-        float headLength = (float) this.style.getHeadLength();
-        float headWidth = (float) this.style.getHeadWidth();
         float length = (float) Math.sqrt((startX - endX) * (startX - endX) +
                                           (startY - endY) * (startY - endY));
 
@@ -69,13 +67,7 @@ public class TransitionArrow extends MovableCanvasItem {
     	
     	Paint oldPaint = g.getPaint();
         
-        Shape line = this.style.getStroke().createStrokedShape(new Line2D.Double(-length,0,-headLength,0));
-    	
-		GeneralPath arrow = new GeneralPath(line);
-        arrow.moveTo(-headLength,-headWidth/2);
-		arrow.lineTo(0,0);
-		arrow.lineTo(-headLength,headWidth/2);
-		arrow.closePath();
+        Shape arrow = getArrowShape(this.style, length);
         
 		AffineTransform shapeTransform = new AffineTransform();        
 		shapeTransform.translate(this.manualOffset.getX(), this.manualOffset.getY());
@@ -89,6 +81,20 @@ public class TransitionArrow extends MovableCanvasItem {
     	g.setPaint(oldPaint);
     }
     
+    public static Shape getArrowShape(ArrowStyle style, double length) {
+        float headLength = (float) style.getHeadLength();
+        float headWidth = (float) style.getHeadWidth();
+
+        Shape line = style.getStroke().createStrokedShape(new Line2D.Double(-length,0,-headLength,0));
+    	
+		GeneralPath arrow = new GeneralPath(line);
+        arrow.moveTo(-headLength,-headWidth/2);
+		arrow.lineTo(0,0);
+		arrow.lineTo(-headLength,headWidth/2);
+		arrow.closePath();
+        return arrow;
+    }
+
     protected Paint calculatePaint(float arrowLength) {
         AnimationTimeController controller = this.timeController;
 

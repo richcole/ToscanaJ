@@ -47,4 +47,24 @@ public class ArrowStyle {
     public double getRelativeLength() {
         return this.relativeLength;
     }
+    
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public void setHeadLength(double headLength) {
+        this.headLength = headLength;
+    }
+
+    public void setHeadWidth(double headWidth) {
+        this.headWidth = headWidth;
+    }
+
+    public void setRelativeLength(double relativeLength) {
+        this.relativeLength = relativeLength;
+    }
+
+    public void setStroke(Stroke stroke) {
+        this.stroke = stroke;
+    }
 }
