@@ -62,15 +62,17 @@
         <!-- this copies all files in libs itself, but not the subdiretories ("testing") -->
 		<copy todir="${dist.dir}/${dist.name}/libs" includeEmptyDirs="no">
 			<fileset dir="${libs.dir}">
-                <include name="*"/>
-            </fileset>
+			        <include name="*"/>
+                        </fileset>
 		</copy>
+		<fixcrlf srcDir="${dist.dir}/${dist.name}/libs" eol="crlf" includes="LICENSE.*"/>
 		<copy todir="${dist.dir}/${dist.name}/examples">
 			<fileset dir="${examples.dir}">
 				<include name="nodb/**"/>
 				<include name="sql/**"/>
 			</fileset>
 		</copy>
+		<fixcrlf srcDir="${dist.dir}/${dist.name}/examples" eol="crlf" includes="nodb/**, sql/**"/>
 		<copy todir="${dist.dir}/${dist.name}">
 			<fileset dir="${src.dir}">
 				<include name="*.txt"/>
@@ -79,6 +81,7 @@
 				<include name="toscanaj.prop"/>
 			</fileset>
 		</copy>
+		<fixcrlf srcDir="${dist.dir}/${dist.name}" eol="crlf" includes="*.txt, *.bat, toscanaj.prop"/>
         </target>
 	<target name="dist" depends="prepareDist">
 		<!-- remove old tar-file (the task doesn't update properly) -->
