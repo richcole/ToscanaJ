@@ -100,15 +100,17 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
                                     conceptualSchema, databaseConnection);
                     if (null != returnValue) {
                     	Diagram2D diagramWithSameTitle = null;
+                    	int indexOfExistingDiagram = -1;
                     	for(int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
                     		if(conceptualSchema.getDiagram(i).getTitle().equalsIgnoreCase(returnValue.getTitle())) {
-                    			diagramWithSameTitle = conceptualSchema.getDiagram(i); 
+                    			diagramWithSameTitle = conceptualSchema.getDiagram(i);
+                    			indexOfExistingDiagram = i; 
                     		}
                     	}
                     	if(diagramWithSameTitle != null) {
     							int rv = showTitleExistsDialog(returnValue);
 								if(rv==JOptionPane.OK_OPTION){
-									replaceTitle(returnValue, diagramWithSameTitle);
+									replaceTitle(returnValue, diagramWithSameTitle, indexOfExistingDiagram);
 								}else if(rv==JOptionPane.CANCEL_OPTION){
 									renameTitle(returnValue, diagramWithSameTitle);
 								}		
@@ -117,9 +119,14 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
                     	}
                     }
                 }
-				private void replaceTitle(Diagram2D returnValue, Diagram2D diagramWithSameTitle) {
-					conceptualSchema.removeDiagram(diagramWithSameTitle);
+				private void replaceTitle(Diagram2D returnValue, Diagram2D diagramWithSameTitle, int indexOfExistingDiagram) {
 					conceptualSchema.addDiagram(returnValue);
+					if(indexOfExistingDiagram!=-1){
+						conceptualSchema.exchangeDiagram((conceptualSchema.getNumberOfDiagrams()-1),indexOfExistingDiagram);
+						conceptualSchema.removeDiagram(diagramWithSameTitle);
+					}else{
+						conceptualSchema.removeDiagram(diagramWithSameTitle);
+					}
 				}
 				private void renameTitle(Diagram2D returnValue, Diagram2D diagramWithSameTitle) {
 					String inputValue = "";
