@@ -29,9 +29,6 @@ import java.net.URL;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-/**
- * @todo
- */
 public class ToscanaJServlet extends HttpServlet {
     private static String SERVLET_URL;
     private static double viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight;
