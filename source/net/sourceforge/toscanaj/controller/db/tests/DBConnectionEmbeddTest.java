@@ -41,7 +41,7 @@ public class DBConnectionEmbeddTest extends TestCase {
             assertEquals(1, connection.getTableNames().size());
 
         } catch (DatabaseException e) {
-            fail("DB Exception: " + e.getMessage());
+            fail("DB Exception: " + e.getMessage() + " - " + e.getCause().getMessage());
         }
 
     }
