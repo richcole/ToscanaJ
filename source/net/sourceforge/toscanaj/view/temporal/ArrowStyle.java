@@ -28,6 +28,14 @@ public class ArrowStyle {
         this.relativeLength = relativeLength;
     }
     
+    public ArrowStyle(ArrowStyle style) {
+        this.color = style.color;
+        this.stroke = style.stroke;
+        this.headWidth = style.headWidth;
+        this.headLength = style.headLength;
+        this.relativeLength = style.relativeLength;
+    }
+
     public Color getColor() {
         return this.color;
     }

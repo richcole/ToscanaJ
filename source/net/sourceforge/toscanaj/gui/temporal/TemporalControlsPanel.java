@@ -179,9 +179,9 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                 int index = listView.getSelectedIndex();
                 ListModel model = listView.getModel();
                 ArrowStyle style = (ArrowStyle) model.getElementAt(index);
-                Color newColor = JColorChooser.showDialog(listView, "Pick new color", style.getColor());
-                if(newColor != null) {
-                    style.setColor(newColor);
+                ArrowStyle newStyle = ArrowStyleChooser.showDialog(listView, "Edit arrow style", style);
+                if(newStyle != null) {
+                    styles[index] = newStyle;
                     diagramView.repaint();
                 }
             } 
