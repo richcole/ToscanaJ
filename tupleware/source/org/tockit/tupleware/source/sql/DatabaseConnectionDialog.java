@@ -19,7 +19,6 @@ import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileFilter;
 
 import org.tockit.events.EventBroker;
-import org.tockit.plugin.DatabaseDriverLoader;
 import org.tockit.tupleware.model.TupleSet;
 
 import java.awt.*;
@@ -29,12 +28,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.net.MalformedURLException;
-import java.sql.Driver;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 
 
 /**
@@ -82,19 +79,17 @@ public class DatabaseConnectionDialog extends JDialog {
     }
     
     class DatabaseTypePanel extends WizardPanel {
-        private JRadioButton embDBMSRadioButton;
         private JRadioButton jdbcRadioButton;
         private JRadioButton accessRadioButton;
         private JRadioButton odbcRadioButton;
         DatabaseTypePanel() {
             super();
-            embDBMSRadioButton = new JRadioButton(EMBEDDED_DBMS_ID_STRING);
+            
             jdbcRadioButton = new JRadioButton(JDBC_ID_STRING);
             accessRadioButton = new JRadioButton(ACCESS_FILE_ID_STRING);
             odbcRadioButton = new JRadioButton(ODBC_ID_STRING);
             
             ButtonGroup buttonGroup = new ButtonGroup();
-            buttonGroup.add(embDBMSRadioButton);
             buttonGroup.add(jdbcRadioButton);
             buttonGroup.add(accessRadioButton);
             buttonGroup.add(odbcRadioButton);
@@ -102,72 +97,45 @@ public class DatabaseConnectionDialog extends JDialog {
             updateContents();
 
 			this.setLayout(new GridBagLayout());
-			int row = 0;
-			
-			try {
-				DatabaseInfo embedInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
-                // try loading the embedded engine to see if it is available
-				Class.forName(embedInfo.getDriverClass());
-				this.add(embDBMSRadioButton,new GridBagConstraints(
-						0,row,1,1,1,0,
-						GridBagConstraints.NORTHWEST,
-						GridBagConstraints.HORIZONTAL,
-						new Insets(5, 5, 5, 0),
-						2,2));
-				row++;
-			}
-			catch (ClassNotFoundException e) {
-				// we only catch it so we can figure out if we
-				// should include embedded db or not.
-			}
-			
+						
             this.add(jdbcRadioButton,new GridBagConstraints(
-                    0,row,1,1,1,0,
+                    0,0,1,1,1,0,
                     GridBagConstraints.NORTHWEST,
                     GridBagConstraints.HORIZONTAL,
                     new Insets(5, 5, 5, 0),
                     2,2));
-			row++;
             this.add(odbcRadioButton,new GridBagConstraints(
-                    0,row,1,1,1,0,
+                    0,1,1,1,1,0,
                     GridBagConstraints.NORTHWEST,
                     GridBagConstraints.HORIZONTAL,
                     new Insets(5, 5, 5, 0),
                     2,2));
-			row++;
             this.add(accessRadioButton,new GridBagConstraints(
-                    0,row,1,1,1,0,
+                    0,2,1,1,1,0,
                     GridBagConstraints.NORTHWEST,
                     GridBagConstraints.HORIZONTAL,
                     new Insets(5, 5, 5, 0),
                     2,2));
-			row++;
             this.add(new JPanel(),new GridBagConstraints(
-                    0,row,1,1,1,1,
+                    0,3,1,1,1,1,
                     GridBagConstraints.NORTHWEST,
                     GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 0),
                     2,2));
         }
         void updateContents() {
-            if(databaseInfo == null) {
-                embDBMSRadioButton.setSelected(true);
-            } else {
-            	Type type = databaseInfo.getType();
-            	if(type == DatabaseInfo.EMBEDDED) {
-                    embDBMSRadioButton.setSelected(true);
-                } else if (type == DatabaseInfo.UNDEFINED) {
-					jdbcRadioButton.setSelected(true);
-                } else if (type == DatabaseInfo.JDBC) {
-            	    jdbcRadioButton.setSelected(true);
-                } else if (type == DatabaseInfo.ODBC) {
-            	    odbcRadioButton.setSelected(true);
-                } else if (type == DatabaseInfo.ACCESS_FILE) {
-            	    accessRadioButton.setSelected(true);
-            	} else {
-            		throw new RuntimeException("Unknown database type");
-            	}
-            }
+        	Type type = databaseInfo.getType();
+			if (type == DatabaseInfo.UNDEFINED) {
+				jdbcRadioButton.setSelected(true);
+            } else if (type == DatabaseInfo.JDBC) {
+        	    jdbcRadioButton.setSelected(true);
+            } else if (type == DatabaseInfo.ODBC) {
+        	    odbcRadioButton.setSelected(true);
+            } else if (type == DatabaseInfo.ACCESS_FILE) {
+        	    accessRadioButton.setSelected(true);
+        	} else {
+        		throw new RuntimeException("Unknown database type");
+        	}
         }
         String getTitle() {
             return "Database Type:";
@@ -180,9 +148,7 @@ public class DatabaseConnectionDialog extends JDialog {
         	return true;
         }
         WizardPanel getNextPanel() {
-            if(embDBMSRadioButton.isSelected()) {
-                return embeddedDbPanel;
-            } else if(jdbcRadioButton.isSelected()) {
+            if(jdbcRadioButton.isSelected()) {
                 return jdbcDbPanel;
             } else if(odbcRadioButton.isSelected()) {
                 return odbcDbPanel;
@@ -646,26 +612,6 @@ public class DatabaseConnectionDialog extends JDialog {
 	public DatabaseConnectionDialog(JFrame parent, File lastFile) {
 		super(parent, "Database connection", true);
 		
-		System.out.println("starting to load DB drivers");
-		// @todo location of dbdrivers should be read from config manager
-		String dbDriversDir = System.getProperty("user.dir") + File.separator + "dbdrivers";
-		// @todo this code is very similar to code it TuplewareMainPanel.loadPlugins. need to refactor!
-		File[] dbDriversLocations = { new File (dbDriversDir) };
-		DatabaseDriverLoader.Result result = DatabaseDriverLoader.loadDrivers(dbDriversLocations);
-		Driver[] drivers = result.getDrivers();
-		DatabaseDriverLoader.Error[] errors = result.getErrors();
-		for (int i = 0; i < errors.length; i++) {
-			DatabaseDriverLoader.Error error = errors[i];
-			System.out.println("Error: " + error.getException());
-			error.getException().printStackTrace();
-		}
-		System.out.println("finished loading DB drivers");
-		for (int i = 0; i < drivers.length; i++) {
-			Driver driver = drivers[i];
-			System.out.println(" - " + driver.getClass().getName());
-			System.out.println("\t" + driver.toString());
-		}
-				
 		this.databaseInfo = new DatabaseInfo();
 		this.connection = new DatabaseConnection(new EventBroker());
         this.owner = parent;
