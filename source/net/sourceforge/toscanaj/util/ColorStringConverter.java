@@ -7,9 +7,15 @@
  */
 package net.sourceforge.toscanaj.util;
 
-import java.awt.*;
+import java.awt.Color;
 
-public class ColorWriter {
+/**
+ * Function class with static methods to read and write colors from strings.
+ * 
+ * The difference to Color.decode(String) is that this class does support alpha
+ * and can write the colors, too.
+ */
+public class ColorStringConverter {
 
     private static final String chars = "0123456789abcdef";
 
@@ -20,10 +26,11 @@ public class ColorWriter {
     }
 
     private static int fromHex(String s) {
-        return chars.indexOf(s.charAt(0)) * 16 + chars.indexOf(s.charAt(1));
+    	String lower = s.toLowerCase();
+        return chars.indexOf(lower.charAt(0)) * 16 + chars.indexOf(lower.charAt(1));
     }
 
-    public static Color fromHexString(String s) {
+    public static Color stringToColor(String s) {
         Color color = new Color(fromHex(s.substring(2, 4)),
                 fromHex(s.substring(4, 6)),
                 fromHex(s.substring(6, 8)),
@@ -32,8 +39,8 @@ public class ColorWriter {
 
     }
 
-    public static String toHexString(Color color) {
-        return toHex(color.getAlpha()) +
+    public static String colorToString(Color color) {
+        return "#" + toHex(color.getAlpha()) +
                 toHex(color.getRed()) +
                 toHex(color.getGreen()) +
                 toHex(color.getBlue());

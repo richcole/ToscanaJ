@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-import net.sourceforge.toscanaj.util.ColorWriter;
+import net.sourceforge.toscanaj.util.ColorStringConverter;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
@@ -127,10 +127,10 @@ public class LabelInfo implements XMLizable, ChangeObservable {
         offsetElem.setAttribute(OFFSET_Y_ATTRIBUTE_NAME, String.valueOf(offset.getY()));
         retVal.addContent(offsetElem);
         Element backgroundColorElem = new Element(BACKGROUND_COLOR_ELEMENT_NAME);
-        backgroundColorElem.addContent("#" + ColorWriter.toHexString(backgroundColor));
+        backgroundColorElem.addContent(ColorStringConverter.colorToString(backgroundColor));
         retVal.addContent(backgroundColorElem);
         Element textColorElem = new Element(TEXT_COLOR_ELEMENT_NAME);
-        textColorElem.addContent("#" + ColorWriter.toHexString(textColor));
+        textColorElem.addContent(ColorStringConverter.colorToString(textColor));
         retVal.addContent(textColorElem);
         Element textAlignmentElem = new Element(TEXT_ALIGNMENT_ELEMENT_NAME);
         switch (textAlignment) {
@@ -165,13 +165,9 @@ public class LabelInfo implements XMLizable, ChangeObservable {
                 XMLHelper.getDoubleAttribute(offsetElem, OFFSET_Y_ATTRIBUTE_NAME)
         );
         Element backgroundColorElem = XMLHelper.mustbe(BACKGROUND_COLOR_ELEMENT_NAME, elem);
-        setBackgroundColor(ColorWriter.fromHexString(
-                backgroundColorElem.getText().substring(1)
-        ));
+        setBackgroundColor(ColorStringConverter.stringToColor(backgroundColorElem.getText()));
         Element textColorElem = XMLHelper.mustbe(TEXT_COLOR_ELEMENT_NAME, elem);
-        setTextColor(ColorWriter.fromHexString(
-                textColorElem.getText().substring(1)
-        ));
+        setTextColor(ColorStringConverter.stringToColor(textColorElem.getText()));
 
         readTextAlignment(elem);
     }
