@@ -44,3 +44,4 @@ ToscanaJMainPanel-mruFiles-1=./examples/sql/pctest/pctest.csx
 # ToscanaJMainPanel-offerNodeSizeScalingOptions=[if set to "1", the node size scaling can be changed by the user]
 # NodeView-displayVectors=[if set to "1", the vectors for the nodes will be shown (debug option)]
 # DatabaseConnection-logger=[if set all database calls will be logged, either to the given file or to stdout if "-" is used]
+# SienaTemporalControls-enabled=[if set to "1", Siena will offer controls for Temporal Concept Analysis]
