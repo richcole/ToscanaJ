@@ -3,7 +3,7 @@
  * User: rjcole
  * Date: Jun 28, 2002
  * Time: 4:14:58 AM
- * To change template for new class use 
+ * To change template for new class use
  * Code Style | Class Templates options (Tools | IDE Options).
  */
 package net.sourceforge.toscanaj.view.database;
@@ -21,7 +21,7 @@ import net.sourceforge.toscanaj.util.STD_Iterator;
 import javax.swing.*;
 import java.awt.*;
 
-public class SchemeView extends JPanel implements BrokerEventListener
+public class DatabaseSchemaView extends JPanel implements BrokerEventListener
 {
 
     DefaultListModel availableTableList;
@@ -29,7 +29,7 @@ public class SchemeView extends JPanel implements BrokerEventListener
 
     private DatabaseSchema dbScheme;
 
-  public SchemeView(JFrame frame, EventBroker broker)
+  public DatabaseSchemaView(JFrame frame, EventBroker broker)
   {
       super(new GridLayout(0,1));
       JPanel leftPane = new JPanel(new GridBagLayout());

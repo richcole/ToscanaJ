@@ -19,7 +19,7 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
-import net.sourceforge.toscanaj.view.database.SchemeView;
+import net.sourceforge.toscanaj.view.database.DatabaseSchemaView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingView;
@@ -97,7 +97,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         DatabaseConnectionInformationView connectionInformationView =
             new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);
 
-        JPanel tableView = new SchemeView(this, eventBroker);
+        JPanel tableView = new DatabaseSchemaView(this, eventBroker);
 
         scaleView = new ScaleEditingView(this, conceptualSchema, eventBroker);
         scaleView.setHorizontalDividerLocation(
