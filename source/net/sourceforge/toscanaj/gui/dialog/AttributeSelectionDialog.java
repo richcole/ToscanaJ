@@ -185,11 +185,11 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
         this.eventBroker = eventBroker;
         init();
         eventBroker.subscribe(this, DatabaseConnectEvent.class, Object.class);
-        int divPos = ConfigurationManager.fetchInt(this.getClass().getName(), "verticalDivider", 100);
+        int divPos = ConfigurationManager.fetchInt("AttributeSelectionDialog", "verticalDivider", 100);
         listSplitPane.setDividerLocation(divPos);
-        divPos = ConfigurationManager.fetchInt(this.getClass().getName(), "horizontalDivider", 100);
+        divPos = ConfigurationManager.fetchInt("AttributeSelectionDialog", "horizontalDivider", 100);
         mainSplitPane.setDividerLocation(divPos);
-        ConfigurationManager.restorePlacement(this.getClass().getName(), this,
+        ConfigurationManager.restorePlacement("AttributeSelectionDialog", this,
                                               new Rectangle(100, 100, 300, 200));
     }
 
@@ -254,8 +254,8 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
 
     public void hide() {
         super.hide();
-        ConfigurationManager.storeInt(this.getClass().getName(), "verticalDivider", listSplitPane.getDividerLocation());
-        ConfigurationManager.storeInt(this.getClass().getName(), "horizontalDivider", mainSplitPane.getDividerLocation());
-        ConfigurationManager.storePlacement(this.getClass().getName(), this);
+        ConfigurationManager.storeInt("AttributeSelectionDialog", "verticalDivider", listSplitPane.getDividerLocation());
+        ConfigurationManager.storeInt("AttributeSelectionDialog", "horizontalDivider", mainSplitPane.getDividerLocation());
+        ConfigurationManager.storePlacement("AttributeSelectionDialog", this);
     }
 }
