@@ -8,7 +8,9 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.fca.DiagramToContextConverter;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
@@ -37,7 +39,7 @@ public class NominalScaleGenerator implements ScaleGenerator {
         return columns.length == 1;
     }
 
-    public Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
+    public Context generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
         Column column = columns[0].getColumn();
         NominalScaleEditorDialog dialog = new NominalScaleEditorDialog(
                 parent,
@@ -100,7 +102,7 @@ public class NominalScaleGenerator implements ScaleGenerator {
             concept.buildClosures();
         }
 
-        return ret;
+        return DiagramToContextConverter.getContext(ret);
     }
 
     private String getSQLClause(String columnName, Object[] values, int i) {

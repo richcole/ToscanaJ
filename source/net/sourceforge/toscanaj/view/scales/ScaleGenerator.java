@@ -9,12 +9,12 @@ package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.Context;
 
 public interface ScaleGenerator {
     String getScaleName();
 
     boolean canHandleColumns(TableColumnPair[] columns);
 
-    Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection);
+    Context generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection);
 }

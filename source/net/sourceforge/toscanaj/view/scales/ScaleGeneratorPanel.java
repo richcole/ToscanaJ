@@ -8,10 +8,16 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
+import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
+import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.util.CollectionFactory;
 
 import org.tockit.events.Event;
@@ -95,9 +101,12 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
             generatorButton.setEnabled(false);
             generatorButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Diagram2D returnValue =
-                            generator.generateScale(selectionSource.getSelectedTableColumnPairs(),
-                                    conceptualSchema, databaseConnection);
+                    Context context =
+                		   generator.generateScale(selectionSource.getSelectedTableColumnPairs(),
+                           conceptualSchema, databaseConnection);
+					LatticeGenerator lgen = new GantersAlgorithm();
+					Lattice lattice = lgen.createLattice(context);
+					Diagram2D returnValue = NDimLayoutOperations.createDiagram(lattice, context.getName(), new DefaultDimensionStrategy());
                     if (null != returnValue) {
                     	Diagram2D diagramWithSameTitle = null;
                     	int indexOfExistingDiagram = -1;
