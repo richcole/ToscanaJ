@@ -385,8 +385,8 @@ public class NominalScaleEditorDialog extends JDialog {
 
     private void removeValuesFromSelection() {
         for (int i = this.attributeListView.getSelectedValues().length - 1; i >= 0; i--) {
-            TableColumnValueTriple tcv = (TableColumnValueTriple) this.attributeListView.getSelectedValues()[i];
-            this.attributeListModel.removeElement(tcv);
+            Object selectedItem = this.attributeListView.getSelectedValues()[i];
+            this.attributeListModel.removeElement(selectedItem);
         }
     }
 
