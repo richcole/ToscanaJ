@@ -304,20 +304,16 @@ public class NominalScaleEditorDialog extends JDialog {
                         0, 0
                 )
         );
-        tablePane.add(new LabeledPanel("Selected Clauses", this.attributeListView),
+        
+        JPanel selectedClausePane = new JPanel(new BorderLayout());
+        selectedClausePane.add(new LabeledPanel("Selected Clauses",this.attributeListView),BorderLayout.CENTER);
+        selectedClausePane.add(combinationButtonPanel, BorderLayout.SOUTH);
+        
+        tablePane.add(selectedClausePane,
                 new GridBagConstraints(
-                        2, 0, 1, 2, 1, 1,
-                        GridBagConstraints.CENTER,
+                        2, 0 , 1, 3, 1, 1,
+                        GridBagConstraints.NORTHWEST,
                         GridBagConstraints.BOTH,
-                        new Insets(5, 5, 5, 5),
-                        0, 0
-                )
-        );
-        tablePane.add(combinationButtonPanel,
-                new GridBagConstraints(
-                        2, 2, 1, 1, 1, 0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.HORIZONTAL,
                         new Insets(5, 5, 5, 5),
                         0, 0
                 )
