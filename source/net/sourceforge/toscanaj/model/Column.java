@@ -38,7 +38,7 @@ public class Column implements XML_Serializable {
 
     public void readXML(Element elem) throws XML_SyntaxError {
         XML_Helper.checkName(COLUMN_ELEMENT_NAME, elem);
-        name = XML_Helper.getAttribute(elem, COLUMN_NAME_ATTRIBUTE_NAME).toString();
+        name = XML_Helper.getAttribute(elem, COLUMN_NAME_ATTRIBUTE_NAME).getValue();
         type = XML_Helper.getIntAttribute(elem, COLUMN_TYPE_ATTRIBUTE_NAME);
     }
 

@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.model.XML_Helper;
 
 /**
  * This class is an abstraction of all diagram related information.
@@ -79,7 +80,10 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {
-        throw new XML_SyntaxError("Not yet implemented");
+        XML_Helper.checkName(DIAGRAM_ELEMENT_NAME, elem);
+        title=XML_Helper.getAttribute(elem, TITLE_ATTRIBUTE_NAME).getValue();
+        throw new XML_SyntaxError("not yet implemented.");
+
     }
 
     /**

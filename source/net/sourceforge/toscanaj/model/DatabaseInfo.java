@@ -235,15 +235,17 @@ public class DatabaseInfo implements XML_Serializable {
     public void readXML(Element elem) throws XML_SyntaxError {
         XML_Helper.checkName(DATABASE_CONNECTION_ELEMENT_NAME, elem);
         if (XML_Helper.contains(elem, EMBEDDED_SOURCE_ELEMENT_NAME)) {
-            embeddedSQLPath=XML_Helper.getAttribute(elem,EMBEDDED_URL_ATTRIBUTE_NAME).toString();
+            Element embedElem = elem.getChild(EMBEDDED_SOURCE_ELEMENT_NAME);
+            embeddedSQLPath=XML_Helper.getAttribute(embedElem,EMBEDDED_URL_ATTRIBUTE_NAME).getValue();
         } else {
-            sourceURL=XML_Helper.mustbe(URL_SOURCE_ELEMENT_NAME,elem).getText();
-            driverClass=XML_Helper.getAttribute(elem, DRIVER_CLASS_ATTRIBUTE_NAME).toString();
-            userName=XML_Helper.getAttribute(elem, USERNAME_ATTRIBUTE_NAME).toString();
-            password=XML_Helper.getAttribute(elem, PASSWORD_ATTRIBUTE_NAME).toString();
+            Element urlElement=XML_Helper.mustbe(URL_SOURCE_ELEMENT_NAME,elem);
+            sourceURL=urlElement.getText();
+            driverClass=XML_Helper.getAttribute(urlElement, DRIVER_CLASS_ATTRIBUTE_NAME).getValue();
+            userName=XML_Helper.getAttribute(urlElement, USERNAME_ATTRIBUTE_NAME).getValue();
+            password=XML_Helper.getAttribute(urlElement, PASSWORD_ATTRIBUTE_NAME).getValue();;
         }
-        table=XML_Helper.mustbe(TABLE_ELEMENT_NAME, elem).getContent().toString();
-        objectKey= XML_Helper.mustbe(OBJECT_KEY_ELEMENT_NAME,elem).getContent().toString();
+        table=XML_Helper.mustbe(TABLE_ELEMENT_NAME, elem).getText();
+        objectKey= XML_Helper.mustbe(OBJECT_KEY_ELEMENT_NAME,elem).getText();
     }
 
     /**

@@ -53,14 +53,8 @@ public class Table implements XML_Serializable {
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {
-        if(!elem.getName().equals(TABLE_ELEMENT_NAME)){
-            throw new XML_SyntaxError("Expected Element: " + TABLE_ELEMENT_NAME);
-        }
-        name = elem.getAttribute(TABLE_NAME_ATTRIBUTE_NAME).toString();
-        if (name == null){
-            throw new XML_SyntaxError("Expected Attribute " +
-                    TABLE_NAME_ATTRIBUTE_NAME + " for Element " + TABLE_ELEMENT_NAME);
-        }
+        XML_Helper.checkName(TABLE_ELEMENT_NAME, elem);
+        name = XML_Helper.getAttribute(elem, TABLE_NAME_ATTRIBUTE_NAME).getValue();
         List columnElems=elem.getChildren(Column.COLUMN_ELEMENT_NAME);
         for (Iterator iterator = columnElems.iterator(); iterator.hasNext();) {
             Element element = (Element) iterator.next();

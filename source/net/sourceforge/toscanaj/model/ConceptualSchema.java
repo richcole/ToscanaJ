@@ -87,6 +87,7 @@ public class ConceptualSchema implements XML_Serializable, DiagramCollection {
     public Element toXML() {
         Element retVal = new Element(CONCEPTUAL_SCHEMA_ELEMENT_NAME);
         retVal.setAttribute(VERSION_ATTRIBUTE_NAME, VERSION_ATTRIBUTE_VALUE);
+        Element descriptionElement= new Element(DESCRIPTION_ELEMENT_NAME);
         retVal.addContent(description);
         retVal.addContent(databaseInfo.toXML());
         retVal.addContent(dbScheme.toXML());
