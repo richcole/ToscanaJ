@@ -705,6 +705,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		this.tableView.setManyValuedContext(inputModel.getContext());
 		this.rowHeader.setManyValuedContext(inputModel.getContext());
 		this.colHeader.setManyValuedContext(inputModel.getContext());
+        
+        this.currentFile = null;
+        String filename =
+            file.getName().substring(0, file.getName().lastIndexOf('.'));
+        setTitle(filename + " (Cernato import, unsaved) - " + WINDOW_TITLE);
 		validate();
 		repaint();
     }
@@ -915,15 +920,14 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
 	/**
-	 * @todo this is platform specific and has to be moved into the base class we still don't have.
+	 * @todo this has to be moved into the base class we still don't have.
 	 */
     private void updateWindowTitle() {
         // get the current filename without the extension and full path
-        // we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
         if (currentFile != null) {
             String filename =
                 currentFile.substring(
-                    currentFile.lastIndexOf("\\") + 1,
+                    currentFile.lastIndexOf(File.separator) + 1,
                     (currentFile.length() - 4));
             setTitle(filename + " - " + WINDOW_TITLE);
         } else {

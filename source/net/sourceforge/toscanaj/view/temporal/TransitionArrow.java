@@ -121,6 +121,9 @@ public class TransitionArrow extends MovableCanvasItem {
     }
 
     public Rectangle2D getCanvasBounds(Graphics2D g) {
+        // we need to update in case one of the nodes has moved
+        // @todo try finding something better
+        calculateBounds();
         return bounds;
     }
 
