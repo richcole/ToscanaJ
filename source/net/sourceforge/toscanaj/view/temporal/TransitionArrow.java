@@ -7,15 +7,12 @@
  */
 package net.sourceforge.toscanaj.view.temporal;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
@@ -28,23 +25,9 @@ public class TransitionArrow extends CanvasItem {
     private NodeView startNodeView;
 	private NodeView endNodeView;
 	private Color color;
-	private static Shape arrowHead;
 	private Rectangle2D bounds;
     private Point2D shiftVector = new Point2D.Double();
 	
-	static {
-		arrowHead = createArrowHead();
-	}
-
-    protected static GeneralPath createArrowHead() {
-        GeneralPath path = new GeneralPath();
-        path.moveTo(-20,-10);
-        path.lineTo(5,0);
-        path.lineTo(-20,10);
-        path.closePath();
-        return path;
-    }
-
     public TransitionArrow(NodeView startNodeView, NodeView endNodeView, Color color) {
     	this.startNodeView = startNodeView;
     	this.endNodeView = endNodeView;
@@ -63,13 +46,27 @@ public class TransitionArrow extends CanvasItem {
     	Stroke oldStroke = g.getStroke();
     	AffineTransform oldTransform = g.getTransform();
     	
+        double startX = getStartX();
+        double startY = getStartY();
+        double endX = getEndX();
+        double endY = getEndY();
+    	float length = (float) Math.sqrt((startX - endX) * (startX - endX) +
+        				       		      (startY - endY) * (startY - endY));
+
+        GeneralPath arrow = new GeneralPath();
+        arrow.moveTo(-20,-7);
+        arrow.lineTo(0,0);
+        arrow.lineTo(-20,7);
+        arrow.lineTo(-20,2);
+        arrow.lineTo(-length,2);
+        arrow.lineTo(-length,-2);
+        arrow.lineTo(-20,-2);
+        arrow.closePath();
+
     	g.setPaint(color);
-    	g.setStroke(new BasicStroke(3));
-    	Line2D line = new Line2D.Double(getStartX(), getStartY(), getEndX(), getEndY()); 
-    	g.draw(line);
-    	g.translate(getEndX(), getEndY());
-    	g.rotate(Math.atan2(getEndY() - getStartY(), getEndX() - getStartX()));
-    	g.fill(arrowHead);
+        g.translate(endX, endY);
+        g.rotate(Math.atan2(endY - startY, endX - startX));
+    	g.fill(arrow);
     	
     	g.setPaint(oldPaint);
     	g.setStroke(oldStroke);
