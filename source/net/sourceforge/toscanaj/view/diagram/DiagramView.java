@@ -169,7 +169,6 @@ public class DiagramView extends Canvas implements ChangeObserver {
         // draw diagram title in the top left corner
         g2d.setPaint(diagramSchema.getForegroundColor());
         g2d.setTransform(oldTransform);
-        g2d.drawString(diagram.getTitle(), margin, margin);
     }
 
     protected void makeScreenTransformClear() {
