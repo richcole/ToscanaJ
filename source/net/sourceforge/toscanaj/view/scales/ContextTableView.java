@@ -108,9 +108,26 @@ public class ContextTableView extends JComponent {
 		g2d.draw(new Rectangle2D.Double(x,y,CELL_WIDTH, CELL_HEIGHT));
 		
 		FontMetrics fontMetrics = g2d.getFontMetrics();
-		g2d.drawString(content, x + CELL_WIDTH/2 - fontMetrics.stringWidth(content)/2, 
+		String newContent = reduceStringDisplayWidth(content, g2d);
+		
+		g2d.drawString(newContent, x + CELL_WIDTH/2 - fontMetrics.stringWidth(newContent)/2, 
 		                        y + CELL_HEIGHT/2 + fontMetrics.getMaxAscent()/2);
 		g2d.setPaint(oldPaint);
+	}
+	
+	protected String reduceStringDisplayWidth(String content, Graphics2D g2d) {
+		String newContent = content;
+		String tail = "...";
+		int stringWidth = g2d.getFontMetrics().stringWidth(newContent);
+		int tailWidth = g2d.getFontMetrics().stringWidth(tail);
+		if (stringWidth > (CELL_WIDTH-10)){
+			while((stringWidth + tailWidth) > (CELL_WIDTH-10)){
+				newContent = newContent.substring(0,(newContent.length()-1));
+				stringWidth = g2d.getFontMetrics().stringWidth(newContent);
+			}
+			newContent+=tail;
+		}
+		return newContent;
 	}
 	
 	protected void update(Context ctx){
