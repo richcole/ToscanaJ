@@ -297,158 +297,158 @@
 		<object id="241">[interne Laufwerkschächte] = 44</object>
 		<attribute id="1"/>
 		<attribute id="2"/>
-		<attribute id="3">&gt;=2500$</attribute>
-		<attribute id="4">&gt;=3000$</attribute>
-		<attribute id="5">&gt;=3500$</attribute>
-		<attribute id="6">&gt;=4000$</attribute>
-		<attribute id="7">&gt;=4500$</attribute>
-		<attribute id="8">&gt;=5000$</attribute>
-		<attribute id="9">&lt;5000$</attribute>
-		<attribute id="10">&lt;4500$</attribute>
-		<attribute id="11">&lt;4000$</attribute>
-		<attribute id="12">&lt;3500$</attribute>
-		<attribute id="13">&lt;3000$</attribute>
-		<attribute id="14">&lt;2500$</attribute>
+		<attribute id="3" name="&gt;=2500$"/>
+		<attribute id="4" name="&gt;=3000$"/>
+		<attribute id="5" name="&gt;=3500$"/>
+		<attribute id="6" name="&gt;=4000$"/>
+		<attribute id="7" name="&gt;=4500$"/>
+		<attribute id="8" name="&gt;=5000$"/>
+		<attribute id="9" name="&lt;5000$"/>
+		<attribute id="10" name="&lt;4500$"/>
+		<attribute id="11" name="&lt;4000$"/>
+		<attribute id="12" name="&lt;3500$"/>
+		<attribute id="13" name="&lt;3000$"/>
+		<attribute id="14" name="&lt;2500$"/>
 		<attribute id="15"/>
 		<attribute id="16"/>
-		<attribute id="17">&gt;=225MB</attribute>
-		<attribute id="18">&gt;=250MB</attribute>
-		<attribute id="19">&gt;=350MB</attribute>
-		<attribute id="20">&gt;=400MB</attribute>
-		<attribute id="21">&gt;=450MB</attribute>
-		<attribute id="22">&gt;=500MB</attribute>
-		<attribute id="23">&lt;500MB</attribute>
-		<attribute id="24">&lt;450MB</attribute>
-		<attribute id="25">&lt;400MB</attribute>
-		<attribute id="26">&lt;350MB</attribute>
-		<attribute id="27">&lt;250MB</attribute>
-		<attribute id="28">&lt;225MB</attribute>
-		<attribute id="29">Disk WinMark &gt; 0, Graphics WinMark &gt; 0</attribute>
-		<attribute id="30">&gt; 5</attribute>
-		<attribute id="31">&gt; 10</attribute>
-		<attribute id="32">&gt; 15</attribute>
-		<attribute id="33">&gt; 20</attribute>
-		<attribute id="34">&gt; 30</attribute>
-		<attribute id="35">&gt; 40</attribute>
-		<attribute id="36">&gt; 15</attribute>
-		<attribute id="37">&gt; 30</attribute>
-		<attribute id="38">&gt; 45</attribute>
-		<attribute id="39">&gt; 60</attribute>
-		<attribute id="40">&gt; 90</attribute>
-		<attribute id="41">&gt; 120</attribute>
-		<attribute id="42">ISA-Bus</attribute>
-		<attribute id="43">EISA-Bus</attribute>
-		<attribute id="44">MCA-Bus</attribute>
-		<attribute id="45">&gt;=200MB</attribute>
-		<attribute id="46">&gt;=400MB</attribute>
+		<attribute id="17" name="&gt;=225MB"/>
+		<attribute id="18" name="&gt;=250MB"/>
+		<attribute id="19" name="&gt;=350MB"/>
+		<attribute id="20" name="&gt;=400MB"/>
+		<attribute id="21" name="&gt;=450MB"/>
+		<attribute id="22" name="&gt;=500MB"/>
+		<attribute id="23" name="&lt;500MB"/>
+		<attribute id="24" name="&lt;450MB"/>
+		<attribute id="25" name="&lt;400MB"/>
+		<attribute id="26" name="&lt;350MB"/>
+		<attribute id="27" name="&lt;250MB"/>
+		<attribute id="28" name="&lt;225MB"/>
+		<attribute id="29" name="Disk WinMark &gt; 0, Graphics WinMark &gt; 0"/>
+		<attribute id="30" name="&gt; 5"/>
+		<attribute id="31" name="&gt; 10"/>
+		<attribute id="32" name="&gt; 15"/>
+		<attribute id="33" name="&gt; 20"/>
+		<attribute id="34" name="&gt; 30"/>
+		<attribute id="35" name="&gt; 40"/>
+		<attribute id="36" name="&gt; 15"/>
+		<attribute id="37" name="&gt; 30"/>
+		<attribute id="38" name="&gt; 45"/>
+		<attribute id="39" name="&gt; 60"/>
+		<attribute id="40" name="&gt; 90"/>
+		<attribute id="41" name="&gt; 120"/>
+		<attribute id="42" name="ISA-Bus"/>
+		<attribute id="43" name="EISA-Bus"/>
+		<attribute id="44" name="MCA-Bus"/>
+		<attribute id="45" name="&gt;=200MB"/>
+		<attribute id="46" name="&gt;=400MB"/>
 		<attribute id="47"/>
 		<attribute id="48"/>
-		<attribute id="49">&gt;=1500</attribute>
-		<attribute id="50">&gt;=3000</attribute>
-		<attribute id="51">&gt;=4500</attribute>
-		<attribute id="52">&gt;=6000</attribute>
-		<attribute id="53">&gt;=7500</attribute>
-		<attribute id="54">&gt;=9000</attribute>
-		<attribute id="55">&lt;9000</attribute>
-		<attribute id="56">&lt;7500</attribute>
-		<attribute id="57">&lt;6000</attribute>
-		<attribute id="58">&lt;4500</attribute>
-		<attribute id="59">&lt;3000</attribute>
-		<attribute id="60">&lt;1500</attribute>
-		<attribute id="61">Disk WinMark &gt; 0, DOSmark &gt;= 0</attribute>
-		<attribute id="62">&gt;= 40</attribute>
-		<attribute id="63">&gt;= 50</attribute>
-		<attribute id="64">&gt;= 60</attribute>
-		<attribute id="65">&gt;= 70</attribute>
-		<attribute id="66">&gt;= 80</attribute>
-		<attribute id="67">&gt;= 90</attribute>
-		<attribute id="68">&gt; 15</attribute>
-		<attribute id="69">&gt; 30</attribute>
-		<attribute id="70">&gt; 45</attribute>
-		<attribute id="71">&gt; 60</attribute>
-		<attribute id="72">&gt; 90</attribute>
-		<attribute id="73">&gt; 120</attribute>
-		<attribute id="74">Direktvertrieb</attribute>
-		<attribute id="75">Nur Direktvertrieb</attribute>
-		<attribute id="76">Händler</attribute>
-		<attribute id="77">Nur Händlervertrieb</attribute>
-		<attribute id="78">Beide Vertriebsformen</attribute>
-		<attribute id="79">Desktop</attribute>
-		<attribute id="80">Slimline</attribute>
-		<attribute id="81">Small-footprint</attribute>
-		<attribute id="82">Tower</attribute>
-		<attribute id="83">Mini-Tower</attribute>
-		<attribute id="84">kein 5¼" Schacht</attribute>
-		<attribute id="85">kein 3½" Schacht</attribute>
-		<attribute id="86">ein 3½" Schacht</attribute>
-		<attribute id="87">zwei 3½" Schächte</attribute>
-		<attribute id="88">drei 3½" Schächte</attribute>
-		<attribute id="89">ein 5¼" Schacht</attribute>
-		<attribute id="90">zwei 5¼" Schächte</attribute>
-		<attribute id="91">drei 5¼" Schächte</attribute>
-		<attribute id="92">vier 5¼" Schächte</attribute>
-		<attribute id="93">fünf 5¼" Schächte</attribute>
-		<attribute id="94">sechs 5¼" Schächte</attribute>
-		<attribute id="95">sieben 5¼" Schächte</attribute>
-		<attribute id="96">5 Anschlüsse</attribute>
+		<attribute id="49" name="&gt;=1500"/>
+		<attribute id="50" name="&gt;=3000"/>
+		<attribute id="51" name="&gt;=4500"/>
+		<attribute id="52" name="&gt;=6000"/>
+		<attribute id="53" name="&gt;=7500"/>
+		<attribute id="54" name="&gt;=9000"/>
+		<attribute id="55" name="&lt;9000"/>
+		<attribute id="56" name="&lt;7500"/>
+		<attribute id="57" name="&lt;6000"/>
+		<attribute id="58" name="&lt;4500"/>
+		<attribute id="59" name="&lt;3000"/>
+		<attribute id="60" name="&lt;1500"/>
+		<attribute id="61" name="Disk WinMark &gt; 0, DOSmark &gt;= 0"/>
+		<attribute id="62" name="&gt;= 40"/>
+		<attribute id="63" name="&gt;= 50"/>
+		<attribute id="64" name="&gt;= 60"/>
+		<attribute id="65" name="&gt;= 70"/>
+		<attribute id="66" name="&gt;= 80"/>
+		<attribute id="67" name="&gt;= 90"/>
+		<attribute id="68" name="&gt; 15"/>
+		<attribute id="69" name="&gt; 30"/>
+		<attribute id="70" name="&gt; 45"/>
+		<attribute id="71" name="&gt; 60"/>
+		<attribute id="72" name="&gt; 90"/>
+		<attribute id="73" name="&gt; 120"/>
+		<attribute id="74" name="Direktvertrieb"/>
+		<attribute id="75" name="Nur Direktvertrieb"/>
+		<attribute id="76" name="Händler"/>
+		<attribute id="77" name="Nur Händlervertrieb"/>
+		<attribute id="78" name="Beide Vertriebsformen"/>
+		<attribute id="79" name="Desktop"/>
+		<attribute id="80" name="Slimline"/>
+		<attribute id="81" name="Small-footprint"/>
+		<attribute id="82" name="Tower"/>
+		<attribute id="83" name="Mini-Tower"/>
+		<attribute id="84" name="kein 5¼&quot; Schacht"/>
+		<attribute id="85" name="kein 3½&quot; Schacht"/>
+		<attribute id="86" name="ein 3½&quot; Schacht"/>
+		<attribute id="87" name="zwei 3½&quot; Schächte"/>
+		<attribute id="88" name="drei 3½&quot; Schächte"/>
+		<attribute id="89" name="ein 5¼&quot; Schacht"/>
+		<attribute id="90" name="zwei 5¼&quot; Schächte"/>
+		<attribute id="91" name="drei 5¼&quot; Schächte"/>
+		<attribute id="92" name="vier 5¼&quot; Schächte"/>
+		<attribute id="93" name="fünf 5¼&quot; Schächte"/>
+		<attribute id="94" name="sechs 5¼&quot; Schächte"/>
+		<attribute id="95" name="sieben 5¼&quot; Schächte"/>
+		<attribute id="96" name="5 Anschlüsse"/>
 		<attribute id="97"/>
 		<attribute id="98"/>
 		<attribute id="99"/>
 		<attribute id="100"/>
-		<attribute id="101">Leistung &lt;150 Watt</attribute>
-		<attribute id="102">2 Anschlüsse</attribute>
-		<attribute id="103">6 Anschlüsse</attribute>
+		<attribute id="101" name="Leistung &lt;150 Watt"/>
+		<attribute id="102" name="2 Anschlüsse"/>
+		<attribute id="103" name="6 Anschlüsse"/>
 		<attribute id="104"/>
 		<attribute id="105"/>
 		<attribute id="106"/>
 		<attribute id="107"/>
-		<attribute id="108">7 Anschlüsse</attribute>
+		<attribute id="108" name="7 Anschlüsse"/>
 		<attribute id="109"/>
 		<attribute id="110"/>
 		<attribute id="111"/>
 		<attribute id="112"/>
-		<attribute id="113">8 Anschlüsse</attribute>
+		<attribute id="113" name="8 Anschlüsse"/>
 		<attribute id="114"/>
 		<attribute id="115"/>
 		<attribute id="116"/>
 		<attribute id="117"/>
-		<attribute id="118">4 Anschlüsse</attribute>
+		<attribute id="118" name="4 Anschlüsse"/>
 		<attribute id="119"/>
 		<attribute id="120"/>
 		<attribute id="121"/>
 		<attribute id="122"/>
-		<attribute id="123">3 Anschlüsse</attribute>
+		<attribute id="123" name="3 Anschlüsse"/>
 		<attribute id="124"/>
 		<attribute id="125"/>
 		<attribute id="126"/>
 		<attribute id="127"/>
-		<attribute id="128">&lt;200 Watt</attribute>
-		<attribute id="129">&lt;250 Watt</attribute>
-		<attribute id="130">&lt;300 Watt</attribute>
-		<attribute id="131">&gt;=300 Watt</attribute>
-		<attribute id="132">ISA Bus</attribute>
-		<attribute id="133">EISA Bus</attribute>
-		<attribute id="134">Local Bus</attribute>
-		<attribute id="135">Motherboard</attribute>
-		<attribute id="136">MCA</attribute>
-		<attribute id="137">VESA Local Bus</attribute>
-		<attribute id="138">Proprietary Local Bus</attribute>
-		<attribute id="139">UBSA Local BUS</attribute>
-		<attribute id="140">Ein paraller Port</attribute>
-		<attribute id="141">Ein serieller Port</attribute>
-		<attribute id="142">ein Mouse-Port</attribute>
-		<attribute id="143">Zwei serielle Ports</attribute>
-		<attribute id="144">Zwei parallele Ports</attribute>
-		<attribute id="145">kein 5¼" Schacht</attribute>
-		<attribute id="146">kein 3½" Schacht</attribute>
-		<attribute id="147">ein 5½" Schacht</attribute>
-		<attribute id="148">zwei 5½" Schächte</attribute>
-		<attribute id="149">drei 5½" Schächte</attribute>
-		<attribute id="150">ein 3¼" Schacht</attribute>
-		<attribute id="151">zwei 3¼" Schächte</attribute>
-		<attribute id="152">drei 3¼" Schächte</attribute>
-		<attribute id="153">vier 5½" Schächte</attribute>
-		<attribute id="154">vier 3¼" Schächte</attribute>
+		<attribute id="128" name="&lt;200 Watt"/>
+		<attribute id="129" name="&lt;250 Watt"/>
+		<attribute id="130" name="&lt;300 Watt"/>
+		<attribute id="131" name="&gt;=300 Watt"/>
+		<attribute id="132" name="ISA Bus"/>
+		<attribute id="133" name="EISA Bus"/>
+		<attribute id="134" name="Local Bus"/>
+		<attribute id="135" name="Motherboard"/>
+		<attribute id="136" name="MCA"/>
+		<attribute id="137" name="VESA Local Bus"/>
+		<attribute id="138" name="Proprietary Local Bus"/>
+		<attribute id="139" name="UBSA Local BUS"/>
+		<attribute id="140" name="Ein paraller Port"/>
+		<attribute id="141" name="Ein serieller Port"/>
+		<attribute id="142" name="ein Mouse-Port"/>
+		<attribute id="143" name="Zwei serielle Ports"/>
+		<attribute id="144" name="Zwei parallele Ports"/>
+		<attribute id="145" name="kein 5¼&quot; Schacht"/>
+		<attribute id="146" name="kein 3½&quot; Schacht"/>
+		<attribute id="147" name="ein 5½&quot; Schacht"/>
+		<attribute id="148" name="zwei 5½&quot; Schächte"/>
+		<attribute id="149" name="drei 5½&quot; Schächte"/>
+		<attribute id="150" name="ein 3¼&quot; Schacht"/>
+		<attribute id="151" name="zwei 3¼&quot; Schächte"/>
+		<attribute id="152" name="drei 3¼&quot; Schächte"/>
+		<attribute id="153" name="vier 5½&quot; Schächte"/>
+		<attribute id="154" name="vier 3¼&quot; Schächte"/>
 	</context>
 	<diagram title="Preise für 486/66 PCs">
 		<concept id="1">

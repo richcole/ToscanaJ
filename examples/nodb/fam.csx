@@ -6,11 +6,11 @@
 		<object id="nora">Nora</object>
 		<object id="elin">Elin</object>
 		<object id="bernhard">Bernhard</object>
-		<attribute id="1">männlich</attribute>
-		<attribute id="2">weiblich</attribute>
-		<attribute id="3">beruf</attribute>
-		<attribute id="4">student</attribute>
-		<attribute id="5">schüler</attribute>
+		<attribute id="1" name="männlich"/>
+		<attribute id="2" name="weiblich"/>
+		<attribute id="3" name="beruf"/>
+		<attribute id="4" name="student"/>
+		<attribute id="5" name="schüler"/>
 	</context>
 	<diagram title="Geschlecht">
 		<concept id="1">
