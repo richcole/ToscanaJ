@@ -42,12 +42,10 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 	private static final String ATTRIBUTES_ELEMENT_NAME = "attributes";
 	private static final String TYPES_ELEMENT_NAME = "types";
 	private static final String RELATION_ELEMENT_NAME = "relation";
-	private static final String ROW_ELEMENT_NAME = "object";
 	private static final String OBJECT_ID_ATTRIBUTE_NAME = "objectId";
 	private static final String TYPE_ID_ATTRIBUTE_NAME = "typeId";
-	private static final String ROW_OBJECT_REF_ATTRIBUTE_NAME = "objectRef";
-	private static final String ATTRIBUTE_VALUE_PAIR_ELEMENT_NAME = "attribute";
-	private static final String ATTRIBUTE_VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME = "attributeRef";
+	private static final String VALUE_OBJECT_REF_ATTRIBUTE_NAME = "objectRef";
+	private static final String VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME = "attributeRef";
 	
 	public ManyValuedContextImplementation() {
     }
@@ -194,19 +192,16 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		Element relationElement = new Element(RELATION_ELEMENT_NAME);
 		for (Iterator iter = relation.entrySet().iterator(); iter.hasNext();) {
 			Entry itRow = (Entry) iter.next();
-			Element rowElement = new Element(ROW_ELEMENT_NAME);
-			rowElement.setAttribute(ROW_OBJECT_REF_ATTRIBUTE_NAME, (String) objectIdMapping.get(itRow.getKey()));
 			Hashtable values = (Hashtable) itRow.getValue();
 			for (Iterator iterator = values.entrySet().iterator(); iterator.hasNext();) {
 				Entry  itAttributeValue = (Entry) iterator.next();
-				Element attributeValueElement = new Element(ATTRIBUTE_VALUE_PAIR_ELEMENT_NAME);
 				ManyValuedAttributeImplementation mvAttribute = (ManyValuedAttributeImplementation) itAttributeValue.getKey();
 				String attributeId = (String) attributeIdMapping.get(mvAttribute);
-				attributeValueElement.setAttribute(ATTRIBUTE_VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME, attributeId);
-				attributeValueElement.addContent(mvAttribute.getType().toElement((AttributeValue)itAttributeValue.getValue()));
-				rowElement.addContent(attributeValueElement);
+				Element valueElement = mvAttribute.getType().toElement((AttributeValue)itAttributeValue.getValue());
+				valueElement.setAttribute(VALUE_OBJECT_REF_ATTRIBUTE_NAME, (String) objectIdMapping.get(itRow.getKey()));
+				valueElement.setAttribute(VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME, attributeId);
+				relationElement.addContent(valueElement);
 			}
-			relationElement.addContent(rowElement);
 		}
 		retVal.addContent(relationElement);
 		return retVal;
@@ -250,21 +245,13 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 			attributes.add(newAttribute);
 		}
 		for (Iterator iter = relationElement.getChildren().iterator(); iter.hasNext();) {
-			Element row = (Element) iter.next();
-			String objectRef = XMLHelper.getAttribute(row, ROW_OBJECT_REF_ATTRIBUTE_NAME).getValue();
+			Element valueElement = (Element) iter.next();
+			String objectRef = XMLHelper.getAttribute(valueElement, VALUE_OBJECT_REF_ATTRIBUTE_NAME).getValue();
 			FCAElementImplementation rowObject = (FCAElementImplementation) objectIdMapping.get(objectRef);
-			ManyValuedAttribute tempAttribute;
-			AttributeValue tempValue;
-			Hashtable tempRow = new Hashtable();
-			for (Iterator it = row.getChildren().iterator(); it.hasNext();) {
-				Element attributeValueElement = (Element) it.next();
-				String attributeRef = XMLHelper.getAttribute(attributeValueElement, ATTRIBUTE_VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME).getValue();
-				tempAttribute = (ManyValuedAttribute) attributeIdMapping.get(attributeRef);
-				Element valueElement = XMLHelper.getMandatoryChild(attributeValueElement, TypeImplementation.VALUE_ELEMENT_NAME);
-				tempValue = tempAttribute.getType().toValue(valueElement);
-				tempRow.put(tempAttribute, tempValue);
-			}
-			relation.put(rowObject, tempRow);
+            String attributeRef = XMLHelper.getAttribute(valueElement, VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME).getValue();
+			ManyValuedAttribute tempAttribute = (ManyValuedAttribute) attributeIdMapping.get(attributeRef);
+			AttributeValue tempValue = tempAttribute.getType().toValue(valueElement);
+			setRelationship(rowObject, tempAttribute, tempValue);
 		}
 	}
 }
