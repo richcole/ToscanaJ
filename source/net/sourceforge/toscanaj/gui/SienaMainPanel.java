@@ -9,12 +9,7 @@ package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.cernato.CernatoDimensionStrategy;
-import net
-    .sourceforge
-    .toscanaj
-    .controller
-    .diagram
-    .ObjectEditingLabelViewPopupMenuHandler;
+import net.sourceforge.toscanaj.controller.diagram.ObjectEditingLabelViewPopupMenuHandler;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
@@ -74,9 +69,7 @@ import java.util.Vector;
 import java.util.List;
 import java.util.ListIterator;
 
-public class SienaMainPanel
-    extends JFrame
-    implements MainPanel, EventBrokerListener {
+public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     private static final String CONFIGURATION_SECTION_NAME = "SienaMainPanel";
     private static final String WINDOW_TITLE = "Siena";
     static private final int MaxMruFiles = 8;
@@ -114,7 +107,9 @@ public class SienaMainPanel
     private SaveFileAction saveAsFileAction;
     private SaveConceptualSchemaActivity saveActivity;
 
-    public SienaMainPanel() {
+    private Object cernatoObjectDialog;
+	private Object cernatoTableView;
+	public SienaMainPanel() {
         super(WINDOW_TITLE);
 
         eventBroker = new EventBroker();
@@ -179,30 +174,33 @@ public class SienaMainPanel
         });
     }
 
-    public void createViews() {
-        diagramEditingView =
-            new DiagramEditingView(conceptualSchema, eventBroker);
-        DiagramView diagramView = diagramEditingView.getDiagramView();
+	protected void createViews() {
+		createDiagramEditingView();
 
-        diagramView.getController().getEventBroker().subscribe(
-            this,
-            DisplayedDiagramChangedEvent.class,
-            Object.class);
+		JTabbedPane mainPanel = new JTabbedPane();
+		mainPanel.addTab("Context", createContextEditingView());
+		mainPanel.setSelectedIndex(0);
+		mainPanel.addTab("Diagrams", this.diagramEditingView);
+		setContentPane(mainPanel);
+	}
 
-        diagramView.getController().getEventBroker().subscribe(
-            new ObjectEditingLabelViewPopupMenuHandler(
-                diagramView,
-                eventBroker),
-            CanvasItemContextMenuRequestEvent.class,
-            ObjectLabelView.getFactory().getLabelClass());
+	protected void createDiagramEditingView() {
+		this.diagramEditingView = new DiagramEditingView(conceptualSchema, eventBroker);
+		this.diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
+										this, DisplayedDiagramChangedEvent.class, Object.class);
+		DiagramView diagramView = diagramEditingView.getDiagramView();
+		diagramView.getController().getEventBroker().subscribe(
+			new ObjectEditingLabelViewPopupMenuHandler(
+				diagramView,
+				eventBroker),
+			CanvasItemContextMenuRequestEvent.class,
+			ObjectLabelView.getFactory().getLabelClass());
+		this.diagramEditingView.setDividerLocation(ConfigurationManager.fetchInt("SienaMainPanel", "diagramViewDivider", 200));
+	}
 
-        diagramEditingView.setDividerLocation(
-            ConfigurationManager.fetchInt(
-                "SienaMainPanel",
-                "diagramViewDivider",
-                200));
-        setContentPane(diagramEditingView);
-    }
+	protected JPanel createContextEditingView() {
+		return new JPanel();
+	}
 
     public void createMenuBar() {
 
