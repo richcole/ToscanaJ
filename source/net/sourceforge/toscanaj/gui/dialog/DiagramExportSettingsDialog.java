@@ -7,8 +7,7 @@
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
-import net.sourceforge.toscanaj.model.DiagramExportSettings;
-
+import org.tockit.canvas.imagewriter.DiagramExportSettings;
 import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.swing.preferences.ExtendedPreferences;
@@ -31,6 +30,8 @@ import java.util.Iterator;
  * Use the static method showDialog() to get a modal dialog. If this returns
  * true the user clicked ok (otherwise cancel) and the information can be
  * retrieved with the methods getFormat(), getWidth() and getHeight().
+ * 
+ * @todo move into Tockit, using a panel and the GenericDialog class
  */
 public class DiagramExportSettingsDialog extends JDialog implements ActionListener {
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramExportSettingsDialog.class);

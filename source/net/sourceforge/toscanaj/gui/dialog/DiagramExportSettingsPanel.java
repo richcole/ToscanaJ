@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
-import net.sourceforge.toscanaj.model.DiagramExportSettings;
-
 import javax.swing.*;
+
+import org.tockit.canvas.imagewriter.DiagramExportSettings;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

@@ -12,12 +12,12 @@ import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsPanel;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
-import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
+import org.tockit.canvas.imagewriter.DiagramExportSettings;
 import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.canvas.imagewriter.ImageGenerationException;
