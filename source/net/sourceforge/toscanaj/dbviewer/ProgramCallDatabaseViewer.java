@@ -80,7 +80,8 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
             }
             command += (String) itText.next();
         } catch (DatabaseException e) {
-            System.err.println("Failed to query database:\n" + e.getMessage() + "\n" + e.getCause().getMessage());
+        	/// @todo maybe we should introduce a proper DatabaseViewerException in the signature
+            throw new RuntimeException("Failed to query database.", e);
         }
         try {
             // add command shell on Win32 platforms

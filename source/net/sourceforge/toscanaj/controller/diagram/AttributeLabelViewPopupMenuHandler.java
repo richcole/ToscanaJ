@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
@@ -70,7 +71,12 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
             menuItem = new JMenuItem(attributeViewName);
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    DatabaseViewerManager.showAttribute(attributeViewName, attribute);
+                	try {
+                    	DatabaseViewerManager.showAttribute(attributeViewName, attribute);
+                	} catch(Exception exc) { // we catch any exception and show it to the user
+                		ErrorDialog.showError(diagramView, exc, "Database View Failed", "The database view could not be shown,\n" +
+                										    							"possibly due to a misconfiguration.");
+                	}
                 }
             });
             popupMenu.add(menuItem);
