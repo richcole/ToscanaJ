@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+ <!-- this is partly outdated -->
 <sourceStructure>
 	<package name="net">
 		<package name="sourceforge">
@@ -26,6 +27,11 @@
 						</description>
 					</package>
 				</package>
+                <package name="events">
+                    <description>
+                        Classes for handling events, based on a publish/subscribe pattern
+                    </description>
+                </package>
 				<package name="model">
 					<description>
 						All model related classes
@@ -64,7 +70,7 @@
 			</package>
 		</package>
 	</package>
-</cvsStructure>
+</sourceStructure>
 
 <!-- copy and paste stuff
 	<package name="">
