@@ -105,7 +105,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     // nesting submenu
     private JRadioButtonMenuItem noNestingMenuItem = null;
     private JRadioButtonMenuItem nestingLevel1MenuItem = null;
-    private JRadioButtonMenuItem nestingLevel2MenuItem = null;
 
     // view menu
     private JRadioButtonMenuItem showAllMenuItem = null;
@@ -348,27 +347,18 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         diagrMenu.addSeparator();
 
         // create the nesting submenu
-        JMenu nestingMenu = new JMenu("Nesting");
-        nestingMenu.setMnemonic(KeyEvent.VK_N);
-        diagrMenu.add(nestingMenu);
-
         ButtonGroup nestingGroup = new ButtonGroup();
 
-        this.noNestingMenuItem = new JRadioButtonMenuItem("No Nesting");
+        this.noNestingMenuItem = new JRadioButtonMenuItem("No nesting of diagrams");
         this.noNestingMenuItem.addActionListener(this);
         this.noNestingMenuItem.setSelected(true);
         nestingGroup.add(noNestingMenuItem);
-        nestingMenu.add(noNestingMenuItem);
+        diagrMenu.add(noNestingMenuItem);
 
-        this.nestingLevel1MenuItem = new JRadioButtonMenuItem("One level");
+        this.nestingLevel1MenuItem = new JRadioButtonMenuItem("One level of nesting");
         this.nestingLevel1MenuItem.addActionListener(this);
         nestingGroup.add(nestingLevel1MenuItem);
-        nestingMenu.add(nestingLevel1MenuItem);
-
-        this.nestingLevel2MenuItem = new JRadioButtonMenuItem("Two levels");
-        this.nestingLevel2MenuItem.addActionListener(this);
-        nestingGroup.add(nestingLevel2MenuItem);
-        nestingMenu.add(nestingLevel2MenuItem);
+        diagrMenu.add(nestingLevel1MenuItem);
 
         // create the view menu
         JMenu viewMenu = new JMenu("View");
@@ -552,9 +542,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         }
         if (actionSource == this.nestingLevel1MenuItem) {
             DiagramController.getController().setNestingLevel(1);
-        }
-        if (actionSource == this.nestingLevel2MenuItem) {
-            DiagramController.getController().setNestingLevel(2);
         }
 
         // view menu
