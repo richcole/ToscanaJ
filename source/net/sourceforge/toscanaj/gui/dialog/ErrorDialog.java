@@ -18,7 +18,7 @@ import javax.swing.JOptionPane;
  * ToscanaJ Exceptions will give the user the option to see a simple error
  * message or thay can view more detailed error message.
  * 
- * @todo use JDK 1.4 getCause() instead
+ * @todo break messages that are too long into multiple lines
  */
 
 public class ErrorDialog {

@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.gui;
 
+import net.sourceforge.toscanaj.DataDump;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
@@ -15,6 +16,7 @@ import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.gui.dialog.ExportStatisticalDataSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
@@ -38,6 +40,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.LinkedList;
@@ -94,6 +97,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         this.eventBroker = new EventBroker();
         this.conceptualSchema = new ConceptualSchema(eventBroker);
         this.databaseConnection = new DatabaseConnection(eventBroker);
+        DatabaseConnection.setConnection(this.databaseConnection);
 
         this.eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
         this.eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class);
@@ -260,6 +264,18 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             }
         });
         editMenu.add(editSchemaDescriptionMenuItem);
+        
+        JMenu toolMenu = new JMenu("Tools");
+        toolMenu.setMnemonic(KeyEvent.VK_T);
+        JMenuItem dumpStatisticalDataMenuItem = new JMenuItem("Export Statistical Data...");
+        dumpStatisticalDataMenuItem.setMnemonic(KeyEvent.VK_S);
+        dumpStatisticalDataMenuItem.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e) {
+        		exportStatisticalData();
+        	}
+        });
+        toolMenu.add(dumpStatisticalDataMenuItem);
+		menuBar.add(toolMenu);
 
         // --- help menu ---
         // create a help menu
@@ -414,7 +430,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
         openDialog.setApproveButtonText("Import");
-		int rv = openDialog.showOpenDialog(this);
+        int rv = openDialog.showOpenDialog(this);
         if (rv != JFileChooser.APPROVE_OPTION) {
             return;
         }
@@ -441,4 +457,40 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         }
     }
 
+    private void exportStatisticalData() {
+        ExportStatisticalDataSettingsDialog expSettingsDialog = new ExportStatisticalDataSettingsDialog(this);
+        expSettingsDialog.show();
+        if(!expSettingsDialog.hasPositiveResult()) {
+        	return;
+        }
+        
+        final JFileChooser saveDialog;
+        if (this.currentFile != null) {
+            // use position of last file for dialog
+            saveDialog = new JFileChooser(this.currentFile);
+        } else {
+            saveDialog = new JFileChooser(System.getProperty("user.dir"));
+        }
+        saveDialog.setApproveButtonText("Export");
+        int rv = saveDialog.showSaveDialog(this);
+        if (rv != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        exportStatisticalData(saveDialog.getSelectedFile(), 
+        							expSettingsDialog.getFilterClause(), 
+							        expSettingsDialog.hasIncludeContingentListsSet(),
+							        expSettingsDialog.hasIncludeIntentExtentListsSet());
+    }
+
+    private void exportStatisticalData(File file, String filterClause, 
+    									boolean includeContingentLists, boolean includeIntentExtent) {
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            DataDump.dumpData(this.conceptualSchema, outputStream, filterClause, includeContingentLists, includeIntentExtent);
+            outputStream.close();
+        } catch (Exception e) {
+            ErrorDialog.showError(this, e, "Could not export file");
+            return;
+        }
+    }
 }

@@ -317,7 +317,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
 
     public void next(Concept zoomedConcept) {
         if (!canPerformNext()) {
-            return;
+            throw new RuntimeException("No next diagram to go to");
         }
         getReferenceAt(currStartPosition).setZoomedConcept(zoomedConcept);
         if (shouldChangeCurrentStartDiagram()) {

@@ -9,10 +9,13 @@ package net.sourceforge.toscanaj;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.diagram.DiagramLine;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
@@ -24,8 +27,9 @@ import org.jdom.output.XMLOutputter;
 import org.tockit.events.EventBroker;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Hashtable;
 import java.util.Iterator;
 
 /**
@@ -45,19 +49,19 @@ import java.util.Iterator;
  * 3: reserved
  * 4: could not connect to database
  * 5: could not write output
- * 6: filter clause given for non-DB file
+ * 6: unknown problem
  */
 public class DataDump {
     /**
      * The main procedure.
      */
-    protected static void dumpData(File file, String filterClause, boolean includeLists) {
+    protected static void dumpData(File inputFile, String filterClause, boolean includeLists) {
         // parse input
         ConceptualSchema schema = null;
         EventBroker broker = new EventBroker();
         DatabaseConnection.initialize(broker);
         try {
-            schema = CSXParser.parse(new EventBroker(), file);
+            schema = CSXParser.parse(new EventBroker(), inputFile);
         } catch (DataFormatException e) {
             System.err.println("Could not parse input.");
             System.err.println("- " + e.getMessage());
@@ -78,40 +82,59 @@ public class DataDump {
             System.err.println("- " + e.getMessage());
             System.exit(4);
         }
-        // create concept for filtering if needed
-        ConceptImplementation filterConcept = null;
-        /// @todo don't generate multiple connections, instead send the same connection object.
-        if (filterClause != null) {
-            try {
-                filterConcept = new ConceptImplementation();
-            } catch (Exception e) {
-                System.err.println("Couldn't create filter for database");
-                System.exit(4);
-            }
-            filterConcept.addObject(filterClause);
-        }
-        // create output structure
-        Document output = new Document(new Element("csxDump"));
-        // dump all diagrams
-        for (int diag = 0; diag < schema.getNumberOfDiagrams(); diag++) {
-            dumpDiagram(filterDiagram(schema.getDiagram(diag), filterConcept),
-                    output.getRootElement(), includeLists);
-        }
-        // write XML to stdout
-        XMLOutputter outputter = new XMLOutputter("    ", true);
         try {
-            outputter.output(output, System.out);
-        } catch (Exception e) {
+        	dumpData(schema, System.out, filterClause, includeLists, includeLists);
+        } catch (IOException e) {
             System.err.println("Could not write output.");
             e.printStackTrace();
             System.exit(5);
+        } catch (Exception e) {
+            System.err.println("Unknown problem occured.");
+            e.printStackTrace();
+            System.exit(6);
         }
+    }
+
+    public static void dumpData(ConceptualSchema schema, OutputStream outputStream, String filterClause,
+                                  boolean includeContingentLists, boolean includeIntentExtent) 
+    					throws IOException {
+	    DiagramHistory diagramHistory = new DiagramHistory();
+        // create output structure
+        Document output = new Document(new Element("csxDump"));
+
+	    if (filterClause != null && filterClause.length() != 0) {
+	        diagramHistory.addDiagram(new SimpleLineDiagram());
+	        diagramHistory.addDiagram(new SimpleLineDiagram());
+	        ConceptImplementation filterConcept = new ConceptImplementation();
+	        filterConcept.addObject(filterClause);
+	        diagramHistory.next(filterConcept);
+        	output.getRootElement().setAttribute("filterClause", filterClause);
+        }
+
+        // dump all diagrams
+        for (int diag = 0; diag < schema.getNumberOfDiagrams(); diag++) {
+            dumpDiagram(schema.getDiagram(diag), schema.getDatabaseInfo(), diagramHistory,
+                    output.getRootElement(), includeContingentLists, includeIntentExtent);
+        }
+
+        // write XML to file
+        XMLOutputter outputter = new XMLOutputter("    ", true);
+        outputter.output(output, outputStream);
     }
 
     /**
      * Dumps a single diagram into the given JDOM element.
      */
-    protected static void dumpDiagram(Diagram2D diagram, Element targetElement, boolean includeLists) {
+    protected static void dumpDiagram(Diagram2D diagram, DatabaseInfo dbInfo, DiagramHistory diagramHistory, 
+    								    Element targetElement, boolean includeContingentLists, boolean includeIntentExtent) {
+    	ConceptInterpreter interpreter = new DatabaseConnectedConceptInterpreter(dbInfo);
+        ConceptInterpretationContext extContext =
+                    new ConceptInterpretationContext(diagramHistory, new EventBroker());
+        extContext.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
+        ConceptInterpretationContext contContext =
+                    new ConceptInterpretationContext(diagramHistory, new EventBroker());
+        contContext.setObjectDisplayMode(ConceptInterpretationContext.CONTINGENT);
+        
         Element diagElem = new Element("diagram");
         targetElement.addContent(diagElem);
         diagElem.setAttribute("title", diagram.getTitle());
@@ -120,24 +143,29 @@ public class DataDump {
 
             Element conceptElem = new Element("concept");
             diagElem.addContent(conceptElem);
+            if(interpreter.isRealized(cur, extContext)) {
+            	conceptElem.setAttribute("realized", "true");
+            } else {
+                conceptElem.setAttribute("realized", "false");
+            }
 
             Element intentElem = new Element("intent");
             intentElem.setAttribute("size", Integer.toString(cur.getIntentSize()));
             conceptElem.addContent(intentElem);
 
             Element extentElem = new Element("extent");
-            extentElem.setAttribute("size", Integer.toString(cur.getExtentSize()));
+            extentElem.setAttribute("size", Integer.toString(interpreter.getObjectCount(cur, extContext)));
             conceptElem.addContent(extentElem);
 
             Element attrContElem = new Element("attributeContingent");
-            attrContElem.setAttribute("size", Integer.toString(cur.getAttributeContingentSize()));
+            attrContElem.setAttribute("size", Integer.toString(interpreter.getAttributeCount(cur, contContext)));
             conceptElem.addContent(attrContElem);
 
             Element objContElem = new Element("objectContingent");
-            objContElem.setAttribute("size", Integer.toString(cur.getObjectContingentSize()));
+            objContElem.setAttribute("size", Integer.toString(interpreter.getObjectCount(cur, contContext)));
             conceptElem.addContent(objContElem);
 
-            if (includeLists) {
+            if (includeIntentExtent) {
                 Iterator it;
                 it = cur.getIntentIterator();
                 while (it.hasNext()) {
@@ -147,15 +175,18 @@ public class DataDump {
                     intentElem.addContent(newElem);
                 }
 
-                it = cur.getExtentIterator();
+                it = interpreter.getObjectSetIterator(cur, extContext);
                 while (it.hasNext()) {
                     String name = it.next().toString();
                     Element newElem = new Element("object");
                     newElem.addContent(name);
                     extentElem.addContent(newElem);
                 }
-
-                it = cur.getAttributeContingentIterator();
+            }
+            
+            if (includeContingentLists) {
+                Iterator it;
+                it = interpreter.getAttributeSetIterator(cur, contContext);
                 while (it.hasNext()) {
                     String name = it.next().toString();
                     Element newElem = new Element("attribute");
@@ -163,7 +194,7 @@ public class DataDump {
                     attrContElem.addContent(newElem);
                 }
 
-                it = cur.getObjectContingentIterator();
+                it = interpreter.getObjectSetIterator(cur, contContext);
                 while (it.hasNext()) {
                     String name = it.next().toString();
                     Element newElem = new Element("object");
@@ -172,66 +203,6 @@ public class DataDump {
                 }
             }
         }
-    }
-
-    /**
-     * Creates a filtered diagram.
-     *
-     * This is copy&paste code of DiagramController.getSimpleDiagram(int) -- we
-     * might want to get a common code base here. If the filterConcept is null,
-     * a copy of the input is returned.
-     */
-    protected static Diagram2D filterDiagram(Diagram2D inputDiagram, Concept filterConcept) {
-        SimpleLineDiagram retVal = new SimpleLineDiagram();
-        Hashtable nodeMap = new Hashtable();
-
-        retVal.setTitle(inputDiagram.getTitle());
-        for (int i = 0; i < inputDiagram.getNumberOfNodes(); i++) {
-            DiagramNode oldNode = inputDiagram.getNode(i);
-            DiagramNode newNode;
-            if (filterConcept == null) {
-                newNode = new DiagramNode("filtered:" + oldNode.getIdentifier(),
-                        oldNode.getPosition(),
-                        oldNode.getConcept(),
-                        oldNode.getAttributeLabelInfo(),
-                        oldNode.getObjectLabelInfo(),
-                        null);
-            } else {
-                newNode = new DiagramNode("filtered:" + oldNode.getIdentifier(),
-                        oldNode.getPosition(),
-                        /// @todo fix this using concept interpreter
-                        /*
-                        oldNode.getConcept().filterByContingent(filterConcept),
-                        */
-                        oldNode.getConcept(),
-                        oldNode.getAttributeLabelInfo(),
-                        oldNode.getObjectLabelInfo(),
-                        null);
-            }
-            retVal.addNode(newNode);
-            nodeMap.put(oldNode, newNode);
-        }
-        for (int i = 0; i < inputDiagram.getNumberOfLines(); i++) {
-            DiagramLine line = inputDiagram.getLine(i);
-            DiagramNode from = (DiagramNode) nodeMap.get(line.getFromNode());
-            DiagramNode to = (DiagramNode) nodeMap.get(line.getToNode());
-            retVal.addLine(from, to);
-
-            // add direct neighbours to concepts
-            ConceptImplementation concept1 =
-                    (ConceptImplementation) from.getConcept();
-            ConceptImplementation concept2 =
-                    (ConceptImplementation) to.getConcept();
-            concept1.addSubConcept(concept2);
-            concept2.addSuperConcept(concept1);
-        }
-
-        // build transitive closures for each concept
-        for (int i = 0; i < retVal.getNumberOfNodes(); i++) {
-            ((ConceptImplementation) retVal.getNode(i).getConcept()).buildClosures();
-        }
-
-        return retVal;
     }
 
     /**
