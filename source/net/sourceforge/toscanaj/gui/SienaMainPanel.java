@@ -36,10 +36,12 @@ import net.sourceforge.toscanaj.model.cernato.View;
 import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.parser.BurmeisterParser;
 import net.sourceforge.toscanaj.parser.CSCParser;
+import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.CernatoXMLParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
@@ -61,11 +63,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Vector;
+import java.util.List;
+import java.util.ListIterator;
 
 /// @todo check if the file we save to exists, warn if it does
 
 public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
+	private static final String CONFIGURATION_SECTION_NAME = "SienaMainPanel";
+	private static final String WINDOW_TITLE = "Siena";
+	static private final int MaxMruFiles = 8;
+	
     /**
      *  Main Controllers
      */
@@ -82,19 +91,23 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private JMenuBar menuBar;
     private JMenu helpMenu;
     private JMenu fileMenu;
+	private JMenu mruMenu;
 
     /**
      * Views
      */
     private DiagramEditingView diagramEditingView;
+	private List mruList = new LinkedList();
     private String currentFile = null;
     private TemporalMainDialog temporalControls;
     private DiagramExportSettings diagramExportSettings;
     private ExportDiagramAction exportDiagramAction;
     private File lastCSCFile;
+	private SaveFileAction saveFileAction;
+	private SaveConceptualSchemaActivity saveActivity;
 
     public SienaMainPanel() {
-        super("Siena");
+        super(WINDOW_TITLE);
 
         eventBroker = new EventBroker();
         conceptualSchema = new ConceptualSchema(eventBroker);
@@ -117,7 +130,20 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         createViews();
 
         createMenuBar();
-        
+		
+		mruList = ConfigurationManager.fetchStringList(
+				  CONFIGURATION_SECTION_NAME, "mruFiles",
+				  MaxMruFiles);
+		// if we have at least one MRU file try to open it
+		if (this.mruList.size() > 0) {
+			System.out.println("at least 1 mru file");
+			File schemaFile =
+				new File((String) mruList.get(mruList.size() - 1));
+			if (schemaFile.canRead()) {
+				openSchemaFile(schemaFile);
+			}
+		}
+		
         ConfigurationManager.restorePlacement("SienaMainPanel", this,
                 new Rectangle(10, 10, 900, 700));
 
@@ -156,10 +182,17 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(fileMenu);
 
+		SimpleActivity testSchemaSavedActivity = new SimpleActivity(){
+			public boolean doActivity() throws Exception {
+				return checkForMissingSave();
+			}
+		};
+
         NewConceptualSchemaActivity newSchemaActivity = new NewConceptualSchemaActivity(eventBroker);
         newSchemaActivity.setPostNewActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
                 currentFile = null;
+                updateWindowTitle();
                 return true;
             }
         });
@@ -178,7 +211,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         LoadConceptualSchemaActivity loadSchemaActivity = new LoadConceptualSchemaActivity(eventBroker);
         /// @todo add dirty flag support as Elba has
-//        loadSchemaActivity.setTestOpenOkActivity(testSchemaSavedActivity);
+        loadSchemaActivity.setTestOpenOkActivity(testSchemaSavedActivity);
         OpenFileAction openFileAction =
             new OpenFileAction(
                 this,
@@ -186,26 +219,57 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 currentFile,
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-
+		openFileAction.addPostOpenActivity(new SimpleActivity() {
+			public boolean doActivity() throws Exception {
+				updateWindowTitle();
+				return true;
+			}
+		});
         JMenuItem openMenuItem = new JMenuItem("Open...");
         openMenuItem.addActionListener(openFileAction);
         fileMenu.add(openMenuItem);
 
+		mruMenu = new JMenu("Reopen");
+		mruMenu.setMnemonic(KeyEvent.VK_R);
+		recreateMruMenu();
+		fileMenu.add(mruMenu);
+
         JMenuItem saveMenuItem = new JMenuItem("Save...");
-        SaveConceptualSchemaActivity saveActivity =
-                new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
-        saveMenuItem.addActionListener(
-                new SaveFileAction(
-                        this,
-                        saveActivity,
-                        KeyEvent.VK_S,
-                        KeyStroke.getKeyStroke(
-                                KeyEvent.VK_S,
-                                ActionEvent.CTRL_MASK
-                        )
-                )
-        );
+		saveMenuItem.setMnemonic(KeyEvent.VK_S);
+		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		saveMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				saveFile();
+			}
+		});
+        saveActivity = new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
+		this.saveFileAction =	 
+				new SaveFileAction(
+						this,
+						saveActivity,
+						KeyEvent.VK_S,
+						KeyStroke.getKeyStroke(
+								KeyEvent.VK_S,
+								ActionEvent.CTRL_MASK
+						)
+				);
+		saveFileAction.setPostSaveActivity(new SimpleActivity(){
+			public boolean doActivity() throws Exception {
+				currentFile = saveFileAction.getLastFileUsed().getPath();
+				addFileToMRUList(saveFileAction.getLastFileUsed());
+				conceptualSchema.dataSaved();
+				updateWindowTitle();
+				return true;
+			}
+		});
+		
         fileMenu.add(saveMenuItem);
+
+		JMenuItem saveAsMenuItem = new JMenuItem("Save As...");
+		saveAsMenuItem.setMnemonic(KeyEvent.VK_A);
+		saveAsMenuItem.addActionListener(saveFileAction);
+		fileMenu.add(saveAsMenuItem);
+
 
         fileMenu.addSeparator();
         
@@ -533,6 +597,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     public void closeMainPanel() {
         // store current position
         ConfigurationManager.storePlacement("SienaMainPanel", this);
+		ConfigurationManager.storeStringList(CONFIGURATION_SECTION_NAME,"mruFiles",this.mruList);
         ConfigurationManager.storeInt("SienaMainPanel", "diagramViewDivider",
                 diagramEditingView.getDividerLocation()
         );
@@ -548,8 +613,168 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
             conceptualSchema = schemaEvent.getConceptualSchema();
         }
+		if (e instanceof ConceptualSchemaLoadedEvent) {
+			ConceptualSchemaLoadedEvent loadEvent =
+				(ConceptualSchemaLoadedEvent) e;
+			File schemaFile = loadEvent.getFile();
+			addFileToMRUList(schemaFile);
+		}
         this.exportDiagramAction.setEnabled(
                 (this.diagramEditingView.getDiagramView().getDiagram() != null) &&
                 (this.diagramExportSettings != null));
     }
+    
+	private void updateWindowTitle() {
+		// get the current filename without the extension and full path
+		// we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
+		if(currentFile != null){
+			System.out.println("currentfile NOT null. set title to "+currentFile+" Siena");
+			String filename = currentFile.substring(currentFile.lastIndexOf("\\")+1,(currentFile.length()-4));
+			setTitle(filename +" - "+WINDOW_TITLE);
+		} else {
+			System.out.println("currentfile is null. set title as 'Siena'");
+			setTitle(WINDOW_TITLE);
+		}
+	}
+	
+	private void recreateMruMenu() {
+		if (mruMenu == null) { // no menu yet
+			return;
+		}
+		this.mruMenu.removeAll();
+		boolean empty = true;
+		// will be used to check if we have at least one entry
+		if (this.mruList.size() > 0) {
+			ListIterator it = mruList.listIterator(mruList.size() - 1);
+			while (it.hasPrevious()) {
+				String cur = (String) it.previous();
+				if (cur.equals(currentFile)) {
+					// don't enlist the current file
+					continue;
+				}
+				empty = false;
+				JMenuItem mruItem = new JMenuItem(cur);
+				mruItem.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						JMenuItem menuItem = (JMenuItem) e.getSource();
+						openSchemaFile(new File(menuItem.getText()));
+					}
+				});
+				this.mruMenu.add(mruItem);
+			}
+		}
+		// we have now at least one file
+		this.mruMenu.setEnabled(!empty);
+	}
+	
+	private void openSchemaFile(File schemaFile) {
+		try {
+			conceptualSchema = CSXParser.parse(eventBroker, schemaFile);
+			setTitle(schemaFile.getName().substring(0,((schemaFile.getName()).length()-4))+" - "+WINDOW_TITLE);		
+			} catch (FileNotFoundException e) {
+			ErrorDialog.showError(
+				this,
+				e,
+				"Could not find file",
+				e.getMessage());
+			conceptualSchema = new ConceptualSchema(eventBroker);
+		} catch (IOException e) {
+			ErrorDialog.showError(
+				this,
+				e,
+				"Could not open file",
+				e.getMessage());
+			conceptualSchema = new ConceptualSchema(eventBroker);
+		} catch (DataFormatException e) {
+			ErrorDialog.showError(
+				this,
+				e,
+				"Could not read file",
+				e.getMessage());
+			conceptualSchema = new ConceptualSchema(eventBroker);
+		} catch (Exception e) {
+			ErrorDialog.showError(
+				this,
+				e,
+				"Could not open file",
+				e.getMessage());
+			e.printStackTrace();
+			conceptualSchema = new ConceptualSchema(eventBroker);
+		}
+	}
+	
+	private void addFileToMRUList(File file) {
+		try {
+			this.currentFile = file.getCanonicalPath();
+		} catch (IOException ex) { // could not resolve canonical path
+			ex.printStackTrace();
+			this.currentFile = file.getAbsolutePath();
+			/// @todo what could be done here?
+		}
+		if (this.mruList.contains(this.currentFile)) {
+			// if it is already in, just remove it and add it at the end
+			this.mruList.remove(this.currentFile);
+		}
+		this.mruList.add(this.currentFile);
+		if (this.mruList.size() > MaxMruFiles) {
+			this.mruList.remove(0);
+		}
+		recreateMruMenu();
+	}
+	
+	protected boolean checkForMissingSave() throws HeadlessException {
+		boolean closeOk;
+		if (!conceptualSchema.isDataSaved()) {
+			int returnValue = showFileChangedDialog();
+			if (returnValue == 0) {
+				// save
+				boolean result = this.saveFileAction.saveFile();
+				if (result) {
+					closeOk = true;
+				} else {
+					closeOk = false;
+				}
+			} else if (returnValue == 1) {
+				// discard
+				closeOk = true;
+			} else {
+				// go back
+				closeOk = false;
+			}
+		} else {
+			closeOk = true;
+		}
+		return closeOk;
+	}
+	
+	private int showFileChangedDialog() {
+		// return values
+		// 0 : Save file
+		// 1 : Discard current file
+		// 2 : Go back (cancel save/open/close operation) 
+		Object[] options = { "Save", "Discard", "Go back" };
+		return JOptionPane.showOptionDialog(
+			this,
+			"The conceptual schema has been modified. Do you want to save the changes?",
+			"Schema changed",
+			JOptionPane.YES_NO_CANCEL_OPTION,
+			JOptionPane.WARNING_MESSAGE,
+			null,
+			options,
+			options[2]);
+	}
+	
+	private void saveFile() {
+		if(this.currentFile == null) {
+			this.saveFileAction.saveFile();	
+		} else {
+			try {
+				saveActivity.processFile(new File(this.currentFile));
+				this.conceptualSchema.dataSaved();
+			} catch (Exception e) {
+				ErrorDialog.showError(this,e,"Saving file failed");
+			}			
+		}
+	}
+
 }
