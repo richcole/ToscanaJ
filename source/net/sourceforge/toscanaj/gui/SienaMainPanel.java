@@ -8,6 +8,8 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
+import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.cernato.LayoutOperations;
 import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.events.Event;
@@ -16,11 +18,9 @@ import net.sourceforge.toscanaj.gui.action.*;
 import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.model.cernato.CernatoModel;
-import net.sourceforge.toscanaj.model.cernato.View;
-import net.sourceforge.toscanaj.model.cernato.Criterion;
-import net.sourceforge.toscanaj.model.cernato.PartialOrderNode;
+import net.sourceforge.toscanaj.model.cernato.*;
 import net.sourceforge.toscanaj.model.cernato.tests.TextDumps;
 import net.sourceforge.toscanaj.model.events.*;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
@@ -208,13 +208,13 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
         for (Iterator iterator = views.iterator(); iterator.hasNext();) {
             View view = (View) iterator.next();
             TextDumps.dump(cernatoModel, view, System.out);
-            addDiagram(schema, view, dimensions);
+            addDiagram(schema, cernatoModel, view, dimensions);
             System.out.println("============================================================");
             System.out.println();
         }
     }
 
-    private void addDiagram(ConceptualSchema schema, View view, Vector dimensions) {
+    private void addDiagram(ConceptualSchema schema, CernatoModel model, View view, Vector dimensions) {
         SimpleLineDiagram diagram = new SimpleLineDiagram();
         diagram.setTitle(view.getName());
         List criteria = view.getCriteria();
@@ -237,6 +237,10 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
             }
             System.out.println("");
         }
+        System.out.println("Extents:");
+        System.out.println("========");
+        LatticeGenerator lgen = new GantersAlgorithm();
+        Lattice lattice = lgen.createLattice(new ViewContext(model, view));
         schema.addDiagram(diagram);
     }
 
