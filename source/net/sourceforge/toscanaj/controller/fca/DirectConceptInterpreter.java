@@ -17,7 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class DirectConceptInterpreter extends AbstractConceptInterperter
+public class DirectConceptInterpreter extends AbstractConceptInterpreter
 										implements ConceptInterpreter {
 											
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {

@@ -25,7 +25,7 @@ import org.tockit.relations.model.Tuple;
 import org.tockit.relations.operations.PickColumnsOperation;
 
 
-public class TupleConceptInterpreter extends AbstractConceptInterperter
+public class TupleConceptInterpreter extends AbstractConceptInterpreter
 										implements ConceptInterpreter, XMLizable {
 	private final static String OBJECT_COLUMN_ELEMENT_NAME = "objectColumn"; 
 											

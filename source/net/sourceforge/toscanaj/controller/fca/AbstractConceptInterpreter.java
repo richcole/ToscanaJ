@@ -22,7 +22,7 @@ import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-public abstract class AbstractConceptInterperter implements ConceptInterpreter, EventBrokerListener {
+public abstract class AbstractConceptInterpreter implements ConceptInterpreter, EventBrokerListener {
     private boolean showDeviation = false;
 	private Hashtable contingentSizes = new Hashtable();
 	private Hashtable extentSizes = new Hashtable();

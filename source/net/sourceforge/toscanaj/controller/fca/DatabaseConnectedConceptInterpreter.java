@@ -21,7 +21,7 @@ import java.util.*;
 
 import org.tockit.swing.preferences.ExtendedPreferences;
 
-public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterperter {
+public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterpreter {
     private static final ExtendedPreferences preferences = 
                 ExtendedPreferences.userNodeForClass(DatabaseConnectedConceptInterpreter.class);
 

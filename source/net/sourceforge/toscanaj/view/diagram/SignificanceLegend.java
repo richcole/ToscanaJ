@@ -16,7 +16,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.NumberFormat;
 
-import net.sourceforge.toscanaj.controller.fca.AbstractConceptInterperter;
+import net.sourceforge.toscanaj.controller.fca.AbstractConceptInterpreter;
 import net.sourceforge.toscanaj.util.gradients.Gradient;
 
 import org.tockit.canvas.MovableCanvasItem;
@@ -38,7 +38,7 @@ public class SignificanceLegend extends MovableCanvasItem {
     
     public void draw(Graphics2D g) {
         TextLayout titleLayout = new TextLayout(TITLE, this.font, g.getFontRenderContext());
-        int numEntries = AbstractConceptInterperter.SIGNIFICANCE_LEVELS.length;
+        int numEntries = AbstractConceptInterpreter.SIGNIFICANCE_LEVELS.length;
         TextLayout[] numberLayouts = new TextLayout[numEntries];
         double maxWidth = 0;
         double height = 0;
@@ -46,7 +46,7 @@ public class SignificanceLegend extends MovableCanvasItem {
             NumberFormat format = NumberFormat.getNumberInstance();
             format.setMinimumFractionDigits(3);
             format.setMaximumFractionDigits(6);
-            numberLayouts[i] = new TextLayout(format.format(AbstractConceptInterperter.SIGNIFICANCE_LEVELS[i]), this.font, g.getFontRenderContext());
+            numberLayouts[i] = new TextLayout(format.format(AbstractConceptInterpreter.SIGNIFICANCE_LEVELS[i]), this.font, g.getFontRenderContext());
             maxWidth = Math.max(maxWidth, numberLayouts[i].getVisibleAdvance());
             height += (numberLayouts[i].getAscent() + numberLayouts[i].getDescent() + numberLayouts[i].getLeading()) * MARGIN_FACTOR;
         }
