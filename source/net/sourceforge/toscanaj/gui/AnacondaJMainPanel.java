@@ -1,7 +1,7 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
@@ -12,8 +12,8 @@ import net.sourceforge.toscanaj.gui.activity.CloseMainPanelActivity;
 import net.sourceforge.toscanaj.gui.activity.LoadConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.NewConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
-import net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent;
-import net.sourceforge.toscanaj.gui.events.DatabaseInfoChangedEvent;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
@@ -36,7 +36,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
      *  Main Controllers
      */
     private EventBroker eventBroker;
-    private DBConnection databaseConnection;
+    private DatabaseConnection databaseConnection;
 
     /**
      *  Model
@@ -70,7 +70,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
 
         eventBroker = new EventBroker();
         conceptualSchema = new ConceptualSchema(eventBroker);
-        databaseConnection = new DBConnection(eventBroker);
+        databaseConnection = new DatabaseConnection(eventBroker);
 
         eventBroker.subscribe(this,
                               ConceptualSchemaChangeEvent.class,

@@ -6,18 +6,18 @@
  * To change template for new class use 
  * Code Style | Class Templates options (Tools | IDE Options).
  */
-package net.sourceforge.toscanaj.gui.events;
+package net.sourceforge.toscanaj.controller.events;
 
 import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 
-public class DatabaseModifiedEvent implements Event {
+public class DatabaseConnectedEvent implements Event {
 
     private Object source;
 
-    private DBConnection connection;
+    private DatabaseConnection connection;
 
-    public DatabaseModifiedEvent(Object source, DBConnection connection) {
+    public DatabaseConnectedEvent(Object source, DatabaseConnection connection) {
         this.source = source;
         this.connection = connection;
     }
@@ -26,7 +26,7 @@ public class DatabaseModifiedEvent implements Event {
         return source;
     }
 
-    public DBConnection getConnection() {
+    public DatabaseConnection getConnection() {
         return connection;
     }
 }

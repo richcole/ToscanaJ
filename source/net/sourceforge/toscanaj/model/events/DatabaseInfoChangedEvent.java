@@ -6,7 +6,7 @@
  * To change template for new class use 
  * Code Style | Class Templates options (Tools | IDE Options).
  */
-package net.sourceforge.toscanaj.gui.events;
+package net.sourceforge.toscanaj.model.events;
 
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.ConceptualSchema;

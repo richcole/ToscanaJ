@@ -6,7 +6,7 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
-import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.Query;
@@ -20,7 +20,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     /**
      * Stores the database connection we use for querying the objects.
      */
-    private DBConnection connection;
+    private DatabaseConnection connection;
 
     /**
      * Stores the information on how to use the Database connected.
@@ -67,7 +67,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * The constructor always needs the DB connection and the information how
      * to use it.
      */
-    public DatabaseConnectedConcept(DatabaseInfo dbInfo, DBConnection connection) {
+    public DatabaseConnectedConcept(DatabaseInfo dbInfo, DatabaseConnection connection) {
         this.dbInfo = dbInfo;
         this.connection = connection;
     }
@@ -75,7 +75,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     /**
      * Changes the information about the database connection.
      */
-    public void setDatabase(DatabaseInfo dbInfo, DBConnection connection) {
+    public void setDatabase(DatabaseInfo dbInfo, DatabaseConnection connection) {
         this.dbInfo = dbInfo;
         this.connection = connection;
     }

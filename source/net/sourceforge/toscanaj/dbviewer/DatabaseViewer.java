@@ -60,7 +60,7 @@ package net.sourceforge.toscanaj.dbviewer;
  *                        a string with one line.
  * - getTemplate(): returns the full <template> element as org.jdom.Element. This way you can
  *                  define more complex templates, e.g. using HTML or XForms.
- * - getConnection(): returns the database connection as net.sourceforge.controller.db.DBConnection.
+ * - getConnection(): returns the database connection as net.sourceforge.controller.db.DatabaseConnection.
  *                    You can instantly call queries on this one, typically you will use the method
  *                    executeQuery(List, String, String) which takes a list of field names to query
  *                    (Strings), the name of the table to query and a where clause.

@@ -9,12 +9,12 @@
 package net.sourceforge.toscanaj.view.database;
 
 import net.sourceforge.toscanaj.gui.PanelStackView;
-import net.sourceforge.toscanaj.gui.events.DBSchemeChangedEvent;
+import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.model.DBScheme;
+import net.sourceforge.toscanaj.model.DatabaseSchema;
 import net.sourceforge.toscanaj.model.Table;
 import net.sourceforge.toscanaj.util.STD_Iterator;
 
@@ -27,7 +27,7 @@ public class SchemeView extends JPanel implements BrokerEventListener
     DefaultListModel availableTableList;
     DefaultListModel selectedTableList;
 
-    private DBScheme dbScheme;
+    private DatabaseSchema dbScheme;
 
   public SchemeView(JFrame frame, EventBroker broker)
   {
@@ -43,6 +43,8 @@ public class SchemeView extends JPanel implements BrokerEventListener
 
       JList availableTableListPanel = new JList(this.availableTableList);
       JList selectedTableListPanel = new JList(this.selectedTableList);
+
+
 
       leftTopPane.getViewport().add(availableTableListPanel, null);
       leftBottomPane.getViewport().add(selectedTableListPanel, null);
@@ -86,7 +88,7 @@ public class SchemeView extends JPanel implements BrokerEventListener
       splitPane.setResizeWeight(0);
       add(splitPane);
 
-      broker.subscribe(this, DBSchemeChangedEvent.class, Object.class);
+      broker.subscribe(this, DatabaseSchemaChangedEvent.class, Object.class);
   }
 
     class TableInfo {
@@ -104,8 +106,8 @@ public class SchemeView extends JPanel implements BrokerEventListener
 
     public void processEvent(Event e) {
 
-        if ( e instanceof DBSchemeChangedEvent ) {
-            DBSchemeChangedEvent event = (DBSchemeChangedEvent) e;
+        if ( e instanceof DatabaseSchemaChangedEvent ) {
+            DatabaseSchemaChangedEvent event = (DatabaseSchemaChangedEvent) e;
             this.dbScheme = event.getDBScheme();
 
             clear();

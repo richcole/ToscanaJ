@@ -9,8 +9,8 @@ package net.sourceforge.toscanaj.controller.db;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.gui.events.DatabaseConnectedEvent;
-import net.sourceforge.toscanaj.gui.events.DatabaseModifiedEvent;
+import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
+import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -27,7 +27,7 @@ import java.util.Vector;
  * This class facilitates connection to and communication with a database
  * via JDBC.
  */
-public class DBConnection {
+public class DatabaseConnection {
     /**
      * The JDBC database connection we use.
      */
@@ -44,7 +44,7 @@ public class DBConnection {
      * Initializes the logger from the system configuration.
      */
     static {
-        String log = ConfigurationManager.fetchString("DBConnection", "logger", "");
+        String log = ConfigurationManager.fetchString("DatabaseConnection", "logger", "");
         PrintStream result = null; // we need indirection since the compiler doesn't grok it otherwise
         if (log.length() == 0) {
             // keep the null
@@ -66,12 +66,12 @@ public class DBConnection {
      *
      * @TODO Throw exceptions instead of just printing them.
      */
-    public DBConnection(EventBroker broker, String url, String driver, String account, String password) throws DatabaseException {
+    public DatabaseConnection(EventBroker broker, String url, String driver, String account, String password) throws DatabaseException {
         this.broker = broker;
         connect(url, driver, account, password);
     }
 
-    public DBConnection(EventBroker broker, Connection connection) {
+    public DatabaseConnection(EventBroker broker, Connection connection) {
         this.broker = broker;
         jdbcConnection = connection;
     }
@@ -79,7 +79,7 @@ public class DBConnection {
     /**
      *  Create a connection that isn't connected.
      */
-    public DBConnection(EventBroker broker) {
+    public DatabaseConnection(EventBroker broker) {
         this.broker = broker;
     }
 
@@ -505,11 +505,11 @@ public class DBConnection {
     public static void main(String[] args) throws DatabaseException {
         if (args.length != 1) {
             System.err.println(
-                    "Usage: DBConnection [JDBC database url]");
+                    "Usage: DatabaseConnection [JDBC database url]");
             System.exit(1);
         }
 
-        DBConnection test = new DBConnection(new EventBroker(), args[0], "", "", "");
+        DatabaseConnection test = new DatabaseConnection(new EventBroker(), args[0], "", "", "");
 
         // print the tables
         System.out.println("The tables:\n-----------");

@@ -2,7 +2,7 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
-import net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;

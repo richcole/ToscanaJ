@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.model.lattice.tests;
 import com.mockobjects.sql.MockConnection;
 import junit.framework.Test;
 import junit.framework.TestSuite;
-import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -28,7 +28,7 @@ public class DatabaseConnectedConceptTest extends ConceptTest {
         return new TestSuite(DatabaseConnectedConceptTest.class);
     }
 
-    static class MockDBConnection extends DBConnection {
+    static class MockDBConnection extends DatabaseConnection {
         public MockDBConnection() throws DatabaseException {
             super(new EventBroker(), new MockConnection());
         }

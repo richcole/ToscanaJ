@@ -6,23 +6,23 @@
  * To change template for new class use 
  * Code Style | Class Templates options (Tools | IDE Options).
  */
-package net.sourceforge.toscanaj.gui.events;
+package net.sourceforge.toscanaj.model.events;
 
-import net.sourceforge.toscanaj.model.DBScheme;
+import net.sourceforge.toscanaj.model.DatabaseSchema;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.events.Event;
 
-public class DBSchemeChangedEvent implements Event {
+public class DatabaseSchemaChangedEvent implements Event {
 
-    private DBScheme dbScheme;
+    private DatabaseSchema dbScheme;
     private Object   source;
 
-    public DBSchemeChangedEvent(Object source, DBScheme dbScheme) {
+    public DatabaseSchemaChangedEvent(Object source, DatabaseSchema dbScheme) {
         this.source = source;
         this.dbScheme = dbScheme;
     }
 
-    public DBScheme getDBScheme() {
+    public DatabaseSchema getDBScheme() {
         return dbScheme;
     }
 

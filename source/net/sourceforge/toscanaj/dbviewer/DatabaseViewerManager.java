@@ -6,7 +6,7 @@
  */
 package net.sourceforge.toscanaj.dbviewer;
 
-import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import org.jdom.Element;
 import org.jdom.input.DOMBuilder;
@@ -30,10 +30,10 @@ public class DatabaseViewerManager {
     private Element template = null;
     private Dictionary parameters = new Hashtable();
     private DatabaseInfo databaseInfo;
-    private DBConnection dbConnection;
+    private DatabaseConnection dbConnection;
     private URL baseURL;
 
-    public DatabaseViewerManager(Element viewerDefinition, DatabaseInfo databaseInfo, DBConnection connection, URL baseURL)
+    public DatabaseViewerManager(Element viewerDefinition, DatabaseInfo databaseInfo, DatabaseConnection connection, URL baseURL)
             throws DatabaseViewerInitializationException {
         screenName = viewerDefinition.getAttributeValue("name");
         template = viewerDefinition.getChild("template");
@@ -200,7 +200,7 @@ public class DatabaseViewerManager {
         }
     }
 
-    public DBConnection getConnection() {
+    public DatabaseConnection getConnection() {
         return this.dbConnection;
     }
 

@@ -4,7 +4,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.gui.events;
+package net.sourceforge.toscanaj.model.events;
 
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.model.ConceptualSchema;

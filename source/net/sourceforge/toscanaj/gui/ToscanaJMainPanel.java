@@ -19,7 +19,7 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.diagram.FilterOperationEventListener;
 import net.sourceforge.toscanaj.controller.diagram.HighlightingOperationEventListener;
 import net.sourceforge.toscanaj.controller.diagram.HighlightRemovalOperationEventListener;
-import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
@@ -89,7 +89,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
     /**
      * The database connection
      */
-    private DBConnection databaseConnection;
+    private DatabaseConnection databaseConnection;
 
     /**
      * Stores the divider position when the diagram organizer is hidden.
@@ -180,7 +180,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 
         broker = new EventBroker();
         conceptualSchema = new ConceptualSchema(broker);
-        databaseConnection = new DBConnection(broker);
+        databaseConnection = new DatabaseConnection(broker);
 
         // register all image writers we want to support
         net.sourceforge.toscanaj.canvas.imagewriter.BatikImageWriter.initialize();

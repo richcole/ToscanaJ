@@ -8,25 +8,25 @@
  */
 package net.sourceforge.toscanaj.model;
 
-import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.util.STD_Iterator;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.gui.events.DatabaseConnectedEvent;
-import net.sourceforge.toscanaj.gui.events.DBSchemeChangedEvent;
-import net.sourceforge.toscanaj.gui.events.DatabaseModifiedEvent;
+import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
+import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
+import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class DBScheme implements BrokerEventListener {
+public class DatabaseSchema implements BrokerEventListener {
 
     EventBroker broker;
     List tables;
 
-    public DBScheme(EventBroker broker) {
+    public DatabaseSchema(EventBroker broker) {
         this.tables = new ArrayList();
         this.broker = broker;
         this.broker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
@@ -41,7 +41,7 @@ public class DBScheme implements BrokerEventListener {
         return tables;
     }
 
-    public void readFromDBConnection(DBConnection connection) {
+    public void readFromDBConnection(DatabaseConnection connection) {
 
         for (Iterator it = connection.getTableNames().iterator(); it.hasNext();) {
             String tableName = (String) it.next();
@@ -61,7 +61,7 @@ public class DBScheme implements BrokerEventListener {
             }
             addTable(table);
         }
-        broker.processEvent(new DBSchemeChangedEvent(this, this));
+        broker.processEvent(new DatabaseSchemaChangedEvent(this, this));
     }
 
     public void processEvent(Event e) {

@@ -6,13 +6,13 @@
  */
 package net.sourceforge.toscanaj.model;
 
-import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.gui.events.DatabaseInfoChangedEvent;
+import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import org.jdom.Element;
 
 import java.util.Iterator;
@@ -48,7 +48,7 @@ public class ConceptualSchema {
     /**
      * List of tables and views in the database
      */
-    private DBScheme dbScheme;
+    private DatabaseSchema dbScheme;
 
     /**
      * The list of diagrams.
@@ -70,7 +70,7 @@ public class ConceptualSchema {
      */
     public ConceptualSchema(EventBroker broker) {
         this.broker = broker;
-        this.dbScheme = new DBScheme(broker);
+        this.dbScheme = new DatabaseSchema(broker);
         reset();
     }
 
@@ -119,11 +119,11 @@ public class ConceptualSchema {
         this.databaseInfo = databaseInfo;
         broker.processEvent(new DatabaseInfoChangedEvent(this, this, databaseInfo));
 
-        /* remove:
+/* remove:
         if (databaseInfo == null) {
             return;
         }
-        DBConnection conn = new DBConnection(null,
+        DatabaseConnection conn = new DatabaseConnection(null,
                 this.databaseInfo.getURL(),
                 this.databaseInfo.getUserName(),
                 this.databaseInfo.getPassword()
@@ -197,7 +197,7 @@ public class ConceptualSchema {
         return this.hasDiagramDescription;
     }
 
-    public DBScheme getDbScheme() {
+    public DatabaseSchema getDbScheme() {
         return dbScheme;
     }
 }

@@ -7,7 +7,7 @@ import net.sourceforge.toscanaj.model.Column;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Table;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 
 import javax.swing.*;
 import java.awt.*;

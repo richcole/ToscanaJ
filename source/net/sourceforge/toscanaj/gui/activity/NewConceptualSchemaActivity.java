@@ -8,7 +8,7 @@ package net.sourceforge.toscanaj.gui.activity;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 
 public class NewConceptualSchemaActivity implements SimpleActivity {
     private EventBroker broker;

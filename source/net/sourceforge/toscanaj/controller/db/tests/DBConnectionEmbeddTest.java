@@ -13,7 +13,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.events.tests.EventBrokerTest;
 import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 
@@ -37,7 +37,7 @@ public class DBConnectionEmbeddTest extends TestCase {
         try {
             DatabaseInfo info = DatabaseInfo.getEmbeddedDatabaseInfo();
 
-            DBConnection connection = new DBConnection(new EventBroker());
+            DatabaseConnection connection = new DatabaseConnection(new EventBroker());
 
             connection.connect(info);
             connection.executeSQLAsString(SQLCommand, "EmbedDBConnectionTestSQL");

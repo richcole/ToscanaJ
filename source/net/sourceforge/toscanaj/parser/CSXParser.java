@@ -6,7 +6,7 @@
  */
 package net.sourceforge.toscanaj.parser;
 
-import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
@@ -52,7 +52,7 @@ public class CSXParser {
      * The database connection is created here and attached to each concept
      * if a database is used.
      */
-    // remove: private static DBConnection _DatabaseConnection = null;
+    // remove: private static DatabaseConnection _DatabaseConnection = null;
 
     /**
      * Stores the JDOM document used.
@@ -98,7 +98,7 @@ public class CSXParser {
     public static ConceptualSchema parse(
             EventBroker broker,
             File csxFile,
-            DBConnection databaseConnection)
+            DatabaseConnection databaseConnection)
             throws FileNotFoundException, IOException, DataFormatException, Exception {
         // open stream on file
         FileInputStream in;
@@ -138,7 +138,7 @@ public class CSXParser {
     /**
      * Parses the database section of the file.
      */
-    private static void parseDatabaseInformation(Element contextElem, DBConnection databaseConnection)
+    private static void parseDatabaseInformation(Element contextElem, DatabaseConnection databaseConnection)
             throws DataFormatException {
         // check if database should be used and fetch the data if needed
         Element dbElem = contextElem.getChild("databaseConnection");
@@ -159,7 +159,7 @@ public class CSXParser {
         }
     }
 
-    private static void parseDatabaseObjectViewerSetups(Element viewsElem, DBConnection databaseConnection)
+    private static void parseDatabaseObjectViewerSetups(Element viewsElem, DatabaseConnection databaseConnection)
             throws DataFormatException {
         List viewerElems = viewsElem.getChildren("objectView");
         Iterator it = viewerElems.iterator();
@@ -173,7 +173,7 @@ public class CSXParser {
         }
     }
 
-    private static void parseDatabaseObjectListViewerSetups(Element viewsElem, DBConnection databaseConnection)
+    private static void parseDatabaseObjectListViewerSetups(Element viewsElem, DatabaseConnection databaseConnection)
             throws DataFormatException {
         List viewerElems = viewsElem.getChildren("objectListView");
         Iterator it = viewerElems.iterator();
@@ -190,7 +190,7 @@ public class CSXParser {
     /**
      * Parses the context in the file.
      */
-    private static void parseContext(DBConnection databaseConnection)
+    private static void parseContext(DatabaseConnection databaseConnection)
             throws DataFormatException {
         Element contextElem = _Document.getRootElement().getChild("context");
         if (contextElem == null) {
@@ -234,7 +234,7 @@ public class CSXParser {
     /**
      * Parses the diagrams in the file.
      */
-    private static void parseDiagrams(DBConnection databaseConnection) throws DataFormatException {
+    private static void parseDiagrams(DatabaseConnection databaseConnection) throws DataFormatException {
         // find and store diagrams
         List elements = _Document.getRootElement().getChildren("diagram");
         Iterator it = elements.iterator();
@@ -338,7 +338,7 @@ public class CSXParser {
      * Creates a concept for DB access from the information in the given
      * XML element.
      */
-    private static Concept parseDBConcept(Element conceptElem, DBConnection databaseConnection) {
+    private static Concept parseDBConcept(Element conceptElem, DatabaseConnection databaseConnection) {
         // create the concept
         DatabaseConnectedConcept concept =
                 new DatabaseConnectedConcept(_Schema.getDatabaseInfo(),
