@@ -190,7 +190,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 					});
 					popupMenu.add(rename);
 					popupMenu.add(remove);
-					popupMenu.show(dialog.getScrollPane(), e.getX(), e.getY());
+                    popupMenu.show(dialog.getScrollPane(), e.getX() + getX(), e.getY() + getY() + ContextTableView.CELL_HEIGHT);
 			}
 
 			public void mouseReleased(MouseEvent e) {
