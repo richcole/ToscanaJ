@@ -253,7 +253,7 @@ public class DiagramHistoryTest extends TestCase {
         diagramHistory.back();
         diagramHistory.setNestingLevel(1);
         assertEquals(2, diagramHistory.getNumberOfCurrentDiagrams());
-        assertEquals(true, diagramHistory.canMoveUp());
+        assertEquals(false, diagramHistory.canMoveUp());
         diagramHistory.back();
         assertEquals(1, diagramHistory.getNumberOfCurrentDiagrams());
         assertEquals(0, diagramHistory.getFirstCurrentDiagramPosition());
