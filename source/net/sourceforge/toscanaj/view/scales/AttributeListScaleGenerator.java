@@ -60,7 +60,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 		}
 		
 		boolean useAllCombi = scaleDialog.getUseAllCombinations();
-				for (int i = 0; i < Math.pow(2,dimensions); i++) {
+		for (int i = 0; i < Math.pow(2,dimensions); i++) {
 			String objectData = "";
 			List relatedAttributes = new ArrayList();
 			for(int j = 0; j < dimensions; j++) {
@@ -75,43 +75,37 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 				objectData += "(" + tableData[j][1] + ")";
 			}
 
-		WritableFCAObject object = new FCAObjectImplementation(objectData);
-
-		if(useAllCombi){
-			context.getObjects().add(object);
-			Iterator it = relatedAttributes.iterator();
-			while (it.hasNext()) {
-				Attribute attrib = (Attribute) it.next();
-				relation.insert(object, attrib);
+			WritableFCAObject object = new FCAObjectImplementation(objectData);
+	
+			if(useAllCombi){
+				context.getObjects().add(object);
+				Iterator it = relatedAttributes.iterator();
+				while (it.hasNext()) {
+					Attribute attrib = (Attribute) it.next();
+					relation.insert(object, attrib);
+				}
+			}else{
+				try{
+					int result =
+					databaseConnection.queryInt(
+						"SELECT count (*) FROM "
+							+ scheme.getDatabaseInfo().getTable().getSqlExpression()
+							+ " WHERE ( "
+							+ objectData
+							+ " );",
+						1);
+					if( result != 0 ){
+						context.getObjects().add(object);
+						Iterator it = relatedAttributes.iterator();
+						while (it.hasNext()) {
+							Attribute attrib = (Attribute) it.next();
+							relation.insert(object, attrib);
+						}
+					}	
+				}catch(DatabaseException e) {
+					throw new RuntimeException(e.getCause().getMessage());
+				}
 			}
-		}else{
-			try{
-						int result =
-				databaseConnection.queryInt(
-					"SELECT count (*) FROM "
-						+ scheme.getDatabaseInfo().getTable().getSqlExpression()
-						+ " WHERE ( "
-						+ objectData
-						+ " );",
-					1);
-				if( result != 0 ){
-					context.getObjects().add(object);
-					Iterator it = relatedAttributes.iterator();
-					while (it.hasNext()) {
-						Attribute attrib = (Attribute) it.next();
-						relation.insert(object, attrib);
-					}
-				}	
-			}catch(DatabaseException e) {
-				throw new RuntimeException(e.getCause().getMessage());
-			}
-		}
-//			context.getObjects().add(object);
-//			Iterator it = relatedAttributes.iterator();
-//			while (it.hasNext()) {
-//				Attribute attrib = (Attribute) it.next();
-//				relation.insert(object, attrib);
-//			}
 		}
 		return context;
     }
