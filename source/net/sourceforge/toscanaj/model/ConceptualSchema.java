@@ -331,7 +331,9 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
     }
 
     public void setDescription(Element description) {
-		markDataDirty();
+    	if(this.description != description) {
+			markDataDirty();
+    	}
         if (description != null) {
             this.description = (Element) description.clone();
         } else {

@@ -309,8 +309,10 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 	 * here we don't --> check why
 	 */
     public void setDescription(Element desc) {
+    	if(this.description != desc) {
+			sendChangeEvent();
+    	}
         this.description = desc;
-        sendChangeEvent();
     }
 
 	public void sendChangeEvent() {
