@@ -16,6 +16,7 @@ import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -24,6 +25,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class BiordinalScaleEditorDialog extends JDialog {
 	
@@ -71,7 +74,7 @@ public class BiordinalScaleEditorDialog extends JDialog {
 
 	private void layoutDialog(DatabaseSchema databaseSchema, DatabaseConnection connection) {
 		setModal(true);
-		setTitle("Biordinal scale editor");
+		setTitle("Cross-ordinal scale editor");
 		JPanel mainPane = new JPanel(new GridBagLayout());
         
 		mainPane.add(makeTitlePane(),new GridBagConstraints(
@@ -206,10 +209,20 @@ public class BiordinalScaleEditorDialog extends JDialog {
 	public Context createContext() {
 		ContextImplementation firstContext = 
 						(ContextImplementation) this.leftPanel.createContext("left");
+		extendAttributeNames(firstContext.getAttributes(), leftPanel.getColumn().getName());
 		Context secondContext = this.rightPanel.createContext("right");
+		extendAttributeNames(secondContext.getAttributes(), rightPanel.getColumn().getName());
 		return firstContext.createProduct(secondContext, this.titleEditor.getText());
 	}
 	
+	private void extendAttributeNames(Collection attributes, String colName) {
+		Iterator it = attributes.iterator();
+		while (it.hasNext()) {
+			Attribute attribute = (Attribute) it.next();
+			attribute.setData(colName + " " + attribute.toString());
+		}
+	}
+
 	private class UpdateButtonForCorrectModelStateListDataListener implements ListDataListener {
 		private final JButton actionButton;
 

@@ -74,9 +74,12 @@ public class DiagramNode implements XMLizable {
     public static final String ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME = "attributeLabelStyle";
     public static final String OBJECT_LABEL_STYLE_ELEMENT_NAME = "objectLabelStyle";
 
-    public DiagramNode(String identifier, Point2D position, Concept concept,
+    protected WriteableDiagram2D diagram;
+
+	public DiagramNode(WriteableDiagram2D diagram, String identifier, Point2D position, Concept concept,
                        LabelInfo attributeLabelInfo, LabelInfo objectLabelInfo,
                        DiagramNode outerNode) {
+        this.diagram = diagram;
         this.identifier = identifier;
         this.position = position;
         this.concept = concept;
@@ -85,10 +88,10 @@ public class DiagramNode implements XMLizable {
         this.outerNode = outerNode;
     }
     
-    public DiagramNode(String identifier, Point2D position, Concept concept,
+    public DiagramNode(WriteableDiagram2D diagram, String identifier, Point2D position, Concept concept,
                            LabelInfo attributeLabel, LabelInfo objectLabel,
                            DiagramNode outerNode, double radiusX, double radiusY) {
-        this(identifier, position, concept, attributeLabel, objectLabel, outerNode);
+        this(diagram, identifier, position, concept, attributeLabel, objectLabel, outerNode);
         this.radiusX = radiusX;
         this.radiusY = radiusY;
     }
@@ -202,6 +205,7 @@ public class DiagramNode implements XMLizable {
      */
     public void setPosition(Point2D position) {
         this.position = position;
+        this.diagram.sendChangeEvent();
     }
 
     /**
@@ -271,6 +275,7 @@ public class DiagramNode implements XMLizable {
         if (attributeLabelInfo != null) {
             attributeLabelInfo.attachNode(this);
         }
+		this.diagram.sendChangeEvent();
     }
 
     /**
@@ -281,6 +286,7 @@ public class DiagramNode implements XMLizable {
         if (objectLabelInfo != null) {
             objectLabelInfo.attachNode(this);
         }
+		this.diagram.sendChangeEvent();
     }
 
     /**
@@ -300,6 +306,7 @@ public class DiagramNode implements XMLizable {
 	        this.objectLabelInfo.setOffset(this.objectLabelInfo.getOffset().getX(),
 	                -this.objectLabelInfo.getOffset().getY());
         }
+		this.diagram.sendChangeEvent();
     }
 
     /**

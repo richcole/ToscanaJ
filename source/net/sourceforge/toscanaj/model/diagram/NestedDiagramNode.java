@@ -55,9 +55,9 @@ public class NestedDiagramNode extends DiagramNode {
      * @todo since we require 1.4 by now we could go back to double and see if
      * it breaks.
      */
-    public NestedDiagramNode(DiagramNode outerNode, Diagram2D innerDiagram, float scale,
+    public NestedDiagramNode(WriteableDiagram2D outerDiagram, DiagramNode outerNode, Diagram2D innerDiagram, float scale,
                              boolean dropAttributeLabels) {
-        super("outer:" + outerNode.getIdentifier(),
+        super(outerDiagram, "outer:" + outerNode.getIdentifier(),
                 new Point2D.Double(outerNode.getX() * OUTER_SCALE_FACTOR, 
                                    outerNode.getY() * OUTER_SCALE_FACTOR),
                 outerNode.getConcept(),
@@ -89,7 +89,7 @@ public class NestedDiagramNode extends DiagramNode {
                 newAttrLabel = new LabelInfo(oldNode.getAttributeLabelInfo());
             }
             LabelInfo newObjLabel = new LabelInfo(oldNode.getObjectLabelInfo());
-            DiagramNode newNode = new DiagramNode(outerNode.getIdentifier() + " x " + oldNode.getIdentifier(),
+            DiagramNode newNode = new DiagramNode(newDiag, outerNode.getIdentifier() + " x " + oldNode.getIdentifier(),
                     newPos, newConcept, newAttrLabel, newObjLabel, this, oldNode.getRadiusX()/innerScale, oldNode.getRadiusY()/innerScale);
             nodeMap.put(oldNode, newNode);
             newDiag.addNode(newNode);

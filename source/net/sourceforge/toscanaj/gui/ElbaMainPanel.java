@@ -180,6 +180,7 @@ public class ElbaMainPanel
 				openSchemaFile(schemaFile);
 			}
 		}
+
 		ConfigurationManager.restorePlacement(
 			CONFIGURATION_SECTION_NAME,
 			this,
@@ -351,32 +352,33 @@ public class ElbaMainPanel
 		            try {
 		                Context context =
 		                       generator.generateScale(conceptualSchema, databaseConnection);
-		                Diagram2D returnValue = null;
+		                Diagram2D newDiagram = null;
 		                Lattice lattice = null;
 		                if(context!=null){
 		                    LatticeGenerator lgen = new GantersAlgorithm();
 		                    lattice = lgen.createLattice(context);
-		                    returnValue = NDimLayoutOperations.createDiagram(
+		                    newDiagram = NDimLayoutOperations.createDiagram(
 		                                  lattice, context.getName(),
 		                                  new DefaultDimensionStrategy());
-		                    if (null != returnValue) {
+		                    if (null != newDiagram) {
 		                       Diagram2D diagramWithSameTitle = null;
 		                       int indexOfExistingDiagram = -1;
 		                       for(int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
-		                           if(conceptualSchema.getDiagram(i).getTitle().equalsIgnoreCase(returnValue.getTitle())) {
+		                           if(conceptualSchema.getDiagram(i).getTitle().equalsIgnoreCase(newDiagram.getTitle())) {
 		                               diagramWithSameTitle = conceptualSchema.getDiagram(i);
 		                               indexOfExistingDiagram = i;
 		                           }
 		                       }
 		                       if(diagramWithSameTitle != null) {
-		                               int rv = showTitleExistsDialog(returnValue);
+		                               int rv = showTitleExistsDialog(newDiagram);
 		                               if(rv==JOptionPane.OK_OPTION){
-		                                   replaceTitle(returnValue, diagramWithSameTitle, indexOfExistingDiagram);
+		                                   replaceTitle(newDiagram, diagramWithSameTitle, indexOfExistingDiagram);
 		                               }else if(rv==JOptionPane.CANCEL_OPTION){
-		                                   renameTitle(returnValue, diagramWithSameTitle);
+		                                   renameTitle(newDiagram, diagramWithSameTitle);
 		                               }
 		                       }else{
-		                           conceptualSchema.addDiagram(returnValue);
+		                           conceptualSchema.addDiagram(newDiagram);
+		                           diagramEditingView.getDiagramView().showDiagram(newDiagram);
 		                       }
 		                   }
 		                }
@@ -508,6 +510,7 @@ public class ElbaMainPanel
             public boolean doActivity() throws Exception {
             	currentFile = null;
                 showDatabaseConnectionDialog();
+				DatabaseViewerManager.resetRegistry();
                 return databaseConnection.isConnected();
             }
 		});
@@ -888,7 +891,6 @@ public class ElbaMainPanel
 					schemaDescriptionView.setContent(
 						conceptualSchema.getDescription());
 				}
-				DatabaseViewerManager.resetRegistry();
 				connectDatabase();
 			}
 			if (e instanceof DatabaseInfoChangedEvent) {

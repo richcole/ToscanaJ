@@ -14,35 +14,35 @@ import net.sourceforge.toscanaj.model.Context;
  * $Id$
  */
 public class BiordinalScaleGenerator implements ScaleGenerator{
-	private Frame parent;
-	
-	public BiordinalScaleGenerator(Frame parent){
-		this.parent = parent;
-	}
-	public String getScaleName() {
-		 return "Biordinal Scale";
-	 }
+    private Frame parent;
 
-	 /// @todo should check type of column, too -- we need at least two versions for int and float values (should be
-	 /// transparent to the user
-	 public boolean canHandleColumns(TableColumnPair[] columns) {
-		 if (columns.length != 1) {
-			 return false;
-		 }
-		 int columnType = columns[0].getColumn().getType();
-		 if (OrdinalScaleGeneratorPanel.determineDataType(columnType) == OrdinalScaleGeneratorPanel.UNSUPPORTED) {
-			 return false;
-		 } else {
-			 return true;
-		 }
-	 }
+    public BiordinalScaleGenerator(Frame parent){
+        this.parent = parent;
+    }
+    public String getScaleName() {
+         return "Crossordinal Scale";
+     }
 
-	 public Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection) {
-		 BiordinalScaleEditorDialog scaleDialog = new BiordinalScaleEditorDialog(parent, scheme.getDatabaseSchema(), databaseConnection);
-		 if (!scaleDialog.execute()) {
-			 return null;
-		 }
-		 return scaleDialog.createContext();
-	 }
+     /// @todo should check type of column, too -- we need at least two versions for int and float values (should be
+     /// transparent to the user
+     public boolean canHandleColumns(TableColumnPair[] columns) {
+         if (columns.length != 1) {
+             return false;
+         }
+         int columnType = columns[0].getColumn().getType();
+         if (OrdinalScaleGeneratorPanel.determineDataType(columnType) == OrdinalScaleGeneratorPanel.UNSUPPORTED) {
+             return false;
+         } else {
+             return true;
+         }
+     }
+
+     public Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection) {
+         BiordinalScaleEditorDialog scaleDialog = new BiordinalScaleEditorDialog(parent, scheme.getDatabaseSchema(), databaseConnection);
+         if (!scaleDialog.execute()) {
+             return null;
+         }
+         return scaleDialog.createContext();
+     }
 
 }

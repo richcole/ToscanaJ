@@ -467,7 +467,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      * Returns true whenever the point is in the bounding rectangle.
      */
     public boolean containsPoint(Point2D point) {
-        if (this.rect == null) {
+        if (this.rect == null || isVisible() == false) {
             return false;
         }
         return this.rect.contains(point);

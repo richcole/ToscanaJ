@@ -1,9 +1,9 @@
-ToscanaJ 0.6 Readme File
+ToscanaJ 0.7 Readme File
 ========================
 
 What is it?
 -----------
-A sixth release of the Java reimplementation of the
+A seventh release of the Java reimplementation of the
 classic Formal Concept Analysis tool named "Toscana".
 
 It is open sourced under a BSD-style licence (see the text
@@ -40,13 +40,14 @@ JDK 1.4.0_01 for development purposes.
 
 How do I start ToscanaJ?
 ------------------------
-Run the appropriate start script ("start.bat" on Windows,
-"start.sh" on Unix/Linux). If you run it from the command
-line make sure you are in the installation directory, it
-won't work from within another path. Alternatively you can
-start it direcly with "java -jar ToscanaJ.jar". On Windows
-you can connect the ".jar" extension with "javaw -jar",
-then you can just double-click the JAR file in the explorer.
+Run the appropriate start script ("run-toscanaj.bat" on 
+Windows, insource the script on Unix/Linux with the command
+". ./run-toscanaj.sh"). If you run it from the command line 
+make sure you are in the installation directory, it won't work 
+from within another path. Alternatively you can start it direcly 
+with "java -jar ToscanaJ.jar". On Windows you can connect the 
+".jar" extension with "javaw -jar", then you can just double-
+click the JAR file in the explorer.
 
 
 What can I do with ToscanaJ?
@@ -119,28 +120,21 @@ Changes in ToscanaJ 0.5:
 Changes in ToscanaJ 0.6:
 - loads of them, please check the download site for the
   changelog
+  
+Changed in ToscanaJ 0.7:
+- speedup of ToscanaJ
+- some minor UI features
+- a first completely working editor: Elba
 
 
 How do I create examples?
 -------------------------
-Unfortunately we currently can't offer any editor. There is
-a tool converting the old CSC files into the new CSX files,
-but due to the different scaling approach this usually needs
-some editing afterwards.
-
-You can edit the CSX files in an XML or generic text editor,
-the structure should be self-explanatory if you know something
-about the way Toscana works. Ask on the mailing lists for help
-if you really want to create your own examples, it is not that
-hard if you know what to do, but it is hard to explain ;-)
-
-There are three editors in work at the moment, with different
-target workflows, and a lot of shared code. The idea is that
-we will offer at least two different editors in the long run,
-which are optimised for specific purposes in the frontend part
-but share a lot of code so it is more like one program from
-the programmers point of view.
-
+The only fully working editor at the moment is Elba, which
+you can start with the "run-elba" scripts. Note that Elba
+needs a database connection to work, so if some features are
+not available, please make sure you are connected to a 
+database. You can connect to a database by using the rightmost
+button in the toolbar.
 
 What are your plans for ToscanaJ?
 ---------------------------------
@@ -166,7 +160,10 @@ which are collected here:
   http://sourceforge.net/tracker/?group_id=37081&atid=418904
 
 Feel free to add comments/items if you think you found
-something new.
+something new. You can mail comments/bugreports to
+toscanaj-developers@lists.sf.net -- we are always happy to
+hear from users, esp. if it helps improving the quality of
+our programs.
 
 
 How can I help?

@@ -33,7 +33,7 @@ public class NDimDiagramNode extends DiagramNode {
     public NDimDiagramNode(NDimDiagram diagram, String identifier, double[] ndimVector, Concept concept,
                            LabelInfo attributeLabel, LabelInfo objectLabel,
                            DiagramNode outerNode) {
-        super(identifier, new Point2D.Double(0, 0), concept, attributeLabel, objectLabel, outerNode);
+        super(diagram, identifier, new Point2D.Double(0, 0), concept, attributeLabel, objectLabel, outerNode);
         this.ndimVector = ndimVector;
         this.diagram = diagram;
     }

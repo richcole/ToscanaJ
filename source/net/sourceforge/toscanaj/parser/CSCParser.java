@@ -222,6 +222,12 @@ public class CSCParser {
             while(objIt.hasNext()) {
                 Object object = objIt.next();
                 String row = tokenizer.getCurrentToken(); // get row string
+				if(row.length() == 0) {
+					throw new DataFormatException("Missing row in the relation in line " + tokenizer.currentLine);
+				}
+				if(row.length() < attributes.size()) {
+					throw new DataFormatException("Incomplete row in the relation in line " + tokenizer.currentLine);
+				}
                 Iterator attrIt = attributes.iterator(); // iterate over attributes
                 int i = 0; // count pos in string
                 while(attrIt.hasNext()) {
@@ -250,13 +256,14 @@ public class CSCParser {
         	
         	if(tokenizer.getCurrentToken().equals("TITLE")) {
         		tokenizer.advance();
-        		diagram.setTitle(tokenizer.getCurrentToken());
-        		sectionIdMap.put(diagram.getTitle(), identifier);
+        		String title = tokenizer.getCurrentToken();
         		tokenizer.advance();
-        	} else {
-        	    diagram.setTitle(identifier);
-        	    sectionIdMap.put(identifier,identifier);
+        		if(!title.equals("")) {
+        			identifier = title;
+        		}
         	}
+        	diagram.setTitle(identifier);
+        	sectionIdMap.put(identifier,identifier);
         	
             while(!tokenizer.getCurrentToken().equals("POINTS")) { // we ignore remark, special list and unitlength
                 tokenizer.advance();
@@ -273,7 +280,7 @@ public class CSCParser {
                 tokenizer.advance();
                 Point2D position = new Point2D.Double(x,y);
             	
-            	DiagramNode node = new DiagramNode(id, position, new ConceptImplementation(), null, null, null);
+            	DiagramNode node = new DiagramNode(diagram, id, position, new ConceptImplementation(), null, null, null);
             	diagram.addNode(node);
             }
             tokenizer.advance();

@@ -112,10 +112,16 @@ public class DatabaseViewerManager implements XMLizable {
 
     public static void showObject(int viewerID, DatabaseRetrievedObject object) {
         if (object.hasKey()) {
+        	if(objectViewerRegistry.size() == 0) {
+        		return;
+        	}
             DatabaseViewerManager manager = (DatabaseViewerManager) objectViewerRegistry.get(viewerID);
             DatabaseViewer viewer = manager.viewer;
             viewer.showView("WHERE " + manager.getKeyName() + " = '" + object.getKey() + "'");
         } else if (object.hasSpecialWhereClause()) {
+			if(objectListViewerRegistry.size() == 0) {
+				return;
+			}
             DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(viewerID);
             DatabaseViewer viewer = manager.viewer;
             viewer.showView(object.getSpecialWhereClause());
@@ -147,7 +153,10 @@ public class DatabaseViewerManager implements XMLizable {
     }
 
     public static void showObjectList(int viewerID, DatabaseRetrievedObject object) {
-        DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(viewerID);
+		if(objectListViewerRegistry.size() == 0) {
+			return;
+		}
+		DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(viewerID);
         manager.viewer.showView(object.getQueryWhereClause());
     }
 

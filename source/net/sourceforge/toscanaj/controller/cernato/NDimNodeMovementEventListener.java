@@ -55,23 +55,26 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
         NDimDiagramNode ndimNode,
         double diffX,
         double diffY) {
-        double[] diffUpperNeighbours = findUpperNeighbourDiff(diagram, ndimNode);
-        double sumCoord = 0;
+        int[] diffUpperNeighbours = findUpperNeighbourDiff(diagram, ndimNode);
+        int numDiffs = 0;
         for (int i = 0; i < diffUpperNeighbours.length; i++) {
-            sumCoord += diffUpperNeighbours[i];
+            numDiffs += diffUpperNeighbours[i];
         }
         Iterator baseIt = diagram.getBase().iterator();
         for (int i = 0; i < diffUpperNeighbours.length; i++) {
-            double v = diffUpperNeighbours[i];
-            Point2D baseVec = (Point2D) baseIt.next();
-            baseVec.setLocation(baseVec.getX() + diffX * v / (sumCoord + ndimNode.getNdimVector()[i]),
-                    baseVec.getY() + diffY * v / (sumCoord + ndimNode.getNdimVector()[i]));
+			Point2D baseVec = (Point2D) baseIt.next();
+			if(ndimNode.getNdimVector()[i] == 0) {
+				continue;
+			}
+            double relDiffI = diffUpperNeighbours[i] / (double) numDiffs;
+            baseVec.setLocation(baseVec.getX() + diffX * relDiffI / ndimNode.getNdimVector()[i],
+                    baseVec.getY() + diffY * relDiffI / ndimNode.getNdimVector()[i]);
         }
     }
 
-    private double[] findUpperNeighbourDiff(Diagram2D diagram, NDimDiagramNode node) {
+    private int[] findUpperNeighbourDiff(Diagram2D diagram, NDimDiagramNode node) {
         double[] nodeVec = node.getNdimVector();
-        double[] retVal = new double[nodeVec.length];
+        int[] retVal = new int[nodeVec.length];
         Iterator it = diagram.getLines();
         while (it.hasNext()) {
             DiagramLine line = (DiagramLine) it.next();
@@ -79,8 +82,7 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
                 NDimDiagramNode upperNeighbour = (NDimDiagramNode) line.getFromNode();
                 double[] upperVec = upperNeighbour.getNdimVector();
                 for (int i = 0; i < upperVec.length; i++) {
-                    double v = upperVec[i];
-                    if (v < nodeVec[i]) {
+                    if (upperVec[i] < nodeVec[i]) {
                         retVal[i] = 1;
                     }
                 }

@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.parser;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
@@ -97,38 +98,44 @@ public class CSXParser {
             EventBroker eventBroker,
             File csxFile)
             throws FileNotFoundException, IOException, DataFormatException, Exception {
-        // open stream on file
-        FileInputStream in;
-        in = new FileInputStream(csxFile);
-
-        SAXBuilder parser = new SAXBuilder();
-        _Document = parser.build(in);
-
-        _BaseURL = csxFile.toURL();
-        DatabaseInfo.baseURL = _BaseURL;
-        DatabaseViewerManager.setBaseURL(_BaseURL);
-
-        Element element = _Document.getRootElement();
-        if (element.getName().equals("conceptualSchema")) {
-            if (element.getAttributeValue("version").equals("TJ0.6")) {
-                _Schema = new ConceptualSchema(eventBroker, element);
-            } else {
-                // create data structure
-                _Schema = new ConceptualSchema(eventBroker);
-
-                // parse the different sections
-                parseDescription();
-                parseContext();
-                parseDiagrams();
-            }
-        } else {
-            throw new DataFormatException("Root element name is not <conceptualSchema>");
+        try {
+	        // open stream on file
+	        FileInputStream in;
+	        in = new FileInputStream(csxFile);
+	
+	        SAXBuilder parser = new SAXBuilder();
+	        _Document = parser.build(in);
+	
+	        _BaseURL = csxFile.toURL();
+	        DatabaseInfo.baseURL = _BaseURL;
+	        DatabaseViewerManager.setBaseURL(_BaseURL);
+	
+	        Element element = _Document.getRootElement();
+	        if (element.getName().equals("conceptualSchema")) {
+	            if (element.getAttributeValue("version").equals("TJ0.6") ||
+				    	element.getAttributeValue("version").equals("TJ1.0")) {
+	                _Schema = new ConceptualSchema(eventBroker, element);
+	            } else {
+	                // create data structure
+	                _Schema = new ConceptualSchema(eventBroker);
+	
+	                // parse the different sections
+	                parseDescription();
+	                parseContext();
+	                parseDiagrams();
+	            }
+	        } else {
+	            throw new DataFormatException("Root element name is not <conceptualSchema>");
+	        }
+	        eventBroker.processEvent(new ConceptualSchemaLoadedEvent(CSXParser.class, _Schema, csxFile));
+	        
+	        _Schema.dataSaved();
+	
+	        return _Schema;
+        } catch (OutOfMemoryError exc) {
+        	ErrorDialog.showError(null,"Out of memory", "The system ran out of memory while opening a file.");
+        	return new ConceptualSchema(eventBroker);
         }
-        eventBroker.processEvent(new ConceptualSchemaLoadedEvent(CSXParser.class, _Schema, csxFile));
-        
-        _Schema.dataSaved();
-
-        return _Schema;
     }
 
     /**
@@ -319,7 +326,7 @@ public class CSXParser {
                 String identifier = conceptElem.getAttribute("id").getValue();
 
                 // create the node
-                DiagramNode node = new DiagramNode(identifier, position, concept, attrLabel, objLabel, null);
+                DiagramNode node = new DiagramNode(diagram, identifier, position, concept, attrLabel, objLabel, null);
 
                 // put in into the diagram
                 diagram.addNode(node);

@@ -49,7 +49,13 @@ public class FilterOperationEventListener implements EventBrokerListener {
         int extent = interpreter.getObjectCount(filterConcept, context);
         context.setObjectDisplayMode(oldDisplayMode);
         if(extent != 0) {
-        	controller.next(filterConcept);
+        	try {
+				controller.next(filterConcept);
+        	} catch (RuntimeException exc) {
+        		/// @todo create a proper exception for this case
+				Canvas canvas = nodeView.getDiagramView();
+				new CanvasFeedbackMessage("No further diagram selected", canvas, itemEvent.getCanvasPosition());
+        	}
         } else {
         	Canvas canvas = nodeView.getDiagramView();
         	new CanvasFeedbackMessage("No objects would be left", canvas, itemEvent.getCanvasPosition());

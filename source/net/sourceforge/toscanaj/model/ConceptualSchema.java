@@ -13,7 +13,9 @@ import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.diagram.WriteableDiagram2D;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
+import net.sourceforge.toscanaj.model.events.DiagramChangedEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
@@ -23,7 +25,9 @@ import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
+import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
+import org.tockit.events.EventBrokerListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -40,7 +44,7 @@ import java.util.Vector;
  * @todo write test cases, e.g. for testing if the dirty flag is handled
  * properly
  */
-public class ConceptualSchema implements XMLizable, DiagramCollection {
+public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrokerListener {
     /**
      * The database information.
      */
@@ -79,7 +83,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     private boolean hasDiagramDescription = false;
     private static final String CONCEPTUAL_SCHEMA_ELEMENT_NAME = "conceptualSchema";
     private static final String VERSION_ATTRIBUTE_NAME = "version";
-    private static final String VERSION_ATTRIBUTE_VALUE = "TJ0.6";
+    private static final String VERSION_ATTRIBUTE_VALUE = "TJ1.0";
     private static final String DESCRIPTION_ELEMENT_NAME = "description";
     private static final String VIEWS_ELEMENT_NAME = "views";
     private static final String QUERIES_ELEMENT_NAME = "queries";
@@ -93,6 +97,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     public ConceptualSchema(EventBroker broker) {
         this.eventBroker = broker;
         reset();
+        eventBroker.subscribe(this, DiagramChangedEvent.class, Object.class);
         eventBroker.processEvent(new NewConceptualSchemaEvent(this, this));
     }
 
@@ -100,6 +105,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         this.eventBroker = eventBroker;
         reset();
         readXML(element);
+		eventBroker.subscribe(this, DiagramChangedEvent.class, Object.class);
         eventBroker.processEvent(new NewConceptualSchemaEvent(this, this));
     }
 
@@ -112,14 +118,17 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         if (databaseInfo != null) {
             retVal.addContent(databaseInfo.toXML());
         }
-        if (databaseSchema != null) {
-            retVal.addContent(databaseSchema.toXML());
-        }
+        /// @todo reintroduce when we start really using it properly
+//        if (databaseSchema != null) {
+//            retVal.addContent(databaseSchema.toXML());
+//        }
         if (DatabaseViewerManager.getNumberOfObjectListViews() != 0 ||
                 DatabaseViewerManager.getNumberOfObjectViews() != 0) {
             Element viewsElem = new Element(VIEWS_ELEMENT_NAME);
             DatabaseViewerManager.listsToXML(viewsElem);
-            retVal.addContent(viewsElem);
+            if(viewsElem.getChildren().size() != 0) {
+            	retVal.addContent(viewsElem);
+            }
         }
         if (this.queries.size() != 0) {
 	        Element queriesElement = new Element(QUERIES_ELEMENT_NAME);
@@ -155,7 +164,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
                 databaseSchema = new DatabaseSchema(eventBroker);
             }
         }
-        /// @todo change this once DatabaseViewers are one the schema itself
+        /// @todo change this once DatabaseViewers are on the schema itself
+		DatabaseViewerManager.resetRegistry();
         Element viewsElem = elem.getChild(VIEWS_ELEMENT_NAME);
         if (viewsElem != null) {
             try {
@@ -165,7 +175,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
             }
         }
         Element queriesElem = elem.getChild(QUERIES_ELEMENT_NAME);
-        if (queriesElem != null) {
+        if (queriesElem != null && queriesElem.getChildren().size() != 0) {
             for (Iterator iterator = queriesElem.getChildren().iterator(); iterator.hasNext();) {
                 Element queryElem = (Element) iterator.next();
                 if (queryElem.getName().equals(AggregateQuery.QUERY_ELEMENT_NAME)) {
@@ -189,7 +199,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
             } else {
             	diagram = new SimpleLineDiagram(element);
             }
-            diagrams.add(diagram);
+            addDiagram(diagram);
         }
         this.dataSaved = true;
     }
@@ -264,6 +274,13 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
      */
     public void addDiagram(Diagram2D diagram) {
         diagrams.add(diagram);
+        if(diagram instanceof WriteableDiagram2D) {
+			WriteableDiagram2D wd2d = (WriteableDiagram2D) diagram;
+			wd2d.setEventBroker(this.eventBroker);        	
+        }
+        if(diagram.getDescription() != null) {
+        	this.hasDiagramDescription = true;
+        }
 		markDataDirty();
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
@@ -271,15 +288,29 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     public void removeDiagram(int diagramIndex) {
         diagrams.remove(diagramIndex);
 		markDataDirty();
+		checkForDescriptions();
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
 
-    public void removeDiagram(Diagram2D diagram) {
+	public void removeDiagram(Diagram2D diagram) {
         diagrams.remove(diagram);
 		markDataDirty();
+		checkForDescriptions();
         eventBroker.processEvent(new DiagramListChangeEvent(this, this));
     }
     
+	private void checkForDescriptions() {
+		Iterator it = this.diagrams.iterator();
+		this.hasDiagramDescription = false;
+		while (it.hasNext()) {
+			Diagram2D diagram = (Diagram2D) it.next();
+			if(diagram.getDescription() != null) {
+				this.hasDiagramDescription = true;
+				return;
+			}
+		}		
+	}
+
     public void exchangeDiagrams(int from, int to){
 		Diagram2D indexDiagram = (Diagram2D)diagrams.get( from );
 		Diagram2D diagram = (Diagram2D)diagrams.get( to );
@@ -354,4 +385,15 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     public boolean isDataSaved() {
     	return this.dataSaved;
     }
+
+	public void processEvent(Event e) {
+		DiagramChangedEvent dce = (DiagramChangedEvent) e;
+		Iterator it = this.diagrams.iterator();
+		while (it.hasNext()) {
+			Diagram2D diag = (Diagram2D) it.next();
+			if(diag == dce.getDiagram()) {
+				this.dataSaved = false;
+			}
+		}		
+	}
 }

@@ -101,7 +101,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         
         Frame frame = JOptionPane.getFrameForComponent(this);
         this.contextEditingDialog = new ContextTableScaleEditorDialog(frame, this.conceptualSchema, this.databaseConnection, eventBroker);
-
+        
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
         eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
         eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
@@ -122,6 +122,8 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 new ConceptInterpretationContext(new DiagramHistory(), canvasEventBroker);
         diagramView.setConceptInterpreter(interpreter);
         diagramView.setConceptInterpretationContext(interpretationContext);
+        diagramView.setGrid(DEFAULT_GRID_SIZE,DEFAULT_GRID_SIZE);
+        diagramView.setGridEnabled(false);
         new LabelDragEventHandler(canvasEventBroker);
         new LabelClickEventHandler(canvasEventBroker);
         diagramView.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -171,6 +173,8 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         		diagramView.setGridEnabled(enabled);	
             }
         });
+        gridEnabledCheckBox.setSelected(false);
+        gridEnabledCheckBox.setEnabled(false);
         toolPanel.add(gridEnabledCheckBox);
 
         editContextButton = new JButton("Edit Context...");

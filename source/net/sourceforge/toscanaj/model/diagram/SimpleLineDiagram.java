@@ -7,10 +7,12 @@
  */
 package net.sourceforge.toscanaj.model.diagram;
 
+import net.sourceforge.toscanaj.model.events.DiagramChangedEvent;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
+import org.tockit.events.EventBroker;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -31,6 +33,8 @@ import java.util.List;
  */
 
 public class SimpleLineDiagram implements WriteableDiagram2D {
+	protected EventBroker eventBroker;
+	
     /**
      * The title used for this diagram.
      */
@@ -132,6 +136,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      */
     public void setTitle(String title) {
         this.title = title;
+        sendChangeEvent();
     }
 
     /**
@@ -229,6 +234,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      */
     public void addNode(DiagramNode node) {
         this.nodes.add(node);
+		sendChangeEvent();
     }
 
     /**
@@ -257,6 +263,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     public void addLine(DiagramNode from, DiagramNode to) {
         this.lines.add(new DiagramLine(from, to, this));
         this.coordinateSystemChecked = false;
+		sendChangeEvent();
     }
 
     /**
@@ -299,9 +306,16 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 
     public void setDescription(Element desc) {
         this.description = desc;
+        sendChangeEvent();
     }
 
-    public Element getDescription() {
+	public void sendChangeEvent() {
+		if(this.eventBroker != null) {
+			this.eventBroker.processEvent(new DiagramChangedEvent(this, this));
+		}
+	}
+
+	public Element getDescription() {
         return this.description;
     }
     
@@ -317,4 +331,8 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         }
         return true;
     }
+
+	public void setEventBroker(EventBroker eventBroker) {
+		this.eventBroker = eventBroker;
+	}
 }

@@ -206,11 +206,11 @@ public class DiagramView extends Canvas implements ChangeObserver {
             requestScreenTransformUpdate();
             repaint();
             this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
-            getParent().setCursor(Cursor.getDefaultCursor());
         } catch (Exception e) {
         	ErrorDialog.showError(this, e, "Showing diagram failed", "The selected diagram can not be shown");
         	showDiagram(null);
         }
+		getParent().setCursor(Cursor.getDefaultCursor());
     }
 
 	private void removeSubscriptions() {

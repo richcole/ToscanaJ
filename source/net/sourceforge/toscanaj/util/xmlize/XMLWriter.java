@@ -28,6 +28,8 @@ public class XMLWriter {
 
         Document document = new Document(object.toXML());
         outputter.output(document, out);
+        
+        out.close();
     }
 
 }

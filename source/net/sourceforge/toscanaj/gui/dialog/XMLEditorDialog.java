@@ -65,7 +65,7 @@ public class XMLEditorDialog extends JDialog {
             XMLOutputter outputter = new XMLOutputter("  ", false);
             textPane.setText(outputter.outputString(content));
         } else {
-            textPane.setText("<html>\n  <head>\n    <title></title>\n  </head>\n  <body>\n  </body>\n</html>");
+            textPane.setText("<description><html>\n  <head>\n    <title></title>\n  </head>\n  <body>\n  </body>\n</html>\n</description>\n");
         }
     }
 

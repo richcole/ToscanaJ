@@ -213,10 +213,10 @@ public class OrdinalScaleEditorDialog extends JDialog {
     
     private static class Type1InterordinalGenerator extends InterordinalGenerator {
         protected Attribute getUpwardsAttribute(List dividers, int i) {
-            return new Attribute(">= " + dividers.get(i));
+            return new Attribute(" >= " + dividers.get(i));
         }
         protected Attribute getDownwardsAttribute(List dividers, int i) {
-            return new Attribute("< " + dividers.get(i));
+            return new Attribute(" < " + dividers.get(i));
         }
         public String toString() {
             return "both, increasing side includes bounds";

@@ -30,7 +30,7 @@ public class NestedLineDiagram extends SimpleLineDiagram {
         Hashtable nodeMap = new Hashtable();
         for (int i = 0; i < outerDiagram.getNumberOfNodes(); i++) {
             DiagramNode oldNode = outerDiagram.getNode(i);
-            NestedDiagramNode node = new NestedDiagramNode(oldNode, innerDiagram, scale,
+            NestedDiagramNode node = new NestedDiagramNode(this, oldNode, innerDiagram, scale,
                     !oldNode.getConcept().isTop());
             this.addNode(node);
             nodeMap.put(oldNode, node);

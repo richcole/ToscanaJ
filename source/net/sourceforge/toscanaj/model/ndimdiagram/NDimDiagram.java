@@ -20,7 +20,6 @@ public class NDimDiagram extends SimpleLineDiagram {
 	private Vector base;
 	
     public NDimDiagram(Vector base) {
-        super();
         this.base = base;
     }
 

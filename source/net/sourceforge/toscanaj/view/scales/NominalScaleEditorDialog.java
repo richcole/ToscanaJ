@@ -31,6 +31,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Types;
 import java.util.Iterator;
 import java.util.List;
 
@@ -85,7 +86,11 @@ public class NominalScaleEditorDialog extends JDialog {
             return this.value;
         }
         public String getSqlClause() {
-            return this.tableColumnPair.toString() + " = '" + this.value + "'";
+        	if(tableColumnPair.getColumn().getType() == Types.VARCHAR) {
+            	return this.tableColumnPair.toString() + " = '" + this.value + "'";
+        	} else {
+				return this.tableColumnPair.toString() + " = " + this.value;
+        	}
         }
         public String getClosedAttributeLabel() {
             return this.getAttributeLabel();
@@ -166,6 +171,7 @@ public class NominalScaleEditorDialog extends JDialog {
         setModal(true);
         setTitle("Nominal Scale Generator");
         getContentPane().setLayout(new GridBagLayout());
+
         // -- title pane ---
         this.scaleTitleField = new JTextField();
         this.scaleTitleField.addKeyListener(new KeyListener(){

@@ -644,6 +644,9 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
                 Color nextColor = COLORS[seqNum % COLORS.length];
                 NodeView endViewLast = findObjectConceptView((FCAObject) lastSequence.get(lastSequence.size()-1), nodeViewMap);
                 NodeView startViewNew = findObjectConceptView((FCAObject) sequence.get(0), nodeViewMap);
+                if(endViewLast == null) {
+                	continue;
+                }
                 if(endViewLast != startViewNew) {
 	                this.diagramView.addCanvasItem(
 	                            new InterSequenceTransitionArrow(endViewLast, startViewNew,
