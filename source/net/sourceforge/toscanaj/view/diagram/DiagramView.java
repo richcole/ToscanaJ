@@ -15,7 +15,7 @@ import java.util.ListIterator;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.DrawingCanvas;
-import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
@@ -80,8 +80,8 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
      * Implements ChangeObserver.update(Object) by repainting the diagram.
      */
     public void update(Object source){
-        if(source instanceof DiagramHistory) {
-            showDiagram((SimpleLineDiagram)DiagramHistory.getDiagramHistory().getCurrentDiagram());
+        if(source instanceof DiagramController) {
+            showDiagram((SimpleLineDiagram)DiagramController.getController().getCurrentDiagram());
         }
         else {
             repaint();

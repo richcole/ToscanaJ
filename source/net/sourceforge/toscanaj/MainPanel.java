@@ -2,7 +2,7 @@ package net.sourceforge.toscanaj;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
@@ -445,8 +445,8 @@ public class MainPanel extends JFrame implements ActionListener {
         }
         diagramView.showDiagram(null);
         diagramOrganiser.setConceptualSchema(conceptualSchema);
-        DiagramHistory.getDiagramHistory().clear();
-        DiagramHistory.getDiagramHistory().addObserver(this.diagramView);
+        DiagramController.getController().reset();
+        DiagramController.getController().addObserver(this.diagramView);
 
         // enable relevant buttons and menus
         fileIsOpen = true;

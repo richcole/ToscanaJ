@@ -1,7 +1,7 @@
 package net.sourceforge.toscanaj.view;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.DiagramController;
 
 import net.sourceforge.toscanaj.view.DiagramHistoryView;
 
@@ -61,7 +61,7 @@ public class DiagramOrganiser extends JPanel {
         JScrollPane selectedDiagramsPanel = new JScrollPane();
         availableDiagramsListview = new JList();
         availableDiagramsListview.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        selectedDiagramsListview = new DiagramHistoryView(DiagramHistory.getDiagramHistory());
+        selectedDiagramsListview = new DiagramHistoryView(DiagramController.getController().getDiagramHistory());
         selectedDiagramsListview.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
         // label the buttons
@@ -93,7 +93,7 @@ public class DiagramOrganiser extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 int index = availableDiagramsListview.getSelectedIndex();
                 if(index >= 0) {
-                    DiagramHistory.getDiagramHistory().addDiagram(schema.getDiagram(index));
+                    DiagramController.getController().addDiagram(schema.getDiagram(index));
                 }
             }
         });
@@ -101,7 +101,7 @@ public class DiagramOrganiser extends JPanel {
         removeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int index = selectedDiagramsListview.getSelectedIndex();
-                DiagramHistory.getDiagramHistory().removeDiagram(index);
+                DiagramController.getController().removeDiagram(index);
                 int size = selectedDiagramsListview.getModel().getSize();
                 if (size == 0) {
                     //clearSelection() will disable remove button
@@ -120,7 +120,7 @@ public class DiagramOrganiser extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int index = availableDiagramsListview.locationToIndex(e.getPoint());
-                    DiagramHistory.getDiagramHistory().addDiagram(schema.getDiagram(index));
+                    DiagramController.getController().addDiagram(schema.getDiagram(index));
                 }
             }
         };

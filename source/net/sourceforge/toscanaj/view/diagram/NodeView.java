@@ -1,7 +1,7 @@
 package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
-import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
@@ -62,6 +62,6 @@ public class NodeView extends CanvasItem {
      * Tells the filter controller to add the nodes concept to
      */
     public void doubleClicked(Point2D point) {
-        DiagramHistory.getDiagramHistory().next(diagramNode.getConcept());
+        DiagramController.getController().next(diagramNode.getConcept());
     }
 }

@@ -1,6 +1,6 @@
 package net.sourceforge.toscanaj.view;
 
-import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 
 import java.awt.Component;
@@ -39,8 +39,8 @@ public class DiagramHistoryView extends JList {
             boolean isSelected,      // is the cell selected
             boolean cellHasFocus)    // the list and the cell have the focus
         {
-            DiagramHistory.DiagramReference diagram = (DiagramHistory.DiagramReference)value;
-            DiagramHistory history = (DiagramHistory) list.getModel();
+            DiagramController.DiagramReference diagram = (DiagramController.DiagramReference)value;
+            DiagramController.DiagramHistory history = (DiagramController.DiagramHistory) list.getModel();
 
             setText(diagram.toString());
             setOpaque(true);
@@ -79,8 +79,8 @@ public class DiagramHistoryView extends JList {
      */
     public DiagramHistoryView(ListModel history) {
         super(history);
-        if(!(history instanceof DiagramHistory)) {
-            throw new ClassCastException("This view needs a model of type DiagramHistory");
+        if(!(history instanceof DiagramController.DiagramHistory)) {
+            throw new ClassCastException("This view needs a model of type DiagramController.DiagramHistory");
         }
         this.setCellRenderer(new DiagramCellRenderer());
         this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
