@@ -40,6 +40,9 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
 
         setName("DiagramEditingView");
 
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.add(new JLabel("Diagrams:"), BorderLayout.NORTH);
+
         diagramListModel = new DefaultListModel();
         final JList listView = new JList(diagramListModel);
         fillDiagramListView();
@@ -52,6 +55,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
             }
         };
         listView.addMouseListener(mouseListener);
+        leftPanel.add(listView, BorderLayout.CENTER);
 
         JPanel rightPanel = new JPanel(new BorderLayout());
 
@@ -63,11 +67,6 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
 
         diagramView = new DiagramView();
         final EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
-        canvasEventBroker.subscribe(
-                new NodeMovementEventListener(),
-                CanvasItemDraggedEvent.class,
-                NodeView.class
-        );
         movementChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JComboBox combobox = (JComboBox) e.getSource();
@@ -103,7 +102,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         rightPanel.add(toolPanel, BorderLayout.NORTH);
         rightPanel.add(diagramView, BorderLayout.CENTER);
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, listView, rightPanel);
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);

@@ -60,7 +60,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         requestScreenTransformUpdate();
     }
 
-    private void requestScreenTransformUpdate() {
+    public void requestScreenTransformUpdate() {
         screenTransformDirty = true;
     }
 

@@ -37,6 +37,7 @@ public class FilterMovementEventListener implements BrokerEventListener {
                 otherNode.setPosition(new Point2D.Double(oldPosition.getX() + diffX, oldPosition.getY() + diffY));
             }
         }
+        diagramView.requestScreenTransformUpdate();
         diagramView.repaint();
     }
 }
