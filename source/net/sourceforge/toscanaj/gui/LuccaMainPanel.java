@@ -86,6 +86,8 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private XMLEditorDialog schemaDescriptionView;
     private AttributeSelectionDialog columnChooserDialog;
     private static final DimensionCreationStrategy DimensionStrategy = new DefaultDimensionStrategy();
+	private SaveFileAction saveAsFileAction;
+	private SaveConceptualSchemaActivity saveActivity;
 
     public LuccaMainPanel() {
         super(WINDOW_TITLE);
@@ -182,8 +184,8 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
 
     public void createMenuBar() {
-
-        // --- menu bar ---
+    	
+	    // --- menu bar ---
         menuBar = new JMenuBar();
         setJMenuBar(menuBar);
 
@@ -191,10 +193,24 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
         fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(fileMenu);
-
+		
+		SimpleActivity testSchemaSavedActivity = new SimpleActivity(){
+			public boolean doActivity() throws Exception {
+				return checkForMissingSave();
+			}
+		};
+		NewConceptualSchemaActivity newSchemaActivity = new NewConceptualSchemaActivity(eventBroker);
+		newSchemaActivity.setTestNewOkActivity(testSchemaSavedActivity);
+		newSchemaActivity.setPostNewActivity(new SimpleActivity() {
+			public boolean doActivity() throws Exception {
+				currentFile = null;
+				updateWindowTitle();
+				return true;
+			}
+		});
         SimpleAction newAction = new SimpleAction(
                 this,
-                new NewConceptualSchemaActivity(eventBroker),
+                newSchemaActivity,
                 "New",
                 KeyEvent.VK_N,
                 KeyStroke.getKeyStroke(
@@ -202,7 +218,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
                         ActionEvent.CTRL_MASK
                 )
         );
-
+	
         JMenuItem newMenuItem = new JMenuItem("New");
         newMenuItem.addActionListener(newAction);
         fileMenu.add(newMenuItem);
@@ -228,21 +244,38 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
         openMenuItem.addActionListener(openFileAction);
         fileMenu.add(openMenuItem);
 
-        JMenuItem saveMenuItem = new JMenuItem("Save...");
-        SaveConceptualSchemaActivity saveActivity =
-                new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
-        saveMenuItem.addActionListener(
-                new SaveFileAction(
-                        this,
-                        saveActivity,
-                        KeyEvent.VK_S,
-                        KeyStroke.getKeyStroke(
-                                KeyEvent.VK_S,
-                                ActionEvent.CTRL_MASK
-                        )
-                )
-        );
-        fileMenu.add(saveMenuItem);
+		this.saveActivity =
+				new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
+		JMenuItem saveMenuItem = new JMenuItem("Save");
+		saveMenuItem.setMnemonic(KeyEvent.VK_S);
+		saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		saveMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				saveFile();
+			}
+		});
+				
+		fileMenu.add(saveMenuItem);
+		
+		this.saveAsFileAction =
+			new SaveFileAction(
+				this,
+				saveActivity,
+				KeyEvent.VK_A,
+				KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
+		this.saveAsFileAction.setPostSaveActivity(new SimpleActivity(){
+			public boolean doActivity() throws Exception {
+				currentFile = saveAsFileAction.getLastFileUsed().getPath();
+				addFileToMRUList(saveAsFileAction.getLastFileUsed());
+				conceptualSchema.dataSaved();
+				updateWindowTitle();
+				return true;
+			}
+		});
+		JMenuItem saveAsMenuItem = new JMenuItem("Save As...");
+		saveAsMenuItem.setMnemonic(KeyEvent.VK_A);
+		saveAsMenuItem.addActionListener(saveAsFileAction);
+		fileMenu.add(saveAsMenuItem);
 
         JMenuItem dbConnectionMenuItem = new JMenuItem("Database connection...");
         dbConnectionMenuItem.addActionListener(new ActionListener() {
@@ -439,4 +472,59 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
         recreateMruMenu();
     }
+    
+	protected boolean checkForMissingSave() throws HeadlessException {
+		boolean closeOk;
+		if (!conceptualSchema.isDataSaved()) {
+			int returnValue = showFileChangedDialog();
+			if (returnValue == 0) {
+				// save
+				boolean result = this.saveAsFileAction.saveFile();
+				if (result) {
+					closeOk = true;
+				} else {
+					closeOk = false;
+				}
+			} else if (returnValue == 1) {
+				// discard
+				closeOk = true;
+			} else {
+				// go back
+				closeOk = false;
+			}
+		} else {
+			closeOk = true;
+		}
+		return closeOk;
+	}
+	
+	private int showFileChangedDialog() {
+		// return values
+		// 0 : Save file
+		// 1 : Discard current file
+		// 2 : Go back (cancel save/open/close operation) 
+		Object[] options = { "Save", "Discard", "Go back" };
+		return JOptionPane.showOptionDialog(
+			this,
+			"The conceptual schema has been modified. Do you want to save the changes?",
+			"Schema changed",
+			JOptionPane.YES_NO_CANCEL_OPTION,
+			JOptionPane.WARNING_MESSAGE,
+			null,
+			options,
+			options[2]);
+	}
+	
+	private void saveFile() {
+		if(this.currentFile == null) {
+			this.saveAsFileAction.saveFile();
+		} else {
+			try {
+				saveActivity.processFile(new File(this.currentFile));
+				this.conceptualSchema.dataSaved();
+			} catch (Exception e) {
+				ErrorDialog.showError(this,e,"Saving file failed");
+			}			
+		}
+	}
 }
