@@ -11,7 +11,6 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
-import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import net.sourceforge.toscanaj.model.database.ListQuery;
@@ -21,11 +20,10 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.*;
 
-public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, EventBrokerListener {
+public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterperter 
+										implements ConceptInterpreter, EventBrokerListener {
     private DatabaseInfo databaseInfo;
 
 	private Hashtable contingentSizes = new Hashtable();
@@ -44,18 +42,6 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 	 */
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
     	return Arrays.asList(executeQuery(this.listQuery, concept, context)).iterator();
-    }
-
-    public Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context) {
-        return concept.getAttributeContingentIterator();
-    }
-
-    public int getObjectCount(Concept concept, ConceptInterpretationContext context) {
-		if (context.getObjectDisplayMode() == ConceptInterpretationContext.CONTINGENT) {
-			return getObjectContingentSize(concept, context);
-		} else {
-			return getExtentSize(concept,context);
-		}
     }
 
     public int getObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
@@ -113,14 +99,11 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 		return retVal;
 	}
 
-    public int getAttributeCount(Concept concept, ConceptInterpretationContext context) {
-        return concept.getAttributeContingentSize();
-    }
 
     /**
      * This returns the maximal contingent found up to now.
      */
-    private int getMaximalContingentSize() {
+    protected int getMaximalContingentSize() {
         int maxVal = 0;
         for (Iterator iterator = this.contingentSizes.values().iterator(); iterator.hasNext();) {
             Hashtable contSizes = (Hashtable) iterator.next();
@@ -134,61 +117,6 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         return maxVal;
     }
 
-    /**
-     * Gives the relation of the contingent size of the concept given and the largest contingent size queried in the
-     * given context up to now.
-     *
-     * Note that it is not ensured that all contingent sizes have been queried before this call, this is up to the
-     * caller.
-     */
-    public NormedIntervalSource getIntervalSource(IntervalType type) {
-        if(type == INTERVAL_TYPE_CONTINGENT) {
-            return new NormedIntervalSource(){
-                public double getValue(Concept concept, ConceptInterpretationContext context) {
-                    int contingentSize = getObjectContingentSize(concept, context);
-                    if (contingentSize == 0) {
-                        return 0; //avoids division by zero
-                    }
-                    return (double) contingentSize / (double) getMaximalContingentSize();
-                }
-            };
-        } else if(type == INTERVAL_TYPE_EXTENT) {
-            return new NormedIntervalSource(){
-                public double getValue(Concept concept, ConceptInterpretationContext context) {
-                    int extentSize = getExtentSize(concept, context);
-                    if (extentSize == 0) {
-                        return 0; //avoids division by zero
-                    }
-                    /// @todo add way to find top compareConcept more easily
-                    Concept compareConcept;
-                    ConceptInterpretationContext compareContext;
-                    List nesting = context.getNestingConcepts();
-                    if (nesting.size() != 0) {
-                        // go outermost
-                        compareConcept = (Concept) nesting.get(0);
-                        compareContext = (ConceptInterpretationContext) context.getNestingContexts().get(0);
-                    } else {
-                        compareConcept = concept;
-                        compareContext = context;
-                    }
-                    while (!compareConcept.isTop()) {
-                        Concept other = compareConcept;
-                        Iterator it = compareConcept.getUpset().iterator();
-                        do {
-                            other = (Concept) it.next();
-                        } while (other == compareConcept);
-                        compareConcept = other;
-                    }
-                    return (double) extentSize /
-                            (double) getExtentSize(compareConcept, compareContext);
-                }
-            };
-        } else if(type == INTERVAL_TYPE_FIXED) {
-            return new FixedValueIntervalSource(1);
-        } else {
-            throw new IllegalArgumentException("Unknown interval type");
-        }
-    }
 
     public boolean isRealized(Concept concept, ConceptInterpretationContext context) {
         /// @todo do check only lower neighbours
@@ -246,44 +174,25 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         clearCaches((ConceptInterpretationContext) e.getSubject());
     }
 
-    public Object[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
-		if(!isRealized(concept, context)) {
-			return null;
-		}
-		boolean objectDisplayMode = context.getObjectDisplayMode();
-		boolean filterMode = context.getFilterMode();
+
+	protected Object  getObject (String value, Concept concept, ConceptInterpretationContext context) {
 		String whereClause = WhereClauseGenerator.createWhereClause(concept,
-				context.getDiagramHistory(),
-				context.getNestingConcepts(),
-				objectDisplayMode,
-				filterMode);
-		Object[] retVal;
-		if (query == ListQuery.KEY_LIST_QUERY) {
-			int objectCount = getObjectCount(concept, context);
-			retVal = new Object[objectCount];
-			if( objectCount != 0) {
-				Iterator it = getObjectSetIterator(concept, context);
-				int pos = 0;
-				while (it.hasNext()) {
-					Object o = it.next();
-					retVal[pos] = o;
-					pos++;
-				}
-			} else {
-				return null;
-			}
-		} else if (query == AggregateQuery.COUNT_QUERY) {
-			int objectCount = getObjectCount(concept, context);
-			retVal = new Object[1];
-			if( objectCount != 0) {
-				retVal[0] = new DatabaseRetrievedObject(whereClause, String.valueOf(objectCount));
-			} else {
-				return null;
-			}
-		} else if (query == AggregateQuery.PERCENT_QUERY) {
-			int objectCount = getObjectCount(concept, context);
-			retVal = new Object[1];
-			if( objectCount != 0) {
+										context.getDiagramHistory(),
+										context.getNestingConcepts(),
+										context.getObjectDisplayMode(),
+										context.getFilterMode());
+		return new DatabaseRetrievedObject(whereClause, value);		
+	}
+	protected Object[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) {
+		String whereClause = WhereClauseGenerator.createWhereClause(concept,
+									context.getDiagramHistory(),
+									context.getNestingConcepts(),
+									context.getObjectDisplayMode(),
+									context.getFilterMode());											
+		if (concept.getObjectContingentSize() != 0 ||
+				((context.getObjectDisplayMode() == ConceptInterpretationContext.EXTENT) && !concept.isBottom())
+		) {
+			if(query.doesNeedReferenceValues()){
 				Concept top = concept;
 				while(top.getUpset().size() > 1) {
 					Iterator it = top.getUpset().iterator();
@@ -294,46 +203,20 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 						top = (Concept) it.next();
 					}
 				}
-				boolean oldMode = context.getObjectDisplayMode();
-				context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
-				int fullExtent = getObjectCount(top,context);
-				context.setObjectDisplayMode(oldMode);
-				NumberFormat format = DecimalFormat.getNumberInstance();
-				format.setMaximumFractionDigits(2);
-				retVal[0] = new DatabaseRetrievedObject(whereClause, format.format(100 * objectCount/(double)fullExtent) + " %");
+				String referenceWhereClause = WhereClauseGenerator.createWhereClause(top,
+											context.getDiagramHistory(),
+											context.getNestingConcepts(),
+											ConceptInterpretationContext.EXTENT,
+											context.getFilterMode());
+				return execute(query, whereClause, referenceWhereClause);
 			} else {
-				return null;
+				return execute(query, whereClause, null);
 			}
 		} else {
-	        if (concept.getObjectContingentSize() != 0 ||
-	                ((objectDisplayMode == ConceptInterpretationContext.EXTENT) && !concept.isBottom())
-	        ) {
-				if(query.doesNeedReferenceValues()){
-					Concept top = concept;
-					while(top.getUpset().size() > 1) {
-						Iterator it = top.getUpset().iterator();
-						Concept upper = (Concept) it.next();
-						if(upper != top) {
-							top = upper;
-						} else {
-							top = (Concept) it.next();
-						}
-					}
-					String referenceWhereClause = WhereClauseGenerator.createWhereClause(top,
-							context.getDiagramHistory(),
-							context.getNestingConcepts(),
-							ConceptInterpretationContext.EXTENT,
-							filterMode);
-					return execute(query, whereClause, referenceWhereClause);
-				} else {
-					return execute(query, whereClause, null);
-				}
-	        } else {
-	            return null;
-	        }
+			return null;
 		}
-		return retVal;
-    }
+		 
+	}
 
     private Object[] execute(Query query, String whereClause, String referenceWhereClause) {
         Object[] retVal = null;
@@ -367,6 +250,8 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         }
         return retVal;
     }
+    
+    
 
 	/**
 	 * @todo throw something more specific here

@@ -7,18 +7,15 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
-import net.sourceforge.toscanaj.model.database.AggregateQuery;
-import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.*;
 
 ///@todo this class does not allow nesting and filtering at the moment (or does it?)
 
-public class DirectConceptInterpreter implements ConceptInterpreter {
+public class DirectConceptInterpreter extends AbstractConceptInterperter
+										implements ConceptInterpreter {
     private Hashtable contingents = new Hashtable();
     private Hashtable extents = new Hashtable();
 
@@ -30,89 +27,21 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
         }
     }
 
-    public Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context) {
-        return concept.getAttributeContingentIterator();
-    }
-
-    public int getObjectCount(Concept concept, ConceptInterpretationContext context) {
-        return getCount(concept, context, context.getObjectDisplayMode());
-    }
-
-    public int getAttributeCount(Concept concept, ConceptInterpretationContext context) {
-        return concept.getAttributeContingentSize();
-    }
-
-    private int getMaximalContingentSize() {
+    protected int getMaximalContingentSize() {
         /// @todo implement
         return 1;
     }
 
-    public NormedIntervalSource getIntervalSource(IntervalType type) {
-        if(type == INTERVAL_TYPE_CONTINGENT) {
-            return new NormedIntervalSource(){
-                public double getValue(Concept concept, ConceptInterpretationContext context) {
-                    int contingentSize = getCount(concept, context, ConceptInterpretationContext.CONTINGENT);
-                    if (contingentSize == 0) {
-                        return 0; //avoids division by zero
-                    }
-                    return (double) contingentSize / (double) getMaximalContingentSize();
-                }
-            };
-        } else if(type == INTERVAL_TYPE_EXTENT) {
-            return new NormedIntervalSource(){
-                public double getValue(Concept concept, ConceptInterpretationContext context) {
-                    int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
-                    if (extentSize == 0) {
-                        return 0; //avoids division by zero
-                    }
-                    /// @todo add way to find top compareConcept more easily
-                    Concept compareConcept;
-                    ConceptInterpretationContext compareContext;
-                    List nesting = context.getNestingConcepts();
-                    if (nesting.size() != 0) {
-                        // go outermost
-                        compareConcept = (Concept) nesting.get(0);
-                        compareContext = new ConceptInterpretationContext(context.getDiagramHistory(), context.getEventBroker());
-                    } else {
-                        compareConcept = concept;
-                        compareContext = context;
-                    }
-                    while (!compareConcept.isTop()) {
-                        Concept other;
-                        Iterator it = compareConcept.getUpset().iterator();
-                        do {
-                            other = (Concept) it.next();
-                        } while (other == compareConcept);
-                        compareConcept = other;
-                    }
-                    int maxExtent = getCount(compareConcept, compareContext, ConceptInterpretationContext.EXTENT);
-                    return (double) extentSize / (double) maxExtent;
-                }
-            };
-        } else if(type == INTERVAL_TYPE_FIXED) {
-            return new FixedValueIntervalSource(1);
-        } else {
-            throw new IllegalArgumentException("Unknown interval type");
-        }
-    }
-
-    private int getCount(Concept concept, ConceptInterpretationContext context, boolean extent) {
-        if (extent == ConceptInterpretationContext.CONTINGENT) {
-            return getContingent(concept, context).size();
-        } else {
-            return getExtent(concept, context).size();
-        }
-    }
 
     public boolean isRealized(Concept concept, ConceptInterpretationContext context) {
         /// @todo there might be some reuse with the same method from the DB version
-        int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
+        int extentSize = getExtentSize(concept, context);
         for (Iterator iterator = concept.getDownset().iterator(); iterator.hasNext();) {
             Concept other = (Concept) iterator.next();
             if (other == concept) {
                 continue;
             }
-            int otherExtentSize = getCount(other, context, ConceptInterpretationContext.EXTENT);
+            int otherExtentSize = getExtentSize(other, context);
             if (otherExtentSize == extentSize) {
                 return false;
             }
@@ -128,7 +57,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
                         List nesting = otherContext.getNestingConcepts();
                         if (nesting.size() != 0) {
                             if (nesting.get(nesting.size() - 1).equals(otherConcept)) {
-                                int otherExtentSize = getCount(concept, otherContext, ConceptInterpretationContext.EXTENT);
+                                int otherExtentSize = getExtentSize(concept, otherContext);
                                 if (otherExtentSize == extentSize) {
                                     return false;
                                 }
@@ -278,69 +207,23 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
         filterObjects(retVal, context);
         return retVal;
     }
-
-    public Object[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
-		if(!isRealized(concept, context)) {
-			return null;
-		}
-		Object[] retVal;
-		if (query == ListQuery.KEY_LIST_QUERY) {
-			int objectCount = getObjectCount(concept, context);
-			if( objectCount != 0) {
-				retVal = new Object[objectCount];
-				Iterator it = getObjectSetIterator(concept, context);
-				int pos = 0;
-				while (it.hasNext()) {
-					Object o = it.next();
-					retVal[pos] = o;
-					pos++;
-				}
-			} else {
-				return null;
-			}
-		} else if (query == AggregateQuery.COUNT_QUERY) {
-			int objectCount = getObjectCount(concept, context);
-			retVal = new Object[1];
-			if( objectCount != 0) {
-				retVal[0] = new Integer(objectCount);
-			} else {
-				return null;
-			}
-		} else if (query == AggregateQuery.PERCENT_QUERY) {
-			int objectCount = getObjectCount(concept, context);
-			retVal = new Object[1];
-			if( objectCount != 0) {
-				Concept top = concept;
-				while(top.getUpset().size() > 1) {
-					Iterator it = top.getUpset().iterator();
-					Concept upper = (Concept) it.next();
-					if(upper != top) {
-						top = upper;
-					} else {
-						top = (Concept) it.next();
-					}
-				}
-				boolean oldMode = context.getObjectDisplayMode();
-				context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
-				int fullExtent = getObjectCount(top,context);
-				context.setObjectDisplayMode(oldMode);
-				NumberFormat format = DecimalFormat.getNumberInstance();
-				format.setMaximumFractionDigits(2);
-				retVal[0] = format.format(100 * objectCount/(double)fullExtent) + " %";
-			} else {
-				return null;
-			}
-		} else {
-			throw new RuntimeException("Query not supported by this class (" + this.getClass().getName() + ")");
-		}
-		return retVal;
-    }
+    
+	protected Object  getObject (String value, Concept concept, ConceptInterpretationContext context) {
+		return value;
+	}
+	
+	protected Object[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) { 
+		throw new RuntimeException("Query not supported by this class (" + this.getClass().getName() + ")");
+	}
+    
 
     public int getObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
-		return getCount(concept, context, ConceptInterpretationContext.CONTINGENT);
+		return getContingent(concept, context).size();
     }
 
     public int getExtentSize(Concept concept, ConceptInterpretationContext context) {
-		return getCount(concept, context, ConceptInterpretationContext.EXTENT);
+		return getExtent(concept, context).size();
     }
+    
+    
 }
