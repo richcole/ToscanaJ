@@ -23,6 +23,7 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
 		<table>PCTest</table>
 		<key>PCname</key>
 		<queries dropDefaults="false">
+            <!-- distinct queries are not supported by some database systems, e.g. McKoi -->
 			<list name="Cases" distinct="true">
 				<column>typeCase</column>
 			</list>
@@ -38,9 +39,9 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
 				<column format="$0.00">MAX(price)</column>
 			</aggregate>
 		</queries>
-	</database>
-        <!-- a simple HTML summary, given as part of this file -->
-        <viewer class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML View...">
+        <views>
+            <!-- a simple HTML summary, given as part of this file -->
+            <objectView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML View...">
                 <template>
                     <html>
                         <body>
@@ -58,28 +59,30 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
                         </body>
                     </html>
                 </template>
-        </viewer>
-        <!-- this one is demonstrating the usage of external files. And how to use color to your own disadvantage :-) -->
-        <viewer class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML View (Color)...">
+            </objectView>
+            <!-- this one is demonstrating the usage of external files. And how to use color to your own disadvantage :-) -->
+            <objectView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML View (Color)...">
                 <template url="views/coloredSummary.html"/>
-        </viewer>
-        <!-- it does not have to be HTML... Loading plain text is not yet implemented. BTW: delimiters can have more than one char. -->
-        <viewer class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer" name="Short View...">
+            </objectView>
+            <!-- it does not have to be HTML... Loading plain text is not yet implemented. BTW: delimiters can have more than one char. -->
+            <objectView class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer" name="Short View...">
                 <parameter name="openDelimiter" value="$"/>
                 <parameter name="closeDelimiter" value="$"/>
                 <template>Name:  $PCName$
 Price: $price$</template>
-        </viewer>
-        <!-- this one is just showing syntax, it does not do anything useful -->
-        <viewer class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer" name="External View...">
+            </objectView>
+            <!-- this one is just showing syntax, it does not do anything useful -->
+            <objectView class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer" name="External View...">
                 <parameter name="openDelimiter" value="$$$"/>
                 <parameter name="closeDelimiter" value="%%%"/>
                 <parameter name="commandLine" value="echo $$$PCname%%%"/>
-        </viewer>
-        <!-- a report, syntax will change (the file will be included later), we still lack formatting of results... -->
-        <report class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseReportGenerator" name="HTML Report...">
+            </objectView>
+            <!-- a report, syntax will change (the file will be included later), we still lack formatting of results... -->
+            <objectListView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseReportGenerator" name="HTML Report...">
                 <parameter name="template" value="/home/pbecker/temp/report.html"/>
-        </report>
+            </objectListView>
+        </views>
+	</database>
 	<context>
 		<object id="1">price&gt;=5000</object>
 		<object id="2">price&lt;5000 and price&gt;=4500</object>
@@ -495,6 +498,15 @@ Price: $price$</template>
 		<attribute id="154" name="four 3¼&quot; bays"/>
 	</context>
 	<diagram title="Prices for 486/66 PCs">
+        <description>
+            <html>
+                <body>
+                    <h1>Prices</h1>
+                    This diagrams gives a general overview on the price distribution
+                    in the PC set.
+                </body>
+            </html>
+        </description>
 		<concept id="1">
 			<position x="0.000000" y="0.000000"/>
 			<objectContingent/>
