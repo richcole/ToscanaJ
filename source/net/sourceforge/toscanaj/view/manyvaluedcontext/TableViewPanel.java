@@ -81,6 +81,8 @@ public class TableViewPanel extends JFrame {
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,createTableView(),createDiagramView());
 		splitPane.setOneTouchExpandable(true);
 		setContentPane(splitPane);
+		pack();
+		splitPane.setDividerLocation(0.5);
 	}
 		
 	protected JScrollPane createTableView(){
@@ -360,7 +362,7 @@ public class TableViewPanel extends JFrame {
 			WritableManyValuedContext context = model.getContext();
 			TableViewPanel c1 = new TableViewPanel(context);
 			c1.setDefaultCloseOperation(EXIT_ON_CLOSE);
-			c1.setSize(c1.getPreferredSize());
+			c1.setBounds(10,10,1000,700);
 			c1.setVisible(true);
 		}
 	}
