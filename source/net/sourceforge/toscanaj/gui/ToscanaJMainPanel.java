@@ -42,6 +42,9 @@ import java.util.List;
 /**
  *  This class provides the main GUI panel with menus and a toolbar
  *  for ToscanaJ.
+ *
+ *
+ * @todo store view settings (contingent/extent labels/gradient) in session management
  */
 public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeObserver {
 
@@ -428,7 +431,6 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         viewMenu.setMnemonic(KeyEvent.VK_V);
         menubar.add(viewMenu);
 
-        // menu radio buttons group:
         ButtonGroup documentsDisplayGroup = new ButtonGroup();
         this.showExactMenuItem = new JRadioButtonMenuItem("Show only exact matches");
         this.showExactMenuItem.setMnemonic(KeyEvent.VK_X);
@@ -437,8 +439,8 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         this.showExactMenuItem.setSelected(true);
         this.showExactMenuItem.addActionListener(this);
         documentsDisplayGroup.add(this.showExactMenuItem);
-
         viewMenu.add(this.showExactMenuItem);
+
         this.showAllMenuItem = new JRadioButtonMenuItem("Show all matches");
         this.showAllMenuItem.setMnemonic(KeyEvent.VK_A);
         this.showAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
@@ -446,9 +448,38 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         this.showAllMenuItem.addActionListener(this);
         documentsDisplayGroup.add(this.showAllMenuItem);
         viewMenu.add(this.showAllMenuItem);
-
-        // separator
         viewMenu.addSeparator();
+
+        if (ConfigurationManager.fetchInt("ToscanaJMainPanel","offerGradientOptions",0) == 1) {
+            ButtonGroup colorGradientGroup = new ButtonGroup();
+            JRadioButtonMenuItem showAllMenuItem = new JRadioButtonMenuItem("Use colors for exact matches");
+            showAllMenuItem.setMnemonic(KeyEvent.VK_C);
+            showAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                    KeyEvent.VK_G, ActionEvent.CTRL_MASK));
+            showAllMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    DiagramSchema.getDiagramSchema().setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT );
+                    diagramView.update(this);
+                }
+            });
+            colorGradientGroup.add(showAllMenuItem);
+            viewMenu.add(showAllMenuItem);
+
+            JRadioButtonMenuItem showExactMenuItem = new JRadioButtonMenuItem("Use colors for all matches");
+            showExactMenuItem.setMnemonic(KeyEvent.VK_T);
+            showExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                    KeyEvent.VK_G, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+            showExactMenuItem.setSelected(true);
+            showExactMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    DiagramSchema.getDiagramSchema().setGradientType(DiagramSchema.GRADIENT_TYPE_EXTENT);
+                    diagramView.update(this);
+                }
+            });
+            colorGradientGroup.add(showExactMenuItem);
+            viewMenu.add(showExactMenuItem);
+            viewMenu.addSeparator();
+        }
 
         // menu radio buttons group:
         ButtonGroup labelContentGroup = new ButtonGroup();
@@ -762,8 +793,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         diagramView.showDiagram(null);
         DiagramController controller = DiagramController.getController();
         DatabaseConnectedConceptInterpreter interpreter =
-                new DatabaseConnectedConceptInterpreter(DatabaseConnection.getConnection(),
-                        conceptualSchema.getDatabaseInfo());
+                new DatabaseConnectedConceptInterpreter(conceptualSchema.getDatabaseInfo());
         ConceptInterpretationContext interpretationContext = new ConceptInterpretationContext(controller.getDiagramHistory(),
                 broker);
         diagramView.setConceptInterpreter(interpreter);

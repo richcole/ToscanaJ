@@ -16,6 +16,8 @@ import java.awt.*;
  * for the DiagramView.
  *
  * This class uses a Singleton design pattern.
+ *
+ * @todo drop singleton, attach object to DiagramView
  */
 
 public class DiagramSchema {

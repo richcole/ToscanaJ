@@ -131,8 +131,7 @@ public class NodeView extends CanvasItem {
 
     /**
      *  calculates relative size in order to calculate node color
-     * */
-
+     */
     private double calculateRelativeSize(DiagramSchema diagramSchema) {
         if (diagramSchema.getGradientReference() == DiagramSchema.GRADIENT_REFERENCE_DIAGRAM) {
             if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {

@@ -25,10 +25,14 @@ import java.util.List;
 
 /**
  * This class paints a diagram defined by the SimpleLineDiagram class.
+ *
+ * @todo get rid of ChangeObserver, use EventBroker.
  */
 public class DiagramView extends Canvas implements ChangeObserver {
     /**
      * This is a generic margin used for all four edges.
+     *
+     * @todo move into DiagramSchema
      */
     private final int MARGIN = 20;
 
@@ -61,7 +65,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
      */
     static final public int SELECTED_IDEAL = 4;
 
-    class ResizeListener extends ComponentAdapter {
+    private class ResizeListener extends ComponentAdapter {
         public void componentResized(ComponentEvent e) {
             requestScreenTransformUpdate();
             repaint();
@@ -124,7 +128,6 @@ public class DiagramView extends Canvas implements ChangeObserver {
             repaint();
         }
     }
-
 
     private boolean screenTransformDirty = false;
 

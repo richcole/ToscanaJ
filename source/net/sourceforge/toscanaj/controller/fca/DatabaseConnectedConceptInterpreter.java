@@ -17,17 +17,12 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import java.util.*;
 
 public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, EventListener {
-
-    private DatabaseConnection databaseConnection;
-
     private DatabaseInfo databaseInfo;
 
     private Hashtable extentSizes = new Hashtable();
     private Hashtable contingentSizes = new Hashtable();
 
-    public DatabaseConnectedConceptInterpreter(DatabaseConnection databaseConnection,
-                                               DatabaseInfo databaseInfo) {
-        this.databaseConnection = databaseConnection;
+    public DatabaseConnectedConceptInterpreter(DatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
     }
 
@@ -114,28 +109,35 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         try {
             int contingentSize = getCount(concept, context, ConceptInterpretationContext.CONTINGENT);
             if (reference == REFERENCE_DIAGRAM) {
-                /// @todo add way to find top concept more easily
-		/// @todo refactor lookup of diagram object count here and in getRelativeExtentSize
-                while (!concept.isTop()) {
-                    Concept other = concept;
-                    Iterator it = concept.getUpset().iterator();
-                    do {
-                        other = (Concept) it.next();
-                    } while (other == concept);
-                    concept = other;
-                }
                 if (contingentSize == 0) {
                     return 0; //avoids division by zero
                 }
-                return (double) contingentSize / (double) getCount(concept, context, ConceptInterpretationContext.EXTENT);
+                return (double) contingentSize / (double) getMaximalContingentSize();
             } else {
-                /// @todo implement
+                /// @todo implement or remove the distinction
                 return 1;
             }
         } catch (DatabaseException e) {
             e.getOriginal().printStackTrace();
             throw new RuntimeException("Error querying database");
         }
+    }
+
+    /**
+     * @todo this assumes the cache is up-to-date. Ensure it is.
+     */
+    private int getMaximalContingentSize() {
+        int maxVal = 0;
+        for (Iterator iterator = this.contingentSizes.values().iterator(); iterator.hasNext();) {
+            Hashtable contSizes = (Hashtable) iterator.next();
+            for (Iterator iterator2 = contSizes.values().iterator(); iterator2.hasNext();) {
+                Integer curVal = (Integer) iterator2.next();
+                if(curVal.intValue() > maxVal) {
+                    maxVal = curVal.intValue();
+                }
+            }
+        }
+        return maxVal;
     }
 
     public double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context, int reference) {
@@ -156,7 +158,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                 }
                 return (double) extentSize / (double) getCount(concept, context, ConceptInterpretationContext.EXTENT);
             } else {
-                /// @todo implement
+                /// @todo implement or remove the distinction
                 return 1;
             }
         } catch (DatabaseException e) {
