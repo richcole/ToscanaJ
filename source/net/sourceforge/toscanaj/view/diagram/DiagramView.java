@@ -14,7 +14,6 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.view.diagram.LabelView;
-import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
 import java.awt.*;
 import java.awt.geom.*;
@@ -34,19 +33,9 @@ import java.util.ListIterator;
  */
 public class DiagramView extends DrawingCanvas implements ChangeObserver {
     /**
-     * The minimum size for drawing.
-     *
-     * If this size for a diagram is not reached (in width or height), the digram
-     * will not be drawn at all.
-     */
-    private final int MINDIAGRAMSIZE=50;
-
-    /**
      * This is a generic margin used for all four edges.
-     *
-     * The margin should be big enough to allow a RADIUS to lap over.
      */
-    private final int MARGIN = 80;
+    private final int MARGIN = 20;
 
     /**
      * The diagram to display.
@@ -99,52 +88,16 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         }
         Graphics2D g2d = (Graphics2D) g;
 
-        // calculate paintable area
-        Insets insets = getInsets();
-        int x = getX() + insets.left + MARGIN;
-        int y = getY() + insets.top + MARGIN;
-        int h = getHeight() - insets.left - insets.right - 2 * MARGIN;
-        int w = getWidth() - insets.top - insets.bottom - 2 * MARGIN;
-
-        // check if there is enough left to paint on, otherwise abort
-        if( ( h < MINDIAGRAMSIZE ) || ( w < MINDIAGRAMSIZE ) ) {
-            return;
-        }
-
         // draw diagram title in the top left corner
-        g2d.drawString( diagram.getTitle(), x - MARGIN/2, y - MARGIN/2 );
+        g2d.drawString( diagram.getTitle(), this.getX() + MARGIN, this.getY() + MARGIN );
 
-        // get the dimensions of the diagram
-        Rectangle2D diagBounds = diagram.getBounds();
+        Rectangle2D bounds = new Rectangle2D.Double( getX() + MARGIN, getY() + MARGIN,
+                                                     getWidth() - 2*MARGIN, getHeight() - 2*MARGIN );
 
-        // we need some values to do the projection -- the initial values are
-        // centered and no size change. This is useful if the diagram has no
-        // extent in a direction
-        double xOrigin = x + w/2;
-        double yOrigin = y + h/2;
-        double xScale = 1;
-        double yScale = 1;
+        this.scaleToFit(g2d, bounds);
 
-        // adjust the scaling values if the diagram has extent in a dimension
-        // and move the top/left edge of the diagram to the top/left edge of
-        // the painting area. If the diagram has no extent in one direction
-        // there will be no scaling and it will be placed centered
-        /** @TODO change this to calculate the lable sizes/offsets into the
-         *  scaling */
-        if( diagBounds.getWidth() != 0 )
-        {
-            xScale = w / diagBounds.getWidth();
-            xOrigin = x - diagBounds.getX() * xScale;
-        }
-        if( diagBounds.getHeight() != 0 && diagram.getNumberOfNodes() != 0 )
-        {
-            yScale = h / diagBounds.getHeight();
-            yOrigin = y - diagram.getNode(0).getPosition().getY() * yScale;
-        }
-        //store updated ToscanajGraphics2D
-        graphics = new ToscanajGraphics2D(g2d, new Point2D.Double( xOrigin, yOrigin ), xScale, yScale );
         // paint all items on canvas
-        paintCanvasItems(graphics);
+        paintCanvasItems(g2d);
     }
 
     /**

@@ -92,21 +92,23 @@ public class SimpleLineDiagram implements Diagram2D
         double minY = Double.MAX_VALUE;
         double maxY = -Double.MAX_VALUE;
         for( int i = 0; i < this.nodes.size(); i++ ) {
-            Point2D p = ((DiagramNode)this.nodes.get( i )).getPosition();
-            double x = p.getX();
-            double y = p.getY();
+            DiagramNode node = (DiagramNode)this.nodes.get( i );
+            double x = node.getX();
+            double y = node.getY();
+            double rx = node.getRadiusX();
+            double ry = node.getRadiusY();
 
-            if( x < minX ) {
-                minX = x;
+            if( x-rx < minX ) {
+                minX = x-rx;
             }
-            if( x > maxX ) {
-                maxX = x;
+            if( x+rx > maxX ) {
+                maxX = x+rx;
             }
-            if( y < minY ) {
-                minY = y;
+            if( y-ry < minY ) {
+                minY = y-ry;
             }
-            if( y > maxY ) {
-                maxY = y;
+            if( y+ry > maxY ) {
+                maxY = y+ry;
             }
         }
         return new Rectangle2D.Double( minX, minY, maxX - minX, maxY - minY );

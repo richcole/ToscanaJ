@@ -2,8 +2,6 @@ package net.sourceforge.toscanaj.canvas.imagewriter;
 
 import net.sourceforge.toscanaj.canvas.DrawingCanvas;
 
-import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
-
 import com.sun.jimi.core.Jimi;
 import com.sun.jimi.core.JimiException;
 import com.sun.jimi.core.JimiWriter;
@@ -11,6 +9,7 @@ import com.sun.jimi.core.JimiWriter;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Graphics2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import java.io.File;
@@ -76,18 +75,13 @@ public class ImageWriter {
             // Create an instance of the SVG Generator
             SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
             svgGenerator.setSVGCanvasSize(new Dimension(settings.getImageWidth(),settings.getImageHeight()));
+            Rectangle2D bounds = new Rectangle2D.Double(
+                                        0, 0, settings.getImageWidth(), settings.getImageHeight() );
 
-            // scale teh diagram to fit the image size
-            double xScale = settings.getImageWidth()/(double)canvas.getWidth();
-            double yScale = settings.getImageHeight()/(double)canvas.getHeight();
-            svgGenerator.scale(xScale,yScale);
+            canvas.scaleToFit(svgGenerator, bounds);
 
             // render the graphic into the DOM
-            ToscanajGraphics2D tgraphics = new ToscanajGraphics2D( svgGenerator,
-                                                                   canvas.getToscanaGraphics().getOffset(),
-                                                                   canvas.getToscanaGraphics().getXScaling(),
-                                                                   canvas.getToscanaGraphics().getYScaling() );
-            canvas.paintCanvasItems(tgraphics);
+            canvas.paintCanvasItems(svgGenerator);
 
             // Finally, stream out SVG to the standard output using UTF-8
             // character to byte encoding
@@ -108,17 +102,13 @@ public class ImageWriter {
             Image image = new BufferedImage(settings.getImageWidth(), settings.getImageHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics2D graphics2D = (Graphics2D) image.getGraphics();
 
-            double xScale = settings.getImageWidth()/(double)canvas.getWidth();
-            double yScale = settings.getImageHeight()/(double)canvas.getHeight();
-            graphics2D.scale(xScale,yScale);
+            Rectangle2D bounds = new Rectangle2D.Double(
+                                        0, 0, settings.getImageWidth(), settings.getImageHeight() );
 
-            ToscanajGraphics2D tgraphics = new ToscanajGraphics2D( graphics2D,
-                                                                   canvas.getToscanaGraphics().getOffset(),
-                                                                   canvas.getToscanaGraphics().getXScaling(),
-                                                                   canvas.getToscanaGraphics().getYScaling() );
+            canvas.scaleToFit(graphics2D, bounds);
 
             // paint all items on canvas
-            canvas.paintCanvasItems(tgraphics);
+            canvas.paintCanvasItems(graphics2D);
             try
             {
                 JimiWriter writer = Jimi.createJimiWriter(jimiName);

@@ -11,7 +11,6 @@ import java.awt.geom.Point2D;
  * on the labels attached to it.
  */
 public class DiagramNode {
-
     /**
      * The size of nodes.
      *
@@ -46,13 +45,6 @@ public class DiagramNode {
     protected LabelInfo objectLabel;
 
     /**
-     * The nesting level we are upon.
-     *
-     * One means toplevel, two nested in the toplevel diagram, etc.
-     */
-    private int level = 1;
-
-    /**
      * Construct a node for a concept at a position with two labels attached.
      *
      * The labels can be null if there is no label in this position. The concept
@@ -73,8 +65,6 @@ public class DiagramNode {
 
     /**
      * A copy constructor creating a duplicate of the given node.
-     *
-     * The level will be set to one, no nesting assumed.
      */
     public DiagramNode(DiagramNode other) {
         this.position = other.position;
@@ -87,22 +77,6 @@ public class DiagramNode {
         if(this.objectLabel != null) {
             this.objectLabel.attachNode(this);
         }
-    }
-
-    /**
-     * Sets the level of nesting.
-     *
-     * One = toplevel, Two = nested in toplevel diagram, etc.
-     */
-    public void setNestingLevel(int level) {
-        this.level = level;
-    }
-
-    /**
-     * Returns the level of nesting.
-     */
-    public int getNestingLevel() {
-        return this.level;
     }
 
     /**
@@ -144,15 +118,11 @@ public class DiagramNode {
      * Get the horizontal radius used for this node.
      */
     public double getRadiusX() {
-        double scale = 1;
-        for(int i = 1; i < this.level; i++ ) {
-            scale *= 0.7;
-        }
         if(this.concept.isRealised()) {
-            return RADIUS * scale;
+            return RADIUS;
         }
         else {
-            return RADIUS * scale / 3;
+            return RADIUS / 3;
         }
     }
 
@@ -160,15 +130,11 @@ public class DiagramNode {
      * Get the vertical radius used for this node.
      */
     public double getRadiusY() {
-        double scale = 1;
-        for(int i = 1; i < this.level; i++ ) {
-            scale *= 0.7;
-        }
         if(this.concept.isRealised()) {
-            return RADIUS * scale;
+            return RADIUS;
         }
         else {
-            return RADIUS * scale / 3;
+            return RADIUS / 3;
         }
     }
 
@@ -223,8 +189,9 @@ public class DiagramNode {
      * Debug output.
      */
     public String toString() {
-        String retVal = "pos = (" + this.getX() + ", " + this.getY() +")\n";
-        retVal += "size = (" + this.getRadiusX() + ", " + this.getRadiusX() +")\n";
+        String retVal = "DiagramNode:\n";
+        retVal+= "- Pos : (" + getX() + "," + getY() + ")\n";
+        retVal+= "- Size: (" + getRadiusX() + "," + getRadiusY() + ")\n";
         return retVal;
     }
 }

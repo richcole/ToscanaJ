@@ -2,6 +2,8 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 
+import java.awt.Graphics2D;
+
 /**
  * A LabelView for displaying the objects.
  *
@@ -38,7 +40,7 @@ public class ObjectLabelView extends LabelView {
     /**
      * Avoids drawing object labels for non-realised concepts.
      */
-    public void draw(ToscanajGraphics2D graphics) {
+    public void draw(Graphics2D graphics) {
         if(this.labelInfo.getNode().getConcept().isRealised()) {
             super.draw(graphics);
         }

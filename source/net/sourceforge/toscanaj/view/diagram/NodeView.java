@@ -5,13 +5,13 @@ import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -88,17 +88,6 @@ public class NodeView extends CanvasItem {
     private DiagramView diagramView = null;
 
     /**
-     * Stores the graphic environment.
-     *
-     * This is done since the radius in DiagramNode is not stored in model
-     * coordinates due to Toscanas weird scaling behaviour.
-     *
-     * @TODO: Reconsider the handling of the scaling or find a way to store
-     * the radius somewhere else (global options?).
-     */
-    private ToscanajGraphics2D graphics;
-
-    /**
      * Stores the selection state.
      */
     private int selectionState;
@@ -158,9 +147,9 @@ public class NodeView extends CanvasItem {
     /**
      * Draws the node as circle.
      */
-    public void draw(ToscanajGraphics2D g) {
+    public void draw(Graphics2D graphics) {
         if(diagramNode != null) {
-            Paint oldPaint = g.getGraphics2D().getPaint();
+            Paint oldPaint = graphics.getPaint();
             Color nodeColor;
             Color circleColor = this.circleColor;
             if(diagramNode instanceof NestedDiagramNode) {
@@ -173,9 +162,9 @@ public class NodeView extends CanvasItem {
                                        (int)(topColor.getBlue()*rel + bottomColor.getBlue()*(1-rel)),
                                        (int)(topColor.getAlpha()*rel + bottomColor.getAlpha()*(1-rel)) );
             }
-            Stroke oldStroke = g.getGraphics2D().getStroke();
+            Stroke oldStroke = graphics.getStroke();
             if(this.selectionState != NOT_SELECTED) {
-                g.getGraphics2D().setStroke(new BasicStroke(this.selectionSize));
+                graphics.setStroke(new BasicStroke(this.selectionSize));
                 if(this.selectionState == SELECTED_DIRECTLY) {
                     circleColor = this.circleSelectionColor;
                 }
@@ -186,11 +175,17 @@ public class NodeView extends CanvasItem {
                     circleColor = this.circleFilterColor;
                 }
             }
-            g.drawFilledEllipse( diagramNode.getPosition(), diagramNode.getRadiusX(), diagramNode.getRadiusY(),
-                                 nodeColor, circleColor );
-            g.getGraphics2D().setPaint(oldPaint);
-            g.getGraphics2D().setStroke(oldStroke);
-            graphics = g;
+
+            Ellipse2D ellipse = new Ellipse2D.Double(
+                                        diagramNode.getPosition().getX() - diagramNode.getRadiusX(),
+                                        diagramNode.getPosition().getY() - diagramNode.getRadiusY(),
+                                        diagramNode.getRadiusX() * 2, diagramNode.getRadiusY() * 2 );
+            graphics.setPaint(nodeColor);
+            graphics.fill(ellipse);
+            graphics.setPaint(circleColor);
+            graphics.draw(ellipse);
+            graphics.setPaint(oldPaint);
+            graphics.setStroke(oldStroke);
         }
     }
 
@@ -201,8 +196,8 @@ public class NodeView extends CanvasItem {
      * circle with the geometric average of the two radii is hit.
      */
     public boolean containsPoint(Point2D point) {
-        double deltaX = graphics.scaleX(point.getX() - diagramNode.getPosition().getX());
-        double deltaY = graphics.scaleY(point.getY() - diagramNode.getPosition().getY());
+        double deltaX = point.getX() - diagramNode.getPosition().getX();
+        double deltaY = point.getY() - diagramNode.getPosition().getY();
         double sqDist = deltaX*deltaX + deltaY*deltaY;
         double sqRadius = diagramNode.getRadiusX()*diagramNode.getRadiusY();
         return sqDist <= sqRadius;
@@ -225,8 +220,8 @@ public class NodeView extends CanvasItem {
     /**
      * Calculates the rectangle around this node.
      */
-    public Rectangle2D getBounds(ToscanajGraphics2D g) {
-        Point2D center = g.project(this.diagramNode.getPosition());
+    public Rectangle2D getBounds(Graphics2D g) {
+        Point2D center = this.diagramNode.getPosition();
         double x = center.getX();
         double y = center.getY();
         double rx = this.diagramNode.getRadiusX();

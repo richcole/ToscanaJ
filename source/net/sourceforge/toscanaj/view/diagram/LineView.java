@@ -3,12 +3,12 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.canvas.CanvasItem;
-import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -38,23 +38,23 @@ public class LineView extends CanvasItem {
     /**
      * Draws the line.
      */
-    public void draw(ToscanajGraphics2D g) {
+    public void draw(Graphics2D graphics) {
         Point2D from = diagramLine.getFromPosition();
         Point2D to = diagramLine.getToPosition();
-        Paint oldPaint = g.getGraphics2D().getPaint();
-        Stroke oldStroke = g.getGraphics2D().getStroke();
+        Paint oldPaint = graphics.getPaint();
+        Stroke oldStroke = graphics.getStroke();
         if(this.selectionState != NodeView.NOT_SELECTED) {
-            g.getGraphics2D().setStroke(new BasicStroke(NodeView.selectionSize));
+            graphics.setStroke(new BasicStroke(NodeView.selectionSize));
             if(this.selectionState == NodeView.SELECTED_IDEAL) {
-                g.getGraphics2D().setPaint(NodeView.circleIdealColor);
+                graphics.setPaint(NodeView.circleIdealColor);
             }
             else if(this.selectionState == NodeView.SELECTED_FILTER) {
-                g.getGraphics2D().setPaint(NodeView.circleFilterColor);
+                graphics.setPaint(NodeView.circleFilterColor);
             }
         }
-        g.drawLine(from, to);
-        g.getGraphics2D().setPaint(oldPaint);
-        g.getGraphics2D().setStroke(oldStroke);
+        graphics.draw(new Line2D.Double(from,to));
+        graphics.setPaint(oldPaint);
+        graphics.setStroke(oldStroke);
     }
 
     /**
@@ -67,9 +67,9 @@ public class LineView extends CanvasItem {
     /**
      * Calculates the rectangle around this line.
      */
-    public Rectangle2D getBounds(ToscanajGraphics2D g) {
-        Point2D from = g.project(diagramLine.getFromPosition());
-        Point2D to = g.project(diagramLine.getToPosition());
+    public Rectangle2D getBounds(Graphics2D graphics) {
+        Point2D from = diagramLine.getFromPosition();
+        Point2D to = diagramLine.getToPosition();
         double x,y,w,h;
         if( from.getX() < to.getX() ) {
             x = from.getX();
@@ -95,11 +95,6 @@ public class LineView extends CanvasItem {
      * and marks it appropriately.
      *
      * @see NodeView.setSelectedConcept(Concept)
-     */
-    /**
-     * Recalculates if the node is selected and how.
-     *
-     * @see getSelectionState()
      */
     public void setSelectedConcept(Concept concept) {
         if(concept == null) {

@@ -2,8 +2,8 @@ package net.sourceforge.toscanaj.canvas;
 
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
+import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -51,7 +51,7 @@ public abstract class CanvasItem implements ChangeObservable {
     /**
      * Draw method called to draw canvas item
      */
-    public abstract void draw(ToscanajGraphics2D g);
+    public abstract void draw(Graphics2D g);
 
     /**
      * Returns true when the given point is on the item.
@@ -64,6 +64,15 @@ public abstract class CanvasItem implements ChangeObservable {
      * Unless it is overwritten in a derived class this will do nothing.
      */
     public void moveBy(double deltaX, double deltaY) {
+    }
+
+    /**
+     * Moves the label by the given vector.
+     *
+     * This is a convenience method calling moveBy(double, double).
+     */
+    public void moveBy(Point2D dist) {
+        moveBy(dist.getX(), dist.getY());
     }
 
     /**
@@ -85,7 +94,7 @@ public abstract class CanvasItem implements ChangeObservable {
     /**
      * Returns the rectangular bounds of the canvas item.
      */
-    abstract public Rectangle2D getBounds(ToscanajGraphics2D g);
+    abstract public Rectangle2D getBounds(Graphics2D g);
 
     /**
      * Returns true if the item should be raised on clicks.

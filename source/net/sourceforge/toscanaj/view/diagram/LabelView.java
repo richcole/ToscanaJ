@@ -12,7 +12,6 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
 /**
  * This class encapsulates all generic label drawing code.
@@ -58,6 +57,19 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     private int displayType = DISPLAY_LIST;
 
     /**
+     * This is the smallest font size we accept.
+     *
+     * If the font size would go below this due to scaling, we will increase it
+     * to this.
+     */
+    static private final int MinFontSize = 10;
+
+    /**
+     * Stores the font we use.
+     */
+    private Font font = new Font("Arial", Font.PLAIN, 10);
+
+    /**
      * Stores if percentual distribution should be shown behind numbers.
      */
     private boolean showPercentage = false;
@@ -71,21 +83,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     private boolean showOnlyContingent = true;
 
     /**
-     * Label current width.
+     * The bounding rectangle for the label itself.
      */
-    private double width;
-    /**
-     * Label current height.
-     */
-    private double height;
-    /**
-     * Label current x coordinate.
-     */
-    private double xPos;
-    /**
-     * Label current y coordinate.
-     */
-    private double yPos;
+    private Rectangle2D rect = null;
 
     /**
      * The label information that should be drawn.
@@ -146,28 +146,28 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      * Return Label width
      */
     public double getLabelWidth() {
-      return width;
+      return this.rect.getWidth();
     }
 
     /**
      * Return Label height
      */
     public double getLabelHeight() {
-      return height;
+      return this.rect.getHeight();
     }
 
     /**
      * Return label x coordinate
      */
     public double getLabelX() {
-      return xPos;
+      return this.rect.getX();
     }
 
     /**
      * Return label y coordinate
      */
     public double getLabelY() {
-      return yPos;
+      return this.rect.getY();
     }
 
     /**
@@ -182,17 +182,25 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      *
      * The scaling information is needed to scale the offset.
      */
-    public void draw( ToscanajGraphics2D tg )
+    public void draw(Graphics2D graphics)
     {
         // we draw only if we have content to draw
         if(this.labelInfo.getNumberOfEntries(this.showOnlyContingent) == 0) {
             return;
         }
 
-        Graphics2D graphics = tg.getGraphics2D();
-
         // remember some settings to restore them later
         Paint oldPaint = graphics.getPaint();
+
+        // set the font we want -- don't get too small
+        if(graphics.getTransform().getScaleX() * this.font.getSize() < MinFontSize) {
+            Font newFont = new Font( this.font.getName(), this.font.getStyle(),
+                                     (int)(MinFontSize / graphics.getTransform().getScaleX()) );
+            graphics.setFont(newFont);
+        }
+        else {
+            graphics.setFont(this.font);
+        }
 
         // get the font metrics
         FontMetrics fm = graphics.getFontMetrics();
@@ -201,32 +209,37 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         DiagramNode node = this.labelInfo.getNode();
         double x = node.getX();
         double y = node.getY();
-        double lw = getWidth( fm );
-        width = tg.inverseScaleX(lw);
-        double lh = getHeight( fm );
-        height = tg.inverseScaleY(lh);
-        xPos = x - tg.inverseScaleX(lw/2) + this.labelInfo.getOffset().getX();
         double radius = node.getRadiusY();
+
+        // get the bounding rectangle
+        this.rect = getBounds(graphics);
+        double xPos = rect.getX();
+        double yPos = rect.getY();
+        double lw = rect.getWidth();
+        double lh = rect.getHeight();
         if( getPlacement() == ABOVE )
         {
-            y = y - tg.inverseScaleY(radius);
-            yPos = y - tg.inverseScaleY(lh) + this.labelInfo.getOffset().getY();
+            y = y - radius;
         }
         else
         {
-            y = y + tg.inverseScaleY(radius);
-            yPos = y + this.labelInfo.getOffset().getY();
+            y = y + radius;
         }
+
         // draw a dashed line from the given point to the calculated
         Stroke oldStroke = graphics.getStroke();
         float[] dashstyle = { 4, 4 };
-        tg.setStroke( new BasicStroke( 1, BasicStroke.CAP_BUTT,
+        graphics.setStroke( new BasicStroke( 1, BasicStroke.CAP_BUTT,
                                     BasicStroke.JOIN_BEVEL, 1, dashstyle, 0 ) );
-        tg.drawLine( x, y, xPos + tg.inverseScaleX(lw/2),  y + this.labelInfo.getOffset().getY() );
-        tg.setStroke( oldStroke );
+        graphics.draw( new Line2D.Double( x, y, xPos + lw/2,  y + this.labelInfo.getOffset().getY() ) );
+        graphics.setStroke( oldStroke );
 
         // draw the label itself
-        tg.drawFilledRectangle(xPos, yPos, lw, lh, this.labelInfo.getBackgroundColor(), this.labelInfo.getTextColor() );
+        this.rect = new Rectangle2D.Double( xPos, yPos, lw, lh );
+        graphics.setPaint( this.labelInfo.getBackgroundColor() );
+        graphics.fill( rect );
+        graphics.setPaint( this.labelInfo.getTextColor() );
+        graphics.draw( rect );
 
         if(this.displayType == DISPLAY_LIST) {
             // draw the object names
@@ -236,9 +249,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
                 int j = 0;
                 while(it.hasNext()) {
                     String cur = it.next().toString();
-                    tg.drawString( cur ,xPos, yPos, fm.getLeading() +
-                                                    fm.getDescent(), fm.getAscent() +
-                                                    fm.getLeading() + j * fm.getHeight() );
+                    graphics.drawString( cur,
+                                         (float)xPos + fm.getLeading() + fm.getDescent(),
+                                         (float)yPos + fm.getAscent() + fm.getLeading() + j * fm.getHeight() );
                     j++;
                 }
             }
@@ -248,9 +261,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
                 int j = 0;
                 while(it.hasNext()) {
                     String cur = it.next().toString();
-                    tg.drawString( cur , xPos, yPos,
-                            (int)(fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(cur))/2  ),
-                            fm.getAscent() + fm.getLeading() + j * fm.getHeight() );
+                    graphics.drawString( cur,
+                            (float)(xPos + (fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(cur))/2 )),
+                            (float)yPos + fm.getAscent() + fm.getLeading() + j * fm.getHeight() );
                     j++;
                 }
             }
@@ -260,9 +273,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
                 int j = 0;
                 while(it.hasNext()) {
                     String cur = it.next().toString();
-                    tg.drawString( cur ,xPos ,yPos ,
-                                (int)(-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(cur)),
-                                fm.getAscent() + fm.getLeading() + j * fm.getHeight() );
+                    graphics.drawString( cur,
+                                (float)(xPos + (-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(cur))),
+                                (float)yPos + fm.getAscent() + fm.getLeading() + j * fm.getHeight() );
                     j++;
                 }
             }
@@ -275,21 +288,21 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
             }
             if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT )
             {
-                tg.drawString( num ,xPos, yPos, fm.getLeading() +
-                                                fm.getDescent(), fm.getAscent() +
-                                                fm.getLeading() );
+                graphics.drawString( num,
+                                     (float)xPos + fm.getLeading() + fm.getDescent(),
+                                     (float)yPos + fm.getAscent() + fm.getLeading() );
             }
             else if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER )
             {
-                tg.drawString( num , xPos, yPos,
-                        (int)(fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(num))/2  ),
-                        fm.getAscent() + fm.getLeading() );
+                graphics.drawString( num,
+                        (float)(xPos + (fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(num))/2 )),
+                        (float)yPos + fm.getAscent() + fm.getLeading() );
             }
             else if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT )
             {
-                tg.drawString( num ,xPos ,yPos ,
-                            (int)(-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(num)),
-                            fm.getAscent() + fm.getLeading() );
+                graphics.drawString( num,
+                            (float)(xPos + (-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(num))),
+                            (float)yPos + fm.getAscent() + fm.getLeading() );
             }
         }
 
@@ -362,21 +375,10 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      * Returns true whenever the point is in the bounding rectangle.
      */
     public boolean containsPoint(Point2D point) {
-        double x = point.getX();
-        if( x < this.xPos ) {
+        if(this.rect == null) {
             return false;
         }
-        if( x > this.xPos + this.width ) {
-            return false;
-        }
-        double y = point.getY();
-        if( y > this.yPos ) {
-            return false;
-        }
-        if( y < this.yPos + this.height ) {
-            return false;
-        }
-        return true;
+        return this.rect.contains(point);
     }
 
     /**
@@ -403,9 +405,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * Calculates the rectangle around label and its connection line.
      */
-    public Rectangle2D getBounds(ToscanajGraphics2D tg) {
-        Graphics2D graphics = tg.getGraphics2D();
-
+    public Rectangle2D getBounds(Graphics2D graphics) {
         // get the font metrics
         FontMetrics fm = graphics.getFontMetrics();
 
@@ -414,23 +414,20 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         double x = node.getX();
         double y = node.getY();
         double lw = getWidth( fm );
-        width = tg.inverseScaleX(lw);
         double lh = getHeight( fm );
-        height = tg.inverseScaleY(lh);
-        xPos = x - tg.inverseScaleX(lw/2) + this.labelInfo.getOffset().getX();
+        double xPos = x - lw/2 + this.labelInfo.getOffset().getX();
         double radius = node.getRadiusY();
+        double yPos;
         if( getPlacement() == ABOVE )
         {
-            y = y - tg.inverseScaleY(radius);
-            yPos = y - tg.inverseScaleY(lh) + this.labelInfo.getOffset().getY();
+            y = y - radius;
+            yPos = y - lh + this.labelInfo.getOffset().getY();
         }
         else
         {
-            y = y + tg.inverseScaleY(radius);
+            y = y + radius;
             yPos = y + this.labelInfo.getOffset().getY();
         }
-        Rectangle2D rect = new Rectangle2D.Double(xPos, yPos, lw, lh);
-        rect.add(x,y);
-        return rect;
+        return new Rectangle2D.Double(xPos, yPos, lw, lh);
     }
 }

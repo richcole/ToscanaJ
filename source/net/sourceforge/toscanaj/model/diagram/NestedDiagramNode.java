@@ -30,7 +30,7 @@ public class NestedDiagramNode extends DiagramNode {
      * attribute labels attached.
      */
     public NestedDiagramNode(DiagramNode outerNode, Diagram2D innerDiagram, double scale,
-                                         boolean dropAttributeLabels, int level ) {
+                                         boolean dropAttributeLabels ) {
         super( new Point2D.Double(outerNode.getX()*scale, outerNode.getY()*scale),
                outerNode.getConcept(), outerNode.getAttributeLabelInfo(), null);
         // scale attribute label position
@@ -59,7 +59,6 @@ public class NestedDiagramNode extends DiagramNode {
             LabelInfo newObjLabel = new ObjectLabelInfo(oldNode.getObjectLabelInfo());
 
             DiagramNode newNode = new DiagramNode(newPos, newConcept, newAttrLabel, newObjLabel);
-            newNode.setNestingLevel(level+1);
             nodeMap.put(oldNode,newNode);
             newDiag.addNode(newNode);
         }
@@ -94,7 +93,7 @@ public class NestedDiagramNode extends DiagramNode {
      * This is based on the bounds of the inner diagram.
      */
     public double getRadiusX() {
-        return this.innerDiagram.getBounds().getWidth();
+        return this.innerDiagram.getBounds().getWidth()/1.7;
     }
 
     /**
@@ -103,6 +102,6 @@ public class NestedDiagramNode extends DiagramNode {
      * This is based on the bounds of the inner diagram.
      */
     public double getRadiusY() {
-        return this.innerDiagram.getBounds().getHeight();
+        return this.innerDiagram.getBounds().getHeight()/1.7;
     }
 }

@@ -1,7 +1,5 @@
 package net.sourceforge.toscanaj.canvas;
 
-import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
-
 import javax.swing.JComponent;
 
 import java.awt.Dimension;
@@ -11,7 +9,9 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -56,15 +56,6 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     protected List canvasItems = new LinkedList();
 
     /**
-     * Stores the drawing context used for scaling.
-     *
-     * This is created any time the diagram is drawn and is needed for mapping
-     * a point on the screen back into the coordinate system for the diagram
-     * whenever a mouse event occurs.
-     */
-    protected ToscanajGraphics2D graphics = null;
-
-    /**
      * Flag to prevent label from being moved when just clicked on
      */
     private boolean dragMode = false;
@@ -86,17 +77,23 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     private CanvasItem selectedCanvasItem = null;
 
     /**
+     * Stores the transformation matrix we used on the last draw event.
+     *
+     * This is used to map mouse positions to the canvas coordinates.
+     */
+    private AffineTransform transform = null;
+
+    /**
      * Paints the CanvasItems in the diagram.
      */
-    public void paintCanvasItems(ToscanajGraphics2D graphics)
+    public void paintCanvasItems(Graphics2D graphics)
     {
         // fill the background
         /// @TODO Rename this method (it draws not only the items)
         /// @TODO Make Background color configurable
-        Graphics2D graphics2D = graphics.getGraphics2D();
-        graphics2D.setPaint(this.getBackground());
-        graphics2D.fillRect(0,0,this.getWidth(), this.getHeight());
-        graphics2D.setPaint(java.awt.Color.black);
+        graphics.setPaint(this.getBackground());
+        graphics.fill(this.getCanvasSize(graphics));
+        graphics.setPaint(java.awt.Color.black);
 
         // paint all items on canvas
         Iterator it = this.canvasItems.iterator();
@@ -104,6 +101,28 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
             CanvasItem cur = (CanvasItem) it.next();
             cur.draw(graphics);
         }
+
+        // store affine transformation matrix for mapping mouse positions
+        this.transform = graphics.getTransform();
+    }
+
+    /**
+     * Calculates the size of this canvas on a specific drawing context.
+     *
+     * This is the smallest upright rectangle that contains all canvas items.
+     */
+    public Rectangle2D getCanvasSize(Graphics2D graphics) {
+        Iterator it = this.canvasItems.iterator();
+        if(!it.hasNext()) {
+            return new Rectangle2D.Double(0,0,0,0);
+        }
+        CanvasItem cur = (CanvasItem) it.next();
+        Rectangle2D retVal = cur.getBounds(graphics);
+        while(it.hasNext()) {
+            cur = (CanvasItem) it.next();
+            retVal = retVal.createUnion(cur.getBounds(graphics));
+        }
+        return retVal;
     }
 
     /**
@@ -113,34 +132,65 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
         if(pageIndex == 0) {
             Graphics2D graphics2D = (Graphics2D) graphics;
 
-            // set top left corner
-            graphics2D.translate(pageFormat.getImageableX(),pageFormat.getImageableY());
-
-            // scale to just fit the page
-            double xScale = pageFormat.getImageableWidth()/this.getWidth();
-            double yScale = pageFormat.getImageableHeight()/this.getHeight();
-            double scale;
-            if(xScale < yScale) {
-                scale = xScale;
-            }
-            else {
-                scale = yScale;
-            }
-            graphics2D.scale(scale,scale);
-
-            ToscanajGraphics2D tgraphics = new ToscanajGraphics2D( graphics2D,
-                                                                   this.graphics.getOffset(),
-                                                                   this.graphics.getXScaling(),
-                                                                   this.graphics.getYScaling() );
+            Rectangle2D bounds = new Rectangle2D.Double(
+                                     pageFormat.getImageableX(),
+                                     pageFormat.getImageableY(),
+                                     pageFormat.getImageableWidth(),
+                                     pageFormat.getImageableHeight() );
+            scaleToFit(graphics2D,bounds);
 
             // paint all items on canvas
-            paintCanvasItems(tgraphics);
+            paintCanvasItems(graphics2D);
 
             return PAGE_EXISTS;
         }
         else {
             return NO_SUCH_PAGE;
         }
+    }
+
+    /**
+     * Scales the graphic context in which the canvas items will be completely
+     * visible in the rectangle.
+     */
+    public void scaleToFit(Graphics2D graphics2D, Rectangle2D bounds) {
+        // get the dimensions of the canvas
+        Rectangle2D canvasSize = this.getCanvasSize(graphics2D);
+
+        // we need some values to do the projection -- the initial values are
+        // centered and no size change. This is useful if the canvas has no
+        // extent in a direction
+        double xOrigin = bounds.getX() + bounds.getWidth()/2;
+        double yOrigin = bounds.getY() + bounds.getHeight()/2;
+        double xScale = 1;
+        double yScale = 1;
+
+        if( canvasSize.getWidth() != 0 )
+        {
+            xScale = bounds.getWidth() / canvasSize.getWidth();
+            xOrigin = bounds.getX()/xScale - canvasSize.getX();
+        }
+        if( canvasSize.getHeight() != 0 )
+        {
+            yScale = bounds.getHeight() / canvasSize.getHeight();
+            yOrigin = bounds.getY()/yScale - canvasSize.getY();
+        }
+
+        // scale proportionally, add half of the possible difference to the offset to center
+        if( (canvasSize.getWidth()!=0) && (canvasSize.getHeight()!=0) ) {
+            if(xScale > yScale) {
+                xScale = yScale;
+                xOrigin = xOrigin + ( bounds.getWidth()/xScale - canvasSize.getWidth() ) / 2;
+            }
+            else {
+                yScale = xScale;
+                yOrigin = yOrigin + ( bounds.getHeight()/yScale - canvasSize.getHeight() ) / 2;
+            }
+        }
+
+        // reposition / rescale
+        graphics2D.scale(xScale, yScale);
+        graphics2D.translate(xOrigin, yOrigin);
     }
 
     /**
@@ -203,13 +253,23 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
         if(!this.contains(e.getPoint())) {
             return;
         }
-        if(!dragMode && (getDistance(lastMousePos.getX(), lastMousePos.getY(), e.getX(), e.getY()) >= dragMin)) {
+        if(!dragMode && (lastMousePos.distance(e.getPoint()) >= dragMin)) {
             dragMode = true;
         }
         if(dragMode) {
-            selectedCanvasItem.moveBy(graphics.inverseScaleX(e.getX() - lastMousePos.getX()),
-                                 graphics.inverseScaleY(e.getY() - lastMousePos.getY()));
-            lastMousePos = new Point2D.Double(e.getX(), e.getY());
+            Point2D mousePosTr = null;
+            Point2D lastMousePosTr = null;
+            try {
+                mousePosTr = (Point2D)this.transform.inverseTransform(e.getPoint(), null);
+                lastMousePosTr = (Point2D)this.transform.inverseTransform(lastMousePos, null);
+            }
+            catch (Exception ex ) {
+                //this should not happen
+                ex.printStackTrace();
+            }
+            selectedCanvasItem.moveBy( mousePosTr.getX() - lastMousePosTr.getX(),
+                                       mousePosTr.getY() - lastMousePosTr.getY() );
+            lastMousePos = e.getPoint();
         }
     }
 
@@ -224,10 +284,17 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * Finds, raises and stores the canvas item hit.
      */
     public void mousePressed(MouseEvent e) {
+        Point2D point = null;
+        try {
+            point = (Point2D)this.transform.inverseTransform(e.getPoint(),null);
+        }
+        catch (Exception ex ) {
+            //this should not happen
+            ex.printStackTrace();
+        }
         ListIterator it = this.canvasItems.listIterator(this.canvasItems.size());
         while(it.hasPrevious()) {
             CanvasItem cur = (CanvasItem) it.previous();
-            Point2D point = this.graphics.inverseProject(e.getPoint());
             if(cur.containsPoint(point)) {
                 // store the CanvasItem hit
                 this.selectedCanvasItem = cur;
@@ -271,13 +338,6 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      */
     public void addCanvasItem(CanvasItem node) {
         this.canvasItems.add(node);
-    }
-
-    /**
-     * Returns the graphic context used.
-     */
-    public ToscanajGraphics2D getToscanaGraphics() {
-        return this.graphics;
     }
 
     /**
