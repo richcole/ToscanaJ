@@ -116,12 +116,16 @@ public class ObjectLabelView extends LabelView {
     protected void doQuery() {
         /// @todo try to get the distinction of query/no query somehow out of here
         DiagramNode node = this.labelInfo.getNode();
+        Concept concept = node.getConcept();
         ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
-        if ((query == null) || (query == ListQuery.KeyListQuery)) {
-            int objectCount = this.diagramView.getConceptInterpreter().getObjectCount(node.getConcept(), context);
+        ConceptInterpreter conceptInterpreter = this.diagramView.getConceptInterpreter();
+        if(!conceptInterpreter.isRealized(concept, context)) {
+        	this.contents = null;
+        } else if ((query == null) || (query == ListQuery.KeyListQuery)) {
+            int objectCount = conceptInterpreter.getObjectCount(concept, context);
             if( objectCount != 0) {
 	            contents = new ArrayList();
-	            Iterator it = this.diagramView.getConceptInterpreter().getObjectSetIterator(node.getConcept(), context);
+	            Iterator it = conceptInterpreter.getObjectSetIterator(concept, context);
 	            while (it.hasNext()) {
 	                Object o = it.next();
 	                contents.add(o);
@@ -130,7 +134,7 @@ public class ObjectLabelView extends LabelView {
                 contents = null;
             }
         } else if (query == AggregateQuery.CountQuery) {
-            int objectCount = this.diagramView.getConceptInterpreter().getObjectCount(node.getConcept(), context);
+            int objectCount = conceptInterpreter.getObjectCount(concept, context);
             if( objectCount != 0) {
 		        contents = new ArrayList();
 		        contents.add(new Integer(objectCount));
@@ -138,9 +142,9 @@ public class ObjectLabelView extends LabelView {
             	contents = null;
             }
         } else {
-            DatabaseConnectedConceptInterpreter conceptInterpreter =
-                    (DatabaseConnectedConceptInterpreter) this.diagramView.getConceptInterpreter();
-            contents = conceptInterpreter.executeQuery(query, node.getConcept(), context);
+            DatabaseConnectedConceptInterpreter dbConceptInterpreter =
+                    (DatabaseConnectedConceptInterpreter) conceptInterpreter;
+            contents = dbConceptInterpreter.executeQuery(query, concept, context);
         }
     }
 

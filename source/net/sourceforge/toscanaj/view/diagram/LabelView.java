@@ -187,7 +187,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     }
     
     public boolean isVisible() {
-    	return this.getNumberOfEntries() != 0;
+    	return this.displayLines != 0;
     }
 
     /**
