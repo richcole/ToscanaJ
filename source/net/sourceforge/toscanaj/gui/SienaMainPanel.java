@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import net.sourceforge.toscanaj.controller.cernato.LayoutOperations;
 import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.events.EventListener;
@@ -15,12 +16,11 @@ import net.sourceforge.toscanaj.gui.action.*;
 import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.cernato.View;
 import net.sourceforge.toscanaj.model.cernato.Criterion;
-import net.sourceforge.toscanaj.model.cernato.ValueGroup;
+import net.sourceforge.toscanaj.model.cernato.PartialOrderNode;
 import net.sourceforge.toscanaj.model.events.*;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.ToscanaJ;
@@ -201,23 +201,38 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
     }
 
     private void addDiagrams(ConceptualSchema schema, CernatoModel cernatoModel) {
-
+        /// @todo finish (create lattice generation, create layout algorithm)
         Vector views = cernatoModel.getViews();
+        Vector dimensions = LayoutOperations.calculateDimensions(cernatoModel);
         for (Iterator iterator = views.iterator(); iterator.hasNext();) {
             View view = (View) iterator.next();
-            addDiagram(schema, view);
+            addDiagram(schema, view, dimensions);
         }
     }
 
-    private void addDiagram(ConceptualSchema schema, View view) {
-        List criteria = view.getCriteria();
+    private void addDiagram(ConceptualSchema schema, View view, Vector dimensions) {
         SimpleLineDiagram diagram = new SimpleLineDiagram();
         diagram.setTitle(view.getName());
-        ValueGroup[] groups = new ValueGroup[criteria.size()];
-        int i = 0;
+        System.out.println("View: " + view.getName());
+        List criteria = view.getCriteria();
         for (Iterator iterator = criteria.iterator(); iterator.hasNext();) {
             Criterion criterion = (Criterion) iterator.next();
-            groups[i] = criterion.getValueGroup();
+            System.out.println("Criterion '" + criterion.getProperty().getName() + ": " +
+                               criterion.getValueGroup().getName() + "' is assigned to dimensions:");
+            int count = 0;
+            for (Iterator iterator2 = dimensions.iterator(); iterator2.hasNext();) {
+                net.sourceforge.toscanaj.model.cernato.Dimension dimension =
+                                                (net.sourceforge.toscanaj.model.cernato.Dimension) iterator2.next();
+                count++;
+                Vector path = dimension.getPath();
+                for (Iterator it3 = path.iterator(); it3.hasNext();) {
+                    PartialOrderNode node = (PartialOrderNode) it3.next();
+                    if(node.getValueGroup() == criterion.getValueGroup()) {
+                        System.out.print(count + " - ");
+                    }
+                }
+            }
+            System.out.println("");
         }
         schema.addDiagram(diagram);
     }

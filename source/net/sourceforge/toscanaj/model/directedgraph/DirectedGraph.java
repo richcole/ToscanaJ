@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.directedgraph;
 
+import net.sourceforge.toscanaj.model.cernato.PartialOrderNode;
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;

@@ -91,13 +91,12 @@ public class CernatoXMLParser {
             Element valueGroupElement = (Element) iterator.next();
             String groupId = valueGroupElement.getAttributeValue("id");
             String groupName = valueGroupElement.getChild("name").getText();
-            TextualValueGroup group = new TextualValueGroup(newType, groupName);
+            TextualValueGroup group = new TextualValueGroup(newType, groupName, groupId);
             List values = valueGroupElement.getChildren("text_value");
             for (Iterator iterator2 = values.iterator(); iterator2.hasNext();) {
                 Element valueElement = (Element) iterator2.next();
                 group.addValue(new TextualValue(valueElement.getText()));
             }
-            newType.addValueGroup(group, groupId);
         }
         types.put(id,newType);
         model.getTypes().add(newType);
@@ -122,8 +121,7 @@ public class CernatoXMLParser {
             boolean minIncluded = valueGroupElement.getChild("lower_border").getAttributeValue("included").equals("yes");
             double max = Double.parseDouble(valueGroupElement.getChild("upper_border").getText());
             boolean maxIncluded = valueGroupElement.getChild("upper_border").getAttributeValue("included").equals("yes");
-            ValueGroup group = new NumericalValueGroup(newType, groupName, min, minIncluded, max, maxIncluded);
-            newType.addValueGroup(group, groupId);
+            new NumericalValueGroup(newType, groupName, groupId, min, minIncluded, max, maxIncluded);
         }
         types.put(id,newType);
         model.getTypes().add(newType);

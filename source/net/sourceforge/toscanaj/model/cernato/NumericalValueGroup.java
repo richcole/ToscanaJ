@@ -7,9 +7,6 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
-import java.util.List;
-import java.util.ArrayList;
-
 public class NumericalValueGroup implements ValueGroup {
     private NumericalType type;
     private String name;
@@ -18,7 +15,7 @@ public class NumericalValueGroup implements ValueGroup {
     private double max;
     private boolean maxIncluded;
 
-    public NumericalValueGroup(NumericalType type, String name,
+    public NumericalValueGroup(NumericalType type, String name, String id,
                                double min, boolean minIncluded, double max, boolean maxIncluded) {
         this.type = type;
         this.name = name;
@@ -26,7 +23,7 @@ public class NumericalValueGroup implements ValueGroup {
         this.minIncluded = minIncluded;
         this.max = max;
         this.maxIncluded = maxIncluded;
-        type.addValueGroup(this, name);
+        type.addValueGroup(this, id);
     }
 
     public String getName() {

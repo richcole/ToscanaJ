@@ -16,10 +16,10 @@ public class TextualValueGroup implements ValueGroup {
     private String name;
     private List values = new ArrayList();
 
-    public TextualValueGroup(TextualType type, String name) {
+    public TextualValueGroup(TextualType type, String name, String id) {
         this.type = type;
         this.name = name;
-        type.addValueGroup(this, name);
+        type.addValueGroup(this, id);
     }
 
     public String getName() {

@@ -27,12 +27,12 @@ public class ValueGroupTest extends TestCase {
         TextualType textType1 = new TextualType("texttype1");
         TextualType textType2 = new TextualType("texttype2");
 
-        NumericalValueGroup numGroup1 = new NumericalValueGroup(numType1, "num1", 0, true, 3, true);
-        NumericalValueGroup numGroup2 = new NumericalValueGroup(numType1, "num2", 0, true, 3, false);
-        NumericalValueGroup numGroup3 = new NumericalValueGroup(numType1, "num3", 0, false, 3, false);
-        NumericalValueGroup numGroup4 = new NumericalValueGroup(numType1, "num4", 1, true, 2, true);
-        NumericalValueGroup numGroup5 = new NumericalValueGroup(numType2, "num5", 1, true, 2, true);
-        NumericalValueGroup numGroup6 = new NumericalValueGroup(numType1, "num6", 0, false, 3, true);
+        NumericalValueGroup numGroup1 = new NumericalValueGroup(numType1, "num1", "num1", 0, true, 3, true);
+        NumericalValueGroup numGroup2 = new NumericalValueGroup(numType1, "num2", "num2", 0, true, 3, false);
+        NumericalValueGroup numGroup3 = new NumericalValueGroup(numType1, "num3", "num3", 0, false, 3, false);
+        NumericalValueGroup numGroup4 = new NumericalValueGroup(numType1, "num4", "num4", 1, true, 2, true);
+        NumericalValueGroup numGroup5 = new NumericalValueGroup(numType2, "num5", "num5", 1, true, 2, true);
+        NumericalValueGroup numGroup6 = new NumericalValueGroup(numType1, "num6", "num6", 0, false, 3, true);
 
         assertEquals(numGroup1.isSuperSetOf(numGroup1), true);
         assertEquals(numGroup1.isSuperSetOf(numGroup2), true);
@@ -76,15 +76,15 @@ public class ValueGroupTest extends TestCase {
         assertEquals(numGroup6.isSuperSetOf(numGroup5), false);
         assertEquals(numGroup6.isSuperSetOf(numGroup6), true);
 
-        TextualValueGroup textGroup1 = new TextualValueGroup(textType1, "text1");
+        TextualValueGroup textGroup1 = new TextualValueGroup(textType1, "text1", "text1");
         textGroup1.addValue(new TextualValue("one"));
         textGroup1.addValue(new TextualValue("two"));
-        TextualValueGroup textGroup2 = new TextualValueGroup(textType1, "text2");
+        TextualValueGroup textGroup2 = new TextualValueGroup(textType1, "text2", "text2");
         textGroup2.addValue(new TextualValue("one"));
-        TextualValueGroup textGroup3 = new TextualValueGroup(textType1, "text3");
+        TextualValueGroup textGroup3 = new TextualValueGroup(textType1, "text3", "text3");
         textGroup3.addValue(new TextualValue("two"));
-        TextualValueGroup textGroup4 = new TextualValueGroup(textType1, "text4");
-        TextualValueGroup textGroup5 = new TextualValueGroup(textType2, "text5");
+        TextualValueGroup textGroup4 = new TextualValueGroup(textType1, "text4", "text4");
+        TextualValueGroup textGroup5 = new TextualValueGroup(textType2, "text5", "text5");
         textGroup5.addValue(new TextualValue("two"));
 
         assertEquals(textGroup1.isSuperSetOf(textGroup1), true);
