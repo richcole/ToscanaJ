@@ -59,6 +59,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Properties;
 
 
 /**
@@ -1117,6 +1118,29 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 
 	protected void exportImage(File selectedFile){
 		try {
+			// Get title of the current diagram
+			String title = "";
+			String lineSeparator = System.getProperty("line.separator");
+			DiagramHistory diagramHistory = DiagramController.getController().getDiagramHistory(); 
+			int numCurDiag = diagramHistory.getNumberOfCurrentDiagrams();
+			int firstCurrentPos = diagramHistory.getFirstCurrentDiagramPosition();
+			for(int i=0; i<numCurDiag; i++) { 
+				title += diagramHistory.getElementAt(i+firstCurrentPos).toString();
+				if( i < numCurDiag-1 ){
+				title += " / ";
+				}
+				if ( (i == numCurDiag-1) && numCurDiag >1) {
+					title += " ( Outer diagram / Inner diagram )";
+				}
+			}			
+			
+			// Get description of the diagrams
+			String description = DiagramController.getController().getDiagramHistory().getTextualDescription();
+			
+			// Put title and desc in properties
+			Properties metadata = new Properties();
+			metadata.setProperty("title", title);
+			metadata.setProperty("description", description.trim());
 			this
 				.diagramExportSettings
 				.getGraphicFormat()
@@ -1124,7 +1148,8 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 				.exportGraphic(
 				this.diagramView,
 				this.diagramExportSettings,
-				selectedFile);
+				selectedFile,
+				metadata);
 				if(this.diagramExportSettings.getSaveCommentsToFile()==true){
 					try{
 						PrintWriter out = new PrintWriter(new FileWriter(new File(selectedFile.getAbsolutePath()+".txt")));

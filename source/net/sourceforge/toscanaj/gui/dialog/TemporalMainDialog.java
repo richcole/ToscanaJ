@@ -21,6 +21,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Properties;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -404,7 +405,8 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
                 .exportGraphic(
                 this.diagramView,
                 this.diagramExportSettings,
-                file);
+                file, 
+                new Properties());
         } catch (ImageGenerationException e) {
             ErrorDialog.showError(this, e, "Exporting image error");
         } catch (OutOfMemoryError e) {
