@@ -163,18 +163,22 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             }
             else {
                 DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
-                String clause = "(" + this.objectClause + ") AND (";
+                String clause = this.objectClause;
                 Iterator it = otherDB.ideal.iterator();
                 boolean first = true;
                 while(it.hasNext()) {
                     DatabaseConnectedConcept cur = (DatabaseConnectedConcept) it.next();
+                    if(cur.objectClause == null) {
+                        continue;
+                    }
                     if(!first) {
                         clause = clause + " OR ";
                     }
                     else {
+                        clause = clause + " AND (";
                         first = false;
                     }
-                    clause = clause + "(" + cur.objectClause + ")";
+                    clause = clause + cur.objectClause;
                 }
                 clause = clause + ")";
                 retVal.setObjectClause(clause);
@@ -193,12 +197,12 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             retVal.setObjectClause(this.objectClause);
         }
         else {
-            if(this.objectClause == null) {
+            DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
+            if( (this.objectClause == null) || (otherDB.objectClause == null) ) {
                 retVal.setObjectClause(null);
             }
             else {
-                DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
-                retVal.setObjectClause("(" + this.objectClause + ") AND (" + otherDB.objectClause + ")");
+                retVal.setObjectClause("(" + this.objectClause + " AND " + otherDB.objectClause + ")");
             }
         }
         return retVal;

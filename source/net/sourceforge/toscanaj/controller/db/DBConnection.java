@@ -75,7 +75,7 @@ public class DBConnection
         // submit a query
         try {
             Statement stmt = con.createStatement();
-            printLogMessage(System.currentTimeMillis() + ": Exectuting statement: " + statement);
+            printLogMessage(System.currentTimeMillis() + ": Executing statement: " + statement);
             result = stmt.executeQuery(statement);
             printLogMessage(System.currentTimeMillis() + ": done.");
         }
