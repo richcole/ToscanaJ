@@ -28,6 +28,7 @@ import com.hp.hpl.jena.rdql.Query;
 import com.hp.hpl.jena.rdql.QueryEngine;
 import com.hp.hpl.jena.rdql.QueryExecution;
 import com.hp.hpl.jena.rdql.QueryResults;
+import com.hp.hpl.jena.rdql.ResultBinding;
 
 
 public class RdfQueryUtil {
@@ -72,12 +73,12 @@ public class RdfQueryUtil {
 	public static void main (String[] args) {
 		long time_start = System.currentTimeMillis();
 
-		String usage = "Usage:\nRdfQueryTool dataFile queriesFile --printTriples\n";
+		String usage = "Usage:\nRdfQueryTool dataFile queriesFile [--printTriples] [--printResultBindings]\n";
 		usage += "where\n";
 		usage += "\tdataFile - RDF or N3 file\n";
 		usage += "\tqueriesFile - text file containing a RDQL query per line\n";
 		
-		if ((args.length >= 2) && (args.length <= 3)) {
+		if ((args.length >= 2) && (args.length <= 4)) {
 		}
 		else {
 			System.out.println(usage);
@@ -87,8 +88,23 @@ public class RdfQueryUtil {
 		String dataFileName = args[0];
 		String queriesFileName = args[1];
 		boolean printTriples = false;
-		if ((args.length == 3) && (args[2].endsWith("printTriples"))) {
-			printTriples = true;
+		boolean printResults = false;
+		if (args.length >= 3) {
+			if  (args[2].endsWith("printTriples"))  {
+				printTriples = true;
+			}
+			if  (args[2].endsWith("printResultBindings"))  {
+				printResults = true;
+			}
+			if (args.length == 4) {
+				if  (args[3].endsWith("printTriples")) {
+					printTriples = true;
+				}
+				if (args[3].endsWith("printResultBindings")) {
+					printResults = true;
+				}
+			}
+			
 		}
 		
 		
@@ -114,6 +130,19 @@ public class RdfQueryUtil {
 				String queryString = (String) it.next();
 				Query query = new Query(queryString);
 				QueryResults results = RdfQueryUtil.executeRDQL(rdfModel, query);
+				if (printResults) {
+					System.out.println("---QUERY " + queryString + "------------------");
+					List resultVars = results.getResultVars();
+					for ( Iterator iter = results ; iter.hasNext() ; ) {
+						ResultBinding resBinding = (ResultBinding)iter.next() ;
+						for (int i = 0; i < resultVars.size(); i++) {
+							String  queryVar = (String) resultVars.get(i);
+							Object obj = resBinding.get(queryVar);
+							System.out.println("?" + queryVar + ": " + obj);
+						} 
+					}
+					results.close() ;
+				}
 			}
 			long time_query = System.currentTimeMillis() - time_start_query;
 
