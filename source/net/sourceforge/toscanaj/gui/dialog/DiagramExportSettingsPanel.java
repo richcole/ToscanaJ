@@ -21,10 +21,6 @@ import java.awt.event.ActionListener;
  * This panel asks the user for the graphic format and size to use when exporting
  * a diagram. It is meant to be used as accessory for a file dialog.
  *
- * Use the static method showDialog() to get a modal dialog. If this returns
- * true the user clicked ok (otherwise cancel) and the information can be
- * retrieved with the methods getFormat(), getWidth() and getHeight().
- * 
  * @todo check if this should be Tockit code
  */
 public class DiagramExportSettingsPanel extends JComponent implements ActionListener {
