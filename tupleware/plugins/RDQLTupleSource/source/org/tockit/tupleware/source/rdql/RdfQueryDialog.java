@@ -37,7 +37,7 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
 import org.tockit.relations.model.Relation;
-import org.tockit.relations.model.Tuple;
+import org.tockit.relations.model.RelationImplementation;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdql.Query;
@@ -188,7 +188,7 @@ public class RdfQueryDialog extends JDialog {
 
 				Query query = new Query(queryString) ;
 				List resultVars = query.getResultVars();
-				tupleSet = new Relation(
+				tupleSet = new RelationImplementation(
 									(String[]) resultVars.toArray(new String[resultVars.size()]));
 				QueryResults results = RdfQueryUtil.executeRDQL(rdfModel, query);
 				for ( Iterator iter = results ; iter.hasNext() ; ) {
@@ -199,7 +199,7 @@ public class RdfQueryDialog extends JDialog {
 						Object obj = resBinding.get(queryVar);
 						tuple[i] = obj;				
 					} 
-					tupleSet.addTuple(new Tuple(tuple));
+					tupleSet.addTuple(tuple);
 				}
 				results.close() ;
 				return true;

@@ -20,7 +20,7 @@ import javax.swing.filechooser.FileFilter;
 
 import org.tockit.events.EventBroker;
 import org.tockit.relations.model.Relation;
-import org.tockit.relations.model.Tuple;
+import org.tockit.relations.model.RelationImplementation;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -576,13 +576,13 @@ public class DatabaseConnectionDialog extends JDialog {
 				for (int i = 0; i < numberColumns; i++) {
                     names[i] = metaData.getColumnLabel(i + 1);
                 }
-				tuples = new Relation(names);
+				tuples = new RelationImplementation(names);
 				while (resultSet.next()) {
 					Object[] tuple = new Object[numberColumns];
 					for (int i = 0; i < numberColumns; i++) {
 						tuple[i] = resultSet.getObject(i + 1);
 					}
-					tuples.addTuple(new Tuple(tuple));
+					tuples.addTuple(tuple);
 				}
 				connection.disconnect();
                 return true;

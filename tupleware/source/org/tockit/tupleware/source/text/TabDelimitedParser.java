@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.tockit.relations.model.Relation;
+import org.tockit.relations.model.RelationImplementation;
 import org.tockit.relations.model.Tuple;
 
 
@@ -58,10 +59,10 @@ public class TabDelimitedParser {
                 i++;
             }
             if(retVal == null) {
-                retVal = new Relation(tuple); 
+                retVal = new RelationImplementation(tuple); 
             } else {
             	try {
-					retVal.addTuple(new Tuple(tuple));
+					retVal.addTuple(tuple);
 	           	} catch(IllegalArgumentException e) {
 	           		throw new IOException("Illegal tuple in line #" + lineNum);
 	           	}
