@@ -32,7 +32,7 @@ public class ContextTableView extends JComponent {
 	private static final Color TABLE_CELL_COLOR = Color.WHITE;
 	private Context context;
 	private ContextTableScaleEditorDialog dialog;
-	private static final int CELL_WIDTH = 100;
+	private static final int CELL_WIDTH = 150;
 	private static final int CELL_HEIGHT = 30;
 
 	public static class Position {
