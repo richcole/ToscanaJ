@@ -486,7 +486,9 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         // save the MRU list
         ConfigurationManager.storeStringList("mainPanel","mruFiles",this.mruList);
         // store last image export position
-        ConfigurationManager.storeString("mainPanel","lastImageExport",this.lastImageExportFile.getPath());
+        if( this.lastImageExportFile != null ) {
+            ConfigurationManager.storeString("mainPanel","lastImageExport",this.lastImageExportFile.getPath());
+        }
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
         System.exit(0);
