@@ -80,6 +80,7 @@ public class LatticeGeneratorTest extends TestCase {
     	// add complete duplicate object to context
     	String oldObject = OBJECTS[OBJECTS.length - 1];
         String newObject = new String(oldObject);
+        this.context.getObjects().add(newObject);
 		BinaryRelationImplementation relation = this.context.getRelationImplementation();
 		
 		for (int i = 0; i < ATTRIBUTES.length; i++) {
