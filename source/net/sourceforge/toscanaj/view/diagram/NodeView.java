@@ -117,7 +117,7 @@ public class NodeView extends CanvasItem {
                 vector = "(";
                 for (int i = 0; i < ndimVec.length; i++) {
                     double v = ndimVec[i];
-                    vector += v;
+                    vector += (int)v;
                     if(i != ndimVec.length-1) {
                         vector += ",";
                     }
