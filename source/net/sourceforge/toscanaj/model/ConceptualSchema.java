@@ -8,6 +8,9 @@
 package net.sourceforge.toscanaj.model;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.DirectConceptInterpreter;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.database.*;
@@ -28,6 +31,8 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -70,6 +75,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
      * The XML (XHTML) describing the schema (or null if not found).
      */
     private Element description = null;
+    
+    private ConceptInterpreter conceptInterpreter;
    
     private static final String CONCEPTUAL_SCHEMA_ELEMENT_NAME = "conceptualSchema";
     private static final String VERSION_ATTRIBUTE_NAME = "version";
@@ -87,6 +94,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
     public ConceptualSchema(EventBroker broker) {
         this.eventBroker = broker;
         reset();
+		this.conceptInterpreter = new DirectConceptInterpreter();
         eventBroker.subscribe(this, DiagramChangedEvent.class, Object.class);
         eventBroker.processEvent(new NewConceptualSchemaEvent(this, this));
     }
@@ -154,6 +162,35 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
             } else {
                 databaseSchema = new DatabaseSchema(eventBroker);
             }
+        }
+        if (XMLHelper.contains(elem, ConceptInterpreter.CONCEPT_INTERPRETER_ELEMENT_NAME)) {
+        	Element conceptInterpreterElem = elem.getChild(ConceptInterpreter.CONCEPT_INTERPRETER_ELEMENT_NAME);
+        	String className = XMLHelper.getAttribute(conceptInterpreterElem, ConceptInterpreter.CONCEPT_INTERPRETER_CLASS_ATTRIBUTE).getValue();
+        	try {
+                Class ciClass = Class.forName(className);
+                Constructor constructor = ciClass.getConstructor(new Class[]{Element.class});
+                this.conceptInterpreter = (ConceptInterpreter) constructor.newInstance(new Object[]{conceptInterpreterElem});
+            } catch (ClassNotFoundException e) {
+            	throw new XMLSyntaxError("Could not find concept interpreter class", e);
+            } catch (SecurityException e) {
+				throw new XMLSyntaxError("Could not access concept interpreter class", e);
+            } catch (NoSuchMethodException e) {
+				throw new XMLSyntaxError("Could not find concept interpreter constructor", e);
+            } catch (IllegalArgumentException e) {
+				throw new XMLSyntaxError("Could not initialize concept interpreter", e);
+            } catch (InstantiationException e) {
+				throw new XMLSyntaxError("Could not initialize concept interpreter", e);
+            } catch (IllegalAccessException e) {
+				throw new XMLSyntaxError("Could not access concept interpreter constructor", e);
+            } catch (InvocationTargetException e) {
+				throw new XMLSyntaxError("Could not initialize concept interpreter", e);
+            }
+        } else {
+        	if(this.databaseInfo != null) {
+        		this.conceptInterpreter = new DatabaseConnectedConceptInterpreter(this.databaseInfo);
+        	} else {
+        		this.conceptInterpreter = new DirectConceptInterpreter();
+        	}
         }
         /// @todo change this once DatabaseViewers are on the schema itself
 		DatabaseViewerManager.resetRegistry();
@@ -395,4 +432,12 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
 	public Iterator getDiagramsIterator () {
 		return this.diagrams.iterator();
 	}
+	
+    public ConceptInterpreter getConceptInterpreter() {
+        return conceptInterpreter;
+    }
+
+    public void setConceptInterpreter(ConceptInterpreter interpreter) {
+        this.conceptInterpreter = interpreter;
+    }
 }

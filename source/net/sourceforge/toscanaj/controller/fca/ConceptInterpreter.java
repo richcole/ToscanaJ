@@ -38,10 +38,12 @@ import java.util.Iterator;
  * @todo it might be better not to have the objectDisplayMode but two methods for extent/contingent instead. This allows more caching
  *       since the context would be the same more often.
  */
-
+// @todo it would be better if the concept interpreter can create the concepts, e.g. the tuple version could store the tuples.
 public interface ConceptInterpreter {
+	public static final String CONCEPT_INTERPRETER_ELEMENT_NAME = "conceptInterpreter";
+	public static final String CONCEPT_INTERPRETER_CLASS_ATTRIBUTE = "class";
+
     public static class IntervalType {}
-    
     public static final IntervalType INTERVAL_TYPE_FIXED = new IntervalType();
     public static final IntervalType INTERVAL_TYPE_CONTINGENT = new IntervalType();
     public static final IntervalType INTERVAL_TYPE_EXTENT = new IntervalType();

@@ -1166,15 +1166,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 			diagramPreview.showDiagram(null);
 		}
         DiagramController controller = DiagramController.getController();
-        ConceptInterpreter interpreter = null;
-        if (databaseInfo != null) {
-            interpreter = new DatabaseConnectedConceptInterpreter(databaseInfo);
-        } else {
-            interpreter = new DirectConceptInterpreter();
-        }
         ConceptInterpretationContext interpretationContext = new ConceptInterpretationContext(controller.getDiagramHistory(),
                 broker);
-        diagramView.setConceptInterpreter(interpreter);
+        diagramView.setConceptInterpreter(this.conceptualSchema.getConceptInterpreter());
         diagramView.setConceptInterpretationContext(interpretationContext);
         updateLabelViews();
         diagramOrganiser.setConceptualSchema(conceptualSchema);
