@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
@@ -163,7 +164,11 @@ public class ObjectLabelView extends LabelView {
         } else {
             DatabaseConnectedConceptInterpreter dbConceptInterpreter =
                     (DatabaseConnectedConceptInterpreter) conceptInterpreter;
-            contents = dbConceptInterpreter.executeQuery(query, concept, context);
+            try{
+	            contents = dbConceptInterpreter.executeQuery(query, concept, context);
+			} catch (Exception e) {
+				ErrorDialog.showError(this.diagramView, e, "Querying database failed");
+			}
         }
     }
 
