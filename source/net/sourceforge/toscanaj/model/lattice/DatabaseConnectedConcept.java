@@ -110,12 +110,18 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                     this.numObjects = Integer.parseInt(result.getString(1));
                 }
                 catch (SQLException e) {
-                    e.printStackTrace(System.err);
                     /// @TODO Find something useful to do here.
+                    e.printStackTrace(System.err);
                 }
                 catch (DatabaseException e) {
-                    e.printStackTrace(System.err);
                     /// @TODO Find something useful to do here.
+                    if(e.getOriginal()!=null) {
+                        System.err.println(e.getMessage());
+                        e.getOriginal().printStackTrace();
+                    }
+                    else {
+                        e.printStackTrace(System.err);
+                    }
                 }
             }
         }
@@ -155,8 +161,14 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                     /// @TODO Find something useful to do here.
                 }
                 catch (DatabaseException e) {
-                    e.printStackTrace(System.err);
                     /// @TODO Find something useful to do here.
+                    if(e.getOriginal()!=null) {
+                        System.err.println(e.getMessage());
+                        e.getOriginal().printStackTrace();
+                    }
+                    else {
+                        e.printStackTrace(System.err);
+                    }
                 }
             }
         }
