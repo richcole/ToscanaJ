@@ -391,7 +391,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             /// @todo make sure the events come in the proper order
             ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
             conceptualSchema = schemaEvent.getConceptualSchema();
-            /// @todo since we don't support the db viewers yet, we just reset all of them --> change
+        }
+		if (e instanceof NewConceptualSchemaEvent) {
             DatabaseViewerManager.resetRegistry();
         }
         if (e instanceof ConceptualSchemaLoadedEvent) {
