@@ -600,7 +600,7 @@ public class CSCParser {
             ConceptImplementation concept = (ConceptImplementation) node.getConcept();
             Iterator objIt = concept.getObjectContingentIterator();
             while (objIt.hasNext()) {
-                String object = (String) objIt.next();
+                Object object = objIt.next();
                 if(queryMap.map.containsKey(object)) {
                 	objIt.remove();
                 	concept.addObject(queryMap.map.get(object));
