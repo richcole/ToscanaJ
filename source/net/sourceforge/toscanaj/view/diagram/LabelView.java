@@ -116,6 +116,16 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     protected int lineHeight = 0;
 
     protected Vector observers = new Vector();
+    
+    protected DragMode dragMode = NOT_DRAGGING;
+    
+    protected static class DragMode {
+    }
+
+    protected static final DragMode NOT_DRAGGING = new DragMode();
+    protected static final DragMode RESIZING = new DragMode();
+    protected static final DragMode MOVING = new DragMode();
+    protected static final DragMode SCROLLING = new DragMode();
 
     /**
      * Creates a view for the given label information.
@@ -429,50 +439,62 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         return this.rect.contains(point);
     }
 
-    /**
-     * Moves or resizes the label, depending on where the drag event occured.
-     */
     public void processDragEvent(Point2D from, Point2D to) {
-        if ((from.getX() >= this.rect.getMaxX() - this.scrollbarWidth)) {
+    	if(this.dragMode == NOT_DRAGGING) {
+    		return;
+   	    } else if(this.dragMode == RESIZING) {
+    	    int lineHit = (int) ((from.getY() - this.rect.getY()) / this.lineHeight);
+    	    int newLine = (int) ((to.getY() - this.rect.getY()) / this.lineHeight);
+    	    // check if it is above/below
+    	    if (newLine > lineHit) {
+    	        if (this.displayLines < this.getNumberOfEntries()) {
+    	            this.displayLines++;
+    	            if (this.firstItem + this.displayLines >
+    	                    this.getNumberOfEntries()) {
+    	                this.firstItem--;
+    	            }
+    	            notifyObservers();
+    	        }
+    	    } else if (newLine < lineHit) {
+    	        if (this.displayLines > MIN_DISPLAY_LINES) {
+    	            this.displayLines--;
+    	            notifyObservers();
+    	        }
+    	    }
+  	    } else if(this.dragMode == SCROLLING) {
+    	    // User wants to drag the scrollbar
+    	    int scrollbarHeight = (this.displayLines - 3) * this.lineHeight;
+    	    double scrollbarYToPos = to.getY() - this.rect.getY() - this.lineHeight;
+    	    double relativePos = scrollbarYToPos / scrollbarHeight;
+    	    int newLinePos = (int) (relativePos * (getNumberOfEntries() - this.displayLines));
+    	    this.firstItem = newLinePos;
+    	    ensureFirstItemBounds();
+    	    notifyObservers();
+   	    } else if(this.dragMode == MOVING) {
+    	    double deltaX = to.getX() - from.getX();
+    	    double deltaY = to.getY() - from.getY();
+    	    this.labelInfo.setOffset(this.labelInfo.getOffset().getX() + deltaX,
+    	            this.labelInfo.getOffset().getY() + deltaY);
+    	}
+    }
+    
+    public void startDrag(Point2D from, Point2D to) {
+        if (from.getX() >= this.rect.getMaxX() - this.scrollbarWidth) {
             // we have a click on the scrollbar, calculate the line hit
             int lineHit = (int) ((from.getY() - this.rect.getY()) / this.lineHeight);
             if (lineHit == this.displayLines - 1) { // it is on the resize handle
-                // calculate the line hit by the new mouse position
-                int newLine = (int) ((to.getY() - this.rect.getY()) / this.lineHeight);
-                // check if it is above/below
-                if (newLine > lineHit) {
-                    if (this.displayLines < this.getNumberOfEntries()) {
-                        this.displayLines++;
-                        if (this.firstItem + this.displayLines >
-                                this.getNumberOfEntries()) {
-                            this.firstItem--;
-                        }
-                        notifyObservers();
-                    }
-                } else if (newLine < lineHit) {
-                    if (this.displayLines > MIN_DISPLAY_LINES) {
-                        this.displayLines--;
-                        notifyObservers();
-                    }
-                }
+            	this.dragMode = RESIZING;
             } else if( (lineHit >= 1) && (lineHit <= this.displayLines - 3) ){
-				// User wants to drag the scrollbar
-				int scrollbarHeight = (this.displayLines - 3) * this.lineHeight;
-				double scrollbarYToPos = to.getY() - this.rect.getY() - this.lineHeight;
-				double relativePos = scrollbarYToPos / scrollbarHeight;
-				int newLinePos = (int) (relativePos * (getNumberOfEntries() - this.displayLines));
-				this.firstItem = newLinePos;
-				ensureFirstItemBounds();
-				notifyObservers();
+                this.dragMode = SCROLLING;
+            } else {
+            	this.dragMode = NOT_DRAGGING;
             }
         } else {
-            // move
-            double deltaX = to.getX() - from.getX();
-            double deltaY = to.getY() - from.getY();
-            this.labelInfo.setOffset(this.labelInfo.getOffset().getX() + deltaX,
-                    this.labelInfo.getOffset().getY() + deltaY);
+            this.dragMode = MOVING;
         }
+    	processDragEvent(from,to);
     }
+    
 	/**
 	 * Method ensureFirstItemBounds.
 	 */
