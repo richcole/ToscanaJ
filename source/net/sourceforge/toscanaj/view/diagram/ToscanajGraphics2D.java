@@ -12,7 +12,16 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-
+/**
+ * Implements the scaling as typical for Toscana.
+ *
+ * Toscana scales only distances, not sizes. The projection information set on
+ * this class will be used on the coordinates of drawn objects but they will remain
+ * their sizes.
+ *
+ * If e.g. a circles is drawn with different scaling sizes it will appear in
+ * different positions but it will not have a different radius.
+ */
 public class ToscanajGraphics2D {
     /**
      * The offset used to shift the projection in the new coordinate system.
@@ -38,13 +47,40 @@ public class ToscanajGraphics2D {
       _yScale = 1;
     }
 
+    /**
+     * Stores the internal standard graphic context.
+     */
     private Graphics2D graphics;
 
+    /**
+     * Creates a new Toscana graphic context based on the given graphic context.
+     */
     public ToscanajGraphics2D(Graphics2D graphics,  Point2D offset, double xscale, double yscale) {
         _offset = offset;
         _xScale = xscale;
         _yScale = yscale;
         this.graphics = graphics;
+    }
+
+    /**
+     * Returns the offset used when projecting.
+     */
+    public Point2D getOffset() {
+        return this._offset;
+    }
+
+    /**
+     * Returns the horizontal scaling used.
+     */
+    public double getXScaling() {
+        return this._xScale;
+    }
+
+    /**
+     * Returns the vertical scaling used.
+     */
+    public double getYScaling() {
+        return this._yScale;
     }
 
     /**

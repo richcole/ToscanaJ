@@ -19,6 +19,8 @@ import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -112,7 +114,12 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      * Flag to indicate if the save icon and menu options should be
      * enabled
      */
-    public boolean fileIsOpen = false;
+    private boolean fileIsOpen = false;
+
+    /**
+     * The last setup for page format given by the user.
+     */
+    private PageFormat pageFormat = new PageFormat();
 
     /**
      * Simple initialisation constructor.
@@ -211,13 +218,13 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         printMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                  KeyEvent.VK_P, ActionEvent.CTRL_MASK));
         printMenuItem.addActionListener(this);
-        printMenuItem.setEnabled(fileIsOpen);
+        printMenuItem.setEnabled(false);
         fileMenu.add(printMenuItem);
 
         // menu item PRINT SETUP
         printSetupMenuItem = new JMenuItem("Print Setup");
         printSetupMenuItem.addActionListener(this);
-        printSetupMenuItem.setEnabled(fileIsOpen);
+        printSetupMenuItem.setEnabled(true);
         fileMenu.add(printSetupMenuItem);
 
         // separator
@@ -359,9 +366,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      */
     public void resetButtons(boolean isOpen) {
         // menues
-        printMenuItem.setEnabled (isOpen);
-        printSetupMenuItem.setEnabled (isOpen);
-
         this.showAllMenuItem.setEnabled (isOpen);
         this.showExactMenuItem.setEnabled (isOpen);
         this.filterExactMenuItem.setEnabled (isOpen);
@@ -369,16 +373,15 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         this.numDocMenuItem.setEnabled (isOpen);
         this.listDocMenuItem.setEnabled (isOpen);
         this.percDistMenuItem.setEnabled (isOpen);
-
-        // toolbar
     }
 
     /**
      * Callback for listening to changes on DiagramController.
      *
-     * Updates the back button / menu entry.
+     * Updates the buttons / menu entries.
      */
     public void update(Object source) {
+        this.printMenuItem.setEnabled(DiagramController.getController().getDiagramHistory().getSize()!=0);
         this.backMenuItem.setEnabled(DiagramController.getController().undoIsPossible());
         this.backButton.setEnabled(DiagramController.getController().undoIsPossible());
     }
@@ -408,10 +411,19 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
             openSchema();
         }
         if (actionSource == printMenuItem) {
-            /// @TODO
+            PrinterJob printJob = PrinterJob.getPrinterJob();
+            if (printJob.printDialog()) {
+                try {
+                    printJob.setPrintable(this.diagramView,pageFormat);
+                    printJob.print();
+                }
+                catch (Exception PrintException) {
+                    PrintException.printStackTrace();
+                }
+            }
         }
         if (actionSource == printSetupMenuItem) {
-            /// @TODO
+            pageFormat = PrinterJob.getPrinterJob().pageDialog(pageFormat);
         }
         if (actionSource == exitMenuItem) {
             closeMainPanel();

@@ -1,18 +1,5 @@
 package net.sourceforge.toscanaj.view.diagram;
 
-import java.awt.*;
-import java.awt.geom.*;
-import javax.swing.*;
-
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseEvent;
-
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.DrawingCanvas;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
@@ -26,12 +13,23 @@ import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.view.diagram.LabelView;
 import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
+import java.awt.*;
+import java.awt.geom.*;
+import javax.swing.*;
+
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseEvent;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * This class paints a diagram defined by the SimpleLineDiagram class.
  */
-public class DiagramView extends DrawingCanvas implements ChangeObserver
-{
+public class DiagramView extends DrawingCanvas implements ChangeObserver {
     /**
      * The minimum size for drawing.
      *

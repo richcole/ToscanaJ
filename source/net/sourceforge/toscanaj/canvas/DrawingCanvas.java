@@ -8,7 +8,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,7 +28,7 @@ import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
  * a separate class eventually (CanvasController)
  */
 
-public class DrawingCanvas extends JComponent implements MouseListener, MouseMotionListener {
+public class DrawingCanvas extends JComponent implements MouseListener, MouseMotionListener, Printable {
     /**
      * A list of all canvas items to draw.
      */
@@ -70,10 +71,46 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     {
         // paint all items on canvas
         Iterator it = this.canvasItems.iterator();
-        //ListIterator it = this.canvasItems.listIterator(this.canvasItems.size());
         while( it.hasNext() ) {
             CanvasItem cur = (CanvasItem) it.next();
             cur.draw(graphics);
+        }
+    }
+
+    /**
+     * Implements Printable.print(Graphics, PageFormat, int).
+     */
+    public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
+        if(pageIndex == 0) {
+            Graphics2D graphics2D = (Graphics2D) graphics;
+
+            // set top left corner
+            graphics2D.translate(pageFormat.getImageableX(),pageFormat.getImageableY());
+
+            // scale to just fit the page
+            double xScale = pageFormat.getImageableWidth()/this.getWidth();
+            double yScale = pageFormat.getImageableHeight()/this.getHeight();
+            double scale;
+            if(xScale < yScale) {
+                scale = xScale;
+            }
+            else {
+                scale = yScale;
+            }
+            graphics2D.scale(scale,scale);
+
+            ToscanajGraphics2D tgraphics = new ToscanajGraphics2D( graphics2D,
+                                                                   this.graphics.getOffset(),
+                                                                   this.graphics.getXScaling(),
+                                                                   this.graphics.getYScaling() );
+
+            // paint all items on canvas
+            paintCanvasItems(tgraphics);
+
+            return PAGE_EXISTS;
+        }
+        else {
+            return NO_SUCH_PAGE;
         }
     }
 
