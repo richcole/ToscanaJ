@@ -94,6 +94,16 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
             try {
                 // submit the query
                 List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
+                // first of all, check results for NULL values. That can happen if we have the infimum
+                // of the realized lattice and it has an empty contingent but an object label attached.
+                // In that case SQL aggregates will return NULL, if we try to display this we create
+                // either exceptions or some other mess. We return null instead.
+                Vector firstResult = (Vector) queryResults.get(0);
+                for (Iterator iter = firstResult.iterator(); iter.hasNext(); ) {
+                    if(iter.next() == null) {
+                        return null;
+                    }
+                }
                 retVal = new FCAElement[queryResults.size()];
 				Vector reference = null;
 				if(referenceWhereClause != null){

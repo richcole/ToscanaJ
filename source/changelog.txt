@@ -8,6 +8,8 @@ Affecting different programs:
 
 Specific for ToscanaJ:
 ======================
+- Bugfix: in some occasions exceptions where thrown when using SQL queries
+  (lattice infimum with empty contingent)
 
 Specific for Elba:
 ==================
