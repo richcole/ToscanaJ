@@ -25,8 +25,12 @@ public class NestedDiagramNode extends DiagramNode {
      * given diagram is the inner diagram in a nested diagram. The scale parameter
      * determines how much the new diagram will be scaled to accomodate the inner
      * diagrams.
+     *
+     * If the dropAttributeLabels flag is set, the inner nodes will have no
+     * attribute labels attached.
      */
-    public NestedDiagramNode(DiagramNode outerNode, Diagram2D innerDiagram, double scale ) {
+    public NestedDiagramNode(DiagramNode outerNode, Diagram2D innerDiagram, double scale,
+                                         boolean dropAttributeLabels ) {
         super( new Point2D.Double(outerNode.getX()*scale, outerNode.getY()*scale),
                outerNode.getConcept(), outerNode.getAttributeLabelInfo(), null);
         // scale attribute label position
@@ -45,7 +49,13 @@ public class NestedDiagramNode extends DiagramNode {
             Point2D newPos = new Point2D.Double( oldNode.getX() + offset.getX(),
                                                  oldNode.getY() + offset.getY() );
             Concept newConcept = oldNode.getConcept().filterByContingent(outerNode.getConcept());
-            LabelInfo newAttrLabel = new AttributeLabelInfo(oldNode.getAttributeLabelInfo());
+            LabelInfo newAttrLabel;
+            if(dropAttributeLabels) {
+                newAttrLabel = null;
+            }
+            else {
+                newAttrLabel = new AttributeLabelInfo(oldNode.getAttributeLabelInfo());
+            }
             LabelInfo newObjLabel = new ObjectLabelInfo(oldNode.getObjectLabelInfo());
 
             DiagramNode newNode = new DiagramNode(newPos, newConcept, newAttrLabel, newObjLabel);

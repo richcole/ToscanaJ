@@ -29,7 +29,8 @@ public class NestedLineDiagram extends SimpleLineDiagram {
         HashSet concepts = new HashSet(); // stores all concepts involved
         for(int i=0; i < outerDiagram.getNumberOfNodes(); i++ ) {
             DiagramNode oldNode = outerDiagram.getNode(i);
-            NestedDiagramNode node = new NestedDiagramNode(oldNode, innerDiagram, scale);
+            NestedDiagramNode node = new NestedDiagramNode(oldNode, innerDiagram, scale,
+                                                           !oldNode.getConcept().isTop() );
             this.addNode(node);
             nodeMap.put(oldNode,node);
         }

@@ -398,4 +398,18 @@ public abstract class AbstractConceptImplementation implements Concept
         // now we are at the bottom
         return cur.getIntentSize();
     }
+
+    /**
+     * Returns true if this is the top concept.
+     */
+    public boolean isTop() {
+        return this.filter.size() == 1;
+    }
+
+    /**
+     * Returns true if this is the bottom concept.
+     */
+    public boolean isBottom() {
+        return this.ideal.size() == 1;
+    }
 }

@@ -135,4 +135,14 @@ public interface Concept {
      * If the other concept is null, a copy of the original concept will be returned.
      */
     Concept filterByContingent(Concept other);
+
+    /**
+     * Returns true if this is the top concept.
+     */
+    boolean isTop();
+
+    /**
+     * Returns true if this is the bottom concept.
+     */
+    boolean isBottom();
 }
