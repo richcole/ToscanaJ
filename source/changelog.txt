@@ -1,4 +1,26 @@
-Changes between version 1.3 and the CVS version of the ToscanaJ 
+Changes between version 1.4 and the CVS version of the ToscanaJ 
+program suite:
+
+Affecting different programs:
+=============================
+
+Specific for ToscanaJ:
+======================
+
+Specific for Elba:
+==================
+
+Specific for Siena (still not fully complete):
+==============================================
+
+Other new experimental features:
+================================
+
+
+
+
+
+Changes between version 1.3 and version 1.4 of the ToscanaJ 
 program suite:
 
 Affecting different programs:
@@ -59,11 +81,6 @@ Specific for Siena (still not fully complete):
   inconsistent), an error message will appear and the following diagrams
   will still be created if possible
   
-
-Other new experimental features:
-================================
-
-
 
 
 
