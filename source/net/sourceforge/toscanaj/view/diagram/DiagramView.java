@@ -127,6 +127,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
 
     public void requestScreenTransformUpdate() {
         screenTransformDirty = true;
+        repaint();
     }
 
     /**
