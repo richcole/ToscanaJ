@@ -458,12 +458,14 @@ public class CSXParser {
         String driver;
         String username;
         String password;
+        String embeddedDBlocation;
         URL embeddedDB;
         if (urlElem != null) {
             url = urlElem.getText();
             driver = urlElem.getAttributeValue("driver");
             username = urlElem.getAttributeValue("user");
             password = urlElem.getAttributeValue("password");
+            embeddedDBlocation = null;
             embeddedDB = null;
         } else {
             DatabaseInfo tmpInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
@@ -471,13 +473,13 @@ public class CSXParser {
             driver = tmpInfo.getDriverClass();
             username = tmpInfo.getUserName();
             password = tmpInfo.getPassword();
-            String urlString = embedElem.getAttributeValue("url");
+            embeddedDBlocation = embedElem.getAttributeValue("url");
             embeddedDB = null;
-            if (urlString != null) {
+            if (embeddedDBlocation != null) {
                 try {
-                    embeddedDB = new URL(_BaseURL, urlString);
+                    embeddedDB = new URL(_BaseURL, embeddedDBlocation);
                 } catch (MalformedURLException e) {
-                    throw new DataFormatException("Could not create URL for database: " + embeddedDB);
+                    throw new DataFormatException("Could not create URL for database: " + embeddedDBlocation);
                 }
             }
         }
@@ -495,7 +497,7 @@ public class CSXParser {
         dbInfo.setDriverClass(driver);
         dbInfo.setUserName(username);
         dbInfo.setPassword(password);
-        dbInfo.setEmbeddedSQLLocation(embeddedDB);
+        dbInfo.setEmbeddedSQLLocation(embeddedDB, embeddedDBlocation);
 
         // let's try to find the query
         Element elem = dbElement.getChild("table");

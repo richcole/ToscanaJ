@@ -42,6 +42,7 @@ public class DatabaseInfo implements XML_Serializable {
     private String password = null;
 
     private URL embeddedSQLLocation = null;
+    private String embeddedSQLPath = null;
 
     private String driverClass = null;
 
@@ -210,9 +211,9 @@ public class DatabaseInfo implements XML_Serializable {
 
     public Element toXML() {
         Element retVal = new Element(DATABASE_CONNECTION_ELEMENT_NAME);
-        if( embeddedSQLLocation != null ) {
+        if( embeddedSQLPath != null ) {
             Element embedElem = new Element(EMBEDDED_SOURCE_ELEMENT_NAME);
-            embedElem.setAttribute(EMBEDDED_URL_ATTRIBUTE_NAME,embeddedSQLLocation.toString());
+            embedElem.setAttribute(EMBEDDED_URL_ATTRIBUTE_NAME,embeddedSQLPath);
             retVal.addContent(embedElem);
         } else {
             Element urlElem = new Element(URL_SOURCE_ELEMENT_NAME);
@@ -313,8 +314,9 @@ public class DatabaseInfo implements XML_Serializable {
         return this.objectKey;
     }
 
-    public void setEmbeddedSQLLocation(URL location) {
-        this.embeddedSQLLocation = location;
+    public void setEmbeddedSQLLocation(URL resolvedLocation, String relativePath) {
+        this.embeddedSQLLocation = resolvedLocation;
+        this.embeddedSQLPath = relativePath;
     }
 
     public URL getEmbeddedSQLLocation() {
