@@ -2,6 +2,8 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import java.awt.*;
 
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
+
 /**
  * DiagramSchema will hold the palette colors, line widths and similar information
  * for the DiagramView.
@@ -111,6 +113,9 @@ public class DiagramSchema {
      * Default constructor.
      */
     private DiagramSchema() {
+        background = ConfigurationManager.fetchColor("diagramSchema","backgroundColor",background);
+        topColor = ConfigurationManager.fetchColor("diagramSchema","topColor",topColor);
+        bottomColor = ConfigurationManager.fetchColor("diagramSchema","bottomColor",bottomColor);
     }
 
     /**
@@ -121,16 +126,16 @@ public class DiagramSchema {
     }
 
     /**
-     * Returns foreground color.
+     * Returns default foreground color.
      */
-    public Color getForeground() {
+    public Color getForegroundColor() {
         return foreground;
     }
 
     /**
      * Returns background color.
      */
-    public Color getBackground() {
+    public Color getBackgroundColor() {
         return background;
     }
 

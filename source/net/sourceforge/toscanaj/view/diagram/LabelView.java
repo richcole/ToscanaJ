@@ -231,9 +231,12 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         // draw a dashed line from the given point to the calculated
         Stroke oldStroke = graphics.getStroke();
         float[] dashstyle = { 4, 4 };
+        graphics.setPaint(DiagramSchema.getDiagramSchema().getLineColor());
         graphics.setStroke( new BasicStroke( 1, BasicStroke.CAP_BUTT,
                                     BasicStroke.JOIN_BEVEL, 1, dashstyle, 0 ) );
         graphics.draw( new Line2D.Double( x, y, xPos + lw/2,  y + this.labelInfo.getOffset().getY() ) );
+
+        graphics.setPaint(DiagramSchema.getDiagramSchema().getForegroundColor());
         graphics.setStroke( oldStroke );
 
         // draw the label itself

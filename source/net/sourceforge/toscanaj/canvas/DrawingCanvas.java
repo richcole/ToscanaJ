@@ -132,6 +132,8 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      */
     private Timer doubleClickTimer = null;
 
+    private Paint backgroundPaint = null;
+
     /**
      * Just adds the listeners we need to work.
      */
@@ -144,16 +146,16 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * Paints the canvas including all CanvasItems on it.
      */
     public void paintCanvas(Graphics2D graphics) {
-        // fill the background
-        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
-        graphics.setPaint(diagramSchema.getForeground());
-
         // paint all items on canvas
         Iterator it = this.canvasItems.iterator();
         while (it.hasNext()) {
             CanvasItem cur = (CanvasItem) it.next();
             cur.draw(graphics);
         }
+    }
+
+    public void setBackgroundPaint(Paint backgroundPaint) {
+        this.backgroundPaint = backgroundPaint;
     }
 
     protected void setScreenTransform(AffineTransform transform) {

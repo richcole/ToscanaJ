@@ -151,4 +151,26 @@ public class ConfigurationManager {
         }
         return retVal;
     }
+
+    /**
+     * Stores a Color value.
+     */
+    static public void storeColor(String section, String key, Color value) {
+        storeInt(section, key, value.getRGB());
+    }
+
+    /**
+     * Retrieves a Color value.
+     */
+    static public Color fetchColor(String section, String key, Color defaultValue) {
+        try {
+            return Color.decode(properties.getProperty(section + "-" + key));
+        }
+        catch(NumberFormatException e) {
+            return defaultValue;
+        }
+        catch(NullPointerException e) {
+            return defaultValue;
+        }
+    }
 }

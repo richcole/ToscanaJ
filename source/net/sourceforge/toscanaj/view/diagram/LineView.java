@@ -41,18 +41,20 @@ public class LineView extends CanvasItem {
         Point2D to = diagramLine.getToPosition();
         Paint oldPaint = graphics.getPaint();
         Stroke oldStroke = graphics.getStroke();
-        if(this.selectionState != NodeView.NO_SELECTION) {
-            if(this.selectionState == NodeView.SELECTED_IDEAL) {
-                graphics.setPaint(diagramSchema.getCircleIdealColor());
-                graphics.setStroke(new BasicStroke(NodeView.selectionSize));
-            }
-            else if(this.selectionState == NodeView.SELECTED_FILTER) {
-                graphics.setPaint(diagramSchema.getCircleFilterColor());
-                graphics.setStroke(new BasicStroke(NodeView.selectionSize));
-            }
-            else if(this.selectionState == NodeView.NOT_SELECTED) {
-                graphics.setPaint(diagramSchema.fadeOut(diagramSchema.getLineColor()));
-            }
+        if(this.selectionState == NodeView.NO_SELECTION) {
+            graphics.setPaint(diagramSchema.getLineColor());
+            graphics.setStroke(new BasicStroke(1));
+        }
+        else if(this.selectionState == NodeView.SELECTED_IDEAL) {
+            graphics.setPaint(diagramSchema.getCircleIdealColor());
+            graphics.setStroke(new BasicStroke(NodeView.selectionSize));
+        }
+        else if(this.selectionState == NodeView.SELECTED_FILTER) {
+            graphics.setPaint(diagramSchema.getCircleFilterColor());
+            graphics.setStroke(new BasicStroke(NodeView.selectionSize));
+        }
+        else if(this.selectionState == NodeView.NOT_SELECTED) {
+            graphics.setPaint(diagramSchema.fadeOut(diagramSchema.getLineColor()));
         }
         graphics.draw(new Line2D.Double(from,to));
         graphics.setPaint(oldPaint);

@@ -44,6 +44,8 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     public DiagramView() {
         super();
         addComponentListener(new ResizeListener());
+        /// @todo this is not yet used since the title is not a canvas item yet
+        setBackgroundPaint(DiagramSchema.getDiagramSchema().getBackgroundColor());
     }
 
     protected void dragFinished(MouseEvent e) {
@@ -84,13 +86,12 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         }
         Graphics2D g2d = (Graphics2D) g;
 
-        // fill the background
-        g2d.setPaint(DiagramSchema.getDiagramSchema().getBackground());
-        g2d.fill(this.getBounds());
+        // fill the background (without transform)
+        g2d.setPaint(DiagramSchema.getDiagramSchema().getBackgroundColor());
+        g2d.fill(new Rectangle2D.Double(0,0,getWidth(),getHeight()));
 
         // draw diagram title in the top left corner
-
-        g2d.setPaint(DiagramSchema.getDiagramSchema().getForeground());
+        g2d.setPaint(DiagramSchema.getDiagramSchema().getForegroundColor());
         // title is not scaled on purpose
         g2d.drawString(diagram.getTitle(), MARGIN, MARGIN);
 
