@@ -194,21 +194,12 @@ public class ConfigurationManager {
         if( propVal == null ) {
             return defaultValue;
         }
-        else if( propVal.charAt(0) == '#') {
-            try {
-                propVal = propVal.substring(1);
-                int colorValue = Integer.parseInt(propVal,16);
-                return new Color(colorValue);
-            }
-            catch(NumberFormatException e) {
-                return defaultValue;
-            }
-        }
         else {
             try {
                 return Color.decode(propVal);
             }
             catch(NumberFormatException e) {
+                System.err.println(e.getMessage());
                 return defaultValue;
             }
         }
