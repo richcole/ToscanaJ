@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.model.database.Query;
+import net.sourceforge.toscanaj.model.database.DatabaseQuery;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
@@ -241,7 +242,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
     /**
      * Sets all object label views to use this query when asking their concepts.
      */
-    public void setQuery(Query query) {
+    public void setQuery(DatabaseQuery query) {
         // update the current labels
         Iterator it = this.canvasItems.iterator();
         while (it.hasNext()) {

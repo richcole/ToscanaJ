@@ -62,6 +62,8 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * Stores all clauses used to filter into the current concept.
      *
      * @see #objectClause
+     *
+     * @todo This should be removed later.
      */
     private Set filterClauses = new HashSet();
     private static final String OBJECT_ELEMENT_NAME = "object";
@@ -136,6 +138,10 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      */
     public boolean hasObjectClause() {
         return this.objectClause != null;
+    }
+
+    public String getObjectClause() {
+        return this.objectClause;
     }
 
     /**
@@ -225,92 +231,6 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     }
 
     /**
-     * Implements Concept.executeQuery(Query, boolean).
-     */
-    public List executeQuery(Query query, boolean contingentOnly) {
-        if (query instanceof DatabaseQuery) {
-            return executeDatabaseQuery((DatabaseQuery) query, contingentOnly);
-        } else {
-            throw new RuntimeException("Unknown Query type");
-        }
-    }
-
-    private List executeDatabaseQuery(DatabaseQuery dbQuery, boolean contingentOnly) {
-        List retVal = new ArrayList();
-        // do a query only if there will be something to query
-        // either: there is a contingent in this concept or we query extent and we
-        // have subconcepts (at least one should have a contingent, otherwise this
-        // concept shouldn't exist)
-        if (this.objectClause != null || (!contingentOnly && this.ideal.size() != 1)) {
-            String whereClause = constructWhereClause(contingentOnly);
-            if (whereClause != null) {
-                try {
-                    retVal = DatabaseConnection.getConnection().executeQuery(dbQuery, whereClause);
-                } catch (DatabaseException e) {
-                    handleDBException(e);
-                }
-            }
-        }
-        return retVal;
-    }
-
-    private void handleDBException(DatabaseException e) {
-        /// @TODO Find something useful to do here.
-        if (e.getOriginal() != null) {
-            System.err.println(e.getMessage());
-            e.getOriginal().printStackTrace();
-        } else {
-            e.printStackTrace(System.err);
-        }
-    }
-
-    public String constructWhereClause(boolean contingentOnly) {
-        boolean first = true;
-        String whereClause = "WHERE ";
-        if (contingentOnly) {
-            if (this.objectClause != null) {
-                whereClause += this.objectClause;
-                first = false;
-            }
-        } else {
-            // aggregate all clauses from the downset
-            Iterator iter = this.ideal.iterator();
-            while (iter.hasNext()) {
-                DatabaseConnectedConcept concept = (DatabaseConnectedConcept) iter.next();
-                if (concept.objectClause == null) {
-                    continue;
-                }
-                if (first) {
-                    first = false;
-                    whereClause += " (";
-                } else {
-                    whereClause += " OR ";
-                }
-                whereClause += concept.objectClause;
-            }
-            if (!first) {
-                whereClause += ") ";
-            }
-        }
-
-        Iterator iter = this.filterClauses.iterator();
-        while (iter.hasNext()) {
-            Object item = iter.next();
-            if (first) {
-                first = false;
-            } else {
-                whereClause += " AND ";
-            }
-            whereClause += item;
-        }
-        if (first) {
-            return null; // no clause at all
-        }
-        whereClause += ";";
-        return whereClause;
-    }
-
-    /**
      * Implements Concept.filterByExtent(Concept).
      *
      * The other concept is assumed to be a DatabaseConnectedConcept.
@@ -397,5 +317,51 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         retVal.setObjectClause(clause);
         retVal.filterClauses.addAll(this.filterClauses);
         return retVal;
+    }
+
+    public String constructWhereClause(boolean contingentOnly) {
+        boolean first = true;
+        String whereClause = "WHERE ";
+        if (contingentOnly) {
+            if (this.hasObjectClause()) {
+                whereClause += this.getObjectClause();
+                first = false;
+            }
+        } else {
+            // aggregate all clauses from the downset
+            Iterator iter = this.ideal.iterator();
+            while (iter.hasNext()) {
+                DatabaseConnectedConcept otherConcept = (DatabaseConnectedConcept) iter.next();
+                if (otherConcept.hasObjectClause()) {
+                    continue;
+                }
+                if (first) {
+                    first = false;
+                    whereClause += " (";
+                } else {
+                    whereClause += " OR ";
+                }
+                whereClause += otherConcept.getObjectClause();
+            }
+            if (!first) {
+                whereClause += ") ";
+            }
+        }
+
+        Iterator iter = this.filterClauses.iterator();
+        while (iter.hasNext()) {
+            Object item = iter.next();
+            if (first) {
+                first = false;
+            } else {
+                whereClause += " AND ";
+            }
+            whereClause += item;
+        }
+        if (first) {
+            return null; // no clause at all
+        }
+        whereClause += ";";
+        return whereClause;
     }
 }

@@ -41,7 +41,7 @@ public class DatabaseConnectedConceptTest extends ConceptTest {
         }
     }
 
-    protected Concept makeConceptWithEmptyContingentAndExtent() {
+    protected DatabaseConnectedConcept makeConceptWithEmptyContingentAndExtent() {
         try {
             DatabaseConnection.setConnection(new MockDBConnection());
             DatabaseConnectedConcept databaseConnectedConcept = new DatabaseConnectedConcept(new DatabaseInfo());

@@ -7,9 +7,15 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.ArrayList;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -38,7 +44,40 @@ public abstract class DatabaseQuery extends Query {
         col.separator = separator;
         col.queryPart = queryPart;
         columnList.add(col);
-    };
+    }
+
+    public List execute(Concept concept, boolean contingentOnly) {
+        if( !(concept instanceof DatabaseConnectedConcept) ) {
+            throw new RuntimeException("Expected DatabaseConnectedConcept for DatabaseQuery");
+        }
+        DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
+        List retVal = new ArrayList();
+        // do a query only if there will be something to query
+        // either: there is a contingent in this concept or we query extent and we
+        // have subconcepts (at least one should have a contingent, otherwise this
+        // concept shouldn't exist)
+        if (dbConcept.getObjectClause() != null || (!contingentOnly && !concept.isBottom())) {
+            String whereClause = dbConcept.constructWhereClause(contingentOnly);
+            if (whereClause != null) {
+                try {
+                    retVal = DatabaseConnection.getConnection().executeQuery(this, whereClause);
+                } catch (DatabaseException e) {
+                    handleDBException(e);
+                }
+            }
+        }
+        return retVal;
+    }
+
+    private void handleDBException(DatabaseException e) {
+        /// @TODO Find something useful to do here.
+        if (e.getOriginal() != null) {
+            System.err.println(e.getMessage());
+            e.getOriginal().printStackTrace();
+        } else {
+            e.printStackTrace(System.err);
+        }
+    }
 
     /**
      * Formats a row of a result set for this query.

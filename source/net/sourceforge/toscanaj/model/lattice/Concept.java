@@ -117,17 +117,6 @@ public interface Concept extends XMLizable {
     Iterator getAttributeContingentIterator();
 
     /**
-     * Executes the given query on the objects and returns a list as result.
-     *
-     * If the boolean flag is set, only the object contingent qill be queried,
-     * otherwise the full extent.
-     *
-     * If the Query type given is not supported, a RuntimeException will be
-     * thrown.
-     */
-    List executeQuery(Query query, boolean contingentOnly);
-
-    /**
      * Returns an iterator returning the objects from the contingent.
      *
      * The Java objects returned from the iterator should offer a toString()

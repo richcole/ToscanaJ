@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseQuery;
 import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
 import java.util.List;
 
@@ -27,25 +28,25 @@ public abstract class ConceptTest extends TestCase {
     }
 
     public void testObjectNumberQueryOnConceptWithEmptyExtentAndContigent() {
-        Concept concept = makeConceptWithEmptyContingentAndExtent();
+        DatabaseConnectedConcept concept = makeConceptWithEmptyContingentAndExtent();
         DatabaseQuery query = dbInfo.createAggregateQuery("Number of Objects", "");
         query.insertQueryColumn("count", "0", null, "count(*)");
-        List result = concept.executeQuery(query, false);
+        List result = query.execute(concept, false);
         assertEquals(true, result.isEmpty());
 
-        result = concept.executeQuery(query, true);
+        result = query.execute(concept, true);
         assertEquals(true, result.isEmpty());
     }
 
     public void testObjectListQueryOnConceptWithEmptyExtentAndContigent() {
-        Concept concept = makeConceptWithEmptyContingentAndExtent();
+        DatabaseConnectedConcept concept = makeConceptWithEmptyContingentAndExtent();
         DatabaseQuery query = dbInfo.createListQuery("List of Objects", "", false);
         query.insertQueryColumn("list", null, null, "unknown");
-        List result = concept.executeQuery(query, false);
+        List result = query.execute(concept, false);
         assertEquals(true, result.isEmpty());
-        result = concept.executeQuery(query, true);
+        result = query.execute(concept, true);
         assertEquals(true, result.isEmpty());
     }
 
-    protected abstract Concept makeConceptWithEmptyContingentAndExtent();
+    protected abstract DatabaseConnectedConcept makeConceptWithEmptyContingentAndExtent();
 }

@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.database.DatabaseAggregateQuery;
 import net.sourceforge.toscanaj.model.database.DatabaseListQuery;
+import net.sourceforge.toscanaj.model.database.DatabaseQuery;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
@@ -43,12 +44,12 @@ public class ObjectLabelView extends LabelView {
     /**
      * Sets the default query used for new labels.
      */
-    static private Query defaultQuery = null;
+    static private DatabaseQuery defaultQuery = null;
 
     /**
      * Stores the query we currently use.
      */
-    private Query query = null;
+    private DatabaseQuery query = null;
 
     private List queryKeyValues = null;
     private List queryDisplayStrings = null;
@@ -97,7 +98,7 @@ public class ObjectLabelView extends LabelView {
     /**
      * Sets the default query for new labels.
      */
-    static public void setDefaultQuery(Query query) {
+    static public void setDefaultQuery(DatabaseQuery query) {
         ObjectLabelView.defaultQuery = query;
     }
 
@@ -110,7 +111,7 @@ public class ObjectLabelView extends LabelView {
 
     /**
      */
-    public void setQuery(Query query) {
+    public void setQuery(DatabaseQuery query) {
         this.query = query;
         doQuery();
         if (this.getNumberOfEntries() > DEFAULT_DISPLAY_LINES) {
@@ -135,8 +136,7 @@ public class ObjectLabelView extends LabelView {
 
     protected void doQuery() {
         if (query != null) {
-            List queryResult = this.labelInfo.getNode().getConcept().executeQuery(
-                    this.query, this.showOnlyContingent);
+            List queryResult = this.query.execute(this.labelInfo.getNode().getConcept(),this.showOnlyContingent);
             this.queryKeyValues = new LinkedList();
             this.queryDisplayStrings = new LinkedList();
             Iterator it = queryResult.iterator();
@@ -195,7 +195,7 @@ public class ObjectLabelView extends LabelView {
             JMenu queryMenu = new JMenu("Change label");
             Iterator it = queries.iterator();
             while (it.hasNext()) {
-                final Query query = (Query) it.next();
+                final DatabaseQuery query = (DatabaseQuery) it.next();
                 menuItem = new JMenuItem(query.getName());
                 menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
