@@ -24,6 +24,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.net.URL;
@@ -451,7 +452,7 @@ public class ToscanaJServlet extends HttpServlet {
     private void printHead(PrintWriter out) {
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         out.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">");
-        out.println("<svg viewBox=\"0 0 1000 850\" width=\"" + IMAGE_WIDTH + "\" height=\"" + IMAGE_HEIGHT + "\" xmlns=\"http://www.w3.org/2000/svg\">");
+        out.println("<svg viewBox=\"0 0 1000 850\" xmlns=\"http://www.w3.org/2000/svg\">");
     }
 
     private void printEnd(PrintWriter out) {
