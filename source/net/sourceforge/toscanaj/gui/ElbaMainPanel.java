@@ -1065,7 +1065,7 @@ public class ElbaMainPanel
         }
         recreateMruMenu();
     }
-
+    
     private void importCSC() {
         final JFileChooser openDialog;
         if (this.lastCSCFile != null) {
@@ -1077,15 +1077,34 @@ public class ElbaMainPanel
         openDialog.setApproveButtonText("Import");
         openDialog.setFileFilter(
             new ExtensionFileFilter(new String[] { "csc" }, "Conscript Files"));
+            
+		JPanel optionsPanel = new JPanel(new BorderLayout());
+		JCheckBox openNewSchema = new JCheckBox("Create a new schema with this file", true);
+		optionsPanel.add(openNewSchema, BorderLayout.CENTER);
+		optionsPanel.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+		openDialog.setAccessory(optionsPanel);
+
         int rv = openDialog.showOpenDialog(this);
         if (rv != JFileChooser.APPROVE_OPTION) {
             return;
         }
         try {
+        	if (openNewSchema.isSelected()) {
+				if (checkForMissingSave()) {
+					// @todo is is possible to reuse NewConceptualSchemaAction here?..
+					new ConceptualSchema(this.eventBroker);
+				}
+        	}
             importCSC(openDialog.getSelectedFile());
             this.lastCSCFile = openDialog.getSelectedFile();
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Import failed");
+        }
+        if (openNewSchema.isSelected()) {
+			currentFile = null;
+			updateWindowTitle();
+			showDatabaseConnectionDialog();
+			DatabaseViewerManager.resetRegistry();
         }
     }
 
