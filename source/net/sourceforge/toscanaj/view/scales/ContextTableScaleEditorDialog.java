@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
@@ -678,36 +679,36 @@ public class ContextTableScaleEditorDialog
 		}
 
 		// check if all conjunctions are empty
-		it = this.context.getObjects().iterator();
-		while (it.hasNext()) {
-			String clause = (String) it.next();
-			validClauses.remove(clause);
-			Iterator it2 = validClauses.iterator();
-			while (it2.hasNext()) {
-				String otherClause = (String) it2.next();
-				String query =
-					"SELECT count(*) FROM "
-						+ dbinfo.getTable().getSqlExpression()
-						+ " WHERE ("
-						+ clause
-						+ ") AND ("
-						+ otherClause
-						+ ");";
-				try {
-					int count = this.databaseConnection.queryInt(query, 1);
-					if (count != 0) {
-						problems.add(
-							"Object clauses '"
-								+ clause
-								+ "' and '"
-								+ otherClause
-								+ "' overlap.");
+		if (problems.isEmpty()) {
+			it = this.context.getObjects().iterator();
+			while (it.hasNext()) {
+				String clause = (String) it.next();
+				validClauses.remove(clause);
+				Iterator it2 = validClauses.iterator();
+				while (it2.hasNext()) {
+					String otherClause = (String) it2.next();
+					String query =
+						"SELECT count(*) FROM "
+							+ dbinfo.getTable().getSqlExpression()
+							+ " WHERE ("
+							+ clause
+							+ ") AND ("
+							+ otherClause
+							+ ");";
+					try {
+						int count = this.databaseConnection.queryInt(query, 1);
+						if (count != 0) {
+							problems.add(
+								"Object clauses '"
+									+ clause
+									+ "' and '"
+									+ otherClause
+									+ "' overlap.");
+						}
+					} catch (DatabaseException e) {
+						// should not happen
+						ErrorDialog.showError(this,e,"Error querying the database");
 					}
-				} catch (DatabaseException e) {
-					// should not happen
-					throw new RuntimeException(
-						"Failed to query the database.",
-						e);
 				}
 			}
 		}
