@@ -128,7 +128,7 @@ import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ColumnHeader;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ObjectDialog;
-import net.sourceforge.toscanaj.view.manyvaluedcontext.PropertiesDialog;
+import net.sourceforge.toscanaj.view.manyvaluedcontext.ManyValuedAttributeDialog;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.RowHeader;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.TableView;
 
@@ -320,7 +320,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		Frame tFrame = JOptionPane.getFrameForComponent(tableView);
 		List manyValuedAttributeList = (List) conceptualSchema.getManyValuedContext().getAttributes();
 		WritableManyValuedAttribute attribute = (WritableManyValuedAttribute) manyValuedAttributeList.get(column);
-		new PropertiesDialog(tFrame, attribute,	conceptualSchema.getManyValuedContext());
+		new ManyValuedAttributeDialog(tFrame, attribute,	conceptualSchema.getManyValuedContext());
 		this.conceptualSchema.getManyValuedContext().update();
 		this.tableView.updateSize();
 		this.colHeader.updateSize();

@@ -32,7 +32,7 @@ public class NumericalTypeDialog extends JDialog {
 	private JTextField maxValueField, minValueField, numDecimalField;
 	private NumericalTypeDialog dialog = this;
 	
-	public NumericalTypeDialog(PropertiesDialog dialog,AttributeType type){
+	public NumericalTypeDialog(ManyValuedAttributeDialog dialog,AttributeType type){
 		super(dialog, "Many Valued-context:Type",true);
 		this.type = (NumericalType) type;
 		setContentPane(createView());

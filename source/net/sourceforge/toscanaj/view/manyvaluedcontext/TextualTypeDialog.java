@@ -62,7 +62,7 @@ public class TextualTypeDialog extends JDialog implements DragGestureListener ,
 	private DragSource dragSource;
 	private JButton applyButton;
 	
-	public TextualTypeDialog(PropertiesDialog dialog,AttributeType type){
+	public TextualTypeDialog(ManyValuedAttributeDialog dialog,AttributeType type){
 		super(dialog, "Many Valued-context:Type",true);
 		textualType = (TextualType) type;
 		setContentPane(createView());

@@ -28,7 +28,7 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 
-public class PropertiesDialog extends JDialog{
+public class ManyValuedAttributeDialog extends JDialog{
 	
 	private JTextField nameTextField;
 	private JButton cancelButton;
@@ -37,7 +37,7 @@ public class PropertiesDialog extends JDialog{
 	private WritableManyValuedAttribute property;
 	private Frame parent;
 	private JComboBox typeBox;
-	private PropertiesDialog dialog = this;
+	private ManyValuedAttributeDialog dialog = this;
 	private ManyValuedContext context;
 	
 	/**
@@ -45,7 +45,7 @@ public class PropertiesDialog extends JDialog{
 	 * @todo use session management
 	 * @todo either get object dialog to call show() in the constructor or remove it here
 	 */
-	public PropertiesDialog(Frame parent,
+	public ManyValuedAttributeDialog(Frame parent,
 										WritableManyValuedAttribute property, 
 										ManyValuedContext context){
 		super(parent,"Many Valued-Context:Properties",true);
