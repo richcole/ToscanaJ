@@ -17,7 +17,4 @@ public interface ScaleGenerator {
     boolean canHandleColumns(TableColumnPair[] columns);
 
     Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection);
-
-    /// @todo shouldn't that be called editScale?
-    Diagram2D generateScale(Diagram2D oldVersion);
 }

@@ -117,8 +117,4 @@ public class NominalScaleGenerator implements ScaleGenerator {
         }
         return retVal;
     }
-
-    public Diagram2D generateScale(Diagram2D oldVersion) {
-        return null;
-    }
 }

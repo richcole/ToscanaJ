@@ -49,8 +49,4 @@ public class ContextTableScaleGenerator implements ScaleGenerator {
 			return NDimLayoutOperations.createDiagram(lattice, dialog.getDiagramTitle(), new DefaultDimensionStrategy());
         }       
     }
-
-    public Diagram2D generateScale(Diagram2D oldVersion) {
-        return null;
-    }
 }

@@ -148,8 +148,4 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         retVal.addObject(queryClause);
         return retVal;
     }
-
-    public Diagram2D generateScale(Diagram2D oldVersion) {
-        return null;
-    }
 }
