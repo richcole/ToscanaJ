@@ -1,5 +1,8 @@
 package net.sourceforge.toscanaj.controller.db;
 
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
+
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.*;
 import java.sql.*;
@@ -24,7 +27,30 @@ public class DBConnection
      * If set to something else than null we will print log entries into this
      * stream.
      */
-    static private final PrintStream logger = null;
+    static private final PrintStream logger;
+
+    /**
+     * Initializes the logger from the system configuration.
+     */
+    static {
+        String log = ConfigurationManager.fetchString("DBConnection", "logger", "");
+        PrintStream result = null; // we need indirection since the compiler doesn't grok it otherwise
+        if(log.length() == 0) {
+            // keep the null
+        }
+        else if(log.equals("-")) {
+            result = System.out;
+        }
+        else {
+            try {
+                result = new PrintStream(new FileOutputStream(log));
+            }
+            catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+        logger = result;
+    }
 
     /**
      * This constructor takes the data source only.
