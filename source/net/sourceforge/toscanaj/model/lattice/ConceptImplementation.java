@@ -494,7 +494,7 @@ public class ConceptImplementation implements Concept {
         List objects = objectContingentElem.getChildren(OBJECT_ELEMENT_NAME);
         for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
             Element objElem = (Element) iterator.next();
-            this.objectContingent.add(objElem.getText());
+            this.objectContingent.add(new FCAObjectImplementation(objElem.getText()));
         }
         Element attributeContingentElem = XMLHelper.mustbe(ATTRIBUTE_CONTINGENT_ELEMENT_NAME, elem);
         List attributes = attributeContingentElem.getChildren(ATTRIBUTE_ELEMENT_NAME);

@@ -20,10 +20,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
@@ -38,6 +37,7 @@ import net.sourceforge.toscanaj.model.context.Attribute;
 
 public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	private ContextTableEditorDialog dialog;
+	private Attribute[] attributes;
 
 	public ContextTableColumnHeader(ContextTableEditorDialog dialog) {
 		super();
@@ -63,19 +63,17 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	}
 
 	public Dimension calculateNewSize() {
-		int numCol = this.dialog.getContext().getAttributes().size()+1;
-		int numRow = this.dialog.getContext().getObjects().size()+1;
-		return new Dimension(numCol * ContextTableView.CELL_WIDTH + 1, numRow * ContextTableView.CELL_HEIGHT + 1);
+		Set attributesSet = this.dialog.getContext().getAttributes();
+		this.attributes = (Attribute[]) attributesSet.toArray(new Attribute[attributesSet.size()]);
+		int numCol = this.attributes.length + 1;
+		return new Dimension(numCol * ContextTableView.CELL_WIDTH + 1, ContextTableView.CELL_HEIGHT + 1);
 	}
 
 	protected void drawColumnHeader(Graphics2D g2d) {
 		g2d.setPaint(ContextTableView.TABLE_HEADER_COLOR);
-		Iterator attrIt = this.dialog.getContext().getAttributes().iterator();
-		int col = 0;
-		while (attrIt.hasNext()) {
-			Object attribute = attrIt.next();
-			drawCell(g2d, attribute.toString(), col * ContextTableView.CELL_WIDTH, 0);
-			col += 1;
+		for (int i = 0; i < this.attributes.length; i++) {
+			Attribute attribute = this.attributes[i];
+			drawCell(g2d, attribute.toString(), i * ContextTableView.CELL_WIDTH, 0);			
 		}
 	}
 
@@ -110,38 +108,20 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 		return newContent;
 	}
 
-	public int getCellHeight() {
-		return ContextTableView.CELL_HEIGHT;
-	}
-
-	public int getCellWidth() {
-		return ContextTableView.CELL_WIDTH;
-	}
-
 	public String getToolTipText(MouseEvent e) {
 		String tooltipText = null;
 
-		ArrayList attributeArrayList = (ArrayList) dialog.getContext().getAttributes();
-		ContextTableView.Position pos = getTablePosition(e.getX(), e.getY());
+		ContextTableView.Position pos = this.dialog.getTablePosition(e.getX(), e.getY());
 
 		if (pos != null) {
-			if (pos.getCol() != attributeArrayList.size()) {
-				Attribute attr = (Attribute) attributeArrayList.get(pos.getCol());
-				tooltipText = (String) attr.getData();
+			if (pos.getCol() != this.attributes.length) {
+				Attribute attr =  this.attributes[pos.getCol()];
+				tooltipText = attr.toString();
 			}
 		}
 		return tooltipText;
 	}
 
-	protected ContextTableView.Position getTablePosition(int xLoc, int yLoc) {
-		int col = xLoc / getCellWidth();
-		int row = yLoc / getCellHeight();
-		if ((col > this.dialog.getContext().getAttributes().size() )
-			|| (row > this.dialog.getContext().getObjects().size() )) {
-			return null;
-		}
-		return new ContextTableView.Position(row, col);
-	}
 	
     public Dimension getPreferredScrollableViewportSize() {
     	return ContextTableView.TABLE_HEADER_PREFERRED_VIEWPORT_SIZE;
@@ -188,14 +168,14 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	}
 	
 	private void removeAttribute(int pos) {
-		List attributes = (List) this.dialog.getContext().getAttributes();
-		attributes.remove(pos);
-		repaint();
+		Attribute attrToRemove = this.attributes[pos];
+		this.dialog.getContext().getAttributes().remove(attrToRemove);
+		this.dialog.updateView();
 	}
 	
 	protected boolean addAttribute(String newAttributeName) {
-		if (!collectionContainsString(newAttributeName, dialog.getContext().getAttributes())) {
-			dialog.getContext().getAttributes().add(new Attribute(newAttributeName));
+		if (!this.dialog.collectionContainsString(newAttributeName, this.attributes)) {
+			this.dialog.getContext().getAttributes().add(new Attribute(newAttributeName));
 			return true;
 		} else {
 			return false;
@@ -207,7 +187,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 			public void mousePressed(MouseEvent e) {
 				if (e.isPopupTrigger()) {
 					final ContextTableView.Position pos =
-						getTablePosition(e.getX(), e.getY());
+						dialog.getTablePosition(e.getX(), e.getY());
 					if (pos == null) {
 						return;
 					} else {
@@ -240,7 +220,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 			public void mouseReleased(MouseEvent e) {
 				if (e.isPopupTrigger()) {
 					final ContextTableView.Position pos =
-						getTablePosition(e.getX(), e.getY());
+						dialog.getTablePosition(e.getX(), e.getY());
 					if (pos == null) {
 						return;
 					} else {
@@ -251,7 +231,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 
 			public void mouseClicked(MouseEvent e) {
 				final ContextTableView.Position pos =
-					getTablePosition(e.getX(), e.getY());
+					dialog.getTablePosition(e.getX(), e.getY());
 				if (pos == null) {
 					return;
 				}
@@ -268,16 +248,14 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	}
 	
 	private void renameAttribute(int num) {
-		List attributeList = (List) this.dialog.getContext().getAttributes();
 		String inputValue = "";
 		do {
-			Attribute attr = (Attribute) attributeList.get(num);
+			Attribute attr = this.attributes[num];
 			InputTextDialog dialog = new InputTextDialog(this.dialog, "Rename Attribute", "attribute", attr.toString());
 			if (!dialog.isCancelled()) {
 				inputValue = dialog.getInput();
-				if (!collectionContainsString(inputValue, attributeList)) {
-					Attribute attribute = (Attribute) attributeList.get(num);
-					attribute.setData(inputValue);
+				if (!this.dialog.collectionContainsString(inputValue, this.attributes)) {
+					this.attributes[num].setData(inputValue);
 					repaint();
 					inputValue = "";
 				} else {
@@ -293,7 +271,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 			else {
 				break;
 			}
-		} while (collectionContainsString(inputValue, attributeList));
+		} while (this.dialog.collectionContainsString(inputValue, this.attributes));
 		repaint();
 	}
 

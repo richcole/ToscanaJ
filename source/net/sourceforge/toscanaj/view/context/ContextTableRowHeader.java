@@ -20,10 +20,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
@@ -34,11 +31,12 @@ import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
 import net.sourceforge.toscanaj.gui.dialog.*;
-import net.sourceforge.toscanaj.model.context.Attribute;
-import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
+import net.sourceforge.toscanaj.model.context.FCAObject;
+import net.sourceforge.toscanaj.model.context.WritableFCAObject;
 
 public class ContextTableRowHeader extends JComponent implements Scrollable {
 	private ContextTableEditorDialog dialog;
+	private WritableFCAObject[] objects;
 	
 	public ContextTableRowHeader (ContextTableEditorDialog dialog) {
 		super();
@@ -57,12 +55,9 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 		Font oldFont = g2d.getFont();
 
 		g2d.setFont(oldFont.deriveFont(Font.BOLD));
-		Iterator objIt = this.dialog.getContext().getObjects().iterator();
-		int row = 0;
-		while (objIt.hasNext()) {
-			Object object = objIt.next();
-			drawRow(g2d, object, row);
-			row += 1;
+		for (int i = 0; i < this.objects.length; i++) {
+			FCAObject object = this.objects[i];
+			drawRow(g2d, object, i);
 		}
 
 		g2d.setPaint(oldPaint);
@@ -70,9 +65,10 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 	}
 
 	public Dimension calculateNewSize() {
-		int numCol = this.dialog.getContext().getAttributes().size()+1;
-		int numRow = this.dialog.getContext().getObjects().size()+1;
-		return new Dimension(numCol * ContextTableView.CELL_WIDTH + 1, numRow * ContextTableView.CELL_HEIGHT + 1);
+		Set objectsSet = this.dialog.getContext().getObjects();
+		this.objects = (WritableFCAObject[]) objectsSet.toArray(new WritableFCAObject[objectsSet.size()]);
+		int numRow = this.objects.length + 1;
+		return new Dimension(ContextTableView.CELL_WIDTH + 1, numRow * ContextTableView.CELL_HEIGHT + 1);
 	}
 
 	protected void drawRow(Graphics2D g2d, Object object, int row) {
@@ -114,37 +110,20 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 		return newContent;
 	}
 
-	public int getCellHeight() {
-		return ContextTableView.CELL_HEIGHT;
-	}
-
-	public int getCellWidth() {
-		return ContextTableView.CELL_WIDTH;
-	}
 		
 	public String getToolTipText(MouseEvent e) {
 		String tooltipText = null;
 		
-		ArrayList objectsArrayList = (ArrayList) this.dialog.getContext().getObjects();
-		ContextTableView.Position pos = getTablePosition(e.getX(), e.getY());
+		ContextTableView.Position pos = dialog.getTablePosition(e.getX(), e.getY());
 
 		if (pos != null) {
-			if (pos.getCol() == 0 && pos.getRow() != objectsArrayList.size()) {
-				tooltipText = (String) objectsArrayList.get(pos.getRow());
+			if (pos.getCol() == 0 && pos.getRow() != this.objects.length) {
+				tooltipText = this.objects[pos.getRow()].toString();
 			}
 		}
 		return tooltipText;
 	}
 
-	protected ContextTableView.Position getTablePosition(int xLoc, int yLoc) {
-		int col = xLoc / getCellWidth();
-		int row = yLoc / getCellHeight();
-		if ((col > this.dialog.getContext().getAttributes().size() )
-			|| (row > this.dialog.getContext().getObjects().size() )) {
-			return null;
-		}
-		return new ContextTableView.Position(row, col);
-	}
 	
     public Dimension getPreferredScrollableViewportSize() {
     	return ContextTableView.TABLE_HEADER_PREFERRED_VIEWPORT_SIZE;
@@ -182,7 +161,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 			public void mousePressed(MouseEvent e) {
 				if (e.isPopupTrigger()) {
 					final ContextTableView.Position pos =
-						getTablePosition(e.getX(), e.getY());
+						dialog.getTablePosition(e.getX(), e.getY());
 					if (pos == null) {
 						return;
 					} else {
@@ -215,7 +194,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 			public void mouseReleased(MouseEvent e) {
 				if (e.isPopupTrigger()) {
 					final ContextTableView.Position pos =
-						getTablePosition(e.getX(), e.getY());
+						dialog.getTablePosition(e.getX(), e.getY());
 					if (pos == null) {
 						return;
 					} else {
@@ -226,7 +205,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 
 			public void mouseClicked(MouseEvent e) {
 				final ContextTableView.Position pos =
-					getTablePosition(e.getX(), e.getY());
+					dialog.getTablePosition(e.getX(), e.getY());
 				if (pos == null) {
 					return;
 				}
@@ -246,14 +225,14 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 	}
 
 	private void removeObject(int pos) {
-		List objects = (List) this.dialog.getContext().getObjects();
-		objects.remove(pos);
-		repaint();
+		Object objToRemove = this.objects[pos];
+		this.dialog.getContext().getObjects().remove(objToRemove);
+		this.dialog.updateView();
 	}
 	
 	protected boolean addObject(String newObjectName){
-		if (!collectionContainsString(newObjectName, dialog.getContext().getObjects())) {
-			dialog.getContext().getObjects().add(newObjectName);
+		if (!collectionContainsString(newObjectName, this.objects)) {
+			this.dialog.getContext().getObjects().add(newObjectName);
 			return true;
 		} else {
 			return false;
@@ -261,25 +240,14 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 	}
 	
 	private void renameObject(int num) {
-		List objectList = (List) this.dialog.getContext().getObjects();
 		String inputValue = "";
 		do {
-			String oldName = (String) objectList.get(num);
+			String oldName = this.objects[num].toString();
 			InputTextDialog dialog = new InputTextDialog(this.dialog, "Rename Object", "object", oldName);
 			if (!dialog.isCancelled()) {
 				inputValue = dialog.getInput();
-				if (!collectionContainsString(inputValue, objectList)) {
-					objectList.set(num, inputValue);
-					BinaryRelationImplementation relation =
-						(BinaryRelationImplementation) this.dialog.getContext().getRelation();
-					Iterator attrIt = this.dialog.getContext().getAttributes().iterator();
-					while (attrIt.hasNext()) {
-						Attribute attribute = (Attribute) attrIt.next();
-						if (relation.contains(oldName, attribute)) {
-							relation.remove(oldName, attribute);
-							relation.insert(inputValue, attribute);
-						}
-					}
+				if (!collectionContainsString(inputValue, this.objects)) {
+					this.objects[num].setData(inputValue);
 					repaint();
 					inputValue = "";
 				} else {
@@ -296,16 +264,15 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 				break;
 			}	
 		}
-		while (collectionContainsString(inputValue, objectList));
+		while (collectionContainsString(inputValue, this.objects));
 		repaint();
 	}
 	
 	protected boolean collectionContainsString(
 		String value,
-		Collection collection) {
-		Iterator it = collection.iterator();
-		while (it.hasNext()) {
-			Object obj = (Object) it.next();
+		Object[] objects) {
+		for (int i = 0; i < objects.length; i++) {
+			Object obj = objects[i];
 			if (obj.toString().equalsIgnoreCase(value.trim())) {
 				return true;
 			}

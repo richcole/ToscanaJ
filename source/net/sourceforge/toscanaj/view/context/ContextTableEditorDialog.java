@@ -214,7 +214,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 				doneButton.setEnabled(newNameField.getText().trim().equals(""));
 				boolean createPossible =
 					!rowHeader.collectionContainsString(newNameField.getText(),
-						context.getObjects());
+						context.getObjects().toArray());
 				createObjButton.setEnabled(createPossible);
 				if (createPossible) {
 					createObjButton.setToolTipText("Create a new object");
@@ -227,7 +227,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		newNameField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (rowHeader.collectionContainsString(newNameField.getText(),
-					context.getObjects())) {
+					context.getObjects().toArray())) {
 					return;
 				}
 				addObject(doneButton, newNameField);
@@ -346,7 +346,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		doneButton.setEnabled(true);
 	}
 
-	private void updateView() {
+	void updateView() {
 		this.tableView.updateSize();
 		this.tableView.revalidate();
 		this.tableView.repaint();
@@ -715,4 +715,22 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 	protected JScrollPane getScrollPane() {
 		return scrollpane;
 	}
+	
+	boolean collectionContainsString(
+		String value,
+		Object[] objects) {
+		for (int i = 0; i < objects.length; i++) {
+			Object obj = objects[i];
+			if (obj.toString().equalsIgnoreCase(value.trim())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	protected ContextTableView.Position getTablePosition(int xLoc, int yLoc) {
+		return this.tableView.getTablePosition(xLoc, yLoc);
+	}
+	
+	
 }

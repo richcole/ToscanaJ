@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
@@ -231,7 +232,7 @@ public class CSXParser {
             Element object = (Element) it.next();
             if (object.getText().length() != 0) {
                 _Objects.put(object.getAttribute("id").getValue(),
-                        object.getText());
+                        new FCAObjectImplementation(object.getText()));
             }
         }
 
