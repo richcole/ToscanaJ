@@ -158,7 +158,6 @@ public class AddCriterionDialog extends JDialog{
 													name.getText(),"",fromValue,minIncluded.isSelected(),
 													toValue,maxIncluded.isSelected());
 					view.addCriterion(new Criterion(attr,valueGroup));
-					parent.validate();
 					dispose();
 				}
 			});
@@ -298,7 +297,6 @@ public class AddCriterionDialog extends JDialog{
 					}
 					Criterion c = new Criterion(attr,selectedValues);
 					view.addCriterion(c);
-					parent.validate();
 					dispose();
 				}
 			});

@@ -57,7 +57,7 @@ public class DiagramLine implements XMLizable {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
-        XMLHelper.checkName(DIAGRAM_LINE_ELEMENT_NAME, elem);
+        XMLHelper.checkName(elem, DIAGRAM_LINE_ELEMENT_NAME);
         String fromId = XMLHelper.getAttribute(elem, FROM_NODE_ATTRIBUTE_NAME).getValue();
         String toId = XMLHelper.getAttribute(elem, TO_NODE_ATTRIBUTE_NAME).getValue();
         fromNode = diagram.getNode(fromId);

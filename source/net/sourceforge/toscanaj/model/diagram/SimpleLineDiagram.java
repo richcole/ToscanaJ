@@ -192,7 +192,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
             retVal.addContent(line.toXML());
         }
         if(!this.extraCanvasItems.isEmpty()) {
-            Element extraItemElem = new Element("extraCanvasItems");
+            Element extraItemElem = new Element(EXTRA_CANVAS_ITEMS_ELEMENT_NAME);
             for (Iterator iter = this.extraCanvasItems.iterator(); iter.hasNext();) {
                 CanvasItem item = (CanvasItem) iter.next();
                 if(item instanceof XMLizable) {
@@ -207,7 +207,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 
     public void readXML(Element elem) throws XMLSyntaxError {
         coordinateSystemChecked = true; // don't check while we still build the diagram
-        XMLHelper.checkName(DIAGRAM_ELEMENT_NAME, elem);
+        XMLHelper.checkName(elem, DIAGRAM_ELEMENT_NAME);
         title = XMLHelper.getAttribute(elem, TITLE_ATTRIBUTE_NAME).getValue();
         description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
         List nodeElems = elem.getChildren(DiagramNode.NODE_ELEMENT_NAME);
@@ -246,7 +246,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         }
         coordinateSystemChecked = false;
         
-        Element extraItemElem = elem.getChild("extraCanvasItems");
+        Element extraItemElem = elem.getChild(EXTRA_CANVAS_ITEMS_ELEMENT_NAME);
         if(extraItemElem != null) {
             List children = extraItemElem.getChildren();
             for (Iterator iter = children.iterator(); iter.hasNext(); ) {

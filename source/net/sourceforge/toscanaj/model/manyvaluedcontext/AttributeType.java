@@ -7,9 +7,12 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
+import org.jdom.Element;
+
 public interface AttributeType {
-    String getName();
+	String getName();
     Scale[] getScales();
     AttributeValue[] getValueRange();
     boolean isValidValue(AttributeValue valueToTest);
+    AttributeValue toValue(Element element);
 }

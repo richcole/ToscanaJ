@@ -497,7 +497,7 @@ public class ConceptImplementation implements Concept {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
-        XMLHelper.checkName(CONCEPT_ELEMENT_NAME, elem);
+        XMLHelper.checkName(elem, CONCEPT_ELEMENT_NAME);
         Element objectContingentElem = XMLHelper.mustbe(OBJECT_CONTINGENT_ELEMENT_NAME, elem);
         List objects = objectContingentElem.getChildren(OBJECT_ELEMENT_NAME);
         for (Iterator iterator = objects.iterator(); iterator.hasNext();) {

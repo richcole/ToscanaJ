@@ -69,7 +69,7 @@ public class Table implements XMLizable {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
-        XMLHelper.checkName(TABLE_ELEMENT_NAME, elem);
+        XMLHelper.checkName(elem, TABLE_ELEMENT_NAME);
         this.name = elem.getAttributeValue(TABLE_NAME_ATTRIBUTE_NAME);
         if(this.name == null) {
         	this.name = elem.getText();

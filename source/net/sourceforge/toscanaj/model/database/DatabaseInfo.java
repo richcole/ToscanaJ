@@ -157,7 +157,7 @@ public class DatabaseInfo implements XMLizable {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
-        XMLHelper.checkName(DATABASE_CONNECTION_ELEMENT_NAME, elem);
+        XMLHelper.checkName(elem, DATABASE_CONNECTION_ELEMENT_NAME);
         if (XMLHelper.contains(elem, EMBEDDED_SOURCE_ELEMENT_NAME)) {
             Element embedElem = elem.getChild(EMBEDDED_SOURCE_ELEMENT_NAME);
             setEmbeddedSQLLocation(

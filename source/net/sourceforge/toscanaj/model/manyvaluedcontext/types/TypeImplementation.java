@@ -7,11 +7,22 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext.types;
 
+import org.jdom.Element;
+
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Scale;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableAttributeType;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
-public abstract class TypeImplementation implements WritableAttributeType {
+public abstract class TypeImplementation implements WritableAttributeType, XMLizable {
+	
+	private static final String TYPE_ELEMENT_NAME = "type";
+	private static final String CLASS_ATTRIBUTE_NAME = "class";
+	private static final String RANGE_ELEMENT_NAME = "range";
+	private static final String NAME_ATTRIBUTE_NAME = "name";
+	
     protected String name;
     protected Scale scale;
 
@@ -39,4 +50,25 @@ public abstract class TypeImplementation implements WritableAttributeType {
     public void setName(String name){
     	this.name = name;
     }
+    
+    protected abstract void fillRangeElement(Element rangeElement);
+    protected abstract void readRangeElement(Element rangeElement) throws XMLSyntaxError;
+    
+    /* (non-Javadoc)
+	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#toXML()
+	 */
+	public Element toXML() {
+		Element retVal = new Element(TYPE_ELEMENT_NAME);
+		retVal.setAttribute(CLASS_ATTRIBUTE_NAME, this.getClass().getName());
+		retVal.setAttribute(NAME_ATTRIBUTE_NAME, this.getName());
+		Element rangeElement = new Element(RANGE_ELEMENT_NAME);
+		retVal.addContent(rangeElement);
+		return null;
+	}
+	
+	public void readXML(Element element) throws XMLSyntaxError {
+		this.name = XMLHelper.getAttribute(element, NAME_ATTRIBUTE_NAME).getValue();
+		Element rangeElement = element.getChild(RANGE_ELEMENT_NAME);
+		readRangeElement(rangeElement);
+	}
 }

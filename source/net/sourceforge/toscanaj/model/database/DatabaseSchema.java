@@ -52,7 +52,7 @@ public class DatabaseSchema implements XMLizable, EventBrokerListener {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
-        XMLHelper.checkName(DATABASE_SCHEMA_ELEMENT_NAME, elem);
+        XMLHelper.checkName(elem, DATABASE_SCHEMA_ELEMENT_NAME);
         List tableElems = elem.getChildren(Table.TABLE_ELEMENT_NAME);
         for (Iterator iterator = tableElems.iterator(); iterator.hasNext();) {
             Element element = (Element) iterator.next();

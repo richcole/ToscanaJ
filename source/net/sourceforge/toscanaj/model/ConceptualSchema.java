@@ -117,6 +117,10 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
             XMLizable xmlConceptInterpreter = (XMLizable) this.conceptInterpreter;
             retVal.addContent(xmlConceptInterpreter.toXML());
         }
+        if (this.manyValuedContext instanceof XMLizable) {
+        	XMLizable xmlManyValuedContext = (XMLizable) this.manyValuedContext;
+        	retVal.addContent(xmlManyValuedContext.toXML());
+        }
         if (databaseInfo != null) {
             retVal.addContent(databaseInfo.toXML());
         }
@@ -152,7 +156,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
-        XMLHelper.checkName(CONCEPTUAL_SCHEMA_ELEMENT_NAME, elem);
+        XMLHelper.checkName(elem, CONCEPTUAL_SCHEMA_ELEMENT_NAME);
         Element descriptionChild = elem.getChild(DESCRIPTION_ELEMENT_NAME);
         if (descriptionChild != null) {
             description = (Element) descriptionChild.clone();

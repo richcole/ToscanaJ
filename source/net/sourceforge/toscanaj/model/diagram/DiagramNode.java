@@ -123,7 +123,7 @@ public class DiagramNode implements XMLizable {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
-        XMLHelper.checkName(NODE_ELEMENT_NAME, elem);
+        XMLHelper.checkName(elem, NODE_ELEMENT_NAME);
         identifier = XMLHelper.getAttribute(elem, ID_ATTRIBUTE_NAME).getValue();
         Element positionElem = XMLHelper.mustbe(POSITION_ELEMENT_NAME, elem);
         position = new Point2D.Double(

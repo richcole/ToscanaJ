@@ -46,7 +46,7 @@ public abstract class XMLHelper {
         return (null != parent.getChild(name));
     }
 
-    static public void checkName(String name, Element element) throws XMLSyntaxError {
+    static public void checkName(Element element, String name) throws XMLSyntaxError {
         if (!element.getName().equals(name)) {
             throw new XMLSyntaxError("Expected Element: " + name);
         }
