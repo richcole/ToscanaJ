@@ -115,7 +115,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 new Rectangle(100, 100, 500, 400));
 
 		if(ConfigurationManager.fetchInt("SienaTemporalControls", "enabled", 0) == 1) {
-		    temporalControls = new TemporalMainDialog(this, this.diagramEditingView.getDiagramView(), eventBroker);
+		    temporalControls = new TemporalMainDialog(this, this.diagramEditingView.getDiagramView(), 
+		    										  diagramExportSettings, eventBroker);
 		    ConfigurationManager.restorePlacement("SienaTemporalControls", temporalControls, 
 		    		new Rectangle(350,350,420,350));
 		    temporalControls.show();
@@ -248,7 +249,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
         DiagramExportSettingsDialog.initialize(this, this.diagramExportSettings);
         boolean changesDone = DiagramExportSettingsDialog.showDialog(this);
-        if (changesDone) {
+        if (changesDone && this.diagramEditingView.getDiagramView().getDiagram() != null) {
             this.exportDiagramAction.exportImage();
         }
     }

@@ -1010,7 +1010,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         }
         DiagramExportSettingsDialog.initialize(this, this.diagramExportSettings);
         boolean changesDone = DiagramExportSettingsDialog.showDialog(this);
-        if (changesDone) {
+        if (changesDone && this.diagramView.getDiagram() != null) {
             this.exportDiagramAction.exportImage();
         }
     }

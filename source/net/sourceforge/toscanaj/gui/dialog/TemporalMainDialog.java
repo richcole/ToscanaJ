@@ -93,7 +93,8 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private JLabel stepPositionLabel;
     private JButton startSteppingButton;
 	
-    public TemporalMainDialog(Frame frame, DiagramView diagramView, EventBroker eventBroker) {
+    public TemporalMainDialog(Frame frame, DiagramView diagramView, 
+    						   DiagramExportSettings diagramExportSettings, EventBroker eventBroker) {
 	  	super(frame, "Temporal Controls", false);
 	  	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 	  	
@@ -104,19 +105,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, DiagramView.class);
         diagramView.getController().getEventBroker().subscribe(this, CanvasDrawnEvent.class, Object.class);
 
-		/// @todo all this diagram export settings stuff should be in the main program        
-        try {
-            org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
-        } catch (Throwable t) {
-            // do nothing, we just don't support SVG
-        }
-        org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
-
-        Iterator it = GraphicFormatRegistry.getIterator();
-        if (it.hasNext()) {
-            this.diagramExportSettings = new DiagramExportSettings(null, 0, 0, true);
-        }
-        
+        this.diagramExportSettings = diagramExportSettings;
         this.timeController = new AnimationTimeController(0,0,0,0,0);
 	  	
 	  	buildGUI();
