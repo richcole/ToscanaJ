@@ -36,7 +36,8 @@ public class TransitionArrow extends CanvasItem {
     	this.baseColor = color;
     	this.timePos = timePos;
     	this.timeController = timeController;
-    	
+
+		updateShiftVector();    	
     	calculateBounds();
     }
 
