@@ -58,6 +58,9 @@ public class DiagramToContextConverter {
 	}
 
     private static void insertIntoList(List list, Object object) {
+        if(list.contains(object)) {
+            return;
+        }
         int insertionPos = list.size();
         if(object instanceof Comparable) {
             // insert in order if possible
