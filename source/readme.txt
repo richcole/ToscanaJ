@@ -1,5 +1,5 @@
-ToscanaJ 1.3 Readme File
-========================
+ToscanaJ Readme File
+====================
 
 What is it?
 -----------
