@@ -91,8 +91,8 @@ public class EventBroker implements EventListener {
      */
     public void subscribe(EventListener listener, Class eventType, Class subjectType) {
         try {
-            Class eventClass = Class.forName(PACKAGE_NAME + ".Event");
-            if (!implementsInterface(eventType, eventClass)) {
+            Class eventInterface = Class.forName(PACKAGE_NAME + ".Event");
+            if (!eventInterface.isAssignableFrom(eventType)) {
                 throw new RuntimeException("Subscription to class not implementing Event impossible");
             }
         } catch (ClassNotFoundException e) {
@@ -164,104 +164,10 @@ public class EventBroker implements EventListener {
     private void processExternalEvent(Event event) {
         for (Iterator iterator = subscriptions.iterator(); iterator.hasNext();) {
             EventSubscription subscription = (EventSubscription) iterator.next();
-            if (extendsOrImplements(event.getClass(), subscription.getEventType()) &&
-                    extendsOrImplements(event.getSubject().getClass(), subscription.getSubjectType())) {
+            if (subscription.getEventType().isAssignableFrom(event.getClass()) &&
+                    subscription.getSubjectType().isAssignableFrom(event.getSubject().getClass())) {
                 subscription.getListener().processEvent(event);
             }
         }
-    }
-
-    /**
-     * Checks if a class or interface does derive from another.
-     *
-     * Returns true in three situations:
-     * * the first parameter is a class extending the class given as second
-     *   parameter (directly or indirectly)
-     * * the first paramater is a class implementing the interface given by
-     *   the second parameter (directly or indirectly)
-     * * the first parameter is an interface which extends the interface
-     *   given by the second parameter (directly or indirectly)
-     *
-     * In all other cases the return value is false.
-     */
-    private boolean extendsOrImplements(Class subClass, Class superClass) {
-        return implementsInterface(subClass, superClass) || extendsClass(subClass, superClass);
-    }
-
-    /**
-     * Returns true if the second parameter is an interface implemented by
-     * the former.
-     *
-     * This is true in any of these cases:
-     * * the first paramater is a class implementing the interface given by
-     *   the second parameter (directly or indirectly)
-     * * the first parameter is an interface which extends the interface
-     *   given by the second parameter (directly or indirectly)
-     */
-    private boolean implementsInterface(Class classType, Class interfaceType) {
-        Class curClass = classType;
-        while (curClass != null) {
-            if (implementsInterfaceDirectly(curClass, interfaceType)) {
-                return true;
-            }
-            curClass = curClass.getSuperclass();
-        }
-        return false;
-    }
-
-    /**
-     * Returns true if an interface is implemented directly.
-     *
-     * This means either the first parameter is a class which is declared to have
-     * the second parameter itself as interface (and not a subtype) or if the
-     * first parameter is an interface deriving directly from the latter.
-     */
-    private boolean implementsInterfaceDirectly(Class classType, Class interfaceType) {
-        Class[] interfaces = classType.getInterfaces();
-        for (int i = 0; i < interfaces.length; i++) {
-            Class curInterface = interfaces[i];
-            if (extendsInterface(curInterface, interfaceType)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns true iff the first parameter is an interface extending the second.
-     *
-     * This is treated as transitive (i.e. subinterfaces of subinterfaces are accepted)
-     * and reflexive (an interface is considered to extend itself).
-     */
-    private boolean extendsInterface(Class subInterface, Class superInterface) {
-        if (subInterface.equals(superInterface)) {
-            return true;
-        }
-        // this gets the super interfaces if we have an interface
-        Class[] interfaces = subInterface.getInterfaces();
-        for (int i = 0; i < interfaces.length; i++) {
-            Class curInterface = interfaces[i];
-            if (extendsInterface(curInterface, superInterface)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns true iff the first parameter is a class extending the second.
-     *
-     * This is treated as transitive (i.e. subclasses of subclasses are accepted)
-     * and reflexive (a class is considered to extend itself).
-     */
-    private boolean extendsClass(Class subClass, Class superClass) {
-        Class curClass = subClass;
-        while (curClass != null) {
-            if (curClass.equals(superClass)) {
-                return true;
-            }
-            curClass = curClass.getSuperclass();
-        }
-        return false;
     }
 }
