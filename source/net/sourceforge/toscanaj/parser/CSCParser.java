@@ -456,7 +456,6 @@ public class CSCParser {
                /// @todo tupels should be send as a couple of tokens
                while(!tokenizer.getCurrentToken().equals(";")) {
                    String tupel = tokenizer.getCurrentToken();
-                   System.out.println(tupel);
                    tokenizer.advance();
                    tupel = tupel.substring(1,tupel.length()-1);
                    int commaPos = tupel.indexOf(',');
