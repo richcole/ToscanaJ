@@ -61,18 +61,23 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
 
     public void openPopupMenu(final ObjectLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
         Object object = labelView.getObjectAtPosition(canvasPosition);
-        if (! (object instanceof DatabaseRetrievedObject) ) {
-            return;
-        }
-        final DatabaseRetrievedObject dbObject =
-                (DatabaseRetrievedObject) object;
+        
         int numberOfQueries = 0;
         if (this.queries != null) {
             numberOfQueries = this.queries.size();
         }
-        List objectViewNames = DatabaseViewerManager.getObjectViewNames(dbObject);
-        List objectListViewNames = DatabaseViewerManager.getObjectListViewNames(dbObject);
-        if (numberOfQueries + objectViewNames.size() + objectListViewNames.size() == 0) { // nothing to display
+        
+        int numberOfViews = 0;
+		List objectViewNames = null;
+		List objectListViewNames = null;
+		if (object instanceof DatabaseRetrievedObject) {
+			final DatabaseRetrievedObject dbObject =
+					(DatabaseRetrievedObject) object;
+			objectViewNames = DatabaseViewerManager.getObjectViewNames(dbObject);
+			objectListViewNames = DatabaseViewerManager.getObjectListViewNames(dbObject);
+		}
+		
+        if (numberOfQueries + numberOfViews == 0) { // nothing to display
             return;
         }
         // create the menu
@@ -80,12 +85,16 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
         if (numberOfQueries != 0) {
             addQueryOptions(queries, labelView, popupMenu);
         }
-        if (objectViewNames.size() != 0) {
-            addObjectViewOptions(objectViewNames, dbObject, popupMenu);
-        }
-        if (objectListViewNames.size() != 0) {
-            addObjectListViewOptions(objectListViewNames, dbObject, popupMenu);
-        }
+		if (object instanceof DatabaseRetrievedObject) {
+			final DatabaseRetrievedObject dbObject =
+					(DatabaseRetrievedObject) object;
+	        if (objectViewNames.size() != 0) {
+	            addObjectViewOptions(objectViewNames, dbObject, popupMenu);
+	        }
+	        if (objectListViewNames.size() != 0) {
+	            addObjectListViewOptions(objectListViewNames, dbObject, popupMenu);
+	        }
+		}
         popupMenu.show(this.diagramView, (int) screenPosition.getX(), (int) screenPosition.getY());
     }
 
