@@ -246,7 +246,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                 // nothing to query
                 retVal.setObjectClause(null);
             } else {
-                retVal.filterClauses.add(otherDB.getExtendClause());
+                retVal.filterClauses.add(otherDB.getExtentClause());
                 retVal.filterClauses.addAll(otherDB.filterClauses);
             }
         }
@@ -279,12 +279,12 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     public Concept getCollapsedConcept() {
         DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo);
         retVal.attributeContingent.addAll(this.attributeContingent);
-        retVal.setObjectClause(getExtendClause());
+        retVal.setObjectClause(getExtentClause());
         retVal.filterClauses.addAll(this.filterClauses);
         return retVal;
     }
 
-    public String getExtendClause() {
+    public String getExtentClause() {
         String clause = "(";
         boolean first = true;
         Iterator iter = this.ideal.iterator();

@@ -704,11 +704,14 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 
         // diagram view
         if (actionSource == this.filterExactMenuItem) {
-            DiagramController.getController().setFilterMethod(DiagramController.FILTER_CONTINGENT);
+            diagramView.getConceptInterpretationContext().setFilterMode(ConceptInterpretationContext.CONTINGENT);
+            updateLabelViews();
             return;
         }
         if (actionSource == this.filterAllMenuItem) {
-            DiagramController.getController().setFilterMethod(DiagramController.FILTER_EXTENT);
+
+            diagramView.getConceptInterpretationContext().setFilterMode(ConceptInterpretationContext.EXTENT);
+            updateLabelViews();
             return;
         }
         // nesting

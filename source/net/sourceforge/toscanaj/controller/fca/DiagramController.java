@@ -119,22 +119,6 @@ public class DiagramController implements ChangeObservable {
     }
 
     /**
-     * Sets if we filter on the extent or object contingent of concepts zoomed
-     * into.
-     *
-     * If this is set to FILTER_EXTENT all objects in the extent of a zoomed
-     * concept will be used in the next, if set to FILTER_CONTINGENT only the
-     * objects in the object contingent will be used.
-     *
-     * This can be changed after the zooming operation and will affect all
-     * diagrams used for zooming.
-     */
-    public void setFilterMethod(int method) {
-        this.filterMethod = method;
-        notifyObservers();
-    }
-
-    /**
      * Adds a diagram to the history.
      *
      * If no diagram is open yet it will be used as current diagram, else it

@@ -120,15 +120,19 @@ public class ObjectLabelView extends LabelView {
             DiagramNode node = this.labelInfo.getNode();
             DatabaseConnectedConcept concept = (DatabaseConnectedConcept) node.getConcept();
             boolean objectDisplayMode = diagramView.getConceptInterpretationContext().getObjectDisplayMode();
+            boolean filterMode = diagramView.getConceptInterpretationContext().getFilterMode();
             if (concept.getObjectClause() != null ||
                     ((objectDisplayMode==ConceptInterpretationContext.EXTENT) && !concept.isBottom())
             ) {
-                WhereClauseGenerator clauseGenerator = new WhereClauseGenerator();
-                String whereClause = clauseGenerator.createWhereClause(concept,
+                String whereClause = WhereClauseGenerator.createWhereClause(concept,
                                                                        DiagramController.getController().getDiagramHistory(),
                                                                        node.getConceptNestingList(),
-                                                                       objectDisplayMode);
+                                                                       objectDisplayMode,
+                                                                       filterMode);
                 queryResults = this.query.execute(whereClause);
+            }
+            else {
+                queryResults = null;
             }
         }
     }
