@@ -183,6 +183,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         clearCanvas();
         if (diagram == null) {
             repaint();
+			this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
             return;
         }
         addLayer("lines-0");

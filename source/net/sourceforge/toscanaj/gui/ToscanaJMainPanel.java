@@ -15,6 +15,7 @@ import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.fca.*;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
+import net.sourceforge.toscanaj.gui.dialog.DiagramContextDescriptionDialog;
 import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
@@ -105,6 +106,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
     // buttons list
     private JButton diagramDescriptionButton = null;
     private JButton schemaDescriptionButton = null;
+    private JButton diagramContextDescriptionButton = null;
 
     // menu items list
     // FILE menu
@@ -676,7 +678,16 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         toolbar.add(this.openFileAction);
         toolbar.add(this.goBackAction);
         toolbar.add(Box.createHorizontalGlue());
-        schemaDescriptionButton = new JButton(" About Schema... ");
+        diagramContextDescriptionButton = new JButton(" Diagram Context Description... ");
+		diagramContextDescriptionButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showDiagramContextDescription();
+			}
+		});
+		diagramContextDescriptionButton.setVisible(true);
+		diagramContextDescriptionButton.setEnabled(false);
+		toolbar.add(diagramContextDescriptionButton);
+		schemaDescriptionButton = new JButton(" About Schema... ");
         schemaDescriptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showSchemaDescription();
@@ -740,6 +751,13 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 this.diagramDescriptionButton.setEnabled(false);
                 this.diagramDescriptionMenuItem.setEnabled(false);
             }
+        }
+        if((this.diagramContextDescriptionButton != null)) {
+        	boolean diagramOpened = false;
+        	if( diagContr.getDiagramHistory().getNumberOfCurrentDiagrams() != 0) {
+				diagramOpened = true;
+        	}
+			this.diagramContextDescriptionButton.setEnabled(diagramOpened);
         }
     }
 
@@ -1288,6 +1306,14 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         }
     }
 
+	protected void showDiagramContextDescription() {
+		if(DiagramController.getController().getDiagramHistory().getNumberOfCurrentDiagrams() != 0){
+			DiagramContextDescriptionDialog dialog = new DiagramContextDescriptionDialog(this, 
+								this.diagramView.getController().getEventBroker());
+			dialog.showDescription();
+		}
+   }
+	   
     protected void showSchemaDescription() {
         DescriptionViewer.show(this, this.conceptualSchema.getDescription());
     }
