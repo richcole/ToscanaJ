@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.controller.diagram.SelectionChangedEvent;
-import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
@@ -18,7 +17,6 @@ import org.tockit.events.EventBrokerListener;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
-import java.awt.font.LineMetrics;
 import java.awt.font.TextLayout;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
@@ -106,14 +104,14 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     /**
      * The width reserved for the scrollbar to the right.
      */
-    protected double currentScrollBarWidth = 0;
+    protected float currentScrollBarWidth = 0;
     
     protected boolean scrollbarShown = false;
 
     /**
      * The height of a single line in the view.
      */
-    protected double lineHeight = 0;
+    protected float lineHeight = 0;
 
     protected Vector observers = new Vector();
     
@@ -127,7 +125,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     protected static final DragMode MOVING = new DragMode();
     protected static final DragMode SCROLLING = new DragMode();
     
-    private double potentialScrollBarWidth;
+    private float potentialScrollBarWidth;
 
 	public interface LabelFactory {
     	LabelView createLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label);
@@ -249,38 +247,36 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         }
 
         // draw the label itself
-        this.rect = new Rectangle2D.Double(xPos, yPos, lw, lh); /// @todo this doesn't seem to change anything: check
         graphics.setPaint(backgroundColor);
         graphics.fill(rect);
         graphics.setPaint(textColor);
         graphics.draw(rect);
 
-		try{ // debugging test for bug #686310, which unfurtunately happens rarely but must be somewhere in here
-		double textWidth;
+		float textWidth;
         int numItems = this.getNumberOfEntries();
         if (numItems > MIN_DISPLAY_LINES) {
-        	textWidth = lw - currentScrollBarWidth;
+        	textWidth = (float)lw - currentScrollBarWidth;
         } else {
-            textWidth = lw;
+            textWidth = (float)lw;
         }
         
         // draw the contents
  		for (int i = this.firstItem; i < this.firstItem + this.displayLines; i++) {
 			TextLayout cur = getTextLayoutForEntry(i, graphics.getFontRenderContext());
             int curPos = i - this.firstItem;
-			double curWidth = cur.getBounds().getWidth() + 2 * this.textmargin;
+			float curWidth = (float)cur.getBounds().getWidth() + 2 * this.textmargin;
         	float textX;
-        	float textY = (float)yPos + cur.getAscent() + cur.getLeading() + curPos * (float)cur.getBounds().getHeight();
             if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT) {
-				textX = (float) xPos;
+				textX = (float)xPos;
             } else if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER) {
-                textX = (float) (xPos + (textWidth - curWidth) / 2);
+                textX = (float)xPos + (textWidth - curWidth) / 2;
             } else if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT) {
-                textX = (float) (xPos + textWidth - curWidth);
+                textX = (float)xPos + textWidth - curWidth;
             } else {
                 throw new RuntimeException("Unknown label alignment.");
             }
-            textX += this.textmargin;
+			textX += this.textmargin;
+			float textY = (float)yPos + curPos * this.lineHeight + cur.getAscent();
             cur.draw(graphics, textX, textY);
         }
 
@@ -345,11 +341,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
                     (this.lineHeight - height) / 2,
                     width, height));
         }
-		} catch(Exception e) {
-			/// @todo remove this once the bug is fixed
-			ErrorDialog.showError(this.diagramView, e, "Here comes the weird one...");
-			e.printStackTrace();
-		}
 
         // restore old settings
         graphics.setPaint(oldPaint);
@@ -357,9 +348,58 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     }
 
     public void updateBounds(Graphics2D graphics) {
+		if (this.getNumberOfEntries() == 0) {
+			this.rect = null;
+		}
+
         FontRenderContext fontRenderContext = graphics.getFontRenderContext();
-		this.rect = getLabelBounds(fontRenderContext);
-        this.lineHeight = this.font.getLineMetrics("",fontRenderContext).getHeight();
+
+		// find some basic values used
+		TextLayout mLayout = new TextLayout("M", this.font, fontRenderContext);
+		this.potentialScrollBarWidth = (float) mLayout.getBounds().getWidth();
+		if (this.getNumberOfEntries() > MIN_DISPLAY_LINES && this.scrollbarShown) {
+			this.currentScrollBarWidth = potentialScrollBarWidth;
+		} else {
+			this.currentScrollBarWidth = 0;
+		}
+		
+		// margin is something dependend on the font, but the detailed choice is a bit
+		// arbitrary
+		this.textmargin = mLayout.getLeading() + mLayout.getDescent();
+        
+        // find the size and position
+        DiagramNode node = this.labelInfo.getNode();
+        double x = node.getX();
+        double y = node.getY();
+        this.lineHeight = 0;
+        double lw = 0;
+        
+        // find maximum width and height of string content
+        for (int i = 0; i < getNumberOfEntries(); i++) {
+            TextLayout cur = getTextLayoutForEntry(i, fontRenderContext);
+        	double w = cur.getBounds().getWidth();
+        	if (w > lw) {
+        		lw = w;
+        	}
+        	float h = cur.getLeading() + cur.getAscent() + cur.getDescent();
+        	if (h > this.lineHeight) {
+        		this.lineHeight = h;
+        	}
+        }
+        lw += 2 * textmargin;
+        
+        double lh = this.displayLines * this.lineHeight;
+        double xPos = x - lw / 2 + this.labelInfo.getOffset().getX();
+        double radius = nodeView.getRadiusY();
+        double yPos;
+        if (getPlacement() == ABOVE) {
+            y = y - radius;
+            yPos = y - lh + this.labelInfo.getOffset().getY();
+        } else {
+            y = y + radius;
+            yPos = y + this.labelInfo.getOffset().getY();
+        }
+		this.rect = new Rectangle2D.Double(xPos, yPos, lw + this.currentScrollBarWidth, lh);
     }
     
     Point2D getConnectorStartPosition() {
@@ -413,58 +453,10 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      */
     protected abstract int getPlacement();
 
-    /**
-     * Calculates the width of the label given a specific font metric.
-     *
-     * The width is calculated as the maximum string width plus two times the
-     * leading and the descent from the font metrics. When drawing the text the
-     * horizontal position should be the left edge of the label plus one times
-     * the two values (FontMetrics::getLeading() and FontMetrics::getDescent()).
-     */
-    public double getWidth(FontRenderContext frc) {
-        if (this.getNumberOfEntries() == 0) {
-            return 0;
-        }
-
-		this.potentialScrollBarWidth = this.font.getStringBounds("M",frc).getWidth();
-        if (this.getNumberOfEntries() > MIN_DISPLAY_LINES && this.scrollbarShown) {
-			this.currentScrollBarWidth = potentialScrollBarWidth;
-        } else {
-            this.currentScrollBarWidth = 0;
-        }
-
-        double result = 0;
-
-        // find maximum width of string
-        for (int i = 0; i < getNumberOfEntries(); i++) {
-            TextLayout cur = getTextLayoutForEntry(i, frc);
-            double w = cur.getBounds().getWidth();
-            if (w > result) {
-                result = w;
-            }
-        }
-
-        // add two leadings and two descents to have some spacing on the left
-        // and right side
-		LineMetrics lineMetrics = this.font.getLineMetrics("M",frc);
-        this.textmargin = lineMetrics.getLeading() + lineMetrics.getDescent();
-        result += 2 * textmargin;
-
-        return result;
-    }
-    
     private TextLayout getTextLayoutForEntry(int position, FontRenderContext frc) {
     	String content = getEntryAt(position).toString();
     	TextLayout retVal = new TextLayout(content, this.font, frc);
     	return retVal;
-    }
-
-    /**
-     * Calculates the height of the label given a specific font metric.
-     */
-    public double getHeight(FontRenderContext frc) {
-		LineMetrics lineMetrics = this.font.getLineMetrics("",frc);
-        return this.displayLines * lineMetrics.getHeight();
     }
 
     /**
@@ -590,30 +582,10 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         } 
     }
 
-    /**
-     * Calculates the rectangle around the label, without the stroke.
-     */
-    public Rectangle2D getLabelBounds(FontRenderContext frc) {
-        // find the size and position
-        DiagramNode node = this.labelInfo.getNode();
-        double x = node.getX();
-        double y = node.getY();
-        double lw = getWidth(frc);
-        double lh = getHeight(frc);
-        double xPos = x - lw / 2 + this.labelInfo.getOffset().getX();
-        double radius = nodeView.getRadiusY();
-        double yPos;
-        if (getPlacement() == ABOVE) {
-            y = y - radius;
-            yPos = y - lh + this.labelInfo.getOffset().getY();
-        } else {
-            y = y + radius;
-            yPos = y + this.labelInfo.getOffset().getY();
-        }
-        return new Rectangle2D.Double(xPos, yPos, lw + this.currentScrollBarWidth, lh);
-    }
-
     public Rectangle2D getCanvasBounds(Graphics2D graphics) {
+    	if(this.rect == null) {
+    		return null;
+    	}
     	Stroke stroke = graphics.getStroke();
         updateBounds(graphics);
     	if (stroke instanceof BasicStroke) {

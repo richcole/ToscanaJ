@@ -61,6 +61,9 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
 
     public void openPopupMenu(final ObjectLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
         Object object = labelView.getObjectAtPosition(canvasPosition);
+        if(object == null) {
+        	return;
+        }
         
         int numberOfQueries = 0;
         if (this.queries != null) {
