@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.view.diagram.cernato;
 
 import net.sourceforge.toscanaj.controller.cernato.NDimNodeMovementEventListener;
-import net.sourceforge.toscanaj.model.DiagramCollection;
+import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
@@ -21,7 +21,7 @@ import java.awt.event.ActionListener;
 public class NDimDiagramEditingView extends DiagramEditingView {
     protected NDimNodeMovementEventListener ndimMovementEventListener;
 
-    public NDimDiagramEditingView(DiagramCollection conceptualSchema, EventBroker eventBroker) {
+    public NDimDiagramEditingView(ConceptualSchema conceptualSchema, EventBroker eventBroker) {
         super(conceptualSchema, eventBroker);
     }
 

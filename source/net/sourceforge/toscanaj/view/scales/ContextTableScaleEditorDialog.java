@@ -29,7 +29,8 @@ import java.util.List;
 
 public class ContextTableScaleEditorDialog extends JDialog {
 
-	private static final int MINIMUM_WIDTH = 700;
+	private static final String CONFIGURATION_SECTION_NAME = "ContextTableEditorDialog";
+    private static final int MINIMUM_WIDTH = 700;
 	private static final int MINIMUM_HEIGHT = 500;
 	private static final int DEFAULT_X_POS = 50;
 	private static final int DEFAULT_Y_POS = 100;
@@ -48,21 +49,23 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	private JPanel buttonsPane, titlePane;
 	private JScrollPane scrollpane;
 
-	public ContextTableScaleEditorDialog(
-		Frame owner,
-		ConceptualSchema conceptualSchema,
-		DatabaseConnection databaseConnection) {
-		super(owner,true);
-		this.conceptualSchema = conceptualSchema;
-		this.databaseConnection = databaseConnection;
-		this.contextTableScaleEditorDialog = this;
-		this.context = new ContextImplementation();
-		createView();
-	}
+    public ContextTableScaleEditorDialog(Frame owner, ConceptualSchema conceptualSchema, DatabaseConnection databaseConnection) {
+    	this(owner, conceptualSchema, databaseConnection, new ContextImplementation());
+    }
+
+    public ContextTableScaleEditorDialog(Frame owner, ConceptualSchema conceptualSchema, 
+    									  DatabaseConnection databaseConnection, ContextImplementation context) {
+        super(owner,true);
+        this.conceptualSchema = conceptualSchema;
+        this.databaseConnection = databaseConnection;
+        this.contextTableScaleEditorDialog = this;
+        this.context = context;
+        createView();
+    }
 
 	private void createView() {
-		setTitle("Context Table Scale Generator");
-		ConfigurationManager.restorePlacement("ContextTableScaleEditorDialog", 
+		setTitle("Context Table");
+		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
 			this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
 		onFirstLoad = true; 
 		// to enforce the minimum size during resizing of the JDialog
@@ -130,7 +133,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 
 	private void getInput(){
 		onFirstLoad=false;
-		String title = showTextInputDialog("New Title", "title","");
+		String title = showTextInputDialog("New Title", "context","");
 		scaleTitleField.setText(title);
 		showObjectInputDialog();
 		showAttributeInputDialog();
@@ -301,6 +304,9 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		titlePane = new JPanel(new GridBagLayout());
 		JLabel titleLabel = new JLabel("Title:");
 		this.scaleTitleField = new JTextField();
+		if(this.context.getName() != null) {
+			this.scaleTitleField.setText(this.context.getName());
+		}
 		
 		scaleTitleField.addKeyListener( new KeyListener(){
 			private void validateTextField(){
@@ -459,7 +465,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	}
 	
 	private void closeDialog(boolean result) {
-		ConfigurationManager.storePlacement("ContextTableScaleEditorDialog",this);
+		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
 		this.result = result;
 		setVisible(false);
 	}

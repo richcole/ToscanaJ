@@ -10,9 +10,11 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.DiagramToContextConverter;
 import net.sourceforge.toscanaj.controller.fca.DirectConceptInterpreter;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
-import net.sourceforge.toscanaj.model.DiagramCollection;
+import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
@@ -20,6 +22,8 @@ import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.view.scales.ContextTableScaleEditorDialog;
+
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -35,7 +39,7 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 
 public class DiagramEditingView extends JPanel implements EventBrokerListener {
-    private DiagramCollection conceptualSchema;
+    private ConceptualSchema conceptualSchema;
     private DefaultListModel diagramListModel;
     private JSplitPane splitPane;
     protected DiagramView diagramView;
@@ -43,11 +47,12 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     protected SetMovementEventListener idealMovementEventListener = new IdealMovementEventListener();
     protected FilterMovementEventListener filterMovementEventListener = new FilterMovementEventListener();
     private static final double ZOOM_FACTOR = 1.1;
+    private JButton editContextButton;
 
     /**
      * Construct an instance of this view
      */
-    public DiagramEditingView(DiagramCollection conceptualSchema, EventBroker eventBroker) {
+    public DiagramEditingView(ConceptualSchema conceptualSchema, EventBroker eventBroker) {
         super();
         setLayout(new BorderLayout());
         this.conceptualSchema = conceptualSchema;
@@ -61,6 +66,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
         eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
+        this.diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, Object.class);
     }
 
     protected JPanel makeDiagramViewPanel() {
@@ -95,6 +101,16 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
             }
         });
         toolPanel.add(zoomOutButton);
+
+        editContextButton = new JButton("Edit Context...");
+        editContextButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                editContext();
+            }
+        });
+        editContextButton.setEnabled(false);
+        toolPanel.add(editContextButton);
+
         diagramViewPanel.add(toolPanel, BorderLayout.NORTH);
         diagramViewPanel.add(diagramView, BorderLayout.CENTER);
         return diagramViewPanel;
@@ -162,6 +178,14 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         }
         this.diagramView.requestScreenTransformUpdate();
         this.diagramView.repaint();
+    }
+    
+    protected void editContext() {
+        ContextImplementation context = (ContextImplementation) DiagramToContextConverter.getContext(this.diagramView.getDiagram());
+    	/// @todo add database connection
+    	Frame frame = JOptionPane.getFrameForComponent(this);
+    	ContextTableScaleEditorDialog dialog = new ContextTableScaleEditorDialog(frame, this.conceptualSchema, null, context);
+    	dialog.execute();
     }
 
     protected JComponent makeDiagramListView() {
@@ -273,11 +297,20 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     }
 
     public void processEvent(Event event) {
+    	if(event instanceof DisplayedDiagramChangedEvent) {
+    	    updateButtons();
+    	    return;
+    	}
         ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
         if (event instanceof NewConceptualSchemaEvent) {
             conceptualSchema = changeEvent.getConceptualSchema();
         }
         fillDiagramListView();
+        updateButtons();
+    }
+    
+    private void updateButtons() {
+    	this.editContextButton.setEnabled(this.diagramView.getDiagram() != null);
     }
 
     public void setDividerLocation(int location) {

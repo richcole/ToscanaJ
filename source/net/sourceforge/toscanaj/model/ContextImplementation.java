@@ -11,6 +11,9 @@ package net.sourceforge.toscanaj.model;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * @todo hide access to collections and relation by playing middle man.
+ */
 public class ContextImplementation implements Context {
     private Collection objects = new ArrayList();
     private Collection attributes = new ArrayList();
