@@ -283,6 +283,12 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 				CanvasItemContextMenuRequestEvent.class,
 				NodeView.class
 		);
+		diagramEventBroker.subscribe(
+				new BackgroundPopupMenuHandler(diagramView,this),
+				CanvasItemContextMenuRequestEvent.class,
+				CanvasBackground.class
+		);
+		
 		new LabelClickEventHandler(diagramEventBroker);
         new LabelDragEventHandler(diagramEventBroker);
 
@@ -1046,7 +1052,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         }
     }
 
-	protected void showDiagramContextDescription() {
+	public void showDiagramContextDescription() {
 		if(DiagramController.getController().getDiagramHistory().getNumberOfCurrentDiagrams() != 0){
 			DiagramContextDescriptionDialog dialog = new DiagramContextDescriptionDialog(this, 
 								this.diagramView.getController().getEventBroker());
@@ -1058,7 +1064,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         DescriptionViewer.show(this, this.conceptualSchema.getDescription());
     }
 
-    protected void showDiagramDescription() {
+    public void showDiagramDescription() {
     	if(DiagramController.getController().getDiagramHistory().getNestingLevel() == 0) {
     	    DescriptionViewer.show(this, DiagramController.getController().getCurrentDiagram().getDescription());
     	} else { // we assume we have a nesting level of two
@@ -1113,5 +1119,10 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     //don't have to do anything
     //see exportImage(File selectedFile) method
     }
+
+	public ConceptualSchema getConceptualSchema() {
+		return conceptualSchema;
+	}
+
 }
 
