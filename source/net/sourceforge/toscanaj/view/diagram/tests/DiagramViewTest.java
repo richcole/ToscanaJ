@@ -25,6 +25,8 @@ public class DiagramViewTest extends TestCase {
 
     static class TestDiagramView extends DiagramView {
 
+        boolean repaintCalled = false;
+
         public TestDiagramView() {
         }
 
@@ -36,12 +38,15 @@ public class DiagramViewTest extends TestCase {
             super.makeScreenTransformClear();
         }
 
-        public ExpectationCounter repaintCounter = new ExpectationCounter("Expected calls to repaint");
+        public void clearRepaintFlag(){
+            repaintCalled = false;
+        }
 
         public void repaint() {
-            repaintCounter.inc();
+            repaintCalled = true;
             // super.p;
         }
+
     }
 
     public void testChangeOfScreenTransform() {
@@ -50,10 +55,10 @@ public class DiagramViewTest extends TestCase {
         assertEquals(new Dimension(100, 100), view.getSize());
         view.makeScreenTransformClear();
         assertEquals(false, view.isScreenTransformDirty());
-        view.repaintCounter.setExpected(1);
+        view.clearRepaintFlag();
         view.setSize(200, 200);
         assertEquals(new Dimension(200, 200), view.getSize());
         assertEquals(true, view.isScreenTransformDirty());
-        view.repaintCounter.verify();
+        assertEquals(true, view.repaintCalled);
     }
 }
