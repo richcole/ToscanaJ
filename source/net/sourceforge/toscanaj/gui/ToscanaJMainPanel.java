@@ -63,10 +63,16 @@ import java.util.ListIterator;
  * @todo store view settings (contingent/extent labels/gradient) in session management
  */
 public class ToscanaJMainPanel extends JFrame implements ChangeObserver, ClipboardOwner {
-
-    private static final String CONFIGURATION_KEY_COLOR_MODE = "colorMode";
-	private static final String CONFIGURATION_SECTION_NAME = "ToscanaJMainPanel";
     private static final String WINDOW_TITLE = "ToscanaJ";
+
+    private static final String CONFIGURATION_SECTION_NAME = "ToscanaJMainPanel";
+    
+    private static final String CONFIGURATION_KEY_COLOR_MODE = "colorMode";
+    private static final String CONFIGURATION_VALUE_COLOR_MODE_COLOR = "color";
+    private static final String CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE = "grayscale";
+    private static final String CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES = "whiteNodes";
+    private static final String CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES = "blackNodes";
+    
     /**
      * The central event broker for the main panel
      */
@@ -121,8 +127,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     private JRadioButtonMenuItem nestingLevel1MenuItem = null;
 
     // view menu
-    private JRadioButtonMenuItem showAllMenuItem = null;
-    private JRadioButtonMenuItem showExactMenuItem = null;
+    private JRadioButtonMenuItem showAllMenuItem;
+    private JRadioButtonMenuItem showExactMenuItem;
 
     /**
      * The main model member.
@@ -171,7 +177,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
 	private JRadioButtonMenuItem colorModeGrayscaleMenuItem;
 	private JRadioButtonMenuItem colorModeColorMenuItem;
-	private JRadioButtonMenuItem colorModeBlackAndWhiteMenuItem;
+	private JRadioButtonMenuItem colorModeWhiteNodesMenuItem;
+    private JRadioButtonMenuItem colorModeBlackNodesMenuItem;
+
 	/**
 	 * Simple initialisation constructor.
 	 */
@@ -660,34 +668,42 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		colorModeGroup.add(colorModeGrayscaleMenuItem);
 		colorModeMenu.add(colorModeGrayscaleMenuItem);
 
-		colorModeBlackAndWhiteMenuItem = new JRadioButtonMenuItem("Black and White");
-		colorModeBlackAndWhiteMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				setDiagramSchema(DiagramSchema.getDefaultSchema().getBlackAndWhiteVersion());
-			}
-		});
-		colorModeGroup.add(colorModeBlackAndWhiteMenuItem);
-		colorModeMenu.add(colorModeBlackAndWhiteMenuItem);
+        colorModeWhiteNodesMenuItem = new JRadioButtonMenuItem("White nodes");
+        colorModeWhiteNodesMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setDiagramSchema(DiagramSchema.getDefaultSchema().getWhiteNodeVersion());
+            }
+        });
+        colorModeGroup.add(colorModeWhiteNodesMenuItem);
+        colorModeMenu.add(colorModeWhiteNodesMenuItem);
 
-		// @todo replace with typesafe enum pattern
-		int colorMode = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, 0);
-		switch(colorMode) {
-			case 0:
-				colorModeColorMenuItem.setSelected(true);
-				setDiagramSchema(DiagramSchema.getDefaultSchema());
-				break;
-			case 1:
-				colorModeGrayscaleMenuItem.setSelected(true);
-				setDiagramSchema(DiagramSchema.getDefaultSchema().getGrayScaleVersion());
-				break;
-			case 2:
-				colorModeBlackAndWhiteMenuItem.setSelected(true);
-				setDiagramSchema(DiagramSchema.getDefaultSchema().getBlackAndWhiteVersion());
-				break;
-			default:
-				System.err.println("Unknown color mode setting, using color");
-				colorModeColorMenuItem.setSelected(true);
-		}
+        colorModeBlackNodesMenuItem = new JRadioButtonMenuItem("Black nodes");
+        colorModeBlackNodesMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setDiagramSchema(DiagramSchema.getDefaultSchema().getBlackNodeVersion());
+            }
+        });
+        colorModeGroup.add(colorModeBlackNodesMenuItem);
+        colorModeMenu.add(colorModeBlackNodesMenuItem);
+
+		String colorMode = ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, null);
+        if(CONFIGURATION_VALUE_COLOR_MODE_COLOR.equals(colorMode)) {
+            colorModeColorMenuItem.setSelected(true);
+            setDiagramSchema(DiagramSchema.getDefaultSchema());
+        } else if(CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE.equals(colorMode)) {
+            colorModeGrayscaleMenuItem.setSelected(true);
+            setDiagramSchema(DiagramSchema.getDefaultSchema().getGrayScaleVersion());
+        } else if(CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES.equals(colorMode)) {
+            colorModeWhiteNodesMenuItem.setSelected(true);
+            setDiagramSchema(DiagramSchema.getDefaultSchema().getWhiteNodeVersion());
+        } else if(CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES.equals(colorMode)) {
+            colorModeBlackNodesMenuItem.setSelected(true);
+            setDiagramSchema(DiagramSchema.getDefaultSchema().getBlackNodeVersion());
+        } else {
+            System.err.println("Unknown color mode setting, using color");
+            colorModeColorMenuItem.setSelected(true);
+            setDiagramSchema(DiagramSchema.getDefaultSchema());
+        } 
 
 		viewMenu.add(colorModeMenu);
 
@@ -991,11 +1007,13 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		ConfigurationManager.storeFloat(CONFIGURATION_SECTION_NAME, "minLabelFontSize", (float)this.diagramView.getMinimumFontSize());
 		// store print mode
 		if(this.colorModeColorMenuItem.isSelected()) {
-			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, 0);
+			ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_COLOR);
 		} else if(this.colorModeGrayscaleMenuItem.isSelected()) {
-			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, 1);
-		} else if(this.colorModeBlackAndWhiteMenuItem.isSelected()) {
-			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, 2);
+			ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE);
+        } else if(this.colorModeWhiteNodesMenuItem.isSelected()) {
+            ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES);
+        } else if(this.colorModeBlackNodesMenuItem.isSelected()) {
+            ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES);
 		}
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
