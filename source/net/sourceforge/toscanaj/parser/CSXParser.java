@@ -524,7 +524,7 @@ public class CSXParser {
                 /// @todo add error handling
                 String name = cur.getAttributeValue("name");
                 /// @todo handle the head
-                String header = cur.getAttributeValue("header");
+                String header = cur.getAttributeValue("head");
                 String distinct = cur.getAttributeValue("distinct");
                 boolean isDistinct = (distinct != null) && (distinct.equals("true"));
                 Query query = dbInfo.createListQuery(name, header, isDistinct);
