@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.view.temporal;
 
 import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.AffineTransform;
@@ -84,39 +83,23 @@ public class TransitionArrow extends CanvasItem {
     protected Paint calculatePaint(float arrowLength) {
         AnimationTimeController controller = this.timeController;
 
-        double startTimeOffset = controller.getCurrentTime() - this.timePos;
-        double startAlpha = 0;
-        if(startTimeOffset < - controller.getFadeInTime()) {
+        double timeOffset = controller.getCurrentTime() - this.timePos;
+        double alpha = 0;
+        if(timeOffset < - controller.getFadeInTime()) {
             return null;
-        } else if(startTimeOffset < 0) {
-            startAlpha = 1 + startTimeOffset / controller.getFadeInTime();
-        } else if(startTimeOffset < controller.getVisibleTime()) {
-            startAlpha = 1;
-        } else if(startTimeOffset < controller.getVisibleTime() + controller.getFadeOutTime()) {
-            startAlpha = 1 - (startTimeOffset - controller.getVisibleTime()) / controller.getFadeOutTime();
+        } else if(timeOffset < 0) {
+            alpha = 1 + timeOffset / controller.getFadeInTime();
+        } else if(timeOffset < controller.getVisibleTime()) {
+            alpha = 1;
+        } else if(timeOffset < controller.getVisibleTime() + controller.getFadeOutTime()) {
+            alpha = 1 - (timeOffset - controller.getVisibleTime()) / controller.getFadeOutTime();
         } else {
             return null;
         }
-        Color finalStartColor = new Color(this.baseColor.getRed(), this.baseColor.getGreen(), this.baseColor.getBlue(),
-                          (int) (startAlpha * this.baseColor.getAlpha()));
+        Color finalColor = new Color(this.baseColor.getRed(), this.baseColor.getGreen(), this.baseColor.getBlue(),
+                          (int) (alpha * this.baseColor.getAlpha()));
 
-        double endTimeOffset = controller.getCurrentTime() - this.timePos;
-        double endAlpha = 0;
-        if(endTimeOffset < - controller.getFadeInTime()) {
-            return null;
-        } else if(endTimeOffset < 0) {
-            endAlpha = 1 + endTimeOffset / controller.getFadeInTime();
-        } else if(endTimeOffset < controller.getVisibleTime()) {
-            endAlpha = 1;
-        } else if(endTimeOffset < controller.getVisibleTime() + controller.getFadeOutTime()) {
-            endAlpha = 1 - (endTimeOffset - controller.getVisibleTime()) / controller.getFadeOutTime();
-        } else {
-            return null;
-        }
-        Color finalEndColor = new Color(this.baseColor.getRed(), this.baseColor.getGreen(), this.baseColor.getBlue(),
-                          (int) (endAlpha * this.baseColor.getAlpha()));
-
-        return new GradientPaint(-arrowLength, 0, finalStartColor, 0, 0, finalEndColor);
+        return finalColor;
     }
     
     public boolean containsPoint(Point2D point) {
