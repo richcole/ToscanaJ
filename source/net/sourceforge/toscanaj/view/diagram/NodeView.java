@@ -29,6 +29,8 @@ import java.util.prefs.Preferences;
 
 public class NodeView extends CanvasItem {
     private static final Preferences preferences = Preferences.userNodeForPackage(NodeView.class);
+    private static final Color WARNING_COLOR = Color.RED;
+    private static final BasicStroke WARNING_STROKE = new BasicStroke(2.5f);
     
     /**
      * Store the node model for this view
@@ -106,6 +108,11 @@ public class NodeView extends CanvasItem {
                 nodeColor = diagramSchema.fadeOut(nodeColor);
                 circleColor = diagramSchema.fadeOut(circleColor);
             }
+        }
+        
+        if(this.diagramNode.hasCollision()) {
+            nodeColor = WARNING_COLOR;
+            graphics.setStroke(WARNING_STROKE);
         }
 
         Ellipse2D ellipse = new Ellipse2D.Double(

@@ -5,6 +5,8 @@ Affecting different programs:
 =============================
 - Label scrollbars are now inside the normal label bounds instead of extending to
   the right.
+- if a node collides with a line it is not connected to, it will be shown red instead
+  of its normal color.
 
 Specific for ToscanaJ:
 ======================

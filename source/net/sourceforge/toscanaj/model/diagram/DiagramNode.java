@@ -16,6 +16,7 @@ import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
 
 import java.awt.geom.Point2D;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -370,5 +371,26 @@ public class DiagramNode implements XMLizable {
             }
         }
         return true;
+    }
+    
+    /**
+     * Returns true iff the node connects to a line it does not belong to.
+     */
+    public boolean hasCollision() {
+        Iterator lineIt = this.diagram.getLines();
+        while (lineIt.hasNext()) {
+            DiagramLine line = (DiagramLine) lineIt.next();
+            if(line.getFromNode() == this) {
+                continue;
+            }
+            if(line.getToNode() == this) {
+                continue;
+            }
+            double avRadius = (this.radiusX + this.radiusY)/2;
+            if(line.calculateDistance(this.position) < avRadius) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -114,8 +114,42 @@ public class DiagramLine implements XMLizable {
      * Returns the length of this line.
      */
     public double getLength() {
-        double dx = this.toNode.getX() - this.fromNode.getX();
-        double dy = this.toNode.getY() - this.fromNode.getY();
-        return Math.sqrt(dx * dx + dy * dy);
+        return this.toNode.position.distance(this.fromNode.position);
+    }
+    
+    /**
+     * Returns the distance of the given point to the line.
+     * 
+     * Note that the line has ends, a point which is further not to the side
+     * of the line will have its distance determined by its distance to the
+     * closer end point.
+     */
+    public double calculateDistance(Point2D point) {
+        // first store all coordinates in nice short vars
+        double fx = this.fromNode.getX();
+        double fy = this.fromNode.getY();
+        double tx = this.toNode.getX();
+        double ty = this.toNode.getY();
+        double x = point.getX();
+        double y = point.getY();
+        double length = getLength();
+        
+        // calculate distance from line without considering end points
+        double distLine = Math.abs((tx-fx)*(fy-y) - (fx-x)*(ty-fy)) / length;
+        // calculate the distance to the end points
+        double distFrom = this.fromNode.position.distance(point);
+        double distTo = this.toNode.position.distance(point);
+        // the distance of a point on a perpendicular in an end node, distLine
+        // from that end node away, measured from the other end node (Pythagoras)
+        double distOppSq = distLine * distLine + length * length;
+        
+        // now check if we are outside the sides
+        if(distFrom > distTo && distFrom * distFrom > distOppSq) {
+            return distTo;
+        }
+        if(distTo > distFrom && distTo * distTo > distOppSq) {
+            return distFrom;
+        }
+        return distLine;
     }
 }
