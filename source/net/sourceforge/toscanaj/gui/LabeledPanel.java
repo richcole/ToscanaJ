@@ -12,11 +12,11 @@ import java.awt.*;
 
 public class LabeledPanel extends JPanel {
     public LabeledPanel(String label, Component contentView) {
-        this(label, contentView, null, true);
+        this(label, contentView, new Component[0], true);
     }
 
     public LabeledPanel(String label, Component contentView, boolean scrollable) {
-        this(label, contentView, null, scrollable);
+        this(label, contentView, new Component[0], scrollable);
     }
 
     public LabeledPanel(String label, Component contentView, Component extraComponent) {
@@ -24,20 +24,26 @@ public class LabeledPanel extends JPanel {
     }
 
     public LabeledPanel(String label, Component contentView, Component extraComponent, boolean scrollable) {
+        this(label, contentView, new Component[] {extraComponent}, scrollable);
+    }
+    
+    public LabeledPanel(String label, Component contentView, Component[] extraComponents, boolean scrollable) {
         super();
         setLayout(new GridBagLayout());
+
         add(new JLabel(label),
                 new GridBagConstraints(
-                        0, 0, 1, 1, 1.0, 0,
+                        0, GridBagConstraints.RELATIVE, 1, 1, 1.0, 0,
                         GridBagConstraints.CENTER,
                         GridBagConstraints.HORIZONTAL,
                         new Insets(0, 5, 5, 5),
                         5, 5)
         );
+
 		if(scrollable) {
 		    add(new JScrollPane(contentView),
 		            new GridBagConstraints(
-		                    0, 1, 1, 1, 1.0, 1.0,
+		                    0, GridBagConstraints.RELATIVE, 1, 1, 1.0, 1.0,
 		                    GridBagConstraints.CENTER,
 		                    GridBagConstraints.BOTH,
 		                    new Insets(2, 5, 2, 5),
@@ -46,23 +52,27 @@ public class LabeledPanel extends JPanel {
 		} else {
 		    add(contentView,
 		            new GridBagConstraints(
-		                    0, 1, 1, 1, 1.0, 1.0,
+		                    0, GridBagConstraints.RELATIVE, 1, 1, 1.0, 1.0,
 		                    GridBagConstraints.CENTER,
 		                    GridBagConstraints.BOTH,
 		                    new Insets(2, 5, 2, 5),
 		                    5, 5)
 		    );
 		}
-		        
-        if (extraComponent != null) {
-            add(extraComponent,
-                    new GridBagConstraints(
-                            0, 2, 1, 1, 1.0, 0,
-                            GridBagConstraints.CENTER,
-                            GridBagConstraints.HORIZONTAL,
-                            new Insets(2, 5, 2, 0),
-                            5, 5)
-            );
+
+        for (int i = 0; i < extraComponents.length; i++) {
+            addExtraComponent(extraComponents[i]);
         }
+    }
+
+    public void addExtraComponent(Component extraComponent) {
+        add(extraComponent,
+                new GridBagConstraints(
+                        0, GridBagConstraints.RELATIVE, 1, 1, 1.0, 0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL,
+                        new Insets(2, 5, 2, 0),
+                        5, 5)
+        );
     }
 }

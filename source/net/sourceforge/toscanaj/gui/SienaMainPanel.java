@@ -13,7 +13,6 @@ package net.sourceforge.toscanaj.gui;
  */ 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -58,7 +57,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 
@@ -160,7 +158,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private DiagramEditingView diagramEditingView;
     private List mruList = new LinkedList();
     private String currentFile = null;
-    private TemporalControlsPanel temporalControls;
     private DiagramExportSettings diagramExportSettings;
     private ExportDiagramAction exportDiagramAction;
     private File lastCSCFile;
@@ -267,27 +264,22 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		JTabbedPane mainPanel = new JTabbedPane();
 		mainPanel.addTab("Context", createContextEditingView());
 		mainPanel.setSelectedIndex(0);
-		if (ConfigurationManager.fetchInt("SienaTemporalControls", "enabled", 0) == 1) {
-			temporalControls =
-				new TemporalControlsPanel(
-					this.diagramEditingView.getDiagramView(),
-					diagramExportSettings,
-					eventBroker);
-			JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-												  this.diagramEditingView, new JScrollPane(temporalControls));
-			splitPane.setOneTouchExpandable(true);
-			splitPane.setResizeWeight(1.0);
-			this.diagramEditingView.setPreferredSize(new Dimension(500,500));
-			mainPanel.addTab("Diagrams", splitPane);
-		} else {
-			mainPanel.addTab("Diagrams", this.diagramEditingView);
-		}
+        mainPanel.addTab("Diagrams", this.diagramEditingView);
 
 		getContentPane().add(mainPanel);
 	}
 
 	protected void createDiagramEditingView() {
-		this.diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
+        if (ConfigurationManager.fetchInt("SienaTemporalControls", "enabled", 0) == 1) {
+            this.diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
+            TemporalControlsPanel temporalControls = new TemporalControlsPanel(
+                this.diagramEditingView.getDiagramView(),
+                diagramExportSettings,
+                eventBroker);
+            this.diagramEditingView.addAccessory(temporalControls);
+        } else {
+            this.diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
+        }        
 		this.diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
 										this, DisplayedDiagramChangedEvent.class, Object.class);
 		DiagramView diagramView = diagramEditingView.getDiagramView();

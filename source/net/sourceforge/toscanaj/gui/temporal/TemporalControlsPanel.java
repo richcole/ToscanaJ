@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
 
+import javax.swing.*;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -59,7 +60,7 @@ import net.sourceforge.toscanaj.view.temporal.InterSequenceTransitionArrow;
 import net.sourceforge.toscanaj.view.temporal.StateRing;
 import net.sourceforge.toscanaj.view.temporal.TransitionArrow;
 
-public class TemporalControlsPanel extends JPanel implements EventBrokerListener {
+public class TemporalControlsPanel extends JTabbedPane implements EventBrokerListener {
 	private static final Insets DEFAULT_SPACER_INSETS = new Insets(0,0,10,0);
 	private static final Insets DEFAULT_BUTTON_INSETS = new Insets(2,16,2,16);
 	private static final Insets DEFAULT_LABEL_INSETS = new Insets(2,2,2,2);
@@ -117,6 +118,12 @@ public class TemporalControlsPanel extends JPanel implements EventBrokerListener
     }
     
     private void buildGUI() {
+        this.addTab("Controls", createControlsPanel());
+        this.addTab("Data", createBasicSettingsPanel());
+        this.addTab("Animation Settings", createAnimationsSettingsPanel());
+    }
+
+	private JPanel createControlsPanel() {
         addStaticTransitionsButton = new JButton("Show all transitions");
         addStaticTransitionsButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
@@ -144,52 +151,37 @@ public class TemporalControlsPanel extends JPanel implements EventBrokerListener
                 exportImages();
             }
         });
-        
-        this.setLayout(new GridBagLayout());
 
-		int row = 0;
-		this.add(new JLabel("Temporal Controls"), new GridBagConstraints(0, row, 1, 1, 1, 0,
-														GridBagConstraints.NORTH, GridBagConstraints.NONE,
-														new Insets(2,2,10,2), 0, 0));
-		row++;
-		this.add(addStaticTransitionsButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
+        JPanel panel = new JPanel(new GridBagLayout());
+        int row = 0;
+        panel.add(addStaticTransitionsButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
 														GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 														DEFAULT_BUTTON_INSETS, 0, 0));
 		row++;
-		this.add(exportImagesButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
+        panel.add(exportImagesButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
 														GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 														DEFAULT_BUTTON_INSETS, 0, 0));
 		row++;
-		this.add(animateTransitionsButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
+        panel.add(animateTransitionsButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
 														GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 														DEFAULT_BUTTON_INSETS, 0, 0));
 		row++;
-		this.add(startSteppingButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
+        panel.add(startSteppingButton, new GridBagConstraints(0, row, 1, 1, 1, 0,
 														GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
 														DEFAULT_BUTTON_INSETS, 0, 0));
-		row++;
-		this.add(new JPanel(), new GridBagConstraints(0, row, 1, 1, 1, 0,
-														GridBagConstraints.WEST, GridBagConstraints.BOTH,
-														DEFAULT_SPACER_INSETS, 0, 0));
-		row++;
-		this.add(createStepPanel(), new GridBagConstraints(0, row, 1, 1, 1, 0,
-														GridBagConstraints.CENTER, GridBagConstraints.NONE,
-														DEFAULT_SPACER_INSETS, 0, 0));
         row++;
-		this.add(createBasicSettingsPanel(), new GridBagConstraints(0, row, 1, 1, 1, 0,
-														GridBagConstraints.WEST, GridBagConstraints.BOTH,
-														DEFAULT_SPACER_INSETS, 0, 0));
-		row++;
-		this.add(createAnimationsSettingsPanel(), new GridBagConstraints(0, row, 1, 1, 1, 0,
-														GridBagConstraints.WEST, GridBagConstraints.BOTH,
-														DEFAULT_SPACER_INSETS, 0, 0));
-		row++;
-		this.add(new JPanel(), new GridBagConstraints(0, row, 1, 1, 1, 1,
-														GridBagConstraints.WEST, GridBagConstraints.BOTH,
-														DEFAULT_LABEL_INSETS, 0, 0));
+        panel.add(createStepPanel(), new GridBagConstraints(0, row, 1, 1, 1, 0,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                                        DEFAULT_SPACER_INSETS, 0, 0));
+        row++;
+        panel.add(new JPanel(), new GridBagConstraints(0, row, 1, 1, 1, 1,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                                        DEFAULT_SPACER_INSETS, 0, 0));
+        panel.setBorder(createTitledBorder("Temporal Controls"));                                                
+        return panel;
     }
 
-	private JPanel createBasicSettingsPanel() {
+    private JPanel createBasicSettingsPanel() {
 		JLabel sequenceColumnLabel = new JLabel("Sequence Column:");
 		sequenceColumnChooser = new JComboBox();
 		sequenceColumnChooser.addActionListener(new ActionListener() {
@@ -242,6 +234,10 @@ public class TemporalControlsPanel extends JPanel implements EventBrokerListener
 		basicSettingsPanel.add(serializeSequencesBox, new GridBagConstraints(0, r, 1, 1, 1, 0,
 														GridBagConstraints.CENTER, GridBagConstraints.NONE,
 														new Insets(2,2,2,2), 0, 0));
+        r++;
+        basicSettingsPanel.add(new JPanel(), new GridBagConstraints(0, r, 1, 1, 1, 1,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                                        DEFAULT_SPACER_INSETS, 0, 0));
 		basicSettingsPanel.setBorder(createTitledBorder("Data settings"));
 		return basicSettingsPanel;
 	}
@@ -293,6 +289,10 @@ public class TemporalControlsPanel extends JPanel implements EventBrokerListener
 		animationSettingsPanel.add(fadeOutField, new GridBagConstraints(0, r, 1, 1, 1, 0,
 														GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
 														DEFAULT_FIELD_INSETS, 0, 0));
+        r++;
+        animationSettingsPanel.add(new JPanel(), new GridBagConstraints(0, r, 1, 1, 1, 1,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                                                        DEFAULT_SPACER_INSETS, 0, 0));
 		animationSettingsPanel.setBorder(createTitledBorder("Animation controls"));
 		return animationSettingsPanel;
 	}

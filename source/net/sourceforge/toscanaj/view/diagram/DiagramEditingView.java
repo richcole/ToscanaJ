@@ -85,11 +85,9 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private JButton gridDecreaseButton;
     private JCheckBox gridEnabledCheckBox;
     private Frame parent;
+    private LabeledPanel diagramListView;
     
 
-    /**
-     * Construct an instance of this view
-	 */
 	public DiagramEditingView(Frame parent, ConceptualSchema conceptualSchema, EventBroker eventBroker) {
 		super();
 		this.conceptualSchema = conceptualSchema;
@@ -99,7 +97,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		
 		setName("DiagramEditingView");
 		
-		JComponent diagramListView = makeDiagramListView();
+		diagramListView = makeDiagramListView();
 		JPanel mainDiagramView = makeDiagramViewPanel();
 		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, diagramListView, mainDiagramView);
 		splitPane.setOneTouchExpandable(true);
@@ -454,7 +452,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		}
 	}
 	
-    protected JComponent makeDiagramListView() {
+    protected LabeledPanel makeDiagramListView() {
         diagramListModel = new DefaultListModel();
         final JList listView = new JList(diagramListModel);
 		final JButton upButton=new JButton("Up");
@@ -707,4 +705,8 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		}
 		return copiedDiagramTitle;
 	}
+
+    public void addAccessory(Component accessory) {
+        this.diagramListView.addExtraComponent(accessory);
+    }
 }
