@@ -82,6 +82,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     private static final String QUERIES_ELEMENT_NAME = "queries";
     
     private ManyValuedContext manyValuedContext;
+	private boolean dataSaved;
 
     /**
      * Creates an empty schema.
@@ -319,9 +320,18 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
 
     public void setManyValuedContext(ManyValuedContext context) {
         this.manyValuedContext = context;
+		this.dataSaved = false;
     }
 
     public ManyValuedContext getManyValuedContext() {
         return this.manyValuedContext;
+    }
+    
+    public void dataSaved() {
+    	this.dataSaved = true;
+    }
+    
+    public boolean isDataSaved() {
+    	return this.dataSaved;
     }
 }
