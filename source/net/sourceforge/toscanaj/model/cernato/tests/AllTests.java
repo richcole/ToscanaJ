@@ -8,8 +8,6 @@
 package net.sourceforge.toscanaj.model.cernato.tests;
 
 import junit.framework.*;
-import net.sourceforge.toscanaj.model.diagram.tests.DiagramNodeTest;
-import net.sourceforge.toscanaj.model.diagram.tests.LabelInfoTest;
 
 public class AllTests extends TestCase {
     public AllTests(String s) {
@@ -19,6 +17,7 @@ public class AllTests extends TestCase {
     public static Test suite() {
         TestSuite suite = new TestSuite();
         suite.addTest(ValueGroupTest.suite());
+        suite.addTest(ViewContextTest.suite());
         return suite;
     }
 

@@ -42,8 +42,8 @@ public class ManyValuedContext {
         row.put(property, value);
     }
 
-    public Object getRelationship(FCAObject object, Property property) {
+    public Value getRelationship(FCAObject object, Property property) {
         Hashtable row = (Hashtable) relation.get(object);
-        return row.get(object);
+        return (Value) row.get(property);
     }
 }
