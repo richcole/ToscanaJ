@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.events.CanvasItemEvent;
 import org.tockit.events.Event;
@@ -35,6 +36,9 @@ public class FilterOperationEventListener implements EventBrokerListener {
             throw new RuntimeException(getClass().getName() +
                     " has to be subscribed to events from NodeViews only");
         }
-        controller.next(nodeView.getDiagramNode().getFilterConcept());
+        Concept filterConcept = nodeView.getDiagramNode().getFilterConcept();
+        if(filterConcept.getExtentSize() != 0) {
+        	controller.next(filterConcept);
+        }
     }
 }
