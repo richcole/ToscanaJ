@@ -14,18 +14,21 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.JComponent;
+import javax.swing.Scrollable;
+import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 
-public class ContextTableView extends JComponent {
+public class ContextTableView extends JComponent implements Scrollable {
 	private static final Color TEXT_COLOR = Color.BLACK;
 	private static final Color TABLE_CORNER_COLOR = Color.LIGHT_GRAY;
 	private static final Color TABLE_HEADER_COLOR = Color.LIGHT_GRAY;
@@ -34,6 +37,7 @@ public class ContextTableView extends JComponent {
 	private ContextTableScaleEditorDialog dialog;
 	private static final int CELL_WIDTH = 150;
 	private static final int CELL_HEIGHT = 30;
+    private static final Dimension PREFERRED_VIEWPORT_SIZE = new Dimension(6 * CELL_WIDTH, 6 * CELL_HEIGHT);
 
 	public static class Position {
 		private int row;
@@ -57,6 +61,7 @@ public class ContextTableView extends JComponent {
 		this.context = context;
 		this.dialog = dialog;
 		ToolTipManager.sharedInstance().registerComponent(this);
+		updateSize();
 	}
 
 	public void paintComponent(Graphics g) {
@@ -82,22 +87,10 @@ public class ContextTableView extends JComponent {
 		dialog.setCreateButtonStatus();
 	}
 
-	public Dimension getSize() {
+	public Dimension calculateNewSize() {
 		int numCol = this.context.getAttributes().size() + 1;
 		int numRow = this.context.getObjects().size() + 1;
 		return new Dimension(numCol * CELL_WIDTH + 1, numRow * CELL_HEIGHT + 1);
-	}
-
-	public Dimension getMinimumSize() {
-		return getSize();
-	}
-
-	public Dimension getPreferredSize() {
-		return getSize();
-	}
-
-	public Dimension getMaximumSize() {
-		return getSize();
 	}
 
 	protected void drawColumnHeader(Graphics2D g2d) {
@@ -207,4 +200,34 @@ public class ContextTableView extends JComponent {
 		return this.context;
 	}
 	
+    public Dimension getPreferredScrollableViewportSize() {
+    	return PREFERRED_VIEWPORT_SIZE;
+    }
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+    	if(orientation == SwingConstants.HORIZONTAL) {
+    		return CELL_WIDTH;
+    	} else {
+    	    return CELL_HEIGHT;
+    	}
+    }
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+    	// round the size in any direction down to a multiple of the cell size
+        if(orientation == SwingConstants.HORIZONTAL) {
+            return (visibleRect.width / CELL_WIDTH) * CELL_WIDTH;
+        } else {
+            return (visibleRect.height / CELL_HEIGHT) * CELL_HEIGHT;
+        }
+    }
+ 
+    public boolean getScrollableTracksViewportWidth() {
+        return false;
+    }
+ 
+    public boolean getScrollableTracksViewportHeight() {
+        return false;
+    }
+    
+    public void updateSize() {
+    	this.setPreferredSize(calculateNewSize());
+    }
 }

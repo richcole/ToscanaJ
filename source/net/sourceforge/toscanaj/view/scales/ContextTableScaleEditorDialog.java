@@ -271,7 +271,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	}
 
 	private void updateScrollPane() {
-		scrollpane.updateUI();
+	    this.tableView.updateSize();
 		this.tableView.revalidate();
 	}
 
