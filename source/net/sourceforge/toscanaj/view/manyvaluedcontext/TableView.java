@@ -76,7 +76,7 @@ public class TableView extends JComponent implements Scrollable{
 		while(objIt.hasNext()){
 			FCAObject object = (FCAObject) objIt.next();
 			AttributeValue relationship = context.getRelationship(object,attribute);
-			
+					
 			boolean selected = checkCellSelected(row,columnSelected);
 			if(!attribute.getType().isValidValue(relationship)){
 				drawCell(g2d,col,row,ERROR_CELL_COLOR,relationship);
@@ -198,6 +198,7 @@ public class TableView extends JComponent implements Scrollable{
 		this.context = context;
 		updateSize();
 		validate();
+		revalidate();
 		repaint();
 	}
 }
