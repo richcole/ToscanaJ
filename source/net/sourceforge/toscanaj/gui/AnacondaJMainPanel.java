@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.gui.activity.LoadConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.NewConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.gui.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
@@ -217,9 +218,13 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
     }
 
     public void processEvent(Event e) {
+        /// @todo introduce separate event for new conceptual schemas to avoid setting this all over again
         if ( e instanceof ConceptualSchemaChangeEvent ) {
             ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
             conceptualSchema = schemaEvent.getConceptualSchema();
+        }
+        if ( e instanceof DatabaseInfoChangedEvent ) {
+            DatabaseInfoChangedEvent schemaEvent = (DatabaseInfoChangedEvent) e;
             if (databaseConnection.isConnected()) {
                 try {
                     databaseConnection.disconnect();

@@ -72,6 +72,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         conceptualSchema = changeEvent.getConceptualSchema();
         diagramListModel.clear();
         fillDiagramListView();
+        diagramView.showDiagram(null);
     }
 
     public void setDividerLocation(int location) {

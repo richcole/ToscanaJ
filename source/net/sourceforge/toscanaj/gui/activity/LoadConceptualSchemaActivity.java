@@ -28,7 +28,6 @@ public class LoadConceptualSchemaActivity implements FileActivity {
         try {
             ConceptualSchema newSchema = CSXParser.parse(broker, file, databaseConnection);
             broker.processEvent(new ConceptualSchemaChangeEvent(this, newSchema));
-            databaseConnection.connect(newSchema.getDatabaseInfo());
         } catch (DataFormatException e) {
             throw e;
         }
