@@ -1,4 +1,4 @@
-Copyright (c) 2001,2002, DSTC Pty. Ltd., Technische Universitaet
+Copyright (c) 2001,2002,2003 DSTC Pty. Ltd., Technische Universitaet
 Darmstadt and University of Queensland.
 All rights reserved.
 
