@@ -73,6 +73,22 @@ public class DiagramNode {
     }
 
     /**
+     * Returns the concept which should be used for filtering.
+     *
+     * This is not the concept of this node if the node is nested into
+     * another node. In that case we use the concept of the outermost
+     * node.
+     */
+    public Concept getFilterConcept() {
+        if( this.outerNode == null ) {
+            return this.concept;
+        }
+        else {
+            return this.outerNode.getFilterConcept();
+        }
+    }
+
+    /**
      * A copy constructor creating a duplicate of the given node.
      *
      * This is a deep copy for position and labels but refers to the same concept.

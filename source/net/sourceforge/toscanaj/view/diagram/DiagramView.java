@@ -133,7 +133,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         if (diagram instanceof NestedLineDiagram) {
             addDiagram((NestedLineDiagram) diagram);
         } else {
-            addDiagram(diagram, null);
+            addDiagram(diagram);
         }
         requestScreenTransformUpdate();
         repaint();
@@ -145,7 +145,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * If the filter concept is non-null all nodes created will use this for
      * filter operations.
      */
-    private void addDiagram(SimpleLineDiagram diagram, Concept filterConcept) {
+    private void addDiagram(SimpleLineDiagram diagram) {
         // add all lines to the canvas
         for (int i = 0; i < diagram.getNumberOfLines(); i++) {
             DiagramLine dl = diagram.getLine(i);
@@ -154,12 +154,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         // add all nodes to the canvas
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
-            NodeView nodeView;
-            if (filterConcept == null) {
-                nodeView = new NodeView(node, this);
-            } else {
-                nodeView = new NodeView(node, this, filterConcept);
-            }
+            NodeView nodeView = new NodeView(node, this);
             addCanvasItem(nodeView);
         }
         // add all labels to the canvas
@@ -197,7 +192,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         // recurse for the inner diagrams
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             NestedDiagramNode node = (NestedDiagramNode) diagram.getNode(i);
-            addDiagram((SimpleLineDiagram) node.getInnerDiagram(), node.getConcept());
+            addDiagram((SimpleLineDiagram) node.getInnerDiagram());
         }
         // add all outer labels to the canvas
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
