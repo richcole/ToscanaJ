@@ -3,6 +3,8 @@ program suite:
 
 Affecting all programs:
 =======================
+- contexts do have a notion of object and attribute order now,
+  which they remember
 
 ToscanaJ:
 =========
@@ -12,6 +14,12 @@ Elba:
 
 Siena (still not fully complete):
 =================================
+- the way grayscale and black&white views are created has been
+  changed to cover all visual objects (affects transition arrows)
+- many-valued contexts imported from Cernato XML can be seen (and
+  edited, but this is not finished and will not affect anything yet)
+- transition arrow styles have extra option to change the width of
+  the border line
 
 Other new experimental features:
 ================================
