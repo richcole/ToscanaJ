@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ContextImplementation;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,7 +42,8 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		this.databaseConnection = databaseConnection;
 		this.contextTableScaleEditorDialog = this;
 		//for testing purposes
-		this.context = createDummyData();
+		//this.context = createDummyData();
+		this.context = new ContextImplementation();
 		createView();
 	}
 
@@ -174,21 +176,23 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		createButton.setEnabled((scaleTitleField.getText()!=null && 
 						!scaleTitleField.getText().equals("")));
 		JButton cancelButton = new JButton(" Cancel ");
-
 		addObjButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ArrayList objList = (ArrayList) context.getObjects();
 				String inputValue = "";
 				do{
-				inputValue = showAddOrRenameInputDialog("Add Object", "object");
-					if (inputValue != null && !inputValue.trim().equals("")) {
+				inputValue = showAddOrRenameInputDialog("Add Object", "object", "");
+					if (inputValue != null && !inputValue.equals("")) {
+						inputValue = inputValue.trim();
 						if(!objectOrAttributeIsDuplicated(inputValue, objList, null)){
-							context.getObjects().add(inputValue);
+							context.getObjects().add(new Attribute(inputValue));
 							scrollpane.updateUI();
 							inputValue = "";	
 						}else{
 							JOptionPane.showMessageDialog(contextTableScaleEditorDialog,"An object named '"+inputValue+"' already exist. Please enter a different name.","Object exists",JOptionPane.WARNING_MESSAGE);
 						}
+					}else{
+						break;
 					}
 				}while(objectOrAttributeIsDuplicated(inputValue, objList, null));
 			}
@@ -199,22 +203,26 @@ public class ContextTableScaleEditorDialog extends JDialog {
 				ArrayList attrList = (ArrayList) context.getAttributes();
 				String inputValue = "";
 				do{
-					inputValue = showAddOrRenameInputDialog("Add Attribute", "attribute");
-					if (inputValue != null && !inputValue.trim().equals("")) {
+					inputValue = showAddOrRenameInputDialog("Add Attribute", "attribute", "");
+					if (inputValue != null && !inputValue.equals("")) {
+						inputValue = inputValue.trim();
 						if(!objectOrAttributeIsDuplicated(inputValue, null, attrList)){
-							context.getAttributes().add(inputValue);
+							context.getAttributes().add(new Attribute(inputValue));
 							scrollpane.updateUI();
 							inputValue = "";	
 						}else{
 							JOptionPane.showMessageDialog(contextTableScaleEditorDialog,"An attribute named '"+inputValue+"' already exist. Please enter a different name.","Attribute exists",JOptionPane.WARNING_MESSAGE);
 						}
+					}else{
+						break;
 					}
 				}while(objectOrAttributeIsDuplicated(inputValue, attrList, null));
 			}
 		});
 		createButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("create");
+				dispose();
+				result = true;
 			}
 		});
 		cancelButton.addActionListener(new ActionListener() {
@@ -282,30 +290,30 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	}
 
 	private void closeDialog() {
-		ConfigurationManager.storePlacement(
-			"ContextTableScaleEditorDialog",
-			this);
-		this.setVisible(false);
+		ConfigurationManager.storePlacement("ContextTableScaleEditorDialog",this);
+		dispose();
+		result = false;
 	}
 
 	/**
 	  * To display the dialog asking for the object or attribute input name
 	  * @param title The title of the dialog
 	  * @param thingToAdd The string of the element to be added, either an
-	  * "object" or "attribute". To be used in the formatting of the text
-	  * message prompt in the JDialog
+	  * "object" or "attribute".
+	  * @param currentTextValue The value of the current string.
+	  * To be used in the formatting of the text message prompt in the JDialog
 	  * @return The name of the object/ attribute
 	  */
-	private String showAddOrRenameInputDialog(String title, String thingToAdd) {
+	private String showAddOrRenameInputDialog(String title, String thingToAdd, String currentTextValue) {
 		String inputValue = "";
 		do {
 			inputValue =
-				JOptionPane.showInputDialog(
+				(String) JOptionPane.showInputDialog(
 					contextTableScaleEditorDialog,
 					"Please input the name of the " + thingToAdd + ": ",
 					title,
-					JOptionPane.PLAIN_MESSAGE);
-		} while (inputValue != null && inputValue.equals(""));
+					JOptionPane.PLAIN_MESSAGE,null,null, currentTextValue);
+		} while (inputValue != null && inputValue.trim().equals(""));
 		return inputValue;
 	}
 	
@@ -321,7 +329,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		}
 		for(int i = 0;i< listToCheck.size();i++) {
 			Object obj = listToCheck.get(i);
-			if(obj.toString().equalsIgnoreCase(input)){
+			if(obj.toString().equalsIgnoreCase(input.trim())){
 				exists = true;
 				break;
 			}
@@ -330,13 +338,13 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	}
 	private ContextImplementation createDummyData() {
 		ContextImplementation context = new ContextImplementation();
-		String o1 = "one";
-		String o2 = "two";
-		String o3 = "three";
-		String o4 = "four";
-		String a1 = "Aone";
-		String a2 = "Atwo";
-		String a3 = "Athree";
+		String o1 = "Apple";
+		String o2 = "Carrot";
+		String o3 = "Papaya";
+		String o4 = "Pineapple";
+		String a1 = "Vitamin A";
+		String a2 = "Vitamin C";
+		String a3 = "Vitamin E";
 
 		context.getObjects().add(o1);
 		context.getObjects().add(o2);
@@ -347,11 +355,11 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		context.getAttributes().add(a2);
 		context.getAttributes().add(a3);
 
-		context.getRelationImplementation().insert(o1, a1);
 		context.getRelationImplementation().insert(o1, a2);
 		context.getRelationImplementation().insert(o2, a2);
-		context.getRelationImplementation().insert(o3, a3);
-		context.getRelationImplementation().insert(o4, a3);
+		context.getRelationImplementation().insert(o2, a1);
+		context.getRelationImplementation().insert(o3, a2);
+		context.getRelationImplementation().insert(o4, a2);
 
 		return context;
 	}
@@ -488,9 +496,12 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					} else {
 						if (e.getButton() == MouseEvent.BUTTON1) {
 							if (e.getClickCount() == 2) {
-								String attribute = (String) attributeArrayList.get(pos.getCol() - 1);
-								String object =	(String) objectsArrayList.get(pos.getRow() - 1);
+								Attribute attribute = (Attribute) attributeArrayList.get(pos.getCol() - 1);
+								Attribute object =	(Attribute) objectsArrayList.get(pos.getRow() - 1);
 								changeRelationImplementation(object, attribute);
+//								String attribute = (String) attributeArrayList.get(pos.getCol() - 1);
+//								String object =	(String) objectsArrayList.get(pos.getRow() - 1);
+//								changeRelationImplementation(object, attribute);
 							}
 						}
 					}
@@ -506,12 +517,13 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		int xP,
 		int yP) {
 		if (xP == 0) {
+			//rename Object
 			String inputValue = "";
 			do{
-				inputValue = showAddOrRenameInputDialog("Rename Object", "object");
+				inputValue = showAddOrRenameInputDialog("Rename Object", "object", (String) objectsArrayList.get(yP - 1));
 				if (inputValue != null && !inputValue.trim().equals("")) {
+					inputValue = inputValue.trim();
 					if(!objectOrAttributeIsDuplicated(inputValue, objectsArrayList, null)){
-						String object = (String) objectsArrayList.get(yP - 1);
 						objectsArrayList.remove(yP - 1);
 						objectsArrayList.add(yP - 1, inputValue);
 						scrollpane.updateUI();
@@ -519,15 +531,18 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					}else{
 						JOptionPane.showMessageDialog(this,"An object named '"+inputValue+"' already exist. Please enter a different name.","Object exists",JOptionPane.WARNING_MESSAGE);
 					}
+				}else{
+					break;
 				}
-			}while(objectOrAttributeIsDuplicated(inputValue, objectsArrayList, null));
+			}while(objectOrAttributeIsDuplicated(inputValue, objectsArrayList, null)==true);
 		} else if (yP == 0) {
 			String inputValue = "";
 			do{
-				inputValue = showAddOrRenameInputDialog("Rename Attribute", "attribute");
+				//rename attribute
+				inputValue = showAddOrRenameInputDialog("Rename Attribute", "attribute", (String) attributeArrayList.get(xP - 1));
 				if (inputValue != null && !inputValue.trim().equals("")) {
+					inputValue = inputValue.trim();
 					if(!objectOrAttributeIsDuplicated(inputValue, null, attributeArrayList)){
-						String attribute = (String) attributeArrayList.get(xP - 1);
 						attributeArrayList.remove(xP - 1);
 						attributeArrayList.add(xP - 1, inputValue);
 						scrollpane.updateUI();
@@ -535,11 +550,14 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					}else{
 					JOptionPane.showMessageDialog(this,"An attribute named '"+inputValue+"' already exist. Please enter a different name.","Attribute exists",JOptionPane.WARNING_MESSAGE);
 					}	
+				}else{
+					break;
+				
 				}
 			}while(objectOrAttributeIsDuplicated(inputValue, null, attributeArrayList));
 		}
 	}
-	public void changeRelationImplementation(String object, String attribute) {
+	public void changeRelationImplementation(Attribute object, Attribute attribute) {
 		if (context.getRelationImplementation().contains(object, attribute)) {
 			context.getRelationImplementation().remove(object, attribute);
 		} else {
@@ -560,7 +578,11 @@ public class ContextTableScaleEditorDialog extends JDialog {
 			}else{
 				createButton.setEnabled(false);
 			}
-			
 		}
 	}
+
+	public ContextImplementation getContext(){
+		return context;	
 	}
+	
+}

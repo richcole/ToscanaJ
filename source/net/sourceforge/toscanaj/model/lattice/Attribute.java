@@ -13,10 +13,14 @@ public class Attribute {
     private Object data;
     private Element description;
 
-    public Attribute(Object data, Element description) {
-        this.data = data;
-        this.description = description;
-    }
+	public Attribute(Object data) {
+		this(data,null);
+	}
+
+	public Attribute(Object data, Element description) {
+		this.data = data;
+		this.description = description;
+	}
 
     public Object getData() {
         return this.data;

@@ -8,11 +8,16 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
+import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
+import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.WriteableDiagram2D;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
 
 import javax.swing.*;
 
@@ -39,10 +44,11 @@ public class ContextTableScaleGenerator implements ScaleGenerator {
         );
         if (!dialog.execute()) {
             return null;
-        }
-
-        WriteableDiagram2D ret = new SimpleLineDiagram();
-        return ret;
+        }else{
+			LatticeGenerator lgen = new GantersAlgorithm();
+			Lattice lattice = lgen.createLattice(dialog.getContext());
+			return NDimLayoutOperations.createDiagram(lattice, dialog.getDiagramTitle(), new DefaultDimensionStrategy());
+        }       
     }
 
     public Diagram2D generateScale(Diagram2D oldVersion) {

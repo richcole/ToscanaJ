@@ -441,4 +441,5 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             return;
         }
     }
+
 }

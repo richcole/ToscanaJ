@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.controller.fca.DirectConceptInterpreter;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.DiagramCollection;
+import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
@@ -66,6 +67,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         JPanel diagramViewPanel = new JPanel(new BorderLayout());
 
         diagramView = new DiagramView();
+        diagramView.setQuery(ListQuery.KeyListQuery);
         EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
         DirectConceptInterpreter interpreter = new DirectConceptInterpreter();
         ConceptInterpretationContext interpretationContext =
