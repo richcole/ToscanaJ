@@ -96,4 +96,13 @@ public interface Diagram2D extends XMLizable {
      * Returns the XML Element describing the diagram (if available, null otherwise).
      */
     Element getDescription();
+    
+    /**
+     * Returns true if the diagram is layouted as Hasse diagram.
+     * 
+     * This means every line is pointing downwards or in other terms: every node
+     * is located above all nodes that represent a concept lesser than its
+     * concept.
+     */
+    boolean isHasseDiagram();
 }

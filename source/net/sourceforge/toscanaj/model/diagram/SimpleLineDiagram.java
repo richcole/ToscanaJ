@@ -304,4 +304,15 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     public Element getDescription() {
         return this.description;
     }
+    
+    public boolean isHasseDiagram() {
+    	Iterator it = this.lines.iterator();
+    	while (it.hasNext()) {
+            DiagramLine line = (DiagramLine) it.next();
+            if(line.getFromPosition().getY() > line.getToPosition().getY()) {
+            	return false;
+            }
+        }
+        return true;
+    }
 }

@@ -20,10 +20,17 @@ public class NodeMovementEventListener implements EventBrokerListener {
     public void processEvent(Event e) {
         CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
         NodeView nodeView = (NodeView) dragEvent.getSubject();
+        DiagramView diagramView = nodeView.getDiagramView();
+
         DiagramNode node = nodeView.getDiagramNode();
+        Point2D oldPosition = node.getPosition();
         Point2D toPosition = dragEvent.getCanvasToPosition();
         node.setPosition(toPosition);
-        DiagramView diagramView = nodeView.getDiagramView();
+        
+        if(!diagramView.getDiagram().isHasseDiagram()) {
+        	node.setPosition(oldPosition);
+        }
+
         diagramView.requestScreenTransformUpdate();
         diagramView.repaint();
     }
