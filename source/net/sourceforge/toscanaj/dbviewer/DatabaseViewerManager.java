@@ -79,6 +79,17 @@ public class DatabaseViewerManager
         DatabaseViewerManager manager = (DatabaseViewerManager) viewerRegistry.get(viewerID);
         manager.viewer.showObject(objectKey);
     }
+    public static void showObject(String viewName, String objectKey)
+    {
+        for(int i = 0; i<viewerRegistry.size(); i++)
+        {
+            DatabaseViewerManager manager = (DatabaseViewerManager) viewerRegistry.get(i);
+            if(manager.screenName.equals(viewName))
+            {
+                manager.viewer.showObject(objectKey);
+            }
+        }
+    }
     public Element getTemplate()
     {
         return this.template;
@@ -102,5 +113,24 @@ public class DatabaseViewerManager
     public DBConnection getConnection()
     {
         return this.dbConnection;
+    }
+    public static List getViewNames()
+    {
+        List retVal = new LinkedList();
+        Iterator it = viewerRegistry.iterator();
+        while(it.hasNext())
+        {
+            DatabaseViewerManager manager = (DatabaseViewerManager) it.next();
+            retVal.add(manager.screenName);
+        }
+        return retVal;
+    }
+    public static int getNumberOfViews()
+    {
+        return viewerRegistry.size();
+    }
+    public static void resetRegistry()
+    {
+        viewerRegistry.clear();
     }
 }

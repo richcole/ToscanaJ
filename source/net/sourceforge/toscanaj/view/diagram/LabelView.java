@@ -81,10 +81,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
 
     /**
      * Store the diagram view that the label belongs to.
-     *
-     * This is used only for message passing whenever an update is needed.
      */
-    private DiagramView diagramView = null;
+    protected DiagramView diagramView = null;
 
     /**
      * The current display size in lines.

@@ -8,11 +8,16 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Vector;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 /**
  * A LabelView for displaying the objects.
@@ -40,6 +45,8 @@ public class ObjectLabelView extends LabelView {
 
     private List queryKeyValues = null;
     private List queryDisplayStrings = null;
+    
+    private JPopupMenu popupMenu = null;
 
     /**
      * Creates a view for the given label information.
@@ -142,14 +149,85 @@ public class ObjectLabelView extends LabelView {
         }
         /// @todo Get rid of RTTI here.
         if(this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.ListQuery) {
+            if(DatabaseViewerManager.getNumberOfViews() == 0)
+            {
+                return;
+            }
             int lineHit = (int)((pos.getY()-this.rect.getY())/this.lineHeight);
             int itemHit = lineHit + this.firstItem;
             DatabaseViewerManager.showObject(0,this.queryKeyValues.get(itemHit).toString());
         }
         if(this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.AggregateQuery) {
+            if(DatabaseReportGeneratorManager.getNumberOfReports() == 0)
+            {
+                return;
+            }
             DatabaseConnectedConcept concept = (DatabaseConnectedConcept) this.labelInfo.getNode().getConcept();
             DatabaseReportGeneratorManager.showReport(0,concept.constructWhereClause(this.showOnlyContingent));
         }
         return;
+    }
+    
+    public void openPopupMenu(MouseEvent event, Point2D pos) {
+        if(pos.getX() > this.rect.getMaxX() - this.scrollbarWidth) {
+            // a click on the scrollbar
+            return;
+        }
+        List viewNames;
+        if(this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.ListQuery)
+        {
+            viewNames = DatabaseViewerManager.getViewNames();
+        }
+        else
+        { // no views for aggregates
+            viewNames = new LinkedList();
+        }
+        List reportNames = DatabaseReportGeneratorManager.getReportNames();
+        if( viewNames.size() + reportNames.size() == 0 )
+        { // nothing to display
+            return;
+        }
+        popupMenu = new JPopupMenu();
+        JMenuItem menuItem;
+        if( viewNames.size() != 0 )
+        {
+            int lineHit = (int)((pos.getY()-this.rect.getY())/this.lineHeight);
+            int itemHit = lineHit + this.firstItem;
+            final String objectKey = this.queryKeyValues.get(itemHit).toString();
+            Iterator it = viewNames.iterator();
+            while(it.hasNext())
+            {
+                final String viewName = (String) it.next();
+                menuItem= new JMenuItem(viewName);
+                menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        DatabaseViewerManager.showObject(viewName, objectKey);    
+                    }
+                });
+                popupMenu.add(menuItem);
+            }
+        }
+        if( reportNames.size() != 0 )
+        {
+            if( viewNames.size() != 0 )
+            {
+                popupMenu.addSeparator();
+            }
+            DatabaseConnectedConcept concept = (DatabaseConnectedConcept) this.labelInfo.getNode().getConcept();
+            final String whereClause = concept.constructWhereClause(this.showOnlyContingent);
+            Iterator it = reportNames.iterator();
+            while(it.hasNext())
+            {
+                final String reportName = (String) it.next();
+                menuItem= new JMenuItem(reportName);
+                menuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        DatabaseReportGeneratorManager.showReport(reportName, whereClause);    
+                    }
+                });
+                popupMenu.add(menuItem);
+            }
+        }
+        popupMenu.show(this.diagramView,event.getX(),event.getY());
     }
 }

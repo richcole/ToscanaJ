@@ -4,6 +4,7 @@ import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
@@ -67,11 +68,22 @@ public abstract class CanvasItem implements ChangeObservable {
     }
 
     /**
+     * Callback for getting notification about any click.
+     *
+     * Unless it is overwritten in a derived class this will do nothing.
+     * Use this method only if you don't distinguish between single and
+     * double clicks, otherwise you should use the more specific methods
+     * singleClicked(Point2D) and doubleClicked(Point2D).
+     */
+    public void clicked(Point2D point) {
+    }
+
+    /**
      * Callback for getting notification about single clicks.
      *
      * Unless it is overwritten in a derived class this will do nothing.
      */
-    public void clicked(Point2D point) {
+    public void singleClicked(Point2D point) {
     }
 
     /**
@@ -80,6 +92,16 @@ public abstract class CanvasItem implements ChangeObservable {
      * Unless it is overwritten in a derived class this will do nothing.
      */
     public void doubleClicked(Point2D point) {
+    }
+
+    /**
+     * Callback for opening context menus.
+     *
+     * Unless it is overwritten in a derived class this will do nothing. It
+     * will be called whenever a popup was requested on that item (e.g. by
+     * clicking with the second mouse button on Windows).
+     */
+    public void openPopupMenu(MouseEvent event, Point2D point) {
     }
 
     /**

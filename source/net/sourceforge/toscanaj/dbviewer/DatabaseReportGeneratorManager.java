@@ -82,6 +82,17 @@ public class DatabaseReportGeneratorManager
         DatabaseReportGeneratorManager manager = (DatabaseReportGeneratorManager) generatorRegistry.get(generatorID);
         manager.reportGenerator.showReport(whereClause);
     }
+    public static void showReport(String reportName, String whereClause)
+    {
+        for(int i = 0; i<generatorRegistry.size(); i++)
+        {
+            DatabaseReportGeneratorManager manager = (DatabaseReportGeneratorManager) generatorRegistry.get(i);
+            if(manager.screenName.equals(reportName))
+            {
+                manager.reportGenerator.showReport(whereClause);
+            }
+        }
+    }
     public Element getTemplate()
     {
         return this.template;
@@ -105,5 +116,24 @@ public class DatabaseReportGeneratorManager
     public DBConnection getConnection()
     {
         return this.dbConnection;
+    }
+    public static List getReportNames()
+    {
+        List retVal = new LinkedList();
+        Iterator it = generatorRegistry.iterator();
+        while(it.hasNext())
+        {
+            DatabaseReportGeneratorManager manager = (DatabaseReportGeneratorManager) it.next();
+            retVal.add(manager.screenName);
+        }
+        return retVal;
+    }
+    public static int getNumberOfReports()
+    {
+        return generatorRegistry.size();
+    }
+    public static void resetRegistry()
+    {
+        generatorRegistry.clear();
     }
 }

@@ -633,7 +633,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      * Open a file and parse it to create ConceptualSchema.
      */
     protected void openSchemaFile(File schemaFile) {
-        // parse it
+        DatabaseViewerManager.resetRegistry();
+        DatabaseReportGeneratorManager.resetRegistry();
         try {
             conceptualSchema = CSXParser.parse(schemaFile);
         } catch (FileNotFoundException e) {
