@@ -170,7 +170,7 @@ public class DatabaseInfo implements XMLizable {
             setPassword("");
         } else {
             Element urlElement =
-                XMLHelper.mustbe(URL_SOURCE_ELEMENT_NAME, elem);
+                XMLHelper.getMandatoryChild(elem, URL_SOURCE_ELEMENT_NAME);
             sourceURL = urlElement.getTextNormalize();
             driverClass =
                 XMLHelper
@@ -185,8 +185,8 @@ public class DatabaseInfo implements XMLizable {
                     .getAttribute(urlElement, PASSWORD_ATTRIBUTE_NAME)
                     .getValue();
         }
-        this.table = new Table(XMLHelper.mustbe(TABLE_ELEMENT_NAME, elem));
-        this.objectKey = new Column(XMLHelper.mustbe(OBJECT_KEY_ELEMENT_NAME, elem), this.table);
+        this.table = new Table(XMLHelper.getMandatoryChild(elem, TABLE_ELEMENT_NAME));
+        this.objectKey = new Column(XMLHelper.getMandatoryChild(elem, OBJECT_KEY_ELEMENT_NAME), this.table);
     }
 
     /**

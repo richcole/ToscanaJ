@@ -125,7 +125,7 @@ public class DiagramNode implements XMLizable {
     public void readXML(Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(elem, NODE_ELEMENT_NAME);
         identifier = XMLHelper.getAttribute(elem, ID_ATTRIBUTE_NAME).getValue();
-        Element positionElem = XMLHelper.mustbe(POSITION_ELEMENT_NAME, elem);
+        Element positionElem = XMLHelper.getMandatoryChild(elem, POSITION_ELEMENT_NAME);
         position = new Point2D.Double(
                 XMLHelper.getDoubleAttribute(positionElem, POSITION_X_ATTRIBUTE_NAME),
                 XMLHelper.getDoubleAttribute(positionElem, POSITION_Y_ATTRIBUTE_NAME)
@@ -145,7 +145,7 @@ public class DiagramNode implements XMLizable {
         objectLabelInfo.attachNode(this);
 
         concept = new ConceptImplementation(
-                XMLHelper.mustbe(ConceptImplementation.CONCEPT_ELEMENT_NAME, elem)
+                XMLHelper.getMandatoryChild(elem, ConceptImplementation.CONCEPT_ELEMENT_NAME)
         );
     }
 

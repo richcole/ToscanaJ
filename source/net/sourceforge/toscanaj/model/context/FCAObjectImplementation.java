@@ -7,15 +7,26 @@
  */
 package net.sourceforge.toscanaj.model.context;
 
+import java.lang.reflect.Constructor;
+
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+
+import org.jdom.Attribute;
 import org.jdom.Element;
 
 /**
  * @todo consider using a cache to reuse existing FCAObjects, i.e. don't have two FCAObjects with the same data (and description).
  * Should descriptions be functionally dependend on the data? How to model this in CSX?
  */
-public class FCAObjectImplementation implements WritableFCAObject {
+public class FCAObjectImplementation implements WritableFCAObject, XMLizable {
 	private Object data;
 	private Element description;
+	private static final String OBJECT_ELEMENT_NAME = "object";
+	private static final String DESCRIPTION_ELEMENT_NAME = "description";
+	private static final String DATA_ELEMENT_NAME = "data";
+	private static final String CLASS_ATTRIBUTE_NAME = "class";
 
 	public FCAObjectImplementation(Object data) {
 		this(data,null);
@@ -64,5 +75,48 @@ public class FCAObjectImplementation implements WritableFCAObject {
 	
 	public int hashCode() {
 		return this.data.hashCode();
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#toXML()
+	 * @todo think about base64 encoding for serializable data objects, currently
+	 *       works only for String and XMLizable data objects
+	 */
+	public Element toXML() {
+		Element retVal = new Element(OBJECT_ELEMENT_NAME);
+		Element descriptionElement = new Element(DESCRIPTION_ELEMENT_NAME);
+		descriptionElement.addContent(description);
+		retVal.addContent(descriptionElement);
+		Element dataElement = new Element(DATA_ELEMENT_NAME);
+		if (data instanceof XMLizable) {
+			dataElement=((XMLizable)data).toXML();
+			dataElement.setAttribute(CLASS_ATTRIBUTE_NAME, data.getClass().getName());
+		} else {
+			dataElement.addContent(data.toString());
+			dataElement.setAttribute(CLASS_ATTRIBUTE_NAME, String.class.getName());
+		}
+		retVal.addContent(dataElement);
+		return retVal;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#readXML(org.jdom.Element)
+	 */
+	public void readXML(Element elem) throws XMLSyntaxError {
+		// TODO Auto-generated method stub
+		description = XMLHelper.getMandatoryChild(elem, DESCRIPTION_ELEMENT_NAME);
+		Element dataElement = XMLHelper.getMandatoryChild(elem, DATA_ELEMENT_NAME);
+		String className = XMLHelper.getAttribute(elem, CLASS_ATTRIBUTE_NAME).getValue();
+		if (className.equals(String.class.getName())) {
+			data = dataElement.getTextTrim();
+		} else {
+			Constructor construct;
+			try {
+				construct = Class.forName(className).getConstructor(new Class[] {Element.class});
+				data = construct.newInstance(new Object[] {dataElement});
+			} catch (Exception e) {
+				throw new XMLSyntaxError("Initialization of object of type " + className + "failed.", e);
+			}
+		}
 	}
 }

@@ -159,21 +159,21 @@ public class LabelInfo implements XMLizable, ChangeObservable {
                 }
             }
         }
-        Element offsetElem = XMLHelper.mustbe(OFFSET_ELEMENT_NAME, elem);
+        Element offsetElem = XMLHelper.getMandatoryChild(elem, OFFSET_ELEMENT_NAME);
         setOffset(
                 XMLHelper.getDoubleAttribute(offsetElem, OFFSET_X_ATTRIBUTE_NAME),
                 XMLHelper.getDoubleAttribute(offsetElem, OFFSET_Y_ATTRIBUTE_NAME)
         );
-        Element backgroundColorElem = XMLHelper.mustbe(BACKGROUND_COLOR_ELEMENT_NAME, elem);
+        Element backgroundColorElem = XMLHelper.getMandatoryChild(elem, BACKGROUND_COLOR_ELEMENT_NAME);
         setBackgroundColor(ColorStringConverter.stringToColor(backgroundColorElem.getText()));
-        Element textColorElem = XMLHelper.mustbe(TEXT_COLOR_ELEMENT_NAME, elem);
+        Element textColorElem = XMLHelper.getMandatoryChild(elem, TEXT_COLOR_ELEMENT_NAME);
         setTextColor(ColorStringConverter.stringToColor(textColorElem.getText()));
 
         readTextAlignment(elem);
     }
 
     private void readTextAlignment(Element elem) throws XMLSyntaxError {
-        Element textAlignmentElem = XMLHelper.mustbe(TEXT_ALIGNMENT_ELEMENT_NAME, elem);
+        Element textAlignmentElem = XMLHelper.getMandatoryChild(elem, TEXT_ALIGNMENT_ELEMENT_NAME);
         String textAlignmentElemText = textAlignmentElem.getText();
         if (textAlignmentElemText.equals(TEXT_ALIGNMENT_LEFT_CONTENT)) {
             textAlignment = ALIGNLEFT;

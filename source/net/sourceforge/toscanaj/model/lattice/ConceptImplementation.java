@@ -498,13 +498,13 @@ public class ConceptImplementation implements Concept {
 
     public void readXML(Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(elem, CONCEPT_ELEMENT_NAME);
-        Element objectContingentElem = XMLHelper.mustbe(OBJECT_CONTINGENT_ELEMENT_NAME, elem);
+        Element objectContingentElem = XMLHelper.getMandatoryChild(elem, OBJECT_CONTINGENT_ELEMENT_NAME);
         List objects = objectContingentElem.getChildren(OBJECT_ELEMENT_NAME);
         for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
             Element objElem = (Element) iterator.next();
             this.objectContingent.add(new FCAObjectImplementation(objElem.getText()));
         }
-        Element attributeContingentElem = XMLHelper.mustbe(ATTRIBUTE_CONTINGENT_ELEMENT_NAME, elem);
+        Element attributeContingentElem = XMLHelper.getMandatoryChild(elem, ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
         List attributes = attributeContingentElem.getChildren(ATTRIBUTE_ELEMENT_NAME);
         for (Iterator iterator = attributes.iterator(); iterator.hasNext();) {
             Element attrElem = (Element) iterator.next();

@@ -31,12 +31,12 @@ public abstract class XMLHelper {
         }
     }
 
-    static public Element mustbe(String name, Element parent)
+    static public Element getMandatoryChild(Element element, String name)
             throws XMLSyntaxError {
-        Element child = parent.getChild(name);
+        Element child = element.getChild(name);
         if (child == null) {
             String reason = "Expected element '" +
-                    name + "' in '" + parent.getName() + "'";
+                    name + "' in '" + element.getName() + "'";
             throw new XMLSyntaxError(reason);
         }
         return child;
@@ -48,7 +48,8 @@ public abstract class XMLHelper {
 
     static public void checkName(Element element, String name) throws XMLSyntaxError {
         if (!element.getName().equals(name)) {
-            throw new XMLSyntaxError("Expected Element: " + name);
+            throw new XMLSyntaxError("Expected Element <" + name + ">. Found <" +
+            		element.getName() + "> instead.");
         }
 
     }
