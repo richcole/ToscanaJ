@@ -7,12 +7,9 @@
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.parser.DataFormatException;
-import org.tockit.canvas.imagewriter.ImageGenerationException;
-
 import java.awt.Component;
-import javax.swing.*;
+
+import javax.swing.JOptionPane;
 
 
 /**
@@ -59,16 +56,7 @@ public class ErrorDialog {
      * error message if required.
      */
     private void showDetailedErrorMsg(Component component, Throwable e, String title, String errorMsg) {
-        Throwable original = null;
-        if (e instanceof ImageGenerationException) {
-            original = ((ImageGenerationException) e).getOriginal();
-        } else if (e instanceof DataFormatException) {
-            original = ((DataFormatException) e).getOriginal();
-        } else if (e instanceof DatabaseException) {
-            original = ((DatabaseException) e).getCause();
-        } else {
-        	original = e.getCause();
-        }
+        Throwable original = e.getCause();
         if (original == null) {
             new ErrorDialog(component, title, errorMsg);
             return;

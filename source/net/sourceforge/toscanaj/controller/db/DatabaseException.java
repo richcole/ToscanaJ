@@ -16,24 +16,19 @@ package net.sourceforge.toscanaj.controller.db;
  * @todo build hierarchy for this.
  */
 public class DatabaseException extends Exception {
-    /**
-     * Constructs an exception without detail message.
-     */
     public DatabaseException() {
-        super();
+    super();
     }
 
-    /**
-     * Constructs an exception with detail message.
-     */
-    public DatabaseException(String s) {
-        super(s);
+    public DatabaseException(String message) {
+    super(message);
     }
 
-    /**
-     * Constructs an exception with detail message and embedded exception.
-     */
-    public DatabaseException(String s, Exception e) {
-        super(s, e);
+    public DatabaseException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public DatabaseException(Throwable cause) {
+        super(cause);
     }
 }

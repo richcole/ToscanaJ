@@ -61,9 +61,9 @@ public class DataDump {
         } catch (DataFormatException e) {
             System.err.println("Could not parse input.");
             System.err.println("- " + e.getMessage());
-            if (e.getOriginal() != null) {
+            if (e.getCause() != null) {
                 System.err.println("Detail:");
-                System.err.println("- " + e.getOriginal().getMessage());
+                System.err.println("- " + e.getCause().getMessage());
             }
             System.exit(2);
         } catch (Exception e) {
