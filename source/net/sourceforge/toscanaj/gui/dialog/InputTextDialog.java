@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.view.context;
+package net.sourceforge.toscanaj.gui.dialog;
 
 import java.awt.Component;
 import java.awt.Dialog;

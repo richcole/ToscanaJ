@@ -7,10 +7,10 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
+import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
-import net.sourceforge.toscanaj.view.context.InputTextDialog;
 
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
