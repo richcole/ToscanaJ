@@ -124,15 +124,18 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 			for(Iterator it = outerConcept.getDownset().iterator(); it.hasNext(); ) {
 				Concept currentOuterConcept = (Concept) it.next();
 				ConceptInterpretationContext currentContext = parentContext.createNestedContext(currentOuterConcept);
-				retVal += getLocalObjectContingentSize(concept, currentContext);
+				retVal += getLocalExtentSize(concept, currentContext);
 			}
 			return retVal;
 		} else {
-			return getLocalObjectContingentSize(concept, context);
+			return getLocalExtentSize(concept, context);
 		}
 	}
 
-	private int getLocalObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
+	/**
+	 * Calculates the extent independent of nesting.
+	 */
+	private int getLocalExtentSize(Concept concept, ConceptInterpretationContext context) {
 		int retVal = 0;
 		Iterator it = concept.getDownset().iterator();
 		while (it.hasNext()) {
