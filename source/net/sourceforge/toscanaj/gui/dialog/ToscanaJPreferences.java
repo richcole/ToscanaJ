@@ -3,7 +3,7 @@
  * read licence.txt file provided with the distribution for
  * licensing information.
  * 
- * $ID$
+ * $Id$
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
