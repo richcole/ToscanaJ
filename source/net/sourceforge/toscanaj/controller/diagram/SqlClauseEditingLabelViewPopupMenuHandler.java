@@ -66,6 +66,12 @@ public class SqlClauseEditingLabelViewPopupMenuHandler implements EventBrokerLis
 															 "Change SQL Clause", "SQL clause", currentValue);
 				if (!dialog.isCancelled()) {
 					String newValue = dialog.getInput();
+					Iterator it = labelView.getNodeView().getDiagramNode().getConcept().getObjectContingentIterator();
+					while (it.hasNext()) {
+						Object cur = (Object) it.next();
+						//System.out.println("cur concept = " + cur);
+						
+					}
 					diagramView.repaint();
 				}
 			}
