@@ -7,13 +7,21 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
 import net.sourceforge.toscanaj.model.context.*;
 import net.sourceforge.toscanaj.model.order.Ordered;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 
-import java.util.*;
 
 /**
  * This implements concepts.
@@ -37,8 +45,8 @@ public class ConceptImplementation implements Concept {
     public static final String ATTRIBUTE_ELEMENT_NAME = "attribute";
     public static final String DESCRIPTION_ELEMENT_NAME = "description";
 
-    private Set attributeContingent = new TreeSet();
-    private Set objectContingent = new TreeSet();
+    private Set attributeContingent = new HashSet();
+    private Set objectContingent = new HashSet();
 
     protected static List makeList() {
         return new ArrayList();
