@@ -17,7 +17,7 @@ public class DistributionQuery extends Query {
     private DatabaseInfo info;
     public static final String QUERY_ELEMENT_NAME = "distributionQuery";
 
-    public static final DistributionQuery PERCENT_QUERY = new DistributionQuery(null, "Percent", "fake");
+    public static final DistributionQuery PERCENT_QUERY = new DistributionQuery(null, "Distribution of Objects", "fake");
 
     public DistributionQuery(DatabaseInfo info, String name, String header) {
         super(name, header);
