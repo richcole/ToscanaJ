@@ -8,8 +8,6 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
-import org.w3c.dom.Node;
-
 import java.util.List;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;

@@ -14,8 +14,6 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 
 import java.util.List;
 
-import org.w3c.dom.Node;
-
 public class DefaultConceptInterpreter implements ConceptInterpreter {
 
     List N;
