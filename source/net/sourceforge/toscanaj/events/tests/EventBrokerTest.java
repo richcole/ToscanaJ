@@ -38,23 +38,32 @@ public class EventBrokerTest extends TestCase {
         try {
             TestListener testListener1 = new TestListener();
             TestListener testListener2 = new TestListener();
+            TestListener testListener3 = new TestListener();
+            TestListener testListener4 = new TestListener();
 
             EventBroker mainBroker = new EventBroker();
             String packageName = getClass().getPackage().getName();
             mainBroker.subscribe(testListener1, Class.forName(packageName + ".TestEventType1"), Object.class);
-            mainBroker.subscribe(testListener2, Class.forName(packageName + ".TestEventType2"), Integer.class );
+            mainBroker.subscribe(testListener2, Class.forName(packageName + ".TestEventType1"), Integer.class );
+            mainBroker.subscribe(testListener3, Class.forName(packageName + ".TestEventType2"), Object.class );
+            mainBroker.subscribe(testListener4, Class.forName(packageName + ".TestEventType2"), Integer.class );
 
-            testListener1.eventCounter.setExpected(3);
-            testListener2.eventCounter.setExpected(1);
+            testListener1.eventCounter.setExpected(4);
+            testListener2.eventCounter.setExpected(2);
+            testListener3.eventCounter.setExpected(2);
+            testListener4.eventCounter.setExpected(1);
 
             mainBroker.processEvent(new TestEventType1(new Object()));
             mainBroker.processEvent(new TestEventType1(new Integer(0)));
             mainBroker.processEvent(new TestEventType1b(new Object()));
+            mainBroker.processEvent(new TestEventType1b(new Integer(0)));
             mainBroker.processEvent(new TestEventType2(new Object()));
             mainBroker.processEvent(new TestEventType2(new Integer(0)));
 
             testListener1.eventCounter.verify();
             testListener2.eventCounter.verify();
+            testListener3.eventCounter.verify();
+            testListener4.eventCounter.verify();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
