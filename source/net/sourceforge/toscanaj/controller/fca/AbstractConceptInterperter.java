@@ -30,8 +30,8 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 		private int neutralSize;
 		private int outerSize;
 		private double expectedSize;
-		private DeviationValuesRef (int neutrialSize, int outerSize, double expectedSize) {
-			this.neutralSize = neutrialSize;
+		private DeviationValuesRef (int neutralSize, int outerSize, double expectedSize) {
+			this.neutralSize = neutralSize;
 			this.outerSize = outerSize;
 			this.expectedSize = expectedSize;
 		}
