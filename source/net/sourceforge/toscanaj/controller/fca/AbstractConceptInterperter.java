@@ -229,7 +229,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 	}
 	
 	public Object[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
-		if(!isRealized(concept, context)) {
+		if(!isRealized(concept, context) && !this.showDeviation) {
 			return null;
 		}
 		if (query == ListQuery.KEY_LIST_QUERY) {
@@ -255,9 +255,6 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                 DeviationValuesRef deviationValues = new DeviationValuesRef(concept, context);
                 double expectedSize = deviationValues.getExpectedSize();
                 int objectCount = getObjectCount(concept, context); 
-                if ((objectCount == 0) && (expectedSize == 0)) {
-                    return null;
-                }
                 if (objectCount == expectedSize) {
                     return executeObjectCountQuery(concept, context);
                 }
@@ -275,9 +272,6 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                     DeviationValuesRef deviationValues = new DeviationValuesRef(concept, context);
                     double expectedSize = deviationValues.getExpectedSize();
                     int objectCount = getObjectCount(concept, context); 
-                    if ((objectCount == 0) && (expectedSize == 0)) {
-                        return null;
-                    }
                     if (objectCount != expectedSize) {
                         int fullExtent = getExtentSize(concept.getTopConcept(), context);
                         NumberFormat format = DecimalFormat.getPercentInstance();
@@ -424,4 +418,8 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
     public void showDeviation(boolean show) {
         this.showDeviation = show;    
     }
+
+	public boolean isVisible(Concept concept, ConceptInterpretationContext context) {
+	    return this.showDeviation || isRealized(concept, context);
+	}
 }

@@ -80,7 +80,7 @@ public class ObjectLabelView extends LabelView {
         Concept concept = this.labelInfo.getNode().getConcept();
         ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
         ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
-        return interpreter.isRealized(concept, context) && super.isVisible() && !allHidden;
+        return interpreter.isVisible(concept, context) && super.isVisible() && !allHidden;
     }
 
     public void updateEntries() {

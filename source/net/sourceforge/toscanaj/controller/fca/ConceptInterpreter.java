@@ -72,4 +72,6 @@ public interface ConceptInterpreter {
     Object[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context);
     
     void showDeviation(boolean show);
+    
+    boolean isVisible(Concept concept, ConceptInterpretationContext context);
 }

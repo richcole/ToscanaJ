@@ -269,14 +269,14 @@ public class DiagramView extends Canvas implements ChangeObserver {
                     }
                     addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept), layer + 1, isTopRealizedConcept);
                 }
-                LabelInfo objLabelInfo = diagram.getObjectLabel(i);
-                if (objLabelInfo != null && this.objectLabelFactory != null) {
-                    LabelView labelView = this.objectLabelFactory.createLabelView(this, nodeView, objLabelInfo);
-                    addCanvasItem(labelView, labelLayerName);
-                    addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
-                    labelView.addObserver(this);
-                }
             }
+			LabelInfo objLabelInfo = diagram.getObjectLabel(i);
+			if (objLabelInfo != null && this.objectLabelFactory != null) {
+				LabelView labelView = this.objectLabelFactory.createLabelView(this, nodeView, objLabelInfo);
+				addCanvasItem(labelView, labelLayerName);
+				addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
+				labelView.addObserver(this);
+			}
             if(showAttributeLabels) {
 	            LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
 	            if (attrLabelInfo != null) {
