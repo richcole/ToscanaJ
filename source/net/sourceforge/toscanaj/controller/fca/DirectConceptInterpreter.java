@@ -10,9 +10,9 @@ package net.sourceforge.toscanaj.controller.fca;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 
 
 public class DirectConceptInterpreter extends AbstractConceptInterperter
@@ -20,21 +20,21 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
 											
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
         if (context.getObjectDisplayMode() == ConceptInterpretationContext.CONTINGENT) {
-	        Set contingent = calculateContingent(concept, context);
+	        List contingent = calculateContingent(concept, context);
 			return contingent.iterator();
         } else {
-			Set extent = calculateExtent(concept, context);
+			List extent = calculateExtent(concept, context);
             return extent.iterator();
         }
     }
 
     protected int calculateContingentSize(Concept concept, ConceptInterpretationContext context) {
-    	Set contingent = calculateContingent(concept, context);
+    	List contingent = calculateContingent(concept, context);
     	return contingent.size();
     }
 
-    private Set calculateContingent(Concept concept, ConceptInterpretationContext context) {
-		HashSet retVal = new HashSet();
+    private List calculateContingent(Concept concept, ConceptInterpretationContext context) {
+        ArrayList retVal = new ArrayList();
         Iterator objectContingentIterator = concept.getObjectContingentIterator();
         while (objectContingentIterator.hasNext()) {
             Object o = objectContingentIterator.next();
@@ -45,7 +45,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
         return retVal;
     }
 
-    private void filterObjects(final Set currentSet, ConceptInterpretationContext context) {
+    private void filterObjects(final List currentSet, ConceptInterpretationContext context) {
         DiagramHistory.ConceptVisitor visitor;
         if (context.getFilterMode() == ConceptInterpretationContext.EXTENT) {
             visitor = new DiagramHistory.ConceptVisitor() {
@@ -91,7 +91,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
         context.getDiagramHistory().visitZoomedConcepts(visitor);
     }
 
-    private void nestObjects(Set currentSet, ConceptInterpretationContext context, boolean contingentOnly) {
+    private void nestObjects(List currentSet, ConceptInterpretationContext context, boolean contingentOnly) {
         Iterator mainIt = context.getNestingConcepts().iterator();
         while (mainIt.hasNext()) {
             Concept concept = (Concept) mainIt.next();
@@ -118,8 +118,8 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
         }
     }
 
-    private Set calculateExtent(Concept concept, ConceptInterpretationContext context) {
-        HashSet retVal = new HashSet();
+    private List calculateExtent(Concept concept, ConceptInterpretationContext context) {
+        ArrayList retVal = new ArrayList();
         Iterator extentContingentIterator = concept.getExtentIterator();
         while (extentContingentIterator.hasNext()) {
             Object o = extentContingentIterator.next();
@@ -130,7 +130,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
         return retVal;
     }
     
-	protected Object  getObject (String value, Concept concept, ConceptInterpretationContext context) {
+	protected Object getObject(String value, Concept concept, ConceptInterpretationContext context) {
 		return value;
 	}
 	

@@ -143,7 +143,7 @@ import org.tockit.swing.preferences.ExtendedPreferences;
  * @todo make sure all changes to the context will propagate to make the schema dirty.
  */
 public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
-    private static final int NUMBER_OF_VALUE_POPUP_MENU_ROWS = 15;
+    private static final int MAXIMUM_ROWS_IN_VALUE_MENU = 15;
     private static final String WINDOW_TITLE = "Siena";
     private static final int MaxMruFiles = 8;
 
@@ -977,9 +977,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
     }
 
-    private void addDiagrams(
-        ConceptualSchema schema,
-        CernatoModel cernatoModel) {
+    private void addDiagrams(ConceptualSchema schema, CernatoModel cernatoModel) {
         Vector views = cernatoModel.getViews();
         for (Iterator iterator = views.iterator(); iterator.hasNext();) {
             View view = (View) iterator.next();
@@ -991,18 +989,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
     }
 
-    private void addDiagram(
-        ConceptualSchema schema,
-        Context context,
-        String name,
-        DimensionCreationStrategy dimensionStrategy) {
+    private void addDiagram(ConceptualSchema schema, Context context, String name,
+                            DimensionCreationStrategy dimensionStrategy) {
         LatticeGenerator lgen = new GantersAlgorithm();
         Lattice lattice = lgen.createLattice(context);
-        Diagram2D diagram =
-            NDimLayoutOperations.createDiagram(
-                lattice,
-                name,
-                dimensionStrategy);
+        Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, name, dimensionStrategy);
         schema.addDiagram(diagram);
     }
 
@@ -1335,11 +1326,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		AttributeValue[] textualValueList = attributeType.getValueRange();
 		JPopupMenu menu = new JPopupMenu();
 		
-		if(textualValueList.length<=NUMBER_OF_VALUE_POPUP_MENU_ROWS){
+		if(textualValueList.length<=MAXIMUM_ROWS_IN_VALUE_MENU){
 			menu = createPopupMenu(1,textualValueList.length,textualValueList,
 														property,obj);
 		} else {
-			menu = createPopupMenu(textualValueList.length/NUMBER_OF_VALUE_POPUP_MENU_ROWS,NUMBER_OF_VALUE_POPUP_MENU_ROWS,
+			menu = createPopupMenu(textualValueList.length/MAXIMUM_ROWS_IN_VALUE_MENU,MAXIMUM_ROWS_IN_VALUE_MENU,
 											textualValueList,property,obj );
 		}
 		menu.show(tableView,(int)xPos,(int)yPos);

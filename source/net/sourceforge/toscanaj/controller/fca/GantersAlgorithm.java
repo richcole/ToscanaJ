@@ -7,12 +7,19 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Vector;
+
+import org.tockit.util.ListSet;
+import org.tockit.util.ListSetImplementation;
+
 import net.sourceforge.toscanaj.model.context.*;
 import net.sourceforge.toscanaj.model.context.BinaryRelation;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.lattice.*;
-
-import java.util.*;
 
 public class GantersAlgorithm implements LatticeGenerator {
     private Context context;
@@ -77,7 +84,7 @@ public class GantersAlgorithm implements LatticeGenerator {
         if (concept1.getObjectContingentSize() > concept2.getObjectContingentSize()) {
             return false;
         }
-        Set extent2 = new HashSet();
+        ListSet extent2 = new ListSetImplementation();
         for (Iterator iterator = concept2.getObjectContingentIterator(); iterator.hasNext();) {
             Object obj = iterator.next();
             extent2.add(obj);
@@ -117,12 +124,12 @@ public class GantersAlgorithm implements LatticeGenerator {
     }
 
     private void findExtents() {
-        Set extent = new HashSet();
+        ListSet extent = new ListSetImplementation();
         createClosure(extent);
         extents.add(extent);
         do {
             for (int i = objects.length - 1; i >= 0; i--) {
-                Set newExtent = calculateNewExtent(extent, i);
+                ListSet newExtent = calculateNewExtent(extent, i);
                 if (iLargerThan(newExtent, extent, i)) {
                     extents.add(newExtent);
                     extent = newExtent;
@@ -135,12 +142,12 @@ public class GantersAlgorithm implements LatticeGenerator {
     private void createConcepts(LatticeImplementation lattice) {
         for (Iterator iterator = extents.iterator(); iterator.hasNext();) {
             ConceptImplementation concept = new ConceptImplementation();
-            Set ext = (Set) iterator.next();
+            ListSet ext = (ListSet) iterator.next();
             for (Iterator intit = ext.iterator(); intit.hasNext();) {
                 Object fcaObject = intit.next();
                 concept.addObject(fcaObject);
             }
-            Set intent = (Set) intents.get(ext);
+            ListSet intent = (ListSet) intents.get(ext);
             for (Iterator intit = intent.iterator(); intit.hasNext();) {
                 Attribute attribute = (Attribute) intit.next();
                 concept.addAttribute(attribute);
@@ -149,7 +156,7 @@ public class GantersAlgorithm implements LatticeGenerator {
         }
     }
 
-    private boolean iLargerThan(Set largerSet, Set smallerSet, int i) {
+    private boolean iLargerThan(ListSet largerSet, ListSet smallerSet, int i) {
         for (int j = 0; j <= i - 1; j++) {
             if (largerSet.contains(objects[j]) != smallerSet.contains(objects[j])) {
                 return false;
@@ -164,8 +171,8 @@ public class GantersAlgorithm implements LatticeGenerator {
         return true;
     }
 
-    private Set calculateNewExtent(Set extent, int i) {
-        Set newExtent = new HashSet();
+    private ListSet calculateNewExtent(ListSet extent, int i) {
+        ListSet newExtent = new ListSetImplementation();
         for (int j = 0; j <= i - 1; j++) {
             if (extent.contains(objects[j])) {
                 newExtent.add(objects[j]);
@@ -176,13 +183,13 @@ public class GantersAlgorithm implements LatticeGenerator {
         return newExtent;
     }
 
-    private void createClosure(Set extent) {
+    private void createClosure(ListSet extent) {
         Collection attributes = context.getAttributes();
         BinaryRelation relation = context.getRelation();
-        Set intent = new HashSet(attributes);
+        ListSet intent = new ListSetImplementation(attributes);
         for (Iterator it1 = extent.iterator(); it1.hasNext();) {
             Object object = it1.next();
-            Set unrelatedAttributes = new HashSet();
+            ListSet unrelatedAttributes = new ListSetImplementation();
             for (Iterator it2 = intent.iterator(); it2.hasNext();) {
                 Object attribute = it2.next();
                 if (!relation.contains(object, attribute)) {
@@ -195,7 +202,7 @@ public class GantersAlgorithm implements LatticeGenerator {
         extent.addAll(context.getObjects());
         for (Iterator it1 = intent.iterator(); it1.hasNext();) {
             Object attribute = it1.next();
-            Set unrelatedObjects = new HashSet();
+            ListSet unrelatedObjects = new ListSetImplementation();
             for (Iterator it2 = extent.iterator(); it2.hasNext();) {
                 Object object = it2.next();
                 if (!relation.contains(object, attribute)) {

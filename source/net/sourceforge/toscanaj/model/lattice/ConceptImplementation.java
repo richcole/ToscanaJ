@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,6 +20,8 @@ import net.sourceforge.toscanaj.model.order.Ordered;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
+import org.tockit.util.ListSet;
+import org.tockit.util.ListSetImplementation;
 
 
 /**
@@ -45,12 +46,8 @@ public class ConceptImplementation implements Concept {
     public static final String ATTRIBUTE_ELEMENT_NAME = "attribute";
     public static final String DESCRIPTION_ELEMENT_NAME = "description";
 
-    private Set attributeContingent = new HashSet();
-    private Set objectContingent = new HashSet();
-
-    protected static List makeList() {
-        return new ArrayList();
-    }
+    private ListSet attributeContingent = new ListSetImplementation();
+    private ListSet objectContingent = new ListSetImplementation();
 
     /**
      * This class implements an iterator that iterates over all attribute
