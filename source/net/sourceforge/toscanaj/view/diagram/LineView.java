@@ -16,7 +16,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 /**
- * class DiagramLine drawsdsfdfs a line between two points
+ * Draws a line between two points, representing a DiagramLine in the model.
  */
 public class LineView extends CanvasItem {
     /**
