@@ -104,28 +104,34 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
                     Context context =
                 		   generator.generateScale(selectionSource.getSelectedTableColumnPairs(),
                            conceptualSchema, databaseConnection);
-					LatticeGenerator lgen = new GantersAlgorithm();
-					Lattice lattice = lgen.createLattice(context);
-					Diagram2D returnValue = NDimLayoutOperations.createDiagram(lattice, context.getName(), new DefaultDimensionStrategy());
-                    if (null != returnValue) {
-                    	Diagram2D diagramWithSameTitle = null;
-                    	int indexOfExistingDiagram = -1;
-                    	for(int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
-                    		if(conceptualSchema.getDiagram(i).getTitle().equalsIgnoreCase(returnValue.getTitle())) {
-                    			diagramWithSameTitle = conceptualSchema.getDiagram(i);
-                    			indexOfExistingDiagram = i; 
-                    		}
-                    	}
-                    	if(diagramWithSameTitle != null) {
-    							int rv = showTitleExistsDialog(returnValue);
-								if(rv==JOptionPane.OK_OPTION){
-									replaceTitle(returnValue, diagramWithSameTitle, indexOfExistingDiagram);
-								}else if(rv==JOptionPane.CANCEL_OPTION){
-									renameTitle(returnValue, diagramWithSameTitle);
-								}		
-                    	}else{
-							conceptualSchema.addDiagram(returnValue);
-                    	}
+                    Diagram2D returnValue = null;
+                    Lattice lattice = null;
+                    if(context!=null){
+						LatticeGenerator lgen = new GantersAlgorithm();
+						lattice = lgen.createLattice(context);
+						returnValue = NDimLayoutOperations.createDiagram(
+									  lattice, context.getName(), 
+									  new DefaultDimensionStrategy());
+						if (null != returnValue) {
+						   Diagram2D diagramWithSameTitle = null;
+						   int indexOfExistingDiagram = -1;
+						   for(int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
+							   if(conceptualSchema.getDiagram(i).getTitle().equalsIgnoreCase(returnValue.getTitle())) {
+								   diagramWithSameTitle = conceptualSchema.getDiagram(i);
+								   indexOfExistingDiagram = i; 
+							   }
+						   }
+						   if(diagramWithSameTitle != null) {
+								   int rv = showTitleExistsDialog(returnValue);
+								   if(rv==JOptionPane.OK_OPTION){
+									   replaceTitle(returnValue, diagramWithSameTitle, indexOfExistingDiagram);
+								   }else if(rv==JOptionPane.CANCEL_OPTION){
+									   renameTitle(returnValue, diagramWithSameTitle);
+								   }		
+						   }else{
+							   conceptualSchema.addDiagram(returnValue);
+						   }
+					   }
                     }
                 }
 				private void replaceTitle(Diagram2D returnValue, Diagram2D diagramWithSameTitle, int indexOfExistingDiagram) {
