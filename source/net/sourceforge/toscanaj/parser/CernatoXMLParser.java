@@ -98,7 +98,7 @@ public class CernatoXMLParser {
             }
         }
         types.put(id, newType);
-        model.getContext().getTypes().add(newType);
+        model.getContext().add(newType);
     }
 
     private static void parseNumericalType(Element element, CernatoModel model, Hashtable types) throws DataFormatException {
@@ -150,7 +150,7 @@ public class CernatoXMLParser {
             new NumericalValueGroup(newType, groupName, groupId, min, minIncluded, max, maxIncluded);
         }
         types.put(id, newType);
-        model.getContext().getTypes().add(newType);
+        model.getContext().add(newType);
     }
 
     private static void parseProperties(Element root, CernatoModel model, Hashtable types, Hashtable properties)

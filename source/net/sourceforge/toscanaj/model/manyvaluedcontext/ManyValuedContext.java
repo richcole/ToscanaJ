@@ -7,15 +7,13 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-import java.util.Set;
+import org.tockit.util.ListSet;
 
 import net.sourceforge.toscanaj.model.context.*;
 
 public interface ManyValuedContext {
-    void add(FCAObject object);
-    Set getObjects();
-    void add(ManyValuedAttribute attribute);
-    Set getAttributes();
-    Set getTypes();
+    ListSet getObjects();
+    ListSet getAttributes();
+    ListSet getTypes();
     AttributeValue getRelationship(FCAObject object, ManyValuedAttribute attribute);
 }

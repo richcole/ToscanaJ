@@ -34,7 +34,6 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -311,7 +310,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
 	private void editObject(int row) {
 		Frame tFrame = JOptionPane.getFrameForComponent(tableView);
-		ArrayList objectList = (ArrayList) conceptualSchema.getManyValuedContext().getObjects();
+		List objectList = (List) conceptualSchema.getManyValuedContext().getObjects();
 		WritableFCAObject object = (WritableFCAObject) objectList.get(row);
 		ObjectDialog objectDialog = new ObjectDialog(tFrame, object);
 		objectDialog.show();
@@ -368,10 +367,10 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 				
 				if(e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1){
 					WritableManyValuedContext context = conceptualSchema.getManyValuedContext();
-                    ArrayList propertyList = (ArrayList)context.getAttributes();
+                    List propertyList = (List)context.getAttributes();
 					WritableManyValuedAttribute attribute = (WritableManyValuedAttribute)
 															propertyList.get(row);
-					ArrayList objectList = (ArrayList) context.getObjects();
+					List objectList = (List) context.getObjects();
 					WritableFCAObject obj = (WritableFCAObject)objectList.get(col);
 					
 					if(attribute.getType() instanceof TextualType){

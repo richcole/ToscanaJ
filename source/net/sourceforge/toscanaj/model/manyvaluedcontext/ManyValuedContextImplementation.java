@@ -7,50 +7,68 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.Hashtable;
+
+import org.tockit.util.ListSet;
+import org.tockit.util.ListSetImplementation;
 
 import net.sourceforge.toscanaj.model.context.*;
 
 
 public class ManyValuedContextImplementation implements WritableManyValuedContext {
-    private Set objects = new LinkedHashSet();
-    private Set properties = new LinkedHashSet();
+    private ListSet objects = new ListSetImplementation();
+    private ListSet properties = new ListSetImplementation();
     private Hashtable relation = new Hashtable();
-	private Set types = new LinkedHashSet();
+	private ListSet types = new ListSetImplementation();
 
     public ManyValuedContextImplementation() {
     }
 
     public void add(FCAObject object) {
-        objects.add(object);
-        relation.put(object, new Hashtable());
+        this.objects.add(object);
+        this.relation.put(object, new Hashtable());
     }
 
-    public Set getObjects() {
-        return objects;
+    public void remove(FCAObject object) {
+        this.objects.remove(object);
+        this.relation.remove(object);
+    }
+
+    public ListSet getObjects() {
+        return ListSetImplementation.unmodifiableListSet(this.objects);
     }
 
     public void add(ManyValuedAttribute attribute) {
-        properties.add(attribute);
+        this.properties.add(attribute);
     }
 
-    public Set getAttributes() {
-        return properties;
+    public void remove(ManyValuedAttribute attribute) {
+        this.properties.remove(attribute);
+    }
+
+    public ListSet getAttributes() {
+        return ListSetImplementation.unmodifiableListSet(this.properties);
     }
     
-    public Set getTypes(){
-    	return types;
+    public void add(AttributeType type) {
+        this.types.add(type);
+    }
+
+    public void remove(AttributeType type) {
+        this.types.remove(type);
+    }
+
+    public ListSet getTypes(){
+    	return ListSetImplementation.unmodifiableListSet(this.types);
     }
 
     public void setRelationship(FCAObject object, ManyValuedAttribute attribute, AttributeValue value) {
-        Hashtable row = (Hashtable) relation.get(object);
+        Hashtable row = (Hashtable) this.relation.get(object);
         row.put(attribute, value);
     }
 
     public AttributeValue getRelationship(FCAObject object, ManyValuedAttribute attribute) {
-        Hashtable row = (Hashtable) relation.get(object);
+        Hashtable row = (Hashtable) this.relation.get(object);
         return (AttributeValue) row.get(attribute);
     }	
 }

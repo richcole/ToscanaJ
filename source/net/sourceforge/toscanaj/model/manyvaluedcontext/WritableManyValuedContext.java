@@ -10,5 +10,11 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext;
 import net.sourceforge.toscanaj.model.context.*;
 
 public interface WritableManyValuedContext extends ManyValuedContext {
-	void setRelationship(FCAObject object, ManyValuedAttribute attribute, AttributeValue value);
+    void add(FCAObject object);
+    void add(ManyValuedAttribute attribute);
+    void add(AttributeType type);
+    void remove(FCAObject object);
+    void remove(ManyValuedAttribute attribute);
+    void remove(AttributeType type);
+    void setRelationship(FCAObject object, ManyValuedAttribute attribute, AttributeValue value);
 }
