@@ -269,6 +269,14 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         graphics.setPaint(textColor);
         graphics.draw(rect);
 
+		double textWidth;
+        int numItems = this.getNumberOfEntries();
+        if (numItems > MIN_DISPLAY_LINES) {
+        	textWidth = lw - scrollbarWidth;
+        } else {
+            textWidth = lw;
+        }
+
         // draw the object names
         Iterator it = this.getEntryIterator();
         int numItem = 0;
@@ -277,26 +285,23 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
             if (numItem >= this.firstItem) {
                 int curPos = numItem - this.firstItem;
                 if (curPos < this.displayLines) {
+                	double textX;
+                	double textY = yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight();
                     if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT) {
-                        graphics.drawString(cur,
-                                (float) xPos + fm.getLeading() + fm.getDescent(),
-                                (float) yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight());
+						textX = (float) xPos + fm.getLeading() + fm.getDescent();
                     } else if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER) {
-                        graphics.drawString(cur,
-                                (float) (xPos + (fm.getLeading() / 2 + fm.getDescent() / 2 + (lw - fm.stringWidth(cur)) / 2)),
-                                (float) yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight());
+                        textX = (float) (xPos + (fm.getLeading() / 2 + fm.getDescent() / 2 + (textWidth - fm.stringWidth(cur)) / 2));
                     } else if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT) {
-                        graphics.drawString(cur,
-                                (float) (xPos + (-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(cur))),
-                                (float) yPos + fm.getAscent() + fm.getLeading() + curPos * fm.getHeight());
+                        textX = (float) (xPos + (-fm.getLeading() - fm.getDescent() + textWidth - fm.stringWidth(cur)));
                     } else {
                         throw new RuntimeException("Unknown label alignment.");
                     }
+                    graphics.drawString(cur, (float)textX, (float)textY);
                 }
             }
             numItem++;
         }
-        int numItems = this.getNumberOfEntries();
+
         // draw the scroller elements when needed
         if (numItems > MIN_DISPLAY_LINES) {
             // first a line separating the scrollbar from the rest
