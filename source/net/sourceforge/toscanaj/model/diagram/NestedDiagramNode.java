@@ -51,6 +51,9 @@ public class NestedDiagramNode extends DiagramNode {
      * Parameter scale is float due to JIT error in JDK 1.3, where in case of double
      * JIT was breaking transmission of value of scale after a while of program usage
      * , that lead to a distorted nested line diagrams.
+     * 
+     * @todo since we require 1.4 by now we could go back to double and see if
+     * it breaks.
      */
     public NestedDiagramNode(DiagramNode outerNode, Diagram2D innerDiagram, float scale,
                              boolean dropAttributeLabels) {
