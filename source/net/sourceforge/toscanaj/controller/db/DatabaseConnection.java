@@ -429,7 +429,12 @@ public class DatabaseConnection implements EventBrokerListener {
         return result;
     }
 
-    public Vector getColumns(String table, String column) {
+    /**
+     * Returns a list of column names.
+     * 
+     * The input parameter can be the name of either a table or a view.
+     */
+    public Vector getColumns(String table) {
         Vector result = new Vector();
 
         try {
