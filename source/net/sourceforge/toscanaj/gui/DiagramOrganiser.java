@@ -9,13 +9,18 @@ package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.gui.eventhandler.DiagramOrganiserDnDController;
+import net.sourceforge.toscanaj.gui.events.DiagramClickedEvent;
 import net.sourceforge.toscanaj.model.DiagramCollection;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import org.tockit.events.EventBroker;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -52,11 +57,12 @@ public class DiagramOrganiser extends JPanel {
      */
     private DiagramHistoryView selectedDiagramsListview;
     
-    	
-	
-    public DiagramOrganiser(DiagramCollection conceptualSchema) {
+    private EventBroker eventBroker;
+
+	public DiagramOrganiser(DiagramCollection conceptualSchema, final EventBroker eventBroker) {
         // store model
         this.schema = conceptualSchema;
+        this.eventBroker = eventBroker;
        	
 		
         // create view components
@@ -111,11 +117,13 @@ public class DiagramOrganiser extends JPanel {
 
         MouseListener mouseListener = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
+				int index = availableDiagramsListview.locationToIndex(e.getPoint());
+				Diagram2D diagram = schema.getDiagram(index);
+				eventBroker.processEvent(new DiagramClickedEvent(diagram));            	
                 if (e.getClickCount() == 2) {
-                    int index = availableDiagramsListview.locationToIndex(e.getPoint());
-                    DiagramController.getController().addDiagram(schema.getDiagram(index));
+					/// @todo this should be done using an event
+					DiagramController.getController().addDiagram(diagram);
                 }
-                            
             }
             
         };

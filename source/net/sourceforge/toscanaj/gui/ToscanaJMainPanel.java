@@ -15,6 +15,7 @@ import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.fca.*;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.*;
+import net.sourceforge.toscanaj.gui.events.DiagramClickedEvent;
 import net.sourceforge.toscanaj.gui.action.ExportDiagramAction;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DiagramExportSettings;
@@ -31,7 +32,9 @@ import org.tockit.canvas.events.CanvasItemActivatedEvent;
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemSelectedEvent;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
+import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
+import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
 
@@ -129,6 +132,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
      * The diagram viewing area.
      */
     private DiagramView diagramView;
+    
+    private DiagramView diagramPreview;
 
     /**
      * The pane for selecting the diagrams.
@@ -161,6 +166,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
      */
     private DiagramExportSettings diagramExportSettings = null;
 
+	private JSplitPane leftHandPane;
 	/**
 	 * Simple initialisation constructor.
 	 */
@@ -308,21 +314,36 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		new LabelClickEventHandler(diagramEventBroker);
         new LabelDragEventHandler(diagramEventBroker);
 
-        diagramOrganiser = new DiagramOrganiser(this.conceptualSchema);
+		Dimension minimumSize = new Dimension(50, 50);
 
-
-
-        //Create a split pane with the two scroll panes in it.
+        diagramOrganiser = new DiagramOrganiser(this.conceptualSchema, broker);
+        this.diagramPreview = new DiagramView();
+        this.diagramPreview.setConceptInterpreter(new DirectConceptInterpreter());
+        this.diagramPreview.setConceptInterpretationContext(
+        							new ConceptInterpretationContext(new DiagramHistory(),new EventBroker()));
+        this.diagramPreview.setObjectLabelFactory(null);
+        this.diagramPreview.setMinimumFontSize(8.0);
+        this.diagramPreview.setMinimumSize(minimumSize);
+        
+        broker.subscribe(new EventBrokerListener() {
+			public void processEvent(Event e) {
+				Diagram2D diagram = ((DiagramClickedEvent)e).getDiagram();
+				diagramPreview.showDiagram(diagram);
+			}
+		}, DiagramClickedEvent.class, Diagram2D.class);
+        
+        /// @todo add this pane to the session management
+		leftHandPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, 
+		                                                 this.diagramOrganiser, 
+		                                                 this.diagramPreview);
+		leftHandPane.setOneTouchExpandable(true);
+		leftHandPane.setResizeWeight(0);
 
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-
-                diagramOrganiser, diagramView);
-
+                                   leftHandPane, this.diagramView);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
 
-        //Provide minimum sizes for the two components in the split pane
-        Dimension minimumSize = new Dimension(50, 100);
         diagramView.setMinimumSize(minimumSize);
         diagramOrganiser.setMinimumSize(minimumSize);
         contentPane.add(this.toolbar, BorderLayout.NORTH);
@@ -330,8 +351,10 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         setContentPane(contentPane);
         // restore old position
         ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, this, new Rectangle(10, 10, 900, 700));
-        int div = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "divider", 200);
-        splitPane.setDividerLocation(div);
+		int mainDividerPos = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "mainDivider", 200);
+		splitPane.setDividerLocation(mainDividerPos);
+		int secondaryDividerPos = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "secondaryDivider", 560);
+		leftHandPane.setDividerLocation(secondaryDividerPos);
     }
 
     private void createActions() {
@@ -873,7 +896,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     private void closeMainPanel() {
         // store current position
         ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, this);
-        ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, "divider", splitPane.getDividerLocation());
+		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, "mainDivider", splitPane.getDividerLocation());
+		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, "secondaryDivider", leftHandPane.getDividerLocation());
         // save the MRU list
         ConfigurationManager.storeStringList(CONFIGURATION_SECTION_NAME, "mruFiles", this.mruList);
         // store the minimum label size
@@ -966,7 +990,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             e.printStackTrace();
             return;
         }
-        diagramView.showDiagram(null);
+		diagramView.showDiagram(null);
+		diagramPreview.showDiagram(null);
         DiagramController controller = DiagramController.getController();
         ConceptInterpreter interpreter = null;
         if (databaseInfo != null) {

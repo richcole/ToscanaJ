@@ -256,13 +256,15 @@ public class DiagramView extends Canvas implements ChangeObserver {
             Concept concept = node.getConcept();
             /// @todo calling isRealized(..) has the side effect of initialising the caches in the DB connected version -- find better way
             // if the caches are not initialized, the object contingent gradient will be wrong from time to time
+            /// @todo make sure there always is a concept interpreter and an interpretation context. 
+            ///       At the moment both are not initialized automatically
             if (conceptInterpreter.isRealized(concept, context)) {
                 if (node instanceof NestedDiagramNode) {
 		            NestedDiagramNode ndNode = (NestedDiagramNode) node;
 		            addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept), layer + 1);
                 }
                 LabelInfo objLabelInfo = diagram.getObjectLabel(i);
-                if (objLabelInfo != null) {
+                if (objLabelInfo != null && this.objectLabelFactory != null) {
                     LabelView labelView = this.objectLabelFactory.createLabelView(this, nodeView, objLabelInfo);
                     addCanvasItem(labelView, labelLayerName);
                     addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
@@ -356,8 +358,13 @@ public class DiagramView extends Canvas implements ChangeObserver {
         this.attributeLabelFactory = attributeLabelFactory;
     }
 
-    public void setObjectLabelFactory(
-        LabelView.LabelFactory objectLabelFactory) {
+	/**
+	 * This changes the object labels created for new diagrams.
+	 * 
+	 * If a different label factory is given, this factory will be used to create
+	 * the object labels. If null is given, no object labels will be used.
+	 */
+    public void setObjectLabelFactory(LabelView.LabelFactory objectLabelFactory) {
         this.objectLabelFactory = objectLabelFactory;
     }
 }
