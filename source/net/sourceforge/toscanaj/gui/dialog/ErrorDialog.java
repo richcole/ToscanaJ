@@ -41,6 +41,7 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
  */
 
 public class ErrorDialog extends JDialog{
+	private static final String ERROR_MESSAGE_INDENT = "    ";
 	private static final String CONFIGURATION_SECTION_NAME = "ErrorDialog";
 	private static final int MINIMUM_WIDTH = 400;
 	private static final int MINIMUM_HEIGHT = 300;
@@ -65,41 +66,23 @@ public class ErrorDialog extends JDialog{
 		
 		Component detailedPanel = createErrorLogPanel(e);	
 		this.getContentPane().add(createErrorMsgPanel(e, errorMsg), new GridBagConstraints(
-		0,
-		0,
-		1,
-		1,
-		1,
-		0,
-		GridBagConstraints.WEST,
-		GridBagConstraints.HORIZONTAL,
-		new Insets(5, 5, 0, 5),
-		0,
-		0));
+					0, 0,  1, 1,  1, 0,
+					GridBagConstraints.WEST,
+					GridBagConstraints.HORIZONTAL,
+					new Insets(5, 5, 0, 5),
+					0, 0));
 		this.getContentPane().add(createButtonsPanel(e, detailedPanel), new GridBagConstraints(
-		0,
-		1,
-		1,
-		1,
-		1,
-		0,
-		GridBagConstraints.EAST,
-		GridBagConstraints.VERTICAL,
-		new Insets(0, 5, 0, 5),
-		0,
-		0));
+					0, 1, 1, 1,	1, 0,
+					GridBagConstraints.EAST,
+					GridBagConstraints.VERTICAL,
+					new Insets(0, 5, 0, 5),
+					0, 0));
 		this.getContentPane().add(detailedPanel, new GridBagConstraints(
-		0,
-		2,
-		1,
-		1,
-		1,
-		1,
-		GridBagConstraints.CENTER,
-		GridBagConstraints.BOTH,
-		new Insets(0, 5, 0, 5),
-		0,
-		0));
+					0, 2, 1, 1,	1, 1,
+					GridBagConstraints.CENTER,
+					GridBagConstraints.BOTH,
+					new Insets(5, 5, 5, 5),
+					0, 0));
 		pack();
 		show();
     }
@@ -113,17 +96,11 @@ public class ErrorDialog extends JDialog{
 		JPanel simpleErrorMsgPanel = new JPanel(new GridBagLayout());
 		
 		simpleErrorMsgPanel.add(simpleErrorLabel, new GridBagConstraints(
-		0,
-		0,
-		1,
-		1,
-		1,
-		0,
-		GridBagConstraints.WEST,
-		GridBagConstraints.HORIZONTAL,
-		new Insets(0, 5, 0, 5),
-		0,
-		0));
+					0, 0, 1, 1,	1, 0,
+					GridBagConstraints.WEST,
+					GridBagConstraints.HORIZONTAL,
+					new Insets(0, 5, 0, 5),
+					0, 0));
 		
 		return simpleErrorMsgPanel;
 	}
@@ -163,30 +140,34 @@ public class ErrorDialog extends JDialog{
 	}
 	
 	private String createErrorLog(Throwable e) {
+		Throwable currentException = e;
 		String lineBreak = System.getProperty("line.separator");
-		String returnString = "";
-		String stackTrace = "";
+		String stackTrace = "=============="+lineBreak+"== Stack Trace =="+lineBreak+"=============="+lineBreak;
+		String causedBy="";
 		String exceptionName = e.getClass().getName();
 		String exceptionMsg =e.getMessage();
 		
-		while(e.getCause()!=null){
-			stackTrace += e.getMessage()+lineBreak;
-			e = e.getCause();			
+		while(currentException.getCause()!=null){
+			currentException = currentException.getCause();			
+			causedBy += "Caused By:" + lineBreak +
+ 						"-----------------" + lineBreak + 
+ 						ERROR_MESSAGE_INDENT + currentException.getMessage() + lineBreak +
+						ERROR_MESSAGE_INDENT + ERROR_MESSAGE_INDENT + "(" + currentException.getClass().getName() + ")" + lineBreak +
+ 						lineBreak;
 		}
-		if(e.getCause() == null){
-			//stack trace
-			 StringWriter stackTraceWriter = new StringWriter();
-			 e.printStackTrace(new PrintWriter(stackTraceWriter));		
-			 stackTrace += stackTraceWriter.toString();	
-		}
-		returnString += exceptionName
-			+ exceptionMsg
-			+ lineBreak
-			+ lineBreak
-			+ "Caused by:"
-			+ lineBreak
-			+ stackTrace;
-		return returnString;
+		
+		//stack trace
+		StringWriter stackTraceWriter = new StringWriter();
+		e.printStackTrace(new PrintWriter(stackTraceWriter));		
+		stackTrace += stackTraceWriter.toString();	
+		
+		return "Error Message:" + lineBreak +
+				"---------------------"	+ lineBreak +
+				ERROR_MESSAGE_INDENT + exceptionMsg	+ lineBreak +	
+				ERROR_MESSAGE_INDENT + ERROR_MESSAGE_INDENT + "(" + exceptionName + ")" + lineBreak +
+				lineBreak +
+				causedBy + lineBreak +
+				stackTrace;
 	}
 	
 	private Component createErrorLogPanel(Throwable e) {
