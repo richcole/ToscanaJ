@@ -64,7 +64,7 @@ public class NodeView extends CanvasItem {
      * The Color for the circles around the nodes in the ideal of the selected
      * concept.
      */
-    static public Color circleIdealColor = new Color(255,255,0);
+    static public Color circleIdealColor = new Color(0,255,0);
 
     /**
      * The Color for the circles around the nodes in the filter of the selected
@@ -276,5 +276,12 @@ public class NodeView extends CanvasItem {
      */
     public int getSelectionState() {
         return this.selectionState;
+    }
+
+    /**
+     * Overwritten to avoid raising nodes with diagrams in them/
+     */
+    public boolean hasAutoRaise() {
+        return !(this.diagramNode instanceof NestedDiagramNode);
     }
 }

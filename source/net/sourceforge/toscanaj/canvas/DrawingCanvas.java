@@ -349,11 +349,13 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
                 // store the CanvasItem hit
                 this.selectedCanvasItem = cur;
                 this.lastMousePos = e.getPoint();
-                // raise the item
-                it.remove();
-                this.canvasItems.add(cur);
-                // redraw the raised item (needed if it will not be moved)
-                repaint();
+                if(cur.hasAutoRaise()) {
+                    // raise the item
+                    it.remove();
+                    this.canvasItems.add(cur);
+                    // redraw the raised item (needed if it will not be moved)
+                    repaint();
+                }
                 break;
             }
         }

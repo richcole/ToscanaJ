@@ -86,4 +86,14 @@ public abstract class CanvasItem implements ChangeObservable {
      * Returns the rectangular bounds of the canvas item.
      */
     abstract public Rectangle2D getBounds(ToscanajGraphics2D g);
+
+    /**
+     * Returns true if the item should be raised on clicks.
+     *
+     * This is true per default, if a subclass should not be raised this method
+     * can be overwritten and DrawingCanvas will not raise it automatically.
+     */
+    public boolean hasAutoRaise() {
+        return true;
+    }
 }
