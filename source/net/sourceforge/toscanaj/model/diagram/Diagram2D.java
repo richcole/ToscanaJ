@@ -24,6 +24,8 @@ public interface Diagram2D extends XMLizable {
     static final String DIAGRAM_ELEMENT_NAME = "diagram";
     static final String TITLE_ATTRIBUTE_NAME = "title";
     static final String DESCRIPTION_ELEMENT_NAME = "description";
+    
+    static final double MINIMUM_STEEPNESS = 0.1;
 
     /**
      * Returns the title of the diagram.
