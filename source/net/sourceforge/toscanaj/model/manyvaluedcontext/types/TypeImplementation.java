@@ -34,7 +34,7 @@ public abstract class TypeImplementation implements WritableAttributeType, XMLiz
     }
     
     public TypeImplementation(Element element) throws XMLSyntaxError {
-    	this.scale = new ScaleImplementation(name);
+    	this.scale = new ScaleImplementation(name); /// @todo name is not initialized here
     	readXML(element);
     }
     
@@ -44,10 +44,6 @@ public abstract class TypeImplementation implements WritableAttributeType, XMLiz
 
     public Scale[] getScales() {
         return new Scale[]{this.scale};
-    }
-    
-    public void setScales(Scale scale){
-    	this.scale = scale;
     }
     
     public String toString(){

@@ -16,7 +16,6 @@ import java.awt.Component;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -53,7 +52,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
@@ -1394,42 +1392,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		}
 	}
 	
-	protected void showPopupMenu(double xPos, double yPos, ManyValuedAttribute 
-										property, FCAElement obj) {
-		TextualType attributeType = (TextualType)property.getType();
-		AttributeValue[] textualValueList = attributeType.getValueRange();
-		JPopupMenu menu = new JPopupMenu();
-		
-		if(textualValueList.length<=MAXIMUM_ROWS_IN_VALUE_MENU){
-			menu = createPopupMenu(1,textualValueList.length,textualValueList,
-														property,obj);
-		} else {
-			menu = createPopupMenu(textualValueList.length/MAXIMUM_ROWS_IN_VALUE_MENU,MAXIMUM_ROWS_IN_VALUE_MENU,
-											textualValueList,property,obj );
-		}
-		menu.show(tableView,(int)xPos,(int)yPos);
-	}
-
-	protected JPopupMenu createPopupMenu(int numOfCol,int numOfRows, AttributeValue[] textualValueList,
-											final ManyValuedAttribute property, 
-												final FCAElement obj) {
-		final WritableManyValuedContext context = this.conceptualSchema.getManyValuedContext();
-		JPopupMenu menu = new JPopupMenu();
-		menu.setLayout(new GridLayout(numOfRows ,numOfCol));
-		for(int i = 0 ; i < textualValueList.length ; i++){
-			final AttributeValue textualValue = textualValueList[i];
-			JMenuItem menuItem = new JMenuItem(textualValue.getDisplayString());
-			menuItem.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e){
-					context.setRelationship(obj,property,textualValue);
-					validate();
-				}
-			});
-			menu.add(menuItem);
-		}
-		return menu;
-	}
-
     private void setCurrentFile(File newCurrentFile) {
         this.currentFile = newCurrentFile;
         if(newCurrentFile != null) {

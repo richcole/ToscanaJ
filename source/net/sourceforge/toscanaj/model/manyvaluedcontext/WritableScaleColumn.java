@@ -10,7 +10,5 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
 
 public interface WritableScaleColumn extends ScaleColumn{
-	
 	public void addValue(AttributeValue attributeValue);
-
 }

@@ -56,26 +56,6 @@ public class StringType extends AbstractDatatype {
         return true;
     }
 
-    public JComponent getTypeEditingComponent() {
-        return null;
-    }
-
-    public JComponent getValueEditingComponent() {
-        return null;
-    }
-
-    public JComponent getTypeDisplayComponent() {
-        return null;
-    }
-
-    public JComponent getValueDisplayComponent() {
-        return null;
-    }
-
-    public JComponent getSubsetSelectionComponent() {
-        return null;
-    }
-
     public Value toValue(Element element) {
         return null;
     }
