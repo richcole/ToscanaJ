@@ -78,6 +78,11 @@ public class ConfigurationManager {
      * Stores the size and position of a window.
      */
     static public void storePlacement(String section, Window window) {
+    	if(window instanceof Frame) {
+			Frame frame = (Frame)window;
+            properties.setProperty(section + "-windowstate", String.valueOf(frame.getExtendedState()));
+			frame.setExtendedState(Frame.NORMAL);			
+    	}
         properties.setProperty(section + "-x", String.valueOf(window.getX()));
         properties.setProperty(section + "-y", String.valueOf(window.getY()));
         properties.setProperty(section + "-width", String.valueOf(window.getWidth()));
@@ -100,6 +105,15 @@ public class ConfigurationManager {
             // use default
             window.setBounds(defaultPlacement);
         }
+		if(window instanceof Frame) {
+			Frame frame = (Frame)window;
+			try {
+				int state = Integer.parseInt(properties.getProperty(section + "-windowstate"));
+				frame.setExtendedState(state);
+			} catch (NumberFormatException e) {
+				frame.setExtendedState(Frame.NORMAL);
+			}			
+		}
     }
 
     /**
