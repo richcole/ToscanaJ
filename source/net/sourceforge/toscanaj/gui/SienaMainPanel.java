@@ -861,6 +861,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 && (this.diagramExportSettings != null));
     }
 
+	/**
+	 * @todo this is platform specific and has to be moved into the base class we still don't have.
+	 */
     private void updateWindowTitle() {
         // get the current filename without the extension and full path
         // we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
