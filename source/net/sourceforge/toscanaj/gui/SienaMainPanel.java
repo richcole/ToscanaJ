@@ -88,7 +88,6 @@ import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.model.diagram.WriteableDiagram2D;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -109,6 +108,8 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.ViewContext;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 import net.sourceforge.toscanaj.parser.BurmeisterParser;
 import net.sourceforge.toscanaj.parser.CSCParser;
 import net.sourceforge.toscanaj.parser.CSXParser;
@@ -1096,7 +1097,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
         
 		for (Iterator diagIt = this.conceptualSchema.getDiagramsIterator(); diagIt.hasNext();) {
-			WriteableDiagram2D diagram = (WriteableDiagram2D) diagIt.next();
+			NDimDiagram diagram = (NDimDiagram) diagIt.next();
 			
 			ConceptImplementation concept = (ConceptImplementation) diagram.getTopConcept();
 			if(concept.getExtentSize() == allObjects.size()) {
@@ -1111,11 +1112,22 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             
 			if(concept.getAttributeContingentSize() != 0) {
 				DiagramNode topNode = diagram.getNodeForConcept(concept);
-				double x = topNode.getX();
-				double y = topNode.getY() - 10;
 				concept = new ConceptImplementation();
-				DiagramNode newTop = new DiagramNode(diagram,"new top", new Point2D.Double(x,y), concept, 
-				                                     null, new LabelInfo(),null);
+				
+				diagram.getBase().add(new Point2D.Double(0,diagram.getBounds().getHeight()/10));
+				DiagramNode newTop = new NDimDiagramNode(diagram,"new top", new double[diagram.getBase().size()], concept, 
+				                                         null, new LabelInfo(),null);
+				                                         
+				for (Iterator nodeIt = diagram.getNodes(); nodeIt.hasNext();) {
+					NDimDiagramNode node = (NDimDiagramNode) nodeIt.next();
+                    double[] newPos = new double[node.getNdimVector().length + 1];
+                    for (int i = 0; i < node.getNdimVector().length; i++) {
+                        newPos[i] = node.getNdimVector()[i];
+                    }
+                    newPos[newPos.length - 1] = 1;
+                    node.setNdimVector(newPos); 
+                }
+                
 				diagram.addNode(newTop);
 				diagram.addLine(newTop, topNode);
 			}
