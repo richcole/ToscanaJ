@@ -332,8 +332,6 @@ public class CSCParser {
                 concept.buildClosures();
             }
             
-            diagram.checkCoordinateSystem();
-            
         	return diagram;
         }
     };

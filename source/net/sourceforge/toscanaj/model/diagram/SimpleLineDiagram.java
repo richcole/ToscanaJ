@@ -249,6 +249,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      */
     public void addLine(DiagramNode from, DiagramNode to) {
         this.lines.add(new DiagramLine(from, to, this));
+        this.coordinateSystemChecked = false;
     }
 
     /**
@@ -268,7 +269,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     /**
      * Makes sure the y-coordinates increase in the downward direction.
      */
-    public void checkCoordinateSystem() {
+    protected void checkCoordinateSystem() {
         if (this.nodes.size() > 1) { // no point in checking direction otherwise
             DiagramNode highestNode = (DiagramNode) this.nodes.get(0);
             for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
