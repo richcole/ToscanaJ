@@ -9,8 +9,8 @@ package net.sourceforge.toscanaj.controller.fca;
 
 import net.sourceforge.toscanaj.controller.db.*;
 import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
-import net.sourceforge.toscanaj.events.EventListener;
-import net.sourceforge.toscanaj.events.Event;
+import org.tockit.events.EventListener;
+import org.tockit.events.Event;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 

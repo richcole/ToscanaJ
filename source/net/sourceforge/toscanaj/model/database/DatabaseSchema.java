@@ -9,8 +9,8 @@ package net.sourceforge.toscanaj.model.database;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
-import net.sourceforge.toscanaj.events.*;
-import net.sourceforge.toscanaj.events.EventListener;
+import org.tockit.events.*;
+import org.tockit.events.EventListener;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
 import net.sourceforge.toscanaj.util.STD_Iterator;

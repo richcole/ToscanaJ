@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.canvas.CanvasItem;
+import org.tockit.canvas.CanvasItem;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
@@ -199,6 +199,10 @@ public class NodeView extends CanvasItem {
         double rx = getRadiusX();
         double ry = getRadiusY();
         return new Rectangle2D.Double(x - rx, y - ry, 2 * rx, 2 * ry);
+    }
+
+    public Point2D getPosition() {
+        return this.diagramNode.getPosition();
     }
 
     /**

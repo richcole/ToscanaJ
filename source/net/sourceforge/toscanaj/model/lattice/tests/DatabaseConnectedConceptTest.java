@@ -12,7 +12,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.events.EventBroker;
+import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 import java.util.ArrayList;

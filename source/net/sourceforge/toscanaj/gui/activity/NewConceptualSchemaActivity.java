@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.gui.activity;
 
-import net.sourceforge.toscanaj.events.EventBroker;
+import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 
 public class NewConceptualSchemaActivity implements SimpleActivity {

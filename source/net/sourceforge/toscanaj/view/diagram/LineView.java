@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.canvas.CanvasItem;
+import org.tockit.canvas.CanvasItem;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 
 import java.awt.*;
@@ -113,5 +113,9 @@ public class LineView extends CanvasItem {
             return DiagramView.SELECTED_IDEAL;
         }
         return DiagramView.NOT_SELECTED;
+    }
+
+    public Point2D getPosition() {
+        return this.fromView.getPosition();
     }
 }

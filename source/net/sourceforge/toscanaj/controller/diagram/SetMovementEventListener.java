@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
-import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
-import net.sourceforge.toscanaj.events.EventListener;
-import net.sourceforge.toscanaj.events.Event;
+import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.events.EventListener;
+import org.tockit.events.Event;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;

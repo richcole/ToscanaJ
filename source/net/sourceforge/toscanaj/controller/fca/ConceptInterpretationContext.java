@@ -8,12 +8,13 @@
 package net.sourceforge.toscanaj.controller.fca;
 
 import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
-import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import util.CollectionFactory;
 
 import java.util.List;
+
+import org.tockit.events.EventBroker;
 
 public class ConceptInterpretationContext implements ChangeObserver {
     /** Constant value which may be used to set displayMode or filterMode */

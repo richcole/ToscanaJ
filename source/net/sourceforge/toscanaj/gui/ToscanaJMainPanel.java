@@ -8,16 +8,16 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.ToscanaJ;
-import net.sourceforge.toscanaj.canvas.CanvasBackground;
-import net.sourceforge.toscanaj.canvas.events.*;
-import net.sourceforge.toscanaj.canvas.imagewriter.*;
+import org.tockit.canvas.CanvasBackground;
+import org.tockit.canvas.events.*;
+import org.tockit.canvas.imagewriter.*;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.fca.*;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.events.EventBroker;
+import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Query;
@@ -228,7 +228,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         DiagramController controller = DiagramController.getController();
         diagramView = new DiagramView();
         /// @todo move the subscriptions into the handlers
-        EventBroker diagramEventBroker = diagramView.getController().getEventBroker();
+        org.tockit.events.EventBroker diagramEventBroker = diagramView.getController().getEventBroker();
         diagramEventBroker.subscribe(
                 new FilterOperationEventListener(controller),
                 CanvasItemActivatedEvent.class,

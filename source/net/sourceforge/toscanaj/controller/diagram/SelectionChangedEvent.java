@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
-import net.sourceforge.toscanaj.events.StandardEvent;
+import org.tockit.events.StandardEvent;
 
 public class SelectionChangedEvent extends StandardEvent {
     public SelectionChangedEvent(Object source) {

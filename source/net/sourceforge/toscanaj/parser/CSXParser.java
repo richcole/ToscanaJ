@@ -11,7 +11,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.events.EventBroker;
+import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.diagram.*;

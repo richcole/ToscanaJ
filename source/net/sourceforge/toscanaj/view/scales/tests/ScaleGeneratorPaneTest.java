@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.view.scales.tests;
 
 import junit.framework.*;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.events.EventBroker;
+import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.view.scales.*;

@@ -66,6 +66,10 @@ public class NDimDiagramNode extends DiagramNode {
         return ndimVector;
     }
 
+    public void setNdimVector(double[] ndimVector) {
+        this.ndimVector = ndimVector;
+    }
+
     public Vector getBase() {
         return base;
     }

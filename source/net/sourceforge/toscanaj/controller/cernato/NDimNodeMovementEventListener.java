@@ -7,9 +7,10 @@
  */
 package net.sourceforge.toscanaj.controller.cernato;
 
-import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
-import net.sourceforge.toscanaj.events.EventListener;
-import net.sourceforge.toscanaj.events.Event;
+import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.canvas.events.CanvasItemDroppedEvent;
+import org.tockit.events.EventListener;
+import org.tockit.events.Event;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
@@ -47,7 +48,9 @@ public class NDimNodeMovementEventListener implements EventListener {
             baseVec.setLocation(baseVec.getX() + diffX * v / sumCoord,
                                 baseVec.getY() + diffY * v / sumCoord);
         }
-        diagramView.requestScreenTransformUpdate();
+        if (dragEvent instanceof CanvasItemDroppedEvent) {
+            diagramView.requestScreenTransformUpdate();
+        }
         diagramView.repaint();
     }
 

@@ -47,6 +47,7 @@ public class LayoutOperations {
         Vector base = createBase(dimensions);
         Concept[] concepts = lattice.getConcepts();
         Hashtable nodemap = new Hashtable();
+        double[] topVector = null;
         for (int i = 0; i < concepts.length; i++) {
             Concept concept = concepts[i];
             double[] ndimVector = new double[dimensions.size()];
@@ -56,13 +57,30 @@ public class LayoutOperations {
                 Criterion criterion = (Criterion) attribute.getData();
                 addVector(ndimVector, criterion, dimensions);
             }
+            if(concept.isTop()) {
+                topVector = ndimVector;
+            }
             DiagramNode node = new NDimDiagramNode(String.valueOf(i), ndimVector, concept,
                                                new LabelInfo(), new LabelInfo(), null, base);
             nodemap.put(concept, node);
             diagram.addNode(node);
         }
+        // the top node has to be at (0,0), otherwise base changes will affect the overall position of the diagram
+        Iterator it = nodemap.values().iterator();
+        while (it.hasNext()) {
+            NDimDiagramNode node = (NDimDiagramNode) it.next();
+            node.setNdimVector(substract(node.getNdimVector(),topVector));
+        }
         createConnections(diagram, nodemap);
         return diagram;
+    }
+
+    private static double[] substract(double[] a, double[] b) {
+        double[] retVal = new double[a.length];
+        for (int i = 0; i < a.length; i++) {
+            retVal[i] = a[i] - b[i];
+        }
+        return retVal;
     }
 
     private static Vector createBase(Vector dimensions) {

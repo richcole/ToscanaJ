@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
-import net.sourceforge.toscanaj.canvas.events.CanvasItemEventWithPosition;
+import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.events.*;
+import org.tockit.events.*;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;

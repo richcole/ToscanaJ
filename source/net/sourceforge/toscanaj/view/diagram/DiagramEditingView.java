@@ -7,11 +7,11 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.fca.*;
-import net.sourceforge.toscanaj.events.*;
-import net.sourceforge.toscanaj.events.Event;
+import org.tockit.events.*;
+import org.tockit.events.Event;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.DiagramCollection;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;

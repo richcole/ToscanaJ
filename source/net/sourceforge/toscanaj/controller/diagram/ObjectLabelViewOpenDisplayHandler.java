@@ -7,10 +7,10 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
-import net.sourceforge.toscanaj.canvas.events.CanvasItemEventWithPosition;
+import org.tockit.canvas.events.CanvasItemEventWithPosition;
+import org.tockit.events.EventListener;
+import org.tockit.events.Event;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.events.EventListener;
-import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 

@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
-import net.sourceforge.toscanaj.canvas.imagewriter.*;
+import org.tockit.canvas.imagewriter.*;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 
 import javax.swing.*;

@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import net.sourceforge.toscanaj.events.EventBroker;
+import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.model.events.TableChangedEvent;
 import net.sourceforge.toscanaj.util.xmlize.*;
 import org.jdom.Element;

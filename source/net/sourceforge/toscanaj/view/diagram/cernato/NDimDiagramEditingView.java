@@ -9,8 +9,8 @@ package net.sourceforge.toscanaj.view.diagram.cernato;
 
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
-import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.events.EventBroker;
+import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import net.sourceforge.toscanaj.model.DiagramCollection;
 import net.sourceforge.toscanaj.controller.cernato.NDimNodeMovementEventListener;
 

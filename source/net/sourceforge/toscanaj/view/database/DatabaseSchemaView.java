@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.view.database;
 
-import net.sourceforge.toscanaj.events.*;
-import net.sourceforge.toscanaj.events.Event;
+import org.tockit.events.*;
+import org.tockit.events.Event;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;

@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.controller.fca.events;
 
-import net.sourceforge.toscanaj.events.StandardEvent;
+import org.tockit.events.StandardEvent;
 
 public class ConceptInterpretationContextChangedEvent extends StandardEvent {
     public ConceptInterpretationContextChangedEvent(Object source) {

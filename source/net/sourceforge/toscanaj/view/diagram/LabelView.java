@@ -7,10 +7,10 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.canvas.CanvasItem;
+import org.tockit.canvas.CanvasItem;
+import org.tockit.events.Event;
+import org.tockit.events.EventListener;
 import net.sourceforge.toscanaj.controller.diagram.SelectionChangedEvent;
-import net.sourceforge.toscanaj.events.EventListener;
-import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
@@ -18,6 +18,7 @@ import net.sourceforge.toscanaj.observer.ChangeObserver;
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * This class encapsulates all generic label drawing code.
@@ -110,6 +111,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      */
     protected int lineHeight = 0;
 
+    protected Vector observers = new Vector();
+
     /**
      * Creates a view for the given label information.
      */
@@ -173,6 +176,10 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      */
     public double getLabelY() {
         return this.rect.getY();
+    }
+
+    public Point2D getPosition() {
+        return new Point2D.Double(getLabelX(), getLabelY());
     }
 
     /**
@@ -560,5 +567,16 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 
     public void processEvent(Event e) {
         nodeSelectionChanged();
+    }
+
+    public void addObserver(ChangeObserver observer) {
+        this.observers.add(observer);
+    }
+
+    protected void notifyObservers() {
+        for (Iterator iterator = observers.iterator(); iterator.hasNext();) {
+            ChangeObserver changeObserver = (ChangeObserver) iterator.next();
+            changeObserver.update(this);
+        }
     }
 }

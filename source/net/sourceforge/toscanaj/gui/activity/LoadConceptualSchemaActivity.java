@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.gui.activity;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.events.EventBroker;
+import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;

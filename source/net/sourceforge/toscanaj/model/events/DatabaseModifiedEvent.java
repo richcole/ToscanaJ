@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.model.events;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.events.Event;
+import org.tockit.events.Event;
 
 public class DatabaseModifiedEvent implements Event {
 

@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.model.tests;
 
 import junit.framework.*;
-import net.sourceforge.toscanaj.events.EventBroker;
+import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.Table;
 

@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.events;
 
-import net.sourceforge.toscanaj.events.Event;
+import org.tockit.events.Event;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 
 public class ConceptualSchemaChangeEvent implements Event {

@@ -9,8 +9,8 @@ package net.sourceforge.toscanaj.view.database;
 
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import net.sourceforge.toscanaj.events.*;
-import net.sourceforge.toscanaj.events.Event;
+import org.tockit.events.*;
+import org.tockit.events.Event;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.EmitEventActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;

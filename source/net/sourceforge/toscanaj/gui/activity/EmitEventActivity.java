@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.gui.activity;
 
-import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.events.EventBroker;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
 
 public class EmitEventActivity implements SimpleActivity {
     private EventBroker broker;

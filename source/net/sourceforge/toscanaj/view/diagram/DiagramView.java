@@ -7,8 +7,9 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.canvas.Canvas;
-import net.sourceforge.toscanaj.canvas.CanvasItem;
+import org.tockit.canvas.Canvas;
+import org.tockit.canvas.CanvasItem;
+import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.controller.diagram.SelectionChangedEvent;
 import net.sourceforge.toscanaj.controller.fca.*;
 import net.sourceforge.toscanaj.model.database.Query;
@@ -71,7 +72,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * Creates a new view displaying an empty digram (i.e. nothing at all).
      */
     public DiagramView() {
-        super();
+        super(new EventBroker());
         this.conceptInterpreter = null;
         this.conceptInterpretationContext = null;
         this.diagramSchema = new DiagramSchema();
