@@ -628,8 +628,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         // @todo disable gradient options while deviation is analyzed
         if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerOrthogonalityGradient", 0) == 1) {
             viewMenu.addSeparator();
-            final CombinedGradient redGreenGradient = new CombinedGradient(new LinearGradient(Color.RED, Color.WHITE), 1);
-            redGreenGradient.addGradientPart(new LinearGradient(Color.WHITE, Color.GREEN), 1);
+            final CombinedGradient redGreenGradient = new CombinedGradient(new LinearGradient(new Color(180,0,0), Color.WHITE), 1);
+            redGreenGradient.addGradientPart(new LinearGradient(Color.WHITE, new Color(0,130,0)), 1);
 			final SignificanceLegend legendItem = new SignificanceLegend(new Font("sans-serif",Font.PLAIN, 12),new Point2D.Double(0,0),redGreenGradient);
 			new ItemMovementManipulator(diagramView, SignificanceLegend.class, diagramView.getController().getEventBroker());
             final JCheckBoxMenuItem showOrthogonalityMenuItem = new JCheckBoxMenuItem("Analyze orthogonality");
