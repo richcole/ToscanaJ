@@ -195,6 +195,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
                     "Selected Keys:",
                     keyedTableListPanel,
                     removeButton));
+        leftPane.setDividerLocation(200);
         leftPane.setOneTouchExpandable(true);
         leftPane.setResizeWeight(0);
 
@@ -205,6 +206,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
                 new LabeledScrollPaneView(
                     "Available Object Keys:",
                     columnsPanel));
+        splitPane.setDividerLocation(180);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);
