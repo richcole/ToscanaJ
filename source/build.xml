@@ -22,8 +22,6 @@
        value="net.sourceforge.toscanaj.Elba"/>
     <property name="siena.class"
        value="net.sourceforge.toscanaj.Siena"/>
-    <property name="lucca.class"
-       value="net.sourceforge.toscanaj.Lucca"/>
     <path id="project.dev.class.path">
         <pathelement path="${classpath}"/>
         <pathelement path="${build.dev.dir}"/>
@@ -180,11 +178,6 @@
     </target>
     <target name="run-siena" depends="compileRelease">
         <java classname="${siena.class}" fork="true">
-            <classpath refid="project.release.class.path"/>
-        </java>
-    </target>
-    <target name="run-lucca" depends="compileRelease">
-        <java classname="${lucca.class}" fork="true">
             <classpath refid="project.release.class.path"/>
         </java>
     </target>
