@@ -307,7 +307,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         contentPane.add(splitPane, BorderLayout.CENTER);
         setContentPane(contentPane);
         // restore old position
-        ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, this, new Rectangle(10, 10, 600, 450));
+        ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, this, new Rectangle(10, 10, 900, 700));
         int div = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "divider", 200);
         splitPane.setDividerLocation(div);
     }

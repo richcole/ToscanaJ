@@ -114,7 +114,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
         createLayout();
 
         ConfigurationManager.restorePlacement("LuccaMainPanel", this,
-                new Rectangle(100, 100, 500, 400));
+                new Rectangle(10, 10, 900, 700));
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
