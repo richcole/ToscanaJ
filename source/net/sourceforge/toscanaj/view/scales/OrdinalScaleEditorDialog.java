@@ -148,12 +148,12 @@ public class OrdinalScaleEditorDialog extends JDialog {
             return ">";
         }
     }
-
+    
 	/**
 	 * @todo there is another case, which mirrors this but puts the equals on
 	 * the other direction ==> implement.
 	 */
-    private static class InterordinalGenerator implements ContextGenerator {
+    private static abstract class InterordinalGenerator implements ContextGenerator {
         public Context createContext(String name, List dividers, Column column) {
             ContextImplementation context = new ContextImplementation();
             context.setName(name);
@@ -161,8 +161,8 @@ public class OrdinalScaleEditorDialog extends JDialog {
             Attribute[] upwardsAttributes = new Attribute[numDiv];
             Attribute[] downwardsAttributes = new Attribute[numDiv];
             for (int i = 0; i < numDiv; i++) {
-                upwardsAttributes[i] = new Attribute(">= " + dividers.get(i));
-                downwardsAttributes[i] = new Attribute("< " + dividers.get(i));
+                upwardsAttributes[i] = getUpwardsAttribute(dividers, i);
+                downwardsAttributes[i] = getDownwardsAttribute(dividers, i);
                 context.getAttributes().add(upwardsAttributes[i]);
                 context.getAttributes().add(downwardsAttributes[i]);
             }
@@ -187,8 +187,32 @@ public class OrdinalScaleEditorDialog extends JDialog {
             }
             return context;
         }
+
+        protected abstract Attribute getUpwardsAttribute(List dividers, int i);
+        protected abstract Attribute getDownwardsAttribute(List dividers, int i);
+    }
+    
+    private static class Type1InterordinalGenerator extends InterordinalGenerator {
+        protected Attribute getUpwardsAttribute(List dividers, int i) {
+            return new Attribute(">= " + dividers.get(i));
+        }
+        protected Attribute getDownwardsAttribute(List dividers, int i) {
+            return new Attribute("< " + dividers.get(i));
+        }
         public String toString() {
-        	return "both";
+            return "both, increasing side includes bounds";
+        }
+    }
+
+    private static class Type2InterordinalGenerator extends InterordinalGenerator {
+        protected Attribute getUpwardsAttribute(List dividers, int i) {
+            return new Attribute("> " + dividers.get(i));
+        }
+        protected Attribute getDownwardsAttribute(List dividers, int i) {
+            return new Attribute("<= " + dividers.get(i));
+        }
+        public String toString() {
+            return "both, decreasing side includes bounds";
         }
     }
 
@@ -588,7 +612,8 @@ public class OrdinalScaleEditorDialog extends JDialog {
         		new IncreasingInclusiveGenerator(),
         		new DecreasingExclusiveGenerator(),
         		new DecreasingInclusiveGenerator(),
-        		new InterordinalGenerator()} );
+	            new Type1InterordinalGenerator(),
+    		    new Type2InterordinalGenerator()} );
         pane.add(label, BorderLayout.WEST);
         pane.add(this.typeChooser, BorderLayout.CENTER);
         return pane;
