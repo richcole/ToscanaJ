@@ -23,6 +23,7 @@ import javax.swing.JComponent;
 import javax.swing.ToolTipManager;
 
 import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 public class ContextTableView extends JComponent {
 	private static final Color TEXT_COLOR = Color.BLACK;
@@ -183,11 +184,11 @@ public class ContextTableView extends JComponent {
 
 		if (pos != null) {
 			if (pos.getCol() == 0 && pos.getRow() != 0) {
-				tooltipText =
-					(String) objectsArrayList.get(pos.getRow() - 1);
+				Attribute attr = (Attribute) objectsArrayList.get(pos.getRow() - 1);
+				tooltipText = (String) attr.getData();
 			} else if (pos.getCol() != 0 && pos.getRow() == 0) {
-				tooltipText =
-					(String) attributeArrayList.get(pos.getCol() - 1);
+				Attribute attr = (Attribute) attributeArrayList.get(pos.getCol() - 1);
+				tooltipText = (String) attr.getData();
 			}
 		}
 		return tooltipText;

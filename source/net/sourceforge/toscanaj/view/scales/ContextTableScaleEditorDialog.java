@@ -181,7 +181,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 				ArrayList objList = (ArrayList) context.getObjects();
 				String inputValue = "";
 				do{
-				inputValue = showAddOrRenameInputDialog("Add Object", "object", "");
+				inputValue = showAddOrRenameInputDialog("Add Object", "object", null);
 					if (inputValue != null && !inputValue.equals("")) {
 						inputValue = inputValue.trim();
 						if(!objectOrAttributeIsDuplicated(inputValue, objList, null)){
@@ -203,7 +203,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 				ArrayList attrList = (ArrayList) context.getAttributes();
 				String inputValue = "";
 				do{
-					inputValue = showAddOrRenameInputDialog("Add Attribute", "attribute", "");
+					inputValue = showAddOrRenameInputDialog("Add Attribute", "attribute", null);
 					if (inputValue != null && !inputValue.equals("")) {
 						inputValue = inputValue.trim();
 						if(!objectOrAttributeIsDuplicated(inputValue, null, attrList)){
@@ -520,7 +520,8 @@ public class ContextTableScaleEditorDialog extends JDialog {
 			//rename Object
 			String inputValue = "";
 			do{
-				inputValue = showAddOrRenameInputDialog("Rename Object", "object", (String) objectsArrayList.get(yP - 1));
+				Attribute obj = (Attribute) objectsArrayList.get(yP - 1); 
+				inputValue = showAddOrRenameInputDialog("Rename Object", "object", (String) obj.getData());
 				if (inputValue != null && !inputValue.trim().equals("")) {
 					inputValue = inputValue.trim();
 					if(!objectOrAttributeIsDuplicated(inputValue, objectsArrayList, null)){
@@ -536,10 +537,11 @@ public class ContextTableScaleEditorDialog extends JDialog {
 				}
 			}while(objectOrAttributeIsDuplicated(inputValue, objectsArrayList, null)==true);
 		} else if (yP == 0) {
+			//rename attribute
 			String inputValue = "";
 			do{
-				//rename attribute
-				inputValue = showAddOrRenameInputDialog("Rename Attribute", "attribute", (String) attributeArrayList.get(xP - 1));
+				Attribute attr = (Attribute) attributeArrayList.get(xP - 1);	
+				inputValue = showAddOrRenameInputDialog("Rename Attribute", "attribute", (String) attr.getData());
 				if (inputValue != null && !inputValue.trim().equals("")) {
 					inputValue = inputValue.trim();
 					if(!objectOrAttributeIsDuplicated(inputValue, null, attributeArrayList)){
