@@ -103,7 +103,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private DiagramExportSettings diagramExportSettings;
     private ExportDiagramAction exportDiagramAction;
     private File lastCSCFile;
-	private SaveFileAction saveFileAction;
+	private SaveFileAction saveAsFileAction;
 	private SaveConceptualSchemaActivity saveActivity;
 
     public SienaMainPanel() {
@@ -243,7 +243,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 			}
 		});
         saveActivity = new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
-		this.saveFileAction =	 
+		this.saveAsFileAction =	 
 				new SaveFileAction(
 						this,
 						saveActivity,
@@ -253,10 +253,10 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 								ActionEvent.CTRL_MASK
 						)
 				);
-		saveFileAction.setPostSaveActivity(new SimpleActivity(){
+		saveAsFileAction.setPostSaveActivity(new SimpleActivity(){
 			public boolean doActivity() throws Exception {
-				currentFile = saveFileAction.getLastFileUsed().getPath();
-				addFileToMRUList(saveFileAction.getLastFileUsed());
+				currentFile = saveAsFileAction.getLastFileUsed().getPath();
+				addFileToMRUList(saveAsFileAction.getLastFileUsed());
 				conceptualSchema.dataSaved();
 				updateWindowTitle();
 				return true;
@@ -267,7 +267,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
 		JMenuItem saveAsMenuItem = new JMenuItem("Save As...");
 		saveAsMenuItem.setMnemonic(KeyEvent.VK_A);
-		saveAsMenuItem.addActionListener(saveFileAction);
+		saveAsMenuItem.addActionListener(saveAsFileAction);
 		fileMenu.add(saveAsMenuItem);
 
 
@@ -728,7 +728,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 			int returnValue = showFileChangedDialog();
 			if (returnValue == 0) {
 				// save
-				boolean result = this.saveFileAction.saveFile();
+				boolean result = this.saveAsFileAction.saveFile();
 				if (result) {
 					closeOk = true;
 				} else {
@@ -766,7 +766,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	
 	private void saveFile() {
 		if(this.currentFile == null) {
-			this.saveFileAction.saveFile();	
+			this.saveAsFileAction.saveFile();	
 		} else {
 			try {
 				saveActivity.processFile(new File(this.currentFile));
