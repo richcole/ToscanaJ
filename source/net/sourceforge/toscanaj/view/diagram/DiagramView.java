@@ -175,11 +175,16 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
             DiagramLine dl = diagram.getLine(i);
             addCanvasItem( new LineView(dl) );
         }
-        // add all points and labels to the canvas
+        // add all nodes to the canvas
         for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
             DiagramNode node = diagram.getNode(i);
             NodeView nodeView = new NodeView(node);
             addCanvasItem( nodeView );
+        }
+        // add all labels to the canvas
+        for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
+            DiagramNode node = diagram.getNode(i);
+            NodeView nodeView = new NodeView(node);
             LabelInfo attrLabelInfo = diagram.getAttributeLabel( i );
             if( attrLabelInfo != null ) {
                 LabelView labelView = new LabelView( this, LabelView.ABOVE, attrLabelInfo );
