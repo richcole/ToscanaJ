@@ -27,6 +27,7 @@ public class IndexSelectionDialog extends JDialog {
     private JList availableListView;
     private JList selectedListView;
     private JSplitPane mainSplitPane;
+    private boolean forceSelection;
 
     class MoveEntryListSelectionListener implements ListSelectionListener {
         private DefaultListModel fromModel;
@@ -55,21 +56,26 @@ public class IndexSelectionDialog extends JDialog {
     }
     
     private void updateUIStates() {
-    	this.okButton.setEnabled(this.selectedList.size() != 0);
+    	this.okButton.setEnabled(!this.forceSelection || this.selectedList.size() != 0);
     }
     
     public IndexSelectionDialog(Frame aFrame, String title, Object[] data) {
+        this(aFrame, title, data, true);
+    }
+    
+    public IndexSelectionDialog(Frame aFrame, String title, Object[] data, boolean forceSelection) {
         super(aFrame, true);
         setTitle(title);
-        init(title, data);
+        init(title, data, forceSelection);
         int divPos = ConfigurationManager.fetchInt("IndexSelectionDialog", "verticalDivider", 100);
         mainSplitPane.setDividerLocation(divPos);
         ConfigurationManager.restorePlacement("IndexSelectionDialog", this,
                                               new Rectangle(100, 100, 300, 200));
     }
 
-    public void init(String title, Object[] data) {
+    public void init(String title, Object[] data, boolean forceSelection) {
         this.data = data;
+        this.forceSelection = forceSelection;
         this.availableList = new DefaultListModel();
         for (int i = 0; i < data.length; i++) {
             this.availableList.addElement(data[i]);
@@ -95,7 +101,7 @@ public class IndexSelectionDialog extends JDialog {
                 hide();
             }
         });
-        this.okButton.setEnabled(false);
+        this.okButton.setEnabled(!forceSelection);
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

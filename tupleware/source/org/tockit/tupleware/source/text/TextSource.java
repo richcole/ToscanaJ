@@ -19,6 +19,7 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 
 import org.tockit.relations.model.Relation;
+import org.tockit.relations.operations.DropColumnsOperation;
 import org.tockit.tupleware.gui.IndexSelectionDialog;
 import org.tockit.tupleware.source.TupleSource;
 
@@ -46,7 +47,10 @@ public class TextSource implements TupleSource {
                 if(this.tuples == null) {
                     throw new IOException("No tuples found in file");
                 }
-				IndexSelectionDialog dialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getDimensionNames());
+                IndexSelectionDialog dialog = new IndexSelectionDialog(parent, "Select columns to drop", this.tuples.getDimensionNames(), false);
+                dialog.show();
+                this.tuples = DropColumnsOperation.drop(this.tuples, dialog.getSelectedIndices());
+				dialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getDimensionNames());
 				dialog.show();
 				this.objectIndices = dialog.getSelectedIndices();
 			} catch (Exception e) {

@@ -231,16 +231,16 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 		});
 		toolBar.add(newDiagramButton);
 
-		JButton createModalSystemButton = new JButton("Create modal system");
-		createModalSystemButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				createModalSystem();
-			}
-		});
-		toolBar.add(createModalSystemButton);
+        JButton createModalSystemButton = new JButton("Create modal system");
+        createModalSystemButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                createModalSystem();
+            }
+        });
+        toolBar.add(createModalSystemButton);
     }
 
-	private void createNewDiagram() {
+    private void createNewDiagram() {
 		IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tuples.getDimensionNames());
 		dialog.show();
 		int[] attributeIndices = dialog.getSelectedIndices();
