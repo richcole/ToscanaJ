@@ -4,6 +4,7 @@ import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
@@ -49,6 +50,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         add(splitPane);
 
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class );
+        eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class );
     }
 
     private JPanel makeDiagramViewPanel() {
@@ -138,10 +140,15 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
     }
 
     private void showDiagram(int index) {
-        diagramView.showDiagram(conceptualSchema.getDiagram(index));
+        if( index == -1 ) {
+            diagramView.showDiagram(null);
+        } else {
+            diagramView.showDiagram(conceptualSchema.getDiagram(index));
+        }
     }
 
     protected void fillDiagramListView() {
+        diagramListModel.clear();
         for (int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
             SimpleLineDiagram diagram = (SimpleLineDiagram) conceptualSchema.getDiagram(i);
             diagramListModel.addElement(diagram.getTitle());
@@ -150,10 +157,10 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
 
     public void processEvent(Event event) {
         ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
-        conceptualSchema = changeEvent.getConceptualSchema();
-        diagramListModel.clear();
+        if ( event instanceof NewConceptualSchemaEvent ) {
+            conceptualSchema = changeEvent.getConceptualSchema();
+        }
         fillDiagramListView();
-        diagramView.showDiagram(null);
     }
 
     public void setDividerLocation(int location) {

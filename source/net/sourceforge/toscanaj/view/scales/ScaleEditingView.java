@@ -9,12 +9,13 @@ import net.sourceforge.toscanaj.model.Table;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.Iterator;
 
 public class ScaleEditingView extends JPanel implements BrokerEventListener {
@@ -46,6 +47,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
         add(splitPane);
 
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+        eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
     }
 
     static class TableColumnPair {
@@ -120,6 +122,24 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
         fillScalesList();
 
         final JList listView = new JList(scalesListModel);
+        final JButton removeButton = new JButton("Remove");
+        removeButton.setEnabled(false);
+        listView.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        listView.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                removeButton.setEnabled(listView.getSelectedIndex() != -1);
+            }
+        });
+        removeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int[] selections = listView.getSelectedIndices();
+                for (int i = selections.length - 1; i >= 0;  i--) {
+                    int selection = selections[i];
+                    System.out.println(selection);
+                    conceptualSchema.removeDiagram(selection);
+                }
+            }
+        });
 
         JPanel scalesPane = new JPanel();
         scalesPane.setLayout(new GridBagLayout());
@@ -139,6 +159,14 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
                         new Insets(5, 5, 5, 5),
                         5, 5)
         );
+        scalesPane.add(removeButton,
+                new GridBagConstraints(
+                        0, 2, 1, 1, 1.0, 0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL,
+                        new Insets(5, 5, 5, 5),
+                        5, 5)
+        );
 
         return scalesPane;
     }
@@ -153,8 +181,10 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
 
     public void processEvent(Event event) {
         ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
-        conceptualSchema = changeEvent.getConceptualSchema();
-        fillTableColumnsList();
+        if( event instanceof NewConceptualSchemaEvent ) {
+            conceptualSchema = changeEvent.getConceptualSchema();
+            fillTableColumnsList();
+        }
         fillScalesList();
     }
 

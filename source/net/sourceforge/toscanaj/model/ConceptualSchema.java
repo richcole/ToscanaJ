@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
+import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import org.jdom.Element;
 
 import java.util.Iterator;
@@ -38,7 +39,7 @@ public class ConceptualSchema {
     /**
      * The event broker for administering the conceptual scheme events.
      */
-    EventBroker broker;
+    EventBroker eventBroker;
 
     /**
      * List of scales
@@ -69,7 +70,7 @@ public class ConceptualSchema {
      * Creates an empty schema.
      */
     public ConceptualSchema(EventBroker broker) {
-        this.broker = broker;
+        this.eventBroker = broker;
         this.dbScheme = new DatabaseSchema(broker);
         reset();
     }
@@ -117,7 +118,7 @@ public class ConceptualSchema {
     public void setDatabaseInfo(DatabaseInfo databaseInfo) throws DatabaseException {
 
         this.databaseInfo = databaseInfo;
-        broker.processEvent(new DatabaseInfoChangedEvent(this, this, databaseInfo));
+        eventBroker.processEvent(new DatabaseInfoChangedEvent(this, this, databaseInfo));
 
 /* remove:
         if (databaseInfo == null) {
@@ -179,6 +180,12 @@ public class ConceptualSchema {
      */
     public void addDiagram(SimpleLineDiagram diagram) {
         diagrams.add(diagram);
+        eventBroker.processEvent(new DiagramListChangeEvent(this,this));
+    }
+
+    public void removeDiagram(int diagramIndex) {
+        diagrams.remove(diagramIndex);
+        eventBroker.processEvent(new DiagramListChangeEvent(this,this));
     }
 
     public void setDescription(Element description) {
