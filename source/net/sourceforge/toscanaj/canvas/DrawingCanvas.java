@@ -44,12 +44,6 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     protected ToscanajGraphics2D graphics = null;
 
     /**
-     * Holds the LabelView for selected label view
-     * that the user has clicked on with intent to move
-     */
-    //private LabelView selectedLabel = null;
-
-    /**
      * Flag to prevent label from being moved when just clicked on
      */
     private boolean dragMode = false;

@@ -51,12 +51,6 @@ public class DiagramView extends DrawingCanvas implements DiagramObserver
     private Diagram2D _diagram = null;
 
     /**
-     * Holds the LabelView for selected label view
-     * that the user has clicked on with intent to move
-     */
-    private LabelView selectedLabel = null;
-
-    /**
      * Flag to prevent label from being moved when just clicked on
      */
     private boolean dragMode = false;
