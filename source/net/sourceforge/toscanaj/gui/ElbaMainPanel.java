@@ -1263,6 +1263,7 @@ public class ElbaMainPanel
 				String columnName = "__diagram" + i + "__";
 				try {
 					databaseConnection.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " INTEGER;");
+					databaseConnection.executeUpdate("CREATE INDEX " + columnName + "index ON " + tableName + "("+ columnName + ");");
 				} catch (DatabaseException e) {
 					// that is ok, we just had this column before
 				}
