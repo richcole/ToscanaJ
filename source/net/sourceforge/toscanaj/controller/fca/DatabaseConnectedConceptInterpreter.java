@@ -82,7 +82,7 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
 				return execute(query, whereClause, null);
 			}
 		} else {
-			return null;
+			return new Object[0];
 		}
 	}
 
