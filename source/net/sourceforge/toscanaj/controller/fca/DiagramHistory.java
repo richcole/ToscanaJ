@@ -245,7 +245,6 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         if ((!hasFutureDiagrams()) &&
                 (getNumberOfCurrentDiagrams() == 1)) {
             // nothing to go to
-            ///@todo Give feedback, when know how
             return false;
         }
         return true;
