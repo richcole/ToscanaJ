@@ -464,7 +464,7 @@ public class CSXParser {
         String password;
         String embeddedDBlocation;
         if (urlElem != null) {
-            url = urlElem.getText();
+            url = urlElem.getTextNormalize();
             driver = urlElem.getAttributeValue("driver");
             username = urlElem.getAttributeValue("user");
             password = urlElem.getAttributeValue("password");

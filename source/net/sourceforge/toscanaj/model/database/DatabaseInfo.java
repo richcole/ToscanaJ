@@ -130,11 +130,10 @@ public class DatabaseInfo implements XMLizable {
             setPassword("");
         } else {
             Element urlElement = XMLHelper.mustbe(URL_SOURCE_ELEMENT_NAME, elem);
-            sourceURL = urlElement.getText();
+            sourceURL = urlElement.getTextNormalize();
             driverClass = XMLHelper.getAttribute(urlElement, DRIVER_CLASS_ATTRIBUTE_NAME).getValue();
             userName = XMLHelper.getAttribute(urlElement, USERNAME_ATTRIBUTE_NAME).getValue();
             password = XMLHelper.getAttribute(urlElement, PASSWORD_ATTRIBUTE_NAME).getValue();
-            ;
         }
         table = XMLHelper.mustbe(TABLE_ELEMENT_NAME, elem).getText();
         objectKey = XMLHelper.mustbe(OBJECT_KEY_ELEMENT_NAME, elem).getText();
