@@ -375,7 +375,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, this, new Rectangle(10, 10, 900, 700));
 		int mainDividerPos = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "mainDivider", 200);
 		splitPane.setDividerLocation(mainDividerPos);
-		int secondaryDividerPos = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "secondaryDivider", 560);
+		int secondaryDividerPos = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "secondaryDivider", 420);
 		if(leftHandPane != null) {
 			leftHandPane.setDividerLocation(secondaryDividerPos);
 		}
