@@ -118,12 +118,12 @@ public class ObjectLabelViewPopupMenuHandler implements BrokerEventListener {
     }
 
     private void addQueryOptions(List queries, final ObjectLabelView labelView, JPopupMenu popupMenu) {
-        JMenuItem menuItem;
+        JRadioButtonMenuItem menuItem;
         JMenu queryMenu = new JMenu("Change label");
         Iterator it = queries.iterator();
         while (it.hasNext()) {
             final Query query = (Query) it.next();
-            menuItem = new JMenuItem(query.getName());
+            menuItem = new JRadioButtonMenuItem(query.getName(),query.equals(labelView.getQuery()));
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     labelView.setQuery(query);

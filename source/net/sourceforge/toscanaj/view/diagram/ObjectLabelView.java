@@ -148,4 +148,8 @@ public class ObjectLabelView extends LabelView {
     protected boolean highlightedInFilter() {
         return false;
     }
+
+    public Query getQuery() {
+        return this.query;
+    }
 }
