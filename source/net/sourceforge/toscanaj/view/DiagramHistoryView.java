@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 
 /**
  * A view for presenting the list of all diagrams.
@@ -46,10 +47,12 @@ public class DiagramHistoryView extends JList {
             if(isSelected) {
                 setBackground(list.getSelectionBackground());
                 setForeground(list.getSelectionForeground());
+                setBorder(new javax.swing.border.LineBorder(java.awt.Color.black));
             }
             else {
-                 setBackground(list.getBackground());
-                 setForeground(list.getForeground());
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
+                setBorder(null);
             }
             setEnabled(list.isEnabled());
             Font font = list.getFont();
@@ -75,5 +78,6 @@ public class DiagramHistoryView extends JList {
             throw new ClassCastException("This view needs a model of type DiagramHistory");
         }
         this.setCellRenderer(new DiagramCellRenderer());
+        this.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
 }

@@ -6,7 +6,7 @@ import net.sourceforge.toscanaj.model.DiagramHistory;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
-import net.sourceforge.toscanaj.view.DiagramHistoryView;
+import net.sourceforge.toscanaj.view.DiagramOrganiser;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
 
@@ -35,6 +35,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JDialog;
 import javax.swing.JList;
+import javax.swing.JSplitPane;
 
 /**
  *  This class provides the main GUI panel with menus and a toolbar
@@ -115,6 +116,11 @@ public class MainPanel extends JFrame implements ActionListener {
    */
   private DiagramView diagramView;
 
+  /**
+   * The pane for selecting the diagrams.
+   */
+  DiagramOrganiser diagramOrganiser;
+
   // specify the location of icon images - this is platform safe
   // because the String is converted into a URL so the "/" is OK for
   // all platforms.
@@ -128,7 +134,8 @@ public class MainPanel extends JFrame implements ActionListener {
      * Simple initialisation constructor.
      */
     public MainPanel() {
-        super("ToscanaJ 0.2");
+        super("ToscanaJ");
+        this.history = new DiagramHistory();
         buildPanel();
         // try to set Windows LnF
         try {
@@ -166,17 +173,26 @@ public class MainPanel extends JFrame implements ActionListener {
         //Lay out the content pane.
         JPanel contentPane = new JPanel();
         contentPane.setLayout(new BorderLayout());
+
         diagramView = new DiagramView();
+        diagramOrganiser = new DiagramOrganiser(this.conceptualSchema, this.history);
 
-//        contentPane.add(toolbar, BorderLayout.NORTH);
-        contentPane.add(diagramView, BorderLayout.CENTER);
+        //Create a split pane with the two scroll panes in it.
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+                                   diagramView, diagramOrganiser);
+        splitPane.setOneTouchExpandable(true);
+        splitPane.setDividerLocation(400);
+        splitPane.setResizeWeight(1);
 
-        this.history = new DiagramHistory();
-        DiagramHistoryView histview = new DiagramHistoryView(history);
-        contentPane.add(histview, BorderLayout.EAST);
+        //Provide minimum sizes for the two components in the split pane
+        Dimension minimumSize = new Dimension(100, 50);
+        diagramView.setMinimumSize(minimumSize);
+        diagramOrganiser.setMinimumSize(minimumSize);
+
+        contentPane.add(splitPane, BorderLayout.CENTER);
 
         setContentPane( contentPane );
-        contentPane.setPreferredSize(new Dimension(400, 400));
+        contentPane.setPreferredSize(new Dimension(550, 400));
     }
 
 
@@ -384,8 +400,6 @@ public class MainPanel extends JFrame implements ActionListener {
         contentsButton.setToolTipText("Contents");
         contentsButton.addActionListener(this);
         toolbar.add(contentsButton);
-
-
     }
 
     /**
@@ -595,19 +609,13 @@ public class MainPanel extends JFrame implements ActionListener {
             }
         }
 
+        diagramOrganiser.setConceptualSchema(conceptualSchema);
+        history.clear();
+
         // if there is at least one diagram, open the first
         if( conceptualSchema.getNumberOfDiagrams() != 0 ) {
             currentSelectedIndex = 0;
             diagramView.showDiagram( conceptualSchema.getDiagram( 0 ) );
-        }
-
-        // set the diagram history to contain all diagrams
-        /// @TODO Do something useful here
-        for(int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
-            history.addFutureDiagram(conceptualSchema.getDiagram(i));
-            if(i==0) {
-                history.next();
-            }
         }
 
         // enable relevant buttons and menus

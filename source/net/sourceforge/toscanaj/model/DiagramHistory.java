@@ -64,6 +64,56 @@ public class DiagramHistory extends AbstractListModel {
      */
     public void addFutureDiagram(Diagram2D diagram){
         this.futureDiagrams.add(diagram);
+        int lastPos = pastDiagrams.size() + currentDiagrams.size() + futureDiagrams.size() - 1;
+        this.fireIntervalAdded(this,lastPos,lastPos);
+    }
+
+    /**
+     * Removes a diagram from the model.
+     *
+     * Throws NoSuchElementException if there is no such diagram. If it is tried
+     * to remove the current diagram nothing will happen.
+     *
+     * @TODO Find somthing useful when removing the current diagram.
+     */
+    public void removeDiagram(int position) {
+        if(position < this.pastDiagrams.size()) {
+            this.pastDiagrams.remove(position);
+            this.fireIntervalAdded(this,position,position);
+            return;
+        }
+        int pos = position - this.pastDiagrams.size();
+        if(pos < this.currentDiagrams.size()) {
+            return;
+        }
+        pos = pos - this.currentDiagrams.size();
+        if( pos < this.futureDiagrams.size()) {
+            this.futureDiagrams.remove(pos);
+            this.fireIntervalAdded(this,position,position);
+            return;
+        }
+        throw new NoSuchElementException("Tried to remove diagram beyond range");
+    }
+
+    /**
+     * Removes all diagrams: past, current and future from the history.
+     */
+    public void clear() {
+        int last = this.getSize()-1;
+        if(last == -1) {
+            return;
+        }
+        this.pastDiagrams.clear();
+        this.currentDiagrams.clear();
+        this.futureDiagrams.clear();
+        this.fireIntervalRemoved(this,0,last);
+    }
+
+    /**
+     * Returns true if there a still diagrams to visit.
+     */
+    public boolean hasFutureDiagrams() {
+        return this.futureDiagrams.size() != 0;
     }
 
     /**
