@@ -12,8 +12,9 @@ import org.jfree.chart.ChartFrame;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.JDBCCategoryDataset;
+import org.tockit.plugin.Plugin;
 
-public class JFreeChartViewer implements DatabaseViewer {
+public class JFreeChartViewer implements DatabaseViewer, Plugin {
     private DatabaseViewerManager manager;
     private String queryFront;
     private String windowTitle;
@@ -97,5 +98,9 @@ public class JFreeChartViewer implements DatabaseViewer {
         frame.getChartPanel().setPreferredSize(new Dimension(500, 270));
         frame.pack();
         frame.show();        
+    }
+    
+    public void load() {
+        // do nothing, just to make plugin loader happy
     }
 }
