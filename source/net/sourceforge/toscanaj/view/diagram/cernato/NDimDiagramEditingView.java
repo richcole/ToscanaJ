@@ -34,14 +34,14 @@ public class NDimDiagramEditingView extends DiagramEditingView {
                 CanvasItemDraggedEvent.class,
                 NodeView.class
         );
-        String[] movementNames = {"Cernato", "Node", "Ideal", "Filter"};
+        String[] movementNames = {"NDim", "Node", "Ideal", "Filter"};
         JComboBox movementChooser = new JComboBox(movementNames);
         toolPanel.add(movementChooser);
         movementChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JComboBox combobox = (JComboBox) e.getSource();
                 String selection = combobox.getSelectedItem().toString();
-                if (selection.equals("Cernato")) {
+                if (selection.equals("NDim")) {
                     canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
                     canvasEventBroker.removeSubscriptions(idealMovementEventListener);
                     canvasEventBroker.removeSubscriptions(filterMovementEventListener);
