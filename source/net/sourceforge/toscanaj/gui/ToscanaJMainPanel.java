@@ -12,6 +12,9 @@ import net.sourceforge.toscanaj.canvas.imagewriter.DiagramExportSettings;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormat;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormatRegistry;
 import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
+import net.sourceforge.toscanaj.canvas.events.CanvasItemActivatedEvent;
+import net.sourceforge.toscanaj.canvas.events.CanvasItemSelectedEvent;
+import net.sourceforge.toscanaj.canvas.CanvasBackground;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.diagram.FilterOperationEventListener;
 import net.sourceforge.toscanaj.controller.diagram.HighlightingOperationEventListener;
@@ -32,6 +35,7 @@ import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.jdom.Element;
 
 import javax.swing.*;
@@ -247,18 +251,18 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         diagramView = new DiagramView();
         diagramView.getController().getEventBroker().subscribe(
                 new FilterOperationEventListener(DiagramController.getController()),
-                "net.sourceforge.toscanaj.canvas.events.CanvasItemActivatedEvent",
-                "net.sourceforge.toscanaj.view.diagram.NodeView"
+                CanvasItemActivatedEvent.class,
+                NodeView.class
         );
         diagramView.getController().getEventBroker().subscribe(
                 new HighlightingOperationEventListener(diagramView),
-                "net.sourceforge.toscanaj.canvas.events.CanvasItemSelectedEvent",
-                "net.sourceforge.toscanaj.view.diagram.NodeView"
+                CanvasItemSelectedEvent.class,
+                NodeView.class
         );
         diagramView.getController().getEventBroker().subscribe(
                 new HighlightRemovalOperationEventListener(diagramView),
-                "net.sourceforge.toscanaj.canvas.events.CanvasItemSelectedEvent",
-                "net.sourceforge.toscanaj.canvas.CanvasBackground"
+                CanvasItemSelectedEvent.class,
+                CanvasBackground.class
         );
         diagramOrganiser = new DiagramOrganiser(this.conceptualSchema);
 
