@@ -158,6 +158,8 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
     
     public void updateSize() {
     	this.setPreferredSize(calculateNewSize());
+        invalidate();
+        repaint();
     }
     
 	protected boolean collectionContainsString(

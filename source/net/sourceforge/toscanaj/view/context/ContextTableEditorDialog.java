@@ -344,6 +344,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		this.tableView.updateSize();
 		this.colHeader.updateSize();
 		this.rowHeader.updateSize();
+        validateTree();
     }
     
 	private void addAttribute(

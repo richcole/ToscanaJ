@@ -165,6 +165,8 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
     
     public void updateSize() {
     	this.setPreferredSize(calculateNewSize());
+        invalidate();
+        repaint();
     }
     
 	private MouseListener createMouseListener() {

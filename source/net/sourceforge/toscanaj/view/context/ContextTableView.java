@@ -164,6 +164,8 @@ public class ContextTableView extends JComponent implements Scrollable {
     
     public void updateSize() {
     	this.setPreferredSize(calculateNewSize());
+        invalidate();
+        repaint();
     }
     
     public ContextImplementation getContext() {
