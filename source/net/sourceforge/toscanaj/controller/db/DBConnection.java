@@ -89,20 +89,68 @@ public class DBConnection
     }
 
     /**
-     * Execute a query and return the results.
+     * Retrieves a specific column from a query as a list of strings.
      */
-    public ResultSet query(String statement) throws DatabaseException {
-        ResultSet result = null;
+    public List queryColumn(String statement, int column) throws DatabaseException {
+        ResultSet resultSet = null;
+        Statement stmt = null;
+        List result = new LinkedList();
 
-        // submit a query
+        // submit the query
         try {
-            Statement stmt = con.createStatement();
+            stmt = con.createStatement();
             printLogMessage(System.currentTimeMillis() + ": Executing statement: " + statement);
-            result = stmt.executeQuery(statement);
+            resultSet = stmt.executeQuery(statement);
             printLogMessage(System.currentTimeMillis() + ": done.");
+            while(resultSet.next()) {
+                result.add(resultSet.getString(column));
+            }
         }
         catch( SQLException se ) {
             throw new DatabaseException("An error occured while querying the database.", se);
+        }
+        finally {
+            try {
+                resultSet.close();
+                stmt.close();
+            }
+            catch(SQLException e) {
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Retrieves the first value of the given column as integer.
+     */
+    public int queryNumber(String statement, int column) throws DatabaseException {
+        ResultSet resultSet = null;
+        Statement stmt = null;
+        int result;
+
+        // submit the query
+        try {
+            stmt = con.createStatement();
+            printLogMessage(System.currentTimeMillis() + ": Executing statement: " + statement);
+            resultSet = stmt.executeQuery(statement);
+            printLogMessage(System.currentTimeMillis() + ": done.");
+            resultSet.next();
+            result = resultSet.getInt(column);
+        }
+        catch( SQLException se ) {
+            throw new DatabaseException("An error occured while querying the database.", se);
+        }
+        finally {
+            try {
+                if(resultSet != null) {
+                    resultSet.close();
+                }
+                if(stmt != null) {
+                    stmt.close();
+                }
+            }
+            catch(SQLException e) {
+            }
         }
 
         return result;

@@ -105,13 +105,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                 // we don't know the answer yet, ask DB
                 try {
                     String query = this.dbInfo.getCountQuery() + " WHERE " + this.objectClause + ";";
-                    ResultSet result = connection.query(query);
-                    result.next();
-                    this.numObjects = Integer.parseInt(result.getString(1));
-                }
-                catch (SQLException e) {
-                    /// @TODO Find something useful to do here.
-                    e.printStackTrace(System.err);
+                    this.numObjects = this.connection.queryNumber(query,1);
                 }
                 catch (DatabaseException e) {
                     /// @TODO Find something useful to do here.
@@ -146,19 +140,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             if( this.objectClause != null ) {
                 try {
                     String query = this.dbInfo.getQuery() + " WHERE " + this.objectClause + ";";
-                    ResultSet result = connection.query(query);
-                    if( result != null ) {
-                        while( result.next() ) {
-                            objects.add(result.getString(1));
-                        }
-                    }
-                    else {
-                        System.err.println("Could not resolve query: " + query);
-                    }
-                }
-                catch (SQLException e) {
-                    e.printStackTrace(System.err);
-                    /// @TODO Find something useful to do here.
+                    objects = this.connection.queryColumn(query,1);
                 }
                 catch (DatabaseException e) {
                     /// @TODO Find something useful to do here.
@@ -209,7 +191,9 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                     }
                     clause = clause + cur.objectClause;
                 }
-                clause = clause + ")";
+                if(!first) { // we had at least one clause
+                    clause = clause + ")";
+                }
                 retVal.setObjectClause(clause);
             }
         }
