@@ -92,7 +92,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         super(new EventBroker());
         this.conceptInterpreter = null;
         this.conceptInterpretationContext = null;
-        this.diagramSchema = DiagramSchema.getDefaultSchema();
+        this.diagramSchema = DiagramSchema.getCurrentSchema();
         addComponentListener(new ResizeListener());
         getBackgroundItem().setPaint(diagramSchema.getBackgroundColor());
     }

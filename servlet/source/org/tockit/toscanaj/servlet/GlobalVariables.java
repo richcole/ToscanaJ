@@ -43,7 +43,7 @@ public class GlobalVariables {
 
 	public static void initialize(File schemaFile, String servletUrl) {
 		GlobalVariables.servletUrl = servletUrl;
-		diagramSchema = DiagramSchema.getDefaultSchema();
+		diagramSchema = DiagramSchema.getCurrentSchema();
 		try {
 			conceptualSchema = CSXParser.parse(new EventBroker(), schemaFile);
 		}

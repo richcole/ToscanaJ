@@ -9,8 +9,13 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.util.gradients.*;
+import net.sourceforge.toscanaj.view.temporal.ArrowStyle;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import org.tockit.swing.preferences.ExtendedPreferences;
 
@@ -29,7 +34,7 @@ public class DiagramSchema {
      * Otherwise editing them will not work.
      */
     static {
-        DiagramSchema schema = getDefaultSchema();
+        DiagramSchema schema = getCurrentSchema();
         schema.setAsDefault();
     }
 
@@ -115,54 +120,87 @@ public class DiagramSchema {
     private ConceptInterpreter.IntervalType nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_FIXED;
     
     private Font labelFont;
+    
+    private ArrowStyle[] arrowStyles;
 
+    private static DiagramSchema currentSchema;
+    
     private DiagramSchema() {
     }
     
-    public static DiagramSchema getDefaultSchema() {
-    	DiagramSchema retVal = new DiagramSchema();
-		retVal.background = preferences.getColor("backgroundColor", null);
-		retVal.topColor = preferences.getColor("topColor", new Color(0, 0, 150));
-		retVal.bottomColor = preferences.getColor("bottomColor", new Color(255, 255, 150));
-		retVal.gradient = retVal.getDefaultGradient();
-		retVal.foreground = preferences.getColor("foregroundColor", new Color(0, 0, 0));
-		retVal.nestedDiagramNodeColor = preferences.getColor("nestedDiagramNodeColor", new Color(255, 255, 255));
-		retVal.notRealisedDiagramNodeColor = preferences.getColor("notRealisedDiagramNodeColor", null);
-		retVal.circleColor = preferences.getColor("circleColor", new Color(0, 0, 0));
-		retVal.lineColor = preferences.getColor("lineColor", new Color(0, 0, 0));
-		retVal.circleSelectionColor = preferences.getColor("circleSelectionColor", new Color(255, 0, 0));
-		retVal.circleIdealColor = preferences.getColor("circleIdealColor", new Color(0, 0, 0));
-		retVal.circleFilterColor = preferences.getColor("circleFilterColor", new Color(0, 0, 0));
-		retVal.fadeOut = preferences.getFloat("fadeOutValue", 0.7F);
-		retVal.margin = preferences.getInt("margin", 20);
-		retVal.notRealizedNodeSizeReductionFactor = preferences.getFloat("notRealizedNodeSizeReductionFactor", 3);
-		String propVal = preferences.get("gradientType", "extent");
-		propVal = propVal.toLowerCase();
-		if (propVal.equals("extent")) {
-			retVal.gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
-		} else if (propVal.equals("contingent")) {
-			retVal.gradientType = ConceptInterpreter.INTERVAL_TYPE_CONTINGENT;
-		} else {
-			System.err.println("Caught unknown gradient type for DiagramSchema: " + propVal);
-			System.err.println("-- using default");
-		}
-		retVal.selectionLineWidth = preferences.getInt("selectionLineWidth", 3);
-		String labelFontName = preferences.get("labelFontName", "SansSerif");
-		int labelFontSize = preferences.getInt("labelFontSize", 10);
-		propVal = preferences.get("scaleNodeSize", "none");
-		propVal = propVal.toLowerCase();
-		retVal.labelFont = new Font(labelFontName, Font.PLAIN, labelFontSize);
-		if (propVal.equals("contingent")) {
-			retVal.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_CONTINGENT;
-		} else if (propVal.equals("extent")) {
-			retVal.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
-		} else if (propVal.equals("none")) {
-			retVal.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_FIXED;
-		} else {
-			System.err.println("Caught unknown node size scaling value for DiagramSchema: " + propVal);
-			System.err.println("-- using default");
-		}
-    	return retVal;
+    public static DiagramSchema getCurrentSchema() {
+        if(currentSchema == null) {
+            currentSchema = new DiagramSchema();
+    		currentSchema.background = preferences.getColor("backgroundColor", null);
+    		currentSchema.topColor = preferences.getColor("topColor", new Color(0, 0, 150));
+    		currentSchema.bottomColor = preferences.getColor("bottomColor", new Color(255, 255, 150));
+    		currentSchema.gradient = currentSchema.getDefaultGradient();
+    		currentSchema.foreground = preferences.getColor("foregroundColor", new Color(0, 0, 0));
+    		currentSchema.nestedDiagramNodeColor = preferences.getColor("nestedDiagramNodeColor", new Color(255, 255, 255));
+    		currentSchema.notRealisedDiagramNodeColor = preferences.getColor("notRealisedDiagramNodeColor", null);
+    		currentSchema.circleColor = preferences.getColor("circleColor", new Color(0, 0, 0));
+    		currentSchema.lineColor = preferences.getColor("lineColor", new Color(0, 0, 0));
+    		currentSchema.circleSelectionColor = preferences.getColor("circleSelectionColor", new Color(255, 0, 0));
+    		currentSchema.circleIdealColor = preferences.getColor("circleIdealColor", new Color(0, 0, 0));
+    		currentSchema.circleFilterColor = preferences.getColor("circleFilterColor", new Color(0, 0, 0));
+    		currentSchema.fadeOut = preferences.getFloat("fadeOutValue", 0.7F);
+    		currentSchema.margin = preferences.getInt("margin", 20);
+    		currentSchema.notRealizedNodeSizeReductionFactor = preferences.getFloat("notRealizedNodeSizeReductionFactor", 3);
+    		String propVal = preferences.get("gradientType", "extent");
+    		propVal = propVal.toLowerCase();
+    		if (propVal.equals("extent")) {
+    			currentSchema.gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
+    		} else if (propVal.equals("contingent")) {
+    			currentSchema.gradientType = ConceptInterpreter.INTERVAL_TYPE_CONTINGENT;
+    		} else {
+    			System.err.println("Caught unknown gradient type for DiagramSchema: " + propVal);
+    			System.err.println("-- using default");
+    		}
+    		currentSchema.selectionLineWidth = preferences.getInt("selectionLineWidth", 3);
+    		String labelFontName = preferences.get("labelFontName", "SansSerif");
+    		int labelFontSize = preferences.getInt("labelFontSize", 10);
+    		propVal = preferences.get("scaleNodeSize", "none");
+    		propVal = propVal.toLowerCase();
+    		currentSchema.labelFont = new Font(labelFontName, Font.PLAIN, labelFontSize);
+    		if (propVal.equals("contingent")) {
+    			currentSchema.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_CONTINGENT;
+    		} else if (propVal.equals("extent")) {
+    			currentSchema.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
+    		} else if (propVal.equals("none")) {
+    			currentSchema.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_FIXED;
+    		} else {
+    			System.err.println("Caught unknown node size scaling value for DiagramSchema: " + propVal);
+    			System.err.println("-- using default");
+    		}
+            List arrowStylesList = new ArrayList();
+            int i = 0;
+            try {
+                while(preferences.nodeExists("arrowStyle-" + i)) {
+                    arrowStylesList.add(new ArrowStyle(preferences.node("arrowStyle-" + i)));
+                    i++;
+                }
+            } catch (BackingStoreException e) {
+                // make sure to revert to defaults -- otherwise we might not have enough
+                arrowStylesList.clear();
+            }
+            if(arrowStylesList.size() != 0) {
+                currentSchema.arrowStyles = (ArrowStyle[]) arrowStylesList.toArray(new ArrowStyle[arrowStylesList.size()]);
+            } else {
+                currentSchema.arrowStyles = new ArrowStyle[] {
+                        new ArrowStyle(Color.RED),
+                        new ArrowStyle(Color.BLUE),
+                        new ArrowStyle(Color.GREEN),
+                        new ArrowStyle(Color.CYAN),
+                        new ArrowStyle(Color.GRAY),
+                        new ArrowStyle(Color.MAGENTA),
+                        new ArrowStyle(Color.ORANGE),
+                        new ArrowStyle(Color.PINK),
+                        new ArrowStyle(Color.BLACK),
+                        new ArrowStyle(Color.YELLOW)
+                };
+            }
+        }
+    	return currentSchema;
     }
 
     public Color getForegroundColor() {
@@ -329,38 +367,53 @@ public class DiagramSchema {
      * Stores the schema in the preferences.
      */
     public void setAsDefault() {
-        preferences.putColor("backgroundColor", this.background);
-        preferences.putColor("topColor", this.topColor);
-        preferences.putColor("bottomColor", this.bottomColor);
-        preferences.putColor("foregroundColor", this.foreground);
-        preferences.putColor("nestedDiagramNodeColor", this.nestedDiagramNodeColor);
-        preferences.putColor("notRealisedDiagramNodeColor", this.notRealisedDiagramNodeColor);
-        preferences.putColor("circleColor", this.circleColor);
-        preferences.putColor("lineColor", this.lineColor);
-        preferences.putColor("circleSelectionColor", this.circleSelectionColor);
-        preferences.putColor("circleIdealColor", this.circleIdealColor);
-        preferences.putColor("circleFilterColor", this.circleFilterColor);
-        preferences.putFloat("fadeOutValue", this.fadeOut);
-        preferences.putInt("margin", this.margin);
-        preferences.putFloat("notRealizedNodeSizeReductionFactor", this.notRealizedNodeSizeReductionFactor);
+        DiagramSchema.currentSchema = this;
+        writeToPreferences(DiagramSchema.preferences);
+    }
+
+    private void writeToPreferences(ExtendedPreferences prefs) {
+        prefs.putColor("backgroundColor", this.background);
+        prefs.putColor("topColor", this.topColor);
+        prefs.putColor("bottomColor", this.bottomColor);
+        prefs.putColor("foregroundColor", this.foreground);
+        prefs.putColor("nestedDiagramNodeColor", this.nestedDiagramNodeColor);
+        prefs.putColor("notRealisedDiagramNodeColor", this.notRealisedDiagramNodeColor);
+        prefs.putColor("circleColor", this.circleColor);
+        prefs.putColor("lineColor", this.lineColor);
+        prefs.putColor("circleSelectionColor", this.circleSelectionColor);
+        prefs.putColor("circleIdealColor", this.circleIdealColor);
+        prefs.putColor("circleFilterColor", this.circleFilterColor);
+        prefs.putFloat("fadeOutValue", this.fadeOut);
+        prefs.putInt("margin", this.margin);
+        prefs.putFloat("notRealizedNodeSizeReductionFactor", this.notRealizedNodeSizeReductionFactor);
         if(this.gradientType == ConceptInterpreter.INTERVAL_TYPE_EXTENT) {
-            preferences.put("gradientType", "extent");
+            prefs.put("gradientType", "extent");
         } else if(this.gradientType == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT) {
-            preferences.put("gradientType", "contingent");
+            prefs.put("gradientType", "contingent");
         } else {
             throw new RuntimeException("Unknown gradient type");
         }
-        preferences.putInt("selectionLineWidth", this.selectionLineWidth);
-        preferences.put("labelFontName", this.labelFont.getFamily());
-        preferences.putInt("labelFontSize", this.labelFont.getSize());
+        prefs.putInt("selectionLineWidth", this.selectionLineWidth);
+        prefs.put("labelFontName", this.labelFont.getFamily());
+        prefs.putInt("labelFontSize", this.labelFont.getSize());
         if(this.nodeSizeScalingType == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT) {
-            preferences.put("scaleNodeSize", "contingent");
+            prefs.put("scaleNodeSize", "contingent");
         } else if(this.nodeSizeScalingType == ConceptInterpreter.INTERVAL_TYPE_EXTENT) {
-            preferences.put("scaleNodeSize", "extent");
+            prefs.put("scaleNodeSize", "extent");
         } else if(this.nodeSizeScalingType == ConceptInterpreter.INTERVAL_TYPE_FIXED) {
-            preferences.put("scaleNodeSize", "none");
+            prefs.put("scaleNodeSize", "none");
         } else {
             throw new RuntimeException("Unknown node scaling type");
         }
+        
+        for (int i = 0; i < this.arrowStyles.length; i++) {
+            ArrowStyle style = this.arrowStyles[i];
+            Preferences stylePrefs = prefs.node("arrowStyle-" + i);
+            style.writeToPreferences(stylePrefs);
+        }
+    }
+
+    public ArrowStyle[] getArrowStyles() {
+        return this.arrowStyles;
     }
 }

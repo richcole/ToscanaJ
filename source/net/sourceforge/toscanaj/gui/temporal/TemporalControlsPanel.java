@@ -59,6 +59,7 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
+import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.scales.NumberField;
@@ -79,19 +80,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	private static final Insets DEFAULT_BUTTON_INSETS = new Insets(2,16,2,16);
 	private static final Insets DEFAULT_LABEL_INSETS = new Insets(2,2,2,2);
 	private static final Insets DEFAULT_FIELD_INSETS = new Insets(2,20,2,2);
-
-    private ArrowStyle[] styles = new ArrowStyle[] {
-        ArrowStyle.createDefaultArrowStyle(Color.RED),
-        ArrowStyle.createDefaultArrowStyle(Color.BLUE),
-        ArrowStyle.createDefaultArrowStyle(Color.GREEN),
-        ArrowStyle.createDefaultArrowStyle(Color.CYAN),
-        ArrowStyle.createDefaultArrowStyle(Color.GRAY),
-        ArrowStyle.createDefaultArrowStyle(Color.MAGENTA),
-        ArrowStyle.createDefaultArrowStyle(Color.ORANGE),
-        ArrowStyle.createDefaultArrowStyle(Color.PINK),
-        ArrowStyle.createDefaultArrowStyle(Color.BLACK),
-        ArrowStyle.createDefaultArrowStyle(Color.YELLOW)
-    };
 
     private ManyValuedContext context;
     private JComboBox sequenceColumnChooser;
@@ -155,7 +143,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     }
 
 	private Component createArrowSettingsPanel() {
-        final JList listView = new JList(styles);
+        final JList listView = new JList(DiagramSchema.getCurrentSchema().getArrowStyles());
         listView.setCellRenderer(new ListCellRenderer() {
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 final ArrowStyle style = (ArrowStyle) value;
@@ -199,6 +187,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                 ArrowStyle newStyle = ArrowStyleChooser.showDialog(listView, "Edit arrow style", style);
                 if(newStyle != null) {
                     style.copyValues(newStyle);
+                    DiagramSchema.getCurrentSchema().setAsDefault();
                     diagramView.repaint();
                 }
             } 
@@ -737,6 +726,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                 this.targetTime = newTargetTime;
                 this.lastAnimationTime = 0;
             }
+            ArrowStyle[] styles = DiagramSchema.getCurrentSchema().getArrowStyles();
             if(selectedSequence == null || selectedSequence == curSequenceValue) {
                 addTransitions(sequence, styles[styleNum], highlightStates);
             }
@@ -763,6 +753,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         int seqNum = 0;
         int seqLength = this.timelineValues.size();
         List lastSequence = null;
+        ArrowStyle[] styles = DiagramSchema.getCurrentSchema().getArrowStyles();
         ArrowStyle style = null;
         while (seqIt.hasNext()) {
             List sequence = (List) seqIt.next();

@@ -23,7 +23,10 @@ import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.ExtraCanvasItemFactory;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 
 import org.jdom.Element;
 import org.tockit.canvas.CanvasItem;
@@ -31,7 +34,7 @@ import org.tockit.canvas.MovableCanvasItem;
 
 public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     private static class Factory implements ExtraCanvasItemFactory {
-        public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) {
+        public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) throws XMLSyntaxError {
             TransitionArrow retVal = new TransitionArrow();
             retVal.timeController = new AnimationTimeController(Double.MAX_VALUE, 0, Double.MAX_VALUE, 0, 1);
             retVal.timeController.setCurrentTime(Double.MAX_VALUE/2);
@@ -41,7 +44,8 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
             double offsetX = Double.parseDouble(offsetElem.getAttributeValue("x"));
             double offsetY = Double.parseDouble(offsetElem.getAttributeValue("y"));
             retVal.manualOffset = new Point2D.Double(offsetX, offsetY);
-            retVal.style = new ArrowStyle(element.getChild("arrowStyle"));
+            retVal.style = DiagramSchema.getCurrentSchema().
+                                getArrowStyles()[XMLHelper.getIntAttribute(element, "arrowStyle")];
 
             retVal.updateShiftVector();        
             retVal.calculateBounds();
@@ -261,7 +265,11 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
         offsetElem.setAttribute("x", String.valueOf(manualOffset.getX()));
         offsetElem.setAttribute("y", String.valueOf(manualOffset.getY()));
         result.addContent(offsetElem);
-        result.addContent(this.style.toXML());
+        for (int i = 0; i < DiagramSchema.getCurrentSchema().getArrowStyles().length; i++) {
+            if(this.style == DiagramSchema.getCurrentSchema().getArrowStyles()[i]) {
+                result.setAttribute("arrowStyle", String.valueOf(i));
+            }
+        }
         return result;
     }
 

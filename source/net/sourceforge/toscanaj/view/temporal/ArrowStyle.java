@@ -10,25 +10,19 @@ package net.sourceforge.toscanaj.view.temporal;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.util.StringTokenizer;
+import java.util.prefs.Preferences;
 
-import org.jdom.Element;
-import org.tockit.util.ColorStringConverter;
-
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 
-public class ArrowStyle implements XMLizable {
-    private static final double DEFAULT_ARROW_RELATIVE_LENGTH = 0.75;
-	private static final int DEFAULT_ARROW_HEADLENGTH = 20;
-	private static final int DEFAULT_ARROW_HEADWIDTH = 14;
-	private static final int DEFAULT_ARROW_WIDTH = 4;
-	private static final float DEFAULT_BORDER_WIDTH = 0.2f;
-	private Color color;
-    private BasicStroke stroke;
-    private double headWidth;
-    private double headLength;
-    private double relativeLength;
-    private float borderWidth;
+public class ArrowStyle {
+    // setting some defaults
+	private Color color = Color.WHITE;
+    private BasicStroke stroke = new BasicStroke(4, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+    private double headWidth = 14;
+    private double headLength = 20;
+    private double relativeLength = 0.75;
+    private float borderWidth = 0.2f;
     
     public ArrowStyle(Color color, BasicStroke stroke, 
                       double headWidth, double headLength,
@@ -39,6 +33,10 @@ public class ArrowStyle implements XMLizable {
         this.headLength = headLength;
         this.relativeLength = relativeLength;
         this.borderWidth = borderWidth;
+    }
+    
+    public ArrowStyle(Color color) {
+        this.color = color;
     }
     
     public ArrowStyle(ArrowStyle style) {
@@ -59,15 +57,23 @@ public class ArrowStyle implements XMLizable {
         this.setBorderWidth(style.borderWidth);
     }
     
-    public ArrowStyle(Element element) {
-        readXML(element);
+    public ArrowStyle(Preferences preferences) {
+        ExtendedPreferences prefs = new ExtendedPreferences(preferences);
+        this.color = prefs.getColor("color", this.color);
+        float lineWidth = prefs.getFloat("stroke-width", this.stroke.getLineWidth());
+        int endCap = prefs.getInt("stroke-cap", this.stroke.getEndCap());
+        int lineJoin = prefs.getInt("stroke-join", this.stroke.getLineJoin());
+        float miterLimit = prefs.getFloat("stroke-miterLimit", this.stroke.getMiterLimit());
+        float[] dashArray = parseFloatArray(
+                                prefs.get("stroke-dash", serializeFloatArray(this.stroke.getDashArray())));
+        float dashPhase = prefs.getFloat("stroke-dashPhase", this.stroke.getDashPhase());
+        this.stroke = new BasicStroke(lineWidth, endCap, lineJoin, miterLimit, dashArray, dashPhase);
+        this.headWidth = prefs.getDouble("headWidth", this.headWidth);
+        this.headLength = prefs.getDouble("headLength", this.headLength);
+        this.relativeLength = prefs.getDouble("relativeLength", this.relativeLength);
+        this.borderWidth = prefs.getFloat("borderWidth", this.borderWidth);
     }
     
-    public static ArrowStyle createDefaultArrowStyle(Color color){
-    	BasicStroke stroke = new BasicStroke(DEFAULT_ARROW_WIDTH, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
-		return new ArrowStyle(color, stroke, DEFAULT_ARROW_HEADWIDTH, DEFAULT_ARROW_HEADLENGTH, DEFAULT_ARROW_RELATIVE_LENGTH, DEFAULT_BORDER_WIDTH); 
-    }
-
     public Color getColor() {
         return this.color;
     }
@@ -108,38 +114,6 @@ public class ArrowStyle implements XMLizable {
         this.stroke = stroke;
     }
 
-    public Element toXML() {
-        Element result = new Element("arrowStyle");
-        result.setAttribute("color", ColorStringConverter.colorToString(this.color));
-        result.setAttribute("stroke-width", "" + stroke.getLineWidth());
-        result.setAttribute("stroke-cap", "" + stroke.getEndCap());
-        result.setAttribute("stroke-join", "" + stroke.getLineJoin());
-        result.setAttribute("stroke-miterLimit", "" + stroke.getMiterLimit());
-        result.setAttribute("stroke-dash", "" + serializeFloatArray(stroke.getDashArray()));
-        result.setAttribute("stroke-dashPhase", "" + stroke.getDashPhase());
-        result.setAttribute("headWidth", "" + this.headWidth);
-        result.setAttribute("headLength", "" + this.headLength);
-        result.setAttribute("relativeLength", "" + this.relativeLength);
-        result.setAttribute("borderWidth", "" + this.borderWidth);
-        return result;
-    }
-
-    public void readXML(Element elem) {
-        String colorValue = elem.getAttributeValue("color");
-        this.color = ColorStringConverter.stringToColor(colorValue);
-        float width = Float.parseFloat(elem.getAttributeValue("stroke-width"));
-        int cap = Integer.parseInt(elem.getAttributeValue("stroke-cap"));
-        int join = Integer.parseInt(elem.getAttributeValue("stroke-join"));
-        float miterLimit = Float.parseFloat(elem.getAttributeValue("stroke-miterLimit"));
-        float[] dash = parseFloatArray(elem.getAttributeValue("stroke-dash"));
-        float dashPhase = Float.parseFloat(elem.getAttributeValue("stroke-dashPhase"));
-        this.stroke = new BasicStroke(width, cap, join, miterLimit, dash, dashPhase);
-        this.headWidth = Double.parseDouble(elem.getAttributeValue("headWidth"));
-        this.headLength =Double.parseDouble(elem.getAttributeValue("headLength"));
-        this.relativeLength = Double.parseDouble(elem.getAttributeValue("relativeLength"));
-        this.borderWidth = Integer.parseInt(elem.getAttributeValue("borderWidth"));
-    }
-
     private String serializeFloatArray(float[] array) {
         if(array == null) {
             return "";
@@ -173,5 +147,20 @@ public class ArrowStyle implements XMLizable {
 
     public void setBorderWidth(float borderWidth) {
         this.borderWidth = borderWidth;
+    }
+
+    public void writeToPreferences(Preferences preferences) {
+        ExtendedPreferences prefs = new ExtendedPreferences(preferences);
+        prefs.putColor("color", this.color);
+        prefs.putFloat("stroke-width", this.stroke.getLineWidth());
+        prefs.putInt("stroke-cap", this.stroke.getEndCap());
+        prefs.putInt("stroke-join", this.stroke.getLineJoin());
+        prefs.putFloat("stroke-miterLimit", this.stroke.getMiterLimit());
+        prefs.put("stroke-dash", serializeFloatArray(this.stroke.getDashArray()));
+        prefs.putFloat("stroke-dashPhase", this.stroke.getDashPhase());
+        prefs.putDouble("headWidth", this.headWidth);
+        prefs.putDouble("headLength", this.headLength);
+        prefs.putDouble("relativeLength", this.relativeLength);
+        prefs.putFloat("borderWidth", this.borderWidth);
     }
 }
