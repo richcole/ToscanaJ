@@ -8,6 +8,8 @@ import java.awt.Frame;
 
 import javax.swing.JOptionPane;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -167,6 +169,8 @@ public class DatabaseViewerManager
             Element root = doc.getRootElement();
             root.detach();
             elem.addContent(root);
+            // remove "url" so we don't insert again
+            elem.removeAttribute("url");
         }
         catch(Exception e) {
             /// @todo handle exceptions, give feedback
@@ -179,8 +183,25 @@ public class DatabaseViewerManager
         if( urlAttr == null ) {
             return null;
         }
-        /// @todo implement
-        return "not yet implemented";
+        String result = "";
+        try
+        {
+            URL url = new URL(this.baseURL, urlAttr);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            String line = reader.readLine();
+            while( line != null ) {
+                result += line + "\n";
+                line = reader.readLine();
+            }
+            elem.addContent(result);
+            // remove "url" so we don't insert again
+            elem.removeAttribute("url");
+        }
+        catch(Exception e) {
+            /// @todo handle exceptions, give feedback
+            e.printStackTrace();
+        }
+        return result;
     }
     public Dictionary getParameters()
     {
