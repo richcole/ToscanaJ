@@ -107,7 +107,7 @@ public class DataDump {
     protected static void dumpDiagram(Diagram2D diagram, Element targetElement, boolean includeLists) {
         Element diagElem = new Element("diagram");
         targetElement.addContent(diagElem);
-        diagElem.addAttribute("title", diagram.getTitle());
+        diagElem.setAttribute("title", diagram.getTitle());
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             Concept cur = diagram.getNode(i).getConcept();
 
@@ -115,19 +115,19 @@ public class DataDump {
             diagElem.addContent(conceptElem);
 
             Element intentElem = new Element("intent");
-            intentElem.addAttribute("size", Integer.toString(cur.getIntentSize()));
+            intentElem.setAttribute("size", Integer.toString(cur.getIntentSize()));
             conceptElem.addContent(intentElem);
 
             Element extentElem = new Element("extent");
-            extentElem.addAttribute("size", Integer.toString(cur.getExtentSize()));
+            extentElem.setAttribute("size", Integer.toString(cur.getExtentSize()));
             conceptElem.addContent(extentElem);
 
             Element attrContElem = new Element("attributeContingent");
-            attrContElem.addAttribute("size", Integer.toString(cur.getAttributeContingentSize()));
+            attrContElem.setAttribute("size", Integer.toString(cur.getAttributeContingentSize()));
             conceptElem.addContent(attrContElem);
 
             Element objContElem = new Element("objectContingent");
-            objContElem.addAttribute("size", Integer.toString(cur.getObjectContingentSize()));
+            objContElem.setAttribute("size", Integer.toString(cur.getObjectContingentSize()));
             conceptElem.addContent(objContElem);
 
             if (includeLists) {
@@ -223,8 +223,6 @@ public class DataDump {
 
     /**
      * Prints the usage information.
-     *
-     * @todo implement
      */
     protected static void printUsage(PrintStream stream) {
         stream.println("Usage:");
