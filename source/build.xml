@@ -114,6 +114,9 @@
 				<include name="toscanaj.prop"/>
 			</fileset>
 		</copy>
+		<!-- add some empty dirs to tell people where to put stuff -->
+		<mkdir dir="${dist.dir}/${dist.name}/dbDrivers"/>
+		<mkdir dir="${dist.dir}/${dist.name}/plugins"/>
 		<fixcrlf srcDir="${dist.dir}/${dist.name}" eol="crlf" includes="*.txt, *.bat, toscanaj.prop"/>
 		<fixcrlf srcDir="${dist.dir}/${dist.name}" eol="lf" includes="*.sh"/>
     </target>

@@ -47,6 +47,7 @@ ToscanaJMainPanel-mruFiles-1=./examples/sql/pctest/pctest.csx
 # ToscanaJMainPanel-showDiagramPreview=[if set to "0", the diagram preview in the lower left corner disappears]
 # NodeView-displayVectors=[if set to "1", the vectors for the nodes will be shown (debug option)]
 # DatabaseConnection-logger=[if set all database calls will be logged, either to the given file or to stdout if "-" is used]
+# DatabaseConnection-driverDirectory=[the directory to look for database drivers, defaults to "dbDrivers" in the program dir]
 # SienaTemporalControls-enabled=[if set to "1", Siena will offer controls for Temporal Concept Analysis]
 # LineView-showExtentRatioLabels=[if set to "1", the ratio of the extents of the upper and lower concept is shown on the lines]
 # LineView-labelFormat=[if set to a format accepted by DecimalFormat the format used to display labels on the lines, defaults to "0.## %"]

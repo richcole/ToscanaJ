@@ -44,8 +44,10 @@ import java.util.Vector;
  *       code could be unified in one method
  */
 public class DatabaseConnection implements EventBrokerListener {
-	
-	/**
+	private static final String DEFAULT_DATABASE_DRIVER_LOCATION = "dbdrivers";
+    private static final String CONFIGURATION_SECTION = "DatabaseConnection";
+
+    /**
      * The JDBC database connection we use.
      */
     private Connection jdbcConnection = null;
@@ -57,32 +59,39 @@ public class DatabaseConnection implements EventBrokerListener {
      * If set to something else than null we will print log entries into this
      * stream.
      */
-    static private final PrintStream logger;
+    static private PrintStream logger;
 	private Type type;
 
     private long lastStatementStartTime;
+
     /**
      * Initializes the logger from the system configuration.
+     * 
+     * @todo move to the JDK 1.4 logging API
      */
     static {
-        String log = ConfigurationManager.fetchString("DatabaseConnection", "logger", "");
-        PrintStream result = null; // we need indirection since the compiler doesn't grok it otherwise
-        if (log.length() != 0) {
-	        if (log.equals("-")) {
-	            result = System.out;
-	        } else {
-	            try {
-	                result = new PrintStream(new FileOutputStream(log));
-	            } catch (Exception e) {
-	                e.printStackTrace();
-	            }
-	        }
-        }
-        logger = result;
+        setUpLogging();
     }
 
     static public void initialize(EventBroker eventBroker) {
         singleton = new DatabaseConnection(eventBroker);
+    }
+
+    private static void setUpLogging() {
+        String log = ConfigurationManager.fetchString(CONFIGURATION_SECTION, "logger", "");
+        PrintStream result = null; // we need indirection since the compiler doesn't grok it otherwise
+        if (log.length() != 0) {
+            if (log.equals("-")) {
+                result = System.out;
+            } else {
+                try {
+                    result = new PrintStream(new FileOutputStream(log));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        logger = result;
     }
 
     static public DatabaseConnection getConnection() {
@@ -158,25 +167,15 @@ public class DatabaseConnection implements EventBrokerListener {
         }
 		try {
 			Class.forName(driverName);
-			Driver driver = DriverManager.getDriver(url);
-			if (driver == null) {
-				// @todo location of dbdrivers should be read from config manager
-				String dbDriversDir = System.getProperty("user.dir") + File.separator + "dbdrivers";
-				DatabaseDriverLoader.Error[] errors = DatabaseDriverLoader.loadDrivers(new File(dbDriversDir));
-				for (int i = 0; i < errors.length; i++) {
-					DatabaseDriverLoader.Error error = errors[i];
-					error.getException().printStackTrace();
-					// @todo need to figure out how to deal with exceptions better - 
-					// we probably want to notify a user about all errors at once rather
-					// then having him/her to fix each error one by one.
-					throw new DatabaseException("Error locating JDBC Driver class for the url:\n" + url, error.getException());
-				}
-				//throw new DatabaseException("Could not locate JDBC Driver class for the url:\n" + url);
-			}
-		} catch (SQLException e) {
-			throw new DatabaseException("Error locating JDBC Driver class for the url:\n" + url, e);
 		} catch (ClassNotFoundException e) {
-			throw new DatabaseException("The class for '" + url + "' couldn't be loaded", e);
+            String dbDriverLocation = ConfigurationManager.fetchString(CONFIGURATION_SECTION, "driverDirectory", DEFAULT_DATABASE_DRIVER_LOCATION);
+            DatabaseDriverLoader.Error[] errors = DatabaseDriverLoader.loadDrivers(new File(dbDriverLocation));
+            if(logger != null) {
+                for (int i = 0; i < errors.length; i++) {
+                    DatabaseDriverLoader.Error error = errors[i];
+                    error.getException().printStackTrace(logger);
+                }
+            }
 		}
         
         
