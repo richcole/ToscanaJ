@@ -9,6 +9,8 @@ Affecting different programs:
   of its normal color.
 - Elba and Siena have now an executable Jar file to start them. This allows starting
   them without scripts if the graphical user interface allows starting Java files.
+- the preferences for the diagram have a new option to set the width of the normal
+  (i.e. not highlighted) lines.
 
 Specific for ToscanaJ:
 ======================

@@ -71,6 +71,7 @@ public class ToscanaJPreferences {
                 new ConfigurationSubsection(new ConfigurationEntry[] {
                     new ConfigurationEntry(DIAGRAM_SCHEMA_NODE, "margin", ConfigurationType.INTEGER, "Margins"),
                     new ConfigurationEntry(DIAGRAM_SCHEMA_NODE, "notRealizedNodeSizeReductionFactor", ConfigurationType.DOUBLE, "Reduction for non-realized"),
+                    new ConfigurationEntry(DIAGRAM_SCHEMA_NODE, "defaultLineWidth", ConfigurationType.INTEGER, "Default line width"),
                     new ConfigurationEntry(DIAGRAM_SCHEMA_NODE, "selectionLineWidth", ConfigurationType.INTEGER, "Selection line width"),
                     new ConfigurationEntry(DIAGRAM_SCHEMA_NODE, "fadeOutValue", ConfigurationType.DOUBLE, "Fade out")
                 }, 

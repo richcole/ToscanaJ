@@ -165,6 +165,8 @@ public class DiagramSchema implements Comparable {
      */
     private ConceptInterpreter.IntervalType gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
 
+    private int defaultLineWidth;
+
     private int selectionLineWidth;
 
     private int margin;
@@ -199,6 +201,7 @@ public class DiagramSchema implements Comparable {
         schema.margin = 20;
         schema.notRealizedNodeSizeReductionFactor = 3;
         schema.gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
+        schema.defaultLineWidth = 1;
         schema.selectionLineWidth = 3;
         schema.labelFont = new Font("SansSerif", Font.PLAIN, 10);
         schema.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_FIXED;
@@ -237,6 +240,7 @@ public class DiagramSchema implements Comparable {
         schema.margin = 20;
         schema.notRealizedNodeSizeReductionFactor = 3;
         schema.gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
+        schema.defaultLineWidth = 1;
         schema.selectionLineWidth = 3;
         schema.labelFont = new Font("SansSerif", Font.PLAIN, 10);
         schema.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_FIXED;
@@ -275,6 +279,7 @@ public class DiagramSchema implements Comparable {
         schema.margin = 20;
         schema.notRealizedNodeSizeReductionFactor = 3;
         schema.gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
+        schema.defaultLineWidth = 1;
         schema.selectionLineWidth = 3;
         schema.labelFont = new Font("SansSerif", Font.PLAIN, 10);
         schema.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_FIXED;
@@ -313,6 +318,7 @@ public class DiagramSchema implements Comparable {
         schema.margin = 20;
         schema.notRealizedNodeSizeReductionFactor = 3;
         schema.gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
+        schema.defaultLineWidth = 1;
         schema.selectionLineWidth = 3;
         schema.labelFont = new Font("SansSerif", Font.PLAIN, 10);
         schema.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_FIXED;
@@ -417,6 +423,14 @@ public class DiagramSchema implements Comparable {
      */
     public ConceptInterpreter.IntervalType getGradientType() {
         return this.gradientType;
+    }
+
+    public int getDefaultLineWidth() {
+        return this.defaultLineWidth;
+    }
+
+    public void setDeafultLineWidth(int lineWidth) {
+        this.defaultLineWidth = lineWidth;
     }
 
     public int getSelectionLineWidth() {
@@ -538,6 +552,7 @@ public class DiagramSchema implements Comparable {
         } else {
             throw new RuntimeException("Unknown gradient type");
         }
+        extPrefs.putInt("defaultLineWidth", this.defaultLineWidth);
         extPrefs.putInt("selectionLineWidth", this.selectionLineWidth);
         extPrefs.put("labelFontName", this.labelFont.getFamily());
         extPrefs.putInt("labelFontSize", this.labelFont.getSize());
@@ -604,6 +619,7 @@ public class DiagramSchema implements Comparable {
             System.err.println("Caught unknown gradient type for DiagramSchema: " + propVal);
             System.err.println("-- using default");
         }
+        this.defaultLineWidth = extPrefs.getInt("defaultLineWidth", 1);
         this.selectionLineWidth = extPrefs.getInt("selectionLineWidth", 3);
         String labelFontName = extPrefs.get("labelFontName", "SansSerif");
         int labelFontSize = extPrefs.getInt("labelFontSize", 10);

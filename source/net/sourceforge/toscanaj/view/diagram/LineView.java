@@ -102,15 +102,16 @@ public class LineView extends CanvasItem {
 			extentRatio = (double)lowerExtent / (double)upperExtent;
 		}
 
+		int defaultLineWidth = diagramSchema.getDefaultLineWidth();
 		int selectionLineWidth = diagramSchema.getSelectionLineWidth();
 		Color lineColor = null;
-		float strokeWidth = 1;
+		float strokeWidth = defaultLineWidth;
 		if (this.diagramLine.getFromNode().getY() > this.diagramLine.getToNode().getY()) {
 			lineColor = Color.red;
-			strokeWidth = 3;
+			strokeWidth = 3 * defaultLineWidth;
 		} else if (this.getSelectionState() == DiagramView.NO_SELECTION) {
 			lineColor = diagramSchema.getLineColor();
-			strokeWidth = 1;
+			strokeWidth = defaultLineWidth;
 		} else if (this.getSelectionState() == DiagramView.SELECTED_IDEAL) {
 			lineColor = diagramSchema.getCircleIdealColor();
 			strokeWidth = selectionLineWidth;
@@ -119,7 +120,7 @@ public class LineView extends CanvasItem {
 			strokeWidth = selectionLineWidth;
 		} else if (this.getSelectionState() == DiagramView.NOT_SELECTED) {
 			lineColor = diagramSchema.fadeOut(diagramSchema.getLineColor());
-			strokeWidth = 1;
+			strokeWidth = defaultLineWidth;
 		}
 
 		if(extentRatio == 1 && this.groupingMode != NO_GROUPING) {
@@ -128,7 +129,7 @@ public class LineView extends CanvasItem {
             Color fillColor = diagramSchema.getGradient().getColor(gradientPosition);
 			if (this.getSelectionState() == DiagramView.NOT_SELECTED) {
 				fillColor = diagramSchema.fadeOut(fillColor);
-				strokeWidth = 1;
+				strokeWidth = defaultLineWidth;
 			}
 
 			double lineLength = this.fromView.getPosition().distance(this.toView.getPosition());
@@ -165,7 +166,7 @@ public class LineView extends CanvasItem {
             graphics.setTransform(oldTransform);
 		} else {
 			if(this.dynamicLineWidth) {
-				strokeWidth *= 7 * extentRatio;
+				strokeWidth = 7 * (float)extentRatio;
 				if(strokeWidth < 0) {
 					strokeWidth = Float.MIN_VALUE;
 				}
