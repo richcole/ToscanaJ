@@ -78,7 +78,10 @@ public class Table implements XMLizable {
             Element element = (Element) iterator.next();
             this.columns.add(new Column(element, this));
         }
-        if("true".equals(elem.getAttributeValue(SUPPRESS_ESCAPING_ATTRIBUTE_NAME))) {
+        String attributeValue = elem.getAttributeValue(SUPPRESS_ESCAPING_ATTRIBUTE_NAME);
+        if("true".equalsIgnoreCase(attributeValue) ||
+                  "yes".equalsIgnoreCase(attributeValue) ||
+                  "on".equalsIgnoreCase(attributeValue)) {
         	this.suppressEscaping = true;
         }
     }
