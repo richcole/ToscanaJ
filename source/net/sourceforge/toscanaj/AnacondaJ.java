@@ -129,9 +129,9 @@ public class AnacondaJ extends JFrame
             new SaveFileAction(
                     this,
                     saveActivity,
-                    KeyEvent.VK_O,
+                    KeyEvent.VK_S,
                     KeyStroke.getKeyStroke(
-                            KeyEvent.VK_O,
+                            KeyEvent.VK_S,
                             ActionEvent.CTRL_MASK
                     )
             )
@@ -146,7 +146,7 @@ public class AnacondaJ extends JFrame
                 new SimpleAction(
                         this,
                         new AnacondaQuitActivity(this),
-                        KeyEvent.VK_O,
+                        KeyEvent.VK_Q,
                         KeyStroke.getKeyStroke(
                             KeyEvent.VK_F4, ActionEvent.ALT_MASK
                         )
