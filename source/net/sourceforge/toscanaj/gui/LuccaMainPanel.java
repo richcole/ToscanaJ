@@ -53,6 +53,7 @@ import java.util.ListIterator;
 
 public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     static private final int MaxMruFiles = 8;
+	private static final String WINDOW_TITLE = "Lucca";
 
     /**
      *  Main Controllers
@@ -87,7 +88,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private static final DimensionCreationStrategy DimensionStrategy = new DefaultDimensionStrategy();
 
     public LuccaMainPanel() {
-        super("Lucca");
+        super(WINDOW_TITLE);
 
         eventBroker = new EventBroker();
         conceptualSchema = new ConceptualSchema(eventBroker);
@@ -216,6 +217,12 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
                         ActionEvent.CTRL_MASK
                 )
         );
+		openFileAction.addPostOpenActivity(new SimpleActivity() {
+			public boolean doActivity() throws Exception {
+				updateWindowTitle();
+				return true;
+			}
+		});
 
         JMenuItem openMenuItem = new JMenuItem("Open...");
         openMenuItem.addActionListener(openFileAction);
@@ -317,6 +324,13 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
             conceptualSchema = new ConceptualSchema(eventBroker);
         }
     }
+    
+	private void updateWindowTitle() {
+		// get the current filename without the extension and full path
+		// we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
+		String filename = currentFile.substring(currentFile.lastIndexOf("\\")+1,(currentFile.length()-4));
+		setTitle(filename +" - "+WINDOW_TITLE);
+	}
 
     private void recreateMruMenu() {
         if (mruMenu == null) { // no menu yet
