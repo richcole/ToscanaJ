@@ -911,7 +911,9 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         	    Iterator objIt = this.context.getObjects().iterator();
         	    while (objIt.hasNext()) {
         	        FCAElement object = (FCAElement) objIt.next();
-        			if( this.context.getRelationship(object, sequenceAttribute).equals(sequenceValue) && 
+        			if( this.context.getRelationship(object, sequenceAttribute) != null &&
+        				this.context.getRelationship(object, sequenceAttribute).equals(sequenceValue) &&
+        				this.context.getRelationship(object, timelineAttribute) != null &&
         	        	this.context.getRelationship(object, timelineAttribute).equals(timelineValue) ) {
         	        		sequence.add(object);
         	        		objectFound = true;
