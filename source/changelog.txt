@@ -1,10 +1,36 @@
-Changes between version 1.4 and the CVS version of the ToscanaJ 
+Changes between version 1.4.1 and the CVS version of the ToscanaJ 
 program suite:
 
 Affecting different programs:
 =============================
 - grid size now changes with a factor of third root of two. This means after
   three refinements the nodes are all on a grid location again
+
+Specific for ToscanaJ:
+======================
+
+Specific for Elba:
+==================
+- Elba can now connect to Excel files directly, using a new option in the DB
+  connection dialog. This avoids having to set up a data source manually
+- before creating a speed optimized system Elba will check if the schema has
+  been saved
+- Elba warns before creating a speed optimized system that this changes the
+  database and the conceptual schema
+
+Specific for Siena (still not fully complete):
+==============================================
+
+Other new experimental features:
+================================
+
+
+
+Changes between version 1.4 and version 1.4.1 of the ToscanaJ 
+program suite:
+
+Affecting different programs:
+=============================
 - Bugfix: MRU menu after File->New is handled correctly now
 - Bugfix: title of the window adjusts after File->New
 
@@ -15,21 +41,12 @@ Specific for ToscanaJ:
 
 Specific for Elba:
 ==================
-- Elba can now connect to Excel files directly, using a new option in the DB
-  connection dialog. This avoids having to set up a data source manually
 - Bugfix: ordinal scale generation works again
 - Bugfix: nominal scale generator allows re-adding values after removal from
   selection
 - Bugfix: nominal scales across columns add the column names and can have the 
   same values in different columns without breaking the scale
 - Bugfix: grid scale generation works again
-
-Specific for Siena (still not fully complete):
-==============================================
-
-Other new experimental features:
-================================
-
 
 
 

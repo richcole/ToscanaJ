@@ -416,6 +416,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
     public void createMenuBar() {
         final DiagramView diagramView = diagramEditingView.getDiagramView();
+        final JFrame parent = this;
 
         saveActivity =
             new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
@@ -666,7 +667,21 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 		createOptimizedSystemMenuItem.setMnemonic(KeyEvent.VK_O);
 		createOptimizedSystemMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				createSpeedOptimizedSystem();
+                checkForMissingSave();
+                int result = JOptionPane.showOptionDialog(parent, 
+                                    "Creating a speed optimized system will modify your database by adding a column for each diagram\n" +
+                                    "and your conceptual schema will be changed to query these new columns.\n\n" +
+                                    "The procedure can take some time on a large system. At the end Elba will offer you to save the\n" +
+                                    "new conceptual schema, since the changed made are irreversible.\n\n",
+                                    "Warning", 
+                                    JOptionPane.YES_NO_OPTION, 
+                                    JOptionPane.WARNING_MESSAGE, 
+                                    null, 
+                                    new String[] {"Cancel", "Continue"}, 
+                                    "Cancel");
+				if(result == 1) {
+                    createSpeedOptimizedSystem();
+                }
 			}
 		});
 		createOptimizedSystemMenuItem.setEnabled(false);
@@ -685,7 +700,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
-        final JFrame parent = this;
         JMenuItem aboutItem = new JMenuItem("About Elba...");
         aboutItem.setMnemonic(KeyEvent.VK_A);
         aboutItem.addActionListener(new ActionListener() {
