@@ -11,9 +11,13 @@ import org.jdom.Element;
 
 
 /**
- * This serialization interface is used for the AnacondaJMainPanel model. All
+ * This serialization interface is used for the model. All
  * elements of the model support this interface and in addition have a
  * constructor that callls readXML.
+ *
+ * @todo separate this aspect of the code from the model. Turning the model into XML
+ *     and back should not be part of the models interface but of some other classes,
+ *     maybe using introspection and some kind of mapping information.
  */
 public interface XMLizable {
 
@@ -27,5 +31,3 @@ public interface XMLizable {
      */
     public abstract void readXML(Element elem) throws XMLSyntaxError;
 }
-
-;

@@ -10,6 +10,9 @@ package net.sourceforge.toscanaj.model.database;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @todo move the query list into the ConceptualSchema
+ */
 public class Query {
     private String name;
 

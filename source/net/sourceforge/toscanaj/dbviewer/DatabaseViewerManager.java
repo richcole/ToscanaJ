@@ -21,6 +21,16 @@ import java.net.URL;
 import java.util.*;
 import java.util.List;
 
+/**
+ * @todo drop distinction between the one element viewers and the multi-element viewers.
+ *      Implementing multi-element viewers can still easily done by supplying a framework
+ *      giving a dialog which shows a one-element view and adds controls for changing the
+ *      item (first/prev/next/last/number) if needed.
+ *
+ * @todo the actual storing of the available viewers should not be part of this class, but
+ *      should be in the ConceptualSchema instead, this class should just have a reference
+ *      to a list.
+ */
 public class DatabaseViewerManager {
     private static Component parentComponent = null;
     private static List objectViewerRegistry = new LinkedList();

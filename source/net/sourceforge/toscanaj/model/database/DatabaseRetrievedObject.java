@@ -7,7 +7,15 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-
+/**
+ * @todo drop distinctions between objects with or without keys and with or without special
+ *     clauses. The object should have only one clause attached which gives whatever this
+ *     object represents, the clause for the full object set of a label should not be part
+ *     of instances of this class. Probably it is a good idea if aggregates just return
+ *     null as their clause -- they just don't have any clause specific for them.
+ *     This change needs first dropping the distinction between different viewers in the
+ *     DatabaseViewerManager.
+ */
 public class DatabaseRetrievedObject {
     private Object key = null;
     private String displayString;

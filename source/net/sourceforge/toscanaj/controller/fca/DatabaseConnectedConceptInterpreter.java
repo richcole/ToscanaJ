@@ -90,6 +90,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         if (retVal == null) {
             retVal = new Hashtable();
             contingentSizes.put(context, retVal);
+            /// @todo wouldn't it be better to implement equals/hashvalue on the context object
             context.getEventBroker().subscribe(this,
                     ConceptInterpretationContextChangedEvent.class,
                     ConceptInterpretationContext.class);

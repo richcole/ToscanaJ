@@ -17,6 +17,10 @@ import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.util.Timer;
 
+/**
+ * @todo pass event broker at construction instead of creating one
+ * @todo remove callbacks on the canvas items, force using event broker
+ */
 public class CanvasController implements MouseListener, MouseMotionListener {
 
     private Canvas canvas;
@@ -82,7 +86,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
      * singleClicked() will only be send if it is not a double click. In any case
      * clicked() or backgroundClicked() will be send.
      *
-     * @TODO Use system double click timing instead of hard-coded 300ms
+     * @todo Use system double click timing instead of hard-coded 300ms
      */
     public void mouseReleased(MouseEvent e) {
         if (popupOpen) {
@@ -118,25 +122,13 @@ public class CanvasController implements MouseListener, MouseMotionListener {
         selectedCanvasItem = null;
     }
 
-    /**
-     * Not used.
-     */
     protected void dragFinished(MouseEvent e) {
-
     }
 
-    /**
-     * Not used.
-     */
     public void mouseEntered(MouseEvent e) {
-        //System.out.println("mouseEntered");
     }
 
-    /**
-     * Not used.
-     */
     public void mouseExited(MouseEvent e) {
-        //System.out.println("mouseExited");
     }
 
     /**
@@ -167,11 +159,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
         }
     }
 
-    /**
-     * Not used.
-     */
     public void mouseMoved(MouseEvent e) {
-        //System.out.println("mouseMoved");
     }
 
     /**

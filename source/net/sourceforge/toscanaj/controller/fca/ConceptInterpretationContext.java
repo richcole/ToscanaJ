@@ -28,6 +28,7 @@ public class ConceptInterpretationContext implements ChangeObserver {
     private boolean filterMode;
     private DiagramHistory diagramHistory;
 
+    /// @todo allow passing null brokers
     private EventBroker eventBroker;
 
     private List nestingConcepts = CollectionFactory.createDefaultList();
