@@ -169,7 +169,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		if (table != null) {
             for (Iterator it = table.getColumns().iterator(); it.hasNext(); ) {
                 Column column = (Column) it.next();
-                columnsList.addElement(column);
+                columnsList.addElement(new ColumnInfo(column));
             }
 		}
 	}
