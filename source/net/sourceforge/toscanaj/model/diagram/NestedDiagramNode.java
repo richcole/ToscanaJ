@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * A class representing a diagram node with an inner diagram.
@@ -125,5 +126,9 @@ public class NestedDiagramNode extends DiagramNode {
         } else {
             return bounds.getHeight() / 1.7;
         }
+    }
+
+    public List getConceptNestingList() {
+        return getInnerDiagram().getNode(0).getConceptNestingList();
     }
 }

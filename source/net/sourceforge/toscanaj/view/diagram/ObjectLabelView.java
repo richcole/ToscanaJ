@@ -10,9 +10,11 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 
 import javax.swing.*;
@@ -115,13 +117,17 @@ public class ObjectLabelView extends LabelView {
 
     protected void doQuery() {
         if (query != null) {
-            DatabaseConnectedConcept concept = (DatabaseConnectedConcept) this.labelInfo.getNode().getConcept();
+            DiagramNode node = this.labelInfo.getNode();
+            DatabaseConnectedConcept concept = (DatabaseConnectedConcept) node.getConcept();
             boolean objectDisplayMode = diagramView.getConceptInterpretationContext().getObjectDisplayMode();
             if (concept.getObjectClause() != null ||
                     ((objectDisplayMode==ConceptInterpretationContext.EXTENT) && !concept.isBottom())
             ) {
                 WhereClauseGenerator clauseGenerator = new WhereClauseGenerator();
-                String whereClause = clauseGenerator.createWhereClause(concept, null, null, objectDisplayMode);
+                String whereClause = clauseGenerator.createWhereClause(concept,
+                                                                       DiagramController.getController().getDiagramHistory(),
+                                                                       node.getConceptNestingList(),
+                                                                       objectDisplayMode);
                 queryResults = this.query.execute(whereClause);
             }
         }

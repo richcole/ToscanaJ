@@ -15,8 +15,11 @@ import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 import java.awt.geom.Point2D;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.jdom.Element;
+import util.CollectionFactory;
 
 /**
  * Stores the information on a node in a diagram.
@@ -298,6 +301,16 @@ public class DiagramNode implements XMLizable {
 
     public static String getElementName() {
         return NODE_ELEMENT_NAME;
+    }
+
+    public List getConceptNestingList() {
+        List conceptList = CollectionFactory.createDefaultList();
+        DiagramNode node = this;
+        while (node != null) {
+            conceptList.add(node.getConcept());
+            node = node.getOuterNode();
+        }
+        return conceptList;
     }
 
     public boolean equals(Object obj) {

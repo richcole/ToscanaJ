@@ -42,16 +42,6 @@ public class HighlightingOperationEventListener implements BrokerEventListener {
                     " has to be subscribed to events from NodeViews only");
         }
 
-        List conceptList = new ArrayList();
-        DiagramNode node = nodeView.getDiagramNode();
-        if (node instanceof NestedDiagramNode) {
-            NestedDiagramNode ndNode = (NestedDiagramNode) node;
-            node = ndNode.getInnerDiagram().getNode(0);
-        }
-        while (node != null) {
-            conceptList.add(node.getConcept());
-            node = node.getOuterNode();
-        }
-        this.diagramView.setSelectedConcepts(conceptList);
+        this.diagramView.setSelectedConcepts(nodeView.getDiagramNode().getConceptNestingList());
     }
 }
