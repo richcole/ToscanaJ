@@ -11,6 +11,7 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
 
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
@@ -25,7 +26,15 @@ public class NDimDiagram extends SimpleLineDiagram {
 
     public NDimDiagram(Element element) throws XMLSyntaxError {
         super(element);
-        /// @todo XML in/out
+        this.base = new Vector();
+        Element baseElem = element.getChild("projectionBase");
+        Iterator it = baseElem.getChildren("vector").iterator();
+        while (it.hasNext()) {
+            Element vecElem = (Element) it.next();
+            double x = Double.parseDouble(vecElem.getAttributeValue("x"));
+            double y = Double.parseDouble(vecElem.getAttributeValue("y"));
+            this.base.add(new Point2D.Double(x,y));
+        }
     }
     
     public Element toXML() {
@@ -41,6 +50,10 @@ public class NDimDiagram extends SimpleLineDiagram {
         }
         retVal.addContent(baseElem);
     	return retVal;
+    }
+
+    protected DiagramNode createNewDiagramNode(Element diagramNode) throws XMLSyntaxError {
+        return new NDimDiagramNode(this, diagramNode);
     }
 
     public Vector getBase() {

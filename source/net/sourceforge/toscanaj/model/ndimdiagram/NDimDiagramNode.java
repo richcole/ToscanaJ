@@ -10,9 +10,11 @@ package net.sourceforge.toscanaj.model.ndimdiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 import java.awt.geom.Point2D;
 import java.util.Iterator;
+import java.util.List;
 
 import org.jdom.Element;
 
@@ -36,6 +38,20 @@ public class NDimDiagramNode extends DiagramNode {
         this.diagram = diagram;
     }
     
+    public NDimDiagramNode(NDimDiagram nDimDiagram, Element diagramNode) throws XMLSyntaxError {
+    	super(diagramNode);
+    	this.diagram = nDimDiagram;
+    	Element ndimPosElem = diagramNode.getChild("ndimVector");
+    	List coordElems = ndimPosElem.getChildren("coordinate");
+        Iterator it = coordElems.iterator();
+        this.ndimVector = new double[coordElems.size()];
+        int i = 0;
+    	while (it.hasNext()) {
+            Element coordElem = (Element) it.next();
+            this.ndimVector[i] = Double.parseDouble(coordElem.getTextNormalize());
+        }
+    }
+
     public Element toXML() {
     	Element retVal = super.toXML();
     	Element nDimPosElem = new Element("ndimVector");

@@ -49,7 +49,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     /**
      * This is set to true once we determined the direction of the y-axis.
      */
-    private boolean coordinateSystemChecked = false;
+    private boolean coordinateSystemChecked;
 
     private Element description = null;
 
@@ -57,10 +57,13 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      * The default constructor creates a diagram with just nothing in it at all.
      */
     public SimpleLineDiagram() {
+        coordinateSystemChecked = false;
     }
 
     public SimpleLineDiagram(Element element) throws XMLSyntaxError {
+        coordinateSystemChecked = true; // don't check while we still build the diagram
         readXML(element);
+        coordinateSystemChecked = false;
     }
 
     public Element toXML() {
@@ -87,7 +90,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         List nodeElems = elem.getChildren(DiagramNode.NODE_ELEMENT_NAME);
         for (Iterator iterator = nodeElems.iterator(); iterator.hasNext();) {
             Element diagramNode = (Element) iterator.next();
-            nodes.add(new DiagramNode(diagramNode));
+            nodes.add(createNewDiagramNode(diagramNode));
         }
         List lineElems = elem.getChildren(DiagramLine.DIAGRAM_LINE_ELEMENT_NAME);
         for (Iterator iterator = lineElems.iterator(); iterator.hasNext();) {
@@ -111,6 +114,10 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
             DiagramNode node = (DiagramNode) iterator.next();
             ((ConceptImplementation) node.getConcept()).buildClosures();
         }
+    }
+
+    protected DiagramNode createNewDiagramNode(Element diagramNode) throws XMLSyntaxError {
+        return new DiagramNode(diagramNode);
     }
 
     /**

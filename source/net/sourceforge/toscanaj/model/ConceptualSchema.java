@@ -18,6 +18,7 @@ import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
 import net.sourceforge.toscanaj.util.CollectionFactory;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
@@ -176,7 +177,12 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         List diagramElems = elem.getChildren(Diagram2D.DIAGRAM_ELEMENT_NAME);
         for (Iterator iterator = diagramElems.iterator(); iterator.hasNext();) {
             Element element = (Element) iterator.next();
-            SimpleLineDiagram diagram = new SimpleLineDiagram(element);
+            SimpleLineDiagram diagram;
+            if(element.getChild("projectionBase") != null) {
+                diagram = new NDimDiagram(element);
+            } else {
+            	diagram = new SimpleLineDiagram(element);
+            }
             diagrams.add(diagram);
         }
     }
