@@ -44,9 +44,13 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
             double offsetX = Double.parseDouble(offsetElem.getAttributeValue("x"));
             double offsetY = Double.parseDouble(offsetElem.getAttributeValue("y"));
             retVal.manualOffset = new Point2D.Double(offsetX, offsetY);
-            retVal.style = DiagramSchema.getCurrentSchema().
-                                getArrowStyles()[XMLHelper.getIntAttribute(element, "arrowStyle")];
-
+            if(element.getAttributeValue("arrowStyle") != null) {
+                retVal.style = DiagramSchema.getCurrentSchema().
+                                    getArrowStyles()[XMLHelper.getIntAttribute(element, "arrowStyle")];
+            } else {
+                // just to keep parsing older file formats, even though not correct
+                retVal.style = DiagramSchema.getCurrentSchema().getArrowStyles()[0];
+            }
             retVal.updateShiftVector();        
             retVal.calculateBounds();
             
