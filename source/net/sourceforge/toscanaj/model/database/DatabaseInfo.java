@@ -1,27 +1,17 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.model.database;
 
+import net.sourceforge.toscanaj.util.xmlize.*;
 import org.jdom.Element;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.net.URL;
 import java.net.MalformedURLException;
-
-import net.sourceforge.toscanaj.parser.DataFormatException;
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import java.net.URL;
 
 /**
  * This class contains information how to connect to a database.
@@ -78,10 +68,9 @@ public class DatabaseInfo implements XMLizable {
      * Creates a new Query that will query a list.
      */
     public DatabaseQuery createListQuery(String name, String header, boolean isDistinct) {
-        if( isDistinct ) {
+        if (isDistinct) {
             return new DatabaseDistinctListQuery(this, name, header);
-        }
-        else {
+        } else {
             return new DatabaseListQuery(this, name, header);
         }
     }
@@ -107,9 +96,9 @@ public class DatabaseInfo implements XMLizable {
 
     public Element toXML() {
         Element retVal = new Element(DATABASE_CONNECTION_ELEMENT_NAME);
-        if( embeddedSQLPath != null ) {
+        if (embeddedSQLPath != null) {
             Element embedElem = new Element(EMBEDDED_SOURCE_ELEMENT_NAME);
-            embedElem.setAttribute(EMBEDDED_URL_ATTRIBUTE_NAME,embeddedSQLPath);
+            embedElem.setAttribute(EMBEDDED_URL_ATTRIBUTE_NAME, embeddedSQLPath);
             retVal.addContent(embedElem);
         } else {
             Element urlElem = new Element(URL_SOURCE_ELEMENT_NAME);
@@ -132,20 +121,21 @@ public class DatabaseInfo implements XMLizable {
         XMLHelper.checkName(DATABASE_CONNECTION_ELEMENT_NAME, elem);
         if (XMLHelper.contains(elem, EMBEDDED_SOURCE_ELEMENT_NAME)) {
             Element embedElem = elem.getChild(EMBEDDED_SOURCE_ELEMENT_NAME);
-            setEmbeddedSQLLocation(XMLHelper.getAttribute(embedElem,EMBEDDED_URL_ATTRIBUTE_NAME).getValue());
+            setEmbeddedSQLLocation(XMLHelper.getAttribute(embedElem, EMBEDDED_URL_ATTRIBUTE_NAME).getValue());
             setUrl("jdbc:hsqldb:.");
             setDriverClass("org.hsqldb.jdbcDriver");
             setUserName("sa");
             setPassword("");
         } else {
-            Element urlElement=XMLHelper.mustbe(URL_SOURCE_ELEMENT_NAME,elem);
-            sourceURL=urlElement.getText();
-            driverClass=XMLHelper.getAttribute(urlElement, DRIVER_CLASS_ATTRIBUTE_NAME).getValue();
-            userName=XMLHelper.getAttribute(urlElement, USERNAME_ATTRIBUTE_NAME).getValue();
-            password=XMLHelper.getAttribute(urlElement, PASSWORD_ATTRIBUTE_NAME).getValue();;
+            Element urlElement = XMLHelper.mustbe(URL_SOURCE_ELEMENT_NAME, elem);
+            sourceURL = urlElement.getText();
+            driverClass = XMLHelper.getAttribute(urlElement, DRIVER_CLASS_ATTRIBUTE_NAME).getValue();
+            userName = XMLHelper.getAttribute(urlElement, USERNAME_ATTRIBUTE_NAME).getValue();
+            password = XMLHelper.getAttribute(urlElement, PASSWORD_ATTRIBUTE_NAME).getValue();
+            ;
         }
-        table=XMLHelper.mustbe(TABLE_ELEMENT_NAME, elem).getText();
-        objectKey= XMLHelper.mustbe(OBJECT_KEY_ELEMENT_NAME,elem).getText();
+        table = XMLHelper.mustbe(TABLE_ELEMENT_NAME, elem).getText();
+        objectKey = XMLHelper.mustbe(OBJECT_KEY_ELEMENT_NAME, elem).getText();
     }
 
     /**

@@ -1,15 +1,13 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.events;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * A class distributing events to listeners.
@@ -67,7 +65,7 @@ public class EventBroker implements BrokerEventListener {
     public void subscribe(BrokerEventListener listener, Class eventType, Class sourceType) {
         try {
             Class eventClass = Class.forName(PACKAGE_NAME + ".Event");
-            if( !implementsInterface(eventType, eventClass) ) {
+            if (!implementsInterface(eventType, eventClass)) {
                 throw new RuntimeException("Subscription to class not implementing Event impossible");
             }
         } catch (ClassNotFoundException e) {
@@ -84,7 +82,7 @@ public class EventBroker implements BrokerEventListener {
     public void removeSubscriptions(BrokerEventListener listener) {
         for (Iterator iterator = subscriptions.iterator(); iterator.hasNext();) {
             EventSubscription subscription = (EventSubscription) iterator.next();
-            if( subscription.getListener().equals(listener) ) {
+            if (subscription.getListener().equals(listener)) {
                 iterator.remove();
             }
         }
@@ -100,13 +98,13 @@ public class EventBroker implements BrokerEventListener {
      * RuntimeException will be thrown.
      */
     public void processEvent(Event event) {
-        if(event.getSource() == null) {
+        if (event.getSource() == null) {
             throw new RuntimeException("Event needs source to be processed, null not allowed.");
         }
         for (Iterator iterator = subscriptions.iterator(); iterator.hasNext();) {
             EventSubscription subscription = (EventSubscription) iterator.next();
-            if( extendsOrImplements(event.getClass(), subscription.getEventType()) &&
-                    extendsOrImplements(event.getSource().getClass(), subscription.getSourceType()) ) {
+            if (extendsOrImplements(event.getClass(), subscription.getEventType()) &&
+                    extendsOrImplements(event.getSource().getClass(), subscription.getSourceType())) {
                 subscription.getListener().processEvent(event);
             }
         }
@@ -141,8 +139,8 @@ public class EventBroker implements BrokerEventListener {
      */
     private boolean implementsInterface(Class classType, Class interfaceType) {
         Class curClass = classType;
-        while( curClass != null ) {
-            if( implementsInterfaceDirectly(curClass, interfaceType) ) {
+        while (curClass != null) {
+            if (implementsInterfaceDirectly(curClass, interfaceType)) {
                 return true;
             }
             curClass = curClass.getSuperclass();
@@ -159,9 +157,9 @@ public class EventBroker implements BrokerEventListener {
      */
     private boolean implementsInterfaceDirectly(Class classType, Class interfaceType) {
         Class[] interfaces = classType.getInterfaces();
-        for(int i = 0; i < interfaces.length; i++) {
+        for (int i = 0; i < interfaces.length; i++) {
             Class curInterface = interfaces[i];
-            if( extendsInterface(curInterface, interfaceType) ) {
+            if (extendsInterface(curInterface, interfaceType)) {
                 return true;
             }
         }
@@ -175,14 +173,14 @@ public class EventBroker implements BrokerEventListener {
      * and reflexive (an interface is considered to extend itself).
      */
     private boolean extendsInterface(Class subInterface, Class superInterface) {
-        if( subInterface.equals(superInterface) ) {
+        if (subInterface.equals(superInterface)) {
             return true;
         }
         // this gets the super interfaces if we have an interface
         Class[] interfaces = subInterface.getInterfaces();
-        for(int i = 0; i < interfaces.length; i++) {
+        for (int i = 0; i < interfaces.length; i++) {
             Class curInterface = interfaces[i];
-            if( extendsInterface(curInterface, superInterface) ) {
+            if (extendsInterface(curInterface, superInterface)) {
                 return true;
             }
         }
@@ -197,8 +195,8 @@ public class EventBroker implements BrokerEventListener {
      */
     private boolean extendsClass(Class subClass, Class superClass) {
         Class curClass = subClass;
-        while( curClass != null ) {
-            if( curClass.equals(superClass) ) {
+        while (curClass != null) {
+            if (curClass.equals(superClass)) {
                 return true;
             }
             curClass = curClass.getSuperclass();

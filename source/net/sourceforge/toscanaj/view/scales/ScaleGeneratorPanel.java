@@ -1,28 +1,26 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.view.scales;
 
-import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import util.CollectionFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class ScaleGeneratorPanel extends JPanel implements BrokerEventListener {
     private List scaleGenerators = null;
@@ -43,8 +41,7 @@ public class ScaleGeneratorPanel extends JPanel implements BrokerEventListener {
             ConceptualSchema conceptualSchema,
             TableColumnPairsSelectionSource selectionSource,
             DatabaseConnection databaseConnection,
-            EventBroker eventBroker)
-    {
+            EventBroker eventBroker) {
         super();
         this.parentFrame = frame;
         this.conceptualSchema = conceptualSchema;

@@ -1,31 +1,24 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.model.diagram.tests;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.model.database.Column;
-import net.sourceforge.toscanaj.model.database.Table;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import net.sourceforge.toscanaj.model.lattice.DummyConcept;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import junit.framework.*;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-
-import java.awt.geom.Point2D;
-import java.awt.*;
-
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 import util.StringUtil;
 
+import java.awt.*;
+import java.awt.geom.Point2D;
+
 public class LabelInfoTest extends TestCase {
     final static Class THIS = LabelInfoTest.class;
+
     public LabelInfoTest(String s) {
         super(s);
     }
@@ -49,7 +42,7 @@ public class LabelInfoTest extends TestCase {
 
     }
 
-    public void testEquals(){
+    public void testEquals() {
         LabelInfo one = new LabelInfo();
         LabelInfo two = new LabelInfo();
         assertEquals(one, two);
@@ -61,10 +54,10 @@ public class LabelInfoTest extends TestCase {
         assertEquals(false, one.equals(two));
 
         one = new LabelInfo();
-        one.setTextColor(new Color(1,2,3));
+        one.setTextColor(new Color(1, 2, 3));
         assertEquals(false, one.equals(two));
 
-        one  = new LabelInfo();
+        one = new LabelInfo();
         one.setTextAlignment(LabelInfo.ALIGNRIGHT);
         assertEquals(false, one.equals(two));
 

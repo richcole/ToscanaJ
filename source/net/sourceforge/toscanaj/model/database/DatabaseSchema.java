@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -8,24 +8,15 @@
 package net.sourceforge.toscanaj.model.database;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.util.STD_Iterator;
-import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.events.BrokerEventListener;
-import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
-import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
+import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
-import net.sourceforge.toscanaj.model.*;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.sql.Types;
-
+import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
+import net.sourceforge.toscanaj.util.STD_Iterator;
+import net.sourceforge.toscanaj.util.xmlize.*;
 import org.jdom.Element;
+
+import java.util.*;
 
 public class DatabaseSchema implements XMLizable, BrokerEventListener {
 

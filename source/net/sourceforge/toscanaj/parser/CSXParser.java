@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -11,31 +11,23 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseQuery;
+import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.*;
-import net.sourceforge.toscanaj.events.EventBroker;
-import org.jdom.DataConversionException;
-import org.jdom.Document;
-import org.jdom.Element;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
+import org.jdom.*;
 import org.jdom.adapters.DOMAdapter;
 import org.jdom.input.DOMBuilder;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.*;
 import java.net.URL;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -118,9 +110,9 @@ public class CSXParser {
         _BaseURL = csxFile.toURL();
         DatabaseInfo.baseURL = _BaseURL;
 
-        Element element=_Document.getRootElement();
-        if(element.getName().equals("conceptualSchema")){
-            if(element.getAttributeValue("version").equals("TJ0.6")){
+        Element element = _Document.getRootElement();
+        if (element.getName().equals("conceptualSchema")) {
+            if (element.getAttributeValue("version").equals("TJ0.6")) {
                 _Schema = new ConceptualSchema(eventBroker, element);
                 return _Schema;
             }
@@ -144,7 +136,7 @@ public class CSXParser {
     private static void parseDescription()
             throws DataFormatException {
         Element descElem = _Document.getRootElement().getChild("description");
-        if(descElem != null) {
+        if (descElem != null) {
             _Schema.setDescription(descElem.detach());
         }
     }
@@ -238,7 +230,7 @@ public class CSXParser {
             org.jdom.Attribute name = attribute.getAttribute("name");
             if ((name != null) && (name.getValue() != null) && (name.getValue().length() != 0)) {
                 Element descriptionElem = attribute.getChild("description");
-                if(descriptionElem != null) {
+                if (descriptionElem != null) {
                     descriptionElem = descriptionElem.detach();
                 }
                 _Attributes.put(attribute.getAttribute("id").getValue(),

@@ -1,30 +1,28 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.view.scales;
 
-import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.model.database.Column;
+import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
-import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
-import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
-import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.model.events.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Iterator;
 
 public class ScaleEditingView extends JPanel implements BrokerEventListener, TableColumnPairsSelectionSource {
@@ -42,7 +40,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
         return parentFrame;
     }
 
-    public DefaultListModel getScalesListModel(){
+    public DefaultListModel getScalesListModel() {
         return scalesListModel;
     }
 
@@ -53,8 +51,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
             JFrame frame,
             ConceptualSchema conceptualSchema,
             EventBroker eventBroker,
-            DatabaseConnection databaseConnection)
-    {
+            DatabaseConnection databaseConnection) {
         super();
         this.parentFrame = frame;
         this.conceptualSchema = conceptualSchema;
@@ -78,8 +75,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
 
     private ScaleGeneratorPanel makeScaleGeneratorPane(
             EventBroker eventBroker,
-            DatabaseConnection databaseConnection)
-    {
+            DatabaseConnection databaseConnection) {
         return new ScaleGeneratorPanel(
                 getParentFrame(),
                 conceptualSchema,
@@ -103,10 +99,10 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
         fillTableColumnsList();
         tableColumnsListView = new JList(tableColumnListModel);
         ListSelectionModel listSelectionModel = tableColumnsListView.getSelectionModel();
-        listSelectionModel.addListSelectionListener(new ListSelectionListener(){
+        listSelectionModel.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-                if(lsm.getValueIsAdjusting()){
+                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                if (lsm.getValueIsAdjusting()) {
                     return;
                 }
                 scaleGeneratorPanel.updateGeneratorViews();

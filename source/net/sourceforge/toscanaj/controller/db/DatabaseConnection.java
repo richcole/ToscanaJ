@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -10,24 +10,15 @@ package net.sourceforge.toscanaj.controller.db;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
-import net.sourceforge.toscanaj.events.BrokerEventListener;
-import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-import net.sourceforge.toscanaj.model.*;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
 
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.URL;
 import java.sql.*;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * This class facilitates connection to and communication with a database
@@ -566,9 +557,9 @@ public class DatabaseConnection implements BrokerEventListener {
         for (int i = 0; i < views.size(); i++) {
             System.out.println("========== " + views.get(i) + " ==========");
             Vector columns = test.getColumns(
-                new Table(
-                    new EventBroker(),
-                    (String) views.get(i))
+                    new Table(
+                            new EventBroker(),
+                            (String) views.get(i))
             );
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {

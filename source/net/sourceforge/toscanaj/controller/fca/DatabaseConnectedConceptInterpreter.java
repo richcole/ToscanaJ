@@ -7,23 +7,16 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
-import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.controller.db.*;
+import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
-import net.sourceforge.toscanaj.model.database.DatabaseInfo;
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
 
-import java.util.List;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Hashtable;
-
-import util.CollectionFactory;
+import java.util.Iterator;
 
 public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, BrokerEventListener {
 
@@ -35,8 +28,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     private Hashtable contingentSizes = new Hashtable();
 
     public DatabaseConnectedConceptInterpreter(DatabaseConnection databaseConnection,
-                                               DatabaseInfo databaseInfo)
-    {
+                                               DatabaseInfo databaseInfo) {
         this.databaseConnection = databaseConnection;
         this.databaseInfo = databaseInfo;
     }
@@ -44,9 +36,9 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
         DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
         boolean displayMode = context.getObjectDisplayMode();
-        if( displayMode == ConceptInterpretationContext.CONTINGENT ) {
+        if (displayMode == ConceptInterpretationContext.CONTINGENT) {
             return dbConcept.getObjectContingentIterator();
-        } else if( displayMode == ConceptInterpretationContext.EXTENT ) {
+        } else if (displayMode == ConceptInterpretationContext.EXTENT) {
             return dbConcept.getExtentIterator();
         } else {
             throw new RuntimeException("Can't happen");
@@ -68,23 +60,22 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 
     private int getCount(Concept concept, ConceptInterpretationContext context, boolean countType) throws DatabaseException {
         Hashtable sizes;
-        if(countType == ConceptInterpretationContext.CONTINGENT) {
-            sizes=getContingentSizesCache(context);
-        }
-        else {
-            sizes=getExtentSizesCache(context);
+        if (countType == ConceptInterpretationContext.CONTINGENT) {
+            sizes = getContingentSizesCache(context);
+        } else {
+            sizes = getExtentSizesCache(context);
         }
         Integer cacheVal = (Integer) sizes.get(concept);
-        if(cacheVal!=null) {
+        if (cacheVal != null) {
             return cacheVal.intValue();
         }
         DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
         String whereClause = WhereClauseGenerator.createWhereClause(dbConcept,
-                                    context.getDiagramHistory(),
-                                    context.getNestingConcepts(),
-                                    countType,
-                                    context.getFilterMode());
-        if(whereClause == null) {
+                context.getDiagramHistory(),
+                context.getNestingConcepts(),
+                countType,
+                context.getFilterMode());
+        if (whereClause == null) {
             return 0;
         }
         DatabaseConnection connection = DatabaseConnection.getConnection();
@@ -95,25 +86,25 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     private Hashtable getContingentSizesCache(ConceptInterpretationContext context) {
-        Hashtable retVal=(Hashtable) contingentSizes.get(context);
-        if(retVal == null) {
+        Hashtable retVal = (Hashtable) contingentSizes.get(context);
+        if (retVal == null) {
             retVal = new Hashtable();
             contingentSizes.put(context, retVal);
             context.getEventBroker().subscribe(this,
-                                               ConceptInterpretationContextChangedEvent.class,
-                                               ConceptInterpretationContext.class);
+                    ConceptInterpretationContextChangedEvent.class,
+                    ConceptInterpretationContext.class);
         }
         return retVal;
     }
 
     private Hashtable getExtentSizesCache(ConceptInterpretationContext context) {
-        Hashtable retVal=(Hashtable) extentSizes.get(context);
-        if(retVal == null) {
+        Hashtable retVal = (Hashtable) extentSizes.get(context);
+        if (retVal == null) {
             retVal = new Hashtable();
             extentSizes.put(context, retVal);
             context.getEventBroker().subscribe(this,
-                                               ConceptInterpretationContextChangedEvent.class,
-                                               ConceptInterpretationContext.class);
+                    ConceptInterpretationContextChangedEvent.class,
+                    ConceptInterpretationContext.class);
         }
         return retVal;
     }
@@ -130,9 +121,9 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     public double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context, int reference) {
         try {
             int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
-            if( reference == REFERENCE_DIAGRAM ) {
+            if (reference == REFERENCE_DIAGRAM) {
                 /// @todo add way to find top concept more easily
-                while(!concept.isTop()) {
+                while (!concept.isTop()) {
                     Concept other = concept;
                     Iterator it = concept.getUpset().iterator();
                     do {
@@ -140,12 +131,11 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                     } while (other == concept);
                     concept = other;
                 }
-                if(extentSize == 0) {
+                if (extentSize == 0) {
                     return 0; //avoids division by zero
                 }
-                return (double)extentSize/(double)getCount(concept, context, ConceptInterpretationContext.EXTENT);
-            }
-            else {
+                return (double) extentSize / (double) getCount(concept, context, ConceptInterpretationContext.EXTENT);
+            } else {
                 /// @todo implement
                 return 1;
             }
@@ -161,11 +151,11 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
             int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
             for (Iterator iterator = concept.getDownset().iterator(); iterator.hasNext();) {
                 Concept other = (Concept) iterator.next();
-                if(other == concept) {
+                if (other == concept) {
                     continue;
                 }
                 int otherExtentSize = getCount(other, context, ConceptInterpretationContext.EXTENT);
-                if(otherExtentSize == extentSize) {
+                if (otherExtentSize == extentSize) {
                     return false;
                 }
             }
@@ -182,6 +172,6 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     public void processEvent(Event e) {
-        clearCaches((ConceptInterpretationContext)e.getSource());
+        clearCaches((ConceptInterpretationContext) e.getSource());
     }
 }

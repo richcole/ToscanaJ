@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.util.xmlize;
 
-import  org.jdom.Element;
+import org.jdom.Element;
 
 
 /**
@@ -26,4 +26,6 @@ public interface XMLizable {
      * Read this element as the content of elem.
      */
     public abstract void readXML(Element elem) throws XMLSyntaxError;
-};
+}
+
+;

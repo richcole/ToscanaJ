@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -9,14 +9,9 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
-import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.awt.*;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
-import java.util.List;
+import java.awt.geom.*;
 
 /**
  * class DiagramLine drawsdsfdfs a line between two points
@@ -102,19 +97,19 @@ public class LineView extends CanvasItem {
     }
 
     private int getSelectionState() {
-        if(this.fromView.getSelectionState() == DiagramView.NO_SELECTION) {
+        if (this.fromView.getSelectionState() == DiagramView.NO_SELECTION) {
             return DiagramView.NO_SELECTION;
         }
-        if(this.fromView.getSelectionState() == DiagramView.NOT_SELECTED) {
+        if (this.fromView.getSelectionState() == DiagramView.NOT_SELECTED) {
             return DiagramView.NOT_SELECTED;
         }
-        if(this.toView.getSelectionState() == DiagramView.NOT_SELECTED) {
+        if (this.toView.getSelectionState() == DiagramView.NOT_SELECTED) {
             return DiagramView.NOT_SELECTED;
         }
-        if(this.fromView.getSelectionState() == DiagramView.SELECTED_FILTER) {
+        if (this.fromView.getSelectionState() == DiagramView.SELECTED_FILTER) {
             return DiagramView.SELECTED_FILTER;
         }
-        if(this.toView.getSelectionState() == DiagramView.SELECTED_IDEAL) {
+        if (this.toView.getSelectionState() == DiagramView.SELECTED_IDEAL) {
             return DiagramView.SELECTED_IDEAL;
         }
         return DiagramView.NOT_SELECTED;

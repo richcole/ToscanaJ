@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -71,7 +71,7 @@ public class NestedDiagramNode extends DiagramNode {
             }
             LabelInfo newObjLabel = new LabelInfo(oldNode.getObjectLabelInfo());
             DiagramNode newNode = new DiagramNode(outerNode.getIdentifier() + " x " + oldNode.getIdentifier(),
-                                                  newPos, newConcept, newAttrLabel, newObjLabel, this);
+                    newPos, newConcept, newAttrLabel, newObjLabel, this);
             nodeMap.put(oldNode, newNode);
             newDiag.addNode(newNode);
         }

@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.controller.events;
 
 import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 
 public class DatabaseConnectEvent implements Event {
@@ -16,7 +15,7 @@ public class DatabaseConnectEvent implements Event {
     private Object source;
     private DatabaseInfo info;
 
-    public DatabaseConnectEvent(Object source, DatabaseInfo info){
+    public DatabaseConnectEvent(Object source, DatabaseInfo info) {
         this.source = source;
         this.info = info;
     }

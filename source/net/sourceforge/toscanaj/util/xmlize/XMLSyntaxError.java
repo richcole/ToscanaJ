@@ -16,6 +16,8 @@ package net.sourceforge.toscanaj.util.xmlize;
 public class XMLSyntaxError extends Exception {
 
     public XMLSyntaxError(String reason) {
-	super(reason);
+        super(reason);
     }
-};
+}
+
+;

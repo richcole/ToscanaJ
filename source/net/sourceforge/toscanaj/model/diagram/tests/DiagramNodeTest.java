@@ -1,27 +1,21 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.model.diagram.tests;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.model.database.Column;
-import net.sourceforge.toscanaj.model.database.Table;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import net.sourceforge.toscanaj.model.lattice.DummyConcept;
+import junit.framework.*;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-
-import java.awt.geom.Point2D;
-
+import net.sourceforge.toscanaj.model.lattice.DummyConcept;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 import util.StringUtil;
+
+import java.awt.geom.Point2D;
 
 public class DiagramNodeTest extends TestCase {
     final static Class THIS = DiagramNodeTest.class;
@@ -37,7 +31,7 @@ public class DiagramNodeTest extends TestCase {
     public void testReadWriteFromXML() {
 
         Point2D position = new Point2D.Double(10, 10);
-        DiagramNode node = new DiagramNode("Id", position,new DummyConcept(),
+        DiagramNode node = new DiagramNode("Id", position, new DummyConcept(),
                 new LabelInfo(), new LabelInfo(), null);
 
         Element xmlDesc = node.toXML();
@@ -51,14 +45,14 @@ public class DiagramNodeTest extends TestCase {
 
     }
 
-    public void testEquals(){
+    public void testEquals() {
         Point2D position = new Point2D.Double(0, 0);
         final String identifier = "Id";
-        DiagramNode node = new DiagramNode(identifier, position,new DummyConcept(),
+        DiagramNode node = new DiagramNode(identifier, position, new DummyConcept(),
                 new LabelInfo(), new LabelInfo(), null);
 
 
-        DiagramNode node2 = new DiagramNode(identifier, position,new DummyConcept(),
+        DiagramNode node2 = new DiagramNode(identifier, position, new DummyConcept(),
                 new LabelInfo(), new LabelInfo(), null);
 
         assertEquals(node, node2);
@@ -69,14 +63,14 @@ public class DiagramNodeTest extends TestCase {
         node.setPosition(new Point2D.Double(10, 0));
         assertEquals(false, node.equals(node2));
 
-        node = new DiagramNode("Id2", position,new DummyConcept(),
+        node = new DiagramNode("Id2", position, new DummyConcept(),
                 new LabelInfo(), new LabelInfo(), null);
         assertEquals(false, node.equals(node2));
 
-        LabelInfo info= new LabelInfo();
-        info.setOffset(new Point2D.Double(0,10));
+        LabelInfo info = new LabelInfo();
+        info.setOffset(new Point2D.Double(0, 10));
 
-        node  = new DiagramNode(identifier,position, new DummyConcept(),info, new LabelInfo(), null);
+        node = new DiagramNode(identifier, position, new DummyConcept(), info, new LabelInfo(), null);
         assertEquals(false, node.equals(node2));
 
     }

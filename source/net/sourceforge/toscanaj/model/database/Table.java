@@ -1,24 +1,18 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.model.database;
 
-import util.CollectionFactory;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.events.TableChangedEvent;
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.*;
 import org.jdom.Element;
+
+import java.util.*;
 
 public class Table implements XMLizable {
 
@@ -44,7 +38,7 @@ public class Table implements XMLizable {
     public Element toXML() {
         Element retVal = new Element(TABLE_ELEMENT_NAME);
         retVal.setAttribute(TABLE_NAME_ATTRIBUTE_NAME, name);
-        if( key != null ) {
+        if (key != null) {
             retVal.addContent(key.toXML());
         }
         for (Iterator iterator = columns.iterator(); iterator.hasNext();) {
@@ -57,7 +51,7 @@ public class Table implements XMLizable {
     public void readXML(Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(TABLE_ELEMENT_NAME, elem);
         name = XMLHelper.getAttribute(elem, TABLE_NAME_ATTRIBUTE_NAME).getValue();
-        List columnElems=elem.getChildren(Column.COLUMN_ELEMENT_NAME);
+        List columnElems = elem.getChildren(Column.COLUMN_ELEMENT_NAME);
         for (Iterator iterator = columnElems.iterator(); iterator.hasNext();) {
             Element element = (Element) iterator.next();
             columns.add(new Column(element, this));

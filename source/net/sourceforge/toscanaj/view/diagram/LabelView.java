@@ -8,22 +8,16 @@
 package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.observer.ChangeObserver;
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.diagram.SelectionChangedEvent;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.observer.ChangeObserver;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * This class encapsulates all generic label drawing code.
@@ -560,17 +554,17 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Br
     abstract protected Iterator getEntryIterator();
 
     private void nodeSelectionChanged() {
-        if ( highlightedInFilter() &&
-             ( (nodeView.getSelectionState() == DiagramView.SELECTED_FILTER) ||
-               (nodeView.getSelectionState() == DiagramView.SELECTED_DIRECTLY) )
-           ) {
+        if (highlightedInFilter() &&
+                ((nodeView.getSelectionState() == DiagramView.SELECTED_FILTER) ||
+                (nodeView.getSelectionState() == DiagramView.SELECTED_DIRECTLY))
+        ) {
             this.diagramView.raiseItem(this);
         }
 
-        if ( highlightedInIdeal() &&
-             ( (nodeView.getSelectionState() == DiagramView.SELECTED_IDEAL) ||
-               (nodeView.getSelectionState() == DiagramView.SELECTED_DIRECTLY) )
-           ) {
+        if (highlightedInIdeal() &&
+                ((nodeView.getSelectionState() == DiagramView.SELECTED_IDEAL) ||
+                (nodeView.getSelectionState() == DiagramView.SELECTED_DIRECTLY))
+        ) {
             this.diagramView.raiseItem(this);
         }
     }

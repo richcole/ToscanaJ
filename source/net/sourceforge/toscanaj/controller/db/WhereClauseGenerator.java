@@ -7,13 +7,13 @@
  */
 package net.sourceforge.toscanaj.controller.db;
 
-import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
     private static class NoClauseCreatedException extends RuntimeException {
@@ -35,7 +35,7 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
     }
 
     private void createClauseStart(String startClause) {
-        if(startClause == null) {
+        if (startClause == null) {
             throw new NoClauseCreatedException();
         }
         this.clause = "WHERE " + startClause;
@@ -49,30 +49,27 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
     private void addNestingPart(List outerConcepts, boolean displayMode) {
         for (Iterator iterator = outerConcepts.iterator(); iterator.hasNext();) {
             DatabaseConnectedConcept concept = (DatabaseConnectedConcept) iterator.next();
-            if(displayMode == ConceptInterpretationContext.CONTINGENT) {
+            if (displayMode == ConceptInterpretationContext.CONTINGENT) {
                 addClausePart(concept.getObjectClause());
-            }
-            else {
+            } else {
                 addClausePart(concept.getExtentClause());
             }
         }
     }
 
     private void addClausePart(String clausePart) {
-        if(clausePart != null) {
+        if (clausePart != null) {
             clause += " AND " + clausePart;
-        }
-        else {
+        } else {
             throw new NoClauseCreatedException();
         }
     }
 
     public void visitConcept(Concept concept) {
         DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
-        if(filterMode == ConceptInterpretationContext.CONTINGENT) {
+        if (filterMode == ConceptInterpretationContext.CONTINGENT) {
             addClausePart(dbConcept.getObjectClause());
-        }
-        else {
+        } else {
             addClausePart(dbConcept.getExtentClause());
         }
     }

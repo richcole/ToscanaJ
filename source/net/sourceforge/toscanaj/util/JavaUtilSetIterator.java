@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -14,8 +14,7 @@ class JavaUtilSetIterator implements Iterator {
     private Object m_curr_object;
     private boolean m_at_end;
 
-    private JavaUtilSetIterator(JavaUtilSetIterator a_it)
-             {
+    private JavaUtilSetIterator(JavaUtilSetIterator a_it) {
         m_set = a_it.m_set;
         reset();
 
@@ -62,7 +61,7 @@ class JavaUtilSetIterator implements Iterator {
         return m_curr_object;
     }
 
-    public void next()  {
+    public void next() {
         if (m_at_end == true) {
             throw new Error("At end of sequence");
         } else {

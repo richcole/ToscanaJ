@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -9,17 +9,12 @@ package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
-import net.sourceforge.toscanaj.model.*;
-import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.*;
+import org.jdom.Element;
+import util.CollectionFactory;
 
 import java.awt.geom.Point2D;
 import java.util.List;
-import java.util.ArrayList;
-
-import org.jdom.Element;
-import util.CollectionFactory;
 
 /**
  * Stores the information on a node in a diagram.
@@ -100,12 +95,12 @@ public class DiagramNode implements XMLizable {
         positionElem.setAttribute(POSITION_X_ATTRIBUTE_NAME, String.valueOf(position.getX()));
         positionElem.setAttribute(POSITION_Y_ATTRIBUTE_NAME, String.valueOf(position.getY()));
         retVal.addContent(positionElem);
-        if(attributeLabel != null) {
+        if (attributeLabel != null) {
             Element attrLabelInfoElem = attributeLabel.toXML();
             attrLabelInfoElem.setName(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME);
             retVal.addContent(attrLabelInfoElem);
         }
-        if(objectLabel != null) {
+        if (objectLabel != null) {
             Element objectLabelInfoElem = objectLabel.toXML();
             objectLabelInfoElem.setName(OBJECT_LABEL_STYLE_ELEMENT_NAME);
             retVal.addContent(objectLabelInfoElem);
@@ -116,20 +111,20 @@ public class DiagramNode implements XMLizable {
 
     public void readXML(Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(NODE_ELEMENT_NAME, elem);
-        identifier=XMLHelper.getAttribute(elem, ID_ATTRIBUTE_NAME).getValue();
+        identifier = XMLHelper.getAttribute(elem, ID_ATTRIBUTE_NAME).getValue();
         Element positionElem = XMLHelper.mustbe(POSITION_ELEMENT_NAME, elem);
         position = new Point2D.Double(
                 XMLHelper.getDoubleAttribute(positionElem, POSITION_X_ATTRIBUTE_NAME),
                 XMLHelper.getDoubleAttribute(positionElem, POSITION_Y_ATTRIBUTE_NAME)
         );
-        if (XMLHelper.contains(elem, ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)){
-            attributeLabel=new LabelInfo(elem.getChild(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME));
+        if (XMLHelper.contains(elem, ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)) {
+            attributeLabel = new LabelInfo(elem.getChild(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME));
         }
-        if (XMLHelper.contains(elem, OBJECT_LABEL_STYLE_ELEMENT_NAME)){
-            objectLabel=new LabelInfo(elem.getChild(OBJECT_LABEL_STYLE_ELEMENT_NAME));
+        if (XMLHelper.contains(elem, OBJECT_LABEL_STYLE_ELEMENT_NAME)) {
+            objectLabel = new LabelInfo(elem.getChild(OBJECT_LABEL_STYLE_ELEMENT_NAME));
         }
-        concept =  new DatabaseConnectedConcept(
-                   XMLHelper.mustbe(DatabaseConnectedConcept.CONCEPT_ELEMENT_NAME,elem)
+        concept = new DatabaseConnectedConcept(
+                XMLHelper.mustbe(DatabaseConnectedConcept.CONCEPT_ELEMENT_NAME, elem)
         );
     }
 
@@ -149,10 +144,9 @@ public class DiagramNode implements XMLizable {
      * node.
      */
     public Concept getFilterConcept() {
-        if( this.outerNode == null ) {
+        if (this.outerNode == null) {
             return this.concept;
-        }
-        else {
+        } else {
             return this.outerNode.getFilterConcept();
         }
     }
@@ -218,7 +212,7 @@ public class DiagramNode implements XMLizable {
      * Get the horizontal radius used for this node.
      */
     public double getRadiusX() {
-        if(null==concept){
+        if (null == concept) {
             return 0;
         }
         return RADIUS;
@@ -228,7 +222,7 @@ public class DiagramNode implements XMLizable {
      * Get the vertical radius used for this node.
      */
     public double getRadiusY() {
-        if(null==concept){
+        if (null == concept) {
             return 0;
         }
         return RADIUS;

@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -10,38 +10,28 @@ package net.sourceforge.toscanaj.gui;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.gui.action.OpenFileAction;
-import net.sourceforge.toscanaj.gui.action.SimpleAction;
-import net.sourceforge.toscanaj.gui.action.SaveFileAction;
+import net.sourceforge.toscanaj.gui.action.*;
 import net.sourceforge.toscanaj.gui.activity.*;
-import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
-import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
-import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
-import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
-import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
-import net.sourceforge.toscanaj.view.database.DatabaseSchemaView;
-import net.sourceforge.toscanaj.view.diagram.DiagramView;
-import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
-import net.sourceforge.toscanaj.view.scales.ScaleEditingView;
+import net.sourceforge.toscanaj.model.events.*;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
+import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
+import net.sourceforge.toscanaj.view.database.DatabaseSchemaView;
+import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
+import net.sourceforge.toscanaj.view.scales.ScaleEditingView;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.net.URL;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileNotFoundException;
+import java.util.*;
 import java.util.List;
-import java.util.LinkedList;
-import java.util.ListIterator;
 
 public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEventListener {
     static private final int MaxMruFiles = 8;
@@ -91,8 +81,8 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         conceptualSchema = new ConceptualSchema(eventBroker);
         databaseConnection = new DatabaseConnection(eventBroker);
 
-        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class );
-        eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class );
+        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+        eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class);
 
         createViews();
 
@@ -122,19 +112,19 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         mainView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "mainPanelDivider", 200));
 
         DatabaseConnectionInformationView connectionInformationView =
-            new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);
+                new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);
 
         databaseSchemaView = new DatabaseSchemaView(this, eventBroker);
         databaseSchemaView.setHorizontalDividerLocation(
-                            ConfigurationManager.fetchInt("AnacondaJMainPanel", "databaseSchemaViewHorizontalDivider", 200));
+                ConfigurationManager.fetchInt("AnacondaJMainPanel", "databaseSchemaViewHorizontalDivider", 200));
         databaseSchemaView.setVerticalDividerLocation(
-                            ConfigurationManager.fetchInt("AnacondaJMainPanel", "databaseSchemaViewVerticalDivider", 300));
+                ConfigurationManager.fetchInt("AnacondaJMainPanel", "databaseSchemaViewVerticalDivider", 300));
 
         scaleView = new ScaleEditingView(this, conceptualSchema, eventBroker, databaseConnection);
         scaleView.setHorizontalDividerLocation(
-                            ConfigurationManager.fetchInt("AnacondaJMainPanel", "scaleViewHorizontalDivider", 200));
+                ConfigurationManager.fetchInt("AnacondaJMainPanel", "scaleViewHorizontalDivider", 200));
         scaleView.setVerticalDividerLocation(
-                            ConfigurationManager.fetchInt("AnacondaJMainPanel", "scaleViewVerticalDivider", 300));
+                ConfigurationManager.fetchInt("AnacondaJMainPanel", "scaleViewVerticalDivider", 300));
 
         diagramView = new DiagramEditingView(this, conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "diagramViewDivider", 200));
@@ -197,17 +187,17 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
 
         JMenuItem saveMenuItem = new JMenuItem("Save...");
         SaveConceptualSchemaActivity saveActivity =
-            new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
+                new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
         saveMenuItem.addActionListener(
-            new SaveFileAction(
-                    this,
-                    saveActivity,
-                    KeyEvent.VK_S,
-                    KeyStroke.getKeyStroke(
-                            KeyEvent.VK_S,
-                            ActionEvent.CTRL_MASK
-                    )
-            )
+                new SaveFileAction(
+                        this,
+                        saveActivity,
+                        KeyEvent.VK_S,
+                        KeyStroke.getKeyStroke(
+                                KeyEvent.VK_S,
+                                ActionEvent.CTRL_MASK
+                        )
+                )
         );
 //        saveActivity.setPrepareActivity(new PrepareToSaveActivity());
         fileMenu.add(saveMenuItem);
@@ -254,7 +244,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
     }
 
     private void recreateMruMenu() {
-        if(mruMenu == null) { // no menu yet
+        if (mruMenu == null) { // no menu yet
             return;
         }
         this.mruMenu.removeAll();
@@ -313,18 +303,18 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
     }
 
     public void processEvent(Event e) {
-        if ( e instanceof ConceptualSchemaChangeEvent ) {
+        if (e instanceof ConceptualSchemaChangeEvent) {
             // set schema in any change event, sometimes the order of the events is wrong
             /// @todo make sure the events come in the proper order
             ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
             conceptualSchema = schemaEvent.getConceptualSchema();
         }
-        if ( e instanceof ConceptualSchemaLoadedEvent ) {
+        if (e instanceof ConceptualSchemaLoadedEvent) {
             ConceptualSchemaLoadedEvent loadEvent = (ConceptualSchemaLoadedEvent) e;
             File schemaFile = loadEvent.getFile();
             addFileToMRUList(schemaFile);
         }
-        if ( e instanceof DatabaseInfoChangedEvent ) {
+        if (e instanceof DatabaseInfoChangedEvent) {
             DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
             if (databaseInformation.getDriverClass() != null && databaseInformation.getURL() != null) {
                 if (databaseConnection.isConnected()) {
@@ -332,7 +322,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
                         databaseConnection.disconnect();
                     } catch (DatabaseException ex) {
                         ErrorDialog.showError(this, ex, "Closing database error",
-                                              "Some error closing the old database:\n" + ex.getMessage());
+                                "Some error closing the old database:\n" + ex.getMessage());
                         return;
                     }
                 }
@@ -343,8 +333,8 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
                         databaseConnection.executeScript(location);
                     }
                 } catch (DatabaseException ex) {
-                    ErrorDialog.showError(this, ex,  "DB Connection failed",
-                                          "Can not connect to the database:\n" + ex.getMessage());
+                    ErrorDialog.showError(this, ex, "DB Connection failed",
+                            "Can not connect to the database:\n" + ex.getMessage());
                 }
             }
         }

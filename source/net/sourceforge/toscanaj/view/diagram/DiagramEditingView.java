@@ -7,33 +7,22 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.gui.action.SimpleAction;
-import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
+import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
+import net.sourceforge.toscanaj.controller.diagram.*;
+import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.events.*;
+import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
-import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
-import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
-import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
-import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.DiagramCollection;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.events.BrokerEventListener;
-import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.controller.fca.DiagramController;
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
-import net.sourceforge.toscanaj.controller.diagram.NodeMovementEventListener;
-import net.sourceforge.toscanaj.controller.diagram.IdealMovementEventListener;
-import net.sourceforge.toscanaj.controller.diagram.FilterMovementEventListener;
-import net.sourceforge.toscanaj.controller.diagram.SetMovementEventListener;
-import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
+import net.sourceforge.toscanaj.model.events.*;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.Observable;
-import java.util.Observer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class DiagramEditingView extends JPanel implements BrokerEventListener {
     private DiagramCollection conceptualSchema;
@@ -59,8 +48,8 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         splitPane.setResizeWeight(0);
         add(splitPane);
 
-        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class );
-        eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class );
+        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+        eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
     }
 
     private JPanel makeDiagramViewPanel() {
@@ -68,7 +57,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
 
         JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         toolPanel.add(new JLabel("Movement:"));
-        String[] movementNames = { "Node", "Ideal", "Filter" };
+        String[] movementNames = {"Node", "Ideal", "Filter"};
         JComboBox movementChooser = new JComboBox(movementNames);
         toolPanel.add(movementChooser);
 
@@ -84,7 +73,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
             public void actionPerformed(ActionEvent e) {
                 JComboBox combobox = (JComboBox) e.getSource();
                 String selection = combobox.getSelectedItem().toString();
-                if(selection.equals("Node")) {
+                if (selection.equals("Node")) {
                     canvasEventBroker.removeSubscriptions(idealMovementEventListener);
                     canvasEventBroker.removeSubscriptions(filterMovementEventListener);
                     canvasEventBroker.subscribe(
@@ -92,7 +81,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
                             CanvasItemDraggedEvent.class,
                             NodeView.class
                     );
-                } else if(selection.equals("Ideal")) {
+                } else if (selection.equals("Ideal")) {
                     canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
                     canvasEventBroker.removeSubscriptions(filterMovementEventListener);
                     canvasEventBroker.subscribe(
@@ -100,7 +89,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
                             CanvasItemDraggedEvent.class,
                             NodeView.class
                     );
-                } else if(selection.equals("Filter")) {
+                } else if (selection.equals("Filter")) {
                     canvasEventBroker.removeSubscriptions(idealMovementEventListener);
                     canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
                     canvasEventBroker.subscribe(
@@ -126,10 +115,10 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         fillDiagramListView();
         listView.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                if(!e.getValueIsAdjusting()) {
+                if (!e.getValueIsAdjusting()) {
                     removeButton.setEnabled(listView.getSelectedIndex() != -1);
                     int[] selections = listView.getSelectedIndices();
-                    if(selections.length == 1) {
+                    if (selections.length == 1) {
                         diagramView.showDiagram(conceptualSchema.getDiagram(selections[0]));
                     } else {
                         diagramView.showDiagram(null);
@@ -160,7 +149,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
 
     public void processEvent(Event event) {
         ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
-        if ( event instanceof NewConceptualSchemaEvent ) {
+        if (event instanceof NewConceptualSchemaEvent) {
             conceptualSchema = changeEvent.getConceptualSchema();
         }
         fillDiagramListView();

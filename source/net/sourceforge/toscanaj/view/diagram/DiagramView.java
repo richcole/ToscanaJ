@@ -7,29 +7,21 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.Canvas;
-import net.sourceforge.toscanaj.controller.fca.DiagramController;
-import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.controller.diagram.SelectionChangedEvent;
-import net.sourceforge.toscanaj.model.database.Query;
+import net.sourceforge.toscanaj.controller.fca.*;
 import net.sourceforge.toscanaj.model.database.DatabaseQuery;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
-import java.util.Iterator;
+import java.awt.geom.Rectangle2D;
+import java.util.*;
 import java.util.List;
-import java.util.Hashtable;
 
 /**
  * This class paints a diagram defined by the SimpleLineDiagram class.
@@ -208,7 +200,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
             NodeView nodeView = new NodeView(node, this, context);
-            nodeMap.put(node,nodeView);
+            nodeMap.put(node, nodeView);
         }
         for (int i = 0; i < diagram.getNumberOfLines(); i++) {
             DiagramLine dl = diagram.getLine(i);

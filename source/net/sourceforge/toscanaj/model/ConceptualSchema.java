@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -8,27 +8,17 @@
 package net.sourceforge.toscanaj.model;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
-import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
-import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
-import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
-import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.model.database.DatabaseSchema;
+import net.sourceforge.toscanaj.model.diagram.*;
+import net.sourceforge.toscanaj.model.events.*;
+import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
+import net.sourceforge.toscanaj.util.xmlize.*;
 import org.jdom.Element;
 import util.CollectionFactory;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-import java.net.URL;
+import java.util.*;
 
 /**
  * This is the main interface for the data structures.
@@ -98,7 +88,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     public Element toXML() {
         Element retVal = new Element(CONCEPTUAL_SCHEMA_ELEMENT_NAME);
         retVal.setAttribute(VERSION_ATTRIBUTE_NAME, VERSION_ATTRIBUTE_VALUE);
-        Element descriptionElement= new Element(DESCRIPTION_ELEMENT_NAME);
+        Element descriptionElement = new Element(DESCRIPTION_ELEMENT_NAME);
         retVal.addContent(description);
         retVal.addContent(databaseInfo.toXML());
         retVal.addContent(dbScheme.toXML());
@@ -115,7 +105,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         databaseInfo = new DatabaseInfo(
                 XMLHelper.mustbe(DatabaseInfo.DATABASE_CONNECTION_ELEMENT_NAME, elem)
         );
-        if(XMLHelper.contains(elem, DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME)){
+        if (XMLHelper.contains(elem, DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME)) {
             dbScheme = new DatabaseSchema(eventBroker, elem.getChild(DatabaseSchema.DATABASE_SCHEMA_ELEMENT_NAME));
         } else {
             dbScheme = new DatabaseSchema(eventBroker);

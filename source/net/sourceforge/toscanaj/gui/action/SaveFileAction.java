@@ -1,20 +1,17 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.gui.action;
 
-import net.sourceforge.toscanaj.util.xmlize.XMLReader;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.gui.activity.FileActivity;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 
 public class SaveFileAction extends KeyboardMappedAction {
@@ -32,16 +29,14 @@ public class SaveFileAction extends KeyboardMappedAction {
             JFrame frame,
             FileActivity activity,
             int mnemonic,
-            KeyStroke keystroke)
-    {
+            KeyStroke keystroke) {
         super(frame, "Save...", mnemonic, keystroke);
         this.activity = activity;
     }
 
     public SaveFileAction(
             JFrame frame,
-            FileActivity activity)
-    {
+            FileActivity activity) {
         super(frame, "Save...");
         this.activity = activity;
     }
@@ -52,8 +47,7 @@ public class SaveFileAction extends KeyboardMappedAction {
         boolean result = false;
         try {
             result = activity.prepareToProcess();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             JOptionPane.showMessageDialog(
                     frame,
                     "Unable to initiate file saving:" + ex.getMessage(),
@@ -61,7 +55,7 @@ public class SaveFileAction extends KeyboardMappedAction {
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        if ( result ) {
+        if (result) {
             if (previousFile != null) {
                 saveDialog = new JFileChooser(previousFile);
             } else {

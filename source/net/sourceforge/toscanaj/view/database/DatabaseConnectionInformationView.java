@@ -1,22 +1,22 @@
 package net.sourceforge.toscanaj.view.database;
+
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 
+import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
+import net.sourceforge.toscanaj.events.*;
+import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
-import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.gui.activity.EmitEventActivity;
+import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
-import net.sourceforge.toscanaj.model.database.DatabaseInfo;
-import net.sourceforge.toscanaj.events.BrokerEventListener;
-import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -82,7 +82,7 @@ public class DatabaseConnectionInformationView extends JPanel implements BrokerE
         add(pane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.SOUTH);
 
-        eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class );
+        eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class);
     }
 
     public boolean areControlsChanged() {

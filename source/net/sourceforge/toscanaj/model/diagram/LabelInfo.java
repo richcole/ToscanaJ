@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -9,19 +9,14 @@ package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-import net.sourceforge.toscanaj.model.*;
 import net.sourceforge.toscanaj.util.ColorWriter;
-import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.*;
+import org.jdom.Element;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
-import java.math.BigInteger;
-
-import org.jdom.Element;
 
 /**
  * This class encapsulates all information needed to paint a label.
@@ -105,18 +100,18 @@ public class LabelInfo implements XMLizable, ChangeObservable {
      * The copy constructor makes a deep copy without the observers.
      */
     public LabelInfo(LabelInfo other) {
-        this( (Point2D) other.offset.clone(),
+        this((Point2D) other.offset.clone(),
                 makeColorCopy(other.backgroundColor),
                 makeColorCopy(other.textColor),
                 other.textAlignment
-                );
+        );
     }
 
     private static Color makeColorCopy(Color color) {
         return new Color(color.getRed(),
-                        color.getGreen(),
-                        color.getBlue(),
-                        color.getAlpha());
+                color.getGreen(),
+                color.getBlue(),
+                color.getAlpha());
     }
 
     public LabelInfo(Element element) throws XMLSyntaxError {
@@ -152,9 +147,9 @@ public class LabelInfo implements XMLizable, ChangeObservable {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
-        if (!elem.getName().equals(LABEL_INFO_ELEMENT_NAME)){
-            if(!elem.getName().equals(DiagramNode.ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)){
-                if(!elem.getName().equals(DiagramNode.OBJECT_LABEL_STYLE_ELEMENT_NAME)){
+        if (!elem.getName().equals(LABEL_INFO_ELEMENT_NAME)) {
+            if (!elem.getName().equals(DiagramNode.ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)) {
+                if (!elem.getName().equals(DiagramNode.OBJECT_LABEL_STYLE_ELEMENT_NAME)) {
                     throw new XMLSyntaxError("Expected either " +
                             LABEL_INFO_ELEMENT_NAME + " or " +
                             DiagramNode.ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME + " or " +
@@ -311,20 +306,20 @@ public class LabelInfo implements XMLizable, ChangeObservable {
     }
 
     public boolean equals(Object obj) {
-        if(!(obj instanceof LabelInfo)){
+        if (!(obj instanceof LabelInfo)) {
             return false;
         }
-        LabelInfo that = (LabelInfo)obj;
-        if(!this.getBackgroundColor().equals(that.getBackgroundColor())){
+        LabelInfo that = (LabelInfo) obj;
+        if (!this.getBackgroundColor().equals(that.getBackgroundColor())) {
             return false;
         }
-        if(!this.getTextColor().equals(that.getTextColor())){
+        if (!this.getTextColor().equals(that.getTextColor())) {
             return false;
         }
-        if(this.getTextAlignment()!=that.getTextAlignment()){
+        if (this.getTextAlignment() != that.getTextAlignment()) {
             return false;
         }
-        if(!this.getOffset().equals(that.getOffset())){
+        if (!this.getOffset().equals(that.getOffset())) {
             return false;
         }
 

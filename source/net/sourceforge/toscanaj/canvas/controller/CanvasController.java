@@ -1,26 +1,21 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.canvas.controller;
 
-import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.Canvas;
-import net.sourceforge.toscanaj.canvas.events.CanvasItemActivatedEvent;
-import net.sourceforge.toscanaj.canvas.events.CanvasItemContextMenuRequestEvent;
-import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
+import net.sourceforge.toscanaj.canvas.CanvasItem;
+import net.sourceforge.toscanaj.canvas.events.*;
 import net.sourceforge.toscanaj.events.EventBroker;
 
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
 import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.Point2D;
 import java.util.Timer;
-import java.util.ListIterator;
 
 public class CanvasController implements MouseListener, MouseMotionListener {
 
@@ -117,7 +112,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
                 this.doubleClickTimer.cancel();
                 selectedCanvasItem.doubleClicked(modelPos);
                 this.eventBroker.processEvent(
-                         new CanvasItemActivatedEvent(selectedCanvasItem, modelPos, screenPos));
+                        new CanvasItemActivatedEvent(selectedCanvasItem, modelPos, screenPos));
             }
         }
         selectedCanvasItem = null;
@@ -167,7 +162,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
             this.eventBroker.processEvent(new CanvasItemDraggedEvent(
                     this.selectedCanvasItem,
                     lastMousePosTr, lastMousePos,
-                    mousePosTr, mousePos ) );
+                    mousePosTr, mousePos));
             lastMousePos = mousePos;
         }
     }
@@ -196,6 +191,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
     private void handlePopupRequest(Point2D canvasPos, Point screenPos) {
         this.selectedCanvasItem.openPopupMenu(canvasPos, screenPos);
         this.eventBroker.processEvent(new CanvasItemContextMenuRequestEvent(
-                this.selectedCanvasItem, canvasPos, screenPos ) );
+                this.selectedCanvasItem, canvasPos, screenPos));
     }
 }

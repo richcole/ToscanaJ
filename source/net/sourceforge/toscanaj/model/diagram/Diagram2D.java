@@ -1,18 +1,17 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.model.diagram;
 
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 /**
  * Interface for getting diagram related information.
@@ -22,6 +21,7 @@ public interface Diagram2D extends XMLizable {
     static final String DIAGRAM_ELEMENT_NAME = "diagram";
     static final String TITLE_ATTRIBUTE_NAME = "title";
     static final String DESCRIPTION_ELEMENT_NAME = "description";
+
     /**
      * Returns the title of the diagram.
      */

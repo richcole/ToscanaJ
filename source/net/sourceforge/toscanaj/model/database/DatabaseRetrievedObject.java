@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import java.sql.ResultSet;
 
 public class DatabaseRetrievedObject {
     private Object key = null;

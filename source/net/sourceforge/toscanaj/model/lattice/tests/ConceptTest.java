@@ -8,13 +8,8 @@
 package net.sourceforge.toscanaj.model.lattice.tests;
 
 import junit.framework.TestCase;
-import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
-import net.sourceforge.toscanaj.model.database.DatabaseQuery;
-import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
-
-import java.util.List;
 
 /**
  * @todo these tests are rather broken, we should test with an embedded database with some objects

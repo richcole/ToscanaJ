@@ -9,15 +9,10 @@ package net.sourceforge.toscanaj.model.database;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
-import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.util.*;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.DecimalFormat;
+import java.util.*;
 
 public abstract class DatabaseQuery extends Query {
     public class Column {
@@ -57,7 +52,7 @@ public abstract class DatabaseQuery extends Query {
                 while (it.hasNext()) {
                     Vector item = (Vector) it.next();
                     DatabaseRetrievedObject object = createDatabaseRetrievedObject(whereClause, item);
-                    if(object != null) {
+                    if (object != null) {
                         retVal.add(object);
                     }
                 }

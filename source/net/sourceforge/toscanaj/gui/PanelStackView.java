@@ -1,13 +1,11 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.gui;
-
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,8 +29,8 @@ public class PanelStackView extends JPanel {
                 layout.show(mainPane, displayName);
             }
         });
-        button.setPreferredSize(new Dimension(SomeArbitraryLargeNumberForStupidSwing,SomeArbitraryLargeNumberForStupidSwing));
-        button.setMaximumSize(new Dimension(SomeArbitraryLargeNumberForStupidSwing,SomeArbitraryLargeNumberForStupidSwing));
+        button.setPreferredSize(new Dimension(SomeArbitraryLargeNumberForStupidSwing, SomeArbitraryLargeNumberForStupidSwing));
+        button.setMaximumSize(new Dimension(SomeArbitraryLargeNumberForStupidSwing, SomeArbitraryLargeNumberForStupidSwing));
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         buttonPane.add(button);
     }

@@ -7,27 +7,19 @@
  */
 package net.sourceforge.toscanaj.util.xmlize;
 
-import  java.lang.Exception;
-import  java.io.FileInputStream;
+import org.jdom.Document;
+import org.jdom.output.XMLOutputter;
+
 import java.io.File;
 import java.io.FileOutputStream;
-
-import org.jdom.DataConversionException;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.jdom.adapters.DOMAdapter;
-import org.jdom.input.DOMBuilder;
 
 /**
  * This class provides a mechanism to read an XMLizable object from a
  * filename.
  */
-public class XMLWriter
-{
+public class XMLWriter {
     public static void write(File file, XMLizable object)
-            throws Exception
-    {
+            throws Exception {
         // open stream on file
         FileOutputStream out = new FileOutputStream(file);
         XMLOutputter outputter = new XMLOutputter();

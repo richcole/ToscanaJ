@@ -7,10 +7,9 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import net.sourceforge.toscanaj.model.lattice.Concept;
+
+import java.util.Iterator;
 
 
 /*
@@ -47,10 +46,10 @@ public interface ConceptInterpreter {
     Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context);
 
     /** @note is Dependent on displayMode and filterMode */
-    int  getObjectCount(Concept concept, ConceptInterpretationContext context);
+    int getObjectCount(Concept concept, ConceptInterpretationContext context);
 
     /** @note is Dependent on displayMode and filterMode */
-    int  getAttributeCount(Concept concept, ConceptInterpretationContext context);
+    int getAttributeCount(Concept concept, ConceptInterpretationContext context);
 
     /** @note these are independent of displayMode and dependent on filterMode */
     double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context, int reference);

@@ -7,12 +7,8 @@
  */
 package net.sourceforge.toscanaj.view.diagram.tests;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import junit.framework.*;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
-import net.sourceforge.toscanaj.controller.fca.DiagramController;
 
 import java.awt.*;
 import java.awt.event.ComponentAdapter;

@@ -7,20 +7,13 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
-import net.sourceforge.toscanaj.model.*;
-import net.sourceforge.toscanaj.model.database.DatabaseQuery;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
-import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-
-import java.util.*;
-
 import org.jdom.Element;
 import util.CollectionFactory;
+
+import java.util.*;
 
 /**
  * Implements a concept whose objects are stored in a relational database.
@@ -56,8 +49,8 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         this.dbInfo = dbInfo;
     }
 
-    public DatabaseConnectedConcept(Element element) throws XMLSyntaxError{
-           readXML(element);
+    public DatabaseConnectedConcept(Element element) throws XMLSyntaxError {
+        readXML(element);
     }
 
 
@@ -66,21 +59,20 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         XMLHelper.checkName(CONCEPT_ELEMENT_NAME, elem);
         Element objectContingentElem = XMLHelper.mustbe(OBJECT_CONTINGENT_ELEMENT_NAME, elem);
         List objects = objectContingentElem.getChildren(OBJECT_ELEMENT_NAME);
-        if(objects.size() > 1) {
+        if (objects.size() > 1) {
             throw new XMLSyntaxError("Only one object clause allowed in this version");
         }
-        if(objects.size() == 1) {
+        if (objects.size() == 1) {
             Element objElem = (Element) objects.get(0);
             this.objectClause = objElem.getText();
-        }
-        else {
+        } else {
             this.objectClause = null;
         }
         Element attributeContingentElem = XMLHelper.mustbe(ATTRIBUTE_CONTINGENT_ELEMENT_NAME, elem);
         List attributes = attributeContingentElem.getChildren(ATTRIBUTE_ELEMENT_NAME);
         for (Iterator iterator = attributes.iterator(); iterator.hasNext();) {
             Element attrElem = (Element) iterator.next();
-            addAttribute(new Attribute(attrElem.getText(),null));
+            addAttribute(new Attribute(attrElem.getText(), null));
         }
     }
 
@@ -169,7 +161,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             }
         }
         clause += ")";
-        if(first) { // nothing found
+        if (first) { // nothing found
             return null;
         }
         return clause;

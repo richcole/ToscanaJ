@@ -7,27 +7,20 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.model.database.*;
-import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
-import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
-import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.model.database.DatabaseQuery;
+import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * A LabelView for displaying the objects.
@@ -127,16 +120,15 @@ public class ObjectLabelView extends LabelView {
             boolean objectDisplayMode = context.getObjectDisplayMode();
             boolean filterMode = context.getFilterMode();
             if (concept.getObjectClause() != null ||
-                    ((objectDisplayMode==ConceptInterpretationContext.EXTENT) && !concept.isBottom())
+                    ((objectDisplayMode == ConceptInterpretationContext.EXTENT) && !concept.isBottom())
             ) {
                 String whereClause = WhereClauseGenerator.createWhereClause(concept,
-                                                                       context.getDiagramHistory(),
-                                                                       context.getNestingConcepts(),
-                                                                       objectDisplayMode,
-                                                                       filterMode);
+                        context.getDiagramHistory(),
+                        context.getNestingConcepts(),
+                        objectDisplayMode,
+                        filterMode);
                 queryResults = this.query.execute(whereClause);
-            }
-            else {
+            } else {
                 queryResults = null;
             }
         }
@@ -144,7 +136,7 @@ public class ObjectLabelView extends LabelView {
 
     public DatabaseRetrievedObject getObjectAtPosition(Point2D position) {
         int itemHit = getItemAtPosition(position);
-        if( itemHit == -1 ) {
+        if (itemHit == -1) {
             return null;
         }
         return (DatabaseRetrievedObject) this.queryResults.get(itemHit);

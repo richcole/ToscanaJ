@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -27,7 +27,7 @@ public class CanvasItemDraggedEvent extends CanvasItemEvent {
      * Creates a new event.
      */
     public CanvasItemDraggedEvent(CanvasItem item, Point2D canvasFromPosition, Point2D awtFromPosition,
-                                                   Point2D canvasToPosition, Point2D awtToPosition) {
+                                  Point2D canvasToPosition, Point2D awtToPosition) {
         super(item);
         this.canvasFromPosition = canvasFromPosition;
         this.awtFromPosition = awtFromPosition;

@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -36,12 +36,12 @@ public class CanvasBackground extends CanvasItem {
      * Fills the whole graphic context with the paint given.
      */
     public void draw(Graphics2D g) {
-        if( paint != null ) {
+        if (paint != null) {
             g.setPaint(paint);
             Rectangle clipBounds = g.getClipBounds();
             if (clipBounds != null) {
-				g.fill(clipBounds);
-			}
+                g.fill(clipBounds);
+            }
         }
     }
 
@@ -63,7 +63,7 @@ public class CanvasBackground extends CanvasItem {
      * origin will always be on the canvas.
      */
     public Rectangle2D getCanvasBounds(Graphics2D g) {
-        return new Rectangle2D.Double(0,0,0,0);
+        return new Rectangle2D.Double(0, 0, 0, 0);
     }
 
     /**

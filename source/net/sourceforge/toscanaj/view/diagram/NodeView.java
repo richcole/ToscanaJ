@@ -8,18 +8,14 @@
 package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
-import net.sourceforge.toscanaj.controller.fca.DiagramController;
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
+import java.awt.geom.*;
 import java.util.Iterator;
 import java.util.List;
 
@@ -118,9 +114,8 @@ public class NodeView extends CanvasItem {
         ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
         if (interpreter.isRealized(concept, conceptInterpretationContext)) {
             return diagramNode.getRadiusY();
-        }
-        else {
-            return diagramNode.getRadiusY()/3;
+        } else {
+            return diagramNode.getRadiusY() / 3;
         }
     }
 
@@ -129,9 +124,8 @@ public class NodeView extends CanvasItem {
         ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
         if (interpreter.isRealized(concept, conceptInterpretationContext)) {
             return diagramNode.getRadiusX();
-        }
-        else {
-            return diagramNode.getRadiusX()/3;
+        } else {
+            return diagramNode.getRadiusX() / 3;
         }
     }
 
@@ -143,31 +137,31 @@ public class NodeView extends CanvasItem {
         if (diagramSchema.getGradientReference() == DiagramSchema.GRADIENT_REFERENCE_DIAGRAM) {
             if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
                 return diagramView.getConceptInterpreter().getRelativeExtentSize(
-                                        this.diagramNode.getConcept(),
-                                        conceptInterpretationContext,
-                                        ConceptInterpreter.REFERENCE_DIAGRAM
-                        );
+                        this.diagramNode.getConcept(),
+                        conceptInterpretationContext,
+                        ConceptInterpreter.REFERENCE_DIAGRAM
+                );
             } else {
                 return diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
-                                        this.diagramNode.getConcept(),
-                                        conceptInterpretationContext,
-                                        ConceptInterpreter.REFERENCE_DIAGRAM
-                        );
+                        this.diagramNode.getConcept(),
+                        conceptInterpretationContext,
+                        ConceptInterpreter.REFERENCE_DIAGRAM
+                );
             }
         } else {
             if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
                 return diagramView.getConceptInterpreter().getRelativeExtentSize(
-                                        this.diagramNode.getConcept(),
-                                        conceptInterpretationContext,
-                                        ConceptInterpreter.REFERENCE_SCHEMA
-                        );
+                        this.diagramNode.getConcept(),
+                        conceptInterpretationContext,
+                        ConceptInterpreter.REFERENCE_SCHEMA
+                );
             } else {
                 /// @todo Check if this one can be avoided -- it is pretty useless
                 return diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
-                                        this.diagramNode.getConcept(),
-                                        conceptInterpretationContext,
-                                        ConceptInterpreter.REFERENCE_SCHEMA
-                        );
+                        this.diagramNode.getConcept(),
+                        conceptInterpretationContext,
+                        ConceptInterpreter.REFERENCE_SCHEMA
+                );
             }
         }
     }
@@ -219,24 +213,21 @@ public class NodeView extends CanvasItem {
         List ourConcepts = getDiagramNode().getConceptNestingList();
         Iterator it = selectedConcepts.iterator();
         Iterator it2 = ourConcepts.iterator();
-        for(int i = 0; i<selectedConcepts.size() - ourConcepts.size(); i++) {
+        for (int i = 0; i < selectedConcepts.size() - ourConcepts.size(); i++) {
             it.next();
         }
         while (it.hasNext()) {
             Concept selectedConcept = (Concept) it.next();
             Concept ourConcept = (Concept) it2.next();
             if (ourConcept == selectedConcept) {
-                if(this.selectionState == DiagramView.NOT_SELECTED) {
+                if (this.selectionState == DiagramView.NOT_SELECTED) {
                     this.selectionState = DiagramView.SELECTED_DIRECTLY;
                 }
-            }
-            else if (ourConcept.hasSuperConcept(selectedConcept)) {
+            } else if (ourConcept.hasSuperConcept(selectedConcept)) {
                 this.selectionState = DiagramView.SELECTED_IDEAL;
-            }
-            else if (ourConcept.hasSubConcept(selectedConcept)) {
+            } else if (ourConcept.hasSubConcept(selectedConcept)) {
                 this.selectionState = DiagramView.SELECTED_FILTER;
-            }
-            else {
+            } else {
                 this.selectionState = DiagramView.NOT_SELECTED;
                 return;
             }

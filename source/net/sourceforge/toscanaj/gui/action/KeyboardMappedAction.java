@@ -1,23 +1,18 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.gui.action;
 
-import net.sourceforge.toscanaj.util.xmlize.XMLReader;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
 
 public abstract class KeyboardMappedAction extends AbstractAction {
 
     protected JFrame frame;
+
     /**
      *  @note
      *     If you don't want to specify mnemonics
@@ -27,15 +22,13 @@ public abstract class KeyboardMappedAction extends AbstractAction {
     public KeyboardMappedAction(
             JFrame frame,
             String displayName, int mnemonic,
-            KeyStroke keystroke)
-    {
+            KeyStroke keystroke) {
         this(frame, displayName);
         this.putValue(Action.MNEMONIC_KEY, new Integer(mnemonic));
         this.putValue(Action.ACCELERATOR_KEY, keystroke);
     }
 
-    public KeyboardMappedAction(JFrame frame, String displayName)
-    {
+    public KeyboardMappedAction(JFrame frame, String displayName) {
         super(displayName);
         this.frame = frame;
     }

@@ -1,21 +1,18 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.gui.action;
 
-import net.sourceforge.toscanaj.util.xmlize.XMLReader;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.gui.activity.FileActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,7 +31,7 @@ public class OpenFileAction extends KeyboardMappedAction {
     protected void processPostOpenActivities() throws Exception {
         for (Iterator it = postOpenActivities.iterator(); it.hasNext();) {
             SimpleActivity activity = (SimpleActivity) it.next();
-            if ( ! activity.doActivity() ) {
+            if (!activity.doActivity()) {
                 break;
             }
         }
@@ -51,8 +48,7 @@ public class OpenFileAction extends KeyboardMappedAction {
             FileActivity activity,
             String defaultOpenLocation,
             int mnemonic,
-            KeyStroke keystroke)
-    {
+            KeyStroke keystroke) {
         super(frame, "Open...", mnemonic, keystroke);
         this.openActivity = activity;
         this.previousFile = getFile(defaultOpenLocation);
@@ -61,8 +57,7 @@ public class OpenFileAction extends KeyboardMappedAction {
     public OpenFileAction(
             JFrame frame,
             FileActivity activity,
-            String defaultOpenLocation)
-    {
+            String defaultOpenLocation) {
         super(frame, "Open...");
         this.openActivity = activity;
         this.previousFile = getFile(defaultOpenLocation);
@@ -84,8 +79,7 @@ public class OpenFileAction extends KeyboardMappedAction {
         boolean result = false;
         try {
             result = openActivity.prepareToProcess();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             ErrorDialog.showError(
                     frame,
                     ex,
@@ -93,7 +87,7 @@ public class OpenFileAction extends KeyboardMappedAction {
                     "Error preparing to save");
         }
 
-        if ( result ) {
+        if (result) {
 
             if (previousFile != null) {
                 openDialog = new JFileChooser(previousFile);

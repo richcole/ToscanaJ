@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Vector;
-import java.sql.SQLException;
 
 public class DatabaseListQuery extends DatabaseQuery {
     private DatabaseInfo info;

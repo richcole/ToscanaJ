@@ -1,19 +1,16 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.view.database;
 
-import net.sourceforge.toscanaj.events.BrokerEventListener;
+import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
-import net.sourceforge.toscanaj.model.database.Column;
-import net.sourceforge.toscanaj.model.database.DatabaseSchema;
-import net.sourceforge.toscanaj.model.database.Table;
+import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
 import net.sourceforge.toscanaj.model.events.TableChangedEvent;
 import net.sourceforge.toscanaj.util.STD_Iterator;
@@ -62,7 +59,7 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
             if (event.getSource() instanceof JList) {
                 JList list = (JList) event.getSource();
                 ListSelectionModel model = list.getSelectionModel();
-                if(model.getValueIsAdjusting()){
+                if (model.getValueIsAdjusting()) {
                     return;
                 }
                 if (model.isSelectionEmpty()) {
@@ -107,7 +104,7 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
                             model.getMinSelectionIndex()
                     );
             final int selectedIndex = unkeyedTableListPanel.getSelectedIndex();
-            if(selectedIndex<0){
+            if (selectedIndex < 0) {
                 return;
             }
             TableInfo tableInfo =
@@ -139,9 +136,10 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
             }
         }
         /// @todo remove workaround for a bug in swing ver. < 1.3rel03
-        if ( unkeyedTableList.size() == 0 ) {
+        if (unkeyedTableList.size() == 0) {
             displayTable(null);
-        };
+        }
+        ;
     }
 
     private void removeKeyedTable(Table table) {
@@ -189,14 +187,14 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
         JButton removeButton = new JButton(removeTableAction);
 
         leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                                             new LabeledScrollPaneView("Available Tables:",unkeyedTableListPanel),
-                                             new LabeledScrollPaneView("Selected Keys:", keyedTableListPanel, removeButton));
+                new LabeledScrollPaneView("Available Tables:", unkeyedTableListPanel),
+                new LabeledScrollPaneView("Selected Keys:", keyedTableListPanel, removeButton));
         leftPane.setOneTouchExpandable(true);
         leftPane.setResizeWeight(0);
 
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                                   leftPane,
-                                   new LabeledScrollPaneView("Available Object Keys:", columnsPanel));
+                leftPane,
+                new LabeledScrollPaneView("Available Object Keys:", columnsPanel));
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);

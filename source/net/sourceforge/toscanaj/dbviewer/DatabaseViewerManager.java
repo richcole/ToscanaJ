@@ -85,23 +85,21 @@ public class DatabaseViewerManager {
     }
 
     public static void showObject(int viewerID, DatabaseRetrievedObject object) {
-        if(object.hasKey()) {
+        if (object.hasKey()) {
             DatabaseViewerManager manager = (DatabaseViewerManager) objectViewerRegistry.get(viewerID);
             DatabaseViewer viewer = manager.viewer;
             viewer.showView("WHERE " + manager.getKeyName() + " = '" + object.getKey() + "'");
-        }
-        else if(object.hasSpecialWhereClause()) {
+        } else if (object.hasSpecialWhereClause()) {
             DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(viewerID);
             DatabaseViewer viewer = manager.viewer;
             viewer.showView(object.getSpecialWhereClause());
-        }
-        else {
+        } else {
             showObjectList(viewerID, object);
         }
     }
 
     public static void showObject(String viewName, DatabaseRetrievedObject object) {
-        if(object.hasKey()) {
+        if (object.hasKey()) {
             for (int i = 0; i < objectViewerRegistry.size(); i++) {
                 DatabaseViewerManager manager = (DatabaseViewerManager) objectViewerRegistry.get(i);
                 if (manager.screenName.equals(viewName)) {
@@ -109,8 +107,7 @@ public class DatabaseViewerManager {
                     viewer.showView("WHERE " + manager.getKeyName() + " = '" + object.getKey() + "'");
                 }
             }
-        }
-        else if(object.hasSpecialWhereClause()) {
+        } else if (object.hasSpecialWhereClause()) {
             for (int i = 0; i < objectListViewerRegistry.size(); i++) {
                 DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(i);
                 if (manager.screenName.equals(viewName)) {
@@ -118,8 +115,7 @@ public class DatabaseViewerManager {
                     viewer.showView(object.getSpecialWhereClause());
                 }
             }
-        }
-        else {
+        } else {
             showObjectList(viewName, object);
         }
     }
@@ -232,14 +228,14 @@ public class DatabaseViewerManager {
 
     public static List getObjectViewNames(DatabaseRetrievedObject object) {
         List retVal = new LinkedList();
-        if( object.hasKey() ) {
+        if (object.hasKey()) {
             Iterator it = objectViewerRegistry.iterator();
             while (it.hasNext()) {
                 DatabaseViewerManager manager = (DatabaseViewerManager) it.next();
                 retVal.add(manager.screenName);
             }
         }
-        if( object.hasSpecialWhereClause() ) {
+        if (object.hasSpecialWhereClause()) {
             Iterator it = objectListViewerRegistry.iterator();
             while (it.hasNext()) {
                 DatabaseViewerManager manager = (DatabaseViewerManager) it.next();

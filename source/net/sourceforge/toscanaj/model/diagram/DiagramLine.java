@@ -1,19 +1,16 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.model.diagram;
 
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.*;
+import org.jdom.Element;
 
 import java.awt.geom.Point2D;
-
-import org.jdom.Element;
 
 /**
  * This encapsulates all information about a line in a diagram.
@@ -59,8 +56,8 @@ public class DiagramLine implements XMLizable {
 
     public void readXML(Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(DIAGRAM_LINE_ELEMENT_NAME, elem);
-        String fromId=XMLHelper.getAttribute(elem, FROM_NODE_ATTRIBUTE_NAME).getValue();
-        String toId=XMLHelper.getAttribute(elem, TO_NODE_ATTRIBUTE_NAME).getValue();
+        String fromId = XMLHelper.getAttribute(elem, FROM_NODE_ATTRIBUTE_NAME).getValue();
+        String toId = XMLHelper.getAttribute(elem, TO_NODE_ATTRIBUTE_NAME).getValue();
         fromNode = diagram.getNode(fromId);
         toNode = diagram.getNode(toId);
     }

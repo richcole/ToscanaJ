@@ -1,23 +1,20 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
  */
 package net.sourceforge.toscanaj.model.diagram;
 
+import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
-import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
+import java.util.*;
 
 /**
  * This class is an abstraction of all diagram related information.
@@ -68,7 +65,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     public Element toXML() {
         Element retVal = new Element(DIAGRAM_ELEMENT_NAME);
         retVal.setAttribute(TITLE_ATTRIBUTE_NAME, title);
-        if( description != null ) {
+        if (description != null) {
             retVal.addContent(description);
         }
         for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
@@ -84,7 +81,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 
     public void readXML(Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(DIAGRAM_ELEMENT_NAME, elem);
-        title=XMLHelper.getAttribute(elem, TITLE_ATTRIBUTE_NAME).getValue();
+        title = XMLHelper.getAttribute(elem, TITLE_ATTRIBUTE_NAME).getValue();
         description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
         List nodeElems = elem.getChildren(DiagramNode.NODE_ELEMENT_NAME);
         for (Iterator iterator = nodeElems.iterator(); iterator.hasNext();) {
@@ -195,7 +192,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         }
         for (int i = 0; i < nodes.size(); i++) {
             DiagramNode node = (DiagramNode) nodes.get(i);
-            if(node.getIdentifier().equals(identifier)) {
+            if (node.getIdentifier().equals(identifier)) {
                 return node;
             }
         }

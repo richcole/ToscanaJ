@@ -8,38 +8,25 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.ToscanaJ;
-import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.canvas.imagewriter.DiagramExportSettings;
-import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormat;
-import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormatRegistry;
-import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
-import net.sourceforge.toscanaj.canvas.events.CanvasItemActivatedEvent;
-import net.sourceforge.toscanaj.canvas.events.CanvasItemSelectedEvent;
-import net.sourceforge.toscanaj.canvas.events.CanvasItemContextMenuRequestEvent;
 import net.sourceforge.toscanaj.canvas.CanvasBackground;
+import net.sourceforge.toscanaj.canvas.events.*;
+import net.sourceforge.toscanaj.canvas.imagewriter.*;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.controller.fca.DiagramController;
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
-import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
+import net.sourceforge.toscanaj.controller.diagram.*;
+import net.sourceforge.toscanaj.controller.fca.*;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
-import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
-import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.database.Query;
-import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseQuery;
+import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
-import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
-import net.sourceforge.toscanaj.view.diagram.DiagramView;
-import net.sourceforge.toscanaj.view.diagram.NodeView;
-import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
+import net.sourceforge.toscanaj.view.diagram.*;
 import org.jdom.Element;
 
 import javax.swing.*;
@@ -47,15 +34,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
+import java.io.*;
 import java.net.URL;
-import java.net.MalformedURLException;
+import java.util.*;
+import java.util.List;
 
 /**
  *  This class provides the main GUI panel with menus and a toolbar
@@ -803,10 +785,10 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         diagramView.showDiagram(null);
         DiagramController controller = DiagramController.getController();
         DatabaseConnectedConceptInterpreter interpreter =
-                                            new DatabaseConnectedConceptInterpreter(DatabaseConnection.getConnection(),
-                                                                                    conceptualSchema.getDatabaseInfo());
+                new DatabaseConnectedConceptInterpreter(DatabaseConnection.getConnection(),
+                        conceptualSchema.getDatabaseInfo());
         ConceptInterpretationContext interpretationContext = new ConceptInterpretationContext(controller.getDiagramHistory(),
-                                                                                 broker);
+                broker);
         diagramView.setConceptInterpreter(interpreter);
         diagramView.setConceptInterpretationContext(interpretationContext);
         updateLabelViews();

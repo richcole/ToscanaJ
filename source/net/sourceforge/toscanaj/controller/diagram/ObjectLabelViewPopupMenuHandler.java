@@ -7,29 +7,20 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
+import net.sourceforge.toscanaj.canvas.events.CanvasItemEventWithPosition;
+import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.controller.fca.DiagramController;
-import net.sourceforge.toscanaj.canvas.events.CanvasItemEvent;
-import net.sourceforge.toscanaj.canvas.events.CanvasItemContextMenuRequestEvent;
-import net.sourceforge.toscanaj.canvas.events.CanvasItemEventWithPosition;
-import net.sourceforge.toscanaj.view.diagram.NodeView;
+import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
-import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
-import net.sourceforge.toscanaj.model.database.Query;
-import net.sourceforge.toscanaj.model.database.DatabaseQuery;
-import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 
 import javax.swing.*;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.awt.geom.Point2D;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+import java.util.Iterator;
+import java.util.List;
 
 public class ObjectLabelViewPopupMenuHandler implements BrokerEventListener {
     private DiagramView diagramView;
@@ -58,7 +49,7 @@ public class ObjectLabelViewPopupMenuHandler implements BrokerEventListener {
 
     public void openPopupMenu(final ObjectLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
         final DatabaseRetrievedObject object = labelView.getObjectAtPosition(canvasPosition);
-        if( object == null ) {
+        if (object == null) {
             return;
         }
         List queries = Query.getQueries();
@@ -79,7 +70,7 @@ public class ObjectLabelViewPopupMenuHandler implements BrokerEventListener {
         if (objectListViewNames.size() != 0) {
             addObjectListViewOptions(objectListViewNames, object, popupMenu);
         }
-        popupMenu.show(this.diagramView, (int)screenPosition.getX(), (int)screenPosition.getY());
+        popupMenu.show(this.diagramView, (int) screenPosition.getX(), (int) screenPosition.getY());
     }
 
     private void addObjectListViewOptions(List objectListViewNames, final DatabaseRetrievedObject object, JPopupMenu popupMenu) {
