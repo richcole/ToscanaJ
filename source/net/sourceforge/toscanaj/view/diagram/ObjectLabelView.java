@@ -113,6 +113,7 @@ public class ObjectLabelView extends LabelView {
         else {
             this.displayLines = this.getNumberOfEntries();
         }
+        this.firstItem = 0;
         update(this);
     }
 
