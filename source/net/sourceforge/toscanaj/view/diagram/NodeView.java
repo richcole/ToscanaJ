@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  * class DiagramNode holds details on node position and size
@@ -139,5 +140,17 @@ public class NodeView extends CanvasItem {
      */
     public void doubleClicked(Point2D point) {
         DiagramController.getController().next(diagramNode.getConcept());
+    }
+
+    /**
+     * Calculates the rectangle around this node.
+     */
+    public Rectangle2D getBounds(ToscanajGraphics2D g) {
+        Point2D center = g.project(this.diagramNode.getPosition());
+        double x = center.getX();
+        double y = center.getY();
+        double rx = this.diagramNode.getRadiusX();
+        double ry = this.diagramNode.getRadiusY();
+        return new Rectangle2D.Double(x-rx, y-ry, 2*rx, 2*ry);
     }
 }

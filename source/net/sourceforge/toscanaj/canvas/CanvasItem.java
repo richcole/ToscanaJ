@@ -5,6 +5,7 @@ import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -80,4 +81,9 @@ public abstract class CanvasItem implements ChangeObservable {
      */
     public void doubleClicked(Point2D point) {
     }
+
+    /**
+     * Returns the rectangular bounds of the canvas item.
+     */
+    abstract public Rectangle2D getBounds(ToscanajGraphics2D g);
 }

@@ -5,6 +5,7 @@ import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  * class DiagramLine draws a line between two points
@@ -29,10 +30,9 @@ public class LineView extends CanvasItem {
      * Draws the line.
      */
     public void draw(ToscanajGraphics2D g) {
-        ///@TODO Probably should throw a LineNotFoundException
-        if(diagramLine != null) {
-            g.drawLine(diagramLine.getFromPosition(), diagramLine.getToPosition());
-        }
+        Point2D from = diagramLine.getFromPosition();
+        Point2D to = diagramLine.getToPosition();
+        g.drawLine(from, to);
     }
 
     /**
@@ -40,5 +40,31 @@ public class LineView extends CanvasItem {
      */
     public boolean containsPoint(Point2D point) {
         return false;
+    }
+
+    /**
+     * Calculates the rectangle around this line.
+     */
+    public Rectangle2D getBounds(ToscanajGraphics2D g) {
+        Point2D from = g.project(diagramLine.getFromPosition());
+        Point2D to = g.project(diagramLine.getToPosition());
+        double x,y,w,h;
+        if( from.getX() < to.getX() ) {
+            x = from.getX();
+            w = to.getX() - x;
+        }
+        else {
+            x = to.getX();
+            w = from.getX() - x;
+        }
+        if( from.getY() < to.getY() ) {
+            y = from.getY();
+            h = to.getY() - y;
+        }
+        else {
+            y = to.getY();
+            h = from.getY() - y;
+        }
+        return new Rectangle2D.Double(x,y,w,h);
     }
 }

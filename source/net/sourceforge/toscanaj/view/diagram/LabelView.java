@@ -399,4 +399,38 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         }
         notifyObservers();
     }
+
+    /**
+     * Calculates the rectangle around label and its connection line.
+     */
+    public Rectangle2D getBounds(ToscanajGraphics2D tg) {
+        Graphics2D graphics = tg.getGraphics2D();
+
+        // get the font metrics
+        FontMetrics fm = graphics.getFontMetrics();
+
+        // find the size and position
+        DiagramNode node = this.labelInfo.getNode();
+        double x = node.getX();
+        double y = node.getY();
+        double lw = getWidth( fm );
+        width = tg.inverseScaleX(lw);
+        double lh = getHeight( fm );
+        height = tg.inverseScaleY(lh);
+        xPos = x - tg.inverseScaleX(lw/2) + this.labelInfo.getOffset().getX();
+        double radius = node.getRadiusY();
+        if( getPlacement() == ABOVE )
+        {
+            y = y - tg.inverseScaleY(radius);
+            yPos = y - tg.inverseScaleY(lh) + this.labelInfo.getOffset().getY();
+        }
+        else
+        {
+            y = y + tg.inverseScaleY(radius);
+            yPos = y + this.labelInfo.getOffset().getY();
+        }
+        Rectangle2D rect = new Rectangle2D.Double(xPos, yPos, lw, lh);
+        rect.add(x,y);
+        return rect;
+    }
 }
