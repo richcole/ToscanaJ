@@ -9,7 +9,10 @@
 	<property name="src.dir" value="source"/>
 	<property name="libs.dir" value="libs"/>
 	<property name="examples.dir" value="examples"/>
-	<property name="class" value="net.sourceforge.toscanaj.MainPanel"/>
+	<property name="toscanaj.class" 
+           value="net.sourceforge.toscanaj.MainPanel"/>
+	<property name="anacondaj.class" 
+	   value="net.sourceforge.toscanaj.AnacondaMainPanel"/>
 	<path id="project.class.path">
 		<pathelement path="${classpath}"/>
 		<pathelement path="${build.dev.dir}"/>
@@ -131,7 +134,12 @@
 		</javadoc>
 	</target>
 	<target name="run" depends="compile">
-		<java classname="${class}" fork="true">
+		<java classname="${toscanaj.class}" fork="true">
+			<classpath refid="project.class.path"/>
+		</java>
+	</target>
+	<target name="run-anaconda" depends="compile">
+		<java classname="${anacondaj.class}" fork="true">
 			<classpath refid="project.class.path"/>
 		</java>
 	</target>
