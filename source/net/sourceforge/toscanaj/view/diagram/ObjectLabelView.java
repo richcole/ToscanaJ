@@ -131,11 +131,8 @@ public class ObjectLabelView extends LabelView {
         Concept concept = node.getConcept();
         ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
         ConceptInterpreter conceptInterpreter = this.diagramView.getConceptInterpreter();
-        if(this.query == null) {
-        	this.query = defaultQuery;
-        }
         try {
-			this.contents = conceptInterpreter.executeQuery(this.query, concept, context);
+			this.contents = conceptInterpreter.executeQuery(getQuery(), concept, context);
         } catch (Exception e) {
 			ErrorDialog.showError(this.diagramView, e, "Getting object label content failed");
         }
@@ -158,6 +155,9 @@ public class ObjectLabelView extends LabelView {
     }
 
     public Query getQuery() {
+		if(this.query == null) {
+			this.query = defaultQuery;
+		}
         return this.query;
     }
 
