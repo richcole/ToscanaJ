@@ -40,24 +40,16 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
 
         setName("DiagramEditingView");
 
-        JPanel leftPanel = new JPanel(new BorderLayout());
-        leftPanel.add(new JLabel("Diagrams:"), BorderLayout.NORTH);
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, makeDiagramListView(), makeDiagramViewPanel());
+        splitPane.setOneTouchExpandable(true);
+        splitPane.setResizeWeight(0);
+        add(splitPane);
 
-        diagramListModel = new DefaultListModel();
-        final JList listView = new JList(diagramListModel);
-        fillDiagramListView();
-        MouseListener mouseListener = new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int index = listView.locationToIndex(e.getPoint());
-                    showDiagram(index);
-                }
-            }
-        };
-        listView.addMouseListener(mouseListener);
-        leftPanel.add(listView, BorderLayout.CENTER);
+        eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class );
+    }
 
-        JPanel rightPanel = new JPanel(new BorderLayout());
+    private JPanel makeDiagramViewPanel() {
+        JPanel diagramViewPanel = new JPanel(new BorderLayout());
 
         JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         toolPanel.add(new JLabel("Movement:"));
@@ -104,21 +96,50 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
             }
         });
 
-        rightPanel.add(toolPanel, BorderLayout.NORTH);
-        rightPanel.add(diagramView, BorderLayout.CENTER);
+        diagramViewPanel.add(toolPanel, BorderLayout.NORTH);
+        diagramViewPanel.add(diagramView, BorderLayout.CENTER);
+        return diagramViewPanel;
+    }
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, rightPanel);
-        splitPane.setOneTouchExpandable(true);
-        splitPane.setResizeWeight(0);
-        add(splitPane);
+    private JComponent makeDiagramListView() {
+        diagramListModel = new DefaultListModel();
+        final JList listView = new JList(diagramListModel);
+        fillDiagramListView();
+        MouseListener mouseListener = new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int index = listView.locationToIndex(e.getPoint());
+                    showDiagram(index);
+                }
+            }
+        };
+        listView.addMouseListener(mouseListener);
 
-        eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class );
+        JPanel listViewPane = new JPanel();
+        listViewPane.setLayout(new GridBagLayout());
+        listViewPane.add(new JLabel("Diagrams:"),
+                new GridBagConstraints(
+                        0, 0, 1, 1, 1.0, 0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL,
+                        new Insets(5, 5, 5, 5),
+                        5, 5)
+        );
+        listViewPane.add(new JScrollPane(listView),
+                new GridBagConstraints(
+                        0, 1, 1, 1, 1.0, 1.0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.BOTH,
+                        new Insets(5, 5, 5, 5),
+                        5, 5)
+        );
+
+        return listViewPane;
     }
 
     private void showDiagram(int index) {
         diagramView.showDiagram(conceptualSchema.getDiagram(index));
     }
-    ;
 
     protected void fillDiagramListView() {
         for (int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
