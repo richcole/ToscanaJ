@@ -21,7 +21,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -55,18 +54,16 @@ public class CSVImportDetailsDialog extends JDialog {
 	private DatabaseConnection connection;
 	
 	private String fieldSeparator = ";";
-	private String tableName = "TEST";
-	
-	private Hashtable columnNameToTypeMapping = new Hashtable();
 	
 	private JTextField columnNameField;
 	private JComboBox dataTypesComboBox;
 	private JButton addColumnButton;
 	private JButton removeColumnButton;
-	
 	private DBTypesTableModel columnsTableModel = new DBTypesTableModel();
-	
 	private JTable columnsDisplayTable;
+	
+	private JTextField tableNameField;
+	private JButton okButton;
 	
 	
 	public CSVImportDetailsDialog(Frame owner, String filename, DatabaseConnection connection) throws HeadlessException {
@@ -74,7 +71,7 @@ public class CSVImportDetailsDialog extends JDialog {
 		this.filename = filename;
 		this.connection = connection;
 
-		JLabel headingLabel = new JLabel ("Database Setup Details");
+		JLabel headingLabel = new JLabel ("Table Configuration Details");
 		
 		
 		JPanel dbSetupPanel = buildDatabaseSetupDetailsPanel();
@@ -84,13 +81,15 @@ public class CSVImportDetailsDialog extends JDialog {
 		JPanel mainPanel = new JPanel();		
 		
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-		dbSetupPanel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
+		
+		dbSetupPanel.setBorder(BorderFactory.createEtchedBorder());
 		dbSetupPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mainPanel.add(dbSetupPanel);
 		
-		columnsSetupPanel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
+		columnsSetupPanel.setBorder(BorderFactory.createEtchedBorder());
 		columnsSetupPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		mainPanel.add(columnsSetupPanel);
+		
 		mainPanel.setBorder(BorderFactory.createRaisedBevelBorder());
 
 
@@ -109,8 +108,16 @@ public class CSVImportDetailsDialog extends JDialog {
 
 	private JPanel buildDatabaseSetupDetailsPanel() {
 	
-		JPanel separatorsPanel = new JPanel();
-		separatorsPanel.setLayout(new GridBagLayout());
+		JPanel detailsPanel = new JPanel();
+		detailsPanel.setLayout(new GridBagLayout());
+		
+		tableNameField = new JTextField(20);
+		tableNameField.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				updateOkButton();
+			}
+		});
+		
 		
 		JRadioButton commaSeparatorButton = new JRadioButton("comma");
 		commaSeparatorButton.addActionListener(new ActionListener() {
@@ -141,34 +148,47 @@ public class CSVImportDetailsDialog extends JDialog {
 		separatorsButtonGroup.add(semicolonSeparatorButton);
 		
 		commaSeparatorButton.setSelected(true);
-
-
-		separatorsPanel.add(new JLabel("Fields Separator "),new GridBagConstraints(
+				
+		detailsPanel.add(new JLabel("Table Name "),new GridBagConstraints(
 				0,0,1,1,1,0,
 				GridBagConstraints.NORTHWEST,
 				GridBagConstraints.NONE,
 				new Insets(5, 5, 5, 5),
 				2,2));
-		separatorsPanel.add(commaSeparatorButton,new GridBagConstraints(
-				1,0,1,1,1,0,
+		detailsPanel.add(tableNameField,new GridBagConstraints(
+				1,0,3,1,1,0,
 				GridBagConstraints.NORTHWEST,
 				GridBagConstraints.NONE,
 				new Insets(5, 5, 5, 5),
 				2,2));
-		separatorsPanel.add(tabSeparatorButton,new GridBagConstraints(
-				2,0,1,1,1,0,
+
+
+		detailsPanel.add(new JLabel("Fields Separator "),new GridBagConstraints(
+				0,1,GridBagConstraints.RELATIVE,1,1,0,
 				GridBagConstraints.NORTHWEST,
 				GridBagConstraints.NONE,
 				new Insets(5, 5, 5, 5),
 				2,2));
-		separatorsPanel.add(semicolonSeparatorButton,new GridBagConstraints(
-				3,0,1,1,1,0,
+		detailsPanel.add(commaSeparatorButton,new GridBagConstraints(
+				1,1,1,1,1,0,
+				GridBagConstraints.NORTHWEST,
+				GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5),
+				2,2));
+		detailsPanel.add(tabSeparatorButton,new GridBagConstraints(
+				2,1,GridBagConstraints.RELATIVE,1,1,0,
+				GridBagConstraints.NORTHWEST,
+				GridBagConstraints.NONE,
+				new Insets(5, 5, 5, 5),
+				2,2));
+		detailsPanel.add(semicolonSeparatorButton,new GridBagConstraints(
+				3,1,GridBagConstraints.RELATIVE,1,1,0,
 				GridBagConstraints.NORTHWEST,
 				GridBagConstraints.NONE,
 				new Insets(5, 5, 5, 5),
 				2,2));
 			
-		return separatorsPanel;
+		return detailsPanel;
 	}
 	
 	
@@ -203,8 +223,6 @@ public class CSVImportDetailsDialog extends JDialog {
 		addColumnButton.addActionListener(new ActionListener () {
 			public void actionPerformed(ActionEvent event) {
 				columnsTableModel.addRow(columnNameField.getText(), (String) dataTypesComboBox.getSelectedItem());
-//				columnsDisplayTable.repaint();
-//				tableScrollPane.repaint();
 				columnNameField.setText("");
 				dataTypesComboBox.setSelectedIndex(0);
 				updateAddColumnButton();
@@ -217,8 +235,6 @@ public class CSVImportDetailsDialog extends JDialog {
 			public void actionPerformed (ActionEvent event) {
 				int selectedRow = columnsDisplayTable.getSelectedRow();
 				columnsTableModel.removeRow(selectedRow);
-//				columnsDisplayTable.repaint();
-//				tableScrollPane.repaint();
 			}
 		});
 		
@@ -288,7 +304,7 @@ public class CSVImportDetailsDialog extends JDialog {
 	private JPanel buildButtonsPanel () {
 		JPanel buttonsPanel = new JPanel();
 		
-		JButton okButton = new JButton("Import file data");
+		okButton = new JButton("Import file data");
 		okButton.addActionListener(new ActionListener () {
 			public void actionPerformed(ActionEvent event) {
 				importData();
@@ -311,6 +327,8 @@ public class CSVImportDetailsDialog extends JDialog {
 		buttonsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
 		buttonsPanel.add(cancelButton);
 		
+		updateOkButton();
+		
 		return buttonsPanel;		
 	}
 
@@ -326,6 +344,7 @@ public class CSVImportDetailsDialog extends JDialog {
 		else {
 			addColumnButton.setEnabled(false);
 		}	
+		updateOkButton();
 	}
 
 	private void updateRemoveColumnButton () {
@@ -335,6 +354,19 @@ public class CSVImportDetailsDialog extends JDialog {
 		else {
 			removeColumnButton.setEnabled(false);
 		}
+		updateOkButton();
+	}
+	
+	private void updateOkButton () {
+		if (tableNameField.getText().length() <= 0) {
+			okButton.setEnabled(false);
+			return;
+		}
+		if (columnsTableModel.getRowCount() <= 0 ) {
+			okButton.setEnabled(false);
+			return;
+		}
+		okButton.setEnabled(true);
 	}
 	
 	private List getDatabaseTypes() {
@@ -354,7 +386,7 @@ public class CSVImportDetailsDialog extends JDialog {
 	}
 	
 	private void importData () {
-		String createTableStatement = "CREATE TEXT TABLE " + tableName + " {" + "\n";
+		String createTableStatement = "CREATE TEXT TABLE " + tableNameField.getText() + " {" + "\n";
 		for (int i = 0; i < columnsTableModel.getRowCount(); i++ ) {
 			createTableStatement = createTableStatement + columnsTableModel.getValueAt(i, 0) + 
 									" " + columnsTableModel.getValueAt(i, 1);
@@ -364,11 +396,20 @@ public class CSVImportDetailsDialog extends JDialog {
 		}
 		createTableStatement += "};";
 		
-		String importDataStatement = "SET TABLE " + tableName + " SOURCE \"" + filename +
+		
+		String importDataStatement = "SET TABLE " + tableNameField.getText() + " SOURCE \"" + filename +
 										";fs=" + this.fieldSeparator + "\"";
 
 		//System.out.println("statement 1: \n" + createTableStatement);
-		//System.out.println("statement 2: \n" + importDataStatement);										
+		//System.out.println("statement 2: \n" + importDataStatement);
+		
+		try {
+			connection.executeUpdate(createTableStatement);				
+			connection.executeUpdate(importDataStatement);						
+		}
+		catch (DatabaseException e) {
+			ErrorDialog.showError(this, e, "Error importing text file");
+		}
 		
 	}
 	
@@ -397,10 +438,6 @@ public class CSVImportDetailsDialog extends JDialog {
 		public boolean isCellEditable(int rowIndex, int colIndex) {
 			return true;
 		}
-
-//		public void setValueAt(Object value, int rowIndex, int colIndex) {
-//			
-//		}
 
 		public void addRow (String newColNameStr, String colDataType) {
 			List rowData = new ArrayList();

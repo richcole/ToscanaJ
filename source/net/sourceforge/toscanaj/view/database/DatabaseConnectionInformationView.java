@@ -194,6 +194,7 @@ public class DatabaseConnectionInformationView extends JDialog
         }
         boolean connectDatabase() {
         	try {
+        		System.out.println("connectDatabase");
 				DatabaseConnection.setConnection(connection);
                 connection.connect(databaseInfo);
             } catch (DatabaseException e) {
@@ -282,6 +283,7 @@ public class DatabaseConnectionInformationView extends JDialog
 				   GridBagConstraints.BOTH,
 				   new Insets(5, 5, 5, 5),
 				   2,2));
+			
     	}
 
         void updateContents() {
@@ -315,6 +317,7 @@ public class DatabaseConnectionInformationView extends JDialog
             	return false;
             }
             if (csvFileLocationField.getText().length() > 0) {
+            	System.out.println("connected = " + connected);
 				CSVImportDetailsDialog csvImportDialog = new CSVImportDetailsDialog(owner, csvFileLocationField.getText(), connection);
             }
             return true;
