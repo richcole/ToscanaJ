@@ -55,10 +55,8 @@ public class DumpSqlScript {
                 out.print("INSERT INTO " + tableName + " VALUES (");
                 
                 Iterator resultIt = rowResults.iterator();
-                Iterator colIt = columns.iterator();
                 while (resultIt.hasNext()) {
                     String result = (String) resultIt.next();
-                    Column column = (Column) colIt.next();
                     if(result == null) {
                     	out.print("NULL");
                     } else {

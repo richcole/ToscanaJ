@@ -55,7 +55,6 @@ public class DescriptionViewer {
             super(frame, "Description", true);
 
             final JButton closeButton = new JButton("Close");
-            final ViewerDialog dialog = this;
             closeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     closeDialog();

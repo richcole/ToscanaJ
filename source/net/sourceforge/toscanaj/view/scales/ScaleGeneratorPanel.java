@@ -52,7 +52,7 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
         this.eventBroker = eventBroker;
         this.conceptualSchema = conceptualSchema;
         this.databaseConnection = databaseConnection;
-        fillGeneratorButtonsPane(eventBroker);
+        fillGeneratorButtonsPane();
 
         this.selectionSource = selectionSource;
         eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
@@ -91,7 +91,7 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
 
     Map generatorButtonMap = CollectionFactory.createDefaultMap();
 
-    private void fillGeneratorButtonsPane(EventBroker eventBroker) {
+    private void fillGeneratorButtonsPane() {
         setLayout(new FlowLayout());
         removeAll();
         generatorButtonMap.clear();

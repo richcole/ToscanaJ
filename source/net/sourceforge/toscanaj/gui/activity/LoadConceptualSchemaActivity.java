@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.gui.activity;
 
-import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import org.tockit.events.EventBroker;
@@ -24,7 +23,7 @@ public class LoadConceptualSchemaActivity implements FileActivity {
 
     public void processFile(File file) throws Exception {
         try {
-            ConceptualSchema newSchema = CSXParser.parse(broker, file);
+            CSXParser.parse(broker, file);
         } catch (DataFormatException e) {
             throw e;
         }

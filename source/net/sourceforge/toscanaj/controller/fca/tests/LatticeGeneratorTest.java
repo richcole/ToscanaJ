@@ -93,7 +93,7 @@ public class LatticeGeneratorTest extends TestCase {
 		// that is illegal, so we want an exception to be raised
         LatticeGenerator lgen = new GantersAlgorithm();
 		try {
-        	Lattice lattice = lgen.createLattice(this.context);
+        	lgen.createLattice(this.context);
         	fail("Lattice should not be generated on invalid context");
 		} catch(Exception e) {
 		}

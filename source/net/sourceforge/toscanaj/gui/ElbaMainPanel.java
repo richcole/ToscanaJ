@@ -99,7 +99,6 @@ public class ElbaMainPanel
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
 	private JMenu mruMenu;
-	private JMenu editMenu;
 	private JMenu helpMenu;
 
 	private List mruList = new LinkedList();

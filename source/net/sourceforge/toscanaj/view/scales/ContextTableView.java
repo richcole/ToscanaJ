@@ -27,8 +27,6 @@ import net.sourceforge.toscanaj.model.ContextImplementation;
 
 public class ContextTableView extends JComponent implements Scrollable {
 	private static final Color TEXT_COLOR = Color.BLACK;
-	private static final Color TABLE_CORNER_COLOR = Color.LIGHT_GRAY;
-	private static final Color TABLE_HEADER_COLOR = Color.LIGHT_GRAY;
 	private static final Color TABLE_CELL_COLOR = Color.WHITE;
 	private ContextImplementation context;
 	private ContextTableScaleEditorDialog dialog;

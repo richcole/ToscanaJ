@@ -373,7 +373,6 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         }
         final GraphicFormat graphicFormat = this.diagramExportSettings.getGraphicFormat();
         if(graphicFormat==null){}
-        final DiagramExportSettings exportSettings= this.diagramExportSettings;
         final JFileChooser saveDialog = new JFileChooser(this.lastImageExportFile);
         boolean formatDefined;
         do {
@@ -787,7 +786,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         // initialise sequences with empty lists
         Iterator seqValIt = sequenceValues.iterator();
         while (seqValIt.hasNext()) {
-            AttributeValue value = (AttributeValue) seqValIt.next();
+            seqValIt.next();
             objectSequences.add(new ArrayList());
         }
         

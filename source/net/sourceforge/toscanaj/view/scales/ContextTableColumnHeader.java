@@ -39,9 +39,7 @@ import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	private static final Color TEXT_COLOR = Color.BLACK;
-	private static final Color TABLE_CORNER_COLOR = Color.LIGHT_GRAY;
 	private static final Color TABLE_HEADER_COLOR = Color.LIGHT_GRAY;
-	private static final Color TABLE_CELL_COLOR = Color.WHITE;
 	private ContextImplementation context;
 	private static final int CELL_WIDTH = 150;
 	private static final int CELL_HEIGHT = 30;

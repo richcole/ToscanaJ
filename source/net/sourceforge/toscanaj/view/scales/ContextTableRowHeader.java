@@ -38,11 +38,14 @@ import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 
+/**
+ * @todo there are a number of constants in here which are the same as in other
+ * parts of the context table editing components. Share them...
+ *
+ */
 public class ContextTableRowHeader extends JComponent implements Scrollable {
 	private static final Color TEXT_COLOR = Color.BLACK;
-	private static final Color TABLE_CORNER_COLOR = Color.LIGHT_GRAY;
 	private static final Color TABLE_HEADER_COLOR = Color.LIGHT_GRAY;
-	private static final Color TABLE_CELL_COLOR = Color.WHITE;
 	private ContextImplementation context;
 	private ContextTableScaleEditorDialog dialog;
 	private static final int CELL_WIDTH = 150;

@@ -123,7 +123,7 @@ public class DiagramExportSettings extends org.tockit.canvas.imagewriter.Diagram
 		this.saveCommentsToFile= false;
 		this.saveCommentsToClipboard= false;
 		String lastImage = ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, CONFIGURATION_LAST_EXPORT_FILE_ENTRY, null);
-		this.lastImageExportFile = null;  
+		this.lastImageExportFile = new File(lastImage);  
     }
 
     /**

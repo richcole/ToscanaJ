@@ -427,7 +427,6 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
 	public String getTextualDescription() {
 		String comments= "";
 		String lineSeparator = System.getProperty("line.separator");
-		Diagram2D currentDiagram=null;
 		DiagramHistory diagramHistory = DiagramController.getController().getDiagramHistory();
 		int firstCurrentPos = diagramHistory.getFirstCurrentDiagramPosition();
 		if( firstCurrentPos > 1 ) {

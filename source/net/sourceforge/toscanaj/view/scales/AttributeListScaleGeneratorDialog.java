@@ -38,7 +38,6 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 	private JButton createButton, removeButton;
 	private JPanel buttonsPane, titlePane, optionsPane, tableButtonsPane;
 	private JScrollPane scrollpane;
-	private JButton checkConsistencyButton;
 	private JTable table;
 	
 	public AttributeListScaleGeneratorDialog(Frame owner, ConceptualSchema conceptualSchema,DatabaseConnection databaseConnection) {
@@ -425,7 +424,6 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				Object[][] newData = new Object[this.getRowCount()+1][this.getColumnCount()];
 				for(int row = 0; row< modelData.length; row++){
 					for(int col = 0 ; col < modelData[row].length ; col++){
-						Object value = modelData[row][col];
 						newData[row][col] = modelData[row][col];
  					}
 				}
@@ -508,7 +506,6 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				}
 				Object[][] newModel = new Object[getRowCount() - 1][getColumnCount()];
 				for (int i = 0; i < newModel.length; i++) {
-					Object[] curRow;
 					if(i < row) {
 						newModel[i] = this.modelData[i];
 					} else {

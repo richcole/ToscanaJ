@@ -208,9 +208,10 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 				if(this.diagramExportSettings.getSaveCommentsToFile()==true){
 					try{
 						PrintWriter out = new PrintWriter(new FileWriter(new File(selectedFile.getAbsolutePath()+".txt")));
-						out.println("The diagram(s) you have viewed for the resulting image: "+System.getProperty("line.separator")+selectedFile.getAbsolutePath());
+						out.println("The diagram(s) you have viewed for the resulting image: " + 
+								    lineSeparator + selectedFile.getAbsolutePath());
 						DateFormat dateFormatter = DateFormat.getDateTimeInstance();
-						out.println("as at "+dateFormatter.format(new Date(System.currentTimeMillis()))+" is(are): ");
+						out.println("as at " + dateFormatter.format(new Date(System.currentTimeMillis())) + " is(are): ");
 						out.println();
 						out.println(description);
 						out.close();

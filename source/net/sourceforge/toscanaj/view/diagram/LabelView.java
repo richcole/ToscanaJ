@@ -62,14 +62,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     protected static final int DEFAULT_DISPLAY_LINES = 4;
 
     /**
-     * This is the smallest font size we accept.
-     *
-     * If the font size would go below this due to scaling, we will increase it
-     * to this.
-     */
-    static private final int MinFontSize = 10;
-
-    /**
      * Stores the font we use.
      */
     private Font font;

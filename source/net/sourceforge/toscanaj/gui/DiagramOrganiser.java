@@ -153,7 +153,7 @@ public class DiagramOrganiser extends JPanel {
         );
         removeButton.setEnabled(false);
         
-        DiagramOrganiserDnDController con=new DiagramOrganiserDnDController(availableDiagramsListview , selectedDiagramsListview , this);
+        new DiagramOrganiserDnDController(availableDiagramsListview , selectedDiagramsListview , this);
     }
     
 

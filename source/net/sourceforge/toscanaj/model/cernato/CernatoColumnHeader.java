@@ -50,19 +50,18 @@ public class CernatoColumnHeader extends JComponent{
 		Iterator attrIt = attributeList.iterator();
 		while(attrIt.hasNext()){
 			Property attribute = (Property) attrIt.next();	
-			drawAttirbuteNameCell(g2d,attribute.toString(),col * CELL_WIDTH,0);	
+			drawAttributeNameCell(g2d,attribute.toString(),col * CELL_WIDTH,0);	
 			drawAttributeTypeCell(g2d, attribute.getType().getName() , col*CELL_WIDTH,CELL_HEIGHT);
 			col+=1;
 		}
 		g2d.setPaint(oldPaint);
-	
+		g2d.setFont(oldFont);	
 	}
 
 	protected void drawAttributeTypeCell(Graphics2D g2d,String content,int x,int y)
 	 {
 	 	g2d.setPaint(TABLE_TYPE_CELL_COLOR);
 		g2d.fill(new Rectangle2D.Double(x,y,CELL_WIDTH,CELL_HEIGHT));
-		Paint oldPaint = g2d.getPaint();
 		g2d.setPaint(TEXT_COLOR);
 		g2d.draw(new Rectangle2D.Double(x,y,CELL_WIDTH,CELL_HEIGHT));
 		
@@ -74,10 +73,9 @@ public class CernatoColumnHeader extends JComponent{
 		y + CELL_HEIGHT / 2 + fontMetrics.getMaxAscent() / 2);
 	}
 	
-	protected void drawAttirbuteNameCell(Graphics2D g2d, String content, int x, int y) {
+	protected void drawAttributeNameCell(Graphics2D g2d, String content, int x, int y) {
 		g2d.setPaint(TABLE_HEADER_COLOR);
 		g2d.fill(new Rectangle2D.Double(x, y, CELL_WIDTH, CELL_HEIGHT));
-		Paint oldPaint = g2d.getPaint();
 		g2d.setPaint(TEXT_COLOR);
 		g2d.draw(new Rectangle2D.Double(x, y, CELL_WIDTH, CELL_HEIGHT));
 	

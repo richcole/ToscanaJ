@@ -14,12 +14,9 @@ import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
-import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 public class NominalScaleGenerator implements ScaleGenerator {
 	private Frame parent;
-	/// @todo this should be calculated from the number of nodes (the more nodes the wider)
-	private static final int DIAGRAM_WIDTH = 400;
 
 	public NominalScaleGenerator(Frame parent) {
 		this.parent = parent;
@@ -68,18 +65,5 @@ public class NominalScaleGenerator implements ScaleGenerator {
 		context.getObjects().add(topNodeClause);
 		
 		return context;
-	}
-
-	private ConceptImplementation makeConcept(
-		String label,
-		String queryClause) {
-		ConceptImplementation retVal = new ConceptImplementation();
-		if (label != null) {
-			retVal.addAttribute(new Attribute(label, null));
-		}
-		if (queryClause != null) {
-			retVal.addObject(queryClause);
-		}
-		return retVal;
 	}
 }

@@ -52,7 +52,6 @@ public class CernatoRowHeader extends JComponent{
 	protected void drawCell(Graphics2D g2d, String content, int x, int y) {
 		g2d.setPaint(CELL_COLOR);
 		g2d.fill( new Rectangle2D.Double(x , y , CELL_WIDTH, CELL_HEIGHT));
-		Paint oldPaint = g2d.getPaint();
 		g2d.setPaint(TEXT_COLOR);
 		g2d.draw(new Rectangle2D.Double(x , y , CELL_WIDTH, CELL_HEIGHT));
 		

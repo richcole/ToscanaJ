@@ -23,7 +23,7 @@ public class IteratorTest extends TestCase {
 
     public void testIterateOverList() throws Exception {
         List list = new LinkedList();
-        int i, j;
+        int i;
         int LEN = 100, POS = 50;
 
         for (i = 0; i < LEN; i++) {
