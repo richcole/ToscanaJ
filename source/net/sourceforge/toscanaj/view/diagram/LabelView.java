@@ -17,6 +17,7 @@ import org.tockit.events.EventBrokerListener;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -310,34 +311,36 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
             /// @todo find a way to use the double coordinate system
             double xleft = xPos + lw - this.scrollbarWidth + (this.scrollbarWidth - width) / 2;
             double ytop = yPos + (this.lineHeight - height) / 2;
-            int[] xpoints = new int[3];
-            int[] ypoints = new int[3];
-            xpoints[0] = (int) (xleft);
-            ypoints[0] = (int) (ytop + height);
-            xpoints[1] = (int) (xleft + width / 2);
-            ypoints[1] = (int) (ytop);
-            xpoints[2] = (int) (xleft + width);
-            ypoints[2] = (int) (ytop + height);
+			
             if (this.firstItem != 0) {
                 graphics.setPaint(scrollbarColorDark);
             } else {
                 graphics.setPaint(scrollbarColorLight);
             }
-            graphics.fill(new Polygon(xpoints, ypoints, 3));
+            
+            GeneralPath upwardTriangle = new GeneralPath();
+            upwardTriangle.moveTo((float)(xleft), (float)(ytop + height));
+			upwardTriangle.lineTo((float)(xleft + width / 2), (float)(ytop));
+			upwardTriangle.lineTo((float)(xleft + width), (float)(ytop + height));
+			upwardTriangle.closePath();
+			graphics.fill(upwardTriangle);
+			
             // draw the downwards triangle
             ytop = yPos + (this.displayLines - 2) * this.lineHeight + (this.lineHeight - height) / 2;
-            xpoints[0] = (int) (xleft);
-            ypoints[0] = (int) (ytop);
-            xpoints[1] = (int) (xleft + width / 2);
-            ypoints[1] = (int) (ytop + height);
-            xpoints[2] = (int) (xleft + width);
-            ypoints[2] = (int) (ytop);
-            if (this.firstItem + this.displayLines < numItems) {
+            
+            if (this.firstItem + this.displayLines < numItems) { 
                 graphics.setPaint(scrollbarColorDark);
             } else {
-                graphics.setPaint(scrollbarColorLight);
+                graphics.setPaint(scrollbarColorLight); 
             }
-            graphics.fill(new Polygon(xpoints, ypoints, 3));
+            
+			GeneralPath downwardTriangle = new GeneralPath();
+			downwardTriangle.moveTo((float)(xleft), (float)(ytop));
+			downwardTriangle.lineTo((float)(xleft + width / 2), (float)(ytop + height));
+			downwardTriangle.lineTo((float)(xleft + width), (float)(ytop));
+			downwardTriangle.closePath();
+		    graphics.fill(downwardTriangle);
+            
             // draw the current position
             double scale = (this.lineHeight * (this.displayLines - 3)) / (double) numItems;
             width = 0.8 * width;
