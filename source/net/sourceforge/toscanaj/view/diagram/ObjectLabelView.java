@@ -137,33 +137,28 @@ public class ObjectLabelView extends LabelView {
     }
 
     public void doubleClicked(Point2D pos) {
-        if (pos.getX() > this.rect.getMaxX() - this.scrollbarWidth) {
-            // a doubleClick on the scrollbar
+        int itemHit = getItemAtPosition(pos);
+        if( itemHit == -1 ) {
             return;
         }
-        /// @todo Get rid of RTTI here.
-        if (this.query instanceof DatabaseListQuery) {
+        DatabaseRetrievedObject object = getObject(itemHit);
+        if (object.hasKey()) {
             if (DatabaseViewerManager.getNumberOfObjectViews() == 0) {
                 return;
             }
-            int lineHit = (int) ((pos.getY() - this.rect.getY()) / this.lineHeight);
-            int itemHit = lineHit + this.firstItem;
-            DatabaseViewerManager.showObject(0, getObjectKey(itemHit));
+            DatabaseViewerManager.showObject(0, getObject(itemHit));
         }
-        if ( (this.query instanceof DatabaseAggregateQuery) || (this.query instanceof DatabaseDistinctListQuery) ) {
+        else {
             if (DatabaseViewerManager.getNumberOfObjectListViews() == 0) {
                 return;
             }
-            DatabaseConnectedConcept concept = (DatabaseConnectedConcept) this.labelInfo.getNode().getConcept();
-            DatabaseViewerManager.showObjectList(0, concept.constructWhereClause(this.showOnlyContingent));
+            DatabaseViewerManager.showObjectList(0, object);
         }
         return;
     }
 
-    private String getObjectKey(int itemHit) {
-        DatabaseRetrievedObject object = (DatabaseRetrievedObject) this.queryResults.get(itemHit);
-        String objectKey = object.getKey().toString();
-        return objectKey;
+    private DatabaseRetrievedObject getObject(int itemHit) {
+        return (DatabaseRetrievedObject) this.queryResults.get(itemHit);
     }
 
     public void openPopupMenu(Point2D canvasPosition, Point2D screenPosition) {
@@ -208,7 +203,7 @@ public class ObjectLabelView extends LabelView {
                 menuItem = new JMenuItem(objectViewName);
                 menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        DatabaseViewerManager.showObject(objectViewName, getObjectKey(itemHit));
+                        DatabaseViewerManager.showObject(objectViewName, getObject(itemHit));
                     }
                 });
                 objectViewMenu.add(menuItem);
@@ -217,15 +212,13 @@ public class ObjectLabelView extends LabelView {
         }
         if (objectListViewNames.size() != 0) {
             JMenu objectListViewMenu = new JMenu("View summary");
-            DatabaseConnectedConcept concept = (DatabaseConnectedConcept) this.labelInfo.getNode().getConcept();
-            final String whereClause = concept.constructWhereClause(this.showOnlyContingent);
             Iterator it = objectListViewNames.iterator();
             while (it.hasNext()) {
                 final String objectListViewName = (String) it.next();
                 menuItem = new JMenuItem(objectListViewName);
                 menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        DatabaseViewerManager.showObjectList(objectListViewName, whereClause);
+                        DatabaseViewerManager.showObjectList(objectListViewName, getObject(itemHit));
                     }
                 });
                 objectListViewMenu.add(menuItem);

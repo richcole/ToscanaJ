@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -34,12 +34,12 @@ public class DatabaseAggregateQuery extends DatabaseQuery {
         return retValue;
     }
 
-    protected DatabaseRetrievedObject createDatabaseRetrievedObject(Vector values) throws SQLException {
+    protected DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) throws SQLException {
         if( values.get(0).toString().equals("0") ) {
             return null;
         }
         String displayString = this.formatResults(values, 1);
-        DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(displayString);
+        DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
         return retVal;
     }
 }

@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.dbviewer;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import org.jdom.Element;
 import org.jdom.input.DOMBuilder;
 
@@ -83,32 +84,38 @@ public class DatabaseViewerManager {
         return JOptionPane.getFrameForComponent(parentComponent);
     }
 
-    public static void showObject(int viewerID, String objectKey) {
+    public static void showObject(int viewerID, DatabaseRetrievedObject object) {
+        if(!object.hasKey()) {
+            throw new RuntimeException("Can not display object without key: " + object.getDisplayString());
+        }
         DatabaseViewerManager manager = (DatabaseViewerManager) objectViewerRegistry.get(viewerID);
         DatabaseViewer viewer = manager.viewer;
-        viewer.showView("WHERE " + manager.getKeyName() + " = '" + objectKey + "'");
+        viewer.showView("WHERE " + manager.getKeyName() + " = '" + object.getKey() + "'");
     }
 
-    public static void showObject(String viewName, String objectKey) {
+    public static void showObject(String viewName, DatabaseRetrievedObject object) {
+        if(!object.hasKey()) {
+            throw new RuntimeException("Can not display object without key: " + object.getDisplayString());
+        }
         for (int i = 0; i < objectViewerRegistry.size(); i++) {
             DatabaseViewerManager manager = (DatabaseViewerManager) objectViewerRegistry.get(i);
             if (manager.screenName.equals(viewName)) {
                 DatabaseViewer viewer = manager.viewer;
-                viewer.showView("WHERE " + manager.getKeyName() + " = '" + objectKey + "'");
+                viewer.showView("WHERE " + manager.getKeyName() + " = '" + object.getKey() + "'");
             }
         }
     }
 
-    public static void showObjectList(int viewerID, String whereClause) {
+    public static void showObjectList(int viewerID, DatabaseRetrievedObject object) {
         DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(viewerID);
-        manager.viewer.showView(whereClause);
+        manager.viewer.showView(object.getWhereClause());
     }
 
-    public static void showObjectList(String viewName, String whereClause) {
+    public static void showObjectList(String viewName, DatabaseRetrievedObject object) {
         for (int i = 0; i < objectListViewerRegistry.size(); i++) {
             DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(i);
             if (manager.screenName.equals(viewName)) {
-                manager.viewer.showView(whereClause);
+                manager.viewer.showView(object.getWhereClause());
             }
         }
     }

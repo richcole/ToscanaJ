@@ -65,7 +65,7 @@ public abstract class DatabaseQuery extends Query {
                     Iterator it = queryResults.iterator();
                     while (it.hasNext()) {
                         Vector item = (Vector) it.next();
-                        DatabaseRetrievedObject object = createDatabaseRetrievedObject(item);
+                        DatabaseRetrievedObject object = createDatabaseRetrievedObject(whereClause, item);
                         if(object != null) {
                             retVal.add(object);
                         }
@@ -80,7 +80,7 @@ public abstract class DatabaseQuery extends Query {
         return retVal;
     }
 
-    protected abstract DatabaseRetrievedObject createDatabaseRetrievedObject(Vector values) throws SQLException;
+    protected abstract DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) throws SQLException;
 
     private void handleDBException(DatabaseException e) {
         /// @TODO Find something useful to do here.

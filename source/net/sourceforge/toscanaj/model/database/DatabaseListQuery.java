@@ -34,9 +34,9 @@ public class DatabaseListQuery extends DatabaseQuery {
         return retValue;
     }
 
-    protected DatabaseRetrievedObject createDatabaseRetrievedObject(Vector values) throws SQLException {
+    protected DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) throws SQLException {
         String displayString = this.formatResults(values, 1);
-        DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(displayString);
+        DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
         retVal.setKey(values.get(0));
         return retVal;
     }

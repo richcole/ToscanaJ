@@ -33,9 +33,9 @@ public class DatabaseDistinctListQuery extends DatabaseQuery {
         return retValue;
     }
 
-    protected DatabaseRetrievedObject createDatabaseRetrievedObject(Vector values) throws SQLException {
+    protected DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) throws SQLException {
         String displayString = this.formatResults(values, 0);
-        DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(displayString);
+        DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
         return retVal;
     }
 }
