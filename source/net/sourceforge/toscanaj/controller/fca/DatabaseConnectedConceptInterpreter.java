@@ -52,24 +52,7 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
 		}
 	}
 
-    /**
-     * This returns the maximal contingent found up to now.
-     */
-    protected int getMaximalContingentSize() {
-        int maxVal = 0;
-        for (Iterator iterator = this.contingentSizes.values().iterator(); iterator.hasNext();) {
-            Hashtable contSizes = (Hashtable) iterator.next();
-            for (Iterator iterator2 = contSizes.values().iterator(); iterator2.hasNext();) {
-                Integer curVal = (Integer) iterator2.next();
-                if (curVal.intValue() > maxVal) {
-                    maxVal = curVal.intValue();
-                }
-            }
-        }
-        return maxVal;
-    }
-
-	protected Object  getObject (String value, Concept concept, ConceptInterpretationContext context) {
+	protected Object getObject(String value, Concept concept, ConceptInterpretationContext context) {
 		String whereClause = WhereClauseGenerator.createWhereClause(concept,
 										context.getDiagramHistory(),
 										context.getNestingConcepts(),

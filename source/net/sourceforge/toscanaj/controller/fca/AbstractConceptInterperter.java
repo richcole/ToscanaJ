@@ -23,19 +23,15 @@ import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 public abstract class AbstractConceptInterperter implements ConceptInterpreter, EventBrokerListener {
-	// @this should be private once refactoring is finished.
-	protected Hashtable contingentSizes = new Hashtable();
+	private Hashtable contingentSizes = new Hashtable();
 	private Hashtable extentSizes = new Hashtable();
 
 	public abstract Iterator getObjectSetIterator(Concept concept,ConceptInterpretationContext context) ;
 
-	protected abstract Object  getObject (String value, Concept concept, ConceptInterpretationContext context);
+	protected abstract Object getObject(String value, Concept concept, ConceptInterpretationContext context);
 	
 	protected abstract Object[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context); 
 	
-	// @todo implement this here maybe?..
-	protected abstract int getMaximalContingentSize() ;
-
 	protected abstract int calculateContingentSize (Concept concept, ConceptInterpretationContext context);
 
 	protected int calculateExtentSize(Concept concept, ConceptInterpretationContext context) {
@@ -241,6 +237,22 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 		return retVal;
 	}
 
+	/**
+	 * This returns the maximal contingent found up to now.
+	 */
+	protected int getMaximalContingentSize() {
+		int maxVal = 0;
+		for (Iterator iterator = this.contingentSizes.values().iterator(); iterator.hasNext();) {
+			Hashtable contSizes = (Hashtable) iterator.next();
+			for (Iterator iterator2 = contSizes.values().iterator(); iterator2.hasNext();) {
+				Integer curVal = (Integer) iterator2.next();
+				if (curVal.intValue() > maxVal) {
+					maxVal = curVal.intValue();
+				}
+			}
+		}
+		return maxVal;
+	}
 
 	public boolean isRealized(Concept concept, ConceptInterpretationContext context) {
 		/// @todo do check only lower neighbours

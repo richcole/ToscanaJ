@@ -29,12 +29,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
         }
     }
 
-    protected int getMaximalContingentSize() {
-        /// @todo implement
-        return 1;
-    }
-
-    protected int calculateContingentSize (Concept concept, ConceptInterpretationContext context) {
+    protected int calculateContingentSize(Concept concept, ConceptInterpretationContext context) {
     	Set contingent = calculateContingent(concept, context);
     	return contingent.size();
     }
