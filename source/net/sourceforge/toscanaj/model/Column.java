@@ -8,14 +8,23 @@
  */
 package net.sourceforge.toscanaj.model;
 
-public class Column {
-    private String name;
+import java.sql.Types;
 
-    public Column(String name) {
+public class Column {
+
+    private String name;
+    private Types type;
+
+    public Column(String name, Types type) {
         this.name = name;
+        this.type = type;
     }
 
     public String getName() {
         return name;
+    }
+
+    public Types getType() {
+        return type;
     }
 }

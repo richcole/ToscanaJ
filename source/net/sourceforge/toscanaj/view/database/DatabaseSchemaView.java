@@ -145,6 +145,11 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
                 break;
             }
         }
+
+        /// @todo remove workaround for a bug in swing ver. < 1.3rel03
+        if ( keyedTableList.size() == 0 ) {
+            displayTable(null);
+        };
     }
 
     public void displayTable(Table table) {
