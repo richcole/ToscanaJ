@@ -713,13 +713,13 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
             if( this.lastImageExportFile == null ) {
                 this.lastImageExportFile = new File(System.getProperty("user.dir"));
             }
-            final JFileChooser openDialog = new JFileChooser(this.lastImageExportFile);
-            int rv=openDialog.showOpenDialog( this );
+            final JFileChooser saveDialog = new JFileChooser(this.lastImageExportFile);
+            int rv=saveDialog.showSaveDialog( this );
             if( rv == JFileChooser.APPROVE_OPTION )
             {
-                this.lastImageExportFile = openDialog.getSelectedFile();
+                this.lastImageExportFile = saveDialog.getSelectedFile();
                 try {
-                    ImageWriter.exportGraphic(this.diagramView, this.diagramExportSettings, openDialog.getSelectedFile());
+                    ImageWriter.exportGraphic(this.diagramView, this.diagramExportSettings, saveDialog.getSelectedFile());
                 }
                 catch ( ImageGenerationException e ) {
                     /// @TODO Give feedback here
