@@ -229,13 +229,13 @@ public class ToscanajGraphics2D {
     }
 
     /**
-     * Draws a circle around the given point with different fill and border paints.
+     * Draws an ellipse around the given point with different fill and border paints.
      */
-    public void drawCircle(Point2D center, double radius, Paint fill, Paint border) {
+    public void drawFilledEllipse(Point2D center, double radiusX, double radiusY, Paint fill, Paint border) {
         Paint oldPaint = graphics.getPaint();
-        Ellipse2D circle = new Ellipse2D.Double( projectX(center.getX()) - radius,
-                                                 projectY(center.getY()) - radius,
-                                                 radius * 2, radius * 2 );
+        Ellipse2D circle = new Ellipse2D.Double( projectX(center.getX()) - radiusX,
+                                                 projectY(center.getY()) - radiusY,
+                                                 radiusX * 2, radiusY * 2 );
         graphics.setPaint(fill);
         graphics.fill(circle);
         graphics.setPaint(border);

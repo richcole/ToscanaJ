@@ -65,6 +65,22 @@ public class DiagramNode {
     }
 
     /**
+     * A copy constructor creating a duplicate of the given node.
+     */
+    public DiagramNode(DiagramNode other) {
+        this.position = other.position;
+        this.concept = other.concept;
+        this.attributeLabel = other.attributeLabel;
+        if(this.attributeLabel != null) {
+            this.attributeLabel.attachNode(this);
+        }
+        this.objectLabel = other.objectLabel;
+        if(this.objectLabel != null) {
+            this.objectLabel.attachNode(this);
+        }
+    }
+
+    /**
      * Get the current node position.
      */
     public Point2D getPosition(){
@@ -100,9 +116,21 @@ public class DiagramNode {
     }
 
     /**
-     * Get the radius set for the node.
+     * Get the horizontal radius used for this node.
      */
-    public double getRadius() {
+    public double getRadiusX() {
+        if(this.concept.isRealised()) {
+            return RADIUS;
+        }
+        else {
+            return RADIUS/3;
+        }
+    }
+
+    /**
+     * Get the vertical radius used for this node.
+     */
+    public double getRadiusY() {
         if(this.concept.isRealised()) {
             return RADIUS;
         }

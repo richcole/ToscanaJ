@@ -419,14 +419,7 @@ public class DiagramController implements ChangeObservable {
             // we don't have a diagram to display
             return null;
         }
-        if(history.currentDiagrams.size() == 1) {
-            // we have only a flat diagram
-            return getSimpleDiagram(0);
-        }
-        else {
-            // create a nested diagram
-            return getNestedDiagram();
-        }
+        return getNestedDiagram(history.currentDiagrams.size()-1);
     }
 
     /**
@@ -504,9 +497,17 @@ public class DiagramController implements ChangeObservable {
 
     /**
      * Returns a nested diagram using the list of current diagrams.
+     *
+     * The parameter pos determines the position in the list of current diagrams.
      */
-    protected Diagram2D getNestedDiagram() {
-        return getSimpleDiagram(0);
+    protected Diagram2D getNestedDiagram(int pos) {
+        if(pos == 0) {
+            // we have only a flat diagram left
+            return getSimpleDiagram(0);
+        }
+        // else recurse
+
+        return getNestedDiagram(pos-1);
     }
 
     /**

@@ -206,7 +206,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         double lh = getHeight( fm );
         height = tg.inverseScaleY(lh);
         xPos = x - tg.inverseScaleX(lw/2) + this.labelInfo.getOffset().getX();
-        double radius = node.getRadius();
+        double radius = node.getRadiusY();
         if( getPlacement() == ABOVE )
         {
             y = y - tg.inverseScaleY(radius);

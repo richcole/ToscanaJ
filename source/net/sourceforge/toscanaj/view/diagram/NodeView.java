@@ -106,21 +106,24 @@ public class NodeView extends CanvasItem {
                                          (int)(topColor.getGreen()*rel + bottomColor.getGreen()*(1-rel)),
                                          (int)(topColor.getBlue()*rel + bottomColor.getBlue()*(1-rel)),
                                          (int)(topColor.getAlpha()*rel + bottomColor.getAlpha()*(1-rel)) );
-            g.drawCircle( diagramNode.getPosition(), diagramNode.getRadius(),
-                          nodeColor, circleColor );
+            g.drawFilledEllipse( diagramNode.getPosition(), diagramNode.getRadiusX(), diagramNode.getRadiusY(),
+                                 nodeColor, circleColor );
             g.getGraphics2D().setPaint(oldPaint);
             graphics = g;
         }
     }
 
     /**
-     * Returns always false at the moment.
+     * Implements CanvasItem.containsPoint(Point2D).
+     *
+     * This is currently not exact if the node is not a circle, the test is if a
+     * circle with the geometric average of the two radii is hit.
      */
     public boolean containsPoint(Point2D point) {
         double deltaX = graphics.scaleX(point.getX() - diagramNode.getPosition().getX());
         double deltaY = graphics.scaleY(point.getY() - diagramNode.getPosition().getY());
         double sqDist = deltaX*deltaX + deltaY*deltaY;
-        double sqRadius = diagramNode.getRadius()*diagramNode.getRadius();
+        double sqRadius = diagramNode.getRadiusX()*diagramNode.getRadiusY();
         return sqDist <= sqRadius;
     }
 
