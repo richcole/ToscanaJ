@@ -22,6 +22,7 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.parser.CSCParser;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
@@ -211,6 +212,14 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 //        saveActivity.setPrepareActivity(new PrepareToSaveActivity());
         fileMenu.add(saveMenuItem);
 
+        JMenuItem importCSCMenuItem = new JMenuItem("Import CSC File...");
+        importCSCMenuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                importCSC();
+            }
+        });
+        fileMenu.add(importCSCMenuItem);
+
         JMenuItem dbConnectionMenuItem = new JMenuItem("Database connection...");
         dbConnectionMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -396,5 +405,40 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             this.mruList.remove(0);
         }
         recreateMruMenu();
+    }
+
+    private void importCSC() {
+        final JFileChooser openDialog;
+        if (this.currentFile != null) {
+            // use position of last file for dialog
+            openDialog = new JFileChooser(this.currentFile);
+        } else {
+            openDialog = new JFileChooser(System.getProperty("user.dir"));
+        }
+        int rv = openDialog.showOpenDialog(this);
+        if (rv != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        importCSC(openDialog.getSelectedFile());
+    }
+
+    private void importCSC(File file) {
+        // store current file
+        try {
+            this.currentFile = file.getCanonicalPath();
+        } catch (IOException e) { // could not resolve canonical path
+            e.printStackTrace();
+            this.currentFile = file.getAbsolutePath();
+            /// @todo what could be done here?
+        }
+        try {
+            CSCParser.importCSCFile(file, this.conceptualSchema);
+        } catch (FileNotFoundException e) {
+            ErrorDialog.showError(this, e, "Could not find file");
+            return;
+        } catch (DataFormatException e) {
+            ErrorDialog.showError(this, e, "Could not parse file");
+            return;
+        }
     }
 }

@@ -17,7 +17,7 @@ import java.util.HashSet;
 public class ContextImplementation implements Context {
     private Collection objects = new HashSet();
     private Collection attributes = new HashSet();
-    private BinaryRelation relation = new BinaryRelationImplementation();
+    private BinaryRelationImplementation relation = new BinaryRelationImplementation();
 
     public ContextImplementation() {
     }
@@ -32,5 +32,9 @@ public class ContextImplementation implements Context {
 
     public BinaryRelation getRelation() {
         return relation;
+    }
+    
+    public BinaryRelationImplementation getRelationImplementation() {
+    	return this.relation;
     }
 }
