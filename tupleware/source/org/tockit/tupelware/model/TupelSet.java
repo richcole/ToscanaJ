@@ -21,6 +21,9 @@ public class TupelSet {
     }
     
     public void addTupel(Object[] tupel) {
+        if(tupel.length != this.variableNames.length) {
+            throw new IllegalArgumentException("Tupels have to have the same length as the number of variables");
+        }
         this.tupels.add(tupel);
     }
     
