@@ -203,37 +203,16 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
 
     private void addDiagrams(ConceptualSchema schema, CernatoModel cernatoModel) {
         Vector views = cernatoModel.getViews();
-        Vector dimensions = LayoutOperations.calculateDimensions(cernatoModel);
         for (Iterator iterator = views.iterator(); iterator.hasNext();) {
             View view = (View) iterator.next();
-            addDiagram(schema, cernatoModel, view, dimensions);
+            addDiagram(schema, cernatoModel, view);
         }
     }
 
-    private void addDiagram(ConceptualSchema schema, CernatoModel model, View view, Vector dimensions) {
-        List criteria = view.getCriteria();
-        for (Iterator iterator = criteria.iterator(); iterator.hasNext();) {
-            Criterion criterion = (Criterion) iterator.next();
-            System.out.print("Criterion '" + criterion.getProperty().getName() + ": " +
-                               criterion.getValueGroup().getName() + "' is assigned to dimensions:");
-            int count = 0;
-            for (Iterator iterator2 = dimensions.iterator(); iterator2.hasNext();) {
-                net.sourceforge.toscanaj.model.cernato.Dimension dimension =
-                                                (net.sourceforge.toscanaj.model.cernato.Dimension) iterator2.next();
-                count++;
-                Vector path = dimension.getPath();
-                for (Iterator it3 = path.iterator(); it3.hasNext();) {
-                    PartialOrderNode node = (PartialOrderNode) it3.next();
-                    if(node.getValueGroup() == criterion.getValueGroup()) {
-                        System.out.print(count + " - ");
-                    }
-                }
-            }
-            System.out.println("");
-        }
+    private void addDiagram(ConceptualSchema schema, CernatoModel model, View view) {
         LatticeGenerator lgen = new GantersAlgorithm();
         Lattice lattice = lgen.createLattice(new ViewContext(model, view));
-        Diagram2D diagram = LayoutOperations.createDiagram(model, lattice, view.getName());
+        Diagram2D diagram = LayoutOperations.createDiagram(lattice, view.getName());
         schema.addDiagram(diagram);
     }
 

@@ -8,27 +8,26 @@
 package net.sourceforge.toscanaj.controller.cernato;
 
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
-import net.sourceforge.toscanaj.model.cernato.ValueGroup;
 import net.sourceforge.toscanaj.model.cernato.PartialOrderNode;
+import net.sourceforge.toscanaj.model.Ordered;
 
 import java.util.Set;
 import java.util.Iterator;
 import java.util.HashSet;
 
 public class PartialOrderOperations {
-    static public DirectedGraph createGraphFromOrder(ValueGroup[] valueGroups) {
+    static public DirectedGraph createGraphFromOrder(Ordered[] order) {
         DirectedGraph graph = new DirectedGraph();
-        for (int i = 0; i < valueGroups.length; i++) {
-            ValueGroup valueGroup = valueGroups[i];
-            PartialOrderNode node = new PartialOrderNode(valueGroup);
+        for (int i = 0; i < order.length; i++) {
+            Ordered item = order[i];
+            PartialOrderNode node = new PartialOrderNode(item);
             Set nodes = graph.getNodes();
             Set largerNodes = new HashSet();
             Set smallerNodes = new HashSet();
             for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
                 PartialOrderNode otherNode = (PartialOrderNode) iterator.next();
-                ValueGroup otherValueGroup = otherNode.getValueGroup();
-                if(otherValueGroup.isSuperSetOf(valueGroup) &&
-                   valueGroup.isSuperSetOf(otherValueGroup) ) {
+                Ordered otherItem = otherNode.getData();
+                if(otherItem.isEqual(item) ) {
                     for (Iterator iterator2 = otherNode.getInboundNodes().iterator(); iterator2.hasNext();) {
                         PartialOrderNode inbNode = (PartialOrderNode) iterator2.next();
                         inbNode.connectTo(node);
@@ -40,9 +39,9 @@ public class PartialOrderOperations {
                     largerNodes.clear();
                     smallerNodes.clear();
                     break;
-                } else if (otherValueGroup.isSuperSetOf(valueGroup)) {
+                } else if (item.isLesserThan(otherItem)) {
                     largerNodes.add(otherNode);
-                } else if (valueGroup.isSuperSetOf(otherValueGroup)) {
+                } else if (otherItem.isLesserThan(item)) {
                     smallerNodes.add(otherNode);
                 }
             }

@@ -9,15 +9,16 @@ package net.sourceforge.toscanaj.model.cernato;
 
 import net.sourceforge.toscanaj.model.directedgraph.Node;
 import net.sourceforge.toscanaj.model.cernato.ValueGroup;
+import net.sourceforge.toscanaj.model.Ordered;
 
 public class PartialOrderNode extends Node {
-    private ValueGroup valueGroup;
+    private Ordered data;
 
-    public PartialOrderNode(ValueGroup valueGroup) {
-        this.valueGroup = valueGroup;
+    public PartialOrderNode(Ordered data) {
+        this.data = data;
     }
 
-    public ValueGroup getValueGroup() {
-        return valueGroup;
+    public Ordered getData() {
+        return data;
     }
 }

@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
+import net.sourceforge.toscanaj.model.Ordered;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -58,5 +60,30 @@ public class TextualValueGroup implements ValueGroup {
             }
         }
         return true;
+    }
+
+    public boolean isLesserThan(Ordered other) {
+        if(! (other instanceof TextualValueGroup) ) {
+            return false;
+        }
+        TextualValueGroup otherVG = (TextualValueGroup) other;
+        if(otherVG.type != type) {
+            return false;
+        }
+        for (Iterator iterator = values.iterator(); iterator.hasNext();) {
+            String value = (String) iterator.next();
+            if(!otherVG.values.contains(value)) {
+                return false;
+            }
+        }
+        return values.size() != otherVG.values.size();
+    }
+
+    public boolean isEqual(Ordered other) {
+        if(! (other instanceof TextualValueGroup) ) {
+            return false;
+        }
+        TextualValueGroup otherVG = (TextualValueGroup) other;
+        return otherVG.isSuperSetOf(this) && (values.size() == otherVG.values.size());
     }
 }

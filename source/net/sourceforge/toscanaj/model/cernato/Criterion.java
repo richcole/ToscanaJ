@@ -7,7 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
-public class Criterion {
+import net.sourceforge.toscanaj.model.Ordered;
+
+public class Criterion implements Ordered {
     private Property property;
     private ValueGroup valueGroup;
 
@@ -30,5 +32,21 @@ public class Criterion {
 
     public String toString() {
         return getDisplayString();
+    }
+
+    public boolean isLesserThan(Ordered other) {
+        if(! (other instanceof Criterion)) {
+            return false;
+        }
+        Criterion crit = (Criterion) other;
+        return (this.property == crit.property) && this.valueGroup.isLesserThan(crit.valueGroup);
+    }
+
+    public boolean isEqual(Ordered other) {
+        if(! (other instanceof Criterion)) {
+            return false;
+        }
+        Criterion crit = (Criterion) other;
+        return (this.property == crit.property) && this.valueGroup.isEqual(crit.valueGroup);
     }
 }

@@ -21,29 +21,35 @@ import java.util.*;
 import java.awt.geom.Point2D;
 
 public class LayoutOperations {
-    public static final Vector calculateDimensions(CernatoModel model) {
+    // constants for base vector calculation
+    private static final double BASE_SCALE = 30;
+    private static final double BASE_X_STRETCH = 2;
+    private static final double BASE_X_SHEAR = -0.1;
+
+    public static final Vector calculateDimensions(Lattice lattice) {
         Vector dimensions = new Vector();
-        Collection properties = model.getContext().getProperties();
-        for (Iterator iterator = properties.iterator(); iterator.hasNext();) {
-            Property property = (Property) iterator.next();
-            Type type = property.getType();
-            Collection valueGroups = type.getValueGroups();
-            ValueGroup[] groups = new ValueGroup[valueGroups.size()];
-            valueGroups.toArray(groups);
-            DirectedGraph graph = PartialOrderOperations.createGraphFromOrder(groups);
-            Set paths = graph.getMaximalPaths();
-            for (Iterator iterator2 = paths.iterator(); iterator2.hasNext();) {
-                Vector path = (Vector) iterator2.next();
-                dimensions.add(new Dimension(property, path));
-            }
+        Concept bottom = lattice.getBottom();
+        Iterator it = bottom.getIntentIterator();
+        Criterion[] criteria = new Criterion[bottom.getIntentSize()];
+        int count = 0;
+        while (it.hasNext()) {
+            Attribute attribute = (Attribute) it.next();
+            criteria[count] = (Criterion) attribute.getData();
+            count++;
+        }
+        DirectedGraph graph = PartialOrderOperations.createGraphFromOrder(criteria);
+        Set paths = graph.getMaximalPaths();
+        for (Iterator iterator2 = paths.iterator(); iterator2.hasNext();) {
+            Vector path = (Vector) iterator2.next();
+            dimensions.add(new Dimension(path));
         }
         return dimensions;
     }
 
-    public static final Diagram2D createDiagram(CernatoModel model, Lattice lattice, String title) {
+    public static final Diagram2D createDiagram(Lattice lattice, String title) {
         SimpleLineDiagram diagram = new SimpleLineDiagram();
         diagram.setTitle(title);
-        Vector dimensions = calculateDimensions(model);
+        Vector dimensions = calculateDimensions(lattice);
         Vector base = createBase(dimensions);
         Concept[] concepts = lattice.getConcepts();
         Hashtable nodemap = new Hashtable();
@@ -83,18 +89,23 @@ public class LayoutOperations {
         return retVal;
     }
 
+    /**
+     * Creates a set of base vectors.
+     *
+     * The return value is a set of base vectors as given in Frank Vogt's book "Formale Begriffsanalyse mit C++",
+     * page 61, rescaled and stretched by the two constants BASE_SCALE and BASE_X_STRETCH, and sheared by BASE_X_SHEAR.
+     */
     private static Vector createBase(Vector dimensions) {
         Vector base = new Vector();
-        double x = 0.5;
-        double size = 30;
+        int n = dimensions.size();
+        int i = 0;
         for (Iterator iterator = dimensions.iterator(); iterator.hasNext();) {
             iterator.next();
-            base.add(new Point2D.Double(x*size, size));
-            if(x>0) {
-                x = -x - 1;
-            } else {
-                x = -x + 1;
-            }
+            double a = Math.pow(2,i);
+            double b = Math.pow(2,n-i-1);
+            base.add(new Point2D.Double( (a-b + BASE_X_SHEAR) * BASE_X_STRETCH * BASE_SCALE,
+                                         (a+b) * BASE_SCALE));
+            i++;
         }
         return base;
     }
@@ -107,7 +118,7 @@ public class LayoutOperations {
             Vector path = dimension.getPath();
             for (Iterator it2 = path.iterator(); it2.hasNext();) {
                 PartialOrderNode node = (PartialOrderNode) it2.next();
-                if(node.getValueGroup() == criterion.getValueGroup()) {
+                if(node.getData() == criterion) {
                     ndimVector[dimCount] += 1;
                 }
             }

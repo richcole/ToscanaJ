@@ -5,18 +5,14 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.model;
 
-import java.util.Vector;
-
-public class Dimension {
-    private Vector path;
-
-    public Dimension(Vector path) {
-        this.path = path;
-    }
-
-    public Vector getPath() {
-        return path;
-    }
+/**
+ * Implements a partial order.
+ *
+ * This differs from java.lang.Comparable, which assumes a total order.
+ */
+public interface Ordered {
+    boolean isLesserThan(Ordered other);
+    boolean isEqual(Ordered other);
 }

@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
+import net.sourceforge.toscanaj.model.Ordered;
+
 public class NumericalValueGroup implements ValueGroup {
     private NumericalType type;
     private String name;
@@ -69,6 +71,52 @@ public class NumericalValueGroup implements ValueGroup {
             return false;
         }
         if(otherNVGroup.max == max && !maxIncluded && otherNVGroup.maxIncluded) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isLesserThan(Ordered other) {
+        if(! (other instanceof NumericalValueGroup) ) {
+            return false;
+        }
+        NumericalValueGroup otherVG = (NumericalValueGroup) other;
+        if(otherVG.type != type) {
+            return false;
+        }
+        if(otherVG.min > min) {
+            return false;
+        }
+        if(otherVG.min == min && minIncluded && !otherVG.minIncluded) {
+            return false;
+        }
+        if(otherVG.max < max) {
+            return false;
+        }
+        if(otherVG.max == max && maxIncluded && !otherVG.maxIncluded) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isEqual(Ordered other) {
+        if(! (other instanceof NumericalValueGroup) ) {
+            return false;
+        }
+        NumericalValueGroup otherVG = (NumericalValueGroup) other;
+        if(otherVG.type != type) {
+            return false;
+        }
+        if(otherVG.min != min) {
+            return false;
+        }
+        if(otherVG.minIncluded != minIncluded) {
+            return false;
+        }
+        if(otherVG.max != max) {
+            return false;
+        }
+        if(otherVG.maxIncluded != maxIncluded) {
             return false;
         }
         return true;

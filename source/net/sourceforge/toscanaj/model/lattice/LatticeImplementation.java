@@ -34,7 +34,7 @@ public class LatticeImplementation implements Lattice {
     public Concept getTop() {
         for (Iterator iterator = concepts.iterator(); iterator.hasNext();) {
             Concept concept = (Concept) iterator.next();
-            if(concept.getUpset().isEmpty()) {
+            if(concept.isTop()) {
                 return concept;
             }
         }
@@ -44,7 +44,7 @@ public class LatticeImplementation implements Lattice {
     public Concept getBottom() {
         for (Iterator iterator = concepts.iterator(); iterator.hasNext();) {
             Concept concept = (Concept) iterator.next();
-            if(concept.getDownset().isEmpty()) {
+            if(concept.isBottom()) {
                 return concept;
             }
         }
