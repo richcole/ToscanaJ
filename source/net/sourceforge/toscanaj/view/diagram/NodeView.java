@@ -200,7 +200,7 @@ public class NodeView extends CanvasItem {
     /**
      * Selects the diagam view of the selected concept.
      */
-    public void clicked(Point2D point) {
+    public void singleClicked(Point2D point) {
         this.diagramView.setSelectedConcept(this.diagramNode.getConcept());
     }
 
