@@ -71,7 +71,6 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
         private String name;
 		private Set objects;
 		private Set attributes;        
-        private Relation magicJoin;
         private BinaryRelation incidenceRelation;
         
         private ModalContext(int dim) {
@@ -96,7 +95,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 					allButThisDim[j] = j + 1;
 				}
 			}
-            magicJoin = JoinOperation.join(tuples, allButThisDim, tuples, allButThisDim);
+            final Relation magicJoin = JoinOperation.join(tuples, allButThisDim, tuples, allButThisDim);
 			incidenceRelation = new BinaryRelation() {
 				public boolean contains(Object domainObject, Object rangeObject) {
 					Tuple left = (Tuple) ((FCAObject)domainObject).getData();
