@@ -5736,7 +5736,9 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
           <object>graphiccard = 'Motherboard'</object>
         </objectContingent>
         <attributeContingent>
-          <attribute>Motherboard</attribute>
+          <attribute><description>
+	          <html>A description of the <b>Motherboard</b> attribute</html>
+	        </description>Motherboard</attribute>
         </attributeContingent>
       </concept>
     </node>
