@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.dbviewer;
 import java.awt.Component;
 import java.awt.Frame;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Dictionary;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
@@ -29,6 +31,7 @@ import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
+import org.tockit.plugin.PluginClassLoader;
 
 /**
  * @todo the actual storing of the available viewers should not be part of this
@@ -67,6 +70,8 @@ public class DatabaseViewerManager implements XMLizable {
     private static final String PARAMETER_ELEMENT_NAME = "parameter";
     private static final String PARAMETER_NAME_ATTRIBUTE_NAME = "name";
     private static final String PARAMETER_VALUE_ATTRIBUTE_NAME = "value";
+    
+    private static final String PLUGIN_LOCATION = ConfigurationManager.fetchString("DatabaseViewerManager", "pluginDirectory", "plugins");
 
     public DatabaseViewerManager(Element viewerDefinition, DatabaseInfo databaseInfo, DatabaseConnection connection)
             throws DatabaseViewerInitializationException {
@@ -85,12 +90,20 @@ public class DatabaseViewerManager implements XMLizable {
             throw new DatabaseViewerInitializationException("Could not find class attribute on <" +
                     viewerType + ">");
         }
+        Class viewerClass;
         try {
-            Class viewerClass = Class.forName(className);
+            PluginClassLoader loader = new PluginClassLoader(new File(PLUGIN_LOCATION));
+            viewerClass = loader.findClass(className);
+        } catch (Exception e) { // if anything fails with the plugin loader, fall back to normal class loader
+            try {
+                viewerClass = Class.forName(className);
+            } catch (ClassNotFoundException e1) {
+                throw new DatabaseViewerInitializationException("Could not find class '" + className + "' -- possible cause: missing plugin");
+            }
+        }
+        try {
             viewer = (DatabaseViewer) viewerClass.newInstance();
             viewer.initialize(this);
-        } catch (ClassNotFoundException e) {
-            throw new DatabaseViewerInitializationException("Could not find class '" + className + "'");
         } catch (InstantiationException e) {
             throw new DatabaseViewerInitializationException("Could not instantiate class '" + className + "'");
         } catch (IllegalAccessException e) {
