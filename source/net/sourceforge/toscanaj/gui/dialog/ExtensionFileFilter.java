@@ -31,7 +31,7 @@ public class ExtensionFileFilter extends FileFilter {
 				return false;
 			}
 			for (int i = 0; i < extensions.length; i++) {
-				if (ext.equals(extensions[i])) {
+				if (ext.toLowerCase().equals(extensions[i].toLowerCase())) {
 					return true;				
 				}
 			}
