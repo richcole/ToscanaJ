@@ -11,8 +11,10 @@
 	<property name="examples.dir" value="examples"/>
 	<property name="toscanaj.class" 
            value="net.sourceforge.toscanaj.ToscanaJ"/>
-	<property name="elba.class"
-	   value="net.sourceforge.toscanaj.Elba"/>
+    <property name="elba.class"
+       value="net.sourceforge.toscanaj.Elba"/>
+    <property name="siena.class"
+       value="net.sourceforge.toscanaj.Siena"/>
 	<path id="project.class.path">
 		<pathelement path="${classpath}"/>
 		<pathelement path="${build.dev.dir}"/>
@@ -138,9 +140,14 @@
 			<classpath refid="project.class.path"/>
 		</java>
 	</target>
-	<target name="run-elba" depends="compile">
-		<java classname="${elba.class}" fork="true">
-			<classpath refid="project.class.path"/>
-		</java>
-	</target>
+    <target name="run-elba" depends="compile">
+        <java classname="${elba.class}" fork="true">
+            <classpath refid="project.class.path"/>
+        </java>
+    </target>
+    <target name="run-siena" depends="compile">
+        <java classname="${siena.class}" fork="true">
+            <classpath refid="project.class.path"/>
+        </java>
+    </target>
 </project>
