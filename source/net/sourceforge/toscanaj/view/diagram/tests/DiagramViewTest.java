@@ -27,6 +27,7 @@ public class DiagramViewTest extends TestCase {
     static class TestDiagramView extends DiagramView {
 
         public TestDiagramView() {
+            super(null);
         }
 
         public boolean isScreenTransformDirty() {

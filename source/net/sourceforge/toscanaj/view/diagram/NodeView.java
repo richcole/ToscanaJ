@@ -8,6 +8,7 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -67,14 +68,17 @@ public class NodeView extends CanvasItem {
      */
     private int selectionState = NO_SELECTION;
 
+    private ConceptInterpreter conceptInterpreter;
+
     /**
      * Construct a nodeView for a Node.
      *
      * The DiagramView is used for the callback when a node was selected.
      */
-    public NodeView(DiagramNode diagramNode, DiagramView diagramView) {
+    public NodeView(DiagramNode diagramNode, DiagramView diagramView, ConceptInterpreter conceptInterpreter) {
         this.diagramNode = diagramNode;
         this.diagramView = diagramView;
+        this.conceptInterpreter = conceptInterpreter;
     }
 
     public DiagramNode getDiagramNode() {

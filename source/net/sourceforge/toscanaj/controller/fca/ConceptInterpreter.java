@@ -8,7 +8,8 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
@@ -38,11 +39,12 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 
 public interface ConceptInterpreter {
 
-    /** @note is Dependent on displayMode and filterMode */
-    List getObjectSet(Concept concept);
 
     /** @note is Dependent on displayMode and filterMode */
-    List getAttributeSet(Concept concept);
+    Iterator getObjectSetIterator(Concept concept);
+
+    /** @note is Dependent on displayMode and filterMode */
+    Iterator getAttributeSetIterator(Concept concept);
 
     /** @note is Dependent on displayMode and filterMode */
     int  getObjectCount(Concept concept);
@@ -51,10 +53,10 @@ public interface ConceptInterpreter {
     int  getAttributeCount(Concept concept);
 
     /** @note these are independent of displayMode and dependent on filterMode */
-    float getRelativeIntentSize(Concept concept);
+    double getRelativeIntentSize(Concept concept);
 
     /** @note these are independent of displayMode and dependent on filterMode */
-    float getRelativeExtentSize(Concept concept);
+    double getRelativeExtentSize(Concept concept);
 
     /** @note see equation above for the effect of this change */
     void setDisplayMode(boolean isContingent);

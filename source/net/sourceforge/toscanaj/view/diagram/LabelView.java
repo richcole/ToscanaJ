@@ -10,6 +10,7 @@ import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -90,6 +91,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      */
     protected DiagramView diagramView = null;
 
+    protected ConceptInterpreter conceptInterpreter = null;
+
     /**
      * The current display size in lines.
      *
@@ -118,10 +121,11 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * Creates a view for the given label information.
      */
-    public LabelView(DiagramView diagramView, LabelInfo label) {
+    public LabelView(DiagramView diagramView, LabelInfo label, ConceptInterpreter conceptInterpreter) {
         this.diagramView = diagramView;
         this.labelInfo = label;
         this.labelInfo.addObserver(this);
+        this.conceptInterpreter = conceptInterpreter;
         DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
         String fontName = diagramSchema.getLabelFontName();
         int fontSize = diagramSchema.getLabelFontSize();

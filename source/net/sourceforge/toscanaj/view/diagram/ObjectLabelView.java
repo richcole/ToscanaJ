@@ -10,6 +10,7 @@ import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,8 +55,8 @@ public class ObjectLabelView extends LabelView {
     /**
      * Creates a view for the given label information.
      */
-    public ObjectLabelView(DiagramView diagramView, LabelInfo label) {
-        super(diagramView, label);
+    public ObjectLabelView(DiagramView diagramView, LabelInfo label, ConceptInterpreter conceptInterpreter) {
+        super(diagramView, label, conceptInterpreter);
         setDisplayType(defaultShowContingentOnly);
         setQuery(defaultQuery);
     }

@@ -10,6 +10,7 @@ import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.Canvas;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -39,6 +40,8 @@ public class DiagramView extends Canvas implements ChangeObserver {
      */
     private Diagram2D diagram = null;
 
+    private ConceptInterpreter conceptInterpreter;
+
     class ResizeListener extends ComponentAdapter {
         public void componentResized(ComponentEvent e) {
             requestScreenTransformUpdate();
@@ -49,11 +52,17 @@ public class DiagramView extends Canvas implements ChangeObserver {
     /**
      * Creates a new view displaying an empty digram (i.e. nothing at all).
      */
-    public DiagramView() {
+    public DiagramView(ConceptInterpreter conceptInterpreter) {
         super();
+        this.conceptInterpreter = conceptInterpreter;
         addComponentListener(new ResizeListener());
         /// @todo this is not yet used since the title is not a canvas item yet
         getBackgroundItem().setPaint(DiagramSchema.getDiagramSchema().getBackgroundColor());
+    }
+
+    public void setConceptInterpreter(ConceptInterpreter conceptInterpreter) {
+        this.conceptInterpreter = conceptInterpreter;
+        /// @todo propagate change to parts, redraw
     }
 
     protected void dragFinished(MouseEvent e) {
@@ -132,7 +141,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
             repaint();
             return;
         }
-        addDiagram(diagram);
+        addDiagram(diagram, conceptInterpreter);
         requestScreenTransformUpdate();
         repaint();
     }
@@ -147,23 +156,23 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * If the filter concept is non-null all nodes created will use this for
      * filter operations.
      */
-    private void addDiagram(Diagram2D diagram) {
+    private void addDiagram(Diagram2D diagram, ConceptInterpreter conceptInterpreter) {
         addDiagramLinesToCanvas(diagram);
-        addDiagramNodesToCanvas(diagram);
-        addDiagramLabelsToCanvas(diagram);
+        addDiagramNodesToCanvas(diagram, conceptInterpreter);
+        addDiagramLabelsToCanvas(diagram, conceptInterpreter);
     }
 
-    private void addDiagramLabelsToCanvas(Diagram2D diagram) {
+    private void addDiagramLabelsToCanvas(Diagram2D diagram, ConceptInterpreter conceptInterpreter) {
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
             if (attrLabelInfo != null) {
-                LabelView labelView = new AttributeLabelView(this, attrLabelInfo);
+                LabelView labelView = new AttributeLabelView(this, attrLabelInfo, conceptInterpreter);
                 addCanvasItem(labelView);
                 labelView.addObserver(this);
             }
             LabelInfo objLabelInfo = diagram.getObjectLabel(i);
             if (objLabelInfo != null) {
-                LabelView labelView = new ObjectLabelView(this, objLabelInfo);
+                LabelView labelView = new ObjectLabelView(this, objLabelInfo, conceptInterpreter);
                 addCanvasItem(labelView);
                 labelView.addObserver(this);
             }
@@ -177,14 +186,14 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
     }
 
-    private void addDiagramNodesToCanvas(Diagram2D diagram) {
+    private void addDiagramNodesToCanvas(Diagram2D diagram, ConceptInterpreter conceptInterpreter) {
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node, this);
+            NodeView nodeView = new NodeView(node, this, conceptInterpreter);
             addCanvasItem(nodeView);
             if (node instanceof NestedDiagramNode) {
                 NestedDiagramNode ndNode = (NestedDiagramNode) node;
-                addDiagram(ndNode.getInnerDiagram());
+                addDiagram(ndNode.getInnerDiagram(), conceptInterpreter);
             }
         }
     }

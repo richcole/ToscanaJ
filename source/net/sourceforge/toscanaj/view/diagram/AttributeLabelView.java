@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import org.jdom.Element;
 
 import javax.swing.*;
@@ -30,8 +31,8 @@ public class AttributeLabelView extends LabelView {
     /**
      * Creates a view for the given label information.
      */
-    public AttributeLabelView(DiagramView diagramView, LabelInfo label) {
-        super(diagramView, label);
+    public AttributeLabelView(DiagramView diagramView, LabelInfo label, ConceptInterpreter conceptInterpreter) {
+        super(diagramView, label, conceptInterpreter);
         setDisplayType(true);
     }
 

@@ -136,14 +136,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             } else {
                 // we don't know the answer yet, ask DB
                 try {
-                    String query = this.dbInfo.getCountQuery() + " WHERE " + this.objectClause;
-                    Iterator iter = this.filterClauses.iterator();
-                    while (iter.hasNext()) {
-                        Object item = iter.next();
-                        query += " AND " + item;
-                    }
-                    query += ";";
-                    this.numObjects = this.connection.queryNumber(query, 1);
+                    this.numObjects = this.connection.queryNumber(calculateContingentQuery(), 1);
                 } catch (DatabaseException e) {
                     /// @TODO Find something useful to do here.
                     if (e.getOriginal() != null) {
@@ -158,6 +151,17 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         return this.numObjects;
     }
 
+    private String calculateContingentQuery() {
+        String query = this.dbInfo.getCountQuery() + " WHERE " + this.objectClause;
+        Iterator iter = this.filterClauses.iterator();
+        while (iter.hasNext()) {
+            Object item = iter.next();
+            query += " AND " + item;
+        }
+        query += ";";
+        return query;
+    }
+
     /**
      * Implements AbstractConceptImplementation.getAttributeContingentIterator().
      */
@@ -169,20 +173,17 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * Implements AbstractConceptImplementation.getObjectContingentIterator().
      */
     public Iterator getObjectContingentIterator() {
+        return getObjectContingent().iterator();
+    }
+
+    private Collection getObjectContingent() {
         // fetch object names if we don't have them -- they will be stored once
         // we have queried them
         if (this.objects == null) {
             objects = new HashSet();
             if (this.objectClause != null) {
                 try {
-                    String query = this.dbInfo.getQuery() + " WHERE " + this.objectClause;
-                    Iterator iter = this.filterClauses.iterator();
-                    while (iter.hasNext()) {
-                        Object item = iter.next();
-                        query += " AND " + item;
-                    }
-                    query += ";";
-                    objects.addAll(this.connection.queryColumn(query, 1));
+                    objects.addAll(this.connection.queryColumn(calculateContingentQuery(), 1));
                 } catch (DatabaseException e) {
                     /// @TODO Find something useful to do here.
                     if (e.getOriginal() != null) {
@@ -194,7 +195,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                 }
             }
         }
-        return objects.iterator();
+        return objects;
     }
 
     /**

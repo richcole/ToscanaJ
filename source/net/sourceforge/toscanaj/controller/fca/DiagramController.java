@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -406,5 +407,11 @@ public class DiagramController implements ChangeObservable {
             ChangeObserver observer = (ChangeObserver) it.next();
             observer.update(this);
         }
+    }
+
+    public ConceptInterpreter getDefaultInterpreter(DatabaseConnection databaseConnection) {
+        return new DatabaseConnectedConceptInterpreter( ConceptInterpreter.CONTINGENT,
+                                                        filterMethod == FILTER_CONTINGENT,
+                                                        databaseConnection );
     }
 }
