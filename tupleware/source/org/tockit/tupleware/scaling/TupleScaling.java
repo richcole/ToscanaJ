@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.tockit.events.EventBroker;
 import org.tockit.relations.model.Relation;
+import org.tockit.relations.model.Tuple;
 import org.tockit.tupleware.source.text.TabDelimitedParser;
 
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
@@ -30,6 +31,7 @@ import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.util.xmlize.XMLWriter;
 
 
+// @todo move this code onto relational algebra code
 public class TupleScaling {
     /**
      * This introduces value identity on object tuples.
@@ -97,14 +99,14 @@ public class TupleScaling {
         ContextImplementation context = new ContextImplementation("Tuples");
         context.getObjects().addAll(tupleObjectMap.values());
         for (Iterator iter = tuples.getTuples().iterator(); iter.hasNext();) {
-            Object[] tuple = (Object[]) iter.next();
-            ObjectTuple objectValues = selectSubset(tuple, objectIndices);
+            Tuple tuple = (Tuple) iter.next();
+            ObjectTuple objectValues = selectSubset(tuple.getData(), objectIndices);
             if(tupleObjectMap.get(objectValues) == null) {
                 FCAObject newObject = new FCAObjectImplementation(createCrossproductName(objectValues));
                 tupleObjectMap.put(objectValues, newObject);
                 context.getObjects().add(newObject);
             }
-            ObjectTuple attributeValues = selectSubset(tuple, attributeIndices); 
+            ObjectTuple attributeValues = selectSubset(tuple.getData(), attributeIndices); 
             if(valueAttributeMap.get(attributeValues) == null) {
                 Attribute newAttribute = new Attribute(createCrossproductName(attributeValues));
                 valueAttributeMap.put(attributeValues, newAttribute);
