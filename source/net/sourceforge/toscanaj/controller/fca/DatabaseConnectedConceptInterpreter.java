@@ -49,7 +49,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         try {
             return getCount(concept, context, context.getObjectDisplayMode());
         } catch (DatabaseException e) {
-            e.getOriginal().printStackTrace();
+            e.printStackTrace();
             throw new RuntimeException("Error accessing the database");
         }
     }
@@ -133,7 +133,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                 return 1;
             }
         } catch (DatabaseException e) {
-            e.getOriginal().printStackTrace();
+            e.printStackTrace();
             throw new RuntimeException("Error querying database");
         }
     }
@@ -189,7 +189,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                 return 1;
             }
         } catch (DatabaseException e) {
-            e.getOriginal().printStackTrace();
+            e.printStackTrace();
             throw new RuntimeException("Error querying database");
         }
     }
@@ -232,7 +232,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
             }
             return true;
         } catch (DatabaseException e) {
-            e.getOriginal().printStackTrace();
+            e.printStackTrace();
             throw new RuntimeException("Error querying the database");
         }
     }
@@ -289,12 +289,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 
     private void handleDBException(DatabaseException e) {
         /// @todo Find something useful to do here.
-        if (e.getOriginal() != null) {
-            System.err.println(e.getMessage());
-            e.getOriginal().printStackTrace();
-        } else {
-            e.printStackTrace(System.err);
-        }
+		e.printStackTrace(System.err);
     }
 
 }

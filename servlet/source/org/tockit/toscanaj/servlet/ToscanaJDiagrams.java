@@ -88,7 +88,7 @@ public class ToscanaJDiagrams extends HttpServlet {
         try {
             DatabaseConnection.getConnection().disconnect();
         } catch (DatabaseException e) {
-            e.getOriginal().printStackTrace();
+            e.printStackTrace();
         }
     }
 

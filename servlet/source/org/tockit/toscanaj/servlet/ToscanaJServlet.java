@@ -68,8 +68,8 @@ public class ToscanaJServlet extends HttpServlet {
             }
             DatabaseConnection.setConnection(connection);
         } catch (DatabaseException e) {
-            e.getOriginal().printStackTrace();
-            throw new ServletException("Could not connect to database: " + e.getOriginal().getMessage(), e);
+            e.printStackTrace();
+            throw new ServletException("Could not connect to database: " + e.getCause().getMessage(), e);
         }
     }
 
@@ -78,7 +78,7 @@ public class ToscanaJServlet extends HttpServlet {
         try {
             DatabaseConnection.getConnection().disconnect();
         } catch (DatabaseException e) {
-            e.getOriginal().printStackTrace();
+            e.printStackTrace();
         }
     }
 

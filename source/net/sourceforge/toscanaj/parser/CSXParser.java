@@ -164,7 +164,7 @@ public class CSXParser {
         try {
             _Schema.setDatabaseInfo(dbInfo);
         } catch (DatabaseException e) {
-            throw new DataFormatException("Could not open database.", e.getOriginal());
+            throw new DataFormatException("Could not open database.", e);
         }
         Element viewsElem = dbElem.getChild("views");
         if (viewsElem != null) {

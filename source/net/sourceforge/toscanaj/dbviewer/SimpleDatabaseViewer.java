@@ -63,7 +63,7 @@ public class SimpleDatabaseViewer extends PagingDatabaseViewer {
             output += (String) itText.next();
             this.textArea.setText(output);
         } catch (DatabaseException e) {
-            this.textArea.setText("Failed to query database:\n" + e.getMessage() + "\n" + e.getOriginal().getMessage());
+            this.textArea.setText("Failed to query database:\n" + e.getMessage() + "\n" + e.getCause().getMessage());
         }
     }
 

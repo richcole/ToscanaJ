@@ -80,7 +80,7 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
             }
             command += (String) itText.next();
         } catch (DatabaseException e) {
-            System.err.println("Failed to query database:\n" + e.getMessage() + "\n" + e.getOriginal().getMessage());
+            System.err.println("Failed to query database:\n" + e.getMessage() + "\n" + e.getCause().getMessage());
         }
         try {
             // add command shell on Win32 platforms

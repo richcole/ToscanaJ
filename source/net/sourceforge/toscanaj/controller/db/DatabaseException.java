@@ -17,11 +17,6 @@ package net.sourceforge.toscanaj.controller.db;
  */
 public class DatabaseException extends Exception {
     /**
-     * This can be used to get the original Exception.
-     */
-    private Exception exception = null;
-
-    /**
      * Constructs an exception without detail message.
      */
     public DatabaseException() {
@@ -39,14 +34,6 @@ public class DatabaseException extends Exception {
      * Constructs an exception with detail message and embedded exception.
      */
     public DatabaseException(String s, Exception e) {
-        super(s);
-        exception = e;
-    }
-
-    /**
-     * Returns the originial exception if attached.
-     */
-    public Exception getOriginal() {
-        return exception;
+        super(s, e);
     }
 }

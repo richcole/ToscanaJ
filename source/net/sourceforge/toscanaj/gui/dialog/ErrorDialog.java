@@ -57,13 +57,13 @@ public class ErrorDialog {
      */
     private void showDetailedErrorMsg(JFrame frame, Throwable e, String title, String errorMsg) {
         ///@TODO an interface is requird for all toscanaJ exceptions
-        Exception original = null;
+        Throwable original = null;
         if (e instanceof ImageGenerationException) {
             original = ((ImageGenerationException) e).getOriginal();
         } else if (e instanceof DataFormatException) {
             original = ((DataFormatException) e).getOriginal();
         } else if (e instanceof DatabaseException) {
-            original = ((DatabaseException) e).getOriginal();
+            original = ((DatabaseException) e).getCause();
         }
         if (original == null) {
             new ErrorDialog(frame, title, errorMsg);

@@ -19,6 +19,14 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
+import net
+    .sourceforge
+    .toscanaj
+    .gui
+    .dialog
+    .attributeselection
+    .SelectedColumnChangedEvent;
+import net.sourceforge.toscanaj.gui.dialog.attributeselection.ValueSetSelector;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.view.database.SQLTypeMapper;
@@ -45,6 +53,7 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
     private JPanel cardPanel;
     private JSplitPane listSplitPane;
     private JSplitPane mainSplitPane;
+    private EventBroker internalBroker;
 
     class TableInfo {
         Table table;
@@ -96,19 +105,7 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
             }
         }
     }
-
-    public void displayTable(Table table) {
-        columnsList.clear();
-
-        if (table != null) {
-            Iterator it = table.getColumns().iterator();
-            while(it.hasNext()) {
-            	Column col = (Column) it.next();
-                columnsList.add(0, new ColumnInfo(col));
-            }
-        }
-    };
-
+    
     class ColumnSelectionListener implements ListSelectionListener {
         public void valueChanged(ListSelectionEvent event) {
             if (!(event.getSource() instanceof JList)) {
@@ -139,6 +136,7 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
             } else {
             	cardLayout.show(cardPanel, ID_UNKNOWN_TYPE_LABEL);
             }
+            internalBroker.processEvent(new SelectedColumnChangedEvent(columnInfo.getColumn()));
         }
         
         private boolean isRangeType(int colType) {
@@ -168,6 +166,18 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
         }
     }
 
+    public void displayTable(Table table) {
+        columnsList.clear();
+
+        if (table != null) {
+            Iterator it = table.getColumns().iterator();
+            while(it.hasNext()) {
+                Column col = (Column) it.next();
+                columnsList.add(0, new ColumnInfo(col));
+            }
+        }
+    };
+
     public AttributeSelectionDialog(Frame aFrame, String title, DatabaseConnection connection, EventBroker eventBroker) {
         super(aFrame, true);
         setTitle(title);
@@ -184,6 +194,8 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
     }
 
     public void init() {
+    	this.internalBroker = new EventBroker();
+    	
         this.tablesList = new DefaultListModel();
         this.columnsList = new DefaultListModel();
 
@@ -200,7 +212,7 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
 
         JLabel nothingSelectedLabel = new JLabel("Please select a table and a column");
         JLabel unknownTypeLabel = new JLabel("Sorry, the type of this column\nis not supported");
-        JLabel nameSetSelector = new JLabel("select names...");
+        ValueSetSelector valueSetSelector = new ValueSetSelector(this.connection, this.internalBroker);
         JLabel intervalSelector = new JLabel("select interval...");
         JLabel booleanSelector = new JLabel("select binary value...");
         
@@ -208,7 +220,7 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
         cardPanel.setLayout(new CardLayout());
         cardPanel.add(nothingSelectedLabel, ID_NOTHING_SELECTED_LABEL);
         cardPanel.add(unknownTypeLabel, ID_UNKNOWN_TYPE_LABEL);
-        cardPanel.add(nameSetSelector, ID_NAME_SELECTOR);
+        cardPanel.add(valueSetSelector, ID_NAME_SELECTOR);
         cardPanel.add(intervalSelector, ID_INTERVAL_SELECTOR);
         cardPanel.add(booleanSelector, ID_BOOLEAN_SELECTOR);
         

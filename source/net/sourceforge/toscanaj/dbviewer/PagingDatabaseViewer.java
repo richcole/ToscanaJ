@@ -75,7 +75,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
                 showCurrentItem();
             } catch (DatabaseException e) {
                 JOptionPane.showMessageDialog(this,
-                        "Failed to query database:\n" + e.getMessage() + "\n" + e.getOriginal().getMessage(),
+                        "Failed to query database:\n" + e.getMessage() + "\n" + e.getCause().getMessage(),
                         "Database connection failed",
                         JOptionPane.ERROR_MESSAGE);
 
