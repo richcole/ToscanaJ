@@ -579,6 +579,12 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK)));
         fileMenu.add(exitMenuItem);
 
+        JMenu editMenu = new JMenu("Edit");
+        editMenu.setMnemonic(KeyEvent.VK_E);
+        editMenu.add(diagramView.getUndoManager().getUndoAction());
+        editMenu.add(diagramView.getUndoManager().getRedoAction());
+        menuBar.add(editMenu);
+        
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
         ButtonGroup fontSizeGroup = new ButtonGroup();

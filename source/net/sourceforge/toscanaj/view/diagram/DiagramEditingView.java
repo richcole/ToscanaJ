@@ -47,6 +47,7 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 import org.tockit.swing.preferences.ExtendedPreferences;
+import org.tockit.swing.undo.ExtendedUndoManager;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
@@ -62,6 +63,15 @@ import java.util.Map;
 import java.util.Vector;
 
 public class DiagramEditingView extends JPanel implements EventBrokerListener {
+	/**
+	 * The factor by which the grid gets rescaled when a button is clicked.
+	 * 
+	 * This is set to the cubic root of 2, which means three clicks double/half the
+	 * grid distance. Whenever the grid distance is halfed, all nodes formerly on a
+	 * grid node are back on a grid node -- this approach thus allows refining the
+	 * grid while having the nodes still placed on it. A factor of 2 or the square
+	 * root of 2 was considered as too coarse. 
+	 */
     private static final double GRID_SIZE_CHANGE_FACTOR = 1.2599210498948731647672106072782;
     private static final int DEFAULT_GRID_SIZE = 15;
     private static final String[] FULL_MOVEMENT_OPTION_NAMES = {"Additive", "Node", "Ideal", "Filter"};
@@ -134,6 +144,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		new LabelClickEventHandler(canvasEventBroker);
 		new LabelScrollEventHandler(canvasEventBroker);
 		diagramView.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+		diagramView.setUndoManager(new ExtendedUndoManager());
 
         JPanel toolPanel = new JPanel(new GridBagLayout());
 		toolPanel.add(createMovementManipulators(), new GridBagConstraints(

@@ -14,4 +14,8 @@ public class IdealMovementEventListener extends SetMovementEventListener {
     protected boolean isPartOfSet(DiagramNode node, DiagramNode otherNode) {
         return node.getConcept().hasSubConcept(otherNode.getConcept());
     }
+
+	protected String getPresentationName() {
+		return "Ideal Movement";
+	}
 }

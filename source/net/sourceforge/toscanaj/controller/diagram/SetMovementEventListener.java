@@ -19,13 +19,25 @@ import org.tockit.events.EventBrokerListener;
 
 import java.awt.geom.Point2D;
 
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+
 public abstract class SetMovementEventListener implements EventBrokerListener {
-    public void processEvent(Event e) {
+    private Point2D startPosition;
+
+	public void processEvent(Event e) {
         CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
         NodeView nodeView = (NodeView) dragEvent.getSubject();
-        DiagramNode node = nodeView.getDiagramNode();
-        Point2D toPosition = dragEvent.getCanvasToPosition();
+        final DiagramNode node = nodeView.getDiagramNode();
+        final Point2D toPosition = dragEvent.getCanvasToPosition();
         Point2D fromPosition = dragEvent.getCanvasFromPosition();
+
+        if(e instanceof CanvasItemPickupEvent) {
+			this.startPosition = node.getPosition();
+		}
+		
         double diffX;
         double diffY;
         if( e instanceof CanvasItemPickupEvent ) {
@@ -37,15 +49,47 @@ public abstract class SetMovementEventListener implements EventBrokerListener {
             diffX = toPosition.getX() - fromPosition.getX();
             diffY = toPosition.getY() - fromPosition.getY();
         }
-        DiagramView diagramView = nodeView.getDiagramView();
-        Diagram2D diagram = diagramView.getDiagram();
+        final DiagramView diagramView = nodeView.getDiagramView();
+        final Diagram2D diagram = diagramView.getDiagram();
         moveSet(diagram, node, diffX, diffY);
         if(!diagram.isHasseDiagram()) {
 			moveSet(diagram,node, -diffX, -diffY);        	
         }
+
         if (dragEvent instanceof CanvasItemDroppedEvent) {
-            diagramView.requestScreenTransformUpdate();
-        }
+			// on drop we update the screen transform ...
+			diagramView.requestScreenTransformUpdate();
+
+		    // ... and add an edit to the undo manager if we find one.
+		    UndoManager undoManager = diagramView.getUndoManager();
+			if (undoManager != null) {
+				// make a copy of the current start position
+				final Point2D undoPosition = this.startPosition;
+				undoManager.addEdit(new AbstractUndoableEdit() {
+					public void undo() throws CannotUndoException {
+			            double diffX = undoPosition.getX() - toPosition.getX();
+			            double diffY = undoPosition.getY() - toPosition.getY();
+						moveSet(diagram, node, diffX, diffY);
+						diagramView.requestScreenTransformUpdate();
+						diagramView.repaint();
+						super.undo();
+					}
+
+					public void redo() throws CannotRedoException {
+			            double diffX = toPosition.getX() - undoPosition.getX();
+			            double diffY = toPosition.getY() - undoPosition.getY();
+						moveSet(diagram, node, diffX, diffY);
+						diagramView.requestScreenTransformUpdate();
+						diagramView.repaint();
+						super.redo();
+					}
+					
+					public String getPresentationName() {
+						return SetMovementEventListener.this.getPresentationName();
+					}
+				});
+			}
+		}
         diagramView.repaint();
     }
 
@@ -60,4 +104,6 @@ public abstract class SetMovementEventListener implements EventBrokerListener {
     }
 
     protected abstract boolean isPartOfSet(DiagramNode node, DiagramNode otherNode);
+    
+    protected abstract String getPresentationName();
 }

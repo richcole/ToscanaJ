@@ -13,4 +13,8 @@ public class FilterMovementEventListener extends SetMovementEventListener {
     protected boolean isPartOfSet(DiagramNode node, DiagramNode otherNode) {
         return node.getConcept().hasSuperConcept(otherNode.getConcept());
     }
+
+	protected String getPresentationName() {
+		return "Filter Movement";
+	}
 }

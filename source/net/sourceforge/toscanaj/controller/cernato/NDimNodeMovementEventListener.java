@@ -16,18 +16,26 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import org.tockit.canvas.events.CanvasItemDroppedEvent;
+import org.tockit.canvas.events.CanvasItemPickupEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+
 public class NDimNodeMovementEventListener implements EventBrokerListener {
+    private Point2D startPosition;
+
     public void processEvent(Event e) {
         CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
         NodeView nodeView = (NodeView) dragEvent.getSubject();
-        DiagramView diagramView = nodeView.getDiagramView();
-        NDimDiagram diagram = (NDimDiagram) diagramView.getDiagram();
+        final DiagramView diagramView = nodeView.getDiagramView();
+        final NDimDiagram diagram = (NDimDiagram) diagramView.getDiagram();
         DiagramNode node = nodeView.getDiagramNode();
         if (!(node instanceof NDimDiagramNode)) {
             throw new RuntimeException("NDimNodeMovementEventListener usable only for NDimDiagramNodes");
@@ -35,18 +43,54 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
         if (node.getConcept().getUpset().size() == 1) {
         	return; // we don't move the top node
         }
-        NDimDiagramNode ndimNode = (NDimDiagramNode) node;
-        Point2D toPos = dragEvent.getCanvasToPosition();
-        Point2D curPos = ndimNode.getPosition();
-        double diffX = toPos.getX() - curPos.getX();
-        double diffY = toPos.getY() - curPos.getY();
+        final NDimDiagramNode ndimNode = (NDimDiagramNode) node;
+        final Point2D toPosition = dragEvent.getCanvasToPosition();
+        Point2D curPosition = ndimNode.getPosition();
+
+        if(e instanceof CanvasItemPickupEvent) {
+			this.startPosition = curPosition;
+		}
+		
+        double diffX = toPosition.getX() - curPosition.getX();
+        double diffY = toPosition.getY() - curPosition.getY();
         moveNodes(diagram, ndimNode, diffX, diffY);
         if(!diagram.isHasseDiagram()) {
             moveNodes(diagram, ndimNode, -diffX, -diffY);
         }
         if (dragEvent instanceof CanvasItemDroppedEvent) {
-            diagramView.requestScreenTransformUpdate();
-        }
+			// on drop we update the screen transform ...
+			diagramView.requestScreenTransformUpdate();
+
+		    // ... and add an edit to the undo manager if we find one.
+		    UndoManager undoManager = diagramView.getUndoManager();
+			if (undoManager != null) {
+				// make a copy of the current start position
+				final Point2D undoPosition = this.startPosition;
+				undoManager.addEdit(new AbstractUndoableEdit() {
+					public void undo() throws CannotUndoException {
+			            double diffX = undoPosition.getX() - toPosition.getX();
+			            double diffY = undoPosition.getY() - toPosition.getY();
+						moveNodes(diagram, ndimNode, diffX, diffY);
+						diagramView.requestScreenTransformUpdate();
+						diagramView.repaint();
+						super.undo();
+					}
+
+					public void redo() throws CannotRedoException {
+			            double diffX = toPosition.getX() - undoPosition.getX();
+			            double diffY = toPosition.getY() - undoPosition.getY();
+						moveNodes(diagram, ndimNode, diffX, diffY);
+						diagramView.requestScreenTransformUpdate();
+						diagramView.repaint();
+						super.redo();
+					}
+					
+					public String getPresentationName() {
+						return "Attribute Additive Movement";
+					}
+				});
+			}
+		}
         diagramView.repaint();
     }
 
