@@ -482,6 +482,7 @@ public class ElbaMainPanel
 		newSchemaActivity.setTestNewOkActivity(testSchemaSavedActivity);
 		newSchemaActivity.setPostNewActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
+            	currentFile = null;
                 showDatabaseConnectionDialog();
                 return databaseConnection.isConnected();
             }
