@@ -178,22 +178,16 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         return this.rect.getHeight();
     }
 
-    /**
-     * Return label x coordinate
-     */
-    public double getLabelX() {
-        return this.rect.getX();
-    }
-
-    /**
-     * Return label y coordinate
-     */
-    public double getLabelY() {
-        return this.rect.getY();
-    }
-
     public Point2D getPosition() {
-        return new Point2D.Double(getLabelX(), getLabelY());
+    	if( this.rect != null ) {
+        	return new Point2D.Double(this.rect.getX(), this.rect.getY());
+    	} else {
+    		return this.nodeView.getPosition();
+    	}
+    }
+    
+    public boolean isVisible() {
+    	return this.getNumberOfEntries() != 0;
     }
 
     /**
@@ -221,48 +215,25 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         FontMetrics fm = graphics.getFontMetrics();
 
         // find the size and position
-        DiagramNode node = this.labelInfo.getNode();
-        double x = node.getX();
-        double y = node.getY();
-        double radius = nodeView.getRadiusY();
-
-        // get the bounding rectangle
-        this.rect = getLabelBounds(graphics);
+        updateBounds(graphics);
         double xPos = rect.getX();
         double yPos = rect.getY();
         double lw = rect.getWidth();
         double lh = rect.getHeight();
-        if (getPlacement() == ABOVE) {
-            y = y - radius;
-        } else {
-            y = y + radius;
-        }
 
         // find colors to use
         DiagramSchema diagramSchema = diagramView.getDiagramSchema();
-        Color lineColor = diagramSchema.getLineColor();
         Color backgroundColor = this.labelInfo.getBackgroundColor();
         Color textColor = this.labelInfo.getTextColor();
         Color scrollbarColorDark = Color.gray;
         Color scrollbarColorLight = Color.lightGray;
         if (isFaded()) {
             // lighten
-            lineColor = diagramSchema.fadeOut(lineColor);
             backgroundColor = diagramSchema.fadeOut(backgroundColor);
             textColor = diagramSchema.fadeOut(textColor);
             scrollbarColorDark = diagramSchema.fadeOut(scrollbarColorDark);
             scrollbarColorLight = diagramSchema.fadeOut(scrollbarColorLight);
         }
-
-        // draw a dashed line from the given point to the calculated
-        Stroke oldStroke = graphics.getStroke();
-        float[] dashstyle = {4, 4};
-        graphics.setPaint(lineColor);
-        graphics.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT,
-                BasicStroke.JOIN_BEVEL, 1, dashstyle, 0));
-        graphics.draw(new Line2D.Double(x, y, xPos + lw / 2, y + this.labelInfo.getOffset().getY()));
-
-        graphics.setStroke(oldStroke);
 
         // draw the label itself
         this.rect = new Rectangle2D.Double(xPos, yPos, lw, lh);
@@ -318,7 +289,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
                 width = height;
             }
             // draw the upwards triangle
-            /// @todo find a way to use the double coordinate system
             double xleft = xPos + lw - this.scrollbarWidth + (this.scrollbarWidth - width) / 2;
             double ytop = yPos + (this.lineHeight - height) / 2;
 			
@@ -371,7 +341,41 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         graphics.setPaint(oldPaint);
     }
 
+    public void updateBounds(Graphics2D graphics) {
+        this.rect = getLabelBounds(graphics);
+    }
+    
+    Point2D getConnectorStartPosition() {
+        DiagramNode node = this.labelInfo.getNode();
+        double radius = nodeView.getRadiusY();
+        double x = node.getX();
+        double y = node.getY();
+        if (getPlacement() == ABOVE) {
+            y = y - radius;
+        } else {
+            y = y + radius;
+        }
+        return new Point2D.Double(x,y);
+    }
+    
+    Point2D getConnectorEndPosition() {
+    	double x = this.rect.getX();
+        double y = getConnectorStartPosition().getY();
+        double lw = rect.getWidth();
+    	return new Point2D.Double(x + lw / 2, y + this.labelInfo.getOffset().getY());
+    }
+
     protected abstract boolean isFaded();
+    
+    Color getConnectorColor() {
+        DiagramSchema diagramSchema = diagramView.getDiagramSchema();
+        Color lineColor = diagramSchema.getLineColor();
+    	if( isFaded() ) {
+    		return diagramSchema.fadeOut(lineColor);
+    	} else {
+    		return lineColor;
+    	}
+    }
 
     /**
      * Returns the placement of the label (above or below the node).
@@ -379,7 +383,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      * Possible return values are LabelView.ABOVE or LabelView.BELOW. This is
      * used to draw the labels in their appropriate position.
      */
-    abstract protected int getPlacement();
+    protected abstract int getPlacement();
 
     /**
      * Calculates the width of the label given a specific font metric.
@@ -654,5 +658,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
             ChangeObserver changeObserver = (ChangeObserver) iterator.next();
             changeObserver.update(this);
         }
+    }
+    
+    public NodeView getNodeView() {
+        return nodeView;
     }
 }

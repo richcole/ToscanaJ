@@ -188,8 +188,10 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
         addLayer("lines-0");
         addLayer("nodes-0");
+        addLayer("connectors-0");
         addLayer("lines-1");
         addLayer("nodes-1");
+        addLayer("connectors-1");
         addLayer("labels");
         addDiagram(diagram, conceptInterpretationContext, 0);
         requestScreenTransformUpdate();
@@ -217,6 +219,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
     private void addDiagram(Diagram2D diagram, ConceptInterpretationContext context, int layer) {
         String lineLayerName = "lines-" + layer;
         String nodeLayerName = "nodes-" + layer;
+        String labelConnectorLayerName = "connectors-" + layer;
         String labelLayerName = "labels";
         Hashtable nodeMap = new Hashtable();
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
@@ -242,12 +245,14 @@ public class DiagramView extends Canvas implements ChangeObserver {
             if (attrLabelInfo != null) {
                 LabelView labelView = new AttributeLabelView(this, nodeView, attrLabelInfo);
                 addCanvasItem(labelView, labelLayerName);
+                addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
                 labelView.addObserver(this);
             }
             LabelInfo objLabelInfo = diagram.getObjectLabel(i);
             if (objLabelInfo != null) {
                 LabelView labelView = new ObjectLabelView(this, nodeView, objLabelInfo);
                 addCanvasItem(labelView, labelLayerName);
+                addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
                 labelView.addObserver(this);
             }
         }
