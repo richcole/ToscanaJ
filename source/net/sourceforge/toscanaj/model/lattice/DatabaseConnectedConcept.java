@@ -46,8 +46,20 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
 
     /**
      * Stores the where clause for finding the object contingent in the database.
+     *
+     * This is only the part that comes from the current diagram, the rest is
+     * stored in a separate list to avoid duplication.
+     *
+     * @see filterClauses
      */
     private String objectClause = null;
+
+    /**
+     * Stores all clauses used to filter into the current concept.
+     *
+     * @see objectClause
+     */
+    private List filterClauses = new LinkedList();
 
     /**
      * The constructor always needs the DB connection and the information how
@@ -104,7 +116,13 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             else {
                 // we don't know the answer yet, ask DB
                 try {
-                    String query = this.dbInfo.getCountQuery() + " WHERE " + this.objectClause + ";";
+                    String query = this.dbInfo.getCountQuery() + " WHERE " + this.objectClause;
+                    Iterator iter = this.filterClauses.iterator();
+                    while (iter.hasNext()) {
+                        Object item = iter.next();
+                        query += " AND " + item;
+                    }
+                    query += ";";
                     this.numObjects = this.connection.queryNumber(query,1);
                 }
                 catch (DatabaseException e) {
@@ -139,7 +157,13 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             objects = new LinkedList();
             if( this.objectClause != null ) {
                 try {
-                    String query = this.dbInfo.getQuery() + " WHERE " + this.objectClause + ";";
+                    String query = this.dbInfo.getQuery() + " WHERE " + this.objectClause;
+                    Iterator iter = this.filterClauses.iterator();
+                    while (iter.hasNext()) {
+                        Object item = iter.next();
+                        query += " AND " + item;
+                    }
+                    query += ";";
                     objects = this.connection.queryColumn(query,1);
                 }
                 catch (DatabaseException e) {
@@ -174,27 +198,26 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             }
             else {
                 DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
-                String clause = this.objectClause;
-                Iterator it = otherDB.ideal.iterator();
+                retVal.objectClause = this.objectClause;
+                retVal.filterClauses.addAll(otherDB.filterClauses);
+                String newFilterClause = "(";
                 boolean first = true;
+                Iterator it = otherDB.ideal.iterator();
                 while(it.hasNext()) {
                     DatabaseConnectedConcept cur = (DatabaseConnectedConcept) it.next();
                     if(cur.objectClause == null) {
                         continue;
                     }
                     if(!first) {
-                        clause = clause + " OR ";
+                        newFilterClause = newFilterClause + " OR " ;
                     }
                     else {
-                        clause = clause + " AND (";
                         first = false;
                     }
-                    clause = clause + cur.objectClause;
+                    newFilterClause = newFilterClause + cur.objectClause;
                 }
-                if(!first) { // we had at least one clause
-                    clause = clause + ")";
-                }
-                retVal.setObjectClause(clause);
+                newFilterClause += ")";
+                retVal.filterClauses.add(newFilterClause);
             }
         }
         return retVal;
@@ -215,9 +238,39 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                 retVal.setObjectClause(null);
             }
             else {
-                retVal.setObjectClause("(" + this.objectClause + " AND " + otherDB.objectClause + ")");
+                retVal.setObjectClause(this.objectClause);
+                retVal.filterClauses.addAll(otherDB.filterClauses);
+                retVal.filterClauses.add(otherDB.objectClause);
             }
         }
+        return retVal;
+    }
+
+    /**
+     * Implements Concept.getCollapsedConcept().
+     */
+    public Concept getCollapsedConcept() {
+        DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo, this.connection);
+        retVal.attributeContingent.addAll(this.attributeContingent);
+        String clause = "(";
+        boolean first = true;
+        Iterator iter = this.ideal.iterator();
+        while (iter.hasNext()) {
+            DatabaseConnectedConcept item = (DatabaseConnectedConcept)iter.next();
+            if(item.objectClause == null) {
+                continue;
+            }
+            if(first) {
+                clause += item.objectClause;
+                first = false;
+            }
+            else {
+                clause += " OR " + item.objectClause;
+            }
+        }
+        clause += ")";
+        retVal.setObjectClause(clause);
+        retVal.filterClauses.addAll(this.filterClauses);
         return retVal;
     }
 }

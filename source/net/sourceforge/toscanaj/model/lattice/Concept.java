@@ -137,6 +137,14 @@ public interface Concept {
     Concept filterByContingent(Concept other);
 
     /**
+     * Returns a cocept which represent a concept with the same extent and intent
+     * but without having any neighbours.
+     *
+     * Basically this collapses the ideal of the concept into a single concept.
+     */
+    Concept getCollapsedConcept();
+
+    /**
      * Returns true iff this is the top concept.
      */
     boolean isTop();

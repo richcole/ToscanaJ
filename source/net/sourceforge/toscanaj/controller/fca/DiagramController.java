@@ -534,7 +534,7 @@ public class DiagramController implements ChangeObservable {
                 filter = curZC.filterByContingent(filter);
             }
             else {
-                filter = curZC.filterByExtent(filter);
+                filter = curZC.getCollapsedConcept().filterByExtent(filter);
             }
         }
         Hashtable nodeMap = new Hashtable();

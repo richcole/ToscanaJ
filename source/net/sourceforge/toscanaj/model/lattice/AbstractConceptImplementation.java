@@ -426,4 +426,35 @@ public abstract class AbstractConceptImplementation implements Concept
     public boolean hasSubConcept(Concept concept) {
         return this.ideal.contains(concept);
     }
+
+    /**
+     * For debugging purposes.
+     */
+    public String toString() {
+        String retVal = "Object Contingent (" + this.getObjectContingentSize() + "):\n";
+        Iterator iter = this.getObjectContingentIterator();
+        while (iter.hasNext()) {
+            Object item = iter.next();
+            retVal = retVal + "- " + item.toString() + "\n";
+        }
+        retVal = retVal + "Attribute Contingent (" + this.getAttributeContingentSize() + "):\n";
+        iter = this.getAttributeContingentIterator();
+        while (iter.hasNext()) {
+            Object item = iter.next();
+            retVal = retVal + "- " + item.toString() + "\n";
+        }
+        retVal = retVal + "Extent (" + this.getExtentSize() + "):\n";
+        iter = this.getExtentIterator();
+        while (iter.hasNext()) {
+            Object item = iter.next();
+            retVal = retVal + "- " + item.toString() + "\n";
+        }
+        retVal = retVal + "Intent (" + this.getIntentSize() + "):\n";
+        iter = this.getIntentIterator();
+        while (iter.hasNext()) {
+            Object item = iter.next();
+            retVal = retVal + "- " + item.toString() + "\n";
+        }
+        return retVal;
+    }
 }

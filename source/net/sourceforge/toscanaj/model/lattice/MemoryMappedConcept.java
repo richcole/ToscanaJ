@@ -120,4 +120,18 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
         retVal.attributeContingent.addAll(this.attributeContingent);
         return retVal;
     }
+
+    /**
+     * Implements Concept.getCollapsedConcept().
+     */
+    public Concept getCollapsedConcept() {
+        MemoryMappedConcept retVal = new MemoryMappedConcept();
+        Iterator it = this.getExtentIterator();
+        while(it.hasNext()) {
+            Object cur = it.next();
+            retVal.addObject(cur);
+        }
+        retVal.attributeContingent.addAll(this.attributeContingent);
+        return retVal;
+    }
 }
