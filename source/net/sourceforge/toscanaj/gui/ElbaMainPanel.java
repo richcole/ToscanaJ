@@ -118,7 +118,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     private SaveFileAction saveAsFileAction;
     private List scaleGenerators;
     private JButton newDiagramButton;
-    private JPanel toolbar;
+    private JToolBar toolbar;
     private SaveConceptualSchemaActivity saveActivity;
     private DiagramExportSettings diagramExportSettings;
     private ExportDiagramAction exportDiagramAction;
@@ -185,19 +185,15 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
-	/**
-	 * @todo wondering if it would be simpler to use JToolBar instead of JPanel with
-	 * GridBagLayout....
-	 */
     public void createViews() {
-        JPanel mainView = new JPanel(new GridBagLayout());
+        JPanel mainView = new JPanel(new BorderLayout());
         connectionInformationView =
             new DatabaseConnectionInformationView(
                 this,
                 conceptualSchema,
                 eventBroker);
         schemaDescriptionView = new XMLEditorDialog(this, "System description");
-        toolbar = new JPanel(new GridBagLayout());
+        toolbar = new JToolBar();
         newDiagramButton = new JButton("New Diagram...");
         newDiagramButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -224,64 +220,9 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             }
         });
 
-        toolbar.add(
-            newDiagramButton,
-            new GridBagConstraints(
-                0,
-                0,
-                1,
-                1,
-                0,
-                0,
-                GridBagConstraints.NORTHWEST,
-                GridBagConstraints.NONE,
-                new Insets(5, 1, 1, 1),
-                2,
-                2));
-
-        toolbar.add(
-            schemaDescriptionButton,
-            new GridBagConstraints(
-                1,
-                0,
-                1,
-                1,
-                0,
-                0,
-                GridBagConstraints.NORTHWEST,
-                GridBagConstraints.NONE,
-                new Insets(5, 1, 1, 1),
-                2,
-                2));
-
-        toolbar.add(
-            databaseConnectionButton,
-            new GridBagConstraints(
-                2,
-                0,
-                1,
-                1,
-                0,
-                0,
-                GridBagConstraints.NORTHWEST,
-                GridBagConstraints.NONE,
-                new Insets(5, 1, 1, 1),
-                2,
-                2));
-        toolbar.add(
-            new JPanel(),
-            new GridBagConstraints(
-                3,
-                0,
-                1,
-                1,
-                1,
-                1,
-                GridBagConstraints.NORTHWEST,
-                GridBagConstraints.HORIZONTAL,
-                new Insets(1, 1, 1, 1),
-                2,
-                2));
+        toolbar.add(newDiagramButton);
+        toolbar.add(schemaDescriptionButton);
+        toolbar.add(databaseConnectionButton);
 
         diagramEditingView =
             new DiagramEditingView(this, conceptualSchema, eventBroker);
@@ -301,34 +242,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             CanvasItemContextMenuRequestEvent.class,
             SqlClauseLabelView.getFactory().getLabelClass());
 
-        mainView.add(
-            toolbar,
-            new GridBagConstraints(
-                0,
-                0,
-                1,
-                1,
-                1.0,
-                0,
-                GridBagConstraints.NORTHWEST,
-                GridBagConstraints.HORIZONTAL,
-                new Insets(2, 2, 2, 2),
-                2,
-                2));
-        mainView.add(
-            diagramEditingView,
-            new GridBagConstraints(
-                0,
-                1,
-                1,
-                1,
-                1,
-                1,
-                GridBagConstraints.WEST,
-                GridBagConstraints.BOTH,
-                new Insets(2, 2, 2, 2),
-                2,
-                2));
+        mainView.add(toolbar,BorderLayout.NORTH);
+        mainView.add(diagramEditingView,BorderLayout.CENTER);
         setContentPane(mainView);
     }
 
