@@ -8,6 +8,8 @@ import java.awt.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * class DiagramLine draws a line between two points
@@ -41,17 +43,18 @@ public class LineView extends CanvasItem {
         Point2D to = diagramLine.getToPosition();
         Paint oldPaint = graphics.getPaint();
         Stroke oldStroke = graphics.getStroke();
+        int selectionLineWidth = diagramSchema.getSelectionLineWidth();
         if(this.selectionState == NodeView.NO_SELECTION) {
             graphics.setPaint(diagramSchema.getLineColor());
             graphics.setStroke(new BasicStroke(1));
         }
         else if(this.selectionState == NodeView.SELECTED_IDEAL) {
             graphics.setPaint(diagramSchema.getCircleIdealColor());
-            graphics.setStroke(new BasicStroke(NodeView.selectionSize));
+            graphics.setStroke(new BasicStroke(selectionLineWidth));
         }
         else if(this.selectionState == NodeView.SELECTED_FILTER) {
             graphics.setPaint(diagramSchema.getCircleFilterColor());
-            graphics.setStroke(new BasicStroke(NodeView.selectionSize));
+            graphics.setStroke(new BasicStroke(selectionLineWidth));
         }
         else if(this.selectionState == NodeView.NOT_SELECTED) {
             graphics.setPaint(diagramSchema.fadeOut(diagramSchema.getLineColor()));
@@ -100,20 +103,24 @@ public class LineView extends CanvasItem {
      *
      * @see NodeView.setSelectedConcept(Concept)
      */
-    public void setSelectedConcept(Concept concept) {
-        if(concept == null) {
+    public void setSelectedConcepts(List concepts) {
+        if((concepts == null) || (concepts.size() == 0)) {
             this.selectionState = NodeView.NO_SELECTION;
             return;
         }
-        Concept from = this.diagramLine.getFromNode().getConcept();
-        if((from == concept) || (from.hasSuperConcept(concept)) ) {
-            this.selectionState = NodeView.SELECTED_IDEAL;
-            return;
-        }
-        Concept to = this.diagramLine.getToNode().getConcept();
-        if((to == concept) || (to.hasSubConcept(concept)) ) {
-            this.selectionState = NodeView.SELECTED_FILTER;
-            return;
+        Iterator it = concepts.iterator();
+        while(it.hasNext()) {
+            Concept concept = (Concept) it.next();
+            Concept from = this.diagramLine.getFromNode().getConcept();
+            if((from == concept) || (from.hasSuperConcept(concept)) ) {
+                this.selectionState = NodeView.SELECTED_IDEAL;
+                return;
+            }
+            Concept to = this.diagramLine.getToNode().getConcept();
+            if((to == concept) || (to.hasSubConcept(concept)) ) {
+                this.selectionState = NodeView.SELECTED_FILTER;
+                return;
+            }
         }
         this.selectionState = NodeView.NOT_SELECTED;
         return;

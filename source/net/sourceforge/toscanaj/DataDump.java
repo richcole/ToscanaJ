@@ -184,13 +184,15 @@ public class DataDump {
                 newNode = new DiagramNode( oldNode.getPosition(),
                                            oldNode.getConcept(),
                                            oldNode.getAttributeLabelInfo(),
-                                           oldNode.getObjectLabelInfo() );
+                                           oldNode.getObjectLabelInfo(),
+                                           null);
             }
             else {
                 newNode = new DiagramNode( oldNode.getPosition(),
                                            oldNode.getConcept().filterByContingent(filterConcept),
                                            oldNode.getAttributeLabelInfo(),
-                                           oldNode.getObjectLabelInfo() );
+                                           oldNode.getObjectLabelInfo(),
+                                           null);
             }
             retVal.addNode(newNode);
             nodeMap.put(oldNode,newNode);

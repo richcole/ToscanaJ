@@ -9,13 +9,15 @@ import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class paints a diagram defined by the SimpleLineDiagram class.
@@ -233,24 +235,18 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         repaint();
     }
 
-    /**
-     * Sets the selected concept.
-     *
-     * The selected concept and its filter and ideal will be highlighted on
-     * drawing. If the parameter is set to null highlighting will be dropped.
-     */
-    public void setSelectedConcept(Concept concept) {
+    public void setSelectedConcepts(List concepts) {
         // notify all nodes and lines
         Iterator it = this.canvasItems.iterator();
         while (it.hasNext()) {
             CanvasItem cur = (CanvasItem) it.next();
             if (cur instanceof NodeView) {
                 NodeView nv = (NodeView) cur;
-                nv.setSelectedConcept(concept);
+                nv.setSelectedConcepts(concepts);
             }
             if (cur instanceof LineView) {
                 LineView lv = (LineView) cur;
-                lv.setSelectedConcept(concept);
+                lv.setSelectedConcepts(concepts);
             }
         }
         repaint();
@@ -279,6 +275,6 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
      * Overwrites DrawingCanvas.backgroundSingleClicked(Point2D) to erase the highlighting.
      */
     protected void backgroundSingleClicked(Point2D point) {
-        this.setSelectedConcept(null);
+        this.setSelectedConcepts(null);
     }
 }

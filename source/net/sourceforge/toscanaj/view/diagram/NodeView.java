@@ -6,10 +6,17 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * class DiagramNode holds details on node position and size
@@ -40,11 +47,6 @@ public class NodeView extends CanvasItem {
      * Node displays a concept in the ideal of the currently selected concept.
      */
     static final public int SELECTED_IDEAL = 4;
-
-    /**
-     * The size of the circles around selected nodes.
-     */
-    static public int selectionSize = 3;
 
     /**
      * Store the node model for this view
@@ -115,17 +117,18 @@ public class NodeView extends CanvasItem {
             nodeColor = diagramSchema.getGradientColor(calculateRelativeSize(diagramSchema));
         }
         Stroke oldStroke = graphics.getStroke();
+        int selectionLineWidth = diagramSchema.getSelectionLineWidth();
         if(this.selectionState != NO_SELECTION) {
             if(this.selectionState == SELECTED_DIRECTLY) {
-                graphics.setStroke(new BasicStroke(this.selectionSize));
+                graphics.setStroke(new BasicStroke(selectionLineWidth));
                 circleColor = diagramSchema.getCircleSelectionColor();
             }
             else if(this.selectionState == SELECTED_IDEAL) {
-                graphics.setStroke(new BasicStroke(this.selectionSize));
+                graphics.setStroke(new BasicStroke(selectionLineWidth));
                 circleColor = diagramSchema.getCircleIdealColor();
             }
             else if(this.selectionState == SELECTED_FILTER) {
-                graphics.setStroke(new BasicStroke(this.selectionSize));
+                graphics.setStroke(new BasicStroke(selectionLineWidth));
                 circleColor = diagramSchema.getCircleFilterColor();
             }
             else if(this.selectionState == NOT_SELECTED) {
@@ -201,7 +204,17 @@ public class NodeView extends CanvasItem {
      * Selects the diagam view of the selected concept.
      */
     public void singleClicked(Point2D point) {
-        this.diagramView.setSelectedConcept(this.diagramNode.getConcept());
+        List conceptList = new ArrayList();
+        DiagramNode node = this.diagramNode;
+        if( node instanceof NestedDiagramNode ) {
+            NestedDiagramNode ndNode = (NestedDiagramNode) node;
+            node = ndNode.getInnerDiagram().getNode(0);
+        }
+        while( node != null ) {
+            conceptList.add(node.getConcept());
+            node = node.getOuterNode();
+        }
+        this.diagramView.setSelectedConcepts(conceptList);
     }
 
     /**
@@ -228,22 +241,26 @@ public class NodeView extends CanvasItem {
      *
      * @see #getSelectionState()
      */
-    public void setSelectedConcept(Concept concept) {
-        if(concept == null) {
+    public void setSelectedConcepts(List concepts) {
+        if((concepts == null) || (concepts.size() == 0)) {
             this.selectionState = NO_SELECTION;
             return;
         }
-        if(this.diagramNode.getConcept() == concept) {
-            this.selectionState = SELECTED_DIRECTLY;
-            return;
-        }
-        if(this.diagramNode.getConcept().hasSuperConcept(concept)) {
-            this.selectionState = SELECTED_IDEAL;
-            return;
-        }
-        if(this.diagramNode.getConcept().hasSubConcept(concept)) {
-            this.selectionState = SELECTED_FILTER;
-            return;
+        Iterator it = concepts.iterator();
+        while(it.hasNext()) {
+            Concept concept = (Concept) it.next();
+            if(this.diagramNode.getConcept() == concept) {
+                this.selectionState = SELECTED_DIRECTLY;
+                return;
+            }
+            if(this.diagramNode.getConcept().hasSuperConcept(concept)) {
+                this.selectionState = SELECTED_IDEAL;
+                return;
+            }
+            if(this.diagramNode.getConcept().hasSubConcept(concept)) {
+                this.selectionState = SELECTED_FILTER;
+                return;
+            }
         }
         this.selectionState = NOT_SELECTED;
         return;

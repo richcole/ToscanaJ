@@ -36,7 +36,8 @@ public class NestedDiagramNode extends DiagramNode {
                                         boolean dropAttributeLabels ) {
         super( new Point2D.Double(outerNode.getX()*scale, outerNode.getY()*scale),
                outerNode.getConcept(),
-               new LabelInfo(outerNode.getAttributeLabelInfo()), null);
+               new LabelInfo(outerNode.getAttributeLabelInfo()), null,
+               outerNode.getOuterNode());
         // scale attribute label position
         this.attributeLabel.setOffset(new Point2D.Double( this.attributeLabel.getOffset().getX() * scale,
                                                           this.attributeLabel.getOffset().getY() * scale ) );
@@ -61,7 +62,7 @@ public class NestedDiagramNode extends DiagramNode {
                 newAttrLabel = new LabelInfo(oldNode.getAttributeLabelInfo());
             }
             LabelInfo newObjLabel = new LabelInfo(oldNode.getObjectLabelInfo());
-            DiagramNode newNode = new DiagramNode(newPos, newConcept, newAttrLabel, newObjLabel);
+            DiagramNode newNode = new DiagramNode(newPos, newConcept, newAttrLabel, newObjLabel, this);
             nodeMap.put(oldNode,newNode);
             newDiag.addNode(newNode);
         }

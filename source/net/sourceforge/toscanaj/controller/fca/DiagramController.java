@@ -288,7 +288,8 @@ public class DiagramController implements ChangeObservable {
         return new DiagramNode(oldNode.getPosition(),
                 concept,
                 oldNode.getAttributeLabelInfo(),
-                oldNode.getObjectLabelInfo());
+                oldNode.getObjectLabelInfo(),
+                oldNode.getOuterNode());
     }
 
     private static void throwUnknownFilterError() {

@@ -345,7 +345,7 @@ public class CSXParser
                 }
 
                 // create the node
-                DiagramNode node = new DiagramNode(position,concept,attrLabel,objLabel);
+                DiagramNode node = new DiagramNode(position,concept,attrLabel,objLabel,null);
 
                 // put in into the diagram
                 diagram.addNode(node);

@@ -108,6 +108,8 @@ public class DiagramSchema {
      * @see #setGradientReference(int)
      */
     private int gradientReference = GRADIENT_REFERENCE_SCHEMA;
+    
+    private int selectionLineWidth = 3;
 
     /**
      * Default constructor.
@@ -148,6 +150,8 @@ public class DiagramSchema {
             System.err.println("Caught unknown gradient reference for DiagramSchema: " + propVal);
             System.err.println("-- using default");
         }
+        selectionLineWidth = ConfigurationManager.fetchInt("diagramSchema","selectionLineWidth",
+                                                           selectionLineWidth);
     }
 
     /**
@@ -264,6 +268,14 @@ public class DiagramSchema {
      */
     public int getGradientReference() {
         return this.gradientReference;
+    }
+
+    public int getSelectionLineWidth() {
+        return this.selectionLineWidth;
+    }
+
+    public void setSelectionLineWidth(int lineWidth) {
+        this.selectionLineWidth = lineWidth;
     }
 
     /**

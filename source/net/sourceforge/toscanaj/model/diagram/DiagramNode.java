@@ -43,14 +43,12 @@ public class DiagramNode {
      * The layout information for the attribute label.
      */
     protected LabelInfo objectLabel;
+    
+    protected DiagramNode outerNode;
 
-    /**
-     * Construct a node for a concept at a position with two labels attached.
-     *
-     * The labels can be null if there is no label in this position. The concept
-     * can be null if there is no concept realised for this node.
-     */
-    public DiagramNode(Point2D position, Concept concept, LabelInfo attributeLabel, LabelInfo objectLabel){
+    public DiagramNode(Point2D position, Concept concept, 
+                       LabelInfo attributeLabel, LabelInfo objectLabel,
+                       DiagramNode outerNode){
         this.position = position;
         this.concept = concept;
         this.attributeLabel = attributeLabel;
@@ -61,6 +59,11 @@ public class DiagramNode {
         if(objectLabel != null) {
             objectLabel.attachNode(this);
         }
+        this.outerNode = outerNode;
+    }
+    
+    public DiagramNode getOuterNode() {
+        return outerNode;
     }
 
     /**
