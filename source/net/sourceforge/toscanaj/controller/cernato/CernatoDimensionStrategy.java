@@ -30,7 +30,7 @@ public class CernatoDimensionStrategy implements DimensionCreationStrategy {
             this.criterion = criterion;
         }
         public Criterion getCriterion() {
-            return criterion;
+            return this.criterion;
         }
         public boolean isLesserThan(Ordered other) {
             if(other.getClass() != this.getClass()) {

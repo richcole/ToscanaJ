@@ -42,10 +42,10 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     }
 
     private void init() {
-        diagrams.clear();
-        currStartPosition = 0;
-        firstFutureDiagramPosition = 0;
-        nestingLevel = 0;
+        this.diagrams.clear();
+        this.currStartPosition = 0;
+        this.firstFutureDiagramPosition = 0;
+        this.nestingLevel = 0;
     }
 
     /**
@@ -64,11 +64,11 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
             if (!hasFutureDiagrams()) {
                 break; // nothing more to get
             }
-            firstFutureDiagramPosition++;
+            this.firstFutureDiagramPosition++;
             lastPos++;
         }
         while (lastPos > level) {
-            firstFutureDiagramPosition--;
+            this.firstFutureDiagramPosition--;
             lastPos--;
         }
         fireContentsChanged();
@@ -79,11 +79,11 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
 	 * Returns the number of diagrams nested in an outer diagram.
 	 */
     public int getNestingLevel() {
-        return nestingLevel;
+        return this.nestingLevel;
     }
 
     public boolean hasPastDiagrams() {
-        return currStartPosition > 0;
+        return this.currStartPosition > 0;
     }
 
 
@@ -91,7 +91,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
      * Implements AbstractListModel.getSize().
      */
     public int getSize() {
-        return diagrams.size();
+        return this.diagrams.size();
     }
 
 
@@ -114,7 +114,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
      * Returns true if the diagram is in the list of visited diagrams.
      */
     public boolean isInPast(int elementPosition) {
-        return (elementPosition < currStartPosition) && (elementPosition >= 0);
+        return (elementPosition < this.currStartPosition) && (elementPosition >= 0);
     }
 
     /**
@@ -150,20 +150,20 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     }
 
     public boolean hasFutureDiagrams() {
-        return getSize() > firstFutureDiagramPosition;
+        return getSize() > this.firstFutureDiagramPosition;
     }
 
 
     public int getNumberOfCurrentDiagrams() {
-        return firstFutureDiagramPosition - currStartPosition;
+        return this.firstFutureDiagramPosition - this.currStartPosition;
     }
 
     public int getFirstCurrentDiagramPosition() {
-        return currStartPosition;
+        return this.currStartPosition;
     }
 
     public Diagram2D getCurrentDiagram(int pos) {
-        final int elementPosition = currStartPosition + pos;
+        final int elementPosition = this.currStartPosition + pos;
         if (isInCurrent(elementPosition)) {
             return getReferenceAt(elementPosition).getDiagram();
         }
@@ -205,7 +205,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     }
 
     private boolean isFirstFutureDiagram(int newDiagramIndex) {
-        return firstFutureDiagramPosition == newDiagramIndex;
+        return this.firstFutureDiagramPosition == newDiagramIndex;
     }
 
     public void removeLastDiagram() {
@@ -214,12 +214,12 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         }
         final int lastPosition = getSize() - 1;
         if (isInCurrent(lastPosition)) {
-            firstFutureDiagramPosition--;
-            if (currStartPosition >= firstFutureDiagramPosition) {
-                currStartPosition = Math.max(firstFutureDiagramPosition - 1, 0);
+            this.firstFutureDiagramPosition--;
+            if (this.currStartPosition >= this.firstFutureDiagramPosition) {
+                this.currStartPosition = Math.max(this.firstFutureDiagramPosition - 1, 0);
             }
         }
-        diagrams.remove(lastPosition);
+        this.diagrams.remove(lastPosition);
         fireIntervalRemoved(getSize(), getSize());
         notifyObservers();
     }
@@ -231,8 +231,8 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         if (isInPast(from) || isInPast(to)) {
             throw new RuntimeException("Trying to change past");
         }
-        Object item = diagrams.remove(from);
-        diagrams.add(to, item);
+        Object item = this.diagrams.remove(from);
+        this.diagrams.add(to, item);
         fireIntervalRemoved(getSize(), getSize());
         notifyObservers();
     }
@@ -264,12 +264,12 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         if (!canPerformNext()) {
             throw new RuntimeException("No next diagram to go to");
         }
-        getReferenceAt(currStartPosition).setFilterConcept(zoomedConcept);
+        getReferenceAt(this.currStartPosition).setFilterConcept(zoomedConcept);
         if (shouldChangeCurrentStartDiagram()) {
-            currStartPosition++;
+            this.currStartPosition++;
         }
         if (hasFutureDiagrams()) {
-            firstFutureDiagramPosition++;
+            this.firstFutureDiagramPosition++;
         }
 
         fireContentsChanged();
@@ -277,19 +277,19 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     }
 
     private boolean shouldChangeCurrentStartDiagram() {
-        return currStartPosition > 0 || (getNumberOfCurrentDiagrams() > getNestingLevel());
+        return this.currStartPosition > 0 || (getNumberOfCurrentDiagrams() > getNestingLevel());
     }
 
     public void back() {
-        if (firstFutureDiagramPosition <= 0) {
+        if (this.firstFutureDiagramPosition <= 0) {
             throw new NoSuchElementException("No diagram left to go back to.");
         }
         int lastPos = getNumberOfCurrentDiagrams() - 1;
         if (lastPos == getNestingLevel()) { // we have our nesting level
-            firstFutureDiagramPosition--;
+            this.firstFutureDiagramPosition--;
         }
         if (hasPastDiagrams()) {
-            currStartPosition--;
+            this.currStartPosition--;
             // we have something to go back to, otherwise we just lose nesting
         }
         fireContentsChanged();
@@ -333,7 +333,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     protected void notifyObservers() {
         // avoid stupid ConcurrentModificationExceptions by operating on copy of list
         List observerCopy = CollectionFactory.createDefaultList();
-        observerCopy.addAll(observers);
+        observerCopy.addAll(this.observers);
         while (!observerCopy.isEmpty()) {
             ChangeObserver observer = (ChangeObserver) observerCopy.remove(0);
             observer.update(this);
@@ -410,9 +410,9 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
 			throw new RuntimeException("Trying to change past");
 		}
 
-		diagrams.add(index, new DiagramReference(diagram2D, null));
+		this.diagrams.add(index, new DiagramReference(diagram2D, null));
 		if (getNumberOfCurrentDiagrams() <= getNestingLevel() && isFirstFutureDiagram(index)) {
-			firstFutureDiagramPosition++;
+			this.firstFutureDiagramPosition++;
 			notifyObservers();
 		}
 		fireIntervalAdded(index, index);

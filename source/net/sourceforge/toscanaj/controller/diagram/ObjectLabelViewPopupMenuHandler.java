@@ -86,7 +86,7 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
         // create the menu
         JPopupMenu popupMenu = new JPopupMenu();
         if (numberOfQueries != 0) {
-            addQueryOptions(queries, labelView, popupMenu);
+            addQueryOptions(labelView, popupMenu);
         }
 		if (object instanceof DatabaseRetrievedObject) {
 			final DatabaseRetrievedObject dbObject =
@@ -113,7 +113,7 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
                     try {
 					    DatabaseViewerManager.showObjectList(objectListViewName, object);
                     } catch (Throwable t) {
-                        ErrorDialog.showError(diagramView, t, "Database View Failed", "Opening the database view failed.");
+                        ErrorDialog.showError(ObjectLabelViewPopupMenuHandler.this.diagramView, t, "Database View Failed", "Opening the database view failed.");
                     }
                 }
             });
@@ -134,7 +134,7 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
                 	try {
                     	DatabaseViewerManager.showObject(objectViewName, object);
                 	} catch (Throwable t) {
-                		ErrorDialog.showError(diagramView, t, "Database View Failed", "Opening the database view failed.");
+                		ErrorDialog.showError(ObjectLabelViewPopupMenuHandler.this.diagramView, t, "Database View Failed", "Opening the database view failed.");
                 	}
                 }
             });
@@ -143,10 +143,10 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
         popupMenu.add(objectViewMenu);
     }
 
-    private void addQueryOptions(List queries, final ObjectLabelView labelView, JPopupMenu popupMenu) {
+    private void addQueryOptions(final ObjectLabelView labelView, JPopupMenu popupMenu) {
         JRadioButtonMenuItem menuItem;
         JMenu queryMenu = new JMenu("Change label");
-        Iterator it = queries.iterator();
+        Iterator it = this.queries.iterator();
         while (it.hasNext()) {
             final Query query = (Query) it.next();
             menuItem = new JRadioButtonMenuItem(query.getName(), query.equals(labelView.getQuery()));

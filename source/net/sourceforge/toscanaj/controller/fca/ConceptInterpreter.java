@@ -44,7 +44,9 @@ public interface ConceptInterpreter {
 	public static final String CONCEPT_INTERPRETER_ELEMENT_NAME = "conceptInterpreter";
 	public static final String CONCEPT_INTERPRETER_CLASS_ATTRIBUTE = "class";
 
-    public static class IntervalType {}
+    public static class IntervalType {
+    	// nothing to declare
+    }
     public static final IntervalType INTERVAL_TYPE_FIXED = new IntervalType();
     public static final IntervalType INTERVAL_TYPE_CONTINGENT = new IntervalType();
     public static final IntervalType INTERVAL_TYPE_EXTENT = new IntervalType();

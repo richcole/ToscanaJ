@@ -46,14 +46,14 @@ public class GantersAlgorithm implements LatticeGenerator {
      * Maps the relation into a BitSet array, assuming the members "objects"
      * and "attributes" are set.
      */
-	private BitSet[] createRelation(BinaryRelation relation) {
+	private BitSet[] createRelation(BinaryRelation inputRelation) {
         BitSet[] retVal = new BitSet[this.objects.length];
         for (int i = 0; i < this.objects.length; i++) {
             Object object = this.objects[i];
 			BitSet derivation = new BitSet(this.attributes.length);
             for (int j = 0; j < this.attributes.length; j++) {
                 Object attribute = this.attributes[j];
-				if(relation.contains(object, attribute)) {
+				if(inputRelation.contains(object, attribute)) {
 					derivation.set(j);
                 }
 			}
@@ -149,7 +149,7 @@ public class GantersAlgorithm implements LatticeGenerator {
         extent = createClosure(extent);
         this.extents.add(extent);
         do {
-            for (int i = objects.length - 1; i >= 0; i--) {
+            for (int i = this.objects.length - 1; i >= 0; i--) {
                 BitSet newExtent = calculateNewExtent(extent, i);
                 if (iLargerThan(newExtent, extent, i)) {
                     this.extents.add(newExtent);
@@ -157,11 +157,11 @@ public class GantersAlgorithm implements LatticeGenerator {
                     break;
                 }
             }
-        } while (extent.cardinality() != objects.length);
+        } while (extent.cardinality() != this.objects.length);
     }
 
     private void createConcepts(LatticeImplementation lattice) {
-        for (Iterator iterator = extents.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = this.extents.iterator(); iterator.hasNext();) {
             ConceptImplementation concept = new ConceptImplementation();
             BitSet extent = (BitSet) iterator.next();
             for (int i = 0; i < this.objects.length; i++) {
@@ -229,7 +229,7 @@ public class GantersAlgorithm implements LatticeGenerator {
     			}
             }
 		}
-        intents.put(retVal, intent);
+        this.intents.put(retVal, intent);
         return retVal;
     }
 }

@@ -68,18 +68,18 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
 				final Point2D undoPosition = this.startPosition;
 				undoManager.addEdit(new AbstractUndoableEdit() {
 					public void undo() throws CannotUndoException {
-			            double diffX = undoPosition.getX() - toPosition.getX();
-			            double diffY = undoPosition.getY() - toPosition.getY();
-						moveNodes(diagram, ndimNode, diffX, diffY);
+			            double undoDiffX = undoPosition.getX() - toPosition.getX();
+			            double undoDiffY = undoPosition.getY() - toPosition.getY();
+						moveNodes(diagram, ndimNode, undoDiffX, undoDiffY);
 						diagramView.requestScreenTransformUpdate();
 						diagramView.repaint();
 						super.undo();
 					}
 
 					public void redo() throws CannotRedoException {
-			            double diffX = toPosition.getX() - undoPosition.getX();
-			            double diffY = toPosition.getY() - undoPosition.getY();
-						moveNodes(diagram, ndimNode, diffX, diffY);
+			            double undoDiffX = toPosition.getX() - undoPosition.getX();
+			            double undoDiffY = toPosition.getY() - undoPosition.getY();
+						moveNodes(diagram, ndimNode, undoDiffX, undoDiffY);
 						diagramView.requestScreenTransformUpdate();
 						diagramView.repaint();
 						super.redo();

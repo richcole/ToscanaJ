@@ -70,12 +70,12 @@ public class AttributeEditingLabelViewPopupMenuHandler implements EventBrokerLis
 		final String currentValue =  attribute.getData().toString();
 		renameAttrMenuItem.addActionListener(new ActionListener () {
 			public void actionPerformed(ActionEvent event) {
-				InputTextDialog dialog = new InputTextDialog(JOptionPane.getFrameForComponent(diagramView), 
+				InputTextDialog dialog = new InputTextDialog(JOptionPane.getFrameForComponent(AttributeEditingLabelViewPopupMenuHandler.this.diagramView), 
 														     "Rename Attribute", "attribute", currentValue);
 				if (!dialog.isCancelled()) {
 					String newValue = dialog.getInput();
 					attribute.setData(newValue);
-					diagramView.repaint();
+					AttributeEditingLabelViewPopupMenuHandler.this.diagramView.repaint();
 				}
 			}
 		});

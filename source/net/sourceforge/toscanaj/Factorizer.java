@@ -67,12 +67,12 @@ public class Factorizer {
 			LatticeGenerator lgen = new GantersAlgorithm();
 					
 			Context context1 = makeContextCopy(fullContext);
-			context1.getAttributes().retainAll(attributes);
+			context1.getAttributes().retainAll(this.attributes);
 			Lattice lattice1 = lgen.createLattice(context1);
 			this.firstFactor = NDimLayoutOperations.createDiagram(lattice1, fullContext.getName(), new DefaultDimensionStrategy());
 					
 			Context context2 = makeContextCopy(fullContext);
-			context2.getAttributes().removeAll(attributes);
+			context2.getAttributes().removeAll(this.attributes);
 			Lattice lattice2 = lgen.createLattice(context2);
 			this.secondFactor = NDimLayoutOperations.createDiagram(lattice2, fullContext.getName(), new DefaultDimensionStrategy());
 
@@ -84,9 +84,9 @@ public class Factorizer {
 		}
 		
 		public String toString() {
-			int numOuterConcepts = firstFactor.getNumberOfNodes();
-			int numInnerConcepts = secondFactor.getNumberOfNodes();
-			return attributes.toString() + " (" + numOuterConcepts + "*" + 
+			int numOuterConcepts = this.firstFactor.getNumberOfNodes();
+			int numInnerConcepts = this.secondFactor.getNumberOfNodes();
+			return this.attributes.toString() + " (" + numOuterConcepts + "*" + 
 														   numInnerConcepts + "=" +
 														   numOuterConcepts * numInnerConcepts + ")";
 		}
@@ -158,9 +158,9 @@ public class Factorizer {
 				NDimNodeMovementEventListener nodeListener = new NDimNodeMovementEventListener();
 				Factorization currentFactorization;
 				public void processEvent(Event e) {
-					nodeListener.processEvent(e);
-					currentFactorization.updateNestedDiagram();
-					nestedDiagramView.showDiagram(currentFactorization.nestedDiagram);
+					this.nodeListener.processEvent(e);
+					this.currentFactorization.updateNestedDiagram();
+					nestedDiagramView.showDiagram(this.currentFactorization.nestedDiagram);
 				}
 			}
 			MoveAndUpdateListener moveAndUpdateListener = new MoveAndUpdateListener();
@@ -169,9 +169,9 @@ public class Factorizer {
 				this.moveAndUpdateListener.currentFactorization = factorization;
 				
 				firstDiagramView.showDiagram(factorization.firstFactor);
-				firstDiagramView.getController().getEventBroker().subscribe(moveAndUpdateListener, CanvasItemDraggedEvent.class, NodeView.class);
+				firstDiagramView.getController().getEventBroker().subscribe(this.moveAndUpdateListener, CanvasItemDraggedEvent.class, NodeView.class);
 				secondDiagramView.showDiagram(factorization.secondFactor);
-				secondDiagramView.getController().getEventBroker().subscribe(moveAndUpdateListener, CanvasItemDraggedEvent.class, NodeView.class);
+				secondDiagramView.getController().getEventBroker().subscribe(this.moveAndUpdateListener, CanvasItemDraggedEvent.class, NodeView.class);
 				nestedDiagramView.showDiagram(factorization.nestedDiagram);
 			}
 		});

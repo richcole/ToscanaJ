@@ -51,7 +51,7 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
 				return 0;
 			}
 			DatabaseConnection connection = DatabaseConnection.getConnection();
-			String statement = "SELECT count(*) FROM " + databaseInfo.getTable().getSqlExpression() + " " + whereClause + ";";
+			String statement = "SELECT count(*) FROM " + this.databaseInfo.getTable().getSqlExpression() + " " + whereClause + ";";
 			return connection.queryInt(statement, 1);
 		} catch (DatabaseException e) {
 			throw new RuntimeException("Error querying the database", e);

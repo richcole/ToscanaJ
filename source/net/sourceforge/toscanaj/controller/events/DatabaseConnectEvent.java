@@ -21,11 +21,11 @@ public class DatabaseConnectEvent implements Event {
     }
 
     public Object getSubject() {
-        return source;
+        return this.source;
     }
 
     public DatabaseInfo getInfo() {
-        return info;
+        return this.info;
     }
 
     public void setInfo(DatabaseInfo info) {

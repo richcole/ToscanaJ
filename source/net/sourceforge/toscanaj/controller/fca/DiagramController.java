@@ -49,7 +49,7 @@ public class DiagramController implements ChangeObservable {
      * This starts with zero (flat, non-nested diagram).
      */
     public void setNestingLevel(int level) {
-        history.setNestingLevel(level);
+        this.history.setNestingLevel(level);
     }
 
     /**
@@ -58,7 +58,7 @@ public class DiagramController implements ChangeObservable {
      * This can be used directly in a JList for displaying purposes.
      */
     public DiagramHistory getDiagramHistory() {
-        return history;
+        return this.history;
     }
 
     /**
@@ -71,7 +71,7 @@ public class DiagramController implements ChangeObservable {
      * @see #back()
      */
     public boolean undoIsPossible() {
-        return history.canMoveUp();
+        return this.history.canMoveUp();
     }
 
     /**
@@ -81,7 +81,7 @@ public class DiagramController implements ChangeObservable {
      * will be added to the list of future diagrams.
      */
     public void addDiagram(Diagram2D diagram) {
-        history.addDiagram(diagram);
+        this.history.addDiagram(diagram);
     }
 
     /**
@@ -92,21 +92,21 @@ public class DiagramController implements ChangeObservable {
      * If no diagram is left a NoSuchElementException will be raised.
      */
     public void removeLastDiagram() {
-        history.removeLastDiagram();
+        this.history.removeLastDiagram();
     }
 
     /**
      * Removes all diagrams: past, current and future from the history.
      */
     public void reset() {
-        history.reset();
+        this.history.reset();
     }
 
     /**
      * Returns true if there a still diagrams to visit.
      */
     public boolean hasFutureDiagrams() {
-        return history.hasFutureDiagrams();
+        return this.history.hasFutureDiagrams();
         //return ;
     }
 
@@ -119,7 +119,7 @@ public class DiagramController implements ChangeObservable {
      * @see #back()
      */
     public void next(Concept zoomedConcept) {
-        history.next(zoomedConcept);
+        this.history.next(zoomedConcept);
 
     }
 
@@ -134,7 +134,7 @@ public class DiagramController implements ChangeObservable {
      * @see #undoIsPossible()
      */
     public void back() {
-        history.back();
+        this.history.back();
     }
 
     /**
@@ -145,11 +145,11 @@ public class DiagramController implements ChangeObservable {
      * no diagram selected this will return null.
      */
     public Diagram2D getCurrentDiagram() {
-        if (history.getNumberOfCurrentDiagrams() == 0) {
+        if (this.history.getNumberOfCurrentDiagrams() == 0) {
             // we don't have a diagram to display
             return null;
         }
-        return getNestedDiagram(history.getNumberOfCurrentDiagrams() - 1);
+        return getNestedDiagram(this.history.getNumberOfCurrentDiagrams() - 1);
     }
 
     /**
@@ -157,7 +157,7 @@ public class DiagramController implements ChangeObservable {
      * of current diagrams.
      */
     protected Diagram2D getSimpleDiagram(int pos) {
-        return history.getCurrentDiagram(pos);
+        return this.history.getCurrentDiagram(pos);
     }
 
     /**
@@ -171,7 +171,7 @@ public class DiagramController implements ChangeObservable {
             return getSimpleDiagram(0);
         }
         // else created nested diagram recursively
-        return new NestedLineDiagram(getNestedDiagram(pos - 1), history.getCurrentDiagram(pos));
+        return new NestedLineDiagram(getNestedDiagram(pos - 1), this.history.getCurrentDiagram(pos));
     }
 
     /**

@@ -39,27 +39,27 @@ public class AnimationTimeController {
 	}
 
     public double getEndTime() {
-        return endTime;
+        return this.endTime;
     }
     
     public double getAllFadedTime() {
-    	return endTime + visibleTime + fadeOutTime;
+    	return this.endTime + this.visibleTime + this.fadeOutTime;
     }
 
     public double getFadeInTime() {
-        return fadeInTime;
+        return this.fadeInTime;
     }
 
     public double getFadeOutTime() {
-        return fadeOutTime;
+        return this.fadeOutTime;
     }
 
     public long getMillisecondsPerStep() {
-        return millisecondsPerStep;
+        return this.millisecondsPerStep;
     }
 
     public double getVisibleTime() {
-        return visibleTime;
+        return this.visibleTime;
     }
 
     public void setEndTime(double endTime) {

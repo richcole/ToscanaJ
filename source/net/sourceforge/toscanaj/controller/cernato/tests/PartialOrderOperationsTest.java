@@ -32,7 +32,7 @@ public class PartialOrderOperationsTest extends TestCase {
             this.valueGroup = valueGroup;
         }
         public ValueGroup getValueGroup() {
-            return valueGroup;
+            return this.valueGroup;
         }
         public boolean isLesserThan(Ordered other) {
             if(other.getClass() != this.getClass()) {

@@ -22,10 +22,10 @@ public class DatabaseConnectedEvent implements Event {
     }
 
     public Object getSubject() {
-        return source;
+        return this.source;
     }
 
     public DatabaseConnection getConnection() {
-        return connection;
+        return this.connection;
     }
 }

@@ -92,7 +92,7 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
                 	try {
                     	DatabaseViewerManager.showAttribute(attributeViewName, attribute);
                 	} catch(Exception exc) { // we catch any exception and show it to the user
-                		ErrorDialog.showError(diagramView, exc, "Database View Failed", "The database view could not be shown,\n" +
+                		ErrorDialog.showError(AttributeLabelViewPopupMenuHandler.this.diagramView, exc, "Database View Failed", "The database view could not be shown,\n" +
                 										    							"possibly due to a misconfiguration.");
                 	}
                 }

@@ -18,15 +18,15 @@ public class SQLTypeInfo {
 	}
 	
 	public int getTypeInt() {
-		return typeInt;
+		return this.typeInt;
 	}
 
 	public String getTypeName() {
-		return typeName;
+		return this.typeName;
 	}
 	
 	public String toString() {
-		String str = "SQLTypeInfo: SQL type int = " + typeInt + ", name = " + typeName;
+		String str = "SQLTypeInfo: SQL type int = " + this.typeInt + ", name = " + this.typeName;
 		return str;
 	}
 

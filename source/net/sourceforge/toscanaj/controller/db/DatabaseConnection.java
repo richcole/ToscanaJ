@@ -88,7 +88,7 @@ public class DatabaseConnection implements EventBrokerListener {
 
     public DatabaseConnection(EventBroker broker, Connection connection) {
         this.broker = broker;
-        jdbcConnection = connection;
+        this.jdbcConnection = connection;
     }
 
     /**
@@ -107,12 +107,12 @@ public class DatabaseConnection implements EventBrokerListener {
     }
 
     public void disconnect() throws DatabaseException {
-    	if(jdbcConnection == null) {
+    	if(this.jdbcConnection == null) {
     		throw new DatabaseException("Disconnect requested but we are not connected.");
     	}
         try {
-            jdbcConnection.close();
-            jdbcConnection = null;
+            this.jdbcConnection.close();
+            this.jdbcConnection = null;
             logger.fine("Disconnected");
         } catch (SQLException e) {
             throw new DatabaseException("Could not disconnect from the database.", e);
@@ -120,14 +120,14 @@ public class DatabaseConnection implements EventBrokerListener {
     }
 
     public boolean isConnected() {
-        return jdbcConnection != null;
+        return this.jdbcConnection != null;
     }
 
     public void connect(String url, String driverName, String account, String password) throws DatabaseException {
-        jdbcConnection = getConnection(url, driverName, account, password);
+        this.jdbcConnection = getConnection(url, driverName, account, password);
         /// @todo we probably could just ask JDBC if it is Access
         this.type = DatabaseInfo.getType(url, driverName);
-        broker.processEvent(new DatabaseConnectedEvent(this, this));
+        this.broker.processEvent(new DatabaseConnectedEvent(this, this));
     }
 
     private static Connection getConnection(String url, String driverName, String account, String password) throws DatabaseException {
@@ -190,7 +190,7 @@ public class DatabaseConnection implements EventBrokerListener {
     public void executeSQLAsString(String sqlCommand) throws DatabaseException {
         Statement stmt;
         try {
-            stmt = jdbcConnection.createStatement();
+            stmt = this.jdbcConnection.createStatement();
             stmt.execute(sqlCommand);
         } catch (SQLException se) {
             throw new DatabaseException("An error occured while processing the DB script.", se);
@@ -207,7 +207,7 @@ public class DatabaseConnection implements EventBrokerListener {
 
         // submit the query
         try {
-            stmt = jdbcConnection.createStatement();
+            stmt = this.jdbcConnection.createStatement();
 			logStatementStart(statement);
             resultSet = stmt.executeQuery(statement);
 			logStatementEnd();
@@ -226,6 +226,7 @@ public class DatabaseConnection implements EventBrokerListener {
                     stmt.close();
                 }
             } catch (SQLException e) {
+            	// can't do anything here
             }
         }
         return result;
@@ -260,7 +261,7 @@ public class DatabaseConnection implements EventBrokerListener {
 		Statement stmt = null;
 		// submit the query
 		try {
-			stmt = jdbcConnection.createStatement();
+			stmt = this.jdbcConnection.createStatement();
 			logStatementStart(statement);
 			resultSet = stmt.executeQuery(statement);
 			logStatementEnd();
@@ -284,6 +285,7 @@ public class DatabaseConnection implements EventBrokerListener {
 					stmt.close();
 				}
 			} catch (SQLException e) {
+				// can't do anything here
 			}
 		}
 		return result;
@@ -294,7 +296,7 @@ public class DatabaseConnection implements EventBrokerListener {
 		Statement stmt = null;
 		// submit the query
 		try {
-			stmt = jdbcConnection.createStatement();
+			stmt = this.jdbcConnection.createStatement();
 			logStatementStart(statement);
 			result = stmt.executeUpdate(statement);
 			logStatementEnd();
@@ -307,6 +309,7 @@ public class DatabaseConnection implements EventBrokerListener {
 					stmt.close();
 				}
 			} catch (SQLException e) {
+				// can't do anything here
 			}
 		}
 		return result;
@@ -322,7 +325,7 @@ public class DatabaseConnection implements EventBrokerListener {
 
         // submit the query
         try {
-            stmt = jdbcConnection.createStatement();
+            stmt = this.jdbcConnection.createStatement();
             logStatementStart(statement);
             resultSet = stmt.executeQuery(statement);
             logStatementEnd();
@@ -340,6 +343,7 @@ public class DatabaseConnection implements EventBrokerListener {
                     stmt.close();
                 }
             } catch (SQLException e) {
+            	// nothing we can do here
             }
         }
 
@@ -356,7 +360,7 @@ public class DatabaseConnection implements EventBrokerListener {
 
         // submit the query
         try {
-            stmt = jdbcConnection.createStatement();
+            stmt = this.jdbcConnection.createStatement();
 			logStatementStart(statement);
             resultSet = stmt.executeQuery(statement);
 			logStatementEnd();
@@ -374,6 +378,7 @@ public class DatabaseConnection implements EventBrokerListener {
                     stmt.close();
                 }
             } catch (SQLException e) {
+            	// nothing we can do here
             }
         }
 
@@ -404,7 +409,7 @@ public class DatabaseConnection implements EventBrokerListener {
         final String[] tableTypes = {"TABLE"};
 
         try {
-            DatabaseMetaData dmd = jdbcConnection.getMetaData();
+            DatabaseMetaData dmd = this.jdbcConnection.getMetaData();
             ResultSet rs = dmd.getTables(null, null, "%", tableTypes);
             while (rs.next()) {
                 result.add(rs.getString(3));
@@ -435,7 +440,7 @@ public class DatabaseConnection implements EventBrokerListener {
         final String[] viewTypes = {"VIEW"};
 
         try {
-            DatabaseMetaData dmd = jdbcConnection.getMetaData();
+            DatabaseMetaData dmd = this.jdbcConnection.getMetaData();
             ResultSet rs = dmd.getTables(null, null, null, viewTypes);
             while (rs.next()) {
                 result.add(rs.getString(3));
@@ -466,7 +471,7 @@ public class DatabaseConnection implements EventBrokerListener {
         Vector result = new Vector();
 
         try {
-            DatabaseMetaData dmd = jdbcConnection.getMetaData();
+            DatabaseMetaData dmd = this.jdbcConnection.getMetaData();
             ResultSet rs = dmd.getColumns(null, null, table.getDisplayName(), null);
             while (rs.next()) {
                 result.add(new Column(
@@ -500,7 +505,7 @@ public class DatabaseConnection implements EventBrokerListener {
         Vector result = new Vector();
 
         try {
-            DatabaseMetaData dmd = jdbcConnection.getMetaData();
+            DatabaseMetaData dmd = this.jdbcConnection.getMetaData();
             ResultSet rs = dmd.getColumns(null, null, table, null);
             while (rs.next()) {
                 result.add(rs.getString(4));
@@ -535,7 +540,7 @@ public class DatabaseConnection implements EventBrokerListener {
         Vector result = new Vector();
 
         try {
-            Statement stmt = jdbcConnection.createStatement();
+            Statement stmt = this.jdbcConnection.createStatement();
             ResultSet resultSet = stmt.executeQuery("SELECT [" + column +
                     "] FROM [" + table + "]");
 
@@ -643,7 +648,7 @@ public class DatabaseConnection implements EventBrokerListener {
 
 	private void logStatementStart(String statement) {
         this.lastStatementStartTime = System.currentTimeMillis();
-        logger.fine(lastStatementStartTime + ": Executing statement: " + statement);
+        logger.fine(this.lastStatementStartTime + ": Executing statement: " + statement);
 	}
 
 	private void logStatementEnd() {

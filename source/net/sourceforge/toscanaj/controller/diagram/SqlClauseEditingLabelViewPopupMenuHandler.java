@@ -77,7 +77,7 @@ public class SqlClauseEditingLabelViewPopupMenuHandler implements EventBrokerLis
 		JMenuItem renameSqlClauseMenuItem = new JMenuItem("Change sql clause...");
 		renameSqlClauseMenuItem.addActionListener(new ActionListener () {
 			public void actionPerformed(ActionEvent event) {
-				InputTextDialog dialog = new InputTextDialog(JOptionPane.getFrameForComponent(diagramView), 
+				InputTextDialog dialog = new InputTextDialog(JOptionPane.getFrameForComponent(SqlClauseEditingLabelViewPopupMenuHandler.this.diagramView), 
 															 "Change SQL Clause", "SQL clause", currentValueString);
 				if (!dialog.isCancelled()) {
 					String newValue = dialog.getInput();

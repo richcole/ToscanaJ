@@ -50,7 +50,7 @@ public class FilterOperationEventListener implements EventBrokerListener {
         int extent = interpreter.getExtentSize(filterConcept, context);
         if(extent != 0) {
         	try {
-				controller.next(filterConcept);
+				this.controller.next(filterConcept);
         	} catch (RuntimeException exc) {
         		/// @todo create a proper exception for this case
 				Canvas canvas = nodeView.getDiagramView();

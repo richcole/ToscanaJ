@@ -75,7 +75,7 @@ public class ObjectEditingLabelViewPopupMenuHandler implements EventBrokerListen
             JMenuItem renameObjectMenuItem = new JMenuItem("Rename object...");
             renameObjectMenuItem.addActionListener(new ActionListener () {
                 public void actionPerformed(ActionEvent event) {
-                    InputTextDialog dialog = new InputTextDialog(JOptionPane.getFrameForComponent(diagramView), 
+                    InputTextDialog dialog = new InputTextDialog(JOptionPane.getFrameForComponent(ObjectEditingLabelViewPopupMenuHandler.this.diagramView), 
                             "Rename Object", "object", currentValue);
                     if (!dialog.isCancelled()) {
                         String newValue = dialog.getInput();

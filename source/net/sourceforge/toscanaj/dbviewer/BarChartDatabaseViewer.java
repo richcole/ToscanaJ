@@ -31,13 +31,13 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 
 	    public Component getComponent() throws DatabaseViewerException {
 	
-	        columnDefSQL = new ArrayList();
-	        columnDefDisplay = new ArrayList();
-	        columnDefLineCol = new ArrayList();
-	        columnDefMaxCol = new ArrayList();
-	        columnDefMinCol = new ArrayList();
+	        this.columnDefSQL = new ArrayList();
+	        this.columnDefDisplay = new ArrayList();
+	        this.columnDefLineCol = new ArrayList();
+	        this.columnDefMaxCol = new ArrayList();
+	        this.columnDefMinCol = new ArrayList();
 	
-	        panels = new ArrayList();
+	        this.panels = new ArrayList();
 	
 	
 	        DatabaseViewerManager viewerManager = getManager();
@@ -48,41 +48,41 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	            if (columnElement.getAttributeValue("sqlname") == null) {
 	                throw new DatabaseViewerException();
 	            } else {
-	                columnDefSQL.add(columnElement.getAttributeValue("sqlname"));
+	                this.columnDefSQL.add(columnElement.getAttributeValue("sqlname"));
 	            }
 	            if (columnElement.getAttributeValue("displayname") == null) {
 	                throw new DatabaseViewerException();
 	            } else {
-	                columnDefDisplay.add(columnElement.getAttributeValue("displayname"));
+	                this.columnDefDisplay.add(columnElement.getAttributeValue("displayname"));
 	            }
 	            if (columnElement.getAttributeValue("linecolor") == null) {
-	                columnDefLineCol.add(new Color(255, 255, 255));
+	                this.columnDefLineCol.add(new Color(255, 255, 255));
 	            } else {
 	                try {
-	                    columnDefLineCol.add(Color.decode(columnElement.getAttributeValue("linecolor")));
+	                    this.columnDefLineCol.add(Color.decode(columnElement.getAttributeValue("linecolor")));
 	                } catch (Exception e) {
 	                    System.err.println("Invalid linecolor code for " + columnElement.getAttributeValue("displayname") + ". Using Default setting.");
-	                    columnDefLineCol.add(new Color(255, 255, 255));
+	                    this.columnDefLineCol.add(new Color(255, 255, 255));
 	                }
 	            }
 	            if (columnElement.getAttributeValue("maxcolor") == null) {
-	                columnDefMaxCol.add(new Color(255, 0, 255));
+	                this.columnDefMaxCol.add(new Color(255, 0, 255));
 	            } else {
 	                try {
-	                    columnDefMaxCol.add(Color.decode(columnElement.getAttributeValue("maxcolor")));
+	                    this.columnDefMaxCol.add(Color.decode(columnElement.getAttributeValue("maxcolor")));
 	                } catch (Exception e) {
 	                    System.err.println("Invalid maxcolor code for " + columnElement.getAttributeValue("displayname") + ". Using Default setting.");
-	                    columnDefMaxCol.add(new Color(255, 0, 255));
+	                    this.columnDefMaxCol.add(new Color(255, 0, 255));
 	                }
 	            }
 	            if (columnElement.getAttributeValue("mincolor") == null) {
-	                columnDefMinCol.add(new Color(0, 255, 0));
+	                this.columnDefMinCol.add(new Color(0, 255, 0));
 	            } else {
 	                try {
-	                    columnDefMinCol.add(Color.decode(columnElement.getAttributeValue("mincolor")));
+	                    this.columnDefMinCol.add(Color.decode(columnElement.getAttributeValue("mincolor")));
 	                } catch (Exception e) {
 	                    System.err.println("Invalid mincolor code for " + columnElement.getAttributeValue("displayname") + ". Using Default setting.");
-	                    columnDefMinCol.add(new Color(0, 255, 0));
+	                    this.columnDefMinCol.add(new Color(0, 255, 0));
 	                }
 	            }
 	        }
@@ -91,10 +91,10 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	
 	        JPanel barChartPanel = new JPanel();
 	        barChartPanel.setLayout(new BoxLayout(barChartPanel, BoxLayout.Y_AXIS));
-	        for (int i = 0; i < columnDefSQL.size(); i++) {
+	        for (int i = 0; i < this.columnDefSQL.size(); i++) {
 	            tmpBC = new BarContainer();
-	            tmpBC.setColors((Color) columnDefMinCol.get(i), (Color) columnDefMaxCol.get(i), (Color) columnDefLineCol.get(i));
-	            panels.add(tmpBC);
+	            tmpBC.setColors((Color) this.columnDefMinCol.get(i), (Color) this.columnDefMaxCol.get(i), (Color) this.columnDefLineCol.get(i));
+	            this.panels.add(tmpBC);
 	            barChartPanel.add(tmpBC);
 	        }
 	
@@ -107,9 +107,9 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	
 	        String tmpS = "";
 	        try {
-	            for (int i = 0; i < columnDefSQL.size(); i++) {
+	            for (int i = 0; i < this.columnDefSQL.size(); i++) {
 	
-	                tmpS = (String) columnDefSQL.get(i);
+	                tmpS = (String) this.columnDefSQL.get(i);
 	                tmpList = (viewerManager.getConnection().executeQuery(
 	                        "SELECT " + tmpS +
 	                        " FROM " + viewerManager.getTableName() +
@@ -117,14 +117,14 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	
 	                float min = Float.parseFloat((String) ((Vector) (tmpList.get(0))).elementAt(0));
 	                float max = Float.parseFloat((String) ((Vector) (tmpList.get(tmpList.size() - 1))).elementAt(0));
-	                ((BarContainer) panels.get(i)).setList(tmpList);
+	                ((BarContainer) this.panels.get(i)).setList(tmpList);
 	                tmpList = (viewerManager.getConnection().executeQuery(
 	                        "SELECT " + tmpS +
 	                        " FROM " + viewerManager.getTableName() +
 	                        " WHERE " + viewerManager.getKeyName() + " = '" + keyValue + "';"));
 	
 	                float cur = Float.parseFloat((String) ((Vector) (tmpList.get(0))).elementAt(0));
-	                ((BarContainer) panels.get(i)).setInfo(cur, min, max, (String) columnDefDisplay.get(i));
+	                ((BarContainer) this.panels.get(i)).setInfo(cur, min, max, (String) this.columnDefDisplay.get(i));
 	
 	
 	            }
@@ -144,43 +144,43 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
         private PrettyPanel prettyPanel;
 
         public BarContainer() {
-            labelPanel = new JPanel();
-            minLabel = new JLabel("min");
-            maxLabel = new JLabel("max");
-            sqlColLabel = new JLabel();
-            labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
-            labelPanel.add(minLabel);
-            labelPanel.add(Box.createHorizontalGlue());
-            labelPanel.add(sqlColLabel);
-            labelPanel.add(Box.createHorizontalGlue());
-            labelPanel.add(maxLabel);
+            this.labelPanel = new JPanel();
+            this.minLabel = new JLabel("min");
+            this.maxLabel = new JLabel("max");
+            this.sqlColLabel = new JLabel();
+            this.labelPanel.setLayout(new BoxLayout(this.labelPanel, BoxLayout.X_AXIS));
+            this.labelPanel.add(this.minLabel);
+            this.labelPanel.add(Box.createHorizontalGlue());
+            this.labelPanel.add(this.sqlColLabel);
+            this.labelPanel.add(Box.createHorizontalGlue());
+            this.labelPanel.add(this.maxLabel);
 
-            prettyPanel = new PrettyPanel();
+            this.prettyPanel = new PrettyPanel();
 
             this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-            labelPanel.setBorder(BorderFactory.createBevelBorder(1));
-            prettyPanel.setBorder(BorderFactory.createBevelBorder(1));
+            this.labelPanel.setBorder(BorderFactory.createBevelBorder(1));
+            this.prettyPanel.setBorder(BorderFactory.createBevelBorder(1));
             this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-            this.add(labelPanel);
-            this.add(prettyPanel);
+            this.add(this.labelPanel);
+            this.add(this.prettyPanel);
 
         }
 
         public void setInfo(float cur, float min, float max, String what) {
-            minLabel.setText(min + "");
-            maxLabel.setText(max + "");
-            sqlColLabel.setText(what);
-            prettyPanel.setInfo(cur, min, max);
+        	this.minLabel.setText(min + "");
+        	this.maxLabel.setText(max + "");
+        	this.sqlColLabel.setText(what);
+        	this.prettyPanel.setInfo(cur, min, max);
             repaint();
 
         }
 
         public void setList(List theList) {
-            prettyPanel.setList(theList);
+        	this.prettyPanel.setList(theList);
         }
 
         public void setColors(Color min, Color max, Color line) {
-            prettyPanel.setColors(min, max, line);
+        	this.prettyPanel.setColors(min, max, line);
         }
 
         private class PrettyPanel extends JPanel {
@@ -199,15 +199,15 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                 super();
                 addMouseMotionListener(new MouseMotionAdapter() {
                     public void mouseMoved(MouseEvent evt) {
-                        hoverPos = evt.getX();
+                    	PrettyPanel.this.hoverPos = evt.getX();
                         repaint();
                     }
                 }
                 );
                 addMouseListener(new MouseAdapter() {
                     public void mouseReleased(MouseEvent evt) {
-                        hoverPos = evt.getX();
-                        drawHover = !drawHover;
+                        PrettyPanel.this.hoverPos = evt.getX();
+                        PrettyPanel.this.drawHover = !PrettyPanel.this.drawHover;
                         repaint();
                     }
                 }
@@ -216,14 +216,14 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
             }
 
             public void setInfo(float cur, float min, float max) {
-                theCur = cur;
-                theMax = max;
-                theMin = min;
+            	this.theCur = cur;
+            	this.theMax = max;
+            	this.theMin = min;
                 repaint();
             }
 
             public void setList(List theList) {
-                data = theList;
+            	this.data = theList;
             }
 
             public void paint(Graphics g) {
@@ -238,26 +238,26 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                 qualityHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                 g2.setRenderingHints(qualityHints);
 
-                float dist = theMax - theMin;
+                float dist = this.theMax - this.theMin;
                 float vrel, vrelold;
-                for (int i = 1; i < data.size(); i++) {
-                    vrel = Float.parseFloat((String) ((Vector) data.get(i)).elementAt(0)) - theMin;
-                    vrelold = Float.parseFloat((String) ((Vector) data.get(i - 1)).elementAt(0)) - theMin;
+                for (int i = 1; i < this.data.size(); i++) {
+                    vrel = Float.parseFloat((String) ((Vector) this.data.get(i)).elementAt(0)) - this.theMin;
+                    vrelold = Float.parseFloat((String) ((Vector) this.data.get(i - 1)).elementAt(0)) - this.theMin;
 
 
                     g2.setColor(new Color(
-                            (int) ((minCol.getRed() * (1 - (vrel / dist))) + (maxCol.getRed() * (vrel / dist))),
-                            (int) ((minCol.getGreen() * (1 - (vrel / dist))) + (maxCol.getGreen() * (vrel / dist))),
-                            (int) ((minCol.getBlue() * (1 - (vrel / dist))) + (maxCol.getBlue() * (vrel / dist)))
+                            (int) ((this.minCol.getRed() * (1 - (vrel / dist))) + (this.maxCol.getRed() * (vrel / dist))),
+                            (int) ((this.minCol.getGreen() * (1 - (vrel / dist))) + (this.maxCol.getGreen() * (vrel / dist))),
+                            (int) ((this.minCol.getBlue() * (1 - (vrel / dist))) + (this.maxCol.getBlue() * (vrel / dist)))
                     ));
 
                     g2.fillRect((int) ((vrelold / dist) * this.getWidth()), 0, ((int) ((vrel / dist) * this.getWidth()) - (int) ((vrelold / dist) * this.getWidth())), this.getHeight() - 1);
-                    g2.setColor(new Color(lineCol.getRed(), lineCol.getGreen(), lineCol.getBlue(), 127));
+                    g2.setColor(new Color(this.lineCol.getRed(), this.lineCol.getGreen(), this.lineCol.getBlue(), 127));
                     if (i > 1) g2.drawLine((int) ((vrelold / dist) * this.getWidth()), Y_OFFSET, (int) ((vrelold / dist) * this.getWidth()), (this.getHeight()) - Y_OFFSET);
                 }
 
 
-                int curpoint = (int) ((theCur - theMin) * ((this.getWidth() - 1) / (dist)));
+                int curpoint = (int) ((this.theCur - this.theMin) * ((this.getWidth() - 1) / (dist)));
                 g2.setColor(Color.white);
 
                 g2.setStroke(new BasicStroke(LINE_OUTER_SIZE));
@@ -269,7 +269,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 
                 Font font2Use = new Font(getFont().getFontName(), Font.PLAIN, getFont().getSize() + 4);
                 g2.setFont(font2Use);
-                TextLayout text = new TextLayout("" + theCur, font2Use, new FontRenderContext(null, true, true));
+                TextLayout text = new TextLayout("" + this.theCur, font2Use, new FontRenderContext(null, true, true));
                 Rectangle2D bounds = text.getBounds();
 
                 final int TEXT_BOX_BUFFER_SIZE = 3; //set the space around rendered text
@@ -279,33 +279,33 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                     g2.fillRect(curpoint + TEXT_BOX_BUFFER_SIZE, (getHeight() / 2) - 1 - (int) bounds.getHeight() - TEXT_BOX_BUFFER_SIZE, (int) bounds.getWidth() + TEXT_BOX_BUFFER_SIZE * 2, (int) bounds.getHeight() + TEXT_BOX_BUFFER_SIZE * 2);
                     g2.setColor(Color.black);
                     g2.drawRect(curpoint + TEXT_BOX_BUFFER_SIZE, (getHeight() / 2) - 1 - (int) bounds.getHeight() - TEXT_BOX_BUFFER_SIZE, (int) bounds.getWidth() + TEXT_BOX_BUFFER_SIZE * 2, (int) bounds.getHeight() + TEXT_BOX_BUFFER_SIZE * 2);
-                    g2.drawString("" + theCur, curpoint + TEXT_BOX_BUFFER_SIZE * 2, getHeight() / 2);
+                    g2.drawString("" + this.theCur, curpoint + TEXT_BOX_BUFFER_SIZE * 2, getHeight() / 2);
                 } else {
                     g2.setColor(Color.white);
                     g2.fillRect((int) (curpoint - bounds.getWidth() - TEXT_BOX_BUFFER_SIZE * 3), (getHeight() / 2) - 1 - (int) bounds.getHeight() - TEXT_BOX_BUFFER_SIZE, (int) bounds.getWidth() + TEXT_BOX_BUFFER_SIZE * 2, (int) bounds.getHeight() + TEXT_BOX_BUFFER_SIZE * 2);
                     g2.setColor(Color.black);
                     g2.drawRect((int) (curpoint - bounds.getWidth() - TEXT_BOX_BUFFER_SIZE * 3), (getHeight() / 2) - 1 - (int) bounds.getHeight() - TEXT_BOX_BUFFER_SIZE, (int) bounds.getWidth() + TEXT_BOX_BUFFER_SIZE * 2, (int) bounds.getHeight() + TEXT_BOX_BUFFER_SIZE * 2);
-                    g2.drawString("" + theCur, (int) (curpoint - bounds.getWidth() - TEXT_BOX_BUFFER_SIZE * 2), getHeight() / 2);
+                    g2.drawString("" + this.theCur, (int) (curpoint - bounds.getWidth() - TEXT_BOX_BUFFER_SIZE * 2), getHeight() / 2);
                 }
 
-                int hoverVal = (int) ((hoverPos / ((this.getWidth() - 1) / (theMax - theMin))) + theMin);
+                int hoverVal = (int) ((this.hoverPos / ((this.getWidth() - 1) / (this.theMax - this.theMin))) + this.theMin);
 
                 text = new TextLayout("" + hoverVal, font2Use, new FontRenderContext(null, true, true));
                 bounds = text.getBounds();
 
-                if (drawHover && hoverPos > bounds.getWidth() / 2 && hoverPos < this.getWidth() - (bounds.getWidth() / 2)) {
+                if (this.drawHover && this.hoverPos > bounds.getWidth() / 2 && this.hoverPos < this.getWidth() - (bounds.getWidth() / 2)) {
                     g2.setColor(Color.white);
-                    g2.fillRect((int) (hoverPos - TEXT_BOX_BUFFER_SIZE - bounds.getWidth() / 2), (getHeight() / 2) - 1 + TEXT_BOX_BUFFER_SIZE, (int) bounds.getWidth() + TEXT_BOX_BUFFER_SIZE * 2, (int) bounds.getHeight() + TEXT_BOX_BUFFER_SIZE * 2);
+                    g2.fillRect((int) (this.hoverPos - TEXT_BOX_BUFFER_SIZE - bounds.getWidth() / 2), (getHeight() / 2) - 1 + TEXT_BOX_BUFFER_SIZE, (int) bounds.getWidth() + TEXT_BOX_BUFFER_SIZE * 2, (int) bounds.getHeight() + TEXT_BOX_BUFFER_SIZE * 2);
                     g2.setColor(Color.black);
-                    g2.drawRect((int) (hoverPos - TEXT_BOX_BUFFER_SIZE - bounds.getWidth() / 2), (getHeight() / 2) - 1 + TEXT_BOX_BUFFER_SIZE, (int) bounds.getWidth() + TEXT_BOX_BUFFER_SIZE * 2, (int) bounds.getHeight() + TEXT_BOX_BUFFER_SIZE * 2);
-                    g2.drawString("" + hoverVal, (int) (hoverPos - bounds.getWidth() / 2), (getHeight() / 2) + (int) bounds.getHeight() + TEXT_BOX_BUFFER_SIZE * 2);
+                    g2.drawRect((int) (this.hoverPos - TEXT_BOX_BUFFER_SIZE - bounds.getWidth() / 2), (getHeight() / 2) - 1 + TEXT_BOX_BUFFER_SIZE, (int) bounds.getWidth() + TEXT_BOX_BUFFER_SIZE * 2, (int) bounds.getHeight() + TEXT_BOX_BUFFER_SIZE * 2);
+                    g2.drawString("" + hoverVal, (int) (this.hoverPos - bounds.getWidth() / 2), (getHeight() / 2) + (int) bounds.getHeight() + TEXT_BOX_BUFFER_SIZE * 2);
                 }
             }
 
             public void setColors(Color min, Color max, Color line) {
-                minCol = min;
-                maxCol = max;
-                lineCol = line;
+            	this.minCol = min;
+            	this.maxCol = max;
+            	this.lineCol = line;
             }
         }
     }

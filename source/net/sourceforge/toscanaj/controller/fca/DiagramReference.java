@@ -52,7 +52,7 @@ public class DiagramReference {
      * Returns the diagram title for usage in a view.
      */
     public String toString() {
-        return diagram.getTitle();
+        return this.diagram.getTitle();
     }
     
     public boolean equals(Object other) {
@@ -70,6 +70,6 @@ public class DiagramReference {
     }
     
     public int hashCode() {
-    	return diagram.hashCode() + 47*filterConcept.hashCode();
+    	return this.diagram.hashCode() + 47*this.filterConcept.hashCode();
     }
 }

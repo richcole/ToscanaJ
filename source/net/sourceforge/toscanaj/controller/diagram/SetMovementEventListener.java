@@ -67,18 +67,18 @@ public abstract class SetMovementEventListener implements EventBrokerListener {
 				final Point2D undoPosition = this.startPosition;
 				undoManager.addEdit(new AbstractUndoableEdit() {
 					public void undo() throws CannotUndoException {
-			            double diffX = undoPosition.getX() - toPosition.getX();
-			            double diffY = undoPosition.getY() - toPosition.getY();
-						moveSet(diagram, node, diffX, diffY);
+			            double undoDiffX = undoPosition.getX() - toPosition.getX();
+			            double undoDiffY = undoPosition.getY() - toPosition.getY();
+						moveSet(diagram, node, undoDiffX, undoDiffY);
 						diagramView.requestScreenTransformUpdate();
 						diagramView.repaint();
 						super.undo();
 					}
 
 					public void redo() throws CannotRedoException {
-			            double diffX = toPosition.getX() - undoPosition.getX();
-			            double diffY = toPosition.getY() - undoPosition.getY();
-						moveSet(diagram, node, diffX, diffY);
+			            double undoDiffX = toPosition.getX() - undoPosition.getX();
+			            double undoDiffY = toPosition.getY() - undoPosition.getY();
+						moveSet(diagram, node, undoDiffX, undoDiffY);
 						diagramView.requestScreenTransformUpdate();
 						diagramView.repaint();
 						super.redo();

@@ -16,6 +16,7 @@ import java.util.List;
 
 public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
     private static class NoClauseCreatedException extends RuntimeException {
+    	// nothing specific
     }
 
     private String clause;
@@ -28,7 +29,7 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
             addFilterPart(filterDiagrams, filterMode);
             addNestingPart(outerConcepts, displayMode);
         } catch (NoClauseCreatedException e) {
-            clause = null;
+            this.clause = null;
         }
     }
 
@@ -39,8 +40,8 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
         this.clause = "WHERE " + startClause;
     }
 
-    private void addFilterPart(DiagramHistory filterDiagrams, boolean filterMode) {
-        this.filterMode = filterMode;
+    private void addFilterPart(DiagramHistory filterDiagrams, boolean newFilterMode) {
+        this.filterMode = newFilterMode;
         filterDiagrams.visitZoomedConcepts(this);
     }
 
@@ -82,14 +83,14 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
 
     private void addClausePart(String clausePart) {
         if (clausePart != null) {
-            clause += " AND " + clausePart;
+            this.clause += " AND " + clausePart;
         } else {
             throw new NoClauseCreatedException();
         }
     }
 
     public void visitConcept(Concept concept) {
-        if (filterMode == ConceptInterpretationContext.CONTINGENT) {
+        if (this.filterMode == ConceptInterpretationContext.CONTINGENT) {
             addClausePart(getObjectClause(concept));
         } else {
             addClausePart(getExtentClause(concept));

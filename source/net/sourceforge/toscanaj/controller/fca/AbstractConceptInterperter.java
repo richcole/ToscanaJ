@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -61,16 +60,16 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
             }
             this.numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
                                                             context.getOutermostContext());
-            this.expectedSize = neutralSize * outerSize / (double) numberOfAllObjectsInDiagram;
+            this.expectedSize = this.neutralSize * this.outerSize / (double) this.numberOfAllObjectsInDiagram;
 		}
 		public double getExpectedSize() {
-			return expectedSize;
+			return this.expectedSize;
 		}
 		public int getNeutralSize() {
-			return neutralSize;
+			return this.neutralSize;
 		}
 		public int getOuterSize() {
-			return outerSize;
+			return this.outerSize;
 		}
         /**
          * This is Pearson's Chi Square test for a 2x2 matrix.
@@ -259,7 +258,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                 if (objectCount == expectedSize) {
                     return executeObjectCountQuery(concept, context);
                 }
-                NumberFormat format = DecimalFormat.getNumberInstance();
+                NumberFormat format = NumberFormat.getNumberInstance();
                 format.setMaximumFractionDigits(1);
                 String expectedValue = "[exp: " + format.format(expectedSize) + "]";
                 return new FCAElement[]{getObject(""+objectCount, concept, context),
@@ -275,7 +274,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                     int objectCount = getObjectCount(concept, context); 
                     if (objectCount != expectedSize) {
                         int fullExtent = getExtentSize(concept.getTopConcept(), context);
-                        NumberFormat format = DecimalFormat.getPercentInstance();
+                        NumberFormat format = NumberFormat.getPercentInstance();
                         format.setMaximumFractionDigits(2);
                         String returnValue = format.format(objectCount/(double)fullExtent);
                         String expectedValue = "[exp: " + format.format(expectedSize/fullExtent) + "]";
@@ -287,7 +286,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
         	int objectCount = getObjectCount(concept, context);
 			if( objectCount != 0) {
 				int fullExtent = getExtentSize(concept.getTopConcept(), context);
-				NumberFormat format = DecimalFormat.getPercentInstance();
+				NumberFormat format = NumberFormat.getPercentInstance();
 				format.setMaximumFractionDigits(2);
 				String objectValue = format.format(objectCount/(double)fullExtent);
                 return new FCAElement[]{getObject(objectValue, concept, context)};				
@@ -377,10 +376,10 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 
 
 	private Hashtable getContingentSizesCache(ConceptInterpretationContext context) {
-		Hashtable retVal = (Hashtable) contingentSizes.get(context);
+		Hashtable retVal = (Hashtable) this.contingentSizes.get(context);
 		if (retVal == null) {
 			retVal = new Hashtable();
-			contingentSizes.put(context, retVal);
+			this.contingentSizes.put(context, retVal);
 			/// @todo can we get around this by being smarter about the hashcodes ???
 			context.getEventBroker().subscribe(this,
 					ConceptInterpretationContextChangedEvent.class,
@@ -402,7 +401,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 		Hashtable retVal = (Hashtable) this.extentSizes.get(context);
 		if (retVal == null) {
 			retVal = new Hashtable();
-			extentSizes.put(context, retVal);
+			this.extentSizes.put(context, retVal);
 			/// @todo can we get around this by being smarter about the hashcodes ???
 			context.getEventBroker().subscribe(this,
 					ConceptInterpretationContextChangedEvent.class,
