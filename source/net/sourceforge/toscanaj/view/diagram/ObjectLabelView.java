@@ -17,7 +17,6 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -56,13 +55,11 @@ public class ObjectLabelView extends LabelView {
     /**
      * Avoids drawing object labels for non-realised concepts.
      */
-    public void draw(Graphics2D graphics) {
+    public boolean isVisible() {
         Concept concept = this.labelInfo.getNode().getConcept();
         ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
         ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
-        if (interpreter.isRealized(concept, context)) {
-            super.draw(graphics);
-        }
+        return interpreter.isRealized(concept, context) && super.isVisible();
     }
 
     public void updateEntries() {

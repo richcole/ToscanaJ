@@ -203,7 +203,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      */
     public void draw(Graphics2D graphics) {
         // we draw only if we have content to draw
-        if (this.displayLines == 0) {
+        if (!isVisible()) {
             return;
         }
 
