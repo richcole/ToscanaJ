@@ -93,13 +93,11 @@ public class LineView extends CanvasItem {
 		DiagramView diagramView = this.fromView.getDiagramView();
 		ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
 		ConceptInterpretationContext interpretationContext = this.fromView.getConceptInterpretationContext();
-		boolean oldObjectDisplayMode = interpretationContext.getObjectDisplayMode();
-		interpretationContext.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
 
 		Point2D from = diagramLine.getFromPosition();
 		Point2D to = diagramLine.getToPosition();
-		int startExtent = interpreter.getObjectCount(this.fromView.getDiagramNode().getConcept(),interpretationContext);
-		int endExtent = interpreter.getObjectCount(this.toView.getDiagramNode().getConcept(),interpretationContext);
+		int startExtent = interpreter.getExtentSize(this.fromView.getDiagramNode().getConcept(),interpretationContext);
+		int endExtent = interpreter.getExtentSize(this.toView.getDiagramNode().getConcept(),interpretationContext);
         double ratioInPercent;
         if(startExtent == 0) {
 			ratioInPercent = 1.0;
@@ -130,7 +128,6 @@ public class LineView extends CanvasItem {
 		graphics.setPaint(Color.BLACK);
         graphics.drawString(formattedNumber, (float)(x - bounds.getWidth()/2 - bounds.getX()), (float)(y - bounds.getHeight()/2 - bounds.getY()));
 
-		interpretationContext.setObjectDisplayMode(oldObjectDisplayMode);
         graphics.setFont(oldFont); 
         graphics.setTransform(oldTransform);
         graphics.setPaint(oldPaint);

@@ -34,29 +34,38 @@ import java.util.Iterator;
  *
  *     createNestedInterpreter
  *     createFilteredInterperter
+ * 
+ * @todo it might be better not to have the objectDisplayMode but two methods for extent/contingent instead. This allows more caching
+ *       since the context would be the same more often.
  */
 
 public interface ConceptInterpreter {
     int REFERENCE_DIAGRAM = 0;
     int REFERENCE_SCHEMA = 1;
 
-    /** is Dependent on displayMode and filterMode */
+    /** is dependent on displayMode and filterMode */
     Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context);
 
-    /** is Dependent on displayMode and filterMode */
+    /** is dependent on displayMode and filterMode */
     Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context);
 
-    /** is Dependent on displayMode and filterMode */
+    /** is dependent on displayMode and filterMode */
     int getObjectCount(Concept concept, ConceptInterpretationContext context);
 
-    /** is Dependent on displayMode and filterMode */
+    /** is dependent on displayMode and filterMode */
     int getAttributeCount(Concept concept, ConceptInterpretationContext context);
 
-    /** these are independent of displayMode and dependent on filterMode */
-    double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context, int reference);
+	/** these are independent of displayMode and dependent on filterMode */
+	int getObjectContingentSize(Concept concept, ConceptInterpretationContext context);
 
-    /** these are independent of displayMode and dependent on filterMode */
-    double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context, int reference);
+	/** these are independent of displayMode and dependent on filterMode */
+	int getExtentSize(Concept concept, ConceptInterpretationContext context);
+
+	/** these are independent of displayMode and dependent on filterMode */
+	double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context, int reference);
+
+	/** these are independent of displayMode and dependent on filterMode */
+	double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context, int reference);
 
     boolean isRealized(Concept concept, ConceptInterpretationContext context);
 

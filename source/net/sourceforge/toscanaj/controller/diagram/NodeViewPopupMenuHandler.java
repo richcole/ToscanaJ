@@ -101,9 +101,7 @@ public class NodeViewPopupMenuHandler implements EventBrokerListener, ClipboardO
 
 	    description += lineSeparator;
 
-		boolean oldDisplayMode = context.getObjectDisplayMode();
-	    context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
-		int extentSize = interpreter.getObjectCount(concept, context);
+		int extentSize = interpreter.getExtentSize(concept, context);
 	    if(extentSize > 0) {
 	        if(extentSize == 1) {
 	            description += "Extent (1 object):" + lineSeparator;
@@ -111,6 +109,7 @@ public class NodeViewPopupMenuHandler implements EventBrokerListener, ClipboardO
 	            description += "Extent (" + extentSize +
 	                           " objects):" + lineSeparator;
 	        }
+			boolean oldDisplayMode = context.getObjectDisplayMode();
 		    context.setObjectDisplayMode(ConceptInterpretationContext.CONTINGENT);
 			Iterator objContIt = interpreter.getObjectSetIterator(concept, context);
 			Set objectContingent = new HashSet();
@@ -130,10 +129,10 @@ public class NodeViewPopupMenuHandler implements EventBrokerListener, ClipboardO
                     description += "- " + objectName + lineSeparator;
 				}
 			}
+			context.setObjectDisplayMode(oldDisplayMode);
 	    } else {
 	    	description += "Empty extent" + lineSeparator;
 	    }
-		context.setObjectDisplayMode(oldDisplayMode);
 		
 		//export to clipboard
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(

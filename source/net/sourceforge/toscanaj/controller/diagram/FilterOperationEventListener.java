@@ -44,10 +44,7 @@ public class FilterOperationEventListener implements EventBrokerListener {
         Concept filterConcept = nodeView.getDiagramNode().getFilterConcept();
         ConceptInterpreter interpreter = nodeView.getDiagramView().getConceptInterpreter();
         ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
-        boolean oldDisplayMode = context.getObjectDisplayMode();
-        context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
-        int extent = interpreter.getObjectCount(filterConcept, context);
-        context.setObjectDisplayMode(oldDisplayMode);
+        int extent = interpreter.getExtentSize(filterConcept, context);
         if(extent != 0) {
         	try {
 				controller.next(filterConcept);

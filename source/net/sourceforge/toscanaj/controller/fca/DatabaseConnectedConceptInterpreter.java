@@ -50,14 +50,10 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     public int getObjectCount(Concept concept, ConceptInterpretationContext context) {
-        try {
-            return getCount(concept, context, context.getObjectDisplayMode());
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Error accessing the database", e);
-        }
+        return getCount(concept, context, context.getObjectDisplayMode());
     }
 
-    private int getCount(Concept concept, ConceptInterpretationContext context, boolean countType) throws DatabaseException {
+    private int getCount(Concept concept, ConceptInterpretationContext context, boolean countType) {
         if (countType == ConceptInterpretationContext.CONTINGENT) {
         	return getObjectContingentSize(concept, context);
         } else {
@@ -71,15 +67,19 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         }
     }
     
-    private int getObjectContingentSize(Concept concept, ConceptInterpretationContext context) throws DatabaseException {
-		Hashtable sizes = getContingentSizesCache(context);
-		Integer cacheVal = (Integer) sizes.get(concept);
-		if (cacheVal != null) {
-			return cacheVal.intValue();
+    public int getObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
+    	try {
+			Hashtable sizes = getContingentSizesCache(context);
+			Integer cacheVal = (Integer) sizes.get(concept);
+			if (cacheVal != null) {
+				return cacheVal.intValue();
+			}
+			int count = queryCount(concept, context, ConceptInterpretationContext.CONTINGENT);
+			sizes.put(concept, new Integer(count));
+			return count;
+		} catch (DatabaseException e) {
+			throw new RuntimeException("Error querying the database", e);
 		}
-		int count = queryCount(concept, context, ConceptInterpretationContext.CONTINGENT);
-		sizes.put(concept, new Integer(count));
-		return count;
     }
 
     private int queryCount(Concept concept, ConceptInterpretationContext context, boolean countType) throws DatabaseException {
@@ -121,19 +121,15 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
      * caller.
      */
     public double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context, int reference) {
-        try {
-            int contingentSize = getCount(concept, context, ConceptInterpretationContext.CONTINGENT);
-            if (reference == REFERENCE_DIAGRAM) {
-                if (contingentSize == 0) {
-                    return 0; //avoids division by zero
-                }
-                return (double) contingentSize / (double) getMaximalContingentSize();
-            } else {
-                /// @todo implement or remove the distinction
-                return 1;
+        int contingentSize = getCount(concept, context, ConceptInterpretationContext.CONTINGENT);
+        if (reference == REFERENCE_DIAGRAM) {
+            if (contingentSize == 0) {
+                return 0; //avoids division by zero
             }
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Error querying database", e);
+            return (double) contingentSize / (double) getMaximalContingentSize();
+        } else {
+            /// @todo implement or remove the distinction
+            return 1;
         }
     }
 
@@ -155,91 +151,84 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     public double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context, int reference) {
-        try {
-            int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
-            if (extentSize == 0) {
-                return 0; //avoids division by zero
-            }
-            if (reference == REFERENCE_DIAGRAM) {
-                /// @todo add way to find top compareConcept more easily
-                Concept compareConcept;
-                ConceptInterpretationContext compareContext;
-                List nesting = context.getNestingConcepts();
-                if (nesting.size() != 0) {
-                    // go outermost
-                    compareConcept = (Concept) nesting.get(0);
-                    compareContext = (ConceptInterpretationContext) context.getNestingContexts().get(0);
-                } else {
-                    compareConcept = concept;
-                    compareContext = context;
-                }
-                while (!compareConcept.isTop()) {
-                    Concept other = compareConcept;
-                    Iterator it = compareConcept.getUpset().iterator();
-                    do {
-                        other = (Concept) it.next();
-                    } while (other == compareConcept);
-                    compareConcept = other;
-                }
-                return (double) extentSize /
-                        (double) getCount(compareConcept, compareContext, ConceptInterpretationContext.EXTENT);
+        int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
+        if (extentSize == 0) {
+            return 0; //avoids division by zero
+        }
+        if (reference == REFERENCE_DIAGRAM) {
+            /// @todo add way to find top compareConcept more easily
+            Concept compareConcept;
+            ConceptInterpretationContext compareContext;
+            List nesting = context.getNestingConcepts();
+            if (nesting.size() != 0) {
+                // go outermost
+                compareConcept = (Concept) nesting.get(0);
+                compareContext = (ConceptInterpretationContext) context.getNestingContexts().get(0);
             } else {
-                /// @todo implement or remove the distinction
-                return 1;
+                compareConcept = concept;
+                compareContext = context;
             }
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Error querying database", e);
+            while (!compareConcept.isTop()) {
+                Concept other = compareConcept;
+                Iterator it = compareConcept.getUpset().iterator();
+                do {
+                    other = (Concept) it.next();
+                } while (other == compareConcept);
+                compareConcept = other;
+            }
+            return (double) extentSize /
+                    (double) getCount(compareConcept, compareContext, ConceptInterpretationContext.EXTENT);
+        } else {
+            /// @todo implement or remove the distinction
+            return 1;
         }
     }
 
     public boolean isRealized(Concept concept, ConceptInterpretationContext context) {
         /// @todo do check only lower neighbours
         /// @todo consider going back to creating the lattice product, this is too much hacking
-        try {
-        	// first we check the inner diagram if anything below the concept has the same extent
-        	// size (iff any subconcept has the same extent size, the concept is not realized) 
-            int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
-            for (Iterator iterator = concept.getDownset().iterator(); iterator.hasNext();) {
-                Concept otherConcept = (Concept) iterator.next();
-                if (otherConcept == concept) {
-                    continue;
-                }
-                int otherExtentSize = getCount(otherConcept, context, ConceptInterpretationContext.EXTENT);
-                if (otherExtentSize == extentSize) {
-                    return false;
-                }
+
+    	// first we check the inner diagram if anything below the concept has the same extent
+    	// size (iff any subconcept has the same extent size, the concept is not realized) 
+        int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
+        for (Iterator iterator = concept.getDownset().iterator(); iterator.hasNext();) {
+            Concept otherConcept = (Concept) iterator.next();
+            if (otherConcept == concept) {
+                continue;
             }
-            // the way it works for the outer diagram is a bit wild -- we assume either all contingent or all
-            // extents have already been calculated (which one depends on the view setting), so the cache for
-            // either the contingent or the extent sizes should contain all interpretation contexts for the
-            // lower nodes of the outer diagrams. Now we look for all whose nesting concepts are subconcepts
-            // of the nesting concepts we are in, then check for the extent of the current concept in these
-            // contexts -- they are all subconcepts of our concept along the outer diagram.
-            List outerConcepts = context.getNestingConcepts();
-            for (Iterator iterator = outerConcepts.iterator(); iterator.hasNext();) {
-                Concept outerConcept = (Concept) iterator.next();
-                for (Iterator iterator2 = outerConcept.getDownset().iterator(); iterator2.hasNext();) {
-                    Concept otherConcept = (Concept) iterator2.next();
-                    if (otherConcept != outerConcept) {
-                        for (Iterator iterator3 = this.contingentSizes.keySet().iterator(); iterator3.hasNext();) {
-                            ConceptInterpretationContext otherContext = (ConceptInterpretationContext) iterator3.next();
-                            List nesting = otherContext.getNestingConcepts();
-                            if (nesting.size() != 0) {
-                                if (nesting.get(nesting.size() - 1).equals(otherConcept)) {
-                                    int otherExtentSize = getCount(concept, otherContext, ConceptInterpretationContext.EXTENT);
-                                    if (otherExtentSize == extentSize) {
-                                        return false;
-                                    }
+            int otherExtentSize = getCount(otherConcept, context, ConceptInterpretationContext.EXTENT);
+            if (otherExtentSize == extentSize) {
+                return false;
+            }
+        }
+        // the way it works for the outer diagram is a bit wild -- we assume either all contingent or all
+        // extents have already been calculated (which one depends on the view setting), so the cache for
+        // either the contingent or the extent sizes should contain all interpretation contexts for the
+        // lower nodes of the outer diagrams. Now we look for all whose nesting concepts are subconcepts
+        // of the nesting concepts we are in, then check for the extent of the current concept in these
+        // contexts -- they are all subconcepts of our concept along the outer diagram.
+        List outerConcepts = context.getNestingConcepts();
+        for (Iterator iterator = outerConcepts.iterator(); iterator.hasNext();) {
+            Concept outerConcept = (Concept) iterator.next();
+            for (Iterator iterator2 = outerConcept.getDownset().iterator(); iterator2.hasNext();) {
+                Concept otherConcept = (Concept) iterator2.next();
+                if (otherConcept != outerConcept) {
+                    for (Iterator iterator3 = this.contingentSizes.keySet().iterator(); iterator3.hasNext();) {
+                        ConceptInterpretationContext otherContext = (ConceptInterpretationContext) iterator3.next();
+                        List nesting = otherContext.getNestingConcepts();
+                        if (nesting.size() != 0) {
+                            if (nesting.get(nesting.size() - 1).equals(otherConcept)) {
+                                int otherExtentSize = getCount(concept, otherContext, ConceptInterpretationContext.EXTENT);
+                                if (otherExtentSize == extentSize) {
+                                    return false;
                                 }
                             }
                         }
                     }
                 }
             }
-            return true;
-        } catch (DatabaseException e) {
-            throw new RuntimeException("Error querying the database", e);
         }
+        return true;
     }
 
     private void clearCaches(ConceptInterpretationContext context) {
@@ -378,5 +367,9 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     private void handleDBException(DatabaseException e, String sqlStatement) {
     	throw new RuntimeException("Error querying the database, the following SQL expression failed:\n" +
     							    sqlStatement , e);
+    }
+
+    public int getExtentSize(Concept concept, ConceptInterpretationContext context) {
+        return getCount(concept, context, ConceptInterpretationContext.EXTENT);
     }
 }

@@ -333,4 +333,12 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
 		}
 		return retVal;
     }
+
+    public int getObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
+		return getCount(concept, context, ConceptInterpretationContext.CONTINGENT);
+    }
+
+    public int getExtentSize(Concept concept, ConceptInterpretationContext context) {
+		return getCount(concept, context, ConceptInterpretationContext.EXTENT);
+    }
 }
