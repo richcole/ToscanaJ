@@ -17,6 +17,7 @@ import org.tockit.events.EventBroker;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,6 +68,62 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 
     public SimpleLineDiagram(Element element) throws XMLSyntaxError {
         readXML(element);
+    }
+    
+    /**
+     * A copy constructor creating a duplicate of given diagram
+     * Makes a deep copy.
+     * 
+     * Assumptions: 
+	 * When making a copy of the diagram node, copying all properties, except:
+	 * -  concept, which should be ok since we probably want both nodes 
+	 * corresponding to the same concept anyway.
+	 * - identifier. Assumption is that if we are copying diagrams and 
+	 * identifiers are unique within each diagram - it should be ok to 
+	 * keep the same identifiers for nodes in a copied diagram.
+	 * 
+	 * @todo Need to make a deep copy of Concepts.
+     */
+    public SimpleLineDiagram (Diagram2D diagram, String newTitle) {
+		coordinateSystemChecked = false;
+		
+		Hashtable oldToNewNodeMapping = new Hashtable();
+    	
+    	this.title = newTitle;
+    	
+    	Iterator diagramNodes = diagram.getNodes();
+    	while (diagramNodes.hasNext()) {
+			DiagramNode curNode = (DiagramNode) diagramNodes.next();
+			//DiagramNode copiedNode = new DiagramNode(curNode);
+			DiagramNode copiedNode = makeDiagramNodeCopy(curNode);
+			this.nodes.add(copiedNode);
+			oldToNewNodeMapping.put(curNode, copiedNode);
+		}
+		
+		Iterator diagramLines = diagram.getLines();
+		while (diagramLines.hasNext()) {
+			DiagramLine curLine = (DiagramLine) diagramLines.next();
+			DiagramNode copiedFromNode = (DiagramNode) oldToNewNodeMapping.get(curLine.getFromNode());
+			DiagramNode copiedToNode = (DiagramNode) oldToNewNodeMapping.get(curLine.getToNode());
+			DiagramLine copiedLine = new DiagramLine(copiedFromNode,copiedToNode, this);
+			this.lines.add(copiedLine);
+		}
+    }
+
+	/**
+	 * Make a deep copy of the node, copying all properties, except
+	 * concept and identifier. 
+	 */
+    private DiagramNode makeDiagramNodeCopy (DiagramNode node) {   	
+		Point2D position = (Point2D) node.getPosition().clone();
+		Concept concept = node.getConcept();
+		LabelInfo attributeLabelInfo = new LabelInfo(node.getAttributeLabelInfo());
+		LabelInfo objectLabelInfo = new LabelInfo(node.getObjectLabelInfo());
+
+		DiagramNode newNode = new DiagramNode(this, node.getIdentifier(), node.getPosition(), concept, attributeLabelInfo, objectLabelInfo, null);
+		attributeLabelInfo.attachNode(newNode);
+		objectLabelInfo.attachNode(newNode);
+		return newNode;
     }
 
     public Element toXML() {

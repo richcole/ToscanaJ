@@ -428,6 +428,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		final JButton upButton=new JButton("Up");
 		final JButton downButton=new JButton("Down");
         final JButton removeButton = new JButton("Remove");
+		final JButton duplicateButton = new JButton("Duplicate");
         JPanel buttonsPane = new JPanel(new GridBagLayout());
         JPanel upDownButtonPane = new JPanel(new GridBagLayout());
         upDownButtonPane.add(upButton, new GridBagConstraints(
@@ -460,11 +461,20 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 							new Insets(1, 1, 1, 1),
 							2, 2)
 		);
+		buttonsPane.add(duplicateButton,new GridBagConstraints(
+							0, 2, 1, 1, 1.0, 0,
+							GridBagConstraints.CENTER,
+							GridBagConstraints.HORIZONTAL,
+							new Insets(1, 1, 1, 1),
+							2, 2)
+		);
 		
 		
         upButton.setEnabled(false);
         downButton.setEnabled(false);
         removeButton.setEnabled(false);
+        duplicateButton.setEnabled(false);
+        
         listView.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         fillDiagramListView();
         listView.addListSelectionListener(new ListSelectionListener() {
@@ -483,6 +493,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 						downButton.setEnabled(listView.getSelectedIndex() != -1);
 					}
 					removeButton.setEnabled(listView.getSelectedIndex() != -1);
+					duplicateButton.setEnabled(listView.getSelectedIndex() != -1);
                     int[] selections = listView.getSelectedIndices();
                     if (selections.length == 1) {
                         diagramView.showDiagram(conceptualSchema.getDiagram(selections[0]));
@@ -501,6 +512,21 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 }
             }
         });
+
+		duplicateButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int index = listView.getSelectedIndex();
+				if (index != -1) {
+					Diagram2D diagram = conceptualSchema.getDiagram(index);
+					Diagram2D copiedDiagram = copyDiagram(diagram, "Copy of " + diagram.getTitle());
+					if (copiedDiagram != null) {
+						conceptualSchema.addDiagram(copiedDiagram);
+						int pos = diagramListModel.indexOf(copiedDiagram.getTitle());
+						listView.setSelectedIndex(pos);
+					}
+				}
+			}
+		});
         
 		upButton.addActionListener(new ActionListener() {
 			 public void actionPerformed(ActionEvent e) {
@@ -599,5 +625,25 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		this.diagramView.setGridEnabled(use);
 		this.gridEnabledCheckBox.setSelected(use);
 		this.gridEnabledCheckBox.setEnabled(use);
+    }
+
+	/**
+	 * @todo we only support copying of SimpleLineDiagrams implementation
+	 * of Diagram2D
+	 */    
+    private Diagram2D copyDiagram (Diagram2D diagram, String copiedDiagramTitle) {
+    	
+    	// @todo error message is not helpfull here as user can't do
+    	// anything to rectify the situation, however, need
+    	// some kind of feedback in case someone forgets that we only 
+    	// support SimpleLineDiagram copying
+    	if ( !(diagram instanceof SimpleLineDiagram) ) {
+    		JOptionPane.showMessageDialog(this, 
+					"Sorry, don't know how to copy a diagram other then SimpleLineDiagram", 
+					"Error copying diagram", JOptionPane.ERROR_MESSAGE);
+			return null;
+    	}
+    	Diagram2D copy = new SimpleLineDiagram(diagram, copiedDiagramTitle);
+		return copy;
     }
 }
