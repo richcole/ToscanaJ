@@ -111,25 +111,34 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
     private JComponent makeDiagramListView() {
         diagramListModel = new DefaultListModel();
         final JList listView = new JList(diagramListModel);
-        listView.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        final JButton removeButton = new JButton("Remove");
+        removeButton.setEnabled(false);
+        listView.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         fillDiagramListView();
         listView.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if(!e.getValueIsAdjusting()) {
-                    showDiagram(listView.getSelectedIndex());
+                    removeButton.setEnabled(listView.getSelectedIndex() != -1);
+                    int[] selections = listView.getSelectedIndices();
+                    if(selections.length == 1) {
+                        diagramView.showDiagram(conceptualSchema.getDiagram(selections[0]));
+                    } else {
+                        diagramView.showDiagram(null);
+                    }
+                }
+            }
+        });
+        removeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int[] selections = listView.getSelectedIndices();
+                for (int i = selections.length - 1; i >= 0; i--) {
+                    int selection = selections[i];
+                    conceptualSchema.removeDiagram(selection);
                 }
             }
         });
 
-        return new LabeledScrollPaneView("Diagrams:", listView);
-    }
-
-    private void showDiagram(int index) {
-        if( index == -1 ) {
-            diagramView.showDiagram(null);
-        } else {
-            diagramView.showDiagram(conceptualSchema.getDiagram(index));
-        }
+        return new LabeledScrollPaneView("Diagrams:", listView, removeButton);
     }
 
     protected void fillDiagramListView() {
