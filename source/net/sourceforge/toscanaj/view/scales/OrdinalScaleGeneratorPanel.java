@@ -187,22 +187,23 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 			}
 			BinaryRelationImplementation relation = context.getRelationImplementation();
 			for (int i = -1; i < numDiv; i++) {
-				String object;
+				String clause;
 				if( i == -1) {
-					object = column.getSqlExpression() + " " + downwardsAttributes[i+1];
+                    clause = column.getSqlExpression() + " " + downwardsAttributes[i+1];
 				} else if (i == numDiv - 1) {
-					object = column.getSqlExpression() + " " + upwardsAttributes[i];
+                    clause = column.getSqlExpression() + " " + upwardsAttributes[i];
 				} else {
-					object = column.getSqlExpression() + " " + upwardsAttributes[i] + " AND " +
+                    clause = column.getSqlExpression() + " " + upwardsAttributes[i] + " AND " +
 							 column.getSqlExpression() + " " + downwardsAttributes[i+1];
 				}
+                FCAElementImplementation object = new FCAElementImplementation(clause);
 				for(int j = 0; j <= i; j++) {
 					relation.insert(object, upwardsAttributes[j]);
 				}
 				for(int j = i + 1; j < numDiv; j++ ) {
 					relation.insert(object, downwardsAttributes[j]);
 				}
-				context.getObjects().add(new FCAElementImplementation(object));
+				context.getObjects().add(object);
 			}
 			return context;
 		}
