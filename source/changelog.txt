@@ -22,6 +22,7 @@ Specific for Elba:
   selection
 - Bugfix: nominal scales across columns add the column names and can have the 
   same values in different columns without breaking the scale
+- Bugfix: grid scale generation works again
 
 Specific for Siena (still not fully complete):
 ==============================================
