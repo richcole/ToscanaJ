@@ -654,7 +654,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                 final CombinedGradient redGreenGradient = new CombinedGradient(new LinearGradient(Color.RED, Color.WHITE), 1);
                 redGreenGradient.addGradientPart(new LinearGradient(Color.WHITE, Color.GREEN), 1);
                 JRadioButtonMenuItem showContingentOrthogonalityMenuItem = new JRadioButtonMenuItem("Use colors for orthogonality deviation (exact matches)");
-                showContingentOrthogonalityMenuItem.setSelected(true);
                 showContingentOrthogonalityMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
 						setDiagramGradient(redGreenGradient, ConceptInterpreter.INTERVAL_TYPE_CONTINGENT_ORTHOGONALTIY);
@@ -664,7 +663,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                 viewMenu.add(showContingentOrthogonalityMenuItem);
 
                 JRadioButtonMenuItem showExtentOrthogonalityMenuItem = new JRadioButtonMenuItem("Use colors for orthogonality deviation (all matches)");
-                showExtentOrthogonalityMenuItem.setSelected(true);
                 showExtentOrthogonalityMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         setDiagramGradient(redGreenGradient, ConceptInterpreter.INTERVAL_TYPE_EXTENT_ORTHOGONALTIY);
