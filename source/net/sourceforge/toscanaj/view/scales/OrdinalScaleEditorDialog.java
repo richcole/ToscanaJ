@@ -10,15 +10,9 @@ package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.Column;
-import util.Assert;
-import util.CollectionFactory;
 
 import javax.swing.*;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListDataEvent;
-import javax.swing.table.AbstractTableModel;
+import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,6 +25,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
     private JButton addButton;
     private DoubleNumberField addField;
+    private JList dividersList;
 
     public OrdinalScaleEditorDialog(Frame owner, Column column) {
         super(owner);
@@ -60,8 +55,9 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
         dividersModel = new DefaultListModel();
 
-        JList dividers = new JList(dividersModel);
-        LabeledScrollPaneView dividerEditor = new LabeledScrollPaneView("Dividers", dividers);
+        dividersList = new JList(dividersModel);
+        dividersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        LabeledScrollPaneView dividerEditor = new LabeledScrollPaneView("Dividers", dividersList);
 
         JPanel dividerPane = new JPanel();
         dividerPane.setLayout(new BoxLayout(dividerPane, BoxLayout.Y_AXIS));
@@ -71,23 +67,67 @@ public class OrdinalScaleEditorDialog extends JDialog {
         entryPanel.setLayout(new BoxLayout(entryPanel, BoxLayout.X_AXIS));
 
         entryPanel.add(makeAddDividerPanel());
-        entryPanel.add(new JButton("Remove"));
+
+        final JButton removeButton = new JButton("Remove");
+        removeButton.setEnabled(hasSelectedDivider());
+
+
+        dividersList.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                removeButton.setEnabled(e.getFirstIndex() != -1);
+            }
+        });
+        dividersModel.addListDataListener(new ListDataListener() {
+            private void updateRemoveButton() {
+                removeButton.setEnabled(dividersModel.getSize() > 0 && hasSelectedDivider());
+            }
+
+            public void intervalAdded(ListDataEvent e) {
+                updateRemoveButton();
+            }
+
+            public void intervalRemoved(ListDataEvent e) {
+                updateRemoveButton();
+            }
+
+            public void contentsChanged(ListDataEvent e) {
+                updateRemoveButton();
+            }
+        });
+
+        removeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int[] selected = dividersList.getSelectedIndices();
+                for (int i = selected.length; --i >= 0;) {
+                    removeDivider(selected[i]);
+                }
+            }
+        });
+
+        entryPanel.add(removeButton);
+
 
         JButton removeAllButton = makeActionOnCorrectScaleButton("Remove All");
-        removeAllButton.addActionListener(new ActionListener(){
+        removeAllButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 removeAllDividers();
             }
         });
 
         entryPanel.add(removeAllButton);
-
         dividerPane.add(entryPanel);
-
         centerPanel.add(dividerPane);
 
         getContentPane().add(centerPanel, BorderLayout.CENTER);
         getContentPane().add(makeButtonsPane(), BorderLayout.SOUTH);
+    }
+
+    public void removeDivider(int i) {
+        dividersModel.removeElementAt(i);
+    }
+
+    private boolean hasSelectedDivider() {
+        return dividersList.getSelectedIndex() != -1;
     }
 
     public void removeAllDividers() {
@@ -107,13 +147,13 @@ public class OrdinalScaleEditorDialog extends JDialog {
         addField = new DoubleNumberField(0, 10);
         addButton = new JButton("Add");
 
-        addButton.addActionListener(new ActionListener(){
+        addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 addDelimiter(addField.getValue());
             }
         });
 
-        addField.getDocument().addDocumentListener(new DocumentListener(){
+        addField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 processDocumentEvent(e);
             }
@@ -123,7 +163,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
             }
 
             public void changedUpdate(DocumentEvent e) {
-                 processDocumentEvent(e);
+                processDocumentEvent(e);
             }
 
             private void processDocumentEvent(DocumentEvent e) {
@@ -139,15 +179,14 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
     private DefaultListModel dividersModel;
 
-
     public void addDelimiter(double value) {
         int i;
-        for(i=0; i<dividersModel.size(); i++){
+        for (i = 0; i < dividersModel.size(); i++) {
             final double currDivider = getDelimiter(i);
-            if(value == currDivider){
+            if (value == currDivider) {
                 return;
             }
-            if(value<currDivider){
+            if (value < currDivider) {
                 break;
             }
         }
@@ -155,10 +194,10 @@ public class OrdinalScaleEditorDialog extends JDialog {
     }
 
     private double getDelimiter(int i) {
-        return ((Double)dividersModel.elementAt(i)).doubleValue();
+        return ((Double) dividersModel.elementAt(i)).doubleValue();
     }
 
-    public java.util.List getDividers(){
+    public java.util.List getDividers() {
         return Arrays.asList(dividersModel.toArray());
     }
 
@@ -193,7 +232,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
     }
 
     private boolean isScaleCorrect() {
-        return dividersModel.getSize()>0;
+        return dividersModel.getSize() > 0;
     }
 
     private class UpdateButtonForCorrectModelStateListDataListener implements ListDataListener {

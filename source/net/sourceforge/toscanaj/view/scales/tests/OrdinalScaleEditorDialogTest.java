@@ -42,6 +42,10 @@ public class OrdinalScaleEditorDialogTest extends TestCase {
         dialog.addDelimiter(1.);
         assertEquals(makeListOfDoubles(new double[]{0., 1., 2}), dialog.getDividers());
 
+        dialog.removeDivider(0);
+        assertEquals(makeListOfDoubles(new double[]{1., 2}), dialog.getDividers());
+
+
         dialog.removeAllDividers();
         assertEquals(makeListOfDoubles(new double[0]), dialog.getDividers());
 
