@@ -25,10 +25,6 @@ import java.util.Hashtable;
 
 import util.CollectionFactory;
 
-/**
- * @todo attach ConceptInterpretationContext to this???
- * @todo add caching of sizes and maybe other information (reset when context changes)
- */
 public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, BrokerEventListener {
 
     private DatabaseConnection databaseConnection;
