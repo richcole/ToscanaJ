@@ -368,9 +368,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
     
     public void setDiagramSchema(DiagramSchema schema) {
     	this.diagramSchema = schema;
-        if(schema.getBackgroundColor() != null) {
-            getBackgroundItem().setPaint(schema.getBackgroundColor());
-        }
+        getBackgroundItem().setPaint(schema.getBackgroundColor());
     	this.repaint();
     }
 

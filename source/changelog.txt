@@ -16,6 +16,7 @@ Specific for ToscanaJ:
   (<html>/<head>/<title>). This is used ass the dialog title for the views created
 - a new database viewer called "InfoDatabaseViewer" allows showing plain text or
   HTML found either directly in the database or via a URL found in the database
+- Bugfix: when changing diagram schemas, the background can be erased again.
 
 Specific for Elba:
 ==================
