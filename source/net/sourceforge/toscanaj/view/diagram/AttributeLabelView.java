@@ -7,15 +7,9 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
-import org.jdom.Element;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
@@ -56,34 +50,6 @@ public class AttributeLabelView extends LabelView {
 
     public Iterator getEntryIterator() {
         return this.labelInfo.getNode().getConcept().getAttributeContingentIterator();
-    }
-
-	/**
-	 * @todo it should be possible to delete this.
-	 */
-    public void openPopupMenu(MouseEvent event, Point2D pos) {
-        int itemHit = getIndexOfPosition(pos);
-        Iterator it = getEntryIterator();
-        Attribute attrib = null;
-        while (itemHit >= 0) {
-            itemHit--;
-            attrib = (Attribute) it.next();
-        }
-        final Element description = attrib.getDescription();
-        if (description == null) {
-            return;
-        }
-        JPopupMenu popupMenu = new JPopupMenu();
-        final DiagramView parent = this.diagramView;
-        JMenuItem menuItem;
-        menuItem = new JMenuItem("Description...");
-        menuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                DescriptionViewer.show(JOptionPane.getFrameForComponent(parent), description);
-            }
-        });
-        popupMenu.add(menuItem);
-        popupMenu.show(this.diagramView, event.getX(), event.getY());
     }
 
     protected boolean highlightedInIdeal() {
