@@ -8,6 +8,8 @@
 package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.FCAObject;
+import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.events.DiagramChangedEvent;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
@@ -79,16 +81,20 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     }
     
     /**
-     * A copy constructor creating a duplicate of given diagram
-     * Makes a deep copy.
+     * A copy constructor creating a duplicate of given diagram.
+     * 
+     * Makes a reasonably deep copy. Does not handle subclasses and at least
+     * NDimDiagram/NDimDiagramNode are not yet supported.
+     * @todo add support for copying n-dim diagrams.
      * 
      * Assumptions:
-     * Assuming that ConceptImplementation is used for Concept interface. 
+     * Assuming that ConceptImplementation is used for Concept interface and
+     * that the objects and attributes are FCAObject(s) and Attribute(s).
+     *  
 	 * When making a copy of the diagram node, copying all properties, except:
-	 * - identifier. Assumption is that if we are copying diagrams and 
+	 * - identifiers. Assumption is that if we are copying diagrams and 
 	 * identifiers are unique within each diagram - it should be ok to 
 	 * keep the same identifiers for nodes in a copied diagram.
-	 * - making "almost" deep copy of a Concept, see notes in makeDiagramNodeCopy method.
      */
     public SimpleLineDiagram (Diagram2D diagram) {
 		coordinateSystemChecked = false;
@@ -130,10 +136,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 
 	/**
 	 * Make a deep copy of the node, copying all properties, with 
-	 * the following exceptions:
-	 *  - concept: we do attempt to do a deep copy, however, Obects
-	 * in objectContingent and Attributes in attributeContingents are copied 
-	 * by reference.
+	 * the following exception:
 	 * - identifier: at the moment just copy the same identifier over.
 	 */
     private DiagramNode makeDiagramNodeCopy (DiagramNode node) {   	
@@ -145,12 +148,12 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 		Iterator attrIterator = originalNodeConcept.getAttributeContingentIterator();
 		while (attrIterator.hasNext()) {
 			Attribute curAttr = (Attribute) attrIterator.next();
-			concept.addAttribute(curAttr);
+			concept.addAttribute(new Attribute(curAttr.getData(), curAttr.getDescription()));
 		}
 		Iterator objIterator = originalNodeConcept.getObjectContingentIterator();
 		while (objIterator.hasNext()) {
-			Object curObj = (Object) objIterator.next();
-			concept.addObject(curObj);
+			FCAObject curObj = (FCAObject) objIterator.next();
+			concept.addObject(new FCAObjectImplementation(curObj.getData()));
 		}
 		
 		LabelInfo attributeLabelInfo = new LabelInfo(node.getAttributeLabelInfo());
