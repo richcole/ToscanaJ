@@ -44,8 +44,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-/// @todo check if the file we save to exists, warn if it does
-
 public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     static private final int MaxMruFiles = 8;
 
