@@ -38,14 +38,14 @@ public class ValueSetSelector extends JPanel implements EventBrokerListener, SQL
     
     private void init() {
     	JLabel label = new JLabel("Select values:");
-        valueList = new JList();
-        valueList.setModel(new DefaultListModel());
-    	valueList.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+        this.valueList = new JList();
+        this.valueList.setModel(new DefaultListModel());
+    	this.valueList.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
 		this.setLayout(new BorderLayout());
 		
     	this.add(label, BorderLayout.NORTH);
-        this.add(valueList, BorderLayout.CENTER);
+        this.add(this.valueList, BorderLayout.CENTER);
     }
 
     public void processEvent(Event e) {
@@ -54,7 +54,7 @@ public class ValueSetSelector extends JPanel implements EventBrokerListener, SQL
     }
     
     private void updateContents(Column column) {
-		DefaultListModel model = (DefaultListModel) valueList.getModel();
+		DefaultListModel model = (DefaultListModel) this.valueList.getModel();
 		model.removeAllElements();
     	String tableName = column.getTable().getSqlExpression();
     	try {

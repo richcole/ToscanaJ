@@ -38,10 +38,10 @@ public class DiagramContextDescriptionDialog extends JDialog
 		broker.subscribe(this, DisplayedDiagramChangedEvent.class, Object.class);
 		
 		// set the content area
-		contentTextArea = new JTextArea();
-		contentTextArea.setEditable(false);
+		this.contentTextArea = new JTextArea();
+		this.contentTextArea.setEditable(false);
 		JScrollPane scrollview = new JScrollPane();
-		scrollview.getViewport().add(contentTextArea);
+		scrollview.getViewport().add(this.contentTextArea);
 		
 		// set the buttons area
 		JPanel buttonsPanel = new JPanel(new FlowLayout());
@@ -55,7 +55,7 @@ public class DiagramContextDescriptionDialog extends JDialog
 		copyToClipboardButton = new JButton(" Copy to Clipboard ");
 		copyToClipboardButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				StringSelection comments = new StringSelection(contentTextArea.getText());
+				StringSelection comments = new StringSelection(DiagramContextDescriptionDialog.this.contentTextArea.getText());
 				Clipboard systemClipboard = getToolkit().getSystemClipboard();
 				systemClipboard.setContents(comments, dialog);
 				close();
@@ -93,7 +93,7 @@ public class DiagramContextDescriptionDialog extends JDialog
 	public void processEvent(Event e) {
 		DiagramHistory diagHistory = DiagramController.getController().getDiagramHistory();
 		if(diagHistory.getNumberOfCurrentDiagrams() > 0) {
-			contentTextArea.setText(diagHistory.getTextualDescription());
+			this.contentTextArea.setText(diagHistory.getTextualDescription());
 		}
 		else{
 			close(); 

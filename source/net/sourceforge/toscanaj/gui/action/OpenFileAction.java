@@ -27,11 +27,11 @@ public class OpenFileAction extends KeyboardMappedAction {
     private List postOpenActivities = new ArrayList();
 
     public void addPostOpenActivity(SimpleActivity activity) {
-        postOpenActivities.add(activity);
+        this.postOpenActivities.add(activity);
     }
 
     protected void processPostOpenActivities() throws Exception {
-        for (Iterator it = postOpenActivities.iterator(); it.hasNext();) {
+        for (Iterator it = this.postOpenActivities.iterator(); it.hasNext();) {
             SimpleActivity activity = (SimpleActivity) it.next();
             if (!activity.doActivity()) {
                 break;
@@ -70,10 +70,10 @@ public class OpenFileAction extends KeyboardMappedAction {
 
         boolean result = false;
         try {
-            result = openActivity.prepareToProcess();
+            result = this.openActivity.prepareToProcess();
         } catch (Exception ex) {
             ErrorDialog.showError(
-                    frame,
+                    this.frame,
                     ex,
                     "Unable to initiate file saving:" + ex.getMessage(),
                     "Error preparing to save");
@@ -81,8 +81,8 @@ public class OpenFileAction extends KeyboardMappedAction {
 
         if (result) {
 
-            if (previousFile != null) {
-                openDialog = new JFileChooser(previousFile);
+            if (this.previousFile != null) {
+                openDialog = new JFileChooser(this.previousFile);
             } else {
                 openDialog = new JFileChooser(System.getProperty("user.dir"));
             }
@@ -90,24 +90,24 @@ public class OpenFileAction extends KeyboardMappedAction {
                                                 this.openActivity.getExtensions(),
                                                 this.openActivity.getDescription()));
 
-            if (openDialog.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
+            if (openDialog.showOpenDialog(this.frame) == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = openDialog.getSelectedFile();
                 try {
-                    openActivity.processFile(selectedFile);
+                    this.openActivity.processFile(selectedFile);
                 } catch (Exception ex) {
                     ErrorDialog.showError(
-                            frame,
+                            this.frame,
                             ex,
                             "Failure to read the file:" + ex.getMessage(),
                             "Error opening file");
                     ex.printStackTrace();
                 }
-                previousFile = selectedFile;
+                this.previousFile = selectedFile;
                 try {
                     processPostOpenActivities();
                 } catch (Exception ex) {
                     ErrorDialog.showError(
-                            frame,
+                            this.frame,
                             ex,
                             "Failure to process the file:" + ex.getMessage(),
                             "Error processing file");

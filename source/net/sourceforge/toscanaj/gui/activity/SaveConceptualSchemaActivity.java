@@ -26,8 +26,8 @@ public class SaveConceptualSchemaActivity implements FileActivity, EventBrokerLi
     }
 
     public void processFile(File file) throws Exception {
-        XMLWriter.write(file, conceptualSchema);
-        conceptualSchema.setLocation(file.toURL());
+        XMLWriter.write(file, this.conceptualSchema);
+        this.conceptualSchema.setLocation(file.toURL());
     }
 
     public boolean prepareToProcess() throws Exception {
@@ -37,7 +37,7 @@ public class SaveConceptualSchemaActivity implements FileActivity, EventBrokerLi
     public void processEvent(Event e) {
         if (e instanceof ConceptualSchemaChangeEvent) {
             ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
-            conceptualSchema = schemaEvent.getConceptualSchema();
+            this.conceptualSchema = schemaEvent.getConceptualSchema();
         }
 
     }

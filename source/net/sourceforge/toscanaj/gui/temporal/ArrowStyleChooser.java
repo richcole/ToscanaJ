@@ -91,12 +91,12 @@ public class ArrowStyleChooser extends JComponent {
                 Paint oldPaint = g2d.getPaint();
                 Stroke oldStroke = g2d.getStroke();
                         
-                Shape arrow = TransitionArrow.getArrowShape(style, this.getWidth() * 0.9);
-                g2d.setPaint(style.getColor());
+                Shape arrow = TransitionArrow.getArrowShape(ArrowStyleChooser.this.style, this.getWidth() * 0.9);
+                g2d.setPaint(ArrowStyleChooser.this.style.getColor());
                 g2d.translate(this.getWidth() * 0.95, this.getHeight() / 2);
                 g2d.fill(arrow);
-                if(style.getBorderWidth() != 0) {
-                    g2d.setStroke(new BasicStroke(style.getBorderWidth()));
+                if(ArrowStyleChooser.this.style.getBorderWidth() != 0) {
+                    g2d.setStroke(new BasicStroke(ArrowStyleChooser.this.style.getBorderWidth()));
                     g2d.setPaint(Color.BLACK);
                     g2d.draw(arrow);
                 }
@@ -123,7 +123,7 @@ public class ArrowStyleChooser extends JComponent {
         final JColorChooser retVal = new JColorChooser(this.style.getColor());
         retVal.getSelectionModel().addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                style.setColor(retVal.getColor());
+                ArrowStyleChooser.this.style.setColor(retVal.getColor());
                 repaint();
             } 
         });
@@ -153,7 +153,7 @@ public class ArrowStyleChooser extends JComponent {
             button.setPreferredSize(new Dimension(buttonWidth,buttonHeight));
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    style.setStroke(button.getStroke());
+                    ArrowStyleChooser.this.style.setStroke(button.getStroke());
                     updateStroke();  
                 }
             });
@@ -167,7 +167,7 @@ public class ArrowStyleChooser extends JComponent {
         headWidthSlider.setPaintTicks(true);
         headWidthSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                style.setHeadWidth(headWidthSlider.getValue());
+                ArrowStyleChooser.this.style.setHeadWidth(headWidthSlider.getValue());
                 repaint();
             }
         });
@@ -178,7 +178,7 @@ public class ArrowStyleChooser extends JComponent {
         headLengthSlider.setPaintTicks(true);
         headLengthSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                style.setHeadLength(headLengthSlider.getValue());
+                ArrowStyleChooser.this.style.setHeadLength(headLengthSlider.getValue());
                 repaint();
             }
         });
@@ -190,7 +190,7 @@ public class ArrowStyleChooser extends JComponent {
         borderWidthSlider.setPaintTicks(true);
         borderWidthSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                style.setBorderWidth(((float)borderWidthSlider.getValue())/BORDER_WIDTH_SCALE);
+                ArrowStyleChooser.this.style.setBorderWidth(((float)borderWidthSlider.getValue())/BORDER_WIDTH_SCALE);
                 repaint();
             }
         });
@@ -215,7 +215,7 @@ public class ArrowStyleChooser extends JComponent {
 
         controlconstraints.gridy++;
         retVal.add(new JLabel("Line Width:"), labelconstraints);
-        retVal.add(strokeWidthSlider, controlconstraints);
+        retVal.add(this.strokeWidthSlider, controlconstraints);
         
         controlconstraints.gridy++;
         retVal.add(new JLabel("Border Width:"), labelconstraints);

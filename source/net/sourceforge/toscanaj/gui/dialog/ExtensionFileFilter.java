@@ -30,8 +30,8 @@ public class ExtensionFileFilter extends FileFilter {
 			if (ext == null) {
 				return false;
 			}
-			for (int i = 0; i < extensions.length; i++) {
-				if (ext.toLowerCase().equals(extensions[i].toLowerCase())) {
+			for (int i = 0; i < this.extensions.length; i++) {
+				if (ext.toLowerCase().equals(this.extensions[i].toLowerCase())) {
 					return true;				
 				}
 			}
@@ -40,14 +40,14 @@ public class ExtensionFileFilter extends FileFilter {
 	} //accept
 
 	public String getFileTypeName() {
-		return fileTypeName;
+		return this.fileTypeName;
 	} //get desc
 
 	/**
 	 * Returns the extensions.
 	 */
 	public String[] getExtensions() {
-		return extensions;
+		return this.extensions;
 	}
 	
 	public String getDescription() {

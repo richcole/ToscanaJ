@@ -65,7 +65,7 @@ public class DiagramOrganiserDnDController implements
      */
 	public void dragGestureRecognized(DragGestureEvent event){
 		if( event.getComponent() == this.sourceList ) {
-			int itemDragged = sourceList.locationToIndex(event.getDragOrigin());
+			int itemDragged = this.sourceList.locationToIndex(event.getDragOrigin());
 			StringSelection transferable = new StringSelection((new Integer(itemDragged)).toString());
 			event.startDrag(null, transferable, this);
 			this.mode = ADD_DIAGRAM_MODE;
@@ -75,7 +75,7 @@ public class DiagramOrganiserDnDController implements
 			if (!history.isInPast(itemDragged)) {
 			/// @todo add specific transferable and data flavor for this
 				StringSelection transferable = new StringSelection((new Integer(itemDragged)).toString());
-				newDiagramDragSource.startDrag(event, null, transferable, this);
+				this.newDiagramDragSource.startDrag(event, null, transferable, this);
 			}	
 			this.mode = HISTORY_REORDER_MODE; 
 		} else {
@@ -84,6 +84,7 @@ public class DiagramOrganiserDnDController implements
 	}
 	
 	public void dragEnter(DropTargetDragEvent event) {
+		// not interesting for us
 	}
 	
 	/**
@@ -107,6 +108,7 @@ public class DiagramOrganiserDnDController implements
 
 
 	public void dropActionChanged(DropTargetDragEvent event) {
+		// not interesting for us
 	}
 
 	/**
@@ -114,6 +116,7 @@ public class DiagramOrganiserDnDController implements
 	 *
 	 */
 	public void dragExit(DropTargetEvent event) {
+		// not interesting for us
 	}
 	
     /**
@@ -134,9 +137,9 @@ public class DiagramOrganiserDnDController implements
 				} else {
 					event.acceptDrop(DnDConstants.ACTION_COPY);
 					if( endIndex == -1 ) {
-						history.addDiagram(diagramOrganiser.getSchema().getDiagram(startIndex));
+						history.addDiagram(this.diagramOrganiser.getSchema().getDiagram(startIndex));
 					} else {
-						history.insertDiagram(endIndex,diagramOrganiser.getSchema().getDiagram(startIndex));
+						history.insertDiagram(endIndex,this.diagramOrganiser.getSchema().getDiagram(startIndex));
 					}
 				}					
 				event.getDropTargetContext().dropComplete(true);
@@ -157,6 +160,7 @@ public class DiagramOrganiserDnDController implements
      * has entered the DropSite
      */
 	public void dragEnter(DragSourceDragEvent event) {
+		// not interesting for us
 	}
 
 	/**
@@ -164,12 +168,14 @@ public class DiagramOrganiserDnDController implements
      * ocurring over the DropSite
      */
 	public void dragOver(DragSourceDragEvent event) {
+		// not interesting for us
 	}
 
 	/**
      * is invoked if the use modifies the current drop gesture
      */
 	public void dropActionChanged(DragSourceDragEvent event) {
+		// not interesting for us
 	}
 
 	/**
@@ -177,6 +183,7 @@ public class DiagramOrganiserDnDController implements
 	 * has exited the DropSite
 	*/
 	public void dragExit(DragSourceEvent event) {
+		// not interesting for us
 	}
 	
     /**
@@ -184,5 +191,6 @@ public class DiagramOrganiserDnDController implements
      * has ended
      */
 	public void dragDropEnd(DragSourceDropEvent event) {
+		// not interesting for us
 	}
 }

@@ -50,22 +50,22 @@ public class ReadingHelpDialog extends JDialog {
         
         diagramEventBroker.subscribe(new EventBrokerListener() {
             public void processEvent(Event e) {
-                textArea.setText(createDescriptiveText((NodeView) e.getSubject()));
+                ReadingHelpDialog.this.textArea.setText(createDescriptiveText((NodeView) e.getSubject()));
             }
         }, CanvasItemMouseEnterEvent.class, NodeView.class);
         diagramEventBroker.subscribe(new EventBrokerListener() {
             public void processEvent(Event e) {
-                textArea.setText("");
+                ReadingHelpDialog.this.textArea.setText("");
             }
         }, CanvasItemMouseExitEvent.class, NodeView.class);
         diagramEventBroker.subscribe(new EventBrokerListener() {
             public void processEvent(Event e) {
-                textArea.setText(createDescriptiveText(((LabelView) e.getSubject()).getNodeView()));
+                ReadingHelpDialog.this.textArea.setText(createDescriptiveText(((LabelView) e.getSubject()).getNodeView()));
             }
         }, CanvasItemMouseEnterEvent.class, LabelView.class);
         diagramEventBroker.subscribe(new EventBrokerListener() {
             public void processEvent(Event e) {
-                textArea.setText("");
+                ReadingHelpDialog.this.textArea.setText("");
             }
         }, CanvasItemMouseExitEvent.class, LabelView.class);
         

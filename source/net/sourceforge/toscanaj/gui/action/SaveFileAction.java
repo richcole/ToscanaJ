@@ -70,10 +70,10 @@ public class SaveFileAction extends KeyboardMappedAction {
 		
 		boolean result = false;
 		try {
-		    result = activity.prepareToProcess();
+		    result = this.activity.prepareToProcess();
 		} catch (Exception ex) {
 		    JOptionPane.showMessageDialog(
-		            frame,
+		            this.frame,
 		            "Unable to initiate file saving:" + ex.getMessage(),
 		            "Error preparing to save",
 		            JOptionPane.ERROR_MESSAGE);
@@ -83,16 +83,16 @@ public class SaveFileAction extends KeyboardMappedAction {
 			String[] csxExtension = {"csx"};
 			ExtensionFileFilter csxFileFilter = new ExtensionFileFilter(csxExtension,"Conceptual Schema");
 			ExtensionFileFilter[] filterArray = { csxFileFilter };
-            saveDialog = new CheckDuplicateFileChooser(previousFile, filterArray);
+            saveDialog = new CheckDuplicateFileChooser(this.previousFile, filterArray);
 			
-		    if (saveDialog.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+		    if (saveDialog.showSaveDialog(this.frame) == JFileChooser.APPROVE_OPTION) {
 		        File selectedFile = saveDialog.getSelectedFile();
-		        previousFile = selectedFile;
+		        this.previousFile = selectedFile;
 		        try {
-		            activity.processFile(selectedFile);
+		            this.activity.processFile(selectedFile);
 		        } catch (Exception ex) {
 		            ErrorDialog.showError(
-		                    frame,
+		                    this.frame,
 		                    ex,
 		                    "Error saving file",
 		                    "Failure to save the file:" + ex.getMessage()
@@ -104,7 +104,7 @@ public class SaveFileAction extends KeyboardMappedAction {
                         return this.postSaveActivity.doActivity();
                     } catch (Exception e) {
 		        	    ErrorDialog.showError(
-		        	            frame,
+		        	            this.frame,
 		        	            e,
 		        	            "Error after saving the file",
 		        	            "The file was saved, but some postprocessing failed."

@@ -60,17 +60,17 @@ public class InputTextDialog extends JDialog {
 		
 		final String message = "Please input the name of the " + thingToAdd + ": ";
 		
-		textField = new JTextField(10);
-		textField.setText(currentTextValue);
+		this.textField = new JTextField(10);
+		this.textField.setText(currentTextValue);
 		
-		Object[] array = {message, textField};
+		Object[] array = {message, this.textField};
 		
 		final String enterButtonString = "Enter";
 		final String cancelButtonString = "Cancel";
 		
 		if (this.withCancelButton) {
 			Object[] options = {enterButtonString, cancelButtonString};
-			optionPane = new JOptionPane(array, 
+			this.optionPane = new JOptionPane(array, 
 										JOptionPane.QUESTION_MESSAGE,
 										JOptionPane.YES_NO_OPTION,
 										null,
@@ -79,62 +79,62 @@ public class InputTextDialog extends JDialog {
 		}
 		else {
 			Object[] options = {enterButtonString};
-			optionPane = new JOptionPane(array, 
+			this.optionPane = new JOptionPane(array, 
 										JOptionPane.QUESTION_MESSAGE,
 										JOptionPane.YES_NO_OPTION,
 										null,
 										options);
 		}
 		
-		setContentPane(optionPane);
+		setContentPane(this.optionPane);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
 		        public void windowClosing(WindowEvent we) {
-		        	if (withCancelButton) {
+		        	if (InputTextDialog.this.withCancelButton) {
 						/*
 						 * Instead of directly closing the window,
 						 * we're going to change the JOptionPane's
 						 * value property.
 						 */
-						optionPane.setValue(new Integer(JOptionPane.CLOSED_OPTION));
+						InputTextDialog.this.optionPane.setValue(new Integer(JOptionPane.CLOSED_OPTION));
 		        	}
 		    }
 		});
 		
-		textField.addActionListener(new ActionListener() {
+		this.textField.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
-		        optionPane.setValue(enterButtonString);
+		        InputTextDialog.this.optionPane.setValue(enterButtonString);
 		    }
 		});
 		
-		optionPane.addPropertyChangeListener(new PropertyChangeListener() {
+		this.optionPane.addPropertyChangeListener(new PropertyChangeListener() {
 		    public void propertyChange(PropertyChangeEvent e) {
 		        String prop = e.getPropertyName();
 		
 		        if (isVisible() 
-				             && (e.getSource() == optionPane)
+				             && (e.getSource() == InputTextDialog.this.optionPane)
 				             && (prop.equals(JOptionPane.VALUE_PROPERTY) ||
 				                 prop.equals(JOptionPane.INPUT_VALUE_PROPERTY))) {
-		            Object value = optionPane.getValue();
+		            Object value = InputTextDialog.this.optionPane.getValue();
 		
 		            if (value == JOptionPane.UNINITIALIZED_VALUE) {
 		                return;
 		            }
 		
 		            if (value.equals(enterButtonString)) {
-		                String typedText = textField.getText();
+		                String typedText = InputTextDialog.this.textField.getText();
 		                if ((typedText.equals(null)) || (typedText.trim().equals(""))) {
 		                	setVisible(true);
-							optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+							InputTextDialog.this.optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 		                }
 		                else {
-		                	optionPane.setInputValue(typedText);
+		                	InputTextDialog.this.optionPane.setInputValue(typedText);
 		                	setVisible(false);
 		                }
 		            }
 		            else {
 		            	setVisible(false);
-						optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
+						InputTextDialog.this.optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
 		            }
 		        }
 		    }
@@ -145,11 +145,11 @@ public class InputTextDialog extends JDialog {
 	}
     
     public String getInput () {
-    	return (String) optionPane.getInputValue();
+    	return (String) this.optionPane.getInputValue();
     }
     
     public boolean isCancelled () {
-    	if (optionPane.getValue() == JOptionPane.UNINITIALIZED_VALUE) {
+    	if (this.optionPane.getValue() == JOptionPane.UNINITIALIZED_VALUE) {
     		return true;
     	}
     	return false;

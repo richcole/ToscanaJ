@@ -27,6 +27,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 import org.tockit.swing.preferences.ExtendedPreferences;
@@ -90,7 +92,7 @@ public class ErrorDialog extends JDialog{
 			extraMessage = e.getMessage();
 		}
 		
-		JLabel simpleErrorLabel = new JLabel(extraMessage,UIManager.getIcon("OptionPane.errorIcon"),JLabel.LEFT);
+		JLabel simpleErrorLabel = new JLabel(extraMessage,UIManager.getIcon("OptionPane.errorIcon"),SwingConstants.LEFT);
 		JPanel simpleErrorMsgPanel = new JPanel(new GridBagLayout());
 		
 		simpleErrorMsgPanel.add(simpleErrorLabel, new GridBagConstraints(
@@ -123,7 +125,7 @@ public class ErrorDialog extends JDialog{
 			public void actionPerformed(ActionEvent e) {
 				int width = errorDialog.getWidth();
 				updateDetailButton(detailButton);
-				detailedPanel.setVisible(!isDetailedExceptionsShown);
+				detailedPanel.setVisible(!ErrorDialog.this.isDetailedExceptionsShown);
 				errorDialog.pack();
 				errorDialog.setSize(new Dimension(width, errorDialog.getHeight()));
 				errorDialog.validate();
@@ -171,25 +173,25 @@ public class ErrorDialog extends JDialog{
 		JTextArea textArea = new JTextArea(createErrorLog(e),20,50);
 		textArea.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(textArea);
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setVisible(isDetailedExceptionsShown);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setVisible(this.isDetailedExceptionsShown);
 		return scrollPane;	
 	}
 	
 	private void updateDetailButton(JButton detailButton){
 		String closeDetailString = "<<< Details";
 		String openDetailString = "Details >>>";
-		if(isDetailedExceptionsShown){
+		if(this.isDetailedExceptionsShown){
 			detailButton.setText(closeDetailString);
-			isDetailedExceptionsShown = false;
-		}else if(isDetailedExceptionsShown !=true && onFirstExecute==true){
+			this.isDetailedExceptionsShown = false;
+		}else if(this.isDetailedExceptionsShown !=true && this.onFirstExecute==true){
 			detailButton.setText(closeDetailString);
-			isDetailedExceptionsShown = false;
-			onFirstExecute = false;
+			this.isDetailedExceptionsShown = false;
+			this.onFirstExecute = false;
 		}else{
 			detailButton.setText(openDetailString);
-			isDetailedExceptionsShown = true;
+			this.isDetailedExceptionsShown = true;
 		}
 	}
 	

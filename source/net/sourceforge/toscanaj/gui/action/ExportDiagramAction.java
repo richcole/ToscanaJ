@@ -40,7 +40,6 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 	private DiagramExportSettings diagramExportSettings;
 	private DiagramView diagramView;
 	private DiagramExportSettingsPanel exportSettingsPanel;
-	private Frame frame;
 	 
 	
 	/**
@@ -56,7 +55,6 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 		super(frame, "Export Diagram...");
 		this.diagramExportSettings = diagExpSettings;
 		this.diagramView = diagramView;
-		this.frame = frame;
 		this.exportSettingsPanel = new DiagramExportSettingsPanel(this.diagramExportSettings);
 	}
 
@@ -70,7 +68,6 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 		super(frame, "Export Diagram...", mnemonic, keystroke);
 		this.diagramExportSettings = diagExpSettings;
 		this.diagramView = diagramView;
-		this.frame = frame;
 		this.exportSettingsPanel = new DiagramExportSettingsPanel(this.diagramExportSettings);
 	}
 	
@@ -107,7 +104,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 		boolean formatDefined;
 		do {
 			formatDefined = true;
-			int rv = saveDialog.showSaveDialog(frame);
+			int rv = saveDialog.showSaveDialog(this.frame);
 			if (rv == JFileChooser.APPROVE_OPTION) {
 				File selectedFile = saveDialog.getSelectedFile();
 				ExtensionFileFilter extFileFilter = (ExtensionFileFilter) saveDialog.getFileFilter();
@@ -123,7 +120,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 				} else {
 					if(selectedFile.getName().indexOf('.') != -1) {
 						JOptionPane.showMessageDialog(
-							frame,
+							this.frame,
 							"Sorry, no type with this extension known.\n"
 								+ "Please use either another extension or try\n"
 								+ "manual settings.",
@@ -131,7 +128,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 							JOptionPane.ERROR_MESSAGE);
 					} else {
 						JOptionPane.showMessageDialog(
-							frame,
+							this.frame,
 							"No extension given.\n" +
 							"Please give an extension or pick a file type\n" +
 							"from the options.",
@@ -190,7 +187,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 					out.println(description);
 					out.close();
 				} catch (IOException e){
-					ErrorDialog.showError(frame, e, "Exporting text file error");
+					ErrorDialog.showError(this.frame, e, "Exporting text file error");
 				}
 			}
 			if(this.diagramExportSettings.getSaveCommentToClipboard()==true){
@@ -203,10 +200,10 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 				systemClipboard.setContents(comments,null);
 			}
 		} catch (ImageGenerationException e) {
-			ErrorDialog.showError(frame, e, "Exporting image error");
+			ErrorDialog.showError(this.frame, e, "Exporting image error");
 		} catch (OutOfMemoryError e) {
 			ErrorDialog.showError(
-				frame,e,
+				this.frame,e,
 				"Out of memory",
 				"Not enough memory available to export\n"
 					+ "the diagram in this size");
@@ -225,7 +222,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 		}
 		
 		public void approveSelection(){
-			exportSettingsPanel.saveSettings();
+			ExportDiagramAction.this.exportSettingsPanel.saveSettings();
 			File selectedFile = getSelectedFile();
 			if(selectedFile.getName().indexOf('.') == -1) { // check for extension
 				// add default
@@ -239,7 +236,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 			}
 			if (selectedFile != null && selectedFile.exists()) {
 				String warningMessage = "The image file '"	+ selectedFile.getName() + "' already exists.\nDo you want to overwrite the existing file?";
-				if(diagramExportSettings.getSaveCommentsToFile()==true) {
+				if(ExportDiagramAction.this.diagramExportSettings.getSaveCommentsToFile()==true) {
 					File textFile = new File(selectedFile.getAbsoluteFile()+".txt");
 					if(textFile.exists()) {
 					warningMessage = "The files '"	+ selectedFile.getName() + "' and '" + textFile.getName()+ "' already exist.\nDo you want to overwrite the existing files?";
@@ -256,7 +253,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 					return;
 				}
 			}
-			if(selectedFile!=null && !selectedFile.exists() && diagramExportSettings.getSaveCommentsToFile()==true){
+			if(selectedFile!=null && !selectedFile.exists() && ExportDiagramAction.this.diagramExportSettings.getSaveCommentsToFile()==true){
 				File textFile = new File(selectedFile.getAbsoluteFile()+".txt");
 				if(textFile.exists()) {
 					int response =

@@ -29,7 +29,7 @@ public class SimpleAction extends KeyboardMappedAction {
     }
 
     public void add(SimpleActivity activity) {
-        activityList.add(activity);
+        this.activityList.add(activity);
     }
 
     public SimpleAction(JFrame frame, String displayName, SimpleActivity activity) {
@@ -43,7 +43,7 @@ public class SimpleAction extends KeyboardMappedAction {
 
     public void actionPerformed(ActionEvent e) {
         try {
-            for (Iterator it = activityList.iterator(); it.hasNext();) {
+            for (Iterator it = this.activityList.iterator(); it.hasNext();) {
                 SimpleActivity activity = (SimpleActivity) it.next();
                 if (!activity.doActivity()) {
                     break;
@@ -51,7 +51,7 @@ public class SimpleAction extends KeyboardMappedAction {
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(
-                    frame,
+                    this.frame,
                     ex.getMessage(),
                     "Error",
                     JOptionPane.ERROR_MESSAGE
