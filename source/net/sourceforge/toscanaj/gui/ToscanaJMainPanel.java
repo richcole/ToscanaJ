@@ -161,8 +161,8 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         DatabaseConnection.initialize(broker);
 
         // register all image writers we want to support
-        net.sourceforge.toscanaj.canvas.imagewriter.BatikImageWriter.initialize();
-        net.sourceforge.toscanaj.canvas.imagewriter.JimiImageWriter.initialize();
+        org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
+        org.tockit.canvas.imagewriter.JimiImageWriter.initialize();
         // set the default diagram export options: the very first format, auto mode, we can't get the size here
         Iterator it = GraphicFormatRegistry.getIterator();
 
