@@ -4,7 +4,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.tests;
+package net.sourceforge.toscanaj.events.tests;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -17,12 +17,7 @@ public class AllTests extends TestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTest(net.sourceforge.toscanaj.controller.fca.tests.AllTests.suite());
-        suite.addTest(net.sourceforge.toscanaj.events.tests.AllTests.suite());
-        suite.addTest(net.sourceforge.toscanaj.model.lattice.tests.AllTests.suite());
-        suite.addTest(net.sourceforge.toscanaj.util.tests.AllTests.suite());
-        suite.addTest(net.sourceforge.toscanaj.view.diagram.tests.AllTests.suite());
-
+        suite.addTest(EventBrokerTest.suite());
         return suite;
     }
 

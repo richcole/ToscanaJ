@@ -17,8 +17,14 @@ public class EventBroker implements BrokerEventListener {
     }
 
     public void subscribe(BrokerEventListener listener, Class eventType, Class sourceType) {
-        if( !implementsInterface(eventType, Class.forName("Event")) ) {
-            throw new RuntimeException("Subscription to class not implementing Event impossible");
+        try {
+            String packageName = getClass().getPackage().getName();
+            Class eventClass = Class.forName(packageName + ".Event");
+            if( !implementsInterface(eventType, eventClass) ) {
+                throw new RuntimeException("Subscription to class not implementing Event impossible");
+            }
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Internal error in EventBroker, class Event not found");
         }
         subscriptions.add(new EventSubscription(listener, eventType, sourceType));
     }
@@ -60,7 +66,7 @@ public class EventBroker implements BrokerEventListener {
     private boolean extendsClass(Class subClass, Class superClass) {
         Class curClass = subClass;
         while( curClass != null ) {
-            if( curClass.equals(superClass) {
+            if( curClass.equals(superClass) ) {
                 return true;
             }
             curClass = curClass.getSuperclass();
