@@ -3,6 +3,9 @@
  * 
  * Changes made in BrowserLauncher for use in ToscanaJ suite:
  * - Changed original package name to net.sourceforge.toscanaj.dbviewer 
+ * - removed some superflous code
+ * - fixed support for Win9x/ME (from patch found in bug tracker:
+ *     http://sourceforge.net/tracker/index.php?func=detail&aid=651785&group_id=14506&atid=114506)
  *
  * $Id$
  */
@@ -230,7 +233,7 @@ public class BrowserLauncher {
 				errorMessage = "Invalid MRJ version: " + mrjVersion;
 			}
 		} else if (osName.startsWith("Windows")) {
-			if (osName.indexOf("9") != -1) {
+			if ((osName.indexOf("9") != -1)|| (osName.indexOf("M") != -1)) {
 				jvm = WINDOWS_9x;
 			} else {
 				jvm = WINDOWS_NT;
@@ -538,6 +541,19 @@ public class BrowserLauncher {
 				}
 				break;
 		    case WINDOWS_NT:
+				Process processNT = Runtime.getRuntime().exec(new String[] { (String) browser,
+																FIRST_WINDOWS_PARAMETER,
+																SECOND_WINDOWS_PARAMETER,
+																THIRD_WINDOWS_PARAMETER,
+                                                                                                                               url });
+                                   				try {
+					processNT.waitFor();
+					processNT.exitValue();
+				} catch (InterruptedException ie) {
+					throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
+				}
+
+                                break;
 		    case WINDOWS_9x:
 		    	// Add quotes around the URL to allow ampersands and other special
 		    	// characters to work.
