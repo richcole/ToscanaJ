@@ -14,7 +14,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.Point2D;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
 import net.sourceforge.toscanaj.view.diagram.NodeView;

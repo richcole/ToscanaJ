@@ -114,7 +114,7 @@ public class ElbaMainPanel
 	private JMenuItem dumpSQLMenuItem;
 	private JMenuItem dumpStatisticalDataMenuItem;
 	private SaveFileAction saveAsFileAction;
-    private ArrayList scaleGenerators;
+    private List scaleGenerators;
     private JButton newDiagramButton;
     private JPanel toolbar;
     private SaveConceptualSchemaActivity saveActivity;

@@ -17,13 +17,14 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class OpenFileAction extends KeyboardMappedAction {
 
     private FileActivity openActivity;
     private File previousFile;
 
-    private ArrayList postOpenActivities = new ArrayList();
+    private List postOpenActivities = new ArrayList();
 
     public void addPostOpenActivity(SimpleActivity activity) {
         postOpenActivities.add(activity);

@@ -81,8 +81,8 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private NumberField fadeInField;
     private NumberField holdField;
     private NumberField fadeOutField;
-    private ArrayList sequenceValues;
-    private ArrayList timelineValues;
+    private List sequenceValues;
+    private List timelineValues;
     private JCheckBox serializeSequencesBox;
     private File lastImageExportFile;
     private DiagramExportSettings diagramExportSettings;
@@ -371,8 +371,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
             this.lastImageExportFile =
                 new File(System.getProperty("user.dir"));
         }
-        final GraphicFormat graphicFormat = this.diagramExportSettings.getGraphicFormat();
-        if(graphicFormat==null){}
+
         final JFileChooser saveDialog = new JFileChooser(this.lastImageExportFile);
         boolean formatDefined;
         do {

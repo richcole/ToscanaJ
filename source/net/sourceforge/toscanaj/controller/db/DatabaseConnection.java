@@ -57,16 +57,16 @@ public class DatabaseConnection implements EventBrokerListener {
     static {
         String log = ConfigurationManager.fetchString("DatabaseConnection", "logger", "");
         PrintStream result = null; // we need indirection since the compiler doesn't grok it otherwise
-        if (log.length() == 0) {
-            // keep the null
-        } else if (log.equals("-")) {
-            result = System.out;
-        } else {
-            try {
-                result = new PrintStream(new FileOutputStream(log));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (log.length() != 0) {
+	        if (log.equals("-")) {
+	            result = System.out;
+	        } else {
+	            try {
+	                result = new PrintStream(new FileOutputStream(log));
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	            }
+	        }
         }
         logger = result;
     }

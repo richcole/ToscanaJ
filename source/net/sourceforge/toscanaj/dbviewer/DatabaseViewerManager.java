@@ -7,23 +7,28 @@
  */
 package net.sourceforge.toscanaj.dbviewer;
 
+import java.awt.Component;
+import java.awt.Frame;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
-
-import javax.swing.*;
-import java.awt.*;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.*;
-import java.util.List;
 
 /**
  * @todo the actual storing of the available viewers should not be part of this

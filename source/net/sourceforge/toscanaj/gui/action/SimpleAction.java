@@ -12,11 +12,12 @@ import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Iterator;
 
 public class SimpleAction extends KeyboardMappedAction {
 
-    protected ArrayList activityList = new ArrayList();
+    protected List activityList = new ArrayList();
 
     public SimpleAction(
             JFrame frame,

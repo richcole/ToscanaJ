@@ -30,11 +30,7 @@ public class CrossordinalScaleGenerator implements ScaleGenerator{
              return false;
          }
          int columnType = columns[0].getColumn().getType();
-         if (OrdinalScaleGeneratorPanel.determineDataType(columnType) == OrdinalScaleGeneratorPanel.UNSUPPORTED) {
-             return false;
-         } else {
-             return true;
-         }
+         return (OrdinalScaleGeneratorPanel.determineDataType(columnType) != OrdinalScaleGeneratorPanel.UNSUPPORTED);
      }
 
      public Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection) {

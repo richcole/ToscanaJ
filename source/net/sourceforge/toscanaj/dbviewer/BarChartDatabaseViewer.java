@@ -25,8 +25,8 @@ import java.util.Vector;
 
 public class BarChartDatabaseViewer extends PagingDatabaseViewer {
     private JPanel barChartPanel;
-    private ArrayList columnDefSQL, columnDefDisplay, panels;
-    private ArrayList columnDefLineCol, columnDefMinCol, columnDefMaxCol;
+    private List columnDefSQL, columnDefDisplay, panels;
+    private List columnDefLineCol, columnDefMinCol, columnDefMaxCol;
 
 
     protected Component getPanel() throws DatabaseViewerInitializationException {

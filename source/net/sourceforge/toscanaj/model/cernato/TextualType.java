@@ -9,11 +9,12 @@ package net.sourceforge.toscanaj.model.cernato;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 
 public class TextualType extends TypeImplementation {
-	private ArrayList valueGroupList ;
+	private List valueGroupList ;
 	
     public TextualType(String name) {
         super(name);
@@ -32,7 +33,7 @@ public class TextualType extends TypeImplementation {
 		valueGroupList.add(textualValue);
 	}
 	
-	public ArrayList getTextualValue(){
+	public List getTextualValue(){
 		return valueGroupList;
 	}
 	

@@ -14,7 +14,7 @@ public class CollectionFactory {
         return new ArrayList();
     }
 
-    public static LinkedList createFastInsertDeleteList() {
+    public static List createFastInsertDeleteList() {
         return new LinkedList();
     }
 

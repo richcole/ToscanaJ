@@ -22,6 +22,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
@@ -146,7 +147,7 @@ public class CernatoTableViewDialog extends JFrame {
 	
 	protected void showPopupMenu(double x, double y, Property property, CernatoObject obj) {
 		TextualType attributeType = (TextualType)property.getType();
-		ArrayList textualValueList = attributeType.getTextualValue();
+		List textualValueList = attributeType.getTextualValue();
 		JPopupMenu menu = new JPopupMenu();
 		
 		if(textualValueList.size()<=15){
@@ -159,7 +160,7 @@ public class CernatoTableViewDialog extends JFrame {
 
 	}
 
-	protected JPopupMenu createPopupMenu(int numOfCol, ArrayList textualValueList,
+	protected JPopupMenu createPopupMenu(int numOfCol, List textualValueList,
 											final Property property, final CernatoObject obj) {
 		JPopupMenu menu = new JPopupMenu();
 		if(numOfCol*15 <= textualValueList.size()){
@@ -180,7 +181,7 @@ public class CernatoTableViewDialog extends JFrame {
 		return menu;
 	}
 	
-	protected JPopupMenu createPopupMenu(ArrayList textualValueList, 
+	protected JPopupMenu createPopupMenu(List textualValueList, 
 									final Property property,final CernatoObject obj) {
 		JPopupMenu menu = new JPopupMenu();
 		for(int i = 0 ; i < textualValueList.size() ; i++){
