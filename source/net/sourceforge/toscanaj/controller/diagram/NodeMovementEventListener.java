@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.canvas.events.CanvasItemDroppedEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
@@ -31,7 +32,9 @@ public class NodeMovementEventListener implements EventBrokerListener {
         	node.setPosition(oldPosition);
         }
 
-        diagramView.requestScreenTransformUpdate();
+        if (dragEvent instanceof CanvasItemDroppedEvent) {
+            diagramView.requestScreenTransformUpdate();
+        }
         diagramView.repaint();
     }
 }
