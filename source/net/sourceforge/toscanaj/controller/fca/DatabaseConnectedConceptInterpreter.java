@@ -281,9 +281,8 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     private List execute(Query query, String whereClause) {
         List retVal = new ArrayList();
         if (whereClause != null) {
+        	String statement = query.getQueryHead() + whereClause;
             try {
-                String statement = query.getQueryHead() + whereClause;
-
                 // submit the query
                 List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
                 Iterator it = queryResults.iterator();
@@ -296,14 +295,18 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                     }
                 }
             } catch (DatabaseException e) {
-                handleDBException(e);
+                handleDBException(e, statement);
             }
         }
         return retVal;
     }
 
-    private void handleDBException(DatabaseException e) {
-    	throw new RuntimeException("Error querying the database", e);
+	/**
+	 * @todo throw something more specific here
+	 */
+    private void handleDBException(DatabaseException e, String sqlStatement) {
+    	throw new RuntimeException("Error querying the database, the following SQL expression failed:\n" +
+    							    sqlStatement , e);
     }
 
 }
