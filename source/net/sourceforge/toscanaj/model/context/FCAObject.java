@@ -5,8 +5,8 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.manyvaluedcontext;
+package net.sourceforge.toscanaj.model.context;
 
 public interface FCAObject {
-    String getName();
+    Object getData();
 }

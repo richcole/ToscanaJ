@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
+import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;

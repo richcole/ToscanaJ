@@ -13,7 +13,7 @@ import javax.swing.event.*;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
-import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 
 import java.awt.*;

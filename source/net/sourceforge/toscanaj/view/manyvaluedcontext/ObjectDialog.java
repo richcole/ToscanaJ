@@ -22,7 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableFCAObject;
+import net.sourceforge.toscanaj.model.context.WritableFCAObject;
 
 public class ObjectDialog extends JDialog{
 	
@@ -38,7 +38,7 @@ public class ObjectDialog extends JDialog{
 	public ObjectDialog(Frame parent, WritableFCAObject object){
 		super(parent,"Object", false);
 		setResizable(false);
-		createView(object.getName());
+		createView(object.toString());
 		pack();
 		this.parent = parent;
 		this.object = object;
@@ -73,7 +73,7 @@ public class ObjectDialog extends JDialog{
 		changeButton.addActionListener(new ActionListener (){
 			public void actionPerformed(ActionEvent e){
 				if(!objectName.getText().equals("")){
-					object.setName(objectName.getText());
+					object.setData(objectName.getText());
 					parent.validate();
 					hide();
 				}

@@ -9,9 +9,9 @@ package org.tockit.toscanaj.servlet;
 
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.diagram.*;
 import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.controller.fca.*;

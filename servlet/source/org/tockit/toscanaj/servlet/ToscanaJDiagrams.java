@@ -6,9 +6,9 @@
  * To change this template use Options | File Templates.
  */
 package org.tockit.toscanaj.servlet;
+import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;

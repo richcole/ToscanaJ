@@ -14,13 +14,13 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
-import net.sourceforge.toscanaj.model.Context;
-import net.sourceforge.toscanaj.model.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
+import net.sourceforge.toscanaj.model.context.Context;
+import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.Table;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.ndimdiagram;
 
-import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.context.Attribute;
 
 import java.util.Vector;
 

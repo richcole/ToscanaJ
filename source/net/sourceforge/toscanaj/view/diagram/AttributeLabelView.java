@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
+import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import java.awt.geom.Point2D;
 import java.util.Iterator;

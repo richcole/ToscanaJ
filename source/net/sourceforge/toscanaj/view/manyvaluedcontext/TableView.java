@@ -21,8 +21,8 @@ import javax.swing.JComponent;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
+import net.sourceforge.toscanaj.model.context.FCAObject;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 

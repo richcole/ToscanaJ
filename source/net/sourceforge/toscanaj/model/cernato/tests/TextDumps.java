@@ -7,15 +7,15 @@
  */
 package net.sourceforge.toscanaj.model.cernato.tests;
 
-import net.sourceforge.toscanaj.model.BinaryRelation;
-import net.sourceforge.toscanaj.model.Context;
-import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.BinaryRelation;
+import net.sourceforge.toscanaj.model.context.Context;
+import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContextImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttributeImplementation;
@@ -57,7 +57,7 @@ public class TextDumps {
         stream.println();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
             FCAObjectImplementation object = (FCAObjectImplementation) it1.next();
-            stream.print(object.getName() + "\t");
+            stream.print(object.toString() + "\t");
             for (Iterator it2 = properties.iterator(); it2.hasNext();) {
                 ManyValuedAttributeImplementation property = (ManyValuedAttributeImplementation) it2.next();
                 stream.print(context.getRelationship(object, property).getDisplayString() + "\t");
@@ -86,7 +86,7 @@ public class TextDumps {
         stream.println();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
             FCAObjectImplementation object = (FCAObjectImplementation) it1.next();
-            stream.print(object.getName() + "\t");
+            stream.print(object.toString() + "\t");
             for (Iterator it2 = attributes.iterator(); it2.hasNext();) {
                 Criterion criterion = (Criterion) it2.next();
                 if (relation.contains(object, criterion)) {
@@ -106,7 +106,7 @@ public class TextDumps {
             Iterator extIt = concept.getObjectContingentIterator();
             while (extIt.hasNext()) {
                 FCAObjectImplementation obj = (FCAObjectImplementation) extIt.next();
-                stream.print(obj.getName());
+                stream.print(obj.toString());
                 if (extIt.hasNext()) {
                     stream.print(", ");
                 }

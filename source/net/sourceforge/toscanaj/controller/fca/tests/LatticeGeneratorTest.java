@@ -11,9 +11,9 @@ import java.util.Arrays;
 
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
-import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
-import net.sourceforge.toscanaj.model.ContextImplementation;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
+import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 
 import junit.framework.Test;

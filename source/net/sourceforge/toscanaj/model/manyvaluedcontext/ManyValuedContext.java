@@ -9,6 +9,8 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
 import java.util.Set;
 
+import net.sourceforge.toscanaj.model.context.*;
+
 public interface ManyValuedContext {
     void add(FCAObject object);
     Set getObjects();

@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model;
+package net.sourceforge.toscanaj.model.context;
 
 public interface BinaryRelation {
     boolean contains(Object domainObject, Object rangeObject);

@@ -34,8 +34,8 @@ import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
-import net.sourceforge.toscanaj.model.ContextImplementation;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.ContextImplementation;
 
 public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	private static final Color TEXT_COLOR = Color.BLACK;

@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.model.cernato.tests;
 
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
+import net.sourceforge.toscanaj.model.context.*;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.*;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValue;

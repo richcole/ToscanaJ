@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model;
+package net.sourceforge.toscanaj.model.context;
 
 
 import java.util.Set;

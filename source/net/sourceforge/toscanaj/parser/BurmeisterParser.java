@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.parser;
 
-import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
-import net.sourceforge.toscanaj.model.ContextImplementation;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
+import net.sourceforge.toscanaj.model.context.ContextImplementation;
 
 import java.io.*;
 import java.util.Collection;

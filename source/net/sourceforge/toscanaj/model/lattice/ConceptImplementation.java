@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
+import net.sourceforge.toscanaj.model.context.*;
 import net.sourceforge.toscanaj.model.order.Ordered;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;

@@ -11,9 +11,9 @@ import java.awt.Frame;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.Context;
-import net.sourceforge.toscanaj.model.ContextImplementation;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.Context;
+import net.sourceforge.toscanaj.model.context.ContextImplementation;
 
 public class NominalScaleGenerator implements ScaleGenerator {
 	private Frame parent;

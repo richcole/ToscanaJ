@@ -5,34 +5,34 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.lattice;
+package net.sourceforge.toscanaj.model.context;
 
 import org.jdom.Element;
 
-public class Attribute {
-    private Object data;
-    private Element description;
+public class FCAObjectImplementation implements WritableFCAObject {
+	private Object data;
+	private Element description;
 
-	public Attribute(Object data) {
+	public FCAObjectImplementation(Object data) {
 		this(data,null);
 	}
 
-	public Attribute(Object data, Element description) {
+	public FCAObjectImplementation(Object data, Element description) {
 		this.data = data;
 		this.description = description;
 	}
 
-    public Object getData() {
-        return this.data;
-    }
+	public Object getData() {
+		return this.data;
+	}
 
-    public Element getDescription() {
-        return this.description;
-    }
+	public Element getDescription() {
+		return this.description;
+	}
 
-    public String toString() {
-        return this.data.toString();
-    }
+	public String toString() {
+		return this.data.toString();
+	}
 
 	public void setData(Object data) {
 		this.data = data;

@@ -5,8 +5,8 @@
  *
  * $Id$
  */	
-package net.sourceforge.toscanaj.model.manyvaluedcontext;
+package net.sourceforge.toscanaj.model.context;
 
 public interface WritableFCAObject extends FCAObject {
-	void setName(String name);
+	void setData(Object data);
 }

@@ -7,8 +7,9 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
-import net.sourceforge.toscanaj.model.BinaryRelation;
-import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.context.*;
+import net.sourceforge.toscanaj.model.context.BinaryRelation;
+import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.lattice.*;
 
 import java.util.*;

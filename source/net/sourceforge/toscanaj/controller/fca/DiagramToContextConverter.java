@@ -10,9 +10,9 @@ package net.sourceforge.toscanaj.controller.fca;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
-import net.sourceforge.toscanaj.model.Context;
-import net.sourceforge.toscanaj.model.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
+import net.sourceforge.toscanaj.model.context.Context;
+import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;

@@ -18,7 +18,7 @@ import java.util.Iterator;
 
 import javax.swing.JComponent;
 
-import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
+import net.sourceforge.toscanaj.model.context.FCAObject;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 
 

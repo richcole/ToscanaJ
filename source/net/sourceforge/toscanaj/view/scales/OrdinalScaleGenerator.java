@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.context.Context;
 
 import java.awt.Frame;
 

@@ -11,6 +11,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Hashtable;
 
+import net.sourceforge.toscanaj.model.context.*;
+
 
 public class ManyValuedContextImplementation implements WritableManyValuedContext {
     private Set objects = new LinkedHashSet();
