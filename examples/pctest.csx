@@ -33,6 +33,7 @@
 		<dsn>PCTest80</dsn>
 		<table>[PC-Test]</table>
 		<key>[PCBezeichnung]</key>
+		<specialQuery name="Average Price" format="$ 0.00">AVG(Preis)</specialQuery>
 	</database>
 	<context>
 		<object id="1">Preis&gt;=5000</object>
