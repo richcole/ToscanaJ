@@ -7,6 +7,7 @@
 package net.sourceforge.toscanaj;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
@@ -69,6 +70,13 @@ public class DataDump {
             System.err.println("Could not parse input.");
             System.err.println("- " + e.getMessage());
             System.exit(2);
+        }
+        try {
+            DatabaseConnection.getConnection().connect(schema.getDatabaseInfo());
+        } catch (DatabaseException e) {
+            System.err.println("Could not connect to the database.");
+            System.err.println("- " + e.getMessage());
+            System.exit(4);
         }
         // create concept for filtering if needed
         DatabaseConnectedConcept filterConcept = null;

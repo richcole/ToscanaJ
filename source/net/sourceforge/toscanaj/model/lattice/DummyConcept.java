@@ -9,12 +9,14 @@
 package net.sourceforge.toscanaj.model.lattice;
 
 import net.sourceforge.toscanaj.model.Query;
+import net.sourceforge.toscanaj.model.XML_SyntaxError;
 
 import java.util.List;
 import java.util.Iterator;
 
 import util.CollectionFactory;
 import util.NullIterator;
+import org.jdom.Element;
 
 public class DummyConcept extends AbstractConceptImplementation {
     public DummyConcept(List attributeContigent) {
@@ -23,6 +25,9 @@ public class DummyConcept extends AbstractConceptImplementation {
 
     public DummyConcept() {
         this(CollectionFactory.createDefaultList());
+    }
+
+    public void readXML(Element elem) throws XML_SyntaxError {
     }
 
     List attributeContigent;

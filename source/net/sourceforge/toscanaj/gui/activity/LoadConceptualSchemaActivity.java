@@ -26,7 +26,7 @@ public class LoadConceptualSchemaActivity implements FileActivity {
 
     public void processFile(File file) throws Exception {
         try {
-            ConceptualSchema newSchema = CSXParser.parse(broker, file, databaseConnection);
+            ConceptualSchema newSchema = CSXParser.parse(broker, file);
         } catch (DataFormatException e) {
             throw e;
         }

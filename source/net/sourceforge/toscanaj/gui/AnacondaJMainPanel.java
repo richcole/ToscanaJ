@@ -229,7 +229,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
 
     private void openSchemaFile(File schemaFile) {
         try {
-            conceptualSchema = CSXParser.parse(eventBroker, schemaFile, databaseConnection);
+            conceptualSchema = CSXParser.parse(eventBroker, schemaFile);
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(this, e, "Could not find file", e.getMessage());
             conceptualSchema = new ConceptualSchema(eventBroker);
