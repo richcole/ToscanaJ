@@ -9,6 +9,7 @@
 	<property name="mainApp.classes" value="../build/release"/>
 	<property name="mainApp.dist.dir" value="../dist"/>
 	<property name="pluginArchitecture.classes" value="../libs/pluginArchitecture.jar"/>	
+	<property name="toscanaj.classes" value="../libs/ToscanaJ.jar"/>	
 	
 	<!-- set plugins dist directory, relative to main program's dist directory -->
 	<property name="plugins.dist.dir" value="${mainApp.dist.dir}"/>
@@ -47,6 +48,7 @@
 			<property name="plugin.dist.dir.name" value="${plugin.dir.name}"/>
 			<property name="mainApp.classes" value="../${mainApp.classes}"/>
 			<property name="pluginArchitecture.classes" value="../${pluginArchitecture.classes}"/>
+			<property name="toscanaj.classes" value="../${toscanaj.classes}"/>
 		</ant>
 		<copy todir="${plugins.dist.dir}">
 			<fileset dir="${plugin.dir}/dist">

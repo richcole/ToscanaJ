@@ -9,10 +9,6 @@
 		<property name="dist.dir" value="${dist.base.dir}/${dist.name}"/>
   	</target>
   	
-  	<!-- IMPORTANT! We assume the source and libs of ToscanaJ in these spots. -->
-  	<!-- BIG TODO: move all resued code into Tockit -->
-  	<property name="toscanaj.src.dir" value="../ToscanaJ/source"/>
-  	<property name="toscanaj.libs.dir" value="../ToscanaJ/libs"/>
 
 	<property name="app.name" value="Tuppleware"/>
 	<property name="build.dev.dir" value="build/dev"/>
@@ -23,6 +19,11 @@
     <property name="tupleware.class" value="org.tockit.tupleware.Tupleware"/>
 	<property name="plugins.dir" value="plugins"/>
 
+  	<!-- IMPORTANT! We assume the source and libs of ToscanaJ in these spots. -->
+  	<!-- BIG TODO: move all resued code into Tockit -->
+  	<property name="toscanaj.classes" value="${libs.dir}/ToscanaJ.jar"/>
+
+
     <path id="project.dev.class.path">
         <pathelement path="${classpath}"/>
         <pathelement path="${build.dev.dir}"/>
@@ -30,15 +31,6 @@
             <include name="**/*.jar"/>
         </fileset>
         <fileset dir="${libs.dir}">
-            <include name="**/*.zip"/>
-        </fileset>
-        <fileset dir="${toscanaj.libs.dir}">
-            <include name="**/*.jar"/>
-        </fileset>
-        <fileset dir="${toscanaj.libs.dir}">
-            <include name="**/*.zip"/>
-        </fileset>
-        <fileset dir="${toscanaj.libs.dir}/testing">
             <include name="**/*.zip"/>
         </fileset>
     </path>
@@ -49,15 +41,6 @@
             <include name="**/*.jar"/>
         </fileset>
         <fileset dir="${libs.dir}">
-            <include name="**/*.zip"/>
-        </fileset>
-        <fileset dir="${toscanaj.libs.dir}">
-            <include name="**/*.jar"/>
-        </fileset>
-        <fileset dir="${toscanaj.libs.dir}">
-            <include name="**/*.zip"/>
-        </fileset>
-        <fileset dir="${toscanaj.libs.dir}/testing">
             <include name="**/*.zip"/>
         </fileset>
     </path>
@@ -72,17 +55,11 @@
 		<ant antfile="build.xml" dir="plugins" target="clean"/>
 	</target>
 	<target name="compile" depends="_prepare">
-		<javac srcdir="${toscanaj.src.dir}" destdir="${build.dev.dir}" debug="on" optimize="off" deprecation="on">
-			<classpath refid="project.dev.class.path"/>
-		</javac>
 		<javac srcdir="${src.dir}" destdir="${build.dev.dir}" debug="on" optimize="off" deprecation="on">
 			<classpath refid="project.dev.class.path"/>
 		</javac>
 	</target>
 	<target name="_compileRelease" depends="_prepare">
-		<javac srcdir="${toscanaj.src.dir}" destdir="${build.release.dir}" debug="off" optimize="on" deprecation="off">
-			<classpath refid="project.release.class.path"/>
-		</javac>
 		<javac srcdir="${src.dir}" destdir="${build.release.dir}" debug="off" optimize="on" deprecation="off">
 			<classpath refid="project.release.class.path"/>
 		</javac>
@@ -139,6 +116,7 @@
 			<property name="mainApp.classes" value="../${build.release.dir}"/>
 			<property name="mainApp.dist.dir" value="../${dist.base.dir}"/>
 			<property name="pluginArchitecture.classes" value="../${libs.dir}/pluginArchitecture.jar"/>			
+			<property name="toscanaj.classes" value="../${toscanaj.classes}"/>			
 		</ant>
 	</target>
 
@@ -148,6 +126,7 @@
 			<property name="mainApp.classes" value="../${build.dev.dir}"/>
 			<property name="mainApp.dist.dir" value="../${dist.base.dir}"/>
 			<property name="pluginArchitecture.classes" value="../${libs.dir}/pluginArchitecture.jar"/>
+			<property name="toscanaj.classes" value="../${toscanaj.classes}"/>
 		</ant>
 	</target>
 	
