@@ -722,6 +722,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         } else {
             openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
+        openDialog.setMultiSelectionEnabled(true);
         // create the options panel to be used in the file chooser 
         JRadioButton keepSchemaButton =
             new JRadioButton("Extend existing schema");
@@ -787,7 +788,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 			currentFile = null;
 			updateWindowTitle();
         }
-        importBurmeister(openDialog.getSelectedFile());
+        File[] files = openDialog.getSelectedFiles();
+        for (int i = 0; i < files.length; i++) {
+            File file = files[i];
+            importBurmeister(file);
+        }
     }
 
     private void importBurmeister(File file) {
