@@ -11,6 +11,8 @@ Affecting different programs:
   duplication of the default one: one of these will stay with default
   values, the other one gets the values changed in the preferences
   dialog
+- the order of objects and attributes in the context will be remembered,
+  even after saving and loading a CSX file
 
 Specific for ToscanaJ:
 ======================
@@ -34,8 +36,8 @@ Specific for Siena (still not fully complete):
   the border line
 - three query types are allowed: count, list, distribution (as in
   the ToscanaJ defaults)
-- diagrams based on the Cernato import feature will use the same order
-  in the labels as in the imported many-valued context
+- diagram labels and contexts based on the Cernato import feature will
+  use the same order as in the imported many-valued context
 - arrow styles are now maintained with the diagram color schema, and 
   thus stored in the session management, i.e they are remembered when
   closing and reopening Siena. This also means that changing the schema

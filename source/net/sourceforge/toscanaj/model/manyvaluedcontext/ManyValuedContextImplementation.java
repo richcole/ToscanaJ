@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TypeImplementation;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
@@ -56,6 +57,9 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 	}
 
     public void add(FCAElement object) {
+        if(object instanceof WritableFCAElement) {
+            ((WritableFCAElement)object).setContextPosition(this.objects.size());
+        }
         this.objects.add(object);
         this.relation.put(object, new Hashtable());
     }

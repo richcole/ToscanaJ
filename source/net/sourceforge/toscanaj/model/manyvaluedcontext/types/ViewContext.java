@@ -49,7 +49,9 @@ public class ViewContext implements Context{
 		attributes = new HashSet();
 		for (Iterator iterator = view.getCriteria().iterator(); iterator.hasNext();) {
 			Criterion criterion = (Criterion) iterator.next();
-			attributes.add(new FCAElementImplementation(criterion, null));
+			FCAElementImplementation attribute = new FCAElementImplementation(criterion, null);
+            attribute.setContextPosition(attributes.size());
+            attributes.add(attribute);
 		}
 		this.name = view.getName();
 	}
