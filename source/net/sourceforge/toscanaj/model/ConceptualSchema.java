@@ -15,6 +15,9 @@ import org.jdom.Element;
 
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.List;
+
+import util.CollectionFactory;
 
 /**
  * This is the main interface for the data structures.
@@ -28,6 +31,11 @@ public class ConceptualSchema {
      * The database information.
      */
     private DatabaseInfo databaseInfo;
+
+    /**
+     * List of scales
+     */
+    private List scales = CollectionFactory.createDefaultList();
 
     /**
      * The list of diagrams.
