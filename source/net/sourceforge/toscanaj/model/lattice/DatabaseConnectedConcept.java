@@ -217,7 +217,9 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                     newFilterClause = newFilterClause + cur.objectClause;
                 }
                 newFilterClause += ")";
-                retVal.filterClauses.add(newFilterClause);
+                if(!first) { // don't do anything if we are still waiting for the first (i.e. we have none)
+                    retVal.filterClauses.add(newFilterClause);
+                }
             }
         }
         return retVal;
