@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <conceptualSchema version="1.0" askDatabase="false">
 	<context>
 		<object id="viola">Viola</object>
@@ -6,20 +6,20 @@
 		<object id="nora">Nora</object>
 		<object id="elin">Elin</object>
 		<object id="bernhard">Bernhard</object>
-		<attribute id="1">männlich</attribute>
+		<attribute id="1">mÃ¤nnlich</attribute>
 		<attribute id="2">weiblich</attribute>
 		<attribute id="3">beruf</attribute>
 		<attribute id="4">student</attribute>
-		<attribute id="5">schüler</attribute>
+		<attribute id="5">schÃ¼ler</attribute>
 	</context>
 	<diagram title="Geschlecht">
 		<concept id="1">
-			<position x="0.000000" y="0.000000"/>
-			<objectContingent/>
-			<attributeContingent/>
+			<position x="0" y="0" />
+			<objectContingent />
+			<attributeContingent />
 		</concept>
 		<concept id="2">
-			<position x="10.000000" y="-10.000000"/>
+			<position x="60" y="-60" />
 			<objectContingent>
 				<labelStyle>
 					<textColor>#0000ff</textColor>
@@ -29,14 +29,14 @@
 			</objectContingent>
 			<attributeContingent>
 				<labelStyle>
-					<offset x="1" y="1"/>
+					<offset x="6" y="6" />
 					<bgColor>#ccccff</bgColor>
 				</labelStyle>
 				<attributeRef>1</attributeRef>
 			</attributeContingent>
 		</concept>
 		<concept id="3">
-			<position x="-10.000000" y="-10.000000"/>
+			<position x="-60" y="-60" />
 			<objectContingent>
 				<labelStyle>
 					<textColor>#0000ff</textColor>
@@ -55,23 +55,23 @@
 			</attributeContingent>
 		</concept>
 		<concept id="4">
-			<position x="0.000000" y="-20.000000"/>
-			<objectContingent/>
-			<attributeContingent/>
+			<position x="0" y="-120" />
+			<objectContingent />
+			<attributeContingent />
 		</concept>
-		<edge from="1" to="2"/>
-		<edge from="1" to="3"/>
-		<edge from="2" to="4"/>
-		<edge from="3" to="4"/>
+		<edge from="1" to="2" />
+		<edge from="1" to="3" />
+		<edge from="2" to="4" />
+		<edge from="3" to="4" />
 	</diagram>
 	<diagram title="Status">
 		<concept id="1">
-			<position x="0.000000" y="0.000000"/>
-			<objectContingent/>
-			<attributeContingent/>
+			<position x="0" y="0" />
+			<objectContingent />
+			<attributeContingent />
 		</concept>
 		<concept id="2">
-			<position x="20.000000" y="-20.000000"/>
+			<position x="120" y="-120" />
 			<objectContingent>
 				<objectRef>elin</objectRef>
 				<objectRef>bernhard</objectRef>
@@ -81,7 +81,7 @@
 			</attributeContingent>
 		</concept>
 		<concept id="3">
-			<position x="0.000000" y="-20.000000"/>
+			<position x="0" y="-120" />
 			<objectContingent>
 				<objectRef>sarah</objectRef>
 				<objectRef>nora</objectRef>
@@ -91,7 +91,7 @@
 			</attributeContingent>
 		</concept>
 		<concept id="4">
-			<position x="-20.000000" y="-20.000000"/>
+			<position x="-120" y="-120" />
 			<objectContingent>
 				<objectRef>viola</objectRef>
 			</objectContingent>
@@ -100,15 +100,15 @@
 			</attributeContingent>
 		</concept>
 		<concept id="5">
-			<position x="0.000000" y="-40.000000"/>
-			<objectContingent/>
-			<attributeContingent/>
+			<position x="0" y="-240" />
+			<objectContingent />
+			<attributeContingent />
 		</concept>
-		<edge from="1" to="2"/>
-		<edge from="1" to="3"/>
-		<edge from="1" to="4"/>
-		<edge from="2" to="5"/>
-		<edge from="3" to="5"/>
-		<edge from="4" to="5"/>
+		<edge from="1" to="2" />
+		<edge from="1" to="3" />
+		<edge from="1" to="4" />
+		<edge from="2" to="5" />
+		<edge from="3" to="5" />
+		<edge from="4" to="5" />
 	</diagram>
 </conceptualSchema>
