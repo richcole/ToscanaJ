@@ -70,8 +70,13 @@ public class AttributeLabelView extends LabelView {
         return this.labelInfo.getNode().getConcept().getAttributeContingentSize();
     }
 
-    public Iterator getEntryIterator() {
-        return this.labelInfo.getNode().getConcept().getAttributeContingentIterator();
+    public Object getEntryAt(int position) {
+        Iterator attributeContingentIterator = this.labelInfo.getNode().getConcept().getAttributeContingentIterator();
+        int i = 0;
+        while(i < position) {
+        	attributeContingentIterator.next();
+        }
+        return attributeContingentIterator.next();
     }
 
     protected boolean highlightedInIdeal() {
@@ -84,14 +89,7 @@ public class AttributeLabelView extends LabelView {
 
     public Attribute getEntryAtPosition(Point2D canvasPosition) {
         int i = getIndexOfPosition(canvasPosition);
-        Iterator it = getEntryIterator();
-        Attribute retVal = null;
-        while(i != -1) {
-            Attribute attr = (Attribute) it.next();
-            retVal = attr;
-            i--;
-        }
-        return retVal;
+        return (Attribute) getEntryAt(i);
     }
 
     protected boolean isFaded() {

@@ -39,8 +39,11 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         this.listQuery.insertQueryColumn("", null, "", databaseInfo.getKey().getSqlExpression(), false);
     }
 
+	/**
+	 * @todo this implementation is most likely extremely inefficient.
+	 */
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
-    	return executeQuery(this.listQuery, concept, context).iterator();
+    	return Arrays.asList(executeQuery(this.listQuery, concept, context)).iterator();
     }
 
     public Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context) {
@@ -264,7 +267,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         clearCaches((ConceptInterpretationContext) e.getSubject());
     }
 
-    public List executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
+    public Object[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
 		if(!isRealized(concept, context)) {
 			return null;
 		}
@@ -275,27 +278,32 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 				context.getNestingConcepts(),
 				objectDisplayMode,
 				filterMode);
-		List retVal = new ArrayList();
+		Object[] retVal;
 		if (query == ListQuery.KEY_LIST_QUERY) {
 			int objectCount = getObjectCount(concept, context);
+			retVal = new Object[objectCount];
 			if( objectCount != 0) {
 				Iterator it = getObjectSetIterator(concept, context);
+				int pos = 0;
 				while (it.hasNext()) {
 					Object o = it.next();
-					retVal.add(o);
+					retVal[pos] = o;
+					pos++;
 				}
 			} else {
 				return null;
 			}
 		} else if (query == AggregateQuery.COUNT_QUERY) {
 			int objectCount = getObjectCount(concept, context);
+			retVal = new Object[1];
 			if( objectCount != 0) {
-				retVal.add(new DatabaseRetrievedObject(whereClause, String.valueOf(objectCount)));
+				retVal[0] = new DatabaseRetrievedObject(whereClause, String.valueOf(objectCount));
 			} else {
 				return null;
 			}
 		} else if (query == AggregateQuery.PERCENT_QUERY) {
 			int objectCount = getObjectCount(concept, context);
+			retVal = new Object[1];
 			if( objectCount != 0) {
 				Concept top = concept;
 				while(top.getUpset().size() > 1) {
@@ -313,7 +321,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 				context.setObjectDisplayMode(oldMode);
 				NumberFormat format = DecimalFormat.getNumberInstance();
 				format.setMaximumFractionDigits(2);
-				retVal.add(new DatabaseRetrievedObject(whereClause, format.format(100 * objectCount/(double)fullExtent) + " %"));
+				retVal[0] = new DatabaseRetrievedObject(whereClause, format.format(100 * objectCount/(double)fullExtent) + " %");
 			} else {
 				return null;
 			}
@@ -348,13 +356,14 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 		return retVal;
     }
 
-    private List execute(Query query, String whereClause, String referenceWhereClause) {
-        List retVal = new ArrayList();
+    private Object[] execute(Query query, String whereClause, String referenceWhereClause) {
+        Object[] retVal = null;
         if (whereClause != null) {
         	String statement = query.getQueryHead() + whereClause;
             try {
                 // submit the query
                 List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
+                retVal = new Object[queryResults.size()];
 				Vector reference = null;
 				if(referenceWhereClause != null){
 					/// @todo this should be cached since it gets reused for every single object label in a diagram
@@ -362,12 +371,15 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 					reference = (Vector) referenceResults.iterator().next();
 				}
                 Iterator it = queryResults.iterator();
+                int pos = 0;
                 while (it.hasNext()) {
                     Vector item = (Vector) it.next();
                     DatabaseRetrievedObject object =
                             query.createDatabaseRetrievedObject(whereClause, item, reference);
+                    /// @todo what does this check do? what happens if it is null?
                     if (object != null) {
-                        retVal.add(object);
+                        retVal[pos] = object;
+                        pos++;
                     }
                 }
             } catch (DatabaseException e) {

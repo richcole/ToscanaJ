@@ -16,7 +16,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
 
-///@todo this class does not allow nesting and filtering at the moment
+///@todo this class does not allow nesting and filtering at the moment (or does it?)
 
 public class DirectConceptInterpreter implements ConceptInterpreter {
     private Hashtable contingents = new Hashtable();
@@ -277,31 +277,36 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
         return retVal;
     }
 
-    public List executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
+    public Object[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
 		if(!isRealized(concept, context)) {
 			return null;
 		}
-		List retVal = new ArrayList();
+		Object[] retVal;
 		if (query == ListQuery.KEY_LIST_QUERY) {
 			int objectCount = getObjectCount(concept, context);
 			if( objectCount != 0) {
+				retVal = new Object[objectCount];
 				Iterator it = getObjectSetIterator(concept, context);
+				int pos = 0;
 				while (it.hasNext()) {
 					Object o = it.next();
-					retVal.add(o);
+					retVal[pos] = o;
+					pos++;
 				}
 			} else {
 				return null;
 			}
 		} else if (query == AggregateQuery.COUNT_QUERY) {
 			int objectCount = getObjectCount(concept, context);
+			retVal = new Object[1];
 			if( objectCount != 0) {
-				retVal.add(new Integer(objectCount));
+				retVal[0] = new Integer(objectCount);
 			} else {
 				return null;
 			}
 		} else if (query == AggregateQuery.PERCENT_QUERY) {
 			int objectCount = getObjectCount(concept, context);
+			retVal = new Object[1];
 			if( objectCount != 0) {
 				Concept top = concept;
 				while(top.getUpset().size() > 1) {
@@ -319,7 +324,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
 				context.setObjectDisplayMode(oldMode);
 				NumberFormat format = DecimalFormat.getNumberInstance();
 				format.setMaximumFractionDigits(2);
-				retVal.add(format.format(100 * objectCount/(double)fullExtent) + " %");
+				retVal[0] = format.format(100 * objectCount/(double)fullExtent) + " %";
 			} else {
 				return null;
 			}

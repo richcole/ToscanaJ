@@ -16,8 +16,6 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.awt.geom.Point2D;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * A LabelView for displaying the objects.
@@ -54,7 +52,7 @@ public class ObjectLabelView extends LabelView {
 
 	// do not initialize this with null -- it happens after the superconstructor call which initializes
 	// it by calling back through updateEntries(), which causes double queries
-    private List contents;
+    private Object[] contents;
 
     public static LabelFactory getFactory() {
         return new LabelFactory(){
@@ -125,14 +123,14 @@ public class ObjectLabelView extends LabelView {
         if (this.contents == null) {
             return 0;
         }
-        return this.contents.size();
+        return this.contents.length;
     }
 
-    public Iterator getEntryIterator() {
+    public Object getEntryAt(int position) {
         if(this.contents == null) {
             updateEntries();
         }
-        return this.contents.iterator();
+        return this.contents[position];
     }
 
     protected void doQuery() {
@@ -152,7 +150,7 @@ public class ObjectLabelView extends LabelView {
         if (itemHit == -1) {
             return null;
         }
-        return this.contents.get(itemHit);
+        return this.contents[itemHit];
     }
 
     protected boolean highlightedInIdeal() {

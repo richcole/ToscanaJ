@@ -257,33 +257,26 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
             textWidth = lw;
         }
         
-        // draw the object names
-        Iterator it = this.getEntryIterator();
-        int numItem = 0;
-        while (it.hasNext()) {
-            String cur = it.next().toString();
-            if (numItem >= this.firstItem) {
-                int curPos = numItem - this.firstItem;
-                if (curPos < this.displayLines) {
-                	/// @todo check out getBounds() on TextLayout. JavaDoc of getStringBounds() seems to indicate
-                	/// we should use that instead.
-					LineMetrics lm = this.font.getLineMetrics(cur,graphics.getFontRenderContext());
-					double curWidth = this.font.getStringBounds(cur, graphics.getFontRenderContext()).getWidth();
-                	double textX;
-                	double textY = yPos + lm.getAscent() + lm.getLeading() + curPos * lm.getHeight();
-                    if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT) {
-						textX = (float) xPos + lm.getLeading() + lm.getDescent();
-                    } else if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER) {
-                        textX = (float) (xPos + (lm.getLeading() / 2 + lm.getDescent() / 2 + (textWidth - curWidth) / 2));
-                    } else if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT) {
-                        textX = (float) (xPos + (-lm.getLeading() - lm.getDescent() + textWidth - curWidth));
-                    } else {
-                        throw new RuntimeException("Unknown label alignment.");
-                    }
-                    graphics.drawString(cur, (float)textX, (float)textY);
-                }
+        // draw the contents
+ 		for (int i = this.firstItem; i < this.firstItem + this.displayLines; i++) {
+			String cur = getEntryAt(i).toString();
+            int curPos = i - this.firstItem;
+        	/// @todo check out getBounds() on TextLayout. JavaDoc of getStringBounds() seems to indicate
+        	/// we should use that instead.
+			LineMetrics lm = this.font.getLineMetrics(cur,graphics.getFontRenderContext());
+			double curWidth = this.font.getStringBounds(cur, graphics.getFontRenderContext()).getWidth();
+        	double textX;
+        	double textY = yPos + lm.getAscent() + lm.getLeading() + curPos * lm.getHeight();
+            if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT) {
+				textX = (float) xPos + lm.getLeading() + lm.getDescent();
+            } else if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER) {
+                textX = (float) (xPos + (lm.getLeading() / 2 + lm.getDescent() / 2 + (textWidth - curWidth) / 2));
+            } else if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT) {
+                textX = (float) (xPos + (-lm.getLeading() - lm.getDescent() + textWidth - curWidth));
+            } else {
+                throw new RuntimeException("Unknown label alignment.");
             }
-            numItem++;
+            graphics.drawString(cur, (float)textX, (float)textY);
         }
 
         // draw the scroller elements when needed
@@ -437,9 +430,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         double result = 0;
 
         // find maximum width of string
-        Iterator it = this.getEntryIterator();
-        while (it.hasNext()) {
-            String cur = it.next().toString();
+        for (int i = 0; i < getNumberOfEntries(); i++) {
+            String cur = getEntryAt(i).toString();
             double w = this.font.getStringBounds(cur,frc).getWidth();
             if (w > result) {
                 result = w;
@@ -655,7 +647,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 
     abstract public int getNumberOfEntries();
 
-    abstract public Iterator getEntryIterator();
+    abstract public Object getEntryAt(int position);
 
     private void nodeSelectionChanged() {
         if (highlightedInFilter() &&

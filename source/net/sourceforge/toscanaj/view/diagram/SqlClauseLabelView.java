@@ -36,6 +36,7 @@ public class SqlClauseLabelView extends LabelView {
         return super.isVisible() && !allHidden;
     }
 
+	/// @todo use String[] instead
 	private List entries;
 	
     public static LabelFactory getFactory() {
@@ -63,8 +64,8 @@ public class SqlClauseLabelView extends LabelView {
         return this.entries.size();
     }
 
-    public Iterator getEntryIterator() {
-        return this.entries.iterator();
+    public Object getEntryAt(int position) {
+        return this.entries.get(position);
     }
 
     protected boolean highlightedInIdeal() {

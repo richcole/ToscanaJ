@@ -11,7 +11,6 @@ import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.util.Iterator;
-import java.util.List;
 
 
 /*
@@ -61,5 +60,5 @@ public interface ConceptInterpreter {
 
     boolean isRealized(Concept concept, ConceptInterpretationContext context);
 
-    List executeQuery(Query query, Concept concept, ConceptInterpretationContext context);
+    Object[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context);
 }
