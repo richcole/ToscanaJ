@@ -135,7 +135,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
             contextContingents = new Hashtable();
             contingents.put(context, contextContingents);
         }
-        Vector contingent = (Vector) contingents.get(concept);
+		TreeSet contingent = (TreeSet) contingents.get(concept);
         if (contingent == null) {
             contingent = calculateContingent(concept, context);
             contextContingents.put(concept, contingent);
@@ -143,8 +143,8 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
         return contingent;
     }
 
-    private Vector calculateContingent(Concept concept, ConceptInterpretationContext context) {
-        Vector retVal = new Vector();
+    private TreeSet calculateContingent(Concept concept, ConceptInterpretationContext context) {
+		TreeSet retVal = new TreeSet();
         Iterator objectContingentIterator = concept.getObjectContingentIterator();
         while (objectContingentIterator.hasNext()) {
             Object o = objectContingentIterator.next();
@@ -155,13 +155,13 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
         return retVal;
     }
 
-    private void filterObjects(final Vector retVal, ConceptInterpretationContext context) {
+    private void filterObjects(final TreeSet currentSet, ConceptInterpretationContext context) {
         DiagramHistory.ConceptVisitor visitor;
-        final Vector toRemove = new Vector();
+        final HashSet toRemove = new HashSet();
         if (context.getFilterMode() == ConceptInterpretationContext.EXTENT) {
             visitor = new DiagramHistory.ConceptVisitor() {
                 public void visitConcept(Concept concept) {
-                    for (Iterator iterator = retVal.iterator(); iterator.hasNext();) {
+                    for (Iterator iterator = currentSet.iterator(); iterator.hasNext();) {
                         Object o = iterator.next();
                         boolean found = false;
                         Iterator extentIterator = concept.getExtentIterator();
@@ -181,7 +181,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
         } else {
             visitor = new DiagramHistory.ConceptVisitor() {
                 public void visitConcept(Concept concept) {
-                    for (Iterator iterator = retVal.iterator(); iterator.hasNext();) {
+                    for (Iterator iterator = currentSet.iterator(); iterator.hasNext();) {
                         Object o = iterator.next();
                         boolean found = false;
                         Iterator contingentIterator = concept.getObjectContingentIterator();
@@ -202,16 +202,16 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
         context.getDiagramHistory().visitZoomedConcepts(visitor);
         for (Iterator iterator = toRemove.iterator(); iterator.hasNext();) {
             Object o = iterator.next();
-            retVal.remove(o);
+            currentSet.remove(o);
         }
     }
 
-    private void nestObjects(Vector retVal, ConceptInterpretationContext context, boolean contingentOnly) {
+    private void nestObjects(TreeSet currentSet, ConceptInterpretationContext context, boolean contingentOnly) {
         Iterator mainIt = context.getNestingConcepts().iterator();
         while (mainIt.hasNext()) {
             Concept concept = (Concept) mainIt.next();
-            Vector toRemove = new Vector();
-            for (Iterator iterator = retVal.iterator(); iterator.hasNext();) {
+            HashSet toRemove = new HashSet();
+            for (Iterator iterator = currentSet.iterator(); iterator.hasNext();) {
                 Object o = iterator.next();
                 boolean found = false;
                 Iterator objectIterator;
@@ -233,7 +233,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
             }
             for (Iterator iterator = toRemove.iterator(); iterator.hasNext();) {
                 Object o = iterator.next();
-                retVal.remove(o);
+				currentSet.remove(o);
             }
         }
     }
@@ -247,7 +247,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
             contextExtents = new Hashtable();
             extents.put(context, contextExtents);
         }
-        Vector extent = (Vector) contextExtents.get(concept);
+        TreeSet extent = (TreeSet) contextExtents.get(concept);
         if (extent == null) {
             extent = calculateExtent(concept, context);
             contextExtents.put(concept, extent);
@@ -255,8 +255,8 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
         return extent;
     }
 
-    private Vector calculateExtent(Concept concept, ConceptInterpretationContext context) {
-        Vector retVal = new Vector();
+    private TreeSet calculateExtent(Concept concept, ConceptInterpretationContext context) {
+        TreeSet retVal = new TreeSet();
         Iterator extentContingentIterator = concept.getExtentIterator();
         while (extentContingentIterator.hasNext()) {
             Object o = extentContingentIterator.next();
