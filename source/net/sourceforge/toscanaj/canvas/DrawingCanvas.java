@@ -84,12 +84,11 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     private AffineTransform transform = null;
 
     /**
-     * Paints the CanvasItems in the diagram.
+     * Paints the canvas including all CanvasItems on it.
      */
-    public void paintCanvasItems(Graphics2D graphics)
+    public void paintCanvas(Graphics2D graphics)
     {
         // fill the background
-        /// @TODO Rename this method (it draws not only the items)
         /// @TODO Make Background color configurable
         graphics.setPaint(this.getBackground());
         graphics.fill(this.getCanvasSize(graphics));
@@ -140,7 +139,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
             scaleToFit(graphics2D,bounds);
 
             // paint all items on canvas
-            paintCanvasItems(graphics2D);
+            paintCanvas(graphics2D);
 
             return PAGE_EXISTS;
         }

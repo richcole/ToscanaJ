@@ -81,7 +81,7 @@ public class ImageWriter {
             canvas.scaleToFit(svgGenerator, bounds);
 
             // render the graphic into the DOM
-            canvas.paintCanvasItems(svgGenerator);
+            canvas.paintCanvas(svgGenerator);
 
             // Finally, stream out SVG to the standard output using UTF-8
             // character to byte encoding
@@ -108,7 +108,7 @@ public class ImageWriter {
             canvas.scaleToFit(graphics2D, bounds);
 
             // paint all items on canvas
-            canvas.paintCanvasItems(graphics2D);
+            canvas.paintCanvas(graphics2D);
             try
             {
                 JimiWriter writer = Jimi.createJimiWriter(jimiName);

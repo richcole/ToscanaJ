@@ -97,7 +97,7 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         this.scaleToFit(g2d, bounds);
 
         // paint all items on canvas
-        paintCanvasItems(g2d);
+        paintCanvas(g2d);
     }
 
     /**
