@@ -12,10 +12,10 @@ Affecting different programs:
 - creating lattice diagrams is now a lot faster (noticable esp. when importing
   Cernato or Burmeister files).
 - the restrictions of the n-dim manipulator on diagrams created without external
-  order (all but Cernato-import) are reduced -- the diagrams are enforced to be
-  additive in attributes of meet-irreducible nodes, but nothing more. In naive
-  terms: it doesn't behave weird anymore :-) Applies only to new diagrams, though.
-  Old ones need to be recreated (e.g. by hitting "Create" in the context editor).
+  order (all but Cernato-import) are reduced -- the manipulator appears like the
+  ideal manipulator on meet-irreducible nodes now but allows dragging other nodes
+  while keeping additivvity. This applies only to new diagrams, existing diagrams
+  need to be recreated (e.g. by hitting "Create" in the context editor).
 
 Specific for ToscanaJ:
 ======================
