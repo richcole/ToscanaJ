@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.rdf.query;
+package org.tockit.tupelware.source.rdql;
 
 import java.io.File;
 import java.util.Iterator;
