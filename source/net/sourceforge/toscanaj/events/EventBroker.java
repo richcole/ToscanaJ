@@ -33,6 +33,14 @@ import java.util.*;
  * a new object implementing the Event interface. Currently this still happens
  * synchronously, i.e. all listeners to this type of event will be called
  * before the method returns.
+ *
+ * Note: if subscription changes are requested while events are still processed,
+ * the changes will only occur after the current event processing has been
+ * finished, but before the next event after that will be processed.
+ *
+ * @todo probably it would be a better idea to process events one by one, i.e.
+ * caching new events until the old ones have been processed, which means adding
+ * an event queue to this class.
  */
 public class EventBroker implements BrokerEventListener {
     /**
@@ -41,7 +49,31 @@ public class EventBroker implements BrokerEventListener {
     private List subscriptions = new ArrayList();
 
     /**
-     * We store the package of this class as constant since Class.getPackage() does not always work.
+     * Stores new subscriptions which shall be added to the subsription list.
+     *
+     * This is needed if a new subscription is made while an event is processed,
+     * otherwise a ConcurrentModificationException will be thrown.
+     */
+    private List newSubscriptions = new ArrayList();
+
+    /**
+     * Stores subscriptions which shall be removed from the subsription list.
+     *
+     * This is needed if a new subscription is removed while an event is processed,
+     * otherwise a ConcurrentModificationException will be thrown.
+     */
+    private List subscriptionsToRemove = new ArrayList();
+
+    /**
+     * This counts the number of iterators accessing the subscriptions list.
+     *
+     * This is used to avoid accessing the subscription list while someone is still iterating.
+     */
+    private int numberOfSubscriptionIterators = 0;
+
+    /**
+     * We store the package of this class as constant since Class.getPackage()
+     * does not always work.
      */
     private static final String PACKAGE_NAME = "net.sourceforge.toscanaj.events";
 
@@ -69,7 +101,7 @@ public class EventBroker implements BrokerEventListener {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Internal error in EventBroker, class Event not found");
         }
-        subscriptions.add(new EventSubscription(listener, eventType, sourceType));
+        newSubscriptions.add(new EventSubscription(listener, eventType, sourceType));
     }
 
     /**
@@ -78,11 +110,26 @@ public class EventBroker implements BrokerEventListener {
      * Afterwards the listener will not receive any events anymore.
      */
     public void removeSubscriptions(BrokerEventListener listener) {
+        updateSubscriptions();
+        numberOfSubscriptionIterators++;
         for (Iterator iterator = subscriptions.iterator(); iterator.hasNext();) {
             EventSubscription subscription = (EventSubscription) iterator.next();
             if (subscription.getListener().equals(listener)) {
-                iterator.remove();
+                subscriptionsToRemove.add(subscription);
             }
+        }
+        numberOfSubscriptionIterators--;
+    }
+
+    /**
+     * Adds the new subscriptions to the main list.
+     */
+    private void updateSubscriptions() {
+        if(numberOfSubscriptionIterators == 0) {
+            subscriptions.addAll(newSubscriptions);
+            newSubscriptions.clear();
+            subscriptions.removeAll(subscriptionsToRemove);
+            subscriptionsToRemove.clear();
         }
     }
 
@@ -96,9 +143,11 @@ public class EventBroker implements BrokerEventListener {
      * RuntimeException will be thrown.
      */
     public void processEvent(Event event) {
+        updateSubscriptions();
         if (event.getSource() == null) {
             throw new RuntimeException("Event needs source to be processed, null not allowed.");
         }
+        numberOfSubscriptionIterators++;
         for (Iterator iterator = subscriptions.iterator(); iterator.hasNext();) {
             EventSubscription subscription = (EventSubscription) iterator.next();
             if (extendsOrImplements(event.getClass(), subscription.getEventType()) &&
@@ -106,6 +155,7 @@ public class EventBroker implements BrokerEventListener {
                 subscription.getListener().processEvent(event);
             }
         }
+        numberOfSubscriptionIterators--;
     }
 
     /**
