@@ -293,9 +293,9 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 				context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
 				int fullExtent = getObjectCount(concept.getTopConcept(), context);
 				context.setObjectDisplayMode(oldMode);
-				NumberFormat format = DecimalFormat.getNumberInstance();
+				NumberFormat format = DecimalFormat.getPercentInstance();
 				format.setMaximumFractionDigits(2);
-				String objectValue = format.format(100 * objectCount/(double)fullExtent) + " %";
+				String objectValue = format.format(objectCount/(double)fullExtent) + " %";
                 return new Object[]{getObject(objectValue, concept, context)};				
 			} else {
 				return null;
