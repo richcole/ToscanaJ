@@ -12,10 +12,14 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.database.Column;
+import net.sourceforge.toscanaj.model.database.DatabaseSchema;
+import net.sourceforge.toscanaj.model.database.Table;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -25,6 +29,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
+import java.util.List;
 
 public class NominalScaleEditorDialog extends JDialog {
     private boolean result;
@@ -40,11 +45,92 @@ public class NominalScaleEditorDialog extends JDialog {
 	private JButton createButton;
 
     private JTextField scaleTitleField;
+    private JComboBox columnChooser;
+    private DatabaseSchema databaseSchema;
+    private JButton andButton;
+    private JButton orButton;
+    
+    public interface SqlFragment {
+    	String getAttributeLabel();
+    	String getSqlClause();
+    	String getClosedAttributeLabel();
+    }
+    
+    private static class TableColumnValueTriple implements SqlFragment{
+    	private TableColumnPair tableColumnPair;
+    	private String value;
+    	public TableColumnValueTriple(TableColumnPair tableColumnPair, String value) {
+    		this.tableColumnPair = tableColumnPair;
+    		this.value = value;
+    	}
+        public TableColumnPair getTableColumnPair() {
+            return tableColumnPair;
+        }
+        public String getValue() {
+            return value;
+        }
+        public String toString() {
+        	return this.getSqlClause();
+        }
+        public String getAttributeLabel() {
+            return this.value;
+        }
+        public String getSqlClause() {
+            return this.tableColumnPair.toString() + " = '" + this.value + "'";
+        }
+        public String getClosedAttributeLabel() {
+            return this.getAttributeLabel();
+        }
+    }
+    
+    private static class Disjunction implements SqlFragment {
+        private SqlFragment firstPart;
+        private SqlFragment secondPart;
+        public Disjunction(SqlFragment firstPart, SqlFragment secondPart) {
+            this.firstPart = firstPart;
+            this.secondPart = secondPart;
+        }
+        public String getAttributeLabel() {
+            return this.firstPart.getClosedAttributeLabel() + " or " + this.secondPart.getClosedAttributeLabel();
+        }
+        public String getSqlClause() {
+            return "(" + this.firstPart.getSqlClause() + ") OR (" + this.secondPart.getSqlClause() + ")";
+        }
+        public String toString() {
+        	return getSqlClause();
+        }
+        public String getClosedAttributeLabel() {
+            return "(" + this.getAttributeLabel() + ")";
+        }
+    }
 
-    public NominalScaleEditorDialog(Frame owner, Column column, DatabaseConnection databaseConnection) {
+    private static class Conjunction implements SqlFragment {
+        private SqlFragment firstPart;
+        private SqlFragment secondPart;
+        public Conjunction(SqlFragment firstPart, SqlFragment secondPart) {
+            this.firstPart = firstPart;
+            this.secondPart = secondPart;
+        }
+        public String getAttributeLabel() {
+            return this.firstPart.getClosedAttributeLabel() + " and " + this.secondPart.getClosedAttributeLabel();
+        }
+        public String getSqlClause() {
+            return "(" + this.firstPart.getSqlClause() + ") AND (" + this.secondPart.getSqlClause() + ")";
+        }
+        public String toString() {
+            return getSqlClause();
+        }
+        public String getClosedAttributeLabel() {
+            return "(" + this.getAttributeLabel() + ")";
+        }
+    }
+
+    public NominalScaleEditorDialog(Frame owner, Column column, DatabaseConnection databaseConnection,
+                                     DatabaseSchema databaseSchema) {
         super(owner);
         this.column = column;
         this.databaseConnection = databaseConnection;
+        this.databaseSchema = databaseSchema;
 
         createControls();
         fillControls();
@@ -59,7 +145,6 @@ public class NominalScaleEditorDialog extends JDialog {
 
         // -- title pane ---
         this.scaleTitleField = new JTextField();
-        scaleTitleField.setText(column.getName() + " (nominal)");
         this.scaleTitleField.addKeyListener(new KeyListener(){
 			private void validateTextField(){
 				if(scaleTitleField.getText().trim().equals("")){
@@ -79,7 +164,7 @@ public class NominalScaleEditorDialog extends JDialog {
 			public void keyPressed(KeyEvent e) {}		
         });
         JPanel titlePane = new JPanel(new GridBagLayout());
-        titlePane.add(new Label("Scale Title"), new GridBagConstraints(
+        titlePane.add(new Label("Scale Title: "), new GridBagConstraints(
         				0,0,1,1,0,0,
         				GridBagConstraints.NORTHWEST,
         				GridBagConstraints.NONE,
@@ -106,6 +191,17 @@ public class NominalScaleEditorDialog extends JDialog {
                         0, 0
                 )
         );
+
+        this.columnChooser = new JComboBox();
+        this.columnChooser.addActionListener(new ActionListener(){
+        	public void actionPerformed(ActionEvent e) {
+        		JComboBox cb = (JComboBox) e.getSource();
+        		if(column != cb.getSelectedItem()) {
+        			column = ((TableColumnPair) cb.getSelectedItem()).getColumn();
+        			fillAvailableValueList();
+        		}
+            }
+        });
 
         JPanel tablePane = new JPanel(new GridBagLayout());
         this.columnValuesListModel = new DefaultListModel();
@@ -143,9 +239,56 @@ public class NominalScaleEditorDialog extends JDialog {
                 }
             }
         });
+        
+        JPanel combinationButtonPanel = new JPanel(new GridBagLayout());
+        this.andButton = new JButton("AND");
+        this.andButton.setEnabled(false);
+        this.andButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+            	createConjunction();
+            }
+        });
+        
+        this.orButton = new JButton("OR");
+        this.orButton.setEnabled(false);
+        this.orButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                createDisjunction();
+            }
+        });
+
+        
+        combinationButtonPanel.add(this.andButton,
+                new GridBagConstraints(
+                        0, 0, 1, 1, 1, 0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL,
+                        new Insets(5, 5, 5, 5),
+                        0, 0
+                )
+        );
+        combinationButtonPanel.add(this.orButton,
+                new GridBagConstraints(
+                        1, 0, 1, 1, 1, 0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL,
+                        new Insets(5, 5, 5, 5),
+                        0, 0
+                )
+        );
+        
+        tablePane.add(new LabeledPanel("Columns", this.columnChooser, false),
+                new GridBagConstraints(
+                        0, 0, 1, 1, 1, 0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL,
+                        new Insets(5, 5, 5, 5),
+                        0, 0
+                )
+        );
         tablePane.add(new LabeledPanel("Available Values", this.columnValuesListView),
                 new GridBagConstraints(
-                        0, 0, 1, 1, 1, 1,
+                        0, 1, 1, 2, 1, 1,
                         GridBagConstraints.CENTER,
                         GridBagConstraints.BOTH,
                         new Insets(5, 5, 5, 5),
@@ -154,23 +297,33 @@ public class NominalScaleEditorDialog extends JDialog {
         );
         tablePane.add(moveButtonPane,
                 new GridBagConstraints(
-                        1, 0, 1, 1, 0, 0,
+                        1, 0, 1, 3, 0, 0,
                         GridBagConstraints.CENTER,
                         GridBagConstraints.NONE,
                         new Insets(5, 5, 5, 5),
                         0, 0
                 )
         );
-        tablePane.add(new LabeledPanel("Selected Attributes", this.attributeListView),
+        tablePane.add(new LabeledPanel("Selected Clauses", this.attributeListView),
                 new GridBagConstraints(
-                        2, 0, 1, 1, 1, 1,
+                        2, 0, 1, 2, 1, 1,
                         GridBagConstraints.CENTER,
                         GridBagConstraints.BOTH,
                         new Insets(5, 5, 5, 5),
                         0, 0
                 )
         );
+        tablePane.add(combinationButtonPanel,
+                new GridBagConstraints(
+                        2, 2, 1, 1, 1, 0,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL,
+                        new Insets(5, 5, 5, 5),
+                        0, 0
+                )
+        );
         tablePane.setBorder(BorderFactory.createEtchedBorder());
+        
         getContentPane().add(
                 tablePane,
                 new GridBagConstraints(
@@ -216,38 +369,78 @@ public class NominalScaleEditorDialog extends JDialog {
         );
         
 		attributeListView.getModel().addListDataListener(new UpdateButtonForCorrectModelStateListDataListener(createButton));
+		attributeListView.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                boolean combinationPossible = attributeListView.getSelectedIndices().length == 2;
+                andButton.setEnabled(combinationPossible);
+                orButton.setEnabled(combinationPossible);
+            }
+		});
         pack();
     }
 
     private void addValuesToSelection() {
         for (int i = this.columnValuesListView.getSelectedValues().length - 1; i >= 0; i--) {
-            Object o = this.columnValuesListView.getSelectedValues()[i];
-            this.columnValuesListModel.removeElement(o);
-            this.attributeListModel.addElement(o);
+            String value = (String)this.columnValuesListView.getSelectedValues()[i];
+            TableColumnPair tabCol = (TableColumnPair) this.columnChooser.getSelectedItem();
+            this.attributeListModel.addElement(new TableColumnValueTriple(tabCol, value));
         }
+        fillAvailableValueList();
     }
 
     private void removeValuesFromSelection() {
         for (int i = this.attributeListView.getSelectedValues().length - 1; i >= 0; i--) {
-            Object o = this.attributeListView.getSelectedValues()[i];
-            this.attributeListModel.removeElement(o);
-            this.columnValuesListModel.addElement(o);
+            TableColumnValueTriple tcv = (TableColumnValueTriple) this.attributeListView.getSelectedValues()[i];
+            this.attributeListModel.removeElement(tcv);
         }
     }
 
     private void fillControls() {
-        // --- get a list of the values in column
-        java.util.List resultSet = null;
+        this.columnChooser.removeAllItems();
+        List tables = this.databaseSchema.getTables();
+        for (Iterator tableIterator = tables.iterator(); tableIterator.hasNext();) {
+            Table table = (Table) tableIterator.next();
+            List columns = table.getColumns();
+            for (Iterator columnsIterator = columns.iterator(); columnsIterator.hasNext();) {
+                Column column = (Column) columnsIterator.next();
+                this.columnChooser.addItem(new TableColumnPair(table, column));
+            }
+            fillAvailableValueList();
+        }
+    }
+
+	/**
+	 * @todo we need caching here
+	 */
+    private void fillAvailableValueList() {
+        this.columnValuesListModel.clear();
+        TableColumnPair tabCol = (TableColumnPair) this.columnChooser.getSelectedItem();
+        List resultSet = null;
         try {
             String query = "SELECT DISTINCT " + column.getName() + " FROM " +
                     column.getTable().getName() + ";";
             resultSet = databaseConnection.queryColumn(query, 1);
             for (Iterator it = resultSet.iterator(); it.hasNext();) {
-                this.columnValuesListModel.addElement((String) it.next());
+            	String value = (String) it.next();
+            	if(!valueSelected(tabCol, value)) {
+                	this.columnValuesListModel.addElement(value);
+            	}
             }
         } catch (DatabaseException e) {
-        	ErrorDialog.showError(this, e, "Database query failed");
+            ErrorDialog.showError(this, e, "Database query failed");
         }
+    }
+    
+    private boolean valueSelected(TableColumnPair tabCol, String value) {
+    	for(int i = 0; i < this.attributeListModel.size(); i++) {
+    		if(this.attributeListModel.get(i) instanceof TableColumnValueTriple) {
+	    		TableColumnValueTriple tcv = (TableColumnValueTriple) this.attributeListModel.get(i);
+	    		if( tcv.getTableColumnPair().equals(tabCol) && tcv.getValue().equals(value)) {
+	    			return true;
+	    		}
+    		}
+    	}
+        return false;
     }
 
     public boolean execute() {
@@ -275,9 +468,30 @@ public class NominalScaleEditorDialog extends JDialog {
 			}
 		}
 	}    
+	
 	private boolean isScaleCorrect() {
 		  return attributeListView.getModel().getSize() > 0;
-	  }
+	}
+	
+    private void createConjunction() {
+        Object[] selectedValues = this.attributeListView.getSelectedValues();
+        SqlFragment firstPart = (SqlFragment) selectedValues[0];
+        SqlFragment secondPart = (SqlFragment) selectedValues[1];
+        int pos = this.attributeListView.getSelectedIndices()[0];
+        this.attributeListModel.removeElement(firstPart);
+        this.attributeListModel.removeElement(secondPart);
+        this.attributeListModel.add(pos, new Conjunction(firstPart,secondPart));
+    }
+
+    private void createDisjunction() {
+        SqlFragment firstPart = (SqlFragment) this.attributeListView.getSelectedValues()[0];
+        SqlFragment secondPart = (SqlFragment) this.attributeListView.getSelectedValues()[1];
+        int pos = this.attributeListView.getSelectedIndices()[0];
+        this.attributeListModel.removeElement(firstPart);
+        this.attributeListModel.removeElement(secondPart);
+        this.attributeListModel.add(pos, new Disjunction(firstPart,secondPart));
+    }
+
 	private class UpdateButtonForCorrectModelStateListDataListener implements ListDataListener {
 			private final JButton actionButton;
 
@@ -285,20 +499,20 @@ public class NominalScaleEditorDialog extends JDialog {
 				this.actionButton = button;
 			}
 
-			private void updateStateOfOkButton() {
+			private void updateStateOfButtons() {
 				actionButton.setEnabled(isScaleCorrect() && !scaleTitleField.getText().equals(""));
 			}
 
 			public void contentsChanged(ListDataEvent e) {
-				updateStateOfOkButton();
+				updateStateOfButtons();
 			}
 
 			public void intervalAdded(ListDataEvent e) {
-				updateStateOfOkButton();
+				updateStateOfButtons();
 			}
 
 			public void intervalRemoved(ListDataEvent e) {
-				updateStateOfOkButton();
+				updateStateOfButtons();
 			}
 		}
     

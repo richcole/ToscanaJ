@@ -12,10 +12,18 @@ import java.awt.*;
 
 public class LabeledPanel extends JPanel {
     public LabeledPanel(String label, Component contentView) {
-        this(label, contentView, null);
+        this(label, contentView, null, true);
     }
-    
+
+    public LabeledPanel(String label, Component contentView, boolean scrollable) {
+        this(label, contentView, null, scrollable);
+    }
+
     public LabeledPanel(String label, Component contentView, Component extraComponent) {
+    	this(label,contentView,extraComponent,true);
+    }
+
+    public LabeledPanel(String label, Component contentView, Component extraComponent, boolean scrollable) {
         super();
         setLayout(new GridBagLayout());
         add(new JLabel(label),
@@ -26,15 +34,26 @@ public class LabeledPanel extends JPanel {
                         new Insets(5, 5, 5, 5),
                         5, 5)
         );
-        add(new JScrollPane(contentView),
-                new GridBagConstraints(
-                        0, 1, 1, 1, 1.0, 1.0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.BOTH,
-                        new Insets(2, 5, 2, 5),
-                        5, 5)
-        );
-        
+		if(scrollable) {
+		    add(new JScrollPane(contentView),
+		            new GridBagConstraints(
+		                    0, 1, 1, 1, 1.0, 1.0,
+		                    GridBagConstraints.CENTER,
+		                    GridBagConstraints.BOTH,
+		                    new Insets(2, 5, 2, 5),
+		                    5, 5)
+		    );
+		} else {
+		    add(contentView,
+		            new GridBagConstraints(
+		                    0, 1, 1, 1, 1.0, 1.0,
+		                    GridBagConstraints.CENTER,
+		                    GridBagConstraints.BOTH,
+		                    new Insets(2, 5, 2, 5),
+		                    5, 5)
+		    );
+		}
+		        
         if (extraComponent != null) {
             add(extraComponent,
                     new GridBagConstraints(

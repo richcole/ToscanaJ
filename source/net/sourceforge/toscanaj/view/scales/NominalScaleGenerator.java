@@ -40,7 +40,7 @@ public class NominalScaleGenerator implements ScaleGenerator {
 		DatabaseConnection databaseConnection) {
 		Column column = columns[0].getColumn();
 		NominalScaleEditorDialog dialog =
-			new NominalScaleEditorDialog(parent, column, databaseConnection);
+			new NominalScaleEditorDialog(parent, column, databaseConnection, scheme.getDatabaseSchema());
 		if (!dialog.execute()) {
 			return null;
 		}
@@ -52,8 +52,9 @@ public class NominalScaleGenerator implements ScaleGenerator {
 		String topNodeClause = null;
 
 		for (int i = 0; i < values.length; i++) {
-			String object = createSQLClause(column.getName(), values, i);
-			String attributeName = createAttributeName(values, i);
+		    NominalScaleEditorDialog.SqlFragment sqlFrag = (NominalScaleEditorDialog.SqlFragment) values[i];
+			String object = sqlFrag.getSqlClause();
+			String attributeName = sqlFrag.getAttributeLabel();
 			Attribute attribute = new Attribute(attributeName);
 
 			context.getObjects().add(object);
@@ -70,14 +71,6 @@ public class NominalScaleGenerator implements ScaleGenerator {
 		context.getObjects().add(topNodeClause);
 		
 		return context;
-	}
-
-	private String createAttributeName(Object[] values, int i) {
-		return ">" + String.valueOf(values[i]);
-	}
-
-	private String createSQLClause(String columnName, Object[] values, int i) {
-		return columnName + "='" + values[i].toString() + "'";
 	}
 
 	private ConceptImplementation makeConcept(
