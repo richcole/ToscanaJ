@@ -56,6 +56,7 @@ import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.context.FCAObject;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
@@ -117,6 +118,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     private JButton lastStepButton;
     private JLabel stepPositionLabel;
     private JButton startSteppingButton;
+    private JButton removeTransitionsButton;
 	
 	public TemporalControlsPanel(DiagramView diagramView, 
     						   DiagramExportSettings diagramExportSettings, EventBroker eventBroker) {
@@ -217,6 +219,13 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             }
         });
 
+        removeTransitionsButton = new JButton("Remove transitions");
+        removeTransitionsButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                removeTransitions();
+            }
+        });
+
         exportImagesButton = new JButton("Export all steps as images");
         exportImagesButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
@@ -231,6 +240,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 
         JPanel panel = new JPanel(new GridBagLayout());
         panel.add(addStaticTransitionsButton, buttonConstraints);
+        panel.add(removeTransitionsButton, buttonConstraints);
         panel.add(exportImagesButton, buttonConstraints);
         panel.add(animateTransitionsButton, buttonConstraints);
         panel.add(startSteppingButton, buttonConstraints);
@@ -241,6 +251,12 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         DEFAULT_SPACER_INSETS, 0, 0));
         return panel;
+    }
+
+    protected void removeTransitions() {
+        SimpleLineDiagram diagram = (SimpleLineDiagram) this.diagramView.getDiagram();
+        diagram.removeExtraCanvasItems();
+        this.diagramView.update(this);
     }
 
     private JPanel createBasicSettingsPanel() {
@@ -455,6 +471,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     private void setButtonStates(boolean allDisabled) {
         boolean enabled = !allDisabled && (this.diagramView.getDiagram() != null);
         addStaticTransitionsButton.setEnabled(enabled);
+        removeTransitionsButton.setEnabled(enabled);
         startSteppingButton.setEnabled(enabled);
         animateTransitionsButton.setEnabled(enabled);
         exportImagesButton.setEnabled(enabled && this.diagramExportSettings != null);
@@ -617,7 +634,9 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     
     private void animate() {
     	if(this.lastAnimationTime > this.targetTime) {
-    		return; // nothing to animate anymore
+            // done
+            removeTransitions();
+    		return;
     	}
         this.timeController.calculateCurrentTime();
         this.lastAnimationTime = this.timeController.getCurrentTime();
@@ -790,6 +809,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     }
 
     private void addTransitions(List sequence, ArrowStyle style, Hashtable nodeViewMap, boolean highlightStates, int countStart) {
+        SimpleLineDiagram diagram = (SimpleLineDiagram) this.diagramView.getDiagram();
     	NodeView oldView = null;
     	Iterator objectIt = sequence.iterator();
     	int count = countStart;
@@ -801,15 +821,14 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     	    	continue;
     	    }
     	    if(highlightStates) {
-    	        this.diagramView.addCanvasItem(new StateRing(curView, style.getColor(), count, this.timeController),
-    	                                       TRANSITION_LAYER_NAME);
+    	        diagram.addExtraCanvasItem(new StateRing(curView, style.getColor(), count, this.timeController));
     	    }
     	    if(oldView != null && oldView != curView) {
-    	        this.diagramView.addCanvasItem(new TransitionArrow(oldView, curView, style, count - 0.5, this.timeController),
-    	                                       TRANSITION_LAYER_NAME);
+                diagram.addExtraCanvasItem(new TransitionArrow(oldView, curView, style, count - 0.5, this.timeController));
     	    }
     	    oldView = curView;
         }
+        this.diagramView.update(this);
     }
 
 	private NodeView findObjectConceptView(FCAObject object, Hashtable nodeViewMap) {

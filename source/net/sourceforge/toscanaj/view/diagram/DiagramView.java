@@ -137,6 +137,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
                 source instanceof DiagramHistory) {
             showDiagram(DiagramController.getController().getCurrentDiagram());
         } else {
+            showDiagram(this.diagram);
             requestScreenTransformUpdate();
             repaint();
         }
@@ -204,6 +205,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         addLayer("nodes-1");
         addLayer("connectors-1");
         addLayer("labels");
+        addLayer("extraItems");
         try{
         	addDiagram(diagram, conceptInterpretationContext, 0, true);
             requestScreenTransformUpdate();
@@ -297,6 +299,13 @@ public class DiagramView extends Canvas implements ChangeObserver {
         for (int i = 0; i < diagram.getNumberOfLines(); i++) {
             DiagramLine dl = diagram.getLine(i);
             addCanvasItem(new LineView(dl, (NodeView) nodeMap.get(dl.getFromNode()), (NodeView) nodeMap.get(dl.getToNode())), lineLayerName);
+        }
+        if(diagram instanceof SimpleLineDiagram) {
+            SimpleLineDiagram sld = (SimpleLineDiagram) diagram;
+            for (Iterator iter = sld.getExtraCanvasItems().iterator(); iter.hasNext();) {
+                CanvasItem item = (CanvasItem) iter.next();
+                addCanvasItem(item, "extraItems");
+            }
         }
     }
 

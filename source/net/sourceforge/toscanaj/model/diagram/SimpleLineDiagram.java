@@ -17,10 +17,14 @@ import net.sourceforge.toscanaj.util.IdPool;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
+import org.tockit.canvas.CanvasItem;
 import org.tockit.events.EventBroker;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -36,11 +40,6 @@ import java.util.List;
  * usual mathematical system) or downwards (the usual computer coordinates). The
  * first call to getNode() or getBounds() will make sure that the coordinates
  * will be pointing downwards when reading.
- * 
- * @todo use IdPool to create identifiers for nodes. Either need 
- * to add this to addNode or, better still, add a factory method 
- * for DiagramNode creation, this method should then be also
- * responsible for creating, checking identifiers.
  */
 public class SimpleLineDiagram implements WriteableDiagram2D {
 	protected EventBroker eventBroker;
@@ -68,6 +67,9 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     private Element description = null;
     
     private IdPool idPool = new IdPool();
+    
+    private static HashMap extraCanvasItemTypes = new HashMap();
+    private List extraCanvasItems = new ArrayList();
 
     /**
      * The default constructor creates a diagram with just nothing in it at all.
@@ -508,5 +510,20 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 		}
 		return bottom;
     }
-        
+
+    public static void registerExtraCanvasItemType(String tagName, Class type) {
+        extraCanvasItemTypes.put(tagName, type);
+    }
+    
+    public void addExtraCanvasItem(CanvasItem item) {
+        this.extraCanvasItems.add(item);
+    }
+    
+    public void removeExtraCanvasItems() {
+        this.extraCanvasItems.clear();
+    }
+    
+    public List getExtraCanvasItems() {
+        return Collections.unmodifiableList(this.extraCanvasItems);
+    }
 }
