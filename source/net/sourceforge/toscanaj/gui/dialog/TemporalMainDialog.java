@@ -302,7 +302,8 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         double hold = this.holdField.getDoubleValue();
         double fadeOut = this.fadeOutField.getDoubleValue();
         int speed = this.speedField.getIntegerValue();
-        if(this.serializeSequencesBox.isSelected()) {
+        if(this.serializeSequencesBox.isSelected() && 
+                    !(this.sequenceToShowChooser.getSelectedItem() instanceof AttributeValue)) {
         	int numSeq = this.sequenceValues.size();
             AnimationTimeController newTimeController = new AnimationTimeController(length * numSeq, fadeIn, hold, fadeOut, speed);
             addTransitionsSerialized(newTimeController.getAllFadedTime(), newTimeController, true);
