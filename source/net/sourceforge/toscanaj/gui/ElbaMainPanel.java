@@ -182,7 +182,7 @@ public class ElbaMainPanel
 		ConfigurationManager.restorePlacement(
 			CONFIGURATION_SECTION_NAME,
 			this,
-			new Rectangle(10, 10, 900, 700));
+			new Rectangle(10, 10, 1000, 700));
 
 		this.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
