@@ -39,19 +39,44 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
 			</aggregate>
 		</queries>
 	</database>
+        <!-- a simple HTML summary, given as part of this file -->
         <viewer class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML View...">
-                <parameter name="template" value="/home/pbecker/temp/objectView.html"/>
+                <template>
+                    <html>
+                        <body>
+                            <h1><field content="PCname"/></h1>
+                            <table border="1" width="100%">
+                                <tr><th colspan="2">Features</th></tr>
+                                <tr><td>Type of case:</td><td><field content="typeCase"/></td></tr>
+                                <tr><td>Size of harddisk:</td><td><field content="harddisk"/></td></tr>
+                                <tr><td>Bus system:</td><td><field content="typeBus"/></td></tr>
+                                <tr><td>Software:</td><td><field content="software"/></td></tr>
+                            </table>
+                            <div align="right">
+                                <font size="+1"><b>Price: <field content="price"/></b></font>
+                            </div>
+                        </body>
+                    </html>
+                </template>
         </viewer>
+        <!-- this one is demonstrating the usage of external files. And how to use color to your own disadvantage :-) -->
+        <viewer class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML View (Color)...">
+                <template url="views/coloredSummary.html"/>
+        </viewer>
+        <!-- it does not have to be HTML... Loading plain text is not yet implemented. BTW: delimiters can have more than one char. -->
         <viewer class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer" name="Short View...">
-                <parameter name="openDelimiter" value="$$$"/>
-                <parameter name="closeDelimiter" value="%%%"/>
-                <template url="views/simple.txt"/>
+                <parameter name="openDelimiter" value="$"/>
+                <parameter name="closeDelimiter" value="$"/>
+                <template>Name:  $PCName$
+Price: $price$</template>
         </viewer>
+        <!-- this one is just showing syntax, it does not do anything useful -->
         <viewer class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer" name="External View...">
                 <parameter name="openDelimiter" value="$$$"/>
                 <parameter name="closeDelimiter" value="%%%"/>
                 <parameter name="commandLine" value="echo $$$PCname%%%"/>
         </viewer>
+        <!-- a report, syntax will change (the file will be included later), we still lack formatting of results... -->
         <report class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseReportGenerator" name="HTML Report...">
                 <parameter name="template" value="/home/pbecker/temp/report.html"/>
         </report>
