@@ -172,7 +172,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
                         Iterator extentIterator = concept.getExtentIterator();
                         while (extentIterator.hasNext()) {
                             Object o2 = extentIterator.next();
-                            if (o == o2) {
+                            if (o.equals(o2)) {
                                 found = true;
                                 break;
                             }
@@ -192,7 +192,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
                         Iterator contingentIterator = concept.getObjectContingentIterator();
                         while (contingentIterator.hasNext()) {
                             Object o2 = contingentIterator.next();
-                            if (o == o2) {
+                            if (o.equals(o2)) {
                                 found = true;
                                 break;
                             }
@@ -227,7 +227,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
                 }
                 while (objectIterator.hasNext()) {
                     Object o2 = objectIterator.next();
-                    if (o == o2) {
+                    if (o.equals(o2)) {
                         found = true;
                         break;
                     }
