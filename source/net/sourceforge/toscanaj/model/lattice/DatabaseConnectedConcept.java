@@ -201,7 +201,6 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             String whereClause = constructWhereClause(contingentOnly);
             try {
                 retVal = this.connection.executeQuery(dbQuery, whereClause);
-
             } catch (DatabaseException e) {
                 handleDBException(e);
             }
