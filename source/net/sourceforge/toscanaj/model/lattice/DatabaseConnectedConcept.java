@@ -62,6 +62,12 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      */
     public void setObjectClause(String clause) {
         this.objectClause = clause;
+        // if we get a null here (no clause for this one), we can initialize without
+        // asking the DB
+        if(clause == null) {
+            this.objects = new LinkedList(); // empty list
+            this.numObjects = 0; // no objects
+        }
     }
 
     /**
