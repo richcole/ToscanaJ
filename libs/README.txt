@@ -10,8 +10,5 @@ jdom.jar:
 hsqldb.jar: 
   HSQL Database Engine, version 1.7.1.b (http://hsqldb.sourceforge.net/, licence in LICENCE.hsqldb.html)
 
-JimiProClasses.zip: 
-  JIMI image manipulation library from Sun (http://java.sun.com/products/jimi/, licence in LICENCE.jimi)
-
 batik-*.jar: 
   Batik SVG library (http://xml.apache.org/batik/, licence in LICENCE.batik)
