@@ -359,7 +359,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     }
 
     public void updateBounds(Graphics2D graphics) {
-        this.rect = getLabelBounds(graphics.getFontRenderContext());
+        FontRenderContext fontRenderContext = graphics.getFontRenderContext();
+		this.rect = getLabelBounds(fontRenderContext);
+        this.lineHeight = this.font.getLineMetrics("",fontRenderContext).getHeight();
     }
     
     Point2D getConnectorStartPosition() {
@@ -610,13 +612,13 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 
     public Rectangle2D getCanvasBounds(Graphics2D graphics) {
     	Stroke stroke = graphics.getStroke();
-        Rectangle2D labelBounds = getLabelBounds(graphics.getFontRenderContext());
+        updateBounds(graphics);
     	if (stroke instanceof BasicStroke) {
     		double w = ((BasicStroke) stroke).getLineWidth();
-    		return new Rectangle2D.Double(labelBounds.getX() - w/2, labelBounds.getY() - w/2,
-    		                               labelBounds.getWidth() + w, labelBounds.getHeight() + w);
+    		return new Rectangle2D.Double(this.rect.getX() - w/2, this.rect.getY() - w/2,
+										   this.rect.getWidth() + w, this.rect.getHeight() + w);
     	}
-        return labelBounds;
+        return this.rect;
     }
 
     /**
