@@ -1,6 +1,7 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
@@ -58,7 +59,9 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 			attributes[i] = new Attribute(attributeName);
 			context.getAttributes().add(attributes[i]);
 		}
-		for (int i = 0; i < Math.pow(2,dimensions); i++) {
+		
+		boolean useAllCombi = scaleDialog.getUseAllCombinations();
+				for (int i = 0; i < Math.pow(2,dimensions); i++) {
 			String object = "";
 			List relatedAttributes = new ArrayList();
 			for(int j = 0; j < dimensions; j++) {
@@ -70,14 +73,44 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 				} else {
 					relatedAttributes.add(attributes[j]);
 				}
-				object += tableData[j][1];
+				object += "(" + tableData[j][1] + ")";
 			}
+
+		if(useAllCombi){
 			context.getObjects().add(object);
 			Iterator it = relatedAttributes.iterator();
 			while (it.hasNext()) {
 				Attribute attrib = (Attribute) it.next();
 				relation.insert(object, attrib);
 			}
+		}else{
+			try{
+						int result =
+				databaseConnection.queryInt(
+					"SELECT count (*) FROM "
+						+ scheme.getDatabaseInfo().getSQLTableName()
+						+ " WHERE ( "
+						+ object
+						+ " );",
+					1);
+				if( result != 0 ){
+					context.getObjects().add(object);
+					Iterator it = relatedAttributes.iterator();
+					while (it.hasNext()) {
+						Attribute attrib = (Attribute) it.next();
+						relation.insert(object, attrib);
+					}
+				}	
+			}catch(DatabaseException e) {
+				throw new RuntimeException(e.getCause().getMessage());
+			}
+		}
+//			context.getObjects().add(object);
+//			Iterator it = relatedAttributes.iterator();
+//			while (it.hasNext()) {
+//				Attribute attrib = (Attribute) it.next();
+//				relation.insert(object, attrib);
+//			}
 		}
 		return context;
     }

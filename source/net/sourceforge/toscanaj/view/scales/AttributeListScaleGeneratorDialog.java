@@ -6,6 +6,7 @@ import net.sourceforge.toscanaj.model.ConceptualSchema;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
@@ -31,10 +32,11 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 	private DatabaseConnection databaseConnection;
 
 	private boolean result;
+	private boolean useAllCombinations;
 	
 	private JTextField scaleTitleField;
 	private JButton createButton, removeButton;
-	private JPanel buttonsPane, titlePane;
+	private JPanel buttonsPane, titlePane, optionsPane, tableButtonsPane;
 	private JScrollPane scrollpane;
 	private JButton checkConsistencyButton;
 	private JTable table;
@@ -67,6 +69,8 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 		
 		createTitlePane();
 		createTablePane();
+		createTableButtonsPane();
+		createOptionsPane();
 		createButtonsPane();
 
 		getContentPane().setLayout(new GridBagLayout());
@@ -99,10 +103,38 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				0,
 				0));
 		getContentPane().add(
-			buttonsPane,
+			tableButtonsPane,
 			new GridBagConstraints(
 				0,
 				2,
+				1,
+				1,
+				1,
+				0,
+				GridBagConstraints.CENTER,
+				GridBagConstraints.BOTH,
+				new Insets(0, 5, 0, 5),
+				0,
+				0));				
+		getContentPane().add(
+			optionsPane,
+			new GridBagConstraints(
+				0,
+				3,
+				1,
+				1,
+				1,
+				0,
+				GridBagConstraints.CENTER,
+				GridBagConstraints.BOTH,
+				new Insets(1, 5, 5, 5),
+				0,
+				0));
+		getContentPane().add(
+			buttonsPane,
+			new GridBagConstraints(
+				0,
+				4,
 				1,
 				1,
 				1,
@@ -122,6 +154,60 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 		this.scrollpane = new JScrollPane(table);
  	    this.scrollpane.setAutoscrolls(true);
 		getContentPane().add(scrollpane, BorderLayout.CENTER);
+	}
+	
+	private void createOptionsPane(){
+		optionsPane = new JPanel(new GridBagLayout());
+		JRadioButton allCombiButton = new JRadioButton("Use all possible combinations");
+		allCombiButton.setMnemonic(KeyEvent.VK_A);
+		allCombiButton.setSelected(true);
+		useAllCombinations = true; //set to true by default
+		allCombiButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				useAllCombinations = true;
+			}
+		});
+		JRadioButton existingCombiButton = new JRadioButton("Use only combinations existing in the database");
+		existingCombiButton.setMnemonic(KeyEvent.VK_E);
+		existingCombiButton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				useAllCombinations = false;
+			}
+		});
+		ButtonGroup group = new ButtonGroup();
+		group.add(allCombiButton);
+		group.add(existingCombiButton);
+		
+		optionsPane.setBorder(BorderFactory.createEtchedBorder());
+		optionsPane.add(
+		allCombiButton,
+			new GridBagConstraints(
+				0,
+				0,
+				1,
+				1,
+				1,
+				0,
+				GridBagConstraints.CENTER,
+				GridBagConstraints.HORIZONTAL,
+				new Insets(0, 5, 0, 0),
+				0,
+				0));
+		optionsPane.add(
+		existingCombiButton,
+			new GridBagConstraints(
+				0,
+				1,
+				1,
+				1,
+				1,
+				1,
+				GridBagConstraints.CENTER,
+				GridBagConstraints.BOTH,
+				new Insets(0, 5, 0, 0),
+				0,
+				0));
+
 	}
 
 	private void createTitlePane() {
@@ -176,10 +262,10 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				0,
 				0));
 	}
-
-	private void createButtonsPane() {
-		buttonsPane = new JPanel(new GridBagLayout());
-		this.removeButton = new JButton("Remove");
+	
+	private void createTableButtonsPane(){
+		tableButtonsPane = new JPanel();
+		this.removeButton = new JButton("Remove selected row");
 		removeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(table.getCellEditor()!=null){
@@ -189,6 +275,11 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				model.removeSelectedRow(table.getSelectedRow());
 			}
 		});
+		tableButtonsPane.add(removeButton);		
+	}
+	
+	private void createButtonsPane() {
+		buttonsPane = new JPanel(new GridBagLayout());
 		this.createButton = new JButton(" Create ");
 		createButton.setEnabled((scaleTitleField.getText()!=null && 
 						!scaleTitleField.getText().equals("")));
@@ -207,25 +298,10 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				closeDialog(false);
 			}
 		});
-
-		buttonsPane.add(
-			removeButton,
-			new GridBagConstraints(
-				0,
-				0,
-				1,
-				1,
-				1,
-				0,
-				GridBagConstraints.EAST,
-				GridBagConstraints.HORIZONTAL,
-				new Insets(0, 5, 0, 5),
-				0,
-				0));
 		buttonsPane.add(
 			createButton,
 			new GridBagConstraints(
-				2,
+				1,
 				0,
 				1,
 				1,
@@ -239,7 +315,7 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 		buttonsPane.add(
 			cancelButton,
 			new GridBagConstraints(
-				3,
+				2,
 				0,
 				1,
 				1,
@@ -260,6 +336,10 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 	public boolean execute() {
 		show();
 		return result;
+	}
+	
+	public boolean getUseAllCombinations(){
+		return this.useAllCombinations;
 	}
     
 	/*
