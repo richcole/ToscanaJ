@@ -12,7 +12,7 @@
 	<property name="toscanaj.class" 
            value="net.sourceforge.toscanaj.ToscanaJ"/>
 	<property name="anacondaj.class" 
-	   value="net.sourceforge.toscanaj.gui.AnacondaJ"/>
+	   value="net.sourceforge.toscanaj.AnacondaJ"/>
 	<path id="project.class.path">
 		<pathelement path="${classpath}"/>
 		<pathelement path="${build.dev.dir}"/>
