@@ -35,6 +35,8 @@ import net.sourceforge.toscanaj.parser.CernatoXMLParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.cernato.NDimDiagramEditingView;
+
+import org.jdom.JDOMException;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -215,6 +217,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             return;
         } catch (DataFormatException e) {
             ErrorDialog.showError(this, e, "Could not parse file");
+            return;
+        } catch (JDOMException e) {
+            ErrorDialog.showError(this, e, "Error parsing the file");
             return;
         }
         this.conceptualSchema = new ConceptualSchema(this.eventBroker);

@@ -10,8 +10,8 @@ package net.sourceforge.toscanaj.parser;
 import net.sourceforge.toscanaj.model.cernato.*;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.adapters.DOMAdapter;
-import org.jdom.input.DOMBuilder;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,23 +22,12 @@ import java.util.List;
 
 public class CernatoXMLParser {
     public static CernatoModel importCernatoXMLFile(File cernatoXMLFile)
-            throws FileNotFoundException, DataFormatException {
+            throws FileNotFoundException, DataFormatException, JDOMException {
         FileInputStream in;
         in = new FileInputStream(cernatoXMLFile);
 
-        // parse schema with Xerxes
-        DOMAdapter domAdapter = new org.jdom.adapters.XercesDOMAdapter();
-        org.w3c.dom.Document w3cdoc = null;
-        try {
-            w3cdoc = domAdapter.getDocument(in, false);
-        } catch (Exception e) {
-            throw new DataFormatException("Failed to parse XML file", e);
-        }
-
-        // create JDOM document
-        DOMBuilder builder =
-                new DOMBuilder("org.jdom.adapters.XercesDOMAdapter");
-        Document document = builder.build(w3cdoc);
+        SAXBuilder parser = new SAXBuilder();
+        Document document = parser.build(in);
 
         Element rootElement = document.getRootElement();
         if (!rootElement.getName().equals("cernatodata")) {
