@@ -25,6 +25,26 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 public abstract class AbstractConceptInterperter implements ConceptInterpreter, EventBrokerListener {
 	private Hashtable contingentSizes = new Hashtable();
 	private Hashtable extentSizes = new Hashtable();
+	
+	private class DeviationValuesRef {
+		private int neutralSize;
+		private int outerSize;
+		private double expectedSize;
+		private DeviationValuesRef (int neutrialSize, int outerSize, double expectedSize) {
+			this.neutralSize = neutrialSize;
+			this.outerSize = outerSize;
+			this.expectedSize = expectedSize;
+		}
+		public double getExpectedSize() {
+			return expectedSize;
+		}
+		public int getNeutralSize() {
+			return neutralSize;
+		}
+		public int getOuterSize() {
+			return outerSize;
+		}
+	}
 
 	public abstract Iterator getObjectSetIterator(Concept concept,ConceptInterpretationContext context) ;
 
@@ -142,12 +162,8 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                     if(context.getNestingContexts().size() == 0) {
                         return 0.5;
                     }
-                    int neutralContingentSize = getObjectContingentSize(concept, context.getOutermostContext());
-                    int outerContingentSize = getObjectContingentSize((Concept) context.getNestingConcepts().get(0), 
-                                                                      context.getOutermostContext());
-                    int numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
-                                                                    context.getOutermostContext());
-                    double expectedSize = neutralContingentSize * outerContingentSize / (double) numberOfAllObjectsInDiagram;
+                    DeviationValuesRef deviationValues = calculateExpectedSize(concept, context, false);
+                    double expectedSize = deviationValues.getExpectedSize();
                     int contingentSize = getObjectContingentSize(concept, context);
                     if(contingentSize == expectedSize) {
                         return 0.5;                                        
@@ -155,7 +171,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                     if(contingentSize < expectedSize) {
                         return 0.5 * contingentSize / expectedSize;                                        
                     }
-                    int max = Math.min(neutralContingentSize, outerContingentSize);
+                    int max = Math.min(deviationValues.getNeutralSize(), deviationValues.getOuterSize());
                     double range = max - expectedSize;
                     return 0.5 + 0.5 * (contingentSize - expectedSize) / range;                                        
                 }
@@ -166,12 +182,10 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                     if(context.getNestingContexts().size() == 0) {
                         return 0.5;
                     }
-                    int neutralExtentSize = getExtentSize(concept, context.getOutermostContext());
-                    int outerExtentSize = getExtentSize((Concept) context.getNestingConcepts().get(0), 
-                                                                      context.getOutermostContext());
+					DeviationValuesRef deviationValues = calculateExpectedSize(concept, context, true);
                     int numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
                                                                     context.getOutermostContext());
-                    double expectedSize = neutralExtentSize * outerExtentSize / (double) numberOfAllObjectsInDiagram;
+                    double expectedSize = deviationValues.getExpectedSize();
                     int extentSize = getExtentSize(concept, context);
                     if(extentSize == expectedSize) {
                         return 0.5;                                        
@@ -179,7 +193,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                     if(extentSize < expectedSize) {
                         return 0.5 * extentSize / expectedSize;                                        
                     }
-                    int max = Math.min(neutralExtentSize, outerExtentSize);
+                    int max = Math.min(deviationValues.getNeutralSize(), deviationValues.getOuterSize());
                     double range = max - expectedSize;
                     return 0.5 + 0.5 * (extentSize - expectedSize)/range;                                        
                 }
@@ -228,24 +242,10 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 		} else if (query == AggregateQuery.DEVIATION_QUERY) {
 			retVal = new Object[1];
 			if(context.getNestingContexts().size() == 0) {
-				retVal = executeObjectCountQuery(concept, context);
+				return executeObjectCountQuery(concept, context);
 			}
-			boolean displayMode = context.getObjectDisplayMode();
-			int neutralSize;
-			int outerSize;
-			if (displayMode == ConceptInterpretationContext.EXTENT) {
-				neutralSize = getExtentSize(concept, context.getOutermostContext());
-				outerSize = getExtentSize((Concept) context.getNestingConcepts().get(0), 
-																  context.getOutermostContext());
-			}
-			else {
-				neutralSize = getObjectContingentSize(concept, context.getOutermostContext());
-				outerSize = getObjectContingentSize((Concept) context.getNestingConcepts().get(0), 
-																  context.getOutermostContext());				
-			}
-			int numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
-															context.getOutermostContext());
-			double expectedSize = neutralSize * outerSize / (double) numberOfAllObjectsInDiagram;
+			DeviationValuesRef deviationValues = calculateExpectedSize(concept, context, context.getObjectDisplayMode()); 
+			double expectedSize = deviationValues.getExpectedSize();
 			int objectCount = getObjectCount(concept, context); 
 			if ((objectCount == 0) && (expectedSize == 0.0)) {
 				return null;
@@ -255,12 +255,32 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 			}
 			NumberFormat format = DecimalFormat.getNumberInstance();
 			format.setMaximumFractionDigits(1);
-			String returnValue = objectCount + " (expected: " + format.format(expectedSize) + ")";
+			String returnValue = objectCount + " [exp: " + format.format(expectedSize) + "]";
 			retVal[0] = getObject(returnValue, concept, context); 
 		} else {
 			return handleNonDefaultQuery(query, concept, context);
 		}
 		return retVal;
+	}
+
+	private DeviationValuesRef calculateExpectedSize(Concept concept,
+									ConceptInterpretationContext context,
+									boolean isExtent) {
+		int neutralSize;
+		int outerSize;
+		Concept nestingConcept = (Concept) context.getNestingConcepts().get(0);
+		if (isExtent) {
+			neutralSize = getExtentSize(concept, context.getOutermostContext());
+			outerSize = getExtentSize(nestingConcept, context.getOutermostContext());
+		}
+		else {
+			neutralSize = getObjectContingentSize(concept, context.getOutermostContext());
+			outerSize = getObjectContingentSize(nestingConcept, context.getOutermostContext());				
+		}
+		int numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
+														context.getOutermostContext());
+		double expectedSize = neutralSize * outerSize / (double) numberOfAllObjectsInDiagram;
+		return new DeviationValuesRef(neutralSize, outerSize, expectedSize);
 	}
 	
 	private Object[] executeObjectCountQuery (Concept concept, ConceptInterpretationContext context) {
