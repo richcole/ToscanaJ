@@ -15,6 +15,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -26,9 +27,15 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import org.tockit.canvas.events.CanvasDrawnEvent;
+import org.tockit.canvas.imagewriter.DiagramExportSettings;
+import org.tockit.canvas.imagewriter.GraphicFormat;
+import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
+import org.tockit.canvas.imagewriter.ImageGenerationException;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -73,6 +80,8 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private ArrayList sequenceValues;
     private ArrayList timelineValues;
     private JCheckBox serializeSequencesBox;
+    private File lastImageExportFile;
+    private DiagramExportSettings diagramExportSettings;
 	
     public TemporalMainDialog(Frame frame, DiagramView diagramView, EventBroker eventBroker) {
 	  	super(frame, "Temporal Controls", false);
@@ -84,6 +93,19 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
         diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, DiagramView.class);
         diagramView.getController().getEventBroker().subscribe(this, CanvasDrawnEvent.class, Object.class);
+
+		/// @todo all this diagram export settings stuff should be in the main program        
+        try {
+            org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
+        } catch (Throwable t) {
+            // do nothing, we just don't support SVG
+        }
+        org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
+
+        Iterator it = GraphicFormatRegistry.getIterator();
+        if (it.hasNext()) {
+            this.diagramExportSettings = new DiagramExportSettings(null, 0, 0, true);
+        }
 	  	
 	  	buildGUI();
 	  	fillGUI();
@@ -141,6 +163,12 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         });
 
         exportImagesButton = new JButton("Export Images");
+        exportImagesButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                exportImages();
+            }
+        });
+
         exportAnimationButton = new JButton("Export Animation");
 
         Container contentPane = this.getContentPane();
@@ -209,11 +237,11 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
         row++;
-        contentPane.add(exportAnimationButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
+        contentPane.add(exportImagesButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
         row++;
-        contentPane.add(exportImagesButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
+        contentPane.add(exportAnimationButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
 
@@ -259,10 +287,135 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         boolean enabled = !allDisabled && (this.diagramView.getDiagram() != null);
         addStaticTransitionsButton.setEnabled(enabled);
         animateTransitionsButton.setEnabled(enabled);
-        exportImagesButton.setEnabled(false);
+        exportImagesButton.setEnabled(enabled && this.diagramExportSettings != null);
         exportAnimationButton.setEnabled(false);
     }
+
+	/**
+	 * @todo this is reduced code from the image export in the
+	 * ToscanaJMainPanel. Extract the full code into a new object, and use it
+	 * here.
+	 */    
+    protected void exportImages() {
+        if (this.lastImageExportFile == null) {
+            this.lastImageExportFile =
+                new File(System.getProperty("user.dir"));
+        }
+        final GraphicFormat graphicFormat = this.diagramExportSettings.getGraphicFormat();
+        if(graphicFormat==null){}
+        final DiagramExportSettings exportSettings= this.diagramExportSettings;
+        final JFileChooser saveDialog = new JFileChooser(this.lastImageExportFile);
+        boolean formatDefined;
+        do {
+            formatDefined = true;
+            int rv = saveDialog.showSaveDialog(this);
+            if (rv == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = saveDialog.getSelectedFile();
+                GraphicFormat format =
+                    GraphicFormatRegistry.getTypeByExtension(
+                        selectedFile);
+                if (format != null) {
+                    this.diagramExportSettings.setGraphicFormat(format);
+                } else {
+                    if(selectedFile.getName().indexOf('.') != -1) {
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Sorry, no type with this extension known.\n"
+                                + "Please use either another extension or try\n"
+                                + "manual settings.",
+                            "Export failed",
+                            JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "No extension given.\n" +
+                            "Please give an extension or pick a file type\n" +
+                            "from the options.",
+                            "Export failed",
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                    formatDefined = false;
+                }
+
+                if (formatDefined) {
+                    exportImages(selectedFile);
+                }
+            }
+        } while (formatDefined == false);
+    }
+
+    protected void exportImages(File selectedFile){
+    	// export all transitions into main file
+        int length = this.timelineValues.size();
+        AnimationTimeController newTimeController = new AnimationTimeController(length,0,Double.MAX_VALUE,0,1);
+        addTransitions(length, newTimeController, false);
+		newTimeController.setCurrentTime(newTimeController.getEndTime());        
+        exportImage(selectedFile);
+        this.lastImageExportFile = selectedFile;
+
+		// export animation steps into numbered files
+        length = this.timelineValues.size();
+        double fadeIn = this.fadeInField.getDoubleValue();
+        double hold = this.holdField.getDoubleValue();
+        double fadeOut = this.fadeOutField.getDoubleValue();
+		
+        if(this.serializeSequencesBox.isSelected() &&
+                    !(this.sequenceToShowChooser.getSelectedItem() instanceof AttributeValue)) {
+            int numSeq = this.sequenceValues.size();
+            newTimeController = new AnimationTimeController(length * numSeq, fadeIn, hold, fadeOut, 1);
+            addTransitionsSerialized(newTimeController.getAllFadedTime(), newTimeController, true);
+        } else {
+            newTimeController = new AnimationTimeController(length, fadeIn, hold, fadeOut, 1);
+            addTransitions(newTimeController.getAllFadedTime(), newTimeController, true);
+        }
+        
+        this.timeController = null; // make sure we don't animate
+        double targetStep = newTimeController.getAllFadedTime();
+        
+        for(int i = 0; i <= targetStep; i++) {
+        	newTimeController.setCurrentTime(i);
+        	exportImage(new File(getNumberedFileName(selectedFile,i,targetStep)));
+        }
+        
+        this.diagramView.removeLayer(TRANSITION_LAYER_NAME);
+    }
     
+    private String getNumberedFileName(File selectedFile, int currentStep, double targetStep) {
+    	String origName = selectedFile.getAbsolutePath();
+    	int dotPos = origName.lastIndexOf('.');
+    	double countdown = targetStep;
+    	String fillingZeroes = "";
+    	while(countdown >= 1) {
+    		fillingZeroes += "0";
+    		countdown /= 10;
+    	} 
+    	String currentPos = String.valueOf(currentStep);
+        return origName.substring(0,dotPos) + "-" + 
+                fillingZeroes.substring(currentPos.length()) + currentPos + 
+                origName.substring(dotPos);
+    }
+
+    protected void exportImage(File file) {
+        try {
+            this
+                .diagramExportSettings
+                .getGraphicFormat()
+                .getWriter()
+                .exportGraphic(
+                this.diagramView,
+                this.diagramExportSettings,
+                file);
+        } catch (ImageGenerationException e) {
+            ErrorDialog.showError(this, e, "Exporting image error");
+        } catch (OutOfMemoryError e) {
+            ErrorDialog.showError(
+                this,
+                "Out of memory",
+                "Not enough memory available to export\n"
+                    + "the diagram in this size");
+        }
+    }
+
     public void processEvent(Event e) {
         if(e instanceof ConceptualSchemaChangeEvent) {
             ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
