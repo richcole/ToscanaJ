@@ -364,8 +364,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // create the nesting submenu
         ButtonGroup nestingGroup = new ButtonGroup();
 
-        this.noNestingMenuItem = new JRadioButtonMenuItem("Simple Diagram");
-        this.noNestingMenuItem.setMnemonic(KeyEvent.VK_S);
+        this.noNestingMenuItem = new JRadioButtonMenuItem("Flat Diagram");
+        this.noNestingMenuItem.setMnemonic(KeyEvent.VK_F);
         this.noNestingMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_1, ActionEvent.CTRL_MASK));
         this.noNestingMenuItem.addActionListener(this);
