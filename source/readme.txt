@@ -55,8 +55,9 @@ ToscanaJ should open an example on startup, unfortunately
 the only examples not using a database we have at the moment
 are in German, if you want to try the database version you 
 can find an English example with the SQL script for creating
-the database in examples/sql/pctest. There is a howto that
-explains how to set up the example will hopefully change soon.
+the database in examples/sql/pctest. There is a readme text
+in the directory examples/sql that explains how to set up the
+database example, more will hopefully come soon.
 Double click on one of the diagram titles on the left side to 
 open your first diagram. You can add multiple diagrams to the 
 list of selected diagrams this way. 
