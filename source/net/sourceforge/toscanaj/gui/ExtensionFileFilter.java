@@ -26,12 +26,12 @@ public class ExtensionFileFilter extends FileFilter {
 				return true;
 			}
 
-			String ext = f.getName().substring(f.getName().length() - 3);
-			if (ext != null) {
+			String ext = f.getName().substring(f.getName().lastIndexOf('.')+1);
+			if (ext == null) {
 				return false;
 			}
 			for (int i = 0; i < extensions.length; i++) {
-				if (ext == extensions[i]) {
+				if (ext.equals(extensions[i])) {
 					return true;				
 				}
 			}
