@@ -9,14 +9,19 @@ package net.sourceforge.toscanaj.controller.cernato;
 
 import net.sourceforge.toscanaj.model.cernato.*;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
 
-import java.util.Vector;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
+import java.awt.geom.Point2D;
 
 public class LayoutOperations {
-    static public Vector calculateDimensions(CernatoModel model) {
+    public static final Vector calculateDimensions(CernatoModel model) {
         Vector dimensions = new Vector();
         Collection properties = model.getContext().getProperties();
         for (Iterator iterator = properties.iterator(); iterator.hasNext();) {
@@ -33,5 +38,83 @@ public class LayoutOperations {
             }
         }
         return dimensions;
+    }
+
+    public static final Diagram2D createDiagram(CernatoModel model, Lattice lattice, String title) {
+        SimpleLineDiagram diagram = new SimpleLineDiagram();
+        diagram.setTitle(title);
+        Vector dimensions = calculateDimensions(model);
+        Hashtable base = createBase(dimensions);
+        Concept[] concepts = lattice.getConcepts();
+        Hashtable nodemap = new Hashtable();
+        for (int i = 0; i < concepts.length; i++) {
+            Concept concept = concepts[i];
+            Point2D.Double position = new Point2D.Double(0,0);
+            Iterator attributes = concept.getIntentIterator();
+            while (attributes.hasNext()) {
+                Attribute attribute = (Attribute) attributes.next();
+                Criterion criterion = (Criterion) attribute.getData();
+                addVector(position, criterion, dimensions, base);
+            }
+            DiagramNode node = new DiagramNode(String.valueOf(i), position, concept,
+                                               new LabelInfo(), new LabelInfo(), null);
+            nodemap.put(concept, node);
+            diagram.addNode(node);
+        }
+        createConnections(diagram, nodemap);
+        return diagram;
+    }
+
+    private static Hashtable createBase(Vector dimensions) {
+        Hashtable base = new Hashtable();
+        double x = 0.5;
+        double size = 30;
+        for (Iterator iterator = dimensions.iterator(); iterator.hasNext();) {
+            Dimension dimension = (Dimension) iterator.next();
+            base.put(dimension, new Point2D.Double(x*size, size));
+            if(x>0) {
+                x = -x - 1;
+            } else {
+                x = -x + 1;
+            }
+        }
+        return base;
+    }
+
+    private static void addVector(Point2D position, Criterion criterion, Vector dimensions, Hashtable base) {
+        for (Iterator it = dimensions.iterator(); it.hasNext();) {
+            net.sourceforge.toscanaj.model.cernato.Dimension dimension =
+                                            (net.sourceforge.toscanaj.model.cernato.Dimension) it.next();
+            Vector path = dimension.getPath();
+            for (Iterator it2 = path.iterator(); it2.hasNext();) {
+                PartialOrderNode node = (PartialOrderNode) it2.next();
+                if(node.getValueGroup() == criterion.getValueGroup()) {
+                    Point2D baseVector = (Point2D) base.get(dimension);
+                    position.setLocation(position.getX() + baseVector.getX(), position.getY() + baseVector.getY());
+                }
+            }
+        }
+    }
+
+    private static void createConnections(SimpleLineDiagram diagram, Hashtable nodemap) {
+        Iterator nodesIt = diagram.getNodes();
+        while (nodesIt.hasNext()) {
+            DiagramNode node = (DiagramNode) nodesIt.next();
+            Concept concept = node.getConcept();
+            Collection upset = new HashSet(concept.getUpset());
+            upset.remove(concept);
+            Set indirectSuperConcepts = new HashSet();
+            for (Iterator iterator = upset.iterator(); iterator.hasNext();) {
+                Concept superconcept = (Concept) iterator.next();
+                Collection upset2 = new HashSet(superconcept.getUpset());
+                upset2.remove(superconcept);
+                indirectSuperConcepts.addAll(upset2);
+            }
+            upset.removeAll(indirectSuperConcepts);
+            for (Iterator iterator = upset.iterator(); iterator.hasNext();) {
+                Concept upperNeighbour = (Concept) iterator.next();
+                diagram.addLine((DiagramNode) nodemap.get(upperNeighbour), node);
+            }
+        }
     }
 }

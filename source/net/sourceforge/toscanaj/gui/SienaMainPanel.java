@@ -19,9 +19,8 @@ import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.cernato.*;
-import net.sourceforge.toscanaj.model.cernato.tests.TextDumps;
 import net.sourceforge.toscanaj.model.events.*;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.ToscanaJ;
@@ -202,21 +201,15 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
     }
 
     private void addDiagrams(ConceptualSchema schema, CernatoModel cernatoModel) {
-        /// @todo finish (create lattice generation, create layout algorithm)
         Vector views = cernatoModel.getViews();
         Vector dimensions = LayoutOperations.calculateDimensions(cernatoModel);
         for (Iterator iterator = views.iterator(); iterator.hasNext();) {
             View view = (View) iterator.next();
-            TextDumps.dump(cernatoModel, view, System.out);
             addDiagram(schema, cernatoModel, view, dimensions);
-            System.out.println("============================================================");
-            System.out.println();
         }
     }
 
     private void addDiagram(ConceptualSchema schema, CernatoModel model, View view, Vector dimensions) {
-        SimpleLineDiagram diagram = new SimpleLineDiagram();
-        diagram.setTitle(view.getName());
         List criteria = view.getCriteria();
         for (Iterator iterator = criteria.iterator(); iterator.hasNext();) {
             Criterion criterion = (Criterion) iterator.next();
@@ -239,9 +232,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
         }
         LatticeGenerator lgen = new GantersAlgorithm();
         Lattice lattice = lgen.createLattice(new ViewContext(model, view));
-        System.out.println("Lattice:");
-        System.out.println("========");
-        TextDumps.dump(lattice);
+        Diagram2D diagram = LayoutOperations.createDiagram(model, lattice, view.getName());
         schema.addDiagram(diagram);
     }
 

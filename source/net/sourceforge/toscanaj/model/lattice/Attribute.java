@@ -10,16 +10,16 @@ package net.sourceforge.toscanaj.model.lattice;
 import org.jdom.Element;
 
 public class Attribute {
-    private String name;
+    private Object data;
     private Element description;
 
-    public Attribute(String name, Element description) {
-        this.name = name;
+    public Attribute(Object data, Element description) {
+        this.data = data;
         this.description = description;
     }
 
-    public String getName() {
-        return this.name;
+    public Object getData() {
+        return this.data;
     }
 
     public Element getDescription() {
@@ -27,6 +27,6 @@ public class Attribute {
     }
 
     public String toString() {
-        return this.name;
+        return this.data.toString();
     }
 }

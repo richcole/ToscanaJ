@@ -93,9 +93,15 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     public Element toXML() {
         Element retVal = new Element(CONCEPTUAL_SCHEMA_ELEMENT_NAME);
         retVal.setAttribute(VERSION_ATTRIBUTE_NAME, VERSION_ATTRIBUTE_VALUE);
-        retVal.addContent(description);
-        retVal.addContent(databaseInfo.toXML());
-        retVal.addContent(dbScheme.toXML());
+        if (description != null) {
+            retVal.addContent(description);
+        }
+        if (databaseInfo != null) {
+            retVal.addContent(databaseInfo.toXML());
+        }
+        if (dbScheme != null) {
+            retVal.addContent(dbScheme.toXML());
+        }
         if(DatabaseViewerManager.getNumberOfObjectListViews() != 0 ||
            DatabaseViewerManager.getNumberOfObjectViews() != 0 ) {
             Element viewsElem = new Element(VIEWS_ELEMENT_NAME);

@@ -79,7 +79,7 @@ public class GantersAlgorithm implements LatticeGenerator {
         Concept[] concepts = lattice.getConcepts();
         for (int i = 0; i < concepts.length; i++) {
             ConceptImplementation concept = (ConceptImplementation) concepts[i];
-            Collection downset = concept.getDownset();
+            Collection downset = new HashSet(concept.getDownset());
             downset.remove(concept);
             for (Iterator iterator = downset.iterator(); iterator.hasNext();) {
                 ConceptImplementation concept2 = (ConceptImplementation) iterator.next();
@@ -88,7 +88,7 @@ public class GantersAlgorithm implements LatticeGenerator {
                     concept.removeObject(object);
                 }
             }
-            Collection upset = concept.getUpset();
+            Collection upset = new HashSet(concept.getUpset());
             upset.remove(concept);
             for (Iterator iterator = upset.iterator(); iterator.hasNext();) {
                 ConceptImplementation concept2 = (ConceptImplementation) iterator.next();
@@ -136,7 +136,7 @@ public class GantersAlgorithm implements LatticeGenerator {
     private Attribute getAttribute(Criterion criterion) {
         Attribute attribute = (Attribute) attributes.get(criterion);
         if(attribute == null) {
-            attribute = new Attribute(criterion.getDisplayString(), null);
+            attribute = new Attribute(criterion, null);
             attributes.put(criterion, attribute);
         }
         return attribute;

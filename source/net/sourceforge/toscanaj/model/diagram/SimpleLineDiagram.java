@@ -264,9 +264,14 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      */
     protected void checkCoordinateSystem() {
         if (this.nodes.size() > 1) { // no point in checking direction otherwise
-            DiagramNode topNode = (DiagramNode) this.nodes.get(0);
-            DiagramNode otherNode = (DiagramNode) this.nodes.get(1);
-            if (topNode.getY() > otherNode.getY()) {
+            DiagramNode highestNode = (DiagramNode) this.nodes.get(0);
+            for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
+                DiagramNode node = (DiagramNode) iterator.next();
+                if (highestNode.getY() > node.getY()) {
+                    highestNode = node;
+                }
+            }
+            if (!highestNode.getConcept().isTop()) {
                 // inverse coordinates (mirror using x-axis)
                 Iterator it = this.nodes.iterator();
                 while (it.hasNext()) {

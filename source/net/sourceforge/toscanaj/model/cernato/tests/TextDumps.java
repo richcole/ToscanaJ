@@ -106,7 +106,7 @@ public class TextDumps {
             Iterator intIt = concept.getAttributeContingentIterator();
             while (intIt.hasNext()) {
                 Attribute attribute = (Attribute) intIt.next();
-                System.out.print(attribute.getName());
+                System.out.print(attribute.toString());
                 if(intIt.hasNext()) {
                     System.out.print(", ");
                 }

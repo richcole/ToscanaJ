@@ -27,4 +27,8 @@ public class Criterion {
     public String getDisplayString() {
         return property.getName() + ":" + valueGroup.getName();
     }
+
+    public String toString() {
+        return getDisplayString();
+    }
 }

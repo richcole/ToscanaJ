@@ -16,4 +16,8 @@ public class FCAObject {
     public String getName() {
         return name;
     }
+
+    public String toString() {
+        return getName();
+    }
 }

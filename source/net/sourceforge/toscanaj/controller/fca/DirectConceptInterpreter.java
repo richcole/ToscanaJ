@@ -75,7 +75,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
                 compareContext = context;
             }
             while (!compareConcept.isTop()) {
-                Concept other = compareConcept;
+                Concept other;
                 Iterator it = compareConcept.getUpset().iterator();
                 do {
                     other = (Concept) it.next();

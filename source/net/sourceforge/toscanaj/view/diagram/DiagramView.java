@@ -118,7 +118,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
     public void update(Object source) {
         if (source instanceof DiagramController ||
                 source instanceof DiagramHistory) {
-            showDiagram((SimpleLineDiagram) DiagramController.getController().getCurrentDiagram());
+            showDiagram(DiagramController.getController().getCurrentDiagram());
         } else {
             requestScreenTransformUpdate();
             repaint();
