@@ -165,6 +165,9 @@ public class CSCParser {
     		return token;
     	}
     	public Object parse(CSCTokenizer tokenizer) throws IOException, DataFormatException {
+    	    if(tokenizer == null) {
+    	        throw new IOException(); // just to match exception signature, otherwise Eclipse warns
+            }
     		throw new SectionTypeNotSupportedException("parse() in " + this.getClass().getName() + " not yet implemented.");
     	}
     	protected void consumeToken(CSCTokenizer tokenizer, String token) throws IOException, DataFormatException{
