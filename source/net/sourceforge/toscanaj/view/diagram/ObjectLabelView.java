@@ -169,10 +169,7 @@ public class ObjectLabelView extends LabelView {
     }
     
     public void openPopupMenu(MouseEvent event, Point2D pos) {
-        if(pos.getX() > this.rect.getMaxX() - this.scrollbarWidth) {
-            // a click on the scrollbar
-            return;
-        }
+        int itemHit = getItemAtPosition(pos);
         List viewNames;
         if(this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.ListQuery)
         {
@@ -191,8 +188,6 @@ public class ObjectLabelView extends LabelView {
         JMenuItem menuItem;
         if( viewNames.size() != 0 )
         {
-            int lineHit = (int)((pos.getY()-this.rect.getY())/this.lineHeight);
-            int itemHit = lineHit + this.firstItem;
             final String objectKey = this.queryKeyValues.get(itemHit).toString();
             Iterator it = viewNames.iterator();
             while(it.hasNext())

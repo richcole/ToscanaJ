@@ -506,6 +506,34 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         }
         return new Rectangle2D.Double(xPos, yPos, lw, lh);
     }
+    
+    /**
+     * Calculates which item was hit.
+     * 
+     * This is the number of the entry, not on the screen but in the full list,
+     * i.e. the offset from scrolling is used. If no item was hit (e.g. a click
+     * on the scrollbar or the position is not on the label), -1 will be returned.
+     */
+    public int getItemAtPosition(Point2D pos) {
+        if(pos.getX() > this.rect.getMaxX() - this.scrollbarWidth) {
+            // a click on the scrollbar or to the right
+            return -1;
+        }
+        if(pos.getX() < this.rect.getMinX() ) {
+            // a click to the left of the label
+            return -1;
+        }
+        if(pos.getY() > this.rect.getMaxY() ) {
+            // a click below the label
+            return -1;
+        }
+        if(pos.getY() < this.rect.getMinY() ) {
+            // a click above the label
+            return -1;
+        }
+        int lineHit = (int)((pos.getY()-this.rect.getY())/this.lineHeight);
+        return lineHit + this.firstItem;
+    }
 
     abstract protected int getNumberOfEntries();
 

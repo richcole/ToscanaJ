@@ -13,10 +13,10 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.model.lattice.MemoryMappedConcept;
-import org.jdom.Attribute;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -229,10 +229,12 @@ public class CSXParser
         while( it.hasNext() )
         {
             Element attribute = (Element) it.next();
-            Attribute name = attribute.getAttribute( "name" );
+            org.jdom.Attribute name = attribute.getAttribute( "name" );
             if( (name != null) && (name.getValue() != null) && (name.getValue().length() != 0) ) {
                 _Attributes.put( attribute.getAttribute( "id" ).getValue(),
-                             attribute.getAttribute( "name" ).getValue() );
+                            new Attribute( name.getValue(),
+                                           attribute.getChild("description") )
+                            );
             }
         }
     }
@@ -392,7 +394,7 @@ public class CSXParser
         while( it3.hasNext() )
         {
             Element ref = (Element) it3.next();
-            String attr = (String)_Attributes.get( ref.getText() );
+            Object attr = _Attributes.get( ref.getText() );
             if(attr != null) {
                 concept.addAttribute(attr);
             }
@@ -428,7 +430,7 @@ public class CSXParser
         while( it3.hasNext() )
         {
             Element ref = (Element) it3.next();
-            String attr = (String)_Attributes.get( ref.getText() );
+            Object attr = _Attributes.get( ref.getText() );
             if(attr != null) {
                 concept.addAttribute(attr);
             }
