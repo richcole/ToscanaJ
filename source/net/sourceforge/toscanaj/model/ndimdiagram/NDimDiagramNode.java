@@ -14,6 +14,8 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
+import org.jdom.Element;
+
 /**
  * Implements a diagram node using an n-dimensional space and projection onto the plane.
  *
@@ -32,6 +34,19 @@ public class NDimDiagramNode extends DiagramNode {
         super(identifier, new Point2D.Double(0, 0), concept, attributeLabel, objectLabel, outerNode);
         this.ndimVector = ndimVector;
         this.diagram = diagram;
+    }
+    
+    public Element toXML() {
+    	Element retVal = super.toXML();
+    	Element nDimPosElem = new Element("ndimVector");
+    	for (int i = 0; i < ndimVector.length; i++) {
+            double coordinate = ndimVector[i];
+            Element coordElem = new Element("coordinate");
+            coordElem.addContent(String.valueOf(coordinate));
+            nDimPosElem.addContent(coordElem);
+        }
+        retVal.addContent(nDimPosElem);
+    	return retVal;
     }
 
     public Point2D getPosition() {
