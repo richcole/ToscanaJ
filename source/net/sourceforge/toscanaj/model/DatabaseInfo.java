@@ -132,11 +132,26 @@ public class DatabaseInfo
 
     /**
      * Sets the query string to use the given table/key combination.
+     *
+     * Both table and key name can be given with the square brackets often used
+     * in SQL, but they don't have to.
      */
     public void setQuery( String table, String key )
     {
         _table = table;
+        while(_table.charAt(0) == '[') {
+            _table = _table.substring(1);
+        }
+        while(_table.charAt(_table.length()-1) == ']') {
+            _table = _table.substring(0,_table.length()-1);
+        }
         _key = key;
+        while(_key.charAt(0) == '[') {
+            _key = _key.substring(1);
+        }
+        while(_key.charAt(_key.length()-1) == ']') {
+            _key = _key.substring(0,_key.length()-1);
+        }
     }
 
     /**
