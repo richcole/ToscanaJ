@@ -141,6 +141,10 @@ public class DiagramView extends Canvas implements ChangeObserver {
         repaint();
     }
 
+    public Diagram2D getDiagram() {
+        return diagram;
+    }
+
     /**
      * Adds a simple non-nested line diagram to the canvas.
      *

@@ -8,15 +8,16 @@ import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.diagram.NodeMovementEventListener;
+import net.sourceforge.toscanaj.controller.diagram.IdealMovementEventListener;
+import net.sourceforge.toscanaj.controller.diagram.FilterMovementEventListener;
 import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -25,6 +26,9 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
     private DefaultListModel diagramListModel;
     private JSplitPane splitPane;
     private DiagramView diagramView;
+    private NodeMovementEventListener nodeMovementEventListener = new NodeMovementEventListener();
+    private IdealMovementEventListener idealMovementEventListener = new IdealMovementEventListener();
+    private FilterMovementEventListener filterMovementEventListener = new FilterMovementEventListener();
 
     /**
      * Construct an instance of this view
@@ -49,14 +53,57 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         };
         listView.addMouseListener(mouseListener);
 
+        JPanel rightPanel = new JPanel(new BorderLayout());
+
+        JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        toolPanel.add(new JLabel("Movement:"));
+        String[] movementNames = { "Node", "Ideal", "Filter" };
+        JComboBox movementChooser = new JComboBox(movementNames);
+        toolPanel.add(movementChooser);
+
         diagramView = new DiagramView();
-        diagramView.getController().getEventBroker().subscribe(
+        final EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
+        canvasEventBroker.subscribe(
                 new NodeMovementEventListener(),
                 CanvasItemDraggedEvent.class,
                 NodeView.class
         );
+        movementChooser.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JComboBox combobox = (JComboBox) e.getSource();
+                String selection = combobox.getSelectedItem().toString();
+                if(selection.equals("Node")) {
+                    canvasEventBroker.removeSubscriptions(idealMovementEventListener);
+                    canvasEventBroker.removeSubscriptions(filterMovementEventListener);
+                    canvasEventBroker.subscribe(
+                            nodeMovementEventListener,
+                            CanvasItemDraggedEvent.class,
+                            NodeView.class
+                    );
+                } else if(selection.equals("Ideal")) {
+                    canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
+                    canvasEventBroker.removeSubscriptions(filterMovementEventListener);
+                    canvasEventBroker.subscribe(
+                            idealMovementEventListener,
+                            CanvasItemDraggedEvent.class,
+                            NodeView.class
+                    );
+                } else if(selection.equals("Filter")) {
+                    canvasEventBroker.removeSubscriptions(idealMovementEventListener);
+                    canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
+                    canvasEventBroker.subscribe(
+                            filterMovementEventListener,
+                            CanvasItemDraggedEvent.class,
+                            NodeView.class
+                    );
+                }
+            }
+        });
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, listView, diagramView);
+        rightPanel.add(toolPanel, BorderLayout.NORTH);
+        rightPanel.add(diagramView, BorderLayout.CENTER);
+
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, listView, rightPanel);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);
