@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -710,9 +711,9 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     private void recreateMruMenu() {
         this.mruMenu.removeAll();
         boolean empty = true; // will be used to check if we have at least one entry
-        Iterator it = mruList.iterator();
-        while(it.hasNext()) {
-            String cur = (String) it.next();
+        ListIterator it = mruList.listIterator(mruList.size()-1);
+        while(it.hasPrevious()) {
+            String cur = (String) it.previous();
             if(cur.equals(currentFile)) {
                 // don't enlist the current file
                 continue;
