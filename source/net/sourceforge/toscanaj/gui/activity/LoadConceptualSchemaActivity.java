@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.gui.activity;
 
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
@@ -17,12 +16,10 @@ import java.io.File;
 
 public class LoadConceptualSchemaActivity implements FileActivity {
     private EventBroker broker;
-    private DatabaseConnection databaseConnection;
     private SimpleActivity testOpenOkActivity;
 
-    public LoadConceptualSchemaActivity(EventBroker broker, DatabaseConnection databaseConnection) {
+    public LoadConceptualSchemaActivity(EventBroker broker) {
         this.broker = broker;
-        this.databaseConnection = databaseConnection;
     }
 
     public void processFile(File file) throws Exception {

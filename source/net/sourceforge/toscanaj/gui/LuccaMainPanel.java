@@ -208,7 +208,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         OpenFileAction openFileAction = new OpenFileAction(
                 this,
-                new LoadConceptualSchemaActivity(eventBroker, DatabaseConnection.getConnection()),
+                new LoadConceptualSchemaActivity(eventBroker),
                 currentFile,
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(

@@ -16,9 +16,11 @@ import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.gui.action.ExportDiagramAction;
+import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.CloseMainPanelActivity;
+import net.sourceforge.toscanaj.gui.activity.LoadConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.SaveConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
@@ -148,23 +150,20 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(fileMenu);
 
-        JMenuItem importCernatoXMLItem = new JMenuItem("Import Cernato XML...");
-        importCernatoXMLItem.setMnemonic(KeyEvent.VK_C);
-        importCernatoXMLItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                importCernatoXML();
-            }
-        });
-        fileMenu.add(importCernatoXMLItem);
+        LoadConceptualSchemaActivity loadSchemaActivity = new LoadConceptualSchemaActivity(eventBroker);
+        /// @todo add dirty flag support as Elba has
+//        loadSchemaActivity.setTestOpenOkActivity(testSchemaSavedActivity);
+        OpenFileAction openFileAction =
+            new OpenFileAction(
+                this,
+                loadSchemaActivity,
+                currentFile,
+                KeyEvent.VK_O,
+                KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 
-        JMenuItem importBurmeisterItem = new JMenuItem("Import Burmeister Format...");
-        importBurmeisterItem.setMnemonic(KeyEvent.VK_B);
-        importBurmeisterItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                importBurmeister();
-            }
-        });
-        fileMenu.add(importBurmeisterItem);
+        JMenuItem openMenuItem = new JMenuItem("Open...");
+        openMenuItem.addActionListener(openFileAction);
+        fileMenu.add(openMenuItem);
 
         JMenuItem saveMenuItem = new JMenuItem("Save...");
         SaveConceptualSchemaActivity saveActivity =
@@ -184,6 +183,26 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         fileMenu.addSeparator();
         
+        JMenuItem importCernatoXMLItem = new JMenuItem("Import Cernato XML...");
+        importCernatoXMLItem.setMnemonic(KeyEvent.VK_C);
+        importCernatoXMLItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                importCernatoXML();
+            }
+        });
+        fileMenu.add(importCernatoXMLItem);
+
+        JMenuItem importBurmeisterItem = new JMenuItem("Import Burmeister Format...");
+        importBurmeisterItem.setMnemonic(KeyEvent.VK_B);
+        importBurmeisterItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                importBurmeister();
+            }
+        });
+        fileMenu.add(importBurmeisterItem);
+
+        fileMenu.addSeparator();
+
         // we add the export options only if we can export at all
         /// @todo reduce duplicate code with ToscanaJMainPanel
         if (this.diagramExportSettings != null) {

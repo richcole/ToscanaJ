@@ -348,9 +348,7 @@ public class ElbaMainPanel
 		newMenuItem.addActionListener(newAction);
 		fileMenu.add(newMenuItem);
 
-		LoadConceptualSchemaActivity loadSchemaActivity = new LoadConceptualSchemaActivity(
-					eventBroker,
-					databaseConnection);
+		LoadConceptualSchemaActivity loadSchemaActivity = new LoadConceptualSchemaActivity(eventBroker);
 		loadSchemaActivity.setTestOpenOkActivity(testSchemaSavedActivity);
 		OpenFileAction openFileAction =
 			new OpenFileAction(
