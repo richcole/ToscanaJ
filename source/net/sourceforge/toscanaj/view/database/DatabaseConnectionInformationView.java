@@ -194,7 +194,6 @@ public class DatabaseConnectionInformationView extends JDialog
         }
         boolean connectDatabase() {
         	try {
-        		System.out.println("connectDatabase");
 				DatabaseConnection.setConnection(connection);
                 connection.connect(databaseInfo);
             } catch (DatabaseException e) {
@@ -251,32 +250,6 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 5),
     	            2,2));
 
-			/*
-			this.add(csvFileLabel,new GridBagConstraints(
-					0,3,2,1,1,0,
-					GridBagConstraints.NORTHWEST,
-					GridBagConstraints.HORIZONTAL,
-					new Insets(5, 5, 5, 5),
-					2,2));
-			this.add(csvFileLocationField,new GridBagConstraints(
-					0,4,1,1,1,0,
-					GridBagConstraints.NORTHWEST,
-					GridBagConstraints.HORIZONTAL,
-					new Insets( 5, 15, 5, 5),
-					2,2));
-			this.add(csvFileButton,new GridBagConstraints(
-					0,5,1,1,0,0,
-					GridBagConstraints.NORTHEAST,
-					GridBagConstraints.NONE,
-					new Insets(5, 5, 5, 5),
-					2,2));
-    	    this.add(new JPanel(),new GridBagConstraints(
-    	            0,6,1,1,1,1,
-    	            GridBagConstraints.WEST,
-    	            GridBagConstraints.BOTH,
-    	            new Insets(5, 5, 5, 5),
-    	            2,2));
-    	   */
 		   this.add(new JPanel(),new GridBagConstraints(
 				   0,3,1,1,1,1,
 				   GridBagConstraints.WEST,
