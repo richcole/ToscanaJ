@@ -121,7 +121,16 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable, 
 	}
 
 	public void readXML(Element elem) throws XMLSyntaxError {
-		this.description = (Element) elem.getChild(DESCRIPTION_ELEMENT_NAME).getChildren().get(0);
+		Element descriptionElement = elem.getChild(DESCRIPTION_ELEMENT_NAME);
+		if(descriptionElement == null) {
+			this.description = null;
+		} else {
+			if(descriptionElement.getChildren().size() == 0) {
+				this.description = null;
+			} else {
+				this.description = (Element) descriptionElement.getChildren().get(0);
+			}
+		}
         String contextPositionAttribute = elem.getAttributeValue(CONTEXT_POSITION_ATTRIBUTE_NAME);
         if(contextPositionAttribute != null) {
             this.contextPosition = Integer.parseInt(contextPositionAttribute);
