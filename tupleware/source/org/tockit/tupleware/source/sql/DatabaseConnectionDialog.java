@@ -41,7 +41,6 @@ import java.sql.Statement;
 public class DatabaseConnectionDialog extends JDialog {
     private static final String CONFIGURATION_SECTION_NAME = "SqlQueryDialog";
     private static final String JDBC_ID_STRING = "JDBC";
-	private static final String EMBEDDED_DBMS_ID_STRING = "Embedded DBMS";
 	private static final String ODBC_ID_STRING = "ODBC Source";
 	private static final String ACCESS_FILE_ID_STRING = "Access File";
 	
