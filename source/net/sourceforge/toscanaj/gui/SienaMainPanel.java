@@ -23,6 +23,7 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.cernato.*;
 import net.sourceforge.toscanaj.model.events.*;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
+import net.sourceforge.toscanaj.view.diagram.cernato.NDimDiagramEditingView;
 import net.sourceforge.toscanaj.ToscanaJ;
 import net.sourceforge.toscanaj.parser.CernatoXMLParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
@@ -85,7 +86,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
     }
 
     public void createViews() {
-        diagramView = new DiagramEditingView(this, conceptualSchema, eventBroker);
+        diagramView = new NDimDiagramEditingView(this, conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("SienaMainPanel", "diagramViewDivider", 200));
         setContentPane(diagramView);
     }

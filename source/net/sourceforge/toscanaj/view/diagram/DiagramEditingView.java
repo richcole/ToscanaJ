@@ -32,10 +32,10 @@ public class DiagramEditingView extends JPanel implements EventListener {
     private DiagramCollection conceptualSchema;
     private DefaultListModel diagramListModel;
     private JSplitPane splitPane;
-    private DiagramView diagramView;
-    private NodeMovementEventListener nodeMovementEventListener = new NodeMovementEventListener();
-    private SetMovementEventListener idealMovementEventListener = new IdealMovementEventListener();
-    private FilterMovementEventListener filterMovementEventListener = new FilterMovementEventListener();
+    protected DiagramView diagramView;
+    protected NodeMovementEventListener nodeMovementEventListener = new NodeMovementEventListener();
+    protected SetMovementEventListener idealMovementEventListener = new IdealMovementEventListener();
+    protected FilterMovementEventListener filterMovementEventListener = new FilterMovementEventListener();
     private static final double ZOOM_FACTOR = 1.1;
 
     /**
@@ -60,11 +60,16 @@ public class DiagramEditingView extends JPanel implements EventListener {
     private JPanel makeDiagramViewPanel() {
         JPanel diagramViewPanel = new JPanel(new BorderLayout());
 
+        diagramView = new DiagramView();
+        DirectConceptInterpreter interpreter = new DirectConceptInterpreter();
+        ConceptInterpretationContext interpretationContext =
+                    new ConceptInterpretationContext(new DiagramHistory(),diagramView.getController().getEventBroker());
+        diagramView.setConceptInterpreter(interpreter);
+        diagramView.setConceptInterpretationContext(interpretationContext);
+
         JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        toolPanel.add(new JLabel("Movement:"));
-        String[] movementNames = {"Node", "Ideal", "Filter"};
-        JComboBox movementChooser = new JComboBox(movementNames);
-        toolPanel.add(movementChooser);
+        createMovementManipulators(toolPanel);
+
         toolPanel.add(new JLabel("Zoom:"));
         JButton zoomInButton = new JButton("+");
         zoomInButton.addActionListener(new ActionListener() {
@@ -81,19 +86,22 @@ public class DiagramEditingView extends JPanel implements EventListener {
         });
         toolPanel.add(zoomOutButton);
 
-        diagramView = new DiagramView();
-        DirectConceptInterpreter interpreter = new DirectConceptInterpreter();
-        ConceptInterpretationContext interpretationContext =
-                    new ConceptInterpretationContext(new DiagramHistory(),diagramView.getController().getEventBroker());
-        diagramView.setConceptInterpreter(interpreter);
-        diagramView.setConceptInterpretationContext(interpretationContext);
+        diagramViewPanel.add(toolPanel, BorderLayout.NORTH);
+        diagramViewPanel.add(diagramView, BorderLayout.CENTER);
+        return diagramViewPanel;
+    }
 
+    protected void createMovementManipulators(JPanel toolPanel) {
+        toolPanel.add(new JLabel("Movement:"));
         final EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
         canvasEventBroker.subscribe(
                 nodeMovementEventListener,
                 CanvasItemDraggedEvent.class,
                 NodeView.class
         );
+        String[] movementNames = {"Node", "Ideal", "Filter"};
+        JComboBox movementChooser = new JComboBox(movementNames);
+        toolPanel.add(movementChooser);
         movementChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JComboBox combobox = (JComboBox) e.getSource();
@@ -125,10 +133,6 @@ public class DiagramEditingView extends JPanel implements EventListener {
                 }
             }
         });
-
-        diagramViewPanel.add(toolPanel, BorderLayout.NORTH);
-        diagramViewPanel.add(diagramView, BorderLayout.CENTER);
-        return diagramViewPanel;
     }
 
     private void zoomIntoDiagram() {

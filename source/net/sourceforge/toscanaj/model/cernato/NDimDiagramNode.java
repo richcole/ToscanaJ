@@ -61,4 +61,12 @@ public class NDimDiagramNode extends DiagramNode {
         Point2D projPos = getProjectedPosition();
         this.position.setLocation(position.getX() - projPos.getX(), position.getY() - projPos.getY());
     }
+
+    public double[] getNdimVector() {
+        return ndimVector;
+    }
+
+    public Vector getBase() {
+        return base;
+    }
 }

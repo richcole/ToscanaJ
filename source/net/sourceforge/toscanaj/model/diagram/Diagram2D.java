@@ -59,6 +59,8 @@ public interface Diagram2D extends XMLizable {
      */
     Iterator getNodes();
 
+    Iterator getLines();
+
     /**
      * Returns the coordinates of a starting point of a line.
      *

@@ -136,6 +136,10 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         return this.nodes.iterator();
     }
 
+    public Iterator getLines() {
+        return this.lines.iterator();
+    }
+
     /**
      * Returns the number of lines in the diagram.
      */
