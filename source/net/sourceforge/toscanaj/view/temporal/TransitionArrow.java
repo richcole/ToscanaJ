@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.temporal;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
@@ -17,18 +18,21 @@ import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
-import org.tockit.canvas.CanvasItem;
+import org.tockit.canvas.MovableCanvasItem;
 
-public class TransitionArrow extends CanvasItem {
+public class TransitionArrow extends MovableCanvasItem {
 	protected static final double SHORTENING_FACTOR = 0.15;
     protected NodeView startNodeView;
     protected NodeView endNodeView;
     protected Color baseColor;
     protected Rectangle2D bounds;
     protected Point2D shiftVector = new Point2D.Double();
+    protected Point2D manualOffset = new Point2D.Double();
     protected double timePos;
     protected AnimationTimeController timeController;
 	
+    private Shape currentShape;
+    
     public TransitionArrow(NodeView startNodeView, NodeView endNodeView, Color color, double timePos, AnimationTimeController timeController) {
     	this.startNodeView = startNodeView;
     	this.endNodeView = endNodeView;
@@ -53,31 +57,34 @@ public class TransitionArrow extends CanvasItem {
                                           (startY - endY) * (startY - endY));
         Paint paint = calculatePaint(length);
         if(paint == null) { // nothing to draw
+        	this.currentShape = null;
         	return;
         }
 
     	updateShiftVector();
     	
     	Paint oldPaint = g.getPaint();
-    	AffineTransform oldTransform = g.getTransform();
     	
-        GeneralPath arrow = new GeneralPath();
-        arrow.moveTo(-20,-7);
-        arrow.lineTo(0,0);
-        arrow.lineTo(-20,7);
-        arrow.lineTo(-20,2);
-        arrow.lineTo(-length,2);
-        arrow.lineTo(-length,-2);
-        arrow.lineTo(-20,-2);
-        arrow.closePath();
+		GeneralPath arrow = new GeneralPath();
+		arrow.moveTo(-20,-7);
+		arrow.lineTo(0,0);
+		arrow.lineTo(-20,7);
+		arrow.lineTo(-20,2);
+		arrow.lineTo(-length,2);
+		arrow.lineTo(-length,-2);
+		arrow.lineTo(-20,-2);
+		arrow.closePath();
+
+		AffineTransform shapeTransform = new AffineTransform();        
+		shapeTransform.translate(this.manualOffset.getX(), this.manualOffset.getY());
+		shapeTransform.translate(endX, endY);
+		shapeTransform.rotate(Math.atan2(endY - startY, endX - startX));
+		this.currentShape = shapeTransform.createTransformedShape(arrow);
 
         g.setPaint(paint);
-        g.translate(endX, endY);
-        g.rotate(Math.atan2(endY - startY, endX - startX));
-    	g.fill(arrow);
+    	g.fill(currentShape);
     	
     	g.setPaint(oldPaint);
-    	g.setTransform(oldTransform);
     }
     
     protected Paint calculatePaint(float arrowLength) {
@@ -103,7 +110,10 @@ public class TransitionArrow extends CanvasItem {
     }
     
     public boolean containsPoint(Point2D point) {
-        return false;
+    	if(this.currentShape == null) {
+    		return false;
+    	}
+    	return this.currentShape.contains(point);
     }
 
     public Point2D getPosition() {
@@ -135,7 +145,7 @@ public class TransitionArrow extends CanvasItem {
             y = y2;
             height = y1 - y2;
         }
-        this.bounds = new Rectangle2D.Double(x,y,width,height);
+        this.bounds = new Rectangle2D.Double(x + this.manualOffset.getX(),y + this.manualOffset.getY(),width,height);
     }
 
     private void updateShiftVector() {
@@ -174,5 +184,10 @@ public class TransitionArrow extends CanvasItem {
         return y + 
                SHORTENING_FACTOR * (this.startNodeView.getPosition().getY() - y) +
                this.shiftVector.getY();
+    }
+
+    public void setPosition(Point2D newPosition) {
+    	this.manualOffset.setLocation(this.manualOffset.getX() + (newPosition.getX() - getPosition().getX()), 
+									  this.manualOffset.getY() + (newPosition.getY() - getPosition().getY()));
     }
 }

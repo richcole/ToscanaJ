@@ -39,6 +39,7 @@ import org.tockit.canvas.events.CanvasDrawnEvent;
 import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.canvas.imagewriter.ImageGenerationException;
+import org.tockit.canvas.manipulators.ItemMovementManipulator;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -103,7 +104,8 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 	  	
         eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
         diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, DiagramView.class);
-        diagramView.getController().getEventBroker().subscribe(this, CanvasDrawnEvent.class, Object.class);
+		diagramView.getController().getEventBroker().subscribe(this, CanvasDrawnEvent.class, Object.class);
+		new ItemMovementManipulator(diagramView, TransitionArrow.class, diagramView.getController().getEventBroker());
 
         this.diagramExportSettings = diagramExportSettings;
         this.timeController = new AnimationTimeController(0,0,0,0,0);
