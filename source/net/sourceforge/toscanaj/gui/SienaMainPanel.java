@@ -784,6 +784,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
         if (newSchemaButton.isSelected()) {
             this.conceptualSchema = new ConceptualSchema(this.eventBroker);
+			currentFile = null;
+			updateWindowTitle();
         }
         importBurmeister(openDialog.getSelectedFile());
     }
