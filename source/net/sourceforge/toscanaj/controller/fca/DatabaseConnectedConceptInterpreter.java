@@ -29,14 +29,6 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
 
     private ListQuery listQuery = null;
     
-    /**
-     * Makes sure the default value for the preferences is set in the preference store.
-     */
-    static {
-        preferences.putBoolean("useOrderBy", 
-                               preferences.getBoolean("useOrderBy", true) );
-    }
-
     public DatabaseConnectedConceptInterpreter(DatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
         this.listQuery = new ListQuery(databaseInfo, "", "");
@@ -104,7 +96,7 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
         FCAElement[] retVal = null;
         if (whereClause != null) {
         	String statement = query.getQueryHead() + whereClause;
-            if(preferences.getBoolean("useOrderBy", true)) {
+            if(preferences.getBoolean("useOrderBy", false)) {
                 statement += " " + query.getOrderClause();
             }
             statement += ";";
