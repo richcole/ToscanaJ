@@ -118,8 +118,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 	public Element toXML() {
 		// TODO Auto-generated method stub
 		Element retVal = new Element(MANY_VALUED_CONTEXT_ELEMENT_NAME);
-/*		private ListSet objects = new ListSetImplementation();
-		private ListSet properties = new ListSetImplementation();
+/*		private ListSet properties = new ListSetImplementation();
 		private Hashtable relation = new Hashtable();
 		private ListSet types = new ListSetImplementation();
 */
@@ -127,9 +126,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		Element objectsElement = new Element(OBJECTS_ELEMENT_NAME);
 		for (Iterator iter = objects.iterator(); iter.hasNext();) {
 			FCAObjectImplementation itObject = (FCAObjectImplementation) iter.next();
-			objectsElement.addContent(itObject.);
-			
-			
+			objectsElement.addContent(itObject.toXML());
 		}
 		return null;
 	}
