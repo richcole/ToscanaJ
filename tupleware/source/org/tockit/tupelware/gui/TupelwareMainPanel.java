@@ -35,7 +35,6 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
     private int[] objectIndices;
     private JTable tupelTable;
     private EventBroker eventBroker;
-    static private final int MaxMruFiles = 8;
 	private static final String WINDOW_TITLE = "Tupelware";
 
     /**
