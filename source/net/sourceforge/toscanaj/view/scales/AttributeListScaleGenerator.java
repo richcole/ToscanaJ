@@ -6,7 +6,6 @@ import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
-import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import java.awt.Frame;
@@ -39,9 +38,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
        return true;
     }
 
-    public Context generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
-        Column column = columns[0].getColumn();
-        String columnName = column.getName();
+    public Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection) {
         AttributeListScaleGeneratorDialog scaleDialog = new AttributeListScaleGeneratorDialog(parent, scheme, databaseConnection);
         if (!scaleDialog.execute()) {
             return null;

@@ -106,8 +106,7 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
                 public void actionPerformed(ActionEvent e) {
                 	try {
 	                    Context context =
-	                		   generator.generateScale(selectionSource.getSelectedTableColumnPairs(),
-	                           conceptualSchema, databaseConnection);
+	                		   generator.generateScale(conceptualSchema, databaseConnection);
 	                    Diagram2D returnValue = null;
 	                    Lattice lattice = null;
 	                    if(context!=null){

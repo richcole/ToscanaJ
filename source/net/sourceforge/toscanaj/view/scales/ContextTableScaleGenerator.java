@@ -32,7 +32,7 @@ public class ContextTableScaleGenerator implements ScaleGenerator {
         return true;
     }
 
-    public Context generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
+    public Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection) {
         ContextTableScaleEditorDialog dialog = new ContextTableScaleEditorDialog(
                 parent,
                 scheme,

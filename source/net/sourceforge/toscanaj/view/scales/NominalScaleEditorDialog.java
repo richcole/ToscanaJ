@@ -125,10 +125,9 @@ public class NominalScaleEditorDialog extends JDialog {
         }
     }
 
-    public NominalScaleEditorDialog(Frame owner, Column column, DatabaseConnection databaseConnection,
+    public NominalScaleEditorDialog(Frame owner, DatabaseConnection databaseConnection,
                                      DatabaseSchema databaseSchema) {
         super(owner);
-        this.column = column;
         this.databaseConnection = databaseConnection;
         this.databaseSchema = databaseSchema;
 

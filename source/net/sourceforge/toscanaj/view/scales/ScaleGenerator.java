@@ -16,5 +16,5 @@ public interface ScaleGenerator {
 
     boolean canHandleColumns(TableColumnPair[] columns);
 
-    Context generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection);
+    Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection);
 }

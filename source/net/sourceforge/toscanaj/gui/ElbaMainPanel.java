@@ -12,6 +12,10 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DumpSqlScript;
+import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
+import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
+import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
@@ -23,11 +27,15 @@ import net.sourceforge.toscanaj.gui.dialog.ExportStatisticalDataSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.parser.CSCParser;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
@@ -35,7 +43,12 @@ import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.SqlClauseLabelView;
+import net.sourceforge.toscanaj.view.scales.AttributeListScaleGenerator;
+import net.sourceforge.toscanaj.view.scales.ContextTableScaleGenerator;
+import net.sourceforge.toscanaj.view.scales.NominalScaleGenerator;
+import net.sourceforge.toscanaj.view.scales.OrdinalScaleGenerator;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingViewDialog;
+import net.sourceforge.toscanaj.view.scales.ScaleGenerator;
 
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -49,6 +62,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -92,6 +107,9 @@ public class ElbaMainPanel
 	private JMenuItem dumpSQLMenuItem;
 	private JMenuItem dumpStatisticalDataMenuItem;
 	private SaveFileAction saveFileAction;
+    private ArrayList scaleGenerators;
+    private JButton newDiagramButton;
+    private JPanel toolbar;
 
 	public ElbaMainPanel() {
 		super("Elba");
@@ -109,6 +127,8 @@ public class ElbaMainPanel
 			this,
 			DatabaseInfoChangedEvent.class,
 			Object.class);
+
+	    fillScaleGeneratorList();
 
 		createViews();
 		// this has to happen before the menu gets created, since the menu uses the information
@@ -164,11 +184,11 @@ public class ElbaMainPanel
 				conceptualSchema,
 				eventBroker);
 		schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
-		JPanel buttonPane = new JPanel(new GridBagLayout());
-		JButton newDiagramButton = new JButton("New Diagram...");
+        toolbar = new JPanel(new GridBagLayout());
+        newDiagramButton = new JButton("New Diagram...");
 		newDiagramButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				scaleEditingViewDialog.show();
+				showScaleGeneratorMenu();
 			}
 		});
 
@@ -195,7 +215,7 @@ public class ElbaMainPanel
 			}
 		});
 
-		buttonPane.add(
+		toolbar.add(
 			newDiagramButton,
 			new GridBagConstraints(
 				0,
@@ -210,7 +230,7 @@ public class ElbaMainPanel
 				2,
 				2));
 
-		buttonPane.add(
+		toolbar.add(
 			schemaDescriptionButton,
 			new GridBagConstraints(
 				1,
@@ -225,7 +245,7 @@ public class ElbaMainPanel
 				2,
 				2));
 
-		buttonPane.add(
+		toolbar.add(
 			databaseConnectionButton,
 			new GridBagConstraints(
 				2,
@@ -239,7 +259,7 @@ public class ElbaMainPanel
 				new Insets(5, 1, 1, 1),
 				2,
 				2));
-		buttonPane.add(
+		toolbar.add(
 			new JPanel(),
 			new GridBagConstraints(
 				3,
@@ -265,7 +285,7 @@ public class ElbaMainPanel
 			SqlClauseLabelView.getFactory());
 
 		mainView.add(
-			buttonPane,
+			toolbar,
 			new GridBagConstraints(
 				0,
 				0,
@@ -294,6 +314,132 @@ public class ElbaMainPanel
 				2));
 		setContentPane(mainView);
 	}
+	
+	public void showScaleGeneratorMenu() {
+	    JPopupMenu popupMenu = new JPopupMenu();
+	    JMenuItem menuItem;
+	    final JFrame parent = this;
+
+	    Iterator it = this.scaleGenerators.iterator();
+	    while (it.hasNext()) {
+	        final ScaleGenerator generator = (ScaleGenerator) it.next();
+		    menuItem = new JMenuItem(generator.getScaleName());
+		    menuItem.addActionListener(new ActionListener() {
+		        public void actionPerformed(ActionEvent e) {
+		            try {
+		                Context context =
+		                       generator.generateScale(conceptualSchema, databaseConnection);
+		                Diagram2D returnValue = null;
+		                Lattice lattice = null;
+		                if(context!=null){
+		                    LatticeGenerator lgen = new GantersAlgorithm();
+		                    lattice = lgen.createLattice(context);
+		                    returnValue = NDimLayoutOperations.createDiagram(
+		                                  lattice, context.getName(),
+		                                  new DefaultDimensionStrategy());
+		                    if (null != returnValue) {
+		                       Diagram2D diagramWithSameTitle = null;
+		                       int indexOfExistingDiagram = -1;
+		                       for(int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
+		                           if(conceptualSchema.getDiagram(i).getTitle().equalsIgnoreCase(returnValue.getTitle())) {
+		                               diagramWithSameTitle = conceptualSchema.getDiagram(i);
+		                               indexOfExistingDiagram = i;
+		                           }
+		                       }
+		                       if(diagramWithSameTitle != null) {
+		                               int rv = showTitleExistsDialog(returnValue);
+		                               if(rv==JOptionPane.OK_OPTION){
+		                                   replaceTitle(returnValue, diagramWithSameTitle, indexOfExistingDiagram);
+		                               }else if(rv==JOptionPane.CANCEL_OPTION){
+		                                   renameTitle(returnValue, diagramWithSameTitle);
+		                               }
+		                       }else{
+		                           conceptualSchema.addDiagram(returnValue);
+		                       }
+		                   }
+		                }
+		            } catch (Exception exc) {
+		                ErrorDialog.showError(parent, exc, "Scale generation failed");
+		            }
+		        }
+		        private void replaceTitle(Diagram2D returnValue, Diagram2D diagramWithSameTitle, int indexOfExistingDiagram) {
+		            conceptualSchema.addDiagram(returnValue);
+		            if(indexOfExistingDiagram!=-1){
+		                conceptualSchema.exchangeDiagrams((conceptualSchema.getNumberOfDiagrams()-1),indexOfExistingDiagram);
+		                conceptualSchema.removeDiagram(diagramWithSameTitle);
+		            }else{
+		                conceptualSchema.removeDiagram(diagramWithSameTitle);
+		            }
+		        }
+		        private void renameTitle(Diagram2D returnValue, Diagram2D diagramWithSameTitle) {
+		            String inputValue = "";
+		            String currentValue = returnValue.getTitle();
+		            do {
+		                inputValue = (String)JOptionPane.showInputDialog(
+		                        null,
+		                        "Enter title: ",
+		                        "Rename title",
+		                        JOptionPane.PLAIN_MESSAGE,
+		                        null,
+		                        null,
+		                        currentValue);
+		                        if(inputValue!=null){
+		                            inputValue = inputValue.trim();
+		                            currentValue = inputValue;
+		                        }
+		            } while (inputValue!=null && (inputValue.equals("") ||
+		                inputValue.equalsIgnoreCase(diagramWithSameTitle.getTitle().trim())));
+		                //to set the edited title to the Diagram2D
+		                SimpleLineDiagram lineDiag = (SimpleLineDiagram) returnValue;
+		                lineDiag.setTitle(inputValue);
+		                conceptualSchema.addDiagram(lineDiag);
+		        }
+	
+		        private int showTitleExistsDialog(Diagram2D returnValue){
+		            Object[] options;
+		            if(returnValue instanceof SimpleLineDiagram){
+		                options = new Object[]{ "Replace Old Diagram", "Discard New Diagram", "Rename New Diagram" };
+		                return JOptionPane.showOptionDialog(
+		                                parent,
+		                                "A diagram with the title '"+
+		                                returnValue.getTitle()+
+		                                "' already exists.",
+		                                "Title exists",
+		                                JOptionPane.YES_NO_CANCEL_OPTION,
+		                                JOptionPane.ERROR_MESSAGE,
+		                                null,
+		                                options,
+		                                options[2]);
+		            } else {
+		                options = new Object[]{ "Replace Old Diagram", "Discard New Diagram" };
+		                return JOptionPane.showOptionDialog(
+		                                parent,
+		                                "A diagram with the title '"+
+		                                returnValue.getTitle()+
+		                                "' already exists.",
+		                                "Title exists",
+		                                JOptionPane.YES_NO_OPTION,
+		                                JOptionPane.ERROR_MESSAGE,
+		                                null,
+		                                options,
+		                                null);
+		            }
+		        }
+		    });
+		    popupMenu.add(menuItem);
+	    }
+	    int x = this.newDiagramButton.getLocationOnScreen().x - this.getX() + 20;
+        int y = this.newDiagramButton.getLocationOnScreen().y - this.getY() + 10;
+        popupMenu.show(this, x, y);
+	}
+
+    protected void fillScaleGeneratorList() {
+        this.scaleGenerators = new ArrayList();
+        scaleGenerators.add(new OrdinalScaleGenerator(this));
+        scaleGenerators.add(new NominalScaleGenerator(this));
+        scaleGenerators.add(new ContextTableScaleGenerator(this, this.eventBroker));
+        scaleGenerators.add(new AttributeListScaleGenerator(this));
+    }
 
 	public void createMenuBar() {
 		final DiagramView diagramView = diagramEditingView.getDiagramView();

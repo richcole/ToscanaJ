@@ -38,7 +38,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         }
     }
 
-    public Context generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
+    public Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection) {
         OrdinalScaleEditorDialog scaleDialog = new OrdinalScaleEditorDialog(parent, scheme.getDatabaseSchema(), databaseConnection);
         if (!scaleDialog.execute()) {
             return null;
