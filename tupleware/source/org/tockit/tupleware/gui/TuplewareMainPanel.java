@@ -547,14 +547,14 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
         menuItem.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 source.show(parent,lastFileRead);
+                if(source.getSelectedFile() != null) {
+                    lastFileRead = source.getSelectedFile();
+                }
                 if(source.getTuples() == null) {
                     return;
                 }
                 tuples = source.getTuples();
                 objectIndices = source.getObjectIndices();
-                if(source.getSelectedFile() != null) {
-                    lastFileRead = source.getSelectedFile();
-                }
                 fillTable();     
                 conceptualSchema = new ConceptualSchema(eventBroker);   
             }
