@@ -27,6 +27,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
     private JList tableColumnsListView;
 
     private JFrame parentFrame;
+    private ScaleGeneratorPanel scaleGeneratorPanel;
 
     public JFrame getParentFrame() {
         return parentFrame;
@@ -46,7 +47,8 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
         leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, makeTableColumnsView(), makeScalesView());
         leftPane.setOneTouchExpandable(true);
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, makeScaleGeneratorPane());
+        scaleGeneratorPanel = makeScaleGeneratorPane();
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, scaleGeneratorPanel);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);
@@ -55,7 +57,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
         eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
     }
 
-    private JComponent makeScaleGeneratorPane() {
+    private ScaleGeneratorPanel makeScaleGeneratorPane() {
         return new ScaleGeneratorPanel(getParentFrame(), conceptualSchema, this);
     }
 
@@ -69,26 +71,9 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
     }
 
     private JComponent makeTableColumnsView() {
-        JComponent tableColumnListView;
-
-        tableColumnListModel = new DefaultListModel();
-        fillTableColumnsList();
-
-        tableColumnsListView = new JList(tableColumnListModel);
-/*
-        MouseListener mouseListener = new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int index = tableColumnsListView.locationToIndex(e.getPoint());
-                }
-            }
-        };
-        tableColumnsListView.addMouseListener(mouseListener);
-*/
-
         JPanel tableColumnPane = new JPanel();
         tableColumnPane.setLayout(new GridBagLayout());
-        tableColumnPane.add(new JLabel("Selected tables"),
+        tableColumnPane.add(new JLabel("Available Columns:"),
                 new GridBagConstraints(
                         0, 0, 1, 1, 1.0, 0,
                         GridBagConstraints.CENTER,
@@ -96,7 +81,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
                         new Insets(5, 5, 5, 5),
                         5, 5)
         );
-        tableColumnPane.add(new JScrollPane(tableColumnsListView),
+        tableColumnPane.add(new JScrollPane(makeTableColumnListView()),
                 new GridBagConstraints(
                         0, 1, 1, 1, 1.0, 1.0,
                         GridBagConstraints.CENTER,
@@ -105,8 +90,24 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
                         5, 5)
         );
 
-        tableColumnListView = tableColumnPane;
-        return tableColumnListView;
+        return tableColumnPane;
+    }
+
+    private JComponent makeTableColumnListView() {
+        tableColumnListModel = new DefaultListModel();
+        fillTableColumnsList();
+        tableColumnsListView = new JList(tableColumnListModel);
+        ListSelectionModel listSelectionModel = tableColumnsListView.getSelectionModel();
+        listSelectionModel.addListSelectionListener(new ListSelectionListener(){
+            public void valueChanged(ListSelectionEvent e) {
+                ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+                if(lsm.getValueIsAdjusting()){
+                    return;
+                }
+                scaleGeneratorPanel.updateGeneratorViews();
+            }
+        });
+        return tableColumnsListView;
     }
 
     private void fillTableColumnsList() {
@@ -148,7 +149,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
 
         JPanel scalesPane = new JPanel();
         scalesPane.setLayout(new GridBagLayout());
-        scalesPane.add(new JLabel("Scales in schema:"),
+        scalesPane.add(new JLabel("Scales in Schema:"),
                 new GridBagConstraints(
                         0, 0, 1, 1, 1.0, 0,
                         GridBagConstraints.CENTER,
