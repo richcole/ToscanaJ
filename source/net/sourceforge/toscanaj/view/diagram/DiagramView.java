@@ -317,4 +317,11 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         }
         repaint();
     }
+
+    /**
+     * Overwrites DrawingCanvas.backgroundClicked(Point2D) to erase the highlighting.
+     */
+    protected void backgroundClicked(Point2D point) {
+        this.setSelectedConcept(null);
+    }
 }

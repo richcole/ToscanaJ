@@ -278,6 +278,12 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
         }
         else {
             if(selectedCanvasItem == null) {
+                if(e.getClickCount() == 1) {
+                    backgroundClicked(e.getPoint());
+                }
+                else if(e.getClickCount() == 2) {
+                    backgroundDoubleClicked(e.getPoint());
+                }
                 return;
             }
             if(e.getClickCount() == 1) {
@@ -380,5 +386,23 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      */
     public void addCanvasItem(CanvasItem node) {
         this.canvasItems.add(node);
+    }
+
+    /**
+     * This callback will be executed when the background was clicked.
+     *
+     * This can be overwritten in subclasses to get effects, the default
+     * implementation does nothing.
+     */
+    protected void backgroundClicked(Point2D point) {
+    }
+
+    /**
+     * This callback will be executed when the background was double-clicked.
+     *
+     * This can be overwritten in subclasses to get effects, the default
+     * implementation does nothing.
+     */
+    protected void backgroundDoubleClicked(Point2D point) {
     }
 }
