@@ -195,7 +195,6 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
 	   this.getContentPane().add(new JPanel(), new GridBagConstraints(0, 6, 5, 1, 1.0, 1.0
 				, GridBagConstraints.EAST, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 1, 1));
        pack();
-       setResizable(false);
     }
 
     protected void closeDialog() {
