@@ -15,6 +15,7 @@ import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
@@ -62,9 +63,10 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventListener {
      * Controls
      */
     private JMenuBar menuBar;
-    private JMenu helpMenu;
     private JMenu fileMenu;
     private JMenu mruMenu;
+    private JMenu editMenu;
+    private JMenu helpMenu;
 
     private List mruList = new LinkedList();
     private String currentFile = null;
@@ -77,6 +79,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventListener {
     private ScaleEditingView scaleView;
     private DiagramEditingView diagramView;
     private DatabaseConnectionInformationView connectionInformationView;
+    private XMLEditorDialog schemaDescriptionView;
 
     public class PrepareToSaveActivity implements SimpleActivity {
 
@@ -125,6 +128,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventListener {
 
         connectionInformationView =
                 new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);
+
+        schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
 
         databaseSchemaView = new DatabaseSchemaView(this, eventBroker);
         databaseSchemaView.setHorizontalDividerLocation(
@@ -235,6 +240,20 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventListener {
         );
         fileMenu.add(exitMenuItem);
 
+        editMenu = new JMenu("Edit");
+        editMenu.setMnemonic(KeyEvent.VK_E);
+        menuBar.add(editMenu);
+
+        JMenuItem editSchemaDescriptionMenuItem = new JMenuItem("Schema Description");
+        editSchemaDescriptionMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                schemaDescriptionView.setContent(conceptualSchema.getDescription());
+                schemaDescriptionView.show();
+                conceptualSchema.setDescription(schemaDescriptionView.getContent());
+            }
+        });
+        editMenu.add(editSchemaDescriptionMenuItem);
+
         // --- help menu ---
         // create a help menu
         helpMenu = new JMenu("Help");
@@ -332,6 +351,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventListener {
             ConceptualSchemaLoadedEvent loadEvent = (ConceptualSchemaLoadedEvent) e;
             File schemaFile = loadEvent.getFile();
             addFileToMRUList(schemaFile);
+            schemaDescriptionView.setContent(conceptualSchema.getDescription());
         }
         if (e instanceof DatabaseInfoChangedEvent) {
             DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
