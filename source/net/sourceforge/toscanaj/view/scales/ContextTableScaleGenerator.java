@@ -15,8 +15,6 @@ import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.model.diagram.WriteableDiagram2D;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 
 import javax.swing.*;
