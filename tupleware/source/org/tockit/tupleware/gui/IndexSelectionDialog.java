@@ -11,7 +11,8 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import org.tockit.swing.preferences.ExtendedPreferences;
+
 import net.sourceforge.toscanaj.gui.LabeledPanel;
 
 import java.awt.*;
@@ -19,6 +20,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class IndexSelectionDialog extends JDialog {
+    private static final ExtendedPreferences preferences = 
+        ExtendedPreferences.userNodeForClass(IndexSelectionDialog.class);
+
     private JButton okButton;
     private Object[] data;
     private DefaultListModel availableList;
@@ -67,9 +71,9 @@ public class IndexSelectionDialog extends JDialog {
         super(aFrame, true);
         setTitle(title);
         init(title, data, forceSelection);
-        int divPos = ConfigurationManager.fetchInt("IndexSelectionDialog", "verticalDivider", 100);
+        int divPos = preferences.getInt("verticalDivider", 100);
         mainSplitPane.setDividerLocation(divPos);
-        ConfigurationManager.restorePlacement("IndexSelectionDialog", this,
+        preferences.restoreWindowPlacement(this,
                                               new Rectangle(100, 100, 300, 200));
     }
 
@@ -116,8 +120,8 @@ public class IndexSelectionDialog extends JDialog {
     
     public void hide() {
         super.hide();
-        ConfigurationManager.storeInt("IndexSelectionDialog", "verticalDivider", mainSplitPane.getDividerLocation());
-        ConfigurationManager.storePlacement("IndexSelectionDialog", this);
+        preferences.putInt("verticalDivider", mainSplitPane.getDividerLocation());
+        preferences.storeWindowPlacement(this);
     }
     
     public int[] getSelectedIndices() {

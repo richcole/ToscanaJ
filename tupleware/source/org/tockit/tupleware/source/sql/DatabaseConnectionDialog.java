@@ -7,7 +7,6 @@
  */
 package org.tockit.tupleware.source.sql;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
@@ -21,6 +20,7 @@ import javax.swing.filechooser.FileFilter;
 import org.tockit.events.EventBroker;
 import org.tockit.relations.model.Relation;
 import org.tockit.relations.model.RelationImplementation;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -39,7 +39,9 @@ import java.sql.Statement;
  * @todo this is just copy & paste code from ToscanaJ's DatabaseConnectionInformationView for now.
  */
 public class DatabaseConnectionDialog extends JDialog {
-    private static final String CONFIGURATION_SECTION_NAME = "SqlQueryDialog";
+    private static final ExtendedPreferences preferences = 
+        ExtendedPreferences.userNodeForClass(DatabaseConnectionDialog.class);
+
     private static final String JDBC_ID_STRING = "JDBC";
 	private static final String ODBC_ID_STRING = "ODBC Source";
 	private static final String ACCESS_FILE_ID_STRING = "Access File";
@@ -653,8 +655,7 @@ public class DatabaseConnectionDialog extends JDialog {
 				
 		setCurrentPanel(this.dbTypePanel);
 				
-		ConfigurationManager.restorePlacement(
-			CONFIGURATION_SECTION_NAME,
+		preferences.restoreWindowPlacement(
 			this,
 			new Rectangle(100, 100, MINIMUM_WIDTH, MINIMUM_WIDTH));
 	}
@@ -767,7 +768,7 @@ public class DatabaseConnectionDialog extends JDialog {
 	public void hide() {
 		super.hide();
 	    setCurrentPanel(this.dbTypePanel);
-		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,	this);
+		preferences.storeWindowPlacement(this);
 	}
 
     public Relation getTuples() {

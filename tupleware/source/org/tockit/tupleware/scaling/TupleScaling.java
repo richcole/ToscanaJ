@@ -22,10 +22,9 @@ import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAObject;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.util.xmlize.XMLWriter;
@@ -102,13 +101,13 @@ public class TupleScaling {
             Tuple tuple = (Tuple) iter.next();
             ObjectTuple objectValues = selectSubset(tuple.getData(), objectIndices);
             if(tupleObjectMap.get(objectValues) == null) {
-                FCAObject newObject = new FCAObjectImplementation(createCrossproductName(objectValues));
+                FCAElement newObject = new FCAElementImplementation(createCrossproductName(objectValues));
                 tupleObjectMap.put(objectValues, newObject);
                 context.getObjects().add(newObject);
             }
             ObjectTuple attributeValues = selectSubset(tuple.getData(), attributeIndices); 
             if(valueAttributeMap.get(attributeValues) == null) {
-                Attribute newAttribute = new Attribute(createCrossproductName(attributeValues));
+                FCAElement newAttribute = new FCAElementImplementation(createCrossproductName(attributeValues));
                 valueAttributeMap.put(attributeValues, newAttribute);
                 context.getAttributes().add(newAttribute);
             }

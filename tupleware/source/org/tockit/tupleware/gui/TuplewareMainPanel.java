@@ -7,13 +7,11 @@
  */
 package org.tockit.tupleware.gui;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.TupleConceptInterpreter;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.gui.MainPanel;
-import net.sourceforge.toscanaj.gui.ToscanaJMainPanel;
 import net.sourceforge.toscanaj.gui.action.ExportDiagramAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
@@ -23,12 +21,7 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.DiagramExportSettings;
-import net.sourceforge.toscanaj.model.context.Attribute;
-import net.sourceforge.toscanaj.model.context.BinaryRelation;
-import net.sourceforge.toscanaj.model.context.Context;
-import net.sourceforge.toscanaj.model.context.FCAObject;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
@@ -40,7 +33,10 @@ import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import org.tockit.canvas.imagewriter.DiagramExportSettings;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
+import org.tockit.context.model.BinaryRelation;
+import org.tockit.context.model.Context;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -49,6 +45,7 @@ import org.tockit.relations.model.Relation;
 import org.tockit.relations.model.Tuple;
 import org.tockit.relations.operations.JoinOperation;
 import org.tockit.relations.operations.PickColumnsOperation;
+import org.tockit.swing.preferences.ExtendedPreferences;
 import org.tockit.tupleware.scaling.TupleScaling;
 import org.tockit.tupleware.source.TupleSource;
 import org.tockit.tupleware.source.TupleSourceRegistry;
@@ -67,6 +64,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class TuplewareMainPanel extends JFrame implements MainPanel, EventBrokerListener {
+    private static final ExtendedPreferences preferences = 
+        ExtendedPreferences.userNodeForClass(TuplewareMainPanel.class);
+
     private final class ModalContext implements Context {
         private String name;
 		private Set objects;
@@ -79,13 +79,13 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
             this.objects = new HashSet();
             for (Iterator iter = objectTuples.iterator(); iter.hasNext();) {
                 final Tuple tuple = (Tuple) iter.next();
-				this.objects.add(new FCAObjectImplementation(tuple));
+				this.objects.add(new FCAElementImplementation(tuple));
             }
             Set attributeTuples = PickColumnsOperation.pickColumn(tuples, dim).getTuples();
             this.attributes = new HashSet();
             for (Iterator iterator = attributeTuples.iterator(); iterator.hasNext();){
                 Tuple tuple = (Tuple) iterator.next();
-				this.attributes.add(new Attribute(tuple.getElement(0)));                
+				this.attributes.add(new FCAElementImplementation(tuple.getElement(0)));                
             }
 			int[] allButThisDim = new int[tuples.getArity() - 1];
 			for (int j = 0; j < allButThisDim.length; j++) {
@@ -98,8 +98,8 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
             final Relation magicJoin = JoinOperation.join(tuples, allButThisDim, tuples, allButThisDim);
 			incidenceRelation = new BinaryRelation() {
 				public boolean contains(Object domainObject, Object rangeObject) {
-					Tuple left = (Tuple) ((FCAObject)domainObject).getData();
-					Object right = ((Attribute)rangeObject).getData();
+					Tuple left = (Tuple) ((FCAElementImplementation)domainObject).getData();
+					Object right = ((FCAElementImplementation)rangeObject).getData();
 					Object[] fullData = new Object[left.getLength() + 1];
 					for (int j = 0; j < left.getLength(); j++) {
 						fullData[j] = left.getElement(j);
@@ -122,7 +122,6 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
             return this.incidenceRelation;
         }
     }
-    private static final String CONFIGURATION_SECTION = "TuplewareMainPanel";
     private static final String CONFIGURATION_ENTRY_LAST_FILE = "lastFileRead";
     private static final String CONFIGURATION_ENTRY_DIVIDER = "diagramViewDivider";
 
@@ -165,9 +164,6 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
     public TuplewareMainPanel() {
         super(WINDOW_TITLE);
 
-        // register all image writers we want to support
-        ToscanaJMainPanel.registerImageWriters();
-
         Iterator it = GraphicFormatRegistry.getIterator();
         if (it.hasNext()) {
             this.diagramExportSettings = new DiagramExportSettings();
@@ -185,10 +181,10 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 
         createLayout();
 
-        ConfigurationManager.restorePlacement(CONFIGURATION_SECTION, this,
+        preferences.restoreWindowPlacement(this,
                 new Rectangle(10, 10, 900, 700));
-        String lastFilePath = ConfigurationManager.fetchString(CONFIGURATION_SECTION, 
-                                                               CONFIGURATION_ENTRY_LAST_FILE, null);
+        String lastFilePath = preferences.get(CONFIGURATION_ENTRY_LAST_FILE, null);
+        
         if(lastFilePath != null) {                                                    
             this.lastFileRead = new File(lastFilePath);
         }
@@ -272,7 +268,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 
     public void createViews() {
         diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
-        diagramEditingView.setDividerLocation(ConfigurationManager.fetchInt(CONFIGURATION_SECTION, CONFIGURATION_ENTRY_DIVIDER, 200));
+        diagramEditingView.setDividerLocation(preferences.getInt(CONFIGURATION_ENTRY_DIVIDER, 200));
         this.diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
                                         this, DisplayedDiagramChangedEvent.class, Object.class);
 
@@ -580,14 +576,13 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 
     public void closeMainPanel() {
         // store current position
-        ConfigurationManager.storePlacement(CONFIGURATION_SECTION, this);
-        ConfigurationManager.storeInt(CONFIGURATION_SECTION, CONFIGURATION_ENTRY_DIVIDER, 
+        preferences.storeWindowPlacement(this);
+        preferences.putInt(CONFIGURATION_ENTRY_DIVIDER, 
                                       diagramEditingView.getDividerLocation());
 		if (this.lastFileRead != null) {                                      
-			ConfigurationManager.storeString(CONFIGURATION_SECTION, CONFIGURATION_ENTRY_LAST_FILE, 
+		    preferences.put(CONFIGURATION_ENTRY_LAST_FILE, 
 										  this.lastFileRead.getAbsolutePath());
 		}
-        ConfigurationManager.saveConfiguration();
         System.exit(0);
     }
 
