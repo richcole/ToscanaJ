@@ -172,8 +172,6 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     {
         // fill the background
         DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
-        graphics.setPaint(diagramSchema.getBackground());
-        graphics.fill(this.getCanvasSize(graphics));
         graphics.setPaint(diagramSchema.getForeground());
 
         // paint all items on canvas

@@ -97,6 +97,9 @@ public class BatikImageWriter implements ImageWriter {
         Rectangle2D bounds = new Rectangle2D.Double(
                                     0, 0, settings.getImageWidth(), settings.getImageHeight() );
 
+        svgGenerator.setPaint(canvas.getBackground());
+        svgGenerator.fill(bounds);
+
         canvas.scaleToFit(svgGenerator, bounds);
 
         // render the graphic into the DOM
