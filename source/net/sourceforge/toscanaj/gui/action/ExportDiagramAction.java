@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.Properties;
 
 public class ExportDiagramAction extends KeyboardMappedAction {
-	private File lastImageExportFile;
 	private DiagramExportSettings diagramExportSettings;
 	private DiagramView diagramView;
 	private DiagramExportSettingsPanel exportSettingsPanel;
@@ -55,7 +54,6 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 			DiagramExportSettings diagExpSettings,
 			DiagramView diagramView) {
 		super(frame, "Export Diagram...");
-		this.lastImageExportFile = diagExpSettings.getLastImageExportFile();
 		this.diagramExportSettings = diagExpSettings;
 		this.diagramView = diagramView;
 		this.frame = frame;
@@ -70,7 +68,6 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 			KeyStroke keystroke
 			) {
 		super(frame, "Export Diagram...", mnemonic, keystroke);
-		this.lastImageExportFile = diagExpSettings.getLastImageExportFile();
 		this.diagramExportSettings = diagExpSettings;
 		this.diagramView = diagramView;
 		this.frame = frame;
@@ -82,12 +79,9 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 	}
 
 	public void exportImage() {
-		if (this.lastImageExportFile == null) {
-			this.lastImageExportFile =
-				new File(System.getProperty("user.dir"));
-		}
+        // important: getParentFile() -- otherwise it won't work if the exported image was deleted
 		final CustomJFileChooser saveDialog =
-			new CustomJFileChooser(this.lastImageExportFile);
+			new CustomJFileChooser(this.diagramExportSettings.getLastImageExportFile().getParentFile());
 		// populate the file extension combo box in the dialog
 		// with all the possible file formats 
 		FileFilter defaultFilter = saveDialog.getFileFilter();
@@ -215,7 +209,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 					+ "the diagram in this size");
 		}
 		this.diagramExportSettings.setLastImageExportFile(selectedFile);
-		}
+	}
 	
 	/**
 	 * The custom file chooser will check whether the file exists and shows

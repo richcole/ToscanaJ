@@ -13,6 +13,9 @@ Affecting different programs:
   dialog
 - the order of objects and attributes in the context will be remembered,
   even after saving and loading a CSX file
+- bugfix: the diagram export dialog now remembers the last export 
+  position properly (was broken during session and in between sessions
+  if the exported file was deleted)
 
 Specific for ToscanaJ:
 ======================
