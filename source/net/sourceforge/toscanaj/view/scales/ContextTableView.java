@@ -14,10 +14,13 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.JComponent;
+import javax.swing.ToolTipManager;
 
 import net.sourceforge.toscanaj.model.Context;
 
@@ -27,25 +30,44 @@ public class ContextTableView extends JComponent {
 	private static final Color TABLE_HEADER_COLOR = Color.LIGHT_GRAY;
 	private static final Color TABLE_CELL_COLOR = Color.WHITE;
 	private Context context;
+	private ContextTableScaleEditorDialog dialog;
 	private static final int CELL_WIDTH = 100;
 	private static final int CELL_HEIGHT = 30;
-	
-	
-	public ContextTableView(Context context) {
+
+	public static class Position {
+		private int row;
+		private int col;
+		public Position(int row, int col) {
+			this.row = row;
+			this.col = col;
+		}
+
+		public int getCol() {
+			return col;
+		}
+
+		public int getRow() {
+			return row;
+		}
+	}
+
+	public ContextTableView(Context context, ContextTableScaleEditorDialog dialog) {
 		super();
 		this.context = context;
+		this.dialog = dialog;
+		ToolTipManager.sharedInstance().registerComponent(this);
 	}
-	
+
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		
+
 		Graphics2D g2d = (Graphics2D) g;
 		Paint oldPaint = g2d.getPaint();
 		Font oldFont = g2d.getFont();
 
-		g2d.setFont(oldFont.deriveFont(Font.BOLD));		
+		g2d.setFont(oldFont.deriveFont(Font.BOLD));
 		drawColumnHeader(g2d);
-		
+
 		Iterator objIt = this.context.getObjects().iterator();
 		int row = 1;
 		while (objIt.hasNext()) {
@@ -53,9 +75,10 @@ public class ContextTableView extends JComponent {
 			drawRow(g2d, object, row);
 			row += 1;
 		}
-		
+
 		g2d.setPaint(oldPaint);
 		g2d.setFont(oldFont);
+		dialog.setCreateButtonStatus();
 	}
 
 	public Dimension getSize() {
@@ -67,23 +90,23 @@ public class ContextTableView extends JComponent {
 	public Dimension getMinimumSize() {
 		return getSize();
 	}
-	
+
 	public Dimension getPreferredSize() {
 		return getSize();
 	}
-	
+
 	public Dimension getMaximumSize() {
 		return getSize();
 	}
-	
+
 	protected void drawColumnHeader(Graphics2D g2d) {
 		g2d.setPaint(TABLE_CORNER_COLOR);
-		drawCell(g2d, "", 0,0);
-		
+		drawCell(g2d, "", 0, 0);
+
 		g2d.setPaint(TABLE_HEADER_COLOR);
 		Iterator attrIt = this.context.getAttributes().iterator();
 		int col = 1;
-		while(attrIt.hasNext()) {
+		while (attrIt.hasNext()) {
 			Object attribute = attrIt.next();
 			drawCell(g2d, attribute.toString(), col * CELL_WIDTH, 0);
 			col += 1;
@@ -92,18 +115,18 @@ public class ContextTableView extends JComponent {
 
 	protected void drawRow(Graphics2D g2d, Object object, int row) {
 		Font font = g2d.getFont();
-		g2d.setFont(font.deriveFont(Font.BOLD));		
+		g2d.setFont(font.deriveFont(Font.BOLD));
 		g2d.setPaint(TABLE_HEADER_COLOR);
 		int y = row * CELL_HEIGHT;
-		drawCell(g2d, object.toString(), 0,y);
-		
-		g2d.setFont(font.deriveFont(Font.PLAIN));		
+		drawCell(g2d, object.toString(), 0, y);
+
+		g2d.setFont(font.deriveFont(Font.PLAIN));
 		g2d.setPaint(TABLE_CELL_COLOR);
 		Iterator attrIt = this.context.getAttributes().iterator();
 		int col = 1;
-		while(attrIt.hasNext()) {
+		while (attrIt.hasNext()) {
 			Object attribute = attrIt.next();
-			if(this.context.getRelation().contains(object,attribute)) {
+			if (this.context.getRelation().contains(object, attribute)) {
 				drawCell(g2d, "X", col * CELL_WIDTH, y);
 			} else {
 				drawCell(g2d, "", col * CELL_WIDTH, y);
@@ -113,34 +136,36 @@ public class ContextTableView extends JComponent {
 	}
 
 	protected void drawCell(Graphics2D g2d, String content, int x, int y) {
-		g2d.fill(new Rectangle2D.Double(x,y,CELL_WIDTH, CELL_HEIGHT));
+		g2d.fill(new Rectangle2D.Double(x, y, CELL_WIDTH, CELL_HEIGHT));
 		Paint oldPaint = g2d.getPaint();
-		g2d.setPaint(TEXT_COLOR); 
-		g2d.draw(new Rectangle2D.Double(x,y,CELL_WIDTH, CELL_HEIGHT));
-		
+		g2d.setPaint(TEXT_COLOR);
+		g2d.draw(new Rectangle2D.Double(x, y, CELL_WIDTH, CELL_HEIGHT));
+
 		FontMetrics fontMetrics = g2d.getFontMetrics();
 		String newContent = reduceStringDisplayWidth(content, g2d);
-		
-		g2d.drawString(newContent, x + CELL_WIDTH/2 - fontMetrics.stringWidth(newContent)/2, 
-		                        y + CELL_HEIGHT/2 + fontMetrics.getMaxAscent()/2);
+
+		g2d.drawString(
+			newContent,
+			x + CELL_WIDTH / 2 - fontMetrics.stringWidth(newContent) / 2,
+			y + CELL_HEIGHT / 2 + fontMetrics.getMaxAscent() / 2);
 		g2d.setPaint(oldPaint);
 	}
-	
+
 	protected String reduceStringDisplayWidth(String content, Graphics2D g2d) {
 		String newContent = content;
 		String tail = "...";
 		int stringWidth = g2d.getFontMetrics().stringWidth(newContent);
 		int tailWidth = g2d.getFontMetrics().stringWidth(tail);
-		if (stringWidth > (CELL_WIDTH-10)){
-			while((stringWidth + tailWidth) > (CELL_WIDTH-10)){
-				newContent = newContent.substring(0,(newContent.length()-1));
+		if (stringWidth > (CELL_WIDTH - 10)) {
+			while ((stringWidth + tailWidth) > (CELL_WIDTH - 10)) {
+				newContent = newContent.substring(0, (newContent.length() - 1));
 				stringWidth = g2d.getFontMetrics().stringWidth(newContent);
 			}
-			newContent+=tail;
+			newContent += tail;
 		}
 		return newContent;
 	}
-	
+
 	public int getCellHeight() {
 		return CELL_HEIGHT;
 	}
@@ -148,4 +173,40 @@ public class ContextTableView extends JComponent {
 	public int getCellWidth() {
 		return CELL_WIDTH;
 	}
+
+	public String getToolTipText(MouseEvent e) {
+		String tooltipText = null;
+
+		ArrayList attributeArrayList = (ArrayList) context.getAttributes();
+		ArrayList objectsArrayList = (ArrayList) context.getObjects();
+		Position pos = getTablePosition(e.getX(), e.getY());
+
+		if (pos != null) {
+			if (pos.getCol() == 0 && pos.getRow() != 0) {
+				tooltipText =
+					(String) objectsArrayList.get(pos.getRow() - 1);
+			} else if (pos.getCol() != 0 && pos.getRow() == 0) {
+				tooltipText =
+					(String) attributeArrayList.get(pos.getCol() - 1);
+			}
+		}
+		return tooltipText;
+	}
+
+	protected Position getTablePosition(int xLoc, int yLoc) {
+		int xPos = xLoc - this.getX();
+		int yPos = yLoc - this.getY();
+		int col = xPos / getCellWidth();
+		int row = yPos / getCellHeight();
+		if ((col > this.context.getAttributes().size() )
+			|| (row > this.context.getObjects().size() )) {
+			return null;
+		}
+		return new Position(row, col);
+	}
+	
+	public Context getModel() {
+		return this.context;
+	}
+	
 }
