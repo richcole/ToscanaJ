@@ -7,7 +7,13 @@
  */
 package net.sourceforge.toscanaj;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.logging.Logger;
+
 import javax.swing.JOptionPane;
+
+import org.tockit.plugin.PluginLoader;
 
 import net.sourceforge.toscanaj.gui.ToscanaJMainPanel;
 
@@ -22,6 +28,7 @@ public class ToscanaJ {
      */
     public static void main(String[] args) {
     	testJavaVersion();
+        loadPlugins();
         final ToscanaJMainPanel mainWindow;
         if (args.length == 1) {
             mainWindow = new ToscanaJMainPanel(args[0]);
@@ -32,7 +39,18 @@ public class ToscanaJ {
         mainWindow.setVisible(true);
     }
 
-	/**
+    /**
+     * Loads all plugins found in the default plugin location.
+     */
+    public static void loadPlugins() {
+        try {
+            PluginLoader.loadPlugins(new File("plugins"));
+        } catch (FileNotFoundException e) {
+            Logger.getLogger(ToscanaJ.class.getName()).info("Could not find plugin directory -- no plugins loaded");
+        }
+    }
+
+    /**
 	 * Tests if we are running at least JRE 1.4.0
 	 */
 	public static void testJavaVersion() {

@@ -17,6 +17,7 @@ public class Siena {
      */
     public static void main(String[] args) {
 		ToscanaJ.testJavaVersion();
+        ToscanaJ.loadPlugins();
         final SienaMainPanel mainWindow;
         mainWindow = new SienaMainPanel();
         for (int i = 0; i < args.length; i++) {

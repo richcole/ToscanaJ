@@ -128,7 +128,6 @@ import net.sourceforge.toscanaj.view.manyvaluedcontext.TableView;
 import org.jdom.JDOMException;
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.imagewriter.DiagramExportSettings;
-import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -181,13 +180,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         eventBroker = new EventBroker();
         conceptualSchema = new ConceptualSchema(eventBroker);
 
-        // register all image writers we want to support
-        ToscanaJMainPanel.registerImageWriters();
-
-        Iterator it = GraphicFormatRegistry.getIterator();
-        if (it.hasNext()) {
-            this.diagramExportSettings = new DiagramExportSettings();
-        }
+        this.diagramExportSettings = new DiagramExportSettings();
 
         eventBroker.subscribe(
             this,

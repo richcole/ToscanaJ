@@ -35,7 +35,6 @@ import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemEvent;
 import org.tockit.canvas.events.CanvasItemSelectedEvent;
 import org.tockit.canvas.imagewriter.DiagramExportSettings;
-import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.canvas.manipulators.ItemMovementManipulator;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -197,14 +196,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         conceptualSchema = new ConceptualSchema(broker);
         DatabaseConnection.initialize(broker);
 
-		registerImageWriters();
-
-		// set the default diagram export options: auto mode, no format defined yet, no size
-		// if there is no format, we don't set the settings, which causes the menu items to be unavailable 
-		Iterator it = GraphicFormatRegistry.getIterator();
-		if (it.hasNext()) {
-			this.diagramExportSettings = new DiagramExportSettings();
-		}
+    	this.diagramExportSettings = new DiagramExportSettings();
 
         // then build the panel (order is important for checking if we want export options)
         buildPanel();
@@ -230,29 +222,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             }
         });
     }
-
-	/** 
-	 * @todo stuff like this should be in an abstract base class shared with Elba and Siena.
-	 */
-	public static void registerImageWriters() {
-		// register all image writers we want to support -- order is relevant since applied
-		// in the export dialog
-
-		// the next one is part of JDK 1.4, so it should give us JPG and PNG all the time
-		org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
-		
-		// the others are optional -- so we don't need the JARs unless the feature is wanted
-		try {
-			org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
-		} catch (Throwable t) {
-			// do nothing, we just don't support SVG
-		}
-		try {
-			org.tockit.canvas.imagewriter.FreeHepImageWriter.initialize();
-		} catch (Throwable t) {
-			// do nothing, we just don't support the formats
-		}
-	}
 
     /**
      * This constructor opens the file given as url in the parameter.

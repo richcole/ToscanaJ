@@ -15,6 +15,7 @@ public class Elba {
      */
     public static void main(String[] args) {
     	ToscanaJ.testJavaVersion();
+        ToscanaJ.loadPlugins();
         final ElbaMainPanel mainWindow;
         mainWindow = new ElbaMainPanel();
         mainWindow.setVisible(true);
