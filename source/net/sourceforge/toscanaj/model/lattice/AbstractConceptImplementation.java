@@ -248,7 +248,7 @@ public abstract class AbstractConceptImplementation implements Concept
             }
         }
         ideal.addAll(idealList);
-        List filterList = new LinkedList(ideal);
+        List filterList = new LinkedList(filter);
         for(int i = 0; i < filterList.size(); i++) {
             AbstractConceptImplementation other = (AbstractConceptImplementation) filterList.get(i);
             Iterator it = other.filter.iterator();
@@ -363,7 +363,14 @@ public abstract class AbstractConceptImplementation implements Concept
         while(cur.filter.size() != 1) {
             // there is another concept in the filter which is not this
             // (this is always the first) ==> go up
-            cur = (AbstractConceptImplementation) cur.filter.iterator().next();
+            // The concept itself is in the filter, too -- we have to avoid
+            // infinite recursion here
+            Iterator it = cur.filter.iterator();
+            Object next = cur;
+            while(cur == next) { // we know there has to be a next()
+                next = it.next();
+            }
+            cur = (AbstractConceptImplementation) next;
         }
         // now we are at the top
         return cur.getExtentSize();
@@ -379,7 +386,14 @@ public abstract class AbstractConceptImplementation implements Concept
         while(cur.ideal.size() != 1) {
             // there is another concept in the ideal which is not this
             // (this is always the first) ==> go down
-            cur = (AbstractConceptImplementation) cur.ideal.iterator().next();
+            // The concept itself is in the filter, too -- we have to avoid
+            // infinite recursion here
+            Iterator it = cur.ideal.iterator();
+            Object next = cur;
+            while(cur == next) { // we know there has to be a next()
+                next = it.next();
+            }
+            cur = (AbstractConceptImplementation) next;
         }
         // now we are at the bottom
         return cur.getIntentSize();
