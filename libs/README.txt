@@ -14,9 +14,7 @@ batik-*.jar:
   Batik SVG library (http://xml.apache.org/batik/, licence in LICENCE.batik)
   
 iText.jar:
-  iText PDF library for Java, version 0.98 (http://itext.sourceforge.net, licence in LICENCE.iText)
-  NOTE: this needs a patch at the moment, which is supplied with the Tockit jars. It is important that the
-        canvas.jar is in front of iText.jar in the classpath
+  iText PDF library for Java, version 0.99 (http://itext.sourceforge.net, licence in LICENCE.iText)
         
 postscriptwriter.zip:
   A Graphics2D implementation for exporting EPS/PS, grabbed out of the CVS from http://www.arakhne.org on
