@@ -58,9 +58,13 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
         }
 		JPopupMenu popupMenu = new JPopupMenu();
 		JMenuItem menuItem;
-		if(attribute.getDescription() == null){
+
+        List attributeViewNames = DatabaseViewerManager.getAttributeViewNames();
+		if( (attribute.getDescription() == null) && attributeViewNames.isEmpty() ){
 			return;
-		}else{
+		}
+		
+        if( attribute.getDescription() != null) {
 			final DiagramView parent = this.diagramView;
 			menuItem = new JMenuItem("Description...");
 			menuItem.addActionListener(new ActionListener() {
@@ -68,10 +72,9 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
 					DescriptionViewer.show(JOptionPane.getFrameForComponent(parent),attribute.getDescription());
 				}
 			});
-			popupMenu.add(menuItem);	
-		}				
+			popupMenu.add(menuItem);
+        }	
 		
-		List attributeViewNames = DatabaseViewerManager.getAttributeViewNames();
 		if (!attributeViewNames.isEmpty()) { 
 			addAttributeViewOptions(attributeViewNames, attribute.toString(), popupMenu);
 		}
