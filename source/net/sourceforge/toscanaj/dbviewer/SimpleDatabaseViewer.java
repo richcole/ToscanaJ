@@ -138,7 +138,7 @@ public class SimpleDatabaseViewer implements DatabaseViewer
         throws DatabaseViewerInitializationException
     {
         this.dialog = new SimpleDatabaseViewerDialog( manager.getParentWindow(), manager );
-        ConfigurationManager.restorePlacement("SimpleDatabaseViewerDialog", dialog, new Rectangle(100,100,150,150));
+        ConfigurationManager.restorePlacement("SimpleDatabaseViewerDialog", dialog, new Rectangle(100,100,350,300));
     }
 
     public void showView(String whereClause)

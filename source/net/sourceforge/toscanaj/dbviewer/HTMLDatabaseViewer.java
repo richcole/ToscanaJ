@@ -28,7 +28,7 @@ import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 
 /**
- * Shows a report using HTML.
+ * Shows a database view using HTML.
  *
  * A definition for this viewer looks like this:
  * <objectListView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseReportGenerator"
@@ -38,7 +38,7 @@ import org.jdom.output.XMLOutputter;
  *
  * The input file will be loaded and displayed as an HTML page. 
  *
- * There has to be a section in the HTML marked with <repeat>...</repeat>
+ * There can be a section in the HTML marked with <repeat>...</repeat>
  * which is the part that shall repeated for each item displayed. All
  * occurances of entries like <field name="givenName"/> within that will be 
  * filled
@@ -125,11 +125,16 @@ public class HTMLDatabaseViewer implements DatabaseViewer
                 }
             }
 
+            this.addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    closeDialog();
+                }
+            });
+
             final JButton closeButton = new JButton("Close");
             closeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    ConfigurationManager.storePlacement("HTMLDatabaseViewDialog", dialog);
-                    dialog.setVisible(false);
+                    closeDialog();
                 }
             });
             getRootPane().setDefaultButton(closeButton);
@@ -152,6 +157,12 @@ public class HTMLDatabaseViewer implements DatabaseViewer
             Container contentPane = getContentPane();
             contentPane.add( scrollview, BorderLayout.CENTER );
             contentPane.add( buttonPane, BorderLayout.SOUTH );
+        }
+        
+        protected void closeDialog()
+        {
+            ConfigurationManager.storePlacement("HTMLDatabaseViewDialog", this);
+            this.hide();
         }
 
         private void showView(String whereClause)
@@ -194,6 +205,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer
                 XMLOutputter outputter = new XMLOutputter();
                 outputter.setOmitDeclaration(true);
                 this.textArea.setText(outputter.outputString(this.template.getChild("html")));
+                this.show();
             }
             catch (DatabaseException e)
             {
@@ -213,7 +225,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer
         throws DatabaseViewerInitializationException
     {
         this.dialog = new HTMLDatabaseViewDialog( manager.getParentWindow(), manager );
-        ConfigurationManager.restorePlacement("HTMLDatabaseViewDialog", dialog, new Rectangle(100,100,150,150));
+        ConfigurationManager.restorePlacement("HTMLDatabaseViewDialog", dialog, new Rectangle(100,100,350,300));
     }
 
     public void showView(String whereClause)
@@ -221,7 +233,6 @@ public class HTMLDatabaseViewer implements DatabaseViewer
         if( this.dialog != null )
         {
             this.dialog.showView(whereClause);
-            this.dialog.setVisible(true);
         }
         else
         {
