@@ -15,7 +15,7 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -109,12 +109,21 @@ public class ObjectLabelView extends LabelView {
     }
 
     protected void doQuery() {
+        /// @todo try to get the distinction of query/no query somehow out of here
+        DiagramNode node = this.labelInfo.getNode();
+        ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
         if (query != null) {
-            DiagramNode node = this.labelInfo.getNode();
-            ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
             DatabaseConnectedConceptInterpreter conceptInterpreter =
                                 (DatabaseConnectedConceptInterpreter) this.diagramView.getConceptInterpreter();
             contents = conceptInterpreter.executeQuery(query, node.getConcept(), context);
+        }
+        else {
+            contents = new ArrayList();
+            Iterator it = this.diagramView.getConceptInterpreter().getObjectSetIterator(node.getConcept(), context);
+            while (it.hasNext()) {
+                Object o = (Object) it.next();
+                contents.add(o);
+            }
         }
     }
 
