@@ -2,6 +2,7 @@ package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.model.DiagramCollection;
+import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import util.CollectionFactory;
 
@@ -16,7 +17,7 @@ import java.util.Map;
 public class ScaleGeneratorPanel extends JPanel{
     private List scaleGenerators = null;
     private JFrame parentFrame;
-    DiagramCollection conceptualSchema;
+    ConceptualSchema conceptualSchema;
     TableColumnPairsSelectionSource selectionSource;
 
     public JFrame getParentFrame() {
@@ -26,7 +27,7 @@ public class ScaleGeneratorPanel extends JPanel{
     /**
      * Construct an instance of this view
      */
-    public ScaleGeneratorPanel(JFrame frame, DiagramCollection conceptualSchema, TableColumnPairsSelectionSource selectionSource) {
+    public ScaleGeneratorPanel(JFrame frame, ConceptualSchema conceptualSchema, TableColumnPairsSelectionSource selectionSource) {
         super();
         this.parentFrame = frame;
         this.conceptualSchema = conceptualSchema;
@@ -57,9 +58,12 @@ public class ScaleGeneratorPanel extends JPanel{
         while (it.hasNext()) {
             final ScaleGenerator generator = (ScaleGenerator) it.next();
             JButton generatorButton = new JButton(generator.getScaleName());
+            generatorButton.setEnabled(false);
             generatorButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Diagram2D returnValue = generator.generateScale(selectionSource.getSelectedTableColumnPairs());
+                    Diagram2D returnValue =
+                            generator.generateScale(selectionSource.getSelectedTableColumnPairs(),
+                                                    conceptualSchema);
                     if (null != returnValue) {
                         conceptualSchema.addDiagram(returnValue);
                     }
