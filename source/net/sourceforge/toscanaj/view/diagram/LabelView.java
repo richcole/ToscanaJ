@@ -216,7 +216,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         double radius = nodeView.getRadiusY();
 
         // get the bounding rectangle
-        this.rect = getCanvasBounds(graphics);
+        this.rect = getLabelBounds(graphics);
         double xPos = rect.getX();
         double yPos = rect.getY();
         double lw = rect.getWidth();
@@ -487,9 +487,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     }
 
     /**
-     * Calculates the rectangle around label.
+     * Calculates the rectangle around the label, without the stroke.
      */
-    public Rectangle2D getCanvasBounds(Graphics2D graphics) {
+    public Rectangle2D getLabelBounds(Graphics2D graphics) {
         // get the font metrics
         FontMetrics fm = graphics.getFontMetrics();
 
@@ -510,6 +510,17 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
             yPos = y + this.labelInfo.getOffset().getY();
         }
         return new Rectangle2D.Double(xPos, yPos, lw, lh);
+    }
+
+    public Rectangle2D getCanvasBounds(Graphics2D graphics) {
+    	Stroke stroke = graphics.getStroke();
+        Rectangle2D labelBounds = getLabelBounds(graphics);
+    	if (stroke instanceof BasicStroke) {
+    		double w = ((BasicStroke) stroke).getLineWidth();
+    		return new Rectangle2D.Double(labelBounds.getX() - w/2, labelBounds.getY() - w/2,
+    		                               labelBounds.getWidth() + w, labelBounds.getHeight() + w);
+    	}
+        return labelBounds;
     }
 
     /**

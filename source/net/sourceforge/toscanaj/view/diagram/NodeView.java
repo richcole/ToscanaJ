@@ -244,6 +244,11 @@ public class NodeView extends CanvasItem {
         double y = center.getY();
         double rx = getRadiusX();
         double ry = getRadiusY();
+        Stroke stroke = g.getStroke();
+        if (stroke instanceof BasicStroke) {
+            double w = ((BasicStroke) stroke).getLineWidth();
+            return new Rectangle2D.Double(x - rx - w/2, y - ry - w/2, 2 * rx + w, 2 * ry + w);
+        }
         return new Rectangle2D.Double(x - rx, y - ry, 2 * rx, 2 * ry);
     }
 
