@@ -233,8 +233,13 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 	}
 	
 	protected boolean addObject(String newObjectName){
-		WritableFCAObject object = new FCAObjectImplementation(newObjectName);
-		return	this.dialog.getContext().getObjects().add(object);
+		if (!collectionContainsString(newObjectName, this.objects)) {
+			WritableFCAObject object = new FCAObjectImplementation(newObjectName);
+			this.dialog.getContext().getObjects().add(object);
+			return true;
+		} else {
+			return false;
+		}		
 	}
 	
 	private void renameObject(int num) {
