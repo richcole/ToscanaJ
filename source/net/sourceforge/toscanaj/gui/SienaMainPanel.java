@@ -214,7 +214,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
         List criteria = view.getCriteria();
         for (Iterator iterator = criteria.iterator(); iterator.hasNext();) {
             Criterion criterion = (Criterion) iterator.next();
-            System.out.println("Criterion '" + criterion.getProperty().getName() + ": " +
+            System.out.print("Criterion '" + criterion.getProperty().getName() + ": " +
                                criterion.getValueGroup().getName() + "' is assigned to dimensions:");
             int count = 0;
             for (Iterator iterator2 = dimensions.iterator(); iterator2.hasNext();) {
