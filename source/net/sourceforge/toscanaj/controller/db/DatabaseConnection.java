@@ -263,40 +263,63 @@ public class DatabaseConnection implements EventBrokerListener {
 	/**
 	 * @todo use String[] instead of Vector for the rows
 	 */
-    public List executeQuery(String statement) throws DatabaseException {
-        List result = new LinkedList();
-        ResultSet resultSet = null;
-        Statement stmt = null;
-        // submit the query
-        try {
-            stmt = jdbcConnection.createStatement();
-            logStatementStart(statement);
-            resultSet = stmt.executeQuery(statement);
-            logStatementEnd();
-            int numberColumns = resultSet.getMetaData().getColumnCount();
-            while (resultSet.next()) {
-                Vector item = new Vector(numberColumns);
-                for (int i = 0; i < numberColumns; i++) {
-                    item.add(i, resultSet.getString(i + 1));
-                }
-                result.add(item);
-            }
-        } catch (SQLException se) {
+	public List executeQuery(String statement) throws DatabaseException {
+		List result = new LinkedList();
+		ResultSet resultSet = null;
+		Statement stmt = null;
+		// submit the query
+		try {
+			stmt = jdbcConnection.createStatement();
+			logStatementStart(statement);
+			resultSet = stmt.executeQuery(statement);
+			logStatementEnd();
+			int numberColumns = resultSet.getMetaData().getColumnCount();
+			while (resultSet.next()) {
+				Vector item = new Vector(numberColumns);
+				for (int i = 0; i < numberColumns; i++) {
+					item.add(i, resultSet.getString(i + 1));
+				}
+				result.add(item);
+			}
+		} catch (SQLException se) {
 			throw new DatabaseException("An error occured while querying the database.\nThe statement \"" + statement +
 										"\" failed.", se);
-        } finally {
-            try {
-                if (resultSet != null) {
-                    resultSet.close();
-                }
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-            }
-        }
-        return result;
-    }
+		} finally {
+			try {
+				if (resultSet != null) {
+					resultSet.close();
+				}
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException e) {
+			}
+		}
+		return result;
+	}
+
+	public int executeUpdate(String statement) throws DatabaseException {
+		int result;
+		Statement stmt = null;
+		// submit the query
+		try {
+			stmt = jdbcConnection.createStatement();
+			logStatementStart(statement);
+			result = stmt.executeUpdate(statement);
+			logStatementEnd();
+		} catch (SQLException se) {
+			throw new DatabaseException("An error occured while querying the database.\nThe statement \"" + statement +
+										"\" failed.", se);
+		} finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException e) {
+			}
+		}
+		return result;
+	}
 
     /**
      * Retrieves the first value of the given column as integer.

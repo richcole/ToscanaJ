@@ -1262,7 +1262,7 @@ public class ElbaMainPanel
 			for (int i = 0; i < this.conceptualSchema.getNumberOfDiagrams(); i++) {
 				String columnName = "__diagram" + i + "__";
 				try {
-					databaseConnection.executeQuery("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " INTEGER;");
+					databaseConnection.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " INTEGER;");
 				} catch (DatabaseException e) {
 					// that is ok, we just had this column before
 				}
@@ -1275,7 +1275,7 @@ public class ElbaMainPanel
 	                if(concept.getObjectContingentSize() != 0) {
 						String oldWhereClause = WhereClauseGenerator.createClause(concept.getObjectContingentIterator());
 						String newWhereClause = columnName + " = " + contingentCount;
-                        databaseConnection.executeQuery("UPDATE " + tableName + 
+                        databaseConnection.executeUpdate("UPDATE " + tableName + 
 														" SET " + newWhereClause +
 														" WHERE " + oldWhereClause + ";");
 						concept.removeObjectContingent();
