@@ -449,7 +449,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
         LoadConceptualSchemaActivity loadSchemaActivity =
             new LoadConceptualSchemaActivity(eventBroker);
-        /// @todo add dirty flag support as Elba has
         loadSchemaActivity.setTestOpenOkActivity(testSchemaSavedActivity);
         OpenFileAction openFileAction =
             new OpenFileAction(
