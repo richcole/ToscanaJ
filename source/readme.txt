@@ -1,9 +1,9 @@
-ToscanaJ 0.1 Readme File
+ToscanaJ 0.2 Readme File
 ========================
 
 What is it?
 -----------
-A very first release of the Java reimplementation of the
+A second release of the Java reimplementation of the
 classic Formal Concept Analysis tool named "Toscana".
 
 It is open sourced under a BSD-style licence (see the text
@@ -34,8 +34,10 @@ to create some common code base.
 What do I need to run ToscanaJ?
 -------------------------------
 You need a Java 2 runtime environment, i.e. any JRE or
-JDK with version number 1.2 or above. We tested with
-Suns JDK version 1.3.1.
+JDK with version number 1.2 or above. We develop with
+Suns JDK version 1.3.1 on Windows 2000, tests were made
+with different JDK 1.3.x on Windows NT and 98 plus 
+different Linux Systems.
 
 
 How do I start ToscanaJ?
@@ -46,7 +48,7 @@ line make sure you are in the installation directory, it
 won't work from within another path. Alternatively you can
 start it direcly with "java -jar ToscanaJ.jar". On Windows
 you can connect the ".jar" extension with "javaw -jar",
-then you can jsut double-click the JAR file in the explorer.
+then you can just double-click the JAR file in the explorer.
 
 
 What can I do with ToscanaJ?
@@ -78,14 +80,22 @@ things:
 - export diagrams as bitmaps (PNG, JPG)
 - export diagrams as vector graphic (SVG)
 
+Added features in ToscanaJ 0.2:
+- connections can be made with all JDBC drivers instead of
+  only the JDBC-ODBC bridge
+- labels are now resizable and scrollable
+- SQL aggregates can be defined in the CSX files to e.g.
+  display an average price in the diagram
+
 
 Are there other examples?
 -------------------------
 The current distribution contains the same example as Access
 database. To use this you have to create an ODBC data source
 name (DSN) pointing to the "pctest.mdb" file in the examples
-directory. The results should be the same but it shows that
-we can use an ODBC connection ;-)
+directory. The data set is the same but this demonstrates how
+to use an ODBC/JDBC connection and how to define extra views
+for SQL aggregates.
 
 
 How do I create examples?

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ToscanaJ" default="dist" basedir="..">
 	<property name="app.name" value="ToscanaJ"/>
-	<property name="dist.name" value="ToscanaJ-0_1"/>
+	<property name="dist.name" value="ToscanaJ-0_2"/>
 	<property name="build.dir" value="build"/>
 	<property name="dist.dir" value="dist"/>
 	<property name="doc.dir" value="javadoc"/>
