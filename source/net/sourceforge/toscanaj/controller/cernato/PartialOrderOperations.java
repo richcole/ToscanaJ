@@ -8,8 +8,8 @@
 package net.sourceforge.toscanaj.controller.cernato;
 
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
-import net.sourceforge.toscanaj.model.cernato.PartialOrderNode;
-import net.sourceforge.toscanaj.model.Ordered;
+import net.sourceforge.toscanaj.model.order.PartialOrderNode;
+import net.sourceforge.toscanaj.model.order.Ordered;
 
 import java.util.Set;
 import java.util.Iterator;

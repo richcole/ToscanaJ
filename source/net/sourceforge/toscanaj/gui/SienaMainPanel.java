@@ -8,9 +8,10 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import net.sourceforge.toscanaj.controller.cernato.CernatoDimensionStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
-import net.sourceforge.toscanaj.controller.cernato.LayoutOperations;
 import org.tockit.events.*;
 import org.tockit.events.Event;
 import org.tockit.events.EventListener;
@@ -36,7 +37,6 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.util.Vector;
 import java.util.Iterator;
-import java.util.List;
 
 /// @todo check if the file we save to exists, warn if it does
 public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
@@ -212,7 +212,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
     private void addDiagram(ConceptualSchema schema, CernatoModel model, View view) {
         LatticeGenerator lgen = new GantersAlgorithm();
         Lattice lattice = lgen.createLattice(new ViewContext(model, view));
-        Diagram2D diagram = LayoutOperations.createDiagram(lattice, view.getName());
+        Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, view.getName(), new CernatoDimensionStrategy());
         schema.addDiagram(diagram);
     }
 

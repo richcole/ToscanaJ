@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
-import net.sourceforge.toscanaj.model.Ordered;
+import net.sourceforge.toscanaj.model.order.Ordered;
 
 import java.util.List;
 import java.util.ArrayList;

@@ -5,10 +5,8 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.controller.cernato;
+package net.sourceforge.toscanaj.controller.ndimlayout;
 
-import net.sourceforge.toscanaj.model.cernato.*;
-import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
@@ -16,40 +14,24 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.cernato.Criterion;
+import net.sourceforge.toscanaj.model.order.PartialOrderNode;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 
 import java.util.*;
 import java.awt.geom.Point2D;
 
-public class LayoutOperations {
+public abstract class NDimLayoutOperations {
     // constants for base vector calculation
     private static final double BASE_SCALE = 30;
     private static final double BASE_X_STRETCH = 2;
     private static final double BASE_X_SHEAR = -0.1;
 
-    public static final Vector calculateDimensions(Lattice lattice) {
-        Vector dimensions = new Vector();
-        Concept bottom = lattice.getBottom();
-        Iterator it = bottom.getIntentIterator();
-        Criterion[] criteria = new Criterion[bottom.getIntentSize()];
-        int count = 0;
-        while (it.hasNext()) {
-            Attribute attribute = (Attribute) it.next();
-            criteria[count] = (Criterion) attribute.getData();
-            count++;
-        }
-        DirectedGraph graph = PartialOrderOperations.createGraphFromOrder(criteria);
-        Set paths = graph.getMaximalPaths();
-        for (Iterator iterator2 = paths.iterator(); iterator2.hasNext();) {
-            Vector path = (Vector) iterator2.next();
-            dimensions.add(new Dimension(path));
-        }
-        return dimensions;
-    }
-
-    public static final Diagram2D createDiagram(Lattice lattice, String title) {
+    public static final Diagram2D createDiagram(Lattice lattice, String title,
+                                                DimensionCreationStrategy dimensionStrategy) {
         SimpleLineDiagram diagram = new SimpleLineDiagram();
         diagram.setTitle(title);
-        Vector dimensions = calculateDimensions(lattice);
+        Vector dimensions = dimensionStrategy.calculateDimensions(lattice);
         Vector base = createBase(dimensions);
         Concept[] concepts = lattice.getConcepts();
         Hashtable nodemap = new Hashtable();
@@ -81,7 +63,7 @@ public class LayoutOperations {
         return diagram;
     }
 
-    private static double[] substract(double[] a, double[] b) {
+    public static double[] substract(double[] a, double[] b) {
         double[] retVal = new double[a.length];
         for (int i = 0; i < a.length; i++) {
             retVal[i] = a[i] - b[i];
@@ -113,8 +95,8 @@ public class LayoutOperations {
     private static void addVector(double[] ndimVector, Criterion criterion, Vector dimensions) {
         int dimCount = 0;
         for (Iterator it = dimensions.iterator(); it.hasNext();) {
-            net.sourceforge.toscanaj.model.cernato.Dimension dimension =
-                                            (net.sourceforge.toscanaj.model.cernato.Dimension) it.next();
+            net.sourceforge.toscanaj.model.ndimdiagram.Dimension dimension =
+                                            (net.sourceforge.toscanaj.model.ndimdiagram.Dimension) it.next();
             Vector path = dimension.getPath();
             for (Iterator it2 = path.iterator(); it2.hasNext();) {
                 PartialOrderNode node = (PartialOrderNode) it2.next();

@@ -5,14 +5,12 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model;
+package net.sourceforge.toscanaj.controller.ndimlayout;
 
-/**
- * Implements a partial order.
- *
- * This differs from java.lang.Comparable, which assumes a total order.
- */
-public interface Ordered {
-    boolean isLesserThan(Ordered other);
-    boolean isEqual(Ordered other);
+import net.sourceforge.toscanaj.model.lattice.Lattice;
+
+import java.util.Vector;
+
+public interface DimensionCreationStrategy {
+    Vector calculateDimensions(Lattice lattice);
 }

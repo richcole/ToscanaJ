@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
-import net.sourceforge.toscanaj.model.Ordered;
+import net.sourceforge.toscanaj.model.order.Ordered;
 
 public interface ValueGroup extends Ordered {
     String getName();
