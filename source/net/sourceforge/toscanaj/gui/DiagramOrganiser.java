@@ -119,35 +119,36 @@ public class DiagramOrganiser extends JPanel {
 
 		availableDiagramsListview.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				int index = availableDiagramsListview.locationToIndex(e.getPoint());
-				Diagram2D diagram = schema.getDiagram(index);
-				eventBroker.processEvent(new DiagramClickedEvent(new DiagramReference(diagram, null)));            	
 				if (e.getClickCount() == 2) {
 					/// @todo this should be done using an event
+					int index = availableDiagramsListview.locationToIndex(e.getPoint());
+					Diagram2D diagram = schema.getDiagram(index);
 					DiagramController.getController().addDiagram(diagram);
+					selectedDiagramsListview.setSelectedIndices(new int[0]);
+					e.consume();
 				}
-				selectedDiagramsListview.setSelectedIndices(new int[0]);
 			}
-            
 		});
 
-		selectedDiagramsListview.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
-				int index = selectedDiagramsListview.locationToIndex(e.getPoint());
+		selectedDiagramsListview.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				int index = selectedDiagramsListview.getSelectedIndex();
 				DiagramHistory diagramHistory = DiagramController.getController().getDiagramHistory();
 				DiagramReference diagramReference = diagramHistory.getReferenceAt(index); 
 				eventBroker.processEvent(new DiagramClickedEvent(diagramReference));            	
 				availableDiagramsListview.setSelectedIndices(new int[0]);
 			}
-            
 		});
 
-        // The add button can only be used if an available diagram is selected
         availableDiagramsListview.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                if (availableDiagramsListview.getSelectedValue() == null) {
+				int index = availableDiagramsListview.getSelectedIndex();
+				Diagram2D diagram = schema.getDiagram(index);
+                if (diagram == null) {
                     addButton.setEnabled(false);
                 } else {
+					eventBroker.processEvent(new DiagramClickedEvent(new DiagramReference(diagram, null)));
+					selectedDiagramsListview.setSelectedIndices(new int[0]);
                     addButton.setEnabled(true);
                 }
             }
