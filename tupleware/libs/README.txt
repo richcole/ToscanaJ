@@ -10,8 +10,8 @@ pluginArhitecture.jar
 jdom.jar: 
   JDOM, beta 9 (http://www.jdom.org, licence in LICENSE.jdom)
 
-hsqldb.jar: 
-  HSQL Database Engine, version 1.7.1.b (http://hsqldb.sourceforge.net/, license in LICENSE.hsqldb.html)
-
 ant-contrib.jar
   ant extras - used in plugins deployment, 0.3 (http://sourceforge.net/projects/ant-contrib/, license in LICENSE-ant-contrib.txt)
+  
+ToscanaJ.jar
+  ToscanaJ. (http://toscanaj.sourceforge.net).
