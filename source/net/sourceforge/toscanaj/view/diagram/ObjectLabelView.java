@@ -121,7 +121,7 @@ public class ObjectLabelView extends LabelView {
         }
         if(!conceptInterpreter.isRealized(concept, context)) {
         	this.contents = null;
-        } else if (query == ListQuery.KeyListQuery) {
+        } else if (query == ListQuery.KEY_LIST_QUERY) {
             int objectCount = conceptInterpreter.getObjectCount(concept, context);
             if( objectCount != 0) {
 	            contents = new ArrayList();
@@ -133,7 +133,7 @@ public class ObjectLabelView extends LabelView {
             } else {
                 contents = null;
             }
-        } else if (query == AggregateQuery.CountQuery) {
+        } else if (query == AggregateQuery.COUNT_QUERY) {
             int objectCount = conceptInterpreter.getObjectCount(concept, context);
             if( objectCount != 0) {
 		        contents = new ArrayList();

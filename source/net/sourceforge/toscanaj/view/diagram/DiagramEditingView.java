@@ -67,7 +67,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         JPanel diagramViewPanel = new JPanel(new BorderLayout());
 
         diagramView = new DiagramView();
-        diagramView.setQuery(ListQuery.KeyListQuery);
+        diagramView.setQuery(ListQuery.KEY_LIST_QUERY);
         EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
         DirectConceptInterpreter interpreter = new DirectConceptInterpreter();
         ConceptInterpretationContext interpretationContext =

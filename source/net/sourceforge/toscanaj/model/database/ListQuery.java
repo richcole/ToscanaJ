@@ -17,7 +17,7 @@ public class ListQuery extends Query {
     private DatabaseInfo info;
     public static final String QUERY_ELEMENT_NAME = "listQuery";
 
-    public static final ListQuery KeyListQuery = new ListQuery(null, "List", "fake");
+    public static final ListQuery KEY_LIST_QUERY = new ListQuery(null, "List", "fake");
 
     public ListQuery(DatabaseInfo info, String name, String header) {
         super(name, header);

@@ -17,7 +17,7 @@ public class AggregateQuery extends Query {
     private DatabaseInfo info;
     public static final String QUERY_ELEMENT_NAME = "aggregateQuery";
 
-    public static final AggregateQuery CountQuery = new AggregateQuery(null, "Count", "fake");
+    public static final AggregateQuery COUNT_QUERY = new AggregateQuery(null, "Count", "fake");
 
     public AggregateQuery(DatabaseInfo info, String name, String header) {
         super(name, header);

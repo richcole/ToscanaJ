@@ -172,8 +172,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
                 }
             }
         } else {
-        	queries.add(AggregateQuery.CountQuery);
-        	queries.add(ListQuery.KeyListQuery);
+        	queries.add(AggregateQuery.COUNT_QUERY);
+        	queries.add(ListQuery.KEY_LIST_QUERY);
         }
         List diagramElems = elem.getChildren(Diagram2D.DIAGRAM_ELEMENT_NAME);
         for (Iterator iterator = diagramElems.iterator(); iterator.hasNext();) {
