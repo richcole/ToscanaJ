@@ -1118,6 +1118,14 @@ public class ElbaMainPanel
             ErrorDialog.showError(this, e, "Could not parse file");
             return;
         }
+        catch (Exception e) {
+        	ErrorDialog.showError(this, e, "Could not parse file");
+        	return;
+        }
+        catch (Error e) {
+        	ErrorDialog.showError(this, e, "Could not parse file", "Could not parse CSC file");
+        	return;
+        }
     }
 
     private void exportStatisticalData() {
