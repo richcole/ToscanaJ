@@ -17,11 +17,6 @@ public class AllTests extends TestCaseMo {
     }
 
 
-    public static void addBitSet64Test(TestSuite suite) {
-        suite.addTest(BitSet64Test.suite());
-    }
-
-
     public static void addBitSetFactoryTest(TestSuite suite) {
         suite.addTest(BitSetFactoryTest.suite());
     }
