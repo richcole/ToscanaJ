@@ -7,7 +7,9 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
+import net.sourceforge.toscanaj.dbviewer.DatabaseViewerException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 
@@ -45,10 +47,14 @@ public class ObjectLabelViewOpenDisplayHandler implements EventBrokerListener {
 		}
 		DatabaseRetrievedObject dbObject =
 				(DatabaseRetrievedObject) labelView.getObjectAtPosition(itemEvent.getCanvasPosition());
-		showObject(dbObject);
+		try {
+            showObject(dbObject);
+        } catch (DatabaseViewerException exc) {
+            ErrorDialog.showError(null, exc, "Failed to open view", "The object view requested can not be shown.");
+        }
     }
 
-    public void showObject(DatabaseRetrievedObject object) {
+    public void showObject(DatabaseRetrievedObject object) throws DatabaseViewerException {
         if (object == null) {
             return;
         }

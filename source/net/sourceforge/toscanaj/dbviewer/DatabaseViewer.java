@@ -103,5 +103,6 @@ public interface DatabaseViewer {
     void initialize(DatabaseViewerManager manager)
             throws DatabaseViewerException;
 
-    void showView(String whereClause);
+    void showView(String whereClause)
+            throws DatabaseViewerException;
 }

@@ -64,7 +64,7 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
         textFragments.add(commandLine);
     }
 
-    public void showView(String whereClause) {
+    public void showView(String whereClause) throws DatabaseViewerException {
         String command = "";
         try {
             List results = this.viewerManager.getConnection().executeQuery(fieldNames,
@@ -81,7 +81,7 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
             command += (String) itText.next();
         } catch (DatabaseException e) {
         	/// @todo maybe we should introduce a proper DatabaseViewerException in the signature
-            throw new RuntimeException("Failed to query database.", e);
+            throw new DatabaseViewerException("Failed to query database.", e);
         }
         try {
             // add command shell on Win32 platforms
@@ -95,7 +95,7 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
             Runtime rt = Runtime.getRuntime();
             rt.exec(command);
         } catch (Exception e) {
-            throw new RuntimeException("There was a problem running external viewer",e);
+            throw new DatabaseViewerException("There was a problem running external viewer",e);
         }
     }
 }

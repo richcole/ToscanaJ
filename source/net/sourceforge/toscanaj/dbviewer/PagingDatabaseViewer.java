@@ -43,7 +43,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(PagingDatabaseViewer.class);
     
 	protected interface PageViewPanel {
-		void showItem(String keyValue);
+		void showItem(String keyValue) throws DatabaseViewerException;
 		Component getComponent() throws DatabaseViewerException;
 	}
 	
@@ -79,11 +79,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
                 showCurrentItem();
                 show();
             } catch (DatabaseException e) {
-                JOptionPane.showMessageDialog(this,
-                        "Failed to query database:\n" + e.getMessage() + "\n" + e.getCause().getMessage(),
-                        "Database connection failed",
-                        JOptionPane.ERROR_MESSAGE);
-
+                ErrorDialog.showError(this, e, "Failed to query database");
             }
         }
 
@@ -180,7 +176,11 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         }
 
         private void showCurrentItem() {
-            this.viewPanel.showItem(keyValues[position]);
+            try {
+                this.viewPanel.showItem(keyValues[position]);
+            } catch (DatabaseViewerException e) {
+                ErrorDialog.showError(this, e, "Failed to show item");
+            }
             infoLabel.setText((position + 1) + "/" + keyValues.length);
         }
 
@@ -211,7 +211,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         this.viewerManager = manager;
     }
 
-    public void showView(String whereClause) {
+    public void showView(String whereClause) throws DatabaseViewerException {
 		Frame parentWindow = DatabaseViewerManager.getParentWindow();
 		PagingDatabaseViewerDialog dialog;
 		try {

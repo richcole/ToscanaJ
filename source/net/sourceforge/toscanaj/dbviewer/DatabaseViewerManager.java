@@ -130,7 +130,7 @@ public class DatabaseViewerManager implements XMLizable {
         return JOptionPane.getFrameForComponent(parentComponent);
     }
 
-    public static void showObject(int viewerID, DatabaseRetrievedObject object) {
+    public static void showObject(int viewerID, DatabaseRetrievedObject object) throws DatabaseViewerException {
         if (object.hasKey()) {
         	if(objectViewerRegistry.size() == 0) {
         		return;
@@ -150,7 +150,7 @@ public class DatabaseViewerManager implements XMLizable {
         }
     }
 
-    public static void showObject(String viewName, DatabaseRetrievedObject object) {
+    public static void showObject(String viewName, DatabaseRetrievedObject object) throws DatabaseViewerException {
         if (object.hasKey()) {
             for (int i = 0; i < objectViewerRegistry.size(); i++) {
                 DatabaseViewerManager manager = (DatabaseViewerManager) objectViewerRegistry.get(i);
@@ -172,7 +172,7 @@ public class DatabaseViewerManager implements XMLizable {
         }
     }
 
-    public static void showObjectList(int viewerID, DatabaseRetrievedObject object) {
+    public static void showObjectList(int viewerID, DatabaseRetrievedObject object) throws DatabaseViewerException {
 		if(objectListViewerRegistry.size() == 0) {
 			return;
 		}
@@ -180,7 +180,7 @@ public class DatabaseViewerManager implements XMLizable {
         manager.viewer.showView(object.getQueryWhereClause());
     }
 
-    public static void showObjectList(String viewName, DatabaseRetrievedObject object) {
+    public static void showObjectList(String viewName, DatabaseRetrievedObject object) throws DatabaseViewerException {
         for (int i = 0; i < objectListViewerRegistry.size(); i++) {
             DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(i);
             if (manager.screenName.equals(viewName)) {
@@ -189,13 +189,13 @@ public class DatabaseViewerManager implements XMLizable {
         }
     }
 
-    public static void showAttribute(int viewerID, String attribute) {
+    public static void showAttribute(int viewerID, String attribute) throws DatabaseViewerException {
             DatabaseViewerManager manager = (DatabaseViewerManager) attributeViewerRegistry.get(viewerID);
             DatabaseViewer viewer = manager.viewer;
             viewer.showView("WHERE " + manager.getKeyName() + " = '" + attribute + "'");
     }
 
-    public static void showAttribute(String viewName, String attribute) {
+    public static void showAttribute(String viewName, String attribute) throws DatabaseViewerException {
         for (int i = 0; i < attributeViewerRegistry.size(); i++) {
             DatabaseViewerManager manager = (DatabaseViewerManager) attributeViewerRegistry.get(i);
             if (manager.screenName.equals(viewName)) {

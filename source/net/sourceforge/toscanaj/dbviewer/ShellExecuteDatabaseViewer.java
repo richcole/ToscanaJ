@@ -69,7 +69,7 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
         fieldNames.add(columnName);
     }
 
-    public void showView(String whereClause) {
+    public void showView(String whereClause) throws DatabaseViewerException {
         String resourceLocation = "";
         try {
             List results = this.viewerManager.getConnection().executeQuery(fieldNames,
@@ -83,7 +83,7 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
             }
         } catch (DatabaseException e) {
         	/// @todo maybe we should introduce a proper DatabaseViewerException in the signature
-            throw new RuntimeException("Failed to query database.", e);
+            throw new DatabaseViewerException("Failed to query database.", e);
         }
         final String finalResourceLocation = resourceLocation;
         Runnable external = new Runnable() {

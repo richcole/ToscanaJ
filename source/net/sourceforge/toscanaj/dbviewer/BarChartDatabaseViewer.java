@@ -101,7 +101,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	        return barChartPanel;
 	    }
 	
-	    public void showItem(String keyValue) {
+	    public void showItem(String keyValue) throws DatabaseViewerException {
 			DatabaseViewerManager viewerManager = getManager();
 	        List tmpList;
 	
@@ -130,7 +130,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	            }
 	
 	        } catch (DatabaseException e) {
-	            throw new RuntimeException("Could not query database", e);
+	            throw new DatabaseViewerException("Could not query database", e);
 	        }
 	
 	    }
