@@ -41,12 +41,9 @@ public class BiordinalScaleEditorDialog extends JDialog {
 	private static final int MINIMUM_HEIGHT = 500;
 	private static final int DEFAULT_X_POS = 10;
 	private static final int DEFAULT_Y_POS = 10;
-	private BiordinalScaleEditorDialog biordinalScaleEditorDialog;
-
 
 	public BiordinalScaleEditorDialog(Frame owner, DatabaseSchema databaseSchema, DatabaseConnection connection) {
 		super(owner);
-		biordinalScaleEditorDialog = this;
 		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
 			this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
 			//	to enforce the minimum size during resizing of the JDialog
@@ -194,7 +191,7 @@ public class BiordinalScaleEditorDialog extends JDialog {
 	}
 	
 	private void closeDialog(boolean result) {
-		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,biordinalScaleEditorDialog);
+		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
 		dispose();
 		this.result = result;
 	}
