@@ -39,6 +39,7 @@ import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.parser.CSCParser;
@@ -783,10 +784,11 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         boolean empty = true;
         // will be used to check if we have at least one entry
         if (this.mruList.size() > 0) {
-            ListIterator it = mruList.listIterator(mruList.size() - 1);
+            ListIterator it = mruList.listIterator(mruList.size());
             while (it.hasPrevious()) {
                 String cur = (String) it.previous();
-                if (cur.equals(currentFile)) {
+                if (this.currentFile != null && 
+                        cur.equals(this.currentFile.getAbsolutePath())) {
                     // don't enlist the current file
                     continue;
                 }
@@ -871,6 +873,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             ConceptualSchemaLoadedEvent loadEvent =
                 (ConceptualSchemaLoadedEvent) e;
             setCurrentFile(loadEvent.getFile());
+        } else if (e instanceof NewConceptualSchemaEvent) {
+            setCurrentFile(null);
         }
         this.exportDiagramAction.setEnabled(
             (this.diagramEditingView.getDiagramView().getDiagram() != null)
@@ -1178,15 +1182,17 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
     private void setCurrentFile(File newCurrentFile) {
         this.currentFile = newCurrentFile;
-        this.saveAsFileAction.setPreviousFile(newCurrentFile);
-        String filePath = newCurrentFile.getAbsolutePath();
-        if (this.mruList.contains(filePath)) {
-            // if it is already in, just remove it and add it at the end
-            this.mruList.remove(filePath);
-        }
-        this.mruList.add(filePath);
-        if (this.mruList.size() > MaxMruFiles) {
-            this.mruList.remove(0);
+        if(newCurrentFile != null) {
+            this.saveAsFileAction.setPreviousFile(newCurrentFile);
+            String filePath = newCurrentFile.getAbsolutePath();
+            if (this.mruList.contains(filePath)) {
+                // if it is already in, just remove it and add it at the end
+                this.mruList.remove(filePath);
+            }
+            this.mruList.add(filePath);
+            if (this.mruList.size() > MaxMruFiles) {
+                this.mruList.remove(0);
+            }
         }
         recreateMruMenu();
         updateWindowTitle();

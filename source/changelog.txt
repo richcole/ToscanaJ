@@ -5,6 +5,8 @@ Affecting different programs:
 =============================
 - grid size now changes with a factor of third root of two. This means after
   three refinements the nodes are all on a grid location again
+- Bugfix: MRU menu after File->New is handled correctly now
+- Bugfix: title of the window adjusts after File->New
 
 Specific for ToscanaJ:
 ======================
@@ -23,8 +25,6 @@ Specific for Elba:
 
 Specific for Siena (still not fully complete):
 ==============================================
-- Bugfix: MRU menu is handled correctly now
-- Bugfix: title of the window adjusts after File->New
 
 Other new experimental features:
 ================================
