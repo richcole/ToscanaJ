@@ -29,11 +29,9 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
         this.listQuery.insertQueryColumn("", null, "", databaseInfo.getKey().getSqlExpression(), false);
     }
 
-	/**
-	 * @todo this implementation is most likely extremely inefficient.
-	 */
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
-    	return Arrays.asList(executeQuery(this.listQuery, concept, context)).iterator();
+    	// for us a KeyList query is nothing but a normal list query with a specific setup
+    	return Arrays.asList(handleNonDefaultQuery(this.listQuery, concept, context)).iterator();
     }
 
 	protected int calculateContingentSize (Concept concept, ConceptInterpretationContext context) {
