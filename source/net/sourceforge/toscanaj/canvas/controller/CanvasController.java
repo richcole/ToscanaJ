@@ -8,6 +8,8 @@ package net.sourceforge.toscanaj.canvas.controller;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.Canvas;
+import net.sourceforge.toscanaj.canvas.events.CanvasItemActivatedEvent;
+import net.sourceforge.toscanaj.events.EventBroker;
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -20,6 +22,8 @@ import java.util.ListIterator;
 public class CanvasController implements MouseListener, MouseMotionListener {
 
     private Canvas canvas;
+
+    private EventBroker eventBroker = new EventBroker();
 
     /**
      * Flag to prevent label from being moved when just clicked on
@@ -57,6 +61,10 @@ public class CanvasController implements MouseListener, MouseMotionListener {
         this.canvas = canvas;
         canvas.addMouseListener(this);
         canvas.addMouseMotionListener(this);
+    }
+
+    public EventBroker getEventBroker() {
+        return eventBroker;
     }
 
     /**
@@ -104,7 +112,8 @@ public class CanvasController implements MouseListener, MouseMotionListener {
                 canvas.backgroundClicked(modelPos);
                 if (e.getClickCount() == 1) {
                     this.doubleClickTimer = new Timer();
-                    this.doubleClickTimer.schedule(new BackgroundSingleClickTask(canvas, modelPos), 300);
+                    this.doubleClickTimer.schedule(
+                            new BackgroundSingleClickTask(canvas, modelPos, eventBroker), 300);
                 } else if (e.getClickCount() == 2) {
                     this.doubleClickTimer.cancel();
                     canvas.backgroundDoubleClicked(modelPos);
@@ -114,10 +123,13 @@ public class CanvasController implements MouseListener, MouseMotionListener {
             selectedCanvasItem.clicked(modelPos);
             if (e.getClickCount() == 1) {
                 this.doubleClickTimer = new Timer();
-                this.doubleClickTimer.schedule(new CanvasItemSingleClickTask(this.selectedCanvasItem, modelPos), 300);
+                this.doubleClickTimer.schedule(
+                        new CanvasItemSingleClickTask(this.selectedCanvasItem, modelPos, eventBroker), 300);
             } else if (e.getClickCount() == 2) {
                 this.doubleClickTimer.cancel();
                 selectedCanvasItem.doubleClicked(modelPos);
+                this.eventBroker.processEvent(
+                         new CanvasItemActivatedEvent(selectedCanvasItem, modelPos, screenPos));
             }
         }
         selectedCanvasItem = null;

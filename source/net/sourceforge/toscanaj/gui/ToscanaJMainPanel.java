@@ -12,6 +12,8 @@ import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormat;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormatRegistry;
 import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import net.sourceforge.toscanaj.controller.FilterOperationEventListener;
+import net.sourceforge.toscanaj.controller.HighlightingOperationEventListener;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
@@ -221,6 +223,16 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         contentPane.setLayout(new BorderLayout());
 
         diagramView = new DiagramView();
+        diagramView.getController().getEventBroker().subscribe(
+                new FilterOperationEventListener(DiagramController.getController()),
+                "net.sourceforge.toscanaj.canvas.events.CanvasItemActivatedEvent",
+                "net.sourceforge.toscanaj.view.diagram.NodeView"
+        );
+        diagramView.getController().getEventBroker().subscribe(
+                new HighlightingOperationEventListener(diagramView),
+                "net.sourceforge.toscanaj.canvas.events.CanvasItemSelectedEvent",
+                "net.sourceforge.toscanaj.view.diagram.NodeView"
+        );
         diagramOrganiser = new DiagramOrganiser(this.conceptualSchema);
 
         //Create a split pane with the two scroll panes in it.

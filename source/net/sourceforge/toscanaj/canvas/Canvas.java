@@ -51,9 +51,15 @@ public class Canvas extends JComponent implements Printable {
 
     private Paint backgroundPaint = null;
 
+    private CanvasController controller = null;
+
     public Canvas() {
         // for now we just attach a default controller
-        new CanvasController(this);
+        this.controller = new CanvasController(this);
+    }
+
+    public CanvasController getController() {
+        return controller;
     }
 
     /**

@@ -29,6 +29,27 @@ public class EventBroker implements BrokerEventListener {
         subscriptions.add(new EventSubscription(listener, eventType, sourceType));
     }
 
+    /**
+     * This is a convenience method finding the classes for subscribe(BrokerEventListener, Class, Class).
+     *
+     * It avoids having to catch the ClassNotFoundExceptions by turning them into RuntimeExceptions.
+     */
+    public void subscribe(BrokerEventListener listener, String eventTypeName, String sourceTypeName) {
+        Class eventType = null;
+        Class sourceType = null;
+        try {
+            eventType = Class.forName(eventTypeName);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Cannot subscribe to events of class \"" + eventTypeName + "\"");
+        }
+        try {
+            sourceType = Class.forName(sourceTypeName);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Cannot subscribe to sources of class \"" + sourceTypeName + "\"");
+        }
+        subscribe(listener, eventType,  sourceType);
+    }
+
     public void removeSubscriptions(BrokerEventListener listener) {
         for (Iterator iterator = subscriptions.iterator(); iterator.hasNext();) {
             EventSubscription subscription = (EventSubscription) iterator.next();

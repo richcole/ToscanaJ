@@ -7,6 +7,8 @@
 package net.sourceforge.toscanaj.canvas.controller;
 
 import net.sourceforge.toscanaj.canvas.Canvas;
+import net.sourceforge.toscanaj.canvas.events.CanvasItemSelectedEvent;
+import net.sourceforge.toscanaj.events.EventBroker;
 
 import java.util.TimerTask;
 import java.awt.geom.Point2D;
@@ -26,12 +28,15 @@ class BackgroundSingleClickTask extends TimerTask {
      */
     private Point2D point;
 
+    private EventBroker context;
+
     /**
      * Creates a new task for sending a message.
      */
-    public BackgroundSingleClickTask(Canvas target, Point2D point) {
+    public BackgroundSingleClickTask(Canvas target, Point2D point, EventBroker context) {
         this.target = target;
         this.point = point;
+        this.context = context;
     }
 
     /**

@@ -77,6 +77,10 @@ public class NodeView extends CanvasItem {
         this.diagramView = diagramView;
     }
 
+    public DiagramNode getDiagramNode() {
+        return diagramNode;
+    }
+
     /**
      * Draws the node as circle.
      */
@@ -169,30 +173,6 @@ public class NodeView extends CanvasItem {
         double sqDist = deltaX * deltaX + deltaY * deltaY;
         double sqRadius = diagramNode.getRadiusX() * diagramNode.getRadiusY();
         return sqDist <= sqRadius;
-    }
-
-    /**
-     * Selects the diagam view of the selected concept.
-     */
-    public void singleClicked(Point2D point) {
-        List conceptList = new ArrayList();
-        DiagramNode node = this.diagramNode;
-        if (node instanceof NestedDiagramNode) {
-            NestedDiagramNode ndNode = (NestedDiagramNode) node;
-            node = ndNode.getInnerDiagram().getNode(0);
-        }
-        while (node != null) {
-            conceptList.add(node.getConcept());
-            node = node.getOuterNode();
-        }
-        this.diagramView.setSelectedConcepts(conceptList);
-    }
-
-    /**
-     * Implements CanvasItem.doubleClicked(Point2D) and starts a filter operation.
-     */
-    public void doubleClicked(Point2D point) {
-        DiagramController.getController().next(this.diagramNode.getFilterConcept());
     }
 
     /**
