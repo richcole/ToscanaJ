@@ -7,15 +7,15 @@
  */
 package net.sourceforge.toscanaj;
 
-import net.sourceforge.toscanaj.gui.AnacondaJMainPanel;
+import net.sourceforge.toscanaj.gui.ElbaMainPanel;
 
-public class AnacondaJ {
+public class Elba {
     /**
      *  Main method for running the program
      */
     public static void main(String[] args) {
-        final AnacondaJMainPanel mainWindow;
-        mainWindow = new AnacondaJMainPanel();
+        final ElbaMainPanel mainWindow;
+        mainWindow = new ElbaMainPanel();
         mainWindow.setVisible(true);
     }
 }

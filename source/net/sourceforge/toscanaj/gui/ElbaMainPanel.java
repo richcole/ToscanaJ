@@ -35,7 +35,7 @@ import java.util.*;
 import java.util.List;
 
 /// @todo check if the file we save to exists, warn if it does
-public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListener {
+public class ElbaMainPanel extends JFrame implements MainPanel, EventListener {
     static private final int MaxMruFiles = 8;
 
     /**
@@ -77,8 +77,8 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListen
         }
     }
 
-    public AnacondaJMainPanel() {
-        super("AnacondaJMainPanel");
+    public ElbaMainPanel() {
+        super("ElbaMainPanel");
 
         eventBroker = new EventBroker();
         conceptualSchema = new ConceptualSchema(eventBroker);
@@ -89,7 +89,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListen
 
         createViews();
 
-        mruList = ConfigurationManager.fetchStringList("AnacondaJMainPanel", "mruFiles", MaxMruFiles);
+        mruList = ConfigurationManager.fetchStringList("ElbaMainPanel", "mruFiles", MaxMruFiles);
         // if we have at least one MRU file try to open it
         if (this.mruList.size() > 0) {
             File schemaFile = new File((String) mruList.get(mruList.size() - 1));
@@ -100,7 +100,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListen
 
         createMenuBar();
 
-        ConfigurationManager.restorePlacement("AnacondaJMainPanel", this,
+        ConfigurationManager.restorePlacement("ElbaMainPanel", this,
                 new Rectangle(100, 100, 500, 400));
 
         this.addWindowListener(new WindowAdapter() {
@@ -112,25 +112,25 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListen
 
     public void createViews() {
         mainView = new PanelStackView(this);
-        mainView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "mainPanelDivider", 200));
+        mainView.setDividerLocation(ConfigurationManager.fetchInt("ElbaMainPanel", "mainPanelDivider", 200));
 
         connectionInformationView =
                 new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);
 
         databaseSchemaView = new DatabaseSchemaView(this, eventBroker);
         databaseSchemaView.setHorizontalDividerLocation(
-                ConfigurationManager.fetchInt("AnacondaJMainPanel", "databaseSchemaViewHorizontalDivider", 200));
+                ConfigurationManager.fetchInt("ElbaMainPanel", "databaseSchemaViewHorizontalDivider", 200));
         databaseSchemaView.setVerticalDividerLocation(
-                ConfigurationManager.fetchInt("AnacondaJMainPanel", "databaseSchemaViewVerticalDivider", 300));
+                ConfigurationManager.fetchInt("ElbaMainPanel", "databaseSchemaViewVerticalDivider", 300));
 
         scaleView = new ScaleEditingView(this, conceptualSchema, eventBroker, databaseConnection);
         scaleView.setHorizontalDividerLocation(
-                ConfigurationManager.fetchInt("AnacondaJMainPanel", "scaleViewHorizontalDivider", 200));
+                ConfigurationManager.fetchInt("ElbaMainPanel", "scaleViewHorizontalDivider", 200));
         scaleView.setVerticalDividerLocation(
-                ConfigurationManager.fetchInt("AnacondaJMainPanel", "scaleViewVerticalDivider", 300));
+                ConfigurationManager.fetchInt("ElbaMainPanel", "scaleViewVerticalDivider", 300));
 
         diagramView = new DiagramEditingView(this, conceptualSchema, eventBroker);
-        diagramView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "diagramViewDivider", 200));
+        diagramView.setDividerLocation(ConfigurationManager.fetchInt("ElbaMainPanel", "diagramViewDivider", 200));
 
         mainView.addView("Tables", databaseSchemaView);
         mainView.addView("Scales", scaleView);
@@ -288,24 +288,24 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, EventListen
 
     public void closeMainPanel() {
         // store current position
-        ConfigurationManager.storePlacement("AnacondaJMainPanel", this);
-        ConfigurationManager.storeInt("AnacondaJMainPanel", "mainPanelDivider",
+        ConfigurationManager.storePlacement("ElbaMainPanel", this);
+        ConfigurationManager.storeInt("ElbaMainPanel", "mainPanelDivider",
                 mainView.getDividerLocation()
         );
-        ConfigurationManager.storeStringList("AnacondaJMainPanel", "mruFiles", this.mruList);
-        ConfigurationManager.storeInt("AnacondaJMainPanel", "databaseSchemaViewHorizontalDivider",
+        ConfigurationManager.storeStringList("ElbaMainPanel", "mruFiles", this.mruList);
+        ConfigurationManager.storeInt("ElbaMainPanel", "databaseSchemaViewHorizontalDivider",
                 databaseSchemaView.getHorizontalDividerLocation()
         );
-        ConfigurationManager.storeInt("AnacondaJMainPanel", "databaseSchemaViewVerticalDivider",
+        ConfigurationManager.storeInt("ElbaMainPanel", "databaseSchemaViewVerticalDivider",
                 databaseSchemaView.getVerticalDividerLocation()
         );
-        ConfigurationManager.storeInt("AnacondaJMainPanel", "scaleViewHorizontalDivider",
+        ConfigurationManager.storeInt("ElbaMainPanel", "scaleViewHorizontalDivider",
                 scaleView.getHorizontalDividerLocation()
         );
-        ConfigurationManager.storeInt("AnacondaJMainPanel", "scaleViewVerticalDivider",
+        ConfigurationManager.storeInt("ElbaMainPanel", "scaleViewVerticalDivider",
                 scaleView.getVerticalDividerLocation()
         );
-        ConfigurationManager.storeInt("AnacondaJMainPanel", "diagramViewDivider",
+        ConfigurationManager.storeInt("ElbaMainPanel", "diagramViewDivider",
                 diagramView.getDividerLocation()
         );
         ConfigurationManager.saveConfiguration();

@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.util.xmlize;
 
 /**
- * This serialization interface is used for the AnacondaJMainPanel model. All
+ * This serialization interface is used for the ElbaMainPanel model. All
  * elements of the model support this interface and in addition have a
  * constructor that callls readXML.
  */
