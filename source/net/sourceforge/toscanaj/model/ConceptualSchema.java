@@ -222,7 +222,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
      */
     public DatabaseInfo getDatabaseInfo() {
     	if (databaseInfo == null) {
-    		return new DatabaseInfo();
+    		return null;
     	}
         return new DatabaseInfo(databaseInfo);
     }
