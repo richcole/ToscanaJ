@@ -1,6 +1,6 @@
 package net.sourceforge.toscanaj.view;
 
-import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,41 +26,38 @@ public class DiagramHistoryView extends JList {
          * display it.
          */
         public Component getListCellRendererComponent(
-            JList list,
-            Object value,            // value to display
-            int index,               // cell index
-            boolean isSelected,      // is the cell selected
-            boolean cellHasFocus)    // the list and the cell have the focus
+                JList list,
+                Object value, // value to display
+                int index, // cell index
+                boolean isSelected, // is the cell selected
+                boolean cellHasFocus)    // the list and the cell have the focus
         {
-            DiagramController.DiagramReference diagram = (DiagramController.DiagramReference)value;
-            DiagramController.DiagramHistory history = (DiagramController.DiagramHistory) list.getModel();
+            DiagramHistory history = (DiagramHistory) list.getModel();
 
-            setText(diagram.toString());
+            setText(value.toString());
             setOpaque(true);
-            if(isSelected) {
+            if (isSelected) {
                 setBackground(list.getSelectionBackground());
                 setForeground(list.getSelectionForeground());
-                if(list.hasFocus()) {
+                if (list.hasFocus()) {
                     setBorder(new javax.swing.border.LineBorder(java.awt.Color.yellow));
-                }
-                else {
+                } else {
                     setBorder(null);
                 }
-            }
-            else {
+            } else {
                 setBackground(list.getBackground());
                 setForeground(list.getForeground());
                 setBorder(null);
             }
             setEnabled(list.isEnabled());
             Font font = list.getFont();
-            if(history.isInCurrent(diagram)) {
+
+            DiagramHistory.DiagramReference diagram = (DiagramHistory.DiagramReference) value;
+            if (history.isInCurrent(diagram)) {
                 setFont(font.deriveFont(Font.BOLD));
-            }
-            else if(history.isInFuture(diagram)) {
+            } else if (history.isInFuture(diagram)) {
                 setFont(font.deriveFont(Font.ITALIC));
-            }
-            else {
+            } else {
                 setFont(font);
             }
             return this;
@@ -72,7 +69,7 @@ public class DiagramHistoryView extends JList {
      */
     public DiagramHistoryView(ListModel history) {
         super(history);
-        if(!(history instanceof DiagramController.DiagramHistory)) {
+        if (!(history instanceof DiagramHistory)) {
             throw new ClassCastException("This view needs a model of type DiagramController.DiagramHistory");
         }
         this.setCellRenderer(new DiagramCellRenderer());

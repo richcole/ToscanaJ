@@ -6,8 +6,10 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 
-import javax.swing.*;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This class encapsulates all code for handling the diagrams and filtering the
@@ -18,173 +20,7 @@ import java.util.*;
  * a JList for displaying purposes.
  */
 public class DiagramController implements ChangeObservable {
-    /**
-     * This stores the diagram references for visited, shown and forthcoming
-     * diagrams and can be used as a model for JList components.
-     */
-    public static class DiagramHistory extends AbstractListModel {
-        /**
-         * Stores the diagrams that have already been visited.
-         */
-        private List pastDiagrams = new LinkedList();
 
-        /**
-         * Stores the diagrams that are in use.
-         */
-        private List currentDiagrams = new LinkedList();
-
-        /**
-         * Stores the diagrams that are scheduled to come.
-         */
-        private List futureDiagrams = new LinkedList();
-
-        /**
-         * Creates an empty list of diagrams.
-         */
-        private DiagramHistory() {
-        }
-
-        /**
-         * Implements AbstractListModel.getSize().
-         */
-        public int getSize() {
-            return this.pastDiagrams.size() +
-                   this.currentDiagrams.size() +
-                   this.futureDiagrams.size();
-        }
-
-        /**
-         * Implements AbstractListModel.getElementAt(int).
-         */
-        public Object getElementAt(int position) {
-            if(position < this.pastDiagrams.size()) {
-                return this.pastDiagrams.get(position);
-            }
-            int pos = position - this.pastDiagrams.size();
-            if(pos < this.currentDiagrams.size()) {
-                return this.currentDiagrams.get(pos);
-            }
-            pos = pos - this.currentDiagrams.size();
-            return this.futureDiagrams.get(pos);
-        }
-
-        /**
-         * Returns true if the diagram is in the list of visited diagrams.
-         */
-        public boolean isInPast(DiagramReference diagram) {
-            return this.pastDiagrams.contains(diagram);
-        }
-
-        /**
-         * Returns true if the diagram is in the list of displayed diagrams.
-         */
-        public boolean isInCurrent(DiagramReference diagram) {
-            return this.currentDiagrams.contains(diagram);
-        }
-
-        /**
-         * Returns true if the diagram is in the list of diagrams still to be visited.
-         */
-        public boolean isInFuture(DiagramReference diagram) {
-            return this.futureDiagrams.contains(diagram);
-        }
-
-        /**
-         * Redirects to the AbstractListModel method.
-         */
-        void fireContentsChanged(int from, int to) {
-            this.fireContentsChanged(this, from, to);
-        }
-
-        /**
-         * Redirects to the AbstractListModel method.
-         */
-        void fireIntervalAdded(int from, int to) {
-             this.fireIntervalAdded(this, from, to);
-        }
-
-        /**
-         * Redirects to the AbstractListModel method.
-         */
-        void fireIntervalRemoved(int from, int to) {
-            this.fireIntervalRemoved(this, from, to);
-        }
-
-        /**
-         * Debug output.
-         */
-        public String toString() {
-            String retVal = "Past Diagrams:\n";
-            Iterator it = this.pastDiagrams.iterator();
-            while(it.hasNext()) {
-                retVal += it.next().toString() + "\n";
-            }
-            retVal += "Current Diagrams:\n";
-            it = this.currentDiagrams.iterator();
-            while(it.hasNext()) {
-                retVal += it.next().toString() + "\n";
-            }
-            retVal += "Future Diagrams:\n";
-            it = this.futureDiagrams.iterator();
-            while(it.hasNext()) {
-                retVal += it.next().toString() + "\n";
-            }
-            return retVal;
-        }
-    }
-
-    /**
-     * Used to store references to diagrams, including the concept used for
-     * zooming in past diagrams.
-     *
-     * Beneath adding the concept reference (which is null for current and future
-     * diagrams) this gives the references identity, otherwise we would get problems
-     * in adding a diagram twice to the history.
-     */
-    public static class DiagramReference {
-        /**
-         * The diagram we refer to.
-         */
-        private Diagram2D diagram;
-
-        /**
-         * The concept the user zoomed into (null for current and future diagrams).
-         */
-        private Concept zoomedConcept;
-
-        /**
-         * Initialises a new reference.
-         *
-         * This is private so it can be called only by the outer class. Other
-         * classes are allowed to use this class (and have to) but they can not
-         * create instances.
-         */
-        private DiagramReference(Diagram2D diagram, Concept zoomedConcept) {
-            this.diagram = diagram;
-            this.zoomedConcept = zoomedConcept;
-        }
-
-        /**
-         * Returns the diagram we refer to.
-         */
-        public Diagram2D getDiagram() {
-            return this.diagram;
-        }
-
-        /**
-         * Returns the concept the user zoomed into (null for current and future diagrams).
-         */
-        public Concept getZoomedConcept() {
-            return this.zoomedConcept;
-        }
-
-        /**
-         * Returns the diagram title for usage in a view.
-         */
-        public String toString() {
-            return diagram.getTitle();
-        }
-    }
 
     /**
      * Constant for setFilterMethod(int).
@@ -217,10 +53,6 @@ public class DiagramController implements ChangeObservable {
      */
     private DiagramHistory history = new DiagramHistory();
 
-    /**
-     * Stores the number of levels we nest diagrams.
-     */
-    private int nestingLevel = 0;
 
     /**
      * Stores the number of objects in the current diagram.
@@ -253,23 +85,8 @@ public class DiagramController implements ChangeObservable {
      * This starts with zero (flat, non-nested diagram).
      */
     public void setNestingLevel(int level) {
-        this.nestingLevel = level;
-        int lastPos = history.currentDiagrams.size() - 1;
-        while( lastPos < level ) {
-            if( history.futureDiagrams.isEmpty() ) {
-                break; // nothing more to get
-            }
-            history.currentDiagrams.add(history.futureDiagrams.get(0));
-            history.futureDiagrams.remove(0);
-            lastPos++;
-        }
-        while( lastPos > level ) {
-            history.futureDiagrams.add(0, history.currentDiagrams.get(lastPos));
-            history.currentDiagrams.remove(lastPos);
-            lastPos--;
-        }
-        history.fireContentsChanged(0,history.getSize()-1);
-        notifyObservers();
+        history.setNestingLevel(level);
+
     }
 
     /**
@@ -291,7 +108,7 @@ public class DiagramController implements ChangeObservable {
      * @see #back()
      */
     public boolean undoIsPossible() {
-        return !history.pastDiagrams.isEmpty();
+        return history.hasPastDiagrams();
     }
 
     /**
@@ -307,7 +124,7 @@ public class DiagramController implements ChangeObservable {
      */
     public void setFilterMethod(int method) {
         this.filterMethod = method;
-        notifyObservers();
+
     }
 
     /**
@@ -316,18 +133,8 @@ public class DiagramController implements ChangeObservable {
      * If no diagram is open yet it will be used as current diagram, else it
      * will be added to the list of future diagrams.
      */
-    public void addDiagram(Diagram2D diagram){
-        if(history.currentDiagrams.size() <= this.nestingLevel) {
-            history.currentDiagrams.add(new DiagramReference(diagram,null));
-            notifyObservers();
-        }
-        else {
-            history.futureDiagrams.add(new DiagramReference(diagram,null));
-        }
-        int lastPos = history.pastDiagrams.size() +
-                      history.currentDiagrams.size() +
-                      history.futureDiagrams.size() - 1;
-        history.fireIntervalAdded(lastPos,lastPos);
+    public void addDiagram(Diagram2D diagram) {
+        history.addDiagram(diagram);
     }
 
     /**
@@ -340,23 +147,7 @@ public class DiagramController implements ChangeObservable {
      * @TODO Do some testing on this, it might be broken.
      */
     public void removeDiagram(int position) {
-        if(position < history.pastDiagrams.size()) {
-            history.pastDiagrams.remove(position);
-            history.fireIntervalAdded(position,position);
-            notifyObservers();
-            return;
-        }
-        int pos = position - history.pastDiagrams.size();
-        if(pos < history.currentDiagrams.size()) {
-            return;
-        }
-        pos = pos - history.currentDiagrams.size();
-        if( pos < history.futureDiagrams.size()) {
-            history.futureDiagrams.remove(pos);
-            history.fireIntervalAdded(position,position);
-            return;
-        }
-        throw new NoSuchElementException("Tried to remove diagram beyond range");
+        history.removeDiagram(position);
     }
 
     /**
@@ -367,48 +158,25 @@ public class DiagramController implements ChangeObservable {
      * If no diagram is left a NoSuchElementException will be raised.
      */
     public void removeLastDiagram() {
-        if( !history.futureDiagrams.isEmpty() ) {
-            history.futureDiagrams.remove(history.futureDiagrams.size()-1);
-            history.fireIntervalRemoved(history.getSize(),history.getSize());
-            return;
-        }
-        // no future diagrams, check if we can undo
-        if( history.pastDiagrams.size() + history.currentDiagrams.size() > 1 ) {
-            back();
-            history.futureDiagrams.remove(0);
-            history.fireIntervalRemoved(history.getSize(),history.getSize());
-            return;
-        }
-        // no future diagrams, no undo -- do we have at least one diagram?
-        if( !history.currentDiagrams.isEmpty() ) {
-            history.currentDiagrams.clear();
-            history.fireIntervalRemoved(history.getSize(),history.getSize());
-            notifyObservers();
-            return;
-        }
-        throw new NoSuchElementException("The list of diagrams is already empty.");
+        history.removeLastDiagram();
+
+
     }
 
     /**
      * Removes all diagrams: past, current and future from the history.
      */
     public void reset() {
-        int last = history.getSize()-1;
-        if(last == -1) {
-            return;
-        }
-        history.pastDiagrams.clear();
-        history.currentDiagrams.clear();
-        history.futureDiagrams.clear();
-        history.fireIntervalRemoved(0,last);
-        notifyObservers();
+        history.reset();
+
     }
 
     /**
      * Returns true if there a still diagrams to visit.
      */
     public boolean hasFutureDiagrams() {
-        return history.futureDiagrams.size() != 0;
+        return history.hasFutureDiagrams();
+        //return ;
     }
 
     /**
@@ -419,28 +187,9 @@ public class DiagramController implements ChangeObservable {
      *
      * @see #back()
      */
-    public void next(Concept zoomedConcept)
-    {
-        if(history.futureDiagrams.isEmpty()) {
-            if(history.currentDiagrams.size() == 1) {
-                // nothing to go to
-                ///@todo Give feedback, when know how
-                return;
-            }
-            DiagramReference oldRef = (DiagramReference) history.currentDiagrams.get(0);
-            history.pastDiagrams.add(new DiagramReference( oldRef.getDiagram(), zoomedConcept ) );
-            history.currentDiagrams.remove(0);
-        }
-        else {
-            // move one of the future diagrams in
-            DiagramReference oldRef = (DiagramReference) history.currentDiagrams.get(0);
-            history.pastDiagrams.add(new DiagramReference( oldRef.getDiagram(), zoomedConcept ) );
-            history.currentDiagrams.remove(0);
-            history.currentDiagrams.add(history.futureDiagrams.get(0));
-            history.futureDiagrams.remove(0);
-        }
-        history.fireContentsChanged(0,history.getSize()-1);
-        notifyObservers();
+    public void next(Concept zoomedConcept) {
+        history.next(zoomedConcept);
+
     }
 
     /**
@@ -454,22 +203,7 @@ public class DiagramController implements ChangeObservable {
      * @see #undoIsPossible()
      */
     public void back() {
-        if(history.pastDiagrams.size() + history.currentDiagrams.size() < 2) {
-            throw new NoSuchElementException("No diagram left to go back to.");
-        }
-        int lastPos = history.currentDiagrams.size() - 1;
-        if( lastPos == this.nestingLevel ) { // we have our nesting level
-            history.futureDiagrams.add(0,history.currentDiagrams.get(lastPos));
-            history.currentDiagrams.remove(lastPos);
-        }
-        if( !history.pastDiagrams.isEmpty() ) {
-            // we have something to go back to, otherwise we just lose nesting
-            history.currentDiagrams.add(0,history.pastDiagrams.get(
-                                        history.pastDiagrams.size()-1));
-            history.pastDiagrams.remove(history.pastDiagrams.size()-1);
-        }
-        history.fireContentsChanged(0,history.getSize()-1);
-        notifyObservers();
+        history.back();
     }
 
     /**
@@ -485,17 +219,17 @@ public class DiagramController implements ChangeObservable {
         // wouldn't check for (filter == null) and just call filterByXX(null)
         // instead we would loose the ideal/filter information which results
         // in wrong output (always filtering by contingent, never by extent)
-        if(history.currentDiagrams.size() == 0) {
+        if (history.getNumberOfCurrentDiagrams() == 0) {
             // we don't have a diagram to display
             return null;
         }
         /** @TODO: Calculating the objects in the diagram is currently a side
-                   effect of the diagram calculation --> fix by putting the
-                   calculation into Diagram2D. */
+         effect of the diagram calculation --> fix by putting the
+         calculation into Diagram2D. */
         this.numberOfCurrentObjects = 0;
         this.maxContingentSize = 0;
-        Diagram2D retVal = getNestedDiagram(history.currentDiagrams.size()-1);
-        if(this.numberOfObjects == -1) {
+        Diagram2D retVal = getNestedDiagram(history.getNumberOfCurrentDiagrams() - 1);
+        if (this.numberOfObjects == -1) {
             this.numberOfObjects = this.numberOfCurrentObjects;
         }
         return retVal;
@@ -506,42 +240,42 @@ public class DiagramController implements ChangeObservable {
      * of current diagrams.
      */
     protected Diagram2D getSimpleDiagram(int pos) {
-        DiagramReference ref = (DiagramReference) history.currentDiagrams.get(pos);
-        Diagram2D diag = ref.getDiagram();
+        Diagram2D diag = history.getCurrentDiagram(pos);
+
         SimpleLineDiagram retVal = new SimpleLineDiagram();
         Concept filter = calculateFilterFromPastDiagrams();
         Hashtable nodeMap = new Hashtable();
 
         retVal.setTitle(diag.getTitle());
-        for(int i = 0; i<diag.getNumberOfNodes(); i++) {
+        for (int i = 0; i < diag.getNumberOfNodes(); i++) {
             DiagramNode oldNode = diag.getNode(i);
             DiagramNode newNode = makeDiagramNode(oldNode, filter);
             retVal.addNode(newNode);
-            nodeMap.put(oldNode,newNode);
+            nodeMap.put(oldNode, newNode);
 
             int contSize = newNode.getConcept().getObjectContingentSize();
             this.numberOfCurrentObjects = this.numberOfCurrentObjects + contSize;
-            if(contSize > this.maxContingentSize) {
+            if (contSize > this.maxContingentSize) {
                 this.maxContingentSize = contSize;
             }
         }
-        for(int i = 0; i < diag.getNumberOfLines(); i++) {
+        for (int i = 0; i < diag.getNumberOfLines(); i++) {
             DiagramLine line = diag.getLine(i);
             DiagramNode from = (DiagramNode) nodeMap.get(line.getFromNode());
             DiagramNode to = (DiagramNode) nodeMap.get(line.getToNode());
-            retVal.addLine( from, to );
+            retVal.addLine(from, to);
 
             // add direct neighbours to concepts
             AbstractConceptImplementation concept1 =
-                             (AbstractConceptImplementation) from.getConcept();
+                    (AbstractConceptImplementation) from.getConcept();
             AbstractConceptImplementation concept2 =
-                             (AbstractConceptImplementation) to.getConcept();
+                    (AbstractConceptImplementation) to.getConcept();
             concept1.addSubConcept(concept2);
             concept2.addSuperConcept(concept1);
         }
 
         // build transitive closures for each concept
-        for(int i = 0; i < retVal.getNumberOfNodes(); i++) {
+        for (int i = 0; i < retVal.getNumberOfNodes(); i++) {
             ((AbstractConceptImplementation) retVal.getNode(i).getConcept()).buildClosures();
         }
 
@@ -559,21 +293,18 @@ public class DiagramController implements ChangeObservable {
         Concept concept = null;
         if (filter == null) {
             concept = oldNode.getConcept();
-        }
-        else if (this.filterMethod == FILTER_CONTINGENT) {
+        } else if (this.filterMethod == FILTER_CONTINGENT) {
             concept = oldNode.getConcept().filterByContingent(filter);
-        }
-        else if (this.filterMethod == FILTER_EXTENT) {
+        } else if (this.filterMethod == FILTER_EXTENT) {
             concept = oldNode.getConcept().filterByExtent(filter);
-        }
-        else {
+        } else {
             throwUnknownFilterError();
         }
 
         return new DiagramNode(oldNode.getPosition(),
-                               concept,
-                               oldNode.getAttributeLabelInfo(),
-                               oldNode.getObjectLabelInfo());
+                concept,
+                oldNode.getAttributeLabelInfo(),
+                oldNode.getObjectLabelInfo());
     }
 
     private static void throwUnknownFilterError() {
@@ -584,25 +315,35 @@ public class DiagramController implements ChangeObservable {
      * Calculates the filter from all past diagrams.
      */
 
-    private Concept calculateFilterFromPastDiagrams() {
+    static class FilterCalculatorVisitor implements DiagramHistory.ConceptVisitor {
         Concept filter = null;
-        Iterator it = history.pastDiagrams.iterator();
-        while(it.hasNext()) {
-            DiagramReference curRef = (DiagramReference) it.next();
-            Concept currentZoomedConcept = curRef.getZoomedConcept();
-            if(filter == null) {
-                filter = currentZoomedConcept;
-            }
-            else if(this.filterMethod == FILTER_CONTINGENT) {
-                filter = currentZoomedConcept.filterByContingent(filter);
-            }
-            else if(this.filterMethod == FILTER_EXTENT) {
-                filter = currentZoomedConcept.getCollapsedConcept().filterByExtent(filter);
-            }else {
+        int filterMethod;
+
+        FilterCalculatorVisitor(int filterMethod) {
+            this.filterMethod = filterMethod;
+        }
+
+        public void visitConcept(Concept concept) {
+            if (filter == null) {
+                filter = concept;
+            } else if (filterMethod == DiagramController.FILTER_CONTINGENT) {
+                filter = concept.filterByContingent(filter);
+            } else if (filterMethod == DiagramController.FILTER_EXTENT) {
+                filter = concept.getCollapsedConcept().filterByExtent(filter);
+            } else {
                 throwUnknownFilterError();
             }
         }
-        return filter;
+
+        public Concept getFilter() {
+            return filter;
+        }
+    }
+
+    private Concept calculateFilterFromPastDiagrams() {
+        FilterCalculatorVisitor filterCalculator = new FilterCalculatorVisitor(this.filterMethod);
+        history.visitZoomedConcepts(filterCalculator);
+        return filterCalculator.getFilter();
     }
 
     /**
@@ -611,13 +352,13 @@ public class DiagramController implements ChangeObservable {
      * The parameter pos determines the position in the list of current diagrams.
      */
     protected Diagram2D getNestedDiagram(int pos) {
-        if(pos == 0) {
+        System.out.println("getNestedDiagram " + pos);
+        if (pos == 0) {
             // we have only a flat diagram left
             return getSimpleDiagram(0);
         }
         // else created nested diagram recursively
-        DiagramReference ref = (DiagramReference)history.currentDiagrams.get(pos);
-        return new NestedLineDiagram(getNestedDiagram(pos-1), ref.getDiagram() );
+        return new NestedLineDiagram(getNestedDiagram(pos - 1), history.getCurrentDiagram(pos));
     }
 
     /**
@@ -651,6 +392,7 @@ public class DiagramController implements ChangeObservable {
      * Implements ChangeObservable.addObserver(ChangeObserver).
      */
     public void addObserver(ChangeObserver observer) {
+        this.history.addObserver(observer);
         this.observers.add(observer);
     }
 
@@ -658,6 +400,7 @@ public class DiagramController implements ChangeObservable {
      * Implements ChangeObservable.removeObserver(ChangeObserver).
      */
     public void removeObserver(ChangeObserver observer) {
+        this.history.removeObserver(observer);
         this.observers.remove(observer);
     }
 
@@ -668,8 +411,8 @@ public class DiagramController implements ChangeObservable {
      */
     protected void notifyObservers() {
         Iterator it = this.observers.iterator();
-        while(it.hasNext()) {
-            ChangeObserver observer = (ChangeObserver)it.next();
+        while (it.hasNext()) {
+            ChangeObserver observer = (ChangeObserver) it.next();
             observer.update(this);
         }
     }

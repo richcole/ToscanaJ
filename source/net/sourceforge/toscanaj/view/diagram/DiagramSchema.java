@@ -157,7 +157,7 @@ public class DiagramSchema {
      * interpolation otherwise.
      */
     public Color getGradientColor(double position) {
-        if( position < 0 || position > 1 ) {
+        if( position < 0 || position > 1) {
             throw new IllegalArgumentException("Gradient position not in [0,1]");
         }
         return new Color( (int)(topColor.getRed()*position + bottomColor.getRed()*(1-position)),

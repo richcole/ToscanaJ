@@ -155,12 +155,12 @@ public class NodeView extends CanvasItem {
         double relativeSize;
         if(diagramSchema.getGradientReference() == DiagramSchema.GRADIENT_REFERENCE_DIAGRAM) {
             if(diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
-                relativeSize = this.diagramNode.getConcept().getExtentSize() /
-                           (double)DiagramController.getController().getNumberOfCurrentObjects();
+                relativeSize = calcRate((double)this.diagramNode.getConcept().getExtentSize(),
+                        (double)DiagramController.getController().getNumberOfCurrentObjects());
             }
             else {
-                relativeSize = this.diagramNode.getConcept().getObjectContingentSize() /
-                           (double)DiagramController.getController().getMaximalObjectContingentSize();
+                relativeSize = calcRate((double)this.diagramNode.getConcept().getObjectContingentSize() ,
+                           (double)DiagramController.getController().getMaximalObjectContingentSize());
             }
         }
         else {
@@ -174,6 +174,13 @@ public class NodeView extends CanvasItem {
             relativeSize = relativeSize / DiagramController.getController().getNumberOfObjects();
         }
         return relativeSize;
+    }
+
+    private double calcRate(double extentSize, double denom) {
+        if(denom==0){
+            return 0;
+        }
+        return extentSize / denom;
     }
 
     /**

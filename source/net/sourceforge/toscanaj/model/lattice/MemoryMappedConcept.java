@@ -18,12 +18,12 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
     /**
      * Stores the information on the attribute contingent.
      */
-    private List attributeContingent = new LinkedList();
+    private List attributeContingent = makeList();
 
     /**
      * Stores the information on the object contingent.
      */
-    private List objectContingent = new LinkedList();
+    private List objectContingent = makeList();
 
     /**
      * Creates a concept without contingents.
@@ -78,31 +78,27 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
      * Implements Concept.executeQuery(Query, boolean).
      */
     public List executeQuery(Query query, boolean contingentOnly) {
-        if( query instanceof ObjectListQuery ) {
-            if( contingentOnly ) {
+        if (query instanceof ObjectListQuery) {
+            if (contingentOnly) {
                 return this.objectContingent;
-            }
-            else {
-                List retVal = new LinkedList();
+            } else {
+                List retVal = makeList();
                 Iterator it = this.ideal.iterator();
-                while(it.hasNext()) {
+                while (it.hasNext()) {
                     MemoryMappedConcept cur = (MemoryMappedConcept) it.next();
                     retVal.addAll(cur.objectContingent);
                 }
                 return retVal;
             }
-        }
-        else if( query instanceof ObjectNumberQuery ) {
+        } else if (query instanceof ObjectNumberQuery) {
             List retVal = new LinkedList();
-            if( contingentOnly ) {
+            if (contingentOnly) {
                 retVal.add(new Integer(this.getObjectContingentSize()));
-            }
-            else {
+            } else {
                 retVal.add(new Integer(this.getExtentSize()));
             }
             return retVal;
-        }
-        else {
+        } else {
             throw new RuntimeException("Unknown Query type");
         }
     }
@@ -112,17 +108,16 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
      */
     public Concept filterByExtent(Concept other) {
         MemoryMappedConcept retVal = new MemoryMappedConcept();
-        if(other == null) {
+        if (other == null) {
             retVal.objectContingent.addAll(this.objectContingent);
-        }
-        else{
+        } else {
             Iterator it = other.getExtentIterator();
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 Object cur = it.next();
                 Iterator it2 = this.objectContingent.iterator();
-                while(it2.hasNext()) {
+                while (it2.hasNext()) {
                     Object cur2 = it2.next();
-                    if(cur.equals(cur2)) {
+                    if (cur.equals(cur2)) {
                         retVal.addObject(cur);
                     }
                 }
@@ -137,17 +132,16 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
      */
     public Concept filterByContingent(Concept other) {
         MemoryMappedConcept retVal = new MemoryMappedConcept();
-        if(other == null) {
+        if (other == null) {
             retVal.objectContingent.addAll(this.objectContingent);
-        }
-        else{
+        } else {
             Iterator it = other.getObjectContingentIterator();
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 Object cur = it.next();
                 Iterator it2 = this.objectContingent.iterator();
-                while(it2.hasNext()) {
+                while (it2.hasNext()) {
                     Object cur2 = it2.next();
-                    if(cur.equals(cur2)) {
+                    if (cur.equals(cur2)) {
                         retVal.addObject(cur);
                     }
                 }
@@ -163,7 +157,7 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
     public Concept getCollapsedConcept() {
         MemoryMappedConcept retVal = new MemoryMappedConcept();
         Iterator it = this.getExtentIterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Object cur = it.next();
             retVal.addObject(cur);
         }

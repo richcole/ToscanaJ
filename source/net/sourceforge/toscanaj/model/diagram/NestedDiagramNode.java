@@ -28,8 +28,8 @@ public class NestedDiagramNode extends DiagramNode {
      * If the dropAttributeLabels flag is set, the inner nodes will have no
      * attribute labels attached.
      */
-    public NestedDiagramNode(DiagramNode outerNode, Diagram2D innerDiagram, double scale,
-                                         boolean dropAttributeLabels ) {
+    public NestedDiagramNode(DiagramNode outerNode, Diagram2D innerDiagram, float scale,
+                                        boolean dropAttributeLabels ) {
         super( new Point2D.Double(outerNode.getX()*scale, outerNode.getY()*scale),
                outerNode.getConcept(),
                new LabelInfo(outerNode.getAttributeLabelInfo()), null);

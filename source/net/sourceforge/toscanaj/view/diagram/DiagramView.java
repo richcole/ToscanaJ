@@ -3,6 +3,7 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.DrawingCanvas;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -10,6 +11,8 @@ import net.sourceforge.toscanaj.observer.ChangeObserver;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
@@ -28,11 +31,19 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
      */
     private Diagram2D diagram = null;
 
+    class ResizeListener extends ComponentAdapter{
+        public void componentResized(ComponentEvent e) {
+             requestScreenTransformUpdate();
+             repaint();
+        }
+    }
+
     /**
      * Creates a new view displaying an empty digram (i.e. nothing at all).
      */
     public DiagramView() {
         super();
+        addComponentListener(new ResizeListener());
     }
 
     protected void dragFinished(MouseEvent e) {
@@ -47,7 +58,8 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
      * Implements ChangeObserver.update(Object) by repainting the diagram.
      */
     public void update(Object source) {
-        if (source instanceof DiagramController) {
+        if (source instanceof DiagramController ||
+            source instanceof DiagramHistory) {
             showDiagram((SimpleLineDiagram) DiagramController.getController().getCurrentDiagram());
         } else {
             repaint();
@@ -55,7 +67,13 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     }
 
 
+
+
     private boolean screenTransformDirty = false;
+
+    protected boolean isScreenTransformDirty(){
+        return screenTransformDirty;
+    }
 
     /**
      * Paints the diagram on the screen.
@@ -81,12 +99,16 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
             Rectangle2D bounds = new Rectangle2D.Double(MARGIN, MARGIN,
                     getWidth() - 2 * MARGIN, getHeight() - 2 * MARGIN);
             this.setScreenTransform(this.scaleToFit(g2d, bounds));
-            screenTransformDirty = false;
+            makeScreenTransformClear();
         }
         g2d.transform(getScreenTransform());
 
         // paint all items on canvas
         paintCanvas(g2d);
+    }
+
+    protected void makeScreenTransformClear() {
+        screenTransformDirty = false;
     }
 
     /**

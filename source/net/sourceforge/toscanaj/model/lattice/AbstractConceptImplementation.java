@@ -18,6 +18,10 @@ import java.util.*;
  */
 public abstract class AbstractConceptImplementation implements Concept
 {
+    protected static List makeList() {
+        return new ArrayList();
+    }
+
     /**
      * This class implements an iterator that iterates over all attribute
      * contingents of a given concept set.
@@ -229,32 +233,33 @@ public abstract class AbstractConceptImplementation implements Concept
      * transitive closures.
      */
     public void buildClosures() {
-        // a little brute force: since we can't change a collection while iterating
-        // we just put ideal/filter into a list and iterate using an index
         List idealList = new LinkedList(ideal);
-        for(int i = 0; i < idealList.size(); i++) {
-            AbstractConceptImplementation other = (AbstractConceptImplementation) idealList.get(i);
+        Set idealSet = new HashSet(ideal);
+        while(!idealList.isEmpty()) {
+            AbstractConceptImplementation other = (AbstractConceptImplementation) idealList.remove(0);
             Iterator it = other.ideal.iterator();
             while(it.hasNext()) {
                 Object trans = it.next();
-                if(! idealList.contains(trans) ) {
+                if(idealSet.add(trans) ) {
                     idealList.add(trans);
                 }
             }
         }
-        ideal.addAll(idealList);
+        ideal=idealSet;
+
+        Set filterSet = new HashSet(filter);
         List filterList = new LinkedList(filter);
-        for(int i = 0; i < filterList.size(); i++) {
-            AbstractConceptImplementation other = (AbstractConceptImplementation) filterList.get(i);
+        while(!idealList.isEmpty()) {
+            AbstractConceptImplementation other = (AbstractConceptImplementation) filterList.remove(0);
             Iterator it = other.filter.iterator();
             while(it.hasNext()) {
                 Object trans = it.next();
-                if(! filterList.contains(trans) ) {
+                if(filterSet.add(trans) ) {
                     filterList.add(trans);
                 }
             }
         }
-        filter.addAll(filterList);
+        filter=filterSet;
     }
 
     /**
