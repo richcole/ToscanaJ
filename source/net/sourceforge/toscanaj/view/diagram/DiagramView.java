@@ -144,13 +144,11 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * Paints the diagram on the screen.
      */
     public void paintComponent(Graphics g) {
+    	super.paintComponent(g);
+    	
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         AffineTransform oldTransform = g2d.getTransform();
-
-        // fill the background (without transform)
-        g2d.setPaint(diagramSchema.getBackgroundColor());
-        g2d.fill(new Rectangle2D.Double(0, 0, getWidth(), getHeight()));
 
         if (diagram == null) {
             return;
