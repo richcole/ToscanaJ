@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.view.database;
 
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
@@ -218,7 +220,8 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
         splitPane.setResizeWeight(0);
         add(splitPane);
 
-        broker.subscribe(this, DatabaseSchemaChangedEvent.class, Object.class);
+		broker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
+		broker.subscribe(this, DatabaseSchemaChangedEvent.class, Object.class);
         broker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
         broker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
         broker.subscribe(this, TableChangedEvent.class, Object.class);
@@ -287,12 +290,20 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
             this.dbScheme = csce.getConceptualSchema().getDatabaseSchema();
             updateTableViews();
         }
-
-        if (e instanceof DatabaseSchemaChangedEvent) {
-            DatabaseSchemaChangedEvent event = (DatabaseSchemaChangedEvent) e;
-            this.dbScheme = event.getDBScheme();
-            updateTableViews();
+        
+        if(e instanceof DatabaseConnectedEvent) {
+			DatabaseConnection connection = DatabaseConnection.getConnection();
+			if(connection.isConnected()) {
+				this.dbScheme.readFromDBConnection(connection);
+			}
+			updateTableViews();
         }
+
+		if (e instanceof DatabaseSchemaChangedEvent) {
+			DatabaseSchemaChangedEvent event = (DatabaseSchemaChangedEvent) e;
+			this.dbScheme = event.getDBScheme();
+			updateTableViews();
+		}
 
         if (e instanceof TableChangedEvent) {
             TableChangedEvent event = (TableChangedEvent) e;

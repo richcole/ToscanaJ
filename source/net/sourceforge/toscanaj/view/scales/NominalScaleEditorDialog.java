@@ -409,6 +409,9 @@ public class NominalScaleEditorDialog extends JDialog {
 	 */
     private void fillAvailableValueList() {
         this.columnValuesListModel.clear();
+        if(column == null) {
+        	return;
+        }
         TableColumnPair tabCol = (TableColumnPair) this.columnChooser.getSelectedItem();
         List resultSet = null;
         try {

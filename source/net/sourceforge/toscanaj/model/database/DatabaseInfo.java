@@ -47,13 +47,21 @@ public class DatabaseInfo implements XMLizable {
 
     private String driverClass = null;
     
-    public static class Type{};
+    public static class Type{
+    	private String name;
+    	protected Type(String name) {
+    		this.name = name;
+    	}
+    	public String toString() {
+    		return name;
+    	}
+    };
     
-    public static final Type UNDEFINED = new Type();
-    public static final Type EMBEDDED = new Type();
-    public static final Type JDBC = new Type();
-    public static final Type ODBC = new Type();
-    public static final Type ACCESS_FILE = new Type();
+    public static final Type UNDEFINED = new Type("UNDEFINED");
+    public static final Type EMBEDDED = new Type("EMBEDDED");
+    public static final Type JDBC = new Type("JDBC");
+    public static final Type ODBC = new Type("ODBC");
+    public static final Type ACCESS_FILE = new Type("ACCESS_FILE");
 
     private static final String ODBC_PREFIX = "jdbc:odbc:";
     private static final String ACCESS_FILE_URL_PREFIX =
@@ -202,7 +210,7 @@ public class DatabaseInfo implements XMLizable {
 
     public String getSQLTableName() {
     	if( getType() == ACCESS_FILE ) {
-	    	return "\"" + this.table + "\"";
+	    	return "[" + this.table + "]";
     	} else {
     		return this.table;
     	}
@@ -275,21 +283,25 @@ public class DatabaseInfo implements XMLizable {
     }
 
 	public Type getType() {
-		if(getURL() == null) {
+		return getType(this.getURL(), this.getDriverClass());
+	}
+	
+	public static Type getType(String url, String driverClass) {
+		if(url == null) {
 			return UNDEFINED;
 		}
-	    if(getURL().equals(getEmbeddedDatabaseInfo().getURL())) {
-	    	return EMBEDDED;
-	    }
-		if(getDriverClass().equals(JDBC_ODBC_BRIDGE_DRIVER)) {
-	        if(getURL().indexOf(';') == -1){ // a semicolon is not allowed in DSN names
-	        	return ODBC;
-	        }
-	        else { // but always in the access file URLs
-	        	return ACCESS_FILE;
-	        }
-	    }
-    	return JDBC;
+		if(url.equals(getEmbeddedDatabaseInfo().getURL())) {
+			return EMBEDDED;
+		}
+		if(driverClass.equals(JDBC_ODBC_BRIDGE_DRIVER)) {
+			if(url.indexOf(';') == -1){ // a semicolon is not allowed in DSN names
+				return ODBC;
+			}
+			else { // but always in the access file URLs
+				return ACCESS_FILE;
+			}
+		}
+		return JDBC;
 	}
 	
 	public void setAccessFileInfo(String fileLocation, String userName, String password) {

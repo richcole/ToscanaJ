@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.Table;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo.Type;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -48,6 +49,7 @@ public class DatabaseConnection implements EventBrokerListener {
      * stream.
      */
     static private final PrintStream logger;
+	private Type type;
 
     /**
      * Initializes the logger from the system configuration.
@@ -129,6 +131,8 @@ public class DatabaseConnection implements EventBrokerListener {
 
     public void connect(String url, String driverName, String account, String password) throws DatabaseException {
         jdbcConnection = getConnection(url, driverName, account, password);
+        /// @todo we probably could just ask JDBC if it is Access
+        this.type = DatabaseInfo.getType(url, driverName);
         broker.processEvent(new DatabaseConnectedEvent(this, this));
     }
 
@@ -624,5 +628,9 @@ public class DatabaseConnection implements EventBrokerListener {
             }
         }
     }
+    
+	public DatabaseInfo.Type getDatabaseType() {
+		return this.type;    
+	}
 }
 
