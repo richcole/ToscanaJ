@@ -43,6 +43,10 @@ public class SqlClauseLabelView extends LabelView {
             public LabelView createLabelView(DiagramView diagramView,NodeView nodeView,LabelInfo label){
                 return new SqlClauseLabelView(diagramView, nodeView, label);
             }
+
+			public Class getLabelClass() {
+				return SqlClauseLabelView.class;
+			}
         };
     }
 

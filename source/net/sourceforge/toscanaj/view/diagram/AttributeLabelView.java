@@ -45,6 +45,10 @@ public class AttributeLabelView extends LabelView {
             public LabelView createLabelView(DiagramView diagramView,NodeView nodeView,LabelInfo label){
                 return new AttributeLabelView(diagramView, nodeView, label);
             }
+
+			public Class getLabelClass() {
+				return AttributeLabelView.class;
+			}
         };
     }
 

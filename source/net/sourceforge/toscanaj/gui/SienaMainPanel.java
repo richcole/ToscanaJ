@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.cernato.CernatoDimensionStrategy;
+import net.sourceforge.toscanaj.controller.diagram.ObjectEditingLabelViewPopupMenuHandler;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
@@ -50,6 +51,7 @@ import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 
 import org.jdom.JDOMException;
+import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -162,8 +164,15 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     public void createViews() {
         diagramEditingView = new DiagramEditingView(conceptualSchema, eventBroker);
-        diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
+        DiagramView diagramView = diagramEditingView.getDiagramView();
+        
+        diagramView.getController().getEventBroker().subscribe(
         								this, DisplayedDiagramChangedEvent.class, Object.class);
+        								
+		diagramView.getController().getEventBroker().subscribe( 
+							new ObjectEditingLabelViewPopupMenuHandler(diagramView, eventBroker),
+							CanvasItemContextMenuRequestEvent.class, ObjectLabelView.getFactory().getLabelClass());
+        								
         diagramEditingView.setDividerLocation(ConfigurationManager.fetchInt("SienaMainPanel", "diagramViewDivider", 200));
         setContentPane(diagramEditingView);
     }

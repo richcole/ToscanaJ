@@ -61,6 +61,10 @@ public class ObjectLabelView extends LabelView {
             public LabelView createLabelView(DiagramView diagramView,NodeView nodeView,LabelInfo label){
                 return new ObjectLabelView(diagramView, nodeView, label);
             }
+
+			public Class getLabelClass() {
+				return ObjectLabelView.class;
+			}
         };
     }
 

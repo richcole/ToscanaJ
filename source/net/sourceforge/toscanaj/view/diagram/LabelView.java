@@ -122,6 +122,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     
     public interface LabelFactory {
     	LabelView createLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label);
+    	Class getLabelClass();
     }
     
     public static LabelFactory getFactory() {

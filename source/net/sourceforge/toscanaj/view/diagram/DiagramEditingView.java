@@ -81,6 +81,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private JButton gridIncreaseButton;
     private JButton gridDecreaseButton;
     private JCheckBox gridEnabledCheckBox;
+    
 
     /**
      * Construct an instance of this view
@@ -108,7 +109,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         this.diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, Object.class);
 		this.diagramView.getController().getEventBroker().subscribe( 
 							new AttributeEditingLabelViewPopupMenuHandler(diagramView, eventBroker),
-							CanvasItemContextMenuRequestEvent.class, AttributeLabelView.class);
+							CanvasItemContextMenuRequestEvent.class, AttributeLabelView.class);							
     }
 
     protected JPanel makeDiagramViewPanel() {

@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DumpSqlScript;
+import net.sourceforge.toscanaj.controller.diagram.SqlClauseEditingLabelViewPopupMenuHandler;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
@@ -55,6 +56,7 @@ import net.sourceforge.toscanaj.view.scales.OrdinalScaleGenerator;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingViewDialog;
 import net.sourceforge.toscanaj.view.scales.ScaleGenerator;
 
+import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -301,10 +303,16 @@ public class ElbaMainPanel
 				"diagramViewDivider",
 				200));
 		DiagramView diagramView = diagramEditingView.getDiagramView();
-		diagramView.setObjectLabelFactory(
-			SqlClauseLabelView.getFactory());
+		diagramView.setObjectLabelFactory(SqlClauseLabelView.getFactory());		
+
+
 		diagramView.getController().getEventBroker().subscribe(
 						this, DisplayedDiagramChangedEvent.class, Object.class);
+
+		diagramView.getController().getEventBroker().subscribe( 
+							new SqlClauseEditingLabelViewPopupMenuHandler(diagramView, eventBroker),
+							CanvasItemContextMenuRequestEvent.class, SqlClauseLabelView.getFactory().getLabelClass());
+						
 
 		mainView.add(
 			toolbar,
