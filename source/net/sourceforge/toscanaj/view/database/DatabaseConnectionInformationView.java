@@ -569,8 +569,8 @@ public class DatabaseConnectionInformationView extends JDialog
             return "Done";
         }
         boolean executeStep() {
-            String sqlTableName = this.tableView.getSqlTableName();
-            String sqlKeyName = this.tableView.getSqlKeyName();
+            String sqlTableName = this.tableView.getTableName();
+            String sqlKeyName = this.tableView.getKeyName();
             if(sqlTableName == null || sqlKeyName == null) {
         		JOptionPane.showMessageDialog(this, "Please select a table/column pair as primary key", "No key selected", 
         									  JOptionPane.ERROR_MESSAGE);

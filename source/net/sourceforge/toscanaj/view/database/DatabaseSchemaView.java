@@ -355,16 +355,16 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		return leftPane.getDividerLocation();
 	}
 
-	public String getSqlTableName() {
+	public String getTableName() {
 		Enumeration enum = this.keyedTableList.elements();
 		while (enum.hasMoreElements()) {
 			KeyTableInfo element = (KeyTableInfo) enum.nextElement();
-			return element.getTable().getName();
+			return element.getTable().getPlainName();
 		}
 		return null;
 	}
 
-	public String getSqlKeyName() {
+	public String getKeyName() {
 		Enumeration enum = this.keyedTableList.elements();
 		while (enum.hasMoreElements()) {
 			KeyTableInfo element = (KeyTableInfo) enum.nextElement();
