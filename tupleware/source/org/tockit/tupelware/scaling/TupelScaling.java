@@ -35,20 +35,20 @@ public class TupelScaling {
      * This introduces value identity on object tupels.
      */
     private static class ObjectTupel {
-        private Object[] tupel;
-        public ObjectTupel(Object[] tupel) {
-            this.tupel = tupel;    
+        private Object[] data;
+        public ObjectTupel(Object[] data) {
+            this.data = data;    
         }
         public boolean equals(Object other) {
             if(this.getClass() != other.getClass()) {
                 return false;
             }
             ObjectTupel otherTupel = (ObjectTupel) other;
-            if(otherTupel.tupel.length != this.tupel.length) {
+            if(otherTupel.data.length != this.data.length) {
                 return false;
             }
-            for (int i = 0; i < otherTupel.tupel.length; i++) {
-                if(!otherTupel.tupel[i].equals(this.tupel[i])) {
+            for (int i = 0; i < otherTupel.data.length; i++) {
+                if(!otherTupel.data[i].equals(this.data[i])) {
                     return false;
                 }
             }
@@ -56,8 +56,8 @@ public class TupelScaling {
         }
         public int hashCode() {
             int hashCode = 7;
-            for (int i = 0; i < this.tupel.length; i++) {
-                Object element = this.tupel[i];
+            for (int i = 0; i < this.data.length; i++) {
+                Object element = this.data[i];
                 hashCode = 42*hashCode + (element == null ? 0 : element.hashCode());
             }
             return hashCode;
@@ -74,104 +74,62 @@ public class TupelScaling {
     public static ConceptualSchema scaleTupels(TupelSet tupels, int objectPosition) {
         ConceptualSchema schema = new ConceptualSchema(new EventBroker());
 
-        // first turn all tupels into FCAObjects, the attributes are done inline
-        Map tupelObjectMap = new HashMap();
-        for (Iterator iter = tupels.getTupels().iterator(); iter.hasNext();) {
-            Object[] tupel = (Object[]) iter.next();
-            FCAObject newObject = new FCAObjectImplementation(tupel[objectPosition]);
-            tupelObjectMap.put(tupel[objectPosition], newObject);
-        }
-        
         String[] variableNames = tupels.getVariableNames();
         for (int i = 0; i < variableNames.length; i++) {
             if(i == objectPosition) {
                 continue;
             }
-            String varName = variableNames[i];
-            Map valueAttributeMap = new HashMap();
-            ContextImplementation context = new ContextImplementation("Tupels");
-            context.getObjects().addAll(tupelObjectMap.values());
-            for (Iterator iter = tupels.getTupels().iterator(); iter.hasNext();) {
-                Object[] tupel = (Object[]) iter.next();
-                if(valueAttributeMap.get(tupel[i]) == null) {
-                    Attribute newAttribute = new Attribute(tupel[i]);
-                    valueAttributeMap.put(tupel[i], newAttribute);
-                    context.getAttributes().add(newAttribute);
-                }
-                context.getRelationImplementation().insert(tupelObjectMap.get(tupel[objectPosition]), valueAttributeMap.get(tupel[i]));
-            }
-            Lattice lattice = new GantersAlgorithm().createLattice(context);
-            Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, varName, new DefaultDimensionStrategy());
-            schema.addDiagram(diagram);
+            schema.addDiagram(scaleTupels(tupels, new int[]{objectPosition}, new int[]{i}));
         }
 
         return schema;
     }
-    
-    /**
-     * Creates a conceptual schema, taking one element as the objects the rest as attributes.
-     * 
-     * The return value is a conceptual schema with n diagrams (n = number of crossproducts given).
-     * The objects are the values of the elements given by objectPosition, the attribute are defined
-     * by the arrays in crossProducts -- for each of these an attribute set is created based on the
-     * crossproduct of the elements given by the int array. The relation used is based on the 
-     * projection of the tupels onto G x (M1 x M2 x ... x Mn). 
-     */
-    public static ConceptualSchema scaleTupels(TupelSet tupels, int objectPosition, int[][] crossProducts) {
-        ConceptualSchema schema = new ConceptualSchema(new EventBroker());
 
-        // first turn all tupels into FCAObjects, the attributes are done inline
+    /**
+     * Creates a diagram projecting the given indices on the context.
+     * 
+     * The objectIndices parameter defines the objects, the attributeIndices parameter
+     * the attributes. They incide iff they cooccur in a tupel.
+     */    
+    public static Diagram2D scaleTupels(TupelSet tupels, int[] objectIndices, int[] attributeIndices) {
         Map tupelObjectMap = new HashMap();
+        Map valueAttributeMap = new HashMap();
+        ContextImplementation context = new ContextImplementation("Tupels");
+        context.getObjects().addAll(tupelObjectMap.values());
         for (Iterator iter = tupels.getTupels().iterator(); iter.hasNext();) {
             Object[] tupel = (Object[]) iter.next();
-            FCAObject newObject = new FCAObjectImplementation(tupel[objectPosition]);
-            tupelObjectMap.put(tupel[objectPosition], newObject);
-        }
-        
-        String[] variableNames = tupels.getVariableNames();
-        for (int i = 0; i < crossProducts.length; i++) {
-            int[] crossProduct = crossProducts[i];
-            Map valueAttributeMap = new HashMap();
-            ContextImplementation context = new ContextImplementation("Tupels");
-            context.getObjects().addAll(tupelObjectMap.values());
-            for (Iterator iter = tupels.getTupels().iterator(); iter.hasNext();) {
-                Object[] tupel = (Object[]) iter.next();
-                Object[] values = new Object[crossProduct.length];
-                for (int j = 0; j < crossProduct.length; j++) {
-                    values[j] = tupel[crossProduct[j]];
-                }
-                ObjectTupel attributeValues = new ObjectTupel(values); 
-                if(valueAttributeMap.get(attributeValues) == null) {
-                    Attribute newAttribute = new Attribute(createCrossproductName(values));
-                    valueAttributeMap.put(attributeValues, newAttribute);
-                    context.getAttributes().add(newAttribute);
-                }
-                context.getRelationImplementation().insert(tupelObjectMap.get(tupel[objectPosition]), valueAttributeMap.get(attributeValues));
+            ObjectTupel objectValues = selectSubset(tupel, objectIndices);
+            if(tupelObjectMap.get(objectValues) == null) {
+                FCAObject newObject = new FCAObjectImplementation(createCrossproductName(objectValues));
+                tupelObjectMap.put(objectValues, newObject);
+                context.getObjects().add(newObject);
             }
-            Lattice lattice = new GantersAlgorithm().createLattice(context);
-            System.out.println(lattice.getConcepts().length);
-            String diagName = createCrossproductName(variableNames, crossProduct);
-            Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, diagName, new DefaultDimensionStrategy());
-            schema.addDiagram(diagram);
+            ObjectTupel attributeValues = selectSubset(tupel, attributeIndices); 
+            if(valueAttributeMap.get(attributeValues) == null) {
+                Attribute newAttribute = new Attribute(createCrossproductName(attributeValues));
+                valueAttributeMap.put(attributeValues, newAttribute);
+                context.getAttributes().add(newAttribute);
+            }
+            context.getRelationImplementation().insert(tupelObjectMap.get(objectValues), valueAttributeMap.get(attributeValues));
         }
-
-        return schema;
+        Lattice lattice = new GantersAlgorithm().createLattice(context);
+        String[] variableNames = tupels.getVariableNames();
+        String diagName = createCrossproductName(selectSubset(variableNames, attributeIndices));
+        Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, diagName, new DefaultDimensionStrategy());
+        return diagram;
     }
 
-    private static String createCrossproductName(String[] variableNames, int[] crossProduct) {
-        StringBuffer retVal = new StringBuffer();
-        for (int j = 0; j < crossProduct.length; j++) {
-            if(j != 0) {
-                retVal.append(" x ");
-            }
-            int index = crossProduct[j];
-            retVal.append(variableNames[index]);
+    private static ObjectTupel selectSubset(Object[] inTupel, int[] indices) {
+        Object[] retVal = new Object[indices.length];
+        for (int j = 0; j < indices.length; j++) {
+            retVal[j] = inTupel[indices[j]];
         }
-        return retVal.toString();
+        return new ObjectTupel(retVal);
     }
     
-    private static String createCrossproductName(Object[] values) {
+    private static String createCrossproductName(ObjectTupel tupel) {
         StringBuffer retVal = new StringBuffer();
+        Object[] values = tupel.data;
         for (int j = 0; j < values.length; j++) {
             if(j != 0) {
                 retVal.append(" x ");
@@ -190,12 +148,6 @@ public class TupelScaling {
         }
         TupelSet input = TupelParser.parseTabDelimitedTupels(new FileReader(new File(args[0])));
         ConceptualSchema result = scaleTupels(input, objectPos);
-        // this is how to do a system with crossproducts
-        //ConceptualSchema result = scaleTupels(input, 5, new int[][]{
-        //    new int[]{0,7},
-        //    new int[]{2,3},
-        //    new int[]{0,3,7}
-        //});
         XMLWriter.write(new File(args[1]), result);
     }
 }
