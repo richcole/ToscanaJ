@@ -150,4 +150,15 @@ public class ContextImplementation implements ListsContext {
     public ListSet getAttributeList() {
         return this.attributes;
     }
+
+    public void updatePositionMarkers() {
+        int pos = 0;
+        for (Iterator it = this.objects.iterator(); it.hasNext(); ) {
+            Object object = it.next();
+            if(object instanceof FCAObjectImplementation) {
+                ((FCAObjectImplementation)object).setContextPosition(pos);
+            }
+            pos++;
+        }
+    }
 }

@@ -109,7 +109,8 @@ public class CSXParser {
 	        Element element = _Document.getRootElement();
 	        if (element.getName().equals("conceptualSchema")) {
 	            if (element.getAttributeValue("version").equals("TJ0.6") ||
-				    	element.getAttributeValue("version").equals("TJ1.0")) {
+				    	element.getAttributeValue("version").equals("TJ1.0") ||
+                        element.getAttributeValue("version").equals("TJ2.0")) {
 	                _Schema = new ConceptualSchema(eventBroker, element);
 	            } else {
 	                // create data structure

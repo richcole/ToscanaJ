@@ -19,6 +19,8 @@ import net.sourceforge.toscanaj.model.context.*;
 import net.sourceforge.toscanaj.model.order.Ordered;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+
 import org.jdom.Element;
 import org.tockit.util.ListSet;
 import org.tockit.util.ListSetImplementation;
@@ -247,31 +249,23 @@ public class ConceptImplementation implements Concept {
         Element retVal = new Element(CONCEPT_ELEMENT_NAME);
         Element objectContingentElem = new Element(OBJECT_CONTINGENT_ELEMENT_NAME);
         retVal.addContent(objectContingentElem);
-        fillObjectContingentElement(objectContingentElem);
+        fillContingentElement(objectContingentElem, getObjectContingentIterator(), OBJECT_ELEMENT_NAME);
         Element attributeContingentElem = new Element(ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
         retVal.addContent(attributeContingentElem);
-        fillAttributeContingentElement(attributeContingentElem);
+        fillContingentElement(attributeContingentElem, getAttributeContingentIterator(), ATTRIBUTE_ELEMENT_NAME);
         return retVal;
     }
 
-    /** @todo we lack the descriptions here */
-    protected void fillAttributeContingentElement(Element attributeContingentElem) {
-        Iterator attrIt = getAttributeContingentIterator();
-        while (attrIt.hasNext()) {
-            Object o = attrIt.next();
-            Element attribElem = new Element(ATTRIBUTE_ELEMENT_NAME);
-            attribElem.addContent(o.toString());
-            attributeContingentElem.addContent(attribElem);
-        }
-    }
-
-    protected void fillObjectContingentElement(Element objectContingentElem) {
-        Iterator objIt = getObjectContingentIterator();
-        while (objIt.hasNext()) {
-            Object o = objIt.next();
-            Element objectElem = new Element(OBJECT_ELEMENT_NAME);
-            objectElem.addContent(o.toString());
-            objectContingentElem.addContent(objectElem);
+    private void fillContingentElement(Element contingentElem, Iterator contingentIterator, String newElementName) {
+        while (contingentIterator.hasNext()) {
+            Object obj = contingentIterator.next();
+            if(obj instanceof XMLizable) {
+                contingentElem.addContent(((XMLizable)obj).toXML());
+            } else {
+                Element newElem = new Element(newElementName);
+                newElem.addContent(obj.toString());
+                contingentElem.addContent(newElem);
+            }
         }
     }
 
@@ -499,7 +493,7 @@ public class ConceptImplementation implements Concept {
         List objects = objectContingentElem.getChildren(OBJECT_ELEMENT_NAME);
         for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
             Element objElem = (Element) iterator.next();
-            this.objectContingent.add(new FCAObjectImplementation(objElem.getText()));
+            this.objectContingent.add(new FCAObjectImplementation(objElem));
         }
         Element attributeContingentElem = XMLHelper.getMandatoryChild(elem, ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
         List attributes = attributeContingentElem.getChildren(ATTRIBUTE_ELEMENT_NAME);

@@ -8,7 +8,9 @@
 package net.sourceforge.toscanaj.controller.fca;
 
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
+
+import org.tockit.util.ListSet;
 
 import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.Context;
@@ -21,8 +23,8 @@ public class DiagramToContextConverter {
 	public static Context getContext(Diagram2D diagram) {
 		ContextImplementation context = new ContextImplementation(diagram.getTitle());
 		
-		Set objects = context.getObjects();
-		Set attributes = context.getAttributes();
+		ListSet objects = context.getObjectList();
+		ListSet attributes = context.getAttributeList();
 		BinaryRelationImplementation relation = context.getRelationImplementation();
 		
 		Iterator nodesIt = diagram.getNodes();
@@ -33,13 +35,13 @@ public class DiagramToContextConverter {
             Iterator objCont = concept.getObjectContingentIterator();
             while (objCont.hasNext()) {
                 Object obj = objCont.next();
-                objects.add(obj);
+                insertIntoList(objects, obj);
             }
             
             Iterator attrCont = concept.getAttributeContingentIterator();
             while (attrCont.hasNext()) {
                 Object attrib = attrCont.next();
-                attributes.add(attrib);
+                insertIntoList(attributes, attrib);
                 Iterator downset = concept.getDownset().iterator();
                 while (downset.hasNext()) {
                     Concept subConcept = (Concept) downset.next();
@@ -54,4 +56,18 @@ public class DiagramToContextConverter {
 		 
 		return context;
 	}
+
+    private static void insertIntoList(List list, Object object) {
+        int insertionPos = list.size();
+        if(object instanceof Comparable) {
+            // insert in order if possible
+            Comparable compObj = (Comparable) object;
+            while(insertionPos != 0 &&
+                    list.get(insertionPos - 1) instanceof Comparable && 
+                    ((Comparable)list.get(insertionPos - 1)).compareTo(compObj) > 0) {
+                insertionPos--;
+            }
+        }
+        list.add(insertionPos, object);
+    }
 }

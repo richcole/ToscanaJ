@@ -342,19 +342,10 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 
 	void updateView() {
 		this.tableView.updateSize();
-		this.tableView.revalidate();
-		this.tableView.repaint();
-
 		this.colHeader.updateSize();
-		this.colHeader.revalidate();
-		this.colHeader.repaint();
-
 		this.rowHeader.updateSize();
-		this.rowHeader.revalidate();
-		this.rowHeader.repaint();
-		
-	}
-
+    }
+    
 	private void addAttribute(
 		final JButton doneButton,
 		final JTextField newNameField)
@@ -568,6 +559,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 	private void closeDialog(boolean result) {
 		preferences.storeWindowPlacement(this);
 		this.context.setName(this.scaleTitleField.getText());
+        this.context.updatePositionMarkers();
 		this.result = result;
 		setVisible(false);
 	}

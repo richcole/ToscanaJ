@@ -19,13 +19,15 @@ import org.jdom.Element;
  * @todo consider using a cache to reuse existing FCAObjects, i.e. don't have two FCAObjects with the same data (and description).
  * Should descriptions be functionally dependend on the data? How to model this in CSX?
  */
-public class FCAObjectImplementation implements WritableFCAObject, XMLizable {
+public class FCAObjectImplementation implements WritableFCAObject, XMLizable, Comparable {
 	private Object data;
 	private Element description;
+    private int contextPosition = -1; // -1 means "not set"
 	private static final String OBJECT_ELEMENT_NAME = "object";
 	private static final String DESCRIPTION_ELEMENT_NAME = "description";
 	private static final String DATA_ELEMENT_NAME = "data";
 	private static final String CLASS_ATTRIBUTE_NAME = "class";
+    private static final String CONTEXT_POSITION_ATTRIBUT_NAME = "contextPosition";
 
 	public FCAObjectImplementation(Object data) {
 		this(data,null);
@@ -65,6 +67,14 @@ public class FCAObjectImplementation implements WritableFCAObject, XMLizable {
 		this.description = description;
 	}
 	
+    public int getContextPosition() {
+        return this.contextPosition;
+    }
+    
+    public void setContextPosition(int contextPosition) {
+        this.contextPosition = contextPosition;
+    }
+    
 	public boolean equals(Object other) {
         if(other == null) {
             return false;
@@ -80,8 +90,7 @@ public class FCAObjectImplementation implements WritableFCAObject, XMLizable {
 		return this.data.hashCode();
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#toXML()
+	/**
 	 * @todo think about base64 encoding for serializable data objects, currently
 	 *       works only for String and XMLizable data objects
 	 */
@@ -92,31 +101,58 @@ public class FCAObjectImplementation implements WritableFCAObject, XMLizable {
 			descriptionElement.addContent(description);
 			retVal.addContent(descriptionElement);
 		}
+        /** @todo this is how it should be in 2.0
 		Element dataElement = new Element(DATA_ELEMENT_NAME);
 		if (data instanceof XMLizable) {
-			dataElement=((XMLizable)data).toXML();
+			dataElement.addContent(((XMLizable)data).toXML());
 			dataElement.setAttribute(CLASS_ATTRIBUTE_NAME, data.getClass().getName());
 		} else if (data != null){
 			dataElement.addContent(data.toString());
 			dataElement.setAttribute(CLASS_ATTRIBUTE_NAME, String.class.getName());
 		}
-		retVal.addContent(dataElement);
+        retVal.addContent(dataElement);
+        **/
+        // this is how we do it for now
+        retVal.addContent(data.toString());
+        if(this.contextPosition != -1) {
+            retVal.setAttribute(CONTEXT_POSITION_ATTRIBUT_NAME, String.valueOf(this.contextPosition));
+        }
 		return retVal;
 	}
 
 	public void readXML(Element elem) throws XMLSyntaxError {
-		description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
+		this.description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
+        // first check for old-style syntax
+        if(elem.getChild(DATA_ELEMENT_NAME) == null) {
+            this.data = elem.getText();
+            return;
+        }
 		Element dataElement = XMLHelper.getMandatoryChild(elem, DATA_ELEMENT_NAME);
 		String className = XMLHelper.getAttribute(dataElement, CLASS_ATTRIBUTE_NAME).getValue();
 		if (className.equals(String.class.getName())) {
-			data = dataElement.getTextTrim();
+			this.data = dataElement.getTextTrim();
 		} else {
 			try {
 				Constructor construct = Class.forName(className).getConstructor(new Class[] {Element.class});
-				data = construct.newInstance(new Object[] {dataElement});
+				this.data = construct.newInstance(new Object[] {dataElement});
 			} catch (Exception e) {
 				throw new XMLSyntaxError("Initialization of object of type " + className + "failed.", e);
 			}
 		}
+        String contextPositionAttribute = elem.getAttributeValue(CONTEXT_POSITION_ATTRIBUT_NAME);
+        if(contextPositionAttribute != null) {
+            this.contextPosition = Integer.parseInt(contextPositionAttribute);
+        }
 	}
+
+    /**
+     * Determines order based on the context position stored.
+     * 
+     * If the context position has not been set on the objects, all objects
+     * will be considered equal. Objects with a context position are always
+     * considered greater than those without.
+     */
+    public int compareTo(Object o) {
+        return this.contextPosition - ((FCAObjectImplementation)o).contextPosition;
+    }
 }
