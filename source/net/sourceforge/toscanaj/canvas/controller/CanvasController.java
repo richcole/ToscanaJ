@@ -110,7 +110,8 @@ public class CanvasController implements MouseListener, MouseMotionListener {
             if (e.getClickCount() == 1) {
                 this.doubleClickTimer = new Timer();
                 this.doubleClickTimer.schedule(
-                        new CanvasItemSingleClickTask(this.selectedCanvasItem, modelPos, eventBroker), 300);
+                        new CanvasItemSingleClickTask(this.selectedCanvasItem,
+                                modelPos, screenPos, eventBroker), 300);
             } else if (e.getClickCount() == 2) {
                 this.doubleClickTimer.cancel();
                 selectedCanvasItem.doubleClicked(modelPos);

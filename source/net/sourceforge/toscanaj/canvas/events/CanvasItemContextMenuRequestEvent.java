@@ -10,29 +10,14 @@ import net.sourceforge.toscanaj.canvas.CanvasItem;
 
 import java.awt.geom.Point2D;
 
-public class CanvasItemContextMenuRequestEvent extends CanvasItemEvent {
-    private Point2D canvasPosition = null;
-    private Point2D awtPosition = null;
-
-    public CanvasItemContextMenuRequestEvent(CanvasItem item) {
-        super(item);
-    }
-
+/**
+ * Indicates that a context menu request was made on a canvas item.
+ *
+ * Typically this is mapped from events of the second mouse button on Windows and Unix
+ * systems and can be used to open a context menu for an item.
+ */
+public class CanvasItemContextMenuRequestEvent extends CanvasItemEventWithPosition {
     public CanvasItemContextMenuRequestEvent(CanvasItem item, Point2D canvasPosition, Point2D awtPosition) {
-        super(item);
-        this.canvasPosition = canvasPosition;
-        this.awtPosition = awtPosition;
-    }
-    
-    public boolean hasPositionAttached() {
-        return this.canvasPosition != null;
-    }
-
-    public Point2D getCanvasPosition() {
-        return canvasPosition;
-    }
-
-    public Point2D getAWTPosition() {
-        return awtPosition;
+        super(item, canvasPosition, awtPosition);
     }
 }

@@ -53,7 +53,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         super();
         addComponentListener(new ResizeListener());
         /// @todo this is not yet used since the title is not a canvas item yet
-        setBackgroundPaint(DiagramSchema.getDiagramSchema().getBackgroundColor());
+        getBackgroundItem().setPaint(DiagramSchema.getDiagramSchema().getBackgroundColor());
     }
 
     protected void dragFinished(MouseEvent e) {

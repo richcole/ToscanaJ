@@ -21,16 +21,20 @@ class CanvasItemSingleClickTask extends TimerTask {
     /**
      * The position transmitted with the message.
      */
-    private Point2D point;
+    private Point2D canvasPosition;
+    private Point2D awtPosition;
 
     private EventBroker context;
 
     /**
      * Creates a new task for sending a message.
      */
-    public CanvasItemSingleClickTask(CanvasItem target, Point2D point, EventBroker context) {
+    public CanvasItemSingleClickTask(CanvasItem target,
+                                     Point2D canvasPosition, Point2D awtPosition,
+                                     EventBroker context) {
         this.target = target;
-        this.point = point;
+        this.canvasPosition = canvasPosition;
+        this.awtPosition = awtPosition;
         this.context = context;
     }
 
@@ -38,7 +42,7 @@ class CanvasItemSingleClickTask extends TimerTask {
      * Sends the message.
      */
     public void run() {
-        target.singleClicked(point);
-        context.processEvent(new CanvasItemSelectedEvent(target));
+        target.singleClicked(canvasPosition);
+        context.processEvent(new CanvasItemSelectedEvent(target, this.canvasPosition, this.awtPosition));
     }
 }

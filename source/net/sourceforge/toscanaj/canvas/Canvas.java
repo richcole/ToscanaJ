@@ -21,19 +21,30 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- * Canvas controls all the updating of CanvasItems contained in a DiagramView
- * ie NodeView, LineView, and LabelView
+ * A generic drawing canvas with z-order and controller structure.
  *
- * @TODO For now the mouse events on the canvas are dealt with here, but shall be handled by
- * a separate class eventually (CanvasController)
+ * This class does implement a generic drawing canvas with a background
+ * object, arbitrary CanvasItem objects on top of that which have z-order
+ * and a controller object which handles the AWT/Swing mouse events and
+ * maps them to canvas-specific callbacks and events.
+ *
+ * All drawing and related features like printing or graphic export are
+ * handled by the canvas, too.
+ *
+ * @todo Move some more of the drawing code from DiagramView into this
+ * class, add options for automatic rescaling or not.
+ *
+ * @todo Add zooming/panning options.
  */
 
 public class Canvas extends JComponent implements Printable {
-
-    private CanvasBackground background = new CanvasBackground(this);
+    /**
+     * This is the background item which is assumed to be wherever no other item is.
+     */
+    private CanvasBackground background = new CanvasBackground();
 
     /**
-     * A list of all canvas items to draw.
+     * A list of all canvas items to draw on top of the background.
      */
     protected List canvasItems = new LinkedList();
 
@@ -51,13 +62,22 @@ public class Canvas extends JComponent implements Printable {
      */
     private Rectangle2D canvasSize = null;
 
+    /**
+     * The controller caring about the event handling and callbacks.
+     */
     private CanvasController controller = null;
 
+    /**
+     * Creates a new, empty canvas with a new controller attached to it.
+     */
     public Canvas() {
         // for now we just attach a default controller
         this.controller = new CanvasController(this);
     }
 
+    /**
+     * Returns the controller object for this canvas.
+     */
     public CanvasController getController() {
         return controller;
     }
@@ -75,14 +95,27 @@ public class Canvas extends JComponent implements Printable {
         }
     }
 
-    public void setBackgroundPaint(Paint backgroundPaint) {
-        this.background.setPaint( backgroundPaint );
+    /**
+     * Returns the canvas item representing the background.
+     *
+     * The background can not be raised and it covers the whole area of the
+     * canvas but otherwise it can be treated as any other item on the canvas.
+     */
+    public CanvasBackground getBackgroundItem() {
+        return background;
     }
 
+    /**
+     * Changes the transformation used for displaying the canvas on screen.
+     */
     public void setScreenTransform(AffineTransform transform) {
         this.screenTransform = transform;
     }
 
+    /**
+     * Returns the transformation currently used for displaying the canvas on the
+     * screen.
+     */
     public AffineTransform getScreenTransform() {
         return screenTransform;
     }
@@ -108,7 +141,14 @@ public class Canvas extends JComponent implements Printable {
     }
 
     /**
-     * Implements Printable.print(Graphics, PageFormat, int).
+     * This prints the canvas onto the printer defined by the graphic context.
+     *
+     * The canvas will always be scaled to fit on the page while being as large
+     * as possible.
+     *
+     * @todo Add other printing options.
+     *
+     * @see Printable.print(Graphics, PageFormat, int).
      */
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
         if (pageIndex == 0) {
@@ -169,6 +209,12 @@ public class Canvas extends JComponent implements Printable {
         return transform;
     }
 
+    /**
+     * Gives the uppermost item at the given position.
+     *
+     * This will return the background object if there is no other item at this position.
+     * If multiple items are overlapping, the highest one will be returned.
+     */
     public CanvasItem getCanvasItemAt(Point2D point) {
         ListIterator it = this.canvasItems.listIterator(this.canvasItems.size());
         while (it.hasPrevious()) {
@@ -186,6 +232,9 @@ public class Canvas extends JComponent implements Printable {
         return background;
     }
 
+    /**
+     * Maps the given point from screen coordinates into the canvas coordinates.
+     */
     public Point2D getCanvasCoordinates(Point2D screenPos) {
         Point2D point = null;
         try {
@@ -199,7 +248,7 @@ public class Canvas extends JComponent implements Printable {
     }
 
     /**
-     * Removes all canvas items from the canvas.
+     * Removes all canvas items from the canvas (except the background).
      */
     public void clearCanvas() {
         canvasItems.clear();
@@ -208,6 +257,7 @@ public class Canvas extends JComponent implements Printable {
     /**
      * Adds a canvas item to the canvasItem list.
      *
+     * It will appear on top of all other items.
      */
     public void addCanvasItem(CanvasItem node) {
         this.canvasItems.add(node);

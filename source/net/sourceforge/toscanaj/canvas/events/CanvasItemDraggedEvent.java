@@ -10,16 +10,21 @@ import net.sourceforge.toscanaj.canvas.CanvasItem;
 
 import java.awt.geom.Point2D;
 
+/**
+ * An event indicating a drag action of the user.
+ *
+ * The from and to positions in both coordinate models (canvas and screen)
+ * can be queried from this class.
+ */
 public class CanvasItemDraggedEvent extends CanvasItemEvent {
     private Point2D canvasFromPosition = null;
     private Point2D awtFromPosition = null;
     private Point2D canvasToPosition = null;
     private Point2D awtToPosition = null;
 
-    public CanvasItemDraggedEvent(CanvasItem item) {
-        super(item);
-    }
-
+    /**
+     * Creates a new event.
+     */
     public CanvasItemDraggedEvent(CanvasItem item, Point2D canvasFromPosition, Point2D awtFromPosition,
                                                    Point2D canvasToPosition, Point2D awtToPosition) {
         super(item);
@@ -29,22 +34,30 @@ public class CanvasItemDraggedEvent extends CanvasItemEvent {
         this.awtToPosition = awtToPosition;
     }
 
-    public boolean hasPositionsAttached() {
-        return (this.canvasFromPosition != null) && (this.canvasToPosition != null);
-    }
-
+    /**
+     * Returns the starting position in the canvas model coordinates.
+     */
     public Point2D getCanvasFromPosition() {
         return canvasFromPosition;
     }
 
+    /**
+     * Returns the starting position in the screen model coordinates.
+     */
     public Point2D getAwtFromPosition() {
         return awtFromPosition;
     }
 
+    /**
+     * Returns the end position in the canvas model coordinates.
+     */
     public Point2D getCanvasToPosition() {
         return canvasToPosition;
     }
 
+    /**
+     * Returns the end position in the screen model coordinates.
+     */
     public Point2D getAwtToPosition() {
         return awtToPosition;
     }

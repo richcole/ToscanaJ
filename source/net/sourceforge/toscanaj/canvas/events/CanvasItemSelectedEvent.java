@@ -10,29 +10,11 @@ import net.sourceforge.toscanaj.canvas.CanvasItem;
 
 import java.awt.geom.Point2D;
 
-public class CanvasItemSelectedEvent extends CanvasItemEvent {
-    private Point2D canvasPosition = null;
-    private Point2D awtPosition = null;
-
-    public CanvasItemSelectedEvent(CanvasItem item) {
-        super(item);
-    }
-
+/**
+ * This event is sent when a canvas item was selected somehow (e.g. clicked once).
+ */
+public class CanvasItemSelectedEvent extends CanvasItemEventWithPosition {
     public CanvasItemSelectedEvent(CanvasItem item, Point2D canvasPosition, Point2D awtPosition) {
-        super(item);
-        this.canvasPosition = canvasPosition;
-        this.awtPosition = awtPosition;
-    }
-
-    public boolean hasPositionAttached() {
-        return this.canvasPosition != null;
-    }
-
-    public Point2D getCanvasPosition() {
-        return canvasPosition;
-    }
-
-    public Point2D getAWTPosition() {
-        return awtPosition;
+        super(item, canvasPosition, awtPosition);
     }
 }
