@@ -22,6 +22,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.text.DecimalFormat;
 
 /**
@@ -32,6 +33,7 @@ public class LineView extends CanvasItem {
 	
 	public static final NonRealizedConceptGroupingMode NO_GROUPING = new NonRealizedConceptGroupingMode();
 	public static final NonRealizedConceptGroupingMode COLORED_LINES_GROUPING = new NonRealizedConceptGroupingMode();
+	public static final NonRealizedConceptGroupingMode CLOUDS_GROUPING = new NonRealizedConceptGroupingMode();
 	
 	private NonRealizedConceptGroupingMode groupingMode = NO_GROUPING;
 	
@@ -65,9 +67,12 @@ public class LineView extends CanvasItem {
 		this.showRatioFillColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioFillColor", this.showRatioFillColor);
         this.fontSize = ConfigurationManager.fetchFloat("LineView", "labelFontSize", 6);
         this.dynamicLineWidth = ConfigurationManager.fetchString("LineView", "lineWidth", "").equals("extentRatio");
-        if(ConfigurationManager.fetchString("LineView", "nonRealizedConceptGrouping", "").equals("coloredLines")) {
-        	this.groupingMode = COLORED_LINES_GROUPING;
-        }
+		if(ConfigurationManager.fetchString("LineView", "nonRealizedConceptGrouping", "").equals("coloredLines")) {
+			this.groupingMode = COLORED_LINES_GROUPING;
+		}
+		if(ConfigurationManager.fetchString("LineView", "nonRealizedConceptGrouping", "").equals("clouds")) {
+			this.groupingMode = CLOUDS_GROUPING;
+		}
     }
 
     /**
@@ -114,7 +119,7 @@ public class LineView extends CanvasItem {
 			strokeWidth = 1;
 		}
 
-		if(extentRatio == 1 && this.groupingMode == COLORED_LINES_GROUPING) {
+		if(extentRatio == 1 && this.groupingMode != NO_GROUPING) {
 			double gradientPosition = interpreter.getRelativeExtentSize(upperConcept,interpretationContext, ConceptInterpreter.REFERENCE_DIAGRAM);
             Color fillColor = diagramSchema.getGradientColor(gradientPosition);
 			if (this.getSelectionState() == DiagramView.NOT_SELECTED) {
@@ -124,16 +129,34 @@ public class LineView extends CanvasItem {
 
 			double lineLength = this.fromView.getPosition().distance(this.toView.getPosition());
             double lineWidth = this.fromView.getRadiusX();
-            Rectangle2D line = new Rectangle2D.Double(0, -strokeWidth/2, lineLength, lineWidth);
-            
-            AffineTransform oldTransform = graphics.getTransform();
+
+			AffineTransform oldTransform = graphics.getTransform();
 			graphics.transform(AffineTransform.getTranslateInstance(from.getX(), from.getY()));
-            graphics.transform(AffineTransform.getRotateInstance(Math.atan2(to.getY() - from.getY(), to.getX() - from.getX())));
-            graphics.setPaint(fillColor);
-            graphics.fill(line);
-            graphics.setPaint(lineColor);
-			graphics.setStroke(new BasicStroke(1));
-            graphics.draw(line);
+			graphics.transform(AffineTransform.getRotateInstance(Math.atan2(to.getY() - from.getY(), to.getX() - from.getX())));
+
+			if(this.groupingMode == COLORED_LINES_GROUPING) {
+				Rectangle2D line = new Rectangle2D.Double(0, -lineWidth/2, lineLength, lineWidth);
+				graphics.setPaint(fillColor);
+				graphics.fill(line);
+				graphics.setPaint(lineColor);
+				graphics.setStroke(new BasicStroke(1));
+				graphics.draw(line);
+			}
+            
+			if(this.groupingMode == CLOUDS_GROUPING) {
+				double extraBit = 15;
+				lineLength += 2 * extraBit;
+				lineWidth += 2 * extraBit;
+				RoundRectangle2D cloud = new RoundRectangle2D.Double(-extraBit, -lineWidth/2, 
+																	 lineLength, lineWidth, 
+																	 lineWidth, lineWidth);
+				graphics.setPaint(new Color(fillColor.getRed(), fillColor.getGreen(), fillColor.getBlue(), (int)(fillColor.getAlpha() * 0.5)));
+				graphics.fill(cloud);
+				graphics.setPaint(lineColor);
+				graphics.setTransform(oldTransform);
+				graphics.setStroke(new BasicStroke(strokeWidth));
+				graphics.draw(new Line2D.Double(from, to));
+			}
             
             graphics.setTransform(oldTransform);
 		} else {
