@@ -95,4 +95,8 @@ public class NestedLineDiagram extends SimpleLineDiagram {
             return (float) rect.getHeight() / minDist;
         }
     }
+    
+    public String toString() {
+    	return this.getTitle();
+    }
 }
