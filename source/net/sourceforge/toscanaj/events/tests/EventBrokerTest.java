@@ -40,6 +40,7 @@ public class EventBrokerTest extends TestCase {
             TestListener testListener2 = new TestListener();
             TestListener testListener3 = new TestListener();
             TestListener testListener4 = new TestListener();
+            TestListener testListener5 = new TestListener();
 
             EventBroker mainBroker = new EventBroker();
             String packageName = getClass().getPackage().getName();
@@ -48,10 +49,17 @@ public class EventBrokerTest extends TestCase {
             mainBroker.subscribe(testListener3, Class.forName(packageName + ".TestEventType2"), Object.class );
             mainBroker.subscribe(testListener4, Class.forName(packageName + ".TestEventType2"), Integer.class );
 
+            // create a chain: another broker listens to the main one, catching only 1b events. A listener listens
+            // to all type 1 events from Integer sources, i.e. it accepts more events but should get only the 1b ones
+            EventBroker eventType1BBroker = new EventBroker();
+            mainBroker.subscribe(eventType1BBroker, Class.forName(packageName + ".TestEventType1b"), Object.class);
+            eventType1BBroker.subscribe(testListener5, Class.forName(packageName + ".TestEventType1"), Integer.class );
+
             testListener1.eventCounter.setExpected(4);
             testListener2.eventCounter.setExpected(2);
             testListener3.eventCounter.setExpected(2);
             testListener4.eventCounter.setExpected(1);
+            testListener5.eventCounter.setExpected(1);
 
             mainBroker.processEvent(new TestEventType1(new Object()));
             mainBroker.processEvent(new TestEventType1(new Integer(0)));
@@ -64,6 +72,7 @@ public class EventBrokerTest extends TestCase {
             testListener2.eventCounter.verify();
             testListener3.eventCounter.verify();
             testListener4.eventCounter.verify();
+            testListener5.eventCounter.verify();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
