@@ -461,6 +461,7 @@ public class CSCParser {
             		results.add(this.currentSectionParser.parse(tokenizer));
             	} catch (SectionTypeNotSupportedException e) {
             		System.err.println(e.getMessage());
+            		tokenizer.advance();
             	}	
             }
             

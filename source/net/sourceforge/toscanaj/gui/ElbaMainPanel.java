@@ -300,6 +300,14 @@ public class ElbaMainPanel
 				saveActivity,
 				KeyEvent.VK_S,
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		this.saveFileAction.setPostSaveActivity(new SimpleActivity(){
+			public boolean doActivity() throws Exception {
+				currentFile = saveFileAction.getLastFileUsed().getPath();
+				addFileToMRUList(saveFileAction.getLastFileUsed());
+				conceptualSchema.dataSaved();
+                return true;
+            }
+		});
 
 		// --- menu bar ---
 		menuBar = new JMenuBar();

@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.gui.action;
 
 import net.sourceforge.toscanaj.gui.activity.FileActivity;
+import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.gui.dialog.CheckDuplicateFileChooser;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
@@ -21,14 +22,9 @@ import java.io.File;
 public class SaveFileAction extends KeyboardMappedAction {
 
     FileActivity activity;
+    SimpleActivity postSaveActivity;
     File previousFile;
 
-    /**
-     *  @note
-     *     If you don't want to specify mnemonics
-     *     then use the other constructor.
-     * @todo if you want another conmbination then write another constructor.
-     */
     public SaveFileAction(
             JFrame frame,
             FileActivity activity,
@@ -43,6 +39,10 @@ public class SaveFileAction extends KeyboardMappedAction {
             FileActivity activity) {
         super(frame, "Save...");
         this.activity = activity;
+    }
+    
+    public void setPostSaveActivity(SimpleActivity activity) {
+    	this.postSaveActivity = activity;
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -76,6 +76,7 @@ public class SaveFileAction extends KeyboardMappedAction {
 			
 		    if (saveDialog.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
 		        File selectedFile = saveDialog.getSelectedFile();
+		        previousFile = selectedFile;
 		        try {
 		            activity.processFile(selectedFile);
 		        } catch (Exception ex) {
@@ -85,15 +86,31 @@ public class SaveFileAction extends KeyboardMappedAction {
 		                    "Error saving file",
 		                    "Failure to save the file:" + ex.getMessage()
 		            );
-		            ex.printStackTrace();
+		            return false;
 		        }
-		        previousFile = selectedFile;
+		        if(this.postSaveActivity != null) {
+		        	try {
+                        return this.postSaveActivity.doActivity();
+                    } catch (Exception e) {
+		        	    ErrorDialog.showError(
+		        	            frame,
+		        	            e,
+		        	            "Error after saving the file",
+		        	            "The file was saved, but some postprocessing failed."
+		        	    );
+		        	    return false;
+                    }
+		        }
 		        return true;
 		    } else {
 		    	return false;
 		    }
 		}
 		return false;
+	}
+	
+	public File getLastFileUsed() {
+		return this.previousFile;
 	}
 }
 
