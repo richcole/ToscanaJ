@@ -10,4 +10,5 @@ package net.sourceforge.toscanaj.model.cernato;
 public interface ValueGroup {
     String getName();
     boolean containsValue(Value value);
+    boolean isSuperSetOf(ValueGroup otherGroup);
 }

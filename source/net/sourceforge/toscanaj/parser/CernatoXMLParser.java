@@ -85,13 +85,13 @@ public class CernatoXMLParser {
         if(name == null) {
             throw new DataFormatException("Type missing name");
         }
-        Type newType = new TextualType(name);
+        TextualType newType = new TextualType(name);
         List valueGroups = element.getChildren("text_value_group");
         for (Iterator iterator = valueGroups.iterator(); iterator.hasNext();) {
             Element valueGroupElement = (Element) iterator.next();
             String groupId = valueGroupElement.getAttributeValue("id");
             String groupName = valueGroupElement.getChild("name").getText();
-            TextualValueGroup group = new TextualValueGroup(groupName);
+            TextualValueGroup group = new TextualValueGroup(newType, groupName);
             List values = valueGroupElement.getChildren("text_value");
             for (Iterator iterator2 = values.iterator(); iterator2.hasNext();) {
                 Element valueElement = (Element) iterator2.next();
@@ -112,7 +112,7 @@ public class CernatoXMLParser {
         if(name == null) {
             throw new DataFormatException("Type missing name");
         }
-        Type newType = new NumericalType(name);
+        NumericalType newType = new NumericalType(name);
         List valueGroups = element.getChildren("num_value_group");
         for (Iterator iterator = valueGroups.iterator(); iterator.hasNext();) {
             Element valueGroupElement = (Element) iterator.next();
@@ -122,7 +122,7 @@ public class CernatoXMLParser {
             boolean minIncluded = valueGroupElement.getChild("lower_border").getAttributeValue("included").equals("yes");
             double max = Double.parseDouble(valueGroupElement.getChild("upper_border").getText());
             boolean maxIncluded = valueGroupElement.getChild("upper_border").getAttributeValue("included").equals("yes");
-            ValueGroup group = new NumericalValueGroup(groupName, min, minIncluded, max, maxIncluded);
+            ValueGroup group = new NumericalValueGroup(newType, groupName, min, minIncluded, max, maxIncluded);
             newType.addValueGroup(group, groupId);
         }
         types.put(id,newType);

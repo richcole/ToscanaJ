@@ -11,13 +11,16 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class NumericalValueGroup implements ValueGroup {
+    private NumericalType type;
     private String name;
     private double min;
     private boolean minIncluded;
     private double max;
     private boolean maxIncluded;
 
-    public NumericalValueGroup(String name, double min, boolean minIncluded, double max, boolean maxIncluded) {
+    public NumericalValueGroup(NumericalType type, String name,
+                               double min, boolean minIncluded, double max, boolean maxIncluded) {
+        this.type = type;
         this.name = name;
         this.min = min;
         this.minIncluded = minIncluded;
@@ -45,6 +48,29 @@ public class NumericalValueGroup implements ValueGroup {
             return false;
         }
         if(number == max && !maxIncluded) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isSuperSetOf(ValueGroup otherGroup) {
+        if(! (otherGroup instanceof NumericalValueGroup)) {
+            return false;
+        }
+        NumericalValueGroup otherNVGroup = (NumericalValueGroup) otherGroup;
+        if(otherNVGroup.type != type) {
+            return false;
+        }
+        if(otherNVGroup.min < min) {
+            return false;
+        }
+        if(otherNVGroup.min == min && !minIncluded && otherNVGroup.minIncluded) {
+            return false;
+        }
+        if(otherNVGroup.max > max) {
+            return false;
+        }
+        if(otherNVGroup.max == max && !maxIncluded && otherNVGroup.maxIncluded) {
             return false;
         }
         return true;
