@@ -134,6 +134,7 @@ public class ConfigurationManager {
         while(it.hasNext()) {
             String cur = (String) it.next();
             properties.setProperty(section + "-" + key + "-" + index, cur);
+            index++;
         }
     }
 

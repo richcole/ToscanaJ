@@ -63,7 +63,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     /**
      * The maximum number of files in the most recently used files list.
      */
-    static private final int MaxMruFiles = 6;
+    static private final int MaxMruFiles = 8;
 
     /**
      * Our toolbar.
@@ -148,6 +148,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     private List mruList = new LinkedList();
 
     /**
+     * Stores the file name of the currently open file.
+     */
+    private String currentFile = null;
+
+    /**
      * Stores the last file where an image was exported to.
      */
     private File lastImageExportFile = null;
@@ -174,6 +179,13 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         DiagramController.getController().addObserver(this);
         // restore the old MRU list
         mruList = ConfigurationManager.fetchStringList("mainPanel", "mruFiles", MaxMruFiles);
+        // set up the menu for the MRU files
+        recreateMruMenu();
+        // if we have at least one MRU file try to open it
+        File schemaFile = new File((String) mruList.get(mruList.size()-1));
+        if(schemaFile.canRead()) {
+            openSchemaFile(schemaFile);
+        }
         // restore the last image export position
         String lastImage = ConfigurationManager.fetchString("mainPanel","lastImageExport",null);
         if(lastImage != null ) {
@@ -290,7 +302,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         // recent edited files will be in this menu
         mruMenu = new JMenu("Reopen");
         mruMenu.setMnemonic(KeyEvent.VK_R);
-        mruMenu.setEnabled(false);
         fileMenu.add(mruMenu);
 
         // separator
@@ -584,8 +595,14 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      * Open a schema using the file open dialog.
      */
     protected void openSchema() {
-        final JFileChooser openDialog =
-                        new JFileChooser( System.getProperty( "user.dir" ) );
+        final JFileChooser openDialog;
+        if(this.currentFile != null) {
+            // use position of last file for dialog
+            openDialog = new JFileChooser(this.currentFile);
+        }
+        else {
+            openDialog = new JFileChooser(System.getProperty( "user.dir" ));
+        }
         int rv=openDialog.showOpenDialog( this );
         if( rv != JFileChooser.APPROVE_OPTION )
         {
@@ -655,33 +672,20 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         resetButtons(fileIsOpen);
 
         // update MRU list
-        if(!this.mruList.contains(schemaFile.getPath())) {
-            this.mruList.add(schemaFile.getPath());
+        if(this.mruList.contains(schemaFile.getPath())) {
+            // if it is already in, just remove it and add it at the end
+            this.mruList.remove(schemaFile.getPath());
         }
+        this.mruList.add(schemaFile.getPath());
         if(this.mruList.size() > MaxMruFiles) {
             this.mruList.remove(0);
         }
 
-        // recreate MRU menu
-        this.mruMenu.removeAll();
-        Iterator it = mruList.iterator();
-        while(it.hasNext()) {
-            String cur = (String) it.next();
-            if(cur.equals(schemaFile.getPath())) {
-                // don't enlist the current file
-                continue;
-            }
-            JMenuItem mruItem = new JMenuItem(cur);
-            mruItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    JMenuItem menuItem = (JMenuItem) e.getSource();
-                    openSchemaFile(new File(menuItem.getText()));
-                }
-            });
-            this.mruMenu.add(mruItem);
-        }
-        // we have now at least one file
-        this.mruMenu.setEnabled(this.mruList.size() > 1);
+        // store current file
+        this.currentFile = schemaFile.getPath();
+
+        // recreate the menu
+        recreateMruMenu();
     }
 
     /**
@@ -694,6 +698,34 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         else {
             this.diagramView.setDisplayType(LabelView.DISPLAY_LIST, this.showExactMenuItem.isSelected());
         }
+    }
+
+    /**
+     * Recreates the menu of most recently used files and enables it if it is not
+     * empty.
+     */
+    private void recreateMruMenu() {
+        this.mruMenu.removeAll();
+        boolean empty = true; // will be used to check if we have at least one entry
+        Iterator it = mruList.iterator();
+        while(it.hasNext()) {
+            String cur = (String) it.next();
+            if(cur.equals(currentFile)) {
+                // don't enlist the current file
+                continue;
+            }
+            empty = false;
+            JMenuItem mruItem = new JMenuItem(cur);
+            mruItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JMenuItem menuItem = (JMenuItem) e.getSource();
+                    openSchemaFile(new File(menuItem.getText()));
+                }
+            });
+            this.mruMenu.add(mruItem);
+        }
+        // we have now at least one file
+        this.mruMenu.setEnabled(!empty);
     }
 
     /**
