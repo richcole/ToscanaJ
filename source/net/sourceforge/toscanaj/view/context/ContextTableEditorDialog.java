@@ -463,21 +463,21 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 
 	private void createButtonsPane() {
 		buttonsPane = new JPanel(new GridBagLayout());
-		JButton addObjButton = new JButton(" Add Objects ");
-		JButton addAttrButton = new JButton(" Add Attributes ");
+		JButton addObjButton = new JButton("Add Objects");
+		JButton addAttrButton = new JButton("Add Attributes");
 
-		this.checkConsistencyButton = new JButton(" Check Consistency... ");
+		this.checkConsistencyButton = new JButton("Check Consistency...");
 		this.checkConsistencyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				checkConsistency();
 			}
 		});
 		setCheckConsistencyButtonState();
-		this.createButton = new JButton(" Create ");
+		this.createButton = new JButton("Create");
 		createButton.setEnabled(
 			(scaleTitleField.getText() != null
 				&& !scaleTitleField.getText().equals("")));
-		JButton cancelButton = new JButton(" Cancel ");
+		JButton cancelButton = new JButton("Cancel");
 		addObjButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showObjectInputDialog();
