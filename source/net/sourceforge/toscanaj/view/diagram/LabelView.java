@@ -360,16 +360,27 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         return new Point2D.Double(x,y);
     }
     
-    Point2D getConnectorEndPosition() {
-    	double x = this.rect.getX();
-        double y = getConnectorStartPosition().getY();
-        double lw = rect.getWidth();
-    	return new Point2D.Double(x + lw / 2, y + this.labelInfo.getOffset().getY());
+    protected Point2D getConnectorEndPosition() {
+    	
+    	DiagramNode node=this.labelInfo.getNode();
+		double rectX = this.rect.getX();
+		double y = getConnectorStartPosition().getY();
+		double lw = rect.getWidth();
+    	double endY = y + this.labelInfo.getOffset().getY();
+		if(rectX>node.getX()){
+			return new Point2D.Double(rectX + 10, endY);
+    	}
+    	else if(rectX+lw < node.getX()){
+			return new Point2D.Double(rectX + lw - 10, endY);
+    	}
+    	else{
+			return new Point2D.Double(rectX + lw / 2, endY);
+    	}
     }
 
     protected abstract boolean isFaded();
     
-    Color getConnectorColor() {
+    protected Color getConnectorColor() {
         DiagramSchema diagramSchema = diagramView.getDiagramSchema();
         Color lineColor = diagramSchema.getLineColor();
     	if( isFaded() ) {
