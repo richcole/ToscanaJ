@@ -52,4 +52,4 @@ ToscanaJMainPanel-mruFiles-1=./examples/sql/pctest/pctest.csx
 # LineView-labelFontSize=[if lines have labels, this is the font size in points. Defaults to 6pt]
 # LineView-lineWidth=[if set to "extentRatio", the line width will vary with the extent size differences]
 # LineView-nonRealizedConceptGrouping=[if set to "coloredLines", all non-realized nodes will be connected to the realized one with the same extent
-                                       if set to "clouds" there will be clouds around all lines connecting such equivalence class]
+#                                      if set to "clouds" there will be clouds around all lines connecting such equivalence class]
