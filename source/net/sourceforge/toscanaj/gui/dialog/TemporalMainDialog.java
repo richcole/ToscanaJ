@@ -735,7 +735,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 	    while(objIt.hasNext()) {
 	        FCAObject object = (FCAObject) objIt.next();
 	        AttributeValue value = this.context.getRelationship(object, sequenceAttribute);
-	        if(!sequenceValues.contains(value)) {
+	        if(!sequenceValues.contains(value) && value != null) {
 	            boolean inserted = false;;
 	            ListIterator seqIt = sequenceValues.listIterator();
 	            while(seqIt.hasNext()) {
@@ -759,7 +759,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 	            ListIterator tlIt = timelineValues.listIterator();
 	            while(tlIt.hasNext()) {
 	                AttributeValue curValue = (AttributeValue) tlIt.next();
-	                if(value.isLesserThan(curValue)) {
+	                if(value != null && value.isLesserThan(curValue)) {
 	                    if(tlIt.hasPrevious()) {
 	                        tlIt.previous();
 	                    }
