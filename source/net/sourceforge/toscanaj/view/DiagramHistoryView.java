@@ -44,10 +44,16 @@ public class DiagramHistoryView extends JList {
 
             String s = diagram.getTitle();
             setText(s);
+            setOpaque(true);
             if(isSelected) {
                 setBackground(list.getSelectionBackground());
                 setForeground(list.getSelectionForeground());
-                setBorder(new javax.swing.border.LineBorder(java.awt.Color.black));
+                if(list.hasFocus()) {
+                    setBorder(new javax.swing.border.LineBorder(java.awt.Color.yellow));
+                }
+                else {
+                    setBorder(null);
+                }
             }
             else {
                 setBackground(list.getBackground());
