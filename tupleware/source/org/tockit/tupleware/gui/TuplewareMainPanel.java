@@ -8,6 +8,9 @@
 package org.tockit.tupleware.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
+import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.gui.MainPanel;
 import net.sourceforge.toscanaj.gui.ToscanaJMainPanel;
 import net.sourceforge.toscanaj.gui.action.ExportDiagramAction;
@@ -20,7 +23,13 @@ import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DiagramExportSettings;
+import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.BinaryRelation;
+import net.sourceforge.toscanaj.model.context.Context;
+import net.sourceforge.toscanaj.model.context.FCAObject;
+import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
@@ -37,6 +46,8 @@ import org.tockit.events.EventBrokerListener;
 import org.tockit.plugin.PluginLoader;
 import org.tockit.relations.model.Relation;
 import org.tockit.relations.model.Tuple;
+import org.tockit.relations.operations.JoinOperation;
+import org.tockit.relations.operations.PickColumnsOperation;
 import org.tockit.tupleware.scaling.TupleScaling;
 import org.tockit.tupleware.source.TupleSource;
 import org.tockit.tupleware.source.TupleSourceRegistry;
@@ -50,9 +61,67 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 public class TuplewareMainPanel extends JFrame implements MainPanel, EventBrokerListener {
+    private final class ModalContext implements Context {
+        private String name;
+		private Set objects;
+		private Set attributes;        
+        private Relation magicJoin;
+        private BinaryRelation incidenceRelation;
+        
+        private ModalContext(int dim) {
+            this.name = tuples.getDimensionNames()[dim];
+            Set objectTuples = tuples.getTuples();
+            this.objects = new HashSet();
+            for (Iterator iter = objectTuples.iterator(); iter.hasNext();) {
+                final Tuple tuple = (Tuple) iter.next();
+				this.objects.add(new FCAObjectImplementation(tuple));
+            }
+            Set attributeTuples = PickColumnsOperation.pickColumn(tuples, dim).getTuples();
+            this.attributes = new HashSet();
+            for (Iterator iterator = attributeTuples.iterator(); iterator.hasNext();){
+                Tuple tuple = (Tuple) iterator.next();
+				this.attributes.add(new Attribute(tuple.getElement(0)));                
+            }
+			int[] allButThisDim = new int[tuples.getArity() - 1];
+			for (int j = 0; j < allButThisDim.length; j++) {
+				if(j < dim) {
+					allButThisDim[j] = j;
+				} else {
+					allButThisDim[j] = j + 1;
+				}
+			}
+            magicJoin = JoinOperation.join(tuples, allButThisDim, tuples, allButThisDim);
+			incidenceRelation = new BinaryRelation() {
+				public boolean contains(Object domainObject, Object rangeObject) {
+					Tuple left = (Tuple) ((FCAObject)domainObject).getData();
+					Object right = ((Attribute)rangeObject).getData();
+					Object[] fullData = new Object[left.getLength() + 1];
+					for (int j = 0; j < left.getLength(); j++) {
+						fullData[j] = left.getElement(j);
+					}
+					fullData[left.getLength()] = right;
+					return magicJoin.isRelated(fullData);
+				}
+			};
+		}
+        public String getName() {
+            return name;
+        }
+        public Set getObjects() {
+        	return this.objects;
+        }
+        public Set getAttributes() {
+            return this.attributes;
+        }
+        public BinaryRelation getRelation() {
+            return this.incidenceRelation;
+        }
+    }
     private static final String CONFIGURATION_SECTION = "TuplewareMainPanel";
     private static final String CONFIGURATION_ENTRY_LAST_FILE = "lastFileRead";
     private static final String CONFIGURATION_ENTRY_DIVIDER = "diagramViewDivider";
@@ -153,22 +222,50 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 
     private void createToolBar() {
         toolBar = new JToolBar();
-        JButton newDiagramButton = new JButton("New Diagram...");
-        newDiagramButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                createNewDiagram();
-            }
-        });
-        toolBar.add(newDiagramButton);
+		JButton newDiagramButton = new JButton("New Diagram...");
+		newDiagramButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				createNewDiagram();
+			}
+		});
+		toolBar.add(newDiagramButton);
+
+		JButton createModalSystemButton = new JButton("Create modal system");
+		createModalSystemButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				createModalSystem();
+			}
+		});
+		toolBar.add(createModalSystemButton);
     }
 
-    private void createNewDiagram() {
-        IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tuples.getDimensionNames());
-        dialog.show();
-        int[] attributeIndices = dialog.getSelectedIndices();
-        Diagram2D diagram = TupleScaling.scaleTuples(this.tuples, this.objectIndices, attributeIndices);
-        this.conceptualSchema.addDiagram(diagram);
-    }
+	private void createNewDiagram() {
+		IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tuples.getDimensionNames());
+		dialog.show();
+		int[] attributeIndices = dialog.getSelectedIndices();
+		Diagram2D diagram = TupleScaling.scaleTuples(this.tuples, this.objectIndices, attributeIndices);
+		this.conceptualSchema.addDiagram(diagram);
+	}
+
+	private void createModalSystem() {
+		String[] dimensionNames = this.tuples.getDimensionNames();
+		int[] nonObjectDims = new int[this.tuples.getArity() - this.objectIndices.length];
+		int offset = 0;
+		for (int i = 0; i < nonObjectDims.length; i++) {
+            while(offset < this.objectIndices.length && i + offset == this.objectIndices[offset]) {
+            	offset++;
+            }
+            nonObjectDims[i] = i + offset;
+        }
+        for (int i = 0; i < nonObjectDims.length; i++) {
+        	int dim = nonObjectDims[i];
+			String dimensionName = dimensionNames[dim];
+            Context context = new ModalContext(dim);
+            Lattice lattice = new GantersAlgorithm().createLattice(context);
+            Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, dimensionName, new DefaultDimensionStrategy());
+            this.conceptualSchema.addDiagram(diagram);
+        }
+	}
 
     public void createViews() {
         diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
