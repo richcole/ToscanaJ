@@ -4,18 +4,18 @@ program suite:
 Affecting different programs:
 =============================
 - grid size now changes with a factor of third root of two. This means after
-  three refinements the nodes are all on a grid location again
-- CSC import is greatly enhanced, most importantly it supports include files now
-- Bugfix: saving files with descriptions on objects or attributes works again
+  three refinements the nodes are all on a grid location again.
+- CSC import is greatly enhanced, most importantly it supports include files now.
+- Bugfix: saving files with descriptions on objects or attributes works again.
 - Bugfix: lines now connect properly to the corners of the labels -- in some 
-  situations there was a visible offset before
+  situations there was a visible offset before.
 
 Specific for ToscanaJ:
 ======================
 - the database viewer for opening documents (ShellExectuteDatabaseViewewr) now
-  starts external programs in a separate Thread, thus not blocking the UI anymore
+  starts external programs in a separate Thread, thus not blocking the UI anymore.
 - the HTMLDatabaseViewer does support giving a title in the way typical for HTML
-  (<html>/<head>/<title>). This is used ass the dialog title for the views created
+  (<html>/<head>/<title>). This is used as the dialog title for the views created.
 - a new database viewer called "InfoDatabaseViewer" allows showing plain text or
   HTML found either directly in the database or via a URL found in the database
 - Bugfix: when changing diagram schemas, the background can be erased again.
@@ -25,17 +25,17 @@ Specific for ToscanaJ:
 Specific for Elba:
 ==================
 - Elba can now connect to Excel files directly, using a new option in the DB
-  connection dialog. This avoids having to set up a data source manually
+  connection dialog. This avoids having to set up a data source manually.
 - before creating a speed optimized system Elba will check if the schema has
-  been saved
+  been saved.
 - Elba warns before creating a speed optimized system that this changes the
-  database and the conceptual schema
+  database and the conceptual schema.
 - the table/key pair for the DB connection now gets selected via two combo
-  boxes (should be more intuitive)
+  boxes (should be more intuitive).
 - after setting up the DB connection, a popup notifies the user about the
-  success
+  success.
 - Bugfix: last CSC import and last export location are remembered between program
-  sessions
+  sessions.
 
 Specific for Siena (still not fully complete):
 ==============================================
