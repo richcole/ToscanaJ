@@ -270,7 +270,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
      * Build the GUI.
      */
     private void buildPanel() {
-        diagramView = new DiagramView();
+        this.diagramView = new DiagramView();
 		// set the minimum font size of the label into diagramView from the properties file
         // this has to happen before the menu gets created, since the menu uses the information
 		double minLabelFontSize = preferences.getDouble("minLabelFontSize", 
