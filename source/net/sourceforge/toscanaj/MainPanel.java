@@ -644,7 +644,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n" + e.getMessage());
             return;
         } catch (DataFormatException e) {
-            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n" + e.getMessage());
+            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n" + e.getMessage() + 
+                                  "\n" + ((DataFormatException)e).getOriginal().getMessage());
             return;
         }
 

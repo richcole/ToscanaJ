@@ -54,16 +54,6 @@ public class DBConnection
     }
 
     /**
-     * This constructor takes the data source only.
-     *
-     * This is a convenience function, it calls the full initialisation
-     * constructor with empty username and password.
-     */
-    public DBConnection(String url) throws DatabaseException {
-        this(url, "", "");
-    }
-
-    /**
      *  This constructor takes the data source as driver/url combination, an
      *  account name and a password.
      *
@@ -93,11 +83,11 @@ public class DBConnection
         // connect to the DB
         try {
             connection= DriverManager.getConnection(url, account, password);
+            printLogMessage("Created new DB connection to " + url);
         }
         catch (SQLException se) {
             throw new DatabaseException("An error occured connecting to the database", se);
         }
-        printLogMessage("Created new DB connection to " + url);
         return connection;
     }
 
@@ -138,11 +128,14 @@ public class DBConnection
     }
 
     /**
-     * Executes the given query and returns a list of formatted Strings.
+     * Executes the given query and returns a list of pairs of keys and formatted Strings.
      *
      * The query is given as Query object given the head of the final query plus
-     * the WHERE clause for specifying the object set used. The results are formatted by
-     * DatabaseInfo.DatabaseQuery.formatResults(ResultSet).
+     * the WHERE clause for specifying the object set used. The results are pairs
+     * of the key value (a string) and the result of the defined query formatted by
+     * DatabaseInfo.DatabaseQuery.formatResults(ResultSet) given as Vector(2).
+     *
+     * If the query is an aggregate, the key value is an empty string.
      */
     public List executeQuery(DatabaseInfo.DatabaseQuery query, String whereClause) throws DatabaseException {
         ResultSet resultSet = null;
@@ -158,7 +151,10 @@ public class DBConnection
             resultSet = stmt.executeQuery(statement);
             printLogMessage(System.currentTimeMillis() + ": done.");
             while(resultSet.next()) {
-                result.add(query.formatResults(resultSet));
+                Vector item = new Vector(2);
+                item.add(0,resultSet.getString(1));
+                item.add(1,query.formatResults(resultSet));
+                result.add(item);
             }
         }
         catch( SQLException se ) {
@@ -392,7 +388,7 @@ public class DBConnection
             System.exit( 1 );
         }
 
-        DBConnection test = new DBConnection( args[0] );
+        DBConnection test = new DBConnection( args[0], "", "" );
 
         // print the tables
         System.out.println("The tables:\n-----------");

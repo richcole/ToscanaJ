@@ -7,6 +7,7 @@ import net.sourceforge.toscanaj.model.Query;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * An implementation of the Concept interface which holds all data in memory.
@@ -80,13 +81,29 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
     public List executeQuery(Query query, boolean contingentOnly) {
         if (query instanceof ObjectListQuery) {
             if (contingentOnly) {
-                return this.objectContingent;
+                List retVal = makeList();
+                Iterator it = this.objectContingent.iterator();
+                while (it.hasNext()) {
+                    String cur = it.next().toString();
+                    Vector item = new Vector(2);
+                    item.add(0, null);
+                    item.add(1, cur);
+                    retVal.add(item);
+                }
+                return retVal;
             } else {
                 List retVal = makeList();
                 Iterator it = this.ideal.iterator();
                 while (it.hasNext()) {
                     MemoryMappedConcept cur = (MemoryMappedConcept) it.next();
-                    retVal.addAll(cur.objectContingent);
+                    Iterator it2 = cur.objectContingent.iterator();
+                    while (it2.hasNext()) {
+                        String cur2 = it2.next().toString();
+                        Vector item = new Vector(2);
+                        item.add(0, null);
+                        item.add(1, cur2);
+                        retVal.add(item);
+                    }
                 }
                 return retVal;
             }
@@ -95,7 +112,10 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
             int size = contingentOnly ? this.getObjectContingentSize() : this.getExtentSize();
 
             if(size >0){
-               retVal.add(new Integer(size));
+                Vector item = new Vector(2);
+                item.add(0, null);
+                item.add(1, new Integer(size).toString());
+                retVal.add(item);
             }
             return retVal;
         } else {

@@ -4,8 +4,11 @@ import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.List;
+import java.util.LinkedList;
+import java.util.Vector;
 
 /**
  * A LabelView for displaying the objects.
@@ -31,10 +34,8 @@ public class ObjectLabelView extends LabelView {
      */
     private Query query = null;
 
-    /**
-     * Caches the result of the query.
-     */
-    private List queryResult = null;
+    private List queryKeyValues = null;
+    private List queryDisplayStrings = null;
 
     /**
      * Creates a view for the given label information.
@@ -108,17 +109,36 @@ public class ObjectLabelView extends LabelView {
         if(this.query == null) {
             return 0;
         }
-        return this.queryResult.size();
+        return this.queryDisplayStrings.size();
     }
 
     protected Iterator getEntryIterator() {
-        return this.queryResult.iterator();
+        return this.queryDisplayStrings.iterator();
     }
 
     protected void doQuery() {
         if(query != null) {
-            this.queryResult = this.labelInfo.getNode().getConcept().executeQuery(
+            List queryResult = this.labelInfo.getNode().getConcept().executeQuery(
                                                this.query, this.showOnlyContingent);
+            this.queryKeyValues = new LinkedList();
+            this.queryDisplayStrings = new LinkedList();
+            Iterator it = queryResult.iterator();
+            while( it.hasNext() ) {
+                Vector cur = (Vector)it.next();
+                this.queryKeyValues.add(cur.elementAt(0));
+                this.queryDisplayStrings.add(cur.elementAt(1));
+            }
         }
+    }
+    
+    public void doubleClicked(Point2D pos) {
+        if(pos.getX() > this.rect.getMaxX() - this.scrollbarWidth) {
+            // a doubleClick on the scrollbar
+            return;
+        }
+        // calculate the line hit
+        int lineHit = (int)((pos.getY()-this.rect.getY())/this.lineHeight);
+        System.out.println(this.queryKeyValues.get(lineHit));
+        System.out.println(this.queryDisplayStrings.get(lineHit));
     }
 }

@@ -128,7 +128,7 @@ public class CSXParser
                     dbInfo = new DatabaseInfo();
                     parseDBInfo(dbInfo, dbElem);
                     /// @TODO Shouldn't this be in the main panel?
-                    _DatabaseConnection = new DBConnection(dbInfo.getSource());
+                    _DatabaseConnection = new DBConnection(dbInfo.getSource(), dbInfo.getUserName(), dbInfo.getPassword());
                 }
                 else {
                     dbInfo = null;
@@ -489,6 +489,8 @@ public class CSXParser
                                     driver + "\" as database driver.");
                 }
             }
+            dbInfo.setUserName(urlElem.getAttributeValue("user"));
+            dbInfo.setPassword(urlElem.getAttributeValue("password"));
         }
         else {
             throw new DataFormatException("One of <dsn>, <path> or <url> expected in <database> element.");

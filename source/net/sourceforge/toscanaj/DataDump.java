@@ -72,7 +72,7 @@ public class DataDump {
             }
             try {
                 filterConcept = new DatabaseConnectedConcept(schema.getDatabaseInfo(),
-                                            new DBConnection(schema.getDatabaseInfo().getSource()) );
+                                            new DBConnection(schema.getDatabaseInfo().getSource(), "", "") );
             }
             catch (Exception e) {
                 System.err.println("Couldn't create filter for database");

@@ -29,6 +29,10 @@ public class DatabaseInfo
      */
     private String objectKey = null;
 
+    private String userName = null;
+
+    private String password = null;
+
     public static abstract class DatabaseQuery extends Query {
         public class Column {
             String name;
@@ -72,7 +76,8 @@ public class DatabaseInfo
                 rowRes += header;
             }
             Iterator colDefIt = this.columnList.iterator();
-            int i = 0;
+            // skip key, start with 1
+            int i = 1;
             while(colDefIt.hasNext()) {
                 Column col = (Column)colDefIt.next();
                 i++;
@@ -102,10 +107,11 @@ public class DatabaseInfo
         }
 
         public String getQueryHead() {
-            String   retValue = "SELECT ";
+            String retValue = "SELECT ";
             if ( isDistinct ) {
                 retValue += "DISTINCT ";
             }
+            retValue += objectKey + ", ";
             Iterator it = columnList.iterator();
             while(it.hasNext()) {
                 Column col = (Column) it.next();
@@ -114,7 +120,7 @@ public class DatabaseInfo
                     retValue += ", ";
                 }
             }
-            retValue += " FROM [" + table + "]";
+            retValue += " FROM " + table + " ";
             return retValue;
         };
     };
@@ -126,7 +132,8 @@ public class DatabaseInfo
         }
 
         public String getQueryHead() {
-            String   retValue = "SELECT ";
+            // this gives an additional column replacing the key (used only in lists)
+            String retValue = "SELECT count(*),";
             Iterator it = columnList.iterator();
             while(it.hasNext()) {
                 Column col = (Column) it.next();
@@ -135,7 +142,7 @@ public class DatabaseInfo
                     retValue += ", ";
                 }
             }
-            retValue += " FROM [" + table + "]";
+            retValue += " FROM " + table + " ";
             return retValue;
         };
     };
@@ -181,7 +188,7 @@ public class DatabaseInfo
      * @deprecated
      */
     public String getQuery() {
-        return "SELECT [" + this.objectKey + "] FROM [" + this.table + "] ";
+        return "SELECT " + this.objectKey + " FROM " + this.table + " ";
     }
 
     /**
@@ -193,7 +200,7 @@ public class DatabaseInfo
      * @deprecated
      */
     public String getCountQuery() {
-        return "SELECT count(*) FROM [" + this.table + "] ";
+        return "SELECT count(*) FROM " + this.table + " ";
     }
 
     /**
@@ -203,6 +210,22 @@ public class DatabaseInfo
         this.source = url;
     }
 
+    public void setUserName( String userName ) {
+        this.userName = userName;
+    }
+    
+    public String getUserName() {
+        return this.userName;
+    }
+
+    public void setPassword( String password ) {
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return this.password;
+    }
+
     /**
      * Sets the database table we want to query.
      *
@@ -210,12 +233,6 @@ public class DatabaseInfo
      */
     public void setTable( String table ) {
         this.table = table;
-        while(this.table.charAt(0) == '[') {
-            this.table = this.table.substring(1);
-        }
-        while(this.table.charAt(this.table.length()-1) == ']') {
-            this.table = this.table.substring(0,this.table.length()-1);
-        }
     }
 
     /**
@@ -223,12 +240,6 @@ public class DatabaseInfo
      */
     public void setKey( String key ) {
         this.objectKey = key;
-        while(this.objectKey.charAt(0) == '[') {
-            this.objectKey = this.objectKey.substring(1);
-        }
-        while(this.objectKey.charAt(this.objectKey.length()-1) == ']') {
-            this.objectKey = this.objectKey.substring(0,this.objectKey.length()-1);
-        }
     }
 
     /**

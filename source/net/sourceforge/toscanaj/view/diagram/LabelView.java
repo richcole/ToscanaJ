@@ -72,7 +72,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * The bounding rectangle for the label itself.
      */
-    private Rectangle2D rect = null;
+    protected Rectangle2D rect = null;
 
     /**
      * The label information that should be drawn.

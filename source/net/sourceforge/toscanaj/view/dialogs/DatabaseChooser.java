@@ -222,7 +222,7 @@ public class DatabaseChooser extends JDialog
     private void fillTableList()
     {
         try {
-            _connection = new DBConnection( _dsnField.getText() );
+            _connection = new DBConnection( _dsnField.getText(), "", "" );
             _tableList.setListData( _connection.getTableNames() );
         }
         catch(DatabaseException e) {
@@ -238,7 +238,7 @@ public class DatabaseChooser extends JDialog
     private void fillKeyList()
     {
         try {
-            _connection = new DBConnection( _dsnField.getText() );
+            _connection = new DBConnection( _dsnField.getText(), "", "" );
             _keyList.setListData( _connection.getColumnNames(
                                         (String)_tableList.getSelectedValue() ) );
         }
