@@ -113,30 +113,30 @@ public class CernatoXMLParser {
         NumericalType newType = new NumericalType(name);
 		String minValString = element.getChild("minval").getText();
 		if (minValString == null) {
-			throw new DataFormatException("Numerical type missing minimum value element <minval>");
+			throw new DataFormatException("Numerical type \"" + name + "\" missing minimum value element <minval>");
 		}
 		try {
 			newType.setMinimumValue(Double.parseDouble(minValString));
 		} catch (NumberFormatException e) {
-			throw new DataFormatException("Minimum value for numerical type is not a number", e);
+			throw new DataFormatException("Minimum value for numerical type \"" + name + "\" is not a number", e);
 		}
 		String maxValString = element.getChild("maxval").getText();
 		if (maxValString == null) {
-			throw new DataFormatException("Numerical type missing maximum value element <maxval>");
+			throw new DataFormatException("Numerical type \"" + name + "\" missing maximum value element <maxval>");
 		}
 		try {
 			newType.setMaximumValue(Double.parseDouble(maxValString));
 		} catch (NumberFormatException e) {
-			throw new DataFormatException("Maximum value for numerical type is not a number", e);
+			throw new DataFormatException("Maximum value for numerical type \"" + name + "\" is not a number", e);
 		}
 		String numDecString = element.getChild("decimals").getText();
 		if (numDecString == null) {
-			throw new DataFormatException("Numerical type missing number of decimals information");
+			throw new DataFormatException("Numerical type \"" + name + "\" missing number of decimals information");
 		}
 		try {
-			newType.setNumberOfDecimals(Integer.parseInt(minValString));
+			newType.setNumberOfDecimals(Integer.parseInt(numDecString));
 		} catch (NumberFormatException e) {
-			throw new DataFormatException("Number of decimals for numerical type is not an integer", e);
+			throw new DataFormatException("Number of decimals for numerical type \"" + name + "\" is not an integer", e);
 		}
         List valueGroups = element.getChildren("num_value_group");
         for (Iterator iterator = valueGroups.iterator(); iterator.hasNext();) {
