@@ -18,10 +18,7 @@ import net.sourceforge.toscanaj.canvas.events.CanvasItemSelectedEvent;
 import net.sourceforge.toscanaj.canvas.events.CanvasItemContextMenuRequestEvent;
 import net.sourceforge.toscanaj.canvas.CanvasBackground;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import net.sourceforge.toscanaj.controller.diagram.FilterOperationEventListener;
-import net.sourceforge.toscanaj.controller.diagram.HighlightingOperationEventListener;
-import net.sourceforge.toscanaj.controller.diagram.HighlightRemovalOperationEventListener;
-import net.sourceforge.toscanaj.controller.diagram.ObjectLabelViewPopupMenuHandler;
+import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
@@ -268,6 +265,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         diagramView.getController().getEventBroker().subscribe(
                 new ObjectLabelViewPopupMenuHandler(diagramView),
                 CanvasItemContextMenuRequestEvent.class,
+                ObjectLabelView.class
+        );
+        diagramView.getController().getEventBroker().subscribe(
+                new ObjectLabelViewOpenDisplayHandler(),
+                CanvasItemActivatedEvent.class,
                 ObjectLabelView.class
         );
         diagramOrganiser = new DiagramOrganiser(this.conceptualSchema);

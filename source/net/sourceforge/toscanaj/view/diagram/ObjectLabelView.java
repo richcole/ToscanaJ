@@ -134,26 +134,6 @@ public class ObjectLabelView extends LabelView {
         }
     }
 
-    public void doubleClicked(Point2D pos) {
-        DatabaseRetrievedObject object = getObjectAtPosition(pos);
-        if (object == null) {
-            return;
-        }
-        if (object.hasKey()) {
-            if (DatabaseViewerManager.getNumberOfObjectViews() == 0) {
-                return;
-            }
-            DatabaseViewerManager.showObject(0, object);
-        }
-        else {
-            if (DatabaseViewerManager.getNumberOfObjectListViews() == 0) {
-                return;
-            }
-            DatabaseViewerManager.showObjectList(0, object);
-        }
-        return;
-    }
-
     public DatabaseRetrievedObject getObjectAtPosition(Point2D position) {
         int itemHit = getItemAtPosition(position);
         if( itemHit == -1 ) {
