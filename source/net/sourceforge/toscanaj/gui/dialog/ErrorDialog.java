@@ -18,8 +18,10 @@ import javax.swing.*;
 /**
  * This is a generic class top handle error messages.
  *
- * ToscanJ Exceptions will give the user the option to see a simple error message
- * or thay can view more detailed error message.
+ * ToscanaJ Exceptions will give the user the option to see a simple error
+ * message or thay can view more detailed error message.
+ * 
+ * @todo use JDK 1.4 getCause() instead
  */
 
 public class ErrorDialog {
