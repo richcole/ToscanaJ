@@ -7,7 +7,7 @@
 package net.sourceforge.toscanaj.canvas.controller;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
-import net.sourceforge.toscanaj.canvas.DrawingCanvas;
+import net.sourceforge.toscanaj.canvas.Canvas;
 
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -19,7 +19,7 @@ import java.util.ListIterator;
 
 public class CanvasController implements MouseListener, MouseMotionListener {
 
-    private DrawingCanvas canvas;
+    private Canvas canvas;
 
     /**
      * Flag to prevent label from being moved when just clicked on
@@ -53,7 +53,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
      */
     private CanvasItem selectedCanvasItem = null;
 
-    public CanvasController(DrawingCanvas canvas) {
+    public CanvasController(Canvas canvas) {
         this.canvas = canvas;
         canvas.addMouseListener(this);
         canvas.addMouseMotionListener(this);

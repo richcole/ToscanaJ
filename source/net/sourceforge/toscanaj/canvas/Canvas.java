@@ -21,14 +21,14 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- * DrawingCanvas controls all the updating of CanvasItems contained in a DiagramView
+ * Canvas controls all the updating of CanvasItems contained in a DiagramView
  * ie NodeView, LineView, and LabelView
  *
  * @TODO For now the mouse events on the canvas are dealt with here, but shall be handled by
  * a separate class eventually (CanvasController)
  */
 
-public class DrawingCanvas extends JComponent implements Printable {
+public class Canvas extends JComponent implements Printable {
 
     /**
      * A list of all canvas items to draw.
@@ -51,7 +51,7 @@ public class DrawingCanvas extends JComponent implements Printable {
 
     private Paint backgroundPaint = null;
 
-    public DrawingCanvas() {
+    public Canvas() {
         // for now we just attach a default controller
         new CanvasController(this);
     }

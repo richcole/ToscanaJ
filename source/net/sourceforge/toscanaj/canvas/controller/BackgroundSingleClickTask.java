@@ -6,7 +6,7 @@
  */
 package net.sourceforge.toscanaj.canvas.controller;
 
-import net.sourceforge.toscanaj.canvas.DrawingCanvas;
+import net.sourceforge.toscanaj.canvas.Canvas;
 
 import java.util.TimerTask;
 import java.awt.geom.Point2D;
@@ -14,13 +14,13 @@ import java.awt.geom.Point2D;
 /**
  * Sends a background click event to a canvas.
  *
- * @see DrawingCanvas.mouseReleaseEvent(MouseEvent)
+ * @see Canvas.mouseReleaseEvent(MouseEvent)
  */
 class BackgroundSingleClickTask extends TimerTask {
     /**
      * The message recipient.
      */
-    private DrawingCanvas target;
+    private Canvas target;
     /**
      * The position transmitted with the message.
      */
@@ -29,7 +29,7 @@ class BackgroundSingleClickTask extends TimerTask {
     /**
      * Creates a new task for sending a message.
      */
-    public BackgroundSingleClickTask(DrawingCanvas target, Point2D point) {
+    public BackgroundSingleClickTask(Canvas target, Point2D point) {
         this.target = target;
         this.point = point;
     }

@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Abstract class to draw 2D graph items.
  *
- * CanvasItems can be put on a DrawingCanvas where they will have a z-order and
+ * CanvasItems can be put on a Canvas where they will have a z-order and
  * can be moved.
  */
 public abstract class CanvasItem implements ChangeObservable {
@@ -119,7 +119,7 @@ public abstract class CanvasItem implements ChangeObservable {
      * Returns true if the item should be raised on clicks.
      *
      * This is true per default, if a subclass should not be raised this method
-     * can be overwritten and DrawingCanvas will not raise it automatically.
+     * can be overwritten and Canvas will not raise it automatically.
      */
     public boolean hasAutoRaise() {
         return true;

@@ -6,7 +6,7 @@
  */
 package net.sourceforge.toscanaj.canvas.imagewriter;
 
-import net.sourceforge.toscanaj.canvas.DrawingCanvas;
+import net.sourceforge.toscanaj.canvas.Canvas;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.w3c.dom.DOMImplementation;
@@ -21,7 +21,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 /**
- * Saves a DrawingCanvas as SVG graphic.
+ * Saves a Canvas as SVG graphic.
  */
 public class BatikImageWriter implements ImageWriter {
     /**
@@ -74,7 +74,7 @@ public class BatikImageWriter implements ImageWriter {
     /**
      * Saves the canvas using the settings to the file.
      */
-    public void exportGraphic(DrawingCanvas canvas, DiagramExportSettings settings, File outputFile)
+    public void exportGraphic(Canvas canvas, DiagramExportSettings settings, File outputFile)
             throws ImageGenerationException {
         if (settings.usesAutoMode()) {
             // update information

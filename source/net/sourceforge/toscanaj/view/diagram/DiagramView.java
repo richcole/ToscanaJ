@@ -7,7 +7,7 @@
 package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.canvas.CanvasItem;
-import net.sourceforge.toscanaj.canvas.DrawingCanvas;
+import net.sourceforge.toscanaj.canvas.Canvas;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.Query;
@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * This class paints a diagram defined by the SimpleLineDiagram class.
  */
-public class DiagramView extends DrawingCanvas implements ChangeObserver {
+public class DiagramView extends Canvas implements ChangeObserver {
     /**
      * This is a generic margin used for all four edges.
      */
@@ -275,7 +275,7 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     }
 
     /**
-     * Overwrites DrawingCanvas.backgroundSingleClicked(Point2D) to erase the highlighting.
+     * Overwrites Canvas.backgroundSingleClicked(Point2D) to erase the highlighting.
      */
     protected void backgroundSingleClicked(Point2D point) {
         this.setSelectedConcepts(null);

@@ -7,7 +7,7 @@
 package net.sourceforge.toscanaj.canvas.imagewriter;
 
 /**
- * Stores all settings needed for creating graphic exports from a DrawingCanvas.
+ * Stores all settings needed for creating graphic exports from a Canvas.
  *
  * This stores the graphic format, size and auto-update information for a graphic
  * export. The file name is not stored.

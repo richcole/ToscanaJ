@@ -6,7 +6,7 @@
  */
 package net.sourceforge.toscanaj.canvas.imagewriter;
 
-import net.sourceforge.toscanaj.canvas.DrawingCanvas;
+import net.sourceforge.toscanaj.canvas.Canvas;
 
 import java.io.File;
 
@@ -30,6 +30,6 @@ public interface ImageWriter {
     /**
      * Saves the canvas using the settings to the file.
      */
-    void exportGraphic(DrawingCanvas canvas, DiagramExportSettings settings, File outputFile)
+    void exportGraphic(Canvas canvas, DiagramExportSettings settings, File outputFile)
             throws ImageGenerationException;
 }
