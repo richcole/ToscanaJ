@@ -7,8 +7,14 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
+import net.sourceforge.toscanaj.model.database.AggregateQuery;
+import net.sourceforge.toscanaj.model.database.DistributionQuery;
+import net.sourceforge.toscanaj.model.database.ListQuery;
+import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 ///@todo this class does not allow nesting and filtering at the moment
@@ -270,5 +276,57 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
         nestObjects(retVal, context, false);
         filterObjects(retVal, context);
         return retVal;
+    }
+
+    public List executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
+		if(!isRealized(concept, context)) {
+			return null;
+		}
+		List retVal = new ArrayList();
+		if (query == ListQuery.KEY_LIST_QUERY) {
+			int objectCount = getObjectCount(concept, context);
+			if( objectCount != 0) {
+				Iterator it = getObjectSetIterator(concept, context);
+				while (it.hasNext()) {
+					Object o = it.next();
+					retVal.add(o);
+				}
+			} else {
+				return null;
+			}
+		} else if (query == AggregateQuery.COUNT_QUERY) {
+			int objectCount = getObjectCount(concept, context);
+			if( objectCount != 0) {
+				retVal.add(new Integer(objectCount));
+			} else {
+				return null;
+			}
+		} else if (query == DistributionQuery.PERCENT_QUERY) {
+			int objectCount = getObjectCount(concept, context);
+			if( objectCount != 0) {
+				Concept top = concept;
+				while(top.getUpset().size() > 1) {
+					Iterator it = top.getUpset().iterator();
+					Concept upper = (Concept) it.next();
+					if(upper != top) {
+						top = upper;
+					} else {
+						top = (Concept) it.next();
+					}
+				}
+				boolean oldMode = context.getObjectDisplayMode();
+				context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
+				int fullExtent = getObjectCount(top,context);
+				context.setObjectDisplayMode(oldMode);
+				NumberFormat format = DecimalFormat.getNumberInstance();
+				format.setMaximumFractionDigits(2);
+				retVal.add(format.format(100 * objectCount/(double)fullExtent) + " %");
+			} else {
+				return null;
+			}
+		} else {
+			throw new RuntimeException("Query not supported by this class (" + this.getClass().getName() + ")");
+		}
+		return retVal;
     }
 }

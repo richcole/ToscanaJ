@@ -11,8 +11,10 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
+import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
+import net.sourceforge.toscanaj.model.database.DistributionQuery;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -20,6 +22,8 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, EventBrokerListener {
@@ -262,35 +266,83 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     public List executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
-        boolean objectDisplayMode = context.getObjectDisplayMode();
-        boolean filterMode = context.getFilterMode();
-        if (concept.getObjectContingentSize() != 0 ||
-                ((objectDisplayMode == ConceptInterpretationContext.EXTENT) && !concept.isBottom())
-        ) {
-			String whereClause = WhereClauseGenerator.createWhereClause(concept,
-					context.getDiagramHistory(),
-					context.getNestingConcepts(),
-					objectDisplayMode,
-					filterMode);
-			Concept top = concept;
-			while(top.getUpset().size() > 1) {
-				Iterator it = top.getUpset().iterator();
-				Concept upper = (Concept) it.next();
-				if(upper != top) {
-					top = upper;
-				} else {
-					top = (Concept) it.next();
+		if(!isRealized(concept, context)) {
+			return null;
+		}
+		boolean objectDisplayMode = context.getObjectDisplayMode();
+		boolean filterMode = context.getFilterMode();
+		String whereClause = WhereClauseGenerator.createWhereClause(concept,
+				context.getDiagramHistory(),
+				context.getNestingConcepts(),
+				objectDisplayMode,
+				filterMode);
+		List retVal = new ArrayList();
+		if (query == ListQuery.KEY_LIST_QUERY) {
+			int objectCount = getObjectCount(concept, context);
+			if( objectCount != 0) {
+				Iterator it = getObjectSetIterator(concept, context);
+				while (it.hasNext()) {
+					Object o = it.next();
+					retVal.add(o);
 				}
+			} else {
+				return null;
 			}
-			String referenceWhereClause = WhereClauseGenerator.createWhereClause(top,
-					context.getDiagramHistory(),
-					context.getNestingConcepts(),
-					ConceptInterpretationContext.EXTENT,
-					filterMode);
-            return execute(query, whereClause, referenceWhereClause);
-        } else {
-            return new ArrayList();
-        }
+		} else if (query == AggregateQuery.COUNT_QUERY) {
+			int objectCount = getObjectCount(concept, context);
+			if( objectCount != 0) {
+				retVal.add(new DatabaseRetrievedObject(whereClause, String.valueOf(objectCount)));
+			} else {
+				return null;
+			}
+		} else if (query == DistributionQuery.PERCENT_QUERY) {
+			int objectCount = getObjectCount(concept, context);
+			if( objectCount != 0) {
+				Concept top = concept;
+				while(top.getUpset().size() > 1) {
+					Iterator it = top.getUpset().iterator();
+					Concept upper = (Concept) it.next();
+					if(upper != top) {
+						top = upper;
+					} else {
+						top = (Concept) it.next();
+					}
+				}
+				boolean oldMode = context.getObjectDisplayMode();
+				context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
+				int fullExtent = getObjectCount(top,context);
+				context.setObjectDisplayMode(oldMode);
+				NumberFormat format = DecimalFormat.getNumberInstance();
+				format.setMaximumFractionDigits(2);
+				retVal.add(new DatabaseRetrievedObject(whereClause, format.format(100 * objectCount/(double)fullExtent) + " %"));
+			} else {
+				return null;
+			}
+		} else {
+	        if (concept.getObjectContingentSize() != 0 ||
+	                ((objectDisplayMode == ConceptInterpretationContext.EXTENT) && !concept.isBottom())
+	        ) {
+				Concept top = concept;
+				while(top.getUpset().size() > 1) {
+					Iterator it = top.getUpset().iterator();
+					Concept upper = (Concept) it.next();
+					if(upper != top) {
+						top = upper;
+					} else {
+						top = (Concept) it.next();
+					}
+				}
+				String referenceWhereClause = WhereClauseGenerator.createWhereClause(top,
+						context.getDiagramHistory(),
+						context.getNestingConcepts(),
+						ConceptInterpretationContext.EXTENT,
+						filterMode);
+	            return execute(query, whereClause, referenceWhereClause);
+	        } else {
+	            return null;
+	        }
+		}
+		return retVal;
     }
 
     private List execute(Query query, String whereClause, String referenceWhereClause) {
@@ -300,6 +352,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
             try {
                 // submit the query
                 List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
+                /// @todo this should be done in a lazy way to avoid uneccessary queries
                 List referenceResults = DatabaseConnection.getConnection().executeQuery(query.getQueryHead() + referenceWhereClause);
                 Vector reference = (Vector) referenceResults.iterator().next();
                 Iterator it = queryResults.iterator();
@@ -325,5 +378,4 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     	throw new RuntimeException("Error querying the database, the following SQL expression failed:\n" +
     							    sqlStatement , e);
     }
-
 }

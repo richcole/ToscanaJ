@@ -7,9 +7,11 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
+import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.util.Iterator;
+import java.util.List;
 
 
 /*
@@ -58,4 +60,6 @@ public interface ConceptInterpreter {
     double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context, int reference);
 
     boolean isRealized(Concept concept, ConceptInterpretationContext context);
+
+    List executeQuery(Query query, Concept concept, ConceptInterpretationContext context);
 }
