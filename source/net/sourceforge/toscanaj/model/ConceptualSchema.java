@@ -117,7 +117,12 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
 
     public void readXML(Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(CONCEPTUAL_SCHEMA_ELEMENT_NAME, elem);
-        description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
+        Element descriptionChild = elem.getChild(DESCRIPTION_ELEMENT_NAME);
+        if (descriptionChild != null) {
+            description = (Element) descriptionChild.clone();
+        } else {
+            description = null;
+        }
         databaseInfo = new DatabaseInfo(
                 XMLHelper.mustbe(DatabaseInfo.DATABASE_CONNECTION_ELEMENT_NAME, elem)
         );
@@ -234,7 +239,11 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     }
 
     public void setDescription(Element description) {
-        this.description = description;
+        if (description != null) {
+            this.description = (Element) description.clone();
+        } else {
+            this.description = null;
+        }
     }
 
     public Element getDescription() {
