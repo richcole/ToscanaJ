@@ -78,6 +78,7 @@ public class DatabaseConnectionInformationView
 	private JRadioButton jdbcRadioButton;
 	private JRadioButton accessRadioButton;
 	private JRadioButton odbcRadioButton;
+    private DatabaseSchemaView tableView;
 	
 	class SaveControlActivity implements SimpleActivity {
 		public boolean doActivity() throws Exception {
@@ -89,10 +90,9 @@ public class DatabaseConnectionInformationView
 	/**
 	 * Construct an instance of this view
 	 */
-	public DatabaseConnectionInformationView(
-											JFrame frame,
-											ConceptualSchema conceptualSchema,
-											final EventBroker eventBroker) {
+	public DatabaseConnectionInformationView(JFrame frame,
+												ConceptualSchema conceptualSchema,
+												EventBroker eventBroker) {
 		super(frame, "Database connection");
 		this.conceptualSchema = conceptualSchema;
 		
@@ -113,7 +113,7 @@ public class DatabaseConnectionInformationView
 		});
 		JTabbedPane tabbedPane = new JTabbedPane();
 		JPanel connection = createConnectionPanel();
-		JPanel tableView = new DatabaseSchemaView(eventBroker);
+		tableView = new DatabaseSchemaView(eventBroker);
 		tabbedPane.addTab(
 			"Step 1: Select Connection",
 			null,
@@ -129,6 +129,8 @@ public class DatabaseConnectionInformationView
 		JButton closeButton = new JButton("Close Dialog");
 		closeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				/// @todo this is a quick hack, should be fixed (or should get superflous)
+				updateDBInfo();
 				hide();
 			}
 		});
@@ -164,6 +166,12 @@ public class DatabaseConnectionInformationView
 	        NewConceptualSchemaEvent.class,
 	        Object.class);
 	}
+
+    protected void updateDBInfo() {
+        DatabaseInfo databaseInfo = this.conceptualSchema.getDatabaseInfo();
+        databaseInfo.setTableName(this.tableView.getSqlTableName());
+        databaseInfo.setKey(this.tableView.getSqlKeyName());
+    }
 
 	public JPanel createConnectionPanel() {
 		JPanel connection = new JPanel(new GridBagLayout());

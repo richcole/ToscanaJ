@@ -26,7 +26,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Enumeration;
 
+/**
+ * @todo support joins or drop the option to select multiple table/column pairs.
+ * 		 getSqlTableName() returns only the first at the moment
+ */
 public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 
     DefaultListModel unkeyedTableList;
@@ -337,5 +342,23 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 
     public int getVerticalDividerLocation() {
         return leftPane.getDividerLocation();
+    }
+
+    public String getSqlTableName() {
+        Enumeration enum = this.keyedTableList.elements();
+        while (enum.hasMoreElements()) {
+            KeyTableInfo element = (KeyTableInfo) enum.nextElement();
+            return element.getTable().getName();
+        }
+        return null;
+    }
+
+    public String getSqlKeyName() {
+        Enumeration enum = this.keyedTableList.elements();
+        while (enum.hasMoreElements()) {
+            KeyTableInfo element = (KeyTableInfo) enum.nextElement();
+            return element.getKey().getName();
+        }
+        return null;
     }
 }
