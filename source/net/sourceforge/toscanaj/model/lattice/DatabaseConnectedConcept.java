@@ -9,8 +9,6 @@ package net.sourceforge.toscanaj.model.lattice;
 import net.sourceforge.toscanaj.controller.db.DBConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.model.ObjectListQuery;
-import net.sourceforge.toscanaj.model.ObjectNumberQuery;
 import net.sourceforge.toscanaj.model.Query;
 
 import java.util.Iterator;
@@ -186,29 +184,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * Implements Concept.executeQuery(Query, boolean).
      */
     public List executeQuery(Query query, boolean contingentOnly) {
-        if (query instanceof ObjectListQuery) {
-            DatabaseInfo.DatabaseQuery dbQuery = dbInfo.createListQuery(query.getName(), "", false);
-            dbQuery.insertQueryColumn("ObjectList", null/*will not call DecimalFormat*/, null, "*");
-            return executeDatabaseQuery(dbQuery, contingentOnly);
-        } else if (query instanceof ObjectNumberQuery) {
-            DatabaseInfo.DatabaseQuery dbQuery = dbInfo.createAggregateQuery(query.getName(), "");
-            dbQuery.insertQueryColumn("Count", null/*will not call DecimalFormat*/, null, "count(*)");
-            List res = executeDatabaseQuery(dbQuery, contingentOnly);
-            if (res.size() == 1) {
-                int count = 0;
-                try {
-                    count = Integer.parseInt(res.get(0).toString());
-                    if (count == 0) {
-                        res.clear();
-                    }
-                } catch (NumberFormatException e) {
-                    throw new RuntimeException("Can't parse result of count: " + e.getMessage());
-                }
-            } else {
-                throw new RuntimeException("Unexpected result size from count query: " + res.size());
-            }
-            return res;
-        } else if (query instanceof DatabaseInfo.DatabaseQuery) {
+        if (query instanceof DatabaseInfo.DatabaseQuery) {
             return executeDatabaseQuery((DatabaseInfo.DatabaseQuery) query, contingentOnly);
         } else {
             throw new RuntimeException("Unknown Query type");

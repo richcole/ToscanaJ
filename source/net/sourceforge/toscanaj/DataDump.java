@@ -70,10 +70,6 @@ public class DataDump {
         // create concept for filtering if needed
         DatabaseConnectedConcept filterConcept = null;
         if (filterClause != null) {
-            if (!schema.usesDatabase()) {
-                System.err.println("Filter can only applied to conceptual schemas that use a DB connection.");
-                System.exit(6);
-            }
             try {
                 filterConcept = new DatabaseConnectedConcept(schema.getDatabaseInfo(),
                         new DBConnection(schema.getDatabaseInfo().getSource(), "", ""));

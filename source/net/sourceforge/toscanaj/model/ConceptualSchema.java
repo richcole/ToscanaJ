@@ -24,20 +24,6 @@ import java.util.Vector;
  * CSXParser class.
  */
 public class ConceptualSchema {
-
-    /**
-     * Flag is set when schema uses database.
-     *
-     * If a schema uses a database all object names should be interpreted as
-     * WHERE-clauses of SQL queries.
-     *
-     * The method should return a DatabaseInfo object that contains all
-     * information needed to connect to the database and the first part of the
-     * query strings. If this is not given, the information has to be asked
-     * from the user.
-     */
-    private boolean useDatabase;
-
     /**
      * The database information.
      */
@@ -62,24 +48,9 @@ public class ConceptualSchema {
      * Creates an empty schema.
      */
     public ConceptualSchema() {
-        useDatabase = false;
         databaseInfo = null;
         diagrams = new Vector();
         hasDiagramDescription = false;
-    }
-
-    /**
-     * Returns true if a database should be used.
-     */
-    public boolean usesDatabase() {
-        return useDatabase;
-    }
-
-    /**
-     * Sets the flag if a database should be used.
-     */
-    public void setUseDatabase(boolean flag) {
-        useDatabase = flag;
     }
 
     /**

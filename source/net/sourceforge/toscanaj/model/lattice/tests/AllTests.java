@@ -17,7 +17,6 @@ public class AllTests extends TestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTest(MemoryMappedConceptTest.suite());
         suite.addTest(DatabaseConnectedConceptTest.suite());
         return suite;
     }

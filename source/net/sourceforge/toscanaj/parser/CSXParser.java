@@ -12,8 +12,6 @@ import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.model.ObjectListQuery;
-import net.sourceforge.toscanaj.model.ObjectNumberQuery;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
@@ -140,41 +138,33 @@ public class CSXParser {
             throws DataFormatException {
         // check if database should be used and fetch the data if needed
         Element dbElem = contextElem.getChild("databaseConnection");
-        if (dbElem != null) {
-            _Schema.setUseDatabase(true);
-            DatabaseInfo dbInfo;
-            try {
-                if (dbElem != null) {
-                    dbInfo = new DatabaseInfo();
-                    parseDBInfo(dbInfo, dbElem);
-                    /// @TODO Shouldn't this be in the main panel?
-                    _DatabaseConnection = new DBConnection(dbInfo.getSource(), dbInfo.getUserName(), dbInfo.getPassword());
-                    String urlString = dbInfo.getEmbeddedSQLLocation();
-                    if (urlString != null) {
-                        URL sqlURL;
-                        try {
-                            sqlURL = new URL(_BaseURL, urlString);
-                        } catch (MalformedURLException e) {
-                            throw new DataFormatException("Could not create URL for database: " + urlString);
-                        }
-                        _DatabaseConnection.executeScript(sqlURL);
-                    }
-                    _Schema.setDatabaseInfo(dbInfo);
-                    Element viewsElem = dbElem.getChild("views");
-                    if (viewsElem != null) {
-                        parseDatabaseObjectViewerSetups(viewsElem);
-                        parseDatabaseObjectListViewerSetups(viewsElem);
-                    }
-                } else {
-                    dbInfo = null;
-                    _Schema.setDatabaseInfo(dbInfo);
+        if (dbElem == null) {
+            throw new DataFormatException("<databaseConnection> not defined in conceptual schema");
+        }
+        DatabaseInfo dbInfo;
+        try {
+            dbInfo = new DatabaseInfo();
+            parseDBInfo(dbInfo, dbElem);
+            /// @TODO Shouldn't this be in the main panel?
+            _DatabaseConnection = new DBConnection(dbInfo.getSource(), dbInfo.getUserName(), dbInfo.getPassword());
+            String urlString = dbInfo.getEmbeddedSQLLocation();
+            if (urlString != null) {
+                URL sqlURL;
+                try {
+                    sqlURL = new URL(_BaseURL, urlString);
+                } catch (MalformedURLException e) {
+                    throw new DataFormatException("Could not create URL for database: " + urlString);
                 }
-            } catch (DatabaseException e) {
-                throw new DataFormatException("Could not open database.", e.getOriginal());
+                _DatabaseConnection.executeScript(sqlURL);
             }
-        } else {
-            new ObjectNumberQuery("Number of Objects");
-            new ObjectListQuery("List of Objects");
+            _Schema.setDatabaseInfo(dbInfo);
+            Element viewsElem = dbElem.getChild("views");
+            if (viewsElem != null) {
+                parseDatabaseObjectViewerSetups(viewsElem);
+                parseDatabaseObjectListViewerSetups(viewsElem);
+            }
+        } catch (DatabaseException e) {
+            throw new DataFormatException("Could not open database.", e.getOriginal());
         }
     }
 
@@ -291,13 +281,8 @@ public class CSXParser {
                             "Position of some concept does not contain double.");
                 }
 
-                // create the concept for DB or in-memory access
-                Concept concept;
-                if (_Schema.usesDatabase()) {
-                    concept = parseDBConcept(conceptElem);
-                } else {
-                    concept = parseInMemoryConcept(conceptElem);
-                }
+                // create the concept
+                Concept concept = parseDBConcept(conceptElem);
 
                 // parse the label layout information if needed
                 LabelInfo objLabel = new LabelInfo();
@@ -390,40 +375,6 @@ public class CSXParser {
             concept.setObjectClause(query);
         } else {
             concept.setObjectClause(null);
-        }
-
-        // get the attribute contingent
-        contElem = conceptElem.getChild("attributeContingent");
-        contingent = contElem.getChildren("attributeRef");
-        it3 = contingent.iterator();
-        while (it3.hasNext()) {
-            Element ref = (Element) it3.next();
-            Object attr = _Attributes.get(ref.getText());
-            if (attr != null) {
-                concept.addAttribute(attr);
-            }
-        }
-        return concept;
-    }
-
-    /**
-     * Creates a concept to be stored in memory from the information in the given
-     * XML element.
-     */
-    private static Concept parseInMemoryConcept(Element conceptElem) {
-        // create the concept
-        MemoryMappedConcept concept = new MemoryMappedConcept();
-
-        // get the object contingent
-        Element contElem = conceptElem.getChild("objectContingent");
-        List contingent = contElem.getChildren("objectRef");
-        Iterator it3 = contingent.iterator();
-        while (it3.hasNext()) {
-            Element ref = (Element) it3.next();
-            String obj = (String) _Objects.get(ref.getText());
-            if (obj != null) {
-                concept.addObject(obj);
-            }
         }
 
         // get the attribute contingent
