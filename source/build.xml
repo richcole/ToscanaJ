@@ -15,20 +15,32 @@
        value="net.sourceforge.toscanaj.Elba"/>
     <property name="siena.class"
        value="net.sourceforge.toscanaj.Siena"/>
-	<path id="project.class.path">
-		<pathelement path="${classpath}"/>
-		<pathelement path="${build.dev.dir}"/>
-		<pathelement path="${build.release.dir}"/>
-		<fileset dir="${libs.dir}">
-			<include name="**/*.jar"/>
-		</fileset>
-		<fileset dir="${libs.dir}">
-			<include name="**/*.zip"/>
-		</fileset>
-		<fileset dir="${libs.dir}/testing">
-			<include name="**/*.zip"/>
-		</fileset>
-	</path>
+    <path id="project.dev.class.path">
+        <pathelement path="${classpath}"/>
+        <pathelement path="${build.dev.dir}"/>
+        <fileset dir="${libs.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${libs.dir}">
+            <include name="**/*.zip"/>
+        </fileset>
+        <fileset dir="${libs.dir}/testing">
+            <include name="**/*.zip"/>
+        </fileset>
+    </path>
+    <path id="project.release.class.path">
+        <pathelement path="${classpath}"/>
+        <pathelement path="${build.release.dir}"/>
+        <fileset dir="${libs.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${libs.dir}">
+            <include name="**/*.zip"/>
+        </fileset>
+        <fileset dir="${libs.dir}/testing">
+            <include name="**/*.zip"/>
+        </fileset>
+    </path>
 	<target name="prepare">
 		<mkdir dir="${build.dev.dir}"/>
 		<mkdir dir="${build.release.dir}"/>
@@ -41,12 +53,12 @@
 	</target>
 	<target name="compile" depends="prepare">
 		<javac srcdir="${src.dir}" destdir="${build.dev.dir}" debug="on" optimize="off" deprecation="on">
-			<classpath refid="project.class.path"/>
+			<classpath refid="project.dev.class.path"/>
 		</javac>
 	</target>
 	<target name="compileRelease" depends="prepare">
 		<javac srcdir="${src.dir}" destdir="${build.release.dir}" debug="off" optimize="on" deprecation="off">
-			<classpath refid="project.class.path"/>
+			<classpath refid="project.release.class.path"/>
 		</javac>
 	</target>
         <target name="rebuild" depends="clean,compile"/>
@@ -132,22 +144,22 @@
 	<target name="javadoc" depends="prepare">
 		<mkdir dir="${doc.dir}"/>
 		<javadoc sourcepath="${src.dir}" packagenames="net.sourceforge.toscanaj" destdir="${doc.dir}">
-			<classpath refid="project.class.path"/>
+			<classpath refid="project.dev.class.path"/>
 		</javadoc>
 	</target>
-	<target name="run" depends="compile">
+	<target name="run" depends="compileRelease">
 		<java classname="${toscanaj.class}" fork="true">
-			<classpath refid="project.class.path"/>
+			<classpath refid="project.release.class.path"/>
 		</java>
 	</target>
-    <target name="run-elba" depends="compile">
+    <target name="run-elba" depends="compileRelease">
         <java classname="${elba.class}" fork="true">
-            <classpath refid="project.class.path"/>
+            <classpath refid="project.release.class.path"/>
         </java>
     </target>
-    <target name="run-siena" depends="compile">
+    <target name="run-siena" depends="compileRelease">
         <java classname="${siena.class}" fork="true">
-            <classpath refid="project.class.path"/>
+            <classpath refid="project.release.class.path"/>
         </java>
     </target>
 </project>
