@@ -1,8 +1,10 @@
 package net.sourceforge.toscanaj.model;
 
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.db.DBConnection;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.MemoryMappedConcept;
+import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
 import java.util.*;
 
@@ -26,26 +28,26 @@ public class ConceptualSchema {
      * query strings. If this is not given, the information has to be asked
      * from the user.
      */
-    private boolean _useDatabase;
+    private boolean useDatabase;
 
     /**
      * The database information.
      */
-    private DatabaseInfo _databaseInfo;
+    private DatabaseInfo databaseInfo;
 
     /**
      * The list of diagrams.
      */
-    private Vector _diagrams;
+    private Vector diagrams;
 
     /**
      * Creates an empty schema.
      */
     public ConceptualSchema()
     {
-        _useDatabase = false;
-        _databaseInfo = null;
-        _diagrams = new Vector();
+        useDatabase = false;
+        databaseInfo = null;
+        diagrams = new Vector();
     }
 
     /**
@@ -53,7 +55,7 @@ public class ConceptualSchema {
      */
     public boolean usesDatabase()
     {
-        return _useDatabase;
+        return useDatabase;
     }
 
     /**
@@ -61,7 +63,7 @@ public class ConceptualSchema {
      */
     public void setUseDatabase( boolean flag )
     {
-        _useDatabase = flag;
+        useDatabase = flag;
     }
 
     /**
@@ -71,15 +73,29 @@ public class ConceptualSchema {
      */
     public DatabaseInfo getDatabaseInfo()
     {
-        return _databaseInfo;
+        return databaseInfo;
     }
 
     /**
      * Sets the database information for the schema.
      */
-    public void setDatabaseInformation( DatabaseInfo databaseInfo )
-    {
-        _databaseInfo = databaseInfo;
+    public void setDatabaseInformation( DatabaseInfo databaseInfo ) throws DatabaseException {
+        this.databaseInfo = databaseInfo;
+        if(databaseInfo == null) {
+            return;
+        }
+        DBConnection conn = new DBConnection(this.databaseInfo.getSource());
+        // update all concepts
+        Iterator diagIt = this.diagrams.iterator();
+        while(diagIt.hasNext()) {
+            SimpleLineDiagram cur = (SimpleLineDiagram)diagIt.next();
+            for(int i=0; i < cur.getNumberOfNodes(); i++) {
+                Concept con = cur.getNode(i).getConcept();
+                if(con instanceof DatabaseConnectedConcept) {
+                    ((DatabaseConnectedConcept) con).setDatabase(this.databaseInfo,conn);
+                }
+            }
+        }
     }
 
     /**
@@ -87,7 +103,7 @@ public class ConceptualSchema {
      */
     public int getNumberOfDiagrams()
     {
-        return _diagrams.size();
+        return diagrams.size();
     }
 
     /**
@@ -95,7 +111,7 @@ public class ConceptualSchema {
      */
     public SimpleLineDiagram getDiagram( int number )
     {
-        return (SimpleLineDiagram)_diagrams.get( number );
+        return (SimpleLineDiagram)diagrams.get( number );
     }
 
     /**
@@ -103,7 +119,7 @@ public class ConceptualSchema {
      */
     public SimpleLineDiagram getDiagram( String title ) {
         SimpleLineDiagram retVal = null;
-        Iterator it = this._diagrams.iterator();
+        Iterator it = this.diagrams.iterator();
         while( it.hasNext() ) {
             SimpleLineDiagram cur = (SimpleLineDiagram) it.next();
             if( cur.getTitle().equals( title ) ) {
@@ -121,31 +137,6 @@ public class ConceptualSchema {
      */
     public void addDiagram( SimpleLineDiagram diagram )
     {
-        _diagrams.add( diagram );
-    }
-
-    /**
-     * Creates a concept directly from the input data (i.e. for a non-nested
-     * diagram).
-     *
-     * If the concept could not be created an NoSuchElementException
-     * will be thrown.
-     */
-    public Concept getConcept( int diagramNumber, int conceptNumber ) {
-        if( this._useDatabase ) {
-            /// @TODO add DB version
-            // just to get things going
-            return null;
-        }
-        else {
-            SimpleLineDiagram diag = (SimpleLineDiagram) this._diagrams.get( diagramNumber );
-            if( diag == null ) {
-                throw new NoSuchElementException("Invalid diagram number");
-            }
-            if( conceptNumber > diag.getNumberOfNodes() - 1 ) {
-                throw new NoSuchElementException("Invalid concept number");
-            }
-            return new MemoryMappedConcept();
-        }
+        diagrams.add( diagram );
     }
 }

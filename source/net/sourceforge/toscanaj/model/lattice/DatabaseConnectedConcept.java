@@ -54,8 +54,16 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * to use it.
      */
     public DatabaseConnectedConcept(DatabaseInfo dbInfo, DBConnection connection) {
-        this.connection = connection;
         this.dbInfo = dbInfo;
+        this.connection = connection;
+    }
+
+    /**
+     * Changes the information about the database connection.
+     */
+    public void setDatabase(DatabaseInfo dbInfo, DBConnection connection) {
+        this.dbInfo = dbInfo;
+        this.connection = connection;
     }
 
     /**

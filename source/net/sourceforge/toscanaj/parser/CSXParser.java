@@ -124,22 +124,22 @@ public class CSXParser
                 _Schema.setUseDatabase( true );
                 DatabaseInfo dbInfo;
                 Element dbElem = _Document.getRootElement().getChild("database");
-                if( dbElem != null ) {
-                    dbInfo = new DatabaseInfo();
-                    parseDBInfo(dbInfo, dbElem);
-                    try {
+                try {
+                    if( dbElem != null ) {
+                        dbInfo = new DatabaseInfo();
+                        parseDBInfo(dbInfo, dbElem);
                         /// @TODO Shouldn't this be in the main panel?
                         _DatabaseConnection = new DBConnection(dbInfo.getSource());
                     }
-                    catch (DatabaseException e) {
+                    else {
                         dbInfo = null;
-                        throw new DataFormatException("Could not open database.", e.getOriginal());
                     }
+                    _Schema.setDatabaseInformation(dbInfo);
                 }
-                else {
+                catch (DatabaseException e) {
                     dbInfo = null;
+                    throw new DataFormatException("Could not open database.", e.getOriginal());
                 }
-                _Schema.setDatabaseInformation(dbInfo);
             }
         }
     }

@@ -7,6 +7,7 @@ import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
 import net.sourceforge.toscanaj.canvas.imagewriter.ImageWriter;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
@@ -642,15 +643,24 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         // if database should be used, but is not given --> ask user
         if( conceptualSchema.usesDatabase() &&
           ( conceptualSchema.getDatabaseInfo() == null ) ) {
+            boolean stillTrying = true;
             DatabaseChooser.initialize( this, new DatabaseInfo() );
-            DatabaseInfo dbInfo = DatabaseChooser.showDialog( this );
-            if( dbInfo == null )
-            {
-                return;
-            }
-            else
-            {
-                conceptualSchema.setDatabaseInformation( dbInfo );
+            while(stillTrying) {
+                DatabaseInfo dbInfo = DatabaseChooser.showDialog( this );
+                if( dbInfo == null )
+                {
+                    stillTrying = false;
+                }
+                else
+                {
+                    try {
+                        conceptualSchema.setDatabaseInformation( dbInfo );
+                        stillTrying = false;
+                    }
+                    catch(DatabaseException e ) {
+                        ErrorDialog.showError(this, e, "Database could not be opened", e.getMessage());
+                    }
+                }
             }
         }
         diagramView.showDiagram(null);
