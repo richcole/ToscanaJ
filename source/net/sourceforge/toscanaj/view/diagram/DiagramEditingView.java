@@ -170,6 +170,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         		diagramView.setGridEnabled(enabled);	
             }
         });
+        gridEnabledCheckBox.setSelected(true);
         gridEnabledCheckBox.setEnabled(false);
         toolPanel.add(gridEnabledCheckBox);
 
