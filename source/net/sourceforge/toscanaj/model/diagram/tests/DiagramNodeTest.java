@@ -52,11 +52,12 @@ public class DiagramNodeTest extends TestCase {
 
     public void testEquals(){
         Point2D position = new Point2D.Double(0, 0);
-        DiagramNode node = new DiagramNode("Id", position,new DummyConcept(),
+        final String identifier = "Id";
+        DiagramNode node = new DiagramNode(identifier, position,new DummyConcept(),
                 new LabelInfo(), new LabelInfo(), null);
 
 
-        DiagramNode node2 = new DiagramNode("Id", position,new DummyConcept(),
+        DiagramNode node2 = new DiagramNode(identifier, position,new DummyConcept(),
                 new LabelInfo(), new LabelInfo(), null);
 
         assertEquals(node, node2);
@@ -71,7 +72,11 @@ public class DiagramNodeTest extends TestCase {
                 new LabelInfo(), new LabelInfo(), null);
         assertEquals(false, node.equals(node2));
 
+        LabelInfo info= new LabelInfo();
+        info.setOffset(new Point2D.Double(0,10));
 
+        node  = new DiagramNode(identifier,position, new DummyConcept(),info, new LabelInfo(), null);
+        assertEquals(false, node.equals(node2));
 
     }
 

@@ -19,6 +19,7 @@ public class AllTests extends TestCase {
     public static Test suite() {
         TestSuite suite = new TestSuite();
         suite.addTest(DiagramNodeTest.suite());
+        suite.addTest(LabelInfoTest.suite());
         return suite;
     }
 

@@ -432,11 +432,11 @@ public class CSXParser {
         if (el != null) {
             String text = el.getText();
             if (text.compareTo("center") == 0) {
-                label.setTextAligment(LabelInfo.ALIGNCENTER);
+                label.setTextAlignment(LabelInfo.ALIGNCENTER);
             } else if (text.compareTo("right") == 0) {
-                label.setTextAligment(LabelInfo.ALIGNRIGHT);
+                label.setTextAlignment(LabelInfo.ALIGNRIGHT);
             } else if (text.compareTo("left") == 0) {
-                label.setTextAligment(LabelInfo.ALIGNLEFT);
+                label.setTextAlignment(LabelInfo.ALIGNLEFT);
             } else {
                 /** @TODO: give more info here */
                 throw new DataFormatException("Unknown text alignment");

@@ -87,10 +87,14 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
      * access the concept with the information on the contingents (strings).
      */
     public LabelInfo() {
-        this.offset = new Point2D.Double(0, 0);
-        this.backgroundColor = Color.white;
-        this.textColor = Color.black;
-        this.textAlignment = ALIGNLEFT;
+        this(new Point2D.Double(), Color.white, Color.black, ALIGNLEFT);
+    }
+
+    private LabelInfo(Point2D offset, Color backColor, Color textColor, int alignment) {
+        this.offset = offset;
+        this.backgroundColor = backColor;
+        this.textColor = textColor;
+        this.textAlignment = alignment;
         labelObservers = new Vector();
     }
 
@@ -98,17 +102,18 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
      * The copy constructor makes a deep copy without the observers.
      */
     public LabelInfo(LabelInfo other) {
-        this.offset = (Point2D) other.offset.clone();
-        this.backgroundColor = new Color(other.backgroundColor.getRed(),
-                other.backgroundColor.getGreen(),
-                other.backgroundColor.getBlue(),
-                other.backgroundColor.getAlpha());
-        this.textColor = new Color(other.textColor.getRed(),
-                other.textColor.getGreen(),
-                other.textColor.getBlue(),
-                other.textColor.getAlpha());
-        this.textAlignment = other.textAlignment;
-        labelObservers = new Vector();
+        this( (Point2D) other.offset.clone(),
+                makeColorCopy(other.backgroundColor),
+                makeColorCopy(other.textColor),
+                other.textAlignment
+                );
+    }
+
+    private static Color makeColorCopy(Color color) {
+        return new Color(color.getRed(),
+                        color.getGreen(),
+                        color.getBlue(),
+                        color.getAlpha());
     }
 
     public LabelInfo(Element element) throws XML_SyntaxError {
@@ -164,9 +169,14 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
                 backgroundColorElem.getText().substring(1)
         ));
         Element textColorElem = XML_Helper.mustbe(TEXT_COLOR_ELEMENT_NAME, elem);
-        setBackgroundColor(ColorWriter.fromHexString(
+        setTextColor(ColorWriter.fromHexString(
                 textColorElem.getText().substring(1)
         ));
+
+        readTextAlignment(elem);
+    }
+
+    private void readTextAlignment(Element elem) throws XML_SyntaxError {
         Element textAlignmentElem = XML_Helper.mustbe(TEXT_ALIGNMENT_ELEMENT_NAME, elem);
         String textAlignmentElemText = textAlignmentElem.getText();
         if (textAlignmentElemText.equals(TEXT_ALIGNMENT_LEFT_CONTENT)) {
@@ -266,7 +276,7 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
     /**
      * Sets the alignment of the text.
      */
-    public void setTextAligment(int alignment) {
+    public void setTextAlignment(int alignment) {
         this.textAlignment = alignment;
         emitChangeSignal();
     }
@@ -295,6 +305,27 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
                 ((ChangeObserver) iterator.next()).update(this);
             }
         }
+    }
+
+    public boolean equals(Object obj) {
+        if(!(obj instanceof LabelInfo)){
+            return false;
+        }
+        LabelInfo that = (LabelInfo)obj;
+        if(!this.getBackgroundColor().equals(that.getBackgroundColor())){
+            return false;
+        }
+        if(!this.getTextColor().equals(that.getTextColor())){
+            return false;
+        }
+        if(this.getTextAlignment()!=that.getTextAlignment()){
+            return false;
+        }
+        if(!this.getOffset().equals(that.getOffset())){
+            return false;
+        }
+
+        return true;
     }
 
     /**

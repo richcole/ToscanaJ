@@ -307,7 +307,14 @@ public class DiagramNode implements XML_Serializable {
         if(!this.getPosition().equals(other.getPosition())){
             return false;
         }
-
+/*
+        if(!this.getObjectLabelInfo().equals(other.getObjectLabelInfo())){
+            return false;'
+        }
+        */
+        if(!this.getAttributeLabelInfo().equals(other.getAttributeLabelInfo())){
+            return false;
+        }
         return true;
     }
 }
