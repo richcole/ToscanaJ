@@ -158,6 +158,11 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
             NodeView nodeView = new NodeView(node, this);
             addCanvasItem( nodeView );
         }
+        // recurse for the inner diagrams
+        for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
+            NestedDiagramNode node = (NestedDiagramNode)diagram.getNode(i);
+            addDiagram((SimpleLineDiagram)node.getInnerDiagram());
+        }
         // add all outer labels to the canvas
         for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
             DiagramNode node = diagram.getNode(i);
@@ -174,11 +179,6 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
                 addCanvasItem( labelView );
                 labelView.addObserver(this);
             }
-        }
-        // recurse for the inner diagrams
-        for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
-            NestedDiagramNode node = (NestedDiagramNode)diagram.getNode(i);
-            addDiagram((SimpleLineDiagram)node.getInnerDiagram());
         }
     }
 
