@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,6 +37,12 @@ import net.sourceforge.toscanaj.model.lattice.Lattice;
 public class CSCParser {
     private static final int TARGET_DIAGRAM_HEIGHT = 460;
     private static final int TARGET_DIAGRAM_WIDTH = 600;
+    
+    protected static final class QueryMap {
+    	public String name;
+    	public Hashtable map = new Hashtable();
+    }
+    
     protected static final class SectionTypeNotSupportedException
         extends DataFormatException {
 
@@ -418,9 +425,53 @@ public class CSCParser {
             return retVal;
         }
     };
+    
     protected static final CSCFileSectionParser STRING_MAP_SECTION = new CSCFileSectionParser("STRING_MAP");
     protected static final CSCFileSectionParser IDENTIFIER_MAP_SECTION = new CSCFileSectionParser("IDENTIFIER_MAP");
-    protected static final CSCFileSectionParser QUERY_MAP_SECTION = new CSCFileSectionParser("QUERY_MAP");
+    protected static final CSCFileSectionParser QUERY_MAP_SECTION = new CSCFileSectionParser("QUERY_MAP") {
+           public Object parse(CSCTokenizer tokenizer) throws IOException, DataFormatException {
+               QueryMap retval = new QueryMap();
+               retval.name = tokenizer.getCurrentToken();
+               tokenizer.advance();
+
+               int line = tokenizer.getCurrentLine();
+               consumeToken(tokenizer, "=");
+               while(tokenizer.getCurrentLine() == line) {
+                   tokenizer.advance(); // skip possible remarks
+               }
+
+               /// @todo tupels should be send as a couple of tokens
+               while(!tokenizer.getCurrentToken().equals(";")) {
+                   String tupel = tokenizer.getCurrentToken();
+                   tokenizer.advance();
+                   tupel = tupel.substring(1,tupel.length()-1);
+                   int commaPos = tupel.indexOf(',');
+                   String clause = resolveEscapes(tupel.substring(0,commaPos).trim());
+                   clause = clause.substring(1,clause.length() -1);
+                   String id = tupel.substring(commaPos + 1).trim();
+                   retval.map.put(id, clause);
+               }
+
+               consumeToken(tokenizer, ";");
+
+               return retval;
+           }
+       };
+       
+    protected static String resolveEscapes(String input) {
+    	String output = "";
+    	for(int i = 0; i < input.length(); i++) {
+    		char curChar = input.charAt(i);
+    		if(curChar == '\\') {
+    			i++;
+    			output += input.charAt(i);
+    		} else {
+    			output += curChar;
+    		}
+    	}
+    	return output;
+    }
+    
     protected static final CSCFileSectionParser ABSTRACT_SCALE_SECTION = new CSCFileSectionParser("ABSTRACT_SCALE");
     protected static final CSCFileSectionParser CONCRETE_SCALE_SECTION = new CSCFileSectionParser("CONCRETE_SCALE");
     protected static final CSCFileSectionParser REALISED_SCALE_SECTION = new CSCFileSectionParser("REALISED_SCALE");
@@ -453,30 +504,44 @@ public class CSCParser {
         try {
             CSCTokenizer tokenizer = new CSCTokenizer(file);
             
-            List results = new ArrayList();
+            List diagrams = new ArrayList();
+            List contexts = new ArrayList();
+            Hashtable queryMaps = new Hashtable();
             
             while(! tokenizer.done()) {
             	this.currentSectionParser = identifySectionParser(tokenizer);
             	try {
-            		results.add(this.currentSectionParser.parse(tokenizer));
+            		Object result = this.currentSectionParser.parse(tokenizer);
+            		if(result instanceof Diagram2D) {
+            			diagrams.add(result);
+            		} else if (result instanceof ContextImplementation) {
+            			contexts.add(result);
+            		} else if (result instanceof QueryMap) {
+            			QueryMap queryMap = (QueryMap) result;
+            			queryMaps.put(queryMap.name, queryMap);
+            		}
             	} catch (SectionTypeNotSupportedException e) {
             		System.err.println(e.getMessage());
+            		// eat a whole section
+            		while(!tokenizer.currentToken.equals(";")) {
+            			tokenizer.advance();
+            		}
             		tokenizer.advance();
-            	}	
+            	}
             }
             
             List importedDiagrams = new ArrayList();
             
-            for (Iterator iter = results.iterator(); iter.hasNext();) {
+            for (Iterator iter = diagrams.iterator(); iter.hasNext();) {
                 Object result = iter.next();
                 if(result instanceof Diagram2D) {
                     Diagram2D diagram = (Diagram2D) result;
-                    insertDiagram(schema, diagram);
+                    insertDiagram(schema, diagram, (QueryMap) queryMaps.get(diagram.getTitle()));
                     importedDiagrams.add(diagram.getTitle());
                 }
             }
 
-            for (Iterator iter = results.iterator(); iter.hasNext();) {
+            for (Iterator iter = contexts.iterator(); iter.hasNext();) {
                 Object result = iter.next();
                 if(result instanceof ContextImplementation) {
                     ContextImplementation context = (ContextImplementation) result;
@@ -486,7 +551,7 @@ public class CSCParser {
                     LatticeGenerator lgen = new GantersAlgorithm();
                     Lattice lattice = lgen.createLattice(context);
                     Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, context.getName(), new DefaultDimensionStrategy());
-                    insertDiagram(schema,diagram);                	
+                    insertDiagram(schema,diagram, (QueryMap) queryMaps.get(diagram.getTitle()));                	
                 }
             }
         } catch (IOException e) {
@@ -494,13 +559,32 @@ public class CSCParser {
         }
     }
 
-    public void insertDiagram(ConceptualSchema schema, Diagram2D diagram) {
+    protected void insertDiagram(ConceptualSchema schema, Diagram2D diagram, QueryMap queryMap) {
+    	if(queryMap != null) {
+    		replaceObjects(diagram, queryMap);
+    	}
         Diagram2D existingDiagram = schema.getDiagram(diagram.getTitle());
         rescale(diagram);
         if(existingDiagram != null) {
             schema.replaceDiagram(existingDiagram, diagram);
         } else {
         	schema.addDiagram(diagram);
+        }
+    }
+
+    private void replaceObjects(Diagram2D diagram, QueryMap queryMap) {
+    	Iterator nodes = diagram.getNodes();
+    	while (nodes.hasNext()) {
+            DiagramNode node = (DiagramNode) nodes.next();
+            ConceptImplementation concept = (ConceptImplementation) node.getConcept();
+            Iterator objIt = concept.getObjectContingentIterator();
+            while (objIt.hasNext()) {
+                String object = (String) objIt.next();
+                if(queryMap.map.containsKey(object)) {
+                	objIt.remove();
+                	concept.addObject(queryMap.map.get(object));
+                }
+            }
         }
     }
 
