@@ -95,9 +95,13 @@ public class ObjectLabelView extends LabelView {
     /**
      * Sets the default query for new labels.
      */
-    static public void setDefaultQuery(Query query) {
-        ObjectLabelView.defaultQuery = query;
-    }
+	static public void setDefaultQuery(Query query) {
+		ObjectLabelView.defaultQuery = query;
+	}
+
+	static public Query getDefaultQuery() {
+		return ObjectLabelView.defaultQuery;
+	}
 
     /**
      * Returns LabelView.BELOW

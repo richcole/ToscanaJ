@@ -27,6 +27,7 @@ import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 
 import org.jdom.Element;
 import org.tockit.canvas.CanvasBackground;
@@ -150,7 +151,6 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
 		if (conceptualSchema != null) {
 			Iterator it = conceptualSchema.getQueries().iterator();
 			if (it.hasNext()) {
-				boolean first = true;
 				int count = 0;
 				while (it.hasNext()) {
 					final Query query = (Query) it.next();
@@ -164,8 +164,7 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
 					});
 					labelContentGroup.add(menuItem);
 					changeLabelMenu.add(menuItem);
-					if (first == true) {
-						first = false;
+					if (query == ObjectLabelView.getDefaultQuery()) {
 						menuItem.setSelected(true);
 					}
 				}
