@@ -130,7 +130,7 @@ public class DataDump {
                 Iterator it;
                 it = cur.getIntentIterator();
                 while (it.hasNext()) {
-                    String name = (String) it.next();
+                    String name = it.next().toString();
                     Element newElem = new Element("attribute");
                     newElem.addContent(name);
                     intentElem.addContent(newElem);
@@ -138,7 +138,7 @@ public class DataDump {
 
                 it = cur.getExtentIterator();
                 while (it.hasNext()) {
-                    String name = (String) it.next();
+                    String name = it.next().toString();
                     Element newElem = new Element("object");
                     newElem.addContent(name);
                     extentElem.addContent(newElem);
@@ -146,7 +146,7 @@ public class DataDump {
 
                 it = cur.getAttributeContingentIterator();
                 while (it.hasNext()) {
-                    String name = (String) it.next();
+                    String name = it.next().toString();
                     Element newElem = new Element("attribute");
                     newElem.addContent(name);
                     attrContElem.addContent(newElem);
@@ -154,7 +154,7 @@ public class DataDump {
 
                 it = cur.getObjectContingentIterator();
                 while (it.hasNext()) {
-                    String name = (String) it.next();
+                    String name = it.next().toString();
                     Element newElem = new Element("object");
                     newElem.addContent(name);
                     objContElem.addContent(newElem);
