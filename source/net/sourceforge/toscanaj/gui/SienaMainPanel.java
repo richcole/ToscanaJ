@@ -232,6 +232,16 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 openSchemaFile(schemaFile);
             }
         }
+        
+        this.lastCernatoFile = new File(
+                ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, "lastCernatoImport", "")
+        );
+        this.lastCSCFile = new File(
+                ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, "lastCSCImport", "")
+        );
+        this.lastBurmeisterFile = new File(
+                ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, "lastBurmeisterImport", "")
+        );
 
 		this.setVisible(true);
         ConfigurationManager.restorePlacement(
@@ -888,12 +898,29 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		if (!closeOk) {
 			return;
 		}
-        // store current position
-        ConfigurationManager.storePlacement("SienaMainPanel", this);
+        // store file locations
         ConfigurationManager.storeStringList(
             CONFIGURATION_SECTION_NAME,
             "mruFiles",
             this.mruList);
+        if(this.lastCernatoFile != null) {
+            ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, 
+                                             "lastCernatoImport", 
+                                             this.lastCernatoFile.getAbsolutePath());
+        }
+        if(this.lastBurmeisterFile!= null) {
+            ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, 
+                                             "lastBurmeisterImport", 
+                                             this.lastBurmeisterFile.getAbsolutePath());
+        }
+        if(this.lastCSCFile!= null) {
+            ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, 
+                                             "lastCSCImport", 
+                                             this.lastCSCFile.getAbsolutePath());
+        }
+
+        // store current position
+        ConfigurationManager.storePlacement("SienaMainPanel", this);
         ConfigurationManager.storeInt(
             "SienaMainPanel",
             "diagramViewDivider",
