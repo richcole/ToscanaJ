@@ -33,6 +33,7 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.view.scales.ContextConsistencyChecker;
 
+/// @todo rename class once we figured out how to call this
 public class CheckContextConsistencyAction extends AbstractAction implements EventBrokerListener {
 	private ConceptualSchema conceptualSchema;
 	private DatabaseConnection databaseConnection;
@@ -43,7 +44,7 @@ public class CheckContextConsistencyAction extends AbstractAction implements Eve
 										DatabaseConnection databaseConnection, 
 										Frame parent,
 										EventBroker eventBroker) {
-		super("Check Context Consistency");
+		super("Check Consistency With Database");
 
 		this.conceptualSchema = conceptualSchema;
 		this.databaseConnection = databaseConnection;
