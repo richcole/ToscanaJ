@@ -227,7 +227,7 @@ public class DatabaseSchemaView extends JPanel implements EventListener {
         }
 
         public String toString() {
-            return column.getName() + ":" + column.getType();
+            return column.getName() + ": " + SQLTypeMapper.getTypeName(column.getType());
         }
 
         public Column getColumn() {
