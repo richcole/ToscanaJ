@@ -8,115 +8,88 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.fca.DiagramToContextConverter;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.database.Column;
-import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 import javax.swing.*;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class NominalScaleGenerator implements ScaleGenerator {
-    private JFrame parent;
-    /// @todo this should be calculated from the number of nodes (the more nodes the wider)
-    private static final int DIAGRAM_WIDTH = 400;
+	private JFrame parent;
+	/// @todo this should be calculated from the number of nodes (the more nodes the wider)
+	private static final int DIAGRAM_WIDTH = 400;
 
-    public NominalScaleGenerator(JFrame parent) {
-        this.parent = parent;
-    }
+	public NominalScaleGenerator(JFrame parent) {
+		this.parent = parent;
+	}
 
-    public String getScaleName() {
-        return "Nominal Scale";
-    }
+	public String getScaleName() {
+		return "Nominal Scale";
+	}
 
-    public boolean canHandleColumns(TableColumnPair[] columns) {
-        return columns.length == 1;
-    }
+	public boolean canHandleColumns(TableColumnPair[] columns) {
+		return columns.length == 1;
+	}
 
-    public Context generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
-        Column column = columns[0].getColumn();
-        NominalScaleEditorDialog dialog = new NominalScaleEditorDialog(
-                parent,
-                column,
-                databaseConnection
-        );
-        if (!dialog.execute()) {
-            return null;
-        }
+	public Context generateScale(
+		TableColumnPair[] columns,
+		ConceptualSchema scheme,
+		DatabaseConnection databaseConnection) {
+		Column column = columns[0].getColumn();
+		NominalScaleEditorDialog dialog =
+			new NominalScaleEditorDialog(parent, column, databaseConnection);
+		if (!dialog.execute()) {
+			return null;
+		}
 
-        Object[] values = dialog.getValues();
+		ContextImplementation context = new ContextImplementation();
+		context.setName(dialog.getDiagramTitle());
+		Object[] values = dialog.getValues();
+		
+		String topNodeClause = null;
 
-        WriteableDiagram2D ret = new SimpleLineDiagram();
-        ret.setTitle(dialog.getDiagramTitle());
+		for (int i = 0; i < values.length; i++) {
+			String object = createSQLClause(column.getName(), values, i);
+			String attributeName = createAttributeName(values, i);
+			Attribute attribute = new Attribute(attributeName);
 
-        List conceptList = new ArrayList();
-        ConceptImplementation top = makeConcept(null, null);
-        DiagramNode topNode = new DiagramNode("top",
-                new Point2D.Double(0, 0),
-                top,
-                new LabelInfo(),
-                new LabelInfo(),
-                null
-        );
-        ret.addNode(topNode);
-        conceptList.add(top);
-        ConceptImplementation bottom = makeConcept(null, null);
-        DiagramNode bottomNode = new DiagramNode("bottom",
-                new Point2D.Double(0, 100),
-                top,
-                new LabelInfo(),
-                new LabelInfo(),
-                null
-        );
-        ret.addNode(bottomNode);
-        conceptList.add(bottom);
-        int numberOfValues = values.length;
-        for (int i = 0; i < numberOfValues; i++) {
-            double x = -DIAGRAM_WIDTH / 2 + i * DIAGRAM_WIDTH / (double) (numberOfValues - 1);
-            ConceptImplementation currentConcept = makeConcept(String.valueOf(values[i]),
-                    getSQLClause(column.getName(), values, i));
-            conceptList.add(currentConcept);
+			context.getObjects().add(object);
+			context.getAttributes().add(attribute);
+			context.getRelationImplementation().insert(object, attribute);
+			
+			if(topNodeClause == null) {
+				topNodeClause = "NOT (" + object + ")";
+			} else {
+				topNodeClause += " AND NOT (" + object + ")";
+			}
+		}
+		
+		context.getObjects().add(topNodeClause);
+		
+		return context;
+	}
 
-            DiagramNode node = new DiagramNode((new Integer(i)).toString(),
-                    new Point2D.Double(x, 50),
-                    currentConcept,
-                    new LabelInfo(),
-                    new LabelInfo(),
-                    null
-            );
-            currentConcept.addSuperConcept(top);
-            currentConcept.addSubConcept(bottom);
+	private String createAttributeName(Object[] values, int i) {
+		return ">" + String.valueOf(values[i]);
+	}
 
-            ret.addNode(node);
-            ret.addLine(topNode, node);
-            ret.addLine(node, bottomNode);
-        }
-        for (Iterator it = conceptList.iterator(); it.hasNext();) {
-            ConceptImplementation concept = (ConceptImplementation) it.next();
-            concept.buildClosures();
-        }
+	private String createSQLClause(String columnName, Object[] values, int i) {
+		return columnName + "='" + values[i].toString() + "'";
+	}
 
-        return DiagramToContextConverter.getContext(ret);
-    }
-
-    private String getSQLClause(String columnName, Object[] values, int i) {
-        return columnName + "='" + values[i].toString() + "'";
-    }
-
-    private ConceptImplementation makeConcept(String label, String queryClause) {
-        ConceptImplementation retVal = new ConceptImplementation();
-        if (label != null) {
-            retVal.addAttribute(new Attribute(label, null));
-        }
-        if (queryClause != null) {
-            retVal.addObject(queryClause);
-        }
-        return retVal;
-    }
+	private ConceptImplementation makeConcept(
+		String label,
+		String queryClause) {
+		ConceptImplementation retVal = new ConceptImplementation();
+		if (label != null) {
+			retVal.addAttribute(new Attribute(label, null));
+		}
+		if (queryClause != null) {
+			retVal.addObject(queryClause);
+		}
+		return retVal;
+	}
 }
