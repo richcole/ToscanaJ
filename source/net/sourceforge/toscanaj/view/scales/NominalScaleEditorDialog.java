@@ -96,44 +96,89 @@ public class NominalScaleEditorDialog extends JDialog {
             return this.getAttributeLabel();
         }
     }
-    
+        
     private static class Disjunction implements SqlFragment {
-        private SqlFragment firstPart;
-        private SqlFragment secondPart;
-        public Disjunction(SqlFragment firstPart, SqlFragment secondPart) {
-            this.firstPart = firstPart;
-            this.secondPart = secondPart;
-        }
+		private SqlFragment [] sqlFragments;
+
+		public Disjunction(SqlFragment[] sqlFragments) {
+			this.sqlFragments = sqlFragments;
+		}
+        
         public String getAttributeLabel() {
-            return this.firstPart.getClosedAttributeLabel() + " or " + this.secondPart.getClosedAttributeLabel();
+			String res = "";
+			for (int i = 0; i < this.sqlFragments.length; i++) {
+				SqlFragment curFragment = (SqlFragment) sqlFragments[i];
+				if (i == 0) {
+					res = curFragment.getClosedAttributeLabel();
+				}
+				else {
+					res = res + " or " + curFragment.getClosedAttributeLabel();
+				}
+			}
+			return res;
         }
+
         public String getSqlClause() {
-            return "(" + this.firstPart.getSqlClause() + ") OR (" + this.secondPart.getSqlClause() + ")";
+			String res = "";
+			for (int i = 0; i < this.sqlFragments.length; i++) {
+				SqlFragment curFragment = (SqlFragment) sqlFragments[i];
+				if (i == 0) {
+					res = "(" + curFragment.getSqlClause() + ")";
+				}
+				else {
+					res = res + " OR (" + curFragment.getSqlClause() + ")";
+				}
+			}
+			return res;
         }
+
         public String toString() {
         	return getSqlClause();
         }
+
         public String getClosedAttributeLabel() {
             return "(" + this.getAttributeLabel() + ")";
         }
     }
 
     private static class Conjunction implements SqlFragment {
-        private SqlFragment firstPart;
-        private SqlFragment secondPart;
-        public Conjunction(SqlFragment firstPart, SqlFragment secondPart) {
-            this.firstPart = firstPart;
-            this.secondPart = secondPart;
-        }
+        private SqlFragment [] sqlFragments;
+		public Conjunction(SqlFragment[] sqlFragments) {
+			this.sqlFragments = sqlFragments;
+		}
+
         public String getAttributeLabel() {
-            return this.firstPart.getClosedAttributeLabel() + " and " + this.secondPart.getClosedAttributeLabel();
+			String res = "";
+			for (int i = 0; i < this.sqlFragments.length; i++) {
+				SqlFragment curFragment = (SqlFragment) sqlFragments[i];
+				if (i == 0) {
+					res = curFragment.getClosedAttributeLabel();
+				}
+				else {
+					res = res + " and " + curFragment.getClosedAttributeLabel();
+				}
+			}
+            return res;
         }
+
         public String getSqlClause() {
-            return "(" + this.firstPart.getSqlClause() + ") AND (" + this.secondPart.getSqlClause() + ")";
+			String res = "";
+			for (int i = 0; i < this.sqlFragments.length; i++) {
+				SqlFragment curSqlFragment = (SqlFragment) sqlFragments[i];
+				if (i == 0) {
+					res = "(" + curSqlFragment.getSqlClause() + ")";
+				}
+				else {
+					res = res + " AND (" + curSqlFragment.getSqlClause() + ")";
+				}
+			}
+			return res;
         }
+
         public String toString() {
             return getSqlClause();
         }
+
         public String getClosedAttributeLabel() {
             return "(" + this.getAttributeLabel() + ")";
         }
@@ -397,7 +442,7 @@ public class NominalScaleEditorDialog extends JDialog {
 		attributeListView.getModel().addListDataListener(new UpdateButtonForCorrectModelStateListDataListener(createButton));
 		attributeListView.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                boolean combinationPossible = attributeListView.getSelectedIndices().length == 2;
+				boolean combinationPossible = attributeListView.getSelectedIndices().length >= 2;
                 andButton.setEnabled(combinationPossible);
                 orButton.setEnabled(combinationPossible);
             }
@@ -507,23 +552,30 @@ public class NominalScaleEditorDialog extends JDialog {
 	}
 	
     private void createConjunction() {
-        Object[] selectedValues = this.attributeListView.getSelectedValues();
-        SqlFragment firstPart = (SqlFragment) selectedValues[0];
-        SqlFragment secondPart = (SqlFragment) selectedValues[1];
-        int pos = this.attributeListView.getSelectedIndices()[0];
-        this.attributeListModel.removeElement(firstPart);
-        this.attributeListModel.removeElement(secondPart);
-        this.attributeListModel.add(pos, new Conjunction(firstPart,secondPart));
+		int pos = this.attributeListView.getSelectedIndices()[0];
+    	Object[] selectedValues = this.attributeListView.getSelectedValues();
+		SqlFragment[] selectedFragments = new SqlFragment[selectedValues.length];
+		for (int i = 0; i < selectedValues.length; i++) {
+			Object curValue = selectedValues[i];
+			SqlFragment fragment = (SqlFragment) curValue;
+			selectedFragments[i] = fragment;
+			this.attributeListModel.removeElement(fragment);
+		}
+		this.attributeListModel.add(pos, new Conjunction(selectedFragments));
 		fillAvailableValueList();
     }
 
     private void createDisjunction() {
-        SqlFragment firstPart = (SqlFragment) this.attributeListView.getSelectedValues()[0];
-        SqlFragment secondPart = (SqlFragment) this.attributeListView.getSelectedValues()[1];
-        int pos = this.attributeListView.getSelectedIndices()[0];
-        this.attributeListModel.removeElement(firstPart);
-        this.attributeListModel.removeElement(secondPart);
-        this.attributeListModel.add(pos, new Disjunction(firstPart,secondPart));
+		int pos = this.attributeListView.getSelectedIndices()[0];
+		Object[] selectedValues = this.attributeListView.getSelectedValues();
+        SqlFragment[] selectedFragments = new SqlFragment[selectedValues.length];
+        for (int i = 0; i < selectedValues.length; i++) {
+			Object curValue = selectedValues[i];
+			SqlFragment fragment = (SqlFragment) curValue;
+			selectedFragments[i] = fragment;
+			this.attributeListModel.removeElement(fragment);
+		}
+		this.attributeListModel.add(pos, new Disjunction(selectedFragments));
 		fillAvailableValueList();
     }
 
