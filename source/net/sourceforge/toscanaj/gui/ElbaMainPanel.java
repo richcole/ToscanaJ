@@ -79,6 +79,7 @@ public class ElbaMainPanel
 	extends JFrame
 	implements MainPanel, EventBrokerListener {
 	private static final String CONFIGURATION_SECTION_NAME = "ElbaMainPanel";
+	private static final String WINDOW_TITLE = "Elba";
 	static private final int MaxMruFiles = 8;
 
 	/**
@@ -538,6 +539,7 @@ public class ElbaMainPanel
 				KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
 		openFileAction.addPostOpenActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
+            	updateWindowTitle();
             	if(conceptualSchema.getDatabaseInfo() != null) {
             		return true;
             	}
@@ -729,7 +731,14 @@ public class ElbaMainPanel
 		menuBar.add(Box.createHorizontalGlue());
 		menuBar.add(helpMenu);
 	}
-
+	
+	private void updateWindowTitle() {
+		// get the current filename without the extension and full path
+		// we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
+		String filename = currentFile.substring(currentFile.lastIndexOf("\\")+1,(currentFile.length()-4));
+		setTitle(filename +" - "+WINDOW_TITLE);
+	}
+	
 	private boolean databaseWellDefined() {
 		if(this.databaseConnection.isConnected()) {
 			return true;
@@ -760,7 +769,8 @@ public class ElbaMainPanel
 	private void openSchemaFile(File schemaFile) {
 		try {
 			conceptualSchema = CSXParser.parse(eventBroker, schemaFile);
-		} catch (FileNotFoundException e) {
+			setTitle(schemaFile.getName().substring(0,((schemaFile.getName()).length()-4))+" - "+WINDOW_TITLE);		
+			} catch (FileNotFoundException e) {
 			ErrorDialog.showError(
 				this,
 				e,
