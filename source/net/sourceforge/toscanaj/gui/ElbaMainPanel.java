@@ -120,7 +120,9 @@ public class ElbaMainPanel
     private SaveConceptualSchemaActivity saveActivity;
 	private DiagramExportSettings diagramExportSettings;
 	private ExportDiagramAction exportDiagramAction;
-
+	private File lastCSCFile;
+	
+	private File lastExportFile;
 	public ElbaMainPanel() {
 		super("Elba");
 
@@ -966,9 +968,9 @@ public class ElbaMainPanel
 
 	private void importCSC() {
 		final JFileChooser openDialog;
-		if (this.currentFile != null) {
+		if (this.lastCSCFile != null) {
 			// use position of last file for dialog
-			openDialog = new JFileChooser(this.currentFile);
+			openDialog = new JFileChooser(this.lastCSCFile);
 		} else {
 			openDialog = new JFileChooser(System.getProperty("user.dir"));
 		}
@@ -981,6 +983,7 @@ public class ElbaMainPanel
 		}
 		try {
 			importCSC(openDialog.getSelectedFile());
+			this.lastCSCFile = openDialog.getSelectedFile();
 		} catch (Exception e) {
 			ErrorDialog.showError(this, e, "Import failed");
 		}
@@ -1011,11 +1014,11 @@ public class ElbaMainPanel
 		ExtensionFileFilter fileFilter =
 			new ExtensionFileFilter(extension, "XML Files");
 		ExtensionFileFilter[] filterArray = { fileFilter };
-		if (this.currentFile != null) {
+		if (this.lastExportFile != null) {
 			// use position of last file for dialog
 			saveDialog =
 				new CheckDuplicateFileChooser(
-					new File(this.currentFile),
+					this.lastExportFile,
 					filterArray);
 		} else {
 			saveDialog =
@@ -1033,6 +1036,7 @@ public class ElbaMainPanel
 			expSettingsDialog.getFilterClause(),
 			expSettingsDialog.hasIncludeContingentListsSet(),
 			expSettingsDialog.hasIncludeIntentExtentListsSet());
+		this.lastExportFile = saveDialog.getSelectedFile();
 	}
 
 	private void exportStatisticalData(
@@ -1061,11 +1065,11 @@ public class ElbaMainPanel
 		ExtensionFileFilter fileFilter =
 			new ExtensionFileFilter(extension, "SQL Scripts");
 		ExtensionFileFilter[] filterArray = { fileFilter };
-		if (this.currentFile != null) {
+		if (this.lastExportFile != null) {
 			// use position of last file for dialog
 			saveDialog =
 				new CheckDuplicateFileChooser(
-					new File(this.currentFile),
+					this.lastExportFile,
 					filterArray);
 		} else {
 			saveDialog =
@@ -1079,6 +1083,7 @@ public class ElbaMainPanel
 			return;
 		}
 		exportSQLScript(saveDialog.getSelectedFile());
+		this.lastExportFile = saveDialog.getSelectedFile();
 	}
 
 	private void exportSQLScript(File file) {
