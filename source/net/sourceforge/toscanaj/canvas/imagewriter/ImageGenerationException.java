@@ -1,4 +1,4 @@
-package net.sourceforge.toscanaj.canvas;
+package net.sourceforge.toscanaj.canvas.imagewriter;
 
 /**
  * Signals that an image could not be created.

@@ -1,6 +1,8 @@
 package net.sourceforge.toscanaj;
 
-import net.sourceforge.toscanaj.canvas.ImageGenerationException;
+import net.sourceforge.toscanaj.canvas.imagewriter.DiagramExportSettings;
+import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
+import net.sourceforge.toscanaj.canvas.imagewriter.ImageWriter;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
@@ -19,7 +21,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.LabelView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
-import net.sourceforge.toscanaj.view.dialogs.DiagramExportDialog;
+import net.sourceforge.toscanaj.view.dialogs.DiagramExportSettingsDialog;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -93,15 +95,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     // FILE menu
     private JMenuItem openMenuItem = null;
     private JMenuItem exportDiagramMenuItem = null;
+    private JMenuItem exportDiagramSetupMenuItem = null;
     private JMenuItem printMenuItem = null;
     private JMenuItem printSetupMenuItem = null;
     private JMenu mruMenu = null;
     private JMenuItem exitMenuItem = null;
-
-    //file->auto/manual
-    private JMenu setupDiagramMenuItem = null;
-    private JRadioButtonMenuItem autoExportDiagramMenuItem = null;
-    private JRadioButtonMenuItem manualExportDiagramMenuItem = null;
 
     // DIAGRAM menu
     private JMenuItem backMenuItem = null;
@@ -155,9 +153,19 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     private List mruList = new LinkedList();
 
     /**
+     * Stores the last file where an image was exported to.
+     */
+    private File lastImageExportFile = null;
+
+    /**
      * The last setup for page format given by the user.
      */
     private PageFormat pageFormat = new PageFormat();
+
+    /**
+     * The current settings for diagram export.
+     */
+    private DiagramExportSettings diagramExportSettings = null;
 
     /**
      * Simple initialisation constructor.
@@ -165,6 +173,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     public MainPanel() {
         super("ToscanaJ");
         buildPanel();
+        // set the default diagram export options: PNG, auto mode, we can't get the size here
+        this.diagramExportSettings = new DiagramExportSettings( DiagramExportSettings.FORMAT_PNG, 0, 0, true );
         // listen to changes on DiagramController
         DiagramController.getController().addObserver(this);
         // restore the old MRU list
@@ -251,31 +261,16 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         fileMenu.add(exportDiagramMenuItem);
 
         // create the export diagram save options submenu
-        this.setupDiagramMenuItem = new JMenu("Export Diagram Setup");
-        this.setupDiagramMenuItem.setMnemonic(KeyEvent.VK_N);
-        this.setupDiagramMenuItem.setEnabled(false);
-        fileMenu.add(setupDiagramMenuItem);
-        // export diagram button group
-        ButtonGroup exportDiagramGroup = new ButtonGroup();
-        // auto export
-        this.autoExportDiagramMenuItem = new JRadioButtonMenuItem("Auto");
-        this.autoExportDiagramMenuItem.setSelected(true);
-        this.autoExportDiagramMenuItem.setMnemonic(KeyEvent.VK_E);
-        this.autoExportDiagramMenuItem.addActionListener(this);
-        this.setupDiagramMenuItem.add(autoExportDiagramMenuItem);
-        exportDiagramGroup.add(this.autoExportDiagramMenuItem);
-        //manual export
-        this.manualExportDiagramMenuItem = new JRadioButtonMenuItem("Manual");
-        this.manualExportDiagramMenuItem.setMnemonic(KeyEvent.VK_E);
-        this.manualExportDiagramMenuItem.addActionListener(this);
-        this.setupDiagramMenuItem.add(manualExportDiagramMenuItem);
-        exportDiagramGroup.add(this.manualExportDiagramMenuItem);
+        this.exportDiagramSetupMenuItem = new JMenuItem("Export Diagram Setup...");
+        this.exportDiagramSetupMenuItem.setMnemonic(KeyEvent.VK_E);
+        this.exportDiagramSetupMenuItem.addActionListener(this);
+        fileMenu.add(exportDiagramSetupMenuItem);
 
         // separator
         fileMenu.addSeparator();
 
         // menu item PRINT
-        printMenuItem = new JMenuItem("Print");
+        printMenuItem = new JMenuItem("Print...");
         printMenuItem.setMnemonic(KeyEvent.VK_P);
         printMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                  KeyEvent.VK_P, ActionEvent.CTRL_MASK));
@@ -284,7 +279,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         fileMenu.add(printMenuItem);
 
         // menu item PRINT SETUP
-        printSetupMenuItem = new JMenuItem("Print Setup");
+        printSetupMenuItem = new JMenuItem("Print Setup...");
         printSetupMenuItem.addActionListener(this);
         printSetupMenuItem.setEnabled(true);
         fileMenu.add(printSetupMenuItem);
@@ -472,7 +467,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     public void update(Object source) {
         this.printMenuItem.setEnabled(DiagramController.getController().getDiagramHistory().getSize()!=0);
         this.exportDiagramMenuItem.setEnabled(DiagramController.getController().getDiagramHistory().getSize()!=0);
-        this.setupDiagramMenuItem.setEnabled(DiagramController.getController().getDiagramHistory().getSize()!=0);
         this.backMenuItem.setEnabled(DiagramController.getController().undoIsPossible());
         this.backButton.setEnabled(DiagramController.getController().undoIsPossible());
     }
@@ -493,8 +487,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
     public void actionPerformed (ActionEvent ae) {
         Object actionSource = ae.getSource();
-        //System.out.println ("actionSource = " + actionSource);
-        //System.out.println ("action command = " + ae.getActionCommand());
 
         // Button actions
         if (actionSource == openButton) {
@@ -507,21 +499,34 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         if (actionSource == openMenuItem) {
             openSchema();
         }
-        if(actionSource == this.autoExportDiagramMenuItem) {
-            this.diagramExportSettings = new DiagramExportSettings(  1,
-                                                                      this.diagramView.getWidth(),
-                                                                      this.diagramView.getHeight() );
-        }
         if (actionSource == exportDiagramMenuItem) {
-            //manualy export diagram is the delault setting
-            if(this.autoExportDiagramMenuItem.isSelected()){
-                autoExportDiagram();
-            } else {
-                manualExportDiagram();
+            if( this.lastImageExportFile == null ) {
+                this.lastImageExportFile = new File(System.getProperty("user.dir"));
+            }
+            final JFileChooser openDialog = new JFileChooser(this.lastImageExportFile);
+            int rv=openDialog.showOpenDialog( this );
+            if( rv == JFileChooser.APPROVE_OPTION )
+            {
+                this.lastImageExportFile = openDialog.getSelectedFile();
+                try {
+                    ImageWriter.exportGraphic(this.diagramView, this.diagramExportSettings, openDialog.getSelectedFile());
+                }
+                catch ( ImageGenerationException e ) {
+                    /// @TODO Give feedback here
+                    e.printStackTrace();
+                }
             }
         }
-        if (actionSource == manualExportDiagramMenuItem) {
-            showDiagramExportDialog();
+        if (actionSource == exportDiagramSetupMenuItem) {
+            if(this.diagramExportSettings.usesAutoMode()) {
+                this.diagramExportSettings.setImageSize(this.diagramView.getWidth(), this.diagramView.getHeight());
+            }
+            DiagramExportSettingsDialog.initialize(this, this.diagramExportSettings);
+            DiagramExportSettings rv=DiagramExportSettingsDialog.showDialog(this);
+            if( rv != null )
+            {
+                this.diagramExportSettings = rv;
+            }
         }
         if (actionSource == printMenuItem) {
             PrinterJob printJob = PrinterJob.getPrinterJob();
@@ -599,108 +604,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
                 NodeView.setBottomColor(newColor);
             }
             repaint();
-        }
-    }
-
-    // temp member to hold the current export diagram setting
-    static private DiagramExportSettings diagramExportSettings = null;
-
-    /**
-     * store the latest file path
-     */
-    private String imagePath = null;
-
-
-    // DiagramExportSettings stores the default image setting
-
-    private class DiagramExportSettings {
-        private int format;
-        private int width;
-        private int height;
-        public DiagramExportSettings(int format, int width, int height) {
-            this.format = format;
-            this.width = width;
-            this.height = height;
-        }
-        /**
-         * get the current image format
-         */
-        public int getImageFormat(){ return this.format; }
-
-        /**
-         * get the current image width
-         */
-        public int getImageWidth() { return this.width; }
-
-        /**
-         * get the current image height
-         */
-        public int getImageHeight() { return this.height; }
-
-    }
-
-    private boolean showDiagramExportDialog() {
-        if(diagramExportSettings != null) {
-            DiagramExportDialog.initialize(this, diagramExportSettings.getImageWidth(), diagramExportSettings.getImageHeight());
-        } else {
-            DiagramExportDialog.initialize(this, diagramView.getWidth(), diagramView.getHeight());
-        }
-        if(DiagramExportDialog.showDialog(this)) {
-            this.diagramExportSettings = new DiagramExportSettings(  DiagramExportDialog.getImageFormat(),
-                                                                      DiagramExportDialog.getImageWidth(),
-                                                                      DiagramExportDialog.getImageHeight() );
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * DiagramExportDialog called to manualy export a diagram
-     *
-     */
-    private void manualExportDiagram() {
-        if( diagramExportSettings == null) {
-            if(showDiagramExportDialog() == false) {
-                return;
-            }
-        }
-        final JFileChooser saveDialog =
-                        new JFileChooser( (imagePath == null)? "user.dir" : imagePath );
-        int rv = saveDialog.showSaveDialog( this );
-        if( rv == JFileChooser.APPROVE_OPTION ) {
-            try {
-                imagePath = saveDialog.getSelectedFile().getPath();
-                this.diagramView.exportGraphic( diagramExportSettings.getImageFormat(),
-                                                diagramExportSettings.getImageWidth(),
-                                                diagramExportSettings.getImageHeight(),
-                                                imagePath );
-            }
-            catch(ImageGenerationException e) {
-                /// @TODO give some feedback here
-            }
-        }
-    }
-
-    /**
-     * method automatically export a diagram
-     *
-     */
-    private void autoExportDiagram() {
-        final JFileChooser saveDialog =
-                        new JFileChooser( (imagePath == null)? "user.dir" : imagePath );
-        int rv = saveDialog.showSaveDialog( this );
-        if( rv == JFileChooser.APPROVE_OPTION ) {
-            try {
-                imagePath = saveDialog.getSelectedFile().getPath();
-                System.out.println(imagePath);
-                this.diagramView.exportGraphic( 1,
-                                                this.diagramView.getWidth(),
-                                                this.diagramView.getHeight(),
-                                                imagePath );
-            }
-            catch(ImageGenerationException e) {
-                /// @TODO give some feedback here
-            }
         }
     }
 
