@@ -28,6 +28,15 @@ public abstract class SetMovementEventListener implements EventBrokerListener {
         double diffY = toPosition.getY() - fromPosition.getY();
         DiagramView diagramView = nodeView.getDiagramView();
         Diagram2D diagram = diagramView.getDiagram();
+        moveSet(diagram, node, diffX, diffY);
+        if(!diagram.isHasseDiagram()) {
+			moveSet(diagram,node, -diffX, -diffY);        	
+        }
+        diagramView.requestScreenTransformUpdate();
+        diagramView.repaint();
+    }
+
+    public void moveSet(Diagram2D diagram, DiagramNode node, double diffX, double diffY) {
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode otherNode = diagram.getNode(i);
             if (isPartOfSet(node, otherNode)) {
@@ -35,8 +44,6 @@ public abstract class SetMovementEventListener implements EventBrokerListener {
                 otherNode.setPosition(new Point2D.Double(oldPosition.getX() + diffX, oldPosition.getY() + diffY));
             }
         }
-        diagramView.requestScreenTransformUpdate();
-        diagramView.repaint();
     }
 
     protected abstract boolean isPartOfSet(DiagramNode node, DiagramNode otherNode);
