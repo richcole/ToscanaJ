@@ -5,6 +5,7 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Stroke;
@@ -26,7 +27,7 @@ public class LineView extends CanvasItem {
      *
      * @see setSelectedConcept(Concept)
      */
-    private int selectionState = NodeView.NOT_SELECTED;
+    private int selectionState = NodeView.NO_SELECTION;
 
     /**
      * Creates a view for the given DiagramLine.
@@ -43,13 +44,23 @@ public class LineView extends CanvasItem {
         Point2D to = diagramLine.getToPosition();
         Paint oldPaint = graphics.getPaint();
         Stroke oldStroke = graphics.getStroke();
-        if(this.selectionState != NodeView.NOT_SELECTED) {
-            graphics.setStroke(new BasicStroke(NodeView.selectionSize));
+        if(this.selectionState != NodeView.NO_SELECTION) {
             if(this.selectionState == NodeView.SELECTED_IDEAL) {
                 graphics.setPaint(NodeView.circleIdealColor);
+                graphics.setStroke(new BasicStroke(NodeView.selectionSize));
             }
             else if(this.selectionState == NodeView.SELECTED_FILTER) {
                 graphics.setPaint(NodeView.circleFilterColor);
+                graphics.setStroke(new BasicStroke(NodeView.selectionSize));
+            }
+            else if(this.selectionState == NodeView.NOT_SELECTED) {
+                Color circleColor = NodeView.circleColor;
+                float rel = NodeView.fadeOut;
+                circleColor = new Color( (int)(circleColor.getRed()*(1-rel) + 255*rel),
+                                         (int)(circleColor.getGreen()*(1-rel) + 255*rel),
+                                         (int)(circleColor.getBlue()*(1-rel) + 255*rel),
+                                         (int)(circleColor.getAlpha()*(1-rel) + 255*rel) );
+                graphics.setPaint(circleColor);
             }
         }
         graphics.draw(new Line2D.Double(from,to));
@@ -98,7 +109,7 @@ public class LineView extends CanvasItem {
      */
     public void setSelectedConcept(Concept concept) {
         if(concept == null) {
-            this.selectionState = NodeView.NOT_SELECTED;
+            this.selectionState = NodeView.NO_SELECTION;
             return;
         }
         Concept from = this.diagramLine.getFromNode().getConcept();

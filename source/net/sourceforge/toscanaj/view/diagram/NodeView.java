@@ -21,6 +21,11 @@ import java.awt.geom.Rectangle2D;
 
 public class NodeView extends CanvasItem {
     /**
+     * Currently we don't use selection.
+     */
+    static final public int NO_SELECTION = -1;
+
+    /**
      * Node displays nothing selected
      */
     static final public int NOT_SELECTED = 0;
@@ -58,19 +63,24 @@ public class NodeView extends CanvasItem {
     /**
      * The Color for the circles around the node with the selected concept.
      */
-    static public Color circleSelectionColor = new Color(80,80,80);
+    static public Color circleSelectionColor = new Color(255,0,0);
 
     /**
      * The Color for the circles around the nodes in the ideal of the selected
      * concept.
      */
-    static public Color circleIdealColor = new Color(0,255,0);
+    static public Color circleIdealColor = new Color(0,0,0);
 
     /**
      * The Color for the circles around the nodes in the filter of the selected
      * concept.
      */
-    static public Color circleFilterColor = new Color(255,0,0);
+    static public Color circleFilterColor = new Color(0,0,0);
+
+    /**
+     * The amount of fade out for unselected nodes.
+     */
+    static public float fadeOut = 0.7F;
 
     /**
      * The size of the circles around selected nodes.
@@ -89,8 +99,10 @@ public class NodeView extends CanvasItem {
 
     /**
      * Stores the selection state.
+     *
+     * @see getSelectionState()
      */
-    private int selectionState;
+    private int selectionState = NO_SELECTION;
 
     /**
      * Changes the top color of the gradient.
@@ -163,16 +175,30 @@ public class NodeView extends CanvasItem {
                                        (int)(topColor.getAlpha()*rel + bottomColor.getAlpha()*(1-rel)) );
             }
             Stroke oldStroke = graphics.getStroke();
-            if(this.selectionState != NOT_SELECTED) {
-                graphics.setStroke(new BasicStroke(this.selectionSize));
+            if(this.selectionState != NO_SELECTION) {
                 if(this.selectionState == SELECTED_DIRECTLY) {
+                    graphics.setStroke(new BasicStroke(this.selectionSize));
                     circleColor = this.circleSelectionColor;
                 }
                 else if(this.selectionState == SELECTED_IDEAL) {
+                    graphics.setStroke(new BasicStroke(this.selectionSize));
                     circleColor = this.circleIdealColor;
                 }
                 else if(this.selectionState == SELECTED_FILTER) {
+                    graphics.setStroke(new BasicStroke(this.selectionSize));
                     circleColor = this.circleFilterColor;
+                }
+                else if(this.selectionState == NOT_SELECTED) {
+                    // lighten
+                    float rel = fadeOut;
+                    nodeColor = new Color( (int)(nodeColor.getRed()*(1-rel) + 255*rel),
+                                           (int)(nodeColor.getGreen()*(1-rel) + 255*rel),
+                                           (int)(nodeColor.getBlue()*(1-rel) + 255*rel),
+                                           (int)(nodeColor.getAlpha()*(1-rel) + 255*rel) );
+                    circleColor = new Color( (int)(circleColor.getRed()*(1-rel) + 255*rel),
+                                             (int)(circleColor.getGreen()*(1-rel) + 255*rel),
+                                             (int)(circleColor.getBlue()*(1-rel) + 255*rel),
+                                             (int)(circleColor.getAlpha()*(1-rel) + 255*rel) );
                 }
             }
 
@@ -236,7 +262,7 @@ public class NodeView extends CanvasItem {
      */
     public void setSelectedConcept(Concept concept) {
         if(concept == null) {
-            this.selectionState = NOT_SELECTED;
+            this.selectionState = NO_SELECTION;
             return;
         }
         if(this.diagramNode.getConcept() == concept) {
@@ -259,12 +285,13 @@ public class NodeView extends CanvasItem {
      * Returns the information if and how the node is selected.
      *
      * The return values are:
-     * - NOT_SELECTED: the node dispalys a concept which is neither in filter
+     * - NO_SELECTION: we don't have a selection at the moment
+     * - NOT_SELECTED: the node displays a concept which is neither in filter
      *   nor ideal of the selected concept
-     * - SELECTED_DIRECTLY: the node dispalys the selected concept
-     * - SELECTED_IN_FILTER: the node dispalys a concept which is in the filter
+     * - SELECTED_DIRECTLY: the node displays the selected concept
+     * - SELECTED_IN_FILTER: the node displays a concept which is in the filter
      *   of the selected concept
-     * - SELECTED_IN_IDEAL: the node dispalys a concept which is in the ideal
+     * - SELECTED_IN_IDEAL: the node displays a concept which is in the ideal
      *   of the selected concept
      *
      * @see setSelectedConcept(Concept)
