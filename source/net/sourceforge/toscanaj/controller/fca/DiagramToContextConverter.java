@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.controller.fca;
 
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.Context;
@@ -21,8 +21,8 @@ public class DiagramToContextConverter {
 	public static Context getContext(Diagram2D diagram) {
 		ContextImplementation context = new ContextImplementation(diagram.getTitle());
 		
-		List objects = (List) context.getObjects();
-		List attributes = (List) context.getAttributes();
+		Set objects = (Set) context.getObjects();
+		Set attributes = (Set) context.getAttributes();
 		BinaryRelationImplementation relation = context.getRelationImplementation();
 		
 		Iterator nodesIt = diagram.getNodes();
