@@ -1,2 +1,2 @@
 Main-Class: net/sourceforge/toscanaj/ToscanaJ
-Class-Path: libs/jdom.jar libs/commons-cli.jar libs/hsqldb.jar libs/tockit-canvas.jar libs/tockit-events.jar libs/tockit-pluginArchitecture.jar libs/tockit-relations.jar libs/tockit-swing.jar libs/tockit-utils.jar libs/tockit-conscript.jar
+Class-Path: libs/jdom.jar libs/commons-cli.jar libs/hsqldb.jar libs/tockit-canvas.jar libs/tockit-events.jar libs/tockit-pluginArchitecture.jar libs/tockit-relations.jar libs/tockit-swing.jar libs/tockit-utils.jar libs/tockit-conscript.jar libs/tockit-fca.jar libs/tockit-cernatoXML.jar
