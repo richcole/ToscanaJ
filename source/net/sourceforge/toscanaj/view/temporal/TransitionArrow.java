@@ -10,13 +10,13 @@ package net.sourceforge.toscanaj.view.temporal;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
-import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
 
+import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.CanvasItem;
 
@@ -24,14 +24,18 @@ public class TransitionArrow extends CanvasItem {
 	private static final double SHORTENING_FACTOR = 0.15;
     private NodeView startNodeView;
 	private NodeView endNodeView;
-	private Color color;
+	private Color baseColor;
 	private Rectangle2D bounds;
     private Point2D shiftVector = new Point2D.Double();
+    private double timePos;
+    private AnimationTimeController timeController;
 	
-    public TransitionArrow(NodeView startNodeView, NodeView endNodeView, Color color) {
+    public TransitionArrow(NodeView startNodeView, NodeView endNodeView, Color color, double timePos, AnimationTimeController timeController) {
     	this.startNodeView = startNodeView;
     	this.endNodeView = endNodeView;
-    	this.color = color;
+    	this.baseColor = color;
+    	this.timePos = timePos;
+    	this.timeController = timeController;
     	
     	calculateBounds();
     }
@@ -40,10 +44,14 @@ public class TransitionArrow extends CanvasItem {
     	if(this.startNodeView == this.endNodeView) {
     		return;
     	}
+        Paint color = calculatePaint();
+        if(color == null) { // nothing to draw
+        	return;
+        }
+
     	updateShiftVector();
     	
     	Paint oldPaint = g.getPaint();
-    	Stroke oldStroke = g.getStroke();
     	AffineTransform oldTransform = g.getTransform();
     	
         double startX = getStartX();
@@ -63,14 +71,32 @@ public class TransitionArrow extends CanvasItem {
         arrow.lineTo(-20,-2);
         arrow.closePath();
 
-    	g.setPaint(color);
+        g.setPaint(color);
         g.translate(endX, endY);
         g.rotate(Math.atan2(endY - startY, endX - startX));
     	g.fill(arrow);
     	
     	g.setPaint(oldPaint);
-    	g.setStroke(oldStroke);
     	g.setTransform(oldTransform);
+    }
+    
+    private Paint calculatePaint() {
+        AnimationTimeController controller = this.timeController;
+        double timeOffset = controller.getCurrentTime() - this.timePos;
+        double alpha = 0;
+        if(timeOffset < - controller.getFadeInTime()) {
+            return null;
+        } else if(timeOffset < 0) {
+            alpha = 1 + timeOffset / controller.getFadeInTime();
+        } else if(timeOffset < controller.getVisibleTime()) {
+            alpha = 1;
+        } else if(timeOffset < controller.getVisibleTime() + controller.getFadeOutTime()) {
+            alpha = 1 - (timeOffset - controller.getVisibleTime()) / controller.getFadeOutTime();
+        } else {
+            return null;
+        }
+        return new Color(this.baseColor.getRed(), this.baseColor.getGreen(), this.baseColor.getBlue(),
+                          (int) (alpha * this.baseColor.getAlpha()));
     }
     
     public boolean containsPoint(Point2D point) {

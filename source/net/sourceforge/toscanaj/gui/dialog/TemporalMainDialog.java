@@ -28,10 +28,12 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.tockit.canvas.events.CanvasDrawnEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
+import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
@@ -41,6 +43,7 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
+import net.sourceforge.toscanaj.view.temporal.StateRing;
 import net.sourceforge.toscanaj.view.temporal.TransitionArrow;
 
 public class TemporalMainDialog extends JDialog implements EventBrokerListener {
@@ -49,15 +52,19 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private EventBroker eventBroker;
     private JComboBox sequenceChooser;
     private JComboBox timelineChooser;
-    private JButton showAllTransitionsButton;
+    private JButton addStaticTransitionsButton;
+    private JButton animateTransitionsButton;
     private JButton exportImagesButton;
     private JButton exportAnimationButton;
     private JButton stepControlsButton;
-    private JButton animateControlsButton;
     private DiagramView diagramView;
+    private AnimationTimeController timeController;
     
     private static final Color[] COLORS = new Color[]{Color.RED, Color.BLUE, Color.GREEN, Color.CYAN, Color.GRAY, Color.MAGENTA,
                                                          Color.ORANGE, Color.PINK, Color.BLACK, Color.YELLOW};
+    private double targetTime;
+    private int timelineLength;
+    private double lastAnimationTime;
 	
     public TemporalMainDialog(Frame frame, DiagramView diagramView, EventBroker eventBroker) {
 	  	super(frame, "Temporal Controls", false);
@@ -68,6 +75,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 	  	
         eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
         diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, DiagramView.class);
+        diagramView.getController().getEventBroker().subscribe(this, CanvasDrawnEvent.class, Object.class);
 	  	
 	  	buildGUI();
 	  	fillGUI();
@@ -80,17 +88,22 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         JLabel timelineLabel = new JLabel("Timeline Column:");
         timelineChooser = new JComboBox();
 
-        showAllTransitionsButton = new JButton("Show All Transitions");
-        showAllTransitionsButton.addActionListener(new ActionListener(){
+        addStaticTransitionsButton = new JButton("Add Static Transitions");
+        addStaticTransitionsButton.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e) {
-        		showAllTransitions();
+        		addFixedTransitions();
         	}
+        });
+        animateTransitionsButton = new JButton("Animate Transitions");
+        animateTransitionsButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                addAnimatedTransitions();
+            }
         });
 
         exportImagesButton = new JButton("Export Images");
         exportAnimationButton = new JButton("Export Animation");
         stepControlsButton = new JButton("Step Controls");
-        animateControlsButton = new JButton("Animate Controls");
 
         Container contentPane = this.getContentPane();
         GridBagLayout layout = new GridBagLayout();
@@ -111,13 +124,13 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         contentPane.add(new JPanel(), new GridBagConstraints(0, 2, 1, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(showAllTransitionsButton, new GridBagConstraints(1, 2, 2, 1, 1, 0,
+        contentPane.add(addStaticTransitionsButton, new GridBagConstraints(1, 2, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
         contentPane.add(new JPanel(), new GridBagConstraints(3, 2, 1, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(exportImagesButton, new GridBagConstraints(1, 3, 2, 1, 1, 0,
+        contentPane.add(animateTransitionsButton, new GridBagConstraints(1, 3, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
         contentPane.add(exportAnimationButton, new GridBagConstraints(1, 4, 2, 1, 1, 0,
@@ -126,7 +139,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         contentPane.add(stepControlsButton, new GridBagConstraints(1, 5, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
-        contentPane.add(animateControlsButton, new GridBagConstraints(1, 6, 2, 1, 1, 0,
+        contentPane.add(exportImagesButton, new GridBagConstraints(1, 6, 2, 1, 1, 0,
                                                         GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
 
@@ -155,11 +168,11 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
 
     private void setButtonStates(boolean allDisabled) {
         boolean enabled = !allDisabled && (this.diagramView.getDiagram() != null);
-        showAllTransitionsButton.setEnabled(enabled);
+        addStaticTransitionsButton.setEnabled(enabled);
+        animateTransitionsButton.setEnabled(enabled);
         exportImagesButton.setEnabled(false);
         exportAnimationButton.setEnabled(false);
         stepControlsButton.setEnabled(false);
-        animateControlsButton.setEnabled(false);
     }
     
     public void processEvent(Event e) {
@@ -172,24 +185,61 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         if(e instanceof DisplayedDiagramChangedEvent) {
         	setButtonStates(false);
         }
+        if(e instanceof CanvasDrawnEvent) {
+        	animate();
+        }
+    }
+    
+    private void animate() {
+    	if(this.timeController == null) {
+    		return; // we are not animating
+    	} 
+    	if(this.lastAnimationTime > this.targetTime) {
+    		return; // nothing to animate anymore
+    	}
+        this.timeController.calculateCurrentTime();
+        this.lastAnimationTime = this.timeController.getCurrentTime();
+        this.diagramView.repaint(); // paint it again as time has past
     }
 
-    private void showAllTransitions() {
-    	if(!this.diagramView.hasLayer(TRANSITION_LAYER_NAME)) {
-    		this.diagramView.addLayer(TRANSITION_LAYER_NAME);
-    	}
+    private void addFixedTransitions() {
+    	// calculate timeline length
+    	calculateObjectSequences();
+        AnimationTimeController newTimeController = new AnimationTimeController(this.timelineLength,0,Double.MAX_VALUE,0,1);
+        addTransitions(this.timelineLength, newTimeController, false);
+    }
+
+    private void addAnimatedTransitions() {
+        // calculate timeline length
+        calculateObjectSequences();
+        AnimationTimeController newTimeController = new AnimationTimeController(this.timelineLength,1,1,5,300);
+        addTransitions(newTimeController.getAllFadedTime(), newTimeController, true);
+    }
+
+    private void addTransitions(double newTargetTime, AnimationTimeController newTimeController, boolean highlightStates) {
+        if(this.diagramView.hasLayer(TRANSITION_LAYER_NAME)) {
+        	this.diagramView.removeLayer(TRANSITION_LAYER_NAME);
+        }
+        this.diagramView.addLayer(TRANSITION_LAYER_NAME);
         List objectSequences = calculateObjectSequences();
         Hashtable nodeViewMap = createNodeViewMap();
+        this.timeController = null;
         Iterator seqIt = objectSequences.iterator();
         int colNum = 0;
         while (seqIt.hasNext()) {
             List sequence = (List) seqIt.next();
+            if(this.timeController == null) {
+                this.timeController = newTimeController;
+            	this.targetTime = newTargetTime;
+                this.lastAnimationTime = 0;
+            }
             Color color = COLORS[colNum];
-            showTransitions(sequence, new Color(color.getRed(), color.getGreen(), color.getBlue(), 100), nodeViewMap);
+            addTransitions(sequence, new Color(color.getRed(), color.getGreen(), color.getBlue(), 140), nodeViewMap, highlightStates);
             colNum = (colNum + 1) % COLORS.length;
         }
         this.diagramView.repaint();
     }
+    
     private Hashtable createNodeViewMap() {
     	Hashtable retVal = new Hashtable();
     	Iterator it = this.diagramView.getCanvasItemsByType(NodeView.class).iterator();
@@ -200,10 +250,12 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         return retVal;
     }
     
-    private void showTransitions(List sequence, Color color, Hashtable nodeViewMap) {
+    private void addTransitions(List sequence, Color color, Hashtable nodeViewMap, boolean highlightStates) {
     	NodeView oldView = null;
     	Iterator objectIt = sequence.iterator();
+    	int count = 0;
     	objLoop: while (objectIt.hasNext()) {
+    		count++;
             FCAObject object = (FCAObject) objectIt.next();
             Iterator nodeIt = diagramView.getDiagram().getNodes();
             while (nodeIt.hasNext()) {
@@ -213,8 +265,13 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
                     FCAObject contObj = (FCAObject) objIt.next();
                     if(contObj.equals(object)) {
                     	NodeView curView = (NodeView) nodeViewMap.get(node);
-                    	if(oldView != null) {
-                    		this.diagramView.addCanvasItem(new TransitionArrow(oldView, curView, color), TRANSITION_LAYER_NAME);
+                    	if(highlightStates) {
+	                        this.diagramView.addCanvasItem(new StateRing(curView, color, count, this.timeController),
+	                                                       TRANSITION_LAYER_NAME);
+                    	}
+                    	if(oldView != null && oldView != curView) {
+                    	    this.diagramView.addCanvasItem(new TransitionArrow(oldView, curView, color, count - 0.5, this.timeController),
+                    	                                   TRANSITION_LAYER_NAME);
                     	}
                     	oldView = curView;
                         continue objLoop;
@@ -309,6 +366,10 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         	    }
             }            
         }
+        
+        // store length of timeline
+        /// @todo side effect! refactor
+        this.timelineLength = timelineValues.size();
         
         return objectSequences;
     }
