@@ -41,6 +41,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 	private static final String ATTRIBUTES_ELEMENT_NAME = "attributes";
 	private static final String TYPES_ELEMENT_NAME = "types";
 	private static final String RELATION_ELEMENT_NAME = "relation";
+    private static final String RELATIONSHIP_ELEMENT_NAME = "tuple";
 	private static final String OBJECT_ID_ATTRIBUTE_NAME = "objectId";
 	private static final String TYPE_ID_ATTRIBUTE_NAME = "typeId";
 	private static final String VALUE_OBJECT_REF_ATTRIBUTE_NAME = "objectRef";
@@ -193,7 +194,8 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 				Entry  itAttributeValue = (Entry) iterator.next();
 				ManyValuedAttributeImplementation mvAttribute = (ManyValuedAttributeImplementation) itAttributeValue.getKey();
 				String attributeId = (String) attributeIdMapping.get(mvAttribute);
-				Element valueElement = mvAttribute.getType().toElement((Value)itAttributeValue.getValue());
+				Element valueElement = new Element(RELATIONSHIP_ELEMENT_NAME); 
+                mvAttribute.getType().insertValue(valueElement, (Value)itAttributeValue.getValue());
 				valueElement.setAttribute(VALUE_OBJECT_REF_ATTRIBUTE_NAME, (String) objectIdMapping.get(itRow.getKey()));
 				valueElement.setAttribute(VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME, attributeId);
 				relationElement.addContent(valueElement);

@@ -10,12 +10,14 @@ package org.tockit.datatype.xsd;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 import org.jdom.Element;
-import org.tockit.datatype.AbstractDatatype;
 import org.tockit.datatype.ConversionException;
 import org.tockit.datatype.Value;
 
 
-public class DecimalType extends AbstractDatatype {
+/**
+ * @todo we lack support for the general decimal type without restriction
+ */
+public class DecimalType extends AbstractXSDDatatype {
     private final double min;
     private final double max;
     private final boolean minIncluded;
@@ -113,14 +115,39 @@ public class DecimalType extends AbstractDatatype {
         return null;
     }
 
-    public Element toElement(Value value) {
-        return null;
-    }
-
-    public Element toXML() {
-        return null;
+    public void insertValue(Element element, Value value) {
+        DecimalValue dValue = (DecimalValue) value;
+        element.setAttribute("value", value.toString());
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
+    }
+
+    protected String getBaseType() {
+        return "decimal";
+    }
+
+    protected void addRestrictions(Element restrictionElement) {
+        Element minElement;
+        if(this.minIncluded) {
+            minElement = createElement("minIncluded");
+        } else {
+            minElement = createElement("minExcluded");
+        }
+        minElement.setAttribute("value", String.valueOf(this.min));
+        restrictionElement.addContent(minElement);
+
+        Element maxElement;
+        if(this.maxIncluded) {
+            maxElement = createElement("maxIncluded");
+        } else {
+            maxElement = createElement("maxExcluded");
+        } 
+        maxElement.setAttribute("value", String.valueOf(this.max));
+        restrictionElement.addContent(maxElement);
+
+        Element fracElement = createElement("fractionDigits");
+        fracElement.setAttribute("value", String.valueOf(this.numDecimals));
+        restrictionElement.addContent(fracElement);
     }
 }

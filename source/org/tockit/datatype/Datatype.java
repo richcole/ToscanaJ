@@ -25,5 +25,15 @@ public interface Datatype extends XMLizable {
     
     // XML marshalling/demarshalling of values
     Value toValue(Element element);
-    Element toElement(Value value);
+    
+    /**
+     * Adds the given value into the element.
+     * 
+     * This can be done either by adding a "value" attribute or by adding content.
+     * Both are in the default namespace, but which way is used depends on the actual
+     * type implementation.
+     * 
+     * @throws ClassCastException if the value is not of matching type
+     */
+    void insertValue(Element element, Value value);
 }

@@ -13,12 +13,14 @@ import java.util.regex.Pattern;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 import org.jdom.Element;
-import org.tockit.datatype.AbstractDatatype;
 import org.tockit.datatype.ConversionException;
 import org.tockit.datatype.Value;
 
 
-public class StringType extends AbstractDatatype {
+/**
+ * @todo XSD allows combining the restrictions, we don't
+ */
+public class StringType extends AbstractXSDDatatype {
     protected StringType(String name) {
         super(name);
     }
@@ -82,15 +84,20 @@ public class StringType extends AbstractDatatype {
         return null;
     }
 
-    public Element toElement(Value value) {
-        return null;
-    }
-
-    public Element toXML() {
-        return null;
+    public void insertValue(Element element, Value value) {
+        StringValue sValue = (StringValue) value;
+        element.setAttribute("value", sValue.getValue());
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
+    }
+
+    protected void addRestrictions(Element restrictionElement) {
+        // no restrictions needed
+    }
+    
+    protected String getBaseType() {
+        return "string";
     }
 
     public static class LengthRestrictedStringType extends StringType {
@@ -120,6 +127,15 @@ public class StringType extends AbstractDatatype {
             }
             return true;
         }
+
+        protected void addRestrictions(Element restElement) {
+            Element minElem = createElement("minLength");
+            minElem.setAttribute("minLength", String.valueOf(this.minLength));
+            restElement.addContent(minElem);
+            Element maxElem = createElement("maxLength");
+            maxElem.setAttribute("maxLength", String.valueOf(this.maxLength));
+            restElement.addContent(maxElem);
+        }
     }
 
     public static class PatternRestrictedStringType extends StringType {
@@ -137,6 +153,12 @@ public class StringType extends AbstractDatatype {
         public boolean isValidStringValue(String valueToTest) {
             Matcher matcher = this.pattern.matcher(valueToTest); 
             return matcher.matches();
+        }
+
+        protected void addRestrictions(Element restElement) {
+            Element pattElem = createElement("pattern");
+            pattElem.setAttribute("value", this.pattern.pattern());
+            restElement.addContent(pattElem);
         }
     }
 
@@ -159,6 +181,15 @@ public class StringType extends AbstractDatatype {
         
         public StringValue[] getEnumeration() {
             return enumeration;
+        }
+
+        protected void addRestrictions(Element restElement) {
+            for (int i = 0; i < this.enumeration.length; i++) {
+                StringValue value = this.enumeration[i];
+                Element enumElem = createElement("enumeration");
+                enumElem.setAttribute("value", value.getValue());
+                restElement.addContent(enumElem);
+            }
         }
     }
 }
