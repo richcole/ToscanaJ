@@ -28,8 +28,7 @@ import java.util.Vector;
  * approach of finding all maximal chains in an order on the attribute, but this time
  * on the order induced by the concept lattice itself.
  * 
- * Behaves rather weird and is left in for historical reasons (or if someone should
- * actually find it useful). Consider deletion...
+ * @todo Creating the attribute order externally could be a better idea. 
  */
 public class MeetIrreducibleChainsDimensionStrategy implements DimensionCreationStrategy {
     public Vector calculateDimensions(Lattice lattice) {

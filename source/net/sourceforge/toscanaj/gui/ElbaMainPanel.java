@@ -15,7 +15,7 @@ import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 import net.sourceforge.toscanaj.controller.diagram.SqlClauseEditingLabelViewPopupMenuHandler;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
-import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.MeetIrreducibleChainsDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.action.CheckContextConsistencyAction;
@@ -269,7 +269,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                                 NDimLayoutOperations.createDiagram(
                                     lattice,
                                     context.getName(),
-                                    new DefaultDimensionStrategy());
+                                    new MeetIrreducibleChainsDimensionStrategy());
                             if (null != newDiagram) {
                                 Diagram2D diagramWithSameTitle = null;
                                 int indexOfExistingDiagram = -1;

@@ -1,4 +1,26 @@
-Changes between version 1.4.1 and the CVS version of the ToscanaJ 
+Changes between version 1.5 and the cvs version of the ToscanaJ 
+program suite:
+
+Affecting different programs:
+=============================
+
+Specific for ToscanaJ:
+======================
+
+Specific for Elba:
+==================
+- The layout has been reset to the old version of 1.4, since ordinal scales
+  are not layed out in chains with the new approach.
+
+Specific for Siena (still not fully complete):
+==============================================
+
+Other new experimental features:
+================================
+
+
+
+Changes between version 1.4.1 and 1.5 of the ToscanaJ 
 program suite:
 
 Affecting different programs:
