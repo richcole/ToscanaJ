@@ -176,6 +176,10 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
         }
         Element queriesElem = elem.getChild(QUERIES_ELEMENT_NAME);
         if (queriesElem != null && queriesElem.getChildren().size() != 0) {
+			String dropDefaultsAttribute = queriesElem.getAttributeValue("dropDefaults");
+            if(dropDefaultsAttribute == null || dropDefaultsAttribute.equals("false")) { 
+				addDefaultQueries();
+			}
             for (Iterator iterator = queriesElem.getChildren().iterator(); iterator.hasNext();) {
                 Element queryElem = (Element) iterator.next();
                 if (queryElem.getName().equals(AggregateQuery.QUERY_ELEMENT_NAME)) {
@@ -185,9 +189,6 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
                 } else if (queryElem.getName().equals(DistinctListQuery.QUERY_ELEMENT_NAME)) {
                     this.queries.add(new DistinctListQuery(databaseInfo, queryElem));
                 }
-            }
-            if(! "true".equals(queriesElem.getAttributeValue("dropDefaults") )) { // the latter might be null
-				addDefaultQueries();
             }
         } else {
             addDefaultQueries();
