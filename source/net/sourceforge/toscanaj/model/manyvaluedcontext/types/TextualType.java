@@ -20,7 +20,8 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 
 public class TextualType extends TypeImplementation {
 	private List valueList ;
-	private static final String VALUE_ELEMENT_NAME = null;
+	private static final String VALUE_ELEMENT_NAME = "value";
+	private static final String TEXTUAL_TYPE_VALUE_ELEMENT_NAME = "value";
 	
     public TextualType(String name) {
         super(name);
@@ -111,7 +112,15 @@ public class TextualType extends TypeImplementation {
 	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType#toValue(org.jdom.Element)
 	 */
 	public AttributeValue toValue(Element element) {
-		// TODO Auto-generated method stub
-		return null;
+		return new TextualValue(element.getTextTrim());
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType#toElement(net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue)
+	 */
+	public Element toElement(AttributeValue value) {
+		Element retVal = new Element(TEXTUAL_TYPE_VALUE_ELEMENT_NAME);
+		retVal.addContent(((TextualValue) value).getDisplayString());
+		return retVal;
 	}
 }

@@ -83,14 +83,16 @@ public class FCAObjectImplementation implements WritableFCAObject, XMLizable {
 	 */
 	public Element toXML() {
 		Element retVal = new Element(OBJECT_ELEMENT_NAME);
-		Element descriptionElement = new Element(DESCRIPTION_ELEMENT_NAME);
-		descriptionElement.addContent(description);
-		retVal.addContent(descriptionElement);
+		if (description != null) {
+			Element descriptionElement = new Element(DESCRIPTION_ELEMENT_NAME);
+			descriptionElement.addContent(description);
+			retVal.addContent(descriptionElement);
+		}
 		Element dataElement = new Element(DATA_ELEMENT_NAME);
 		if (data instanceof XMLizable) {
 			dataElement=((XMLizable)data).toXML();
 			dataElement.setAttribute(CLASS_ATTRIBUTE_NAME, data.getClass().getName());
-		} else {
+		} else if (data != null){
 			dataElement.addContent(data.toString());
 			dataElement.setAttribute(CLASS_ATTRIBUTE_NAME, String.class.getName());
 		}
@@ -98,9 +100,6 @@ public class FCAObjectImplementation implements WritableFCAObject, XMLizable {
 		return retVal;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#readXML(org.jdom.Element)
-	 */
 	public void readXML(Element elem) throws XMLSyntaxError {
 		// TODO Auto-generated method stub
 		description = XMLHelper.getMandatoryChild(elem, DESCRIPTION_ELEMENT_NAME);

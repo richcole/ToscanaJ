@@ -58,16 +58,14 @@ public abstract class TypeImplementation implements WritableAttributeType, XMLiz
     protected abstract void fillRangeElement(Element rangeElement);
     protected abstract void readRangeElement(Element rangeElement) throws XMLSyntaxError;
     
-    /* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#toXML()
-	 */
 	public Element toXML() {
 		Element retVal = new Element(TYPE_ELEMENT_NAME);
 		retVal.setAttribute(CLASS_ATTRIBUTE_NAME, this.getClass().getName());
 		retVal.setAttribute(NAME_ATTRIBUTE_NAME, this.getName());
 		Element rangeElement = new Element(RANGE_ELEMENT_NAME);
+		fillRangeElement(rangeElement);
 		retVal.addContent(rangeElement);
-		return null;
+		return retVal;
 	}
 	
 	public void readXML(Element element) throws XMLSyntaxError {

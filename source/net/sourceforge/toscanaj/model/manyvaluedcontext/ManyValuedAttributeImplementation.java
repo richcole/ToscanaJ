@@ -7,16 +7,17 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
+import java.util.Hashtable;
+
 import org.jdom.Element;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TypeImplementation;
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 
-public class ManyValuedAttributeImplementation implements WritableManyValuedAttribute, XMLizable {
+public class ManyValuedAttributeImplementation implements WritableManyValuedAttribute {
     private AttributeType type;
     private String name;
-	private static final String MANY_VALUED_ATTRIBUTE_ELEMENT_NAME = "manyValuedAttribute";
+	private static final String MANY_VALUED_ATTRIBUTE_ELEMENT_NAME = "attribute";
 	private static final String NAME_ATTRIBUTE_NAME = "name";
+	private static final String TYPE_REF_ATTRIBUTE_NAME = "typeRef";
 
     public ManyValuedAttributeImplementation(AttributeType type, String name) {
         this.type = type;
@@ -43,24 +44,13 @@ public class ManyValuedAttributeImplementation implements WritableManyValuedAttr
 		this.name = name;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#toXML()
-	 */
-	public Element toXML() {
-/*
-*     private AttributeType type;
-    private String name;
-
- */		// TODO Auto-generated method stub
+	public Element toXML(Hashtable typesIdMapping) {
 		Element retVal = new Element(MANY_VALUED_ATTRIBUTE_ELEMENT_NAME);
 		retVal.setAttribute(NAME_ATTRIBUTE_NAME, name);
-		retVal.addContent(((TypeImplementation) type).toXML());
-		return null;
+		retVal.setAttribute(TYPE_REF_ATTRIBUTE_NAME, (String) typesIdMapping.get(this.getType()));
+		return retVal;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#readXML(org.jdom.Element)
-	 */
 	public void readXML(Element elem) { //throws XMLSyntaxError {
 		// TODO Auto-generated method stub
 		

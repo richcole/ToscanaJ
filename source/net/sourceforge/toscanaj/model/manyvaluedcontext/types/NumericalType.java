@@ -22,6 +22,7 @@ public class NumericalType extends TypeImplementation {
 	private static final String MIN_ATTRIBUTE_NAME = "min";
 	private static final String MAX_ATTRIBUTE_NAME = "max";
 	private static final String NUMBER_OF_DECIMALS_ATTRIBUTE_NAME = "numberOfDecimals";
+	private static final String NUMERICAL_TYPE_VALUE_ELEMENT_NAME = "value";
 	
     public NumericalType(String name) {
         super(name);
@@ -92,11 +93,16 @@ public class NumericalType extends TypeImplementation {
 		this.numOfDecimals = XMLHelper.getIntAttribute(rangeElement, NUMBER_OF_DECIMALS_ATTRIBUTE_NAME);
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType#toValue(org.jdom.Element)
-	 */
 	public AttributeValue toValue(Element element) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NumericalValue(Double.parseDouble(element.getTextTrim()));
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType#toElement(net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue)
+	 */
+	public Element toElement(AttributeValue value) {
+		Element retVal = new Element(NUMERICAL_TYPE_VALUE_ELEMENT_NAME);
+		retVal.addContent(String.valueOf(((NumericalValue) value).getValue()));
+		return retVal;
 	}
 }

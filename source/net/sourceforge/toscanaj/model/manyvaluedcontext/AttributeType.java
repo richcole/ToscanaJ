@@ -14,5 +14,7 @@ public interface AttributeType {
     Scale[] getScales();
     AttributeValue[] getValueRange();
     boolean isValidValue(AttributeValue valueToTest);
+    
     AttributeValue toValue(Element element);
+    Element toElement(AttributeValue value);
 }
