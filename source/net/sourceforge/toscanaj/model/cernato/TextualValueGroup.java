@@ -19,6 +19,7 @@ public class TextualValueGroup implements ValueGroup {
     public TextualValueGroup(TextualType type, String name) {
         this.type = type;
         this.name = name;
+        type.addValueGroup(this, name);
     }
 
     public String getName() {

@@ -15,7 +15,12 @@ import net.sourceforge.toscanaj.gui.action.*;
 import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
+import net.sourceforge.toscanaj.model.cernato.View;
+import net.sourceforge.toscanaj.model.cernato.Criterion;
+import net.sourceforge.toscanaj.model.cernato.ValueGroup;
 import net.sourceforge.toscanaj.model.events.*;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.ToscanaJ;
@@ -28,6 +33,9 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.util.Vector;
+import java.util.Iterator;
+import java.util.List;
 
 /// @todo check if the file we save to exists, warn if it does
 public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
@@ -189,6 +197,29 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
             return;
         }
         this.conceptualSchema = new ConceptualSchema(this.eventBroker);
+        addDiagrams(conceptualSchema, inputModel);
+    }
+
+    private void addDiagrams(ConceptualSchema schema, CernatoModel cernatoModel) {
+
+        Vector views = cernatoModel.getViews();
+        for (Iterator iterator = views.iterator(); iterator.hasNext();) {
+            View view = (View) iterator.next();
+            addDiagram(schema, view);
+        }
+    }
+
+    private void addDiagram(ConceptualSchema schema, View view) {
+        List criteria = view.getCriteria();
+        SimpleLineDiagram diagram = new SimpleLineDiagram();
+        diagram.setTitle(view.getName());
+        ValueGroup[] groups = new ValueGroup[criteria.size()];
+        int i = 0;
+        for (Iterator iterator = criteria.iterator(); iterator.hasNext();) {
+            Criterion criterion = (Criterion) iterator.next();
+            groups[i] = criterion.getValueGroup();
+        }
+        schema.addDiagram(diagram);
     }
 
     protected void showAboutDialog() {

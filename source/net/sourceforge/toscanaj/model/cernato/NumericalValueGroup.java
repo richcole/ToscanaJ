@@ -26,6 +26,7 @@ public class NumericalValueGroup implements ValueGroup {
         this.minIncluded = minIncluded;
         this.max = max;
         this.maxIncluded = maxIncluded;
+        type.addValueGroup(this, name);
     }
 
     public String getName() {
