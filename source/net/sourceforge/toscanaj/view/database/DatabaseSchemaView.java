@@ -107,9 +107,13 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
                     (ColumnInfo) columnsList.elementAt(
                             model.getMinSelectionIndex()
                     );
+            final int selectedIndex = unkeyedTableListPanel.getSelectedIndex();
+            if(selectedIndex<0){
+                return;
+            }
             TableInfo tableInfo =
                     (TableInfo) unkeyedTableList.elementAt(
-                            unkeyedTableListPanel.getSelectedIndex()
+                            selectedIndex
                     );
             setObjectKey(tableInfo.getTable(), columnInfo.getColumn());
         }
@@ -135,6 +139,10 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
                 break;
             }
         }
+        /// @todo remove workaround for a bug in swing ver. < 1.3rel03
+        if ( unkeyedTableList.size() == 0 ) {
+            displayTable(null);
+        };
     }
 
     private void removeKeyedTable(Table table) {
@@ -146,10 +154,6 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
             }
         }
 
-        /// @todo remove workaround for a bug in swing ver. < 1.3rel03
-        if ( keyedTableList.size() == 0 ) {
-            displayTable(null);
-        };
     }
 
     public void displayTable(Table table) {
