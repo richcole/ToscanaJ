@@ -16,7 +16,7 @@ class JavaUtilCollectionIterator
     private boolean m_at_end;
 
     private JavaUtilCollectionIterator(JavaUtilCollectionIterator a_it)
-            throws PreconditionFailedException {
+             {
         m_set = a_it.m_set;
         reset();
 
@@ -28,12 +28,7 @@ class JavaUtilCollectionIterator
     }
 
     public Object clone() {
-        try {
-            return new JavaUtilCollectionIterator(this);
-        } catch (PreconditionFailedException e) {
-            throw new UnknownError("Precondition Failed: " +
-                    e.toString());
-        }
+        return new JavaUtilCollectionIterator(this);
     }
 
     public JavaUtilCollectionIterator(java.util.Collection set) {
@@ -61,16 +56,16 @@ class JavaUtilCollectionIterator
         }
     }
 
-    public Object val() throws PreconditionFailedException {
+    public Object val() {
         if (m_at_end == true) {
-            throw new PreconditionFailedException("At end of sequence");
+            throw new Error("At end of sequence");
         }
         return m_curr_object;
     }
 
-    public void next() throws PreconditionFailedException {
+    public void next() {
         if (m_at_end == true) {
-            throw new PreconditionFailedException("At end of sequence");
+            throw new Error("At end of sequence");
         } else {
             if (m_curr.hasNext()) {
                 m_curr_object = m_curr.next();
@@ -94,7 +89,7 @@ class JavaUtilCollectionIterator
         return m_at_end;
     }
 
-    public void nextGTE(Comparable o) throws PreconditionFailedException {
+    public void nextGTE(Comparable o) {
         while (!atEnd() && ((Comparable) val()).compareTo(o) < 0) {
             next();
         }

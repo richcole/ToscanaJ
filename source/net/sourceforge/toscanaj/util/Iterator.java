@@ -80,13 +80,13 @@ public interface Iterator
      * Set the iterator to refer to the next element in the sequence
      * ranged over by this iterator.
      */
-    public void next() throws PreconditionFailedException;
+    public void next();
 
     /**
      * Return the value refered to by this iterator. If the iterator
      * refers to the end of the list then throw an exception.
      */
-    public Object val() throws PreconditionFailedException;
+    public Object val();
 
     /**
      * returns true if the set ranged over by this iterator contains
@@ -109,7 +109,7 @@ public interface Iterator
     /**
      * Advance until an element greater than or equal to o is found.
      */
-    public void nextGTE(Comparable o) throws PreconditionFailedException;
+    public void nextGTE(Comparable o);
 }
 
 

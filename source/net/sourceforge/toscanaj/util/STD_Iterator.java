@@ -30,11 +30,11 @@ public class STD_Iterator implements Iterator {
         it.reset();
     }
 
-    public void next() throws PreconditionFailedException {
+    public void next() {
         it.next();
     }
 
-    public Object val() throws PreconditionFailedException {
+    public Object val()  {
         return it.val();
     }
 
@@ -50,7 +50,7 @@ public class STD_Iterator implements Iterator {
         return new STD_Iterator(it);
     }
 
-    public void nextGTE(Comparable o) throws PreconditionFailedException {
+    public void nextGTE(Comparable o)  {
         it.nextGTE(o);
     };
 }

@@ -14,7 +14,7 @@ class JavaUtilSetIterator implements Iterator {
     private boolean m_at_end;
 
     private JavaUtilSetIterator(JavaUtilSetIterator a_it)
-            throws PreconditionFailedException {
+             {
         m_set = a_it.m_set;
         reset();
 
@@ -26,12 +26,7 @@ class JavaUtilSetIterator implements Iterator {
     }
 
     public Object clone() {
-        try {
-            return new JavaUtilSetIterator(this);
-        } catch (PreconditionFailedException e) {
-            throw new UnknownError("Precondition Failed: " +
-                    e.toString());
-        }
+        return new JavaUtilSetIterator(this);
     }
 
     public JavaUtilSetIterator(java.util.Set set) {
@@ -59,16 +54,16 @@ class JavaUtilSetIterator implements Iterator {
         }
     }
 
-    public Object val() throws PreconditionFailedException {
+    public Object val() {
         if (m_at_end == true) {
-            throw new PreconditionFailedException("At end of sequence");
+            throw new Error("At end of sequence");
         }
         return m_curr_object;
     }
 
-    public void next() throws PreconditionFailedException {
+    public void next()  {
         if (m_at_end == true) {
-            throw new PreconditionFailedException("At end of sequence");
+            throw new Error("At end of sequence");
         } else {
             if (m_curr.hasNext()) {
                 m_curr_object = m_curr.next();
@@ -92,7 +87,7 @@ class JavaUtilSetIterator implements Iterator {
         return m_at_end;
     }
 
-    public void nextGTE(Comparable o) throws PreconditionFailedException {
+    public void nextGTE(Comparable o) {
         while (!atEnd() && ((Comparable) val()).compareTo(o) < 0) {
             next();
         }
