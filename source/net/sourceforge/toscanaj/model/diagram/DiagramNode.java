@@ -339,8 +339,12 @@ public class DiagramNode implements XMLizable {
             return false;
         }
         DiagramNode other = (DiagramNode) obj;
-        if (!this.getIdentifier().equals(other.getIdentifier())) {
-            return false;
+        // @todo a hack to avoid NPE here (after copying diagrams we 
+        // get nodes without identifiers). Rethink the whole identifier thing
+        if ( (this.getIdentifier() != null ) && (other.getIdentifier() != null)) {
+			if (!this.getIdentifier().equals(other.getIdentifier())) {
+				return false;
+			}
         }
         if (!this.getPosition().equals(other.getPosition())) {
             return false;
