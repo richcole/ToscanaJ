@@ -11,11 +11,13 @@ import java.io.File;
 
 import javax.swing.JFrame;
 
+import org.tockit.plugin.Plugin;
 import org.tockit.tupleware.gui.IndexSelectionDialog;
 import org.tockit.tupleware.model.TupleSet;
 import org.tockit.tupleware.source.TupleSource;
+import org.tockit.tupleware.source.TupleSourceRegistry;
 
-public class RdqlQueryEngine implements TupleSource {
+public class RdqlQueryEngine implements TupleSource, Plugin {
 	private int[] objectIndices;
 	private TupleSet tupleSet;
 	private File selectedFile;
@@ -47,4 +49,9 @@ public class RdqlQueryEngine implements TupleSource {
 	public File getSelectedFile() {
 		return selectedFile;
 	}
+	
+	public void load() {
+		TupleSourceRegistry.registerTupleSource(this);
+	}
+	
 }

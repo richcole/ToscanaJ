@@ -33,9 +33,9 @@ import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileFilter;
 
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
-import org.tockit.docco.ConfigurationManager;
 import org.tockit.tupleware.model.TupleSet;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -198,29 +198,35 @@ public class RdfQueryDialog extends JDialog {
 		}
         
 		boolean executeStep() {
-			String queryString = rdfQueryArea.getText();
-			System.out.println("Query: " + queryString);
+			try {
+				String queryString = rdfQueryArea.getText();
+				System.out.println("Query: " + queryString);
 
-			Query query = new Query(queryString) ;
-			List resultVars = query.getResultVars();
-			tupleSet = new TupleSet(
-								(String[]) resultVars.toArray(new String[resultVars.size()]));
-			query.setSource(rdfModel);	
-			QueryExecution qe = new QueryEngine(query) ;
-			QueryResults results = qe.exec();
-			for ( Iterator iter = results ; iter.hasNext() ; ) {
-				ResultBinding resBinding = (ResultBinding)iter.next() ;
-				Object[] tuple = new Object[resultVars.size()];
-				for (int i = 0; i < resultVars.size(); i++) {
-					String  queryVar = (String) resultVars.get(i);
-					Object obj = resBinding.get(queryVar);
-					tuple[i] = obj;				
-				} 
-				System.out.println("---" + TupleSet.toString(tuple));
-				tupleSet.addTuple(tuple);
+				Query query = new Query(queryString) ;
+				List resultVars = query.getResultVars();
+				tupleSet = new TupleSet(
+									(String[]) resultVars.toArray(new String[resultVars.size()]));
+				query.setSource(rdfModel);	
+				QueryExecution qe = new QueryEngine(query) ;
+				QueryResults results = qe.exec();
+				for ( Iterator iter = results ; iter.hasNext() ; ) {
+					ResultBinding resBinding = (ResultBinding)iter.next() ;
+					Object[] tuple = new Object[resultVars.size()];
+					for (int i = 0; i < resultVars.size(); i++) {
+						String  queryVar = (String) resultVars.get(i);
+						Object obj = resBinding.get(queryVar);
+						tuple[i] = obj;				
+					} 
+					System.out.println("---" + TupleSet.toString(tuple));
+					tupleSet.addTuple(tuple);
+				}
+				results.close() ;
+				return true;
 			}
-			results.close() ;
-			return true;
+			catch (Exception e) {
+				ErrorDialog.showError(this, e, "Query Failed");
+				return false;
+			}
 		}
 
 		String getTitle() {
@@ -400,4 +406,5 @@ public class RdfQueryDialog extends JDialog {
 	public TupleSet getTuples() {
 		return this.tupleSet;
 	}
+
 }

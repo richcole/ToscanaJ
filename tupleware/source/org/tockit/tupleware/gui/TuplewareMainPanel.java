@@ -24,11 +24,12 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import org.tockit.events.EventBroker;
+import org.tockit.plugin.PluginLoader;
+import org.tockit.plugin.PluginLoaderException;
 import org.tockit.tupleware.model.TupleSet;
 import org.tockit.tupleware.scaling.TupleScaling;
 import org.tockit.tupleware.source.TupleSource;
-import org.tockit.tupleware.source.text.TextSource;
-import org.tockit.tupleware.source.rdql.RdqlQueryEngine;
+import org.tockit.tupleware.source.TupleSourceRegistry;
 import org.tockit.tupleware.source.sql.SqlQueryEngine;
 
 import java.awt.*;
@@ -77,6 +78,8 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
 
         eventBroker = new EventBroker();
         conceptualSchema = new ConceptualSchema(eventBroker);
+        
+        loadPlugins();
 
         createViews();
 
@@ -194,9 +197,12 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
 		JMenu tuplesMenu = new JMenu("Tuples");
 		tuplesMenu.setMnemonic('t');
 		
-        addTupleSourceMenuItem(tuplesMenu, this, new TextSource());
         addTupleSourceMenuItem(tuplesMenu, this, new SqlQueryEngine());
-		addTupleSourceMenuItem(tuplesMenu, this, new RdqlQueryEngine());
+		Iterator tupleSources = TupleSourceRegistry.getTupleSources().iterator();
+		while (tupleSources.hasNext()) {
+			TupleSource curSource = (TupleSource) tupleSources.next();
+			addTupleSourceMenuItem(tuplesMenu, this, curSource);
+		}
 		
 		tuplesMenu.addSeparator();
 		JMenuItem saveTuplesItem = new JMenuItem("Save tuples...");
@@ -371,4 +377,35 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
 			options,
 			options[2]);
 	}
+
+	private void loadPlugins() {
+		/// @todo this should be read from config manager?...
+		String pluginsDirName = "plugins";
+
+		String pluginsBaseDir = System.getProperty("user.dir") + File.separator;
+		
+		File[] pluginsBaseFiles = { new File(pluginsBaseDir + pluginsDirName)	};
+		
+		try {
+			PluginLoader.Error[] errors = PluginLoader.loadPlugins(pluginsBaseFiles);
+			if (errors.length > 0) {
+				String errorMsg = "";
+				for (int i = 0; i < errors.length; i++) {
+					PluginLoader.Error error = errors[i];
+					errorMsg += "Plugin location:\n\t" + error.getPluginLocation().getAbsolutePath();
+					errorMsg += "\n";
+					errorMsg += "Error:\n\t" + error.getException().getMessage();
+					errorMsg += "\n\n";
+					error.getException().printStackTrace();
+				}
+				JOptionPane.showMessageDialog(this, "There were errors loading plugins: \n" + errorMsg,
+											"Error loading plugins", 
+											JOptionPane.WARNING_MESSAGE);
+			}
+		}
+		catch (PluginLoaderException e) {
+			//ErrorDialog.showError(this, e, "Error loading plugins");
+		}
+	}
+	
 }
