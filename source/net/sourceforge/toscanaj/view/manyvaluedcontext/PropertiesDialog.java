@@ -25,7 +25,7 @@ import javax.swing.JTextField;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableManyValuedAttribute;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 
 public class PropertiesDialog extends JDialog{
@@ -34,14 +34,14 @@ public class PropertiesDialog extends JDialog{
 	private JButton cancelButton;
 	private JButton editTypeButton;
 	private JButton changeButton;
-	private WriteableManyValuedAttribute property;
+	private WritableManyValuedAttribute property;
 	private JFrame frame;
 	private JComboBox typeBox;
 	private PropertiesDialog dialog = this;
 	private ManyValuedContext context;
 	
 	public PropertiesDialog(JFrame frame,
-										WriteableManyValuedAttribute property, 
+										WritableManyValuedAttribute property, 
 										ManyValuedContext context){
 		super(frame,"Many Valued-Context:Properties",true);
 		this.frame = frame;

@@ -9,13 +9,13 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext.types;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableScaleColumn;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableScaleColumn;
 import net.sourceforge.toscanaj.model.order.Ordered;
 
 import java.util.HashSet;
 import java.util.Iterator;
 
-public class TextualValueGroup implements WriteableScaleColumn {
+public class TextualValueGroup implements WritableScaleColumn {
     private TextualType type;
     private String name;
     private HashSet values = new HashSet();

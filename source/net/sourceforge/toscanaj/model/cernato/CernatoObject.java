@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableFCAObject;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableFCAObject;
 
-public class CernatoObject implements WriteableFCAObject {
+public class CernatoObject implements WritableFCAObject {
     private String name;
 
     public CernatoObject(String name) {

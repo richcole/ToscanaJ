@@ -22,7 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableManyValuedContext;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
 
 public class ObjectDialog extends JDialog{
 	
@@ -32,10 +32,10 @@ public class ObjectDialog extends JDialog{
 	private JFrame parent;
 	private int index;
 	private JDialog dialog = this;
-	private WriteableManyValuedContext context;
+	private WritableManyValuedContext context;
 	
 	
-	public ObjectDialog(JFrame parent, WriteableManyValuedContext context){
+	public ObjectDialog(JFrame parent, WritableManyValuedContext context){
 		super(parent,"Object", false);
 		setResizable(false);
 		createView();

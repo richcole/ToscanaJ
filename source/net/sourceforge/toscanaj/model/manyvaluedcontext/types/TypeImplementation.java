@@ -9,9 +9,9 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext.types;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Scale;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleImplementation;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableAttributeType;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableAttributeType;
 
-public abstract class TypeImplementation implements WriteableAttributeType {
+public abstract class TypeImplementation implements WritableAttributeType {
     protected String name;
     protected Scale scale;
 

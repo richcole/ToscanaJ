@@ -23,9 +23,9 @@ import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableFCAObject;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableManyValuedAttribute;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableManyValuedContext;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableFCAObject;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
@@ -64,7 +64,7 @@ import org.tockit.events.EventBroker;
 
 public class TableViewPanel extends JFrame {
 
-	private WriteableManyValuedContext context;
+	private WritableManyValuedContext context;
 	private RowHeader rowHeader;
 	private ColumnHeader colHeader;
 	private TableView cernatoTableView;
@@ -75,7 +75,7 @@ public class TableViewPanel extends JFrame {
 	private DiagramView diagramView;
 	private View view;
 	
-	protected TableViewPanel(WriteableManyValuedContext context) {
+	protected TableViewPanel(WritableManyValuedContext context) {
 		this.context = context;
 		createHeaders();
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,createTableView(),createDiagramView());
@@ -181,10 +181,10 @@ public class TableViewPanel extends JFrame {
 					double y = e.getPoint().getY();
 					Point p = new Point(x,y);
 					ArrayList propertyList = (ArrayList)context.getAttributes();
-					WriteableManyValuedAttribute property = (WriteableManyValuedAttribute)
+					WritableManyValuedAttribute property = (WritableManyValuedAttribute)
 															propertyList.get(p.getRow()-1);
 					ArrayList objectList = (ArrayList) context.getObjects();
-					WriteableFCAObject obj = (WriteableFCAObject)objectList.get(p.getCol()-1);
+					WritableFCAObject obj = (WritableFCAObject)objectList.get(p.getCol()-1);
 					double xPos = e.getPoint().getX();
 					double yPos = e.getPoint().getY();
 					
@@ -218,7 +218,7 @@ public class TableViewPanel extends JFrame {
 					double y = e.getPoint().getY();
 					Point p = new Point(x,y);
 					List propertyList = (List) context.getAttributes();
-					WriteableManyValuedAttribute property = (WriteableManyValuedAttribute)
+					WritableManyValuedAttribute property = (WritableManyValuedAttribute)
 													propertyList.get(p.getRow()-1);
 					PropertiesDialog propertiesDialog = new PropertiesDialog(tFrame,property,context);
 				}
@@ -257,8 +257,8 @@ public class TableViewPanel extends JFrame {
 		
 	}
 
-	protected void showNumericInputDialog(WriteableManyValuedAttribute attribute,
-												WriteableFCAObject obj) {
+	protected void showNumericInputDialog(WritableManyValuedAttribute attribute,
+												WritableFCAObject obj) {
 		String content = context.getRelationship(obj,attribute).toString();
 		String value = (String) JOptionPane.showInputDialog(this,"Enter Value","Edit Value",
 																JOptionPane.PLAIN_MESSAGE,null,null,
@@ -357,7 +357,7 @@ public class TableViewPanel extends JFrame {
 		}
 		
 		if (model != null) {
-			WriteableManyValuedContext context = model.getContext();
+			WritableManyValuedContext context = model.getContext();
 			TableViewPanel c1 = new TableViewPanel(context);
 			c1.setDefaultCloseOperation(EXIT_ON_CLOSE);
 			c1.setSize(c1.getPreferredSize());

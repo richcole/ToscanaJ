@@ -8,9 +8,9 @@
 package net.sourceforge.toscanaj.model.cernato;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableManyValuedAttribute;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
 
-public class Property implements WriteableManyValuedAttribute {
+public class Property implements WritableManyValuedAttribute {
     private AttributeType type;
     private String name;
 

@@ -15,9 +15,9 @@ import java.util.List;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableManyValuedContext;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
 
-public class CernatoTable implements WriteableManyValuedContext {
+public class CernatoTable implements WritableManyValuedContext {
     private List objects = new ArrayList();
     private List properties = new ArrayList();
     private Hashtable relation = new Hashtable();

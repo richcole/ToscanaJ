@@ -4,13 +4,9 @@
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
- */
- 
+ */	
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-
-public interface WriteableScaleColumn extends ScaleColumn{
-	
-	public void addValue(AttributeValue attributeValue);
-
+public interface WritableFCAObject extends FCAObject {
+	void setName(String name);
 }
