@@ -217,7 +217,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * filter operations.
      */
     private void addDiagram(Diagram2D diagram, ConceptInterpretationContext context, int layer) {
-        String lineLayerName = "lines-" + layer;
+		String lineLayerName = "lines-" + layer;
         String nodeLayerName = "nodes-" + layer;
         String labelConnectorLayerName = "connectors-" + layer;
         String labelLayerName = "labels";
@@ -227,30 +227,25 @@ public class DiagramView extends Canvas implements ChangeObserver {
             NodeView nodeView = new NodeView(node, this, context);
             nodeMap.put(node, nodeView);
             addCanvasItem(nodeView, nodeLayerName);
-            if (node instanceof NestedDiagramNode) {
-                Concept concept = node.getConcept();
-                if (conceptInterpreter.isRealized(concept, context)) {
-                    NestedDiagramNode ndNode = (NestedDiagramNode) node;
-                    addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept), layer + 1);
+            Concept concept = node.getConcept();
+            /// @todo calling isRealized(..) has the side effect of initialising the caches in the DB connected version -- find better way
+            // if the caches are not initialized, the object contingent gradient will be wrong from time to time
+            if (conceptInterpreter.isRealized(concept, context)) {
+                if (node instanceof NestedDiagramNode) {
+		            NestedDiagramNode ndNode = (NestedDiagramNode) node;
+		            addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept), layer + 1);
                 }
-            } else {
-                /**
-                 * Inititalize the contingent sizes to allow contingent gradients to work properly on first draw.
-                 *
-                 * @todo this is not a nice place to do this, find something better
-                 */
-                conceptInterpreter.getObjectCount(node.getConcept(), context);
+                LabelInfo objLabelInfo = diagram.getObjectLabel(i);
+                if (objLabelInfo != null) {
+                    LabelView labelView = new ObjectLabelView(this, nodeView, objLabelInfo);
+                    addCanvasItem(labelView, labelLayerName);
+                    addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
+                    labelView.addObserver(this);
+                }
             }
             LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
             if (attrLabelInfo != null) {
                 LabelView labelView = new AttributeLabelView(this, nodeView, attrLabelInfo);
-                addCanvasItem(labelView, labelLayerName);
-                addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
-                labelView.addObserver(this);
-            }
-            LabelInfo objLabelInfo = diagram.getObjectLabel(i);
-            if (objLabelInfo != null) {
-                LabelView labelView = new ObjectLabelView(this, nodeView, objLabelInfo);
                 addCanvasItem(labelView, labelLayerName);
                 addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
                 labelView.addObserver(this);
