@@ -960,7 +960,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 				if (selectedFile != null && selectedFile.exists()) {
 					//Ask the user if they are sure they want to overwrite the existing file
 					int response =
-						JOptionPane.showConfirmDialog(
+						JOptionPane.showOptionDialog(
 							this,
 							"The file "
 								+ selectedFile.getName()
@@ -968,7 +968,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 								+ "Do you want to overwrite the existing file?",
 							"File Export Warning: File exists",
 							JOptionPane.YES_NO_OPTION,
-							JOptionPane.WARNING_MESSAGE);
+							JOptionPane.WARNING_MESSAGE,null,new Object[] {"Yes", "No"}, "No");
 					if (response != JOptionPane.YES_OPTION) {
 						return;
 					}
@@ -1075,15 +1075,18 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 				if (selectedFile != null && selectedFile.exists()) {
 					//Ask the user if they are sure they want to overwrite the existing file
 					int response =
-						JOptionPane.showConfirmDialog(
-							this,
-							"The file "
-								+ selectedFile.getName()
-								+ " already exists.\n"
-								+ "Do you want to overwrite the existing file?",
-							"File Export Warning: File exists",
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showOptionDialog(
+					this,
+					"The file "
+						+ selectedFile.getName()
+						+ " already exists.\n"
+						+ "Do you want to overwrite the existing file?",
+					"File Export Warning: File exists",
+					JOptionPane.YES_NO_OPTION,
+					JOptionPane.WARNING_MESSAGE,
+					null,
+					new Object[] { "Yes", "No" },
+					"No");
 					if (response != JOptionPane.YES_OPTION) {
 						return;
 					}
