@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.ContextImplementation;
@@ -73,6 +74,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
         
         eventBroker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
     	eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+    	eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
     }
 
 	private void createView() {
@@ -825,8 +827,17 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 	}
 
     public void processEvent(Event e) {
-    	ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
-    	this.conceptualSchema = csce.getConceptualSchema();
+    	if(e instanceof ConceptualSchemaChangeEvent) {
+	    	ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
+	    	this.conceptualSchema = csce.getConceptualSchema();
+	    	return;
+    	}
+    	if(e instanceof DatabaseConnectedEvent) {
+    		DatabaseConnectedEvent dbce = (DatabaseConnectedEvent) e;
+    		this.databaseConnection = dbce.getConnection();
+    		return;
+    	}
+    	throw new RuntimeException("Caught event we don't know about");
     }
     
     public void setContext(ContextImplementation context) {
