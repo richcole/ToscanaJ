@@ -512,6 +512,12 @@ public class ConceptImplementation implements Concept {
     public void addAttribute(Attribute attribute) {
         this.attributeContingent.add(attribute);
     }
+    
+    public void replaceObject (Object objectToReplace, Object newObject) {
+    	// @todo make sure new object is inserted at the same position where old one was
+    	this.objectContingent.remove(objectToReplace);
+    	this.objectContingent.add(newObject);
+    }
 
     public void removeObject(Object object) {
         this.objectContingent.remove(object);

@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 import net.sourceforge.toscanaj.view.scales.InputTextDialog;
@@ -22,6 +23,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 
+/**
+ * Assumptions:
+ * - a Concept implementation used here is a ConceptImplementation class
+ * - an object in the FCA sense is a String.  
+ */
 public class ObjectEditingLabelViewPopupMenuHandler implements EventBrokerListener {
     private DiagramView diagramView;
 
@@ -48,7 +54,7 @@ public class ObjectEditingLabelViewPopupMenuHandler implements EventBrokerListen
     }
 
     public void openPopupMenu(final ObjectLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
-        Object object = labelView.getObjectAtPosition(canvasPosition);
+        final Object object = labelView.getObjectAtPosition(canvasPosition);
 		final String currentValue =  object.toString();
         
         // create the menu
@@ -60,7 +66,9 @@ public class ObjectEditingLabelViewPopupMenuHandler implements EventBrokerListen
 															 "Rename Object", "object", currentValue);
 				if (!dialog.isCancelled()) {
 					String newValue = dialog.getInput();
-					diagramView.repaint();
+					ConceptImplementation concept = (ConceptImplementation) labelView.getNodeView().getDiagramNode().getConcept();
+					concept.replaceObject(object, newValue);
+					labelView.updateEntries();
 				}
 			}
 		});
