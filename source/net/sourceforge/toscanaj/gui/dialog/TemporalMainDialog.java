@@ -23,6 +23,7 @@ import java.util.ListIterator;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -70,6 +71,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private NumberField fadeOutField;
     private ArrayList sequenceValues;
     private ArrayList timelineValues;
+    private JCheckBox serializeSequencesBox;
 	
     public TemporalMainDialog(Frame frame, DiagramView diagramView, EventBroker eventBroker) {
 	  	super(frame, "Temporal Controls", false);
@@ -127,6 +129,8 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         JLabel fadeOutLabel = new JLabel("Fade-out steps:");
         fadeOutField = new NumberField(10,NumberField.FLOAT);
         fadeOutField.setText("5");
+        
+        serializeSequencesBox = new JCheckBox("Serialize Sequences"); 
         
         animateTransitionsButton = new JButton("Animate Transitions");
         animateTransitionsButton.addActionListener(new ActionListener(){
@@ -194,6 +198,10 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
                                                         new Insets(2,2,2,2), 0, 0));
         contentPane.add(fadeOutField, new GridBagConstraints(2, row, 2, 1, 1, 0,
                                                         GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        row++;
+        contentPane.add(serializeSequencesBox, new GridBagConstraints(0, row, 4, 1, 1, 0,
+                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
                                                         new Insets(2,2,2,2), 0, 0));
         row++;
         contentPane.add(animateTransitionsButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
@@ -293,22 +301,28 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         double hold = this.holdField.getDoubleValue();
         double fadeOut = this.fadeOutField.getDoubleValue();
         int speed = this.speedField.getIntegerValue();
-        AnimationTimeController newTimeController = new AnimationTimeController(length, fadeIn, hold, fadeOut, speed);
-        addTransitions(newTimeController.getAllFadedTime(), newTimeController, true);
+        if(this.serializeSequencesBox.isSelected()) {
+        	int numSeq = this.sequenceValues.size();
+            AnimationTimeController newTimeController = new AnimationTimeController(length * numSeq, fadeIn, hold, fadeOut, speed);
+            addTransitionsSerialized(newTimeController.getAllFadedTime(), newTimeController, true);
+        } else {
+            AnimationTimeController newTimeController = new AnimationTimeController(length, fadeIn, hold, fadeOut, speed);
+        	addTransitions(newTimeController.getAllFadedTime(), newTimeController, true);
+        }
     }
 
-    private void addTransitions(double newTargetTime, AnimationTimeController newTimeController, 
+    private void addTransitions(double newTargetTime, AnimationTimeController newTimeController,
                                  boolean highlightStates) {
         if(this.diagramView.hasLayer(TRANSITION_LAYER_NAME)) {
-        	this.diagramView.removeLayer(TRANSITION_LAYER_NAME);
+            this.diagramView.removeLayer(TRANSITION_LAYER_NAME);
         }
         this.diagramView.addLayer(TRANSITION_LAYER_NAME);
 
         AttributeValue selectedSequence = null; // no specific sequence selected
-		Object selectedSequenceItem = this.sequenceToShowChooser.getSelectedItem();
-		if(selectedSequenceItem instanceof AttributeValue) {
- 		    selectedSequence = (AttributeValue) selectedSequenceItem;
-		}
+        Object selectedSequenceItem = this.sequenceToShowChooser.getSelectedItem();
+        if(selectedSequenceItem instanceof AttributeValue) {
+            selectedSequence = (AttributeValue) selectedSequenceItem;
+        }
 
         List objectSequences = calculateObjectSequences();
         Hashtable nodeViewMap = createNodeViewMap();
@@ -321,18 +335,62 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
             AttributeValue curSequenceValue = (AttributeValue) seqValIt.next();
             if(this.timeController == null) {
                 this.timeController = newTimeController;
-            	this.targetTime = newTargetTime;
+                this.targetTime = newTargetTime;
                 this.lastAnimationTime = 0;
             }
             Color color = COLORS[colNum];
             if(selectedSequence == null || selectedSequence == curSequenceValue) {
-            	addTransitions(sequence, new Color(color.getRed(), color.getGreen(), color.getBlue(), 140), nodeViewMap, highlightStates);
+                addTransitions(sequence, new Color(color.getRed(), color.getGreen(), color.getBlue(), 140), nodeViewMap, highlightStates);
             }
             colNum = (colNum + 1) % COLORS.length;
         }
         this.diagramView.repaint();
     }
-    
+
+	/**
+	 * @todo Copy and paste code, refactor. Maybe it is best to add the
+	 * transitions once they are known and not every time a button is pressed.
+	 * The buttons would then change only the time controller and not affect the
+	 * canvas items directly.
+	 */
+    private void addTransitionsSerialized(double newTargetTime, AnimationTimeController newTimeController,
+                                           boolean highlightStates) {
+        if(this.diagramView.hasLayer(TRANSITION_LAYER_NAME)) {
+            this.diagramView.removeLayer(TRANSITION_LAYER_NAME);
+        }
+        this.diagramView.addLayer(TRANSITION_LAYER_NAME);
+
+        AttributeValue selectedSequence = null; // no specific sequence selected
+        Object selectedSequenceItem = this.sequenceToShowChooser.getSelectedItem();
+        if(selectedSequenceItem instanceof AttributeValue) {
+            selectedSequence = (AttributeValue) selectedSequenceItem;
+        }
+
+        List objectSequences = calculateObjectSequences();
+        Hashtable nodeViewMap = createNodeViewMap();
+        this.timeController = null;
+        Iterator seqIt = objectSequences.iterator();
+        Iterator seqValIt = this.sequenceValues.iterator();
+        int seqNum = 0;
+        int seqLength = this.timelineValues.size();
+        while (seqIt.hasNext()) {
+            List sequence = (List) seqIt.next();
+            AttributeValue curSequenceValue = (AttributeValue) seqValIt.next();
+            if(this.timeController == null) {
+                this.timeController = newTimeController;
+                this.targetTime = newTargetTime;
+                this.lastAnimationTime = 0;
+            }
+            Color color = COLORS[seqNum % COLORS.length];
+            if(selectedSequence == null || selectedSequence == curSequenceValue) {
+                addTransitions(sequence, new Color(color.getRed(), color.getGreen(), color.getBlue(), 140), 
+                               nodeViewMap, highlightStates, seqNum * seqLength);
+            }
+            seqNum++;
+        }
+        this.diagramView.repaint();
+    }
+
     private Hashtable createNodeViewMap() {
     	Hashtable retVal = new Hashtable();
     	Iterator it = this.diagramView.getCanvasItemsByType(NodeView.class).iterator();
@@ -344,9 +402,13 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     }
     
     private void addTransitions(List sequence, Color color, Hashtable nodeViewMap, boolean highlightStates) {
+    	addTransitions(sequence, color, nodeViewMap, highlightStates, 0);
+    }
+
+    private void addTransitions(List sequence, Color color, Hashtable nodeViewMap, boolean highlightStates, int countStart) {
     	NodeView oldView = null;
     	Iterator objectIt = sequence.iterator();
-    	int count = 0;
+    	int count = countStart;
     	objLoop: while (objectIt.hasNext()) {
     		count++;
             FCAObject object = (FCAObject) objectIt.next();
