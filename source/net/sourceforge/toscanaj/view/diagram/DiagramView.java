@@ -185,10 +185,12 @@ public class DiagramView extends Canvas implements ChangeObserver {
             repaint();
             return;
         }
-        addLayer("lines");
-        addLayer("nodes");
+        addLayer("lines-0");
+        addLayer("nodes-0");
+        addLayer("lines-1");
+        addLayer("nodes-1");
         addLayer("labels");
-        addDiagram(diagram, conceptInterpretationContext);
+        addDiagram(diagram, conceptInterpretationContext, 0);
         requestScreenTransformUpdate();
         repaint();
     }
@@ -205,23 +207,26 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     /**
-     * Adds a simple non-nested line diagram to the canvas.
+     * Adds a line diagram to the canvas.
      *
      * If the filter concept is non-null all nodes created will use this for
      * filter operations.
      */
-    private void addDiagram(Diagram2D diagram, ConceptInterpretationContext context) {
+    private void addDiagram(Diagram2D diagram, ConceptInterpretationContext context, int layer) {
+        String lineLayerName = "lines-" + layer;
+        String nodeLayerName = "nodes-" + layer;
+        String labelLayerName = "labels";
         Hashtable nodeMap = new Hashtable();
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
             NodeView nodeView = new NodeView(node, this, context);
             nodeMap.put(node, nodeView);
-            addCanvasItem(nodeView, "nodes");
+            addCanvasItem(nodeView, nodeLayerName);
             if (node instanceof NestedDiagramNode) {
                 Concept concept = node.getConcept();
                 if (conceptInterpreter.isRealized(concept, context)) {
                     NestedDiagramNode ndNode = (NestedDiagramNode) node;
-                    addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept));
+                    addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept), layer + 1);
                 }
             } else {
                 /**
@@ -234,19 +239,19 @@ public class DiagramView extends Canvas implements ChangeObserver {
             LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
             if (attrLabelInfo != null) {
                 LabelView labelView = new AttributeLabelView(this, nodeView, attrLabelInfo);
-                addCanvasItem(labelView, "labels");
+                addCanvasItem(labelView, labelLayerName);
                 labelView.addObserver(this);
             }
             LabelInfo objLabelInfo = diagram.getObjectLabel(i);
             if (objLabelInfo != null) {
                 LabelView labelView = new ObjectLabelView(this, nodeView, objLabelInfo);
-                addCanvasItem(labelView, "labels");
+                addCanvasItem(labelView, labelLayerName);
                 labelView.addObserver(this);
             }
         }
         for (int i = 0; i < diagram.getNumberOfLines(); i++) {
             DiagramLine dl = diagram.getLine(i);
-            addCanvasItem(new LineView(dl, (NodeView) nodeMap.get(dl.getFromNode()), (NodeView) nodeMap.get(dl.getToNode())), "lines");
+            addCanvasItem(new LineView(dl, (NodeView) nodeMap.get(dl.getFromNode()), (NodeView) nodeMap.get(dl.getToNode())), lineLayerName);
         }
     }
 
