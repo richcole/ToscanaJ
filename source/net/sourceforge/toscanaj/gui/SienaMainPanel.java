@@ -264,7 +264,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 					diagramExportSettings,
 					eventBroker);
 			JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-												  this.diagramEditingView, temporalControls);
+												  this.diagramEditingView, new JScrollPane(temporalControls));
 			splitPane.setOneTouchExpandable(true);
 			splitPane.setResizeWeight(1.0);
 			this.diagramEditingView.setPreferredSize(new Dimension(500,500));
