@@ -7,11 +7,13 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 public class ContextTableScaleEditorDialog extends JDialog {
     private boolean result;
@@ -19,7 +21,6 @@ public class ContextTableScaleEditorDialog extends JDialog {
     private DatabaseConnection databaseConnection;
 
     private JTextField scaleTitleField;
-    
     private JPanel buttonsPanel;
 
     public ContextTableScaleEditorDialog(Frame owner, DatabaseConnection databaseConnection) {
@@ -31,6 +32,8 @@ public class ContextTableScaleEditorDialog extends JDialog {
     private void createView() {
         setModal(true);
         setTitle("Context Table Scale Generator");
+		ConfigurationManager.restorePlacement("ContextTableScaleEditorDialog", 
+						this, new Rectangle(250, 100, 600, 450));
         getContentPane().setLayout(new GridBagLayout());
 
         // -- title pane ---
@@ -111,30 +114,51 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		getContentPane().add(
 				buttonsPanel,
 				new GridBagConstraints(
-						0, 2, 1, 1, 1, 1,
+						0, 2, 1, 1, 1, 0,
 						GridBagConstraints.CENTER,
 						GridBagConstraints.BOTH,
-						new Insets(5, 5, 5, 5),
+						new Insets(1, 5, 5, 5),
 						0, 0
 				)
 		);
-        pack();
     }
 	
 	private void createButtonsPanel(){
 		buttonsPanel = new JPanel(new GridBagLayout());
-		JButton addObj = new JButton("  Add Object ");	
-		JButton addAttr = new JButton("  Add Attribute ");
-		JButton cancel= new JButton("  Cancel ");
-		JButton create = new JButton("  Create ");
-				
+		JButton addObj = new JButton(" Add Object ");	
+		JButton addAttr = new JButton(" Add Attribute ");
+		JButton cancel= new JButton(" Cancel ");
+		JButton create = new JButton(" Create ");
+		
+		addObj.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("add object");
+			}
+		});
+		addAttr.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("add attribute");
+			}
+		});
+		cancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("cancel");
+				closeDialog();
+			}
+		});
+		create.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("create");
+			}
+		});
+		
 		buttonsPanel.add(
 			   addObj,
 			   new GridBagConstraints(
 					   0, 0, 1, 1, 1, 0,
 					   GridBagConstraints.WEST,
 					   GridBagConstraints.HORIZONTAL,
-					   new Insets(0, 5, 5, 5),
+					   new Insets(0, 0, 0, 5),
 					   0, 0
 			   )
 	   );
@@ -144,7 +168,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					   1, 0, 1, 1, 1, 0,
 					   GridBagConstraints.WEST,
 					   GridBagConstraints.BOTH,
-					   new Insets(0, 5, 5, 5),
+					   new Insets(0, 5, 0, 5),
 					   0, 0
 			   )
 	   );
@@ -154,7 +178,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					  2, 0, 1, 1, 1, 0,
 					  GridBagConstraints.EAST,
 					  GridBagConstraints.HORIZONTAL,
-					  new Insets(0, 5, 5, 5),
+					  new Insets(0, 100, 0, 5),
 					  0, 0
 			  )
 	  );
@@ -164,12 +188,16 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					  3, 0, 1, 1, 1, 0,
 					  GridBagConstraints.EAST,
 					  GridBagConstraints.BOTH,
-					  new Insets(0, 5, 5, 5),
+					  new Insets(0, 5, 0, 0),
 					  0, 0
 			  )
 	  );	   
 	}
 	
+	private void closeDialog(){
+		ConfigurationManager.storePlacement("ContextTableScaleEditorDialog",this);
+		this.setVisible(false);
+	}
     public boolean execute() {
         result = false;
         show();
