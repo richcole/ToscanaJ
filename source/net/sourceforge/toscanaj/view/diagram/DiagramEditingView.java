@@ -409,16 +409,19 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     		context = contextEditingDialog.getContext();
     		Lattice lattice = lgen.createLattice(context);
     		String contextName = context.getName();
+			boolean ok;
     		do {
+    			ok = true;
 				Diagram2D foundDiagram = this.conceptualSchema.getDiagram(contextName);
-				if (foundDiagram != null) {				
+				if (foundDiagram != null && foundDiagram != this.diagramView.getDiagram()) {
+					ok = false;				
 					InputTextDialog inputDialog = new InputTextDialog(this.parent, 
 													"Duplicate Diagram Title", 
-													" diagram title", contextName,
+													"diagram title", contextName,
 													false);
 					contextName = inputDialog.getInput();
 				}
-    		} while (contextName.equals(context.getName()));
+    		} while (!ok);
     		
     		Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, contextName, new DefaultDimensionStrategy());
     		this.conceptualSchema.replaceDiagram(this.diagramView.getDiagram(), diagram);
