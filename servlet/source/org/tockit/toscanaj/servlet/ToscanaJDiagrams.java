@@ -344,14 +344,7 @@ public class ToscanaJDiagrams extends HttpServlet {
         return retVal;
     }
 
-    private Concept getConcept(int diagramNumber, String nodeId) {
-		System.out.println("ToscanaJDiagrams: getConcept");
-        Diagram2D diagram = conceptualSchema.getDiagram(diagramNumber);
-        DiagramNode node = diagram.getNode(nodeId);
-        Concept concept = node.getConcept();
-        return concept;
-    }
-
+	/// @todo this method and esp. its unnamed constant is dodgy
     private double addXPos(double oldPos) {
         return (oldPos + 350);
     }
@@ -398,6 +391,7 @@ public class ToscanaJDiagrams extends HttpServlet {
         return fontMetrics.getHeight();
     }
 
+	/// @todo get rid of this, put the main diagram output in a stream buffer and calculate the view box in there before outputting the buffer
     private void calculateViewBoxSize(int diagramNumber, DiagramHistory diagramHistory, PrintWriter out) {
 		System.out.println("ToscanaJDiagrams: calculateViewBoxSize");
         Diagram2D diagram = conceptualSchema.getDiagram(diagramNumber);
@@ -602,5 +596,4 @@ public class ToscanaJDiagrams extends HttpServlet {
 		System.out.println("ToscanaJDiagrams: printEnd");
         out.println("</svg>");
     }
-
 }
