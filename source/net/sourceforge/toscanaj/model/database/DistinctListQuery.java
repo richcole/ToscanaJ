@@ -60,4 +60,8 @@ public class DistinctListQuery extends Query {
         retVal.setSpecialWhereClause(specialWhereClause);
         return retVal;
     }
+
+	public boolean doesNeedReferenceValues() {
+		return false;
+	}
 }

@@ -54,4 +54,8 @@ public class ListQuery extends Query {
         retVal.setKey(values.get(0));
         return retVal;
     }
+
+	public boolean doesNeedReferenceValues() {
+		return false;
+	}
 }

@@ -65,4 +65,8 @@ public class DistributionQuery extends Query {
 		DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
 		return retVal;
     }
+
+    public boolean doesNeedReferenceValues() {
+        return true;
+    }
 }

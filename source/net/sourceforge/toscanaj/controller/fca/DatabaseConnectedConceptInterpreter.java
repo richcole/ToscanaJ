@@ -322,22 +322,26 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
 	        if (concept.getObjectContingentSize() != 0 ||
 	                ((objectDisplayMode == ConceptInterpretationContext.EXTENT) && !concept.isBottom())
 	        ) {
-				Concept top = concept;
-				while(top.getUpset().size() > 1) {
-					Iterator it = top.getUpset().iterator();
-					Concept upper = (Concept) it.next();
-					if(upper != top) {
-						top = upper;
-					} else {
-						top = (Concept) it.next();
+				if(query.doesNeedReferenceValues()){
+					Concept top = concept;
+					while(top.getUpset().size() > 1) {
+						Iterator it = top.getUpset().iterator();
+						Concept upper = (Concept) it.next();
+						if(upper != top) {
+							top = upper;
+						} else {
+							top = (Concept) it.next();
+						}
 					}
+					String referenceWhereClause = WhereClauseGenerator.createWhereClause(top,
+							context.getDiagramHistory(),
+							context.getNestingConcepts(),
+							ConceptInterpretationContext.EXTENT,
+							filterMode);
+					return execute(query, whereClause, referenceWhereClause);
+				} else {
+					return execute(query, whereClause, null);
 				}
-				String referenceWhereClause = WhereClauseGenerator.createWhereClause(top,
-						context.getDiagramHistory(),
-						context.getNestingConcepts(),
-						ConceptInterpretationContext.EXTENT,
-						filterMode);
-	            return execute(query, whereClause, referenceWhereClause);
 	        } else {
 	            return null;
 	        }
@@ -352,9 +356,12 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
             try {
                 // submit the query
                 List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
-                /// @todo this should be done in a lazy way to avoid uneccessary queries
-                List referenceResults = DatabaseConnection.getConnection().executeQuery(query.getQueryHead() + referenceWhereClause);
-                Vector reference = (Vector) referenceResults.iterator().next();
+				Vector reference = null;
+				if(referenceWhereClause != null){
+					/// @todo this should be cached since it gets reused for every single object label in a diagram
+					List referenceResults = DatabaseConnection.getConnection().executeQuery(query.getQueryHead() + referenceWhereClause);
+					reference = (Vector) referenceResults.iterator().next();
+				}
                 Iterator it = queryResults.iterator();
                 while (it.hasNext()) {
                     Vector item = (Vector) it.next();

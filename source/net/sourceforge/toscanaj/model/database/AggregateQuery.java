@@ -56,4 +56,8 @@ public class AggregateQuery extends Query {
         DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
         return retVal;
     }
+
+    public boolean doesNeedReferenceValues() {
+        return false;
+    }
 }

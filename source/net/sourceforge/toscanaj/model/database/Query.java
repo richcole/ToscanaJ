@@ -156,4 +156,6 @@ public abstract class Query implements XMLizable {
 	 * @param referenceValues   The reference values that can be used for relative results, usually the same values for the top node 
 	 */
     abstract public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values, Vector referenceValues);
+    
+    abstract public boolean doesNeedReferenceValues();
 }
