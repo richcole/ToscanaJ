@@ -121,23 +121,29 @@ public class DiagramOrganiser extends JPanel {
         };
         availableDiagramsListview.addMouseListener(mouseListener);
 
-
-        // The add button can only be used if diagram is selected
+        // The add button can only be used if an available diagram is selected
         availableDiagramsListview.addListSelectionListener(new ListSelectionListener(){
             public void valueChanged(ListSelectionEvent e){
-                if(e.getValueIsAdjusting()) {
-                    JList source = (JList)e.getSource();
-                    String selectedStr = (String)source.getSelectedValue();
-                    if(selectedStr == null) {
-                        addButton.setEnabled(false);
-                    } else {
-                        addButton.setEnabled(true);
-                    }
+                if(availableDiagramsListview.getSelectedValue() == null) {
+                    addButton.setEnabled(false);
+                } else {
+                    addButton.setEnabled(true);
                 }
             }
         });
-
         addButton.setEnabled(false);
+
+        // The remove button can only be used if a diagram in the history is selected
+        selectedDiagramsListview.addListSelectionListener(new ListSelectionListener(){
+            public void valueChanged(ListSelectionEvent e){
+                if(selectedDiagramsListview.getSelectedValue() == null) {
+                    removeButton.setEnabled(false);
+                } else {
+                    removeButton.setEnabled(true);
+                }
+            }
+        });
+        removeButton.setEnabled(false);
     }
 
     /**
