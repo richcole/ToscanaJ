@@ -7,16 +7,11 @@
  */
 package net.sourceforge.toscanaj.model.lattice.tests;
 
-import com.mockobjects.sql.MockConnection;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.db.tests.*;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
-import org.tockit.events.EventBroker;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DatabaseConnectedConceptTest extends ConceptTest {
     public DatabaseConnectedConceptTest(String s) {
@@ -25,16 +20,6 @@ public class DatabaseConnectedConceptTest extends ConceptTest {
 
     public static Test suite() {
         return new TestSuite(DatabaseConnectedConceptTest.class);
-    }
-
-    static class MockDBConnection extends DatabaseConnection {
-        public MockDBConnection() throws DatabaseException {
-            super(new EventBroker(), new MockConnection());
-        }
-
-        public List executeQuery(List fields, String tableName, String whereClause) throws DatabaseException {
-            return new ArrayList();
-        }
     }
 
     protected ConceptImplementation makeConceptWithEmptyContingentAndExtent() {
