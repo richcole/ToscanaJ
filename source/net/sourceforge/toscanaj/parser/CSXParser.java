@@ -472,6 +472,7 @@ public class CSXParser {
             username = tmpInfo.getUserName();
             password = tmpInfo.getPassword();
             embeddedDBlocation = embedElem.getAttributeValue("url");
+            dbInfo.setEmbeddedSQLLocation(embeddedDBlocation);
         }
 
         dbInfo.setUrl(url);
@@ -487,7 +488,6 @@ public class CSXParser {
         dbInfo.setDriverClass(driver);
         dbInfo.setUserName(username);
         dbInfo.setPassword(password);
-        dbInfo.setEmbeddedSQLLocation(embeddedDBlocation);
 
         // let's try to find the query
         Element elem = dbElement.getChild("table");
