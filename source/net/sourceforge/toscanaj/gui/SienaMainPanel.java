@@ -29,6 +29,8 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -177,14 +179,21 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private File lastCernatoFile;
     private SaveFileAction saveAsFileAction;
     private SaveConceptualSchemaActivity saveActivity;
-
+    
+    /**
+     * The last setup for page format given by the user.
+     */
+    private PageFormat pageFormat = new PageFormat();
+    
 	private TableView tableView;
 	private RowHeader rowHeader;
 	private ColumnHeader colHeader;
     private JLabel temporalControlsLabel;
     private JRadioButtonMenuItem showExactMenuItem;
     private JRadioButtonMenuItem showAllMenuItem;
-	
+    private JMenuItem printMenuItem;
+    private JMenuItem printSetupMenuItem;
+    
 	public SienaMainPanel(boolean loadLastFile) {
         super(WINDOW_TITLE);
 
@@ -561,6 +570,32 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             exportDiagramAction.setEnabled(false);
             fileMenu.addSeparator();
         }
+
+        // menu item PRINT
+        printMenuItem = new JMenuItem("Print...");
+        printMenuItem.setMnemonic(KeyEvent.VK_P);
+        printMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                KeyEvent.VK_P, ActionEvent.CTRL_MASK));
+        printMenuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                printDiagram();
+            }
+        });
+        printMenuItem.setEnabled(false);
+        fileMenu.add(printMenuItem);
+
+        // menu item PRINT SETUP
+        printSetupMenuItem = new JMenuItem("Print Setup...");
+        printSetupMenuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                pageFormat = PrinterJob.getPrinterJob().pageDialog(pageFormat);
+                printDiagram();
+            }
+        });
+        printSetupMenuItem.setEnabled(true);
+        fileMenu.add(printSetupMenuItem);
+        
+        fileMenu.addSeparator();
 
         // --- file exit item ---
         JMenuItem exitMenuItem;
@@ -1017,6 +1052,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         this.exportDiagramAction.setEnabled(
             (this.diagramEditingView.getDiagramView().getDiagram() != null)
                 && (this.diagramExportSettings != null));
+        this.printMenuItem.setEnabled(this.diagramEditingView.getDiagramView().getDiagram() != null);
     }
 
 	/**
@@ -1339,5 +1375,24 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
         recreateMruMenu();
         updateWindowTitle();
+    }
+
+    /**
+     * Prints the diagram using the current settings.
+     *
+     * If we don't have a diagram at the moment we just return.
+     */
+    protected void printDiagram() {
+        if (this.diagramEditingView.getDiagramView().getDiagram() != null) {
+            PrinterJob printJob = PrinterJob.getPrinterJob();
+            if (printJob.printDialog()) {
+                try {
+                    printJob.setPrintable(this.diagramEditingView.getDiagramView(), pageFormat);
+                    printJob.print();
+                } catch (Exception e) {
+                    ErrorDialog.showError(this, e, "Printing failed");
+                }
+            }
+        }
     }
 }
