@@ -17,7 +17,6 @@ import org.jdom.JDOMException;
 import org.jdom.input.DOMBuilder;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -26,11 +25,8 @@ import java.util.List;
 public class CernatoXMLParser {
     public static CernatoModel importCernatoXMLFile(File cernatoXMLFile)
             throws FileNotFoundException, DataFormatException, JDOMException {
-        FileInputStream in;
-        in = new FileInputStream(cernatoXMLFile);
-
         DOMBuilder parser = new DOMBuilder();
-        Document document = parser.build(in);
+        Document document = parser.build(cernatoXMLFile);
 
         Element rootElement = document.getRootElement();
         if (!rootElement.getName().equals("cernatodata")) {
