@@ -707,5 +707,8 @@ public class DatabaseConnection implements EventBrokerListener {
 		
 	}
 	
+	public Connection getJdbcConnection() {
+		return this.jdbcConnection;
+	}
 }
 
