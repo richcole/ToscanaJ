@@ -162,6 +162,12 @@ public class DiagramController implements ChangeObservable {
      * This is currently an instance of SimpleLineDiagram which is filtered
      * by the extent of the zoomed concepts in the past diagrams. If there is
      * no diagram selected this will return null.
+     * 
+     * @todo the result should be cached, since this method can be called
+     *       multiple times in a row, e.g. if the user changes from flat
+     *       to nested view, both update(..)s of the main panel and the
+     *       diagram view call this, thus the nested diagram gets calculated
+     *       twice. 
      */
     public Diagram2D getCurrentDiagram() {
         // this code is pretty tricky -- if concepts are filtered they loose
