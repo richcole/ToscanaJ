@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
+import net.sourceforge.toscanaj.events.EventBroker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class DatabaseConnectedConceptTest extends ConceptTest {
 
     static class MockDBConnection extends DBConnection {
         public MockDBConnection() throws DatabaseException {
-            super(new MockConnection());
+            super(new EventBroker(), new MockConnection());
         }
 
         public List executeQuery(DatabaseInfo.DatabaseQuery query, String whereClause) throws DatabaseException {

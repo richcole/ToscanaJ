@@ -16,6 +16,7 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.*;
+import net.sourceforge.toscanaj.events.EventBroker;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -94,7 +95,10 @@ public class CSXParser {
      *
      * The code might also have problems when namespaces are used.
      */
-    public static ConceptualSchema parse(File csxFile, DBConnection databaseConnection)
+    public static ConceptualSchema parse(
+            EventBroker broker,
+            File csxFile,
+            DBConnection databaseConnection)
             throws FileNotFoundException, IOException, DataFormatException, Exception {
         // open stream on file
         FileInputStream in;
@@ -110,7 +114,7 @@ public class CSXParser {
         _Document = builder.build(w3cdoc);
 
         // create data structure
-        _Schema = new ConceptualSchema();
+        _Schema = new ConceptualSchema(broker);
 
         _BaseURL = csxFile.toURL();
 

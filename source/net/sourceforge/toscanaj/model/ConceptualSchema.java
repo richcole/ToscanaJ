@@ -11,6 +11,8 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
+import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.gui.events.DatabaseInfoChangedEvent;
 import org.jdom.Element;
 
 import java.util.Iterator;
@@ -33,6 +35,8 @@ public class ConceptualSchema {
      */
     private DatabaseInfo databaseInfo;
 
+    EventBroker broker;
+
     /**
      * An SQL file with with to prime the database
      */
@@ -42,6 +46,11 @@ public class ConceptualSchema {
      * List of scales
      */
     private List scales;
+
+    /**
+     * List of tables and views in the database
+     */
+    private List tables;
 
     /**
      * The list of diagrams.
@@ -61,7 +70,8 @@ public class ConceptualSchema {
     /**
      * Creates an empty schema.
      */
-    public ConceptualSchema() {
+    public ConceptualSchema(EventBroker broker) {
+        this.broker = broker;
         reset();
     }
 
@@ -80,7 +90,9 @@ public class ConceptualSchema {
      *
      * @todo get rid of the exception
      */
-    public void copyContents(ConceptualSchema otherSchema)
+
+    /* remove:
+     public void copyContents(ConceptualSchema otherSchema)
         throws DatabaseException
     {
         reset();
@@ -89,6 +101,7 @@ public class ConceptualSchema {
         setDescription(otherSchema.description);
         scales.addAll(otherSchema.scales);
     }
+    */
 
     /**
      * Returns the database information stored.
@@ -103,12 +116,19 @@ public class ConceptualSchema {
      * Sets the database information for the schema.
      */
     public void setDatabaseInfo(DatabaseInfo databaseInfo) throws DatabaseException {
+
         this.databaseInfo = databaseInfo;
+        broker.processEvent(new DatabaseInfoChangedEvent(this, this, databaseInfo));
+
+        /* remove:
         if (databaseInfo == null) {
             return;
         }
-        DBConnection conn = new DBConnection(this.databaseInfo.getURL(), this.databaseInfo.getUserName(),
-                this.databaseInfo.getPassword());
+        DBConnection conn = new DBConnection(null,
+                this.databaseInfo.getURL(),
+                this.databaseInfo.getUserName(),
+                this.databaseInfo.getPassword()
+        );
         // update all concepts
         Iterator diagIt = this.diagrams.iterator();
         while (diagIt.hasNext()) {
@@ -120,6 +140,7 @@ public class ConceptualSchema {
                 }
             }
         }
+        */
     }
 
     /**

@@ -17,6 +17,7 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
+import net.sourceforge.toscanaj.events.EventBroker;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
@@ -52,9 +53,10 @@ public class DataDump {
     protected static void dumpData(File file, String filterClause, boolean includeLists) {
         // parse input
         ConceptualSchema schema = null;
-        DBConnection databaseConnection = new DBConnection();
+        EventBroker broker = new EventBroker();
+        DBConnection databaseConnection = new DBConnection(broker);
         try {
-            schema = CSXParser.parse(file, databaseConnection);
+            schema = CSXParser.parse(new EventBroker(), file, databaseConnection);
         } catch (DataFormatException e) {
             System.err.println("Could not parse input.");
             System.err.println("- " + e.getMessage());
@@ -73,7 +75,7 @@ public class DataDump {
         if (filterClause != null) {
             try {
                 filterConcept = new DatabaseConnectedConcept(schema.getDatabaseInfo(),
-                        new DBConnection(schema.getDatabaseInfo().getURL(), "", ""));
+                        new DBConnection(broker, schema.getDatabaseInfo().getURL(), "", ""));
             } catch (Exception e) {
                 System.err.println("Couldn't create filter for database");
                 System.exit(4);

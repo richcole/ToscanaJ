@@ -7,6 +7,7 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.ToscanaJ;
+import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.canvas.imagewriter.DiagramExportSettings;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormat;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormatRegistry;
@@ -55,6 +56,11 @@ import java.net.MalformedURLException;
 public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeObserver {
 
     /**
+     * The central event broker for the main panel
+     */
+    private EventBroker broker;
+
+    /**
      * The maximum number of files in the most recently used files list.
      */
     static private final int MaxMruFiles = 8;
@@ -76,11 +82,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
      */
     private JSplitPane splitPane = null;
 
-    private DBConnection databaseConnection = new DBConnection();
-
     /**
      * The database connection
      */
+    private DBConnection databaseConnection;
+
     /**
      * Stores the divider position when the diagram organizer is hidden.
      */
@@ -167,6 +173,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
      */
     public ToscanaJMainPanel() {
         super("ToscanaJ");
+
+        broker = new EventBroker();
+        conceptualSchema = new ConceptualSchema(broker);
+        databaseConnection = new DBConnection(broker);
+
         // register all image writers we want to support
         net.sourceforge.toscanaj.canvas.imagewriter.BatikImageWriter.initialize();
         net.sourceforge.toscanaj.canvas.imagewriter.JimiImageWriter.initialize();
@@ -715,6 +726,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
      */
     protected void openSchemaFile(File schemaFile) {
         // store current file
+
         try {
             this.currentFile = schemaFile.getCanonicalPath();
         } catch (IOException e) { // could not resolve canonical path
@@ -726,7 +738,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         DatabaseViewerManager.resetRegistry();
         Query.clearQueries();
         try {
-            conceptualSchema = CSXParser.parse(schemaFile, databaseConnection);
+            conceptualSchema = CSXParser.parse(broker, schemaFile, databaseConnection);
             databaseConnection.connect(conceptualSchema.getDatabaseInfo());
             if (conceptualSchema.getSQLURL() != null) {
                 databaseConnection.executeScript(conceptualSchema.getSQLURL());

@@ -27,16 +27,17 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEventListener {
-    /**
-     *  Model
-     */
-    private ConceptualSchema conceptualSchema = new ConceptualSchema();
 
     /**
      *  Main Controllers
      */
-    private EventBroker eventBroker = new EventBroker();
-    private DBConnection databaseConnection = new DBConnection();
+    private EventBroker eventBroker;
+    private DBConnection databaseConnection;
+
+    /**
+     *  Model
+     */
+    private ConceptualSchema conceptualSchema;
 
     /**
      * Controls
@@ -61,6 +62,10 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
 
     public AnacondaJMainPanel() {
         super("AnacondaJMainPanel");
+
+        eventBroker = new EventBroker();
+        conceptualSchema = new ConceptualSchema(eventBroker);
+        databaseConnection = new DBConnection(eventBroker);
 
         eventBroker.subscribe(this,
                               ConceptualSchemaChangeEvent.class,

@@ -18,7 +18,10 @@ public class NewConceptualSchemaActivity implements SimpleActivity {
     }
 
     public boolean doActivity() throws Exception {
-        broker.processEvent(new ConceptualSchemaChangeEvent(this, new ConceptualSchema()));
+        broker.processEvent(new ConceptualSchemaChangeEvent(
+                this,
+                new ConceptualSchema(broker))
+        );
         return true;
     }
 }

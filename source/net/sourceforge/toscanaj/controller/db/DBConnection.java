@@ -8,6 +8,8 @@ package net.sourceforge.toscanaj.controller.db;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.gui.events.DatabaseConnectedEvent;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -29,6 +31,7 @@ public class DBConnection {
      * The JDBC database connection we use.
      */
     private Connection con;
+    private EventBroker broker;
 
     /**
      * If set to something else than null we will print log entries into this
@@ -62,22 +65,30 @@ public class DBConnection {
      *
      * @TODO Throw exceptions instead of just printing them.
      */
-    public DBConnection(String url, String account, String password) throws DatabaseException {
-        this(getConnection(url, account, password));
+    public DBConnection(EventBroker broker, String url, String account, String password) throws DatabaseException {
+        this.broker = broker;
+        connect(url, account, password);
     }
 
-    public DBConnection(Connection connection) {
+    public DBConnection(EventBroker broker, Connection connection) {
+        this.broker = broker;
         con = connection;
     }
 
     /**
      *  Create a connection that isn't connected.
      */
-    public DBConnection() {
+    public DBConnection(EventBroker broker) {
+        this.broker = broker;
     }
 
     public void connect(DatabaseInfo info) throws DatabaseException {
-        con = getConnection(info.getURL(), info.getUserName(), info.getPassword());
+        connect(info.getURL(), info.getUserName(), info.getPassword());
+    }
+
+    public void connect(String url, String account, String password) throws DatabaseException {
+        con = getConnection(url, account, password);
+        broker.processEvent(new DatabaseConnectedEvent(this, this));
     }
 
     private static Connection getConnection(String url, String account, String password) throws DatabaseException {
@@ -473,7 +484,7 @@ public class DBConnection {
             System.exit(1);
         }
 
-        DBConnection test = new DBConnection(args[0], "", "");
+        DBConnection test = new DBConnection(new EventBroker(), args[0], "", "");
 
         // print the tables
         System.out.println("The tables:\n-----------");
