@@ -136,6 +136,9 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         notifyObservers();
     }
 
+	/**
+	 * Returns the number of diagrams nested in an outer diagram.
+	 */
     public int getNestingLevel() {
         return nestingLevel;
     }

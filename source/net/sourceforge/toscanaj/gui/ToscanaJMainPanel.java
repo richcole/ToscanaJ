@@ -658,9 +658,19 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
         if ((this.diagramDescriptionButton != null) && (this.diagramDescriptionMenuItem != null)) {
             Diagram2D curDiag = diagContr.getCurrentDiagram();
             if (curDiag != null) {
-                Element diagDesc = curDiag.getDescription();
-                this.diagramDescriptionButton.setEnabled(diagDesc != null);
-                this.diagramDescriptionMenuItem.setEnabled(diagDesc != null);
+            	boolean showAboutDiagramComponents;
+            	if( diagContr.getDiagramHistory().getNumberOfCurrentDiagrams() == 1) {
+            		Element diagDesc = curDiag.getDescription();
+            		showAboutDiagramComponents = diagDesc != null;
+            	} else {
+            	    Diagram2D outerDiagram = diagContr.getDiagramHistory().getCurrentDiagram(0);
+            		Element outerDiagDesc = outerDiagram.getDescription();
+            		Diagram2D innerDiagram = diagContr.getDiagramHistory().getCurrentDiagram(1);
+                    Element innerDiagDesc = innerDiagram.getDescription();
+            		showAboutDiagramComponents = (outerDiagDesc != null) || (innerDiagDesc != null); 
+            	}
+                this.diagramDescriptionButton.setEnabled(showAboutDiagramComponents);
+                this.diagramDescriptionMenuItem.setEnabled(showAboutDiagramComponents);
             } else {
                 this.diagramDescriptionButton.setEnabled(false);
                 this.diagramDescriptionMenuItem.setEnabled(false);
@@ -1129,7 +1139,44 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
     }
 
     protected void showDiagramDescription() {
-        DescriptionViewer.show(this, DiagramController.getController().getCurrentDiagram().getDescription());
+    	if(DiagramController.getController().getDiagramHistory().getNestingLevel() == 0) {
+    	    DescriptionViewer.show(this, DiagramController.getController().getCurrentDiagram().getDescription());
+    	} else { // we assume we have a nesting level of two
+		    JPopupMenu popupMenu = new JPopupMenu();
+		    popupMenu.setLabel("Choose diagram");
+		    JMenuItem menuItem;
+		    final JFrame window = this;
+		    DiagramController diagContr = DiagramController.getController();
+    	    Diagram2D outerDiagram = diagContr.getDiagramHistory().getCurrentDiagram(0);
+    	    final Element outerDiagDesc = outerDiagram.getDescription();
+    	    if(outerDiagDesc != null) {
+	    	    menuItem = new JMenuItem("Outer Diagram");
+	    	    menuItem.addActionListener(new ActionListener() {
+	    	        public void actionPerformed(ActionEvent e) {
+	    	            DescriptionViewer.show(window, outerDiagDesc);
+	    	        }
+	    	    });
+	    	    popupMenu.add(menuItem);
+    	    }
+    	    Diagram2D innerDiagram = diagContr.getDiagramHistory().getCurrentDiagram(1);
+    	    final Element innerDiagDesc = innerDiagram.getDescription();
+    	    if(innerDiagDesc != null) {
+	    	    menuItem = new JMenuItem("Inner Diagram");
+	    	    menuItem.addActionListener(new ActionListener() {
+	    	        public void actionPerformed(ActionEvent e) {
+	    	            DescriptionViewer.show(window, innerDiagDesc);
+	    	        }
+	    	    });
+	    	    popupMenu.add(menuItem);
+    	    }
+		    popupMenu.show(this, -22222, -22222); // show it somewhere where it is not seen
+		    // we need to show it to get its width afterwards (observed on JDK 1.4.0_01/WinXP)
+		    // we can't get a really good position, since it can be invoked either by the toolbar button,
+		    // the help menu entry or a keyboard shortcut, so we just put it somewhere around the area
+		    // of the toolbar button and the menu entry
+		    popupMenu.setLocation(this.getX() + this.diagramView.getX() + this.diagramView.getWidth() - popupMenu.getWidth(),
+		    			          this.getY() + this.diagramView.getY() + this.menubar.getHeight() + this.toolbar.getHeight() );
+    	}
     }
 
     protected void showAboutDialog() {
