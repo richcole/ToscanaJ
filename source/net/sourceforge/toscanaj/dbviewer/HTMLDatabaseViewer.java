@@ -162,7 +162,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer
         protected void closeDialog()
         {
             ConfigurationManager.storePlacement("HTMLDatabaseViewDialog", this);
-            this.hide();
+            this.dispose();
         }
 
         private void showView(String whereClause)

@@ -101,11 +101,16 @@ public class SimpleDatabaseViewer implements DatabaseViewer
             }
             textFragments.add(template);
 
+            this.addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    closeDialog();
+                }
+            });
+
             final JButton closeButton = new JButton("Close");
             closeButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    ConfigurationManager.storePlacement("SimpleDatabaseViewerDialog", dialog);
-                    dialog.setVisible(false);
+                    closeDialog();
                 }
             });
             getRootPane().setDefaultButton(closeButton);
@@ -124,6 +129,12 @@ public class SimpleDatabaseViewer implements DatabaseViewer
             Container contentPane = getContentPane();
             contentPane.add( textArea, BorderLayout.CENTER );
             contentPane.add( buttonPane, BorderLayout.SOUTH );
+        }
+
+        protected void closeDialog()
+        {
+            ConfigurationManager.storePlacement("SimpleDatabaseViewerDialog", dialog);
+            this.dispose();
         }
     }
 
