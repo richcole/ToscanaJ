@@ -263,6 +263,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
                         }
                     }
                     context.getObjects().remove(oldObject);
+                    calculateNewSize();
 					repaint();
 					inputValue = "";
 				} else {
