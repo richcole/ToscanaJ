@@ -74,16 +74,17 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      */
     private int dividerPosition = 0;
 
+    // the actions used in the UI
+    private Action openFileAction;
+    private Action exportDiagramAction;
+    private Action goBackAction;
+
     // buttons list
-    private JButton openButton = null;
-    private JButton backButton = null;
     private JButton diagramDescriptionButton = null;
     private JButton schemaDescriptionButton = null;
 
     // menu items list
     // FILE menu
-    private JMenuItem openMenuItem = null;
-    private JMenuItem exportDiagramMenuItem = null;
     private JMenuItem exportDiagramSetupMenuItem = null;
     private JMenuItem printMenuItem = null;
     private JMenuItem printSetupMenuItem = null;
@@ -92,8 +93,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     private JMenuItem diagramDescriptionMenuItem = null;
 
     // DIAGRAM menu
-    private JMenuItem backMenuItem = null;
-
     private JRadioButtonMenuItem filterAllMenuItem = null;
     private JRadioButtonMenuItem filterExactMenuItem = null;
 
@@ -207,9 +206,9 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      * Build the GUI.
      */
     private void buildPanel() {
+        createActions();
         buildMenuBar();
         setJMenuBar(menubar);
-
         buildToolBar();
 
         //Lay out the content pane.
@@ -240,6 +239,39 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         splitPane.setDividerLocation(div);
     }
 
+    private void createActions() {
+        this.openFileAction = new AbstractAction("Open...") {
+            public void actionPerformed(ActionEvent e) {
+                openSchema();
+            }
+        };
+        this.openFileAction.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_O));
+        this.openFileAction.putValue(Action.ACCELERATOR_KEY,
+                                     KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+
+        this.exportDiagramAction = new AbstractAction("Export Diagram...") {
+            public void actionPerformed(ActionEvent e) {
+                exportImage();
+            }
+        };
+        this.exportDiagramAction.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_E));
+        this.exportDiagramAction.putValue(Action.ACCELERATOR_KEY,
+                                          KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+        this.exportDiagramAction.setEnabled(false);
+
+        this.goBackAction = new AbstractAction("Go Back one Diagram") {
+            public void actionPerformed(ActionEvent e) {
+                DiagramController.getController().back();
+            }
+        };
+        this.goBackAction.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_B));
+        this.goBackAction.putValue(Action.ACCELERATOR_KEY,
+                                          KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.ALT_MASK));
+        this.goBackAction.setEnabled(false);
+
+        /// @todo Change all the other actions into Actions.
+    }
+
     /**
      *  build the MenuBar
      */
@@ -256,25 +288,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menubar.add(fileMenu);
 
-        // menu item OPEN
-        openMenuItem = new JMenuItem("Open...");
-        //new ImageIcon(IMAGE_PATH + OPEN_ICON));
-        openMenuItem.setMnemonic(KeyEvent.VK_O);
-        openMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-        openMenuItem.addActionListener(this);
-        fileMenu.add(openMenuItem);
+        fileMenu.add(this.openFileAction);
 
         // we add the export options only if we can export at all
         if (this.diagramExportSettings != null) {
-            // menu item export diagram
-            exportDiagramMenuItem = new JMenuItem("Export Diagram...");
-            exportDiagramMenuItem.setMnemonic(KeyEvent.VK_E);
-            exportDiagramMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                                                    KeyEvent.VK_E, ActionEvent.CTRL_MASK));
-            exportDiagramMenuItem.addActionListener(this);
-            exportDiagramMenuItem.setEnabled(false);
-            fileMenu.add(exportDiagramMenuItem);
+            fileMenu.add(exportDiagramAction);
 
             // create the export diagram save options submenu
             this.exportDiagramSetupMenuItem = new JMenuItem("Export Diagram Setup...");
@@ -326,15 +344,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         diagrMenu.setMnemonic(KeyEvent.VK_D);
         menubar.add(diagrMenu);
 
-        this.backMenuItem = new JMenuItem("Go Back one Diagram");
-        this.backMenuItem.setMnemonic(KeyEvent.VK_B);
-        this.backMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                                     KeyEvent.VK_LEFT, ActionEvent.ALT_MASK));
-        this.backMenuItem.addActionListener(this);
-        this.backMenuItem.setEnabled(false);
-        diagrMenu.add(backMenuItem);
-
-        // separator
+        diagrMenu.add(goBackAction);
         diagrMenu.addSeparator();
 
         // menu radio buttons group:
@@ -519,14 +529,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         toolbar = new JToolBar();
         toolbar.setFloatable(true);
 
-        openButton = new JButton(" Open ");
-        openButton.addActionListener(this);
-        toolbar.add(openButton);
-
-        backButton = new JButton(" Back ");
-        backButton.addActionListener(this);
-        backButton.setEnabled(false);
-        toolbar.add(backButton);
+        toolbar.add(this.openFileAction);
+        toolbar.add(this.goBackAction);
         
         toolbar.add(Box.createHorizontalGlue());
         
@@ -571,11 +575,10 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     public void update(Object source) {
         DiagramController diagContr = DiagramController.getController();
         this.printMenuItem.setEnabled(diagContr.getDiagramHistory().getSize() != 0);
-        this.exportDiagramMenuItem.setEnabled(
+        this.exportDiagramAction.setEnabled(
                 (diagContr.getDiagramHistory().getSize() != 0) &&
                 (this.diagramExportSettings != null));
-        this.backMenuItem.setEnabled(diagContr.undoIsPossible());
-        this.backButton.setEnabled(diagContr.undoIsPossible());
+        this.goBackAction.setEnabled(diagContr.undoIsPossible());
         if((this.diagramDescriptionButton != null) && (this.diagramDescriptionMenuItem != null)) {
             Diagram2D curDiag = diagContr.getCurrentDiagram();
             if(curDiag != null) {
@@ -611,23 +614,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     public void actionPerformed(ActionEvent ae) {
         Object actionSource = ae.getSource();
         DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
-        // Button actions
-        if (actionSource == openButton) {
-            openSchema();
-            return;
-        }
 
-        // Menus actions
-
-        // menu FILE
-        if (actionSource == openMenuItem) {
-            openSchema();
-            return;
-        }
-        if (actionSource == exportDiagramMenuItem) {
-            exportImage();
-            return;
-        }
         if (actionSource == exportDiagramSetupMenuItem) {
             showImageExportOptions();
             return;
@@ -653,12 +640,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         }
         if (actionSource == this.filterAllMenuItem) {
             DiagramController.getController().setFilterMethod(DiagramController.FILTER_EXTENT);
-            return;
-        }
-        // the back button/menu entry
-        if ((actionSource == this.backButton) ||
-                (actionSource == this.backMenuItem)) {
-            DiagramController.getController().back();
             return;
         }
         // nesting
