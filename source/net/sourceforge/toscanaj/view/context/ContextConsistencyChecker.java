@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.view.scales;
+package net.sourceforge.toscanaj.view.context;
 
 import java.awt.Component;
 import java.util.ArrayList;

@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.view.scales;
+package net.sourceforge.toscanaj.view.context;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;

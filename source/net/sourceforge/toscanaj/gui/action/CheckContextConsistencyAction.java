@@ -31,7 +31,7 @@ import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
-import net.sourceforge.toscanaj.view.scales.ContextConsistencyChecker;
+import net.sourceforge.toscanaj.view.context.ContextConsistencyChecker;
 
 /// @todo rename class once we figured out how to call this
 public class CheckContextConsistencyAction extends AbstractAction implements EventBrokerListener {

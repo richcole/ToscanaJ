@@ -39,7 +39,7 @@ import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
-import net.sourceforge.toscanaj.view.scales.ContextTableScaleEditorDialog;
+import net.sourceforge.toscanaj.view.context.ContextTableScaleEditorDialog;
 
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
