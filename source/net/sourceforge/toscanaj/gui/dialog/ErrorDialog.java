@@ -63,7 +63,7 @@ public class ErrorDialog extends JDialog{
 		this.onFirstExecute = true;
 		this.getContentPane().setLayout(new GridBagLayout());
 		
-		Component detailedPanel = createErrorLogPanel(e.getCause());	
+		Component detailedPanel = createErrorLogPanel(e);	
 		this.getContentPane().add(createErrorMsgPanel(e, errorMsg), new GridBagConstraints(
 		0,
 		0,
@@ -111,7 +111,6 @@ public class ErrorDialog extends JDialog{
 		
 		JLabel simpleErrorLabel = new JLabel(extraMessage,UIManager.getIcon("OptionPane.errorIcon"),JLabel.LEFT);
 		JPanel simpleErrorMsgPanel = new JPanel(new GridBagLayout());
-		simpleErrorMsgPanel.setSize(400,150);
 		
 		simpleErrorMsgPanel.add(simpleErrorLabel, new GridBagConstraints(
 		0,
@@ -189,6 +188,7 @@ public class ErrorDialog extends JDialog{
 			+ stackTrace;
 		return returnString;
 	}
+	
 	private Component createErrorLogPanel(Throwable e) {
 		JTextArea textArea = new JTextArea(createErrorLog(e),20,50);
 		textArea.setEditable(false);
