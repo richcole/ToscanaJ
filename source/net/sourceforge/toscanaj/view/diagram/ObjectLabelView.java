@@ -50,8 +50,6 @@ public class ObjectLabelView extends LabelView {
 
     private List queryResults = null;
 
-    private JPopupMenu popupMenu = null;
-
     /**
      * Creates a view for the given label information.
      */
@@ -137,16 +135,15 @@ public class ObjectLabelView extends LabelView {
     }
 
     public void doubleClicked(Point2D pos) {
-        int itemHit = getItemAtPosition(pos);
-        if( itemHit == -1 ) {
+        DatabaseRetrievedObject object = getObjectAtPosition(pos);
+        if (object == null) {
             return;
         }
-        DatabaseRetrievedObject object = getObject(itemHit);
         if (object.hasKey()) {
             if (DatabaseViewerManager.getNumberOfObjectViews() == 0) {
                 return;
             }
-            DatabaseViewerManager.showObject(0, getObject(itemHit));
+            DatabaseViewerManager.showObject(0, object);
         }
         else {
             if (DatabaseViewerManager.getNumberOfObjectListViews() == 0) {
@@ -157,70 +154,11 @@ public class ObjectLabelView extends LabelView {
         return;
     }
 
-    private DatabaseRetrievedObject getObject(int itemHit) {
-        return (DatabaseRetrievedObject) this.queryResults.get(itemHit);
-    }
-
-    public void openPopupMenu(Point2D canvasPosition, Point2D screenPosition) {
-        int itemHit = getItemAtPosition(canvasPosition);
+    public DatabaseRetrievedObject getObjectAtPosition(Point2D position) {
+        int itemHit = getItemAtPosition(position);
         if( itemHit == -1 ) {
-            return;
+            return null;
         }
-        final DatabaseRetrievedObject object = getObject(itemHit);
-        List queries = Query.getQueries();
-        List objectViewNames = DatabaseViewerManager.getObjectViewNames(object);
-        List objectListViewNames = DatabaseViewerManager.getObjectListViewNames(object);
-        if (queries.size() + objectViewNames.size() + objectListViewNames.size() == 0) { // nothing to display
-            return;
-        }
-        // create the menu
-        popupMenu = new JPopupMenu();
-        JMenuItem menuItem;
-        if (queries.size() != 0) {
-            JMenu queryMenu = new JMenu("Change label");
-            Iterator it = queries.iterator();
-            while (it.hasNext()) {
-                final DatabaseQuery query = (DatabaseQuery) it.next();
-                menuItem = new JMenuItem(query.getName());
-                menuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        setQuery(query);
-                    }
-                });
-                queryMenu.add(menuItem);
-            }
-            popupMenu.add(queryMenu);
-        }
-        if (objectViewNames.size() != 0) {
-            JMenu objectViewMenu = new JMenu("View object");
-            Iterator it = objectViewNames.iterator();
-            while (it.hasNext()) {
-                final String objectViewName = (String) it.next();
-                menuItem = new JMenuItem(objectViewName);
-                menuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        DatabaseViewerManager.showObject(objectViewName, object);
-                    }
-                });
-                objectViewMenu.add(menuItem);
-            }
-            popupMenu.add(objectViewMenu);
-        }
-        if (objectListViewNames.size() != 0) {
-            JMenu objectListViewMenu = new JMenu("View summary");
-            Iterator it = objectListViewNames.iterator();
-            while (it.hasNext()) {
-                final String objectListViewName = (String) it.next();
-                menuItem = new JMenuItem(objectListViewName);
-                menuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        DatabaseViewerManager.showObjectList(objectListViewName, object);
-                    }
-                });
-                objectListViewMenu.add(menuItem);
-            }
-            popupMenu.add(objectListViewMenu);
-        }
-        popupMenu.show(this.diagramView, (int)screenPosition.getX(), (int)screenPosition.getY());
+        return (DatabaseRetrievedObject) this.queryResults.get(itemHit);
     }
 }

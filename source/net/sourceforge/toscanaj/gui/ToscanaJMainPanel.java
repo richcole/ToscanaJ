@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -15,11 +15,13 @@ import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormatRegistry;
 import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
 import net.sourceforge.toscanaj.canvas.events.CanvasItemActivatedEvent;
 import net.sourceforge.toscanaj.canvas.events.CanvasItemSelectedEvent;
+import net.sourceforge.toscanaj.canvas.events.CanvasItemContextMenuRequestEvent;
 import net.sourceforge.toscanaj.canvas.CanvasBackground;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.diagram.FilterOperationEventListener;
 import net.sourceforge.toscanaj.controller.diagram.HighlightingOperationEventListener;
 import net.sourceforge.toscanaj.controller.diagram.HighlightRemovalOperationEventListener;
+import net.sourceforge.toscanaj.controller.diagram.ObjectLabelViewPopupMenuHandler;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
@@ -38,6 +40,7 @@ import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
+import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 import org.jdom.Element;
 
 import javax.swing.*;
@@ -261,6 +264,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 new HighlightRemovalOperationEventListener(diagramView),
                 CanvasItemSelectedEvent.class,
                 CanvasBackground.class
+        );
+        diagramView.getController().getEventBroker().subscribe(
+                new ObjectLabelViewPopupMenuHandler(diagramView),
+                CanvasItemContextMenuRequestEvent.class,
+                ObjectLabelView.class
         );
         diagramOrganiser = new DiagramOrganiser(this.conceptualSchema);
 
