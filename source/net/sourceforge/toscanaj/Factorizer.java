@@ -37,7 +37,6 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
-import net.sourceforge.toscanaj.controller.cernato.NDimNodeMovementEventListener;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.controller.fca.DirectConceptInterpreter;
@@ -45,6 +44,7 @@ import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
+import net.sourceforge.toscanaj.controller.ndimlayout.NDimNodeMovementEventListener;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;

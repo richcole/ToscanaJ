@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.controller.cernato.NDimNodeMovementEventListener;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
@@ -19,6 +18,7 @@ import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
+import net.sourceforge.toscanaj.controller.ndimlayout.NDimNodeMovementEventListener;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;

@@ -199,14 +199,25 @@ public class DiagramNode implements XMLizable {
      * Get the current node position.
      */
     public Point2D getPosition() {
-        return position;
+    	// return copy to make sure updates go through the event broker if required
+        return (Point2D) position.clone();
+    }
+
+    /**
+     * Set the node position in the model space.
+     * 
+     * This is just a convenience method calling setPosition(double, double).
+     * Do not override to ensure behaviour is consistent.
+     */
+    public final void setPosition(Point2D position) {
+        setPosition(position.getX(), position.getY());
     }
 
     /**
      * Set the node position in the model space.
      */
-    public void setPosition(Point2D position) {
-        this.position = position;
+    public void setPosition(double x, double y) {
+        this.position.setLocation(x,y);
         this.diagram.sendChangeEvent();
     }
 

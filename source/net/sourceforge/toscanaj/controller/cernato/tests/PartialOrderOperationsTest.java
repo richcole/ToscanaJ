@@ -10,7 +10,7 @@ package net.sourceforge.toscanaj.controller.cernato.tests;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import net.sourceforge.toscanaj.controller.cernato.PartialOrderOperations;
+import net.sourceforge.toscanaj.controller.ndimlayout.PartialOrderOperations;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
 import net.sourceforge.toscanaj.model.order.Ordered;
 

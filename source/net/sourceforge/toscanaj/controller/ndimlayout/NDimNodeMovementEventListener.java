@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.controller.cernato;
+package net.sourceforge.toscanaj.controller.ndimlayout;
 
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
@@ -35,7 +35,6 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
         CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
         NodeView nodeView = (NodeView) dragEvent.getSubject();
         final DiagramView diagramView = nodeView.getDiagramView();
-        final NDimDiagram diagram = (NDimDiagram) diagramView.getDiagram();
         DiagramNode node = nodeView.getDiagramNode();
         if (!(node instanceof NDimDiagramNode)) {
             throw new RuntimeException("NDimNodeMovementEventListener usable only for NDimDiagramNodes");
@@ -44,6 +43,7 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
         	return; // we don't move the top node
         }
         final NDimDiagramNode ndimNode = (NDimDiagramNode) node;
+        final NDimDiagram diagram = (NDimDiagram) diagramView.getDiagram();
         final Point2D toPosition = dragEvent.getCanvasToPosition();
         Point2D curPosition = ndimNode.getPosition();
 

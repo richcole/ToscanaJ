@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.model.diagram;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
+import org.tockit.events.EventBroker;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -136,4 +137,11 @@ public interface Diagram2D extends XMLizable {
 	 * @throws IllegalStateException if the diagram has no nodes or is not a lattice.
 	 */
 	Concept getBottomConcept();
+	
+	/**
+	 * Returns the event broker this diagram sends change events to.
+	 * 
+	 * @return The target event broker for the diagram or null if none is available.
+	 */
+	EventBroker getEventBroker();
 }

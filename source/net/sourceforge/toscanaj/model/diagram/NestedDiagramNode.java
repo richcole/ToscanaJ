@@ -13,6 +13,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 /**
  * A class representing a diagram node with an inner diagram.
@@ -21,7 +22,7 @@ public class NestedDiagramNode extends DiagramNode {
     /**
      * Stores the inner diagram.
      */
-    private Diagram2D innerDiagram;
+    private final Diagram2D innerDiagram;
     
     /**
      * Determines how much the outer diagram gets scaled.
@@ -45,10 +46,6 @@ public class NestedDiagramNode extends DiagramNode {
      *
      * If the dropAttributeLabels flag is set, the inner nodes will have no
      * attribute labels attached.
-     *
-     * Parameter scale is float due to JIT error in JDK 1.3, where in case of double
-     * JIT was breaking transmission of value of scale after a while of program usage
-     * , that lead to a distorted nested line diagrams.
      */
     public NestedDiagramNode(WriteableDiagram2D outerDiagram, DiagramNode outerNode, Diagram2D innerDiagram, double scale) {
         super(outerDiagram, "outer:" + outerNode.getIdentifier(),
@@ -56,7 +53,7 @@ public class NestedDiagramNode extends DiagramNode {
                                    outerNode.getY() * OUTER_SCALE_FACTOR),
                 outerNode.getConcept(),
                 new LabelInfo(outerNode.getAttributeLabelInfo()), null,
-                outerNode.getOuterNode());
+                outerNode);
                 
         double innerScale = (scale / OUTER_SCALE_FACTOR) * EXTRA_ELLIPSE_SCALING;
                 
@@ -88,12 +85,12 @@ public class NestedDiagramNode extends DiagramNode {
             DiagramNode to = (DiagramNode) nodeMap.get(line.getToNode());
             newDiag.addLine(from, to);
         }
-
+        newDiag.setEventBroker(innerDiagram.getEventBroker());
         this.innerDiagram = newDiag;
         
         calculateEllipse();
     }
-
+    
     /**
      * Returns the inner diagram of the node.
      */
@@ -110,8 +107,20 @@ public class NestedDiagramNode extends DiagramNode {
     }
 
     public Concept[] getConceptNestingList() {
-        return innerDiagram.getNode(0).getConceptNestingList();
+        return this.innerDiagram.getNode(0).getConceptNestingList();
     }
+    
+	public void setPosition(double x, double y) {
+		double dx = x - this.position.getX();
+		double dy = y - this.position.getY();
+		Iterator it = this.innerDiagram.getNodes();
+		while (it.hasNext()) {
+			DiagramNode node = (DiagramNode) it.next();
+			// do not call setPosition() to avoid callbacks
+			node.position.setLocation(node.getX() + dx, node.getY() + dy);
+		}
+		super.setPosition(x, y);
+	}
     
     /**
      * Calculates the ellipse we should use.
@@ -180,5 +189,25 @@ public class NestedDiagramNode extends DiagramNode {
 		
 		// done -- store results
 		this.ellipse = new Ellipse2D.Double(cx - rx, cy - ry, 2 * rx, 2 * ry);
+    }
+    
+    public void updateInnerDiagram(Diagram2D updatedInnerDiagram, double scale) {
+        double innerScale = (scale / OUTER_SCALE_FACTOR) * EXTRA_ELLIPSE_SCALING;
+
+        // calculate an offset that places center of the inner diagram into the middle of the node
+        Rectangle2D rect = updatedInnerDiagram.getBounds();
+        Point2D offset = new Point2D.Double(
+                this.getX() - rect.getX()/innerScale - (rect.getWidth()/innerScale)/2,
+                this.getY() - rect.getY()/innerScale - (rect.getHeight()/innerScale)/2);
+
+        // update all node positions
+        for (int i = 0; i < innerDiagram.getNumberOfNodes(); i++) {
+            DiagramNode oldNode = innerDiagram.getNode(i);
+            DiagramNode updatedNode = updatedInnerDiagram.getNode(i);
+            oldNode.position.setLocation(updatedNode.getX()/innerScale + offset.getX(),
+            		updatedNode.getY()/innerScale + offset.getY());
+        }
+        
+        calculateEllipse();
     }
 }

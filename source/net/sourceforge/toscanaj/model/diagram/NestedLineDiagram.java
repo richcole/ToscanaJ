@@ -10,6 +10,12 @@ package net.sourceforge.toscanaj.model.diagram;
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
 
+import org.tockit.events.Event;
+import org.tockit.events.EventBrokerListener;
+
+import net.sourceforge.toscanaj.model.events.DiagramChangedEvent;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+
 /**
  * Stores a nested line diagram.
  *
@@ -25,8 +31,26 @@ public class NestedLineDiagram extends SimpleLineDiagram {
      * The level gives the depth of nesting for this diagram, starting with one
      * for a diagram on top level.
      */
-    public NestedLineDiagram(Diagram2D outerDiagram, Diagram2D innerDiagram) {
-        double scale = 1.2 * calculateNeededScaling(outerDiagram, innerDiagram);
+    public NestedLineDiagram(final Diagram2D outerDiagram, final Diagram2D innerDiagram) {
+        calculateDiagram(outerDiagram, innerDiagram);
+        if(outerDiagram.getEventBroker() != null) {
+			outerDiagram.getEventBroker().subscribe(new EventBrokerListener(){
+				public void processEvent(Event e) {
+					updateOuterDiagram(outerDiagram, innerDiagram);
+				}
+	    	}, DiagramChangedEvent.class, Object.class);
+        }
+        if(innerDiagram.getEventBroker() != null) {
+			innerDiagram.getEventBroker().subscribe(new EventBrokerListener(){
+				public void processEvent(Event e) {
+					updateInnerDiagrams(outerDiagram, (Diagram2D) e.getSubject());
+				}
+	    	}, DiagramChangedEvent.class, Object.class);
+        }
+    }
+
+    private void calculateDiagram(Diagram2D outerDiagram, Diagram2D innerDiagram) {
+		double scale = 1.2 * calculateNeededScaling(outerDiagram, innerDiagram);
         Hashtable nodeMap = new Hashtable();
         for (int i = 0; i < outerDiagram.getNumberOfNodes(); i++) {
             DiagramNode oldNode = outerDiagram.getNode(i);
@@ -40,9 +64,25 @@ public class NestedLineDiagram extends SimpleLineDiagram {
             NestedDiagramNode to = (NestedDiagramNode) nodeMap.get(oldLine.getToNode());
             this.addLine(from, to);
         }
-    }
+	}
 
-    /**
+    private void updateOuterDiagram(Diagram2D outerDiagram, Diagram2D innerDiagram) {
+        for (int i = 0; i < outerDiagram.getNumberOfNodes(); i++) {
+            DiagramNode outerNode = outerDiagram.getNode(i);
+            NestedDiagramNode node = (NestedDiagramNode) this.getNode(i);
+            node.setPosition(outerNode.getPosition());
+        }
+	}
+
+    private void updateInnerDiagrams(Diagram2D outerDiagram, Diagram2D innerDiagram) {
+		double scale = 1.2 * calculateNeededScaling(outerDiagram, innerDiagram);
+        for (int i = 0; i < getNumberOfNodes(); i++) {
+            NestedDiagramNode node = (NestedDiagramNode) this.getNode(i);
+            node.updateInnerDiagram(innerDiagram, scale);
+        }
+	}
+
+	/**
      * Calculates the scaling we need to fit the inner nodes into the outer ones.
      *
      * The basic algorithm goes like this:
@@ -94,6 +134,15 @@ public class NestedLineDiagram extends SimpleLineDiagram {
             return (float) rect.getHeight() / minDist;
         }
     }
+    
+	public DiagramNode getNodeForConcept(Concept concept) {
+		DiagramNode diagramNode = super.getNodeForConcept(concept);
+		if (diagramNode != null) {
+			return diagramNode;
+		} else { // try inner diagram (via top node)
+			return ((NestedDiagramNode)this.getNode(0)).getInnerDiagram().getNodeForConcept(concept);
+		}
+	}
     
     public String toString() {
     	return this.getTitle();

@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.controller.cernato;
 
 import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.PartialOrderOperations;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
 import net.sourceforge.toscanaj.model.lattice.Concept;

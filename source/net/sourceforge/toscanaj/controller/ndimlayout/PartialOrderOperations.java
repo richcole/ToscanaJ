@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.controller.cernato;
+package net.sourceforge.toscanaj.controller.ndimlayout;
 
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
 import net.sourceforge.toscanaj.model.order.Ordered;

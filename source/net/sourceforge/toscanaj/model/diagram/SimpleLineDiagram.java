@@ -550,4 +550,8 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     public List getExtraCanvasItems() {
         return Collections.unmodifiableList(this.extraCanvasItems);
     }
+
+	public EventBroker getEventBroker() {
+		return this.eventBroker;
+	}
 }
