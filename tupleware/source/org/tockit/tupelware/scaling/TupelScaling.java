@@ -34,7 +34,7 @@ public class TupelScaling {
     public static ConceptualSchema scaleWithTupelsAsObjects(TupelSet tupels) {
         ConceptualSchema schema = new ConceptualSchema(new EventBroker());
 
-        // first turn all tupels into FCAObjects
+        // first turn all tupels into FCAObjects, the attributes are done inline
         Map tupelObjectMap = new HashMap();
         for (Iterator iter = tupels.getTupels().iterator(); iter.hasNext();) {
             Object[] tupel = (Object[]) iter.next();
