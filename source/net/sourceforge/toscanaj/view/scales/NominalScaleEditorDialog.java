@@ -242,12 +242,11 @@ public class NominalScaleEditorDialog extends JDialog {
             String query = "SELECT DISTINCT " + column.getName() + " FROM " +
                     column.getTable().getName() + ";";
             resultSet = databaseConnection.queryColumn(query, 1);
+            for (Iterator it = resultSet.iterator(); it.hasNext();) {
+                this.columnValuesListModel.addElement((String) it.next());
+            }
         } catch (DatabaseException e) {
         	ErrorDialog.showError(this, e, "Database query failed");
-        }
-
-        for (Iterator it = resultSet.iterator(); it.hasNext();) {
-            this.columnValuesListModel.addElement((String) it.next());
         }
     }
 
