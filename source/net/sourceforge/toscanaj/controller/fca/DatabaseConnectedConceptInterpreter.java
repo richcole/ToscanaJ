@@ -198,6 +198,8 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         /// @todo do check only lower neighbours
         /// @todo consider going back to creating the lattice product, this is too much hacking
         try {
+        	// first we check the inner diagram if anything below the concept has the same extent
+        	// size (iff any subconcept has the same extent size, the concept is not realized) 
             int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
             for (Iterator iterator = concept.getDownset().iterator(); iterator.hasNext();) {
                 Concept otherConcept = (Concept) iterator.next();
@@ -209,12 +211,30 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                     return false;
                 }
             }
+            // the way it works for the outer diagram is a bit wild -- we assume either all contingent or all
+            // extents have already been calculated (which one depends on the view setting), so the cache for
+            // either the contingent or the extent sizes should contain all interpretation contexts for the
+            // lower nodes of the outer diagrams. Now we look for all whose nesting concepts are subconcepts
+            // of the nesting concepts we are in, then check for the extent of the current concept in these
+            // contexts -- they are all subconcepts of our concept along the outer diagram.
             List outerConcepts = context.getNestingConcepts();
             for (Iterator iterator = outerConcepts.iterator(); iterator.hasNext();) {
                 Concept outerConcept = (Concept) iterator.next();
                 for (Iterator iterator2 = outerConcept.getDownset().iterator(); iterator2.hasNext();) {
                     Concept otherConcept = (Concept) iterator2.next();
                     if (otherConcept != outerConcept) {
+                        for (Iterator iterator3 = this.extentSizes.keySet().iterator(); iterator3.hasNext();) {
+                            ConceptInterpretationContext otherContext = (ConceptInterpretationContext) iterator3.next();
+                            List nesting = otherContext.getNestingConcepts();
+                            if (nesting.size() != 0) {
+                                if (nesting.get(nesting.size() - 1).equals(otherConcept)) {
+                                    int otherExtentSize = getCount(concept, otherContext, ConceptInterpretationContext.EXTENT);
+                                    if (otherExtentSize == extentSize) {
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
                         for (Iterator iterator3 = this.contingentSizes.keySet().iterator(); iterator3.hasNext();) {
                             ConceptInterpretationContext otherContext = (ConceptInterpretationContext) iterator3.next();
                             List nesting = otherContext.getNestingConcepts();
