@@ -10,7 +10,6 @@ package net.sourceforge.toscanaj.view.database;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.controller.db.SQLTypeInfo;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Column;
@@ -37,8 +36,6 @@ import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 
-import java.util.Collection;
-import java.util.Iterator;
 
 
 /**
@@ -278,13 +275,13 @@ public class DatabaseConnectionInformationView extends JDialog
     	            GridBagConstraints.BOTH,
     	            new Insets(5, 5, 5, 5),
     	            2,2));
-			*/
-    	    this.add(new JPanel(),new GridBagConstraints(
-    	            0,3,1,1,1,1,
-    	            GridBagConstraints.WEST,
-    	            GridBagConstraints.BOTH,
-    	            new Insets(5, 5, 5, 5),
-    	            2,2));
+    	   */
+		   this.add(new JPanel(),new GridBagConstraints(
+				   0,3,1,1,1,1,
+				   GridBagConstraints.WEST,
+				   GridBagConstraints.BOTH,
+				   new Insets(5, 5, 5, 5),
+				   2,2));
     	}
 
         void updateContents() {
@@ -318,20 +315,7 @@ public class DatabaseConnectionInformationView extends JDialog
             	return false;
             }
             if (csvFileLocationField.getText().length() > 0) {
-            	try {
-            		Collection typeNames = connection.getDatabaseSupportedTypeNames();
-            		Iterator it = typeNames.iterator();
-            		while (it.hasNext()) {
-						SQLTypeInfo cur = (SQLTypeInfo) it.next();
-						System.out.println(cur);
-						
-					}
-					CSVImportDetailsDialog csvImportDialog = new CSVImportDetailsDialog(owner, csvFileLocationField.getText(), connection);
-            	}
-            	catch (DatabaseException e) {
-            		ErrorDialog.showError(this, e, "Error retrieving types supported by database");
-            		return false;
-            	}
+				CSVImportDetailsDialog csvImportDialog = new CSVImportDetailsDialog(owner, csvFileLocationField.getText(), connection);
             }
             return true;
         }
