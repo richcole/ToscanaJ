@@ -308,9 +308,9 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 		String inputValue = "";
 		do {
 			String oldName = (String) objectList.get(num);
-			inputValue =
-				showTextInputDialog("Rename Object", "object", oldName);
-			if (inputValue != null && !inputValue.trim().equals("")) {
+			InputTextDialog dialog = new InputTextDialog(this.dialog, "Rename Object", "object", oldName);
+			if (!dialog.isCancelled()) {
+				inputValue = dialog.getInput();
 				if (!collectionContainsString(inputValue, objectList)) {
 					objectList.set(num, inputValue);
 					BinaryRelationImplementation relation =
@@ -334,58 +334,26 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 						"Object exists",
 						JOptionPane.ERROR_MESSAGE);
 				}
-			} else {
-				break;
 			}
+			else {
+				break;
+			}	
 		}
 		while (collectionContainsString(inputValue, objectList));
 		repaint();
 	}
 	
-	/**
-		  * To display the dialog asking for the object or attribute input name
-		  * 
-		  * @todo write custom dialog for this to avoid internationalization
-		  * problem (JOptionPane buttons do get translated in JDKs), to get rid of
-		  * the cancel button and to control the setEnabled() state of the buttons.
-		  * 
-		  * @param title The title of the dialog
-		  * @param thingToAdd The string of the element to be added, either an
-		  * "object" or "attribute" during renaming or the title during creation.
-		  * @param currentTextValue The value of the current string.
-		  * To be used in the formatting of the text message prompt in the JDialog
-		  * @return The name of the object/ attribute
-		  */
-		private String showTextInputDialog(
-			String title,
-			String thingToAdd,
-			String currentTextValue) {
-			String inputValue = "";
-			do {
-				inputValue =
-					(String) JOptionPane.showInputDialog(
-						dialog,
-						"Please input the name of the " + thingToAdd + ": ",
-						title,
-						JOptionPane.PLAIN_MESSAGE,
-						null,
-						null,
-						currentTextValue);
-			} while (inputValue != null && inputValue.trim().equals(""));
-			return inputValue;
-		}
-
-		protected boolean collectionContainsString(
-			String value,
-			Collection collection) {
-			Iterator it = collection.iterator();
-			while (it.hasNext()) {
-				Object obj = (Object) it.next();
-				if (obj.toString().equalsIgnoreCase(value.trim())) {
-					return true;
-				}
+	protected boolean collectionContainsString(
+		String value,
+		Collection collection) {
+		Iterator it = collection.iterator();
+		while (it.hasNext()) {
+			Object obj = (Object) it.next();
+			if (obj.toString().equalsIgnoreCase(value.trim())) {
+				return true;
 			}
-			return false;
 		}
+		return false;
+	}
     
 }

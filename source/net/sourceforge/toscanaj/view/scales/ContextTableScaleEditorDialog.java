@@ -185,8 +185,11 @@ public class ContextTableScaleEditorDialog
 
 	private void getInput() {
 		onFirstLoad = false;
-		String title = showTextInputDialog("New Title", "context", "");
-		scaleTitleField.setText(title);
+		InputTextDialog dialog = new InputTextDialog(this, "New Title", "context", "");
+		if (! dialog.isCancelled()) {
+			String title = dialog.getInput();
+			scaleTitleField.setText(title);
+		}
 		showObjectInputDialog();
 		showAttributeInputDialog();
 	}
@@ -576,39 +579,6 @@ public class ContextTableScaleEditorDialog
 		setVisible(false);
 	}
 
-	/**
-	  * To display the dialog asking for the object or attribute input name
-	  * 
-	  * @todo write custom dialog for this to avoid internationalization
-	  * problem (JOptionPane buttons do get translated in JDKs), to get rid of
-	  * the cancel button and to control the setEnabled() state of the buttons.
-	  * 
-	  * @param title The title of the dialog
-	  * @param thingToAdd The string of the element to be added, either an
-	  * "object" or "attribute" during renaming or the title during creation.
-	  * @param currentTextValue The value of the current string.
-	  * To be used in the formatting of the text message prompt in the JDialog
-	  * @return The name of the object/ attribute
-	  */
-	private String showTextInputDialog(
-		String title,
-		String thingToAdd,
-		String currentTextValue) {
-		String inputValue = "";
-		do {
-			inputValue =
-				(String) JOptionPane.showInputDialog(
-					contextTableScaleEditorDialog,
-					"Please input the name of the " + thingToAdd + ": ",
-					title,
-					JOptionPane.PLAIN_MESSAGE,
-					null,
-					null,
-					currentTextValue);
-		} while (inputValue != null && inputValue.trim().equals(""));
-		return inputValue;
-	}
-
 	public boolean execute() {
 		show();
 		return result;
@@ -672,8 +642,8 @@ public class ContextTableScaleEditorDialog
 
 	public void paint(Graphics g) {
 		super.paint(g);
-		if (this.scaleTitleField.getText().length() == 0
-			&& onFirstLoad == true) {
+		if ( onFirstLoad == true &&
+					this.scaleTitleField.getText().length() == 0) {
 			getInput();
 		}
 	}

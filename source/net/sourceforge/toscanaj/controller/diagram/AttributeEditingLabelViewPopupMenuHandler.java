@@ -70,9 +70,9 @@ public class AttributeEditingLabelViewPopupMenuHandler implements EventBrokerLis
 			}
 		});
 		
-		JMenuItem contextMenuItem = new JMenuItem("Rename attribute...");
+		JMenuItem renameAttrMenuItem = new JMenuItem("Rename attribute...");
 		final String currentValue =  attribute.getData().toString();
-		contextMenuItem.addActionListener(new ActionListener () {
+		renameAttrMenuItem.addActionListener(new ActionListener () {
 			public void actionPerformed(ActionEvent event) {
 				InputTextDialog dialog = new InputTextDialog(JOptionPane.getFrameForComponent(diagramView), 
 														     "Rename Attribute", "attribute", currentValue);
@@ -83,9 +83,10 @@ public class AttributeEditingLabelViewPopupMenuHandler implements EventBrokerLis
 				}
 			}
 		});
+
 		JPopupMenu popupMenu = new JPopupMenu();
 		popupMenu.add(menuItem);
-		popupMenu.add(contextMenuItem);
+		popupMenu.add(renameAttrMenuItem);
 		
 		List attributeViewNames = DatabaseViewerManager.getAttributeViewNames();
 		if (!attributeViewNames.isEmpty()) { 
