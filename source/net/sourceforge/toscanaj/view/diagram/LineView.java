@@ -144,7 +144,7 @@ public class LineView extends CanvasItem {
 			}
             
 			if(this.groupingMode == CLOUDS_GROUPING) {
-				double extraBit = 15;
+				double extraBit = 3 * lineWidth;
 				lineLength += 2 * extraBit;
 				lineWidth += 2 * extraBit;
 				RoundRectangle2D cloud = new RoundRectangle2D.Double(-extraBit, -lineWidth/2, 
