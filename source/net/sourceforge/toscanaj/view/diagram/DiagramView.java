@@ -196,27 +196,16 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * filter operations.
      */
     private void addDiagram(Diagram2D diagram, ConceptInterpretationContext context) {
-        Hashtable nodeMap = new Hashtable();
-        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
-            DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node, this, context);
-            nodeMap.put(node, nodeView);
-        }
-        for (int i = 0; i < diagram.getNumberOfLines(); i++) {
-            DiagramLine dl = diagram.getLine(i);
-            addCanvasItem(new LineView(dl, (NodeView) nodeMap.get(dl.getFromNode()), (NodeView) nodeMap.get(dl.getToNode())));
-        }
+        Hashtable nodeMap = createNodeMap(diagram, context);
+        addLinesToDiagram(diagram, nodeMap);
+        addNodesToDiagram(diagram, nodeMap, context);
+        addLabelsToDiagram(diagram, nodeMap);
+    }
+
+    private void addLabelsToDiagram(Diagram2D diagram, Hashtable nodeMap) {
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
             NodeView nodeView = (NodeView) nodeMap.get(node);
-            addCanvasItem(nodeView);
-            if (node instanceof NestedDiagramNode) {
-                Concept concept = node.getConcept();
-                if (conceptInterpreter.isRealized(concept, context)) {
-                    NestedDiagramNode ndNode = (NestedDiagramNode) node;
-                    addDiagram(ndNode.getInnerDiagram(), context.getNestedContext(concept));
-                }
-            }
             LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
             if (attrLabelInfo != null) {
                 LabelView labelView = new AttributeLabelView(this, nodeView, attrLabelInfo);
@@ -230,6 +219,38 @@ public class DiagramView extends Canvas implements ChangeObserver {
                 labelView.addObserver(this);
             }
         }
+    }
+
+    private void addNodesToDiagram(Diagram2D diagram, Hashtable nodeMap, ConceptInterpretationContext context) {
+        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
+            DiagramNode node = diagram.getNode(i);
+            NodeView nodeView = (NodeView) nodeMap.get(node);
+            addCanvasItem(nodeView);
+            if (node instanceof NestedDiagramNode) {
+                Concept concept = node.getConcept();
+                if (conceptInterpreter.isRealized(concept, context)) {
+                    NestedDiagramNode ndNode = (NestedDiagramNode) node;
+                    addDiagram(ndNode.getInnerDiagram(), context.getNestedContext(concept));
+                }
+            }
+        }
+    }
+
+    private void addLinesToDiagram(Diagram2D diagram, Hashtable nodeMap) {
+        for (int i = 0; i < diagram.getNumberOfLines(); i++) {
+            DiagramLine dl = diagram.getLine(i);
+            addCanvasItem(new LineView(dl, (NodeView) nodeMap.get(dl.getFromNode()), (NodeView) nodeMap.get(dl.getToNode())));
+        }
+    }
+
+    private Hashtable createNodeMap(Diagram2D diagram, ConceptInterpretationContext context) {
+        Hashtable nodeMap = new Hashtable();
+        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
+            DiagramNode node = diagram.getNode(i);
+            NodeView nodeView = new NodeView(node, this, context);
+            nodeMap.put(node, nodeView);
+        }
+        return nodeMap;
     }
 
     /**
