@@ -9,3 +9,6 @@ pluginArhitecture.jar
 
 jdom.jar: 
   JDOM, beta 9 (http://www.jdom.org, licence in LICENSE.jdom)
+
+hsqldb.jar: 
+  HSQL Database Engine, version 1.7.1.b (http://hsqldb.sourceforge.net/, license in LICENSE.hsqldb.html)
