@@ -81,6 +81,20 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
             if (template == null) {
                 throw new DatabaseViewerException("HTMLDatabaseViewer needs <template> in definition");
             }
+            
+            Element htmlElem = this.template.getChild("html");
+            if (htmlElem == null) {
+                throw new DatabaseViewerException("No <html> tag found in <template> for HTMLDatabaseViewer");
+            }
+
+            // check for <title> tag and use it as dialog title if found
+            Element headElem = htmlElem.getChild("head");
+            if(headElem != null) {
+                Element titleElem = headElem.getChild("title");
+                if(titleElem != null) {
+                    setTitle(titleElem.getTextNormalize());
+                }
+            }
 
             // find <repeat> and non-repeat <field>s first
             List queue = new LinkedList();
