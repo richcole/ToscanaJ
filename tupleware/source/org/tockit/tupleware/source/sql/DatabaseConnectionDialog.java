@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.source.sql;
+package org.tockit.tupleware.source.sql;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
@@ -19,7 +19,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileFilter;
 
 import org.tockit.events.EventBroker;
-import org.tockit.tupelware.model.TupelSet;
+import org.tockit.tupleware.model.TupleSet;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -64,7 +64,7 @@ public class DatabaseConnectionDialog extends JDialog {
     private AccessFileConnectionPanel accessDbPanel;
     private SqlQueryPanel sqlQueryPanel;
 
-    private TupelSet tuples;
+    private TupleSet tuples;
 
     private Frame owner;
     
@@ -592,7 +592,7 @@ public class DatabaseConnectionDialog extends JDialog {
 				for (int i = 0; i < numberColumns; i++) {
                     names[i] = metaData.getColumnLabel(i + 1);
                 }
-				tuples = new TupelSet(names);
+				tuples = new TupleSet(names);
 				while (resultSet.next()) {
 					Object[] tuple = new Object[numberColumns];
 					for (int i = 0; i < numberColumns; i++) {
@@ -787,7 +787,7 @@ public class DatabaseConnectionDialog extends JDialog {
 		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,	this);
 	}
 
-    public TupelSet getTuples() {
+    public TupleSet getTuples() {
         return this.tuples;
     }
 }

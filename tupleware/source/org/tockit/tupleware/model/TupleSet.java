@@ -5,18 +5,18 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.model;
+package org.tockit.tupleware.model;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 
-public class TupelSet {
+public class TupleSet {
     private String[] variableNames;
     private Set tuples = new HashSet();
     
-    public TupelSet(String[] variableNames) {
+    public TupleSet(String[] variableNames) {
         this.variableNames = variableNames;  
     }
     

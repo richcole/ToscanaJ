@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.gui;
+package org.tockit.tupleware.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.gui.MainPanel;
@@ -21,18 +21,18 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import org.tockit.events.EventBroker;
-import org.tockit.tupelware.model.TupelSet;
-import org.tockit.tupelware.scaling.TupelScaling;
-import org.tockit.tupelware.source.TupelSource;
-import org.tockit.tupelware.source.text.TextSource;
-import org.tockit.tupelware.source.sql.SqlQueryEngine;
+import org.tockit.tupleware.model.TupleSet;
+import org.tockit.tupleware.scaling.TupleScaling;
+import org.tockit.tupleware.source.TupleSource;
+import org.tockit.tupleware.source.text.TextSource;
+import org.tockit.tupleware.source.sql.SqlQueryEngine;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.Iterator;
 
-public class TupelwareMainPanel extends JFrame implements MainPanel {
+public class TuplewareMainPanel extends JFrame implements MainPanel {
     private static final String CONFIGURATION_SECTION = "TuplewareMainPanel";
 	private static final String WINDOW_TITLE = "Tupleware";
 
@@ -44,7 +44,7 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
      *  Model
      */
     private ConceptualSchema conceptualSchema;
-    private TupelSet tuples;
+    private TupleSet tuples;
 
     /**
      * Controls
@@ -65,7 +65,7 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 	private SaveFileAction saveAsFileAction;
 	private SaveConceptualSchemaActivity saveActivity;
 
-    public TupelwareMainPanel() {
+    public TuplewareMainPanel() {
         super(WINDOW_TITLE);
 
         eventBroker = new EventBroker();
@@ -126,7 +126,7 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
             IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tuples.getVariableNames());
             dialog.show();
             int[] attributeIndices = dialog.getSelectedIndices();
-            Diagram2D diagram = TupelScaling.scaleTuples(this.tuples, this.objectIndices, attributeIndices);
+            Diagram2D diagram = TupleScaling.scaleTuples(this.tuples, this.objectIndices, attributeIndices);
             this.conceptualSchema.addDiagram(diagram);
         }
     }
@@ -228,7 +228,7 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 
     private void addTupleSourceMenuItem(JMenu tuplesMenu,
                                         final JFrame parent,
-                                        final TupelSource source) {
+                                        final TupleSource source) {
         JMenuItem menuItem = new JMenuItem(source.getMenuName());
         menuItem.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {

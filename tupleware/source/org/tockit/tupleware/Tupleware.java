@@ -5,13 +5,13 @@
  *
  * $Id$
  */
-package org.tockit.tupelware;
+package org.tockit.tupleware;
 
 import javax.swing.JOptionPane;
 
-import org.tockit.tupelware.gui.TupelwareMainPanel;
+import org.tockit.tupleware.gui.TuplewareMainPanel;
 
-public class Tupelware {
+public class Tupleware {
     /**
      * The version name used in the about dialog.
      */
@@ -22,7 +22,7 @@ public class Tupelware {
      */
     public static void main(String[] args) {
     	testJavaVersion();
-        final TupelwareMainPanel mainWindow = new TupelwareMainPanel();
+        final TuplewareMainPanel mainWindow = new TuplewareMainPanel();
         mainWindow.setVisible(true);
     }
 

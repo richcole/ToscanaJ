@@ -5,20 +5,20 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.source.sql;
+package org.tockit.tupleware.source.sql;
 
 import java.io.File;
 
 import javax.swing.JFrame;
 
-import org.tockit.tupelware.gui.IndexSelectionDialog;
-import org.tockit.tupelware.model.TupelSet;
-import org.tockit.tupelware.source.TupelSource;
+import org.tockit.tupleware.gui.IndexSelectionDialog;
+import org.tockit.tupleware.model.TupleSet;
+import org.tockit.tupleware.source.TupleSource;
 
 
-public class SqlQueryEngine implements TupelSource {
+public class SqlQueryEngine implements TupleSource {
     private int[] objectIndices;
-    private TupelSet tuples;
+    private TupleSet tuples;
 
     public String getMenuName() {
         return "Query from database...";
@@ -35,7 +35,7 @@ public class SqlQueryEngine implements TupelSource {
         }
     }
 
-    public TupelSet getTuples() {
+    public TupleSet getTuples() {
         return this.tuples;
     }
 

@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.source.text;
+package org.tockit.tupleware.source.text;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,11 +17,11 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import org.tockit.tupelware.model.TupelSet;
+import org.tockit.tupleware.model.TupleSet;
 
 
 /**
- * Parser to parse tupels from files.
+ * Parser to parse tuples from files.
  */
 public class TabDelimitedParser {
     /**
@@ -35,8 +35,8 @@ public class TabDelimitedParser {
      * 
      * @return a Set of Object[] representing the tuples parsed
      */
-    public static TupelSet parseTabDelimitedTuples(Reader input) throws IOException {
-        TupelSet retVal = null;
+    public static TupleSet parseTabDelimitedTuples(Reader input) throws IOException {
+        TupleSet retVal = null;
         BufferedReader buffReader = new BufferedReader(input);
         int lineNum = 0;
         while(true) {
@@ -57,7 +57,7 @@ public class TabDelimitedParser {
                 i++;
             }
             if(retVal == null) {
-                retVal = new TupelSet(tuple); 
+                retVal = new TupleSet(tuple); 
             } else {
             	try {
 					retVal.addTuple(tuple);
@@ -70,14 +70,14 @@ public class TabDelimitedParser {
     }
     
     public static void main(String[] args) throws FileNotFoundException, IOException {
-        TupelSet result = parseTabDelimitedTuples(new FileReader(new File(args[0])));
+        TupleSet result = parseTabDelimitedTuples(new FileReader(new File(args[0])));
         System.out.println("Vars:");
-        System.out.println(TupelSet.toString(result.getVariableNames()));
+        System.out.println(TupleSet.toString(result.getVariableNames()));
         System.out.println("Tuples:");
         Set tuples = result.getTuples();
         for (Iterator iter = tuples.iterator(); iter.hasNext();) {
             Object[] tuple = (Object[]) iter.next();
-            System.out.println(TupelSet.toString(tuple));
+            System.out.println(TupleSet.toString(tuple));
         }
     }
 }

@@ -5,19 +5,19 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.source;
+package org.tockit.tupleware.source;
 
 import java.io.File;
 
 import javax.swing.JFrame;
 
-import org.tockit.tupelware.model.TupelSet;
+import org.tockit.tupleware.model.TupleSet;
 
 
 /**
  * Interface for getting Tuples via GUI.
  */
-public interface TupelSource {
+public interface TupleSource {
     /**
      * The text used in the menu.
      */
@@ -32,11 +32,11 @@ public interface TupelSource {
 	void show(JFrame parent, File lastLocation);
     
     /**
-     * Retrieves the tupels collected.
+     * Retrieves the tuples collected.
      * 
      * @pre show() has been called
      */
-	TupelSet getTuples();
+	TupleSet getTuples();
     
     /**
      * Returns the indices making up the object (as a crossproduct).
@@ -46,7 +46,7 @@ public interface TupelSource {
 	int[] getObjectIndices();
     
     /**
-     * Returns the file selected during the process of getting tupels if applicable.
+     * Returns the file selected during the process of getting tuples if applicable.
      * 
      * @pre show() has been called
      * @return the file that was selected or null if not applicable

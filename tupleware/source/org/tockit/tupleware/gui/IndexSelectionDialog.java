@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.gui;
+package org.tockit.tupleware.gui;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;

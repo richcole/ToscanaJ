@@ -5,13 +5,13 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.source.rdql;
+package org.tockit.tupleware.source.rdql;
 
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
-import org.tockit.tupelware.model.TupelSet;
+import org.tockit.tupleware.model.TupleSet;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -32,26 +32,26 @@ public class RdqlQueryEngine {
 	private RdqlQueryEngine () {	
 	}
 
-	public static TupelSet executeQuery(String queryString, Model model) {
+	public static TupleSet executeQuery(String queryString, Model model) {
 		Query query = new Query(queryString) ;
 		List resultVars = query.getResultVars();
-		TupelSet resTupelSet = new TupelSet(
+		TupleSet resTupleSet = new TupleSet(
 							(String[]) resultVars.toArray(new String[resultVars.size()]));
 		query.setSource(model);	
 		QueryExecution qe = new QueryEngine(query) ;
 		QueryResults results = qe.exec();
 		for ( Iterator iter = results ; iter.hasNext() ; ) {
 			ResultBinding resBinding = (ResultBinding)iter.next() ;
-			Object[] tupel = new Object[resultVars.size()];
+			Object[] tuple = new Object[resultVars.size()];
 			for (int i = 0; i < resultVars.size(); i++) {
 				String  queryVar = (String) resultVars.get(i);
 				Object obj = resBinding.get(queryVar);
-				tupel[i] = obj;				
+				tuple[i] = obj;				
 			} 
-			resTupelSet.addTuple(tupel);
+			resTupleSet.addTuple(tuple);
 		}
 		results.close() ;
-		return resTupelSet;
+		return resTupleSet;
 	}
 	
 	public static void main (String[] args) {
@@ -87,9 +87,9 @@ public class RdqlQueryEngine {
 							"(?c, <is-a>, ?b)";
 		System.out.println("Query: " + queryString);
 
-		TupelSet tupelSet = RdqlQueryEngine.executeQuery(queryString, model);
-		Iterator it = tupelSet.getTuples().iterator();
-		System.out.println("TUPEL SET: ");
+		TupleSet tupleSet = RdqlQueryEngine.executeQuery(queryString, model);
+		Iterator it = tupleSet.getTuples().iterator();
+		System.out.println("TUPLE SET: ");
 		while (it.hasNext()) {
 			Object[] element = (Object[]) it.next();
 			System.out.print("---");

@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.scaling;
+package org.tockit.tupleware.scaling;
 
 import java.io.File;
 import java.io.FileReader;
@@ -14,8 +14,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.tockit.events.EventBroker;
-import org.tockit.tupelware.model.TupelSet;
-import org.tockit.tupelware.source.text.TabDelimitedParser;
+import org.tockit.tupleware.model.TupleSet;
+import org.tockit.tupleware.source.text.TabDelimitedParser;
 
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
@@ -30,9 +30,9 @@ import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.util.xmlize.XMLWriter;
 
 
-public class TupelScaling {
+public class TupleScaling {
     /**
-     * This introduces value identity on object tupels.
+     * This introduces value identity on object tuples.
      */
     private static class ObjectTuple {
         private Object[] data;
@@ -68,10 +68,10 @@ public class TupelScaling {
      * Creates a conceptual schema, taking one element as the objects the rest as attributes.
      * 
      * The return value is a conceptual schema with n-1 diagrams (n = number of elements in tuples).
-     * Each binary relation for the contexts is the projection of the tupels onto the dimension
+     * Each binary relation for the contexts is the projection of the tuples onto the dimension
      * given by the objectPosition parameter and one other.
      */
-    public static ConceptualSchema scaleTuples(TupelSet tuples, int objectPosition) {
+    public static ConceptualSchema scaleTuples(TupleSet tuples, int objectPosition) {
         ConceptualSchema schema = new ConceptualSchema(new EventBroker());
 
         String[] variableNames = tuples.getVariableNames();
@@ -91,7 +91,7 @@ public class TupelScaling {
      * The objectIndices parameter defines the objects, the attributeIndices parameter
      * the attributes. They incide iff they cooccur in a tuple.
      */    
-    public static Diagram2D scaleTuples(TupelSet tuples, int[] objectIndices, int[] attributeIndices) {
+    public static Diagram2D scaleTuples(TupleSet tuples, int[] objectIndices, int[] attributeIndices) {
         Map tupleObjectMap = new HashMap();
         Map valueAttributeMap = new HashMap();
         ContextImplementation context = new ContextImplementation("Tuples");
@@ -146,7 +146,7 @@ public class TupelScaling {
         } else {
             objectPos = 0;
         }
-        TupelSet input = TabDelimitedParser.parseTabDelimitedTuples(new FileReader(new File(args[0])));
+        TupleSet input = TabDelimitedParser.parseTabDelimitedTuples(new FileReader(new File(args[0])));
         ConceptualSchema result = scaleTuples(input, objectPos);
         XMLWriter.write(new File(args[1]), result);
     }

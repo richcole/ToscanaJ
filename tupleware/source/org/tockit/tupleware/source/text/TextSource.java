@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.source.text;
+package org.tockit.tupleware.source.text;
 
 import java.io.File;
 import java.io.FileReader;
@@ -17,17 +17,17 @@ import javax.swing.JFrame;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 
-import org.tockit.tupelware.gui.IndexSelectionDialog;
-import org.tockit.tupelware.model.TupelSet;
-import org.tockit.tupelware.source.TupelSource;
+import org.tockit.tupleware.gui.IndexSelectionDialog;
+import org.tockit.tupleware.model.TupleSet;
+import org.tockit.tupleware.source.TupleSource;
 
 
-public class TextSource implements TupelSource {
+public class TextSource implements TupleSource {
     public static final String[] FILE_EXTENSIONS = new String[]{"tuples"};
 	public static final String FILE_DESCRIPTION = "Tuple Sets";
 	
 	private int[] objectIndices;
-	private TupelSet tuples;
+	private TupleSet tuples;
 	private File selectedFile;
 		
 	public void show(JFrame parent, File lastLocation) {
@@ -55,7 +55,7 @@ public class TextSource implements TupelSource {
         return this.selectedFile;
     }
 
-    public TupelSet getTuples() {
+    public TupleSet getTuples() {
         return this.tuples;
     }
 
