@@ -46,6 +46,7 @@ import java.util.ListIterator;
 /// @todo check if the file we save to exists, warn if it does
 
 public class TupelwareMainPanel extends JFrame implements MainPanel {
+    private int[] objectIndices;
     private JTable tupelTable;
     private EventBroker eventBroker;
     static private final int MaxMruFiles = 8;
@@ -295,6 +296,9 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         try {
             reader = new FileReader(file);
             this.tupels = TupelParser.parseTabDelimitedTupels(reader);
+            IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select object set", this.tupels.getVariableNames());
+            dialog.show();
+            this.objectIndices = dialog.getSelectedIndices();
             fillTable();        
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Could not read file");
