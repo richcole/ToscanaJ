@@ -8,9 +8,11 @@ package net.sourceforge.toscanaj.controller.db;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.events.*;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
+import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -27,7 +29,7 @@ import java.util.Vector;
  * This class facilitates connection to and communication with a database
  * via JDBC.
  */
-public class DatabaseConnection {
+public class DatabaseConnection implements BrokerEventListener {
     /**
      * The JDBC database connection we use.
      */
@@ -81,6 +83,7 @@ public class DatabaseConnection {
      */
     public DatabaseConnection(EventBroker broker) {
         this.broker = broker;
+        broker.subscribe(this, DatabaseConnectEvent.class, Object.class);
     }
 
     public void connect(DatabaseInfo info) throws DatabaseException {
@@ -500,6 +503,21 @@ public class DatabaseConnection {
         }
     }
 
+    public void processEvent(Event e) {
+        if(e instanceof DatabaseConnectEvent){
+            DatabaseConnectEvent event=(DatabaseConnectEvent)e;
+            try {
+                connect(event.getInfo());
+            } catch (DatabaseException ex) {
+                ErrorDialog.showError(
+                        null,
+                        ex,
+                        "Unable to connect to database" + ex.getMessage(),
+                        "Database Connection failed");
+            }
+        }
+    }
+
     /**
      * Main method for testing the class.
      *
@@ -554,6 +572,8 @@ public class DatabaseConnection {
                         (String) views.get(i)));
             }
         }
+
+
     }
 }
 

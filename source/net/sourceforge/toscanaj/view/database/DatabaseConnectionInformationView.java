@@ -2,21 +2,22 @@ package net.sourceforge.toscanaj.view.database;
 
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
+import net.sourceforge.toscanaj.gui.activity.EmitEventActivity;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
-import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Observable;
-import java.util.Observer;
 
 public class DatabaseConnectionInformationView extends JPanel implements BrokerEventListener {
     protected DatabaseInfo info;
+
+    private DatabaseConnectEvent databaseConnectEvent;
 
     private JTextField urlField;
     private JTextField userField;
@@ -51,8 +52,10 @@ public class DatabaseConnectionInformationView extends JPanel implements BrokerE
         passwordField = new JTextField();
 
         JButton connectButton = new JButton();
+        databaseConnectEvent = new DatabaseConnectEvent(this, databaseInfo);
         SimpleAction action = new SimpleAction(frame, "Connect");
         action.add(new SaveControlActivity());
+        action.add(new EmitEventActivity(eventBroker, databaseConnectEvent));
         connectButton.setAction(action);
 
         JPanel buttonPane = new JPanel(new BorderLayout());
@@ -109,6 +112,7 @@ public class DatabaseConnectionInformationView extends JPanel implements BrokerE
     public void processEvent(Event event) {
         ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
         copyToControls(changeEvent.getConceptualSchema().getDatabaseInfo());
+        databaseConnectEvent.setInfo(changeEvent.getConceptualSchema().getDatabaseInfo());
     }
 
     public void setInfo(DatabaseInfo info) {

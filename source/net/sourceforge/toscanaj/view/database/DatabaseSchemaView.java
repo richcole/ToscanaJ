@@ -143,7 +143,7 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
 
     private void removeKeyedTable(Table table) {
         for (int i = 0; i < keyedTableList.size(); ++i) {
-            KeyTableInfo info = (KeyTableInfo) unkeyedTableList.elementAt(i);
+            KeyTableInfo info = (KeyTableInfo) keyedTableList.elementAt(i);
             if (info.getTable() == table) {
                 keyedTableList.removeElementAt(i);
                 break;
