@@ -586,10 +586,12 @@ public class DatabaseConnectionInformationView extends JDialog
             return null;
         }
         void updateContents() {
-            String table = databaseInfo.getTable().getDisplayName();
-            String key = databaseInfo.getKey().getDisplayName();
+            Table table = databaseInfo.getTable();
+            Column key = databaseInfo.getKey();
             if(table != null && key != null) {
-        		tableView.setKey(table, key);
+				String tableName = table.getDisplayName();
+				String keyName = key.getDisplayName();
+        		tableView.setKey(tableName, keyName);
         	}
         }
     }
