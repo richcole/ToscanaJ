@@ -21,6 +21,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.JComponent;
@@ -253,8 +254,15 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 				inputValue = dialog.getInput();
 				if (!collectionContainsString(inputValue, this.objects)) {
 				    ContextImplementation context = this.dialog.getContext();
+                    Set objects = context.getObjects();
                     WritableFCAObject newObject = new FCAObjectImplementation(inputValue);
-                    context.getObjects().add(newObject);
+                    objects.remove(oldObject);
+                    if(objects instanceof List) {
+                        List objectList = (List) objects;
+                        objectList.add(num, newObject);
+                    } else {
+                        objects.add(newObject);
+                    }
                     for (Iterator iter = context.getAttributes().iterator(); iter.hasNext(); ) {
                         Object attribute = iter.next();
                         if(context.getRelation().contains(oldObject, attribute)) {
@@ -262,7 +270,6 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
                             context.getRelationImplementation().remove(oldObject, attribute);
                         }
                     }
-                    context.getObjects().remove(oldObject);
                     calculateNewSize();
 					repaint();
 					inputValue = "";
