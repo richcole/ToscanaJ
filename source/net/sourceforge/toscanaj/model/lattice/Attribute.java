@@ -38,6 +38,11 @@ public class Attribute {
 		this.data = data;
 	}
 
+	/**
+	 * @todo in ConceptualSchema.setDescription(Element) we clone the parameter,
+	 * here we don't --> check why
+	 * @todo notify schema that something has changed
+	 */
 	public void setDescription(Element description) {
 		this.description = description;
 	}

@@ -304,6 +304,10 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         this.coordinateSystemChecked = true;
     }
 
+	/**
+	 * @todo in ConceptualSchema.setDescription(Element) we clone the parameter,
+	 * here we don't --> check why
+	 */
     public void setDescription(Element desc) {
         this.description = desc;
         sendChangeEvent();
