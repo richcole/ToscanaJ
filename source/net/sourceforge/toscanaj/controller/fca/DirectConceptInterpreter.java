@@ -10,7 +10,6 @@ package net.sourceforge.toscanaj.controller.fca;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -48,7 +47,6 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
 
     private void filterObjects(final TreeSet currentSet, ConceptInterpretationContext context) {
         DiagramHistory.ConceptVisitor visitor;
-        final HashSet toRemove = new HashSet();
         if (context.getFilterMode() == ConceptInterpretationContext.EXTENT) {
             visitor = new DiagramHistory.ConceptVisitor() {
                 public void visitConcept(Concept concept) {
@@ -64,7 +62,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
                             }
                         }
                         if (!found) {
-                            toRemove.add(o);
+							iterator.remove();
                         }
                     }
                 }
@@ -84,21 +82,19 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
                             }
                         }
                         if (!found) {
-                            toRemove.add(o);
+                        	iterator.remove();
                         }
                     }
                 }
             };
         }
         context.getDiagramHistory().visitZoomedConcepts(visitor);
-        currentSet.removeAll(toRemove);
     }
 
     private void nestObjects(TreeSet currentSet, ConceptInterpretationContext context, boolean contingentOnly) {
         Iterator mainIt = context.getNestingConcepts().iterator();
         while (mainIt.hasNext()) {
             Concept concept = (Concept) mainIt.next();
-            HashSet toRemove = new HashSet();
             for (Iterator iterator = currentSet.iterator(); iterator.hasNext();) {
                 Object o = iterator.next();
                 boolean found = false;
@@ -116,10 +112,9 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
                     }
                 }
                 if (!found) {
-                    toRemove.add(o);
+                	iterator.remove();
                 }
             }
-			currentSet.removeAll(toRemove);
         }
     }
 
