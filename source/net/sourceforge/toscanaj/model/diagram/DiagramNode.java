@@ -136,14 +136,14 @@ public class DiagramNode implements XMLizable {
         } else {
         	attributeLabelInfo = new LabelInfo();
         }
-        attributeLabelInfo.attachNode(this);
+        attributeLabelInfo.setNode(this);
 
         if (XMLHelper.contains(elem, OBJECT_LABEL_STYLE_ELEMENT_NAME)) {
             objectLabelInfo = new LabelInfo(elem.getChild(OBJECT_LABEL_STYLE_ELEMENT_NAME));
         } else {
             objectLabelInfo = new LabelInfo();
         }
-        objectLabelInfo.attachNode(this);
+        objectLabelInfo.setNode(this);
 
         concept = new ConceptImplementation(
                 XMLHelper.getMandatoryChild(elem, ConceptImplementation.CONCEPT_ELEMENT_NAME)
@@ -183,13 +183,13 @@ public class DiagramNode implements XMLizable {
         this.concept = other.concept;
         if (this.attributeLabelInfo != null) {
             this.attributeLabelInfo = new LabelInfo(other.attributeLabelInfo);
-            this.attributeLabelInfo.attachNode(this);
+            this.attributeLabelInfo.setNode(this);
         } else {
             this.attributeLabelInfo = null;
         }
         if (this.objectLabelInfo != null) {
             this.objectLabelInfo = new LabelInfo(other.objectLabelInfo);
-            this.objectLabelInfo.attachNode(this);
+            this.objectLabelInfo.setNode(this);
         } else {
             this.objectLabelInfo = null;
         }
@@ -275,7 +275,7 @@ public class DiagramNode implements XMLizable {
     public void setAttributeLabelInfo(LabelInfo labelInfo) {
         this.attributeLabelInfo = labelInfo;
         if (attributeLabelInfo != null) {
-            attributeLabelInfo.attachNode(this);
+            attributeLabelInfo.setNode(this);
         }
 		this.diagram.sendChangeEvent();
     }
@@ -286,7 +286,7 @@ public class DiagramNode implements XMLizable {
     public void setObjectLabelInfo(LabelInfo labelInfo) {
         this.objectLabelInfo = labelInfo;
         if (objectLabelInfo != null) {
-            objectLabelInfo.attachNode(this);
+            objectLabelInfo.setNode(this);
         }
 		this.diagram.sendChangeEvent();
     }

@@ -34,15 +34,13 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 public class RowHeader extends JTable {
 	private final static TableCellRenderer CELL_RENDERER = new DefaultTableCellRenderer()
 	{
-	    protected Border noFocusBorder, focusBorder;
-	
+	    protected Border focusBorder;
 	    {
 	        setOpaque(true);
 	        setBorder(noFocusBorder);
 	    }
 	
-	    public void updateUI()
-	    {
+	    public void updateUI() {
 	        super.updateUI();
 	        Border cell = UIManager.getBorder("TableHeader.cellBorder");
 	        Border focus = UIManager.getBorder("Table.focusCellHighlightBorder");

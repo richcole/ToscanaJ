@@ -182,8 +182,8 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                     return;
                 }
                 int index = listView.getSelectedIndex();
-                ListModel model = listView.getModel();
-                ArrowStyle style = (ArrowStyle) model.getElementAt(index);
+                ListModel listModel = listView.getModel();
+                ArrowStyle style = (ArrowStyle) listModel.getElementAt(index);
                 ArrowStyle newStyle = ArrowStyleChooser.showDialog(listView, "Edit arrow style", style);
                 if(newStyle != null) {
                     style.copyValues(newStyle);
@@ -455,15 +455,15 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     }
 
     private void fillSequenceChooser() {
-    	DefaultComboBoxModel model = new DefaultComboBoxModel();
-    	model.addElement("<All Sequences>");
+    	DefaultComboBoxModel listModel = new DefaultComboBoxModel();
+    	listModel.addElement("<All Sequences>");
     	Iterator it = this.sequenceValues.iterator();
     	while (it.hasNext()) {
             Value value = (Value) it.next();
-            model.addElement(value);
+            listModel.addElement(value);
         }
         
-    	this.sequenceToShowChooser.setModel(model);
+    	this.sequenceToShowChooser.setModel(listModel);
     }
 
     private void setButtonStates(boolean allDisabled) {
@@ -569,7 +569,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         }
     }
     
-    private String getNumberedFileName(File selectedFile, int currentStep, double targetStep) {
+    private String getNumberedFileName(File selectedFile, int step, double targetStep) {
     	String origName = selectedFile.getAbsolutePath();
     	int dotPos = origName.lastIndexOf('.');
     	double countdown = targetStep;
@@ -578,7 +578,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     		fillingZeroes += "0";
     		countdown /= 10;
     	} 
-    	String currentPos = String.valueOf(currentStep);
+    	String currentPos = String.valueOf(step);
         return origName.substring(0,dotPos) + "-" + 
                 fillingZeroes.substring(currentPos.length()) + currentPos + 
                 origName.substring(dotPos);

@@ -16,6 +16,7 @@ public class OrExpression implements Expression {
     private Vector subexpressions = new Vector();
 
     public OrExpression() {
+		// nothing to do here
     }
     
     public void addClause(Expression clause) {

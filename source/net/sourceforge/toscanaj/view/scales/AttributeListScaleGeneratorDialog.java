@@ -141,7 +141,6 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 		this.table = new JTable(new AttributeListTableModel());
 		((DefaultCellEditor)table.getDefaultEditor(String.class)).setClickCountToStart(1); 
 		AttributeListTableModel model = (AttributeListTableModel)table.getModel();
-		model.setTable(table);
 		this.scrollpane = new JScrollPane(table);
  	    this.scrollpane.setAutoscrolls(true);
 		getContentPane().add(scrollpane, BorderLayout.CENTER);
@@ -205,7 +204,7 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 		titlePane = new JPanel(new GridBagLayout());
 		JLabel titleLabel = new JLabel("Scale Title:");
 		this.scaleTitleField = new JTextField();
-		scaleTitleField.addKeyListener( new KeyListener(){
+		scaleTitleField.addKeyListener( new KeyAdapter(){
 			private void validateTextField(){
 				if(scaleTitleField.getText().trim().equals("")){
 					createButton.setEnabled(false);
@@ -221,7 +220,6 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				validateTextField();
 				setCreateButtonStatus();
 			}
-			public void keyPressed(KeyEvent e) {}			
 		});
 		
 		titlePane.add(
@@ -319,9 +317,9 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				0));
 	}
 	
-	private void closeDialog(boolean result) {
+	private void closeDialog(boolean withResult) {
         preferences.storeWindowPlacement(this);
-		this.result = result;
+		this.result = withResult;
 		setVisible(false);
 	}
 	public boolean execute() {
@@ -364,7 +362,6 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 	}
 
 	class AttributeListTableModel extends AbstractTableModel{
-			private JTable table;
 			final String[] columnNames = {"Label Name", "SQL Clause"};
 			Object[][] modelData =  new Object[DEFAULT_NUM_OF_ROWS][DEFAULT_NUM_OF_COLS];
 
@@ -423,10 +420,6 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				modelData = newData;
 			}
 			
-			protected void setTable(JTable table){
-				this.table = table;
-			}
-						
 			//removes last row of null values before returning
 			protected Object[][] getTableData(){
 				Object[][] returnData = new Object[getRowCount()-1][getColumnCount()]; 

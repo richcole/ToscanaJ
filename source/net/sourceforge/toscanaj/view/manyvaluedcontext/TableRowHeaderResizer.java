@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.JTable;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.MouseInputAdapter;
 
 import java.io.Serializable;
@@ -77,7 +78,7 @@ public class TableRowHeaderResizer extends MouseInputAdapter
 			this.rowHeader = null;
 		else
 			this.rowHeader = (JTable) viewport.getView();
-		this.corner = pane.getCorner(JScrollPane.UPPER_LEFT_CORNER);
+		this.corner = pane.getCorner(ScrollPaneConstants.UPPER_LEFT_CORNER);
 	}
 
 	public void componentAdded(ContainerEvent e) {

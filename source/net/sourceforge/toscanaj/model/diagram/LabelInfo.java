@@ -194,7 +194,7 @@ public class LabelInfo implements XMLizable, ChangeObservable {
      *
      * Access is package level here since this should be called from DiagramNode.
      */
-    void attachNode(DiagramNode node) {
+    void setNode(DiagramNode node) {
         this.node = node;
     }
 

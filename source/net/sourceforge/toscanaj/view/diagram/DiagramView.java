@@ -199,15 +199,15 @@ public class DiagramView extends Canvas implements ChangeObserver {
      *
      * This will automatically cause a repaint of the view.
      */
-    public void showDiagram(Diagram2D diagram) {
-        showDiagram(diagram, true);
+    public void showDiagram(Diagram2D newDiagram) {
+        showDiagram(newDiagram, true);
     }    
     
-    private void showDiagram(Diagram2D diagram, boolean sendEvent) {
-        this.diagram = diagram;
+    private void showDiagram(Diagram2D newDiagram, boolean sendEvent) {
+        this.diagram = newDiagram;
         removeSubscriptions();
         clearCanvas();
-        if (diagram == null) {
+        if (newDiagram == null) {
             repaint();
             if(sendEvent) {
                 this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
@@ -227,7 +227,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         addLayer("labels");
         addLayer("extraItems");
         try{
-        	addDiagram(diagram, conceptInterpretationContext, 0, true);
+        	addDiagram(newDiagram, conceptInterpretationContext, 0, true);
             requestScreenTransformUpdate();
             repaint();
             if(sendEvent) {
@@ -273,14 +273,14 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * If the filter concept is non-null all nodes created will use this for
      * filter operations.
      */
-    private void addDiagram(Diagram2D diagram, ConceptInterpretationContext context, int layer, boolean showAttributeLabels) {
+    private void addDiagram(Diagram2D newDiagram, ConceptInterpretationContext context, int layer, boolean showAttributeLabels) {
 		String lineLayerName = "lines-" + layer;
         String nodeLayerName = "nodes-" + layer;
         String labelConnectorLayerName = "connectors-" + layer;
         String labelLayerName = "labels";
         Hashtable nodeMap = new Hashtable();
-        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
-            DiagramNode node = diagram.getNode(i);
+        for (int i = 0; i < newDiagram.getNumberOfNodes(); i++) {
+            DiagramNode node = newDiagram.getNode(i);
             NodeView nodeView = new NodeView(node, this, context);
             nodeMap.put(node, nodeView);
             addCanvasItem(nodeView, nodeLayerName);
@@ -303,7 +303,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
                     addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept), layer + 1, isTopRealizedConcept);
                 }
             }
-			LabelInfo objLabelInfo = diagram.getObjectLabel(i);
+			LabelInfo objLabelInfo = newDiagram.getObjectLabel(i);
 			if (objLabelInfo != null && this.objectLabelFactory != null) {
 				LabelView labelView = this.objectLabelFactory.createLabelView(this, nodeView, objLabelInfo);
 				addCanvasItem(labelView, labelLayerName);
@@ -311,7 +311,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
 				labelView.addObserver(this);
 			}
             if(showAttributeLabels) {
-	            LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
+	            LabelInfo attrLabelInfo = newDiagram.getAttributeLabel(i);
 	            if (attrLabelInfo != null) {
 	                LabelView labelView = this.attributeLabelFactory.createLabelView(this, nodeView, attrLabelInfo);
 	                addCanvasItem(labelView, labelLayerName);
@@ -320,12 +320,12 @@ public class DiagramView extends Canvas implements ChangeObserver {
 	            }
 			}
         }
-        for (int i = 0; i < diagram.getNumberOfLines(); i++) {
-            DiagramLine dl = diagram.getLine(i);
+        for (int i = 0; i < newDiagram.getNumberOfLines(); i++) {
+            DiagramLine dl = newDiagram.getLine(i);
             addCanvasItem(new LineView(dl, (NodeView) nodeMap.get(dl.getFromNode()), (NodeView) nodeMap.get(dl.getToNode())), lineLayerName);
         }
-        if(diagram instanceof SimpleLineDiagram) {
-            SimpleLineDiagram sld = (SimpleLineDiagram) diagram;
+        if(newDiagram instanceof SimpleLineDiagram) {
+            SimpleLineDiagram sld = (SimpleLineDiagram) newDiagram;
             for (Iterator iter = sld.getExtraCanvasItems().iterator(); iter.hasNext();) {
                 CanvasItem item = (CanvasItem) iter.next();
                 addCanvasItem(item, "extraItems");

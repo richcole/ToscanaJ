@@ -81,6 +81,7 @@ public class CSXParser {
      * No public constructor -- the class should not be instantiated.
      */
     private CSXParser() {
+		// should not be called
     }
 
     /**

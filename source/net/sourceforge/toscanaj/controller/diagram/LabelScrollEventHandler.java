@@ -23,10 +23,10 @@ public class LabelScrollEventHandler implements EventBrokerListener {
     public void processEvent(Event e) {
     	if(e instanceof CanvasItemMouseEnterEvent) {
 			LabelView labelView = (LabelView) e.getSubject();
-			labelView.showScrollbar(true);
+			labelView.setScrollbarShown(true);
     	} else if (e instanceof CanvasItemMouseExitEvent) {
 			LabelView labelView = (LabelView) e.getSubject();
-			labelView.showScrollbar(false);
+			labelView.setScrollbarShown(false);
     	}
     }
 }

@@ -214,7 +214,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
                         final WritableFCAElement attribute = attributes[i];
                         JMenuItem menuItem = new JMenuItem(attribute.toString());
                         menuItem.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent e) {
+                            public void actionPerformed(ActionEvent ae) {
                                 moveAttribute(pos.getCol(), attribute);
                             }
                         });
@@ -228,7 +228,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
                     if(pos.getCol() != attributes.length - 1) {
                         JMenuItem menuItem = new JMenuItem("Move to end");
                         menuItem.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent e) {
+                            public void actionPerformed(ActionEvent ae) {
                                 moveAttribute(pos.getCol(), null);
                             }
                         });
@@ -237,13 +237,13 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
                     
                     JMenuItem rename = new JMenuItem("Rename Attribute");
 					rename.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
+						public void actionPerformed(ActionEvent ae) {
 							renameAttribute(pos.getCol());
 						}
 					});
 					JMenuItem remove = new JMenuItem("Remove Attribute");
 					remove.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
+						public void actionPerformed(ActionEvent ae) {
 							removeAttribute(pos.getCol());
 						}
 					});
@@ -286,19 +286,19 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 		String inputValue = "";
 		do {
             WritableFCAElement oldAttr = this.attributes[num];
-			InputTextDialog dialog = new InputTextDialog(this.dialog, "Rename Attribute", "attribute", oldAttr.toString());
-			if (!dialog.isCancelled()) {
-                inputValue = dialog.getInput();
+			InputTextDialog inputDialog = new InputTextDialog(this.dialog, "Rename Attribute", "attribute", oldAttr.toString());
+			if (!inputDialog.isCancelled()) {
+                inputValue = inputDialog.getInput();
                 if (!this.dialog.collectionContainsString(inputValue, this.attributes)) {
                     ContextImplementation context = this.dialog.getContext();
-                    Set attributes = context.getAttributes();
+                    Set attributeSet = context.getAttributes();
                     WritableFCAElement newAttr = new FCAElementImplementation(inputValue);
-                    attributes.remove(oldAttr);
-                    if(attributes instanceof List) {
-                        List attributesList = (List) attributes;
+                    attributeSet.remove(oldAttr);
+                    if(attributeSet instanceof List) {
+                        List attributesList = (List) attributeSet;
                         attributesList.add(num, newAttr);
                     } else {
-                        attributes.add(newAttr);
+                        attributeSet.add(newAttr);
                     }
                     for (Iterator iter = context.getObjects().iterator(); iter.hasNext(); ) {
                         Object object = iter.next();

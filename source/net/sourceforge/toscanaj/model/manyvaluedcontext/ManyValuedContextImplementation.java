@@ -52,6 +52,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
     }
 	
 	public ManyValuedContextImplementation() {
+		// nothing to do here
     }
 	
 	public ManyValuedContextImplementation(Element elem) throws XMLSyntaxError {

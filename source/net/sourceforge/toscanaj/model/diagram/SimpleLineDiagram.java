@@ -171,8 +171,8 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 			newIdentifier = this.idPool.getFreeId();
 		}
 		DiagramNode newNode = new DiagramNode(this, newIdentifier, position, concept, attributeLabelInfo, objectLabelInfo, null);
-		attributeLabelInfo.attachNode(newNode);
-		objectLabelInfo.attachNode(newNode);
+		attributeLabelInfo.setNode(newNode);
+		objectLabelInfo.setNode(newNode);
 		return newNode;
     }
 

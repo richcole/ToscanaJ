@@ -202,6 +202,7 @@ public class DecimalType extends AbstractXSDDatatype {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
+    	// @TODO implement
     }
 
     protected String getBaseType() {

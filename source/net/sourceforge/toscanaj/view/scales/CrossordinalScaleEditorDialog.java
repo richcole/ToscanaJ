@@ -27,8 +27,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -105,14 +105,13 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 	}
 
 	private JPanel makeTitlePane() {
-		this.titleEditor.addKeyListener(new KeyListener(){
+		this.titleEditor.addKeyListener(new KeyAdapter(){
 			public void keyTyped(KeyEvent e) {
 				setCreateButtonState();
 			}
 			public void keyReleased(KeyEvent e) {
 				setCreateButtonState();
 			}
-			public void keyPressed(KeyEvent e) {}		
 		});
 		return new LabeledPanel("Title:", this.titleEditor, false);
 	}
@@ -192,10 +191,10 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 		return buttonPane;
 	}
 	
-	private void closeDialog(boolean result) {
+	private void closeDialog(boolean withResult) {
 		preferences.storeWindowPlacement(this);
 		dispose();
-		this.result = result;
+		this.result = withResult;
 	}
 	
 	private JButton makeActionOnCorrectScaleButton(final String label) {

@@ -123,6 +123,7 @@ public class DatabaseInfo implements XMLizable {
      * Creates an empty instance.
      */
 	public DatabaseInfo() {
+		// nothing to initialize here
 	}
 
 	public DatabaseInfo(DatabaseInfo other) {

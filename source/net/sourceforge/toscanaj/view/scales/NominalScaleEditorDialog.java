@@ -7,29 +7,23 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.gui.LabeledPanel;
-import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-import net.sourceforge.toscanaj.model.database.Column;
-import net.sourceforge.toscanaj.model.database.DatabaseSchema;
-import net.sourceforge.toscanaj.model.database.Table;
-
-import javax.swing.*;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import org.tockit.swing.preferences.ExtendedPreferences;
-
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.Label;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.DatabaseMetaData;
@@ -39,6 +33,30 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.gui.LabeledPanel;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.model.database.Column;
+import net.sourceforge.toscanaj.model.database.DatabaseSchema;
+import net.sourceforge.toscanaj.model.database.Table;
+
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 public class NominalScaleEditorDialog extends JDialog {
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(NominalScaleEditorDialog.class);
@@ -316,7 +334,7 @@ public class NominalScaleEditorDialog extends JDialog {
 
         // -- title pane ---
         this.scaleTitleField = new JTextField();
-        this.scaleTitleField.addKeyListener(new KeyListener(){
+        this.scaleTitleField.addKeyListener(new KeyAdapter(){
 			private void validateTextField(){
 				if(scaleTitleField.getText().trim().equals("")){
 					createButton.setEnabled(false);
@@ -332,7 +350,6 @@ public class NominalScaleEditorDialog extends JDialog {
 				validateTextField();
 				setCreateButtonStatus();
 			}
-			public void keyPressed(KeyEvent e) {}		
         });
         JPanel titlePane = new JPanel(new GridBagLayout());
         titlePane.add(new Label("Scale Title: "), new GridBagConstraints(

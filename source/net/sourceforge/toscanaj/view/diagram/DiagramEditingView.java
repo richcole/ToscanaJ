@@ -477,8 +477,8 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 for (Iterator lineIt = diagram.getLines(); lineIt.hasNext(); ) {
                     DiagramLine line = (DiagramLine) lineIt.next();
                     if(line.getToNode() == node) {
-                        NDimDiagramNode parent = (NDimDiagramNode) line.getFromNode();
-                        double[] parentVec = parent.getNdimVector();
+                        NDimDiagramNode parentNode = (NDimDiagramNode) line.getFromNode();
+                        double[] parentVec = parentNode.getNdimVector();
                         for (int i = 0; i < parentVec.length; i++) {
                             if(parentVec[i] < ndimVec[i]) {
                                 dim = i;

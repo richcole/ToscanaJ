@@ -113,6 +113,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     protected DragMode dragMode = NOT_DRAGGING;
     
     protected static class DragMode {
+    	// no declarations
     }
 
     protected static final DragMode NOT_DRAGGING = new DragMode();
@@ -714,7 +715,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 		this.font = font;
 	}
 
-	public void showScrollbar(boolean scrollbarShown) {
+	public void setScrollbarShown(boolean scrollbarShown) {
 		this.scrollbarShown = scrollbarShown;
 		this.diagramView.update(this);
 	}

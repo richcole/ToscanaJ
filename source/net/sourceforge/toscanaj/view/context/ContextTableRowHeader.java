@@ -189,13 +189,13 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 					JPopupMenu popupMenu = new JPopupMenu();
 					JMenuItem rename = new JMenuItem("Rename Object");
 					rename.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
+						public void actionPerformed(ActionEvent ae) {
 							renameObject(pos.getRow());
 						}
 					});
 					JMenuItem remove = new JMenuItem("Remove Object");
 					remove.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
+						public void actionPerformed(ActionEvent ae) {
 							removeObject(pos.getRow());
 						}
 					});
@@ -204,7 +204,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
                         final WritableFCAElement object = objects[i];
                         JMenuItem menuItem = new JMenuItem(object.toString());
                         menuItem.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent e) {
+                            public void actionPerformed(ActionEvent ae) {
                                 moveObject(pos.getRow(), object);
                             }
                         });
@@ -218,7 +218,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
                     if(pos.getRow() != objects.length - 1) {
                         JMenuItem menuItem = new JMenuItem("Move to end");
                         menuItem.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent e) {
+                            public void actionPerformed(ActionEvent ae) {
                                 moveObject(pos.getRow(), null);
                             }
                         });
@@ -283,19 +283,19 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 		String inputValue = "";
 		do {
 			WritableFCAElement oldObject = this.objects[num];
-			InputTextDialog dialog = new InputTextDialog(this.dialog, "Rename Object", "object", oldObject.toString());
-			if (!dialog.isCancelled()) {
-				inputValue = dialog.getInput();
+			InputTextDialog inputDialog = new InputTextDialog(this.dialog, "Rename Object", "object", oldObject.toString());
+			if (!inputDialog.isCancelled()) {
+				inputValue = inputDialog.getInput();
 				if (!collectionContainsString(inputValue, this.objects)) {
 				    ContextImplementation context = this.dialog.getContext();
-                    Set objects = context.getObjects();
+                    Set objectSet = context.getObjects();
                     WritableFCAElement newObject = new FCAElementImplementation(inputValue);
-                    objects.remove(oldObject);
-                    if(objects instanceof List) {
-                        List objectList = (List) objects;
+                    objectSet.remove(oldObject);
+                    if(objectSet instanceof List) {
+                        List objectList = (List) objectSet;
                         objectList.add(num, newObject);
                     } else {
-                        objects.add(newObject);
+                        objectSet.add(newObject);
                     }
                     for (Iterator iter = context.getAttributes().iterator(); iter.hasNext(); ) {
                         Object attribute = iter.next();
@@ -345,9 +345,9 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
     
 	protected boolean collectionContainsString(
 		String value,
-		Object[] objects) {
-		for (int i = 0; i < objects.length; i++) {
-			Object obj = objects[i];
+		Object[] values) {
+		for (int i = 0; i < values.length; i++) {
+			Object obj = values[i];
 			if (obj.toString().equalsIgnoreCase(value.trim())) {
 				return true;
 			}

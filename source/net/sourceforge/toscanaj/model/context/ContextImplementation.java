@@ -28,6 +28,7 @@ public class ContextImplementation implements ListsContext {
     private String name = null;
 
     public ContextImplementation() {
+    	// no further initialization required
     }
 
     public ContextImplementation(String name) {
@@ -60,39 +61,39 @@ public class ContextImplementation implements ListsContext {
 	
 	public Context createSum(Context other, String title) {
 		ContextImplementation context = new ContextImplementation(title);
-		Set objects = context.getObjects();
-		Set attributes = context.getAttributes();
-		BinaryRelationImplementation relation = context.getRelationImplementation();
+		Set newObjects = context.getObjects();
+		Set newAttributes = context.getAttributes();
+		BinaryRelationImplementation newRelation = context.getRelationImplementation();
 		
 		Iterator objIt = this.getObjects().iterator();
 		while (objIt.hasNext()) {
 			Object object = objIt.next();
-			objects.add(object);
+			newObjects.add(object);
 		}
 		objIt = other.getObjects().iterator();
 		while (objIt.hasNext()) {
 			Object object = objIt.next();
-			objects.add(object);
+			newObjects.add(object);
 		}
 		Iterator attrIt = this.getAttributes().iterator();
 		while (attrIt.hasNext()) {
 			Object attribute = attrIt.next();
-			attributes.add(attribute);
+			newAttributes.add(attribute);
 		}
 		attrIt = other.getAttributes().iterator();
 		while (attrIt.hasNext()) {
 			Object attribute = attrIt.next();
-			attributes.add(attribute);
+			newAttributes.add(attribute);
 		}
-		objIt = objects.iterator();
+		objIt = newObjects.iterator();
 		while (objIt.hasNext()) {
 			Object object = objIt.next();
-			attrIt = attributes.iterator();
+			attrIt = newAttributes.iterator();
 			while (attrIt.hasNext()) {
 				Object attribute = attrIt.next();
 				if(this.getRelation().contains(object,attribute) ||
 				   other.getRelation().contains(object,attribute)) {
-					relation.insert(object,attribute);
+					newRelation.insert(object,attribute);
 				}
 			}
 		}
@@ -104,19 +105,19 @@ public class ContextImplementation implements ListsContext {
 	 */
 	public Context createProduct(Context other, String title) {
 		ContextImplementation context = new ContextImplementation(title);
-		Set objects = context.getObjects();
-		Set attributes = context.getAttributes();
-		BinaryRelationImplementation relation = context.getRelationImplementation();
+		Set newObjects = context.getObjects();
+		Set newAttributes = context.getAttributes();
+		BinaryRelationImplementation newRelation = context.getRelationImplementation();
 		
 		Iterator attrIt = this.getAttributes().iterator();
 		while (attrIt.hasNext()) {
 			Object attribute = attrIt.next();
-			attributes.add(attribute);
+			newAttributes.add(attribute);
 		}
 		attrIt = other.getAttributes().iterator();
 		while (attrIt.hasNext()) {
 			Object attribute = attrIt.next();
-			attributes.add(attribute);
+			newAttributes.add(attribute);
 		}
 		Iterator objIt = this.getObjects().iterator();
 		while (objIt.hasNext()) {
@@ -127,19 +128,19 @@ public class ContextImplementation implements ListsContext {
 				String newObjectData = "(" + objectL.getData().toString() 
 									+ ") AND (" + objectR.getData().toString() + ")";
 				FCAElement newObject = new FCAElementImplementation(newObjectData);
-				objects.add(newObject);
+				newObjects.add(newObject);
 				attrIt = this.getAttributes().iterator();
 				while (attrIt.hasNext()) {
 					Object attribute = attrIt.next();
 					if(this.getRelation().contains(objectL, attribute)) {
-						relation.insert(newObject, attribute);
+						newRelation.insert(newObject, attribute);
 					}
 				}
 				attrIt = other.getAttributes().iterator();
 				while (attrIt.hasNext()) {
 					Object attribute = attrIt.next();
 					if(other.getRelation().contains(objectR, attribute)) {
-						relation.insert(newObject, attribute);
+						newRelation.insert(newObject, attribute);
 					}
 				}
 			}

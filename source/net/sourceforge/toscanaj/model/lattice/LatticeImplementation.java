@@ -15,6 +15,7 @@ public class LatticeImplementation implements Lattice {
     private Set concepts = new HashSet();
 
     public LatticeImplementation() {
+    	// nothing to do here
     }
 
     public void addConcept(Concept concept) {

@@ -22,8 +22,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 public class OrdinalScaleEditorDialog extends JDialog {
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(OrdinalScaleEditorDialog.class);
@@ -82,7 +82,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
 					2,2
 		));
 		
-		mainPane.add(makeSelectionPane(databaseSchema, connection), new GridBagConstraints(
+		mainPane.add(makeSelectionPane(), new GridBagConstraints(
 					0,1,1,1,1,1,
 					GridBagConstraints.NORTHWEST,
 					GridBagConstraints.BOTH,
@@ -101,7 +101,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
     }
 
     private JPanel makeTitlePane() {
-        this.titleEditor.addKeyListener(new KeyListener(){
+        this.titleEditor.addKeyListener(new KeyAdapter(){
         	private void validateTextField(){
         		if(titleEditor.getText().equals("") || scalePanel.getDividersList().getModel().getSize()==0){
         			okButton.setEnabled(false);
@@ -115,12 +115,11 @@ public class OrdinalScaleEditorDialog extends JDialog {
         	public void keyReleased(KeyEvent e) {
         		validateTextField();
         	}
-        	public void keyPressed(KeyEvent e) {}		
         });
         return new LabeledPanel("Title:", this.titleEditor, false);
     }
 
-    private JPanel makeSelectionPane(DatabaseSchema databaseSchema, DatabaseConnection connection) {
+    private JPanel makeSelectionPane() {
         this.scalePanel = new OrdinalScaleGeneratorPanel(databaseSchema, connection);
         this.scalePanel.setVisible(true);
         return scalePanel;

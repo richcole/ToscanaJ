@@ -83,6 +83,7 @@ public class DiagramSchema implements Comparable {
                 storeAll();
             }
         } catch (BackingStoreException e) {
+        	// restoring preferences failed, we ignore that for now
         }
     }
     
@@ -182,6 +183,7 @@ public class DiagramSchema implements Comparable {
     private ArrowStyle[] arrowStyles;
 
     private DiagramSchema() {
+    	// nothing to do
     }
     
     private static DiagramSchema getWhiteNodeSchema() {

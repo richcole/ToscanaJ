@@ -16,6 +16,7 @@ public class AndExpression implements Expression {
     private Vector subexpressions = new Vector();
 
     public AndExpression() {
+		// nothing to do here
     }
 
     public void addClause(Expression clause) {

@@ -27,14 +27,14 @@ public abstract class Query implements XMLizable {
     private static final String QUERY_FIELD_FORMAT_ATTRIBUTE_NAME = "format";
 
     protected class QueryField {
-        private String name;
+        private String fieldName;
         private String format;
         private String separator;
         private String queryPart;
         private boolean isRelative;
 
         public QueryField(String name, String format, String separator, String queryPart, boolean isRelative) {
-            this.name = name;
+            this.fieldName = name;
             this.format = format;
             this.separator = separator;
             this.queryPart = queryPart;
@@ -42,7 +42,7 @@ public abstract class Query implements XMLizable {
         }
 
         public String getName() {
-            return name;
+            return fieldName;
         }
 
         public String getFormat() {

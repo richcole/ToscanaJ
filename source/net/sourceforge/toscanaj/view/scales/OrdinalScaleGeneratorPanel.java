@@ -461,9 +461,9 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 			Table table = (Table) tableIterator.next();
 			List columns = table.getColumns();
 			for (Iterator columnsIterator = columns.iterator(); columnsIterator.hasNext();) {
-				Column column = (Column) columnsIterator.next();
-				if(determineDataType(column.getType()) != UNSUPPORTED) {
-					this.columnChooser.addItem(new TableColumnPair(table, column));
+				Column currentColumn = (Column) columnsIterator.next();
+				if(determineDataType(currentColumn.getType()) != UNSUPPORTED) {
+					this.columnChooser.addItem(new TableColumnPair(table, currentColumn));
 				}
 			}
 		}

@@ -10,17 +10,16 @@ package net.sourceforge.toscanaj.view.manyvaluedcontext;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellEditor;
-
-import org.tockit.datatype.Datatype;
-import org.tockit.datatype.Value;
-import org.tockit.datatype.swing.DatatypeViewFactory;
 
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
+
+import org.tockit.datatype.Datatype;
+import org.tockit.datatype.Value;
+import org.tockit.datatype.swing.DatatypeViewFactory;
 
 /**
  * A view for many-valued contexts.
@@ -84,9 +83,6 @@ public class TableView extends JTable {
 		}
 	}
 	
-	private class ContextTableColumnModle extends DefaultTableColumnModel {
-		
-	}
 	public TableView(ManyValuedContext context) {
 		this.context = context;
 		setModel(new ContextTableModel());

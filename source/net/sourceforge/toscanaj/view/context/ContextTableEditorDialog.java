@@ -199,11 +199,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 				addObject(doneButton, newNameField);
 			}
 		});
-		newNameField.addKeyListener(new KeyListener() {
-			public void keyTyped(KeyEvent e) {
-			}
-			public void keyPressed(KeyEvent e) {
-			}
+		newNameField.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				doneButton.setEnabled(newNameField.getText().trim().equals(""));
 				boolean createPossible =
@@ -261,11 +257,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 				addAttribute(doneButton, newNameField);
 			}
 		});
-		newNameField.addKeyListener(new KeyListener() {
-			public void keyTyped(KeyEvent e) {
-			}
-			public void keyPressed(KeyEvent e) {
-			}
+		newNameField.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				doneButton.setEnabled(newNameField.getText().trim().equals(""));
 				boolean createPossible =
@@ -397,7 +389,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 			this.scaleTitleField.setText(this.context.getName());
 		}
 
-		scaleTitleField.addKeyListener(new KeyListener() {
+		scaleTitleField.addKeyListener(new KeyAdapter() {
 			private void validateTextField() {
 				if (scaleTitleField.getText().trim().equals("")) {
 					createButton.setEnabled(false);
@@ -412,8 +404,6 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 			public void keyReleased(KeyEvent e) {
 				validateTextField();
 				setCreateButtonStatus();
-			}
-			public void keyPressed(KeyEvent e) {
 			}
 		});
 
@@ -557,11 +547,11 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 				0));
 	}
 
-	private void closeDialog(boolean result) {
+	private void closeDialog(boolean withResult) {
 		preferences.storeWindowPlacement(this);
 		this.context.setName(this.scaleTitleField.getText());
         this.context.updatePositionMarkers();
-		this.result = result;
+		this.result = withResult;
 		setVisible(false);
 	}
 
@@ -570,11 +560,11 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		return result;
 	}
 
-	private MouseListener getMouseListener(final ContextTableView tableView) {
+	private MouseListener getMouseListener(final ContextTableView view) {
 		MouseListener mouseListener = new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				final ContextTableView.Position pos =
-					tableView.getTablePosition(e.getX(), e.getY());
+					view.getTablePosition(e.getX(), e.getY());
 				if (pos == null) {
 					return;
 				}

@@ -127,6 +127,7 @@ public class StringType extends AbstractXSDDatatype {
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {
+    	// @TODO implement
     }
 
     protected void addRestrictions(Element restrictionElement) {
