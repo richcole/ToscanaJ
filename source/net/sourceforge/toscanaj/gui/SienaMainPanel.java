@@ -23,7 +23,6 @@ import net.sourceforge.toscanaj.gui.activity.LoadConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.NewConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.SaveConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
-import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.TemporalMainDialog;
@@ -310,18 +309,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                                        KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
             fileMenu.add(exportDiagramAction);
             exportDiagramAction.setEnabled(false);
-
-            // create the export diagram save options submenu
-            JMenuItem exportDiagramSetupMenuItem = new JMenuItem("Export Diagram Setup...");
-            exportDiagramSetupMenuItem.setMnemonic(KeyEvent.VK_S);
-            exportDiagramSetupMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                    KeyEvent.VK_E, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
-            exportDiagramSetupMenuItem.addActionListener(new ActionListener(){
-                public void actionPerformed(ActionEvent e) {
-                    showImageExportOptions();
-                }
-            });
-            fileMenu.add(exportDiagramSetupMenuItem);
             fileMenu.addSeparator();
         }
 
@@ -424,19 +411,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(helpMenu);
     }
-
-    protected void showImageExportOptions() {
-    	DiagramView diagramView = this.diagramEditingView.getDiagramView();
-        if (this.diagramExportSettings.usesAutoMode()) {
-            this.diagramExportSettings.setImageSize(diagramView.getWidth(), diagramView.getHeight());
-        }
-        DiagramExportSettingsDialog.initialize(this, this.diagramExportSettings);
-        boolean changesDone = DiagramExportSettingsDialog.showDialog(this);
-        if (changesDone && this.diagramEditingView.getDiagramView().getDiagram() != null) {
-            this.exportDiagramAction.exportImage();
-        }
-    }
-
     private void importCernatoXML() {
         final JFileChooser openDialog;
         if (this.currentFile != null) {

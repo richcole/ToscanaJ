@@ -364,18 +364,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         // we add the export options only if we can export at all
         if (this.diagramExportSettings != null) {
             fileMenu.add(exportDiagramAction);
-
-            // create the export diagram save options submenu
-            this.exportDiagramSetupMenuItem = new JMenuItem("Export Diagram Setup...");
-            this.exportDiagramSetupMenuItem.setMnemonic(KeyEvent.VK_S);
-            this.exportDiagramSetupMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                    KeyEvent.VK_E, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
-            this.exportDiagramSetupMenuItem.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e) {
-					showImageExportOptions();
-				}
-            });
-            fileMenu.add(exportDiagramSetupMenuItem);
         }
 
         // separator
@@ -1044,23 +1032,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         }
         // we have now at least one file
         this.mruMenu.setEnabled(!empty);
-    }
-
-    /**
-     * Shows the dialog to change the image export options.
-     *
-     * If the dialog is closed by pressing ok, the settings will be stored and an
-     * export will be initiated.
-     */
-    protected void showImageExportOptions() {
-        if (this.diagramExportSettings.usesAutoMode()) {
-            this.diagramExportSettings.setImageSize(this.diagramView.getWidth(), this.diagramView.getHeight());
-        }
-        DiagramExportSettingsDialog.initialize(this, this.diagramExportSettings);
-        boolean changesDone = DiagramExportSettingsDialog.showDialog(this);
-        if (changesDone && this.diagramView.getDiagram() != null) {
-            this.exportDiagramAction.exportImage();
-        }
     }
 
     /**

@@ -23,7 +23,6 @@ import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.CheckDuplicateFileChooser;
-import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExportStatisticalDataSettingsPanel;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
@@ -588,8 +587,6 @@ public class ElbaMainPanel
 		});
 		fileMenu.add(importCSCMenuItem);
 
-		fileMenu.addSeparator();
-
 		// we add the export options only if we can export at all
 		/// @todo reduce duplicate code with ToscanaJMainPanel
 		if (this.diagramExportSettings != null) {
@@ -599,18 +596,7 @@ public class ElbaMainPanel
 									   KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
 			fileMenu.add(exportDiagramAction);
 			exportDiagramAction.setEnabled(false);
-
-			// create the export diagram save options submenu
-			JMenuItem exportDiagramSetupMenuItem = new JMenuItem("Export Diagram Setup...");
-			exportDiagramSetupMenuItem.setMnemonic(KeyEvent.VK_S);
-			exportDiagramSetupMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-					KeyEvent.VK_E, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
-			exportDiagramSetupMenuItem.addActionListener(new ActionListener(){
-				public void actionPerformed(ActionEvent e) {
-					showImageExportOptions();
-				}
-			});
-			fileMenu.add(exportDiagramSetupMenuItem);
+			
 			fileMenu.addSeparator();
 		}
 
@@ -1162,16 +1148,4 @@ public class ElbaMainPanel
             connectDatabase();
         }
     }
-
-	protected void showImageExportOptions() {
-		DiagramView diagramView = this.diagramEditingView.getDiagramView();
-		if (this.diagramExportSettings.usesAutoMode()) {
-			this.diagramExportSettings.setImageSize(diagramView.getWidth(), diagramView.getHeight());
-		}
-		DiagramExportSettingsDialog.initialize(this, this.diagramExportSettings);
-		boolean changesDone = DiagramExportSettingsDialog.showDialog(this);
-		if (changesDone && this.diagramEditingView.getDiagramView().getDiagram() != null) {
-			this.exportDiagramAction.exportImage();
-		}
-	}
 }

@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.gui.action;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsPanel;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.model.DiagramExportSettings;
@@ -38,6 +39,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 	private File lastImageExportFile;
 	private DiagramExportSettings diagramExportSettings;
 	private DiagramView diagramView;
+	private DiagramExportSettingsPanel exportSettingsPanel;
 	private Frame frame;
 	 
 	
@@ -56,6 +58,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 		this.diagramExportSettings = diagExpSettings;
 		this.diagramView = diagramView;
 		this.frame = frame;
+		this.exportSettingsPanel = new DiagramExportSettingsPanel(this.diagramExportSettings);
 	}
 
 	public ExportDiagramAction (
@@ -70,6 +73,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 		this.diagramExportSettings = diagExpSettings;
 		this.diagramView = diagramView;
 		this.frame = frame;
+		this.exportSettingsPanel = new DiagramExportSettingsPanel(this.diagramExportSettings);
 	}
 	
 	public void actionPerformed(ActionEvent e) {
@@ -77,19 +81,10 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 	}
 
 	public void exportImage() {
-	    if (this.lastImageExportFile == null) {
-	        this.lastImageExportFile =
-	            new File(System.getProperty("user.dir"));
-	    }
-
-	    if(this.diagramExportSettings.usesAutoMode()) {
-	        exportImageWithAutoMode();
-	    } else {
-	        exportImageWithManualMode();
-	    }
-	}
-	
-	private void exportImageWithAutoMode() {
+		if (this.lastImageExportFile == null) {
+			this.lastImageExportFile =
+				new File(System.getProperty("user.dir"));
+		}
 		final CustomJFileChooser saveDialog =
 			new CustomJFileChooser(this.lastImageExportFile);
 		// populate the file extension combo box in the dialog
@@ -105,6 +100,8 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 			}
 		}
 		saveDialog.setFileFilter(defaultFilter);
+		saveDialog.setAccessory(this.exportSettingsPanel);
+		
 		// Check if user keys in an extension. If not, add it automatically 
 		// according to the file type selected
 		boolean formatDefined;
@@ -112,6 +109,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 			formatDefined = true;
 			int rv = saveDialog.showSaveDialog(frame);
 			if (rv == JFileChooser.APPROVE_OPTION) {
+				
 				File selectedFile = saveDialog.getSelectedFile();
 				FileFilter fileFilter = saveDialog.getFileFilter();
 				if(fileFilter instanceof ExtensionFileFilter) {
@@ -146,7 +144,6 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 					}	
 					formatDefined = false;
 				}
-
 				if (formatDefined) {
 					exportImage(selectedFile);
 				}
@@ -154,19 +151,6 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 		} while (formatDefined == false);
 	}
  
-	private void exportImageWithManualMode() {
-		GraphicFormat format = this.diagramExportSettings.getGraphicFormat();
-		final CustomJFileChooser saveDialog =
-			new CustomJFileChooser(this.lastImageExportFile);
-		ExtensionFileFilter manualFileFilter = new ExtensionFileFilter(format.getExtensions(),format.getName());
-		saveDialog.addChoosableFileFilter(manualFileFilter);
-		int rv = saveDialog.showSaveDialog(frame);
-		if (rv == JFileChooser.APPROVE_OPTION) {
-			File selectedFile = saveDialog.getSelectedFile();
-			exportImage(selectedFile);
-		}
-	}
-	
 	private void exportImage(File selectedFile){
 		try {
 			// Get title of the current diagram
@@ -249,7 +233,9 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 		private CustomJFileChooser(File selectedFile){
 			super(selectedFile);
 		}
+		
 		public void approveSelection(){
+			exportSettingsPanel.saveSettings();
 			File selectedFile = getSelectedFile();
 			if(selectedFile.getName().indexOf('.') == -1) { // check for extension
 				// add default
