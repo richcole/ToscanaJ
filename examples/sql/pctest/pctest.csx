@@ -78,7 +78,7 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
                 <objectView class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer" name="External View...">
                     <parameter name="openDelimiter" value="$$$"/>
                     <parameter name="closeDelimiter" value="%%%"/>
-                    <parameter name="commandLine" value="echo $$$PCname%%%"/>
+                    <parameter name="commandLine" value="c:\progra~1\mozilla.org\mozilla\mozilla.exe http://$$$typeCase%%%"/>
                 </objectView>
                 <!-- a report, syntax will change (the file will be included later), we still lack formatting of results... -->
                 <objectListView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML Report...">
