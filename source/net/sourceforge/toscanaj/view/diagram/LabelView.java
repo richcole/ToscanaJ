@@ -15,22 +15,40 @@ import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
 /**
- * This class encapsulates all label drawing code.
+ * This class encapsulates all generic label drawing code.
+ *
+ * The actual classes to use are the AttributeLabelView and the ObjectLabelView
+ * which are distinguished by position (above vs. below the node) and default
+ * display type (list vs. number).
  */
-public class LabelView extends CanvasItem implements ChangeObserver {
+abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * A constant used to set the labels to display the number of objects.
      *
      * @see setDisplayType(int)
      */
-    static public int DISPLAY_NUMBER = 0;
+    static public final int DISPLAY_NUMBER = 0;
 
     /**
      * A constant used to set the labels to display the list of objects.
      *
      * @see setDisplayType(int)
      */
-    static public int DISPLAY_LIST = 1;
+    static public final int DISPLAY_LIST = 1;
+
+    /**
+     * Used when the label should be drawn above the given point.
+     *
+     * See Draw( Graphics2D, double ,double ,int ).
+     */
+    static protected final int ABOVE = 0;
+
+    /**
+     * Used when the label should be drawn below the given point.
+     *
+     * See Draw( Graphics2D, double ,double ,int ).
+     */
+    static protected final int BELOW = 1;
 
     /**
      * Stores the type of information we want to display.
@@ -57,20 +75,6 @@ public class LabelView extends CanvasItem implements ChangeObserver {
     private double yPos;
 
     /**
-     * Used when the label should be drawn above the given point.
-     *
-     * See Draw( Graphics2D, double ,double ,int ).
-     */
-    public static final int ABOVE = 0;
-
-    /**
-     * Used when the label should be drawn below the given point.
-     *
-     * See Draw( Graphics2D, double ,double ,int ).
-     */
-    public static final int BELOW = 1;
-
-    /**
      * The label information that should be drawn.
      */
     private LabelInfo _labelInfo;
@@ -83,16 +87,10 @@ public class LabelView extends CanvasItem implements ChangeObserver {
     private DiagramView diagramView = null;
 
     /**
-     * Defines how the label has to be placed in relation to the node.
-     */
-    private int placement;
-
-    /**
      * Creates a view for the given label information.
      */
-    public LabelView( DiagramView diagramView, int placement, LabelInfo label ) {
+    public LabelView( DiagramView diagramView, LabelInfo label ) {
         this.diagramView = diagramView;
-        this.placement = placement;
         _labelInfo = label;
         _labelInfo.addObserver(this);
     }
@@ -106,7 +104,6 @@ public class LabelView extends CanvasItem implements ChangeObserver {
      */
     public void setDisplayType(int type) {
         this.displayType = type;
-        System.out.println("Type: "+type);
         update(this);
     }
 
@@ -176,7 +173,7 @@ public class LabelView extends CanvasItem implements ChangeObserver {
         double lh = getHeight( fm );
         height = tg.inverseScaleY(lh);
         xPos = x - tg.inverseScaleX(lw/2) + _labelInfo.getOffset().getX();
-        if( placement == ABOVE )
+        if( getPlacement() == ABOVE )
         {
             y = y - tg.inverseScaleY(node.getRadius());
             yPos = y - tg.inverseScaleY(lh) + _labelInfo.getOffset().getY();
@@ -262,6 +259,14 @@ public class LabelView extends CanvasItem implements ChangeObserver {
         // restore old settings
         graphics.setPaint( oldPaint );
     }
+
+    /**
+     * Returns the placement of the label (above or below the node).
+     *
+     * Possible return values are LabelView.ABOVE or LabelView.BELOW. This is
+     * used to draw the labels in their appropriate position.
+     */
+    abstract protected int getPlacement();
 
     /**
      * Calculates the width of the label given a specific font metric.

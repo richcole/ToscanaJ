@@ -187,14 +187,13 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
             NodeView nodeView = new NodeView(node);
             LabelInfo attrLabelInfo = diagram.getAttributeLabel( i );
             if( attrLabelInfo != null ) {
-                LabelView labelView = new LabelView( this, LabelView.ABOVE, attrLabelInfo );
+                LabelView labelView = new AttributeLabelView( this, attrLabelInfo );
                 addCanvasItem( labelView );
                 labelView.addObserver(this);
             }
             LabelInfo objLabelInfo = diagram.getObjectLabel( i );
             if( objLabelInfo != null ) {
-                LabelView labelView = new LabelView( this, LabelView.BELOW, objLabelInfo );
-                labelView.setDisplayType(LabelView.DISPLAY_NUMBER);
+                LabelView labelView = new ObjectLabelView( this, objLabelInfo );
                 addCanvasItem( labelView );
                 labelView.addObserver(this);
             }
@@ -211,8 +210,8 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
         Iterator it = this.canvasItems.iterator();
         while( it.hasNext() ) {
             CanvasItem cur = (CanvasItem) it.next();
-            if(cur instanceof LabelView) {
-                LabelView lv = (LabelView) cur;
+            if(cur instanceof ObjectLabelView) {
+                ObjectLabelView lv = (ObjectLabelView) cur;
                 lv.setDisplayType(type);
             }
         }
