@@ -207,12 +207,7 @@ public class ElbaMainPanel
 		JButton databaseConnectionButton = new JButton("Database Connection");
 		databaseConnectionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				disconnectDatabase();
-				connectionInformationView.show();
-				if(!connectionInformationView.newConnectionWasSet()) {
-					// reconnect to the old connection
-					connectDatabase();
-				}
+				showDatabaseConnectionDialog();
 			}
 		});
 
@@ -482,6 +477,12 @@ public class ElbaMainPanel
 		};
 		NewConceptualSchemaActivity newSchemaActivity = new NewConceptualSchemaActivity(eventBroker);
 		newSchemaActivity.setTestNewOkActivity(testSchemaSavedActivity);
+		newSchemaActivity.setPostNewActivity(new SimpleActivity() {
+            public boolean doActivity() throws Exception {
+                showDatabaseConnectionDialog();
+                return databaseConnection.isConnected();
+            }
+		});
 		SimpleAction newAction =
 			new SimpleAction(
 				this,
@@ -504,6 +505,15 @@ public class ElbaMainPanel
 				currentFile,
 				KeyEvent.VK_O,
 				KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+		openFileAction.addPostOpenActivity(new SimpleActivity() {
+            public boolean doActivity() throws Exception {
+            	if(conceptualSchema.getDatabaseInfo() != null) {
+            		return true;
+            	}
+                showDatabaseConnectionDialog();
+                return databaseConnection.isConnected();
+            }
+		});
 
 		JMenuItem openMenuItem = new JMenuItem("Open...");
 	    openMenuItem.setMnemonic(KeyEvent.VK_O);
@@ -1035,4 +1045,13 @@ public class ElbaMainPanel
 			options,
 			options[2]);
 	}
+
+    protected void showDatabaseConnectionDialog() {
+        disconnectDatabase();
+        connectionInformationView.show();
+        if(!connectionInformationView.newConnectionWasSet()) {
+            // reconnect to the old connection
+            connectDatabase();
+        }
+    }
 }
