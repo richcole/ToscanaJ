@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
@@ -98,14 +97,6 @@ public class NestedDiagramNode extends DiagramNode {
             DiagramNode from = (DiagramNode) nodeMap.get(line.getFromNode());
             DiagramNode to = (DiagramNode) nodeMap.get(line.getToNode());
             newDiag.addLine(from, to);
-
-            // add direct neighbours in inner diagram to concepts
-            ConceptImplementation concept1 =
-                    (ConceptImplementation) from.getConcept();
-            ConceptImplementation concept2 =
-                    (ConceptImplementation) to.getConcept();
-            concept1.addSubConcept(concept2);
-            concept2.addSuperConcept(concept1);
         }
 
         this.innerDiagram = newDiag;
