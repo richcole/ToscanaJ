@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<conceptualSchema version="1.0" askDatabase="false" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="C:\pbecker\projects\tockit\ToscanaJ\specs\csx.xsd">
+<conceptualSchema version="1.0" askDatabase="false">
 	<context>
 		<object id="viola">Viola</object>
 		<object id="sarah">Sarah</object>
