@@ -56,6 +56,8 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private static final double ZOOM_FACTOR = 1.1;
     private JButton editContextButton;
     private DatabaseConnection databaseConnection = null;
+	private JButton zoomInButton;
+	private JButton zoomOutButton;
 
     /**
      * Construct an instance of this view
@@ -96,14 +98,14 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         createMovementManipulators(toolPanel);
 
         toolPanel.add(new JLabel("Zoom:"));
-        JButton zoomInButton = new JButton("+");
+        zoomInButton = new JButton("+");
         zoomInButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 zoomIntoDiagram();
             }
         });
         toolPanel.add(zoomInButton);
-        JButton zoomOutButton = new JButton("-");
+        zoomOutButton = new JButton("-");
         zoomOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 zoomOutOfDiagram();
@@ -333,7 +335,10 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     }
     
     private void updateButtons() {
-    	this.editContextButton.setEnabled(this.diagramView.getDiagram() != null);
+    	boolean diagramAvailable = this.diagramView.getDiagram() != null;
+		this.zoomInButton.setEnabled(diagramAvailable);
+		this.zoomOutButton.setEnabled(diagramAvailable);
+		this.editContextButton.setEnabled(diagramAvailable);
     }
 
     public void setDividerLocation(int location) {
