@@ -872,22 +872,24 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
     private void recreateMruMenu() {
         this.mruMenu.removeAll();
         boolean empty = true; // will be used to check if we have at least one entry
-        ListIterator it = mruList.listIterator(mruList.size()-1);
-        while(it.hasPrevious()) {
-            String cur = (String) it.previous();
-            if(cur.equals(currentFile)) {
-                // don't enlist the current file
-                continue;
-            }
-            empty = false;
-            JMenuItem mruItem = new JMenuItem(cur);
-            mruItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    JMenuItem menuItem = (JMenuItem) e.getSource();
-                    openSchemaFile(new File(menuItem.getText()));
+        if(this.mruList.size() > 0) {
+            ListIterator it = mruList.listIterator(mruList.size()-1);
+            while(it.hasPrevious()) {
+                String cur = (String) it.previous();
+                if(cur.equals(currentFile)) {
+                    // don't enlist the current file
+                    continue;
                 }
-            });
-            this.mruMenu.add(mruItem);
+                empty = false;
+                JMenuItem mruItem = new JMenuItem(cur);
+                mruItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        JMenuItem menuItem = (JMenuItem) e.getSource();
+                        openSchemaFile(new File(menuItem.getText()));
+                    }
+                });
+                this.mruMenu.add(mruItem);
+            }
         }
         // we have now at least one file
         this.mruMenu.setEnabled(!empty);
