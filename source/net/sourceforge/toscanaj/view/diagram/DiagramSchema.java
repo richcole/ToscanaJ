@@ -21,30 +21,32 @@ import java.awt.*;
  */
 
 public class DiagramSchema {
+    private static final String PROPERTY_SECTION_NAME = "DiagramSchema";
+    
     /**
      * Used when the gradient should use the extent size of a concept as measure.
      */
-    public static int GRADIENT_TYPE_EXTENT = 1;
+    public static final int GRADIENT_TYPE_EXTENT = 1;
 
     /**
      * Used when the gradient should use the contingent size of a concept as measure.
      */
-    public static int GRADIENT_TYPE_CONTINGENT = 2;
+    public static final int GRADIENT_TYPE_CONTINGENT = 2;
 
     /**
      * Used when the gradient should compare to the number of objects in the diagram.
      */
-    public static int GRADIENT_REFERENCE_DIAGRAM = 1;
+    public static final int GRADIENT_REFERENCE_DIAGRAM = 1;
 
     /**
      * Used when the gradient should compare to the number of objects in the conceptual
      * schema.
      */
-    public static int GRADIENT_REFERENCE_SCHEMA = 2;
+    public static final int GRADIENT_REFERENCE_SCHEMA = 2;
     
-    public static int NODE_SIZE_SCALING_NONE = 0;
-    public static int NODE_SIZE_SCALING_CONTINGENT = 1;
-    public static int NODE_SIZE_SCALING_EXTENT = 2;
+    public static final int NODE_SIZE_SCALING_NONE = 0;
+    public static final int NODE_SIZE_SCALING_CONTINGENT = 1;
+    public static final int NODE_SIZE_SCALING_EXTENT = 2;
 
     /**
      * The amount of fade out for unselected nodes.
@@ -140,21 +142,21 @@ public class DiagramSchema {
      * Default constructor.
      */
     public DiagramSchema() {
-        background = ConfigurationManager.fetchColor("diagramSchema", "backgroundColor", background);
-        topColor = ConfigurationManager.fetchColor("diagramSchema", "topColor", topColor);
-        bottomColor = ConfigurationManager.fetchColor("diagramSchema", "bottomColor", bottomColor);
-        foreground = ConfigurationManager.fetchColor("diagramSchema", "foregroundColor", foreground);
-        nestedDiagramNodeColor = ConfigurationManager.fetchColor("diagramSchema", "nestedDiagramNodeColor", nestedDiagramNodeColor);
-        notRealisedDiagramNodeColor = ConfigurationManager.fetchColor("diagramSchema", "notRealisedDiagramNodeColor", notRealisedDiagramNodeColor);
-        circleColor = ConfigurationManager.fetchColor("diagramSchema", "circleColor", circleColor);
-        lineColor = ConfigurationManager.fetchColor("diagramSchema", "lineColor", lineColor);
-        circleSelectionColor = ConfigurationManager.fetchColor("diagramSchema", "circleSelectionColor", circleSelectionColor);
-        circleIdealColor = ConfigurationManager.fetchColor("diagramSchema", "circleIdealColor", circleIdealColor);
-        circleFilterColor = ConfigurationManager.fetchColor("diagramSchema", "circleFilterColor", circleFilterColor);
-        fadeOut = ConfigurationManager.fetchFloat("diagramSchema", "fadeOutValue", fadeOut);
-        margin = ConfigurationManager.fetchInt("diagramSchema", "margin", margin);
-        notRealizedNodeSizeReductionFactor = ConfigurationManager.fetchFloat("diagramSchema", "notRealizedNodeSizeReductionFactor", notRealizedNodeSizeReductionFactor);
-        String propVal = ConfigurationManager.fetchString("diagramSchema", "gradientType", "extent");
+        background = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "backgroundColor", background);
+        topColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "topColor", topColor);
+        bottomColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "bottomColor", bottomColor);
+        foreground = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "foregroundColor", foreground);
+        nestedDiagramNodeColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "nestedDiagramNodeColor", nestedDiagramNodeColor);
+        notRealisedDiagramNodeColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "notRealisedDiagramNodeColor", notRealisedDiagramNodeColor);
+        circleColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleColor", circleColor);
+        lineColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "lineColor", lineColor);
+        circleSelectionColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleSelectionColor", circleSelectionColor);
+        circleIdealColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleIdealColor", circleIdealColor);
+        circleFilterColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleFilterColor", circleFilterColor);
+        fadeOut = ConfigurationManager.fetchFloat(PROPERTY_SECTION_NAME, "fadeOutValue", fadeOut);
+        margin = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "margin", margin);
+        notRealizedNodeSizeReductionFactor = ConfigurationManager.fetchFloat(PROPERTY_SECTION_NAME, "notRealizedNodeSizeReductionFactor", notRealizedNodeSizeReductionFactor);
+        String propVal = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "gradientType", "extent");
         propVal = propVal.toLowerCase();
         if (propVal.equals("extent")) {
             gradientType = GRADIENT_TYPE_EXTENT;
@@ -164,7 +166,7 @@ public class DiagramSchema {
             System.err.println("Caught unknown gradient type for DiagramSchema: " + propVal);
             System.err.println("-- using default");
         }
-        propVal = ConfigurationManager.fetchString("diagramSchema", "gradientReference", "diagram");
+        propVal = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "gradientReference", "diagram");
         propVal = propVal.toLowerCase();
         if (propVal.equals("diagram")) {
             gradientReference = GRADIENT_REFERENCE_DIAGRAM;
@@ -174,11 +176,11 @@ public class DiagramSchema {
             System.err.println("Caught unknown gradient reference for DiagramSchema: " + propVal);
             System.err.println("-- using default");
         }
-        selectionLineWidth = ConfigurationManager.fetchInt("diagramSchema", "selectionLineWidth",
+        selectionLineWidth = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "selectionLineWidth",
                 selectionLineWidth);
-        labelFontName = ConfigurationManager.fetchString("diagramSchema", "labelFontName", labelFontName);
-        labelFontSize = ConfigurationManager.fetchInt("diagramSchema", "labelFontSize", labelFontSize);
-        propVal = ConfigurationManager.fetchString("diagramSchema", "scaleNodeSize", "none");
+        labelFontName = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "labelFontName", labelFontName);
+        labelFontSize = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "labelFontSize", labelFontSize);
+        propVal = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "scaleNodeSize", "none");
         propVal = propVal.toLowerCase();
         if (propVal.equals("contingent")) {
             this.nodeSizeScalingType = NODE_SIZE_SCALING_CONTINGENT;
