@@ -1098,10 +1098,11 @@ public class ElbaMainPanel
         }
         try {
         	if (openNewSchema.isSelected()) {
-				if (checkForMissingSave()) {
-					// @todo is is possible to reuse NewConceptualSchemaAction here?..
-					new ConceptualSchema(this.eventBroker);
+				if (!checkForMissingSave()) {
+					return;
 				}
+				// @todo is is possible to reuse NewConceptualSchemaAction here?..
+				new ConceptualSchema(this.eventBroker);
         	}
             importCSC(openDialog.getSelectedFile());
             this.lastCSCFile = openDialog.getSelectedFile();
