@@ -59,19 +59,12 @@ public class TupelParser {
     public static void main(String[] args) throws FileNotFoundException, IOException {
         TupelSet result = parseTabDelimitedTupels(new FileReader(new File(args[0])));
         System.out.println("Vars:");
-        writeTupel(result.getVariableNames());
+        System.out.println(TupelSet.toString(result.getVariableNames()));
         System.out.println("Tupels:");
         Set tupels = result.getTupels();
         for (Iterator iter = tupels.iterator(); iter.hasNext();) {
             Object[] tupel = (Object[]) iter.next();
-            writeTupel(tupel);
+            System.out.println(TupelSet.toString(tupel));
         }
-    }
-
-    private static void writeTupel(Object[] tupel) {
-        for (int i = 0; i < tupel.length; i++) {
-            System.out.print(tupel[i].toString() + " ");
-        }
-        System.out.println();
     }
 }

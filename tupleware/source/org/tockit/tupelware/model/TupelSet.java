@@ -31,4 +31,15 @@ public class TupelSet {
     public Set getTupels() {
         return Collections.unmodifiableSet(tupels);
     }
+    
+    public static String toString(Object[] tupel) {
+        StringBuffer retVal = new StringBuffer();
+        for (int i = 0; i < tupel.length; i++) {
+            if(i != 0) {
+                retVal.append(" ");
+            }
+            retVal.append(tupel[i].toString());
+        }
+        return retVal.toString();
+    }
 }
