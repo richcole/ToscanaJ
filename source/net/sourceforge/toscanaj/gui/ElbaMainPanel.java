@@ -314,6 +314,11 @@ public class ElbaMainPanel
                 return true;
             }
 		});
+		this.saveFileAction.setPreSaveActivity(new SimpleActivity() {
+			public boolean doActivity() throws Exception {
+                return databaseWellDefined();
+            }
+		});
 
 		// --- menu bar ---
 		menuBar = new JMenuBar();
@@ -454,6 +459,33 @@ public class ElbaMainPanel
 		helpMenu.setMnemonic(KeyEvent.VK_H);
 		menuBar.add(Box.createHorizontalGlue());
 		menuBar.add(helpMenu);
+	}
+
+	private boolean databaseWellDefined() {
+		if(this.databaseConnection.isConnected()) {
+			return true;
+		}
+	    Object[] options = { "Drop database information", "Keep information", "Go back" };
+	    int result = JOptionPane.showOptionDialog(
+					        this,
+					        "No database connection is established, which means the current database\n" +
+					        "information might be wrong. Storing a schema with broken database information\n" +
+					        "might disallow opening it in ToscanaJ, dropping the database information will\n" +
+					        "cause ToscanaJ to display the query clauses. What do you want to do?",
+					        "Database not connected",
+					        JOptionPane.YES_NO_CANCEL_OPTION,
+					        JOptionPane.WARNING_MESSAGE,
+					        null,
+					        options,
+					        options[2]);
+		if(result == 0) {
+			this.conceptualSchema.setDatabaseInfo(null);
+			return true;
+		}
+		if(result == 1) {
+			return true; // save anyway
+		}
+	    return false;
 	}
 
 	private void openSchemaFile(File schemaFile) {

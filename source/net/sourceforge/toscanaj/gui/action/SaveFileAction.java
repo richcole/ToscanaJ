@@ -24,6 +24,7 @@ public class SaveFileAction extends KeyboardMappedAction {
     FileActivity activity;
     SimpleActivity postSaveActivity;
     File previousFile;
+    SimpleActivity preSaveActivity;
 
     public SaveFileAction(
             JFrame frame,
@@ -42,10 +43,25 @@ public class SaveFileAction extends KeyboardMappedAction {
     }
     
     public void setPostSaveActivity(SimpleActivity activity) {
-    	this.postSaveActivity = activity;
+        this.postSaveActivity = activity;
+    }
+
+    public void setPreSaveActivity(SimpleActivity activity) {
+        this.preSaveActivity = activity;
     }
 
     public void actionPerformed(ActionEvent e) {
+    	if(this.preSaveActivity != null) {
+    		boolean result = false;
+            try {
+                result = this.preSaveActivity.doActivity();
+            } catch (Exception ex) {
+            	ErrorDialog.showError(null,ex,"Could not initialize save operation");
+            }
+    		if(result == false) {
+    			return;
+    		}
+    	}
 		saveFile();
     }
 
