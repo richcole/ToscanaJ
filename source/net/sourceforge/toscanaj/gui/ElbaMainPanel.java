@@ -3,11 +3,7 @@
  * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
-<<<<<<< ElbaMainPanel.java
  * $Id$
-=======
- * $Id$
->>>>>>> 1.20
  */
 package net.sourceforge.toscanaj.gui;
 
@@ -168,12 +164,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
         schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
         
-//        scaleView = new ScaleEditingView(this, conceptualSchema, eventBroker, databaseConnection);
-//        scaleView.setHorizontalDividerLocation(
-//                ConfigurationManager.fetchInt("ElbaMainPanel", "scaleViewHorizontalDivider", 200));
-//        scaleView.setVerticalDividerLocation(
-//                ConfigurationManager.fetchInt("ElbaMainPanel", "scaleViewVerticalDivider", 300));
-
         diagramView = new DiagramEditingView(conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("ElbaMainPanel", "diagramViewDivider", 200));
 		
@@ -192,8 +182,6 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 						new Insets(2,2,2,2),
 						2,2)
 		);
-//        mainView.addView("Scales", scaleView);
-//        mainView.addView("Diagrams", diagramView);
         setContentPane(mainView);
     }
 
