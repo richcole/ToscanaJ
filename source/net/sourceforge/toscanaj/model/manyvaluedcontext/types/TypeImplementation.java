@@ -30,7 +30,11 @@ public abstract class TypeImplementation implements WritableAttributeType, XMLiz
         this.name = name;
         this.scale = new ScaleImplementation(name);
     }
-
+    
+    public TypeImplementation(Element element) throws XMLSyntaxError {
+    	readXML(element);
+    }
+    
     public String getName() {
         return name;
     }

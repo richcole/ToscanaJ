@@ -13,9 +13,8 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
-public class NumericalType extends TypeImplementation implements XMLizable{
+public class NumericalType extends TypeImplementation {
 	private double minValue;
 	private double maxValue;
 	private int numOfDecimals;
