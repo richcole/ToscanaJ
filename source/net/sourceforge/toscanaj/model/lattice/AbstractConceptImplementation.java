@@ -231,13 +231,7 @@ public abstract class AbstractConceptImplementation implements Concept {
         Element retVal = new Element(CONCEPT_ELEMENT_NAME);
         Element objectContingentElem = new Element(OBJECT_CONTINGENT_ELEMENT_NAME);
         retVal.addContent(objectContingentElem);
-        Iterator objIt = getObjectContingentIterator();
-        while (objIt.hasNext()) {
-            Object o = (Object) objIt.next();
-            Element objectElem = new Element(OBJECT_ELEMENT_NAME);
-            objectElem.addContent(o.toString());
-            objectContingentElem.addContent(objectElem);
-        }
+        fillObjectContingentElement(objectContingentElem);
         Element attributeContingentElem = new Element(ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
         retVal.addContent(attributeContingentElem);
         Iterator attrIt = getAttributeContingentIterator();
@@ -248,6 +242,16 @@ public abstract class AbstractConceptImplementation implements Concept {
             attributeContingentElem.addContent(attribElem);
         }
         return retVal;
+    }
+
+    protected void fillObjectContingentElement(Element objectContingentElem) {
+        Iterator objIt = getObjectContingentIterator();
+        while (objIt.hasNext()) {
+            Object o = (Object) objIt.next();
+            Element objectElem = new Element(OBJECT_ELEMENT_NAME);
+            objectElem.addContent(o.toString());
+            objectContingentElem.addContent(objectElem);
+        }
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {

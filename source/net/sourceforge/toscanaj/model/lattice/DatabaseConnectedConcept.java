@@ -65,6 +65,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * @see #objectClause
      */
     private Set filterClauses = new HashSet();
+    private static final String OBJECT_ELEMENT_NAME = "object";
 
     /**
      * The constructor always needs the DB connection and the information how
@@ -73,6 +74,14 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     public DatabaseConnectedConcept(DatabaseInfo dbInfo, DatabaseConnection connection) {
         this.dbInfo = dbInfo;
         this.connection = connection;
+    }
+
+    protected void fillObjectContingentElement(Element objectContingentElem) {
+        if (objectClause != null) {
+            Element objectElem = new Element(OBJECT_ELEMENT_NAME);
+            objectElem.addContent(objectClause);
+            objectContingentElem.addContent(objectElem);
+        }
     }
 
     /**
