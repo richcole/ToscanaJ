@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.ndimdiagram;
 
+import java.awt.geom.Point2D;
+import java.util.Iterator;
 import java.util.Vector;
 
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
@@ -24,6 +26,21 @@ public class NDimDiagram extends SimpleLineDiagram {
     public NDimDiagram(Element element) throws XMLSyntaxError {
         super(element);
         /// @todo XML in/out
+    }
+    
+    public Element toXML() {
+    	Element retVal = super.toXML();
+    	Element baseElem = new Element("projectionBase");
+    	Iterator it = this.base.iterator();
+    	while (it.hasNext()) {
+            Point2D baseVec = (Point2D) it.next();
+            Element vecElem = new Element("vector");
+    	    vecElem.setAttribute("x", String.valueOf(baseVec.getX()));
+    	    vecElem.setAttribute("y", String.valueOf(baseVec.getY()));
+    	    baseElem.addContent(vecElem);
+        }
+        retVal.addContent(baseElem);
+    	return retVal;
     }
 
     public Vector getBase() {
