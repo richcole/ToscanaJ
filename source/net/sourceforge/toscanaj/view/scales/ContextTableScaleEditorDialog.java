@@ -36,13 +36,20 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @todo introduced OderedContext interface or something similar to get rid of
+ * @todo introduce OderedContext interface or something similar to get rid of
  * the casts knowing about the internals of the ContextImplementation
+ * 
+ * @todo use dynamic cell widths
+ * 
+ * @todo avoid completely recreating the whole view each time the table changes
  */
-public class ContextTableScaleEditorDialog extends JDialog implements EventBrokerListener {
+public class ContextTableScaleEditorDialog
+	extends JDialog
+	implements EventBrokerListener {
 
-	private static final String CONFIGURATION_SECTION_NAME = "ContextTableEditorDialog";
-    private static final int MINIMUM_WIDTH = 700;
+	private static final String CONFIGURATION_SECTION_NAME =
+		"ContextTableEditorDialog";
+	private static final int MINIMUM_WIDTH = 700;
 	private static final int MINIMUM_HEIGHT = 500;
 	private static final int DEFAULT_X_POS = 50;
 	private static final int DEFAULT_Y_POS = 100;
@@ -54,54 +61,79 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 	private DatabaseConnection databaseConnection;
 
 	private boolean result;
-	private boolean onFirstLoad; 
+	private boolean onFirstLoad;
 
 	private JTextField scaleTitleField;
 	private JButton createButton;
 	private JPanel buttonsPane, titlePane;
 	private JScrollPane scrollpane;
-    private JButton checkConsistencyButton;
+	private JButton checkConsistencyButton;
 
-    public ContextTableScaleEditorDialog(Frame owner, ConceptualSchema conceptualSchema, DatabaseConnection databaseConnection,
-    									  EventBroker eventBroker) {
-    	this(owner, conceptualSchema, databaseConnection, new ContextImplementation(), eventBroker);
-    }
+	public ContextTableScaleEditorDialog(
+		Frame owner,
+		ConceptualSchema conceptualSchema,
+		DatabaseConnection databaseConnection,
+		EventBroker eventBroker) {
+		this(
+			owner,
+			conceptualSchema,
+			databaseConnection,
+			new ContextImplementation(),
+			eventBroker);
+	}
 
-    public ContextTableScaleEditorDialog(Frame owner, ConceptualSchema conceptualSchema, 
-    									  DatabaseConnection databaseConnection, ContextImplementation context,
-    									  EventBroker eventBroker) {
-        super(owner,true);
-        this.conceptualSchema = conceptualSchema;
-        this.databaseConnection = databaseConnection;
-        this.contextTableScaleEditorDialog = this;
-        this.context = context;
-        
-        createView();
-        
-        eventBroker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
-    	eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
-    	eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
-    }
+	public ContextTableScaleEditorDialog(
+		Frame owner,
+		ConceptualSchema conceptualSchema,
+		DatabaseConnection databaseConnection,
+		ContextImplementation context,
+		EventBroker eventBroker) {
+		super(owner, true);
+		this.conceptualSchema = conceptualSchema;
+		this.databaseConnection = databaseConnection;
+		this.contextTableScaleEditorDialog = this;
+		this.context = context;
+
+		createView();
+
+		eventBroker.subscribe(
+			this,
+			ConceptualSchemaLoadedEvent.class,
+			Object.class);
+		eventBroker.subscribe(
+			this,
+			NewConceptualSchemaEvent.class,
+			Object.class);
+		eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
+	}
 
 	private void createView() {
 		setTitle("Context Table");
-		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
-			this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
-		onFirstLoad = true; 
+		ConfigurationManager.restorePlacement(
+			CONFIGURATION_SECTION_NAME,
+			this,
+			new Rectangle(
+				DEFAULT_X_POS,
+				DEFAULT_Y_POS,
+				MINIMUM_WIDTH,
+				MINIMUM_HEIGHT));
+		onFirstLoad = true;
 		// to enforce the minimum size during resizing of the JDialog
-		addComponentListener( new ComponentAdapter() {
+		addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
 				int width = getWidth();
 				int height = getHeight();
-				if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
-				if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
+				if (width < MINIMUM_WIDTH)
+					width = MINIMUM_WIDTH;
+				if (height < MINIMUM_HEIGHT)
+					height = MINIMUM_HEIGHT;
 				setSize(width, height);
 			}
 			public void componentShown(ComponentEvent e) {
 				componentResized(e);
 			}
 		});
-		
+
 		createTitlePane();
 		createTablePane();
 		createButtonsPane();
@@ -151,9 +183,9 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 				0));
 	}
 
-	private void getInput(){
-		onFirstLoad=false;
-		String title = showTextInputDialog("New Title", "context","");
+	private void getInput() {
+		onFirstLoad = false;
+		String title = showTextInputDialog("New Title", "context", "");
 		scaleTitleField.setText(title);
 		showObjectInputDialog();
 		showAttributeInputDialog();
@@ -163,49 +195,58 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		final JButton doneButton = new JButton("Done");
 		doneButton.setMnemonic('d');
 		final JButton createObjButton = new JButton("Create");
-		createObjButton .setMnemonic('c');
-		final JTextField newNameField = new JTextField("",20);
+		createObjButton.setMnemonic('c');
+		final JTextField newNameField = new JTextField("", 20);
 		newNameField.setFocusable(true);
-		
-		createObjButton.addActionListener(new ActionListener(){
+
+		createObjButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				addObject(doneButton, newNameField);
 			}
 		});
-		newNameField.addKeyListener(new KeyListener(){
+		newNameField.addKeyListener(new KeyListener() {
 			public void keyTyped(KeyEvent e) {
 			}
 			public void keyPressed(KeyEvent e) {
 			}
 			public void keyReleased(KeyEvent e) {
 				doneButton.setEnabled(newNameField.getText().trim().equals(""));
-				boolean createPossible = !collectionContainsString(newNameField.getText(),context.getObjects());
+				boolean createPossible =
+					!collectionContainsString(newNameField.getText(),
+						context.getObjects());
 				createObjButton.setEnabled(createPossible);
-				if(createPossible) {
+				if (createPossible) {
 					createObjButton.setToolTipText("Create a new object");
 				} else {
-					createObjButton.setToolTipText("An object with this name already exists");
+					createObjButton.setToolTipText(
+						"An object with this name already exists");
 				}
-			}		
+			}
 		});
-		newNameField.addActionListener(new ActionListener(){
+		newNameField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(collectionContainsString(newNameField.getText(),context.getObjects())) {
+				if (collectionContainsString(newNameField.getText(),
+					context.getObjects())) {
 					return;
 				}
 				addObject(doneButton, newNameField);
 			}
 		});
-		
-		Object[] msg = {"Enter name of object: ", newNameField};
-		Object[] buttons = {createObjButton, doneButton};
-		final JOptionPane optionPane = new JOptionPane(msg, 
-					JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, 
-					null, buttons, msg[1]);
+
+		Object[] msg = { "Enter name of object: ", newNameField };
+		Object[] buttons = { createObjButton, doneButton };
+		final JOptionPane optionPane =
+			new JOptionPane(
+				msg,
+				JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE,
+				null,
+				buttons,
+				msg[1]);
 		final JDialog dialog = optionPane.createDialog(this, "Add object");
 		optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
-				
-		doneButton.addActionListener(new ActionListener(){
+
+		doneButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dialog.setVisible(false);
 			}
@@ -217,48 +258,56 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		final JButton doneButton = new JButton("Done");
 		doneButton.setMnemonic('d');
 		final JButton createAttrButton = new JButton("Create");
-		createAttrButton .setMnemonic('c');
-		final JTextField newNameField = new JTextField("",20);
+		createAttrButton.setMnemonic('c');
+		final JTextField newNameField = new JTextField("", 20);
 		newNameField.setFocusable(true);
-		createAttrButton .addActionListener(new ActionListener(){
+		createAttrButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				addAttribute(doneButton, newNameField);
 			}
 		});
-		newNameField.addKeyListener(new KeyListener(){
+		newNameField.addKeyListener(new KeyListener() {
 			public void keyTyped(KeyEvent e) {
 			}
 			public void keyPressed(KeyEvent e) {
 			}
 			public void keyReleased(KeyEvent e) {
 				doneButton.setEnabled(newNameField.getText().trim().equals(""));
-				boolean createPossible = !collectionContainsString(newNameField.getText(),context.getAttributes());
+				boolean createPossible =
+					!collectionContainsString(newNameField.getText(),
+						context.getAttributes());
 				createAttrButton.setEnabled(createPossible);
-				if(createPossible) {
-					createAttrButton .setToolTipText("Create a new attribute");
+				if (createPossible) {
+					createAttrButton.setToolTipText("Create a new attribute");
 				} else {
-					createAttrButton .setToolTipText("An attribute with this name already exists");
+					createAttrButton.setToolTipText(
+						"An attribute with this name already exists");
 				}
-			}		
+			}
 		});
-		newNameField.addActionListener(new ActionListener(){
+		newNameField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(collectionContainsString(newNameField.getText(),context.getAttributes())) {
+				if (collectionContainsString(newNameField.getText(),
+					context.getAttributes())) {
 					return;
 				}
 				addAttribute(doneButton, newNameField);
 			}
 		});
-		
-		
-		Object[] msg = {"Enter name of attribute: ", newNameField};
-		Object[] buttons = {createAttrButton , doneButton};
-		final JOptionPane optionPane = new JOptionPane(msg, 
-					JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, 
-					null, buttons, msg[1]);
+
+		Object[] msg = { "Enter name of attribute: ", newNameField };
+		Object[] buttons = { createAttrButton, doneButton };
+		final JOptionPane optionPane =
+			new JOptionPane(
+				msg,
+				JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE,
+				null,
+				buttons,
+				msg[1]);
 		final JDialog dialog = optionPane.createDialog(this, "Add attribute");
 		optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
-		doneButton.addActionListener(new ActionListener(){
+		doneButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dialog.setVisible(false);
 			}
@@ -266,57 +315,74 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		dialog.show();
 	}
 
-	private void addObject(final JButton doneButton, final JTextField newNameField)
+	private void addObject(
+		final JButton doneButton,
+		final JTextField newNameField)
 		throws HeadlessException {
-		if(!newNameField.getText().trim().equals("")){
-			if(!collectionContainsString(newNameField.getText(),context.getObjects())){
+		if (!newNameField.getText().trim().equals("")) {
+			if (!collectionContainsString(newNameField.getText(),
+				context.getObjects())) {
 				context.getObjects().add(newNameField.getText());
 				updateView();
 				newNameField.setText("");
-			}else{
-				JOptionPane.showMessageDialog(contextTableScaleEditorDialog,
-				"An object named '"+newNameField.getText()+"' already exist. Please enter a different name.",
-				"Object exists",
-				JOptionPane.WARNING_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(
+					contextTableScaleEditorDialog,
+					"An object named '"
+						+ newNameField.getText()
+						+ "' already exist. Please enter a different name.",
+					"Object exists",
+					JOptionPane.WARNING_MESSAGE);
 				newNameField.setSelectionStart(0);
 				newNameField.setSelectionEnd(newNameField.getText().length());
 			}
-		}else{
-			JOptionPane.showMessageDialog(contextTableScaleEditorDialog, 
-				"Please provide an object name", "No name provided",
+		} else {
+			JOptionPane.showMessageDialog(
+				contextTableScaleEditorDialog,
+				"Please provide an object name",
+				"No name provided",
 				JOptionPane.WARNING_MESSAGE);
-		}			
-		newNameField.grabFocus();	
+		}
+		newNameField.grabFocus();
 		doneButton.setEnabled(true);
 	}
 
 	private void updateView() {
-	    this.tableView.updateSize();
+		this.tableView.updateSize();
 		this.tableView.revalidate();
 		this.tableView.repaint();
 	}
 
-	private void addAttribute(final JButton doneButton, final JTextField newNameField)
+	private void addAttribute(
+		final JButton doneButton,
+		final JTextField newNameField)
 		throws HeadlessException {
-		if(!newNameField.getText().trim().equals("")){
-			if(!collectionContainsString(newNameField.getText(),context.getAttributes())){
-				context.getAttributes().add(new Attribute(newNameField.getText()));
+		if (!newNameField.getText().trim().equals("")) {
+			if (!collectionContainsString(newNameField.getText(),
+				context.getAttributes())) {
+				context.getAttributes().add(
+					new Attribute(newNameField.getText()));
 				updateView();
 				newNameField.setText("");
-			}else{
-				JOptionPane.showMessageDialog(contextTableScaleEditorDialog,
-				"An attribute named '"+newNameField.getText()+"' already exist. Please enter a different name.",
-				"Attribute exists",
-				JOptionPane.WARNING_MESSAGE);
+			} else {
+				JOptionPane.showMessageDialog(
+					contextTableScaleEditorDialog,
+					"An attribute named '"
+						+ newNameField.getText()
+						+ "' already exist. Please enter a different name.",
+					"Attribute exists",
+					JOptionPane.WARNING_MESSAGE);
 				newNameField.setSelectionStart(0);
 				newNameField.setSelectionEnd(newNameField.getText().length());
 			}
-		}else{
-			JOptionPane.showMessageDialog(contextTableScaleEditorDialog, 
-				"Please provide an attribute name", "No name provided",
+		} else {
+			JOptionPane.showMessageDialog(
+				contextTableScaleEditorDialog,
+				"Please provide an attribute name",
+				"No name provided",
 				JOptionPane.WARNING_MESSAGE);
-		}			
-		newNameField.grabFocus();	
+		}
+		newNameField.grabFocus();
 		doneButton.setEnabled(true);
 	}
 
@@ -330,15 +396,15 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		titlePane = new JPanel(new GridBagLayout());
 		JLabel titleLabel = new JLabel("Title:");
 		this.scaleTitleField = new JTextField();
-		if(this.context.getName() != null) {
+		if (this.context.getName() != null) {
 			this.scaleTitleField.setText(this.context.getName());
 		}
-		
-		scaleTitleField.addKeyListener( new KeyListener(){
-			private void validateTextField(){
-				if(scaleTitleField.getText().trim().equals("")){
+
+		scaleTitleField.addKeyListener(new KeyListener() {
+			private void validateTextField() {
+				if (scaleTitleField.getText().trim().equals("")) {
 					createButton.setEnabled(false);
-				}else{
+				} else {
 					createButton.setEnabled(true);
 				}
 			}
@@ -350,9 +416,10 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 				validateTextField();
 				setCreateButtonStatus();
 			}
-			public void keyPressed(KeyEvent e) {}			
+			public void keyPressed(KeyEvent e) {
+			}
 		});
-		
+
 		titlePane.add(
 			titleLabel,
 			new GridBagConstraints(
@@ -387,16 +454,17 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		buttonsPane = new JPanel(new GridBagLayout());
 		JButton addObjButton = new JButton(" Add Objects ");
 		JButton addAttrButton = new JButton(" Add Attributes ");
-        checkConsistencyButton = new JButton(" Check Consistency... ");
-		checkConsistencyButton.addActionListener(new ActionListener() {
+		this.checkConsistencyButton = new JButton(" Check Consistency... ");
+		this.checkConsistencyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				checkConsistency();
 			}
 		});
-		checkConsistencyButton.setEnabled(false);
+		setCheckConsistencyButtonState();
 		this.createButton = new JButton(" Create ");
-		createButton.setEnabled((scaleTitleField.getText()!=null && 
-						!scaleTitleField.getText().equals("")));
+		createButton.setEnabled(
+			(scaleTitleField.getText() != null
+				&& !scaleTitleField.getText().equals("")));
 		JButton cancelButton = new JButton(" Cancel ");
 		addObjButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -490,9 +558,9 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 				0,
 				0));
 	}
-	
+
 	private void closeDialog(boolean result) {
-		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
+		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, this);
 		this.context.setName(this.scaleTitleField.getText());
 		this.result = result;
 		setVisible(false);
@@ -512,7 +580,10 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 	  * To be used in the formatting of the text message prompt in the JDialog
 	  * @return The name of the object/ attribute
 	  */
-	private String showTextInputDialog(String title, String thingToAdd, String currentTextValue) {
+	private String showTextInputDialog(
+		String title,
+		String thingToAdd,
+		String currentTextValue) {
 		String inputValue = "";
 		do {
 			inputValue =
@@ -520,16 +591,21 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 					contextTableScaleEditorDialog,
 					"Please input the name of the " + thingToAdd + ": ",
 					title,
-					JOptionPane.PLAIN_MESSAGE,null,null, currentTextValue);
+					JOptionPane.PLAIN_MESSAGE,
+					null,
+					null,
+					currentTextValue);
 		} while (inputValue != null && inputValue.trim().equals(""));
 		return inputValue;
 	}
-	
-	private boolean collectionContainsString(String value, Collection collection){
+
+	private boolean collectionContainsString(
+		String value,
+		Collection collection) {
 		Iterator it = collection.iterator();
 		while (it.hasNext()) {
 			Object obj = (Object) it.next();
-			if(obj.toString().equalsIgnoreCase(value.trim())){
+			if (obj.toString().equalsIgnoreCase(value.trim())) {
 				return true;
 			}
 		}
@@ -540,170 +616,194 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		show();
 		return result;
 	}
-	
+
 	private void removeObject(int pos) {
 		List objects = (List) this.context.getObjects();
 		objects.remove(pos);
-	    updateView();
+		updateView();
 	}
 
-    private void removeAttribute(int pos) {
-        List attributes = (List) this.context.getAttributes();
-        attributes.remove(pos);
-        updateView();
-    }
+	private void removeAttribute(int pos) {
+		List attributes = (List) this.context.getAttributes();
+		attributes.remove(pos);
+		updateView();
+	}
 
 	private MouseListener getMouseListener(final ContextTableView tableView) {
 		MouseListener mouseListener = new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				if(e.isPopupTrigger()) {
-					final ContextTableView.Position pos = tableView.getTablePosition(e.getX(), e.getY());
-					if( pos == null ) {
+				if (e.isPopupTrigger()) {
+					final ContextTableView.Position pos =
+						tableView.getTablePosition(e.getX(), e.getY());
+					if (pos == null) {
 						return;
 					} else {
-                        showPopupMenu(e, pos);
+						showPopupMenu(e, pos);
 					}
-				}			
+				}
 			}
 
-            public void showPopupMenu(MouseEvent e, final ContextTableView.Position pos) {
-                if (pos.getCol() == 0 && pos.getRow()!=0){
-                	JPopupMenu popupMenu = new JPopupMenu();
-                	JMenuItem rename = new JMenuItem("Rename Object");
-                	rename.addActionListener(new ActionListener() {
-                		public void actionPerformed(ActionEvent e) {
-                			renameObject( pos.getRow() - 1);
-                		}
-                	});
-                	JMenuItem remove = new JMenuItem("Remove Object");
-                	remove.addActionListener(new ActionListener() {
-                		public void actionPerformed(ActionEvent e) {
-                			removeObject(pos.getRow()-1);
-                		}
-                	});
-                	popupMenu.add(rename);
-                	popupMenu.add(remove);
-                	popupMenu.show(scrollpane, e.getX(), e.getY());
-                } else if (pos.getRow() == 0 && pos.getCol()!=0) {
-                	JPopupMenu popupMenu = new JPopupMenu();
-                	JMenuItem rename = new JMenuItem("Rename Attribute");
-                	rename.addActionListener(new ActionListener() {
-                		public void actionPerformed(ActionEvent e) {
-                			renameAttribute(pos.getCol() - 1);
-                		}
-                	});
-                	JMenuItem remove = new JMenuItem("Remove Attribute");
-                	remove.addActionListener(new ActionListener() {
-                		public void actionPerformed(ActionEvent e) {
-                				removeAttribute(pos.getCol()-1);
-                		}
-                	});
-                	popupMenu.add(rename);
-                	popupMenu.add(remove);
-                	popupMenu.show(scrollpane, e.getX(), e.getY());
-                }
-            }
-			
+			public void showPopupMenu(
+				MouseEvent e,
+				final ContextTableView.Position pos) {
+				if (pos.getCol() == 0 && pos.getRow() != 0) {
+					JPopupMenu popupMenu = new JPopupMenu();
+					JMenuItem rename = new JMenuItem("Rename Object");
+					rename.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							renameObject(pos.getRow() - 1);
+						}
+					});
+					JMenuItem remove = new JMenuItem("Remove Object");
+					remove.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							removeObject(pos.getRow() - 1);
+						}
+					});
+					popupMenu.add(rename);
+					popupMenu.add(remove);
+					popupMenu.show(scrollpane, e.getX(), e.getY());
+				} else if (pos.getRow() == 0 && pos.getCol() != 0) {
+					JPopupMenu popupMenu = new JPopupMenu();
+					JMenuItem rename = new JMenuItem("Rename Attribute");
+					rename.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							renameAttribute(pos.getCol() - 1);
+						}
+					});
+					JMenuItem remove = new JMenuItem("Remove Attribute");
+					remove.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							removeAttribute(pos.getCol() - 1);
+						}
+					});
+					popupMenu.add(rename);
+					popupMenu.add(remove);
+					popupMenu.show(scrollpane, e.getX(), e.getY());
+				}
+			}
+
 			public void mouseReleased(MouseEvent e) {
-				if(e.isPopupTrigger()) {
-					final ContextTableView.Position pos = tableView.getTablePosition(e.getX(), e.getY());
-					if( pos == null ) {
+				if (e.isPopupTrigger()) {
+					final ContextTableView.Position pos =
+						tableView.getTablePosition(e.getX(), e.getY());
+					if (pos == null) {
 						return;
-					} else{
-					    showPopupMenu(e, pos);
+					} else {
+						showPopupMenu(e, pos);
 					}
 				}
 			}
-			
+
 			public void mouseClicked(MouseEvent e) {
-				final ContextTableView.Position pos = tableView.getTablePosition(e.getX(), e.getY());
-				if( pos == null ) {
+				final ContextTableView.Position pos =
+					tableView.getTablePosition(e.getX(), e.getY());
+				if (pos == null) {
 					return;
 				}
-				if(e.getButton() != MouseEvent.BUTTON1) {
+				if (e.getButton() != MouseEvent.BUTTON1) {
 					return;
 				}
-				if(e.getClickCount() != 2) {
+				if (e.getClickCount() != 2) {
 					return;
-				}				
-				
-				if( pos.getCol() == 0 ) {
-					if( pos.getRow() != 0) {
-					    renameObject(pos.getRow() - 1);
-					} 
+				}
+
+				if (pos.getCol() == 0) {
+					if (pos.getRow() != 0) {
+						renameObject(pos.getRow() - 1);
+					}
 				} else {
-					if( pos.getRow() == 0) {
+					if (pos.getRow() == 0) {
 						renameAttribute(pos.getCol() - 1);
 					} else {
-						changeRelationImplementation(pos.getRow() - 1, pos.getCol() - 1);
+						changeRelationImplementation(
+							pos.getRow() - 1,
+							pos.getCol() - 1);
 					}
-				}				
+				}
 			}
-		}; 
+		};
 		return mouseListener;
 	}
-	
-    private void renameObject(int num) {
-        List objectList = (List) this.context.getObjects();
-        String inputValue = "";
-        do{
-            String oldName = (String) objectList.get(num);
-            inputValue = showTextInputDialog("Rename Object", "object", oldName);
-            if (inputValue != null && !inputValue.trim().equals("")) {
-                if(!collectionContainsString(inputValue, objectList)) {
-                    objectList.set(num, inputValue);
-                    BinaryRelationImplementation relation = this.context.getRelationImplementation();
-                    Iterator attrIt = this.context.getAttributes().iterator();
-                    while (attrIt.hasNext()) {
-                        Attribute attribute = (Attribute) attrIt.next();
-                        if(relation.contains(oldName, attribute)) {
-                        	relation.remove(oldName, attribute);
-                        	relation.insert(inputValue, attribute);
-                        }
-                    }
-                    updateView();
-                    inputValue = "";
-                } else {
-                    JOptionPane.showMessageDialog(this, "An object named '" + inputValue +
-                                                    "' already exist. Please enter a different name.","Object exists",
-                                                    JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                break;
-            }
-        } while (collectionContainsString(inputValue, objectList) );
-        updateView();
-    }
 
-    private void renameAttribute(int num) {
-        List attributeList = (List) this.context.getAttributes();
-        String inputValue = "";
-        do{
-            Attribute attr = (Attribute) attributeList.get(num);
-            inputValue = showTextInputDialog("Rename Attribute", "attribute", attr.toString());
-            if (inputValue != null && !inputValue.trim().equals("")) {
-                if(!collectionContainsString(inputValue, attributeList)) {
-                    Attribute attribute = (Attribute) attributeList.get(num);
-                    attribute.setData(inputValue);
-                    updateView();
-                    inputValue = "";
-                } else {
-                    JOptionPane.showMessageDialog(this, "An attribute named '" + inputValue +
-                                                    "' already exist. Please enter a different name.","Attribute exists",
-                                                    JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                break;
-            }
-        } while (collectionContainsString(inputValue, attributeList) );
-        updateView();
-    }
+	private void renameObject(int num) {
+		List objectList = (List) this.context.getObjects();
+		String inputValue = "";
+		do {
+			String oldName = (String) objectList.get(num);
+			inputValue =
+				showTextInputDialog("Rename Object", "object", oldName);
+			if (inputValue != null && !inputValue.trim().equals("")) {
+				if (!collectionContainsString(inputValue, objectList)) {
+					objectList.set(num, inputValue);
+					BinaryRelationImplementation relation =
+						this.context.getRelationImplementation();
+					Iterator attrIt = this.context.getAttributes().iterator();
+					while (attrIt.hasNext()) {
+						Attribute attribute = (Attribute) attrIt.next();
+						if (relation.contains(oldName, attribute)) {
+							relation.remove(oldName, attribute);
+							relation.insert(inputValue, attribute);
+						}
+					}
+					updateView();
+					inputValue = "";
+				} else {
+					JOptionPane.showMessageDialog(
+						this,
+						"An object named '"
+							+ inputValue
+							+ "' already exist. Please enter a different name.",
+						"Object exists",
+						JOptionPane.ERROR_MESSAGE);
+				}
+			} else {
+				break;
+			}
+		}
+		while (collectionContainsString(inputValue, objectList));
+		updateView();
+	}
 
-	private void changeRelationImplementation(int objectPos, int attributePos) {
-	    List objectList = (List) this.context.getObjects();
-	    List attributeList = (List) this.context.getAttributes();
-	    Object object = objectList.get(objectPos);
-	    Attribute attribute = (Attribute) attributeList.get(attributePos);
+	private void renameAttribute(int num) {
+		List attributeList = (List) this.context.getAttributes();
+		String inputValue = "";
+		do {
+			Attribute attr = (Attribute) attributeList.get(num);
+			inputValue =
+				showTextInputDialog(
+					"Rename Attribute",
+					"attribute",
+					attr.toString());
+			if (inputValue != null && !inputValue.trim().equals("")) {
+				if (!collectionContainsString(inputValue, attributeList)) {
+					Attribute attribute = (Attribute) attributeList.get(num);
+					attribute.setData(inputValue);
+					updateView();
+					inputValue = "";
+				} else {
+					JOptionPane.showMessageDialog(
+						this,
+						"An attribute named '"
+							+ inputValue
+							+ "' already exist. Please enter a different name.",
+						"Attribute exists",
+						JOptionPane.ERROR_MESSAGE);
+				}
+			} else {
+				break;
+			}
+		} while (collectionContainsString(inputValue, attributeList));
+		updateView();
+	}
+
+	private void changeRelationImplementation(
+		int objectPos,
+		int attributePos) {
+		List objectList = (List) this.context.getObjects();
+		List attributeList = (List) this.context.getAttributes();
+		Object object = objectList.get(objectPos);
+		Attribute attribute = (Attribute) attributeList.get(attributePos);
 		if (context.getRelationImplementation().contains(object, attribute)) {
 			context.getRelationImplementation().remove(object, attribute);
 		} else {
@@ -715,30 +815,32 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 	/*
 	 * Checks against the context whether there are any objects/attributes. If
 	 * either one doesn't exist, disable the button.
-	 */ 
-	protected void setCreateButtonStatus(){
-		if(context.getAttributes().isEmpty() || context.getObjects().isEmpty()){
+	 */
+	protected void setCreateButtonStatus() {
+		if (context.getAttributes().isEmpty()
+			|| context.getObjects().isEmpty()) {
 			createButton.setEnabled(false);
-		}else{
-			if(!scaleTitleField.getText().equals("")){
+		} else {
+			if (!scaleTitleField.getText().equals("")) {
 				createButton.setEnabled(true);
-			}else{
+			} else {
 				createButton.setEnabled(false);
 			}
 		}
 	}
 
-	public ContextImplementation getContext(){
-		return context;	
+	public ContextImplementation getContext() {
+		return context;
 	}
-	
+
 	public void paint(Graphics g) {
 		super.paint(g);
-		if(this.scaleTitleField.getText().length() == 0 && onFirstLoad==true) {
+		if (this.scaleTitleField.getText().length() == 0
+			&& onFirstLoad == true) {
 			getInput();
 		}
 	}
-	
+
 	protected void checkConsistency() {
 		List problems = new ArrayList();
 		DatabaseInfo dbinfo = this.conceptualSchema.getDatabaseInfo();
@@ -749,14 +851,22 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		Iterator it = this.context.getObjects().iterator();
 		while (it.hasNext()) {
 			String clause = (String) it.next();
-			String query = "SELECT count(*) FROM " + dbinfo.getSQLTableName() + 
-			                  " WHERE (" + clause + ");";
+			String query =
+				"SELECT count(*) FROM "
+					+ dbinfo.getSQLTableName()
+					+ " WHERE ("
+					+ clause
+					+ ");";
 			try {
 				sumCounts += this.databaseConnection.queryInt(query, 1);
 				validClauses.add(clause);
 			} catch (DatabaseException e) {
-				problems.add("Object '" + clause + "' is not a valid clause for the database.\n" +
-							 "The database returned:\n\t" + e.getCause().getMessage());
+				problems.add(
+					"Object '"
+						+ clause
+						+ "' is not a valid clause for the database.\n"
+						+ "The database returned:\n\t"
+						+ e.getCause().getMessage());
 			}
 		}
 
@@ -768,27 +878,41 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 			Iterator it2 = validClauses.iterator();
 			while (it2.hasNext()) {
 				String otherClause = (String) it2.next();
-				String query = "SELECT count(*) FROM " + dbinfo.getSQLTableName() +
-				               " WHERE (" + clause + ") AND (" + otherClause + ");";
+				String query =
+					"SELECT count(*) FROM "
+						+ dbinfo.getSQLTableName()
+						+ " WHERE ("
+						+ clause
+						+ ") AND ("
+						+ otherClause
+						+ ");";
 				try {
 					int count = this.databaseConnection.queryInt(query, 1);
-					if(count != 0) {
-						problems.add("Object clauses '" + clause + "' and '" +
-						             otherClause + "' overlap.");
+					if (count != 0) {
+						problems.add(
+							"Object clauses '"
+								+ clause
+								+ "' and '"
+								+ otherClause
+								+ "' overlap.");
 					}
 				} catch (DatabaseException e) {
 					// should not happen
-					throw new RuntimeException("Failed to query the database.", e);
+					throw new RuntimeException(
+						"Failed to query the database.",
+						e);
 				}
 			}
 		}
 
 		// check if disjunction of all contingents covers the data set
-		if(problems.isEmpty()) { // doesn't make sense if we have problems so far
-			String query = "SELECT count(*) FROM " + dbinfo.getSQLTableName() + ";";
+		if (problems.isEmpty()) {
+			// doesn't make sense if we have problems so far
+			String query =
+				"SELECT count(*) FROM " + dbinfo.getSQLTableName() + ";";
 			try {
 				int count = this.databaseConnection.queryInt(query, 1);
-				if(count != sumCounts) {
+				if (count != sumCounts) {
 					problems.add("Object clauses do not cover database.");
 				}
 			} catch (DatabaseException e) {
@@ -798,15 +922,19 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		}
 
 		// give feedback
-		if(problems.isEmpty()) {
-			JOptionPane.showMessageDialog(this, "No problems found","Objects correct",
-			                              JOptionPane.INFORMATION_MESSAGE);
+		if (problems.isEmpty()) {
+			JOptionPane.showMessageDialog(
+				this,
+				"No problems found",
+				"Objects correct",
+				JOptionPane.INFORMATION_MESSAGE);
 		} else {
 			// show problems
 			Iterator strIt = problems.iterator();
 			Element problemDescription = new Element("description");
 			Element htmlElement = new Element("html");
-			htmlElement.addContent(new Element("title").addContent("Consistency problems"));
+			htmlElement.addContent(
+				new Element("title").addContent("Consistency problems"));
 			problemDescription.addContent(htmlElement);
 			Element body = new Element("body");
 			htmlElement.addContent(body);
@@ -816,33 +944,37 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 				body.addContent(new Element("pre").addContent(problem));
 			}
 			Frame frame = JOptionPane.getFrameForComponent(this);
-			DescriptionViewer.show(frame,problemDescription);
+			DescriptionViewer.show(frame, problemDescription);
 		}
 	}
 
-    public void processEvent(Event e) {
-    	if(e instanceof ConceptualSchemaChangeEvent) {
-	    	ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
-	    	this.conceptualSchema = csce.getConceptualSchema();
-	    	if(this.databaseConnection == null) {
-	    	    this.checkConsistencyButton.setEnabled(false);
-	    	} else {
-    	    	this.checkConsistencyButton.setEnabled(this.databaseConnection.isConnected());
-	    	}
-	    	return;
-    	}
-    	if(e instanceof DatabaseConnectedEvent) {
-    		DatabaseConnectedEvent dbce = (DatabaseConnectedEvent) e;
-    		this.databaseConnection = dbce.getConnection();
-    		this.checkConsistencyButton.setEnabled(this.databaseConnection.isConnected());
-    		return;
-    	}
-    	throw new RuntimeException("Caught event we don't know about");
-    }
-    
-    public void setContext(ContextImplementation context) {
-        this.context = context;
-        this.tableView.setContext(context);
-        this.scaleTitleField.setText(context.getName());
-    }
+	public void processEvent(Event e) {
+		if (e instanceof ConceptualSchemaChangeEvent) {
+			ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
+			this.conceptualSchema = csce.getConceptualSchema();
+			setCheckConsistencyButtonState();
+			return;
+		}
+		if (e instanceof DatabaseConnectedEvent) {
+			DatabaseConnectedEvent dbce = (DatabaseConnectedEvent) e;
+			this.databaseConnection = dbce.getConnection();
+			setCheckConsistencyButtonState();
+			return;
+		}
+		throw new RuntimeException("Caught event we don't know about");
+	}
+
+	private void setCheckConsistencyButtonState() {
+		if(this.databaseConnection == null) {
+			this.checkConsistencyButton.setEnabled(false);		
+		} else {
+			this.checkConsistencyButton.setEnabled(this.databaseConnection.isConnected());
+		}
+	}
+
+	public void setContext(ContextImplementation context) {
+		this.context = context;
+		this.tableView.setContext(context);
+		this.scaleTitleField.setText(context.getName());
+	}
 }
