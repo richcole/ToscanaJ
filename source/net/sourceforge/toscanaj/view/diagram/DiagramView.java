@@ -185,6 +185,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
             repaint();
             return;
         }
+        addLayer("lines");
+        addLayer("nodes");
+        addLayer("labels");
         addDiagram(diagram, conceptInterpretationContext);
         requestScreenTransformUpdate();
         repaint();
@@ -208,36 +211,12 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * filter operations.
      */
     private void addDiagram(Diagram2D diagram, ConceptInterpretationContext context) {
-        Hashtable nodeMap = createNodeMap(diagram, context);
-        addLinesToDiagram(diagram, nodeMap);
-        addNodesToDiagram(diagram, nodeMap, context);
-        addLabelsToDiagram(diagram, nodeMap);
-    }
-
-    private void addLabelsToDiagram(Diagram2D diagram, Hashtable nodeMap) {
+        Hashtable nodeMap = new Hashtable();
         for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = (NodeView) nodeMap.get(node);
-            LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
-            if (attrLabelInfo != null) {
-                LabelView labelView = new AttributeLabelView(this, nodeView, attrLabelInfo);
-                addCanvasItem(labelView);
-                labelView.addObserver(this);
-            }
-            LabelInfo objLabelInfo = diagram.getObjectLabel(i);
-            if (objLabelInfo != null) {
-                LabelView labelView = new ObjectLabelView(this, nodeView, objLabelInfo);
-                addCanvasItem(labelView);
-                labelView.addObserver(this);
-            }
-        }
-    }
-
-    private void addNodesToDiagram(Diagram2D diagram, Hashtable nodeMap, ConceptInterpretationContext context) {
-        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
-            DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = (NodeView) nodeMap.get(node);
-            addCanvasItem(nodeView);
+            NodeView nodeView = new NodeView(node, this, context);
+            nodeMap.put(node, nodeView);
+            addCanvasItem(nodeView, "nodes");
             if (node instanceof NestedDiagramNode) {
                 Concept concept = node.getConcept();
                 if (conceptInterpreter.isRealized(concept, context)) {
@@ -252,24 +231,23 @@ public class DiagramView extends Canvas implements ChangeObserver {
                  */
                 conceptInterpreter.getObjectCount(node.getConcept(), context);
             }
+            LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
+            if (attrLabelInfo != null) {
+                LabelView labelView = new AttributeLabelView(this, nodeView, attrLabelInfo);
+                addCanvasItem(labelView, "labels");
+                labelView.addObserver(this);
+            }
+            LabelInfo objLabelInfo = diagram.getObjectLabel(i);
+            if (objLabelInfo != null) {
+                LabelView labelView = new ObjectLabelView(this, nodeView, objLabelInfo);
+                addCanvasItem(labelView, "labels");
+                labelView.addObserver(this);
+            }
         }
-    }
-
-    private void addLinesToDiagram(Diagram2D diagram, Hashtable nodeMap) {
         for (int i = 0; i < diagram.getNumberOfLines(); i++) {
             DiagramLine dl = diagram.getLine(i);
-            addCanvasItem(new LineView(dl, (NodeView) nodeMap.get(dl.getFromNode()), (NodeView) nodeMap.get(dl.getToNode())));
+            addCanvasItem(new LineView(dl, (NodeView) nodeMap.get(dl.getFromNode()), (NodeView) nodeMap.get(dl.getToNode())), "lines");
         }
-    }
-
-    private Hashtable createNodeMap(Diagram2D diagram, ConceptInterpretationContext context) {
-        Hashtable nodeMap = new Hashtable();
-        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
-            DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node, this, context);
-            nodeMap.put(node, nodeView);
-        }
-        return nodeMap;
     }
 
     public void setDisplayType(boolean contingentOnly) {
