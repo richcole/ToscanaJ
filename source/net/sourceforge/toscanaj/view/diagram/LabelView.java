@@ -421,7 +421,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     /**
      * Moves or resizes the label, depending on where the drag event occured.
      */
-    public void dragged(Point2D from, Point2D to) {
+    public void processDragEvent(Point2D from, Point2D to) {
         if ((from.getX() >= this.rect.getMaxX() - this.scrollbarWidth)) {
             // we have a click on the scrollbar, calculate the line hit
             int lineHit = (int) ((from.getY() - this.rect.getY()) / this.lineHeight);
@@ -456,6 +456,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 
     /**
      * Handles scrolling of the items.
+     *
+     * @todo move this into event handler
      */
     public void clicked(Point2D pos) {
         if (pos.getX() < this.rect.getMaxX() - this.scrollbarWidth) {
