@@ -119,6 +119,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     private JLabel stepPositionLabel;
     private JButton startSteppingButton;
     private JButton removeTransitionsButton;
+    private boolean animating;
 	
 	public TemporalControlsPanel(DiagramView diagramView, 
     						   DiagramExportSettings diagramExportSettings, EventBroker eventBroker) {
@@ -536,7 +537,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     }
 
     protected void exportImages(File selectedFile){
-        clearTransitionLayer();
+        removeTransitions();
 
     	// export all transitions into main file
         int length = this.timelineValues.size();
@@ -621,7 +622,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             disableStepControls();
         	setButtonStates(false);
         }
-        if(e instanceof CanvasDrawnEvent) {
+        if((e instanceof CanvasDrawnEvent) && this.animating) {
         	animate();
         }
     }
@@ -634,7 +635,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     
     private void animate() {
     	if(this.lastAnimationTime > this.targetTime) {
-            // done
             removeTransitions();
     		return;
     	}
@@ -644,7 +644,8 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     }
 
     private void addFixedTransitions() {
-        clearTransitionLayer();
+        this.animating = false;
+        removeTransitions();
 
         disableStepControls();
 
@@ -655,13 +656,15 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         this.timeController.setFadeOutTime(0);
         this.timeController.setMillisecondsPerStep(1);
         this.timeController.reset();
+        this.timeController.setCurrentTime(length + 1);
         addTransitions(length, false);
         
-        this.diagramView.repaint();
+        this.diagramView.update(this);
     }
 
     private void startStepping() {
-        clearTransitionLayer();
+        this.animating = false;
+        removeTransitions();
 
         int length = this.timelineValues.size();
         this.timeController.setFadeInTime(0);
@@ -677,12 +680,14 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             this.timeController.setEndTime(length);
             addTransitions(this.timeController.getAllFadedTime(), true);
         }
-        this.lastAnimationTime = this.timeController.getEndTime() + 23; // don't animate
+        this.diagramView.update(this);
         gotoStep(1);
     }
 
     private void addAnimatedTransitions() {
-        clearTransitionLayer();
+        this.animating = false;
+
+        removeTransitions();
         
         disableStepControls();
 
@@ -701,7 +706,8 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             this.timeController.setEndTime(length);
         	addTransitions(this.timeController.getAllFadedTime(), true);
         }
-        this.diagramView.repaint();
+        this.animating = true;
+        this.diagramView.update(this);
     }
 
     private void addTransitions(double newTargetTime, boolean highlightStates) {
@@ -730,13 +736,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             }
             styleNum = (styleNum + 1) % styles.length;
         }
-    }
-
-    private void clearTransitionLayer() {
-        if(this.diagramView.hasLayer(TRANSITION_LAYER_NAME)) {
-            this.diagramView.removeLayer(TRANSITION_LAYER_NAME);
-        }
-        this.diagramView.addLayer(TRANSITION_LAYER_NAME);
     }
 
 	/**
@@ -771,11 +770,10 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                 	continue;
                 }
                 if(endViewLast != startViewNew) {
-	                this.diagramView.addCanvasItem(
-	                            new InterSequenceTransitionArrow(endViewLast, startViewNew,
-	                                                             style, nextColor, seqNum * seqLength + 0.5,
-	                                                             this.timeController),
-	                            TRANSITION_LAYER_NAME);
+                    SimpleLineDiagram diagram = (SimpleLineDiagram) this.diagramView.getDiagram();
+                    diagram.addExtraCanvasItem(new InterSequenceTransitionArrow(endViewLast, startViewNew,
+                                               style, nextColor, seqNum * seqLength + 0.5,
+                                               this.timeController));
                 }
             }
 
@@ -828,7 +826,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     	    }
     	    oldView = curView;
         }
-        this.diagramView.update(this);
     }
 
 	private NodeView findObjectConceptView(FCAObject object, Hashtable nodeViewMap) {

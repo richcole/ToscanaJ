@@ -76,6 +76,7 @@ public class AnimationTimeController {
 
     public void reset() {
     	this.startTimeStamp = System.currentTimeMillis();
+        this.currentTime = 0;
     }
     
     public void setMillisecondsPerStep(long millisecondsPerStep) {

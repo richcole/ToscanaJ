@@ -137,9 +137,8 @@ public class DiagramView extends Canvas implements ChangeObserver {
                 source instanceof DiagramHistory) {
             showDiagram(DiagramController.getController().getCurrentDiagram());
         } else {
-            showDiagram(this.diagram);
             requestScreenTransformUpdate();
-            repaint();
+            showDiagram(this.diagram, false);
         }
     }
 
@@ -189,12 +188,18 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * This will automatically cause a repaint of the view.
      */
     public void showDiagram(Diagram2D diagram) {
+        showDiagram(diagram, true);
+    }    
+    
+    private void showDiagram(Diagram2D diagram, boolean sendEvent) {
         this.diagram = diagram;
         removeSubscriptions();
         clearCanvas();
         if (diagram == null) {
             repaint();
-			this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
+            if(sendEvent) {
+                this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
+            }
             return;
         }
         getParent().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -210,7 +215,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
         	addDiagram(diagram, conceptInterpretationContext, 0, true);
             requestScreenTransformUpdate();
             repaint();
-            this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
+            if(sendEvent) {
+                this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
+            }
         } catch (Exception e) {
         	ErrorDialog.showError(this, e, "Showing diagram failed", "The selected diagram can not be shown");
         	showDiagram(null);
