@@ -45,8 +45,8 @@ public class NDimNodeMovementEventListener implements EventListener {
         for (int i = 0; i < diffUpperNeighbours.length; i++) {
             double v = diffUpperNeighbours[i];
             Point2D baseVec = (Point2D) baseIt.next();
-            baseVec.setLocation(baseVec.getX() + diffX * v / sumCoord,
-                                baseVec.getY() + diffY * v / sumCoord);
+            baseVec.setLocation(baseVec.getX() + diffX * v / (sumCoord + ndimNode.getNdimVector()[i]),
+                                baseVec.getY() + diffY * v / (sumCoord + ndimNode.getNdimVector()[i]));
         }
         if (dragEvent instanceof CanvasItemDroppedEvent) {
             diagramView.requestScreenTransformUpdate();
