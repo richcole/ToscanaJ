@@ -66,7 +66,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
     static final public int SELECTED_IDEAL = 4;
 
     private DiagramSchema diagramSchema;
-
+	
+	private double minimumFontSize = 0;
+	
     private class ResizeListener extends ComponentAdapter {
         public void componentResized(ComponentEvent e) {
             requestScreenTransformUpdate();
@@ -158,6 +160,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
                     getWidth() - 2 * margin, getHeight() - 2 * margin);
             this.setScreenTransform(this.scaleToFit(g2d, bounds));
             makeScreenTransformClear();
+            setLabelFontSizes();
         }
         g2d.transform(getScreenTransform());
 
@@ -207,12 +210,26 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
     }
 
-    private void removeSubscriptions() {
-        for (Iterator iterator = this.getCanvasItemsByType(LabelView.class).iterator(); iterator.hasNext();) {
-            LabelView lv = (LabelView) iterator.next();
-            this.getController().getEventBroker().removeSubscriptions(lv);
-        }
-    }
+	private void removeSubscriptions() {
+		for (Iterator iterator = this.getCanvasItemsByType(LabelView.class).iterator(); iterator.hasNext();) {
+			LabelView lv = (LabelView) iterator.next();
+			this.getController().getEventBroker().removeSubscriptions(lv);
+		}
+	}
+
+	private void setLabelFontSizes() {
+		Font font = diagramSchema.getLabelFont();
+		double scale = this.getScreenTransform().getScaleY();
+		if( (this.minimumFontSize > 0) && 
+		     	(font.getSize() * scale < this.minimumFontSize)
+		   ) {
+		    font = font.deriveFont((float) (this.minimumFontSize / scale));
+		}
+		for (Iterator iterator = this.getCanvasItemsByType(LabelView.class).iterator(); iterator.hasNext();) {
+			LabelView lv = (LabelView) iterator.next();
+			lv.setFont(font);
+		}
+	}
 
     public Diagram2D getDiagram() {
         return diagram;
@@ -314,5 +331,15 @@ public class DiagramView extends Canvas implements ChangeObserver {
     public DiagramSchema getDiagramSchema() {
         return diagramSchema;
     }
+
+	public double getMinimumFontSize() {
+		return minimumFontSize;
+	}
+
+	public void setMinimumFontSize(double minimumFontSize) {
+		this.minimumFontSize = minimumFontSize;
+		this.screenTransformDirty = true;
+		repaint();
+	}
 }
 

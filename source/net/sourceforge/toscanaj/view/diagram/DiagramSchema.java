@@ -137,6 +137,8 @@ public class DiagramSchema {
     private float notRealizedNodeSizeReductionFactor = 3;
     
     private int nodeSizeScalingType = NODE_SIZE_SCALING_NONE;
+    
+    private Font labelFont;
 
     /**
      * Default constructor.
@@ -192,6 +194,7 @@ public class DiagramSchema {
             System.err.println("Caught unknown node size scaling value for DiagramSchema: " + propVal);
             System.err.println("-- using default");
         }
+        this.labelFont = new Font(labelFontName, Font.PLAIN ,labelFontSize);
     }
 
     /**
@@ -417,4 +420,8 @@ public class DiagramSchema {
         	return this.notRealisedDiagramNodeColor;
         }
     }
+
+	public Font getLabelFont() {
+		return this.labelFont;
+	}
 }

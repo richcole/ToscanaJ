@@ -71,7 +71,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     /**
      * Stores the font we use.
      */
-    private Font font = new Font("Arial", Font.PLAIN, 10);
+    private Font font;
 
     /**
      * The bounding rectangle for the label itself.
@@ -136,9 +136,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         this.labelInfo = label;
         this.labelInfo.addObserver(this);
         DiagramSchema diagramSchema = diagramView.getDiagramSchema();
-        String fontName = diagramSchema.getLabelFontName();
-        int fontSize = diagramSchema.getLabelFontSize();
-        this.font = new Font(fontName, Font.PLAIN, fontSize);
+		this.font = diagramSchema.getLabelFont();
         updateEntries();
         diagramView.getController().getEventBroker().subscribe(this, SelectionChangedEvent.class, Object.class);
     }
@@ -676,4 +674,12 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     public NodeView getNodeView() {
         return nodeView;
     }
+
+	public Font getFont() {
+		return font;
+	}
+
+	public void setFont(Font font) {
+		this.font = font;
+	}
 }

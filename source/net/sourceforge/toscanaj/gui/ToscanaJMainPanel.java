@@ -640,6 +640,36 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     }
                 }
             }
+			viewMenu.addSeparator();
+			ButtonGroup fontSizeGroup = new ButtonGroup();
+		  	JMenu setMinLabelSizeSubMenu = new JMenu("Set minimum label size");
+			JMenuItem fontRangeMenuItem = new JRadioButtonMenuItem("None");
+			fontSizeGroup.add(fontRangeMenuItem);
+			fontRangeMenuItem.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					JMenuItem source = (JMenuItem) e.getSource();
+					diagramView.setMinimumFontSize(0);
+					source.setSelected(true);
+				}
+			});
+			fontRangeMenuItem.setSelected(true);
+			setMinLabelSizeSubMenu.add(fontRangeMenuItem);
+			int fontRange = 6; //min font size
+			while(fontRange<26){
+				fontRangeMenuItem = new JRadioButtonMenuItem(fontRange+"");
+				fontSizeGroup.add(fontRangeMenuItem);
+				fontRangeMenuItem.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent e) {
+						JMenuItem source = (JMenuItem) e.getSource();
+						int newFontSize = Integer.parseInt(source.getText());					
+						diagramView.setMinimumFontSize(newFontSize);
+						source.setSelected(true);
+					}
+				});
+				fontRange+=2;
+				setMinLabelSizeSubMenu.add(fontRangeMenuItem);
+			}			
+		    viewMenu.add(setMinLabelSizeSubMenu);
         }
 
         // create a help menu
