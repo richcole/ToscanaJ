@@ -28,32 +28,32 @@
         <xsl:param name="diagram">interne Laufwerksschächte</xsl:param>
         <xsl:param name="scale">4</xsl:param>
 -->
-<conceptualSchema version="1.0" askDatabase="true">
-	<database>
-		<url driver="sun.jdbc.odbc.JdbcOdbcDriver">jdbc:odbc:PCTest80</url>
-		<table>[PC-Test]</table>
-		<key>[PCBezeichnung]</key>
-		<queries dropDefaults="false">
-			<list name="Cases" distinct="true">
-				<column>[Gehäusetyp]</column>
-			</list>
-			<list name="Name with type of case (SQL)">
-				<column>[Gehäusetyp] + ': ' + [PCBezeichnung]</column>
-			</list>
-			<list name="Name with type of case (Toscana)" head="Case: ">
-				<column name="Case" separator=" - PC: ">[Gehäusetyp]</column>
-				<column name="Name">[PCBezeichnung]</column>
-			</list>
-			<aggregate name="Average Price">
-				<column format="$ 0.00">AVG(Preis)</column>
-			</aggregate>
-			<aggregate name="Min/Max Prices">
-				<column format="$0.00" separator=" - ">MIN(Preis)</column>
-				<column format="$0.00">MAX(Preis)</column>
-			</aggregate>
-		</queries>
-	</database>
+<conceptualSchema version="TJ0.4">
 	<context>
+        <databaseConnection>
+            <url driver="sun.jdbc.odbc.JdbcOdbcDriver">jdbc:odbc:PCTest80</url>
+            <table>[PC-Test]</table>
+            <key>[PCBezeichnung]</key>
+            <queries dropDefaults="false">
+                <listQuery name="Cases" distinct="true">
+                    <column>[Gehäusetyp]</column>
+                </listQuery>
+                <listQuery name="Name with type of case (SQL)">
+                    <column>[Gehäusetyp] + ': ' + [PCBezeichnung]</column>
+                </listQuery>
+                <listQuery name="Name with type of case (Toscana)" head="Case: ">
+                    <column name="Case" separator=" - PC: ">[Gehäusetyp]</column>
+                    <column name="Name">[PCBezeichnung]</column>
+                </listQuery>
+                <aggregateQuery name="Average Price">
+                    <column format="$ 0.00">AVG(Preis)</column>
+                </aggregateQuery>
+                <aggregateQuery name="Min/Max Prices">
+                    <column format="$0.00" separator=" - ">MIN(Preis)</column>
+                    <column format="$0.00">MAX(Preis)</column>
+                </aggregateQuery>
+            </queries>
+        </databaseConnection>
 		<object id="1">Preis&gt;=5000</object>
 		<object id="2">Preis&lt;5000 and Preis&gt;=4500</object>
 		<object id="3">Preis&lt;4500 and Preis&gt;=4000</object>

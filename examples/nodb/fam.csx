@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<conceptualSchema version="1.0" askDatabase="false">
+<conceptualSchema version="TJ0.4">
 	<context>
 		<object id="viola">Viola</object>
 		<object id="sarah">Sarah</object>

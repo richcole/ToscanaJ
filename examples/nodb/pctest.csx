@@ -28,7 +28,7 @@
         <xsl:param name="diagram">interne Laufwerksschächte</xsl:param>
         <xsl:param name="scale">4</xsl:param>
 -->
-<conceptualSchema version="1.0" askDatabase="false">
+<conceptualSchema version="TJ0.4">
 	<context>
 		<object id="1">Compaq Deskpro 66M</object>
 		<object id="2">IBM PS/2 Model 77 486DX2</object>

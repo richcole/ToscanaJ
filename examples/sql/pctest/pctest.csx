@@ -14,76 +14,76 @@ Check that the username and password at the beginning match your setup.
 If you want to use another DBMS, you have to change the driver and the url, too.
 Refer to the documentation of your DBMS which class and URL scheme to use.
 -->
-<conceptualSchema version="1.0" askDatabase="true">
+<conceptualSchema version="TJ0.4">
     <description>
         <externalHTML url="pctest.html"/>
     </description>
-	<database>
-		<url driver="com.mckoi.JDBCDriver" user="user" password="password">jdbc:mckoi://localhost/</url>
-		<table>PCTest</table>
-		<key>PCname</key>
-		<queries dropDefaults="false">
-            <!-- distinct queries are not supported by some database systems, e.g. McKoi -->
-			<list name="Cases" distinct="true">
-				<column>typeCase</column>
-			</list>
-			<list name="Name with type of case" head="Case: ">
-				<column name="Case" separator=" - PC: ">typeCase</column>
-				<column name="Name">PCname</column>
-			</list>
-			<aggregate name="Average Price">
-				<column format="$ 0.00">AVG(price)</column>
-			</aggregate>
-			<aggregate name="Min/Max Prices">
-				<column format="$0.00" separator=" - ">MIN(price)</column>
-				<column format="$0.00">MAX(price)</column>
-			</aggregate>
-		</queries>
-        <views>
-            <!-- a simple HTML summary, given as part of this file -->
-            <objectView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML View...">
-                <template>
-                    <html>
-                        <body>
-                            <h1><field content="PCname"/></h1>
-                            <table border="1" width="100%">
-                                <tr><th colspan="2">Features</th></tr>
-                                <tr><td>Type of case:</td><td><field content="typeCase"/></td></tr>
-                                <tr><td>Size of harddisk:</td><td><field content="harddisk"/></td></tr>
-                                <tr><td>Bus system:</td><td><field content="typeBus"/></td></tr>
-                                <tr><td>Software:</td><td><field content="software"/></td></tr>
-                            </table>
-                            <div align="right">
-                                <font size="+1"><b>Price: <field content="price"/></b></font>
-                            </div>
-                        </body>
-                    </html>
-                </template>
-            </objectView>
-            <!-- this one is demonstrating the usage of external files. And how to use color to your own disadvantage :-) -->
-            <objectView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML View (Color)...">
-                <template url="views/coloredSummary.html"/>
-            </objectView>
-            <!-- it does not have to be HTML... Loading plain text is not yet implemented. BTW: delimiters can have more than one char. -->
-            <objectView class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer" name="Short View...">
-                <parameter name="openDelimiter" value="$"/>
-                <parameter name="closeDelimiter" value="$"/>
-                <template>Name:  $PCName$
-Price: $price$</template>
-            </objectView>
-            <!-- this one is just showing syntax, it does not do anything useful -->
-            <objectView class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer" name="External View...">
-                <parameter name="openDelimiter" value="$$$"/>
-                <parameter name="closeDelimiter" value="%%%"/>
-                <parameter name="commandLine" value="echo $$$PCname%%%"/>
-            </objectView>
-            <!-- a report, syntax will change (the file will be included later), we still lack formatting of results... -->
-            <objectListView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseReportGenerator" name="HTML Report...">
-                <parameter name="template" value="/home/pbecker/temp/report.html"/>
-            </objectListView>
-        </views>
-	</database>
 	<context>
+        <databaseConnection>
+            <url driver="com.mckoi.JDBCDriver" user="user" password="password">jdbc:mckoi://localhost/</url>
+            <table>PCTest</table>
+            <key>PCname</key>
+            <queries dropDefaults="false">
+                <!-- distinct queries are not supported by some database systems, e.g. McKoi -->
+                <listQuery name="Cases" distinct="true">
+                    <column>typeCase</column>
+                </listQuery>
+                <listQuery name="Name with type of case" head="Case: ">
+                    <column name="Case" separator=" - PC: ">typeCase</column>
+                    <column name="Name">PCname</column>
+                </listQuery>
+                <aggregateQuery name="Average Price">
+                    <column format="$ 0.00">AVG(price)</column>
+                </aggregateQuery>
+                <aggregateQuery name="Min/Max Prices">
+                    <column format="$0.00" separator=" - ">MIN(price)</column>
+                    <column format="$0.00">MAX(price)</column>
+                </aggregateQuery>
+            </queries>
+            <views>
+                <!-- a simple HTML summary, given as part of this file -->
+                <objectView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML View...">
+                    <template>
+                        <html>
+                            <body>
+                                <h1><field content="PCname"/></h1>
+                                <table border="1" width="100%">
+                                    <tr><th colspan="2">Features</th></tr>
+                                    <tr><td>Type of case:</td><td><field content="typeCase"/></td></tr>
+                                    <tr><td>Size of harddisk:</td><td><field content="harddisk"/></td></tr>
+                                    <tr><td>Bus system:</td><td><field content="typeBus"/></td></tr>
+                                    <tr><td>Software:</td><td><field content="software"/></td></tr>
+                                </table>
+                                <div align="right">
+                                    <font size="+1"><b>Price: <field content="price"/></b></font>
+                                </div>
+                            </body>
+                        </html>
+                    </template>
+                </objectView>
+                <!-- this one is demonstrating the usage of external files. And how to use color to your own disadvantage :-) -->
+                <objectView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML View (Color)...">
+                    <template url="views/coloredSummary.html"/>
+                </objectView>
+                <!-- it does not have to be HTML... Loading plain text is not yet implemented. BTW: delimiters can have more than one char. -->
+                <objectView class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer" name="Short View...">
+                    <parameter name="openDelimiter" value="$"/>
+                    <parameter name="closeDelimiter" value="$"/>
+                    <template>Name:  $PCname$
+    Price: $price$</template>
+                </objectView>
+                <!-- this one is just showing syntax, it does not do anything useful -->
+                <objectView class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer" name="External View...">
+                    <parameter name="openDelimiter" value="$$$"/>
+                    <parameter name="closeDelimiter" value="%%%"/>
+                    <parameter name="commandLine" value="echo $$$PCname%%%"/>
+                </objectView>
+                <!-- a report, syntax will change (the file will be included later), we still lack formatting of results... -->
+                <objectListView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML Report...">
+                    <template url="/home/pbecker/temp/report.html"/>
+                </objectListView>
+            </views>
+        </databaseConnection>
 		<object id="1">price&gt;=5000</object>
 		<object id="2">price&lt;5000 and price&gt;=4500</object>
 		<object id="3">price&lt;4500 and price&gt;=4000</object>
