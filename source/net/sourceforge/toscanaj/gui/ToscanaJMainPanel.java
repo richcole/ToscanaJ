@@ -64,6 +64,7 @@ import java.util.ListIterator;
  */
 public class ToscanaJMainPanel extends JFrame implements ChangeObserver, ClipboardOwner {
 
+    private static final String CONFIGURATION_SECTION_NAME = "ToscanaJMainPanel";
     /**
      * The central event broker for the main panel
      */
@@ -195,7 +196,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         // we are the parent window for anything database viewers / report generators want to display
         DatabaseViewerManager.setParentComponent(this);
         // restore the old MRU list
-        mruList = ConfigurationManager.fetchStringList("ToscanaJMainPanel", "mruFiles", MaxMruFiles);
+        mruList = ConfigurationManager.fetchStringList(CONFIGURATION_SECTION_NAME, "mruFiles", MaxMruFiles);
         // set up the menu for the MRU files
         recreateMruMenu();
         // if we have at least one MRU file try to open it
@@ -231,7 +232,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     private void buildPanel() {
         diagramView = new DiagramView();
 		//set the minimum font size of the label into diagramView from the properties file
-		int minLabelFontSize = ConfigurationManager.fetchInt("ToscanaJMainPanel", "minLabelFontSize", (int)this.diagramView.getMinimumFontSize());
+		int minLabelFontSize = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "minLabelFontSize", 
+															 (int)this.diagramView.getMinimumFontSize());
 		diagramView.setMinimumFontSize(minLabelFontSize);
 
         createActions();
@@ -304,8 +306,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         contentPane.add(splitPane, BorderLayout.CENTER);
         setContentPane(contentPane);
         // restore old position
-        ConfigurationManager.restorePlacement("ToscanaJMainPanel", this, new Rectangle(10, 10, 600, 450));
-        int div = ConfigurationManager.fetchInt("ToscanaJMainPanel", "divider", 200);
+        ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, this, new Rectangle(10, 10, 600, 450));
+        int div = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "divider", 200);
         splitPane.setDividerLocation(div);
     }
 
@@ -513,7 +515,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         documentsDisplayGroup.add(this.showAllMenuItem);
         viewMenu.add(this.showAllMenuItem);
 
-        if (ConfigurationManager.fetchInt("ToscanaJMainPanel", "offerGradientOptions", 0) == 1) {
+        if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerGradientOptions", 0) == 1) {
             viewMenu.addSeparator();
             ButtonGroup colorGradientGroup = new ButtonGroup();
             JRadioButtonMenuItem showExactMenuItem = new JRadioButtonMenuItem("Use colors for exact matches");
@@ -542,7 +544,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             viewMenu.add(showAllMenuItem);
         }
 
-        if (ConfigurationManager.fetchInt("ToscanaJMainPanel", "offerNodeSizeScalingOptions", 0) == 1) {
+        if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerNodeSizeScalingOptions", 0) == 1) {
             viewMenu.addSeparator();
             ButtonGroup nodeSizeScalingGroup = new ButtonGroup();
             JRadioButtonMenuItem nodeSizeExactMenuItem = new JRadioButtonMenuItem("Change node sizes with number of exact matches");
@@ -828,12 +830,12 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
      */
     private void closeMainPanel() {
         // store current position
-        ConfigurationManager.storePlacement("ToscanaJMainPanel", this);
-        ConfigurationManager.storeInt("ToscanaJMainPanel", "divider", splitPane.getDividerLocation());
+        ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, this);
+        ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, "divider", splitPane.getDividerLocation());
         // save the MRU list
-        ConfigurationManager.storeStringList("ToscanaJMainPanel", "mruFiles", this.mruList);
+        ConfigurationManager.storeStringList(CONFIGURATION_SECTION_NAME, "mruFiles", this.mruList);
         // store the minimum label size
-		ConfigurationManager.storeInt("ToscanaJMainPanel", "minLabelFontSize", (int)this.diagramView.getMinimumFontSize());
+		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, "minLabelFontSize", (int)this.diagramView.getMinimumFontSize());
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
 
