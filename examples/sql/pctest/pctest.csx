@@ -28,15 +28,9 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
             <table>PCTest</table>
             <key>PCname</key>
             <queries dropDefaults="false">
-                <!-- distinct queries are not supported by some database systems, 
-                     e.g. the embedded HypersonicSQL or McKoi.
-                     You can add this code to query a list of all case types without
-                     duplicates if your database system supports the SQL keyword
-                     "DISTINCT".
                 <listQuery name="Cases" distinct="true">
                     <column>typeCase</column>
                 </listQuery>
-                -->
                 <listQuery name="Name with type of case" head="Case: ">
                     <column name="Case" separator=" - PC: ">typeCase</column>
                     <column name="Name">PCname</column>
