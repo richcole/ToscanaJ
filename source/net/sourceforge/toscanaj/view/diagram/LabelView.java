@@ -19,6 +19,7 @@ import org.tockit.events.EventBrokerListener;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
+import java.awt.font.TextLayout;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
@@ -35,6 +36,8 @@ import java.util.Vector;
  * display type (list vs. number).
  */
 abstract public class LabelView extends CanvasItem implements ChangeObserver, EventBrokerListener {
+    private float textmargin;
+
     /**
      * Used when the label should be drawn above the given point.
      *
@@ -263,24 +266,22 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         
         // draw the contents
  		for (int i = this.firstItem; i < this.firstItem + this.displayLines; i++) {
-			String cur = getEntryAt(i).toString();
+			TextLayout cur = getTextLayoutForEntry(i, graphics.getFontRenderContext());
             int curPos = i - this.firstItem;
-        	/// @todo check out getBounds() on TextLayout. JavaDoc of getStringBounds() seems to indicate
-        	/// we should use that instead.
-			LineMetrics lm = this.font.getLineMetrics(cur,graphics.getFontRenderContext());
-			double curWidth = this.font.getStringBounds(cur, graphics.getFontRenderContext()).getWidth();
-        	double textX;
-        	double textY = yPos + lm.getAscent() + lm.getLeading() + curPos * lm.getHeight();
+			double curWidth = cur.getBounds().getWidth() + 2 * this.textmargin;
+        	float textX;
+        	float textY = (float)yPos + cur.getAscent() + cur.getLeading() + curPos * (float)cur.getBounds().getHeight();
             if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT) {
-				textX = (float) xPos + lm.getLeading() + lm.getDescent();
+				textX = (float) xPos;
             } else if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER) {
-                textX = (float) (xPos + (lm.getLeading() / 2 + lm.getDescent() / 2 + (textWidth - curWidth) / 2));
+                textX = (float) (xPos + (textWidth - curWidth) / 2);
             } else if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT) {
-                textX = (float) (xPos + (-lm.getLeading() - lm.getDescent() + textWidth - curWidth));
+                textX = (float) (xPos + textWidth - curWidth);
             } else {
                 throw new RuntimeException("Unknown label alignment.");
             }
-            graphics.drawString(cur, (float)textX, (float)textY);
+            textX += this.textmargin;
+            cur.draw(graphics, textX, textY);
         }
 
         // draw the scroller elements when needed
@@ -436,8 +437,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 
         // find maximum width of string
         for (int i = 0; i < getNumberOfEntries(); i++) {
-            String cur = getEntryAt(i).toString();
-            double w = this.font.getStringBounds(cur,frc).getWidth();
+            TextLayout cur = getTextLayoutForEntry(i, frc);
+            double w = cur.getBounds().getWidth();
             if (w > result) {
                 result = w;
             }
@@ -446,9 +447,16 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         // add two leadings and two descents to have some spacing on the left
         // and right side
 		LineMetrics lineMetrics = this.font.getLineMetrics("M",frc);
-        result += 2 * lineMetrics.getLeading() + 2 * lineMetrics.getDescent();
+        this.textmargin = lineMetrics.getLeading() + lineMetrics.getDescent();
+        result += 2 * textmargin;
 
         return result;
+    }
+    
+    private TextLayout getTextLayoutForEntry(int position, FontRenderContext frc) {
+    	String content = getEntryAt(position).toString();
+    	TextLayout retVal = new TextLayout(content, this.font, frc);
+    	return retVal;
     }
 
     /**
