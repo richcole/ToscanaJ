@@ -107,7 +107,7 @@ public abstract class CanvasItem implements ChangeObservable {
      * will be called whenever a popup was requested on that item (e.g. by
      * clicking with the second mouse button on Windows).
      */
-    public void openPopupMenu(MouseEvent event, Point2D point) {
+    public void openPopupMenu(Point2D canvasPosition, Point2D screenPosition) {
     }
 
     /**

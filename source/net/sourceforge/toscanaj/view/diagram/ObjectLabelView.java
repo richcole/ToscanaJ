@@ -168,8 +168,8 @@ public class ObjectLabelView extends LabelView {
         return;
     }
 
-    public void openPopupMenu(MouseEvent event, Point2D pos) {
-        int itemHit = getItemAtPosition(pos);
+    public void openPopupMenu(Point2D canvasPosition, Point2D screenPosition) {
+        int itemHit = getItemAtPosition(canvasPosition);
         // find available queries
         List queries = Query.getQueries();
         // find available object views if list is displayed
@@ -235,6 +235,6 @@ public class ObjectLabelView extends LabelView {
             }
             popupMenu.add(objectListViewMenu);
         }
-        popupMenu.show(this.diagramView, event.getX(), event.getY());
+        popupMenu.show(this.diagramView, (int)screenPosition.getX(), (int)screenPosition.getY());
     }
 }
