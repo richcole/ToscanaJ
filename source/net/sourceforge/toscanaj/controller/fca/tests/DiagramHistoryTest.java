@@ -45,7 +45,12 @@ public class DiagramHistoryTest extends TestCase {
     public void testNextForActiveDiagramWithoutFutureDiagrams() {
         addDiagram();
         assertEquals(1, diagramHistory.getNumberOfCurrentDiagrams());
-        diagramHistory.next(null);
+        try {
+        	diagramHistory.next(null);
+        	fail();
+        } catch(RuntimeException e) {
+        	// this is what should happen
+        }
         assertEquals(1, diagramHistory.getNumberOfCurrentDiagrams());
     }
 
@@ -93,7 +98,12 @@ public class DiagramHistoryTest extends TestCase {
     public void testNextForEmptyDiagramHistory() {
         assertEquals(0, diagramHistory.getSize());
         assertEquals(0, diagramHistory.getNumberOfCurrentDiagrams());
-        diagramHistory.next(null);
+        try {
+            diagramHistory.next(null);
+            fail();
+        } catch(RuntimeException e) {
+            // this is what should happen
+        }
         assertEquals(0, diagramHistory.getNumberOfCurrentDiagrams());
     }
 
