@@ -210,8 +210,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 
         // remember some settings to restore them later
         Paint oldPaint = graphics.getPaint();
+        Font oldFont = graphics.getFont();
 
-        // get the font metrics
+		graphics.setFont(this.font);
         FontMetrics fm = graphics.getFontMetrics();
 
         // find the size and position
@@ -339,6 +340,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 
         // restore old settings
         graphics.setPaint(oldPaint);
+        graphics.setFont(oldFont);
     }
 
     public void updateBounds(Graphics2D graphics) {
