@@ -8,7 +8,6 @@
 package org.tockit.toscanaj.servlet;
 
 import net.sourceforge.toscanaj.parser.CSXParser;
-import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -24,7 +23,6 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.net.URL;
