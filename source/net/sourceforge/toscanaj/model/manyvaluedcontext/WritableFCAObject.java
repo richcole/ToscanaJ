@@ -4,16 +4,9 @@
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
- */
+ */	
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-import java.util.Collection;
-
-public interface ManyValuedContext {
-    void add(FCAObject object);
-    Collection getObjects();
-    void add(ManyValuedAttribute attribute);
-    Collection getAttributes();
-    Collection getTypes();
-    AttributeValue getRelationship(FCAObject object, ManyValuedAttribute attribute);
+public interface WritableFCAObject extends FCAObject {
+	void setName(String name);
 }

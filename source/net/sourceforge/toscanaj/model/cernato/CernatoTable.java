@@ -15,12 +15,13 @@ import java.util.List;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
 
-public class CernatoTable implements ManyValuedContext {
+public class CernatoTable implements WritableManyValuedContext {
     private List objects = new ArrayList();
     private List properties = new ArrayList();
     private Hashtable relation = new Hashtable();
+	private List types = new ArrayList();
 
     public CernatoTable() {
     }
@@ -40,6 +41,10 @@ public class CernatoTable implements ManyValuedContext {
 
     public Collection getAttributes() {
         return properties;
+    }
+    
+    public Collection getTypes(){
+    	return types;
     }
 
     public void setRelationship(FCAObject object, ManyValuedAttribute attribute, AttributeValue value) {

@@ -5,12 +5,12 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato.tests;
+package net.sourceforge.toscanaj.model.manyvaluedcontext.types.tests;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import net.sourceforge.toscanaj.model.cernato.*;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.*;
 
 public class ValueGroupTest extends TestCase {
     final static Class THIS = ValueGroupTest.class;

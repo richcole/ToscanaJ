@@ -15,6 +15,7 @@ import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.*;
 
 import java.io.PrintStream;
 import java.util.Collection;

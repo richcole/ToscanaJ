@@ -7,13 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-import java.util.Collection;
-
-public interface ManyValuedContext {
-    void add(FCAObject object);
-    Collection getObjects();
-    void add(ManyValuedAttribute attribute);
-    Collection getAttributes();
-    Collection getTypes();
-    AttributeValue getRelationship(FCAObject object, ManyValuedAttribute attribute);
+public interface WritableManyValuedAttribute extends ManyValuedAttribute {
+	void setName(String name);
+	void setType(AttributeType type);
 }

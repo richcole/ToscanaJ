@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.parser;
 import net.sourceforge.toscanaj.model.cernato.*;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.*;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -94,7 +95,7 @@ public class CernatoXMLParser {
             }
         }
         types.put(id, newType);
-        model.getTypes().add(newType);
+        model.getContext().getTypes().add(newType);
     }
 
     private static void parseNumericalType(Element element, CernatoModel model, Hashtable types) throws DataFormatException {
@@ -107,6 +108,33 @@ public class CernatoXMLParser {
             throw new DataFormatException("Type missing name");
         }
         NumericalType newType = new NumericalType(name);
+		String minValString = element.getChild("minval").getText();
+		if (minValString == null) {
+			throw new DataFormatException("Numerical type missing minimum value element <minval>");
+		}
+		try {
+			newType.setMinimumValue(Double.parseDouble(minValString));
+		} catch (NumberFormatException e) {
+			throw new DataFormatException("Minimum value for numerical type is not a number", e);
+		}
+		String maxValString = element.getChild("maxval").getText();
+		if (maxValString == null) {
+			throw new DataFormatException("Numerical type missing maximum value element <maxval>");
+		}
+		try {
+			newType.setMaximumValue(Double.parseDouble(maxValString));
+		} catch (NumberFormatException e) {
+			throw new DataFormatException("Maximum value for numerical type is not a number", e);
+		}
+		String numDecString = element.getChild("decimals").getText();
+		if (numDecString == null) {
+			throw new DataFormatException("Numerical type missing number of decimals information");
+		}
+		try {
+			newType.setNumberOfDecimals(Integer.parseInt(minValString));
+		} catch (NumberFormatException e) {
+			throw new DataFormatException("Number of decimals for numerical type is not an integer", e);
+		}
         List valueGroups = element.getChildren("num_value_group");
         for (Iterator iterator = valueGroups.iterator(); iterator.hasNext();) {
             Element valueGroupElement = (Element) iterator.next();
@@ -119,7 +147,7 @@ public class CernatoXMLParser {
             new NumericalValueGroup(newType, groupName, groupId, min, minIncluded, max, maxIncluded);
         }
         types.put(id, newType);
-        model.getTypes().add(newType);
+        model.getContext().getTypes().add(newType);
     }
 
     private static void parseProperties(Element root, CernatoModel model, Hashtable types, Hashtable properties)

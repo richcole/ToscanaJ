@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.model.cernato.tests;
 
 import net.sourceforge.toscanaj.model.cernato.*;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.*;
 
 import java.util.*;
 

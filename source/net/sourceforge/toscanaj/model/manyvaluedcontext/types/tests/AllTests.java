@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato.tests;
+package net.sourceforge.toscanaj.model.manyvaluedcontext.types.tests;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -18,8 +18,7 @@ public class AllTests extends TestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTest(ViewContextTest.suite());
+        suite.addTest(ValueGroupTest.suite());
         return suite;
     }
-
 }

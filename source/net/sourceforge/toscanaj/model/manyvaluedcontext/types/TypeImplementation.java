@@ -5,13 +5,14 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.model.manyvaluedcontext.types;
 
+import net.sourceforge.toscanaj.model.cernato.ScaleImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Scale;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableAttributeType;
 
-public abstract class TypeImplementation implements AttributeType {
+public abstract class TypeImplementation implements WritableAttributeType {
     protected String name;
     protected Scale scale;
 
@@ -30,5 +31,13 @@ public abstract class TypeImplementation implements AttributeType {
     
     public AttributeValue[] getValueRange() {
         return null;
+    }
+    
+    public String toString(){
+    	return getName();
+    }
+    
+    public void setName(String name){
+    	this.name = name;
     }
 }

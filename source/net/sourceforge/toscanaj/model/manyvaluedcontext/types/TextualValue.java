@@ -5,51 +5,44 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.model.manyvaluedcontext.types;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.order.Ordered;
 
-public class NumericalValue implements AttributeValue {
-    private double value;
+public class TextualValue implements AttributeValue {
+    private String value;
 
-    public NumericalValue(double value) {
+    public TextualValue(String value) {
         this.value = value;
     }
 
     public String getDisplayString() {
-        return String.valueOf(value);
-    }
-
-    public double getValue() {
         return value;
     }
-    
+
     public String toString() {
-    	return getDisplayString();
+        return getDisplayString();
     }
-    
+
     public boolean equals(Object other) {
         // copied from Double.equals()
-        return (other instanceof NumericalValue)
-               && (Double.doubleToLongBits(((NumericalValue)other).value) ==
-                  Double.doubleToLongBits(this.value));
+        return (other instanceof TextualValue)
+               && ((TextualValue)other).value.equals(this.value);
     }
-    
+
     public int hashCode() {
-    	// copied from Double.hashCode()
-        long bits = Double.doubleToLongBits(value);
-        return (int)(bits ^ (bits >>> 32));
+        return this.value.hashCode();
     }
-    
+
     public boolean isLesserThan(Ordered other) {
-    	if(!(other instanceof NumericalValue)) {
-    		return false;
-    	}
-    	NumericalValue otherNV = (NumericalValue) other;
-        return this.value < otherNV.value;
+        if(!(other instanceof TextualValue)) {
+            return false;
+        }
+        TextualValue otherTV = (TextualValue) other;
+        return this.value.compareTo(otherTV.value) < 0;
     }
-    
+
     public boolean isEqual(Ordered other) {
         return this.equals(other);
     }

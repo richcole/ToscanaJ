@@ -8,9 +8,9 @@
 package net.sourceforge.toscanaj.model.cernato;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
 
-public class Property implements ManyValuedAttribute {
+public class Property implements WritableManyValuedAttribute {
     private AttributeType type;
     private String name;
 
@@ -22,6 +22,10 @@ public class Property implements ManyValuedAttribute {
     public AttributeType getType() {
         return type;
     }
+    
+    public void setType(AttributeType type){
+    	this.type = type;
+    }
 
     public String getName() {
         return name;
@@ -30,4 +34,8 @@ public class Property implements ManyValuedAttribute {
     public String toString() {
     	return getName();
     }
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }
