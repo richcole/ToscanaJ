@@ -42,14 +42,15 @@ public class ObjectLabelView extends LabelView {
      */
     private Query query = null;
 
-    private List contents = null;
+	// do not initialize this with null -- it happens after the superconstructor call which initializes
+	// it by calling back through updateEntries(), which causes double queries
+    private List contents;
 
     /**
      * Creates a view for the given label information.
      */
     public ObjectLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
         super(diagramView, nodeView, label);
-        setQuery(defaultQuery);
     }
 
     /**
@@ -92,14 +93,7 @@ public class ObjectLabelView extends LabelView {
      */
     public void setQuery(Query query) {
         this.query = query;
-        doQuery();
-        if (this.getNumberOfEntries() > DEFAULT_DISPLAY_LINES) {
-            this.displayLines = DEFAULT_DISPLAY_LINES;
-        } else {
-            this.displayLines = this.getNumberOfEntries();
-        }
-        this.firstItem = 0;
-        update(this);
+        updateEntries();
     }
 
     protected int getNumberOfEntries() {
@@ -110,6 +104,9 @@ public class ObjectLabelView extends LabelView {
     }
 
     protected Iterator getEntryIterator() {
+        if(this.contents == null) {
+            updateEntries();
+        }
         return this.contents.iterator();
     }
 
@@ -119,9 +116,12 @@ public class ObjectLabelView extends LabelView {
         Concept concept = node.getConcept();
         ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
         ConceptInterpreter conceptInterpreter = this.diagramView.getConceptInterpreter();
+        if(this.query == null) {
+        	this.query = defaultQuery;
+        }
         if(!conceptInterpreter.isRealized(concept, context)) {
         	this.contents = null;
-        } else if ((query == null) || (query == ListQuery.KeyListQuery)) {
+        } else if (query == ListQuery.KeyListQuery) {
             int objectCount = conceptInterpreter.getObjectCount(concept, context);
             if( objectCount != 0) {
 	            contents = new ArrayList();
