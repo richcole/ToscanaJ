@@ -11,7 +11,6 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.database.Column;
-import org.apache.batik.ext.swing.GridBagConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,8 +57,8 @@ public class NominalScaleEditorDialog extends JDialog {
                 titlePane,
                 new GridBagConstraints(
                         0, 0, 1, 1, 1, 0,
-                        GridBagConstants.CENTER,
-                        GridBagConstants.HORIZONTAL,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL,
                         new Insets(5, 5, 5, 5),
                         0, 0
                 )
@@ -104,8 +103,8 @@ public class NominalScaleEditorDialog extends JDialog {
         tablePane.add(new LabeledScrollPaneView("Available Values", this.columnValuesListView),
             new GridBagConstraints(
                     0, 0, 1, 1, 1, 1,
-                    GridBagConstants.CENTER,
-                    GridBagConstants.BOTH,
+                    GridBagConstraints.CENTER,
+                    GridBagConstraints.BOTH,
                     new Insets(5, 5, 5, 5),
                     0, 0
             )
@@ -113,8 +112,8 @@ public class NominalScaleEditorDialog extends JDialog {
         tablePane.add(moveButtonPane,
                 new GridBagConstraints(
                         1, 0, 1, 1, 0, 0,
-                        GridBagConstants.CENTER,
-                        GridBagConstants.NONE,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.NONE,
                         new Insets(5, 5, 5, 5),
                         0, 0
                 )
@@ -122,8 +121,8 @@ public class NominalScaleEditorDialog extends JDialog {
         tablePane.add(new LabeledScrollPaneView("Selected Attributes", this.attributeListView),
                 new GridBagConstraints(
                         2, 0, 1, 1, 1, 1,
-                        GridBagConstants.CENTER,
-                        GridBagConstants.BOTH,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.BOTH,
                         new Insets(5, 5, 5, 5),
                         0, 0
                 )
@@ -133,8 +132,8 @@ public class NominalScaleEditorDialog extends JDialog {
                 tablePane,
                 new GridBagConstraints(
                         0, 1, 1, 1, 1, 1,
-                        GridBagConstants.CENTER,
-                        GridBagConstants.BOTH,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.BOTH,
                         new Insets(5, 5, 5, 5),
                         0, 0
                 )
@@ -161,8 +160,8 @@ public class NominalScaleEditorDialog extends JDialog {
                 buttonPane,
                 new GridBagConstraints(
                         0, 2, 1, 1, 1, 0,
-                        GridBagConstants.CENTER,
-                        GridBagConstants.HORIZONTAL,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.HORIZONTAL,
                         new Insets(5, 5, 5, 5),
                         0, 0
                 )

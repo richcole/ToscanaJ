@@ -43,11 +43,6 @@ public class DiagramSchema {
     public static int GRADIENT_REFERENCE_SCHEMA = 2;
 
     /**
-     * Create and store DiagramSchema.
-     */
-    private static DiagramSchema diagramSchema = new DiagramSchema();
-
-    /**
      * The amount of fade out for unselected nodes.
      */
     private float fadeOut = 0.7F;
@@ -124,10 +119,14 @@ public class DiagramSchema {
 
     private int labelFontSize = 10;
 
+    private int margin = 20;
+
+    private float notRealizedNodeSizeReductionFactor = 3;
+
     /**
      * Default constructor.
      */
-    private DiagramSchema() {
+    public DiagramSchema() {
         background = ConfigurationManager.fetchColor("diagramSchema", "backgroundColor", background);
         topColor = ConfigurationManager.fetchColor("diagramSchema", "topColor", topColor);
         bottomColor = ConfigurationManager.fetchColor("diagramSchema", "bottomColor", bottomColor);
@@ -139,6 +138,8 @@ public class DiagramSchema {
         circleIdealColor = ConfigurationManager.fetchColor("diagramSchema", "circleIdealColor", circleIdealColor);
         circleFilterColor = ConfigurationManager.fetchColor("diagramSchema", "circleFilterColor", circleFilterColor);
         fadeOut = ConfigurationManager.fetchFloat("diagramSchema", "fadeOutValue", fadeOut);
+        margin = ConfigurationManager.fetchInt("diagramSchema", "margin", margin);
+        notRealizedNodeSizeReductionFactor = ConfigurationManager.fetchFloat("diagramSchema","notRealizedNodeSizeReductionFactor",notRealizedNodeSizeReductionFactor);
         String propVal = ConfigurationManager.fetchString("diagramSchema", "gradientType", "extent");
         propVal = propVal.toLowerCase();
         if (propVal.equals("extent")) {
@@ -163,13 +164,6 @@ public class DiagramSchema {
                 selectionLineWidth);
         labelFontName = ConfigurationManager.fetchString("diagramSchema", "labelFontName", labelFontName);
         labelFontSize = ConfigurationManager.fetchInt("diagramSchema", "labelFontSize", labelFontSize);
-    }
-
-    /**
-     * Get the only DiagramSchema instance.
-     */
-    public static DiagramSchema getDiagramSchema() {
-        return diagramSchema;
     }
 
     /**
@@ -365,5 +359,13 @@ public class DiagramSchema {
                 (int) (original.getGreen() * (1 - fadeOut) + 255 * fadeOut),
                 (int) (original.getBlue() * (1 - fadeOut) + 255 * fadeOut),
                 (int) (original.getAlpha() * (1 - fadeOut) + 255 * fadeOut));
+    }
+
+    public int getMargin() {
+        return margin;
+    }
+
+    public double getNotRealizedNodeSizeReductionFactor() {
+        return notRealizedNodeSizeReductionFactor;
     }
 }

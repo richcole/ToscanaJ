@@ -42,11 +42,8 @@ public class NodeView extends CanvasItem {
     private int selectionState = DiagramView.NO_SELECTION;
 
     private ConceptInterpretationContext conceptInterpretationContext;
-
     private boolean isRealized;
-
-    /// @todo move into DiagramSchema
-    private static final int NOT_REALIZED_REDUCTION_FACTOR = 3;
+    private boolean isRealizedCalculated = false;
 
     /**
      * Construct a nodeView for a Node.
@@ -57,9 +54,6 @@ public class NodeView extends CanvasItem {
         this.diagramNode = diagramNode;
         this.diagramView = diagramView;
         this.conceptInterpretationContext = context;
-        ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
-        Concept concept = this.diagramNode.getConcept();
-        this.isRealized = interpreter.isRealized(concept, conceptInterpretationContext);
     }
 
     public DiagramNode getDiagramNode() {
@@ -77,7 +71,7 @@ public class NodeView extends CanvasItem {
         if (diagramNode == null) {
             return;
         }
-        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
+        DiagramSchema diagramSchema = diagramView.getDiagramSchema();
         Paint oldPaint = graphics.getPaint();
         Color nodeColor;
         Color circleColor = diagramSchema.getCircleColor();
@@ -118,19 +112,31 @@ public class NodeView extends CanvasItem {
     }
 
     public double getRadiusY() {
-        if (this.isRealized) {
+        if (this.isRealized()) {
             return diagramNode.getRadiusY();
         } else {
-            return diagramNode.getRadiusY() / NOT_REALIZED_REDUCTION_FACTOR;
+            double reductionFactor = this.diagramView.getDiagramSchema().getNotRealizedNodeSizeReductionFactor();
+            return diagramNode.getRadiusY() / reductionFactor;
         }
     }
 
     public double getRadiusX() {
-        if (this.isRealized) {
+        if (this.isRealized()) {
             return diagramNode.getRadiusX();
         } else {
-            return diagramNode.getRadiusX() / NOT_REALIZED_REDUCTION_FACTOR;
+            double reductionFactor = this.diagramView.getDiagramSchema().getNotRealizedNodeSizeReductionFactor();
+            return diagramNode.getRadiusX() / reductionFactor;
         }
+    }
+
+    private boolean isRealized() {
+        if(!isRealizedCalculated) {
+            ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
+            Concept concept = this.diagramNode.getConcept();
+            isRealized = interpreter.isRealized(concept, conceptInterpretationContext);
+            isRealizedCalculated = true;
+        }
+        return isRealized;
     }
 
     /**

@@ -30,13 +30,6 @@ import java.util.List;
  */
 public class DiagramView extends Canvas implements ChangeObserver {
     /**
-     * This is a generic margin used for all four edges.
-     *
-     * @todo move into DiagramSchema
-     */
-    private final int MARGIN = 20;
-
-    /**
      * The diagram to display.
      */
     private Diagram2D diagram = null;
@@ -65,6 +58,8 @@ public class DiagramView extends Canvas implements ChangeObserver {
      */
     static final public int SELECTED_IDEAL = 4;
 
+    private DiagramSchema diagramSchema;
+
     private class ResizeListener extends ComponentAdapter {
         public void componentResized(ComponentEvent e) {
             requestScreenTransformUpdate();
@@ -79,8 +74,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
         super();
         this.conceptInterpreter = null;
         this.conceptInterpretationContext = null;
+        this.diagramSchema = new DiagramSchema();
         addComponentListener(new ResizeListener());
-        getBackgroundItem().setPaint(DiagramSchema.getDiagramSchema().getBackgroundColor());
+        getBackgroundItem().setPaint(diagramSchema.getBackgroundColor());
     }
 
     public ConceptInterpreter getConceptInterpreter() {
@@ -144,17 +140,18 @@ public class DiagramView extends Canvas implements ChangeObserver {
         AffineTransform oldTransform = g2d.getTransform();
 
         // fill the background (without transform)
-        g2d.setPaint(DiagramSchema.getDiagramSchema().getBackgroundColor());
+        g2d.setPaint(diagramSchema.getBackgroundColor());
         g2d.fill(new Rectangle2D.Double(0, 0, getWidth(), getHeight()));
 
         if (diagram == null) {
             return;
         }
 
+        int margin = diagramSchema.getMargin();
         if (screenTransformDirty) {
             // find current bounds
-            Rectangle2D bounds = new Rectangle2D.Double(MARGIN, MARGIN,
-                    getWidth() - 2 * MARGIN, getHeight() - 2 * MARGIN);
+            Rectangle2D bounds = new Rectangle2D.Double(margin, margin,
+                    getWidth() - 2 * margin, getHeight() - 2 * margin);
             this.setScreenTransform(this.scaleToFit(g2d, bounds));
             makeScreenTransformClear();
         }
@@ -163,9 +160,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
         // paint all items on canvas
         paintCanvas(g2d);
         // draw diagram title in the top left corner
-        g2d.setPaint(DiagramSchema.getDiagramSchema().getForegroundColor());
+        g2d.setPaint(diagramSchema.getForegroundColor());
         g2d.setTransform(oldTransform);
-        g2d.drawString(diagram.getTitle(), MARGIN, MARGIN);
+        g2d.drawString(diagram.getTitle(), margin, margin);
     }
 
     protected void makeScreenTransformClear() {
@@ -245,15 +242,17 @@ public class DiagramView extends Canvas implements ChangeObserver {
                 Concept concept = node.getConcept();
                 if (conceptInterpreter.isRealized(concept, context)) {
                     NestedDiagramNode ndNode = (NestedDiagramNode) node;
-                    addDiagram(ndNode.getInnerDiagram(), context.getNestedContext(concept));
+                    addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept));
                 }
             }
-            /**
-             * Inititalize the contingent sizes to allow contingent gradients to work properly on first draw.
-             *
-             * @todo this is not a nice place to do this, find something better
-             */
-            conceptInterpreter.getObjectCount(node.getConcept(), context);
+            else {
+                /**
+                 * Inititalize the contingent sizes to allow contingent gradients to work properly on first draw.
+                 *
+                 * @todo this is not a nice place to do this, find something better
+                 */
+                conceptInterpreter.getObjectCount(node.getConcept(), context);
+            }
         }
     }
 
@@ -330,5 +329,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
         repaint();
         // set the value for new ones
         ObjectLabelView.setDefaultQuery(query);
+    }
+
+    public DiagramSchema getDiagramSchema() {
+        return diagramSchema;
     }
 }

@@ -118,7 +118,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         this.nodeView = nodeView;
         this.labelInfo = label;
         this.labelInfo.addObserver(this);
-        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
+        DiagramSchema diagramSchema = diagramView.getDiagramSchema();
         String fontName = diagramSchema.getLabelFontName();
         int fontSize = diagramSchema.getLabelFontSize();
         this.font = new Font(fontName, Font.PLAIN, fontSize);
@@ -227,7 +227,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         }
 
         // find colors to use
-        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
+        DiagramSchema diagramSchema = diagramView.getDiagramSchema();
         Color lineColor = diagramSchema.getLineColor();
         Color backgroundColor = this.labelInfo.getBackgroundColor();
         Color textColor = this.labelInfo.getTextColor();

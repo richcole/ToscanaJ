@@ -68,6 +68,7 @@ public class ScaleGeneratorPanel extends JPanel implements EventListener {
     private void fillScalesGenerators() {
         scaleGenerators.add(new OrdinalScaleGenerator(getParentFrame()));
         scaleGenerators.add(new NominalScaleGenerator(getParentFrame()));
+        scaleGenerators.add(new ContextTableScaleGenerator(getParentFrame()));
     }
 
     public void processEvent(Event e) {

@@ -41,7 +41,7 @@ public class ConceptInterpretationContext implements ChangeObserver {
         diagramHistory.addObserver(this);
     }
 
-    public ConceptInterpretationContext getNestedContext(Concept nestingConcept) {
+    public ConceptInterpretationContext createNestedContext(Concept nestingConcept) {
         ConceptInterpretationContext retVal = new ConceptInterpretationContext(this.diagramHistory, this.eventBroker);
         retVal.objectDisplayMode = this.objectDisplayMode;
         retVal.filterMode = this.filterMode;

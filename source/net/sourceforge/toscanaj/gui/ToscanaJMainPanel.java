@@ -457,7 +457,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK));
             showAllMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    DiagramSchema.getDiagramSchema().setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT );
+                    diagramView.getDiagramSchema().setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT );
                     diagramView.update(this);
                 }
             });
@@ -471,7 +471,7 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
             showExactMenuItem.setSelected(true);
             showExactMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    DiagramSchema.getDiagramSchema().setGradientType(DiagramSchema.GRADIENT_TYPE_EXTENT);
+                    diagramView.getDiagramSchema().setGradientType(DiagramSchema.GRADIENT_TYPE_EXTENT);
                     diagramView.update(this);
                 }
             });

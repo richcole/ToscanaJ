@@ -38,7 +38,7 @@ public class LineView extends CanvasItem {
      * Draws the line.
      */
     public void draw(Graphics2D graphics) {
-        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
+        DiagramSchema diagramSchema = fromView.getDiagramView().getDiagramSchema();
         Point2D from = diagramLine.getFromPosition();
         Point2D to = diagramLine.getToPosition();
         Paint oldPaint = graphics.getPaint();

@@ -12,9 +12,12 @@ import org.jdom.Element;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 
 /**
  * Interface for getting diagram related information.
+ *
+ * @todo remove index based access, even though this means giving write access in some way
  */
 
 public interface Diagram2D extends XMLizable {
@@ -50,6 +53,11 @@ public interface Diagram2D extends XMLizable {
     DiagramNode getNode(int nodeNumber);
 
     DiagramNode getNode(String identifier);
+
+    /**
+     * Returns the list of all nodes in the diagram.
+     */
+    Iterator getNodes();
 
     /**
      * Returns the coordinates of a starting point of a line.

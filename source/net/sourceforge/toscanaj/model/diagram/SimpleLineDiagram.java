@@ -50,7 +50,6 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     private boolean coordinateSystemChecked = false;
 
     private Element description = null;
-    private static final String DESCRIPTION = "Description";
 
     /**
      * The default constructor creates a diagram with just nothing in it at all.
@@ -131,6 +130,10 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      */
     public int getNumberOfNodes() {
         return this.nodes.size();
+    }
+
+    public Iterator getNodes() {
+        return this.nodes.iterator();
     }
 
     /**
