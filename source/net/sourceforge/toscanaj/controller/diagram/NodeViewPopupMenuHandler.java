@@ -72,42 +72,69 @@ public class NodeViewPopupMenuHandler implements EventBrokerListener, ClipboardO
 		Concept concept = nodeView.getDiagramNode().getConcept();
 		ConceptInterpreter interpreter = this.diagramView.getConceptInterpreter();
 		ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
-		String description = "Intent (" + concept.getIntentSize() + 
-                             " attributes):" + lineSeparator; 
-		Iterator attrContIt = concept.getAttributeContingentIterator();
-		Set attributeContingent = new HashSet();
-		while (attrContIt.hasNext()) {
-			Object attrib = attrContIt.next();
-			description += "+ " + attrib.toString() + lineSeparator;
-			attributeContingent.add(attrib);
-		}
-		Iterator intentIt = concept.getIntentIterator();
-		while (intentIt.hasNext()) {
-			Object attrib = intentIt.next();
-			if(! attributeContingent.contains(attrib)) {
-				description += "- " + attrib.toString() + lineSeparator;
+	    String description = "";
+		int intentSize = concept.getIntentSize();
+		if(intentSize > 0) {
+			if(intentSize == 1) {
+			    description = "Intent (1 attribute):" + lineSeparator;
+			} else {
+			    description = "Intent (" + intentSize + 
+			                         " attributes):" + lineSeparator;
+			} 
+			Iterator attrContIt = concept.getAttributeContingentIterator();
+			Set attributeContingent = new HashSet();
+			while (attrContIt.hasNext()) {
+				Object attrib = attrContIt.next();
+				description += "+ " + attrib.toString() + lineSeparator;
+				attributeContingent.add(attrib);
 			}
+			Iterator intentIt = concept.getIntentIterator();
+			while (intentIt.hasNext()) {
+				Object attrib = intentIt.next();
+				if(! attributeContingent.contains(attrib)) {
+					description += "- " + attrib.toString() + lineSeparator;
+				}
+			}
+	    } else {
+		        description += "Empty intent" + lineSeparator;
 		}
+
+	    description += lineSeparator;
+
 		boolean oldDisplayMode = context.getObjectDisplayMode();
-		description += "Extent (" + concept.getExtentSize() + 
-					   " objects):" + lineSeparator; 
-		context.setObjectDisplayMode(ConceptInterpretationContext.CONTINGENT);
-		Iterator objContIt = interpreter.getObjectSetIterator(concept, context);
-		Set objectContingent = new HashSet();
-		while (objContIt.hasNext()) {
-			Object object = objContIt.next();
-			description += "+ " + object.toString() + lineSeparator;
-			objectContingent.add(object);
-		}
-		context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
-		Iterator extentIt = interpreter.getObjectSetIterator(concept, context);
-		while (extentIt.hasNext()) {
-			Object object = extentIt.next();
-			if(! objectContingent.contains(object)) {
-				description += "- " + object.toString() + lineSeparator;
+	    context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
+		int extentSize = interpreter.getObjectCount(concept, context);
+	    if(extentSize > 0) {
+	        if(extentSize == 1) {
+	            description += "Extent (1 object):" + lineSeparator;
+	        } else {
+	            description += "Extent (" + extentSize +
+	                           " objects):" + lineSeparator;
+	        }
+		    context.setObjectDisplayMode(ConceptInterpretationContext.CONTINGENT);
+			Iterator objContIt = interpreter.getObjectSetIterator(concept, context);
+			Set objectContingent = new HashSet();
+			while (objContIt.hasNext()) {
+				Object object = objContIt.next();
+				String objectName = object.toString();
+                description += "+ " + objectName + lineSeparator;
+			    // we have to use the name here since the objects are created everytime anew
+				objectContingent.add(objectName); 
 			}
-		}
+			context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
+			Iterator extentIt = interpreter.getObjectSetIterator(concept, context);
+			while (extentIt.hasNext()) {
+				Object object = extentIt.next();
+			    String objectName = object.toString();
+				if(! objectContingent.contains(objectName)) {
+                    description += "- " + objectName + lineSeparator;
+				}
+			}
+	    } else {
+	    	description += "Empty extent" + lineSeparator;
+	    }
 		context.setObjectDisplayMode(oldDisplayMode);
+		
 		//export to clipboard
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(
 					new StringSelection(description),this);

@@ -278,7 +278,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                     filterMode);
             return execute(query, whereClause);
         } else {
-            return null;
+            return new ArrayList();
         }
     }
 
