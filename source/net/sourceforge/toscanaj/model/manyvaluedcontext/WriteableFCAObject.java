@@ -7,6 +7,6 @@
  */	
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-public interface WritableFCAObject extends FCAObject {
+public interface WriteableFCAObject extends FCAObject {
 	void setName(String name);
 }

@@ -62,6 +62,7 @@ public class TextualTypeDialog extends JDialog implements DragGestureListener ,
 	private TextualType textualType;
 	private DropTarget dropTarget;
 	private DragSource dragSource;
+	private JButton applyButton;
 	
 	public TextualTypeDialog(PropertiesDialog dialog,AttributeType type){
 		super(dialog, "Many Valued-context:Type",true);
@@ -105,8 +106,8 @@ public class TextualTypeDialog extends JDialog implements DragGestureListener ,
 	
 	protected JPanel createButtonPane() {
 		JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.CENTER));
-		JButton applyButton = new JButton("Apply");
-		JButton undoButton = new JButton("Close");
+		applyButton = new JButton("Apply");
+		JButton closeButton = new JButton("Close");
 		
 		applyButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
@@ -117,14 +118,14 @@ public class TextualTypeDialog extends JDialog implements DragGestureListener ,
 			}
 		});
 		
-		undoButton.addActionListener(new ActionListener(){
+		closeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				dispose();
 			}
 		});
 		
 		buttonPane.add(applyButton);
-		buttonPane.add(undoButton);
+		buttonPane.add(closeButton);
 		
 		return buttonPane;
 	}
@@ -200,7 +201,7 @@ public class TextualTypeDialog extends JDialog implements DragGestureListener ,
 								));
 		
 		
-		valuesList = new JList(textualType.getTextualValue().toArray());
+		valuesList = new JList(textualType.getValueRange());
 		JScrollPane scrollPane = new JScrollPane(valuesList);
 		valuesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		valuesList.addListSelectionListener(new ListSelectionListener(){
@@ -231,10 +232,10 @@ public class TextualTypeDialog extends JDialog implements DragGestureListener ,
 		ActionListener actionListener = new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				if(!valueNameField.getText().equals("")){
-					TextualValue textualValue = new TextualValue(valueNameField.getText());
+					TextualValue textualValue = new TextualValue(valueNameField.getText().trim());
 					textualType.addValue(textualValue);
 					valueNameField.setText("");
-					valuesList.setListData(textualType.getTextualValue().toArray());
+					valuesList.setListData(textualType.getValueRange());
 				}
 			}
 		};
@@ -245,11 +246,11 @@ public class TextualTypeDialog extends JDialog implements DragGestureListener ,
 			ActionListener actionListener = new ActionListener(){
 				public void actionPerformed(ActionEvent e){
 					if(!valueNameField.getText().equals("")){
-						TextualValue textualValue = new TextualValue(valueNameField.getText());
+						TextualValue textualValue = new TextualValue(valueNameField.getText().trim());
 						int selectedIndex = valuesList.getSelectedIndex();
 						textualType.replaceValue(textualValue,selectedIndex);
 						valueNameField.setText("");
-						valuesList.setListData(textualType.getTextualValue().toArray());
+						valuesList.setListData(textualType.getValueRange());
 					}
 				}
 			};
@@ -263,7 +264,7 @@ public class TextualTypeDialog extends JDialog implements DragGestureListener ,
 				textualType.removeValue(selectedIndex);
 				removeButton.setEnabled(false);
 				valueNameField.setText("");
-				valuesList.setListData(textualType.getTextualValue().toArray());
+				valuesList.setListData(textualType.getValueRange());
 			}
 		};
 		
@@ -281,36 +282,51 @@ public class TextualTypeDialog extends JDialog implements DragGestureListener ,
 			public void keyReleased(KeyEvent e) {
 				keyListenerConditions();
 			}
+			protected void keyListenerConditions(){
+				if((valueNameField.getText().trim()).equals("")){
+					addButton.setEnabled(false);
+					replaceButton.setEnabled(false);
+				}
+
+				else if(textualType.isDuplicatedValue(new 
+									TextualValue(valueNameField.getText().trim()))){
+					addButton.setEnabled(false);
+					replaceButton.setEnabled(false);
+				}
+
+				else if(valuesList.getSelectedIndex()!= -1 && 
+							!valueNameField.getText().equals
+									(valuesList.getSelectedValue().toString())){
+					addButton.setEnabled(true);
+					replaceButton.setEnabled(true);
+				}
+				else if(!valueNameField.getText().equals("")){
+					addButton.setEnabled(true);
+				}
+			}
 		};
 		return keyListener;
 	}
 	
-	protected void keyListenerConditions(){
-		if(valueNameField.getText().equals("")){
-			addButton.setEnabled(false);
-			replaceButton.setEnabled(false);
-		}
-
-		else if(textualType.isDuplicatedValue(new 
-							TextualValue(valueNameField.getText().trim()))){
-			addButton.setEnabled(false);
-			replaceButton.setEnabled(false);
-		}
-
-		else if(valuesList.getSelectedIndex()!= -1 && 
-					!valueNameField.getText().equals
-							(valuesList.getSelectedValue().toString())){
-			addButton.setEnabled(true);
-			replaceButton.setEnabled(true);
-		}
-		else if(!valueNameField.getText().equals("")){
-			addButton.setEnabled(true);
-		}
-	}
 	protected JPanel createTypeNamePane() {
 		JPanel typeNamePane = new JPanel(new GridBagLayout());
 		JLabel typeNameLabel = new JLabel("Name of Type: ");
 		typeNameField = new JTextField(textualType.getName());
+		typeNameField.addKeyListener(new KeyListener(){
+			public void keyTyped(KeyEvent e) {
+				if((typeNameField.getText().trim()).equals(""))
+					applyButton.setEnabled(false);
+			}
+			public void keyPressed(KeyEvent e) {
+				if((typeNameField.getText().trim()).equals(""))
+					applyButton.setEnabled(false);
+			}
+			public void keyReleased(KeyEvent e) {
+				if((typeNameField.getText().trim()).equals(""))
+					applyButton.setEnabled(false);
+			}
+			
+		});
 		
 		typeNamePane.add(typeNameLabel, new GridBagConstraints(
 								0,0,1,1,1,1,
@@ -333,91 +349,90 @@ public class TextualTypeDialog extends JDialog implements DragGestureListener ,
 	/**
 	* a drag gesture has been initiated
 	*/
-   public void dragGestureRecognized(DragGestureEvent event){
-		int itemDragged = valuesList.locationToIndex(event.getDragOrigin());
+    public void dragGestureRecognized(DragGestureEvent event){
+    	int itemDragged = valuesList.locationToIndex(event.getDragOrigin());
 		StringSelection transferable = new StringSelection((new Integer(itemDragged)).toString());
 		event.startDrag(null, transferable, this);
-   	
-   }
+    }
 	
-   public void dragEnter(DropTargetDragEvent event) {
-   }
+    public void dragEnter(DropTargetDragEvent event) {
+    }
 	
    /**
 	* is invoked when a drag operation is going on
 	*
 	*/
-   public void dragOver(DropTargetDragEvent event) {
-   }
+    public void dragOver(DropTargetDragEvent event) {
+    }
 
 
-   public void dropActionChanged(DropTargetDragEvent event) {
-   }
+    public void dropActionChanged(DropTargetDragEvent event) {
+    }
 
    /**
 	* is invoked when you are exit the DropSite without dropping
 	*
 	*/
-   public void dragExit(DropTargetEvent event) {
-   }
+    public void dragExit(DropTargetEvent event) {
+    }
 	
    /**
 	* a drop has occurred
 	*
 	*/
-   public void drop(DropTargetDropEvent event) {
-	try {	
-		Transferable transferable = event.getTransferable();
-		if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-			String s = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-			int startIndex = Integer.parseInt(s);
-			int endIndex = this.valuesList.locationToIndex(event.getLocation());	
-			textualType.move(startIndex, endIndex);
-			valuesList.setListData(textualType.getTextualValue().toArray());				
-			event.getDropTargetContext().dropComplete(true);
-		} else {
-			event.rejectDrop();
-		}
-	} catch (IOException exception) {
-		exception.printStackTrace();
-		event.rejectDrop();
-	} catch (UnsupportedFlavorException ufException) {
-		ufException.printStackTrace();
-		event.rejectDrop();
-	}
-   }
+    public void drop(DropTargetDropEvent event) {
+    	try {	
+    		Transferable transferable = event.getTransferable();
+			if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+				String s = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+				int startIndex = Integer.parseInt(s);
+				int endIndex = this.valuesList.locationToIndex(event.getLocation());	
+				textualType.move(startIndex, endIndex);
+				valuesList.setListData(textualType.getValueRange());				
+				event.getDropTargetContext().dropComplete(true);
+				} else {
+					event.rejectDrop();
+					}
+			} catch (IOException exception) {
+				exception.printStackTrace();
+				event.rejectDrop();
+			} catch (UnsupportedFlavorException ufException) {
+				ufException.printStackTrace();
+				event.rejectDrop();
+			}
+    }
 
    /**
 	* this message goes to DragSourceListener, informing it that the dragging
 	* has entered the DropSite
 	*/
-   public void dragEnter(DragSourceDragEvent event) {
-   }
+    public void dragEnter(DragSourceDragEvent event) {
+    }
 
    /**
 	* this message goes to DragSourceListener, informing it that the dragging is currently
 	* ocurring over the DropSite
 	*/
-   public void dragOver(DragSourceDragEvent event) {
-   }
+    public void dragOver(DragSourceDragEvent event) {
+    }
 
    /**
 	* is invoked if the use modifies the current drop gesture
 	*/
-   public void dropActionChanged(DragSourceDragEvent event) {
-   }
+    public void dropActionChanged(DragSourceDragEvent event) {
+    }
 
    /**
 	* this message goes to DragSourceListener, informing it that the dragging
 	* has exited the DropSite
    */
-   public void dragExit(DragSourceEvent event) {
-   }
+    public void dragExit(DragSourceEvent event) {
+    }
 	
    /**
 	* this message goes to DragSourceListener, informing it that the dragging
 	* has ended
 	*/
-   public void dragDropEnd(DragSourceDropEvent event) {
-   }
-}
+    public void dragDropEnd(DragSourceDropEvent event) {
+    }
+ }

@@ -7,12 +7,11 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext.types;
 
-import net.sourceforge.toscanaj.model.cernato.ScaleImplementation;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Scale;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableAttributeType;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleImplementation;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableAttributeType;
 
-public abstract class TypeImplementation implements WritableAttributeType {
+public abstract class TypeImplementation implements WriteableAttributeType {
     protected String name;
     protected Scale scale;
 
@@ -29,8 +28,8 @@ public abstract class TypeImplementation implements WritableAttributeType {
         return new Scale[]{this.scale};
     }
     
-    public AttributeValue[] getValueRange() {
-        return null;
+    public void setScales(Scale scale){
+    	this.scale = scale;
     }
     
     public String toString(){

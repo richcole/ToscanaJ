@@ -34,10 +34,6 @@ public class TextualType extends TypeImplementation {
 	public void addValue(TextualValue textualValue) {
 		valueGroupList.add(textualValue);
 	}
-	
-	public List getTextualValue(){
-		return valueGroupList;
-	}
 
 	public boolean isValidValue(AttributeValue valueToTest) {
 		if(!(valueToTest instanceof TextualValue)){
@@ -75,5 +71,12 @@ public class TextualType extends TypeImplementation {
 		}
 		return false;
 	}
-
+	
+	public AttributeValue[] getValueRange() {
+		AttributeValue[] attribute = new AttributeValue[valueGroupList.size()];
+		for(int i = 0 ; i < valueGroupList.size() ; i++){
+			attribute[i] = (AttributeValue) valueGroupList.get(i);
+		}
+		return attribute;
+	}
 }

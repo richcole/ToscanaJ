@@ -76,9 +76,13 @@ public class NumericalTypeDialog extends JDialog {
 		JLabel minValueName = new JLabel("Minimum Values: ");
 		JLabel numDecimalName = new JLabel("Number of Decimals: ");
 		
-		maxValueField = new JTextField(""+type.getMaximumValue(),JTextField.RIGHT);
-		minValueField = new JTextField(""+type.getMinimumValue(),JTextField.RIGHT);
-		numDecimalField = new JTextField(""+type.getNumOfDecimals(),JTextField.RIGHT);
+		maxValueField = new JTextField(""+type.getMaximumValue());
+		minValueField = new JTextField(""+type.getMinimumValue());
+		numDecimalField = new JTextField(""+type.getNumOfDecimals());
+		
+		minValueField.setHorizontalAlignment(JTextField.RIGHT);
+		maxValueField.setHorizontalAlignment(JTextField.RIGHT);
+		numDecimalField.setHorizontalAlignment(JTextField.RIGHT);
 
 		mainPane.add(maxValueName, new GridBagConstraints(
 								0,0,1,1,1,1,
@@ -157,7 +161,7 @@ public class NumericalTypeDialog extends JDialog {
 	protected JPanel createButtonPane() {
 		JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		JButton applyButton = new JButton("Apply");
-		JButton undoButton = new JButton("Undo");
+		JButton closeButton = new JButton("Close");
 	
 		applyButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
@@ -186,14 +190,14 @@ public class NumericalTypeDialog extends JDialog {
 			}
 		});
 	
-		undoButton.addActionListener(new ActionListener(){
+		closeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				dispose();
 			}
 		});
 	
 		buttonPane.add(applyButton);
-		buttonPane.add(undoButton);
+		buttonPane.add(closeButton);
 	
 		return buttonPane;
 	}

@@ -5,12 +5,10 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
 import java.util.Hashtable;
 
-import net.sourceforge.toscanaj.model.manyvaluedcontext.Scale;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 
 public class ScaleImplementation implements Scale {
     protected String name;

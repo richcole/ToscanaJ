@@ -10,6 +10,8 @@ package net.sourceforge.toscanaj.model.cernato;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.toscanaj.model.manyvaluedcontext.*;
+
 public class View {
     private String name;
     private List criteria = new ArrayList();

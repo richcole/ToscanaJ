@@ -5,21 +5,20 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 import net.sourceforge.toscanaj.model.order.Ordered;
 
 public class Criterion implements Ordered {
-    private Property property;
+    private ManyValuedAttribute property;
     private ScaleColumn valueGroup;
 
-    public Criterion(Property property, ScaleColumn valueGroup) {
+    public Criterion(ManyValuedAttribute property, ScaleColumn valueGroup) {
         this.valueGroup = valueGroup;
         this.property = property;
     }
 
-    public Property getProperty() {
+    public ManyValuedAttribute getProperty() {
         return property;
     }
 

@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-public interface WritableManyValuedAttribute extends ManyValuedAttribute {
+public interface WriteableManyValuedAttribute extends ManyValuedAttribute {
 	void setName(String name);
 	void setType(AttributeType type);
 }

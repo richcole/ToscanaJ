@@ -7,8 +7,18 @@
  */
 package net.sourceforge.toscanaj.model.cernato.tests;
 
-import net.sourceforge.toscanaj.model.cernato.*;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.types.*;
+import net.sourceforge.toscanaj.model.cernato.CernatoModel;
+import net.sourceforge.toscanaj.model.cernato.CernatoObject;
+import net.sourceforge.toscanaj.model.cernato.CernatoTable;
+import net.sourceforge.toscanaj.model.cernato.Property;
+import net.sourceforge.toscanaj.model.cernato.View;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.*;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalType;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValue;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValueGroup;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualValue;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualValueGroup;
 
 import java.util.*;
 

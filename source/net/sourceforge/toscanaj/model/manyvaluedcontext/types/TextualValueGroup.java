@@ -9,16 +9,16 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext.types;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableScaleColumn;
 import net.sourceforge.toscanaj.model.order.Ordered;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 
-public class TextualValueGroup implements ScaleColumn {
+public class TextualValueGroup implements WriteableScaleColumn {
     private TextualType type;
     private String name;
-    private List values = new ArrayList();
+    private HashSet values = new HashSet();
 
     public TextualValueGroup(TextualType type, String name, String id) {
         this.type = type;

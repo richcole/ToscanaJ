@@ -21,23 +21,25 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import net.sourceforge.toscanaj.gui.SienaMainPanel;
+
 
 public class ObjectDialog extends JDialog{
 	
 	private JTextField objectName;
 	private JButton closeButton;
 	private JButton changeButton;
-	private TableViewDialog frame;
+	private TableViewPanel tableView;
 	private int index;
 	private JDialog dialog = this;
 	
 	
-	public ObjectDialog(TableViewDialog frame){
-		super(frame,"Object", false);
+	public ObjectDialog(TableViewPanel tableView, SienaMainPanel sienaPane){
+		super(sienaPane,"Object", false);
 		setResizable(false);
 		createView();
 		pack();
-		this.frame = frame;
+		this.tableView = tableView;
 	}
 
 	private void createView() {
@@ -69,8 +71,8 @@ public class ObjectDialog extends JDialog{
 		changeButton.addActionListener(new ActionListener (){
 			public void actionPerformed(ActionEvent e){
 				if(!objectName.getText().equals("")){
-					frame.getContextTable().updateObject(objectName.getText(),index);
-					frame.update();
+					tableView.getContextTable().updateObject(objectName.getText(),index);
+					tableView.update();
 					hide();
 				}
 				else{

@@ -61,4 +61,7 @@ public class NumericalType extends TypeImplementation {
 		}
 		return false;
 	}
+	public AttributeValue[] getValueRange() {
+		return null;
+	}
 }

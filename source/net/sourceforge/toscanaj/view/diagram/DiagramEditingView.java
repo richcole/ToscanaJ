@@ -115,7 +115,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         JPanel diagramViewPanel = new JPanel(new BorderLayout());
 
         diagramView = new DiagramView();
-        diagramView.setQuery(ListQuery.KEY_LIST_QUERY);
+		diagramView.setQuery(ListQuery.KEY_LIST_QUERY);
         EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
         DirectConceptInterpreter interpreter = new DirectConceptInterpreter();
         ConceptInterpretationContext interpretationContext =
@@ -126,7 +126,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         diagramView.setGridEnabled(false);
         new LabelDragEventHandler(canvasEventBroker);
         new LabelClickEventHandler(canvasEventBroker);
-        diagramView.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+		diagramView.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
         JPanel toolPanel = new JPanel(new GridBagLayout());
 		toolPanel.add(createMovementManipulators(), new GridBagConstraints(
