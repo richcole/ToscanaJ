@@ -56,7 +56,6 @@ public class DatabaseConnectionDialog extends JDialog {
     private File lastFile;
 
     private DatabaseTypePanel dbTypePanel;
-	private EmbeddedDbConnectionPanel embeddedDbPanel;
     private JdbcConnectionPanel jdbcDbPanel;
     private OdbcConnectionPanel odbcDbPanel;
     private AccessFileConnectionPanel accessDbPanel;
@@ -662,7 +661,6 @@ public class DatabaseConnectionDialog extends JDialog {
 
     protected void initializePanels() {
         dbTypePanel = new DatabaseTypePanel();
-        this.embeddedDbPanel = new EmbeddedDbConnectionPanel();
         this.jdbcDbPanel = new JdbcConnectionPanel();
         this.odbcDbPanel = new OdbcConnectionPanel();
         this.accessDbPanel = new AccessFileConnectionPanel();

@@ -19,6 +19,7 @@ import java.util.Set;
 import org.tockit.relations.model.Relation;
 import org.tockit.relations.model.RelationImplementation;
 import org.tockit.relations.model.Tuple;
+import org.tockit.util.StringTokenizer;
 
 
 /**
