@@ -215,7 +215,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		mainPanel.addTab("Context", createContextEditingView());
 		mainPanel.setSelectedIndex(0);
 		mainPanel.addTab("Diagrams", this.diagramEditingView);
-		setContentPane(mainPanel);
+
+		getContentPane().add(mainPanel);
 	}
 
 	protected void createDiagramEditingView() {
