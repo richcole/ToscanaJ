@@ -11,9 +11,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.Query;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Implements a concept whose objects are stored in a relational database.
@@ -32,12 +30,12 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     /**
      * Stores the attributes as Java Objects.
      */
-    private List attributeContingent = new LinkedList();
+    private Set attributeContingent = new HashSet();
 
     /**
      * Stores the object names as Java Strings, fetched on only demand.
      */
-    private List objects = null;
+    private Set objects = null;
 
     /**
      * Stores the number of objects in the contingent.
@@ -63,7 +61,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      *
      * @see #objectClause
      */
-    private List filterClauses = new LinkedList();
+    private Set filterClauses = new HashSet();
 
     /**
      * The constructor always needs the DB connection and the information how
@@ -90,9 +88,16 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         // if we get a null here (no clause for this one), we can initialize without
         // asking the DB
         if (clause == null) {
-            this.objects = new LinkedList(); // empty list
+            this.objects = new HashSet(); // empty list
             this.numObjects = 0; // no objects
         }
+    }
+
+    /**
+     * True if the concept has an object clause defining the contingent.
+     */
+    public boolean hasObjectClause() {
+        return this.objectClause != null;
     }
 
     /**
@@ -155,7 +160,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         // fetch object names if we don't have them -- they will be stored once
         // we have queried them
         if (this.objects == null) {
-            objects = new LinkedList();
+            objects = new HashSet();
             if (this.objectClause != null) {
                 try {
                     String query = this.dbInfo.getQuery() + " WHERE " + this.objectClause;
@@ -165,7 +170,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                         query += " AND " + item;
                     }
                     query += ";";
-                    objects = this.connection.queryColumn(query, 1);
+                    objects.addAll(this.connection.queryColumn(query, 1));
                 } catch (DatabaseException e) {
                     /// @TODO Find something useful to do here.
                     if (e.getOriginal() != null) {
@@ -192,17 +197,19 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     }
 
     private List executeDatabaseQuery(DatabaseInfo.DatabaseQuery dbQuery, boolean contingentOnly) {
-        List retVal = new LinkedList();
+        List retVal = new ArrayList();
         // do a query only if there will be something to query
         // either: there is a contingent in this concept or we query extent and we
         // have subconcepts (at least one should have a contingent, otherwise this
         // concept shouldn't exist)
         if (this.objectClause != null || (!contingentOnly && this.ideal.size() != 1)) {
             String whereClause = constructWhereClause(contingentOnly);
-            try {
-                retVal = this.connection.executeQuery(dbQuery, whereClause);
-            } catch (DatabaseException e) {
-                handleDBException(e);
+            if (whereClause != null) {
+                try {
+                    retVal = this.connection.executeQuery(dbQuery, whereClause);
+                } catch (DatabaseException e) {
+                    handleDBException(e);
+                }
             }
         }
         return retVal;
@@ -219,14 +226,16 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     }
 
     public String constructWhereClause(boolean contingentOnly) {
-        String whereClause = " WHERE (";
+        boolean first = true;
+        String whereClause = "WHERE ";
         if (contingentOnly) {
-            // use only the local clause (we assume there is one)
-            whereClause += this.objectClause;
+            if (this.objectClause != null) {
+                whereClause += this.objectClause;
+                first = false;
+            }
         } else {
             // aggregate all clauses from the downset
             Iterator iter = this.ideal.iterator();
-            boolean first = true;
             while (iter.hasNext()) {
                 DatabaseConnectedConcept concept = (DatabaseConnectedConcept) iter.next();
                 if (concept.objectClause == null) {
@@ -234,18 +243,29 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                 }
                 if (first) {
                     first = false;
+                    whereClause += " (";
                 } else {
                     whereClause += " OR ";
                 }
                 whereClause += concept.objectClause;
             }
+            if (!first) {
+                whereClause += ") ";
+            }
         }
-        whereClause += ") ";
 
         Iterator iter = this.filterClauses.iterator();
         while (iter.hasNext()) {
             Object item = iter.next();
-            whereClause += " AND " + item;
+            if (first) {
+                first = false;
+            } else {
+                whereClause += " AND ";
+            }
+            whereClause += item;
+        }
+        if (first) {
+            return null; // no clause at all
         }
         whereClause += ";";
         return whereClause;
@@ -265,7 +285,7 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             if (this.objectClause == null) {
                 retVal.setObjectClause(null);
             } else {
-                retVal.objectClause = this.objectClause;
+                retVal.setObjectClause(this.objectClause);
             }
             DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
             retVal.filterClauses.addAll(otherDB.filterClauses);
@@ -302,13 +322,13 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             retVal.setObjectClause(this.objectClause);
         } else {
             DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
-            if ((this.objectClause == null) || (otherDB.objectClause == null)) {
+            if (otherDB.objectClause == null) {
                 retVal.setObjectClause(null);
             } else {
                 retVal.setObjectClause(this.objectClause);
+                retVal.filterClauses.add(otherDB.objectClause);
+                retVal.filterClauses.addAll(otherDB.filterClauses);
             }
-            retVal.filterClauses.addAll(otherDB.filterClauses);
-            retVal.filterClauses.add(otherDB.objectClause);
         }
         return retVal;
     }
