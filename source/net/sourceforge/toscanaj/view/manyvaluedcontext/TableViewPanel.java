@@ -221,7 +221,7 @@ public class TableViewPanel extends JFrame {
 					Point p = new Point(x,y);
 					List propertyList = (List) context.getAttributes();
 					WritableManyValuedAttribute property = (WritableManyValuedAttribute)
-													propertyList.get(p.getRow()-1);
+													propertyList.get(p.getRow());
 					PropertiesDialog propertiesDialog = new PropertiesDialog(tFrame,property,context);
 				}
 			}
@@ -241,7 +241,7 @@ public class TableViewPanel extends JFrame {
 					double x = e.getPoint().getX();
 					double y = e.getPoint().getY();
 					Point p = new Point(x,y);
-					int col = p.getCol()-1;
+					int col = p.getCol();
 					cernatoObjectDialog.setObjectName(getObjectName(col));
 					cernatoObjectDialog.setSelectedObjectIndex(col);
 					cernatoObjectDialog.show();

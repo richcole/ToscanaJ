@@ -122,6 +122,7 @@ import org.tockit.events.EventBrokerListener;
  * @todo make sure all changes to the context will propagate to make the schema dirty.
  */
 public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
+    private static final int NUMBER_OF_VALUE_POPUP_MENU_ROWS = 15;
     private static final String CONFIGURATION_SECTION_NAME = "SienaMainPanel";
     private static final String WINDOW_TITLE = "Siena";
     static private final int MaxMruFiles = 8;
@@ -1048,13 +1049,12 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		AttributeValue[] textualValueList = attributeType.getValueRange();
 		JPopupMenu menu = new JPopupMenu();
 		
-		if(textualValueList.length<=15){
+		if(textualValueList.length<=NUMBER_OF_VALUE_POPUP_MENU_ROWS){
 			menu = createPopupMenu(1,textualValueList.length,textualValueList,
 														property,obj);
 		}
 		else{
-			int numOfRows = 15;
-			menu = createPopupMenu(textualValueList.length/numOfRows,numOfRows,
+			menu = createPopupMenu(textualValueList.length/NUMBER_OF_VALUE_POPUP_MENU_ROWS,NUMBER_OF_VALUE_POPUP_MENU_ROWS,
 											textualValueList,property,obj );
 		}
 		menu.show(this,(int)xPos,(int)yPos);
