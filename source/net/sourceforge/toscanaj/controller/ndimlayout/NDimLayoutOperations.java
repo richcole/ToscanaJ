@@ -24,8 +24,8 @@ import java.util.*;
 
 public abstract class NDimLayoutOperations {
     // constants for base vector calculation
-    private static final double BASE_SCALE = 20;
-    private static final double BASE_X_STRETCH = 2;
+    private static final double BASE_SCALE = 80;
+    private static final double BASE_X_STRETCH = 1;
 	private static final double BASE_X_SHEAR = 0.3;
 
     public static final Diagram2D createDiagram(Lattice lattice, String title,
@@ -201,16 +201,21 @@ public abstract class NDimLayoutOperations {
     /**
      * Creates a set of base vectors.
      *
-     * The return value is a set of base vectors as given in Frank Vogt's book "Formale Begriffsanalyse mit C++",
-     * page 61, rescaled and stretched by the two constants BASE_SCALE and BASE_X_STRETCH, and sheared by BASE_X_SHEAR.
+     * The return value is a set of base vectors similar to the ones given in Frank Vogt's book 
+     * "Formale Begriffsanalyse mit C++", page 61.
+     * 
+     * The calculation has been changed to have a more constant scale (the height of the middle vector
+     * is roughly constant) and it is rescaled and stretched by the two constants BASE_SCALE and 
+     * BASE_X_STRETCH, and sheared by BASE_X_SHEAR.
      */
     private static Vector createBase(int n) {
         Vector base = new Vector();
         for(int i = n - 1;i >= 0; i--) {
-            double a = 1 << i;
-            double b = 1 << (n - i - 1);
-            base.add(new Point2D.Double((a - b + BASE_X_SHEAR) * BASE_X_STRETCH * BASE_SCALE,
-                    (a + b) * BASE_SCALE));
+            double a = Math.pow(2, i);
+            double b = Math.pow(2, n - i - i);
+            double scale = BASE_SCALE / Math.pow(2, n - 1);
+            base.add(new Point2D.Double((a - b + BASE_X_SHEAR) * BASE_X_STRETCH * scale,
+                    (a + b) * scale));
         }
         return base;
     }
