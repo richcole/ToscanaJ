@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.*;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 
 import java.util.Collection;
 import java.util.HashSet;

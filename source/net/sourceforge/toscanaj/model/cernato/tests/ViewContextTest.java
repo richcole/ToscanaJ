@@ -12,10 +12,10 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.cernato.CernatoObject;
-import net.sourceforge.toscanaj.model.cernato.View;
 import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 
 import java.util.Collection;
 import java.util.Iterator;

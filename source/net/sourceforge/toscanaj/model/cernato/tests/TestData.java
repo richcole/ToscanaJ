@@ -11,7 +11,6 @@ import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.cernato.CernatoObject;
 import net.sourceforge.toscanaj.model.cernato.CernatoTable;
 import net.sourceforge.toscanaj.model.cernato.Property;
-import net.sourceforge.toscanaj.model.cernato.View;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.*;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValue;
@@ -19,6 +18,7 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValueGrou
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualValueGroup;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 
 import java.util.*;
 
