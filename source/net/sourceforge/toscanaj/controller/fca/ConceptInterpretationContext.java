@@ -16,6 +16,13 @@ import org.tockit.events.EventBroker;
 
 import java.util.List;
 
+/**
+ * @todo remove the objectDisplayMode out of this class, it is not really part of the interpretetation
+ *       context, but an aspect of a certain view. Having it in here caused troubles with requerying
+ *       since the interpreter assumed a context change whenever the view was changed and thus
+ *       queried the same information again. This is by now avoided by not using the display mode
+ *       in equals()/hashCode(), but this is of course only half a solution. 
+ */
 public class ConceptInterpretationContext implements ChangeObserver {
     /** Constant value which may be used to set displayMode or filterMode */
     public static final boolean CONTINGENT = true;
@@ -60,7 +67,8 @@ public class ConceptInterpretationContext implements ChangeObserver {
 
     public void setObjectDisplayMode(boolean isContingent) {
         this.objectDisplayMode = isContingent;
-        this.eventBroker.processEvent(new ConceptInterpretationContextChangedEvent(this));
+        // this change is not considered to be relevant anymore, consistently with equals() and hashCode()
+        // this.eventBroker.processEvent(new ConceptInterpretationContextChangedEvent(this));
     }
 
     public boolean getObjectDisplayMode() {
@@ -90,5 +98,40 @@ public class ConceptInterpretationContext implements ChangeObserver {
 
     public void update(Object source) {
         this.eventBroker.processEvent(new ConceptInterpretationContextChangedEvent(this));
+    }
+    
+    /**
+     * Caution: equals(..) and hashCode() ignore the display mode.
+     */
+    public boolean equals(Object other) {
+    	if(other.getClass() != this.getClass()) {
+    		return false;
+    	}
+    	ConceptInterpretationContext otherContext = (ConceptInterpretationContext) other;
+		if(!otherContext.diagramHistory.equals(this.diagramHistory)) {
+			return false;
+		}
+		if(!otherContext.nestingContexts.equals(this.nestingContexts)) {
+			return false;
+		}
+		if(!otherContext.nestingConcepts.equals(this.nestingConcepts)) {
+			return false;
+		}
+		if(otherContext.filterMode != this.filterMode) {
+			return false;
+		}
+		return true;
+    }
+    
+	/**
+	 * Caution: equals(..) and hashCode() ignore the display mode.
+	 */
+    public int hashCode() {
+    	int result = 17;
+		result = result * 37 + this.diagramHistory.hashCode();
+		result = result * 37 + this.nestingContexts.hashCode();
+		result = result * 37 + this.nestingConcepts.hashCode();
+    	result = result * 37 + (this.filterMode ? 1 : 0);
+    	return result;
     }
 }
