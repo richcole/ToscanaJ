@@ -59,25 +59,6 @@ public class Column implements XMLizable {
     }
 
     public String getSqlExpression() {
-        return getQuotedIdentifier(this.name);
-    }
-
-	/**
-	 * @todo outsource this into some central place. It is copied and pasted
-	 * from DumpSqlScript. A good idea might be implementing an interface for
-	 * SQL expressions, which allows access to this stuff.
-	 */
-    private static String getQuotedIdentifier(String identifier) {
-        String retVal = "\"";
-        for(int i = 0; i < identifier.length(); i++) {
-            char curChar = identifier.charAt(i);
-            if(curChar == '\"') {
-                retVal += "\"\"";
-            } else {
-                retVal += curChar;
-            }
-        }
-        retVal += "\"";
-        return retVal;
+        return Table.getQuotedIdentifier(this.name);
     }
 }

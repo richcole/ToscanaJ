@@ -20,6 +20,7 @@ import java.util.List;
 
 public class Table implements XMLizable {
 
+    public static final String STANDARD_SQL_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_";
     private String name;
 
     private Column key;
@@ -104,12 +105,15 @@ public class Table implements XMLizable {
      * from DumpSqlScript. A good idea might be implementing an interface for
      * SQL expressions, which allows access to this stuff.
      */
-    private static String getQuotedIdentifier(String identifier) {
+    public static String getQuotedIdentifier(String identifier) {
     	/// @todo we might need something like the following lines for supporting Access
 //        DatabaseConnection connection = DatabaseConnection.getConnection();
 //        if( connection != null && connection.getDatabaseType() == DatabaseInfo.ACCESS_FILE) {
 //            return "[" + name + "]";
 //        }
+		if(!quotingIsNeeded(identifier)) {
+			return identifier;
+		}
         String retVal = "\"";
         for(int i = 0; i < identifier.length(); i++) {
             char curChar = identifier.charAt(i);
@@ -121,5 +125,15 @@ public class Table implements XMLizable {
         }
         retVal += "\"";
         return retVal;
+    }
+
+    public static boolean quotingIsNeeded(String identifier) {
+		for(int i = 0; i < identifier.length(); i++) {
+			char curChar = identifier.charAt(i);
+			if(STANDARD_SQL_CHARS.indexOf(curChar) == -1) {
+				return true;
+			}
+		}
+        return false;
     }
 }

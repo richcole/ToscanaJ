@@ -38,7 +38,7 @@ import java.util.List;
 public class NominalScaleEditorDialog extends JDialog {
     private boolean result;
 
-    private Column column;
+    private TableColumnPair selectedTableColumnPair;
     private DatabaseConnection databaseConnection;
 
     private JList columnValuesListView;
@@ -225,9 +225,12 @@ public class NominalScaleEditorDialog extends JDialog {
         this.columnChooser.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e) {
         		JComboBox cb = (JComboBox) e.getSource();
-        		if(column != cb.getSelectedItem()) {
-        			column = ((TableColumnPair) cb.getSelectedItem()).getColumn();
+        		Object newTableColumnPair = cb.getSelectedItem();
+                if(newTableColumnPair != selectedTableColumnPair && newTableColumnPair instanceof TableColumnPair) {
+        			selectedTableColumnPair = (TableColumnPair) newTableColumnPair;
         			fillAvailableValueList();
+        		} else {
+        			selectedTableColumnPair = null;
         		}
             }
         });
@@ -401,16 +404,17 @@ public class NominalScaleEditorDialog extends JDialog {
 		});
         pack();
     }
+    
 	private void closeDialog(boolean res) {
 		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
 		result = res;
 		hide();
 	}
+	
     private void addValuesToSelection() {
         for (int i = this.columnValuesListView.getSelectedValues().length - 1; i >= 0; i--) {
             String value = (String)this.columnValuesListView.getSelectedValues()[i];
-            TableColumnPair tabCol = (TableColumnPair) this.columnChooser.getSelectedItem();
-            this.attributeListModel.addElement(new TableColumnValueTriple(tabCol, value));
+            this.attributeListModel.addElement(new TableColumnValueTriple(this.selectedTableColumnPair, value));
         }
         fillAvailableValueList();
     }
@@ -424,6 +428,7 @@ public class NominalScaleEditorDialog extends JDialog {
 
     private void fillControls() {
         this.columnChooser.removeAllItems();
+        this.columnChooser.addItem("<Please select a column>");
         List tables = this.databaseSchema.getTables();
         for (Iterator tableIterator = tables.iterator(); tableIterator.hasNext();) {
             Table table = (Table) tableIterator.next();
@@ -432,7 +437,6 @@ public class NominalScaleEditorDialog extends JDialog {
                 Column column = (Column) columnsIterator.next();
                 this.columnChooser.addItem(new TableColumnPair(table, column));
             }
-            fillAvailableValueList();
         }
     }
 
@@ -441,18 +445,17 @@ public class NominalScaleEditorDialog extends JDialog {
 	 */
     private void fillAvailableValueList() {
         this.columnValuesListModel.clear();
-        if(column == null) {
+        if(selectedTableColumnPair == null) {
         	return;
         }
-        TableColumnPair tabCol = (TableColumnPair) this.columnChooser.getSelectedItem();
         List resultSet = null;
         try {
-            String query = "SELECT DISTINCT " + column.getSqlExpression() + " FROM " +
-                    column.getTable().getSqlExpression() + ";";
+            String query = "SELECT DISTINCT " + selectedTableColumnPair.getSqlExpression() + " FROM " +
+                    selectedTableColumnPair.getTable().getSqlExpression() + ";";
             resultSet = databaseConnection.queryColumn(query, 1);
             for (Iterator it = resultSet.iterator(); it.hasNext();) {
             	String value = (String) it.next();
-            	if(!valueSelected(tabCol, value)) {
+            	if(!valueSelected(selectedTableColumnPair, value)) {
                 	this.columnValuesListModel.addElement(value);
             	}
             }
