@@ -12,6 +12,8 @@ import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -101,7 +103,7 @@ public class ObjectLabelView extends LabelView {
     }
 
     protected int getNumberOfEntries() {
-        if (this.query == null) {
+        if (this.queryResults == null) {
             return 0;
         }
         return this.queryResults.size();
@@ -113,8 +115,15 @@ public class ObjectLabelView extends LabelView {
 
     protected void doQuery() {
         if (query != null) {
-            queryResults = this.query.execute(this.labelInfo.getNode().getConcept(),
-                                              diagramView.getConceptInterpretationContext().getObjectDisplayMode() );
+            DatabaseConnectedConcept concept = (DatabaseConnectedConcept) this.labelInfo.getNode().getConcept();
+            boolean objectDisplayMode = diagramView.getConceptInterpretationContext().getObjectDisplayMode();
+            if (concept.getObjectClause() != null ||
+                    ((objectDisplayMode==ConceptInterpretationContext.EXTENT) && !concept.isBottom())
+            ) {
+                WhereClauseGenerator clauseGenerator = new WhereClauseGenerator();
+                String whereClause = clauseGenerator.createWhereClause(concept, null, null, objectDisplayMode);
+                queryResults = this.query.execute(whereClause);
+            }
         }
     }
 

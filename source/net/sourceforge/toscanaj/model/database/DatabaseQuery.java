@@ -45,38 +45,26 @@ public abstract class DatabaseQuery extends Query {
         columnList.add(col);
     }
 
-    public List execute(Concept concept, boolean contingentOnly) {
-        if( !(concept instanceof DatabaseConnectedConcept) ) {
-            throw new RuntimeException("Expected DatabaseConnectedConcept for DatabaseQuery");
-        }
-        DatabaseConnectedConcept dbConcept = (DatabaseConnectedConcept) concept;
+    public List execute(String whereClause) {
         List retVal = new ArrayList();
-        // do a query only if there will be something to query
-        // either: there is a contingent in this concept or we query extent and we
-        // have subconcepts (at least one should have a contingent, otherwise this
-        // concept shouldn't exist)
-        if (dbConcept.getObjectClause() != null || (!contingentOnly && !concept.isBottom())) {
-            WhereClauseGenerator clauseGenerator = new WhereClauseGenerator();
-            String whereClause = clauseGenerator.createWhereClause(dbConcept, null, null, contingentOnly);
-            if (whereClause != null) {
-                try {
-                    String statement = this.getQueryHead() + whereClause;
+        if (whereClause != null) {
+            try {
+                String statement = this.getQueryHead() + whereClause;
 
-                    // submit the query
-                    List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
-                    Iterator it = queryResults.iterator();
-                    while (it.hasNext()) {
-                        Vector item = (Vector) it.next();
-                        DatabaseRetrievedObject object = createDatabaseRetrievedObject(whereClause, item);
-                        if(object != null) {
-                            retVal.add(object);
-                        }
+                // submit the query
+                List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
+                Iterator it = queryResults.iterator();
+                while (it.hasNext()) {
+                    Vector item = (Vector) it.next();
+                    DatabaseRetrievedObject object = createDatabaseRetrievedObject(whereClause, item);
+                    if(object != null) {
+                        retVal.add(object);
                     }
-                } catch (DatabaseException e) {
-                    handleDBException(e);
-                } catch (SQLException e) {
-                    e.printStackTrace();
                 }
+            } catch (DatabaseException e) {
+                handleDBException(e);
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
         return retVal;
