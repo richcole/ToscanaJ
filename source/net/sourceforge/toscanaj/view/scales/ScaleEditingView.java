@@ -97,9 +97,23 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
         listView.addMouseListener(mouseListener);
 
         JPanel tableColumnPane= new JPanel();
-        tableColumnPane.setLayout(new BorderLayout());
-        tableColumnPane.add(new JLabel("Selected tables"), BorderLayout.NORTH);
-        tableColumnPane.add(listView, BorderLayout.CENTER);
+        tableColumnPane.setLayout(new GridBagLayout());
+        tableColumnPane.add(new JLabel("Selected tables"),
+                  new GridBagConstraints(
+                  0, 0, 1, 1, 1.0, 0,
+                  GridBagConstraints.CENTER,
+                  GridBagConstraints.HORIZONTAL,
+                  new Insets(5, 5, 5, 5),
+                  5, 5)
+        );
+        tableColumnPane.add(new JScrollPane(listView),
+                new GridBagConstraints(
+                  0, 1, 1, 1, 1.0, 1.0,
+                  GridBagConstraints.CENTER,
+                  GridBagConstraints.BOTH,
+                  new Insets(5, 5, 5, 5),
+                  5, 5)
+);
 
         tableColumnListView = tableColumnPane;
         return tableColumnListView;

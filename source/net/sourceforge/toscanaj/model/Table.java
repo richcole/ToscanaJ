@@ -3,19 +3,20 @@
  * User: p198
  * Date: Jun 27, 2002
  * Time: 5:52:40 PM
- * To change template for new class use 
+ * To change template for new class use
  * Code Style | Class Templates options (Tools | IDE Options).
  */
 package net.sourceforge.toscanaj.model;
 
+import util.CollectionFactory;
+
 import java.util.List;
-import java.util.ArrayList;
 
 public class Table {
 
     private String name;
     private String key;
-    private List   columns = new ArrayList();
+    private List columns = CollectionFactory.createDefaultList();
 
     public Table(String name, String key) {
         this.name = name;
