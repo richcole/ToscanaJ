@@ -149,6 +149,7 @@ public class DiagramSchema {
 		int labelFontSize = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "labelFontSize", 10);
 		propVal = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "scaleNodeSize", "none");
 		propVal = propVal.toLowerCase();
+		retVal.labelFont = new Font(labelFontName, Font.PLAIN, labelFontSize);
 		if (propVal.equals("contingent")) {
 			retVal.nodeSizeScalingType = NODE_SIZE_SCALING_CONTINGENT;
 		} else if (propVal.equals("extent")) {
@@ -159,13 +160,64 @@ public class DiagramSchema {
 			System.err.println("Caught unknown node size scaling value for DiagramSchema: " + propVal);
 			System.err.println("-- using default");
 		}
-		retVal.labelFont = new Font(labelFontName, Font.PLAIN, labelFontSize);
     	return retVal;
     }
 
-    /**
-     * Returns default foreground color.
-     */
+	/**
+	 * Returns a schema similar to this one, but with shades of gray as colors.
+	 */
+	public DiagramSchema getGrayScaleVersion() {
+		DiagramSchema retVal = new DiagramSchema();
+		retVal.background = null;
+		retVal.topColor = new Color(0, 0, 0);
+		retVal.bottomColor = new Color(255, 255, 255);
+		retVal.foreground = new Color(0, 0, 0);
+		retVal.nestedDiagramNodeColor = new Color(255, 255, 255);
+		retVal.notRealisedDiagramNodeColor = null;
+		retVal.circleColor = new Color(0, 0, 0);
+		retVal.lineColor = new Color(0, 0, 0);
+		retVal.circleSelectionColor = new Color(0, 0, 0);
+		retVal.circleIdealColor = new Color(50, 50, 50);
+		retVal.circleFilterColor = new Color(50, 50, 50);
+		retVal.fadeOut = this.fadeOut;
+		retVal.margin = this.margin;
+		retVal.notRealizedNodeSizeReductionFactor = this.notRealizedNodeSizeReductionFactor;
+		retVal.gradientType = this.gradientType;
+		retVal.selectionLineWidth = this.selectionLineWidth;
+		retVal.nodeSizeScalingType = this.nodeSizeScalingType;
+		retVal.labelFont = this.labelFont;
+		return retVal;
+	}
+
+	/**
+	 * Returns a schema similar to this one, but using only black and white.
+	 * 
+	 * The result has no gradient but white nodes and there is no fade out when
+	 * highlighting.
+	 */
+	public DiagramSchema getBlackAndWhiteVersion() {
+		DiagramSchema retVal = new DiagramSchema();
+		retVal.background = null;
+		retVal.topColor = new Color(255,255,255);
+		retVal.bottomColor = new Color(255, 255, 255);
+		retVal.foreground = new Color(0, 0, 0);
+		retVal.nestedDiagramNodeColor = new Color(255, 255, 255);
+		retVal.notRealisedDiagramNodeColor = null;
+		retVal.circleColor = new Color(0, 0, 0);
+		retVal.lineColor = new Color(0, 0, 0);
+		retVal.circleSelectionColor = new Color(0, 0, 0);
+		retVal.circleIdealColor = new Color(0, 0, 0);
+		retVal.circleFilterColor = new Color(0, 0, 0);
+		retVal.fadeOut = 0;
+		retVal.margin = this.margin;
+		retVal.notRealizedNodeSizeReductionFactor = this.notRealizedNodeSizeReductionFactor;
+		retVal.gradientType = this.gradientType;
+		retVal.selectionLineWidth = this.selectionLineWidth;
+		retVal.nodeSizeScalingType = this.nodeSizeScalingType;
+		retVal.labelFont = this.labelFont;
+		return retVal;
+	}
+
     public Color getForegroundColor() {
         return foreground;
     }

@@ -63,7 +63,8 @@ import java.util.ListIterator;
  */
 public class ToscanaJMainPanel extends JFrame implements ChangeObserver, ClipboardOwner {
 
-    private static final String CONFIGURATION_SECTION_NAME = "ToscanaJMainPanel";
+    private static final String CONFIGURATION_KEY_PRINT_MODE = "printMode";
+	private static final String CONFIGURATION_SECTION_NAME = "ToscanaJMainPanel";
     private static final String WINDOW_TITLE = "ToscanaJ";
     /**
      * The central event broker for the main panel
@@ -166,6 +167,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     private DiagramExportSettings diagramExportSettings = null;
 
 	private JSplitPane leftHandPane;
+	private JRadioButtonMenuItem printColorMenuItem;
+	private JRadioButtonMenuItem printGrayScaleMenuItem;
+	private JRadioButtonMenuItem printBlackAndWhiteMenuItem;
 	/**
 	 * Simple initialisation constructor.
 	 */
@@ -457,6 +461,38 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		});
         printSetupMenuItem.setEnabled(true);
         fileMenu.add(printSetupMenuItem);
+        
+        JMenu printModeMenu = new JMenu("Print Mode");
+        
+		ButtonGroup printModeGroup = new ButtonGroup();
+		printColorMenuItem = new JRadioButtonMenuItem("Color");
+		printModeMenu.add(printColorMenuItem);
+		printModeGroup.add(printColorMenuItem);
+		printGrayScaleMenuItem = new JRadioButtonMenuItem("Grayscale");
+		printModeMenu.add(printGrayScaleMenuItem);
+		printModeGroup.add(printGrayScaleMenuItem);
+		printBlackAndWhiteMenuItem = new JRadioButtonMenuItem("Black and White");
+		printModeMenu.add(printBlackAndWhiteMenuItem);
+		printModeGroup.add(printBlackAndWhiteMenuItem);
+
+		// @todo replace with typesafe enum pattern and find better place to put it
+		int printMode = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_PRINT_MODE, 0);
+		switch(printMode) {
+			case 0:
+				printColorMenuItem.setSelected(true);
+				break;
+			case 1:
+				printGrayScaleMenuItem.setSelected(true);
+				break;
+			case 2:
+				printBlackAndWhiteMenuItem.setSelected(true);
+				break;
+			default:
+				System.err.println("Unknown print mode setting, using color");
+				printColorMenuItem.setSelected(true);
+		}
+         
+        fileMenu.add(printModeMenu);
 
         // separator
         fileMenu.addSeparator();
@@ -928,6 +964,14 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         ConfigurationManager.storeStringList(CONFIGURATION_SECTION_NAME, "mruFiles", this.mruList);
         // store the minimum label size
 		ConfigurationManager.storeFloat(CONFIGURATION_SECTION_NAME, "minLabelFontSize", (float)this.diagramView.getMinimumFontSize());
+		// store print mode
+		if(this.printColorMenuItem.isSelected()) {
+			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_PRINT_MODE, 0);
+		} else if(this.printGrayScaleMenuItem.isSelected()) {
+			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_PRINT_MODE, 1);
+		} else if(this.printBlackAndWhiteMenuItem.isSelected()) {
+			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, CONFIGURATION_KEY_PRINT_MODE, 2);
+		}
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
 
@@ -1115,10 +1159,18 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             PrinterJob printJob = PrinterJob.getPrinterJob();
             if (printJob.printDialog()) {
                 try {
-                    printJob.setPrintable(this.diagramView, pageFormat);
+                	DiagramSchema oldSchema = this.diagramView.getDiagramSchema();
+					if(this.printGrayScaleMenuItem.isSelected()) {
+						this.diagramView.setDiagramSchema(oldSchema.getGrayScaleVersion());
+					}
+					if(this.printBlackAndWhiteMenuItem.isSelected()) {
+						this.diagramView.setDiagramSchema(oldSchema.getBlackAndWhiteVersion());
+					}
+					printJob.setPrintable(this.diagramView, pageFormat);
                     printJob.print();
-                } catch (Exception PrintException) {
-                    PrintException.printStackTrace();
+					this.diagramView.setDiagramSchema(oldSchema);
+                } catch (Exception e) {
+                	ErrorDialog.showError(this, e, "Printing failed");
                 }
             }
         }

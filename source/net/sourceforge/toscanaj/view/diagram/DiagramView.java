@@ -343,6 +343,11 @@ public class DiagramView extends Canvas implements ChangeObserver {
     public DiagramSchema getDiagramSchema() {
         return diagramSchema;
     }
+    
+    public void setDiagramSchema(DiagramSchema schema) {
+    	this.diagramSchema = schema;
+    	this.repaint();
+    }
 
 	public double getMinimumFontSize() {
 		return minimumFontSize;
