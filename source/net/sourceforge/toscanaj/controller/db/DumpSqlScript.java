@@ -18,10 +18,6 @@ import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.view.database.SQLTypeMapper;
 
-/***
- * @todo add main method to use this from command line by supplying the DB
- *       connection  parameters (driver, URL, username, password) 
- */
 public class DumpSqlScript {
 	public static final void dumpSqlScript(DatabaseConnection connection, OutputStream outStream) throws DatabaseException {
 		PrintStream out = new PrintStream(outStream);
