@@ -33,7 +33,7 @@ public class ErrorDialog {
      * The user has the choice to view more detail of the error
      * based on the original exception thrown.
      */
-    private ErrorDialog(JFrame frame, Exception e, String title) {
+    private ErrorDialog(JFrame frame, Throwable e, String title) {
         showDetailedErrorMsg(frame, e, title, e.getMessage() );
     }
 
@@ -43,7 +43,7 @@ public class ErrorDialog {
      * The user has the choice to view more detail of the error
      * based on the original exception thrown.
      */
-    private ErrorDialog(JFrame frame, Exception e, String title, String errorMsg) {
+    private ErrorDialog(JFrame frame, Throwable e, String title, String errorMsg) {
         showDetailedErrorMsg(frame, e, title, errorMsg);
     }
 
@@ -51,7 +51,7 @@ public class ErrorDialog {
      * Show an error dialog that gives the option to show a more detailed
      * error message if required.
      */
-    private void showDetailedErrorMsg(JFrame frame, Exception e, String title, String errorMsg) {
+    private void showDetailedErrorMsg(JFrame frame, Throwable e, String title, String errorMsg) {
         ///@TODO an interface is requird for all toscanaJ exceptions
         Exception original = null;
         if( e instanceof ImageGenerationException) {
@@ -97,7 +97,7 @@ public class ErrorDialog {
      * User can see a more detail error message
      * based on original exception thrown
      */
-    public static void showError(JFrame frame, Exception e, String title) {
+    public static void showError(JFrame frame, Throwable e, String title) {
         new ErrorDialog(frame, e, title);
     }
 
@@ -107,7 +107,7 @@ public class ErrorDialog {
      * User can see a more detail error message
      * based on original exception thrown
      */
-    public static void showError(JFrame frame, Exception e, String title, String errorMsg) {
+    public static void showError(JFrame frame, Throwable e, String title, String errorMsg) {
         new ErrorDialog(frame, e, title, errorMsg );
     }
 }
