@@ -242,7 +242,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 closeMainPanel();
             }
         });
-    }
+		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+	}
 
 	private void initializeModel() {
 		this.conceptualSchema.setManyValuedContext(new ManyValuedContextImplementation());
