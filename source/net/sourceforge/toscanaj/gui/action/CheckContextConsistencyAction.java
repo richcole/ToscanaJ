@@ -121,10 +121,10 @@ public class CheckContextConsistencyAction extends KeyboardMappedAction implemen
 			setEnabled(false);		
 			return;
 		} 
-//		else if (!this.databaseConnection.isConnected()) {
-//			setEnabled(false);
-//			return;
-//		}
+		else if (!this.databaseConnection.isConnected()) {
+			setEnabled(false);
+			return;
+		}
 		if (this.conceptualSchema == null) {
 			setEnabled(false);
 			return;
