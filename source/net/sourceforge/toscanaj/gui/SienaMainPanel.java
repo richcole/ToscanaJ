@@ -628,11 +628,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		// get the current filename without the extension and full path
 		// we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
 		if(currentFile != null){
-			System.out.println("currentfile NOT null. set title to "+currentFile+" Siena");
 			String filename = currentFile.substring(currentFile.lastIndexOf("\\")+1,(currentFile.length()-4));
 			setTitle(filename +" - "+WINDOW_TITLE);
 		} else {
-			System.out.println("currentfile is null. set title as 'Siena'");
 			setTitle(WINDOW_TITLE);
 		}
 	}
