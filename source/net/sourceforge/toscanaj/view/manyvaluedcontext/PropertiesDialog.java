@@ -18,6 +18,7 @@ import java.util.Iterator;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -34,12 +35,12 @@ public class PropertiesDialog extends JDialog{
 	private JButton editTypeButton;
 	private JButton changeButton;
 	private WriteableManyValuedAttribute property;
-	private TableViewPanel frame;
+	private JFrame frame;
 	private JComboBox typeBox;
 	private PropertiesDialog dialog = this;
 	private ManyValuedContext context;
 	
-	public PropertiesDialog(TableViewPanel frame,
+	public PropertiesDialog(JFrame frame,
 										WriteableManyValuedAttribute property, 
 										ManyValuedContext context){
 		super(frame,"Many Valued-Context:Properties",true);
@@ -156,7 +157,7 @@ public class PropertiesDialog extends JDialog{
 						property.setName(propertyName.getText());
 					}
 				}
-				frame.update();
+				frame.validate();
 				dispose();
 			}
 		});

@@ -26,6 +26,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -39,18 +40,21 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValueGroup;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualValueGroup;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 
 public class AddCriterionDialog extends JDialog{
 		private ManyValuedAttribute attr;
-		private TableViewPanel tableView;
+		private View view;
+		private JFrame parent;
 		private JButton createButton;
 		private List checkBoxList = new ArrayList();
 		private JTextField minTextField,maxTextField,name;
 		
-		public AddCriterionDialog(ManyValuedAttribute attr, TableViewPanel tableView){
-			super(tableView,"Conditions",false);
+		public AddCriterionDialog(ManyValuedAttribute attr, JFrame parent, View view){
+			super(parent,"Conditions",false);
 			this.attr = attr;
-			this.tableView = tableView;
+			this.parent = parent;
+			this.view = view;
 			if(attr.getType() instanceof TextualType){
 				TextualType textualType = (TextualType)attr.getType();
 				setContentPane(createTextualTypeView(textualType));
@@ -153,7 +157,8 @@ public class AddCriterionDialog extends JDialog{
 					NumericalValueGroup valueGroup = new NumericalValueGroup(numericalType,
 													name.getText(),"",fromValue,minIncluded.isSelected(),
 													toValue,maxIncluded.isSelected());
-					tableView.addCriterion(new Criterion(attr,valueGroup));
+					view.addCriterion(new Criterion(attr,valueGroup));
+					parent.validate();
 					dispose();
 				}
 			});
@@ -292,7 +297,8 @@ public class AddCriterionDialog extends JDialog{
 						}
 					}
 					Criterion c = new Criterion(attr,selectedValues);
-					tableView.addCriterion(c);
+					view.addCriterion(c);
+					parent.validate();
 					dispose();
 				}
 			});

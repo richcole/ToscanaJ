@@ -16,27 +16,32 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableManyValuedContext;
 
 public class ObjectDialog extends JDialog{
 	
 	private JTextField objectName;
 	private JButton closeButton;
 	private JButton changeButton;
-	private TableViewPanel tableView;
+	private JFrame parent;
 	private int index;
 	private JDialog dialog = this;
+	private WriteableManyValuedContext context;
 	
 	
-	public ObjectDialog(TableViewPanel tableView){
-		super(tableView,"Object", false);
+	public ObjectDialog(JFrame parent, WriteableManyValuedContext context){
+		super(parent,"Object", false);
 		setResizable(false);
 		createView();
 		pack();
-		this.tableView = tableView;
+		this.parent = parent;
+		this.context = context;
 	}
 
 	private void createView() {
@@ -68,8 +73,8 @@ public class ObjectDialog extends JDialog{
 		changeButton.addActionListener(new ActionListener (){
 			public void actionPerformed(ActionEvent e){
 				if(!objectName.getText().equals("")){
-					tableView.getContextTable().updateObject(objectName.getText(),index);
-					tableView.update();
+					context.updateObject(objectName.getText(),index);
+					parent.validate();
 					hide();
 				}
 				else{

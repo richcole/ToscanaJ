@@ -21,7 +21,6 @@ import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableFCAObject;
@@ -76,7 +75,7 @@ public class TableViewPanel extends JFrame {
 	private DiagramView diagramView;
 	private View view;
 	
-	public TableViewPanel(WriteableManyValuedContext context) {
+	protected TableViewPanel(WriteableManyValuedContext context) {
 		this.context = context;
 		createHeaders();
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,createTableView(),createDiagramView());
@@ -85,7 +84,7 @@ public class TableViewPanel extends JFrame {
 	}
 		
 	protected JScrollPane createTableView(){
-		cernatoObjectDialog = new ObjectDialog(this);
+		cernatoObjectDialog = new ObjectDialog(this, this.context);
 
 		cernatoTableView = new TableView(context, colHeader, rowHeader);
 		cernatoTableView.addMouseListener(getTableViewMouseListener());
@@ -97,7 +96,7 @@ public class TableViewPanel extends JFrame {
 		return scrollPane;
 	}
 	
-	public JPanel createDiagramView(){
+	protected JPanel createDiagramView(){
 		view = new View("Views");
 		JPanel mainPane = new JPanel(new GridBagLayout());
 		
@@ -113,7 +112,7 @@ public class TableViewPanel extends JFrame {
 		JButton addButton = new JButton ("Add");
 		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				AddCriterionAttributeDialog dialog = new AddCriterionAttributeDialog(context.getAttributes(),tFrame);
+				AddCriterionAttributeDialog dialog = new AddCriterionAttributeDialog(context.getAttributes(),tFrame, view);
 				dialog.show();
 			}
 		});
@@ -153,7 +152,7 @@ public class TableViewPanel extends JFrame {
 		
 	}
 	
-	public void showDiagram(Diagram2D diagram){
+	protected void showDiagram(Diagram2D diagram){
 		diagramView.showDiagram(diagram);
 	}
 	
@@ -170,13 +169,17 @@ public class TableViewPanel extends JFrame {
 		MouseListener mouseListener = new MouseListener() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
-					Point p = getPoint(e.getPoint().getX(), e.getPoint().getY());
+					double x = e.getPoint().getX();
+					double y = e.getPoint().getY();
+					Point p = new Point(x,y);
 					cernatoTableView.setSelectedColumn(new TableView.
 															SelectedCell(p.getCol(), p.getRow()));
 				} 
 				
 				else if(e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1){
-					Point p = getPoint(e.getPoint().getX(), e.getPoint().getY());
+					double x = e.getPoint().getX();
+					double y = e.getPoint().getY();
+					Point p = new Point(x,y);
 					ArrayList propertyList = (ArrayList)context.getAttributes();
 					WriteableManyValuedAttribute property = (WriteableManyValuedAttribute)
 															propertyList.get(p.getRow()-1);
@@ -211,7 +214,9 @@ public class TableViewPanel extends JFrame {
 		colHeader.addMouseListener(new MouseListener() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
-					Point p = getPoint(e.getPoint().getX(), e.getPoint().getY());
+					double x = e.getPoint().getX();
+					double y = e.getPoint().getY();
+					Point p = new Point(x,y);
 					List propertyList = (List) context.getAttributes();
 					WriteableManyValuedAttribute property = (WriteableManyValuedAttribute)
 													propertyList.get(p.getRow()-1);
@@ -231,7 +236,9 @@ public class TableViewPanel extends JFrame {
 		rowHeader.addMouseListener(new MouseListener() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-					Point p = getPoint(e.getPoint().getX(), e.getPoint().getY());
+					double x = e.getPoint().getX();
+					double y = e.getPoint().getY();
+					Point p = new Point(x,y);
 					int col = p.getCol()-1;
 					cernatoObjectDialog.setObjectName(getObjectName(col));
 					cernatoObjectDialog.setSelectedObjectIndex(col);
@@ -261,7 +268,7 @@ public class TableViewPanel extends JFrame {
 				double val = Double.parseDouble(value);
 				NumericalValue numericalValue = new NumericalValue(val);
 				context.setRelationship(obj,attribute,numericalValue);
-				update();
+				validate();
 			}catch(NumberFormatException e){
 				JOptionPane.showMessageDialog(this,
 							"Enter numbers only.",
@@ -301,7 +308,7 @@ public class TableViewPanel extends JFrame {
 			menuItem.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e){
 					context.setRelationship(obj,property,textualValue);
-					update();
+					validate();
 				}
 			});
 			menu.add(menuItem);
@@ -316,21 +323,7 @@ public class TableViewPanel extends JFrame {
 		return objectName;
 	}
 	
-	public WriteableManyValuedContext getContextTable(){
-		return context;
-	}
-	
-	public void update() {
-		cernatoTableView.repaint();
-		rowHeader.repaint();
-		colHeader.repaint();
-	}
-				
-	public Point getPoint(double x, double y){
-		return new Point(x,y);
-	}
-	
-	class Point{
+	protected class Point{
 		
 		private int row;
 		private int col;
@@ -347,9 +340,10 @@ public class TableViewPanel extends JFrame {
 			return col;
 		}
 	}
-	public void addCriterion(Criterion c) {
-		view.addCriterion(c);
+	
+	public void validate() {
 		showDiagram(getDiagram());
+		super.validate();
 	}
 	
 	public static void main(String[] args) {

@@ -19,20 +19,24 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 
 public class AddCriterionAttributeDialog extends JDialog{
-	private TableViewPanel tableView;
+	private JFrame parent;
 	private List manyValuedAttributeList;
 	private AddCriterionAttributeDialog dialog =this;
+	private View view;
 		
-	public AddCriterionAttributeDialog(Collection manyValuedAttributeList,TableViewPanel tableView){
-		super(tableView,"Many Valued Context:Add Criteria",false);
+	public AddCriterionAttributeDialog(Collection manyValuedAttributeList,JFrame parent,View view){
+		super(parent,"Many Valued Context:Add Criteria",false);
 		this.manyValuedAttributeList = (List)manyValuedAttributeList;
-		this.tableView = tableView;
+		this.parent = parent;
+		this.view = view;
 		setSize(300,150);
 		setContentPane(createView());
 	}
@@ -48,7 +52,7 @@ public class AddCriterionAttributeDialog extends JDialog{
 		continueButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				ManyValuedAttribute attr = (ManyValuedAttribute) comboBox.getSelectedItem();
-				AddCriterionDialog dialog = new AddCriterionDialog(attr,tableView);
+				AddCriterionDialog dialog = new AddCriterionDialog(attr,parent,view);
 			}
 		});
 		
