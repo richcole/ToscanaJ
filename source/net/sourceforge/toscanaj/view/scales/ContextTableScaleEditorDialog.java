@@ -28,7 +28,9 @@ import org.tockit.events.EventBrokerListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @todo introduce OderedContext interface or something similar to get rid of
@@ -605,8 +607,11 @@ public class ContextTableScaleEditorDialog
 	private void changeRelationImplementation(
 		int objectPos,
 		int attributePos) {
-		List objectList = (List) this.context.getObjects();
-		List attributeList = (List) this.context.getAttributes();
+			
+		// @todo the next two lines are hacks to get around
+		// Set vs List problem in Concept interface. Need to fix interface.
+		List objectList = new LinkedList((Set) this.context.getObjects());
+		List attributeList = new LinkedList ((Set) this.context.getAttributes());
 		Object object = objectList.get(objectPos);
 		Attribute attribute = (Attribute) attributeList.get(attributePos);
 		if (context.getRelationImplementation().contains(object, attribute)) {
