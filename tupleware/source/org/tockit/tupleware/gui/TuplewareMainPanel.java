@@ -9,6 +9,8 @@ package org.tockit.tupleware.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.gui.MainPanel;
+import net.sourceforge.toscanaj.gui.ToscanaJMainPanel;
+import net.sourceforge.toscanaj.gui.action.ExportDiagramAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.*;
@@ -17,16 +19,21 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
+import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
+import org.tockit.events.EventBrokerListener;
 import org.tockit.plugin.PluginLoader;
 import org.tockit.plugin.PluginLoaderException;
 import org.tockit.tupleware.model.TupleSet;
@@ -42,7 +49,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
-public class TuplewareMainPanel extends JFrame implements MainPanel {
+public class TuplewareMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     private static final String CONFIGURATION_SECTION = "TuplewareMainPanel";
 	private static final String WINDOW_TITLE = "Tupleware";
 
@@ -55,6 +62,9 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
      */
     private ConceptualSchema conceptualSchema;
     private TupleSet tuples;
+
+    private DiagramExportSettings diagramExportSettings;
+    private ExportDiagramAction exportDiagramAction;
 
     /**
      * Controls
@@ -77,6 +87,14 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
 
     public TuplewareMainPanel() {
         super(WINDOW_TITLE);
+
+        // register all image writers we want to support
+        ToscanaJMainPanel.registerImageWriters();
+
+        Iterator it = GraphicFormatRegistry.getIterator();
+        if (it.hasNext()) {
+            this.diagramExportSettings = new DiagramExportSettings();
+        }
 
         eventBroker = new EventBroker();
         conceptualSchema = new ConceptualSchema(eventBroker);
@@ -142,6 +160,8 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
     public void createViews() {
         diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
         diagramEditingView.setDividerLocation(ConfigurationManager.fetchInt(CONFIGURATION_SECTION, "diagramViewDivider", 200));
+        this.diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
+                                        this, DisplayedDiagramChangedEvent.class, Object.class);
 
         schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
     }
@@ -177,6 +197,25 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
 		fileMenu.add(saveAsMenuItem);
 
         fileMenu.addSeparator();
+
+        // we add the export options only if we can export at all
+        /// @todo reduce duplicate code with ToscanaJMainPanel
+        if (this.diagramExportSettings != null) {
+            Frame frame = JOptionPane.getFrameForComponent(this);
+            exportDiagramAction =
+                new ExportDiagramAction(
+                    frame,
+                    this.diagramExportSettings,
+                    this.diagramEditingView.getDiagramView(),
+                    KeyEvent.VK_E,
+                    KeyStroke.getKeyStroke(
+                        KeyEvent.VK_E,
+                        ActionEvent.CTRL_MASK));
+            fileMenu.add(exportDiagramAction);
+            exportDiagramAction.setEnabled(false);
+            fileMenu.addSeparator();
+        }
+        
 
         // --- file exit item ---
         JMenuItem exitMenuItem;
@@ -471,4 +510,9 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
 		}
 	}
 	
+    public void processEvent(Event e) {
+        this.exportDiagramAction.setEnabled(
+            (this.diagramEditingView.getDiagramView().getDiagram() != null)
+                && (this.diagramExportSettings != null));
+    }
 }
