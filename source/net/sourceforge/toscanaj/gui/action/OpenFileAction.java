@@ -4,6 +4,7 @@ import net.sourceforge.toscanaj.model.XML_Reader;
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
 import net.sourceforge.toscanaj.gui.activity.FileActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -64,11 +65,11 @@ public class OpenFileAction extends KeyboardMappedAction {
             result = openActivity.prepareToProcess();
         }
         catch (Exception ex) {
-            JOptionPane.showMessageDialog(
+            ErrorDialog.showError(
                     frame,
+                    ex,
                     "Unable to initiate file saving:" + ex.getMessage(),
-                    "Error preparing to save",
-                    JOptionPane.ERROR_MESSAGE);
+                    "Error preparing to save");
         }
 
         if ( result ) {
@@ -84,21 +85,22 @@ public class OpenFileAction extends KeyboardMappedAction {
                 try {
                     openActivity.processFile(selectedFile);
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(
+                    ErrorDialog.showError(
                             frame,
+                            ex,
                             "Failure to read the file:" + ex.getMessage(),
-                            "Error opening file",
-                            JOptionPane.ERROR_MESSAGE);
+                            "Error opening file");
+                    ex.printStackTrace();
                 }
                 previousFile = selectedFile;
                 try {
                     processPostOpenActivities();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(
+                    ErrorDialog.showError(
                             frame,
+                            ex,
                             "Failure to process the file:" + ex.getMessage(),
-                            "Error processing file",
-                            JOptionPane.ERROR_MESSAGE);
+                            "Error processing file");
                 }
             }
         }
