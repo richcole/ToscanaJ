@@ -42,11 +42,11 @@ public class AttributeLabelView extends LabelView {
         return LabelView.ABOVE;
     }
 
-    protected int getNumberOfEntries() {
+    public int getNumberOfEntries() {
         return this.labelInfo.getNode().getConcept().getAttributeContingentSize();
     }
 
-    protected Iterator getEntryIterator() {
+    public Iterator getEntryIterator() {
         return this.labelInfo.getNode().getConcept().getAttributeContingentIterator();
     }
 

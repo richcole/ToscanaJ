@@ -96,14 +96,14 @@ public class ObjectLabelView extends LabelView {
         updateEntries();
     }
 
-    protected int getNumberOfEntries() {
+    public int getNumberOfEntries() {
         if (this.contents == null) {
             return 0;
         }
         return this.contents.size();
     }
 
-    protected Iterator getEntryIterator() {
+    public Iterator getEntryIterator() {
         if(this.contents == null) {
             updateEntries();
         }

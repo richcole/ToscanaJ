@@ -636,9 +636,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 
     abstract protected boolean highlightedInFilter();
 
-    abstract protected int getNumberOfEntries();
+    abstract public int getNumberOfEntries();
 
-    abstract protected Iterator getEntryIterator();
+    abstract public Iterator getEntryIterator();
 
     private void nodeSelectionChanged() {
         if (highlightedInFilter() &&
