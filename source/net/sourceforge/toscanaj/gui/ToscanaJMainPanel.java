@@ -28,6 +28,11 @@ import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.util.gradients.CombinedGradient;
 import net.sourceforge.toscanaj.util.gradients.Gradient;
 import net.sourceforge.toscanaj.util.gradients.LinearGradient;
+import net.sourceforge.toscanaj.view.colorchange.BlackAndWhiteColorChanger;
+import net.sourceforge.toscanaj.view.colorchange.ColorChanger;
+import net.sourceforge.toscanaj.view.colorchange.GrayscaleColorChanger;
+import net.sourceforge.toscanaj.view.colorchange.NullColorChanger;
+import net.sourceforge.toscanaj.view.colorchange.WhiteAndBlackColorChanger;
 import net.sourceforge.toscanaj.view.diagram.*;
 
 import org.jdom.Element;
@@ -672,8 +677,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		colorModeColorMenuItem = new JRadioButtonMenuItem("Color");
 		colorModeColorMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setDiagramSchema(DiagramSchema.getDefaultSchema());
-			}
+                setColorChanger(new NullColorChanger());
+            }
 		});
 		colorModeGroup.add(colorModeColorMenuItem);
 		colorModeMenu.add(colorModeColorMenuItem);
@@ -681,8 +686,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		colorModeGrayscaleMenuItem = new JRadioButtonMenuItem("Grayscale");
 		colorModeGrayscaleMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setDiagramSchema(DiagramSchema.getDefaultSchema().getGrayScaleVersion());
-			}
+                setColorChanger(new GrayscaleColorChanger());
+            }
 		});
 		colorModeGroup.add(colorModeGrayscaleMenuItem);
 		colorModeMenu.add(colorModeGrayscaleMenuItem);
@@ -690,7 +695,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         colorModeWhiteNodesMenuItem = new JRadioButtonMenuItem("White nodes");
         colorModeWhiteNodesMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                setDiagramSchema(DiagramSchema.getDefaultSchema().getWhiteNodeVersion());
+                setColorChanger(new WhiteAndBlackColorChanger());
             }
         });
         colorModeGroup.add(colorModeWhiteNodesMenuItem);
@@ -699,7 +704,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         colorModeBlackNodesMenuItem = new JRadioButtonMenuItem("Black nodes");
         colorModeBlackNodesMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                setDiagramSchema(DiagramSchema.getDefaultSchema().getBlackNodeVersion());
+                setColorChanger(new BlackAndWhiteColorChanger());
             }
         });
         colorModeGroup.add(colorModeBlackNodesMenuItem);
@@ -708,20 +713,20 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		String colorMode = preferences.get(CONFIGURATION_KEY_COLOR_MODE, null);
         if(CONFIGURATION_VALUE_COLOR_MODE_COLOR.equals(colorMode)) {
             colorModeColorMenuItem.setSelected(true);
-            setDiagramSchema(DiagramSchema.getDefaultSchema());
+            setColorChanger(new NullColorChanger());
         } else if(CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE.equals(colorMode)) {
             colorModeGrayscaleMenuItem.setSelected(true);
-            setDiagramSchema(DiagramSchema.getDefaultSchema().getGrayScaleVersion());
+            setColorChanger(new GrayscaleColorChanger());
         } else if(CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES.equals(colorMode)) {
             colorModeWhiteNodesMenuItem.setSelected(true);
-            setDiagramSchema(DiagramSchema.getDefaultSchema().getWhiteNodeVersion());
+            setColorChanger(new WhiteAndBlackColorChanger());
         } else if(CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES.equals(colorMode)) {
             colorModeBlackNodesMenuItem.setSelected(true);
-            setDiagramSchema(DiagramSchema.getDefaultSchema().getBlackNodeVersion());
+            setColorChanger(new BlackAndWhiteColorChanger());
         } else {
             System.err.println("Unknown color mode setting, using color");
             colorModeColorMenuItem.setSelected(true);
-            setDiagramSchema(DiagramSchema.getDefaultSchema());
+            setColorChanger(new NullColorChanger());
         } 
 
 		viewMenu.add(colorModeMenu);
@@ -965,9 +970,16 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 	}
 
     protected void setDiagramSchema(DiagramSchema schema) {
-    	this.diagramView.setDiagramSchema(schema);
+        this.diagramView.setDiagramSchema(schema);
+        if(this.diagramPreview != null) {
+            this.diagramPreview.setDiagramSchema(schema);
+        }
+    }
+    
+    protected void setColorChanger(ColorChanger changer) {
+    	this.diagramView.setColorChanger(changer);
     	if(this.diagramPreview != null) {
-    		this.diagramPreview.setDiagramSchema(schema);
+    		this.diagramPreview.setColorChanger(changer);
     	}
 	}
 
