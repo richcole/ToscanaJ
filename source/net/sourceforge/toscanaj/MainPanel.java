@@ -771,6 +771,16 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      * Open a file and parse it to create ConceptualSchema.
      */
     protected void openSchemaFile(File schemaFile) {
+        // store current file
+        try {
+            this.currentFile = schemaFile.getCanonicalPath();
+        }
+        catch (IOException e) { // could not resolve canonical path
+            e.printStackTrace();
+            this.currentFile = schemaFile.getAbsolutePath();
+            /// @todo what could be done here?
+        }
+
         DatabaseViewerManager.resetRegistry();
         try {
             conceptualSchema = CSXParser.parse(schemaFile);
@@ -812,19 +822,17 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         }
 
         // update MRU list
-        if (this.mruList.contains(schemaFile.getPath())) {
+        if (this.mruList.contains(this.currentFile)) {
             // if it is already in, just remove it and add it at the end
-            this.mruList.remove(schemaFile.getPath());
+            this.mruList.remove(this.currentFile);
         }
-        this.mruList.add(schemaFile.getPath());
+        this.mruList.add(this.currentFile);
         if (this.mruList.size() > MaxMruFiles) {
             this.mruList.remove(0);
         }
 
-        // store current file
-        this.currentFile = schemaFile.getPath();
         // tell the viewer about it (so relative links can be resolved)
-        DescriptionViewer.setBaseLocation(schemaFile.getPath());
+        DescriptionViewer.setBaseLocation(this.currentFile);
 
         // recreate the menus
         buildMenuBar();
