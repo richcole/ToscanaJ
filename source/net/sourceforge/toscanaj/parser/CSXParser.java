@@ -16,6 +16,7 @@ import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.model.lattice.MemoryMappedConcept;
+import org.jdom.Attribute;
 import org.jdom.DataConversionException;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -228,9 +229,10 @@ public class CSXParser
         while( it.hasNext() )
         {
             Element attribute = (Element) it.next();
-            if(attribute.getText().length() != 0) {
+            Attribute name = attribute.getAttribute( "name" );
+            if( (name != null) && (name.getValue() != null) && (name.getValue().length() != 0) ) {
                 _Attributes.put( attribute.getAttribute( "id" ).getValue(),
-                             attribute.getText() );
+                             attribute.getAttribute( "name" ).getValue() );
             }
         }
     }
