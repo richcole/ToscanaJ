@@ -166,8 +166,16 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
     }
 
     private LabelInfo createLabelInfo(StringFormat format) {
-        // @todo implement
-        return new LabelInfo();
+        LabelInfo retVal = new LabelInfo();
+        retVal.setOffset(format.getOffset().getX(), -format.getOffset().getY());
+        if(format.getHorizontalAlign() == StringFormat.LEFT) {
+            retVal.setTextAlignment(LabelInfo.ALIGNLEFT);
+        } else if(format.getHorizontalAlign() == StringFormat.H_CENTER) {
+            retVal.setTextAlignment(LabelInfo.ALIGNCENTER);
+        } else if(format.getHorizontalAlign() == StringFormat.RIGHT) {
+            retVal.setTextAlignment(LabelInfo.ALIGNRIGHT);
+        }
+        return retVal;
     }
 
     private void rescale(Diagram2D diagram) {
