@@ -42,8 +42,13 @@ public class RowHeader extends JComponent{
 		int row = 0;
 		Iterator objectIt = this.context.getObjects().iterator();
 		while(objectIt.hasNext()){
-			FCAElement object = (FCAElement)objectIt.next();
-			drawCell(g2d , object.toString() , 0 , row * TableView.CELL_HEIGHT);
+            if(row * TableView.CELL_HEIGHT > this.getHeight()) {
+                break;
+            }
+            if(row * TableView.CELL_HEIGHT >= this.getY()) {
+                FCAElement object = (FCAElement)objectIt.next();
+                drawCell(g2d , object.toString() , 0 , row * TableView.CELL_HEIGHT);
+            }
 			row += 1;
 		}
 		g2d.setPaint(oldPaint);

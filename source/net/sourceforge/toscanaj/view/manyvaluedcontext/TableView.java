@@ -54,13 +54,18 @@ public class TableView extends JComponent implements Scrollable{
 		int col = 0;
 		Iterator attriIt = context.getAttributes().iterator();
 		while(attriIt.hasNext()){
-			ManyValuedAttribute attribute = (ManyValuedAttribute) attriIt.next();
-			if(selectedCell.getColumn() == col){
-				drawColumn(g2d, col, true, attribute);
-			}else{
-				drawColumn(g2d,col,false, attribute);
-			}
-			col+=1;
+            if(col * CELL_WIDTH > this.getWidth()) {
+                break;
+            }
+            if(col * CELL_WIDTH >= this.getX()) {
+                ManyValuedAttribute attribute = (ManyValuedAttribute) attriIt.next();
+    			if(selectedCell.getColumn() == col){
+    				drawColumn(g2d, col, true, attribute);
+    			}else{
+    				drawColumn(g2d,col,false, attribute);
+    			}
+            }
+			col += 1;
 		}
 		g2d.setPaint(oldPaint);
 	}
@@ -71,21 +76,25 @@ public class TableView extends JComponent implements Scrollable{
 		Iterator objIt = context.getObjects().iterator();
 		int row = 0;
 		while(objIt.hasNext()){
-			FCAElement object = (FCAElement) objIt.next();
-			AttributeValue relationship = context.getRelationship(object,attribute);
-					
-			boolean selected = checkCellSelected(row,columnSelected);
-			if(!attribute.getType().isValidValue(relationship)){
-				drawCell(g2d,col,row,ERROR_CELL_COLOR,relationship);
-			}
-			else if(selected){
-				drawCell(g2d,col,row,SELECTED_CELL_COLOR,relationship);
-			}
-			else{
-				drawCell(g2d,col,row,CELL_COLOR,relationship);
-			}
-			
-			row+= 1 ;
+            if(row * CELL_HEIGHT > this.getHeight()) {
+                break;
+            }
+            if(row * CELL_HEIGHT >= this.getY()) {
+                FCAElement object = (FCAElement) objIt.next();
+                AttributeValue relationship = context.getRelationship(object,attribute);
+    					
+    			boolean selected = checkCellSelected(row,columnSelected);
+    			if(!attribute.getType().isValidValue(relationship)){
+    				drawCell(g2d,col,row,ERROR_CELL_COLOR,relationship);
+    			}
+    			else if(selected){
+    				drawCell(g2d,col,row,SELECTED_CELL_COLOR,relationship);
+    			}
+    			else{
+    				drawCell(g2d,col,row,CELL_COLOR,relationship);
+    			}
+            }			
+			row += 1 ;
 		}
 	}
 	

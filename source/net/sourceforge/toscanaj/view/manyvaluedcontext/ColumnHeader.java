@@ -49,8 +49,13 @@ public class ColumnHeader extends JComponent{
 		int col = 0;
 		Iterator attrIt = this.context.getAttributes().iterator();
 		while(attrIt.hasNext()){
-			ManyValuedAttribute attribute = (ManyValuedAttribute) attrIt.next();	
-			drawAttributeNameCell(g2d,attribute.getName(),col * TableView.CELL_WIDTH,0);	
+            if(col * TableView.CELL_WIDTH > this.getWidth()) {
+                break;
+            }
+            if(col * TableView.CELL_WIDTH >= this.getX()) {
+                ManyValuedAttribute attribute = (ManyValuedAttribute) attrIt.next();	
+                drawAttributeNameCell(g2d,attribute.getName(),col * TableView.CELL_WIDTH,0);
+            }
 			col+=1;
 		}
 		g2d.setPaint(oldPaint);
