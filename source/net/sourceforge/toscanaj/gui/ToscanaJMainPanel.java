@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.fca.*;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter.IntervalType;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.gui.events.DiagramClickedEvent;
@@ -27,6 +28,7 @@ import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.util.gradients.CombinedGradient;
+import net.sourceforge.toscanaj.util.gradients.Gradient;
 import net.sourceforge.toscanaj.util.gradients.LinearGradient;
 import net.sourceforge.toscanaj.view.diagram.*;
 
@@ -628,10 +630,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK));
             showExactMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    DiagramSchema diagramSchema = diagramView.getDiagramSchema();
-                    diagramSchema.setGradientType(ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
-                    diagramSchema.setGradient(diagramSchema.getDefaultGradient());
-                    diagramView.update(this);
+					DiagramSchema diagramSchema = diagramView.getDiagramSchema();
+					setDiagramGradient(diagramSchema.getDefaultGradient(), ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
                 }
             });
             colorGradientGroup.add(showExactMenuItem);
@@ -644,9 +644,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             showAllMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     DiagramSchema diagramSchema = diagramView.getDiagramSchema();
-                    diagramSchema.setGradientType(ConceptInterpreter.INTERVAL_TYPE_EXTENT);
-                    diagramSchema.setGradient(diagramSchema.getDefaultGradient());
-                    diagramView.update(this);
+					setDiagramGradient(diagramSchema.getDefaultGradient(), ConceptInterpreter.INTERVAL_TYPE_EXTENT);
                 }
             });
             colorGradientGroup.add(showAllMenuItem);
@@ -659,10 +657,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                 showContingentOrthogonalityMenuItem.setSelected(true);
                 showContingentOrthogonalityMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        DiagramSchema diagramSchema = diagramView.getDiagramSchema();
-                        diagramSchema.setGradientType(ConceptInterpreter.INTERVAL_TYPE_CONTINGENT_ORTHOGONALTIY);
-                        diagramSchema.setGradient(redGreenGradient);
-                        diagramView.update(this);
+						setDiagramGradient(redGreenGradient, ConceptInterpreter.INTERVAL_TYPE_CONTINGENT_ORTHOGONALTIY);
                     }
                 });
                 colorGradientGroup.add(showContingentOrthogonalityMenuItem);
@@ -672,10 +667,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                 showExtentOrthogonalityMenuItem.setSelected(true);
                 showExtentOrthogonalityMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        DiagramSchema diagramSchema = diagramView.getDiagramSchema();
-                        diagramSchema.setGradientType(ConceptInterpreter.INTERVAL_TYPE_EXTENT_ORTHOGONALTIY);
-                        diagramSchema.setGradient(redGreenGradient);
-                        diagramView.update(this);
+                        setDiagramGradient(redGreenGradient, ConceptInterpreter.INTERVAL_TYPE_EXTENT_ORTHOGONALTIY);
                     }
                 });
                 colorGradientGroup.add(showExtentOrthogonalityMenuItem);
@@ -927,6 +919,16 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         helpMenu.add(aboutItem);
         this.menubar.updateUI();
     }
+
+	private void setDiagramGradient(Gradient gradient, IntervalType intervalType) {
+		DiagramSchema diagramSchema = diagramView.getDiagramSchema();
+		diagramSchema.setGradientType(intervalType);
+		diagramSchema.setGradient(gradient);
+		this.diagramView.update(this);
+		if(this.diagramPreview != null) {
+			this.diagramPreview.update(this);
+		}
+	}
 
     protected void setDiagramSchema(DiagramSchema schema) {
     	this.diagramView.setDiagramSchema(schema);
