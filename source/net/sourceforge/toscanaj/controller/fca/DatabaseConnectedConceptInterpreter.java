@@ -183,6 +183,7 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
 										context.getFilterMode());
 		return new DatabaseRetrievedObject(whereClause, value);		
 	}
+	
 	protected Object[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) {
 		String whereClause = WhereClauseGenerator.createWhereClause(concept,
 									context.getDiagramHistory(),
@@ -193,17 +194,8 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
 				((context.getObjectDisplayMode() == ConceptInterpretationContext.EXTENT) && !concept.isBottom())
 		) {
 			if(query.doesNeedReferenceValues()){
-				Concept top = concept;
-				while(top.getUpset().size() > 1) {
-					Iterator it = top.getUpset().iterator();
-					Concept upper = (Concept) it.next();
-					if(upper != top) {
-						top = upper;
-					} else {
-						top = (Concept) it.next();
-					}
-				}
-				String referenceWhereClause = WhereClauseGenerator.createWhereClause(top,
+				String referenceWhereClause = WhereClauseGenerator.createWhereClause(
+											concept.getTopConcept(),
 											context.getDiagramHistory(),
 											context.getNestingConcepts(),
 											ConceptInterpretationContext.EXTENT,
@@ -215,7 +207,6 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
 		} else {
 			return null;
 		}
-		 
 	}
 
     private Object[] execute(Query query, String whereClause, String referenceWhereClause) {

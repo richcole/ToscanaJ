@@ -78,16 +78,8 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter {
 						compareConcept = concept;
 						compareContext = context;
 					}
-					while (!compareConcept.isTop()) {
-						Concept other = compareConcept;
-						Iterator it = compareConcept.getUpset().iterator();
-						do {
-							other = (Concept) it.next();
-						} while (other == compareConcept);
-						compareConcept = other;
-					}
 					return (double) extentSize /
-							(double) getExtentSize(compareConcept, compareContext);
+							(double) getExtentSize(compareConcept.getTopConcept(), compareContext);
 				}
 			};
 		} else if(type == INTERVAL_TYPE_FIXED) {
@@ -131,19 +123,9 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter {
 			int objectCount = getObjectCount(concept, context);
 			retVal = new Object[1];
 			if( objectCount != 0) {
-				Concept top = concept;
-				while(top.getUpset().size() > 1) {
-					Iterator it = top.getUpset().iterator();
-					Concept upper = (Concept) it.next();
-					if(upper != top) {
-						top = upper;
-					} else {
-						top = (Concept) it.next();
-					}
-				}
 				boolean oldMode = context.getObjectDisplayMode();
 				context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
-				int fullExtent = getObjectCount(top,context);
+				int fullExtent = getObjectCount(concept.getTopConcept(), context);
 				context.setObjectDisplayMode(oldMode);
 				NumberFormat format = DecimalFormat.getNumberInstance();
 				format.setMaximumFractionDigits(2);

@@ -32,7 +32,6 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
         return 1;
     }
 
-
     public boolean isRealized(Concept concept, ConceptInterpretationContext context) {
         /// @todo there might be some reuse with the same method from the DB version
         int extentSize = getExtentSize(concept, context);
