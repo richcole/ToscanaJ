@@ -268,7 +268,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     /**
      * Makes sure the y-coordinates increase in the downward direction.
      */
-    protected void checkCoordinateSystem() {
+    public void checkCoordinateSystem() {
         if (this.nodes.size() > 1) { // no point in checking direction otherwise
             DiagramNode highestNode = (DiagramNode) this.nodes.get(0);
             for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {

@@ -67,8 +67,8 @@ public class NestedDiagramNode extends DiagramNode {
         double innerScale = (scale / OUTER_SCALE_FACTOR) * EXTRA_ELLIPSE_SCALING;
                 
         // scale attribute label position
-        this.attributeLabel.setOffset(new Point2D.Double(this.attributeLabel.getOffset().getX(),
-                this.attributeLabel.getOffset().getY()));
+        this.attributeLabelInfo.setOffset(new Point2D.Double(this.attributeLabelInfo.getOffset().getX(),
+                this.attributeLabelInfo.getOffset().getY()));
 
         // calculate an offset that places center of the inner diagram into the middle of the node
         Rectangle2D rect = innerDiagram.getBounds();

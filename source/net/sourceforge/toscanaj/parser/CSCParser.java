@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.parser;
 
+import java.awt.geom.Point2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,13 +23,38 @@ import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.Context;
-import net.sourceforge.toscanaj.model.ContextImplementation;
+import net.sourceforge.toscanaj.model.burmeister.BurmeisterContext;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 
 public class CSCParser {
+    protected static final class SectionTypeNotSupportedException
+        extends DataFormatException {
+
+        public SectionTypeNotSupportedException() {
+            super();
+        }
+
+        public SectionTypeNotSupportedException(String message) {
+            super(message);
+        }
+
+        public SectionTypeNotSupportedException(
+            String message,
+            Throwable cause) {
+            super(message, cause);
+        }
+
+        public SectionTypeNotSupportedException(Throwable cause) {
+            super(cause);
+        }
+
+    }
     protected static class CSCTokenizer {
         private BufferedReader inputReader;
         private String currentToken;
@@ -67,6 +93,10 @@ public class CSCParser {
             while( character != -1 && character != '\"' ) {
                 this.currentToken += (char) character;
                 character = this.inputReader.read();
+                if(character == '\\') {
+                	this.currentToken += (char) this.inputReader.read();
+                    character = this.inputReader.read();
+                }                	
             }
             if(character != '\"') {
                 throw new DataFormatException("Open quote from line " + startLine + " not matched.");
@@ -87,6 +117,7 @@ public class CSCParser {
             }
         }
 
+
         public void advanceNormal(int character) throws IOException {
             while( character != -1 && !Character.isWhitespace((char)character) &&
                     character != '\"' && character != '(' ) {
@@ -104,82 +135,295 @@ public class CSCParser {
         }
     }
     
-    public static void importCSCFile(File file, ConceptualSchema schema) 
+    protected static class CSCFileSectionParser {
+    	private String token;
+    	public CSCFileSectionParser(String token) {
+    		this.token = token;
+    	}
+    	public String getStartToken() {
+    		return token;
+    	}
+    	public Object parse(CSCTokenizer tokenizer) throws IOException, DataFormatException {
+    		throw new SectionTypeNotSupportedException("parse() in " + this.getClass().getName() + " not yet implemented.");
+    	}
+    	protected void consumeToken(CSCTokenizer tokenizer, String token) throws IOException, DataFormatException{
+    		if(!tokenizer.getCurrentToken().equals(token)) {
+    			throw new DataFormatException("Expected token '" + token + "' in line " + tokenizer.currentLine);
+    		}
+    		tokenizer.advance();
+    	}
+    };
+    
+    protected static final CSCFileSectionParser REMARK_SECTION = new CSCFileSectionParser("REMARK");
+
+    protected static final CSCFileSectionParser FORMAL_CONTEXT_SECTION = new CSCFileSectionParser("FORMAL_CONTEXT"){
+        public Object parse(CSCTokenizer tokenizer) throws IOException, DataFormatException {
+            BurmeisterContext context = new BurmeisterContext(tokenizer.getCurrentToken());
+            List objects = new ArrayList();
+            List attributes = new ArrayList();
+
+            while(!tokenizer.getCurrentToken().equals("OBJECTS")) { // ignore everything before the objects
+                tokenizer.advance();
+            }
+            tokenizer.advance(); // skip "OBJECTS"
+
+            while(!tokenizer.getCurrentToken().equals("ATTRIBUTES")) { // find objects until attributes come
+                tokenizer.advance(); // skip number
+                tokenizer.advance(); // skip id
+                objects.add(tokenizer.getCurrentToken()); // use name
+                tokenizer.advance(); // next
+            }
+            tokenizer.advance(); // skip "ATTRIBUTES"
+            context.getObjects().addAll(objects); // we have all objects
+
+            while(!tokenizer.getCurrentToken().equals("RELATION")) { // find attributes until relation comes
+                tokenizer.advance(); // skip number
+                tokenizer.advance(); // skip id
+                attributes.add(new Attribute(tokenizer.getCurrentToken(), null)); // use name
+                tokenizer.advance(); // next
+            }
+            tokenizer.advance(); // skip "RELATION"
+            tokenizer.advance(); // skip size ...
+            tokenizer.advance(); // ... both parts of it
+            context.getAttributes().addAll(attributes); // we have all attributes
+
+            BinaryRelationImplementation relation = context.getRelationImplementation();
+
+            // create relation
+            Iterator objIt = objects.iterator(); // iterate over objects/rows
+            while(objIt.hasNext()) {
+                Object object = objIt.next();
+                String row = tokenizer.getCurrentToken(); // get row string
+                Iterator attrIt = attributes.iterator(); // iterate over attributes
+                int i = 0; // count pos in string
+                while(attrIt.hasNext()) {
+                    Object attribute = attrIt.next();
+                    if(row.charAt(i) == '*') {
+                        relation.insert(object,attribute); // hit --> add to relation
+                    }
+                    i++;
+                }
+                tokenizer.advance(); // next row
+            }
+
+			consumeToken(tokenizer,";");            
+
+            return context;
+        }
+    };
+    protected static final CSCFileSectionParser LINE_DIAGRAM_SECTION = new CSCFileSectionParser("LINE_DIAGRAM"){
+        public Object parse(CSCTokenizer tokenizer) throws IOException, DataFormatException {
+        	SimpleLineDiagram diagram = new SimpleLineDiagram();
+        	
+        	String identifier = tokenizer.getCurrentToken();
+        	tokenizer.advance();
+        	
+        	consumeToken(tokenizer, "=");
+        	
+        	if(tokenizer.getCurrentToken().equals("TITLE")) {
+        		tokenizer.advance();
+        		diagram.setTitle(tokenizer.getCurrentToken());
+        		tokenizer.advance();
+        	} else {
+        	    diagram.setTitle(identifier);
+        	}
+        	
+            while(!tokenizer.getCurrentToken().equals("POINTS")) { // we ignore remark, special list and unitlength
+                tokenizer.advance();
+            }
+            tokenizer.advance();
+
+            while(!tokenizer.getCurrentToken().equals("LINES")) {
+            	String id = tokenizer.getCurrentToken();
+            	tokenizer.advance();
+            	
+                double x = Double.parseDouble(tokenizer.getCurrentToken());
+                tokenizer.advance();
+                double y = Double.parseDouble(tokenizer.getCurrentToken());
+                tokenizer.advance();
+                Point2D position = new Point2D.Double(x,y);
+            	
+            	DiagramNode node = new DiagramNode(id, position, new ConceptImplementation(), null, null, null);
+            	diagram.addNode(node);
+            }
+            tokenizer.advance();
+
+            while(!tokenizer.getCurrentToken().equals("OBJECTS")) {
+            	String linecode = tokenizer.getCurrentToken();
+            	
+                String from = linecode.substring(1,linecode.indexOf(','));
+                String to = linecode.substring(linecode.indexOf(',') + 1,linecode.length() - 1);
+                
+                while(to.startsWith(" ")) {
+                	to = to.substring(1);
+                }
+                
+                DiagramNode fromNode = diagram.getNode(from);
+                DiagramNode toNode = diagram.getNode(to);
+                diagram.addLine(fromNode, toNode);
+                
+                ConceptImplementation fromConcept = (ConceptImplementation) fromNode.getConcept();
+                ConceptImplementation toConcept = (ConceptImplementation) toNode.getConcept();
+            	fromConcept.addSubConcept(toNode.getConcept());
+            	toConcept.addSuperConcept(fromConcept);
+            	
+                tokenizer.advance();
+            }
+            tokenizer.advance();
+
+            while(!tokenizer.getCurrentToken().equals("ATTRIBUTES")) { 
+            	DiagramNode node = diagram.getNode(tokenizer.getCurrentToken());
+                tokenizer.advance();
+            	
+                tokenizer.advance(); // ignore id of object
+                
+                int currentLine = tokenizer.currentLine;
+                String content = tokenizer.getCurrentToken();
+                tokenizer.advance();
+                
+                String formattingString = null;
+                if(tokenizer.currentLine == currentLine) {
+                	// still on the same line --> we have a formatting string
+                	formattingString = tokenizer.getCurrentToken();
+                	tokenizer.advance();
+                }
+                
+                ConceptImplementation concept = (ConceptImplementation) node.getConcept();
+                concept.addObject(content);
+                
+                LabelInfo labelInfo = new LabelInfo();
+                node.setObjectLabelInfo(labelInfo);
+            }
+            tokenizer.advance();
+
+            while(!tokenizer.getCurrentToken().equals("CONCEPTS")) { 
+                DiagramNode node = diagram.getNode(tokenizer.getCurrentToken());
+                tokenizer.advance();
+
+                tokenizer.advance(); // ignore id of attribute
+
+                int currentLine = tokenizer.currentLine;
+                String content = tokenizer.getCurrentToken();
+                tokenizer.advance();
+
+                String formattingString = null;
+                if(tokenizer.currentLine == currentLine) {
+                    // still on the same line --> we have a formatting string
+                    formattingString = tokenizer.getCurrentToken();
+                    tokenizer.advance();
+                }
+
+                ConceptImplementation concept = (ConceptImplementation) node.getConcept();
+                concept.addAttribute(new Attribute(content));
+
+                LabelInfo labelInfo = new LabelInfo();
+                node.setAttributeLabelInfo(labelInfo);
+            }
+            tokenizer.advance();
+
+            while(!tokenizer.getCurrentToken().equals(";")) { // we ignore the concept definitions 
+                tokenizer.advance();
+            }
+            consumeToken(tokenizer, ";");
+            
+            for (Iterator iter = diagram.getNodes(); iter.hasNext();) {
+                DiagramNode node = (DiagramNode) iter.next();
+                ConceptImplementation concept = (ConceptImplementation) node.getConcept();
+                concept.buildClosures();
+            }
+            
+            diagram.checkCoordinateSystem();
+            
+        	return diagram;
+        }
+    };
+    protected static final CSCFileSectionParser STRING_MAP_SECTION = new CSCFileSectionParser("STRING_MAP");
+    protected static final CSCFileSectionParser IDENTIFIER_MAP_SECTION = new CSCFileSectionParser("IDENTIFIER_MAP");
+    protected static final CSCFileSectionParser QUERY_MAP_SECTION = new CSCFileSectionParser("QUERY_MAP");
+    protected static final CSCFileSectionParser ABSTRACT_SCALE_SECTION = new CSCFileSectionParser("ABSTRACT_SCALE");
+    protected static final CSCFileSectionParser CONCRETE_SCALE_SECTION = new CSCFileSectionParser("CONCRETE_SCALE");
+    protected static final CSCFileSectionParser REALISED_SCALE_SECTION = new CSCFileSectionParser("REALISED_SCALE");
+    protected static final CSCFileSectionParser DATABASE_SECTION = new CSCFileSectionParser("DATABASE");
+    protected static final CSCFileSectionParser CONCEPTUAL_SCHEME_SECTION = new CSCFileSectionParser("CONCEPTUAL_SCHEME");
+    protected static final CSCFileSectionParser CONCEPTUAL_FILE_SECTION = new CSCFileSectionParser("CONCEPTUAL_FILE");
+    protected static final CSCFileSectionParser INCLUDE_FILE_ENTRY = new CSCFileSectionParser("#INCLUDE");
+    
+    protected static final CSCFileSectionParser[] CSC_FILE_SECTIONS_PARSERS = 
+    								new CSCFileSectionParser[]{
+    											REMARK_SECTION,
+    											FORMAL_CONTEXT_SECTION,
+    											LINE_DIAGRAM_SECTION,
+    											STRING_MAP_SECTION,
+    											IDENTIFIER_MAP_SECTION,
+    											QUERY_MAP_SECTION,
+    											ABSTRACT_SCALE_SECTION,
+    											CONCRETE_SCALE_SECTION,
+    											REALISED_SCALE_SECTION,
+    											DATABASE_SECTION,
+    											CONCEPTUAL_SCHEME_SECTION,
+    											CONCEPTUAL_FILE_SECTION,
+    											INCLUDE_FILE_ENTRY
+    								}; 
+    								
+    protected CSCFileSectionParser currentSectionParser = null;
+    
+    public void importCSCFile(File file, ConceptualSchema schema) 
     								throws FileNotFoundException, DataFormatException {
         try {
             CSCTokenizer tokenizer = new CSCTokenizer(file);
             
+            List results = new ArrayList();
+            
             while(! tokenizer.done()) {
-				if(tokenizer.getCurrentToken().equals("FORMAL_CONTEXT")) {
-				    tokenizer.advance();
-				    String name = tokenizer.getCurrentToken();
-				    tokenizer.advance();
-				    if(!tokenizer.getCurrentToken().equals("=")) {
-				    	throw new DataFormatException("Syntax error in line " + tokenizer.getCurrentLine() + " - expected '='");
-				    }
-					Context context = importContext(tokenizer);
-	                LatticeGenerator lgen = new GantersAlgorithm();
-	                Lattice lattice = lgen.createLattice(context);
-	                Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, name, new DefaultDimensionStrategy());
-	                schema.addDiagram(diagram);
-				}
+            	this.currentSectionParser = identifySectionParser(tokenizer);
+            	try {
+            		results.add(this.currentSectionParser.parse(tokenizer));
+            	} catch (SectionTypeNotSupportedException e) {
+            		System.err.println(e.getMessage());
+            	}	
+            }
+            
+            List importedDiagrams = new ArrayList();
+            
+            for (Iterator iter = results.iterator(); iter.hasNext();) {
+                Object result = iter.next();
+                if(result instanceof Diagram2D) {
+                    Diagram2D diagram = (Diagram2D) result;
+                    Diagram2D existingDiagram = schema.getDiagram(diagram.getTitle());
+                    if(existingDiagram != null) {
+                        schema.removeDiagram(existingDiagram);
+                    }
+                    schema.addDiagram(diagram);
+                    importedDiagrams.add(diagram.getTitle());
+                }
+            }
 
-                tokenizer.advance();
+            for (Iterator iter = results.iterator(); iter.hasNext();) {
+                Object result = iter.next();
+                if(result instanceof BurmeisterContext) {
+                	BurmeisterContext context = (BurmeisterContext) result;
+                	if(importedDiagrams.contains(context.getName())) {
+                		continue;
+                	}
+                    LatticeGenerator lgen = new GantersAlgorithm();
+                    Lattice lattice = lgen.createLattice(context);
+                    Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, context.getName(), new DefaultDimensionStrategy());
+                    schema.addDiagram(diagram);                	
+                }
             }
         } catch (IOException e) {
             throw new DataFormatException("Error reading input file", e);
         }
     }
     
-    private static Context importContext(CSCTokenizer tokenizer) throws IOException, DataFormatException {
-        ContextImplementation context = new ContextImplementation();
-        List objects = new ArrayList();
-        List attributes = new ArrayList();
-        
-        while(!tokenizer.getCurrentToken().equals("OBJECTS")) { // ignore everything before the objects
-        	tokenizer.advance();
+    protected CSCFileSectionParser identifySectionParser(CSCTokenizer tokenizer) throws IOException, DataFormatException {
+    	for (int i = 0; i < CSC_FILE_SECTIONS_PARSERS.length; i++) {
+            CSCFileSectionParser sectionType = CSC_FILE_SECTIONS_PARSERS[i];
+            if(sectionType.getStartToken().equals(tokenizer.getCurrentToken())) {
+            	tokenizer.advance();
+            	return sectionType;
+            }
         }
-        tokenizer.advance(); // skip "OBJECTS"
-
-        while(!tokenizer.getCurrentToken().equals("ATTRIBUTES")) { // find objects until attributes come
-            tokenizer.advance(); // skip number
-            tokenizer.advance(); // skip id
-            objects.add(tokenizer.getCurrentToken()); // use name
-            tokenizer.advance(); // next
-        }
-        tokenizer.advance(); // skip "ATTRIBUTES"
-        context.getObjects().addAll(objects); // we have all objects
-        
-        while(!tokenizer.getCurrentToken().equals("RELATION")) { // find attributes until relation comes
-            tokenizer.advance(); // skip number
-            tokenizer.advance(); // skip id
-            attributes.add(new Attribute(tokenizer.getCurrentToken(), null)); // use name
-            tokenizer.advance(); // next
-        }
-        tokenizer.advance(); // skip "RELATION"
-        tokenizer.advance(); // skip size ...
-        tokenizer.advance(); // ... both parts of it
-		context.getAttributes().addAll(attributes); // we have all attributes
-        
-        BinaryRelationImplementation relation = context.getRelationImplementation();
-        
-        // create relation
-        Iterator objIt = objects.iterator(); // iterate over objects/rows
-        while(objIt.hasNext()) {
-        	Object object = objIt.next();
-        	String row = tokenizer.getCurrentToken(); // get row string
-        	Iterator attrIt = attributes.iterator(); // iterate over attributes
-        	int i = 0; // count pos in string
-        	while(attrIt.hasNext()) {
-        		Object attribute = attrIt.next();
-        		if(row.charAt(i) == '*') {
-        			relation.insert(object,attribute); // hit --> add to relation
-        		}
-        		i++;
-        	}
-            tokenizer.advance(); // next row
-        }
-         
-        return context;
+        return this.currentSectionParser;
     }
 }

@@ -58,12 +58,12 @@ public class DiagramNode implements XMLizable {
     /**
      * The layout information for the attribute label.
      */
-    protected LabelInfo attributeLabel;
+    protected LabelInfo attributeLabelInfo;
 
     /**
      * The layout information for the attribute label.
      */
-    protected LabelInfo objectLabel;
+    protected LabelInfo objectLabelInfo;
 
     protected DiagramNode outerNode;
     public static final String NODE_ELEMENT_NAME = "node";
@@ -75,19 +75,13 @@ public class DiagramNode implements XMLizable {
     public static final String OBJECT_LABEL_STYLE_ELEMENT_NAME = "objectLabelStyle";
 
     public DiagramNode(String identifier, Point2D position, Concept concept,
-                       LabelInfo attributeLabel, LabelInfo objectLabel,
+                       LabelInfo attributeLabelInfo, LabelInfo objectLabelInfo,
                        DiagramNode outerNode) {
         this.identifier = identifier;
         this.position = position;
         this.concept = concept;
-        this.attributeLabel = attributeLabel;
-        if (attributeLabel != null) {
-            attributeLabel.attachNode(this);
-        }
-        this.objectLabel = objectLabel;
-        if (objectLabel != null) {
-            objectLabel.attachNode(this);
-        }
+        setAttributeLabelInfo(attributeLabelInfo);
+        setObjectLabelInfo(objectLabelInfo);
         this.outerNode = outerNode;
     }
     
@@ -110,13 +104,13 @@ public class DiagramNode implements XMLizable {
         positionElem.setAttribute(POSITION_X_ATTRIBUTE_NAME, String.valueOf(getPosition().getX()));
         positionElem.setAttribute(POSITION_Y_ATTRIBUTE_NAME, String.valueOf(getPosition().getY()));
         retVal.addContent(positionElem);
-        if (attributeLabel != null) {
-            Element attrLabelInfoElem = attributeLabel.toXML();
+        if (attributeLabelInfo != null) {
+            Element attrLabelInfoElem = attributeLabelInfo.toXML();
             attrLabelInfoElem.setName(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME);
             retVal.addContent(attrLabelInfoElem);
         }
-        if (objectLabel != null) {
-            Element objectLabelInfoElem = objectLabel.toXML();
+        if (objectLabelInfo != null) {
+            Element objectLabelInfoElem = objectLabelInfo.toXML();
             objectLabelInfoElem.setName(OBJECT_LABEL_STYLE_ELEMENT_NAME);
             retVal.addContent(objectLabelInfoElem);
         }
@@ -133,12 +127,12 @@ public class DiagramNode implements XMLizable {
                 XMLHelper.getDoubleAttribute(positionElem, POSITION_Y_ATTRIBUTE_NAME)
         );
         if (XMLHelper.contains(elem, ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)) {
-            attributeLabel = new LabelInfo(elem.getChild(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME));
-            attributeLabel.attachNode(this);
+            attributeLabelInfo = new LabelInfo(elem.getChild(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME));
+            attributeLabelInfo.attachNode(this);
         }
         if (XMLHelper.contains(elem, OBJECT_LABEL_STYLE_ELEMENT_NAME)) {
-            objectLabel = new LabelInfo(elem.getChild(OBJECT_LABEL_STYLE_ELEMENT_NAME));
-            objectLabel.attachNode(this);
+            objectLabelInfo = new LabelInfo(elem.getChild(OBJECT_LABEL_STYLE_ELEMENT_NAME));
+            objectLabelInfo.attachNode(this);
         }
         concept = new ConceptImplementation(
                 XMLHelper.mustbe(ConceptImplementation.CONCEPT_ELEMENT_NAME, elem)
@@ -176,17 +170,17 @@ public class DiagramNode implements XMLizable {
     public DiagramNode(DiagramNode other) {
         this.position = (Point2D) other.position.clone();
         this.concept = other.concept;
-        if (this.attributeLabel != null) {
-            this.attributeLabel = new LabelInfo(other.attributeLabel);
-            this.attributeLabel.attachNode(this);
+        if (this.attributeLabelInfo != null) {
+            this.attributeLabelInfo = new LabelInfo(other.attributeLabelInfo);
+            this.attributeLabelInfo.attachNode(this);
         } else {
-            this.attributeLabel = null;
+            this.attributeLabelInfo = null;
         }
-        if (this.objectLabel != null) {
-            this.objectLabel = new LabelInfo(other.objectLabel);
-            this.objectLabel.attachNode(this);
+        if (this.objectLabelInfo != null) {
+            this.objectLabelInfo = new LabelInfo(other.objectLabelInfo);
+            this.objectLabelInfo.attachNode(this);
         } else {
-            this.objectLabel = null;
+            this.objectLabelInfo = null;
         }
     }
 
@@ -251,7 +245,7 @@ public class DiagramNode implements XMLizable {
      * This might be null if there is no label attached.
      */
     public LabelInfo getAttributeLabelInfo() {
-        return this.attributeLabel;
+        return this.attributeLabelInfo;
     }
 
     /**
@@ -260,21 +254,27 @@ public class DiagramNode implements XMLizable {
      * This might be null if there is no label attached.
      */
     public LabelInfo getObjectLabelInfo() {
-        return this.objectLabel;
+        return this.objectLabelInfo;
     }
 
     /**
      * Sets the layout information for the attribute label attached.
      */
     public void setAttributeLabelInfo(LabelInfo labelInfo) {
-        this.attributeLabel = labelInfo;
+        this.attributeLabelInfo = labelInfo;
+        if (attributeLabelInfo != null) {
+            attributeLabelInfo.attachNode(this);
+        }
     }
 
     /**
      * Sets the layout information for the object label attached.
      */
     public void setObjectLabelInfo(LabelInfo labelInfo) {
-        this.objectLabel = labelInfo;
+        this.objectLabelInfo = labelInfo;
+        if (objectLabelInfo != null) {
+            objectLabelInfo.attachNode(this);
+        }
     }
 
     /**
@@ -286,10 +286,14 @@ public class DiagramNode implements XMLizable {
      */
     public void invertY() {
         this.position.setLocation(this.position.getX(), -this.position.getY());
-        this.attributeLabel.setOffset(this.attributeLabel.getOffset().getX(),
-                -this.attributeLabel.getOffset().getY());
-        this.objectLabel.setOffset(this.objectLabel.getOffset().getX(),
-                -this.objectLabel.getOffset().getY());
+        if(this.attributeLabelInfo != null) {
+	        this.attributeLabelInfo.setOffset(this.attributeLabelInfo.getOffset().getX(),
+	                -this.attributeLabelInfo.getOffset().getY());
+        }
+        if(this.objectLabelInfo != null) {
+	        this.objectLabelInfo.setOffset(this.objectLabelInfo.getOffset().getX(),
+	                -this.objectLabelInfo.getOffset().getY());
+        }
     }
 
     /**

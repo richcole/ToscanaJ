@@ -432,7 +432,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             /// @todo what could be done here?
         }
         try {
-            CSCParser.importCSCFile(file, this.conceptualSchema);
+            new CSCParser().importCSCFile(file, this.conceptualSchema);
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(this, e, "Could not find file");
             return;

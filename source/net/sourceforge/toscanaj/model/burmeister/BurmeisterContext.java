@@ -14,10 +14,13 @@ import net.sourceforge.toscanaj.model.Context;
 import java.util.Collection;
 import java.util.HashSet;
 
+/**
+ * @todo unite with ContextImplementation
+ */
 public class BurmeisterContext implements Context {
     private Collection objects = new HashSet();
     private Collection attributes = new HashSet();
-    private BinaryRelation relation = new BinaryRelationImplementation();
+    private BinaryRelationImplementation relation = new BinaryRelationImplementation();
     private String name = "";
 
     public BurmeisterContext(String name) {
@@ -33,6 +36,10 @@ public class BurmeisterContext implements Context {
     }
 
     public BinaryRelation getRelation() {
+        return relation;
+    }
+
+    public BinaryRelationImplementation getRelationImplementation() {
         return relation;
     }
 
