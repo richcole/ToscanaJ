@@ -511,6 +511,7 @@ public class NominalScaleEditorDialog extends JDialog {
         this.attributeListModel.removeElement(firstPart);
         this.attributeListModel.removeElement(secondPart);
         this.attributeListModel.add(pos, new Conjunction(firstPart,secondPart));
+		fillAvailableValueList();
     }
 
     private void createDisjunction() {
@@ -520,6 +521,7 @@ public class NominalScaleEditorDialog extends JDialog {
         this.attributeListModel.removeElement(firstPart);
         this.attributeListModel.removeElement(secondPart);
         this.attributeListModel.add(pos, new Disjunction(firstPart,secondPart));
+		fillAvailableValueList();
     }
 
 	private class UpdateButtonForCorrectModelStateListDataListener implements ListDataListener {
