@@ -8,6 +8,8 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.DiagramReference;
 import net.sourceforge.toscanaj.gui.eventhandler.DiagramOrganiserDnDController;
 import net.sourceforge.toscanaj.gui.events.DiagramClickedEvent;
 import net.sourceforge.toscanaj.model.DiagramCollection;
@@ -115,19 +117,30 @@ public class DiagramOrganiser extends JPanel {
             }
         });
 
-        MouseListener mouseListener = new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+		availableDiagramsListview.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
 				int index = availableDiagramsListview.locationToIndex(e.getPoint());
 				Diagram2D diagram = schema.getDiagram(index);
-				eventBroker.processEvent(new DiagramClickedEvent(diagram));            	
-                if (e.getClickCount() == 2) {
+				eventBroker.processEvent(new DiagramClickedEvent(new DiagramReference(diagram, null)));            	
+				if (e.getClickCount() == 2) {
 					/// @todo this should be done using an event
 					DiagramController.getController().addDiagram(diagram);
-                }
-            }
+				}
+				selectedDiagramsListview.setSelectedIndices(new int[0]);
+			}
             
-        };
-        availableDiagramsListview.addMouseListener(mouseListener);
+		});
+
+		selectedDiagramsListview.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				int index = selectedDiagramsListview.locationToIndex(e.getPoint());
+				DiagramHistory diagramHistory = DiagramController.getController().getDiagramHistory();
+				DiagramReference diagramReference = diagramHistory.getReferenceAt(index); 
+				eventBroker.processEvent(new DiagramClickedEvent(diagramReference));            	
+				availableDiagramsListview.setSelectedIndices(new int[0]);
+			}
+            
+		});
 
         // The add button can only be used if an available diagram is selected
         availableDiagramsListview.addListSelectionListener(new ListSelectionListener() {

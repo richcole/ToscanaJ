@@ -28,7 +28,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * This class paints a diagram defined by the SimpleLineDiagram class.
@@ -304,7 +303,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
     }
 
-    public void setSelectedConcepts(List concepts) {
+    public void setSelectedConcepts(Concept[] concepts) {
         // notify all nodes and lines
         Iterator it = this.getCanvasItemsByType(NodeView.class).iterator();
         while (it.hasNext()) {

@@ -7,22 +7,22 @@
  */
 package net.sourceforge.toscanaj.gui.events;
 
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.controller.fca.DiagramReference;
 
 import org.tockit.events.Event;
 
 public class DiagramClickedEvent implements Event {
-	private Diagram2D diagram;
+	private DiagramReference diagramReference;
 	
-	public DiagramClickedEvent(Diagram2D diagram) {
-		this.diagram = diagram;
+	public DiagramClickedEvent(DiagramReference diagramReference) {
+		this.diagramReference = diagramReference;
 	}
 	
 	public Object getSubject() {
-		return this.diagram;
+		return this.diagramReference;
 	}
 	
-	public Diagram2D getDiagram() {
-		return this.diagram;
+	public DiagramReference getDiagramReference() {
+		return this.diagramReference;
 	}
 }

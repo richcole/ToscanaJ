@@ -22,6 +22,7 @@ import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
@@ -327,10 +328,14 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         
         broker.subscribe(new EventBrokerListener() {
 			public void processEvent(Event e) {
-				Diagram2D diagram = ((DiagramClickedEvent)e).getDiagram();
-				diagramPreview.showDiagram(diagram);
+				DiagramReference diagramReference = ((DiagramClickedEvent)e).getDiagramReference();
+				diagramPreview.showDiagram(diagramReference.getDiagram());
+				Concept zoomedConcept = diagramReference.getZoomedConcept();
+				if(zoomedConcept != null) {
+					diagramPreview.setSelectedConcepts(new Concept[]{zoomedConcept});				
+				}
 			}
-		}, DiagramClickedEvent.class, Diagram2D.class);
+		}, DiagramClickedEvent.class, DiagramReference.class);
         
         /// @todo add this pane to the session management
 		leftHandPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, 

@@ -14,7 +14,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
-import java.util.List;
 
 /**
  * A class representing a diagram node with an inner diagram.
@@ -129,7 +128,7 @@ public class NestedDiagramNode extends DiagramNode {
         return this.ellipse.getHeight()/2;
     }
 
-    public List getConceptNestingList() {
+    public Concept[] getConceptNestingList() {
         return innerDiagram.getNode(0).getConceptNestingList();
     }
     

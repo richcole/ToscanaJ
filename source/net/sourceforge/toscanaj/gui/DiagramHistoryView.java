@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.DiagramReference;
 
 import javax.swing.*;
 import java.awt.*;
@@ -60,7 +61,7 @@ public class DiagramHistoryView extends JList{
             setEnabled(list.isEnabled());
             Font font = list.getFont();
 
-            DiagramHistory.DiagramReference diagram = (DiagramHistory.DiagramReference) value;
+            DiagramReference diagram = (DiagramReference) value;
             if (history.isInCurrent(diagram)) {
                 setFont(font.deriveFont(Font.BOLD));
             } else if (history.isInFuture(diagram)) {

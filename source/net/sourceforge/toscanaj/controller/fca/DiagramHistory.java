@@ -29,70 +29,6 @@ import java.util.NoSuchElementException;
  */
 public class DiagramHistory extends AbstractListModel implements ChangeObservable {
 
-    /**
-     * Used to store references to diagrams, including the concept used for
-     * zooming in past diagrams.
-     *
-     * Beneath adding the concept reference (which is null for current and future
-     * diagrams) this gives the references identity, otherwise we would get problems
-     * in adding a diagram twice to the history.
-     */
-    public static class DiagramReference {
-        /**
-         * The diagram we refer to.
-         */
-        private Diagram2D diagram;
-
-        /**
-         * The concept the user zoomed into (null for current and future diagrams).
-         */
-        private Concept zoomedConcept;
-
-        /**
-         * Initialises a new reference.
-         *
-         * This is private so it can be called only by the outer class. Other
-         * classes are allowed to use this class (and have to) but they can not
-         * create instances.
-         */
-        private DiagramReference(Diagram2D diagram, Concept zoomedConcept) {
-            this.diagram = diagram;
-            this.zoomedConcept = zoomedConcept;
-        }
-
-        /**
-         * Returns the diagram we refer to.
-         */
-        public Diagram2D getDiagram() {
-            return this.diagram;
-        }
-
-        /**
-         * Returns the concept the user zoomed into (null for current and future diagrams).
-         */
-        public Concept getZoomedConcept() {
-            return this.zoomedConcept;
-        }
-
-        /**
-         * This is private so it can be called only by the outer class. Other
-         * classes are allowed to use this class (and have to) but they can not
-         * change zoomed concept.
-         */
-
-        private void setZoomedConcept(Concept zoomedConcept) {
-            this.zoomedConcept = zoomedConcept;
-        }
-
-        /**
-         * Returns the diagram title for usage in a view.
-         */
-        public String toString() {
-            return diagram.getTitle();
-        }
-    }
-
-
     private List diagrams = new LinkedList();
 
     private int currStartPosition;
@@ -437,7 +373,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
 		//user has no visited diagrams. display nothing
 		}
 		for(int i=0; i <= firstCurrentPos - 1; i++) { 
-			DiagramHistory.DiagramReference diagramReference = diagramHistory.getReferenceAt(i);
+			DiagramReference diagramReference = diagramHistory.getReferenceAt(i);
 			comments+=(i+1) +") "+diagramReference.getDiagram().getTitle() + lineSeparator;
 			Concept concept = diagramReference.getZoomedConcept();
 			Iterator attrIt = concept.getIntentIterator();

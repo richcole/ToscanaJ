@@ -20,8 +20,6 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * class DiagramNode holds details on node position and size
@@ -261,21 +259,19 @@ public class NodeView extends CanvasItem {
      *
      * @see #getSelectionState()
      */
-    public void setSelectedConcepts(List selectedConcepts) {
-        if ((selectedConcepts == null) || (selectedConcepts.size() == 0)) {
+    public void setSelectedConcepts(Concept[] selectedConcepts) {
+        if ((selectedConcepts == null) || (selectedConcepts.length == 0)) {
             this.selectionState = DiagramView.NO_SELECTION;
             return;
         }
         this.selectionState = DiagramView.NOT_SELECTED;
         // we are comparing nodes from the inside out, assuming both lists are the same lengths
         // (as they always should be)
-        List ourConcepts = getDiagramNode().getConceptNestingList();
-        Iterator it = selectedConcepts.iterator();
-        Iterator it2 = ourConcepts.iterator();
+        Concept[] ourConcepts = getDiagramNode().getConceptNestingList();
         boolean onOurLevel = false;
-        while (it.hasNext()) {
-            Concept selectedConcept = (Concept) it.next();
-            Concept ourConcept = (Concept) it2.next();
+        for (int i = 0; i < selectedConcepts.length; i++) {
+            Concept selectedConcept = selectedConcepts[i];
+            Concept ourConcept = ourConcepts[i];
             // we don't care about anything nested deeper than we are
             if (!onOurLevel && ourConcept != this.getDiagramNode().getConcept()) {
                 continue;

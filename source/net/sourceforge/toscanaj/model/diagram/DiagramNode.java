@@ -324,14 +324,14 @@ public class DiagramNode implements XMLizable {
         return NODE_ELEMENT_NAME;
     }
 
-    public List getConceptNestingList() {
+    public Concept[] getConceptNestingList() {
         List conceptList = CollectionFactory.createDefaultList();
         DiagramNode node = this;
         while (node != null) {
             conceptList.add(node.getConcept());
             node = node.getOuterNode();
         }
-        return conceptList;
+        return (Concept[])conceptList.toArray(new Concept[0]);
     }
 
     public boolean equals(Object obj) {
