@@ -122,6 +122,7 @@ import net.sourceforge.toscanaj.parser.CSCParser;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.CernatoXMLParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
+import net.sourceforge.toscanaj.parser.ObjectAttributeListParser;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
@@ -176,6 +177,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private ExportDiagramAction exportDiagramAction;
     private File lastCSCFile;
     private File lastBurmeisterFile;
+    private File lastOALFile;
     private File lastCernatoFile;
     private SaveFileAction saveAsFileAction;
     private SaveConceptualSchemaActivity saveActivity;
@@ -224,6 +226,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         this.lastCernatoFile = new File(preferences.get("lastCernatoImport", ""));
         this.lastCSCFile = new File(preferences.get("lastCSCImport",""));
         this.lastBurmeisterFile = new File(preferences.get("lastBurmeisterImport",""));
+        this.lastOALFile = new File(preferences.get("lastOALImport",""));
 
 		this.setVisible(true);
         preferences.restoreWindowPlacement(this, new Rectangle(10, 10, 900, 700));
@@ -541,6 +544,16 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             }
         });
         fileMenu.add(importBurmeisterItem);
+
+        JMenuItem importOALItem =
+            new JMenuItem("Import Object Attribute List...");
+        importOALItem.setMnemonic(KeyEvent.VK_A);
+        importOALItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                importObjectAttributeList();
+            }
+        });
+        fileMenu.add(importOALItem);
 
         JMenuItem importCSCMenuItem = new JMenuItem("Import CSC File...");
         importCSCMenuItem.setMnemonic(KeyEvent.VK_I);
@@ -910,8 +923,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
         if (newSchemaButton.isSelected()) {
             this.conceptualSchema = new ConceptualSchema(this.eventBroker);
-			currentFile = null;
-			updateWindowTitle();
+            currentFile = null;
+            updateWindowTitle();
         }
         File[] files = openDialog.getSelectedFiles();
         for (int i = 0; i < files.length; i++) {
@@ -925,6 +938,106 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         ContextImplementation context;
         try {
             context = BurmeisterParser.importBurmeisterFile(file);
+        } catch (FileNotFoundException e) {
+            ErrorDialog.showError(this, e, "Could not find file");
+            return;
+        } catch (DataFormatException e) {
+            ErrorDialog.showError(this, e, "Could not parse file");
+            return;
+        }
+        addDiagram(
+            conceptualSchema,
+            context,
+            context.getName(),
+            new DefaultDimensionStrategy());
+    }
+
+    private void importObjectAttributeList() {
+        final JFileChooser openDialog;
+        if (this.lastOALFile != null) {
+            // use position of last file for dialog
+            openDialog = new JFileChooser(this.lastOALFile);
+        } else {
+            openDialog = new JFileChooser(System.getProperty("user.dir"));
+        }
+        openDialog.setMultiSelectionEnabled(true);
+        // create the options panel to be used in the file chooser 
+        JRadioButton keepSchemaButton =
+            new JRadioButton("Extend existing schema");
+        keepSchemaButton.setSelected(true);
+        JRadioButton newSchemaButton = new JRadioButton("Create new schema");
+        ButtonGroup schemaOptionGroup = new ButtonGroup();
+        schemaOptionGroup.add(keepSchemaButton);
+        schemaOptionGroup.add(newSchemaButton);
+        JPanel schemaOptionPanel = new JPanel(new GridBagLayout());
+        schemaOptionPanel.add(
+            keepSchemaButton,
+            new GridBagConstraints(
+                0,
+                0,
+                1,
+                1,
+                1,
+                0,
+                GridBagConstraints.NORTHWEST,
+                GridBagConstraints.NONE,
+                new Insets(5, 5, 5, 5),
+                2,
+                2));
+        schemaOptionPanel.add(
+            newSchemaButton,
+            new GridBagConstraints(
+                0,
+                1,
+                1,
+                1,
+                1,
+                0,
+                GridBagConstraints.NORTHWEST,
+                GridBagConstraints.NONE,
+                new Insets(0, 5, 5, 5),
+                2,
+                2));
+        schemaOptionPanel.add(
+            new JPanel(),
+            new GridBagConstraints(
+                0,
+                2,
+                1,
+                1,
+                1,
+                1,
+                GridBagConstraints.NORTHWEST,
+                GridBagConstraints.BOTH,
+                new Insets(0, 5, 5, 5),
+                2,
+                2));
+
+        openDialog.setAccessory(schemaOptionPanel);
+        openDialog.setFileFilter(
+            new ExtensionFileFilter(new String[] { "oal" }, "Object Attribute Lists"));
+        openDialog.setApproveButtonText("Import");
+        int rv = openDialog.showOpenDialog(this);
+        if (rv != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        if (newSchemaButton.isSelected()) {
+            this.conceptualSchema = new ConceptualSchema(this.eventBroker);
+            currentFile = null;
+            updateWindowTitle();
+        }
+        File[] files = openDialog.getSelectedFiles();
+        for (int i = 0; i < files.length; i++) {
+            File file = files[i];
+            importObjectAttributeList(file);
+        }
+    }
+
+    private void importObjectAttributeList(File file) {
+        this.lastOALFile = file;
+        ContextImplementation context;
+        try {
+            context = ObjectAttributeListParser.importOALFile(file);
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(this, e, "Could not find file");
             return;
@@ -1023,6 +1136,10 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         if(this.lastBurmeisterFile!= null) {
             preferences.put("lastBurmeisterImport", 
                             this.lastBurmeisterFile.getAbsolutePath());
+        }
+        if(this.lastOALFile!= null) {
+            preferences.put("lastOALImport", 
+                            this.lastOALFile.getAbsolutePath());
         }
         if(this.lastCSCFile!= null) {
             preferences.put("lastCSCImport", 
