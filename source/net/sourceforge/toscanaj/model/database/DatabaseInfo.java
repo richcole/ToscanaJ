@@ -275,10 +275,10 @@ public class DatabaseInfo implements XMLizable {
 	    }
 		if(getDriverClass().equals(JDBC_ODBC_BRIDGE_DRIVER)) {
 	        if(getURL().indexOf(';') == -1){ // a semicolon is not allowed in DSN names
-	        	return ACCESS_FILE;
+	        	return ODBC;
 	        }
 	        else { // but always in the access file URLs
-	        	return ODBC;
+	        	return ACCESS_FILE;
 	        }
 	    }
     	return JDBC;
