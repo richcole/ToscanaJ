@@ -183,8 +183,6 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                         return 0.5;
                     }
 					DeviationValuesRef deviationValues = calculateExpectedSize(concept, context, true);
-                    int numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
-                                                                    context.getOutermostContext());
                     double expectedSize = deviationValues.getExpectedSize();
                     int extentSize = getExtentSize(concept, context);
                     if(extentSize == expectedSize) {
