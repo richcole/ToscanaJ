@@ -630,6 +630,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             viewMenu.addSeparator();
             final CombinedGradient redGreenGradient = new CombinedGradient(new LinearGradient(Color.RED, Color.WHITE), 1);
             redGreenGradient.addGradientPart(new LinearGradient(Color.WHITE, Color.GREEN), 1);
+			final SignificanceLegend legendItem = new SignificanceLegend(new Font("sans-serif",Font.PLAIN, 12),new Point2D.Double(0,0),redGreenGradient);
+			new ItemMovementManipulator(diagramView, SignificanceLegend.class, diagramView.getController().getEventBroker());
             final JCheckBoxMenuItem showOrthogonalityMenuItem = new JCheckBoxMenuItem("Analyze orthogonality");
             showOrthogonalityMenuItem.addActionListener(new ActionListener() {
                 private IntervalType lastIntervalType; 
@@ -639,8 +641,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                         this.lastIntervalType = diagramSchema.getGradientType();
                         setDiagramGradient(redGreenGradient, ConceptInterpreter.INTERVAL_TYPE_ORTHOGONALTIY);
                         diagramView.getConceptInterpreter().showDeviation(true);
-                        diagramView.addCanvasItem(new SignificanceLegend(new Font("sans-serif",Font.PLAIN, 10),new Point2D.Double(0,0)));
-                        new ItemMovementManipulator(diagramView, SignificanceLegend.class, diagramView.getController().getEventBroker());
                     } else {
                         setDiagramGradient(diagramSchema.getDefaultGradient(), this.lastIntervalType);
                         diagramView.getConceptInterpreter().showDeviation(false);
@@ -649,6 +649,15 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                 }
             });
             viewMenu.add(showOrthogonalityMenuItem);
+            
+            JMenuItem showSignificanceLegendMenuItem = new JMenuItem("Show Significance Legend");
+            showSignificanceLegendMenuItem.addActionListener(new ActionListener(){
+                public void actionPerformed(ActionEvent e) {
+					diagramView.addCanvasItem(legendItem);
+					diagramView.repaint();
+                }
+            });
+            viewMenu.add(showSignificanceLegendMenuItem);
         }
 
         if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerGradientOptions", 0) == 1) {

@@ -17,6 +17,7 @@ import java.awt.geom.Rectangle2D;
 import java.text.NumberFormat;
 
 import net.sourceforge.toscanaj.controller.fca.AbstractConceptInterperter;
+import net.sourceforge.toscanaj.util.gradients.Gradient;
 
 import org.tockit.canvas.MovableCanvasItem;
 
@@ -27,9 +28,11 @@ public class SignificanceLegend extends MovableCanvasItem {
     
     private Font font;
     private Rectangle2D bounds;
+    private Gradient gradient;
     
-    public SignificanceLegend(Font font, Point2D pos) {
+    public SignificanceLegend(Font font, Point2D pos, Gradient gradient) {
         this.font = font;
+        this.gradient = gradient;
         this.bounds = new Rectangle2D.Double(pos.getX(), pos.getY(), 0, 0);
     }
     
@@ -44,35 +47,44 @@ public class SignificanceLegend extends MovableCanvasItem {
             format.setMinimumFractionDigits(3);
             format.setMaximumFractionDigits(6);
             numberLayouts[i] = new TextLayout(format.format(AbstractConceptInterperter.SIGNIFICANCE_LEVELS[i]), this.font, g.getFontRenderContext());
-            maxWidth = Math.max(maxWidth, numberLayouts[i].getBounds().getWidth() * MARGIN_FACTOR);
+            maxWidth = Math.max(maxWidth, numberLayouts[i].getVisibleAdvance());
             height += (numberLayouts[i].getAscent() + numberLayouts[i].getDescent() + numberLayouts[i].getLeading()) * MARGIN_FACTOR;
         }
+		double titleHeight = (titleLayout.getAscent() + titleLayout.getDescent() + titleLayout.getLeading()) * MARGIN_FACTOR;
+		double titleWidth = titleLayout.getAdvance() * MARGIN_FACTOR;
         
-        double w = Math.max(titleLayout.getBounds().getWidth() * MARGIN_FACTOR, height);
-        double h = titleLayout.getBounds().getHeight() + maxWidth;
-        double x = this.bounds.getCenterX() - w/2;
-        double y = this.bounds.getCenterY() - h/2;
+        double w = Math.max(titleWidth, height);
+        double h = titleHeight + maxWidth * MARGIN_FACTOR;
+        double x = this.bounds.getX();
+        double y = this.bounds.getY();
         
         this.bounds.setRect(x, y, w, h);
         
         g.setPaint(Color.WHITE);
         g.fill(this.bounds);
         g.setPaint(Color.BLACK);
-        titleLayout.draw(g, (float) (x + titleLayout.getBounds().getWidth() * (MARGIN_FACTOR - 1)/2), 
+        titleLayout.draw(g, (float) (x + titleLayout.getAdvance() * (MARGIN_FACTOR - 1)/2), 
                             (float) y + titleLayout.getAscent());
-        double yBelowTitle = y + titleLayout.getAscent() + titleLayout.getDescent() + titleLayout.getLeading();
-        g.draw(new Line2D.Double(x, yBelowTitle, x + w, yBelowTitle));
+        double yBelowTitle = y + titleHeight;
         g.translate(x, (y+h));
         g.rotate(-Math.PI/2);
-        double curX = 0;
         for (int i = 0; i < numberLayouts.length; i++) {
             TextLayout layout = numberLayouts[i];
-            layout.draw(g, (float) ((MARGIN_FACTOR - 1)/2), (float) curX + layout.getAscent());
-            curX += (layout.getAscent() + layout.getDescent() + layout.getLeading()) * MARGIN_FACTOR;
+			double curY = i * w / numEntries;
+			double curHeight = w / numEntries;
+			double curWidth = maxWidth * MARGIN_FACTOR;
+			double gradPos = (i + 1) / (double)numEntries;                                        
+			g.setPaint(gradient.getColor(0.5 - 0.5 * gradPos));
+			g.fill(new Rectangle2D.Double(0, curY, curWidth/2, curHeight));
+			g.setPaint(gradient.getColor(0.5 + 0.5 * gradPos));
+			g.fill(new Rectangle2D.Double(curWidth/2, curY, curWidth/2, curHeight));
+			g.setPaint(Color.BLACK);
+            layout.draw(g, (float) (maxWidth * (MARGIN_FACTOR - 1)/2), (float) curY + layout.getAscent());
         }
         g.rotate(Math.PI/2);
         g.translate(-x, -(y+h));
         g.setPaint(Color.BLACK);
+		g.draw(new Line2D.Double(x, yBelowTitle, x + w, yBelowTitle));
         g.draw(this.bounds);
     }
 
@@ -81,7 +93,7 @@ public class SignificanceLegend extends MovableCanvasItem {
     }
 
     public Point2D getPosition() {
-        return new Point2D.Double(this.bounds.getCenterX(), this.bounds.getCenterY());
+        return new Point2D.Double(this.bounds.getX(), this.bounds.getY());
     }
 
     public Rectangle2D getCanvasBounds(Graphics2D g) {
@@ -93,6 +105,6 @@ public class SignificanceLegend extends MovableCanvasItem {
         double py = newPosition.getY();
         double w = this.bounds.getWidth();
         double h = this.bounds.getHeight();
-        this.bounds.setRect(px - w/2, py - h/2, w, h);
+        this.bounds.setRect(px, py, w, h);
     }
 }
