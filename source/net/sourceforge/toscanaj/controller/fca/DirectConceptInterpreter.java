@@ -66,11 +66,6 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
     	return contingent.size();
     }
 
-	protected int calculateExtentSize (Concept concept, ConceptInterpretationContext context) {
-		Set contingent = calculateExtent(concept, context);
-		return contingent.size();
-	}
-
     private Set calculateContingent(Concept concept, ConceptInterpretationContext context) {
 		TreeSet retVal = new TreeSet();
         Iterator objectContingentIterator = concept.getObjectContingentIterator();

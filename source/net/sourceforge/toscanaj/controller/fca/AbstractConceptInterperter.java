@@ -37,7 +37,36 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 	protected abstract int getMaximalContingentSize() ;
 
 	protected abstract int calculateContingentSize (Concept concept, ConceptInterpretationContext context);
-	protected abstract int calculateExtentSize (Concept concept, ConceptInterpretationContext context);
+
+	protected int calculateExtentSize(Concept concept, ConceptInterpretationContext context) {
+		List outerConcepts = context.getNestingConcepts();
+		if(outerConcepts.size() > 1) {
+			throw new RuntimeException("multiple levels of nesting not yet supported");
+		}
+		if(outerConcepts.size() == 1) {
+			int retVal = 0;
+			Concept outerConcept = (Concept) outerConcepts.get(0);
+			ConceptInterpretationContext parentContext = (ConceptInterpretationContext) context.getNestingContexts().get(0);
+			for(Iterator it = outerConcept.getDownset().iterator(); it.hasNext(); ) {
+				Concept currentOuterConcept = (Concept) it.next();
+				ConceptInterpretationContext currentContext = parentContext.createNestedContext(currentOuterConcept);
+				retVal += getLocalObjectContingentSize(concept, currentContext);
+			}
+			return retVal;
+		} else {
+			return getLocalObjectContingentSize(concept, context);
+		}
+	}
+
+	private int getLocalObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
+		int retVal = 0;
+		Iterator it = concept.getDownset().iterator();
+		while (it.hasNext()) {
+			Concept subconcept = (Concept) it.next();
+			retVal += getObjectContingentSize(subconcept, context);
+		}
+		return retVal;
+	}
 
 	public Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context) {
 		return concept.getAttributeContingentIterator();
