@@ -17,6 +17,11 @@ import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAObject;
 
+/**
+ * @todo this generator can easily generate scales which are not nominal, and then in
+ *   succession not valid -- objects can appear multiple times if you use ORs or multiple
+ *   columns where they share values
+ */
 public class NominalScaleGenerator implements ScaleGenerator {
 	private Frame parent;
 
