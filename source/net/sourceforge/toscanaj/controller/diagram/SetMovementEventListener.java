@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import org.tockit.canvas.events.CanvasItemDroppedEvent;
+import org.tockit.canvas.events.CanvasItemPickupEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
@@ -25,8 +26,17 @@ public abstract class SetMovementEventListener implements EventBrokerListener {
         DiagramNode node = nodeView.getDiagramNode();
         Point2D toPosition = dragEvent.getCanvasToPosition();
         Point2D fromPosition = dragEvent.getCanvasFromPosition();
-        double diffX = toPosition.getX() - fromPosition.getX();
-        double diffY = toPosition.getY() - fromPosition.getY();
+        double diffX;
+        double diffY;
+        if( e instanceof CanvasItemPickupEvent ) {
+        	// jump onto the grid pos
+            diffX = toPosition.getX() - node.getPosition().getX();
+            diffY = toPosition.getY() - node.getPosition().getY();
+        } else {
+        	// move the difference
+            diffX = toPosition.getX() - fromPosition.getX();
+            diffY = toPosition.getY() - fromPosition.getY();
+        }
         DiagramView diagramView = nodeView.getDiagramView();
         Diagram2D diagram = diagramView.getDiagram();
         moveSet(diagram, node, diffX, diffY);
