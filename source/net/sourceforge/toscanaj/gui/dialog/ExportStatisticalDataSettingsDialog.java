@@ -139,7 +139,7 @@ public class ExportStatisticalDataSettingsDialog extends JDialog {
     }
     
     public String getFilterClause() {
-    	return this.filterClauseTextField.getText();
+    	return this.filterClauseTextField.getText().trim();
     }
     
     public boolean hasIncludeContingentListsSet() {
