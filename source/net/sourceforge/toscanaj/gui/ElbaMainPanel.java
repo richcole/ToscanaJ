@@ -520,6 +520,10 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             FileOutputStream outputStream = new FileOutputStream(file);
             DumpSqlScript.dumpSqlScript(this.databaseConnection, outputStream);
             outputStream.close();
+        } catch (NullPointerException e) {
+        	e.printStackTrace();
+        	JOptionPane.showMessageDialog(this,"An internal error occured", "Internal error", JOptionPane.ERROR);
+            return;
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Could not export file");
             return;

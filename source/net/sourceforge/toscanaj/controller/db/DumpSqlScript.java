@@ -59,13 +59,17 @@ public class DumpSqlScript {
                 while (resultIt.hasNext()) {
                     String result = (String) resultIt.next();
                     Column column = (Column) colIt.next();
-                    try {
-                    	Double.parseDouble(result);
-                    	// Double parses, so we assume that must be a number
-                    	out.print(result);
-                    } catch(NumberFormatException e) {
-                    	// doesn't seem to be a number, better put it in quotes
-                    	out.print("'" + result + "'");
+                    if(result == null) {
+                    	out.print("NULL");
+                    } else {
+                        try {
+                            Double.parseDouble(result);
+                            // Double parses, so we assume that must be a number
+                            out.print(result);
+                        } catch(NumberFormatException e) {
+                            // doesn't seem to be a number, better put it in quotes
+                            out.print("'" + getEscapedString(result) + "'");
+                        }
                     }
                     if(resultIt.hasNext()) {
                     	out.print(",");
@@ -75,4 +79,17 @@ public class DumpSqlScript {
             }		    
         }
 	}
+	
+    private static String getEscapedString(String result) {
+        String retVal = "";
+        for(int i = 0; i < result.length(); i++) {
+        	char curChar = result.charAt(i);
+            if(curChar == '\'') {
+        		retVal += "\'\'";
+        	} else {
+        		retVal += curChar;
+        	}
+        }
+        return retVal;
+    }
 }
