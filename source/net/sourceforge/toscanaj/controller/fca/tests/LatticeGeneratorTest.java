@@ -12,7 +12,6 @@ import java.util.Arrays;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
-import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
@@ -23,8 +22,43 @@ import junit.framework.TestSuite;
 
 public class LatticeGeneratorTest extends TestCase {
     final static Class THIS = LatticeGeneratorTest.class;
-    
-    protected Context context;
+
+    protected static final String CONTEXT_TITLE = "animals";
+    protected static final Attribute[] ATTRIBUTES = new Attribute[]{
+        new Attribute("small"),
+        new Attribute("medium"),
+        new Attribute("big"),
+        new Attribute("twolegs"),
+        new Attribute("fourlegs"),
+        new Attribute("feathers"),
+        new Attribute("hair"),
+        new Attribute("fly"),
+        new Attribute("hunt"),
+        new Attribute("run"),
+        new Attribute("swim"),
+        new Attribute("mane"),
+        new Attribute("hooves")
+    };
+    protected static final String[] OBJECTS = new String[]{
+        "dove", 
+        "hen",
+        "duck",
+        "goose",
+        "owl", // 4
+        "hawk",
+        "eagle",
+        "fox",
+        "dog",
+        "wolf", // 9
+        "cat",
+        "tiger",
+        "lion",
+        "horse",
+        "zebra",
+        "cow"
+    };
+
+    protected ContextImplementation context;
 
     public LatticeGeneratorTest(String s) {
         super(s);
@@ -34,12 +68,34 @@ public class LatticeGeneratorTest extends TestCase {
         return new TestSuite(THIS);
     }
     
-    public void testGantersAlgorithm() {
-    	LatticeGenerator lgen = new GantersAlgorithm();
+    public void testGantersAlgorithmOnValidContext() {
+        LatticeGenerator lgen = new GantersAlgorithm();
 
-    	Lattice lattice = lgen.createLattice(this.context);
-    	
+        Lattice lattice = lgen.createLattice(this.context);
+
         checkLatticeSizes(lattice);
+    }
+
+    public void testGantersAlgorithmOnInvalidContext() {
+    	// add complete duplicate object to context
+    	String oldObject = OBJECTS[OBJECTS.length - 1];
+        String newObject = new String(oldObject);
+		BinaryRelationImplementation relation = this.context.getRelationImplementation();
+		
+		for (int i = 0; i < ATTRIBUTES.length; i++) {
+            Attribute attribute = ATTRIBUTES[i];
+            if(relation.contains(oldObject, attribute)) {
+            	relation.insert(newObject, attribute);
+            }
+        }		
+
+		// that is illegal, so we want an exception to be raised
+        LatticeGenerator lgen = new GantersAlgorithm();
+		try {
+        	Lattice lattice = lgen.createLattice(this.context);
+        	fail("Lattice should not be generated on invalid context");
+		} catch(Exception e) {
+		}
     }
 
     protected void checkLatticeSizes(Lattice lattice) {
@@ -59,143 +115,107 @@ public class LatticeGeneratorTest extends TestCase {
     protected void setUp() {
     	ContextImplementation cont = new ContextImplementation();
 
-    	cont.setName("animals"); // taken from Bastian Wormuth's example
-    	
-        String[] objects = new String[]{
-            "dove", 
-            "hen",
-            "duck",
-            "goose",
-            "owl", // 4
-            "hawk",
-            "eagle",
-            "fox",
-            "dog",
-            "wolf", // 9
-            "cat",
-            "tiger",
-            "lion",
-            "horse",
-            "zebra",
-            "cow"
-        };  // the last one was originally two identical strings "cow", but that is of course not valid
-        
-        cont.getObjects().addAll(Arrays.asList(objects));
-        
-        Attribute[] attributes = new Attribute[]{
-            new Attribute("small"),
-            new Attribute("medium"),
-            new Attribute("big"),
-            new Attribute("twolegs"),
-            new Attribute("fourlegs"),
-            new Attribute("feathers"),
-            new Attribute("hair"),
-            new Attribute("fly"),
-            new Attribute("hunt"),
-            new Attribute("run"),
-            new Attribute("swim"),
-            new Attribute("mane"),
-            new Attribute("hooves")
-        };
-        
-        cont.getAttributes().addAll(Arrays.asList(attributes));
+        // taken from Bastian Wormuth's example
+    	cont.setName(CONTEXT_TITLE); 
+        cont.getObjects().addAll(Arrays.asList(OBJECTS));
+        cont.getAttributes().addAll(Arrays.asList(ATTRIBUTES));
 
 		BinaryRelationImplementation relation = cont.getRelationImplementation();
 		
-        relation.insert(objects[0], attributes[0]);
-        relation.insert(objects[0], attributes[3]);
-        relation.insert(objects[0], attributes[5]);
-        relation.insert(objects[0], attributes[7]);
+        relation.insert(OBJECTS[0], ATTRIBUTES[0]);
+        relation.insert(OBJECTS[0], ATTRIBUTES[3]);
+        relation.insert(OBJECTS[0], ATTRIBUTES[5]);
+        relation.insert(OBJECTS[0], ATTRIBUTES[7]);
 
-        relation.insert(objects[1], attributes[0]);
-        relation.insert(objects[1], attributes[3]);
-        relation.insert(objects[1], attributes[5]);
+        relation.insert(OBJECTS[1], ATTRIBUTES[0]);
+        relation.insert(OBJECTS[1], ATTRIBUTES[3]);
+        relation.insert(OBJECTS[1], ATTRIBUTES[5]);
 
-        relation.insert(objects[2], attributes[0]);
-        relation.insert(objects[2], attributes[3]);
-        relation.insert(objects[2], attributes[5]);
-        relation.insert(objects[2], attributes[7]);
-        relation.insert(objects[2], attributes[10]);
+        relation.insert(OBJECTS[2], ATTRIBUTES[0]);
+        relation.insert(OBJECTS[2], ATTRIBUTES[3]);
+        relation.insert(OBJECTS[2], ATTRIBUTES[5]);
+        relation.insert(OBJECTS[2], ATTRIBUTES[7]);
+        relation.insert(OBJECTS[2], ATTRIBUTES[10]);
 
-        relation.insert(objects[3], attributes[0]);
-        relation.insert(objects[3], attributes[3]);
-        relation.insert(objects[3], attributes[5]);
-        relation.insert(objects[3], attributes[7]);
-        relation.insert(objects[3], attributes[10]);
+        relation.insert(OBJECTS[3], ATTRIBUTES[0]);
+        relation.insert(OBJECTS[3], ATTRIBUTES[3]);
+        relation.insert(OBJECTS[3], ATTRIBUTES[5]);
+        relation.insert(OBJECTS[3], ATTRIBUTES[7]);
+        relation.insert(OBJECTS[3], ATTRIBUTES[10]);
 
-        relation.insert(objects[4], attributes[0]);
-        relation.insert(objects[4], attributes[3]);
-        relation.insert(objects[4], attributes[5]);
-        relation.insert(objects[4], attributes[7]);
-        relation.insert(objects[4], attributes[8]);
+        relation.insert(OBJECTS[4], ATTRIBUTES[0]);
+        relation.insert(OBJECTS[4], ATTRIBUTES[3]);
+        relation.insert(OBJECTS[4], ATTRIBUTES[5]);
+        relation.insert(OBJECTS[4], ATTRIBUTES[7]);
+        relation.insert(OBJECTS[4], ATTRIBUTES[8]);
 
-        relation.insert(objects[5], attributes[0]);
-        relation.insert(objects[5], attributes[3]);
-        relation.insert(objects[5], attributes[5]);
-        relation.insert(objects[5], attributes[7]);
-        relation.insert(objects[5], attributes[8]);
+        relation.insert(OBJECTS[5], ATTRIBUTES[0]);
+        relation.insert(OBJECTS[5], ATTRIBUTES[3]);
+        relation.insert(OBJECTS[5], ATTRIBUTES[5]);
+        relation.insert(OBJECTS[5], ATTRIBUTES[7]);
+        relation.insert(OBJECTS[5], ATTRIBUTES[8]);
 
-        relation.insert(objects[6], attributes[1]);
-        relation.insert(objects[6], attributes[3]);
-        relation.insert(objects[6], attributes[5]);
-        relation.insert(objects[6], attributes[7]);
-        relation.insert(objects[6], attributes[8]);
+        relation.insert(OBJECTS[6], ATTRIBUTES[1]);
+        relation.insert(OBJECTS[6], ATTRIBUTES[3]);
+        relation.insert(OBJECTS[6], ATTRIBUTES[5]);
+        relation.insert(OBJECTS[6], ATTRIBUTES[7]);
+        relation.insert(OBJECTS[6], ATTRIBUTES[8]);
 
-        relation.insert(objects[7], attributes[1]);
-        relation.insert(objects[7], attributes[4]);
-        relation.insert(objects[7], attributes[6]);
-        relation.insert(objects[7], attributes[8]);
-        relation.insert(objects[7], attributes[9]);
+        relation.insert(OBJECTS[7], ATTRIBUTES[1]);
+        relation.insert(OBJECTS[7], ATTRIBUTES[4]);
+        relation.insert(OBJECTS[7], ATTRIBUTES[6]);
+        relation.insert(OBJECTS[7], ATTRIBUTES[8]);
+        relation.insert(OBJECTS[7], ATTRIBUTES[9]);
 
-        relation.insert(objects[8], attributes[1]);
-        relation.insert(objects[8], attributes[4]);
-        relation.insert(objects[8], attributes[6]);
-        relation.insert(objects[8], attributes[9]);
+        relation.insert(OBJECTS[8], ATTRIBUTES[1]);
+        relation.insert(OBJECTS[8], ATTRIBUTES[4]);
+        relation.insert(OBJECTS[8], ATTRIBUTES[6]);
+        relation.insert(OBJECTS[8], ATTRIBUTES[9]);
 
-        relation.insert(objects[9], attributes[1]);
-        relation.insert(objects[9], attributes[4]);
-        relation.insert(objects[9], attributes[6]);
-        relation.insert(objects[9], attributes[8]);
-        relation.insert(objects[9], attributes[9]);
-        relation.insert(objects[9], attributes[11]);
+        relation.insert(OBJECTS[9], ATTRIBUTES[1]);
+        relation.insert(OBJECTS[9], ATTRIBUTES[4]);
+        relation.insert(OBJECTS[9], ATTRIBUTES[6]);
+        relation.insert(OBJECTS[9], ATTRIBUTES[8]);
+        relation.insert(OBJECTS[9], ATTRIBUTES[9]);
+        relation.insert(OBJECTS[9], ATTRIBUTES[11]);
 
-        relation.insert(objects[10], attributes[0]);
-        relation.insert(objects[10], attributes[4]);
-        relation.insert(objects[10], attributes[6]);
-        relation.insert(objects[10], attributes[8]);
-        relation.insert(objects[10], attributes[9]);
+        relation.insert(OBJECTS[10], ATTRIBUTES[0]);
+        relation.insert(OBJECTS[10], ATTRIBUTES[4]);
+        relation.insert(OBJECTS[10], ATTRIBUTES[6]);
+        relation.insert(OBJECTS[10], ATTRIBUTES[8]);
+        relation.insert(OBJECTS[10], ATTRIBUTES[9]);
 
-        relation.insert(objects[11], attributes[2]);
-        relation.insert(objects[11], attributes[4]);
-        relation.insert(objects[11], attributes[6]);
-        relation.insert(objects[11], attributes[8]);
-        relation.insert(objects[11], attributes[9]);
+        relation.insert(OBJECTS[11], ATTRIBUTES[2]);
+        relation.insert(OBJECTS[11], ATTRIBUTES[4]);
+        relation.insert(OBJECTS[11], ATTRIBUTES[6]);
+        relation.insert(OBJECTS[11], ATTRIBUTES[8]);
+        relation.insert(OBJECTS[11], ATTRIBUTES[9]);
 
-        relation.insert(objects[12], attributes[2]);
-        relation.insert(objects[12], attributes[4]);
-        relation.insert(objects[12], attributes[6]);
-        relation.insert(objects[12], attributes[8]);
-        relation.insert(objects[12], attributes[9]);
-        relation.insert(objects[12], attributes[11]);
+        relation.insert(OBJECTS[12], ATTRIBUTES[2]);
+        relation.insert(OBJECTS[12], ATTRIBUTES[4]);
+        relation.insert(OBJECTS[12], ATTRIBUTES[6]);
+        relation.insert(OBJECTS[12], ATTRIBUTES[8]);
+        relation.insert(OBJECTS[12], ATTRIBUTES[9]);
+        relation.insert(OBJECTS[12], ATTRIBUTES[11]);
 
-        relation.insert(objects[13], attributes[2]);
-        relation.insert(objects[13], attributes[4]);
-        relation.insert(objects[13], attributes[6]);
-        relation.insert(objects[13], attributes[9]);
-        relation.insert(objects[13], attributes[11]);
-        relation.insert(objects[13], attributes[12]);
+        relation.insert(OBJECTS[13], ATTRIBUTES[2]);
+        relation.insert(OBJECTS[13], ATTRIBUTES[4]);
+        relation.insert(OBJECTS[13], ATTRIBUTES[6]);
+        relation.insert(OBJECTS[13], ATTRIBUTES[9]);
+        relation.insert(OBJECTS[13], ATTRIBUTES[11]);
+        relation.insert(OBJECTS[13], ATTRIBUTES[12]);
 
-        relation.insert(objects[14], attributes[2]);
-        relation.insert(objects[14], attributes[4]);
-        relation.insert(objects[14], attributes[6]);
-        relation.insert(objects[14], attributes[9]);
-        relation.insert(objects[14], attributes[11]);
-        relation.insert(objects[14], attributes[12]);
+        relation.insert(OBJECTS[14], ATTRIBUTES[2]);
+        relation.insert(OBJECTS[14], ATTRIBUTES[4]);
+        relation.insert(OBJECTS[14], ATTRIBUTES[6]);
+        relation.insert(OBJECTS[14], ATTRIBUTES[9]);
+        relation.insert(OBJECTS[14], ATTRIBUTES[11]);
+        relation.insert(OBJECTS[14], ATTRIBUTES[12]);
 
-        relation.insert(objects[15], attributes[2]);
-        relation.insert(objects[15], attributes[4]);
-        relation.insert(objects[15], attributes[6]);
-        relation.insert(objects[15], attributes[12]);
+        relation.insert(OBJECTS[15], ATTRIBUTES[2]);
+        relation.insert(OBJECTS[15], ATTRIBUTES[4]);
+        relation.insert(OBJECTS[15], ATTRIBUTES[6]);
+        relation.insert(OBJECTS[15], ATTRIBUTES[12]);
 
         this.context = cont;
     }
