@@ -16,7 +16,7 @@ public class AllTests extends TestCase {
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTest(net.sourceforge.toscanaj.controller.fca.tests.AllTests.suite());
+        suite.addTest(net.sourceforge.toscanaj.controller.tests.AllTests.suite());
         suite.addTest(net.sourceforge.toscanaj.events.tests.AllTests.suite());
         suite.addTest(net.sourceforge.toscanaj.model.tests.AllTests.suite());
         suite.addTest(net.sourceforge.toscanaj.util.tests.AllTests.suite());

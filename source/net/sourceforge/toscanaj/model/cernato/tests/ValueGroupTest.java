@@ -32,36 +32,49 @@ public class ValueGroupTest extends TestCase {
         NumericalValueGroup numGroup3 = new NumericalValueGroup(numType1, "num3", 0, false, 3, false);
         NumericalValueGroup numGroup4 = new NumericalValueGroup(numType1, "num4", 1, true, 2, true);
         NumericalValueGroup numGroup5 = new NumericalValueGroup(numType2, "num5", 1, true, 2, true);
+        NumericalValueGroup numGroup6 = new NumericalValueGroup(numType1, "num6", 0, false, 3, true);
 
         assertEquals(numGroup1.isSuperSetOf(numGroup1), true);
         assertEquals(numGroup1.isSuperSetOf(numGroup2), true);
         assertEquals(numGroup1.isSuperSetOf(numGroup3), true);
         assertEquals(numGroup1.isSuperSetOf(numGroup4), true);
         assertEquals(numGroup1.isSuperSetOf(numGroup5), false);
+        assertEquals(numGroup1.isSuperSetOf(numGroup6), true);
 
         assertEquals(numGroup2.isSuperSetOf(numGroup1), false);
         assertEquals(numGroup2.isSuperSetOf(numGroup2), true);
         assertEquals(numGroup2.isSuperSetOf(numGroup3), true);
         assertEquals(numGroup2.isSuperSetOf(numGroup4), true);
         assertEquals(numGroup2.isSuperSetOf(numGroup5), false);
+        assertEquals(numGroup2.isSuperSetOf(numGroup6), false);
 
         assertEquals(numGroup3.isSuperSetOf(numGroup1), false);
         assertEquals(numGroup3.isSuperSetOf(numGroup2), false);
         assertEquals(numGroup3.isSuperSetOf(numGroup3), true);
         assertEquals(numGroup3.isSuperSetOf(numGroup4), true);
         assertEquals(numGroup3.isSuperSetOf(numGroup5), false);
+        assertEquals(numGroup3.isSuperSetOf(numGroup6), false);
 
         assertEquals(numGroup4.isSuperSetOf(numGroup1), false);
         assertEquals(numGroup4.isSuperSetOf(numGroup2), false);
         assertEquals(numGroup4.isSuperSetOf(numGroup3), false);
         assertEquals(numGroup4.isSuperSetOf(numGroup4), true);
         assertEquals(numGroup4.isSuperSetOf(numGroup5), false);
+        assertEquals(numGroup4.isSuperSetOf(numGroup6), false);
 
         assertEquals(numGroup5.isSuperSetOf(numGroup1), false);
         assertEquals(numGroup5.isSuperSetOf(numGroup2), false);
         assertEquals(numGroup5.isSuperSetOf(numGroup3), false);
         assertEquals(numGroup5.isSuperSetOf(numGroup4), false);
         assertEquals(numGroup5.isSuperSetOf(numGroup5), true);
+        assertEquals(numGroup5.isSuperSetOf(numGroup6), false);
+
+        assertEquals(numGroup6.isSuperSetOf(numGroup1), false);
+        assertEquals(numGroup6.isSuperSetOf(numGroup2), false);
+        assertEquals(numGroup6.isSuperSetOf(numGroup3), true);
+        assertEquals(numGroup6.isSuperSetOf(numGroup4), true);
+        assertEquals(numGroup6.isSuperSetOf(numGroup5), false);
+        assertEquals(numGroup6.isSuperSetOf(numGroup6), true);
 
         TextualValueGroup textGroup1 = new TextualValueGroup(textType1, "text1");
         textGroup1.addValue(new TextualValue("one"));
