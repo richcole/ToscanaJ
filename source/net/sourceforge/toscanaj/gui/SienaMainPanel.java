@@ -32,6 +32,7 @@ import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -115,13 +116,9 @@ import net.sourceforge.toscanaj.parser.CSCParser;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.CernatoXMLParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
-import net.sourceforge.toscanaj.view.colorchange.BlackAndWhiteColorChanger;
-import net.sourceforge.toscanaj.view.colorchange.ColorChanger;
-import net.sourceforge.toscanaj.view.colorchange.GrayscaleColorChanger;
-import net.sourceforge.toscanaj.view.colorchange.NullColorChanger;
-import net.sourceforge.toscanaj.view.colorchange.WhiteAndBlackColorChanger;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
+import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
@@ -147,12 +144,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private static final String WINDOW_TITLE = "Siena";
     private static final int MaxMruFiles = 8;
 
-    private static final String CONFIGURATION_KEY_COLOR_MODE = "colorMode";
-    private static final String CONFIGURATION_VALUE_COLOR_MODE_COLOR = "color";
-    private static final String CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE = "grayscale";
-    private static final String CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES = "whiteNodes";
-    private static final String CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES = "blackNodes";
-    
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(SienaMainPanel.class);
 
     /**
@@ -169,10 +160,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private JMenu helpMenu;
     private JMenu fileMenu;
     private JMenu mruMenu;
-    private JRadioButtonMenuItem colorModeGrayscaleMenuItem;
-    private JRadioButtonMenuItem colorModeColorMenuItem;
-    private JRadioButtonMenuItem colorModeWhiteNodesMenuItem;
-    private JRadioButtonMenuItem colorModeBlackNodesMenuItem;
 
     private DiagramEditingView diagramEditingView;
     private TemporalControlsPanel temporalControls;
@@ -680,64 +667,25 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
         viewMenu.add(setMinLabelSizeSubMenu);
 
-        JMenu colorModeMenu = new JMenu("Color mode");
+        JMenu colorModeMenu = new JMenu("Color schema");
         ButtonGroup colorModeGroup = new ButtonGroup();
         
-        colorModeColorMenuItem = new JRadioButtonMenuItem("Color");
-        colorModeColorMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setColorChanger(new NullColorChanger());
+        Collection colorSchemas = DiagramSchema.getSchemas();
+        for (Iterator iter = colorSchemas.iterator(); iter.hasNext(); ) {
+            final DiagramSchema schema = (DiagramSchema) iter.next();
+            JRadioButtonMenuItem colorSchemaItem = new JRadioButtonMenuItem(schema.getName());
+            colorSchemaItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    schema.setAsCurrent();
+                    diagramEditingView.getDiagramView().setDiagramSchema(schema);
+                }
+            });
+            if(schema == DiagramSchema.getCurrentSchema()) {
+                colorSchemaItem.setSelected(true);
             }
-        });
-        colorModeGroup.add(colorModeColorMenuItem);
-        colorModeMenu.add(colorModeColorMenuItem);
-
-        colorModeGrayscaleMenuItem = new JRadioButtonMenuItem("Grayscale");
-        colorModeGrayscaleMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setColorChanger(new GrayscaleColorChanger());
-            }
-        });
-        colorModeGroup.add(colorModeGrayscaleMenuItem);
-        colorModeMenu.add(colorModeGrayscaleMenuItem);
-
-        colorModeWhiteNodesMenuItem = new JRadioButtonMenuItem("White nodes");
-        colorModeWhiteNodesMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setColorChanger(new WhiteAndBlackColorChanger());
-            }
-        });
-        colorModeGroup.add(colorModeWhiteNodesMenuItem);
-        colorModeMenu.add(colorModeWhiteNodesMenuItem);
-
-        colorModeBlackNodesMenuItem = new JRadioButtonMenuItem("Black nodes");
-        colorModeBlackNodesMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setColorChanger(new BlackAndWhiteColorChanger());
-            }
-        });
-        colorModeGroup.add(colorModeBlackNodesMenuItem);
-        colorModeMenu.add(colorModeBlackNodesMenuItem);
-
-        String colorMode = preferences.get(CONFIGURATION_KEY_COLOR_MODE, null);
-        if(CONFIGURATION_VALUE_COLOR_MODE_COLOR.equals(colorMode)) {
-            colorModeColorMenuItem.setSelected(true);
-            setColorChanger(new NullColorChanger());
-        } else if(CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE.equals(colorMode)) {
-            colorModeGrayscaleMenuItem.setSelected(true);
-            setColorChanger(new GrayscaleColorChanger());
-        } else if(CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES.equals(colorMode)) {
-            colorModeWhiteNodesMenuItem.setSelected(true);
-            setColorChanger(new WhiteAndBlackColorChanger());
-        } else if(CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES.equals(colorMode)) {
-            colorModeBlackNodesMenuItem.setSelected(true);
-            setColorChanger(new BlackAndWhiteColorChanger());
-        } else {
-            System.err.println("Unknown color mode setting, using color");
-            colorModeColorMenuItem.setSelected(true);
-            setColorChanger(new NullColorChanger());
-        } 
-
+            colorModeGroup.add(colorSchemaItem);
+            colorModeMenu.add(colorSchemaItem);
+        }
         viewMenu.add(colorModeMenu);
         
         viewMenu.addSeparator();
@@ -1027,16 +975,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         preferences.storeWindowPlacement(this);
         preferences.putInt("diagramViewDivider",
                            diagramEditingView.getDividerLocation());
-        // store color settings
-        if(this.colorModeColorMenuItem.isSelected()) {
-            preferences.put(CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_COLOR);
-        } else if(this.colorModeGrayscaleMenuItem.isSelected()) {
-            preferences.put(CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_GRAYSCALE);
-        } else if(this.colorModeWhiteNodesMenuItem.isSelected()) {
-            preferences.put(CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_WHITE_NODES);
-        } else if(this.colorModeBlackNodesMenuItem.isSelected()) {
-            preferences.put(CONFIGURATION_KEY_COLOR_MODE, CONFIGURATION_VALUE_COLOR_MODE_BLACK_NODES);
-        }
         
         System.exit(0);
     }
@@ -1355,8 +1293,4 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		}
 		return menu;
 	}
-
-    protected void setColorChanger(ColorChanger changer) {
-        this.diagramEditingView.getDiagramView().setColorChanger(changer);
-    }
 }

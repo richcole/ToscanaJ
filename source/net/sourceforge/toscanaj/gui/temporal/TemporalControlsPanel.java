@@ -141,7 +141,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         this.addTab("Arrows", createArrowSettingsPanel());
         this.addTab("Options", createAnimationsSettingsPanel());
     }
-
+    
 	private Component createArrowSettingsPanel() {
         final JList listView = new JList(DiagramSchema.getCurrentSchema().getArrowStyles());
         listView.setCellRenderer(new ListCellRenderer() {
@@ -187,7 +187,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                 ArrowStyle newStyle = ArrowStyleChooser.showDialog(listView, "Edit arrow style", style);
                 if(newStyle != null) {
                     style.copyValues(newStyle);
-                    DiagramSchema.getCurrentSchema().setAsDefault();
+                    DiagramSchema.getCurrentSchema().store();
                     diagramView.repaint();
                 }
             } 

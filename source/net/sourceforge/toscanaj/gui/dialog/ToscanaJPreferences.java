@@ -8,6 +8,8 @@
 package net.sourceforge.toscanaj.gui.dialog;
 
 import java.awt.Component;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.prefs.BackingStoreException;
 
 import net.sourceforge.toscanaj.gui.ToscanaJMainPanel;
@@ -25,7 +27,8 @@ import org.tockit.swing.preferences.PreferencePanel;
 
 
 public class ToscanaJPreferences {
-    private final static ExtendedPreferences DIAGRAM_SCHEMA_NODE = DiagramSchema.preferences;
+    private final static ExtendedPreferences DIAGRAM_SCHEMA_NODE = 
+                                new ExtendedPreferences(DiagramSchema.preferences.node("User Defined"));
     
     private static final ConfigurationSection DIAGRAM_COLORS_SECTION = new ConfigurationSection(
             new ConfigurationSubsection[] {
@@ -125,6 +128,14 @@ public class ToscanaJPreferences {
         boolean okClicked = GenericDialog.showDialog(parent, "Preferences", panel);
         if(okClicked) {
             panel.applyChanges();
+            Collection schemas = DiagramSchema.getSchemas();
+            for (Iterator iter = schemas.iterator(); iter.hasNext(); ) {
+                DiagramSchema schema = (DiagramSchema) iter.next();
+                if(schema.getName().equals("User Defined")) {
+                    schema.setAsCurrent();
+                    schema.restore(DIAGRAM_SCHEMA_NODE);
+                }
+            }
         }
         return okClicked;
     }

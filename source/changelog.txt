@@ -6,6 +6,11 @@ Affecting different programs:
 - contexts do have a notion of object and attribute order now,
   which they remember, the order can be changed using the context
   menus in the context editor
+- instead of having some color modes, five color schemas can now be
+  selected: the four corresponding to the color modes, with a
+  duplication of the default one: one of these will stay with default
+  values, the other one gets the values changed in the preferences
+  dialog
 
 Specific for ToscanaJ:
 ======================
@@ -16,11 +21,11 @@ Specific for ToscanaJ:
 
 Specific for Elba:
 ==================
+- bugfix: export object and attribute lists with Tools->Export Realized 
+  Scales... works again
 
 Specific for Siena (still not fully complete):
 ==============================================
-- the way grayscale and black&white views are created has been
-  changed to cover all visual objects (affects transition arrows)
 - many-valued contexts imported from Cernato XML can be seen (and
   edited, but this is not finished and will not affect anything yet)
 - transition arrow styles have extra option to change the width of
@@ -31,7 +36,11 @@ Specific for Siena (still not fully complete):
   in the labels as in the imported many-valued context
 - arrow styles are now maintained with the diagram color schema, and 
   thus stored in the session management, i.e they are remembered when
-  closing and reopening Siena
+  closing and reopening Siena. This also means that changing the schema
+  implies changing the arrow styles, although this is not instantly
+  visible (some repaints missing) and the standard settings for the
+  grayscale and black&white are not yet adjusted -- this can be done by
+  the user and will be remembered.
   
 
 Other new experimental features:

@@ -17,7 +17,6 @@ import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-import net.sourceforge.toscanaj.view.colorchange.ColorChanger;
 
 import org.tockit.canvas.Canvas;
 import org.tockit.canvas.CanvasItem;
@@ -76,7 +75,6 @@ public class DiagramView extends Canvas implements ChangeObserver {
 
     private LabelView.LabelFactory attributeLabelFactory = AttributeLabelView.getFactory();
     private LabelView.LabelFactory objectLabelFactory = ObjectLabelView.getFactory();
-    private ColorChanger colorChanger;
 
     private class ResizeListener extends ComponentAdapter {
         public void componentResized(ComponentEvent e) {
@@ -152,12 +150,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * Paints the diagram on the screen.
      */
     public void paintComponent(Graphics g) {
-        Graphics2D g2d;
-        if(this.colorChanger != null) {
-            g2d = this.colorChanger.getGraphics2D((Graphics2D) g);
-        } else {
-            g2d = (Graphics2D) g;
-        }
+        Graphics2D g2d = (Graphics2D) g;
         super.paintComponent(g2d);
         
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -412,11 +405,6 @@ public class DiagramView extends Canvas implements ChangeObserver {
 	 */
     public void setObjectLabelFactory(LabelView.LabelFactory objectLabelFactory) {
         this.objectLabelFactory = objectLabelFactory;
-    }
-
-    public void setColorChanger(ColorChanger colorChanger) {
-        this.colorChanger = colorChanger;
-        repaint();
     }
 
     public ConceptInterpretationContext getConceptInterpretationContext() {
