@@ -34,7 +34,7 @@ Specific for Elba:
   boxes (should be more intuitive)
 - after setting up the DB connection, a popup notifies the user about the
   success
-- bugfix: last CSC import and last export location are remembered between program
+- Bugfix: last CSC import and last export location are remembered between program
   sessions
 
 Specific for Siena (still not fully complete):
