@@ -412,4 +412,18 @@ public abstract class AbstractConceptImplementation implements Concept
     public boolean isBottom() {
         return this.ideal.size() == 1;
     }
+
+    /**
+     * Returns true iff the given concept is in the filter of this one.
+     */
+    public boolean hasSuperConcept(Concept concept) {
+        return this.filter.contains(concept);
+    }
+
+    /**
+     * Returns true iff the given concept is in the ideal of this one.
+     */
+    public boolean hasSubConcept(Concept concept) {
+        return this.ideal.contains(concept);
+    }
 }

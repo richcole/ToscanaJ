@@ -4,11 +4,14 @@ import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
+import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Stroke;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -17,6 +20,26 @@ import java.awt.geom.Rectangle2D;
  */
 
 public class NodeView extends CanvasItem {
+    /**
+     * Node displays nothing selected
+     */
+    static final public int NOT_SELECTED = 0;
+
+    /**
+     * Node displays the currently selected concept.
+     */
+    static final public int SELECTED_DIRECTLY = 1;
+
+    /**
+     * Node displays a concept in the filter of the currently selected concept.
+     */
+    static final public int SELECTED_FILTER = 2;
+
+    /**
+     * Node displays a concept in the ideal of the currently selected concept.
+     */
+    static final public int SELECTED_IDEAL = 4;
+
     /**
      * The color used for the top of the gradient.
      */
@@ -33,9 +56,36 @@ public class NodeView extends CanvasItem {
     static protected Color circleColor = new Color(0,0,0);
 
     /**
+     * The Color for the circles around the node with the selected concept.
+     */
+    static public Color circleSelectionColor = new Color(80,80,80);
+
+    /**
+     * The Color for the circles around the nodes in the ideal of the selected
+     * concept.
+     */
+    static public Color circleIdealColor = new Color(255,255,0);
+
+    /**
+     * The Color for the circles around the nodes in the filter of the selected
+     * concept.
+     */
+    static public Color circleFilterColor = new Color(255,0,0);
+
+    /**
+     * The size of the circles around selected nodes.
+     */
+    static public int selectionSize = 3;
+
+    /**
      * Store the node model for this view
      */
     private DiagramNode diagramNode = null;
+
+    /**
+     * Store the diagram view for callbacks on selected concepts.
+     */
+    private DiagramView diagramView = null;
 
     /**
      * Stores the graphic environment.
@@ -47,6 +97,11 @@ public class NodeView extends CanvasItem {
      * the radius somewhere else (global options?).
      */
     private ToscanajGraphics2D graphics;
+
+    /**
+     * Stores the selection state.
+     */
+    private int selectionState;
 
     /**
      * Changes the top color of the gradient.
@@ -91,10 +146,13 @@ public class NodeView extends CanvasItem {
     }
 
     /**
-     * Construct a nodeView for a Node
+     * Construct a nodeView for a Node.
+     *
+     * The DiagramView is used for the callback when a node was selected.
      */
-    public NodeView(DiagramNode diagramNode){
+    public NodeView(DiagramNode diagramNode, DiagramView diagramView){
         this.diagramNode = diagramNode;
+        this.diagramView = diagramView;
     }
 
     /**
@@ -104,6 +162,7 @@ public class NodeView extends CanvasItem {
         if(diagramNode != null) {
             Paint oldPaint = g.getGraphics2D().getPaint();
             Color nodeColor;
+            Color circleColor = this.circleColor;
             if(diagramNode instanceof NestedDiagramNode) {
                 nodeColor = Color.white;
             }
@@ -114,9 +173,23 @@ public class NodeView extends CanvasItem {
                                        (int)(topColor.getBlue()*rel + bottomColor.getBlue()*(1-rel)),
                                        (int)(topColor.getAlpha()*rel + bottomColor.getAlpha()*(1-rel)) );
             }
+            Stroke oldStroke = g.getGraphics2D().getStroke();
+            if(this.selectionState != NOT_SELECTED) {
+                g.getGraphics2D().setStroke(new BasicStroke(this.selectionSize));
+                if(this.selectionState == SELECTED_DIRECTLY) {
+                    circleColor = this.circleSelectionColor;
+                }
+                else if(this.selectionState == SELECTED_IDEAL) {
+                    circleColor = this.circleIdealColor;
+                }
+                else if(this.selectionState == SELECTED_FILTER) {
+                    circleColor = this.circleFilterColor;
+                }
+            }
             g.drawFilledEllipse( diagramNode.getPosition(), diagramNode.getRadiusX(), diagramNode.getRadiusY(),
                                  nodeColor, circleColor );
             g.getGraphics2D().setPaint(oldPaint);
+            g.getGraphics2D().setStroke(oldStroke);
             graphics = g;
         }
     }
@@ -136,6 +209,13 @@ public class NodeView extends CanvasItem {
     }
 
     /**
+     * Selects the diagam view of the selected concept.
+     */
+    public void clicked(Point2D point) {
+        this.diagramView.setSelectedConcept(this.diagramNode.getConcept());
+    }
+
+    /**
      * Implements CanvasItem.doubleClicked(Point2D) and starts a zooming operation.
      */
     public void doubleClicked(Point2D point) {
@@ -152,5 +232,49 @@ public class NodeView extends CanvasItem {
         double rx = this.diagramNode.getRadiusX();
         double ry = this.diagramNode.getRadiusY();
         return new Rectangle2D.Double(x-rx, y-ry, 2*rx, 2*ry);
+    }
+
+    /**
+     * Recalculates if the node is selected and how.
+     *
+     * @see getSelectionState()
+     */
+    public void setSelectedConcept(Concept concept) {
+        if(concept == null) {
+            this.selectionState = NOT_SELECTED;
+            return;
+        }
+        if(this.diagramNode.getConcept() == concept) {
+            this.selectionState = SELECTED_DIRECTLY;
+            return;
+        }
+        if(this.diagramNode.getConcept().hasSuperConcept(concept)) {
+            this.selectionState = SELECTED_IDEAL;
+            return;
+        }
+        if(this.diagramNode.getConcept().hasSubConcept(concept)) {
+            this.selectionState = SELECTED_FILTER;
+            return;
+        }
+        this.selectionState = NOT_SELECTED;
+        return;
+    }
+
+    /**
+     * Returns the information if and how the node is selected.
+     *
+     * The return values are:
+     * - NOT_SELECTED: the node dispalys a concept which is neither in filter
+     *   nor ideal of the selected concept
+     * - SELECTED_DIRECTLY: the node dispalys the selected concept
+     * - SELECTED_IN_FILTER: the node dispalys a concept which is in the filter
+     *   of the selected concept
+     * - SELECTED_IN_IDEAL: the node dispalys a concept which is in the ideal
+     *   of the selected concept
+     *
+     * @see setSelectedConcept(Concept)
+     */
+    public int getSelectionState() {
+        return this.selectionState;
     }
 }

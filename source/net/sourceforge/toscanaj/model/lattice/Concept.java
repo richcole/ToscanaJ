@@ -137,12 +137,22 @@ public interface Concept {
     Concept filterByContingent(Concept other);
 
     /**
-     * Returns true if this is the top concept.
+     * Returns true iff this is the top concept.
      */
     boolean isTop();
 
     /**
-     * Returns true if this is the bottom concept.
+     * Returns true iff this is the bottom concept.
      */
     boolean isBottom();
+
+    /**
+     * Returns true iff the given concept is a superconcept of the object.
+     */
+    boolean hasSuperConcept(Concept concept);
+
+    /**
+     * Returns true iff the given concept is a subconcept of the object.
+     */
+    boolean hasSubConcept(Concept concept);
 }

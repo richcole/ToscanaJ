@@ -10,6 +10,7 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.view.diagram.LabelView;
@@ -191,13 +192,13 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         // add all nodes to the canvas
         for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
             DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node);
+            NodeView nodeView = new NodeView(node, this);
             addCanvasItem( nodeView );
         }
         // add all labels to the canvas
         for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
             DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node);
+            NodeView nodeView = new NodeView(node, this);
             LabelInfo attrLabelInfo = diagram.getAttributeLabel( i );
             if( attrLabelInfo != null ) {
                 LabelView labelView = new AttributeLabelView( this, attrLabelInfo );
@@ -225,13 +226,13 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         // add all outer nodes to the canvas
         for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
             DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node);
+            NodeView nodeView = new NodeView(node, this);
             addCanvasItem( nodeView );
         }
         // add all outer labels to the canvas
         for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
             DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node);
+            NodeView nodeView = new NodeView(node, this);
             LabelInfo attrLabelInfo = diagram.getAttributeLabel( i );
             if( attrLabelInfo != null ) {
                 LabelView labelView = new AttributeLabelView( this, attrLabelInfo );
@@ -292,5 +293,28 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         }
         // set new default
         ObjectLabelView.setDefaultShowPercentage(toggle);
+    }
+
+    /**
+     * Sets the selected concept.
+     *
+     * The selected concept and its filter and ideal will be highlighted on
+     * drawing. If the parameter is set to null highlighting will be dropped.
+     */
+    public void setSelectedConcept(Concept concept) {
+        // notify all nodes and lines
+        Iterator it = this.canvasItems.iterator();
+        while( it.hasNext() ) {
+            CanvasItem cur = (CanvasItem) it.next();
+            if(cur instanceof NodeView) {
+                NodeView nv = (NodeView) cur;
+                nv.setSelectedConcept(concept);
+            }
+            if(cur instanceof LineView) {
+                LineView lv = (LineView) cur;
+                lv.setSelectedConcept(concept);
+            }
+        }
+        repaint();
     }
 }
