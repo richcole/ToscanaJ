@@ -40,6 +40,7 @@ import net.sourceforge.toscanaj.parser.CSCParser;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
+import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.SqlClauseLabelView;
@@ -604,6 +605,31 @@ public class ElbaMainPanel
 			setMinLabelSizeSubMenu.add(fontRangeMenuItem);
 		}
 		viewMenu.add(setMinLabelSizeSubMenu);
+		
+	    final JCheckBoxMenuItem hideAttributeLabels = new JCheckBoxMenuItem("Hide Attribute Labels");
+	    hideAttributeLabels.setMnemonic(KeyEvent.VK_A);
+	    hideAttributeLabels.addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	            boolean newState = !AttributeLabelView.allAreHidden();
+	            hideAttributeLabels.setSelected(newState);
+	            AttributeLabelView.setAllHidden(newState);
+	            diagramView.repaint();
+	        }
+	    });
+	    viewMenu.add(hideAttributeLabels);
+
+	    final JCheckBoxMenuItem hideObjectLabels = new JCheckBoxMenuItem("Hide Object Labels");
+	    hideObjectLabels.setMnemonic(KeyEvent.VK_O);
+	    hideObjectLabels.addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	            boolean newState = !SqlClauseLabelView.allAreHidden();
+	            hideObjectLabels.setSelected(newState);
+	            SqlClauseLabelView.setAllHidden(newState);
+	            diagramView.repaint();
+	        }
+	    });
+	    viewMenu.add(hideObjectLabels);
+
 		menuBar.add(viewMenu);
 
 		JMenu toolMenu = new JMenu("Tools");

@@ -18,6 +18,24 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
  * A LabelView for displaying the SQL clauses.
  */
 public class SqlClauseLabelView extends LabelView {
+    /**
+     * @todo this is a quick hack to get a hide all feature, should be changed
+     * to some controller object or similar
+     */
+    protected static boolean allHidden = false;
+
+    public static void setAllHidden(boolean allHidden) {
+        SqlClauseLabelView.allHidden = allHidden;
+    }
+
+    public static boolean allAreHidden() {
+        return allHidden;
+    }
+
+    public boolean isVisible() {
+        return super.isVisible() && !allHidden;
+    }
+
 	private List entries;
 	
     public static LabelFactory getFactory() {

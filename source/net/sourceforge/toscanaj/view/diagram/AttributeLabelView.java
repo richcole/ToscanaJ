@@ -22,6 +22,24 @@ import java.util.Iterator;
  * @see ObjectLabelView
  */
 public class AttributeLabelView extends LabelView {
+    /**
+     * @todo this is a quick hack to get a hide all feature, should be changed
+     * to some controller object or similar
+     */
+    protected static boolean allHidden = false;
+
+    public static void setAllHidden(boolean allHidden) {
+        AttributeLabelView.allHidden = allHidden;
+    }
+
+    public static boolean allAreHidden() {
+        return allHidden;
+    }
+
+    public boolean isVisible() {
+        return super.isVisible() && !allHidden;
+    }
+	
     public static LabelFactory getFactory() {
         return new LabelFactory(){
             public LabelView createLabelView(DiagramView diagramView,NodeView nodeView,LabelInfo label){

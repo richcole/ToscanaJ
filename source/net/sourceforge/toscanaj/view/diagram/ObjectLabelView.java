@@ -32,6 +32,20 @@ import java.util.List;
  */
 public class ObjectLabelView extends LabelView {
     /**
+     * @todo this is a quick hack to get a hide all feature, should be changed
+     * to some controller object or similar
+     */
+    protected static boolean allHidden = false;
+
+    public static void setAllHidden(boolean allHidden) {
+        ObjectLabelView.allHidden = allHidden;
+    }
+
+    public static boolean allAreHidden() {
+        return allHidden;
+    }
+
+    /**
      * Sets the default query used for new labels.
      */
     static private Query defaultQuery = null;
@@ -67,7 +81,7 @@ public class ObjectLabelView extends LabelView {
         Concept concept = this.labelInfo.getNode().getConcept();
         ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
         ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
-        return interpreter.isRealized(concept, context) && super.isVisible();
+        return interpreter.isRealized(concept, context) && super.isVisible() && !allHidden;
     }
 
     public void updateEntries() {
