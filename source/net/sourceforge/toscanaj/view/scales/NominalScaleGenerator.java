@@ -35,7 +35,9 @@ public class NominalScaleGenerator implements ScaleGenerator {
                 columns[0].getColumn(),
                 databaseConnection
         );
-        dialog.show();
+        if(!dialog.execute()) {
+            return null;
+        }
         return new SimpleLineDiagram();
     }
 

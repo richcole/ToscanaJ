@@ -15,22 +15,21 @@ import org.apache.batik.ext.swing.GridBagConstants;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.Iterator;
 
 public class NominalScaleEditorDialog extends JDialog {
+    private boolean result;
 
     private Column column;
     private DatabaseConnection databaseConnection;
 
-    private JList columnValueList;
-    private JList attributeList;
-    private DefaultListModel columnValues;
-    private DefaultListModel attributeValues;
+    private JList columnValuesListView;
+    private JList attributeListView;
+    private DefaultListModel columnValuesListModel;
+    private DefaultListModel attributeListModel;
 
-    private JTextField scaleTitleLabel;
-
-    private JButton doneButton;
-    private JButton addButton;
+    private JTextField scaleTitleField;
 
     public NominalScaleEditorDialog(Frame owner, Column column, DatabaseConnection databaseConnection) {
         super(owner);
@@ -39,6 +38,8 @@ public class NominalScaleEditorDialog extends JDialog {
 
         createControls();
         fillControls();
+
+        result = false;
     }
 
     private void createControls() {
@@ -47,14 +48,15 @@ public class NominalScaleEditorDialog extends JDialog {
         getContentPane().setLayout(new GridBagLayout());
 
         // -- title pane ---
-        this.scaleTitleLabel = new JTextField();
+        this.scaleTitleField = new JTextField();
+        scaleTitleField.setText(column.getName() + " (nominal)");
         JPanel titlePane = new JPanel(new GridLayout(1, 0));
         titlePane.add(new Label("Scale Title"));
-        titlePane.add(scaleTitleLabel);
+        titlePane.add(scaleTitleField);
         getContentPane().add(
                 titlePane,
                 new GridBagConstraints(
-                        1, 1, 1, 1, 1, 0,
+                        0, 0, 1, 1, 1, 0,
                         GridBagConstants.CENTER,
                         GridBagConstants.HORIZONTAL,
                         new Insets(5, 5, 5, 5),
@@ -62,18 +64,74 @@ public class NominalScaleEditorDialog extends JDialog {
                 )
         );
 
-        JPanel tablePane = new JPanel(new GridLayout(1, 0));
+        JPanel tablePane = new JPanel(new GridBagLayout());
+        this.columnValuesListModel = new DefaultListModel();
+        this.columnValuesListView = new JList(columnValuesListModel);
+        this.columnValuesListView.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if(e.getClickCount() == 2) {
+                    addValuesToSelection();
+                }
+            }
+        });
+        JPanel moveButtonPane = new JPanel(new GridLayout(2,1));
+        JButton addButton = new JButton(">");
+        addButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                addValuesToSelection();
+            }
+        });
+        JButton removeButton = new JButton("<");
+        removeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                removeValuesFromSelection();
+            }
+        });
+        moveButtonPane.add(addButton);
+        moveButtonPane.add(removeButton);
+        this.attributeListModel = new DefaultListModel();
+        this.attributeListView = new JList(attributeListModel);
+        this.attributeListView.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if(e.getClickCount() == 2) {
+                    removeValuesFromSelection();
+                }
+            }
+        });
+        tablePane.add(new LabeledScrollPaneView("Available Values", this.columnValuesListView),
+            new GridBagConstraints(
+                    0, 0, 1, 1, 1, 1,
+                    GridBagConstants.CENTER,
+                    GridBagConstants.BOTH,
+                    new Insets(5, 5, 5, 5),
+                    0, 0
+            )
+        );
+        tablePane.add(moveButtonPane,
+                new GridBagConstraints(
+                        1, 0, 1, 1, 0, 0,
+                        GridBagConstants.CENTER,
+                        GridBagConstants.NONE,
+                        new Insets(5, 5, 5, 5),
+                        0, 0
+                )
+        );
+        tablePane.add(new LabeledScrollPaneView("Selected Attributes", this.attributeListView),
+                new GridBagConstraints(
+                        2, 0, 1, 1, 1, 1,
+                        GridBagConstants.CENTER,
+                        GridBagConstants.BOTH,
+                        new Insets(5, 5, 5, 5),
+                        0, 0
+                )
+        );
         tablePane.setBorder(BorderFactory.createEtchedBorder());
-        this.columnValues = new DefaultListModel();
-        this.columnValueList = new JList(columnValues);
-        this.attributeValues = new DefaultListModel();
-        this.attributeList = new JList(attributeValues);
-        tablePane.add(new LabeledScrollPaneView("Values", this.columnValueList));
-        tablePane.add(new LabeledScrollPaneView("Attributes", this.attributeList));
         getContentPane().add(
                 tablePane,
                 new GridBagConstraints(
-                        1, 2, 1, 1, 1, 1,
+                        0, 1, 1, 1, 1, 1,
                         GridBagConstants.CENTER,
                         GridBagConstants.BOTH,
                         new Insets(5, 5, 5, 5),
@@ -81,14 +139,27 @@ public class NominalScaleEditorDialog extends JDialog {
                 )
         );
 
-        JPanel buttonPane = new JPanel(new GridLayout(1, 0));
-        buttonPane.add(new JButton("Add"));
-        buttonPane.add(new JButton("Cancel"));
-        buttonPane.add(new JButton("Done"));
+        JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                result = false;
+                hide();
+            }
+        });
+        JButton createButton = new JButton("Create");
+        createButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                result = true;
+                hide();
+            }
+        });
+        buttonPane.add(cancelButton);
+        buttonPane.add(createButton);
         getContentPane().add(
                 buttonPane,
                 new GridBagConstraints(
-                        1, 3, 1, 1, 1, 0,
+                        0, 2, 1, 1, 1, 0,
                         GridBagConstants.CENTER,
                         GridBagConstants.HORIZONTAL,
                         new Insets(5, 5, 5, 5),
@@ -98,19 +169,40 @@ public class NominalScaleEditorDialog extends JDialog {
         pack();
     }
 
+    private void addValuesToSelection() {
+        for (int i = this.columnValuesListView.getSelectedValues().length - 1; i>=0; i--) {
+            Object o = this.columnValuesListView.getSelectedValues()[i];
+            this.columnValuesListModel.removeElement(o);
+            this.attributeListModel.addElement(o);
+        }
+    }
+
+    private void removeValuesFromSelection() {
+        for (int i = this.attributeListView.getSelectedValues().length - 1; i>=0; i--) {
+            Object o = this.attributeListView.getSelectedValues()[i];
+            this.attributeListModel.removeElement(o);
+            this.columnValuesListModel.addElement(o);
+        }
+    }
+
     private void fillControls() {
         // --- get a list of the values in column
         java.util.List resultSet = null;
         try {
             String query = "SELECT DISTINCT " + column.getName() + " FROM " +
                     column.getTable().getName() + ";";
-            System.out.println("Query=" + query);
             resultSet = databaseConnection.queryColumn(query, 1);
         } catch (DatabaseException e) {
         }
 
         for (Iterator it = resultSet.iterator(); it.hasNext();) {
-            this.columnValues.addElement((String) it.next());
+            this.columnValuesListModel.addElement((String) it.next());
         }
-    };
+    }
+
+    public boolean execute() {
+        result = false;
+        show();
+        return result;
+    }
 }
