@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.SqlClauseLabelView;
 import net.sourceforge.toscanaj.view.scales.InputTextDialog;
@@ -23,6 +24,16 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
+/**
+ * It seems that in Elba context we only have one object in underlying Concept object iterator, 
+ * which effects the way we are trying to change an Sql Clause. (SqlClauseLabelView 
+ * is constructed by splitting an object string into a number of label entries). Hence  the 
+ * following assumptions.
+ * Assumptions:
+ * - there is always only one object in objects iterator for a corresponding Concept.
+ * - this object is always a String.
+ * - a Concept implementation used here is a ConceptImplementation class
+ */
 public class SqlClauseEditingLabelViewPopupMenuHandler implements EventBrokerListener {
     private DiagramView diagramView;
 
@@ -49,30 +60,27 @@ public class SqlClauseEditingLabelViewPopupMenuHandler implements EventBrokerLis
     }
 
     public void openPopupMenu(final SqlClauseLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
-		String labelContents = "";
-		Iterator it = labelView.getEntryIterator();
-		while (it.hasNext()) {
-			String curEntry = (String) it.next();
-			labelContents = labelContents + curEntry;
+
+		Iterator objIt = labelView.getNodeView().getDiagramNode().getConcept().getObjectContingentIterator();
+		Object curObjectValue = null;
+		if (objIt.hasNext()) {
+			curObjectValue = objIt.next();
 		}
-		final String currentValue = labelContents;
-        
+		final Object currentValue = curObjectValue;
+        final String currentValueString = curObjectValue.toString();
+               
         // create the menu
         JPopupMenu popupMenu = new JPopupMenu();
 		JMenuItem renameSqlClauseMenuItem = new JMenuItem("Change sql clause...");
 		renameSqlClauseMenuItem.addActionListener(new ActionListener () {
 			public void actionPerformed(ActionEvent event) {
 				InputTextDialog dialog = new InputTextDialog(JOptionPane.getFrameForComponent(diagramView), 
-															 "Change SQL Clause", "SQL clause", currentValue);
+															 "Change SQL Clause", "SQL clause", currentValueString);
 				if (!dialog.isCancelled()) {
 					String newValue = dialog.getInput();
-					Iterator it = labelView.getNodeView().getDiagramNode().getConcept().getObjectContingentIterator();
-					while (it.hasNext()) {
-						Object cur = (Object) it.next();
-						//System.out.println("cur concept = " + cur);
-						
-					}
-					diagramView.repaint();
+					ConceptImplementation concept = (ConceptImplementation) labelView.getNodeView().getDiagramNode().getConcept();
+					concept.replaceObject(currentValue, newValue);
+					labelView.updateEntries();
 				}
 			}
 		});
