@@ -1,8 +1,10 @@
 package net.sourceforge.toscanaj.model.lattice;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.NoSuchElementException;
 
 /**
@@ -172,12 +174,28 @@ public abstract class AbstractConceptImplementation implements Concept
     /**
      * Stores all concepts in the filter, including this.
      */
-    List filter = null;
+    Set filter = null;
 
     /**
      * Stores all concepts in the ideal, including this.
      */
-    List ideal = null;
+    Set ideal = null;
+
+    /**
+     * Stores the number of objects in the extent to avoid unneccessary
+     * calculations.
+     *
+     * This is initialized as lazy fetching in getExtentSize().
+     */
+    private int extentSize = -1;
+
+    /**
+     * Stores the number of attribut the intent to avoid unnecc essary
+     * calculations.
+     *
+     * This is initialized as lazy fetching in getIntentSize().
+     */
+    private int intentSize = -1;
 
     /**
      * Initializes the ideal and filter with linked list having a reference to
@@ -187,9 +205,9 @@ public abstract class AbstractConceptImplementation implements Concept
      * and ideal.
      */
     public AbstractConceptImplementation() {
-        this.filter = new LinkedList();
+        this.filter = new HashSet();
         this.filter.add( this );
-        this.ideal = new LinkedList();
+        this.ideal = new HashSet();
         this.ideal.add( this );
     }
 
@@ -216,26 +234,32 @@ public abstract class AbstractConceptImplementation implements Concept
      * transitive closures.
      */
     public void buildClosures() {
-        for(int i = 0; i < ideal.size(); i++) {
-            AbstractConceptImplementation other = (AbstractConceptImplementation) ideal.get(i);
+        // a little brute force: since we can't change a collection while iterating
+        // we just put ideal/filter into a list and iterate using an index
+        List idealList = new LinkedList(ideal);
+        for(int i = 0; i < idealList.size(); i++) {
+            AbstractConceptImplementation other = (AbstractConceptImplementation) idealList.get(i);
             Iterator it = other.ideal.iterator();
             while(it.hasNext()) {
                 Object trans = it.next();
-                if(! ideal.contains(trans) ) {
-                    ideal.add(trans);
+                if(! idealList.contains(trans) ) {
+                    idealList.add(trans);
                 }
             }
         }
-        for(int i = 0; i < filter.size(); i++) {
-            AbstractConceptImplementation other = (AbstractConceptImplementation) filter.get(i);
+        ideal.addAll(idealList);
+        List filterList = new LinkedList(ideal);
+        for(int i = 0; i < filterList.size(); i++) {
+            AbstractConceptImplementation other = (AbstractConceptImplementation) filterList.get(i);
             Iterator it = other.filter.iterator();
             while(it.hasNext()) {
                 Object trans = it.next();
-                if(! filter.contains(trans) ) {
-                    filter.add(trans);
+                if(! filterList.contains(trans) ) {
+                    filterList.add(trans);
                 }
             }
         }
+        filter.addAll(filterList);
     }
 
     /**
@@ -261,13 +285,15 @@ public abstract class AbstractConceptImplementation implements Concept
      * Calculates the intent size based on the contingent sizes in the filter.
      */
     public int getIntentSize() {
-        int retVal = 0;
-        Iterator it = ideal.iterator();
-        while( it.hasNext() ) {
-            Concept cur = (Concept) it.next();
-            retVal += cur.getAttributeContingentSize();
+        if(intentSize < 0) { // not yet calculated
+            intentSize = 0;
+            Iterator it = ideal.iterator();
+            while( it.hasNext() ) {
+                Concept cur = (Concept) it.next();
+                intentSize += cur.getAttributeContingentSize();
+            }
         }
-        return retVal;
+        return intentSize;
     }
 
     /**
@@ -281,13 +307,15 @@ public abstract class AbstractConceptImplementation implements Concept
      * Calculates the extent size based on the contingent sizes in the ideal.
      */
     public int getExtentSize() {
-        int retVal = 0;
-        Iterator it = ideal.iterator();
-        while( it.hasNext() ) {
-            Concept cur = (Concept) it.next();
-            retVal += cur.getObjectContingentSize();
+        if(extentSize < 0 ) { // not yet calculated
+            extentSize = 0;
+            Iterator it = ideal.iterator();
+            while( it.hasNext() ) {
+                Concept cur = (Concept) it.next();
+                extentSize += cur.getObjectContingentSize();
+            }
         }
-        return retVal;
+        return extentSize;
     }
 
     /**
@@ -335,7 +363,7 @@ public abstract class AbstractConceptImplementation implements Concept
         while(cur.filter.size() != 1) {
             // there is another concept in the filter which is not this
             // (this is always the first) ==> go up
-            cur = (AbstractConceptImplementation) cur.filter.get(1);
+            cur = (AbstractConceptImplementation) cur.filter.iterator().next();
         }
         // now we are at the top
         return cur.getExtentSize();
@@ -351,7 +379,7 @@ public abstract class AbstractConceptImplementation implements Concept
         while(cur.ideal.size() != 1) {
             // there is another concept in the ideal which is not this
             // (this is always the first) ==> go down
-            cur = (AbstractConceptImplementation) cur.ideal.get(1);
+            cur = (AbstractConceptImplementation) cur.ideal.iterator().next();
         }
         // now we are at the bottom
         return cur.getIntentSize();
