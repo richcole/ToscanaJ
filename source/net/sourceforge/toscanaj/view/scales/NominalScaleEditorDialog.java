@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.database.Column;
 
 import javax.swing.*;
@@ -242,6 +243,7 @@ public class NominalScaleEditorDialog extends JDialog {
                     column.getTable().getName() + ";";
             resultSet = databaseConnection.queryColumn(query, 1);
         } catch (DatabaseException e) {
+        	ErrorDialog.showError(this, e, "Database query failed");
         }
 
         for (Iterator it = resultSet.iterator(); it.hasNext();) {
