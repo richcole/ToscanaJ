@@ -146,7 +146,6 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		Element retVal = new Element(MANY_VALUED_CONTEXT_ELEMENT_NAME);
 		IdPool oidpool = new IdPool();
 		IdPool aidpool = new IdPool();
-		IdPool tidpool = new IdPool();
 		Hashtable objectIdMapping = new Hashtable();
 		Hashtable attributeIdMapping = new Hashtable();
 		

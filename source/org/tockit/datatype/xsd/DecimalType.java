@@ -198,7 +198,7 @@ public class DecimalType extends AbstractXSDDatatype {
 
     public void insertValue(Element element, Value value) {
         DecimalValue dValue = (DecimalValue) value;
-        element.setAttribute("value", value.toString());
+        element.setAttribute("value", dValue.toString());
     }
 
     public void readXML(Element elem) throws XMLSyntaxError {

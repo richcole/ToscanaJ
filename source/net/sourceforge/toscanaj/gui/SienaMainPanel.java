@@ -156,7 +156,6 @@ import org.tockit.swing.preferences.ExtendedPreferences;
  * @todo make sure all changes to the context will propagate to make the schema dirty.
  */
 public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
-    private static final int MAXIMUM_ROWS_IN_VALUE_MENU = 15;
     private static final String WINDOW_TITLE = "Siena";
     private static final int MaxMruFiles = 8;
 
@@ -353,7 +352,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 			}
 		});
 
-        final Frame parent = this;
 		final JButton createDiagramButton = new JButton("Create Diagram...");
 		createDiagramButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

@@ -163,7 +163,7 @@ public class TableRowHeaderResizer extends MouseInputAdapter
 
 		int newX = e.getX();
 
-		size.width = startWidth + e.getX() - startX;
+		size.width = startWidth + newX - startX;
 
 		if (size.width < minWidth)
 			size.width = minWidth;

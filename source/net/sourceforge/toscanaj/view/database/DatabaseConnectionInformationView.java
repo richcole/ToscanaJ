@@ -851,7 +851,7 @@ public class DatabaseConnectionInformationView extends JDialog
         cancelButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
 				setActionCancelledFlags();
-        		hide();
+        		setVisible(false);
         	}
         });
         
@@ -877,7 +877,7 @@ public class DatabaseConnectionInformationView extends JDialog
     protected void gotoNextStep() {
 		WizardPanel nextPanel = this.currentStep.getNextPanel();
         if(nextPanel == null) {
-            hide();
+            setVisible(false);
             this.conceptualSchema.setDatabaseInfo(this.databaseInfo);
             this.newConnectionSet = true;
         } else {
@@ -958,14 +958,6 @@ public class DatabaseConnectionInformationView extends JDialog
         		ErrorDialog.showError(this, e, "Internal problem");
         	}
         }
-	}
-	
-	public void hide() {
-	    setVisible(false);
-	}
-	
-	public void show() {
-	    setVisible(true);
 	}
 	
     public void setVisible(boolean visible) {

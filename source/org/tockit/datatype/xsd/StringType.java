@@ -50,7 +50,7 @@ public class StringType extends AbstractXSDDatatype {
                 if(child != null) {
                     int minLen = Integer.parseInt(child.getAttributeValue("value"));
                     Element maxLength = restElem.getChild("maxLength", XSD_NAMESPACE);
-                    int maxLen = Integer.parseInt(child.getAttributeValue("value"));
+                    int maxLen = Integer.parseInt(maxLength.getAttributeValue("value"));
                     return createLengthRestrictedType(name, minLen, maxLen);
                 }
                 return createUnrestrictedType(name);
