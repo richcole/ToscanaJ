@@ -18,19 +18,20 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 
 public class OrdinalScaleEditorDialog extends JDialog {
-    Column column;
     boolean result;
     private JTextField titleEditor = new JTextField();
 
     private JButton addButton;
     private DoubleNumberField addField;
     private JList dividersList;
+    /// @todo support INTEGER (i.e. give it different number than -1)
+    public static final int INTEGER = -1;
+    public static final int FLOAT = 1;
+    public static final int UNSUPPORTED = -1;
 
-    public OrdinalScaleEditorDialog(Frame owner, Column column) {
+    public OrdinalScaleEditorDialog(Frame owner, String scaleName, int scaleType) {
         super(owner);
-        this.column = column;
-
-        layoutDialog();
+        layoutDialog(scaleName);
         pack();
     }
 
@@ -40,12 +41,12 @@ public class OrdinalScaleEditorDialog extends JDialog {
         return result;
     }
 
-    private void layoutDialog() {
+    private void layoutDialog(String scaleName) {
         setModal(true);
         setTitle("Ordinal scale editor");
         getContentPane().setLayout(new BorderLayout());
 
-        titleEditor.setText(column.getName() + " (ordinal)");
+        titleEditor.setText(scaleName + " (ordinal)");
         getContentPane().add(new LabeledScrollPaneView("Title", titleEditor), BorderLayout.NORTH);
 
 

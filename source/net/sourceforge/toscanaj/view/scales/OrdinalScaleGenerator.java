@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
@@ -36,22 +37,42 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         if(columns.length != 1) {
             return false;
         }
-        switch(columns[0].getColumn().getType()) {
+        int columnType = columns[0].getColumn().getType();
+        if(determineDataType(columnType) == OrdinalScaleEditorDialog.UNSUPPORTED) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    private int determineDataType(int columnType) {
+        switch(columnType) {
             case Types.DOUBLE:
-                return true;
+                return OrdinalScaleEditorDialog.FLOAT;
             case Types.FLOAT:
-                return true;
+                return OrdinalScaleEditorDialog.FLOAT;
             case Types.REAL:
-                return true;
+                return OrdinalScaleEditorDialog.FLOAT;
+            case Types.BIGINT:
+                return OrdinalScaleEditorDialog.INTEGER;
+            case Types.INTEGER:
+                return OrdinalScaleEditorDialog.INTEGER;
+            case Types.SMALLINT:
+                return OrdinalScaleEditorDialog.INTEGER;
+            case Types.TINYINT:
+                return OrdinalScaleEditorDialog.INTEGER;
             default:
-                return false;
+                return OrdinalScaleEditorDialog.UNSUPPORTED;
         }
     }
 
     public Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
-        Assert.isTrue(canHandleColumns(columns));
-        TableColumnPair pair = columns[0];
-        OrdinalScaleEditorDialog scaleDialog = new OrdinalScaleEditorDialog(parent, pair.getColumn());
+        Column column = columns[0].getColumn();
+        int scaleType = determineDataType(column.getType());
+        Assert.isTrue(scaleType != OrdinalScaleEditorDialog.UNSUPPORTED);
+        String columnName = column.getName();
+        OrdinalScaleEditorDialog scaleDialog = new OrdinalScaleEditorDialog(parent, columnName, scaleType);
         if (!scaleDialog.execute()) {
             return null;
         }
@@ -68,7 +89,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         double y = 0.;
         /// @todo handle or avoid the case where there is no divider
         ConceptImplementation top = makeConcept(null,
-                                "(" + pair.getColumn().getName() + "<=" + String.valueOf(dividers.get(1)) + ")");
+                                "(" + columnName + "<=" + String.valueOf(dividers.get(1)) + ")");
         DiagramNode topNode = new DiagramNode("top",
                 new Point2D.Double(x, y),
                 top,
@@ -83,7 +104,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         for (int i = 0; i < dividers.size(); i++) {
             y += 60;
             ConceptImplementation currentConcept = makeConcept(">" + String.valueOf(dividers.get(i)),
-                                                               getSQLClause(pair, dividers, i));
+                                                               getSQLClause(columnName, dividers, i));
             conceptList.add(currentConcept);
 
             DiagramNode node = new DiagramNode((new Integer(i)).toString(),
@@ -109,10 +130,10 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         return ret;
     }
 
-    private String getSQLClause(TableColumnPair pair, List dividers, int i) {
-        String retVal = "(" + pair.getColumn().getName() + ">" + String.valueOf(dividers.get(i)) + ")";
+    private String getSQLClause(String columnName, List dividers, int i) {
+        String retVal = "(" + columnName + ">" + String.valueOf(dividers.get(i)) + ")";
         if(i < dividers.size()-1 ) {
-            retVal += "AND (" + pair.getColumn().getName() + "<=" + String.valueOf(dividers.get(i+1)) + ")";
+            retVal += "AND (" + columnName + "<=" + String.valueOf(dividers.get(i+1)) + ")";
         }
         return retVal;
     }

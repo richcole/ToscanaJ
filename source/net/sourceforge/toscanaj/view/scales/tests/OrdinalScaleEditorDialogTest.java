@@ -27,10 +27,10 @@ public class OrdinalScaleEditorDialogTest extends TestCase {
 
     public void testAddDivider() {
         Table table = new Table(new EventBroker(), "Table");
-        Column column = new Column("Column", java.sql.Types.INTEGER, table);
+        Column column = new Column("Column", java.sql.Types.DOUBLE, table);
         table.addColumn(column);
         OrdinalScaleEditorDialog dialog = new OrdinalScaleEditorDialog(
-                null, column
+                null, column.getName(), OrdinalScaleEditorDialog.FLOAT
         );
         dialog.addDelimiter(1.);
 
