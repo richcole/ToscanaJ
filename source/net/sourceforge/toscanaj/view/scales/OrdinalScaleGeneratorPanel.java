@@ -42,7 +42,8 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 	private JComboBox typeChooser;
 	private JComboBox columnChooser;
 	private JLabel avgLabel;
-	private JLabel rangeLabel;
+	private JLabel minLabel;
+	private JLabel maxLabel;
 
 	private DefaultListModel dividersModel;
 
@@ -298,18 +299,21 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 				double min = this.connection.queryDouble(minQu,1);
 				double max = this.connection.queryDouble(maxQu,1);
 				double avg = this.connection.queryDouble(avgQu,1);
-				this.rangeLabel.setText("Values between " + min + " and " + max);
-				this.avgLabel.setText("Average value is " + avg);
+				this.minLabel.setText("Min: "+min);
+				this.maxLabel.setText("Max: "+max);
+				this.avgLabel.setText("Average: "+avg);
 			} else {
 				int min = this.connection.queryInt(minQu,1);
 				int max = this.connection.queryInt(maxQu,1);
 				int avg = this.connection.queryInt(avgQu,1);
-				this.rangeLabel.setText("Values between " + min + " and " + max);
-				this.avgLabel.setText("Average value is " + avg);
+				this.minLabel.setText("Min: "+min);
+				this.maxLabel.setText("Max: "+max);
+				this.avgLabel.setText("Average: "+avg);
 			}
 		} catch (DatabaseException e) {
 			ErrorDialog.showError(this,e,"Database query failed");
-			this.rangeLabel.setText("");
+			this.minLabel.setText("");
+			this.maxLabel.setText("");
 			this.avgLabel.setText("");
 		}
 	}
@@ -494,7 +498,8 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 			}
 		});
         
-		this.rangeLabel = new JLabel();
+		this.minLabel = new JLabel();
+		this.maxLabel = new JLabel();
 		this.avgLabel = new JLabel();
         
 		addPanel.add(enterValueLabel, new GridBagConstraints(
@@ -519,15 +524,22 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 					new Insets(0,2,0,2),
 					2,2
 		));
-		addPanel.add(this.rangeLabel,new GridBagConstraints(
+		addPanel.add(this.minLabel,new GridBagConstraints(
 					0,2,2,1,1,0,
 					GridBagConstraints.NORTHWEST,
 					GridBagConstraints.HORIZONTAL,
 					new Insets(0,2,0,2),
 					2,2
 		));
-		addPanel.add(this.avgLabel,new GridBagConstraints(
+		addPanel.add(this.maxLabel,new GridBagConstraints(
 					0,3,2,1,1,0,
+					GridBagConstraints.NORTHWEST,
+					GridBagConstraints.HORIZONTAL,
+					new Insets(0,2,0,2),
+					2,2
+		));
+		addPanel.add(this.avgLabel,new GridBagConstraints(
+					0,4,2,1,1,0,
 					GridBagConstraints.NORTHWEST,
 					GridBagConstraints.HORIZONTAL,
 					new Insets(0,2,0,2),
