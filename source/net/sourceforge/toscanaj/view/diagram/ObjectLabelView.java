@@ -1,9 +1,9 @@
 package net.sourceforge.toscanaj.view.diagram;
 
+import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+
 import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-
-import net.sourceforge.toscanaj.view.dialogs.DatabaseViewer;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -138,8 +138,12 @@ public class ObjectLabelView extends LabelView {
             // a doubleClick on the scrollbar
             return;
         }
+        if(!(this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.ListQuery)) {
+            return;
+            /// @todo Get rid of RTTI here.
+        }
         int lineHit = (int)((pos.getY()-this.rect.getY())/this.lineHeight);
         int itemHit = lineHit + this.firstItem;
-        DatabaseViewer.showDialog(this.queryKeyValues.get(itemHit).toString());
+        DatabaseViewerManager.showObject(0,this.queryKeyValues.get(itemHit).toString());
     }
 }

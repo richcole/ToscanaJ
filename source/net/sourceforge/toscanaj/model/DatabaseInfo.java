@@ -98,7 +98,10 @@ public class DatabaseInfo
         abstract public String getQueryHead();
     };
 
-    protected class ListQuery extends DatabaseQuery {
+    /**
+     * @todo This one is public only to use RTTI in ObjectLabelView. Ugly. Fix.
+     */
+    public class ListQuery extends DatabaseQuery {
         public boolean isDistinct;
 
         public ListQuery(String name, String header, boolean isDistinct) {

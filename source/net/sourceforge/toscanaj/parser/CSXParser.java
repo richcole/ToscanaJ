@@ -2,9 +2,9 @@ package net.sourceforge.toscanaj.parser;
 
 import net.sourceforge.toscanaj.controller.db.DBConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.model.DatabaseViewerSetup;
 import net.sourceforge.toscanaj.model.ObjectListQuery;
 import net.sourceforge.toscanaj.model.ObjectNumberQuery;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
@@ -153,7 +153,7 @@ public class CSXParser
         // check if database should be used and fetch the data if needed
         Element viewerElem = _Document.getRootElement().getChild("viewer");
         if(viewerElem != null) {
-            new DatabaseViewerSetup(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection);
+            new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection);
         }
     }
 

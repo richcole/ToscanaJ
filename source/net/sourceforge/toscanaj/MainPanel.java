@@ -7,9 +7,9 @@ import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.model.DatabaseViewerSetup;
 import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
@@ -18,7 +18,6 @@ import net.sourceforge.toscanaj.view.DiagramOrganiser;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
-import net.sourceforge.toscanaj.view.dialogs.DatabaseViewer;
 import net.sourceforge.toscanaj.view.dialogs.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.view.dialogs.ErrorDialog;
 
@@ -162,6 +161,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         DiagramController.getController().addObserver(this);
         // add listener for keys
         this.addKeyListener(this);
+        // we are the parent window for anything database viewers want to display
+        DatabaseViewerManager.setParentComponent(this);
         // restore the old MRU list
         mruList = ConfigurationManager.fetchStringList("mainPanel", "mruFiles", MaxMruFiles);
         // set up the menu for the MRU files
@@ -669,13 +670,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         diagramOrganiser.setConceptualSchema(conceptualSchema);
         DiagramController.getController().reset();
         DiagramController.getController().addObserver(this.diagramView);
-
-        try {
-            DatabaseViewer.initialize(this, DatabaseViewerSetup.getViewerSetup(0));
-        }
-        catch (IndexOutOfBoundsException e) {
-            // we just don't have one
-        }
 
         // enable relevant buttons and menus
         fileIsOpen = true;
