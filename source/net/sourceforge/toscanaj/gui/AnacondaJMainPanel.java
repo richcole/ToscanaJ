@@ -2,6 +2,7 @@ package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
@@ -12,8 +13,11 @@ import net.sourceforge.toscanaj.gui.activity.LoadConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.NewConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.gui.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
+import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,9 +27,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEventListener {
-
-
-
     /**
      *  Model
      */
@@ -48,6 +49,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
      * Views
      */
     private PanelStackView mainView;
+    private DiagramEditingView diagramView;
 
     public class PrepareToSaveActivity implements SimpleActivity {
 
@@ -79,18 +81,26 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
 
     public void createViews() {
         mainView = new PanelStackView(this);
-        mainView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "divider", 200));
+        mainView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "mainPanelDivider", 200));
+
         DatabaseConnectionInformationView connectionInformationView =
             new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo());
         eventBroker.subscribe(connectionInformationView,
                               ConceptualSchemaChangeEvent.class,
                               Object.class );
+
         JPanel tableView = new JPanel();
         tableView.setBackground(Color.black);
+
         JPanel scaleView = new JPanel();
         scaleView.setBackground(Color.green);
-        JPanel diagramView = new JPanel();
-        diagramView.setBackground(Color.red);
+
+        diagramView = new DiagramEditingView(this, conceptualSchema);
+        diagramView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "diagramViewDivider", 200));
+        eventBroker.subscribe(diagramView,
+                              ConceptualSchemaChangeEvent.class,
+                              Object.class );
+
         mainView.addView("Connection", connectionInformationView);
         mainView.addView("Tables", tableView);
         mainView.addView("Scales", scaleView);
@@ -188,8 +198,11 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
     public void closeMainPanel() {
         // store current position
         ConfigurationManager.storePlacement("AnacondaJMainPanel", this);
-        ConfigurationManager.storeInt("AnacondaJMainPanel", "divider",
+        ConfigurationManager.storeInt("AnacondaJMainPanel", "mainPanelDivider",
                 mainView.getDividerLocation()
+        );
+        ConfigurationManager.storeInt("AnacondaJMainPanel", "diagramViewDivider",
+                diagramView.getDividerLocation()
         );
         ConfigurationManager.saveConfiguration();
         System.exit(0);
@@ -199,6 +212,14 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         if ( e instanceof ConceptualSchemaChangeEvent ) {
             ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
             conceptualSchema = schemaEvent.getConceptualSchema();
+            try {
+                databaseConnection.connect(conceptualSchema.getDatabaseInfo());
+                if (conceptualSchema.getSQLURL() != null) {
+                    databaseConnection.executeScript(conceptualSchema.getSQLURL());
+                }
+            } catch (DatabaseException ex) {
+                ErrorDialog.showError(this, ex,  "DB Connection failed", "Can not connect to the database");
+            }
         }
     }
 }
