@@ -1,17 +1,8 @@
-Changes between version 1.1 and the CVS version of the ToscanaJ 
+Changes between version 1.2 and the CVS version of the ToscanaJ 
 program suite:
 
 Affecting all programs:
 =======================
-- labels hide their scrollbar when they don't contain the mouse
-- objects and attributes in the context have an order based on
-  their content's order if possible (e.g. strings are sorted
-  lexicographically)
-- PDF export now contains selectable text
-- PDF can be exported as version 4 instead of 5
-- EPS export works far better (although not as perfect as other
-  vector formats)
-- EMF and PPM can be exported
 
 ToscanaJ:
 =========
