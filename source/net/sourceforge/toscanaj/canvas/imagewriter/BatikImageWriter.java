@@ -8,6 +8,7 @@ import org.w3c.dom.Document;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -88,7 +89,8 @@ public class BatikImageWriter implements ImageWriter {
         svgGenerator.setPaint(canvas.getBackground());
         svgGenerator.fill(bounds);
 
-        canvas.scaleToFit(svgGenerator, bounds);
+        AffineTransform transform = canvas.scaleToFit(svgGenerator, bounds);
+        svgGenerator.transform(transform);
 
         // render the graphic into the DOM
         canvas.paintCanvas(svgGenerator);

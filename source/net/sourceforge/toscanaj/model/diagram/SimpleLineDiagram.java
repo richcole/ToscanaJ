@@ -18,13 +18,8 @@ import java.util.List;
  * will be pointing downwards when reading.
  */
 
-public class SimpleLineDiagram implements Diagram2D
+public class SimpleLineDiagram implements WriteableDiagram2D
 {
-    /**
-     * The list of DiagramObserver implementations currently observing changes.
-     */
-    private List diagramObserver = new LinkedList();
-
     /**
      * The title used for this diagram.
      */

@@ -9,6 +9,7 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
@@ -34,6 +35,14 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         super();
     }
 
+    protected void dragFinished(MouseEvent e) {
+        requestScreenTransformUpdate();
+    }
+
+    private void requestScreenTransformUpdate() {
+        screenTransformDirty = true;
+    }
+
     /**
      * Implements ChangeObserver.update(Object) by repainting the diagram.
      */
@@ -44,6 +53,9 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
             repaint();
         }
     }
+
+
+    private boolean screenTransformDirty = false;
 
     /**
      * Paints the diagram on the screen.
@@ -59,13 +71,19 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         g2d.fill(this.getBounds());
 
         // draw diagram title in the top left corner
+
         g2d.setPaint(DiagramSchema.getDiagramSchema().getForeground());
+        // title is not scaled on purpose
         g2d.drawString(diagram.getTitle(), MARGIN, MARGIN);
 
-        // find current bounds
-        Rectangle2D bounds = new Rectangle2D.Double(MARGIN, MARGIN,
-                getWidth() - 2 * MARGIN, getHeight() - 2 * MARGIN);
-        this.scaleToFit(g2d, bounds);
+        if (screenTransformDirty) {
+            // find current bounds
+            Rectangle2D bounds = new Rectangle2D.Double(MARGIN, MARGIN,
+                    getWidth() - 2 * MARGIN, getHeight() - 2 * MARGIN);
+            this.setScreenTransform(this.scaleToFit(g2d, bounds));
+            screenTransformDirty = false;
+        }
+        g2d.transform(getScreenTransform());
 
         // paint all items on canvas
         paintCanvas(g2d);
@@ -88,6 +106,7 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         } else {
             addDiagram(diagram, null);
         }
+        requestScreenTransformUpdate();
         repaint();
     }
 

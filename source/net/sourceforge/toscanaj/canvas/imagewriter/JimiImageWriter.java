@@ -7,6 +7,7 @@ import net.sourceforge.toscanaj.canvas.DrawingCanvas;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -121,8 +122,8 @@ public class JimiImageWriter implements ImageWriter {
         graphics2D.setPaint(canvas.getBackground());
         graphics2D.fill(bounds);
 
-        canvas.scaleToFit(graphics2D, bounds);
-
+        AffineTransform transform =  canvas.scaleToFit(graphics2D, bounds);
+        graphics2D.transform(transform);
         // paint all items on canvas
         canvas.paintCanvas(graphics2D);
         try

@@ -64,7 +64,7 @@ public class NodeView extends CanvasItem {
     /**
      * Stores the selection state.
      *
-     * @see getSelectionState()
+     * @see #getSelectionState()
      */
     private int selectionState = NO_SELECTION;
 
@@ -112,28 +112,7 @@ public class NodeView extends CanvasItem {
             nodeColor = diagramSchema.getNestedDiagramNodeColor();
         }
         else {
-            double rel;
-            if(diagramSchema.getGradientReference() == DiagramSchema.GRADIENT_REFERENCE_DIAGRAM) {
-                if(diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
-                    rel = this.diagramNode.getConcept().getExtentSize() /
-                               (double)DiagramController.getController().getNumberOfCurrentObjects();
-                }
-                else {
-                    rel = this.diagramNode.getConcept().getObjectContingentSize() /
-                               (double)DiagramController.getController().getMaximalObjectContingentSize();
-                }
-            }
-            else {
-                if(diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
-                    rel = this.diagramNode.getConcept().getExtentSize();
-                }
-                else {
-                    /// @todo Check if this one can be avoided -- it is pretty useless
-                    rel = this.diagramNode.getConcept().getObjectContingentSize();
-                }
-                rel = rel / DiagramController.getController().getNumberOfObjects();
-            }
-            nodeColor = diagramSchema.getGradientColor(rel);
+            nodeColor = diagramSchema.getGradientColor(calculateRelativeSize(diagramSchema));
         }
         Stroke oldStroke = graphics.getStroke();
         if(this.selectionState != NO_SELECTION) {
@@ -166,6 +145,35 @@ public class NodeView extends CanvasItem {
         graphics.draw(ellipse);
         graphics.setPaint(oldPaint);
         graphics.setStroke(oldStroke);
+    }
+
+    /**
+     *  calculates relative size in order to calculate node color
+     * */
+
+    private double calculateRelativeSize(DiagramSchema diagramSchema) {
+        double relativeSize;
+        if(diagramSchema.getGradientReference() == DiagramSchema.GRADIENT_REFERENCE_DIAGRAM) {
+            if(diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
+                relativeSize = this.diagramNode.getConcept().getExtentSize() /
+                           (double)DiagramController.getController().getNumberOfCurrentObjects();
+            }
+            else {
+                relativeSize = this.diagramNode.getConcept().getObjectContingentSize() /
+                           (double)DiagramController.getController().getMaximalObjectContingentSize();
+            }
+        }
+        else {
+            if(diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
+                relativeSize = this.diagramNode.getConcept().getExtentSize();
+            }
+            else {
+                /// @todo Check if this one can be avoided -- it is pretty useless
+                relativeSize = this.diagramNode.getConcept().getObjectContingentSize();
+            }
+            relativeSize = relativeSize / DiagramController.getController().getNumberOfObjects();
+        }
+        return relativeSize;
     }
 
     /**
@@ -247,7 +255,7 @@ public class NodeView extends CanvasItem {
      * - SELECTED_IN_IDEAL: the node displays a concept which is in the ideal
      *   of the selected concept
      *
-     * @see setSelectedConcept(Concept)
+     * @see #setSelectedConcept(Concept)
      */
     public int getSelectionState() {
         return this.selectionState;

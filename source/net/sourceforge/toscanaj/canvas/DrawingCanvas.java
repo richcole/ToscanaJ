@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.print.PageFormat;
@@ -40,6 +39,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
          * The position transmitted with the message.
          */
         private Point2D point;
+
         /**
          * Creates a new task for sending a message.
          */
@@ -47,6 +47,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
             this.target = target;
             this.point = point;
         }
+
         /**
          * Sends the message.
          */
@@ -69,6 +70,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
          * The position transmitted with the message.
          */
         private Point2D point;
+
         /**
          * Creates a new task for sending a message.
          */
@@ -76,6 +78,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
             this.target = target;
             this.point = point;
         }
+
         /**
          * Sends the message.
          */
@@ -115,7 +118,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      *
      * This is used to map mouse positions to the canvas coordinates.
      */
-    private AffineTransform transform = null;
+    private AffineTransform screenTransform = new AffineTransform();
 
     /**
      * Keeps the size of the canvas.
@@ -140,22 +143,27 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     /**
      * Paints the canvas including all CanvasItems on it.
      */
-    public void paintCanvas(Graphics2D graphics)
-    {
+    public void paintCanvas(Graphics2D graphics) {
         // fill the background
         DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
         graphics.setPaint(diagramSchema.getForeground());
 
         // paint all items on canvas
         Iterator it = this.canvasItems.iterator();
-        while( it.hasNext() ) {
+        while (it.hasNext()) {
             CanvasItem cur = (CanvasItem) it.next();
             cur.draw(graphics);
         }
-
-        // store affine transformation matrix for mapping mouse positions
-        this.transform = graphics.getTransform();
     }
+
+    protected void setScreenTransform(AffineTransform transform) {
+        this.screenTransform = transform;
+    }
+
+    protected AffineTransform getScreenTransform(){
+        return screenTransform;
+    }
+
 
     /**
      * Calculates the size of this canvas on a specific drawing context.
@@ -164,12 +172,12 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      */
     public Rectangle2D getCanvasSize(Graphics2D graphics) {
         Iterator it = this.canvasItems.iterator();
-        if(!it.hasNext()) {
-            return new Rectangle2D.Double(0,0,0,0);
+        if (!it.hasNext()) {
+            return new Rectangle2D.Double(0, 0, 0, 0);
         }
         CanvasItem cur = (CanvasItem) it.next();
         Rectangle2D retVal = cur.getCanvasBounds(graphics);
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             cur = (CanvasItem) it.next();
             retVal = retVal.createUnion(cur.getCanvasBounds(graphics));
         }
@@ -180,22 +188,21 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * Implements Printable.print(Graphics, PageFormat, int).
      */
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
-        if(pageIndex == 0) {
+        if (pageIndex == 0) {
             Graphics2D graphics2D = (Graphics2D) graphics;
 
             Rectangle2D bounds = new Rectangle2D.Double(
-                                     pageFormat.getImageableX(),
-                                     pageFormat.getImageableY(),
-                                     pageFormat.getImageableWidth(),
-                                     pageFormat.getImageableHeight() );
-            scaleToFit(graphics2D,bounds);
-
+                    pageFormat.getImageableX(),
+                    pageFormat.getImageableY(),
+                    pageFormat.getImageableWidth(),
+                    pageFormat.getImageableHeight());
+            AffineTransform transform = scaleToFit(graphics2D, bounds);
+            graphics2D.transform(transform);
             // paint all items on canvas
             paintCanvas(graphics2D);
 
             return PAGE_EXISTS;
-        }
-        else {
+        } else {
             return NO_SUCH_PAGE;
         }
     }
@@ -204,52 +211,45 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * Scales the graphic context in which the canvas items will be completely
      * visible in the rectangle.
      */
-    public void scaleToFit(Graphics2D graphics2D, Rectangle2D bounds) {
-        if(!dragMode) {
-            // get the dimensions of the canvas
-            this.canvasSize = this.getCanvasSize(graphics2D);
-        }
+    public AffineTransform scaleToFit(Graphics2D graphics2D, Rectangle2D bounds) {
+        this.canvasSize = this.getCanvasSize(graphics2D);
 
         // we need some values to do the projection -- the initial values are
         // centered and no size change. This is useful if the canvas has no
         // extent in a direction
-        double xOrigin = bounds.getX() + bounds.getWidth()/2;
-        double yOrigin = bounds.getY() + bounds.getHeight()/2;
+        double xOrigin = bounds.getX() + bounds.getWidth() / 2;
+        double yOrigin = bounds.getY() + bounds.getHeight() / 2;
         double xScale = 1;
         double yScale = 1;
 
-        if( canvasSize.getWidth() != 0 )
-        {
+        if (canvasSize.getWidth() != 0) {
             xScale = bounds.getWidth() / canvasSize.getWidth();
-            xOrigin = bounds.getX()/xScale - canvasSize.getX();
+            xOrigin = bounds.getX() / xScale - canvasSize.getX();
         }
-        if( canvasSize.getHeight() != 0 )
-        {
+        if (canvasSize.getHeight() != 0) {
             yScale = bounds.getHeight() / canvasSize.getHeight();
-            yOrigin = bounds.getY()/yScale - canvasSize.getY();
+            yOrigin = bounds.getY() / yScale - canvasSize.getY();
         }
 
         // scale proportionally, add half of the possible difference to the offset to center
-        if( (canvasSize.getWidth()!=0) && (canvasSize.getHeight()!=0) ) {
-            if(xScale > yScale) {
+        if ((canvasSize.getWidth() != 0) && (canvasSize.getHeight() != 0)) {
+            if (xScale > yScale) {
                 xScale = yScale;
-                xOrigin = xOrigin + ( bounds.getWidth()/xScale - canvasSize.getWidth() ) / 2;
-            }
-            else {
+                xOrigin = xOrigin + (bounds.getWidth() / xScale - canvasSize.getWidth()) / 2;
+            } else {
                 yScale = xScale;
-                yOrigin = yOrigin + ( bounds.getHeight()/yScale - canvasSize.getHeight() ) / 2;
+                yOrigin = yOrigin + (bounds.getHeight() / yScale - canvasSize.getHeight()) / 2;
             }
         }
-
-        // reposition / rescale
-        graphics2D.scale(xScale, yScale);
-        graphics2D.translate(xOrigin, yOrigin);
+        AffineTransform transform = AffineTransform.getScaleInstance(xScale, yScale);
+        transform.concatenate(AffineTransform.getTranslateInstance(xOrigin, yOrigin));
+        return transform;
     }
 
     /**
      * Not used -- mouse clicks are handled as press/release combinations.
      */
-    public void mouseClicked(MouseEvent e){
+    public void mouseClicked(MouseEvent e) {
     }
 
     /**
@@ -265,38 +265,27 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * @TODO Use system double click timing instead of hard-coded 300ms
      */
     public void mouseReleased(MouseEvent e) {
-        if(transform == null) { // nothing displayed yet
-            return;
-        }
-        if(dragMode) {
+        if (dragMode) {
             dragMode = false;
+            dragFinished(e);
             repaint();
-        }
-        else {
+        } else {
             Point2D modelPos = null;
-            try {
-                modelPos = this.transform.inverseTransform(e.getPoint(), null);
-            }
-            catch( NoninvertibleTransformException ex ) {
-                ex.printStackTrace();
-                throw new RuntimeException("Internal error: noninvertible transform encountered");
-            }
-            if(selectedCanvasItem == null) {
-                if(e.getClickCount() == 1) {
+            modelPos = getUserCoords(e.getPoint());
+            if (selectedCanvasItem == null) {
+                if (e.getClickCount() == 1) {
                     this.doubleClickTimer = new Timer();
-                    this.doubleClickTimer.schedule( new BackgroundClickTask( this, modelPos ),  300 );
-                }
-                else if(e.getClickCount() == 2) {
+                    this.doubleClickTimer.schedule(new BackgroundClickTask(this, modelPos), 300);
+                } else if (e.getClickCount() == 2) {
                     this.doubleClickTimer.cancel();
                     backgroundDoubleClicked(modelPos);
                 }
                 return;
             }
-            if(e.getClickCount() == 1) {
+            if (e.getClickCount() == 1) {
                 this.doubleClickTimer = new Timer();
-                this.doubleClickTimer.schedule( new CanvasItemClickTask( this.selectedCanvasItem, modelPos ),  300 );
-            }
-            else if(e.getClickCount() == 2) {
+                this.doubleClickTimer.schedule(new CanvasItemClickTask(this.selectedCanvasItem, modelPos), 300);
+            } else if (e.getClickCount() == 2) {
                 this.doubleClickTimer.cancel();
                 selectedCanvasItem.doubleClicked(modelPos);
             }
@@ -307,43 +296,45 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     /**
      * Not used.
      */
+    protected void dragFinished(MouseEvent e) {
+
+    }
+
+    /**
+     * Not used.
+     */
     public void mouseEntered(MouseEvent e) {
-      //System.out.println("mouseEntered");
+        //System.out.println("mouseEntered");
     }
 
     /**
      * Not used.
      */
     public void mouseExited(MouseEvent e) {
-      //System.out.println("mouseExited");
+        //System.out.println("mouseExited");
     }
 
     /**
      * Handles dragging the canvas items.
      */
     public void mouseDragged(MouseEvent e) {
-        if(selectedCanvasItem == null) {
+        if (selectedCanvasItem == null) {
             return;
         }
-        if(!this.contains(e.getPoint())) {
+        if (!this.contains(e.getPoint())) {
             return;
         }
-        if(!dragMode && (lastMousePos.distance(e.getPoint()) >= dragMin)) {
+        if (!dragMode && (lastMousePos.distance(e.getPoint()) >= dragMin)) {
             dragMode = true;
         }
-        if(dragMode) {
+        if (dragMode) {
             Point2D mousePosTr = null;
             Point2D lastMousePosTr = null;
-            try {
-                mousePosTr = this.transform.inverseTransform(e.getPoint(), null);
-                lastMousePosTr = this.transform.inverseTransform(lastMousePos, null);
-            }
-            catch(NoninvertibleTransformException ex) {
-                //this should not happen
-                ex.printStackTrace();
-                throw new RuntimeException("Internal error: noninvertible transformation found.");
-            }
-            selectedCanvasItem.dragged( lastMousePosTr, mousePosTr );
+            mousePosTr = getUserCoords(e.getPoint());
+            lastMousePosTr = getUserCoords(lastMousePos);
+
+
+            selectedCanvasItem.dragged(lastMousePosTr, mousePosTr);
             lastMousePos = e.getPoint();
         }
     }
@@ -352,32 +343,23 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * Not used.
      */
     public void mouseMoved(MouseEvent e) {
-      //System.out.println("mouseMoved");
+        //System.out.println("mouseMoved");
     }
 
     /**
      * Finds, raises and stores the canvas item hit.
      */
     public void mousePressed(MouseEvent e) {
-        if(transform == null) { //nothing to do yet
-            return;
-        }
-        Point2D point = null;
-        try {
-            point = this.transform.inverseTransform(e.getPoint(),null);
-        }
-        catch (Exception ex ) {
-            //this should not happen
-            ex.printStackTrace();
-        }
+        Point2D point = getUserCoords(e.getPoint());
         ListIterator it = this.canvasItems.listIterator(this.canvasItems.size());
-        while(it.hasPrevious()) {
+        while (it.hasPrevious()) {
             CanvasItem cur = (CanvasItem) it.previous();
-            if(cur.containsPoint(point)) {
+            if (cur.containsPoint(point)) {
                 // store the CanvasItem hit
                 this.selectedCanvasItem = cur;
+
                 this.lastMousePos = e.getPoint();
-                if(cur.hasAutoRaise()) {
+                if (cur.hasAutoRaise()) {
                     // raise the item
                     it.remove();
                     this.canvasItems.add(cur);
@@ -387,6 +369,18 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
                 break;
             }
         }
+    }
+
+    private Point2D getUserCoords(Point2D inPoint) {
+        Point2D point = null;
+        try {
+            point = this.screenTransform.inverseTransform(inPoint, null);
+        } catch (Exception ex) {
+            //this should not happen
+            ex.printStackTrace();
+            throw new RuntimeException("Internal error: noninvertible transformation found.");
+        }
+        return point;
     }
 
     /**
