@@ -169,8 +169,10 @@ public class DatabaseConnectionInformationView
 
     protected void updateDBInfo() {
         DatabaseInfo databaseInfo = this.conceptualSchema.getDatabaseInfo();
-        databaseInfo.setTableName(this.tableView.getSqlTableName());
-        databaseInfo.setKey(this.tableView.getSqlKeyName());
+        if(databaseInfo != null) {
+	        databaseInfo.setTableName(this.tableView.getSqlTableName());
+	        databaseInfo.setKey(this.tableView.getSqlKeyName());
+        }
     }
 
 	public JPanel createConnectionPanel() {
