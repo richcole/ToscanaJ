@@ -14,6 +14,7 @@ Affecting all programs:
 
 ToscanaJ:
 =========
+- the preferences can now be edited with a GUI
 
 Elba:
 =====
@@ -24,6 +25,7 @@ Siena (still not fully complete):
   can be toggled from the view menu. They appear below the diagram
   list now in a redesigned layout
 - the color and style of the arrows can be edited
+- arrow setups are saved and loaded
 
 Other new experimental features:
 ================================
