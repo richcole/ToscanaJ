@@ -494,25 +494,47 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         } else {
             openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
-        openDialog.setFileFilter(
+		// create the options panel to be used in the file chooser 
+		JRadioButton keepSchemaButton = new JRadioButton("Extend existing schema");
+		keepSchemaButton.setSelected(true);
+		JRadioButton newSchemaButton = new JRadioButton("Create new schema");
+		ButtonGroup schemaOptionGroup = new ButtonGroup();
+		schemaOptionGroup.add(keepSchemaButton);
+		schemaOptionGroup.add(newSchemaButton);
+		JPanel schemaOptionPanel = new JPanel(new GridBagLayout());
+		schemaOptionPanel.add(keepSchemaButton, new GridBagConstraints(
+							0, 0, 1, 1, 1, 0,
+							GridBagConstraints.NORTHWEST,
+							GridBagConstraints.NONE,
+							new Insets(5,5,5,5),
+							2,2)
+		);
+		schemaOptionPanel.add(newSchemaButton, new GridBagConstraints(
+							0, 1, 1, 1, 1, 0,
+							GridBagConstraints.NORTHWEST,
+							GridBagConstraints.NONE,
+							new Insets(0,5,5,5),
+							2,2)
+		);
+		schemaOptionPanel.add(new JPanel(), new GridBagConstraints(
+							0, 2, 1, 1, 1, 1,
+							GridBagConstraints.NORTHWEST,
+							GridBagConstraints.BOTH,
+							new Insets(0,5,5,5),
+							2,2)
+		);
+		
+		openDialog.setAccessory(schemaOptionPanel);
+		openDialog.setFileFilter(
             new ExtensionFileFilter(new String[] { "cxt" }, "Context Files"));
         openDialog.setApproveButtonText("Import");
         int rv = openDialog.showOpenDialog(this);
         if (rv != JFileChooser.APPROVE_OPTION) {
             return;
         }
-        String newSchemaString = "Create new schema";
-        String keepSchemaString = "Extend existing schema";
-        Object retVal = JOptionPane.showInputDialog(this, "Do you want to keep the current schema?", "Keep Schema?",
-                JOptionPane.QUESTION_MESSAGE, null,
-                new Object[]{keepSchemaString, newSchemaString},
-                keepSchemaString);
-        if (retVal == null) {
-            return;
-        }
-        if (retVal == newSchemaString) {
-            this.conceptualSchema = new ConceptualSchema(this.eventBroker);
-        }
+		if (newSchemaButton.isSelected()) {
+			this.conceptualSchema = new ConceptualSchema(this.eventBroker);
+		}
         importBurmeister(openDialog.getSelectedFile());
     }
 
