@@ -16,16 +16,21 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class ContextTableScaleEditorDialog extends JDialog {
+    
     private boolean result;
-
+	private ContextImplementation context;
     private DatabaseConnection databaseConnection;
 
     private JTextField scaleTitleField;
-    private JPanel buttonsPanel;
-
+    private JPanel buttonsPane;
+	private ContextTableScaleEditorDialog contextTableScaleEditorDialog;
+	 
     public ContextTableScaleEditorDialog(Frame owner, DatabaseConnection databaseConnection) {
         super(owner);
         this.databaseConnection = databaseConnection;
+        this.contextTableScaleEditorDialog = this;
+		//for testing purposes
+		 this.context = createDummyData();
         createView();
     }
 
@@ -61,35 +66,11 @@ public class ContextTableScaleEditorDialog extends JDialog {
                         0, 0
                 )
         );
-
-		ContextImplementation context = new ContextImplementation();
-		String o1 = "one";
-		String o2 = "two";
-		String o3 = "three";
-		String o4 = "four";
-		String a1 = "Aone";
-		String a2 = "Atwo";
-		String a3 = "Athree alsfdjsa dlfj sadlkdjg salgdkj jkhsf";
-
-		context.getObjects().add(o1);
-		context.getObjects().add(o2);
-		context.getObjects().add(o3);
-		context.getObjects().add(o4);
-
-		context.getAttributes().add(a1);
-		context.getAttributes().add(a2);
-		context.getAttributes().add(a3);
-		
-		context.getRelationImplementation().insert(o1,a1);
-		context.getRelationImplementation().insert(o1,a2);
-		context.getRelationImplementation().insert(o2,a2);
-		context.getRelationImplementation().insert(o3,a3);
-		context.getRelationImplementation().insert(o4,a3);
-
+				
 		ContextTableView tableView = new ContextTableView(context);
         JScrollPane scrollpane = new JScrollPane(tableView);
 		
-		createButtonsPanel();
+		createButtonsPane();
 		
         getContentPane().add(
                 titlePane,
@@ -112,7 +93,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
                 )
         );
 		getContentPane().add(
-				buttonsPanel,
+				buttonsPane,
 				new GridBagConstraints(
 						0, 2, 1, 1, 1, 0,
 						GridBagConstraints.CENTER,
@@ -123,27 +104,25 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		);
     }
 	
-	private void createButtonsPanel(){
-		buttonsPanel = new JPanel(new GridBagLayout());
+	private void createButtonsPane(){
+		buttonsPane = new JPanel(new GridBagLayout());
 		JButton addObj = new JButton(" Add Object ");	
 		JButton addAttr = new JButton(" Add Attribute ");
-		JButton cancel= new JButton(" Cancel ");
 		JButton create = new JButton(" Create ");
+		JButton cancel= new JButton(" Cancel ");
 		
 		addObj.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("add object");
+				String inputValue = showAddInputDialog("Add Object", "object");
+				if(inputValue!=null && !inputValue.trim().equals("")){
+					System.out.println("add obj to context");
+				}
 			}
 		});
 		addAttr.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("add attribute");
-			}
-		});
-		cancel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("cancel");
-				closeDialog();
+				String inputValue = showAddInputDialog("Add Attribute", "attribute");
+				System.out.println("add attr to context");
 			}
 		});
 		create.addActionListener(new ActionListener() {
@@ -151,8 +130,13 @@ public class ContextTableScaleEditorDialog extends JDialog {
 				System.out.println("create");
 			}
 		});
+		cancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				closeDialog();
+			}
+		});
 		
-		buttonsPanel.add(
+		buttonsPane.add(
 			   addObj,
 			   new GridBagConstraints(
 					   0, 0, 1, 1, 1, 0,
@@ -162,7 +146,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					   0, 0
 			   )
 	   );
-	   buttonsPanel.add(
+	   buttonsPane.add(
 			   addAttr,
 			   new GridBagConstraints(
 					   1, 0, 1, 1, 1, 0,
@@ -172,8 +156,8 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					   0, 0
 			   )
 	   );
-	   buttonsPanel.add(
-			  cancel,
+	   buttonsPane.add(
+			  create,
 			  new GridBagConstraints(
 					  2, 0, 1, 1, 1, 0,
 					  GridBagConstraints.EAST,
@@ -182,8 +166,8 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					  0, 0
 			  )
 	  );
-	  buttonsPanel.add(
-			  create,
+	  buttonsPane.add(
+			  cancel,
 			  new GridBagConstraints(
 					  3, 0, 1, 1, 1, 0,
 					  GridBagConstraints.EAST,
@@ -198,6 +182,56 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		ConfigurationManager.storePlacement("ContextTableScaleEditorDialog",this);
 		this.setVisible(false);
 	}
+	
+	/**
+	  * To display the dialog asking for the object or attribute input name
+	  * @param title The title of the dialog
+	  * @param thingToAdd The string of the element to be added, either an
+	  * "object" or "attribute". To be used in the formatting of the text
+	  * message prompt in the JDialog
+	  * @return The name of the object/ attribute
+	  */
+	private String showAddInputDialog(String title, String thingToAdd){
+		String inputValue = "";
+		do {
+			inputValue = JOptionPane.showInputDialog(
+				contextTableScaleEditorDialog,
+				"Please input the name of the " +
+				thingToAdd+ ": ", 
+				title,
+				JOptionPane.PLAIN_MESSAGE);
+		} while(inputValue!=null && inputValue.equals(""));
+		
+		return inputValue;
+	}
+	private ContextImplementation createDummyData(){
+		ContextImplementation context = new ContextImplementation();
+		String o1 = "one";
+		String o2 = "two";
+		String o3 = "three";
+		String o4 = "four";
+		String a1 = "Aone";
+		String a2 = "Atwo";
+		String a3 = "Athree alsfdjsa dlfj sadlkdjg salgdkj jkhsf";
+
+		context.getObjects().add(o1);
+		context.getObjects().add(o2);
+		context.getObjects().add(o3);
+		context.getObjects().add(o4);
+
+		context.getAttributes().add(a1);
+		context.getAttributes().add(a2);
+		context.getAttributes().add(a3);
+
+		context.getRelationImplementation().insert(o1,a1);
+		context.getRelationImplementation().insert(o1,a2);
+		context.getRelationImplementation().insert(o2,a2);
+		context.getRelationImplementation().insert(o3,a3);
+		context.getRelationImplementation().insert(o4,a3);
+		
+		return context;
+	}
+	
     public boolean execute() {
         result = false;
         show();
