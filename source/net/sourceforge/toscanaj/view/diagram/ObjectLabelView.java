@@ -45,10 +45,18 @@ public class ObjectLabelView extends LabelView {
 	// it by calling back through updateEntries(), which causes double queries
     private List contents;
 
+    public static LabelFactory getFactory() {
+        return new LabelFactory(){
+            public LabelView createLabelView(DiagramView diagramView,NodeView nodeView,LabelInfo label){
+                return new ObjectLabelView(diagramView, nodeView, label);
+            }
+        };
+    }
+
     /**
      * Creates a view for the given label information.
      */
-    public ObjectLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
+    protected ObjectLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
         super(diagramView, nodeView, label);
     }
 

@@ -127,11 +127,23 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     protected static final DragMode RESIZING = new DragMode();
     protected static final DragMode MOVING = new DragMode();
     protected static final DragMode SCROLLING = new DragMode();
+    
+    public interface LabelFactory {
+    	LabelView createLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label);
+    }
+    
+    public static LabelFactory getFactory() {
+    	return null;
+    }
 
     /**
      * Creates a view for the given label information.
+     * 
+     * Protected since the factory should be used instead.
+     * 
+     * @see getFactory()
      */
-    public LabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
+    protected LabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
         this.diagramView = diagramView;
         this.nodeView = nodeView;
         this.labelInfo = label;

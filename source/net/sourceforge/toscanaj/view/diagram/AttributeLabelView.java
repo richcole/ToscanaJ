@@ -28,10 +28,18 @@ import java.util.Iterator;
  * @see ObjectLabelView
  */
 public class AttributeLabelView extends LabelView {
+    public static LabelFactory getFactory() {
+        return new LabelFactory(){
+            public LabelView createLabelView(DiagramView diagramView,NodeView nodeView,LabelInfo label){
+                return new AttributeLabelView(diagramView, nodeView, label);
+            }
+        };
+    }
+
     /**
      * Creates a view for the given label information.
      */
-    public AttributeLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
+    protected AttributeLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
         super(diagramView, nodeView, label);
     }
 

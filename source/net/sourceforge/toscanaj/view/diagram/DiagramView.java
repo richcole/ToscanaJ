@@ -69,6 +69,11 @@ public class DiagramView extends Canvas implements ChangeObserver {
 	
 	private double minimumFontSize = 0;
 	
+    private boolean screenTransformDirty = false;
+
+    private LabelView.LabelFactory attributeLabelFactory = AttributeLabelView.getFactory();
+    private LabelView.LabelFactory objectLabelFactory = ObjectLabelView.getFactory();
+
     private class ResizeListener extends ComponentAdapter {
         public void componentResized(ComponentEvent e) {
             requestScreenTransformUpdate();
@@ -130,8 +135,6 @@ public class DiagramView extends Canvas implements ChangeObserver {
             repaint();
         }
     }
-
-    private boolean screenTransformDirty = false;
 
     protected boolean isScreenTransformDirty() {
         return screenTransformDirty;
@@ -262,7 +265,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
                 }
                 LabelInfo objLabelInfo = diagram.getObjectLabel(i);
                 if (objLabelInfo != null) {
-                    LabelView labelView = new ObjectLabelView(this, nodeView, objLabelInfo);
+                    LabelView labelView = this.objectLabelFactory.createLabelView(this, nodeView, objLabelInfo);
                     addCanvasItem(labelView, labelLayerName);
                     addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
                     labelView.addObserver(this);
@@ -270,7 +273,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
             }
             LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
             if (attrLabelInfo != null) {
-                LabelView labelView = new AttributeLabelView(this, nodeView, attrLabelInfo);
+                LabelView labelView = this.attributeLabelFactory.createLabelView(this, nodeView, attrLabelInfo);
                 addCanvasItem(labelView, labelLayerName);
                 addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
                 labelView.addObserver(this);
