@@ -76,6 +76,10 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         this.connection = connection;
     }
 
+    public DatabaseConnectedConcept(Element element) throws XML_SyntaxError{
+           super(element);
+    }
+
     protected void fillObjectContingentElement(Element objectContingentElem) {
         if (objectClause != null) {
             Element objectElem = new Element(OBJECT_ELEMENT_NAME);

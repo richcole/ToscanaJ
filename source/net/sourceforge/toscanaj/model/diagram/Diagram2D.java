@@ -20,6 +20,7 @@ import net.sourceforge.toscanaj.model.XML_Serializable;
 public interface Diagram2D extends XML_Serializable {
     static final String DIAGRAM_ELEMENT_NAME = "diagram";
     static final String TITLE_ATTRIBUTE_NAME = "title";
+    static final String DESCRIPTION_ELEMENT_NAME = "description";
     /**
      * Returns the title of the diagram.
      */

@@ -83,10 +83,17 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     public void readXML(Element elem) throws XML_SyntaxError {
         XML_Helper.checkName(DIAGRAM_ELEMENT_NAME, elem);
         title=XML_Helper.getAttribute(elem, TITLE_ATTRIBUTE_NAME).getValue();
-        description = elem.getChild(DESCRIPTION);
-     //   List elemList = elem.getChildren(DiagramNode);
-        throw new XML_SyntaxError("not yet implemented.");
-
+        description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
+        List nodeElems = elem.getChildren(DiagramNode.NODE_ELEMENT_NAME);
+        for (Iterator iterator = nodeElems.iterator(); iterator.hasNext();) {
+            Element diagramNode = (Element) iterator.next();
+            nodes.add(new DiagramNode(diagramNode));
+        }
+        List lineElems = elem.getChildren(DiagramLine.DIAGRAM_LINE_ELEMENT_NAME);
+        for (Iterator iterator = lineElems.iterator(); iterator.hasNext();) {
+            Element diagramLine = (Element) iterator.next();
+            lines.add(new DiagramLine(diagramLine));
+        }
     }
 
     /**

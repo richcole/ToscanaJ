@@ -57,8 +57,23 @@ public abstract class XML_Helper {
             return attribute.getIntValue();
         } catch (DataConversionException e) {
             throw new XML_SyntaxError("Expected Integer Value for Attribute " + attributeName
-                                      + " in Element " + elem.getName());
+                    + " in Element " + elem.getName());
         }
     }
+
+    static public double getDoubleAttribute(Element elem, String attributeName) throws XML_SyntaxError {
+        Attribute attribute = elem.getAttribute(attributeName);
+        if (attribute == null) {
+            throw new XML_SyntaxError("Expected Attribute " + attributeName + " in Element " + elem.getName());
+        }
+        try {
+            return attribute.getDoubleValue();
+        } catch (DataConversionException e) {
+            throw new XML_SyntaxError("Expected Double Value for Attribute " + attributeName
+                    + " in Element " + elem.getName());
+        }
+    }
+
+
 }
 

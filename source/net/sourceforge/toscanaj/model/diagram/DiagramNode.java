@@ -7,15 +7,12 @@
 package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.XML_Serializable;
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
-import net.sourceforge.toscanaj.model.XML_Helper;
+import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
+import net.sourceforge.toscanaj.model.*;
 
 import java.awt.geom.Point2D;
-import java.util.HashSet;
 
 import org.jdom.Element;
-import org.jdom.DataConversionException;
 
 /**
  * Stores the information on a node in a diagram.
@@ -61,12 +58,12 @@ public class DiagramNode implements XML_Serializable {
 
     protected DiagramNode outerNode;
     public static final String NODE_ELEMENT_NAME = "node";
-    private static final String POSITION_ELEMENT_NAME = "position";
-    private static final String POSITION_X_ATTRIBUTE_NAME = "x";
-    private static final String POSITION_Y_ATTRIBUTE_NAME = "y";
-    private static final String ID_ATTRIBUTE_NAME = "id";
-    private static final String ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME = "attributeLabelStyle";
-    private static final String OBJECT_LABEL_STYLE_ELEMENT_NAME = "objectLabelStyle";
+    public static final String POSITION_ELEMENT_NAME = "position";
+    public static final String POSITION_X_ATTRIBUTE_NAME = "x";
+    public static final String POSITION_Y_ATTRIBUTE_NAME = "y";
+    public static final String ID_ATTRIBUTE_NAME = "id";
+    public static final String ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME = "attributeLabelStyle";
+    public static final String OBJECT_LABEL_STYLE_ELEMENT_NAME = "objectLabelStyle";
 
     public DiagramNode(String identifier, Point2D position, Concept concept,
                        LabelInfo attributeLabel, LabelInfo objectLabel,
@@ -111,22 +108,22 @@ public class DiagramNode implements XML_Serializable {
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {
-        XML_Helper.checkName(getElementName(), elem);
-        identifier = XML_Helper.getAttribute(elem, ID_ATTRIBUTE_NAME).getValue();
-        Element positionElement = XML_Helper.mustbe(POSITION_ELEMENT_NAME, elem);
-
-        try {
-            position = new Point2D.Double(
-                XML_Helper.getAttribute(positionElement, POSITION_X_ATTRIBUTE_NAME).getDoubleValue(),
-                XML_Helper.getAttribute(positionElement, POSITION_Y_ATTRIBUTE_NAME).getDoubleValue()
-            );
-        } catch (DataConversionException e) {
-            throw new XML_SyntaxError(e.toString());
+        XML_Helper.checkName(NODE_ELEMENT_NAME, elem);
+        identifier=XML_Helper.getAttribute(elem, ID_ATTRIBUTE_NAME).getValue();
+        Element positionElem = XML_Helper.mustbe(POSITION_ELEMENT_NAME, elem);
+        position = new Point2D.Double(
+                XML_Helper.getDoubleAttribute(positionElem, POSITION_X_ATTRIBUTE_NAME),
+                XML_Helper.getDoubleAttribute(positionElem, POSITION_Y_ATTRIBUTE_NAME)
+        );
+        if (XML_Helper.contains(elem, ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)){
+            attributeLabel=new LabelInfo(elem.getChild(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME));
         }
-        // if (
-
-
-     //   throw new XML_SyntaxError("Not yet implemented");
+        if (XML_Helper.contains(elem, OBJECT_LABEL_STYLE_ELEMENT_NAME)){
+            objectLabel=new LabelInfo(elem.getChild(OBJECT_LABEL_STYLE_ELEMENT_NAME));
+        }
+        concept =  new DatabaseConnectedConcept(
+                   XML_Helper.mustbe(DatabaseConnectedConcept.CONCEPT_ELEMENT_NAME,elem)
+        );
     }
 
     public String getIdentifier() {
@@ -275,7 +272,7 @@ public class DiagramNode implements XML_Serializable {
      *
      * This is used when the diagram given has the y-axis pointing upwards.
      *
-     * @see SimpleLineDiagram.checkCoordinateSystem()
+     * @ see SimpleLineDiagram.checkCoordinateSystem()
      */
     public void invertY() {
         this.position.setLocation(this.position.getX(), -this.position.getY());

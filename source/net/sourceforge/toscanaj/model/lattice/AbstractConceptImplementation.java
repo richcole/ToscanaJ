@@ -27,11 +27,11 @@ import net.sourceforge.toscanaj.model.XML_SyntaxError;
  * relation.
  */
 public abstract class AbstractConceptImplementation implements Concept {
-    private static final String CONCEPT_ELEMENT_NAME = "concept";
-    private static final String OBJECT_CONTINGENT_ELEMENT_NAME = "objectContingent";
-    private static final String OBJECT_ELEMENT_NAME = "object";
-    private static final String ATTRIBUTE_CONTINGENT_ELEMENT_NAME = "attributeContingent";
-    private static final String ATTRIBUTE_ELEMENT_NAME = "attribute";
+    public static final String CONCEPT_ELEMENT_NAME = "concept";
+    public static final String OBJECT_CONTINGENT_ELEMENT_NAME = "objectContingent";
+    public static final String OBJECT_ELEMENT_NAME = "object";
+    public static final String ATTRIBUTE_CONTINGENT_ELEMENT_NAME = "attributeContingent";
+    public static final String ATTRIBUTE_ELEMENT_NAME = "attribute";
 
     protected static List makeList() {
         return new ArrayList();
@@ -255,6 +255,7 @@ public abstract class AbstractConceptImplementation implements Concept {
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {
+        throw new XML_SyntaxError("Not yet implemented.");
     }
 
     /**

@@ -8,13 +8,14 @@ package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-import net.sourceforge.toscanaj.model.XML_Serializable;
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.model.*;
+import net.sourceforge.toscanaj.util.ColorWriter;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.Vector;
+import java.math.BigInteger;
 
 import org.jdom.Element;
 
@@ -121,13 +122,13 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
         offsetElem.setAttribute(OFFSET_Y_ATTRIBUTE_NAME, String.valueOf(offset.getY()));
         retVal.addContent(offsetElem);
         Element backgroundColorElem = new Element(BACKGROUND_COLOR_ELEMENT_NAME);
-        backgroundColorElem.addContent("#" + Integer.toHexString(backgroundColor.getRGB()));
+        backgroundColorElem.addContent("#" + ColorWriter.toHexString(backgroundColor));
         retVal.addContent(backgroundColorElem);
         Element textColorElem = new Element(TEXT_COLOR_ELEMENT_NAME);
-        textColorElem.addContent("#" + Integer.toHexString(textColor.getRGB()));
+        textColorElem.addContent("#" + ColorWriter.toHexString(textColor));
         retVal.addContent(textColorElem);
         Element textAlignmentElem = new Element(TEXT_ALIGNMENT_ELEMENT_NAME);
-        switch(textAlignment) {
+        switch (textAlignment) {
             case ALIGNLEFT:
                 textAlignmentElem.addContent(TEXT_ALIGNMENT_LEFT_CONTENT);
                 break;
@@ -143,7 +144,42 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
     }
 
     public void readXML(Element elem) throws XML_SyntaxError {
-        throw new XML_SyntaxError("Not yet implemented");
+        if (!elem.getName().equals(LABEL_INFO_ELEMENT_NAME)){
+            if(!elem.getName().equals(DiagramNode.ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)){
+                if(!elem.getName().equals(DiagramNode.OBJECT_LABEL_STYLE_ELEMENT_NAME)){
+                    throw new XML_SyntaxError("Expected either " +
+                            LABEL_INFO_ELEMENT_NAME + " or " +
+                            DiagramNode.ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME + " or " +
+                            DiagramNode.OBJECT_LABEL_STYLE_ELEMENT_NAME);
+                }
+            }
+        }
+        Element offsetElem = XML_Helper.mustbe(OFFSET_ELEMENT_NAME, elem);
+        setOffset(
+                XML_Helper.getDoubleAttribute(offsetElem, OFFSET_X_ATTRIBUTE_NAME),
+                XML_Helper.getDoubleAttribute(offsetElem, OFFSET_Y_ATTRIBUTE_NAME)
+        );
+        Element backgroundColorElem = XML_Helper.mustbe(BACKGROUND_COLOR_ELEMENT_NAME, elem);
+        setBackgroundColor(ColorWriter.fromHexString(
+                backgroundColorElem.getText().substring(1)
+        ));
+        Element textColorElem = XML_Helper.mustbe(TEXT_COLOR_ELEMENT_NAME, elem);
+        setBackgroundColor(ColorWriter.fromHexString(
+                textColorElem.getText().substring(1)
+        ));
+        Element textAlignmentElem = XML_Helper.mustbe(TEXT_ALIGNMENT_ELEMENT_NAME, elem);
+        String textAlignmentElemText = textAlignmentElem.getText();
+        if (textAlignmentElemText.equals(TEXT_ALIGNMENT_LEFT_CONTENT)) {
+            textAlignment = ALIGNLEFT;
+        } else if (textAlignmentElemText.equals(TEXT_ALIGNMENT_CENTER_CONTENT)) {
+            textAlignment = ALIGNCENTER;
+        } else if (textAlignmentElemText.equals(TEXT_ALIGNMENT_RIGHT_CONTENT)) {
+            textAlignment = ALIGNRIGHT;
+        } else {
+            throw new XML_SyntaxError(
+                    "Unknown value " + textAlignmentElemText + " for text alignment."
+            );
+        }
     }
 
     /**

@@ -28,9 +28,9 @@ public class DiagramLine implements XML_Serializable {
      * Holds the ending node in the Diagram the line belongs to.
      */
     private DiagramNode toNode;
-    private static final String DIAGRAM_LINE_ELEMENT_NAME = "edge";
-    private static final String FROM_NODE_ATTRIBUTE_NAME = "from";
-    private static final String TO_NODE_ATTRIBUTE_NAME = "to";
+    public static final String DIAGRAM_LINE_ELEMENT_NAME = "edge";
+    public static final String FROM_NODE_ATTRIBUTE_NAME = "from";
+    public static final String TO_NODE_ATTRIBUTE_NAME = "to";
 
     /**
      * Initialises a line between the given nodes.
