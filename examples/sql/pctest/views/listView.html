@@ -1,0 +1,21 @@
+<html>
+<body>
+<h1>DB Report</h1>
+<table border="1">
+    <tr>
+      <th>Name</th>
+      <th>Price</th>
+    </tr>
+    <repeat>
+        <tr>
+          <td><field content="PCname"/></td>
+          <td><field content="price"/></td>
+        </tr>
+    </repeat>
+    <tr>
+      <td><i><field content="COUNT(*)"/> PCs</i></td>
+      <td><i>Av: <field content="AVG(price)"/></i></td>
+    </tr>
+</table>
+</body>
+</html>

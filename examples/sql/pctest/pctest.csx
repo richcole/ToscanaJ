@@ -69,8 +69,7 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
                 <objectView class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer" name="Short View...">
                     <parameter name="openDelimiter" value="$"/>
                     <parameter name="closeDelimiter" value="$"/>
-                    <template>Name:  $PCname$
-    Price: $price$</template>
+                    <template url="views/simple.txt"/>
                 </objectView>
                 <!-- this one is just showing syntax, it does not do anything useful -->
                 <objectView class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer" name="External View...">
@@ -80,7 +79,7 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
                 </objectView>
                 <!-- a report, syntax will change (the file will be included later), we still lack formatting of results... -->
                 <objectListView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML Report...">
-                    <template url="/home/pbecker/temp/report.html"/>
+                    <template url="views/listView.html"/>
                 </objectListView>
             </views>
         </databaseConnection>
