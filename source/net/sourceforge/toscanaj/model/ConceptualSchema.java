@@ -217,16 +217,20 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
      * Returns the database information stored.
      *
      * The return value is null if no database is defined in the schema.
+     * 
+     * @todo DatabaseInfo should be immutable, then we don't need the defensive copy anymore
      */
     public DatabaseInfo getDatabaseInfo() {
-        return databaseInfo;
+        return new DatabaseInfo(databaseInfo);
     }
 
     /**
      * Sets the database information for the schema.
+     * 
+     * @todo DatabaseInfo should be immutable, then we don't need the defensive copy anymore
      */
     public void setDatabaseInfo(DatabaseInfo databaseInfo) {
-        this.databaseInfo = databaseInfo;
+        this.databaseInfo = new DatabaseInfo(databaseInfo);
 		markDataDirty();
         eventBroker.processEvent(new DatabaseInfoChangedEvent(this, this, databaseInfo));
     }

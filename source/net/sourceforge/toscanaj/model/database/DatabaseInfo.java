@@ -118,8 +118,19 @@ public class DatabaseInfo implements XMLizable {
     /**
      * Creates an empty instance.
      */
-    public DatabaseInfo() {
-    }
+	public DatabaseInfo() {
+	}
+
+	public DatabaseInfo(DatabaseInfo other) {
+		this.sourceURL = other.sourceURL;
+		this.table = other.table;
+		this.objectKey = other.objectKey;
+		this.userName = other.userName;
+		this.password = other.password;
+		this.embeddedSQLLocation = other.embeddedSQLLocation;
+		this.embeddedSQLPath = other.embeddedSQLPath;
+		this.driverClass = other.driverClass;
+	}
 
     public DatabaseInfo(Element element) throws XMLSyntaxError {
         readXML(element);

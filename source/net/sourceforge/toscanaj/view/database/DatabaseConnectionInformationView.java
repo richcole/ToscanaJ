@@ -70,7 +70,8 @@ public class DatabaseConnectionInformationView extends JDialog
 	private KeySelectPanel keySelectPanel;
     private DatabaseTypePanel dbTypePanel;
     private DatabaseSchema databaseSchema;
-    private boolean newConnectionSet;
+
+    boolean newConnectionSet;
     
     private Frame owner;
     
@@ -290,7 +291,6 @@ public class DatabaseConnectionInformationView extends JDialog
             	return false;
             }
             if (csvFileLocationField.getText().length() > 0) {
-            	System.out.println("connected = " + connected);
 				CSVImportDetailsDialog csvImportDialog = new CSVImportDetailsDialog(owner, csvFileLocationField.getText(), connection);
             }
             return true;
@@ -704,6 +704,7 @@ public class DatabaseConnectionInformationView extends JDialog
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
+				setActionCancelledFlags();
         		hide();
         	}
         });
@@ -712,6 +713,10 @@ public class DatabaseConnectionInformationView extends JDialog
         buttonPane.add(nextButton);
         buttonPane.add(cancelButton);
         return buttonPane;
+    }
+    
+    private void setActionCancelledFlags () {
+    	this.newConnectionSet = false;
     }
     
     protected boolean executeCurrentStep() {
