@@ -13,6 +13,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.ListSelectionModel;
 
 /**
  * A panel for editing the list of diagrams used.
@@ -38,6 +41,16 @@ public class DiagramOrganiser extends JPanel {
     private JList availableDiagramsListview;
 
     /**
+     * Button to remove a diagram from the history
+     */
+    JButton removeButton;
+
+    /**
+     * Button to add a Diagram to the history
+     */
+    JButton addButton;
+
+    /**
      * The listview for the selected diagrams.
      */
     private DiagramHistoryView selectedDiagramsListview;
@@ -48,8 +61,8 @@ public class DiagramOrganiser extends JPanel {
         this.history = diagramHistory;
 
         // create view components
-        JButton removeButton = new JButton();
-        JButton addButton = new JButton();
+        removeButton = new JButton();
+        addButton = new JButton();
         JScrollPane availableDiagramsPanel = new JScrollPane();
         JScrollPane selectedDiagramsPanel = new JScrollPane();
         availableDiagramsListview = new JList();
@@ -107,6 +120,24 @@ public class DiagramOrganiser extends JPanel {
             }
         };
         availableDiagramsListview.addMouseListener(mouseListener);
+
+
+        // The add button can only be used if diagram is selected
+        availableDiagramsListview.addListSelectionListener(new ListSelectionListener(){
+            public void valueChanged(ListSelectionEvent e){
+                if(e.getValueIsAdjusting()) {
+                    JList source = (JList)e.getSource();
+                    String selectedStr = (String)source.getSelectedValue();
+                    if(selectedStr == null) {
+                        addButton.setEnabled(false);
+                    } else {
+                        addButton.setEnabled(true);
+                    }
+                }
+            }
+        });
+
+        addButton.setEnabled(false);
     }
 
     /**
