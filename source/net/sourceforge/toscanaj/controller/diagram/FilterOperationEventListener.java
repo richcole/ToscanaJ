@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.gui.CanvasFeedbackMessage;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -40,11 +42,16 @@ public class FilterOperationEventListener implements EventBrokerListener {
                     " has to be subscribed to events from NodeViews only");
         }
         Concept filterConcept = nodeView.getDiagramNode().getFilterConcept();
-        if(filterConcept.getExtentSize() != 0) {
+        ConceptInterpreter interpreter = nodeView.getDiagramView().getConceptInterpreter();
+        ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
+        boolean oldDisplayMode = context.getObjectDisplayMode();
+        context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
+        if(interpreter.getObjectCount(filterConcept, context) != 0) {
         	controller.next(filterConcept);
         } else {
         	Canvas canvas = nodeView.getDiagramView();
         	new CanvasFeedbackMessage("No objects would be left", canvas, itemEvent.getCanvasPosition());
         }
+        context.setObjectDisplayMode(oldDisplayMode);
     }
 }
