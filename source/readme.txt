@@ -1,9 +1,9 @@
-ToscanaJ 0.5 Readme File
+ToscanaJ 0.6 Readme File
 ========================
 
 What is it?
 -----------
-A fifth release of the Java reimplementation of the
+A sixth release of the Java reimplementation of the
 classic Formal Concept Analysis tool named "Toscana".
 
 It is open sourced under a BSD-style licence (see the text
@@ -34,8 +34,8 @@ to create some common code base.
 What do I need to run ToscanaJ?
 -------------------------------
 You need a Java runtime environment (JRE) or Java develop-
-ment kit (JDK), with version number 1.3 or above. We use
-1.3.1 and 1.4 on different Linux and Windows systems. 
+ment kit (JDK), with version number 1.4 or above. We use
+JDK 1.4.0_01 for development purposes. 
 
 
 How do I start ToscanaJ?
@@ -116,6 +116,11 @@ Changes in ToscanaJ 0.5:
   the context menu
 - enhanced highlighting in nested diagrams
 
+Changes in ToscanaJ 0.6:
+- loads of them, please check the download site for the
+  changelog
+
+
 How do I create examples?
 -------------------------
 Unfortunately we currently can't offer any editor. There is
@@ -128,6 +133,13 @@ the structure should be self-explanatory if you know something
 about the way Toscana works. Ask on the mailing lists for help
 if you really want to create your own examples, it is not that
 hard if you know what to do, but it is hard to explain ;-)
+
+There are three editors in work at the moment, with different
+target workflows, and a lot of shared code. The idea is that
+we will offer at least two different editors in the long run,
+which are optimised for specific purposes in the frontend part
+but share a lot of code so it is more like one program from
+the programmers point of view.
 
 
 What are your plans for ToscanaJ?
