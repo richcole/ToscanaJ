@@ -3,6 +3,8 @@ package net.sourceforge.toscanaj.view.database;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
@@ -70,7 +72,7 @@ public class DatabaseConnectionInformationView extends JPanel implements BrokerE
         add(pane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.SOUTH);
 
-        eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class );
+        eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class );
     }
 
     public boolean areControlsChanged() {

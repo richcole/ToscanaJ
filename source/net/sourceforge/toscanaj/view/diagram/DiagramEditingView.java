@@ -3,6 +3,7 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
@@ -45,7 +46,7 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
         splitPane.setResizeWeight(0);
         add(splitPane);
 
-        eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class );
+        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class );
     }
 
     private JPanel makeDiagramViewPanel() {

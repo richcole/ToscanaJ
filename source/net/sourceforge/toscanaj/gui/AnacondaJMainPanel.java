@@ -14,8 +14,10 @@ import net.sourceforge.toscanaj.gui.activity.NewConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
 import net.sourceforge.toscanaj.view.database.SchemeView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
@@ -72,9 +74,8 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
         conceptualSchema = new ConceptualSchema(eventBroker);
         databaseConnection = new DatabaseConnection(eventBroker);
 
-        eventBroker.subscribe(this,
-                              ConceptualSchemaChangeEvent.class,
-                              Object.class );
+        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class );
+        eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class );
 
         createViews();
         createMenuBar();
@@ -221,30 +222,34 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
     }
 
     public void processEvent(Event e) {
-        /// @todo introduce separate event for new conceptual schemas to avoid setting this all over again
         if ( e instanceof ConceptualSchemaChangeEvent ) {
+            // set schema in any change event, sometimes the order of the events is wrong
+            /// @todo make sure the events come in the proper order
             ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
             conceptualSchema = schemaEvent.getConceptualSchema();
         }
         if ( e instanceof DatabaseInfoChangedEvent ) {
-            DatabaseInfoChangedEvent schemaEvent = (DatabaseInfoChangedEvent) e;
-            if (databaseConnection.isConnected()) {
+            DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
+            if (databaseInformation.getDriverClass() != null && databaseInformation.getURL() != null) {
+                if (databaseConnection.isConnected()) {
+                    try {
+                        databaseConnection.disconnect();
+                    } catch (DatabaseException ex) {
+                        ErrorDialog.showError(this, ex, "Closing database error",
+                                              "Some error closing the old database:\n" + ex.getMessage());
+                        return;
+                    }
+                }
                 try {
-                    databaseConnection.disconnect();
+                    databaseConnection.connect(databaseInformation);
+                    URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
+                    if (location != null) {
+                        databaseConnection.executeScript(location);
+                    }
                 } catch (DatabaseException ex) {
-                    ErrorDialog.showError(this, ex, "Closing database error", "Some error closing the old database:\n" + ex.getMessage());
-                    ex.printStackTrace();
-                    return;
+                    ErrorDialog.showError(this, ex,  "DB Connection failed",
+                                          "Can not connect to the database:\n" + ex.getMessage());
                 }
-            }
-            try {
-                databaseConnection.connect(conceptualSchema.getDatabaseInfo());
-                URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
-                if (location != null) {
-                    databaseConnection.executeScript(location);
-                }
-            } catch (DatabaseException ex) {
-                ErrorDialog.showError(this, ex,  "DB Connection failed", "Can not connect to the database");
             }
         }
     }

@@ -8,6 +8,7 @@ import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Table;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,7 +45,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
         splitPane.setResizeWeight(0);
         add(splitPane);
 
-        eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
+        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
     }
 
     static class TableColumnPair {

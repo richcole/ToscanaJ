@@ -11,7 +11,7 @@ import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 
 import java.io.File;
 
@@ -27,7 +27,7 @@ public class LoadConceptualSchemaActivity implements FileActivity {
     public void processFile(File file) throws Exception {
         try {
             ConceptualSchema newSchema = CSXParser.parse(broker, file, databaseConnection);
-            broker.processEvent(new ConceptualSchemaChangeEvent(this, newSchema));
+            broker.processEvent(new NewConceptualSchemaEvent(this, newSchema));
         } catch (DataFormatException e) {
             throw e;
         }
