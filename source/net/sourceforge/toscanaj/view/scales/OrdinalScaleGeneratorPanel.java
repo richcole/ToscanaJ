@@ -203,7 +203,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 				for(int j = i + 1; j < numDiv; j++ ) {
 					relation.insert(object, downwardsAttributes[j]);
 				}
-				context.getObjects().add(object);
+				context.getObjects().add(new FCAObjectImplementation(object));
 			}
 			return context;
 		}
