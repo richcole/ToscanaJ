@@ -13,6 +13,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Iterator;
 import java.awt.geom.Rectangle2D;
@@ -197,4 +198,12 @@ public class TableView extends JComponent implements Scrollable{
 		revalidate();
 		repaint();
 	}
+
+    public static int findRow(Point screenPos) {
+        return (int)(screenPos.getX() / CELL_WIDTH);        
+    }    
+
+    public static int findCol(Point screenPos) {
+        return (int)(screenPos.getY() / CELL_HEIGHT);        
+    }    
 }

@@ -10,6 +10,8 @@ package net.sourceforge.toscanaj.gui;
 /** 
  * @todo this class is too big in many senses, most noticably in the fact that it knows about
  * way too much stuff
+ * 
+ * @todo the context editor is broken since we don't use lists anymore
  */ 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -172,27 +174,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	private RowHeader rowHeader;
 	private ColumnHeader colHeader;
     private JLabel temporalControlsLabel;
-    /**
-	 * @todo this class is superflous, it should be replaced by putting the calculation into the
-	 * TableView class.
-	 */
-	protected class Point{
-		
-		private int row;
-		private int col;
-		
-		public Point(double x, double y){
-			row = (int) x / TableView.CELL_WIDTH;
-			col = (int) y / TableView.CELL_HEIGHT;
-		}
-		
-		public int getRow(){
-			return row;
-		}
-		public int getCol(){
-			return col;
-		}
-	}
 	
 	public SienaMainPanel() {
         super(WINDOW_TITLE);
@@ -296,9 +277,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		colHeader.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-					double x = e.getPoint().getX();
-					double y = e.getPoint().getY();
-					int row = new Point(x,y).getRow();
+					int row = TableView.findRow(e.getPoint());
                     editAttribute(row);
 				}
 			}
@@ -307,10 +286,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		rowHeader.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-					double x = e.getPoint().getX();
-					double y = e.getPoint().getY();
-					Point p = new Point(x,y);
-					int col = p.getCol();
+					int col = TableView.findCol(e.getPoint());
                     editObject(col);
 				}
 			}
@@ -381,21 +357,22 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     protected MouseListener getTableViewMouseListener() {
 		MouseListener mouseListener = new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				double x = e.getPoint().getX();
-				double y = e.getPoint().getY();
-				Point p = new Point(x,y);
-				tableView.setSelectedCell(new TableView.SelectedCell(p.getCol(), p.getRow()));
+                int row = TableView.findRow(e.getPoint());
+                int col = TableView.findCol(e.getPoint());
+				tableView.setSelectedCell(new TableView.SelectedCell(col, row));
 				
 				if(e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1){
 					WritableManyValuedContext context = conceptualSchema.getManyValuedContext();
                     ArrayList propertyList = (ArrayList)context.getAttributes();
 					WritableManyValuedAttribute attribute = (WritableManyValuedAttribute)
-															propertyList.get(p.getRow());
+															propertyList.get(row);
 					ArrayList objectList = (ArrayList) context.getObjects();
-					WritableFCAObject obj = (WritableFCAObject)objectList.get(p.getCol());
+					WritableFCAObject obj = (WritableFCAObject)objectList.get(col);
 					
 					if(attribute.getType() instanceof TextualType){
-						showPopupMenu(x + tableView.getX(), y + tableView.getY(), attribute, obj);
+						showPopupMenu(e.getPoint().getX() + tableView.getX(), 
+                                      e.getPoint().getY() + tableView.getY(), 
+                                      attribute, obj);
 					}
 					else {
 						showNumericInputDialog(attribute, obj);
