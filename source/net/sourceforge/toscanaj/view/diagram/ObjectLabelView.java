@@ -48,8 +48,7 @@ public class ObjectLabelView extends LabelView {
      */
     private DatabaseQuery query = null;
 
-    private List queryKeyValues = null;
-    private List queryDisplayStrings = null;
+    private List queryResults = null;
 
     private JPopupMenu popupMenu = null;
 
@@ -124,24 +123,16 @@ public class ObjectLabelView extends LabelView {
         if (this.query == null) {
             return 0;
         }
-        return this.queryDisplayStrings.size();
+        return this.queryResults.size();
     }
 
     protected Iterator getEntryIterator() {
-        return this.queryDisplayStrings.iterator();
+        return this.queryResults.iterator();
     }
 
     protected void doQuery() {
         if (query != null) {
-            List queryResult = this.query.execute(this.labelInfo.getNode().getConcept(),this.showOnlyContingent);
-            this.queryKeyValues = new LinkedList();
-            this.queryDisplayStrings = new LinkedList();
-            Iterator it = queryResult.iterator();
-            while (it.hasNext()) {
-                Vector cur = (Vector) it.next();
-                this.queryKeyValues.add(cur.elementAt(0));
-                this.queryDisplayStrings.add(cur.elementAt(1));
-            }
+            queryResults = this.query.execute(this.labelInfo.getNode().getConcept(),this.showOnlyContingent);
         }
     }
 
@@ -157,7 +148,7 @@ public class ObjectLabelView extends LabelView {
             }
             int lineHit = (int) ((pos.getY() - this.rect.getY()) / this.lineHeight);
             int itemHit = lineHit + this.firstItem;
-            DatabaseViewerManager.showObject(0, this.queryKeyValues.get(itemHit).toString());
+            DatabaseViewerManager.showObject(0, getObjectKey(itemHit));
         }
         if ( (this.query instanceof DatabaseAggregateQuery) || (this.query instanceof DatabaseDistinctListQuery) ) {
             if (DatabaseViewerManager.getNumberOfObjectListViews() == 0) {
@@ -169,8 +160,14 @@ public class ObjectLabelView extends LabelView {
         return;
     }
 
+    private String getObjectKey(int itemHit) {
+        DatabaseRetrievedObject object = (DatabaseRetrievedObject) this.queryResults.get(itemHit);
+        String objectKey = object.getKey().toString();
+        return objectKey;
+    }
+
     public void openPopupMenu(Point2D canvasPosition, Point2D screenPosition) {
-        int itemHit = getItemAtPosition(canvasPosition);
+        final int itemHit = getItemAtPosition(canvasPosition);
         // find available queries
         List queries = Query.getQueries();
         // find available object views if list is displayed
@@ -205,14 +202,13 @@ public class ObjectLabelView extends LabelView {
         }
         if (objectViewNames.size() != 0) {
             JMenu objectViewMenu = new JMenu("View object");
-            final String objectKey = this.queryKeyValues.get(itemHit).toString();
             Iterator it = objectViewNames.iterator();
             while (it.hasNext()) {
                 final String objectViewName = (String) it.next();
                 menuItem = new JMenuItem(objectViewName);
                 menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        DatabaseViewerManager.showObject(objectViewName, objectKey);
+                        DatabaseViewerManager.showObject(objectViewName, getObjectKey(itemHit));
                     }
                 });
                 objectViewMenu.add(menuItem);

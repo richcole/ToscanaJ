@@ -226,71 +226,11 @@ public class DatabaseConnection implements BrokerEventListener {
     }
 
     /**
-     * Executes the given query and returns a list of pairs of keys and formatted Strings.
-     *
-     * The query is given as Query object given the head of the final query plus
-     * the WHERE clause for specifying the object set used. The results are pairs
-     * of the key value (a string) and the result of the defined query formatted by
-     * DatabaseInfo.DatabaseQuery.formatResults(ResultSet) given as Vector(2).
-     *
-     * If the query is an aggregate, the key value is an empty string.
-     */
-    public List executeQuery(DatabaseQuery query, String whereClause) throws DatabaseException {
-        ResultSet resultSet = null;
-        Statement stmt = null;
-        List result = new LinkedList();
-
-        String statement = query.getQueryHead() + whereClause;
-
-        // submit the query
-        try {
-            stmt = jdbcConnection.createStatement();
-            printLogMessage(System.currentTimeMillis() + ": Executing query: " + statement);
-            resultSet = stmt.executeQuery(statement);
-            printLogMessage(System.currentTimeMillis() + ": done.");
-            while (resultSet.next()) {
-                Vector item = new Vector(2);
-                item.add(0, resultSet.getString(1));
-                item.add(1, query.formatResults(resultSet));
-                result.add(item);
-            }
-        } catch (SQLException se) {
-            throw new DatabaseException("An error occured while querying the database.", se);
-        } finally {
-            try {
-                if (resultSet != null) {
-                    resultSet.close();
-                }
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (SQLException e) {
-            }
-        }
-        // here comes a nasty hack: if we have an aggregate on nothing, we don't want to show it
-        // since the first column of the results does contain count(*) for AggregateQueries we can
-        // figure out which aggregates are called on nothing (others might return zero although being
-        // useful, e.g. an average). So if the count is zero, we remove the entry.
-        /// @todo This is so ugly it really needs to be changed
-        if (query instanceof DatabaseAggregateQuery) {
-            Vector firstRow = (Vector) result.get(0);
-            if (firstRow.get(0).equals("0")) {
-                result.clear();
-            }
-        }
-        return result;
-    }
-
-    /**
      * Expects a list of field names and a where clause and returns all matches.
      *
      * The return value is a list (matching rows) of vectors (fields).
      */
     public List executeQuery(List fields, String tableName, String whereClause) throws DatabaseException {
-        ResultSet resultSet = null;
-        Statement stmt = null;
-        List result = new LinkedList();
-
         String statement = "SELECT ";
         Iterator it = fields.iterator();
         while (it.hasNext()) {
@@ -302,6 +242,13 @@ public class DatabaseConnection implements BrokerEventListener {
         }
         statement += " FROM " + tableName + " " + whereClause;
 
+        return executeQuery(statement);
+    }
+
+    public List executeQuery(String statement) throws DatabaseException {
+        List result = new LinkedList();
+        ResultSet resultSet = null;
+        Statement stmt = null;
         // submit the query
         try {
             stmt = jdbcConnection.createStatement();

@@ -8,6 +8,8 @@
 package net.sourceforge.toscanaj.model.database;
 
 import java.util.Iterator;
+import java.util.Vector;
+import java.sql.SQLException;
 
 public class DatabaseAggregateQuery extends DatabaseQuery {
     private DatabaseInfo info;
@@ -30,5 +32,14 @@ public class DatabaseAggregateQuery extends DatabaseQuery {
         }
         retValue += " FROM " + info.getTableName() + " ";
         return retValue;
+    }
+
+    protected DatabaseRetrievedObject createDatabaseRetrievedObject(Vector values) throws SQLException {
+        if( values.get(0).toString().equals("0") ) {
+            return null;
+        }
+        String displayString = this.formatResults(values, 1);
+        DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(displayString);
+        return retVal;
     }
 }

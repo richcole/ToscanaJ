@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -12,12 +12,10 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Iterator;
-import java.util.ArrayList;
+import java.util.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DecimalFormat;
 
 public abstract class DatabaseQuery extends Query {
@@ -60,14 +58,29 @@ public abstract class DatabaseQuery extends Query {
             String whereClause = dbConcept.constructWhereClause(contingentOnly);
             if (whereClause != null) {
                 try {
-                    retVal = DatabaseConnection.getConnection().executeQuery(this, whereClause);
+                    String statement = this.getQueryHead() + whereClause;
+
+                    // submit the query
+                    List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
+                    Iterator it = queryResults.iterator();
+                    while (it.hasNext()) {
+                        Vector item = (Vector) it.next();
+                        DatabaseRetrievedObject object = createDatabaseRetrievedObject(item);
+                        if(object != null) {
+                            retVal.add(object);
+                        }
+                    }
                 } catch (DatabaseException e) {
                     handleDBException(e);
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
             }
         }
         return retVal;
     }
+
+    protected abstract DatabaseRetrievedObject createDatabaseRetrievedObject(Vector values) throws SQLException;
 
     private void handleDBException(DatabaseException e) {
         /// @TODO Find something useful to do here.
@@ -89,22 +102,23 @@ public abstract class DatabaseQuery extends Query {
      * The return value is a String which returns a formatted version of the
      * row
      */
-    public String formatResults(ResultSet results) throws SQLException {
+    public String formatResults(Vector values, int startPosition) throws SQLException {
         String rowRes = new String();
         if (header != null) {
             rowRes += header;
         }
         Iterator colDefIt = this.columnList.iterator();
         // skip key, start with 1
-        int i = 1;
+        int i = startPosition;
         while (colDefIt.hasNext()) {
             Column col = (Column) colDefIt.next();
+            String value = values.get(i).toString();
             i++;
             if (col.format != null) {
                 DecimalFormat format = new DecimalFormat(col.format);
-                rowRes += format.format(results.getDouble(i));
+                rowRes += format.format(Double.parseDouble(value));
             } else {
-                rowRes += results.getString(i);
+                rowRes += value;
             }
             if (col.separator != null) {
                 rowRes += col.separator;
