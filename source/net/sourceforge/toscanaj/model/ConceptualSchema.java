@@ -73,6 +73,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
 
     /**
      * True if the schema contains at least one diagram with description.
+     * 
+     * @todo remove this member in favour of just-in-time checks. This shouldn't be too expensive, no need for caching.
      */
     private boolean hasDiagramDescription = false;
     private static final String CONCEPTUAL_SCHEMA_ELEMENT_NAME = "conceptualSchema";
