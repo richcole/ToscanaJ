@@ -1,0 +1,6 @@
+The ToscanaJ servlet builds upon the regular ToscanaJ code. To compile it 
+you have to add both source directories, the one from ToscanaJ itself and
+the one in this module to your input path.
+
+The libraries needed should be the servlet.jar found in this module and the
+jdom.jar found in the ToscanaJ libs module.
