@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ToscanaJ documentation" default="distDoc" basedir="..">
+	<property name="temp.dir" value="${basedir}/build/doc"/>
+	<property name="dist.doc.dir" value="${basedir}/documentation/dist"/>
+	<property name="dev.doc.dir" value="${basedir}/documentation/dev"/>
+	<property name="doc.source.dir" value="${basedir}/docs"/>
+	<property name="tools.dir" value="${basedir}/docs/tools"/>
+	<property name="stylesheets.fo.dir" value="${basedir}/docs/stylesheets/fo"/>
+
+    <path id="class.path">
+        <pathelement path="${classpath}"/>
+        <fileset dir="${tools.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${tools.dir}">
+            <include name="**/*.zip"/>
+        </fileset>
+    </path>
+
+	<target name="prepare">
+		<mkdir dir="${temp.dir}"/>
+		<mkdir dir="${dist.doc.dir}"/>
+		<mkdir dir="${dev.doc.dir}"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${temp.dir}"/>
+		<delete dir="${dist.doc.dir}"/>
+		<delete dir="${dev.doc.dir}"/>
+	</target>
+	
+	<target name="makeDirForFile">
+		<!-- evil hack to create directory to place a file,
+		     suggestions for improvement welcome -->
+		<mkdir dir="${fileToPlace}"/>
+		<delete includeEmptyDirs="true">
+    		<fileset dir="${fileToPlace}"/>
+  		</delete>
+	</target>
+
+    <target name="docbook2pdf">
+    	<!-- Parameters: 
+    			"curfile" points to the file relative to doc.source.dir and without extension
+    			"out.dir" points to the target location
+    	-->
+		<antcall target="makeDirForFile">
+      		<param name="fileToPlace" value="${doc.source.dir}/${curfile}"/>
+    	</antcall>
+    	<!-- we fork to avoid clashes with the Ant libraries for XML -->
+    	<java classname="org.apache.xalan.xslt.Process" fork="true">
+    		<classpath refid="class.path"/>
+    		<arg line="-IN &quot;${doc.source.dir}/${curfile}.xml&quot;"/>
+    		<arg line="-XSL &quot;${stylesheets.fo.dir}/docbook.xsl&quot;"/>
+    		<arg line="-OUT &quot;${temp.dir}/${curfile}.fo&quot;"/>
+    	</java>
+		<antcall target="makeDirForFile">
+      		<param name="fileToPlace" value="${out.dir}/${curfile}"/>
+    	</antcall>
+    	<java classname="org.apache.fop.apps.Fop" fork="true">
+    		<classpath refid="class.path"/>
+    		<arg line="&quot;${temp.dir}/${curfile}.fo&quot;"/>
+    		<arg line="&quot;${out.dir}/${curfile}.pdf&quot;"/>
+    	</java>
+    </target>
+
+    <target name="distDoc" depends="prepare">
+		<antcall target="docbook2pdf">
+      		<param name="curfile" value="sysadmin/setupguide"/>
+      		<param name="out.dir" value="${dist.doc.dir}"/>
+    	</antcall>
+    </target>
+</project>
