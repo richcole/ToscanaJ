@@ -175,44 +175,19 @@ public class DatabaseSchemaView extends JPanel implements BrokerEventListener {
                 new ColumnSelectionListener()
         );
 
-        JPanel lowerLeftPane = new JPanel(new GridBagLayout());
-        lowerLeftPane.add(new JLabel("Selected Tables:"),
-                new GridBagConstraints(
-                        0, 0, 1, 1, 1.0, 0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.HORIZONTAL,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
-        lowerLeftPane.add(keyedTableListPanel,
-                new GridBagConstraints(
-                        0, 1, 1, 1, 1.0, 1.0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.BOTH,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
-
-        this.removeTableAction = new RemoveTableKeyAction("Remove Selected Table");
-        lowerLeftPane.add(new JButton(removeTableAction),
-                new GridBagConstraints(
-                        0, 2, 1, 1, 1.0, 0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.HORIZONTAL,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
+        this.removeTableAction = new RemoveTableKeyAction("Remove Key");
+        JButton removeButton = new JButton(removeTableAction);
 
         JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
                                              new LabeledScrollPaneView("Available Tables:",unkeyedTableListPanel),
-                                             lowerLeftPane);
+                                             new LabeledScrollPaneView("Selected Keys:", keyedTableListPanel, removeButton));
         leftPane.setOneTouchExpandable(true);
         leftPane.setResizeWeight(0);
 
         JSplitPane splitPane;
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                    leftPane,
-                                   new LabeledScrollPaneView("Select Object Key:", columnsPanel));
+                                   new LabeledScrollPaneView("Available Object Keys:", columnsPanel));
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);

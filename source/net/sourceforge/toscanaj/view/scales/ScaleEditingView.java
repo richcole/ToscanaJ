@@ -126,34 +126,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener, Tab
             }
         });
 
-        JPanel scalesPane = new JPanel();
-        scalesPane.setLayout(new GridBagLayout());
-        scalesPane.add(new JLabel("Scales in Schema:"),
-                new GridBagConstraints(
-                        0, 0, 1, 1, 1.0, 0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.HORIZONTAL,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
-        scalesPane.add(new JScrollPane(listView),
-                new GridBagConstraints(
-                        0, 1, 1, 1, 1.0, 1.0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.BOTH,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
-        scalesPane.add(removeButton,
-                new GridBagConstraints(
-                        0, 2, 1, 1, 1.0, 0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.HORIZONTAL,
-                        new Insets(5, 5, 5, 5),
-                        5, 5)
-        );
-
-        return scalesPane;
+        return new LabeledScrollPaneView("Scales for Selection:", listView, removeButton);
     }
 
     private void fillScalesList() {
