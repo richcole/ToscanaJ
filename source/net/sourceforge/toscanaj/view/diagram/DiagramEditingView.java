@@ -40,6 +40,7 @@ import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
 import net.sourceforge.toscanaj.view.scales.ContextTableScaleEditorDialog;
 
+import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -92,6 +93,8 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
         eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
         this.diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, Object.class);
+		this.diagramView.getController().getEventBroker().subscribe( new AttributeEditingLabelViewPopupMenuHandler(diagramView, eventBroker),
+		CanvasItemContextMenuRequestEvent.class, AttributeLabelView.class);
     }
 
     protected JPanel makeDiagramViewPanel() {

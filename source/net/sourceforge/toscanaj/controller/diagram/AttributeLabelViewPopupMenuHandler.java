@@ -8,9 +8,12 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
+
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -49,17 +52,29 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
     }
 
     public void openPopupMenu(final AttributeLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
-        final String attribute = labelView.getEntryAtPosition(canvasPosition);
+        final Attribute attribute = labelView.getEntryAtPosition(canvasPosition);
         if (attribute == null) {
             return;
         }
-        List attributeViewNames = DatabaseViewerManager.getAttributeViewNames();
-        if (attributeViewNames.isEmpty()) { // nothing to display
-            return;
-        }
-        // create the menu
-        JPopupMenu popupMenu = new JPopupMenu();
-        addAttributeViewOptions(attributeViewNames, attribute, popupMenu);
+		JPopupMenu popupMenu = new JPopupMenu();
+		JMenuItem menuItem;
+		if(attribute.getDescription() == null){
+			return;
+		}else{
+			final DiagramView parent = this.diagramView;
+			menuItem = new JMenuItem("Description...");
+			menuItem.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					DescriptionViewer.show(JOptionPane.getFrameForComponent(parent),attribute.getDescription());
+				}
+			});
+			popupMenu.add(menuItem);	
+		}				
+		
+		List attributeViewNames = DatabaseViewerManager.getAttributeViewNames();
+		if (!attributeViewNames.isEmpty()) { 
+			addAttributeViewOptions(attributeViewNames, attribute.toString(), popupMenu);
+		}
         popupMenu.show(this.diagramView, (int) screenPosition.getX(), (int) screenPosition.getY());
     }
 

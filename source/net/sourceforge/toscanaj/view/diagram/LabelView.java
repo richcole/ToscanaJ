@@ -611,7 +611,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      * i.e. the offset from scrolling is used. If no item was hit (e.g. a click
      * on the scrollbar or the position is not on the label), -1 will be returned.
      */
-    public int getItemAtPosition(Point2D pos) {
+    public int getIndexOfPosition(Point2D pos) {
         if (pos.getX() > this.rect.getMaxX() - this.scrollbarWidth) {
             // a click on the scrollbar or to the right
             return -1;

@@ -149,7 +149,7 @@ public class ObjectLabelView extends LabelView {
     }
 
     public Object getObjectAtPosition(Point2D position) {
-        int itemHit = getItemAtPosition(position);
+        int itemHit = getIndexOfPosition(position);
         if (itemHit == -1) {
             return null;
         }

@@ -51,7 +51,7 @@ public class AttributeLabelView extends LabelView {
     }
 
     public void openPopupMenu(MouseEvent event, Point2D pos) {
-        int itemHit = getItemAtPosition(pos);
+        int itemHit = getIndexOfPosition(pos);
         Iterator it = getEntryIterator();
         Attribute attrib = null;
         while (itemHit >= 0) {
@@ -83,13 +83,13 @@ public class AttributeLabelView extends LabelView {
         return true;
     }
 
-    public String getEntryAtPosition(Point2D canvasPosition) {
-        int i = getItemAtPosition(canvasPosition);
+    public Attribute getEntryAtPosition(Point2D canvasPosition) {
+        int i = getIndexOfPosition(canvasPosition);
         Iterator it = getEntryIterator();
-        String retVal = null;
+        Attribute retVal = null;
         while(i != -1) {
             Attribute attr = (Attribute) it.next();
-            retVal = attr.getData().toString();
+            retVal = attr;
             i--;
         }
         return retVal;
