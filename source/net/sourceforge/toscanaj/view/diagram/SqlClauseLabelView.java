@@ -7,7 +7,10 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.StringTokenizer;
 
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 
@@ -15,6 +18,8 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
  * A LabelView for displaying the SQL clauses.
  */
 public class SqlClauseLabelView extends LabelView {
+	private List entries;
+	
     public static LabelFactory getFactory() {
         return new LabelFactory(){
             public LabelView createLabelView(DiagramView diagramView,NodeView nodeView,LabelInfo label){
@@ -25,6 +30,7 @@ public class SqlClauseLabelView extends LabelView {
 
     protected SqlClauseLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
         super(diagramView, nodeView, label);
+        this.labelInfo.setTextAlignment(LabelInfo.ALIGNLEFT);
     }
 
     protected int getPlacement() {
@@ -32,11 +38,11 @@ public class SqlClauseLabelView extends LabelView {
     }
 
     public int getNumberOfEntries() {
-        return this.labelInfo.getNode().getConcept().getObjectContingentSize();
+        return this.entries.size();
     }
 
     public Iterator getEntryIterator() {
-        return this.labelInfo.getNode().getConcept().getObjectContingentIterator();
+        return this.entries.iterator();
     }
 
     protected boolean highlightedInIdeal() {
@@ -49,5 +55,43 @@ public class SqlClauseLabelView extends LabelView {
 
     protected boolean isFaded() {
         return nodeView.getSelectionState() == DiagramView.NOT_SELECTED;
+    }
+    
+    public void updateEntries() {
+        this.entries = new ArrayList();
+    	Iterator objIt = this.labelInfo.getNode().getConcept().getObjectContingentIterator();
+    	while (objIt.hasNext()) {
+            String object = objIt.next().toString();
+            addObjectEntries(object);
+        }
+        super.updateEntries();
+    }
+    
+    private void addObjectEntries(String object) {
+    	StringTokenizer tokenizer = new StringTokenizer(object, " \t\n\r\f", true);
+    	String nextEntry;
+    	boolean first = true;
+    	while(tokenizer.hasMoreTokens()) {
+    		nextEntry = null;
+    		String token;
+    		do {
+	    		token = tokenizer.nextToken().trim();
+	    		if (token.equals("")) {
+	    			continue;
+	    		}
+	    		if(nextEntry == null) {
+	    			nextEntry = token;
+	    		} else {
+   		        	nextEntry += " " + token;
+	    		}
+    		} while (tokenizer.hasMoreTokens() && !token.toLowerCase().equals("and") &&
+    					!token.toLowerCase().equals("or"));
+    	    if(first) {
+    	        first = false;
+    	        this.entries.add(nextEntry);
+    	    } else {
+    	        this.entries.add("   " + nextEntry);
+    	    }
+    	}
     }
 }
