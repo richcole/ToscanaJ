@@ -26,4 +26,8 @@ public class Property implements ManyValuedAttribute {
     public String getName() {
         return name;
     }
+    
+    public String toString() {
+    	return getName();
+    }
 }

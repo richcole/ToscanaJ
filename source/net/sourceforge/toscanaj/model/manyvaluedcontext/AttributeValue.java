@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-public interface AttributeValue {
+import net.sourceforge.toscanaj.model.order.Ordered;
+
+public interface AttributeValue extends Ordered {
     String getDisplayString();
 }

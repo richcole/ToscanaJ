@@ -16,6 +16,13 @@ public class Siena {
     public static void main(String[] args) {
         final SienaMainPanel mainWindow;
         mainWindow = new SienaMainPanel();
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if( (arg.compareToIgnoreCase("-importCernatoXML") == 0) && (i < args.length - 1) ){
+            	mainWindow.importCernatoXML(args[i+1]);
+            	i++;
+            }
+        }
         mainWindow.setVisible(true);
     }
 }

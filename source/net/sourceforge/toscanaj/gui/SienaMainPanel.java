@@ -20,6 +20,7 @@ import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.CloseMainPanelActivity;
 import net.sourceforge.toscanaj.gui.activity.SaveConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.gui.dialog.TemporalMainDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.burmeister.BurmeisterContext;
@@ -75,6 +76,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
      */
     private DiagramEditingView diagramView;
     private String currentFile = null;
+    private TemporalMainDialog temporalControls;
 
     public SienaMainPanel() {
         super("Siena");
@@ -87,9 +89,16 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         createViews();
 
         createMenuBar();
-
+        
         ConfigurationManager.restorePlacement("SienaMainPanel", this,
                 new Rectangle(100, 100, 500, 400));
+
+		if(ConfigurationManager.fetchInt("SienaTemporalControls", "enabled", 0) == 1) {
+		    temporalControls = new TemporalMainDialog(this, this.diagramView.getDiagramView(), eventBroker);
+		    ConfigurationManager.restorePlacement("SienaTemporalControls", temporalControls, 
+		    		new Rectangle(350,350,420,240));
+		    temporalControls.show();
+		}
 
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
@@ -197,9 +206,14 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         if (rv != JFileChooser.APPROVE_OPTION) {
             return;
         }
+        System.out.println(openDialog.getSelectedFile().getAbsolutePath());
         importCernatoXML(openDialog.getSelectedFile());
     }
 
+	public void importCernatoXML(String fileLocation) {
+		importCernatoXML(new File(fileLocation));
+	}
+	
     private void importCernatoXML(File file) {
         // store current file
         try {
@@ -223,6 +237,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             return;
         }
         this.conceptualSchema = new ConceptualSchema(this.eventBroker);
+        this.conceptualSchema.setManyValuedContext(inputModel.getContext());
         addDiagrams(conceptualSchema, inputModel);
     }
 
@@ -311,6 +326,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         ConfigurationManager.storeInt("SienaMainPanel", "diagramViewDivider",
                 diagramView.getDividerLocation()
         );
+        if(temporalControls != null) {
+        	ConfigurationManager.storePlacement("SienaTemporalControls", temporalControls);
+        }
         ConfigurationManager.saveConfiguration();
         System.exit(0);
     }

@@ -17,6 +17,7 @@ import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 import net.sourceforge.toscanaj.util.CollectionFactory;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
@@ -79,6 +80,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
     private static final String DESCRIPTION_ELEMENT_NAME = "description";
     private static final String VIEWS_ELEMENT_NAME = "views";
     private static final String QUERIES_ELEMENT_NAME = "queries";
+    
+    private ManyValuedContext manyValuedContext;
 
     /**
      * Creates an empty schema.
@@ -292,5 +295,13 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
 
     public void addQuery(Query query) {
         this.queries.add(query);
+    }
+
+    public void setManyValuedContext(ManyValuedContext context) {
+        this.manyValuedContext = context;
+    }
+
+    public ManyValuedContext getManyValuedContext() {
+        return this.manyValuedContext;
     }
 }

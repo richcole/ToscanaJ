@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.model.cernato;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
+import net.sourceforge.toscanaj.model.order.Ordered;
 
 public class NumericalValue implements AttributeValue {
     private double value;
@@ -22,5 +23,34 @@ public class NumericalValue implements AttributeValue {
 
     public double getValue() {
         return value;
+    }
+    
+    public String toString() {
+    	return getDisplayString();
+    }
+    
+    public boolean equals(Object other) {
+        // copied from Double.equals()
+        return (other instanceof NumericalValue)
+               && (Double.doubleToLongBits(((NumericalValue)other).value) ==
+                  Double.doubleToLongBits(this.value));
+    }
+    
+    public int hashCode() {
+    	// copied from Double.hashCode()
+        long bits = Double.doubleToLongBits(value);
+        return (int)(bits ^ (bits >>> 32));
+    }
+    
+    public boolean isLesserThan(Ordered other) {
+    	if(!(other instanceof NumericalValue)) {
+    		return false;
+    	}
+    	NumericalValue otherNV = (NumericalValue) other;
+        return this.value < otherNV.value;
+    }
+    
+    public boolean isEqual(Ordered other) {
+        return this.equals(other);
     }
 }

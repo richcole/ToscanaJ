@@ -219,7 +219,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         return splitPane.getDividerLocation();
     }
 
-    public Diagram2D getDiagramDisplayed() {
-        return diagramView.getDiagram();
+    public DiagramView getDiagramView() {
+        return this.diagramView;
     }
 }

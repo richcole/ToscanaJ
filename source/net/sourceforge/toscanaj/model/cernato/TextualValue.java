@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.model.cernato;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
+import net.sourceforge.toscanaj.model.order.Ordered;
 
 public class TextualValue implements AttributeValue {
     private String value;
@@ -18,5 +19,31 @@ public class TextualValue implements AttributeValue {
 
     public String getDisplayString() {
         return value;
+    }
+
+    public String toString() {
+        return getDisplayString();
+    }
+
+    public boolean equals(Object other) {
+        // copied from Double.equals()
+        return (other instanceof TextualValue)
+               && ((TextualValue)other).value.equals(this.value);
+    }
+
+    public int hashCode() {
+        return this.value.hashCode();
+    }
+
+    public boolean isLesserThan(Ordered other) {
+        if(!(other instanceof TextualValue)) {
+            return false;
+        }
+        TextualValue otherTV = (TextualValue) other;
+        return this.value.compareTo(otherTV.value) < 0;
+    }
+
+    public boolean isEqual(Ordered other) {
+        return this.equals(other);
     }
 }

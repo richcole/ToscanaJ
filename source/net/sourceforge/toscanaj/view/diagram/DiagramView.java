@@ -193,6 +193,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         addDiagram(diagram, conceptInterpretationContext, 0);
         requestScreenTransformUpdate();
         repaint();
+        this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
     }
 
     private void removeSubscriptions() {
