@@ -200,14 +200,14 @@ public class DiagramNode implements XMLizable {
      * Get the x coordinate in the model space.
      */
     public double getX() {
-        return position.getX();
+        return getPosition().getX();
     }
 
     /**
      * Get the y coordinate in the model space.
      */
     public double getY() {
-        return position.getY();
+        return getPosition().getY();
     }
 
     /**

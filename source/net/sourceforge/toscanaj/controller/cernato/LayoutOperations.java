@@ -44,20 +44,20 @@ public class LayoutOperations {
         SimpleLineDiagram diagram = new SimpleLineDiagram();
         diagram.setTitle(title);
         Vector dimensions = calculateDimensions(model);
-        Hashtable base = createBase(dimensions);
+        Vector base = createBase(dimensions);
         Concept[] concepts = lattice.getConcepts();
         Hashtable nodemap = new Hashtable();
         for (int i = 0; i < concepts.length; i++) {
             Concept concept = concepts[i];
-            Point2D.Double position = new Point2D.Double(0,0);
+            double[] ndimVector = new double[dimensions.size()];
             Iterator attributes = concept.getIntentIterator();
             while (attributes.hasNext()) {
                 Attribute attribute = (Attribute) attributes.next();
                 Criterion criterion = (Criterion) attribute.getData();
-                addVector(position, criterion, dimensions, base);
+                addVector(ndimVector, criterion, dimensions);
             }
-            DiagramNode node = new DiagramNode(String.valueOf(i), position, concept,
-                                               new LabelInfo(), new LabelInfo(), null);
+            DiagramNode node = new NDimDiagramNode(String.valueOf(i), ndimVector, concept,
+                                               new LabelInfo(), new LabelInfo(), null, base);
             nodemap.put(concept, node);
             diagram.addNode(node);
         }
@@ -65,13 +65,13 @@ public class LayoutOperations {
         return diagram;
     }
 
-    private static Hashtable createBase(Vector dimensions) {
-        Hashtable base = new Hashtable();
+    private static Vector createBase(Vector dimensions) {
+        Vector base = new Vector();
         double x = 0.5;
         double size = 30;
         for (Iterator iterator = dimensions.iterator(); iterator.hasNext();) {
-            Dimension dimension = (Dimension) iterator.next();
-            base.put(dimension, new Point2D.Double(x*size, size));
+            iterator.next();
+            base.add(new Point2D.Double(x*size, size));
             if(x>0) {
                 x = -x - 1;
             } else {
@@ -81,7 +81,8 @@ public class LayoutOperations {
         return base;
     }
 
-    private static void addVector(Point2D position, Criterion criterion, Vector dimensions, Hashtable base) {
+    private static void addVector(double[] ndimVector, Criterion criterion, Vector dimensions) {
+        int dimCount = 0;
         for (Iterator it = dimensions.iterator(); it.hasNext();) {
             net.sourceforge.toscanaj.model.cernato.Dimension dimension =
                                             (net.sourceforge.toscanaj.model.cernato.Dimension) it.next();
@@ -89,10 +90,10 @@ public class LayoutOperations {
             for (Iterator it2 = path.iterator(); it2.hasNext();) {
                 PartialOrderNode node = (PartialOrderNode) it2.next();
                 if(node.getValueGroup() == criterion.getValueGroup()) {
-                    Point2D baseVector = (Point2D) base.get(dimension);
-                    position.setLocation(position.getX() + baseVector.getX(), position.getY() + baseVector.getY());
+                    ndimVector[dimCount] += 1;
                 }
             }
+            dimCount++;
         }
     }
 
