@@ -138,11 +138,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
     	this.relation = newRelation;
     }
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#toXML()
-	 */
 	public Element toXML() {
-		// TODO Auto-generated method stub
 		Element retVal = new Element(MANY_VALUED_CONTEXT_ELEMENT_NAME);
 		IdPool oidpool = new IdPool();
 		IdPool aidpool = new IdPool();
