@@ -36,7 +36,8 @@ public class LineView extends CanvasItem {
     private NodeView fromView;
     private NodeView toView;
     
-    private Color showRatioColor;
+	private Color showRatioColor;
+	private Color showRatioFillColor;
     private float fontSize;
     private boolean dynamicLineWidth;
 
@@ -47,7 +48,8 @@ public class LineView extends CanvasItem {
         this.diagramLine = diagramLine;
         this.fromView = fromView;
         this.toView = toView;
-        this.showRatioColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioColor", null);
+		this.showRatioColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioColor", null);
+		this.showRatioFillColor = ConfigurationManager.fetchColor("LineView", "showExtentRatioFillColor", null);
         this.fontSize = ConfigurationManager.fetchFloat("LineView", "labelFontSize", 8);
         this.dynamicLineWidth = ConfigurationManager.fetchString("LineView", "lineWidth", "").equals("extentRatio");
     }
@@ -111,24 +113,37 @@ public class LineView extends CanvasItem {
         graphics.setFont(font);
 		FontRenderContext frc = graphics.getFontRenderContext();
 		TextLayout layout = new TextLayout(formattedNumber, font, frc);
+		// should give something wider than anything we really displays
+		TextLayout longLayout = new TextLayout(format.format(88.8888),font,frc); 
 
 		Rectangle2D bounds = layout.getBounds();
-		Rectangle2D labelRectangle = new Rectangle2D.Double(x - bounds.getWidth()/2 - LABEL_MARGIN,
- 														   y - bounds.getHeight()/2 - LABEL_MARGIN,
- 														   bounds.getWidth() + 2*LABEL_MARGIN,
- 														   bounds.getHeight() + 2*LABEL_MARGIN);
+		Rectangle2D longBounds = longLayout.getBounds();
+		Rectangle2D labelRectangle = new Rectangle2D.Double(x - longBounds.getWidth()/2 - LABEL_MARGIN,
+ 														   y - longBounds.getHeight()/2 - LABEL_MARGIN,
+ 														   longBounds.getWidth() + 2*LABEL_MARGIN,
+ 														   longBounds.getHeight() + 2*LABEL_MARGIN);
 
-		graphics.setPaint(Color.BLACK);
-        graphics.draw(labelRectangle);
 		graphics.setPaint(this.showRatioColor);
 		graphics.fill(labelRectangle);
+		if(this.showRatioFillColor != null) {
+			drawExtentRatioFill(graphics, ratio, labelRectangle);
+		}
 		graphics.setPaint(Color.BLACK);
+		graphics.draw(labelRectangle);
         graphics.drawString(formattedNumber, (float)(x - bounds.getWidth()/2 - bounds.getX()), (float)(y - bounds.getHeight()/2 - bounds.getY()));
 
         graphics.setFont(oldFont); 
         graphics.setTransform(oldTransform);
         graphics.setPaint(oldPaint);
     }
+
+	private void drawExtentRatioFill(Graphics2D graphics, double ratio, Rectangle2D labelRectangle) {
+		double filledWidth = labelRectangle.getWidth() * ratio;
+		graphics.setPaint(this.showRatioFillColor);
+		Rectangle2D filledRectangle = new Rectangle2D.Double(labelRectangle.getX(), labelRectangle.getY(),
+		                                                     filledWidth, labelRectangle.getHeight());
+		graphics.fill(filledRectangle);		
+	}
 
 	private double getExtentRatio() {
 		DiagramView diagramView = this.fromView.getDiagramView();
