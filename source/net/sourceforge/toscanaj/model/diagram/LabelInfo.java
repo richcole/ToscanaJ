@@ -119,6 +119,7 @@ public class LabelInfo implements XML_Serializable, ChangeObservable {
         Element offsetElem = new Element(OFFSET_ELEMENT_NAME);
         offsetElem.setAttribute(OFFSET_X_ATTRIBUTE_NAME, String.valueOf(offset.getX()));
         offsetElem.setAttribute(OFFSET_Y_ATTRIBUTE_NAME, String.valueOf(offset.getY()));
+        retVal.addContent(offsetElem);
         Element backgroundColorElem = new Element(BACKGROUND_COLOR_ELEMENT_NAME);
         backgroundColorElem.addContent("#" + Integer.toHexString(backgroundColor.getRGB()));
         retVal.addContent(backgroundColorElem);
