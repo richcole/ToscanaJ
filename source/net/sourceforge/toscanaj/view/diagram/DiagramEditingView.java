@@ -136,13 +136,13 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 						GridBagConstraints.HORIZONTAL,
 						new Insets(1, 5, 1, 1),
 						2,2));
-		toolPanel.add(createZoomPanel(), new GridBagConstraints(
+		toolPanel.add(createGridPanel(), new GridBagConstraints(
 						1,0,1,1,0,0,
 						GridBagConstraints.NORTHWEST,
 						GridBagConstraints.HORIZONTAL,
 						new Insets(1, 1, 1, 1),
 						2,2));
-		toolPanel.add(createGridPanel(), new GridBagConstraints(
+		toolPanel.add(createZoomPanel(), new GridBagConstraints(
 						2,0,1,1,0,0,
 						GridBagConstraints.NORTHWEST,
 						GridBagConstraints.HORIZONTAL,
