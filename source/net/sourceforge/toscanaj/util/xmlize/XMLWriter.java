@@ -14,8 +14,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 /**
- * This class provides a mechanism to read an XMLizable object from a
- * filename.
+ * This class provides a mechanism to write an XMLizable object to a
+ * file.
  */
 public class XMLWriter {
     public static void write(File file, XMLizable object)
