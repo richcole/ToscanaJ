@@ -1,3 +1,6 @@
+This is a set of results of a graph query on the collection classes
+of the JDK.
+
 _a:0	_name:0	_parent:0	_part_name:0	_type:0
 java.util.AbstractSet	AbstractSet	java.util.Collection	Set	outer-class
 java.util.AbstractSet	AbstractSet	java.util.Collection	Set	class
