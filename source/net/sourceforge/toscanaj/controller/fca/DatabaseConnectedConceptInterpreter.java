@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -86,8 +86,14 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter {
         try {
             int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
             if( reference == REFERENCE_DIAGRAM ) {
+                /// @todo add way to find top concept more easily
                 while(!concept.isTop()) {
-                    concept = (Concept) concept.getUpset().iterator().next();
+                    Concept other = concept;
+                    Iterator it = concept.getUpset().iterator();
+                    do {
+                        other = (Concept) it.next();
+                    } while (other == concept);
+                    concept = other;
                 }
                 return (double)extentSize/(double)getCount(concept, context, ConceptInterpretationContext.EXTENT);
             }
