@@ -109,6 +109,12 @@ public class DatabaseConnection {
     }
 
     private static Connection getConnection(String url, String driverName, String account, String password) throws DatabaseException {
+        if( (url == null) || (url.equals("")) ) {
+            throw new DatabaseException("No URL given for connecting to the database");
+        }
+        if( (driverName == null) || (driverName.equals("")) ) {
+            throw new DatabaseException("No driver given for connecting to the database");
+        }
         try {
             Class.forName(driverName);
             Driver driver = DriverManager.getDriver(url);
