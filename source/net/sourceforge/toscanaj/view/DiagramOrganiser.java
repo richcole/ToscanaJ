@@ -108,6 +108,17 @@ public class DiagramOrganiser extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 int index = selectedDiagramsListview.getSelectedIndex();
                 history.removeDiagram(index);
+                int size = selectedDiagramsListview.getModel().getSize();
+                if (size == 0) {
+                    //clearSelection() will disable remove button
+                    selectedDiagramsListview.clearSelection();
+                } else {
+                    if (index == size) {
+                        //move selected index up one
+                        index--;
+                        selectedDiagramsListview.setSelectedIndex(index);
+                    }
+                }
             }
         });
 

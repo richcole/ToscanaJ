@@ -28,7 +28,7 @@ import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
  * This class paints a diagram defined by the SimpleLineDiagram class.
  */
 
-public class DiagramView extends DrawingCanvas implements MouseListener, MouseMotionListener, DiagramObserver
+public class DiagramView extends DrawingCanvas implements DiagramObserver
 {
     /**
      * The minimum size for drawing.
