@@ -51,6 +51,7 @@ public class DatabaseConnectionInformationView extends JDialog
 	private static final String EMBEDDED_DBMS_ID_STRING = "Embedded DBMS";
 	private static final String ODBC_ID_STRING = "ODBC Source";
 	private static final String ACCESS_FILE_ID_STRING = "Access File";
+    private static final String EXCEL_FILE_ID_STRING = "Excel File";
 	
 	private static final int MINIMUM_WIDTH = 400;
 	private static final int MINIMUM_HEIGHT = 350;
@@ -69,6 +70,7 @@ public class DatabaseConnectionInformationView extends JDialog
     private JdbcConnectionPanel jdbcDbPanel;
     private OdbcConnectionPanel odbcDbPanel;
     private AccessFileConnectionPanel accessDbPanel;
+    private ExcelFileConnectionPanel excelDbPanel;
 	private KeySelectPanel keySelectPanel;
     private DatabaseTypePanel dbTypePanel;
 
@@ -89,20 +91,23 @@ public class DatabaseConnectionInformationView extends JDialog
     class DatabaseTypePanel extends WizardPanel {
         private JRadioButton embDBMSRadioButton;
         private JRadioButton jdbcRadioButton;
-        private JRadioButton accessRadioButton;
         private JRadioButton odbcRadioButton;
+        private JRadioButton accessRadioButton;
+        private JRadioButton excelRadioButton;
         DatabaseTypePanel() {
             super();
             embDBMSRadioButton = new JRadioButton(EMBEDDED_DBMS_ID_STRING);
             jdbcRadioButton = new JRadioButton(JDBC_ID_STRING);
-            accessRadioButton = new JRadioButton(ACCESS_FILE_ID_STRING);
             odbcRadioButton = new JRadioButton(ODBC_ID_STRING);
+            accessRadioButton = new JRadioButton(ACCESS_FILE_ID_STRING);
+            excelRadioButton = new JRadioButton(EXCEL_FILE_ID_STRING);
             
             ButtonGroup buttonGroup = new ButtonGroup();
             buttonGroup.add(embDBMSRadioButton);
             buttonGroup.add(jdbcRadioButton);
-            buttonGroup.add(accessRadioButton);
             buttonGroup.add(odbcRadioButton);
+            buttonGroup.add(accessRadioButton);
+            buttonGroup.add(excelRadioButton);
 
             updateContents();
 
@@ -131,6 +136,12 @@ public class DatabaseConnectionInformationView extends JDialog
                     GridBagConstraints.HORIZONTAL,
                     new Insets(5, 5, 5, 0),
                     2,2));
+            this.add(excelRadioButton,new GridBagConstraints(
+                    0,4,1,1,1,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(5, 5, 5, 0),
+                    2,2));
             this.add(new JPanel(),new GridBagConstraints(
                     0,4,1,1,1,1,
                     GridBagConstraints.NORTHWEST,
@@ -152,7 +163,9 @@ public class DatabaseConnectionInformationView extends JDialog
                 } else if (type == DatabaseInfo.ODBC) {
             	    odbcRadioButton.setSelected(true);
                 } else if (type == DatabaseInfo.ACCESS_FILE) {
-            	    accessRadioButton.setSelected(true);
+                    accessRadioButton.setSelected(true);
+                } else if (type == DatabaseInfo.EXCEL_FILE) {
+                    excelRadioButton.setSelected(true);
             	} else {
             		throw new RuntimeException("Unknown database type");
             	}
@@ -177,6 +190,8 @@ public class DatabaseConnectionInformationView extends JDialog
                 return odbcDbPanel;
             } else if(accessRadioButton.isSelected()) {
                 return accessDbPanel;
+            } else if(excelRadioButton.isSelected()) {
+                return excelDbPanel;
             }
             throw new RuntimeException("Something went really wrong");
         }
@@ -473,81 +488,81 @@ public class DatabaseConnectionInformationView extends JDialog
         private JTextField userNameField;
         private JPasswordField passwordField;
 
-    	AccessFileConnectionPanel() {
+        AccessFileConnectionPanel() {
             super();
-    	    fileUrlField = new JTextField();
-    	    userNameField = new JTextField();
-    	    passwordField = new JPasswordField();
+            fileUrlField = new JTextField();
+            userNameField = new JTextField();
+            passwordField = new JPasswordField();
 
-    	    JButton fileButton = new JButton("Browse...");
-    	    fileButton.addActionListener(new ActionListener() {
-    	        public void actionPerformed(ActionEvent e) {
-    	            getFileURL(fileUrlField, "mdb", "Microsoft Access Databases (*.mdb)");
-    	        }
-    	    });
-    	    fileButton.setMnemonic('f');
+            JButton fileButton = new JButton("Browse...");
+            fileButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    getFileURL(fileUrlField, "mdb", "Microsoft Access Databases (*.mdb)");
+                }
+            });
+            fileButton.setMnemonic('f');
 
             updateContents();
 
-    	    this.setLayout(new GridBagLayout());
-    	    this.add(new JLabel("File Access Location: "),new GridBagConstraints(
-    	            0,0,1,1,0,0,
-    	            GridBagConstraints.NORTHWEST,
-    	            GridBagConstraints.NONE,
-    	            new Insets(5, 5, 5, 0),
-    	            2,2));
+            this.setLayout(new GridBagLayout());
+            this.add(new JLabel("Access Database Location: "),new GridBagConstraints(
+                    0,0,1,1,0,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.NONE,
+                    new Insets(5, 5, 5, 0),
+                    2,2));
 
-    	    this.add(fileUrlField,new GridBagConstraints(
-    	            0,1,1,1,1,0,
-    	            GridBagConstraints.NORTHWEST,
-    	            GridBagConstraints.HORIZONTAL,
-    	            new Insets(0, 15, 5, 0),
-    	            2,2));
+            this.add(fileUrlField,new GridBagConstraints(
+                    0,1,1,1,1,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(0, 15, 5, 0),
+                    2,2));
 
-    	    this.add(fileButton,new GridBagConstraints(
-    	            0,2,1,1,0,0,
-    	            GridBagConstraints.EAST,
-    	            GridBagConstraints.NONE,
-    	            new Insets(5, 5, 5, 5),
-    	            2,2));
-    	    this.add(new JLabel("Username: "),new GridBagConstraints(
-    	            0,3,1,1,0,0,
-    	            GridBagConstraints.NORTHWEST,
-    	            GridBagConstraints.NONE,
-    	            new Insets(5, 5, 5, 5),
-    	            2,2));
+            this.add(fileButton,new GridBagConstraints(
+                    0,2,1,1,0,0,
+                    GridBagConstraints.EAST,
+                    GridBagConstraints.NONE,
+                    new Insets(5, 5, 5, 5),
+                    2,2));
+            this.add(new JLabel("Username: "),new GridBagConstraints(
+                    0,3,1,1,0,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.NONE,
+                    new Insets(5, 5, 5, 5),
+                    2,2));
 
-    	    this.add(userNameField,new GridBagConstraints(
-    	            0,4,1,1,1,0,
-    	            GridBagConstraints.NORTHWEST,
-    	            GridBagConstraints.HORIZONTAL,
-    	            new Insets(0, 15, 5, 5),
-    	            2,2));
+            this.add(userNameField,new GridBagConstraints(
+                    0,4,1,1,1,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(0, 15, 5, 5),
+                    2,2));
 
-    	    this.add(new JLabel("Password: "),new GridBagConstraints(
-    	            0,5,1,1,0,0,
-    	            GridBagConstraints.NORTHWEST,
-    	            GridBagConstraints.NONE,
-    	            new Insets(5, 5, 5, 5),
-    	            2,2));
+            this.add(new JLabel("Password: "),new GridBagConstraints(
+                    0,5,1,1,0,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.NONE,
+                    new Insets(5, 5, 5, 5),
+                    2,2));
 
-    	    this.add(passwordField,new GridBagConstraints(
-    	            0,6,1,1,10,0,
-    	            GridBagConstraints.NORTHWEST,
-    	            GridBagConstraints.HORIZONTAL,
-    	            new Insets(0, 15, 5, 5),
-    	            2,2));
+            this.add(passwordField,new GridBagConstraints(
+                    0,6,1,1,10,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(0, 15, 5, 5),
+                    2,2));
 
-    	    this.add(new JPanel(),new GridBagConstraints(
-    	            0,7,1,1,1,1,
-    	            GridBagConstraints.WEST,
-    	            GridBagConstraints.VERTICAL,
-    	            new Insets(5, 5, 5, 5),
-    	            2,2));
+            this.add(new JPanel(),new GridBagConstraints(
+                    0,7,1,1,1,1,
+                    GridBagConstraints.WEST,
+                    GridBagConstraints.VERTICAL,
+                    new Insets(5, 5, 5, 5),
+                    2,2));
         }
         void updateContents() {
-            if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.ACCESS_FILE) {
-            	this.fileUrlField.setText(databaseInfo.getAccessFileUrl());
+            if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.EXCEL_FILE) {
+                this.fileUrlField.setText(databaseInfo.getExcelFileUrl());
                 this.userNameField.setText(databaseInfo.getUserName());
                 this.passwordField.setText(databaseInfo.getPassword());
             } else {
@@ -558,6 +573,100 @@ public class DatabaseConnectionInformationView extends JDialog
         }
         boolean executeStep() {
             databaseInfo.setAccessFileInfo(fileUrlField.getText(), userNameField.getText(), new String(passwordField.getPassword()));
+            return connectDatabase();
+        }
+    }
+
+    class ExcelFileConnectionPanel extends ConnectionPanel {
+        private JTextField fileUrlField;
+        private JTextField userNameField;
+        private JPasswordField passwordField;
+
+        ExcelFileConnectionPanel() {
+            super();
+            fileUrlField = new JTextField();
+            userNameField = new JTextField();
+            passwordField = new JPasswordField();
+
+            JButton fileButton = new JButton("Browse...");
+            fileButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    getFileURL(fileUrlField, "xls", "Microsoft Excel Workbooks (*.xls)");
+                }
+            });
+            fileButton.setMnemonic('f');
+
+            updateContents();
+
+            this.setLayout(new GridBagLayout());
+            this.add(new JLabel("Excel Workbook Location: "),new GridBagConstraints(
+                    0,0,1,1,0,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.NONE,
+                    new Insets(5, 5, 5, 0),
+                    2,2));
+
+            this.add(fileUrlField,new GridBagConstraints(
+                    0,1,1,1,1,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(0, 15, 5, 0),
+                    2,2));
+
+            this.add(fileButton,new GridBagConstraints(
+                    0,2,1,1,0,0,
+                    GridBagConstraints.EAST,
+                    GridBagConstraints.NONE,
+                    new Insets(5, 5, 5, 5),
+                    2,2));
+            this.add(new JLabel("Username: "),new GridBagConstraints(
+                    0,3,1,1,0,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.NONE,
+                    new Insets(5, 5, 5, 5),
+                    2,2));
+
+            this.add(userNameField,new GridBagConstraints(
+                    0,4,1,1,1,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(0, 15, 5, 5),
+                    2,2));
+
+            this.add(new JLabel("Password: "),new GridBagConstraints(
+                    0,5,1,1,0,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.NONE,
+                    new Insets(5, 5, 5, 5),
+                    2,2));
+
+            this.add(passwordField,new GridBagConstraints(
+                    0,6,1,1,10,0,
+                    GridBagConstraints.NORTHWEST,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(0, 15, 5, 5),
+                    2,2));
+
+            this.add(new JPanel(),new GridBagConstraints(
+                    0,7,1,1,1,1,
+                    GridBagConstraints.WEST,
+                    GridBagConstraints.VERTICAL,
+                    new Insets(5, 5, 5, 5),
+                    2,2));
+        }
+        void updateContents() {
+            if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.ACCESS_FILE) {
+                this.fileUrlField.setText(databaseInfo.getAccessFileUrl());
+                this.userNameField.setText(databaseInfo.getUserName());
+                this.passwordField.setText(databaseInfo.getPassword());
+            } else {
+                this.fileUrlField.setText("");
+                this.userNameField.setText("");
+                this.passwordField.setText("");
+            }
+        }
+        boolean executeStep() {
+            databaseInfo.setExcelFileInfo(fileUrlField.getText(), userNameField.getText(), new String(passwordField.getPassword()));
             return connectDatabase();
         }
     }
@@ -671,6 +780,7 @@ public class DatabaseConnectionInformationView extends JDialog
         this.jdbcDbPanel = new JdbcConnectionPanel();
         this.odbcDbPanel = new OdbcConnectionPanel();
         this.accessDbPanel = new AccessFileConnectionPanel();
+        this.excelDbPanel = new ExcelFileConnectionPanel();
         this.keySelectPanel = new KeySelectPanel(this.internalBroker);
     }
 

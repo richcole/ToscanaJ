@@ -62,6 +62,7 @@ public class DatabaseInfo implements XMLizable {
     public static final Type JDBC = new Type("JDBC");
     public static final Type ODBC = new Type("ODBC");
     public static final Type ACCESS_FILE = new Type("ACCESS_FILE");
+    public static final Type EXCEL_FILE = new Type("ACCESS_FILE");
 
     private static final String ODBC_PREFIX = "jdbc:odbc:";
     private static final String ACCESS_FILE_URL_PREFIX =
@@ -69,6 +70,10 @@ public class DatabaseInfo implements XMLizable {
     private static final String ACCESS_FILE_URL_END =
         ";UserCommitSync=Yes;Threads=3;SafeTransactions=0;PageTimeout=5;"
             + "MaxScanRows=8;MaxBufferSize=2048;DriverId=281";
+    private static final String EXCEL_FILE_URL_PREFIX =
+        "jdbc:odbc:Driver={Microsoft Excel Driver (*.xls)};DBQ=";
+    private static final String EXCEL_FILE_URL_END =
+        ";DriverID=22;READONLY=true";
 
     private static final String JDBC_ODBC_BRIDGE_DRIVER =
         "sun.jdbc.odbc.JdbcOdbcDriver";
@@ -319,19 +324,21 @@ public class DatabaseInfo implements XMLizable {
         }
         if (driverClass.equals(JDBC_ODBC_BRIDGE_DRIVER)) {
             if (url.indexOf(';') == -1) {
-                // a semicolon is not allowed in DSN names
+                // a semicolon is not allowed in DSN names, only in file URLs
                 return ODBC;
-            } else { // but always in the access file URLs
+            } else if (url.indexOf("Access") != -1) {
                 return ACCESS_FILE;
+            } else if (url.indexOf("Excel") != -1) {
+                return EXCEL_FILE;
+            } else {
+                throw new IllegalStateException("Undefined JDBC URL: " + url);
             }
         }
         return JDBC;
     }
 
-    public void setAccessFileInfo(
-        String fileLocation,
-        String userName,
-        String password) {
+    public void setAccessFileInfo(String fileLocation, String userName,
+                                  String password) {
         this.driverClass = JDBC_ODBC_BRIDGE_DRIVER;
         this.sourceURL =
             ACCESS_FILE_URL_PREFIX + fileLocation + ACCESS_FILE_URL_END;
@@ -344,6 +351,23 @@ public class DatabaseInfo implements XMLizable {
     public String getAccessFileUrl() {
         int start = ACCESS_FILE_URL_PREFIX.length();
         int end = getURL().length() - ACCESS_FILE_URL_END.length();
+        return getURL().substring(start, end);
+    }
+
+    public void setExcelFileInfo(String fileLocation, String userName,
+                                  String password) {
+        this.driverClass = JDBC_ODBC_BRIDGE_DRIVER;
+        this.sourceURL =
+            EXCEL_FILE_URL_PREFIX + fileLocation + EXCEL_FILE_URL_END;
+        this.userName = userName;
+        this.password = password;
+        this.embeddedSQLLocation = null;
+        this.embeddedSQLPath = null;
+    }
+
+    public String getExcelFileUrl() {
+        int start = EXCEL_FILE_URL_PREFIX.length();
+        int end = getURL().length() - EXCEL_FILE_URL_END.length();
         return getURL().substring(start, end);
     }
 
