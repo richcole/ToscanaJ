@@ -20,6 +20,7 @@ public class AllTests extends TestCase {
         TestSuite suite = new TestSuite();
         suite.addTest(DiagramHistoryTest.suite());
         suite.addTest(DatabaseConnectedConceptInterpreterTest.suite());
+        suite.addTest(LatticeGeneratorTest.suite());
         return suite;
     }
 
