@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.scales;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
@@ -25,6 +26,8 @@ import net.sourceforge.toscanaj.model.lattice.Attribute;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.sql.Types;
@@ -50,6 +53,12 @@ public class OrdinalScaleEditorDialog extends JDialog {
     private JLabel avgLabel;
     private JLabel rangeLabel;
     private DatabaseConnection connection;
+    
+	private static final String CONFIGURATION_SECTION_NAME = "OrdinalScaleEditorDialog";
+	private static final int MINIMUM_WIDTH = 400;
+	private static final int MINIMUM_HEIGHT = 600;
+	private static final int DEFAULT_X_POS = 200;
+	private static final int DEFAULT_Y_POS = 100;
     
     private static interface ContextGenerator {
     	Context createContext(String name, List dividers, Column column);
@@ -228,10 +237,23 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
     public OrdinalScaleEditorDialog(Frame owner, DatabaseSchema databaseSchema, DatabaseConnection connection) {
         super(owner);
-      	setSize(400,600);
-      	setLocation(200,100);
-      	this.databaseSchema = databaseSchema;
+       	this.databaseSchema = databaseSchema;
       	this.connection = connection;
+		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
+		this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
+		//	to enforce the minimum size during resizing of the JDialog
+		 addComponentListener( new ComponentAdapter() {
+			 public void componentResized(ComponentEvent e) {
+				 int width = getWidth();
+				 int height = getHeight();
+				 if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
+				 if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
+				 setSize(width, height);
+			 }
+			 public void componentShown(ComponentEvent e) {
+				 componentResized(e);
+			 }
+		 });
         layoutDialog();
         fillControls();
         pack();
@@ -656,8 +678,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
         okButton = makeActionOnCorrectScaleButton("Create");
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dispose();
-                result = true;
+				closeDialog(true);
             }
         });
 
@@ -667,14 +688,19 @@ public class OrdinalScaleEditorDialog extends JDialog {
         final JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                dispose();
-                result = false;
+               closeDialog(false);
             }
         });
         buttonPane.add(cancelButton);
         return buttonPane;
     }
-
+	
+	private void closeDialog(boolean res) {
+		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
+		dispose();
+		this.result = res;
+	}
+	
     private JPanel makeTypeOptionPane() {
         this.typeChooser = new JComboBox(new ContextGenerator[]{
         		new IncreasingExclusiveGenerator(),
