@@ -46,6 +46,24 @@ public class DatabaseInfo implements XMLizable {
     private String embeddedSQLPath = null;
 
     private String driverClass = null;
+    
+    public static class Type{};
+    
+    public static final Type UNDEFINED = new Type();
+    public static final Type EMBEDDED = new Type();
+    public static final Type JDBC = new Type();
+    public static final Type ODBC = new Type();
+    public static final Type ACCESS_FILE = new Type();
+
+    private static final String ODBC_PREFIX = "jdbc:odbc:";
+    private static final String ACCESS_FILE_URL_PREFIX =
+                "jdbc:odbc:DRIVER=Microsoft Access Driver (*.mdb); DBQ=";
+    private static final String ACCESS_FILE_URL_END =
+                ";UserCommitSync=Yes;Threads=3;SafeTransactions=0;PageTimeout=5;" +
+                "MaxScanRows=8;MaxBufferSize=2048;DriverId=281";
+
+    private static final String JDBC_ODBC_BRIDGE_DRIVER =
+                "sun.jdbc.odbc.JdbcOdbcDriver";
 
     private static final String TABLE_ELEMENT_NAME = "table";
     public static final String DATABASE_CONNECTION_ELEMENT_NAME = "databaseConnection";
@@ -246,5 +264,51 @@ public class DatabaseInfo implements XMLizable {
                 "\t" + "key/table: " + this.objectKey + "/" + this.table;
 
         return result;
+    }
+
+	public Type getType() {
+		if(getURL() == null) {
+			return UNDEFINED;
+		}
+	    if(getURL().equals(getEmbeddedDatabaseInfo().getURL())) {
+	    	return EMBEDDED;
+	    }
+		if(getDriverClass().equals(JDBC_ODBC_BRIDGE_DRIVER)) {
+	        if(getURL().indexOf(';') == -1){ // a semicolon is not allowed in DSN names
+	        	return ACCESS_FILE;
+	        }
+	        else { // but always in the access file URLs
+	        	return ODBC;
+	        }
+	    }
+    	return JDBC;
+	}
+	
+	public void setAccessFileInfo(String fileLocation, String userName, String password) {
+		this.driverClass = JDBC_ODBC_BRIDGE_DRIVER;
+        this.sourceURL = ACCESS_FILE_URL_PREFIX + fileLocation + ACCESS_FILE_URL_END;
+        this.userName = userName;
+        this.password = password;
+        this.embeddedSQLLocation = null;
+        this.embeddedSQLPath = null;
+    }
+    
+    public String getAccessFileUrl() {
+		int start = ACCESS_FILE_URL_PREFIX.length();
+		int end = getURL().length() - ACCESS_FILE_URL_END.length();
+		return getURL().substring(start, end);
+    }
+    
+    public void setOdbcDataSource(String dsn, String userName, String password) {
+        this.driverClass = JDBC_ODBC_BRIDGE_DRIVER;
+        this.sourceURL = ODBC_PREFIX + dsn;
+        this.userName = userName;
+        this.password = password;
+        this.embeddedSQLLocation = null;
+        this.embeddedSQLPath = null;
+    }
+    
+    public String getOdbcDataSourceName() {
+		return getURL().substring(ODBC_PREFIX.length());
     }
 }

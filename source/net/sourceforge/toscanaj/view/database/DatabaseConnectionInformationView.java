@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo.Type;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -41,17 +42,6 @@ import java.net.URL;
  */
 public class DatabaseConnectionInformationView extends JDialog
 												implements EventBrokerListener {
-
-	private static final String ODBC_PREFIX = "jdbc:odbc:";
-	private static final String ACCESS_FILE_URL_PREFIX = 
-				"jdbc:odbc:DRIVER=Microsoft Access Driver (*.mdb); DBQ=";
-	private static final String ACCESS_FILE_URL_END = 
-				";UserCommitSync=Yes;Threads=3;SafeTransactions=0;PageTimeout=5;" +
-				"MaxScanRows=8;MaxBufferSize=2048;DriverId=281";
-
-	private static final String JDBC_ODBC_BRIDGE_DRIVER = 
-				"sun.jdbc.odbc.JdbcOdbcDriver";
-			
 	private static final String JDBC_ID_STRING = "JDBC";
 	private static final String EMBEDDED_DBMS_ID_STRING = "Embedded DBMS";
 	private static final String ODBC_ID_STRING = "ODBC Source";
@@ -83,6 +73,7 @@ public class DatabaseConnectionInformationView extends JDialog
     		super();
     	    setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
     	}
+    	abstract void updateContents();
     	abstract String getTitle();
     	abstract String getNextButtonText();
     	abstract boolean executeStep();
@@ -100,13 +91,14 @@ public class DatabaseConnectionInformationView extends JDialog
             jdbcRadioButton = new JRadioButton(JDBC_ID_STRING);
             accessRadioButton = new JRadioButton(ACCESS_FILE_ID_STRING);
             odbcRadioButton = new JRadioButton(ODBC_ID_STRING);
-
+            
             ButtonGroup buttonGroup = new ButtonGroup();
             buttonGroup.add(embDBMSRadioButton);
             buttonGroup.add(jdbcRadioButton);
             buttonGroup.add(accessRadioButton);
             buttonGroup.add(odbcRadioButton);
-            embDBMSRadioButton.setSelected(true);
+
+            updateContents();
 
 			this.setLayout(new GridBagLayout());
             this.add(embDBMSRadioButton,new GridBagConstraints(
@@ -139,6 +131,26 @@ public class DatabaseConnectionInformationView extends JDialog
                     GridBagConstraints.BOTH,
                     new Insets(0, 0, 0, 0),
                     2,2));
+        }
+        void updateContents() {
+            if(databaseInfo == null) {
+                embDBMSRadioButton.setSelected(true);
+            } else {
+            	Type type = databaseInfo.getType();
+            	if(type == DatabaseInfo.EMBEDDED) {
+                    embDBMSRadioButton.setSelected(true);
+                } else if (type == DatabaseInfo.UNDEFINED) {
+                    embDBMSRadioButton.setSelected(true);
+                } else if (type == DatabaseInfo.JDBC) {
+            	    jdbcRadioButton.setSelected(true);
+                } else if (type == DatabaseInfo.ODBC) {
+            	    odbcRadioButton.setSelected(true);
+                } else if (type == DatabaseInfo.ACCESS_FILE) {
+            	    accessRadioButton.setSelected(true);
+            	} else {
+            		throw new RuntimeException("Unknown database type");
+            	}
+            }
         }
         String getTitle() {
             return "Database Type:";
@@ -185,20 +197,22 @@ public class DatabaseConnectionInformationView extends JDialog
     }
     
     class EmbeddedDbConnectionPanel extends ConnectionPanel {
-        private JTextField sqlScriptLocationField;
+        private JTextField scriptLocationField;
 
     	EmbeddedDbConnectionPanel() {
     		super();
-    	    sqlScriptLocationField = new JTextField();
+    	    scriptLocationField = new JTextField();
     	    JLabel sqlFileLabel = new JLabel("SQL File Location:");
     	    JButton fileButton = new JButton("Browse...");
     	    fileButton.addActionListener(new ActionListener() {
     	        public void actionPerformed(ActionEvent e) {
-    	            getFileURL(sqlScriptLocationField, "sql", "SQL Scripts (*.sql)");
+    	            getFileURL(scriptLocationField, "sql", "SQL Scripts (*.sql)");
     	        }
     	    });
     	    fileButton.setMnemonic('f');
     	    
+            updateContents();
+
     	    this.setLayout(new GridBagLayout());
     	    this.add(sqlFileLabel,new GridBagConstraints(
     	            0,0,2,1,1,0,
@@ -207,7 +221,7 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 5),
     	            2,2));
 
-    	    this.add(sqlScriptLocationField,new GridBagConstraints(
+    	    this.add(scriptLocationField,new GridBagConstraints(
     	            0,1,1,1,1,0,
     	            GridBagConstraints.NORTHWEST,
     	            GridBagConstraints.HORIZONTAL,
@@ -226,6 +240,14 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 5),
     	            2,2));
     	}
+
+        void updateContents() {
+            if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.EMBEDDED) {
+            	this.scriptLocationField.setText(databaseInfo.getEmbeddedSQLLocation().getPath());
+            } else {
+            	this.scriptLocationField.setText("");
+            }
+        }
     	
         boolean executeStep() {
             DatabaseInfo embedInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
@@ -234,7 +256,7 @@ public class DatabaseConnectionInformationView extends JDialog
             databaseInfo.setPassword(embedInfo.getPassword());
             databaseInfo.setDriverClass(embedInfo.getDriverClass());
             try {
-                databaseInfo.setEmbeddedSQLLocation(new URL("file:\\" + sqlScriptLocationField.getText()));
+                databaseInfo.setEmbeddedSQLLocation(new URL("file:\\" + scriptLocationField.getText()));
             } catch (MalformedURLException e) {
             	ErrorDialog.showError(this,e,"URL invalid");
             	return false;
@@ -254,19 +276,21 @@ public class DatabaseConnectionInformationView extends JDialog
     }
 
     class JdbcConnectionPanel extends ConnectionPanel {
-        private JTextField jdbcUrlField;
-        private JTextField jdbcUserField;
-        private JTextField jdbcPasswordField;
-        private JTextField jdbcDriverField;
+        private JTextField urlField;
+        private JTextField userNameField;
+        private JTextField passwordField;
+        private JTextField driverField;
 
     	JdbcConnectionPanel() {
             super();
-    	    jdbcUrlField = new JTextField();
-    	    jdbcUserField = new JTextField();
-    	    jdbcPasswordField = new JTextField();
-    	    jdbcDriverField = new JTextField();
-    	    this.setLayout(new GridBagLayout());
+    	    urlField = new JTextField();
+    	    userNameField = new JTextField();
+    	    passwordField = new JTextField();
+    	    driverField = new JTextField();
 
+            updateContents();
+
+    	    this.setLayout(new GridBagLayout());
     	    this.add(new JLabel("URL: "),new GridBagConstraints(
     	            0,0,1,1,1,0,
     	            GridBagConstraints.NORTHWEST,
@@ -274,7 +298,7 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 0),
     	            2,2));
 
-    	    this.add(jdbcUrlField,new GridBagConstraints(
+    	    this.add(urlField,new GridBagConstraints(
     	            0,1,1,1,1,0,
     	            GridBagConstraints.NORTHWEST,
     	            GridBagConstraints.HORIZONTAL,
@@ -288,7 +312,7 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 0),
     	            2,2));
 
-    	    this.add(jdbcDriverField,new GridBagConstraints(
+    	    this.add(driverField,new GridBagConstraints(
     	            0,3,1,1,1,0,
     	            GridBagConstraints.NORTHWEST,
     	            GridBagConstraints.HORIZONTAL,
@@ -302,7 +326,7 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 0),
     	            2,2));
 
-    	    this.add(jdbcUserField,new GridBagConstraints(
+    	    this.add(userNameField,new GridBagConstraints(
     	            0,5,1,1,1,0,
     	            GridBagConstraints.NORTHWEST,
     	            GridBagConstraints.HORIZONTAL,
@@ -316,7 +340,7 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 0),
     	            2,2));
 
-    	    this.add(jdbcPasswordField,new GridBagConstraints(
+    	    this.add(passwordField,new GridBagConstraints(
     	            0,7,1,1,1,0,
     	            GridBagConstraints.NORTHWEST,
     	            GridBagConstraints.HORIZONTAL,
@@ -331,36 +355,52 @@ public class DatabaseConnectionInformationView extends JDialog
     	            2,2));
         }
 
+        void updateContents() {
+            if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.JDBC) {
+                this.urlField.setText(databaseInfo.getURL());
+                this.userNameField.setText(databaseInfo.getUserName());
+                this.passwordField.setText(databaseInfo.getPassword());
+                this.driverField.setText(databaseInfo.getDriverClass());
+            } else {
+                this.urlField.setText("");
+                this.userNameField.setText("");
+                this.passwordField.setText("");
+                this.driverField.setText("");
+            }
+        }
+
         boolean executeStep() {
-			databaseInfo.setUrl(jdbcUrlField.getText());
-            databaseInfo.setUserName(jdbcUserField.getText());
-            databaseInfo.setPassword(jdbcPasswordField.getText());
-            databaseInfo.setDriverClass(jdbcDriverField.getText());
+			databaseInfo.setUrl(urlField.getText());
+            databaseInfo.setUserName(userNameField.getText());
+            databaseInfo.setPassword(passwordField.getText());
+            databaseInfo.setDriverClass(driverField.getText());
             databaseInfo.setEmbeddedSQLLocation((String) null);
             return connectDatabase();
         }
     }
 
     class OdbcConnectionPanel extends ConnectionPanel {
-        private JTextField odbcDataSourceNameField;
-        private JTextField odbcUserField;
-        private JTextField odbcPasswordField;
+        private JTextField dataSourceNameField;
+        private JTextField userNameField;
+        private JTextField passwordField;
 
     	OdbcConnectionPanel() {
             super();
-    	    odbcDataSourceNameField = new JTextField();
-    	    odbcUserField = new JTextField();
-    	    odbcPasswordField = new JTextField();
-    	    this.setLayout(new GridBagLayout());
+    	    dataSourceNameField = new JTextField();
+    	    userNameField = new JTextField();
+    	    passwordField = new JTextField();
 
-    	    this.add(new JLabel("Data Name Source: "),new GridBagConstraints(
+            updateContents();
+
+    	    this.setLayout(new GridBagLayout());
+    	    this.add(new JLabel("Data Source Name: "),new GridBagConstraints(
     	            0,0,1,1,0,0,
     	            GridBagConstraints.NORTHWEST,
     	            GridBagConstraints.HORIZONTAL,
     	            new Insets(5, 5, 5, 0),
     	            2,2));
 
-    	    this.add(odbcDataSourceNameField,new GridBagConstraints(
+    	    this.add(dataSourceNameField,new GridBagConstraints(
     	            0,1,1,1,1,0,
     	            GridBagConstraints.NORTHWEST,
     	            GridBagConstraints.HORIZONTAL,
@@ -374,7 +414,7 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 0),
     	            2,2));
 
-    	    this.add(odbcUserField,new GridBagConstraints(
+    	    this.add(userNameField,new GridBagConstraints(
     	            0,3,1,1,1,0,
     	            GridBagConstraints.NORTHWEST,
     	            GridBagConstraints.HORIZONTAL,
@@ -388,7 +428,7 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 0),
     	            2,2));
 
-    	    this.add(odbcPasswordField,new GridBagConstraints(
+    	    this.add(passwordField,new GridBagConstraints(
     	            0,5,1,1,1,0,
     	            GridBagConstraints.NORTHWEST,
     	            GridBagConstraints.HORIZONTAL,
@@ -401,36 +441,45 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 0),
     	            2,2));
         }
+        void updateContents() {
+            if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.ODBC) {
+                this.dataSourceNameField.setText(databaseInfo.getOdbcDataSourceName());
+                this.userNameField.setText(databaseInfo.getUserName());
+                this.passwordField.setText(databaseInfo.getPassword());
+            } else {
+                this.dataSourceNameField.setText("");
+                this.userNameField.setText("");
+                this.passwordField.setText("");
+            }
+        }
         boolean executeStep() {
-            databaseInfo.setDriverClass(JDBC_ODBC_BRIDGE_DRIVER);
-            databaseInfo.setUrl(ODBC_PREFIX + odbcDataSourceNameField.getText());
-            databaseInfo.setUserName(odbcUserField.getText());
-            databaseInfo.setPassword(odbcPasswordField.getText());
-            databaseInfo.setEmbeddedSQLLocation((String) null);
+            databaseInfo.setOdbcDataSource(dataSourceNameField.getText(), userNameField.getText(), passwordField.getText());
             return connectDatabase();
         }
     }
 
     class AccessFileConnectionPanel extends ConnectionPanel {
-        private JTextField accessUrlField;
-        private JTextField accessUserField;
-        private JTextField accessPasswordField;
+        private JTextField fileUrlField;
+        private JTextField userNameField;
+        private JTextField passwordField;
 
     	AccessFileConnectionPanel() {
             super();
-    	    accessUrlField = new JTextField();
-    	    accessUserField = new JTextField();
-    	    accessPasswordField = new JTextField();
-    	    this.setLayout(new GridBagLayout());
-    	    
+    	    fileUrlField = new JTextField();
+    	    userNameField = new JTextField();
+    	    passwordField = new JTextField();
+
     	    JButton fileButton = new JButton("Browse...");
     	    fileButton.addActionListener(new ActionListener() {
     	        public void actionPerformed(ActionEvent e) {
-    	            getFileURL(accessUrlField, "mdb", "Microsoft Access Databases (*.mdb)");
+    	            getFileURL(fileUrlField, "mdb", "Microsoft Access Databases (*.mdb)");
     	        }
     	    });
     	    fileButton.setMnemonic('f');
 
+            updateContents();
+
+    	    this.setLayout(new GridBagLayout());
     	    this.add(new JLabel("File Access Location: "),new GridBagConstraints(
     	            0,0,1,1,0,0,
     	            GridBagConstraints.NORTHWEST,
@@ -438,7 +487,7 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 0),
     	            2,2));
 
-    	    this.add(accessUrlField,new GridBagConstraints(
+    	    this.add(fileUrlField,new GridBagConstraints(
     	            0,1,1,1,1,0,
     	            GridBagConstraints.NORTHWEST,
     	            GridBagConstraints.HORIZONTAL,
@@ -458,7 +507,7 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 5),
     	            2,2));
 
-    	    this.add(accessUserField,new GridBagConstraints(
+    	    this.add(userNameField,new GridBagConstraints(
     	            0,4,1,1,1,0,
     	            GridBagConstraints.NORTHWEST,
     	            GridBagConstraints.HORIZONTAL,
@@ -472,7 +521,7 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 5),
     	            2,2));
 
-    	    this.add(accessPasswordField,new GridBagConstraints(
+    	    this.add(passwordField,new GridBagConstraints(
     	            0,6,1,1,10,0,
     	            GridBagConstraints.NORTHWEST,
     	            GridBagConstraints.HORIZONTAL,
@@ -486,12 +535,19 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 5),
     	            2,2));
         }
+        void updateContents() {
+            if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.ACCESS_FILE) {
+            	this.fileUrlField.setText(databaseInfo.getAccessFileUrl());
+                this.userNameField.setText(databaseInfo.getUserName());
+                this.passwordField.setText(databaseInfo.getPassword());
+            } else {
+                this.fileUrlField.setText("");
+                this.userNameField.setText("");
+                this.passwordField.setText("");
+            }
+        }
         boolean executeStep() {
-            databaseInfo.setDriverClass(JDBC_ODBC_BRIDGE_DRIVER);
-            databaseInfo.setUrl(createAccessFileURL(accessUrlField.getText()));
-            databaseInfo.setUserName(accessUserField.getText());
-            databaseInfo.setPassword(accessPasswordField.getText());
-            databaseInfo.setEmbeddedSQLLocation((String) null);
+            databaseInfo.setAccessFileInfo(fileUrlField.getText(), userNameField.getText(), passwordField.getText());
             return connectDatabase();
         }
     }
@@ -525,6 +581,9 @@ public class DatabaseConnectionInformationView extends JDialog
         }
         WizardPanel getNextPanel() {
             return null;
+        }
+        void updateContents() {
+        	// not needed, we do this via the broker (@todo could be changed)
         }
     }
 
@@ -648,6 +707,7 @@ public class DatabaseConnectionInformationView extends JDialog
         this.currentStep = panel;
         this.stepLabel.setText(panel.getTitle());
         this.nextButton.setText(panel.getNextButtonText());
+        panel.updateContents();
         contentPane.add(panel,new GridBagConstraints(
                 0,1,1,1,1,1,
                 GridBagConstraints.CENTER,
@@ -688,52 +748,13 @@ public class DatabaseConnectionInformationView extends JDialog
 		}
 	}
 
-	private String createAccessFileURL(String fileLocation) {
-		return ACCESS_FILE_URL_PREFIX + fileLocation + ACCESS_FILE_URL_END;
-	}
-
-//	public void copyToControls(DatabaseInfo info) {
-//		if( info == null || info.getURL() == null ) {
-//		    this.sqlScriptLocationField.setText("");
-//		    raisePanel(EMBEDDED_DBMS_ID_STRING);
-//		    return;
-//		}
-//		if(info.getURL().equals(DatabaseInfo.getEmbeddedDatabaseInfo().getURL())) {
-//			copyEmbeddedDataToControls(info);
-//			raisePanel(EMBEDDED_DBMS_ID_STRING);
-//		} else if(info.getDriverClass().equals(JDBC_ODBC_BRIDGE_DRIVER)) {
-//			if(info.getURL().indexOf(';') == -1){ // a semicolon is not allowed in DSN names
-//				copyODBCDataToControls(info);
-//				raisePanel(ODBC_ID_STRING);
-//			} 
-//			else { // but always in the access file URLs
-//				copyAccessDataToControls(info);
-//				raisePanel(ACCESS_FILE_ID_STRING);
-//			}
-//		} 
-//		else {
-//			copyJDBCDataToControls(info);
-//			raisePanel(JDBC_ID_STRING);
-//		}
-//	}
-//
-//	private void copyAccessDataToControls(DatabaseInfo info) {
-//		int start = ACCESS_FILE_URL_PREFIX.length();
-//		int end = info.getURL().length() - ACCESS_FILE_URL_END.length();
-//		this.accessUrlField.setText(info.getURL().substring(start, end));
-//	}
-//
-//	private void copyODBCDataToControls(DatabaseInfo info) {
-//		int start = ODBC_PREFIX.length();
-//		this.odbcDataSourceNameField.setText(info.getURL().substring(start));
-//		this.odbcPasswordField.setText(info.getPassword());
-//		this.odbcUserField.setText(info.getUserName());
-//	}
-//
 	public void processEvent(Event event) {
 		ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
         this.conceptualSchema = changeEvent.getConceptualSchema();
-        DatabaseInfo databaseInfo = this.conceptualSchema.getDatabaseInfo();
+        this.databaseInfo = this.conceptualSchema.getDatabaseInfo();
+        if(this.currentStep != null) {
+        	this.currentStep.updateContents();
+        }
 	}
 	
 	public void hide() {
