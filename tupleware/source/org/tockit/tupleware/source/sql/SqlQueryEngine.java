@@ -27,11 +27,11 @@ public class SqlQueryEngine implements TupleSource {
 
     public void show(JFrame parent, File lastLocation) {
         DatabaseConnectionDialog connectionDialog = new DatabaseConnectionDialog(parent, lastLocation);
-        connectionDialog.show();
+        connectionDialog.setVisible(true);
         this.tuples = connectionDialog.getTuples();
         if(this.tuples != null) {
             IndexSelectionDialog objectSetDialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getDimensionNames());
-            objectSetDialog.show();
+            objectSetDialog.setVisible(true);
             this.objectIndices = objectSetDialog.getSelectedIndices();
             this.lastFile = connectionDialog.getLastFile();
         }

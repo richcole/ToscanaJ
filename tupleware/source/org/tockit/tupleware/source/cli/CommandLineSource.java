@@ -69,7 +69,7 @@ public class CommandLineSource implements TupleSource {
             this.tuples = SeparatedTextParser.parseTabDelimitedTuples(new StringReader(out.toString()),'\t','\"','\000',true);
 
             IndexSelectionDialog dialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getDimensionNames());
-            dialog.show();
+            dialog.setVisible(true);
             this.objectIndices = dialog.getSelectedIndices();
         } catch (Exception e) {
             ErrorDialog.showError(parent, e, "Program failed");

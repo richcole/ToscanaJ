@@ -102,7 +102,7 @@ public class IndexSelectionDialog extends JDialog {
         this.okButton = new JButton("Ok");
         okButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0) {
-                hide();
+                setVisible(false);
             }
         });
         this.okButton.setEnabled(!forceSelection);
@@ -118,10 +118,12 @@ public class IndexSelectionDialog extends JDialog {
         setContentPane(mainPanel);
     }
     
-    public void hide() {
-        super.hide();
-        preferences.putInt("verticalDivider", mainSplitPane.getDividerLocation());
-        preferences.storeWindowPlacement(this);
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        if(!visible) {
+            preferences.putInt("verticalDivider", mainSplitPane.getDividerLocation());
+            preferences.storeWindowPlacement(this);
+        }
     }
     
     public int[] getSelectedIndices() {

@@ -682,7 +682,7 @@ public class DatabaseConnectionDialog extends JDialog {
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		hide();
+                setVisible(false);
         	}
         });
         
@@ -704,7 +704,7 @@ public class DatabaseConnectionDialog extends JDialog {
     protected void gotoNextStep() {
 		WizardPanel nextPanel = this.currentStep.getNextPanel();
         if(nextPanel == null) {
-            hide();
+            setVisible(false);
         } else {
         	setCurrentPanel(nextPanel);
         }
@@ -764,12 +764,15 @@ public class DatabaseConnectionDialog extends JDialog {
 			urlField.setText(fileURL);
 		}
 	}
+	
 
-	public void hide() {
-		super.hide();
-	    setCurrentPanel(this.dbTypePanel);
-		preferences.storeWindowPlacement(this);
-	}
+    public void setVisible(boolean visible) {
+        super.setVisible(visible);
+        if(!visible) {
+    	    setCurrentPanel(this.dbTypePanel);
+    		preferences.storeWindowPlacement(this);
+        }
+    }
 
     public Relation getTuples() {
         return this.tuples;

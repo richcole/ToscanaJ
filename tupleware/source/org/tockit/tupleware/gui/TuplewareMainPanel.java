@@ -7,6 +7,47 @@
  */
 package org.tockit.tupleware.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Frame;
+import java.awt.HeadlessException;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterJob;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.table.DefaultTableModel;
+
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.TupleConceptInterpreter;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
@@ -15,7 +56,9 @@ import net.sourceforge.toscanaj.gui.MainPanel;
 import net.sourceforge.toscanaj.gui.action.ExportDiagramAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
-import net.sourceforge.toscanaj.gui.activity.*;
+import net.sourceforge.toscanaj.gui.activity.CloseMainPanelActivity;
+import net.sourceforge.toscanaj.gui.activity.SaveConceptualSchemaActivity;
+import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.gui.dialog.CheckDuplicateFileChooser;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
@@ -29,9 +72,6 @@ import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
-
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 
 import org.tockit.canvas.imagewriter.DiagramExportSettings;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
@@ -49,19 +89,6 @@ import org.tockit.swing.preferences.ExtendedPreferences;
 import org.tockit.tupleware.scaling.TupleScaling;
 import org.tockit.tupleware.source.TupleSource;
 import org.tockit.tupleware.source.TupleSourceRegistry;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.print.PageFormat;
-import java.awt.print.PrinterJob;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 public class TuplewareMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     private static final ExtendedPreferences preferences = 
@@ -237,7 +264,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 
     private void createNewDiagram() {
 		IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tuples.getDimensionNames());
-		dialog.show();
+		dialog.setVisible(true);
 		int[] attributeIndices = dialog.getSelectedIndices();
 		Diagram2D diagram = TupleScaling.scaleTuples(this.tuples, this.objectIndices, attributeIndices);
 		this.conceptualSchema.addDiagram(diagram);
@@ -394,7 +421,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
         editSchemaDescriptionMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 schemaDescriptionView.setContent(conceptualSchema.getDescription());
-                schemaDescriptionView.show();
+                schemaDescriptionView.setVisible(true);
                 conceptualSchema.setDescription(schemaDescriptionView.getContent());
             }
         });

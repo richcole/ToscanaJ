@@ -58,7 +58,7 @@ public class TextSource implements TupleSource {
                     throw new IOException("No tuples found in file");
                 }
                 IndexSelectionDialog dialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getDimensionNames());
-				dialog.show();
+				dialog.setVisible(true);
 				this.objectIndices = dialog.getSelectedIndices();
 			} catch (Exception e) {
 				ErrorDialog.showError(parent, e, "Could not read file");
