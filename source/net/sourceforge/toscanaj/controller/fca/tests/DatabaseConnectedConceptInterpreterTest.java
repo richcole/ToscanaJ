@@ -83,25 +83,18 @@ public class DatabaseConnectedConceptInterpreterTest extends TestCase {
 
 		history2.addDiagram(new SimpleLineDiagram());
 
-		/// @todo this test is broken to match the broken implementation. We need to reintroduce the
-		///       events to notify a concept interpreter about changes in the interpretation contexts.
-		///       At the moment a change in the history does not affect the caches as it should -- contexts
-		///       are still found in there although they changed in between.
-        interpreter.getObjectCount(concept1, context1);
+		interpreter.getObjectCount(concept1, context1);
         checkAssertion(dbConnection.queryNumberCallCounter == 7);
         interpreter.getObjectCount(concept1, context2);
         checkAssertion(dbConnection.queryNumberCallCounter == 7);
-		dbConnection.queryNumberCallCounter++;
         interpreter.getObjectCount(concept1, context3);
         checkAssertion(dbConnection.queryNumberCallCounter == 8);
         interpreter.getObjectCount(concept2, context1);
         checkAssertion(dbConnection.queryNumberCallCounter == 8);
-		dbConnection.queryNumberCallCounter++;
         interpreter.getObjectCount(concept2, context3);
         checkAssertion(dbConnection.queryNumberCallCounter == 9);
         interpreter.getObjectCount(concept3, context2);
         checkAssertion(dbConnection.queryNumberCallCounter == 9);
-		dbConnection.queryNumberCallCounter++;
         interpreter.getObjectCount(concept3, context3);
         checkAssertion(dbConnection.queryNumberCallCounter == 10);
         interpreter.getObjectCount(concept4, context1.createNestedContext(concept1));

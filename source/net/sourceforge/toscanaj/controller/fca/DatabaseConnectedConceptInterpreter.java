@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.controller.fca;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
+import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
@@ -17,11 +18,14 @@ import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
+import org.tockit.events.Event;
+import org.tockit.events.EventBrokerListener;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
 
-public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter {
+public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, EventBrokerListener {
     private DatabaseInfo databaseInfo;
 
     private Hashtable contingentSizes = new Hashtable();
@@ -97,6 +101,10 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter {
         if (retVal == null) {
             retVal = new Hashtable();
             contingentSizes.put(context, retVal);
+            /// @todo can we get around this by being smarter about the hashcodes ???
+            context.getEventBroker().subscribe(this,
+                    ConceptInterpretationContextChangedEvent.class,
+                    ConceptInterpretationContext.class);
         }
         return retVal;
     }
@@ -225,6 +233,10 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter {
 
     private void clearCaches(ConceptInterpretationContext context) {
         contingentSizes.remove(context);
+    }
+
+    public void processEvent(Event e) {
+        clearCaches((ConceptInterpretationContext) e.getSubject());
     }
 
     public Object[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
