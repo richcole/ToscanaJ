@@ -295,73 +295,78 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		Dimension minimumSize = new Dimension(50, 50);
 
         diagramOrganiser = new DiagramOrganiser(this.conceptualSchema, broker);
-        this.diagramPreview = new DiagramView();
-        this.diagramPreview.setConceptInterpreter(new DirectConceptInterpreter());
-        this.diagramPreview.setConceptInterpretationContext(
-        							new ConceptInterpretationContext(new DiagramHistory(),new EventBroker()));
-        this.diagramPreview.setObjectLabelFactory(null);
-        this.diagramPreview.setMinimumFontSize(8.0);
-        this.diagramPreview.setMinimumSize(minimumSize);
-        
-        /// @todo clean/restructure/outsource some of this if we keep it
-        broker.subscribe(new EventBrokerListener() {
-			class FilterChangeHandler implements EventBrokerListener {
-				private DiagramReference diagramReference;
-				FilterChangeHandler(DiagramReference diagramReference) {
-					this.diagramReference = diagramReference;
+		if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "showDiagramPreview", 1) == 1) {
+			this.diagramPreview = new DiagramView();
+			this.diagramPreview.setConceptInterpreter(new DirectConceptInterpreter());
+			this.diagramPreview.setConceptInterpretationContext(
+										new ConceptInterpretationContext(new DiagramHistory(),new EventBroker()));
+			this.diagramPreview.setObjectLabelFactory(null);
+			this.diagramPreview.setMinimumFontSize(8.0);
+			this.diagramPreview.setMinimumSize(minimumSize);
+			/// @todo clean/restructure/outsource some of this if we keep it
+			broker.subscribe(new EventBrokerListener() {
+				class FilterChangeHandler implements EventBrokerListener {
+					private DiagramReference diagramReference;
+					FilterChangeHandler(DiagramReference diagramReference) {
+						this.diagramReference = diagramReference;
+					}
+					public void processEvent(Event e) {
+						CanvasItemEvent itemEvent = null;
+						try {
+							itemEvent = (CanvasItemEvent) e;
+						} catch (ClassCastException e1) {
+							throw new RuntimeException(getClass().getName() +
+									" has to be subscribed to CanvasItemEvents only");
+						}
+						NodeView nodeView = null;
+						try {
+							nodeView = (NodeView) itemEvent.getItem();
+						} catch (ClassCastException e1) {
+							throw new RuntimeException(getClass().getName() +
+									" has to be subscribed to events from NodeViews only");
+						}
+						diagramPreview.setSelectedConcepts(nodeView.getDiagramNode().getConceptNestingList());
+						this.diagramReference.setFilterConcept(nodeView.getDiagramNode().getConcept());
+						/// @todo evil hack, creates weird dependencies
+						if(diagramView.getConceptInterpreter() instanceof DatabaseConnectedConceptInterpreter) {
+							DatabaseConnectedConceptInterpreter dbint = 
+										(DatabaseConnectedConceptInterpreter) diagramView.getConceptInterpreter();
+							dbint.clearCache();
+						} 
+						diagramView.showDiagram(diagramView.getDiagram());
+					}
 				}
+				FilterChangeHandler selectionListener;
 				public void processEvent(Event e) {
-					CanvasItemEvent itemEvent = null;
-					try {
-						itemEvent = (CanvasItemEvent) e;
-					} catch (ClassCastException e1) {
-						throw new RuntimeException(getClass().getName() +
-								" has to be subscribed to CanvasItemEvents only");
+					DiagramReference diagramReference = ((DiagramClickedEvent)e).getDiagramReference();
+					diagramPreview.showDiagram(diagramReference.getDiagram());
+					Concept zoomedConcept = diagramReference.getFilterConcept();
+					EventBroker canvasBroker = diagramPreview.getController().getEventBroker();
+					if(selectionListener != null) {
+						canvasBroker.removeSubscriptions(selectionListener);
 					}
-					NodeView nodeView = null;
-					try {
-						nodeView = (NodeView) itemEvent.getItem();
-					} catch (ClassCastException e1) {
-						throw new RuntimeException(getClass().getName() +
-								" has to be subscribed to events from NodeViews only");
+					if(zoomedConcept != null) {
+						diagramPreview.setSelectedConcepts(new Concept[]{zoomedConcept});
+						selectionListener = new FilterChangeHandler(diagramReference);
+						canvasBroker.subscribe(selectionListener,CanvasItemSelectedEvent.class,NodeView.class);
 					}
-					diagramPreview.setSelectedConcepts(nodeView.getDiagramNode().getConceptNestingList());
-					this.diagramReference.setFilterConcept(nodeView.getDiagramNode().getConcept());
-					/// @todo evil hack, creates weird dependencies
-					if(diagramView.getConceptInterpreter() instanceof DatabaseConnectedConceptInterpreter) {
-						DatabaseConnectedConceptInterpreter dbint = 
-									(DatabaseConnectedConceptInterpreter) diagramView.getConceptInterpreter();
-						dbint.clearCache();
-					} 
-					diagramView.showDiagram(diagramView.getDiagram());
 				}
-			}
-			FilterChangeHandler selectionListener;
-			public void processEvent(Event e) {
-				DiagramReference diagramReference = ((DiagramClickedEvent)e).getDiagramReference();
-				diagramPreview.showDiagram(diagramReference.getDiagram());
-				Concept zoomedConcept = diagramReference.getFilterConcept();
-				EventBroker canvasBroker = diagramPreview.getController().getEventBroker();
-				if(selectionListener != null) {
-					canvasBroker.removeSubscriptions(selectionListener);
-				}
-				if(zoomedConcept != null) {
-					diagramPreview.setSelectedConcepts(new Concept[]{zoomedConcept});
-					selectionListener = new FilterChangeHandler(diagramReference);
-					canvasBroker.subscribe(selectionListener,CanvasItemSelectedEvent.class,NodeView.class);
-				}
-			}
-		}, DiagramClickedEvent.class, DiagramReference.class);
-        
-        /// @todo add this pane to the session management
-		leftHandPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, 
-		                                                 this.diagramOrganiser, 
-		                                                 this.diagramPreview);
-		leftHandPane.setOneTouchExpandable(true);
-		leftHandPane.setResizeWeight(0);
+			}, DiagramClickedEvent.class, DiagramReference.class);
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                                   leftHandPane, this.diagramView);
+			/// @todo add this pane to the session management
+			leftHandPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, 
+															 this.diagramOrganiser, 
+															 this.diagramPreview);
+			leftHandPane.setOneTouchExpandable(true);
+			leftHandPane.setResizeWeight(0);
+
+			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+									   leftHandPane, this.diagramView);
+		} else {
+			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+									   this.diagramOrganiser, this.diagramView);
+		}
+        
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
 
@@ -375,7 +380,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		int mainDividerPos = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "mainDivider", 200);
 		splitPane.setDividerLocation(mainDividerPos);
 		int secondaryDividerPos = ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "secondaryDivider", 560);
-		leftHandPane.setDividerLocation(secondaryDividerPos);
+		if(leftHandPane != null) {
+			leftHandPane.setDividerLocation(secondaryDividerPos);
+		}
     }
 
     private void createActions() {
@@ -918,7 +925,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         // store current position
         ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, this);
 		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, "mainDivider", splitPane.getDividerLocation());
-		ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, "secondaryDivider", leftHandPane.getDividerLocation());
+		if(leftHandPane != null) {
+			ConfigurationManager.storeInt(CONFIGURATION_SECTION_NAME, "secondaryDivider", leftHandPane.getDividerLocation());
+		}
         // save the MRU list
         ConfigurationManager.storeStringList(CONFIGURATION_SECTION_NAME, "mruFiles", this.mruList);
         // store the minimum label size
@@ -1012,7 +1021,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             return;
         }
 		diagramView.showDiagram(null);
-		diagramPreview.showDiagram(null);
+		if(diagramPreview != null) {
+			diagramPreview.showDiagram(null);
+		}
         DiagramController controller = DiagramController.getController();
         ConceptInterpreter interpreter = null;
         if (databaseInfo != null) {
