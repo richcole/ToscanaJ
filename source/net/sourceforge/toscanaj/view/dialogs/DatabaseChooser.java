@@ -131,7 +131,7 @@ public class DatabaseChooser extends JDialog
         dsnLeftPane.setLayout( new BoxLayout( dsnLeftPane, BoxLayout.Y_AXIS ) );
         JPanel dsnPane = new JPanel();
         dsnPane.setLayout( new BoxLayout( dsnPane, BoxLayout.X_AXIS ) );
-        JLabel dsnLabel = new JLabel( "Data Source Name (DNS):" );
+        JLabel dsnLabel = new JLabel( "Data Source Name (DSN):" );
         dsnLabel.setLabelFor( _dsnField );
         dsnLeftPane.add( dsnLabel );
         dsnLeftPane.add( _dsnField );
