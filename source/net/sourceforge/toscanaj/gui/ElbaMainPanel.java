@@ -25,7 +25,7 @@ import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.CheckDuplicateFileChooser;
 import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-import net.sourceforge.toscanaj.gui.dialog.ExportStatisticalDataSettingsDialog;
+import net.sourceforge.toscanaj.gui.dialog.ExportStatisticalDataSettingsPanel;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
@@ -1020,14 +1020,8 @@ public class ElbaMainPanel
 	}
 
 	private void exportStatisticalData() {
-		ExportStatisticalDataSettingsDialog expSettingsDialog =
-			new ExportStatisticalDataSettingsDialog(this);
-		expSettingsDialog.show();
-		if (!expSettingsDialog.hasPositiveResult()) {
-			return;
-		}
-
 		final JFileChooser saveDialog;
+		ExportStatisticalDataSettingsPanel expSettingsPanel = new ExportStatisticalDataSettingsPanel();
 		String[] extension = { "xml" };
 		ExtensionFileFilter fileFilter =
 			new ExtensionFileFilter(extension, "XML Files");
@@ -1044,6 +1038,7 @@ public class ElbaMainPanel
 					new File(System.getProperty("user.dir")),
 					filterArray);
 		}
+		saveDialog.setAccessory( (JComponent) expSettingsPanel);
 		saveDialog.setApproveButtonText("Export");
 		int rv = saveDialog.showSaveDialog(this);
 		if (rv != JFileChooser.APPROVE_OPTION) {
@@ -1051,9 +1046,9 @@ public class ElbaMainPanel
 		}
 		exportStatisticalData(
 			saveDialog.getSelectedFile(),
-			expSettingsDialog.getFilterClause(),
-			expSettingsDialog.hasIncludeContingentListsSet(),
-			expSettingsDialog.hasIncludeIntentExtentListsSet());
+			expSettingsPanel.getFilterClause(),
+			expSettingsPanel.hasIncludeContingentListsSet(),
+			expSettingsPanel.hasIncludeIntentExtentListsSet());
 		this.lastExportFile = saveDialog.getSelectedFile();
 	}
 
@@ -1062,8 +1057,9 @@ public class ElbaMainPanel
 		String filterClause,
 		boolean includeContingentLists,
 		boolean includeIntentExtent) {
+		FileOutputStream outputStream = null;
 		try {
-			FileOutputStream outputStream = new FileOutputStream(file);
+			outputStream = new FileOutputStream(file);
 			DataDump.dumpData(
 				this.conceptualSchema,
 				outputStream,
@@ -1073,6 +1069,12 @@ public class ElbaMainPanel
 			outputStream.close();
 		} catch (Exception e) {
 			ErrorDialog.showError(this, e, "Could not export file");
+			try {
+				outputStream.close();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+			file.delete();
 			return;
 		}
 	}
@@ -1105,20 +1107,19 @@ public class ElbaMainPanel
 	}
 
 	private void exportSQLScript(File file) {
+		FileOutputStream outputStream = null;
 		try {
-			FileOutputStream outputStream = new FileOutputStream(file);
+			outputStream = new FileOutputStream(file);
 		    DumpSqlScript.dumpSqlScript(this.databaseConnection, outputStream);
 			outputStream.close();
-		} catch (NullPointerException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(
-				this,
-				"An internal error occured",
-				"Internal error",
-				JOptionPane.ERROR);
-			return;
 		} catch (Exception e) {
 			ErrorDialog.showError(this, e, "Could not export file");
+			try {
+				outputStream.close();
+			} catch (Exception e2) {
+				e2.printStackTrace();
+			}
+			file.delete();
 			return;
 		}
 	}
