@@ -5,7 +5,9 @@ import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.geom.Point2D;
 
 /**
@@ -40,9 +42,19 @@ public class NodeView extends CanvasItem {
      * Draws the node as circle.
      */
     public void draw(ToscanajGraphics2D g) {
-        ///@TODO Probably should throw a NodeNotFoundException
         if(diagramNode != null) {
-            g.drawEllipse2D(diagramNode.getPosition(), diagramNode.getRadius());
+            Paint oldPaint = g.getGraphics2D().getPaint();
+            float rel = (float) this.diagramNode.getConcept().getExtentSizeRelative();
+            Color c1 = new Color(0,0,150);
+            Color c2 = new Color(255,255,150);
+            Color circleColor = new Color(0,0,0);
+            Color nodeColor = new Color( (int)(c1.getRed()*rel + c2.getRed()*(1-rel)),
+                                         (int)(c1.getGreen()*rel + c2.getGreen()*(1-rel)),
+                                         (int)(c1.getBlue()*rel + c2.getBlue()*(1-rel)),
+                                         (int)(c1.getAlpha()*rel + c2.getAlpha()*(1-rel)) );
+            g.drawCircle( diagramNode.getPosition(), diagramNode.getRadius(),
+                          nodeColor, circleColor );
+            g.getGraphics2D().setPaint(oldPaint);
             graphics = g;
         }
     }

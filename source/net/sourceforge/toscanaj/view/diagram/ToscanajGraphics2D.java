@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.Stroke;
 
+import java.awt.Paint;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -178,77 +179,60 @@ public class ToscanajGraphics2D {
     }
 
     /**
-     * draws a DiagramLine between to DiagramNode
+     * Draws a line with the current paint.
      */
     public void drawLine(Point2D from, Point2D to) {
         graphics.draw( new Line2D.Double(project(from), project(to) ));
     }
 
+    /**
+     * Draws a line with the current paint.
+     */
     public void drawLine(double x1, double y1, double x2, double y2) {
         graphics.drawLine( (int)projectX(x1), (int)projectY(y1), (int)projectX(x2), (int)projectY(y2) );
     }
 
     /**
-     * draws a DiagramNode
+     * Draws a circle around the given point with different fill and border paints.
      */
-    public void drawEllipse2D(Point2D point, double radius) {
-        graphics.fill( new Ellipse2D.Double( projectX(point.getX()) - radius, projectY(point.getY()) - radius,
-                                            radius * 2, radius * 2 ) );
+    public void drawCircle(Point2D center, double radius, Paint fill, Paint border) {
+        Paint oldPaint = graphics.getPaint();
+        Ellipse2D circle = new Ellipse2D.Double( projectX(center.getX()) - radius,
+                                                 projectY(center.getY()) - radius,
+                                                 radius * 2, radius * 2 );
+        graphics.setPaint(fill);
+        graphics.fill(circle);
+        graphics.setPaint(border);
+        graphics.draw(circle);
+        graphics.setPaint(oldPaint);
     }
 
-    public void drawFilledRectangle(double x, double y, double width, double height, Color fill, Color border) {
+    /**
+     * Draws a rectangle with different fill and border Paints.
+     */
+    public void drawFilledRectangle(double x, double y, double width, double height, Paint fill, Paint border) {
+        Paint oldPaint = graphics.getPaint();
         Rectangle2D rect = new Rectangle2D.Double( projectX(x), projectY(y), width, height );
         graphics.setPaint( fill );
         graphics.fill( rect );
         graphics.setPaint( border );
         graphics.draw( rect );
+        graphics.setPaint(oldPaint);
     }
 
-    public void drawString(String text, double x, double y, int xFontSpacing, int yFontSpacing) {
-        graphics.drawString( text, (int)projectX(x) + xFontSpacing, (int)projectY(y) + yFontSpacing);
+    /**
+     * Draws a string with the current paint.
+     *
+     * The margin is used to get an offset in target coordinates, while the position
+     * itself is assumed to be in model coordinates.
+     *
+     * @see Graphics2D.drawString(String, int, int)
+     */
+    public void drawString(String text, double x, double y, int leftMargin, int topMargin) {
+        graphics.drawString( text, (int)projectX(x) + leftMargin, (int)projectY(y) + topMargin);
     }
 
     public void setStroke(Stroke stroke) {
         graphics.setStroke(stroke);
     }
-
-  /*public abstract  void addRenderingHints(Map hints);
-  public abstract  void clip(Shape s);
-
-  public void draw3DRect(int x, int y, int width, int height, boolean raised){}
-  public abstract  void drawGlyphVector(GlyphVector g, float x, float y);
-  public abstract  void drawImage(BufferedImage img, BufferedImageOp op, int x, int y);
-  public abstract  boolean drawImage(Image img, AffineTransform xform, ImageObserver obs);
-  public abstract  void drawRenderableImage(RenderableImage img, AffineTransform xform);
-  public abstract  void drawRenderedImage(RenderedImage img, AffineTransform xform);
-  public abstract  void drawString(AttributedCharacterIterator iterator, float x, float y);
-  public abstract  void drawString(AttributedCharacterIterator iterator, int x, int y);
-  public abstract  void drawString(String s, float x, float y);
-  public abstract  void drawString(String str, int x, int y);
-  public abstract  void fill(Shape s);
-  public void fill3DRect(int x, int y, int width, int height, boolean raised){}
-  public abstract  Color getBackground();
-  public abstract  Composite getComposite();
-  public abstract  GraphicsConfiguration getDeviceConfiguration();
-  public abstract  FontRenderContext getFontRenderContext();
-  public abstract  Paint getPaint();
-  public abstract  Object getRenderingHint(RenderingHints.Key hintKey);
-  public abstract  RenderingHints getRenderingHints();
-  public abstract  Stroke getStroke();
-  public abstract  AffineTransform getTransform();
-  public abstract  boolean hit(Rectangle rect, Shape s, boolean onStroke);
-  public abstract  void rotate(double theta);
-  public abstract  void rotate(double theta, double x, double y);
-  public abstract  void scale(double sx, double sy);
-  public abstract  void setBackground(Color color);
-  public abstract  void setComposite(Composite comp);
-  public abstract  void setPaint(Paint paint);
-  public abstract  void setRenderingHint(RenderingHints.Key hintKey, Object hintValue);
-  public abstract  void setRenderingHints(Map hints);
-  public abstract  void setStroke(Stroke s);
-  public abstract  void setTransform(AffineTransform Tx);
-  public abstract  void shear(double shx, double shy);
-  public abstract  void transform(AffineTransform Tx);
-  public abstract  void translate(double tx, double ty);
-  public abstract  void translate(int x, int y);*/
 }
