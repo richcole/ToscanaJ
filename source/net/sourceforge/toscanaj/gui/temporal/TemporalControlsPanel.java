@@ -418,11 +418,6 @@ public class TemporalControlsPanel extends JPanel implements EventBrokerListener
     protected void exportImages() {
     	disableStepControls();
     	
-        if (this.lastImageExportFile == null) {
-            this.lastImageExportFile =
-                new File(System.getProperty("user.dir"));
-        }
-
         final JFileChooser saveDialog = new JFileChooser(this.lastImageExportFile);
         boolean formatDefined;
         do {
