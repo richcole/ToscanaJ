@@ -30,9 +30,7 @@ import net.sourceforge.toscanaj.parser.CSCParser;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
-import net.sourceforge.toscanaj.view.database.DatabaseSchemaView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
-import net.sourceforge.toscanaj.view.scales.ScaleEditingView;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingViewDialog;
 
 import org.tockit.events.Event;
@@ -80,10 +78,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     /**
      * Views
      */
-    private PanelStackView mainView;
-    private DatabaseSchemaView databaseSchemaView;
     private ScaleEditingViewDialog scaleEditingViewDialog;
-    private ScaleEditingView scaleView;
     private DiagramEditingView diagramView;
     private DatabaseConnectionInformationView connectionInformationView;
     private XMLEditorDialog schemaDescriptionView;
