@@ -59,6 +59,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 	private JButton createButton;
 	private JPanel buttonsPane, titlePane;
 	private JScrollPane scrollpane;
+    private JButton checkConsistencyButton;
 
     public ContextTableScaleEditorDialog(Frame owner, ConceptualSchema conceptualSchema, DatabaseConnection databaseConnection,
     									  EventBroker eventBroker) {
@@ -385,12 +386,13 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
 		buttonsPane = new JPanel(new GridBagLayout());
 		JButton addObjButton = new JButton(" Add Objects ");
 		JButton addAttrButton = new JButton(" Add Attributes ");
-		JButton checkConsistencyButton = new JButton(" Check Consistency... ");
+        checkConsistencyButton = new JButton(" Check Consistency... ");
 		checkConsistencyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				checkConsistency();
 			}
 		});
+		checkConsistencyButton.setEnabled(false);
 		this.createButton = new JButton(" Create ");
 		createButton.setEnabled((scaleTitleField.getText()!=null && 
 						!scaleTitleField.getText().equals("")));
@@ -807,11 +809,17 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
     	if(e instanceof ConceptualSchemaChangeEvent) {
 	    	ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
 	    	this.conceptualSchema = csce.getConceptualSchema();
+	    	if(this.databaseConnection == null) {
+	    	    this.checkConsistencyButton.setEnabled(false);
+	    	} else {
+    	    	this.checkConsistencyButton.setEnabled(this.databaseConnection.isConnected());
+	    	}
 	    	return;
     	}
     	if(e instanceof DatabaseConnectedEvent) {
     		DatabaseConnectedEvent dbce = (DatabaseConnectedEvent) e;
     		this.databaseConnection = dbce.getConnection();
+    		this.checkConsistencyButton.setEnabled(this.databaseConnection.isConnected());
     		return;
     	}
     	throw new RuntimeException("Caught event we don't know about");
