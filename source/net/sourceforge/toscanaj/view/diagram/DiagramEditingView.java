@@ -483,8 +483,13 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                         attrIt.hasNext();) {
                     FCAElement attribute = (FCAElement) attrIt.next();
                     Point2D vector = (Point2D) attributeVectors.get(attribute.getData());
-                    projX += vector.getX();
-                    projY += vector.getY();
+                    if (vector != null) { // vector can be null if attribute was attached to top before 
+                        projX += vector.getX();
+                        projY += vector.getY();
+                    } else { // add some default vector
+                        projX += 0;
+                        projY += 50;
+                    }
                 }
                 base.set(dim, new Point2D.Double(projX,projY));
             }
