@@ -107,8 +107,8 @@ public class DiagramNode implements XMLizable {
         Element retVal = new Element(NODE_ELEMENT_NAME);
         retVal.setAttribute(ID_ATTRIBUTE_NAME, identifier);
         Element positionElem = new Element(POSITION_ELEMENT_NAME);
-        positionElem.setAttribute(POSITION_X_ATTRIBUTE_NAME, String.valueOf(position.getX()));
-        positionElem.setAttribute(POSITION_Y_ATTRIBUTE_NAME, String.valueOf(position.getY()));
+        positionElem.setAttribute(POSITION_X_ATTRIBUTE_NAME, String.valueOf(getPosition().getX()));
+        positionElem.setAttribute(POSITION_Y_ATTRIBUTE_NAME, String.valueOf(getPosition().getY()));
         retVal.addContent(positionElem);
         if (attributeLabel != null) {
             Element attrLabelInfoElem = attributeLabel.toXML();
