@@ -117,36 +117,6 @@ public class ErrorDialog extends JDialog implements ClipboardOwner{
     }
     
     private void showDetailedErrorMessage(Component component, Throwable e, String title) {
-//        final Component comp = component;
-//        final String dialogTitle = title;
-//        final Throwable original = e.getCause();
-//        if (original == null) {
-//            showLastErrorMessage(component, e, title);
-//            return;
-//        }
-//        JButton okButton = new JButton("OK");
-//		okButton.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				closeDialog();
-//			}
-//		});
-//		JButton detailsButton = new JButton("Details");
-//		detailsButton.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent e) {
-//				ErrorDialog.showError(comp, original, dialogTitle, original.getMessage());
-//			}
-//		});
-//		JDialog dialog = new JDialog(JOptionPane.getFrameForComponent(comp), dialogTitle, true);        
-//        JPanel buttonsPanel = new JPanel(new FlowLayout());
-//        buttonsPanel.add(okButton);
-//		buttonsPanel.add(detailsButton);
-//        dialog.getContentPane().add(new JLabel(e.getMessage()),BorderLayout.CENTER);
-//        dialog.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
-//        dialog.setBounds(getParent().getBounds());
-//        dialog.show();
-
-            
-        
         //original one
 		Throwable original = e.getCause();
 		if (original == null) {
