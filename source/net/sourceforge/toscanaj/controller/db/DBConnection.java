@@ -36,31 +36,31 @@ public class DBConnection
      */
     public DBConnection( String source, String account,	String password)
     {
-	try
+    try
         {
-	    Class.forName(JDBC_ODBC_BRIDGE);
-	}
-	catch (ClassNotFoundException cnfe)
+        Class.forName(JDBC_ODBC_BRIDGE);
+    }
+    catch (ClassNotFoundException cnfe)
         {
-	    System.out.println("Could not locate JDBC Driver class: " +
-			       cnfe.getMessage());
+        System.out.println("Could not locate JDBC Driver class: " +
+                   cnfe.getMessage());
 
-	}
+    }
 
-	dbURL = "jdbc:odbc:" + source;
+    dbURL = "jdbc:odbc:" + source;
 
-	// connect to the DB
-	try
+    // connect to the DB
+    try
         {
-	    con = DriverManager.getConnection(dbURL,
-					      account,
-					      password);
-	}
-	catch (SQLException se)
+        con = DriverManager.getConnection(dbURL,
+                          account,
+                          password);
+    }
+    catch (SQLException se)
         {
-	    System.out.println("An error occured connecting to the DB: " +
-			       se.getMessage());
-	}
+        System.out.println("An error occured connecting to the DB: " +
+                   se.getMessage());
+    }
     }
 
     /**
@@ -68,21 +68,21 @@ public class DBConnection
      */
     public ResultSet query(String statement)
     {
-	ResultSet result = null;
+    ResultSet result = null;
 
-	// submit a query
-	try
+    // submit a query
+    try
         {
-	    Statement stmt = con.createStatement();
-	    result = stmt.executeQuery(statement);
-	}
-	catch( SQLException se )
+        Statement stmt = con.createStatement();
+        result = stmt.executeQuery(statement);
+    }
+    catch( SQLException se )
         {
-	    System.out.println("An error occured while querying the DB: " +
-			       se.getMessage());
-	}
+        System.out.println("An error occured while querying the DB: " +
+                   se.getMessage());
+    }
 
-	return result;
+    return result;
     }
 
     /**
@@ -93,7 +93,7 @@ public class DBConnection
      * seems the concept is not available in JDBC.
      *
      * One way to solve this would be implementing a native method for usage
-     * with JNI -- but this is not a good way since we lose paltform
+     * with JNI -- but this is not a good way since we loose platform
      * independence in doing this.
      */
     public Vector getDatabaseNames()
@@ -119,23 +119,23 @@ public class DBConnection
                 result.add( rs.getString( 3 ) );
             }
         }
-	catch( SQLException ex )
+    catch( SQLException ex )
         {
-	    System.err.println("\n--- SQLException caught ---\n");
-	    while (ex != null)
+        System.err.println("\n--- SQLException caught ---\n");
+        while (ex != null)
             {
-		System.err.println("Message:   "
-				   + ex.getMessage ());
-		System.err.println("SQLState:  "
-				   + ex.getSQLState ());
-		System.err.println("ErrorCode: "
-				   + ex.getErrorCode ());
-		ex = ex.getNextException();
-		System.err.println();
-	    }
-	}
+        System.err.println("Message:   "
+                   + ex.getMessage ());
+        System.err.println("SQLState:  "
+                   + ex.getSQLState ());
+        System.err.println("ErrorCode: "
+                   + ex.getErrorCode ());
+        ex = ex.getNextException();
+        System.err.println();
+        }
+    }
 
-	return result;
+    return result;
     }
 
     /**
@@ -156,23 +156,23 @@ public class DBConnection
                 result.add( rs.getString( 3 ) );
             }
         }
-	catch( SQLException ex )
+    catch( SQLException ex )
         {
-	    System.err.println("\n--- SQLException caught ---\n");
-	    while (ex != null)
+        System.err.println("\n--- SQLException caught ---\n");
+        while (ex != null)
             {
-		System.err.println("Message:   "
-				   + ex.getMessage ());
-		System.err.println("SQLState:  "
-				   + ex.getSQLState ());
-		System.err.println("ErrorCode: "
-				   + ex.getErrorCode ());
-		ex = ex.getNextException();
-		System.err.println();
-	    }
-	}
+        System.err.println("Message:   "
+                   + ex.getMessage ());
+        System.err.println("SQLState:  "
+                   + ex.getSQLState ());
+        System.err.println("ErrorCode: "
+                   + ex.getErrorCode ());
+        ex = ex.getNextException();
+        System.err.println();
+        }
+    }
 
-	return result;
+    return result;
     }
 
     /**
@@ -194,23 +194,23 @@ public class DBConnection
                 result.add( rs.getString( 4 ) );
             }
         }
-	catch( SQLException ex )
+    catch( SQLException ex )
         {
-	    System.err.println("\n--- SQLException caught ---\n");
-	    while (ex != null)
+        System.err.println("\n--- SQLException caught ---\n");
+        while (ex != null)
             {
-		System.err.println("Message:   "
-				   + ex.getMessage ());
-		System.err.println("SQLState:  "
-				   + ex.getSQLState ());
-		System.err.println("ErrorCode: "
-				   + ex.getErrorCode ());
-		ex = ex.getNextException();
-		System.err.println();
-	    }
-	}
+        System.err.println("Message:   "
+                   + ex.getMessage ());
+        System.err.println("SQLState:  "
+                   + ex.getSQLState ());
+        System.err.println("ErrorCode: "
+                   + ex.getErrorCode ());
+        ex = ex.getNextException();
+        System.err.println();
+        }
+    }
 
-	return result;
+    return result;
     }
 
     /**
@@ -226,35 +226,35 @@ public class DBConnection
     {
         Vector result = new Vector();
 
-	try
+    try
         {
-	    Statement stmt = con.createStatement();
-	    ResultSet resultSet = stmt.executeQuery( "SELECT [" + column +
-						     "] FROM [" + table + "]");
+        Statement stmt = con.createStatement();
+        ResultSet resultSet = stmt.executeQuery( "SELECT [" + column +
+                             "] FROM [" + table + "]");
 
-	    while ( resultSet.next() )
+        while ( resultSet.next() )
             {
-		String value = resultSet.getString( 1 );
+        String value = resultSet.getString( 1 );
                 result.add( value );
-	    }
-	}
-	catch( SQLException ex )
+        }
+    }
+    catch( SQLException ex )
         {
-	    System.err.println("\n--- SQLException caught ---\n");
-	    while (ex != null)
+        System.err.println("\n--- SQLException caught ---\n");
+        while (ex != null)
             {
-		System.err.println("Message:   "
-				   + ex.getMessage ());
-		System.err.println("SQLState:  "
-				   + ex.getSQLState ());
-		System.err.println("ErrorCode: "
-				   + ex.getErrorCode ());
-		ex = ex.getNextException();
-		System.err.println();
-	    }
-	}
+        System.err.println("Message:   "
+                   + ex.getMessage ());
+        System.err.println("SQLState:  "
+                   + ex.getSQLState ());
+        System.err.println("ErrorCode: "
+                   + ex.getErrorCode ());
+        ex = ex.getNextException();
+        System.err.println();
+        }
+    }
 
-	return result;
+    return result;
     }
 
     /**
@@ -274,7 +274,7 @@ public class DBConnection
             System.exit( 1 );
         }
 
-	DBConnection test = new DBConnection( args[0] );
+    DBConnection test = new DBConnection( args[0] );
 
         // print the tables
         System.out.println("The tables:\n-----------");
@@ -282,7 +282,7 @@ public class DBConnection
         // get the list of tables
         Vector tables = test.getTableNames();
 
-	// print out each table
+    // print out each table
         for( int i = 0; i < tables.size(); i++ )
         {
             System.out.println( "========== " + tables.get(i) + " ==========" );
@@ -303,7 +303,7 @@ public class DBConnection
         // get the list of tables
         Vector views = test.getViewNames();
 
-	// print out each table
+    // print out each table
         for( int i = 0; i < views.size(); i++ )
         {
             System.out.println( "========== " + views.get(i) + " ==========" );
