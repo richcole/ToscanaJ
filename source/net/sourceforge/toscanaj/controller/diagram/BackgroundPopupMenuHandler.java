@@ -31,8 +31,10 @@ import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 
 import org.jdom.Element;
 import org.tockit.canvas.CanvasBackground;
+import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 
@@ -52,9 +54,10 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
 	private JMenuItem nestedDiagramItem;
 	
 	
-	public BackgroundPopupMenuHandler(DiagramView diagramView, ToscanaJMainPanel mainPanel){
+	public BackgroundPopupMenuHandler(DiagramView diagramView, EventBroker eventBroker, ToscanaJMainPanel mainPanel){
 		this.diagramView = diagramView;
 		this.mainPanel = mainPanel;
+		eventBroker.subscribe(this, CanvasItemContextMenuRequestEvent.class, CanvasBackground.class);
 	}
 	
 	public void processEvent(Event e) {

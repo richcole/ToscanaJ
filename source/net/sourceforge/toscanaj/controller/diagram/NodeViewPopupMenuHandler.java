@@ -12,8 +12,11 @@ import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
+
+import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
@@ -33,8 +36,9 @@ import java.util.Set;
 public class NodeViewPopupMenuHandler implements EventBrokerListener, ClipboardOwner {
     private DiagramView diagramView;
 
-    public NodeViewPopupMenuHandler(DiagramView diagramView) {
+    public NodeViewPopupMenuHandler(DiagramView diagramView, EventBroker eventBroker) {
         this.diagramView = diagramView;
+        eventBroker.subscribe(this, CanvasItemContextMenuRequestEvent.class, NodeView.class);
     }
 
     public void processEvent(Event e) {

@@ -10,14 +10,17 @@ package net.sourceforge.toscanaj.controller.diagram;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.events.CanvasItemEvent;
+import org.tockit.canvas.events.CanvasItemSelectedEvent;
 import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 public class HighlightingOperationEventListener implements EventBrokerListener {
     private DiagramView diagramView;
 
-    public HighlightingOperationEventListener(DiagramView diagramView) {
+    public HighlightingOperationEventListener(DiagramView diagramView, EventBroker eventBroker) {
         this.diagramView = diagramView;
+        eventBroker.subscribe(this, CanvasItemSelectedEvent.class, NodeView.class);
     }
 
     public void processEvent(Event e) {

@@ -8,14 +8,19 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
+
+import org.tockit.canvas.CanvasBackground;
+import org.tockit.canvas.events.CanvasItemSelectedEvent;
 import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 public class HighlightRemovalOperationEventListener implements EventBrokerListener {
     private DiagramView diagramView;
 
-    public HighlightRemovalOperationEventListener(DiagramView diagramView) {
+    public HighlightRemovalOperationEventListener(DiagramView diagramView, EventBroker eventBroker) {
         this.diagramView = diagramView;
+        eventBroker.subscribe(this, CanvasItemSelectedEvent.class, CanvasBackground.class);
     }
 
     public void processEvent(Event e) {

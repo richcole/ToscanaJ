@@ -10,11 +10,20 @@ package net.sourceforge.toscanaj.controller.diagram;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
+
+import org.tockit.canvas.events.CanvasItemActivatedEvent;
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 public class ObjectLabelViewOpenDisplayHandler implements EventBrokerListener {
+
+	public ObjectLabelViewOpenDisplayHandler(EventBroker eventBroker) {
+		eventBroker.subscribe(this, CanvasItemActivatedEvent.class,	ObjectLabelView.class);
+	}
+	
+	
     public void processEvent(Event e) {
         CanvasItemEventWithPosition itemEvent = null;
         try {

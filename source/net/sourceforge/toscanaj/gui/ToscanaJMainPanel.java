@@ -28,8 +28,6 @@ import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.*;
 import org.jdom.Element;
-import org.tockit.canvas.CanvasBackground;
-import org.tockit.canvas.events.CanvasItemActivatedEvent;
 import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
 import org.tockit.canvas.events.CanvasItemEvent;
 import org.tockit.canvas.events.CanvasItemSelectedEvent;
@@ -272,46 +270,22 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         DiagramController controller = DiagramController.getController();
         /// @todo move the subscriptions into the handlers
         EventBroker diagramEventBroker = diagramView.getController().getEventBroker();
-        diagramEventBroker.subscribe(
-                new FilterOperationEventListener(controller),
-                CanvasItemActivatedEvent.class,
-                NodeView.class
-        );
-        diagramEventBroker.subscribe(
-                new HighlightingOperationEventListener(diagramView),
-                CanvasItemSelectedEvent.class,
-                NodeView.class
-        );
-        diagramEventBroker.subscribe(
-                new HighlightRemovalOperationEventListener(diagramView),
-                CanvasItemSelectedEvent.class,
-                CanvasBackground.class
-        );
+        new FilterOperationEventListener(controller, diagramEventBroker);
+        new HighlightingOperationEventListener(diagramView, diagramEventBroker);
+        new HighlightRemovalOperationEventListener(diagramView, diagramEventBroker);
         diagramEventBroker.subscribe(
                 new ObjectLabelViewPopupMenuHandler(diagramView, this.broker),
                 CanvasItemContextMenuRequestEvent.class,
                 ObjectLabelView.class
         );
-        diagramEventBroker.subscribe(
-                new ObjectLabelViewOpenDisplayHandler(),
-                CanvasItemActivatedEvent.class,
-                ObjectLabelView.class
-        );
+        new ObjectLabelViewOpenDisplayHandler(diagramEventBroker);
         diagramEventBroker.subscribe(
                 new AttributeLabelViewPopupMenuHandler(diagramView, this.broker),
                 CanvasItemContextMenuRequestEvent.class,
                 AttributeLabelView.class
         );
-		diagramEventBroker.subscribe(
-				new NodeViewPopupMenuHandler(diagramView),
-				CanvasItemContextMenuRequestEvent.class,
-				NodeView.class
-		);
-		diagramEventBroker.subscribe(
-				new BackgroundPopupMenuHandler(diagramView,this),
-				CanvasItemContextMenuRequestEvent.class,
-				CanvasBackground.class
-		);
+		new NodeViewPopupMenuHandler(diagramView, diagramEventBroker);
+		new BackgroundPopupMenuHandler(diagramView, diagramEventBroker, this);
 		
 		new LabelClickEventHandler(diagramEventBroker);
         new LabelDragEventHandler(diagramEventBroker);

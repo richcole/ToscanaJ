@@ -15,15 +15,18 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 
 import org.tockit.canvas.Canvas;
+import org.tockit.canvas.events.CanvasItemActivatedEvent;
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 public class FilterOperationEventListener implements EventBrokerListener {
     private DiagramController controller;
 
-    public FilterOperationEventListener(DiagramController controller) {
+    public FilterOperationEventListener(DiagramController controller, EventBroker eventBroker) {
         this.controller = controller;
+        eventBroker.subscribe(this, CanvasItemActivatedEvent.class,	NodeView.class);
     }
 
     public void processEvent(Event e) {
