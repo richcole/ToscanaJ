@@ -281,29 +281,31 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
         viewMenu.add(setMinLabelSizeSubMenu);
 
-        final JCheckBoxMenuItem hideAttributeLabels = new JCheckBoxMenuItem("Hide Attribute Labels");
-        hideAttributeLabels.setMnemonic(KeyEvent.VK_A);
-        hideAttributeLabels.addActionListener(new ActionListener() {
+        final JCheckBoxMenuItem showAttributeLabels = new JCheckBoxMenuItem("Show Attribute Labels");
+        showAttributeLabels.setMnemonic(KeyEvent.VK_A);
+        showAttributeLabels.setSelected(true);
+        showAttributeLabels.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 boolean newState = !AttributeLabelView.allAreHidden();
-                hideAttributeLabels.setSelected(newState);
+                showAttributeLabels.setSelected(!newState);
                 AttributeLabelView.setAllHidden(newState);
                 diagramView.repaint();
             }
         });
-        viewMenu.add(hideAttributeLabels);
+        viewMenu.add(showAttributeLabels);
 
-        final JCheckBoxMenuItem hideObjectLabels = new JCheckBoxMenuItem("Hide Object Labels");
-        hideObjectLabels.setMnemonic(KeyEvent.VK_O);
-        hideObjectLabels.addActionListener(new ActionListener() {
+        final JCheckBoxMenuItem showObjectLabels = new JCheckBoxMenuItem("Show Object Labels");
+        showObjectLabels.setMnemonic(KeyEvent.VK_O);
+        showObjectLabels.setSelected(true);
+        showObjectLabels.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 boolean newState = !ObjectLabelView.allAreHidden();
-                hideObjectLabels.setSelected(newState);
+                showObjectLabels.setSelected(!newState);
                 ObjectLabelView.setAllHidden(newState);
                 diagramView.repaint();
             }
         });
-        viewMenu.add(hideObjectLabels);
+        viewMenu.add(showObjectLabels);
 
         menuBar.add(viewMenu);
 

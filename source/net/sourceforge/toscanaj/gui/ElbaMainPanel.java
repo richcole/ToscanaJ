@@ -609,29 +609,31 @@ public class ElbaMainPanel
 		}
 		viewMenu.add(setMinLabelSizeSubMenu);
 		
-	    final JCheckBoxMenuItem hideAttributeLabels = new JCheckBoxMenuItem("Hide Attribute Labels");
-	    hideAttributeLabels.setMnemonic(KeyEvent.VK_A);
-	    hideAttributeLabels.addActionListener(new ActionListener() {
-	        public void actionPerformed(ActionEvent e) {
-	            boolean newState = !AttributeLabelView.allAreHidden();
-	            hideAttributeLabels.setSelected(newState);
-	            AttributeLabelView.setAllHidden(newState);
-	            diagramView.repaint();
-	        }
-	    });
-	    viewMenu.add(hideAttributeLabels);
+		final JCheckBoxMenuItem showAttributeLabels = new JCheckBoxMenuItem("Show Attribute Labels");
+		showAttributeLabels.setMnemonic(KeyEvent.VK_A);
+		showAttributeLabels.setSelected(true);
+		showAttributeLabels.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean newState = !AttributeLabelView.allAreHidden();
+				showAttributeLabels.setSelected(!newState);
+				AttributeLabelView.setAllHidden(newState);
+				diagramView.repaint();
+			}
+		});
+		viewMenu.add(showAttributeLabels);
 
-	    final JCheckBoxMenuItem hideObjectLabels = new JCheckBoxMenuItem("Hide Object Labels");
-	    hideObjectLabels.setMnemonic(KeyEvent.VK_O);
-	    hideObjectLabels.addActionListener(new ActionListener() {
-	        public void actionPerformed(ActionEvent e) {
-	            boolean newState = !SqlClauseLabelView.allAreHidden();
-	            hideObjectLabels.setSelected(newState);
-	            SqlClauseLabelView.setAllHidden(newState);
-	            diagramView.repaint();
-	        }
-	    });
-	    viewMenu.add(hideObjectLabels);
+		final JCheckBoxMenuItem showObjectLabels = new JCheckBoxMenuItem("Show Object Labels");
+		showObjectLabels.setMnemonic(KeyEvent.VK_O);
+		showObjectLabels.setSelected(true);
+		showObjectLabels.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean newState = !SqlClauseLabelView.allAreHidden();
+				showObjectLabels.setSelected(!newState);
+				SqlClauseLabelView.setAllHidden(newState);
+				diagramView.repaint();
+			}
+		});
+		viewMenu.add(showObjectLabels);
 
 		menuBar.add(viewMenu);
 

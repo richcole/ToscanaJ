@@ -521,6 +521,34 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		}); 
         documentsDisplayGroup.add(this.showAllMenuItem);
         viewMenu.add(this.showAllMenuItem);
+	
+		viewMenu.addSeparator();
+
+		final JCheckBoxMenuItem showAttributeLabels = new JCheckBoxMenuItem("Show Attribute Labels");
+		showAttributeLabels.setMnemonic(KeyEvent.VK_A);
+		showAttributeLabels.setSelected(true);
+		showAttributeLabels.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean newState = !AttributeLabelView.allAreHidden();
+				showAttributeLabels.setSelected(!newState);
+				AttributeLabelView.setAllHidden(newState);
+				diagramView.repaint();
+			}
+		});
+		viewMenu.add(showAttributeLabels);
+
+		final JCheckBoxMenuItem showObjectLabels = new JCheckBoxMenuItem("Show Object Labels");
+		showObjectLabels.setMnemonic(KeyEvent.VK_O);
+		showObjectLabels.setSelected(true);
+		showObjectLabels.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				boolean newState = !ObjectLabelView.allAreHidden();
+				showObjectLabels.setSelected(!newState);
+				ObjectLabelView.setAllHidden(newState);
+				diagramView.repaint();
+			}
+		});
+		viewMenu.add(showObjectLabels);
 
         if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerGradientOptions", 0) == 1) {
             viewMenu.addSeparator();
