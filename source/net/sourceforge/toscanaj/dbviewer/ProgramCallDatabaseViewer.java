@@ -34,7 +34,6 @@ import java.util.*;
  * Only the first object in the view will be used for a program call, the others
  * will be ignored.
  *
- * @todo Start external program in new thread, we don't need the output anyway.
  * @todo Handle multiple results somehow.
  */
 public class ProgramCallDatabaseViewer implements DatabaseViewer {
