@@ -7,16 +7,18 @@
  */
 package net.sourceforge.toscanaj.model.ndimdiagram;
 
+import net.sourceforge.toscanaj.model.lattice.Attribute;
+
 import java.util.Vector;
 
 public class Dimension {
-    private Vector path;
+    private Vector attributes;
 
-    public Dimension(Vector path) {
-        this.path = path;
+    public Dimension(Vector attributes) {
+        this.attributes = attributes;
     }
 
-    public Vector getPath() {
-        return path;
+    public boolean contains(Attribute attribute) {
+        return attributes.contains(attribute);
     }
 }

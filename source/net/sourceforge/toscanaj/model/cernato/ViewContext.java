@@ -9,24 +9,31 @@ package net.sourceforge.toscanaj.model.cernato;
 
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.BinaryRelation;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public class ViewContext implements Context {
     private CernatoModel model;
-    private View view;
     private ScalingRelation relation;
+    private Collection attributes;
 
     private class ScalingRelation implements BinaryRelation {
         public boolean contains(Object domainObject, Object rangeObject) {
             if(!(domainObject instanceof FCAObject)) {
                 return false;
             }
-            if(!(rangeObject instanceof Criterion)) {
+            FCAObject fcaObject = (FCAObject) domainObject;
+            if(!(rangeObject instanceof Attribute)) {
                 return false;
             }
-            FCAObject fcaObject = (FCAObject) domainObject;
-            Criterion criterion = (Criterion) rangeObject;
+            Attribute attribute = (Attribute) rangeObject;
+            if(!(attribute.getData() instanceof Criterion)) {
+                return false;
+            }
+            Criterion criterion = (Criterion) attribute.getData();
             Value relationValue = model.getContext().getRelationship(fcaObject, criterion.getProperty());
             return criterion.getValueGroup().containsValue(relationValue);
         }
@@ -34,8 +41,12 @@ public class ViewContext implements Context {
 
     public ViewContext(CernatoModel model, View view) {
         this.model = model;
-        this.view = view;
         this.relation = new ScalingRelation();
+        attributes = new HashSet();
+        for (Iterator iterator = view.getCriteria().iterator(); iterator.hasNext();) {
+            Criterion criterion = (Criterion) iterator.next();
+            attributes.add(new Attribute(criterion, null));
+        }
     }
 
     public Collection getObjects() {
@@ -43,7 +54,7 @@ public class ViewContext implements Context {
     }
 
     public Collection getAttributes() {
-        return view.getCriteria();
+        return attributes;
     }
 
     public BinaryRelation getRelation() {

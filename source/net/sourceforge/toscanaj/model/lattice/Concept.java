@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.model.lattice;
 
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+import net.sourceforge.toscanaj.model.order.Ordered;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -31,7 +32,7 @@ import java.util.Iterator;
  *
  * The contingents are usually used for labelling the diagram.
  */
-public interface Concept extends XMLizable {
+public interface Concept extends XMLizable, Ordered {
     /**
      * Returns the size of the intent.
      */

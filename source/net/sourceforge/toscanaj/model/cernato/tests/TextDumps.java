@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.model.cernato.tests;
 import net.sourceforge.toscanaj.model.cernato.*;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.BinaryRelation;
+import net.sourceforge.toscanaj.model.burmeister.BurmeisterContext;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
@@ -89,38 +90,78 @@ public class TextDumps {
         }
     }
 
-    public static final void dump(Lattice lattice) {
+    public static final void dump(Lattice lattice, PrintStream stream) {
         Concept[] concepts = lattice.getConcepts();
         for (int i = 0; i < concepts.length; i++) {
             Concept concept = concepts[i];
-            System.out.print(concept + "[objectContingent: {");
+            stream.print(concept + "[objectContingent: {");
             Iterator extIt = concept.getObjectContingentIterator();
             while (extIt.hasNext()) {
                 FCAObject obj = (FCAObject) extIt.next();
-                System.out.print(obj.getName());
+                stream.print(obj.getName());
                 if(extIt.hasNext()) {
-                    System.out.print(", ");
+                    stream.print(", ");
                 }
             }
-            System.out.print("}, attributeContingent: {");
+            stream.print("}, attributeContingent: {");
             Iterator intIt = concept.getAttributeContingentIterator();
             while (intIt.hasNext()) {
                 Attribute attribute = (Attribute) intIt.next();
-                System.out.print(attribute.toString());
+                stream.print(attribute.toString());
                 if(intIt.hasNext()) {
-                    System.out.print(", ");
+                    stream.print(", ");
                 }
             }
-            System.out.print("}, subconcepts: {");
+            stream.print("}, subconcepts: {");
             Iterator subIt = concept.getDownset().iterator();
             while (subIt.hasNext()) {
                 Object subConcept = subIt.next();
-                System.out.print(subConcept);
+                stream.print(subConcept);
                 if(subIt.hasNext()) {
-                    System.out.print(", ");
+                    stream.print(", ");
                 }
             }
-            System.out.println("}]");
+            stream.println("}]");
+        }
+    }
+
+    /**
+     * Dumps context in Burmeister format.
+     */
+    public static final void dump(Context context, PrintStream stream) {
+        stream.println("B");
+        if(context instanceof BurmeisterContext) {
+            BurmeisterContext burCon = (BurmeisterContext) context;
+            stream.println(burCon.getName());
+        } else {
+            stream.println("unnamed context");
+        }
+
+        Collection objects = context.getObjects();
+        Collection attributes = context.getAttributes();
+        stream.println(objects.size());
+        stream.println(attributes.size());
+        for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
+            Object o = iterator.next();
+            stream.println(o.toString());
+        }
+        for (Iterator iterator = attributes.iterator(); iterator.hasNext();) {
+            Object a = iterator.next();
+            stream.println(a.toString());
+        }
+
+        BinaryRelation relation = context.getRelation();
+        for (Iterator it1 = objects.iterator(); it1.hasNext();) {
+            Object o = it1.next();
+            for (Iterator it2 = attributes.iterator(); it2.hasNext();) {
+                Object a = it2.next();
+                if(relation.contains(o,a)) {
+                    stream.print("x");
+                } else {
+                    stream.print(".");
+                }
+            }
+            stream.println();
         }
     }
 }

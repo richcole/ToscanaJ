@@ -10,8 +10,6 @@ package net.sourceforge.toscanaj.controller.fca;
 import net.sourceforge.toscanaj.model.lattice.*;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.BinaryRelation;
-import net.sourceforge.toscanaj.model.cernato.FCAObject;
-import net.sourceforge.toscanaj.model.cernato.Criterion;
 
 import java.util.*;
 
@@ -19,7 +17,6 @@ public class GantersAlgorithm implements LatticeGenerator {
     private Context context;
     private Object[] objects;
     private Hashtable intents;
-    private Hashtable attributes;
     public Vector extents;
 
     public Lattice createLattice(Context inputContext) {
@@ -29,7 +26,6 @@ public class GantersAlgorithm implements LatticeGenerator {
         objects = new Object[objectCol.size()];
         objectCol.toArray(objects);
         intents = new Hashtable();
-        attributes = new Hashtable();
         extents = new Vector();
         findExtents();
         createConcepts(lattice);
@@ -121,25 +117,16 @@ public class GantersAlgorithm implements LatticeGenerator {
             ConceptImplementation concept = new ConceptImplementation();
             Set ext = (Set) iterator.next();
             for (Iterator intit = ext.iterator(); intit.hasNext();) {
-                FCAObject fcaObject = (FCAObject) intit.next();
+                Object fcaObject = intit.next();
                 concept.addObject(fcaObject);
             }
             Set intent = (Set) intents.get(ext);
             for (Iterator intit = intent.iterator(); intit.hasNext();) {
-                Criterion criterion = (Criterion) intit.next();
-                concept.addAttribute(getAttribute(criterion));
+                Attribute attribute = (Attribute) intit.next();
+                concept.addAttribute(attribute);
             }
             lattice.addConcept(concept);
         }
-    }
-
-    private Attribute getAttribute(Criterion criterion) {
-        Attribute attribute = (Attribute) attributes.get(criterion);
-        if(attribute == null) {
-            attribute = new Attribute(criterion, null);
-            attributes.put(criterion, attribute);
-        }
-        return attribute;
     }
 
     private boolean iLargerThan(Set largerSet, Set smallerSet, int i) {

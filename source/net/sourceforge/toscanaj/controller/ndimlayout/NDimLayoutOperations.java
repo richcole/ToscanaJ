@@ -14,9 +14,8 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
-import net.sourceforge.toscanaj.model.cernato.Criterion;
-import net.sourceforge.toscanaj.model.order.PartialOrderNode;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
+import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
 
 import java.util.*;
 import java.awt.geom.Point2D;
@@ -42,8 +41,7 @@ public abstract class NDimLayoutOperations {
             Iterator attributes = concept.getIntentIterator();
             while (attributes.hasNext()) {
                 Attribute attribute = (Attribute) attributes.next();
-                Criterion criterion = (Criterion) attribute.getData();
-                addVector(ndimVector, criterion, dimensions);
+                addVector(ndimVector, attribute, dimensions);
             }
             if(concept.isTop()) {
                 topVector = ndimVector;
@@ -92,17 +90,12 @@ public abstract class NDimLayoutOperations {
         return base;
     }
 
-    private static void addVector(double[] ndimVector, Criterion criterion, Vector dimensions) {
+    private static void addVector(double[] ndimVector, Attribute attribute, Vector dimensions) {
         int dimCount = 0;
         for (Iterator it = dimensions.iterator(); it.hasNext();) {
-            net.sourceforge.toscanaj.model.ndimdiagram.Dimension dimension =
-                                            (net.sourceforge.toscanaj.model.ndimdiagram.Dimension) it.next();
-            Vector path = dimension.getPath();
-            for (Iterator it2 = path.iterator(); it2.hasNext();) {
-                PartialOrderNode node = (PartialOrderNode) it2.next();
-                if(node.getData() == criterion) {
-                    ndimVector[dimCount] += 1;
-                }
+            Dimension dimension = (Dimension) it.next();
+            if (dimension.contains(attribute)) {
+                ndimVector[dimCount] += 1;
             }
             dimCount++;
         }

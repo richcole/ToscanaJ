@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.model.lattice;
 
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.model.order.Ordered;
 import org.jdom.Element;
 
 import java.util.*;
@@ -518,5 +519,16 @@ public class ConceptImplementation implements Concept {
 
     public void removeAttribute(Attribute attribute) {
         this.attributeContingent.remove(attribute);
+    }
+
+    public boolean isLesserThan(Ordered other) {
+        if(! (other instanceof ConceptImplementation)) {
+            return false;
+        }
+        return !(other == this) && this.hasSuperConcept((Concept)other);
+    }
+
+    public boolean isEqual(Ordered other) {
+        return other == this;
     }
 }

@@ -10,6 +10,8 @@ package net.sourceforge.toscanaj.gui;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.cernato.CernatoDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
+import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import org.tockit.events.*;
@@ -19,6 +21,8 @@ import net.sourceforge.toscanaj.gui.action.*;
 import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.burmeister.BurmeisterContext;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.cernato.*;
@@ -28,6 +32,7 @@ import net.sourceforge.toscanaj.view.diagram.cernato.NDimDiagramEditingView;
 import net.sourceforge.toscanaj.ToscanaJ;
 import net.sourceforge.toscanaj.parser.CernatoXMLParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
+import net.sourceforge.toscanaj.parser.BurmeisterParser;
 
 import javax.swing.*;
 import java.awt.*;
@@ -111,6 +116,15 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
             }
         });
         fileMenu.add(importCernatoXMLItem);
+
+        JMenuItem importBurmeisterItem = new JMenuItem("Import Burmeister Format...");
+        importBurmeisterItem.setMnemonic(KeyEvent.VK_B);
+        importBurmeisterItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                importBurmeister();
+            }
+        });
+        fileMenu.add(importBurmeisterItem);
 
         JMenuItem saveMenuItem = new JMenuItem("Save...");
         SaveConceptualSchemaActivity saveActivity =
@@ -201,18 +215,68 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
         addDiagrams(conceptualSchema, inputModel);
     }
 
+    private void importBurmeister() {
+        final JFileChooser openDialog;
+        if (this.currentFile != null) {
+            // use position of last file for dialog
+            openDialog = new JFileChooser(this.currentFile);
+        } else {
+            openDialog = new JFileChooser(System.getProperty("user.dir"));
+        }
+        int rv = openDialog.showOpenDialog(this);
+        if (rv != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        String newSchemaString = "Create new schema";
+        String keepSchemaString = "Extend existing schema";
+        Object retVal = JOptionPane.showInputDialog(this,"Do you want to keep the current schema?", "Keep Schema?",
+                                                    JOptionPane.QUESTION_MESSAGE, null,
+                                                    new Object[]{keepSchemaString,newSchemaString},
+                                                    keepSchemaString);
+        if(retVal == null) {
+            return;
+        }
+        if(retVal == newSchemaString) {
+            this.conceptualSchema = new ConceptualSchema(this.eventBroker);
+        }
+        importBurmeister(openDialog.getSelectedFile());
+    }
+
+    private void importBurmeister(File file) {
+        // store current file
+        try {
+            this.currentFile = file.getCanonicalPath();
+        } catch (IOException e) { // could not resolve canonical path
+            e.printStackTrace();
+            this.currentFile = file.getAbsolutePath();
+            /// @todo what could be done here?
+        }
+        BurmeisterContext context;
+        try {
+            context = BurmeisterParser.importBurmeisterFile(file);
+        } catch (FileNotFoundException e) {
+            ErrorDialog.showError(this, e, "Could not find file");
+            return;
+        } catch (DataFormatException e) {
+            ErrorDialog.showError(this, e, "Could not parse file");
+            return;
+        }
+        addDiagram(conceptualSchema, context, context.getName(), new DefaultDimensionStrategy());
+    }
+
     private void addDiagrams(ConceptualSchema schema, CernatoModel cernatoModel) {
         Vector views = cernatoModel.getViews();
         for (Iterator iterator = views.iterator(); iterator.hasNext();) {
             View view = (View) iterator.next();
-            addDiagram(schema, cernatoModel, view);
+            addDiagram(schema, new ViewContext(cernatoModel, view), view.getName(), new CernatoDimensionStrategy());
         }
     }
 
-    private void addDiagram(ConceptualSchema schema, CernatoModel model, View view) {
+    private void addDiagram(ConceptualSchema schema, Context context, String name,
+                            DimensionCreationStrategy dimensionStrategy) {
         LatticeGenerator lgen = new GantersAlgorithm();
-        Lattice lattice = lgen.createLattice(new ViewContext(model, view));
-        Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, view.getName(), new CernatoDimensionStrategy());
+        Lattice lattice = lgen.createLattice(context);
+        Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, name, dimensionStrategy);
         schema.addDiagram(diagram);
     }
 
