@@ -20,7 +20,6 @@ import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
-import net.sourceforge.toscanaj.util.CollectionFactory;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
@@ -54,11 +53,6 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
      * The event broker for administering the conceptual scheme events.
      */
     EventBroker eventBroker;
-
-    /**
-     * List of scales
-     */
-    private List scales;
 
     private List queries = new ArrayList();
 
@@ -222,7 +216,6 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
         databaseInfo = null;
         diagrams = new Vector();
         hasDiagramDescription = false;
-        scales = CollectionFactory.createDefaultList();
     }
 
     /**
