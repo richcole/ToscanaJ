@@ -113,6 +113,7 @@
 		        <include name="libs/**"/>
 		        <include name="${plugin.jar.name}"/>
 	        	<include name="${plugin.description.file}"/>
+	        	<include name="readme.txt"/>
             </fileset>
 		</copy>
 		<zip destfile="${plugin.dist.dir}/${plugin.versioned.name}.zip">
