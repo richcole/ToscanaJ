@@ -20,11 +20,6 @@ import java.util.Vector;
 public class DBConnection
 {
     /**
-     * The URL to find the database.
-     */
-    private String dbURL;
-
-    /**
      * The JDBC database connection we use.
      */
     private Connection con;
@@ -75,6 +70,14 @@ public class DBConnection
      * @TODO Throw exceptions instead of just printing them.
      */
     public DBConnection(String url, String account, String password) throws DatabaseException {
+        this(getConnection(url, account, password));
+    }
+
+    public DBConnection(Connection connection){
+        con = connection;
+    }
+
+    private static Connection getConnection(String url, String account, String password) throws DatabaseException {
         try {
             Driver driver = DriverManager.getDriver(url);
             if(driver == null) {
@@ -85,16 +88,17 @@ public class DBConnection
             throw new DatabaseException("Error locating JDBC Driver class for the url:\n" + url, e);
         }
 
-        this.dbURL = url;
+        Connection connection = null;
 
         // connect to the DB
         try {
-            con = DriverManager.getConnection(dbURL, account, password);
+            connection= DriverManager.getConnection(url, account, password);
         }
         catch (SQLException se) {
             throw new DatabaseException("An error occured connecting to the database", se);
         }
-        printLogMessage("Created new DB connection to " + dbURL);
+        printLogMessage("Created new DB connection to " + url);
+        return connection;
     }
 
     /**
@@ -367,8 +371,8 @@ public class DBConnection
     /**
      * Puts debug output to the logger, if it is not null.
      */
-    private void printLogMessage(String message) {
-        if(this.logger != null) {
+    private static void printLogMessage(String message) {
+        if(logger != null) {
             logger.println(message);
         }
     }

@@ -249,7 +249,7 @@ public abstract class AbstractConceptImplementation implements Concept
 
         Set filterSet = new HashSet(filter);
         List filterList = new LinkedList(filter);
-        while(!idealList.isEmpty()) {
+        while(!filterList.isEmpty()) {
             AbstractConceptImplementation other = (AbstractConceptImplementation) filterList.remove(0);
             Iterator it = other.filter.iterator();
             while(it.hasNext()) {

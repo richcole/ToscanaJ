@@ -352,7 +352,6 @@ public class DiagramController implements ChangeObservable {
      * The parameter pos determines the position in the list of current diagrams.
      */
     protected Diagram2D getNestedDiagram(int pos) {
-        System.out.println("getNestedDiagram " + pos);
         if (pos == 0) {
             // we have only a flat diagram left
             return getSimpleDiagram(0);

@@ -29,7 +29,7 @@ public class DatabaseInfo
      */
     private String objectKey = null;
 
-    public abstract class DatabaseQuery extends Query {
+    public static abstract class DatabaseQuery extends Query {
         public class Column {
             String name;
             String format;

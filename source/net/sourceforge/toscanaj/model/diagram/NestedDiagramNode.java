@@ -27,6 +27,10 @@ public class NestedDiagramNode extends DiagramNode {
      *
      * If the dropAttributeLabels flag is set, the inner nodes will have no
      * attribute labels attached.
+     *
+     * Parameter scale is float due to JIT error in JDK 1.3, where in case of double
+     * JIT was breaking transmission of value of scale after a while of program usage
+     * , that lead to a distorted nested line diagrams.
      */
     public NestedDiagramNode(DiagramNode outerNode, Diagram2D innerDiagram, float scale,
                                         boolean dropAttributeLabels ) {

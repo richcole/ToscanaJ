@@ -516,6 +516,12 @@ public class CSXParser
             query = dbInfo.createListQuery("List of Objects", "", false);
             query.insertQueryColumn("Object Name", null, null, keyName);
             _Schema.addQuery(query);
+
+/**
+ *          @todo use this version once it works
+            _Schema.addQuery(new ObjectNumberQuery("Number of Objects"));
+            _Schema.addQuery(new ObjectListQuery("List of Objects"));
+*/
         }
         if(queryElem != null) {
             Iterator it = queryElem.getChildren("list").iterator();

@@ -92,10 +92,10 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
             }
         } else if (query instanceof ObjectNumberQuery) {
             List retVal = new LinkedList();
-            if (contingentOnly) {
-                retVal.add(new Integer(this.getObjectContingentSize()));
-            } else {
-                retVal.add(new Integer(this.getExtentSize()));
+            int size = contingentOnly ? this.getObjectContingentSize() : this.getExtentSize();
+
+            if(size >0){
+               retVal.add(new Integer(size));
             }
             return retVal;
         } else {

@@ -186,70 +186,100 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      */
     public List executeQuery(Query query, boolean contingentOnly) {
         if( query instanceof ObjectListQuery ) {
-            /// @todo implement this
-            throw new RuntimeException("NYI");
+            DatabaseInfo.DatabaseQuery dbQuery = dbInfo.createListQuery(query.getName(), "", false);
+            dbQuery.insertQueryColumn("ObjectList",null/*will not call DecimalFormat*/,null,"*");
+            return executeDatabaseQuery(dbQuery, contingentOnly);
         }
         else if( query instanceof ObjectNumberQuery ) {
-            /// @todo implement this
-            throw new RuntimeException("NYI");
+            DatabaseInfo.DatabaseQuery dbQuery = dbInfo.createAggregateQuery(query.getName(), "");
+            dbQuery.insertQueryColumn("Count",null/*will not call DecimalFormat*/,null,"count(*)");
+            List res = executeDatabaseQuery(dbQuery, contingentOnly);
+            if(res.size()==1){
+                int count= 0;
+                try {
+                    count = Integer.parseInt(res.get(0).toString());
+                    if(count==0){
+                        res.clear();
+                    }
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("Can't parse result of count: "+e.getMessage());
+                }
+            }else{
+                throw new RuntimeException("Unexpected result size from count query: "+res.size());
+            }
+            return res;
         }
         else if( query instanceof DatabaseInfo.DatabaseQuery ) {
-            DatabaseInfo.DatabaseQuery dbQuery = (DatabaseInfo.DatabaseQuery) query;
-            List retVal = new LinkedList();
-            // do a query only if there will be something to query
-            // either: there is a contingent in this concept or we query extent and we
-            // have subconcepts (at least one should have a contingent, otherwise this
-            // concept shouldn't exist)
-            if( this.objectClause != null || (!contingentOnly && this.ideal.size() != 1) ) {
-                try {
-                    String whereClause = " WHERE (";
-                    if(contingentOnly) {
-                        // use only the local clause (we assume there is one)
-                        whereClause += this.objectClause;
-                    }
-                    else {
-                        // aggregate all clauses from the downset
-                        Iterator iter = this.ideal.iterator();
-                        boolean first = true;
-                        while (iter.hasNext()) {
-                            DatabaseConnectedConcept concept = (DatabaseConnectedConcept) iter.next();
-                            if(concept.objectClause == null) {
-                                continue;
-                            }
-                            if(first) {
-                                first = false;
-                            }
-                            else {
-                                whereClause += " OR ";
-                            }
-                            whereClause += concept.objectClause;
-                        }
-                    }
-                    whereClause += ") ";
-                    Iterator iter = this.filterClauses.iterator();
-                    while (iter.hasNext()) {
-                        Object item = iter.next();
-                        whereClause += " AND " + item;
-                    }
-                    whereClause += ";";
-                    retVal = this.connection.executeQuery(dbQuery, whereClause);
-                }
-                catch (DatabaseException e) {
-                    /// @TODO Find something useful to do here.
-                    if(e.getOriginal()!=null) {
-                        System.err.println(e.getMessage());
-                        e.getOriginal().printStackTrace();
-                    }
-                    else {
-                        e.printStackTrace(System.err);
-                    }
-                }
-            }
-            return retVal;
+            return executeDatabaseQuery((DatabaseInfo.DatabaseQuery)query, contingentOnly);
         }
         else {
             throw new RuntimeException("Unknown Query type");
         }
+    }
+
+    private List executeDatabaseQuery(DatabaseInfo.DatabaseQuery dbQuery, boolean contingentOnly) {
+        List retVal = new LinkedList();
+        // do a query only if there will be something to query
+        // either: there is a contingent in this concept or we query extent and we
+        // have subconcepts (at least one should have a contingent, otherwise this
+        // concept shouldn't exist)
+        if( this.objectClause != null || (!contingentOnly && this.ideal.size() != 1) ) {
+            String whereClause = constructWhereClause(contingentOnly);
+            try {
+                retVal = this.connection.executeQuery(dbQuery, whereClause);
+
+            }
+            catch (DatabaseException e) {
+                handleDBException(e);
+            }
+        }
+        return retVal;
+    }
+
+    private void handleDBException(DatabaseException e) {
+        /// @TODO Find something useful to do here.
+        if(e.getOriginal()!=null) {
+            System.err.println(e.getMessage());
+            e.getOriginal().printStackTrace();
+        }
+        else {
+            e.printStackTrace(System.err);
+        }
+    }
+
+    private String constructWhereClause(boolean contingentOnly) {
+        String whereClause = " WHERE (";
+        if(contingentOnly) {
+            // use only the local clause (we assume there is one)
+            whereClause += this.objectClause;
+        }
+        else {
+            // aggregate all clauses from the downset
+            Iterator iter = this.ideal.iterator();
+            boolean first = true;
+            while (iter.hasNext()) {
+                DatabaseConnectedConcept concept = (DatabaseConnectedConcept) iter.next();
+                if(concept.objectClause == null) {
+                    continue;
+                }
+                if(first) {
+                    first = false;
+                }
+                else {
+                    whereClause += " OR ";
+                }
+                whereClause += concept.objectClause;
+            }
+        }
+        whereClause += ") ";
+
+        Iterator iter = this.filterClauses.iterator();
+        while (iter.hasNext()) {
+            Object item = iter.next();
+            whereClause += " AND " + item;
+        }
+        whereClause += ";";
+        return whereClause;
     }
 
     /**
