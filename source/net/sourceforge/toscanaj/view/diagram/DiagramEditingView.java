@@ -17,6 +17,8 @@ import net.sourceforge.toscanaj.controller.diagram.FilterMovementEventListener;
 import net.sourceforge.toscanaj.canvas.events.CanvasItemDraggedEvent;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Observable;
@@ -105,16 +107,13 @@ public class DiagramEditingView extends JPanel implements BrokerEventListener {
     private JComponent makeDiagramListView() {
         diagramListModel = new DefaultListModel();
         final JList listView = new JList(diagramListModel);
+        listView.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         fillDiagramListView();
-        MouseListener mouseListener = new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int index = listView.locationToIndex(e.getPoint());
-                    showDiagram(index);
-                }
+        listView.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                showDiagram(listView.getSelectedIndex());
             }
-        };
-        listView.addMouseListener(mouseListener);
+        });
 
         JPanel listViewPane = new JPanel();
         listViewPane.setLayout(new GridBagLayout());
