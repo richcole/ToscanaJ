@@ -91,7 +91,7 @@ public class NextClosedSetLatticeBuilderCallback extends DefaultConceptEnumCallb
                 return (LatticeElement) midVal;
             }
         }
-        util.Assert.assert(false);
+        util.Assert.isTrue(false);
         return null;
     }
 */

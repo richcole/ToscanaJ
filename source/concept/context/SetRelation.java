@@ -66,8 +66,8 @@ public class SetRelation implements ModifiableBinaryRelation {
 
 
     public void removeCol(int col) {
-        util.Assert.assert(0 <= col, "removeCol: col should be greater or equal to zero");
-        util.Assert.assert(col < sizeY, "removeCol: col = " + col + "  should be less then relation column count");
+        util.Assert.isTrue(0 <= col, "removeCol: col should be greater or equal to zero");
+        util.Assert.isTrue(col < sizeY, "removeCol: col = " + col + "  should be less then relation column count");
         if (1 == sizeY) {
             //we have only one element
             clearRelation();
@@ -80,8 +80,8 @@ public class SetRelation implements ModifiableBinaryRelation {
     }
 
     public void removeRow(int row) {
-        util.Assert.assert(0 <= row, "removeRow: row should be greater or equal to zero");
-        util.Assert.assert(row < sizeX, "removeRow: row should be less then relation row count");
+        util.Assert.isTrue(0 <= row, "removeRow: row should be greater or equal to zero");
+        util.Assert.isTrue(row < sizeX, "removeRow: row should be less then relation row count");
         int lastElIndex = sizeX - 1;
         if (row != lastElIndex) {
             System.arraycopy(relation, row + 1, relation, row, lastElIndex - row);
@@ -133,7 +133,7 @@ public class SetRelation implements ModifiableBinaryRelation {
      * @param value new value for cell with coordinates(x,y)
      */
     public void setRelationAt(int x, int y, boolean value) {
-        Assert.assert(x < sizeX, "Dimension X of relation " + x + " should be less then sizeX=" + sizeX);
+        Assert.isTrue(x < sizeX, "Dimension X of relation " + x + " should be less then sizeX=" + sizeX);
         // else indexOutOfBounds will be thrown from Java standart classes
         if (value) {
             relation[x].put(y);

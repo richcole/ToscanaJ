@@ -43,11 +43,11 @@ public class SetBuilder {
 
     public static Context makeContext(String[] objectNames, String[] attrNames, int[][] relation) {
         Context ret = makeContext(relation);
-        Assert.assert(ret.getObjectCount() == objectNames.length);
+        Assert.isTrue(ret.getObjectCount() == objectNames.length);
         for (int i = 0; i < objectNames.length; i++) {
             ret.getObject(i).setName(objectNames[i]);
         }
-        Assert.assert(ret.getAttributeCount() == attrNames.length);
+        Assert.isTrue(ret.getAttributeCount() == attrNames.length);
         for (int i = 0; i < attrNames.length; i++) {
             ret.getAttribute(i).setName(attrNames[i]);
         }

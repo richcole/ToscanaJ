@@ -56,8 +56,8 @@ public class ContextFunctions {
     }
 
     public static int idealSize(Set queryIntent, Context cxt, Set attributeMask) {
-        Assert.assert(queryIntent.size() == attributeMask.size());
-        Assert.assert(queryIntent.isSubsetOf(attributeMask));
+        Assert.isTrue(queryIntent.size() == attributeMask.size());
+        Assert.isTrue(queryIntent.isSubsetOf(attributeMask));
         BinaryRelation relation = cxt.getRelation();
         ModifiableSet temp = ContextFactoryRegistry.createSet(queryIntent.size());
         int ret = 0;

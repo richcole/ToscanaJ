@@ -135,7 +135,7 @@ public class Context implements AttributeInformationSupplier, ContextEditingInte
     }
     //---------------------------------------------------------------
     public void increaseAttributes(int incrAttr) {
-        util.Assert.assert(incrAttr > 0, "Attrib increment should be greater than zero");
+        util.Assert.isTrue(incrAttr > 0, "Attrib increment should be greater than zero");
         int oldColCnt = rel.getColCount();
         int newColCnt = oldColCnt + incrAttr;
         ensureRelationsSizes(rel.getRowCount(), newColCnt);
@@ -170,7 +170,7 @@ public class Context implements AttributeInformationSupplier, ContextEditingInte
     }
 
     private void addAttributeToAttributeList(ContextObject newAttribute, int attributeIndex) {
-        Assert.assert(!newAttribute.isObject());
+        Assert.isTrue(!newAttribute.isObject());
         newAttribute.setContextObjectListener(attributeNameListener);
         attributes.add(newAttribute);
         getContextListenersSupport().fireAttributeInserted(attributeIndex);
@@ -178,7 +178,7 @@ public class Context implements AttributeInformationSupplier, ContextEditingInte
 
     //---------------------------------------------------------------
     public void increaseObjects(int incrObjects) {
-        util.Assert.assert(incrObjects > 0, "Objects increment should be greater than zero");
+        util.Assert.isTrue(incrObjects > 0, "Objects increment should be greater than zero");
         int oldRowCnt = rel.getRowCount();
         int newRowCnt = oldRowCnt + incrObjects;
         ensureRelationsSizes(newRowCnt, rel.getColCount());
@@ -195,7 +195,7 @@ public class Context implements AttributeInformationSupplier, ContextEditingInte
     }
 
     private void addObjectToObjectList(ContextObject newObject) {
-        Assert.assert(newObject.isObject());
+        Assert.isTrue(newObject.isObject());
         newObject.setContextObjectListener(objectNameListener);
         objects.add(newObject);
     }

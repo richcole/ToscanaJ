@@ -84,7 +84,7 @@ public class ContextListenerSupport {
     public void realisePostponedStructureChange() {
         if (structureChangePostponed) {
             fireContextStructureChanged();
-            util.Assert.assert(structureChangePostponed == false);
+            util.Assert.isTrue(structureChangePostponed == false);
         }
     }
 

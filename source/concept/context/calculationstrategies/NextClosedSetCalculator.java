@@ -29,7 +29,7 @@ public class NextClosedSetCalculator extends AbstractConceptCalcStrategy impleme
     private boolean closure(ModifiableSet set, int j) {
         boolean ret = true;
         int i = set.length();
-        Assert.assert(i > 0);
+        Assert.isTrue(i > 0);
         //calculating dash operator
         i--;
         attrSet.copy(rel.getSet(i));
@@ -190,7 +190,7 @@ public class NextClosedSetCalculator extends AbstractConceptCalcStrategy impleme
     }
     //-----------------------------------------------------
     public void buildLattice() {
-        Assert.assert(callback instanceof concept.context.enumcallbacks.NextClosedSetLatticeBuilderCallback);
+        Assert.isTrue(callback instanceof concept.context.enumcallbacks.NextClosedSetLatticeBuilderCallback);
         calculateConceptSet();
     }
 
