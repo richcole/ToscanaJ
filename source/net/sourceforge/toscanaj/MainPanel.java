@@ -242,7 +242,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                    diagramOrganiser, diagramView);
         splitPane.setOneTouchExpandable(true);
-        splitPane.setResizeWeight(1);
+        splitPane.setResizeWeight(0);
 
         //Provide minimum sizes for the two components in the split pane
         Dimension minimumSize = new Dimension(50,100);
@@ -255,7 +255,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         setContentPane( contentPane );
         // restore old position
         ConfigurationManager.restorePlacement("mainPanel",this, new Rectangle(10,10,600,450));
-        int div = ConfigurationManager.fetchInt("mainPanel","divider",400);
+        int div = ConfigurationManager.fetchInt("mainPanel","divider",200);
         splitPane.setDividerLocation(div);
     }
 
