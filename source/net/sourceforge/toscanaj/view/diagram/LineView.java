@@ -69,7 +69,7 @@ public class LineView extends CanvasItem {
 		this.showRatioColor = preferences.getColor("showExtentRatioColor", this.showRatioColor);
 		this.showRatioFillColor = preferences.getColor("showExtentRatioFillColor", this.showRatioFillColor);
         this.fontSize = preferences.getFloat("labelFontSize", 6);
-        this.dynamicLineWidth = preferences.get("lineWidth", "").equals("extentRatio");
+        this.dynamicLineWidth = preferences.getBoolean("lineWidth", false);
 		if(preferences.get("nonRealizedConceptGrouping", "").equals("coloredLines")) {
 			this.groupingMode = COLORED_LINES_GROUPING;
 		}

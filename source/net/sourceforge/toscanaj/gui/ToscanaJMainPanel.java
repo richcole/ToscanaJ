@@ -855,6 +855,21 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 			}			
 		    viewMenu.add(setMinLabelSizeSubMenu);
         }
+        
+        viewMenu.addSeparator();
+        
+        final JFrame parent = this;
+        JMenuItem preferencesMenuItem = new JMenuItem("Preferences...");
+        preferencesMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean okClicked = ToscanaJPreferences.showPreferences(parent);
+                if(okClicked) {
+                    setDiagramSchema(DiagramSchema.getDefaultSchema());
+                    buildMenuBar();
+                }
+            }
+        });
+        viewMenu.add(preferencesMenuItem);
 
         // create a help menu
         JMenu helpMenu = new JMenu("Help");
@@ -897,7 +912,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                 helpMenu.addSeparator();
             }
         }
-        final JFrame parent = this;
+
         JMenuItem aboutItem = new JMenuItem("About ToscanaJ...");
         aboutItem.setMnemonic(KeyEvent.VK_A);
         aboutItem.addActionListener(new ActionListener() {

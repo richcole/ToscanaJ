@@ -11,8 +11,8 @@ import java.awt.Color;
 import java.awt.Stroke;
 
 import org.jdom.Element;
+import org.tockit.util.ColorStringConverter;
 
-import net.sourceforge.toscanaj.util.ColorStringConverter;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 

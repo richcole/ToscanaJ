@@ -12,9 +12,9 @@ import java.awt.GradientPaint;
 import java.awt.Paint;
 
 import org.jdom.Element;
+import org.tockit.util.ColorStringConverter;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
-import net.sourceforge.toscanaj.util.ColorStringConverter;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 
 public class InterSequenceTransitionArrow extends TransitionArrow {

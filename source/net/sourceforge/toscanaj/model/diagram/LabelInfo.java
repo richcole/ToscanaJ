@@ -9,11 +9,11 @@ package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-import net.sourceforge.toscanaj.util.ColorStringConverter;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
+import org.tockit.util.ColorStringConverter;
 
 import java.awt.*;
 import java.awt.geom.Point2D;

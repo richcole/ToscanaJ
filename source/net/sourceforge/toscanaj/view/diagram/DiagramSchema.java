@@ -21,7 +21,17 @@ import org.tockit.swing.preferences.ExtendedPreferences;
  * This class uses a Singleton design pattern.
  */
 public class DiagramSchema {
-    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramSchema.class);
+    public static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramSchema.class);
+
+    /**
+     * The static block makes sure the preferences are set.
+     * 
+     * Otherwise editing them will not work.
+     */
+    static {
+        DiagramSchema schema = getDefaultSchema();
+        schema.setAsDefault();
+    }
 
     /**
      * The amount of fade out for unselected nodes.
@@ -401,4 +411,43 @@ public class DiagramSchema {
 	public Font getLabelFont() {
 		return this.labelFont;
 	}
+    
+    /**
+     * Stores the schema in the preferences.
+     */
+    public void setAsDefault() {
+        preferences.putColor("backgroundColor", this.background);
+        preferences.putColor("topColor", this.topColor);
+        preferences.putColor("bottomColor", this.bottomColor);
+        preferences.putColor("foregroundColor", this.foreground);
+        preferences.putColor("nestedDiagramNodeColor", this.nestedDiagramNodeColor);
+        preferences.putColor("notRealisedDiagramNodeColor", this.notRealisedDiagramNodeColor);
+        preferences.putColor("circleColor", this.circleColor);
+        preferences.putColor("lineColor", this.lineColor);
+        preferences.putColor("circleSelectionColor", this.circleSelectionColor);
+        preferences.putColor("circleIdealColor", this.circleIdealColor);
+        preferences.putColor("circleFilterColor", this.circleFilterColor);
+        preferences.putFloat("fadeOutValue", this.fadeOut);
+        preferences.putInt("margin", this.margin);
+        preferences.putFloat("notRealizedNodeSizeReductionFactor", this.notRealizedNodeSizeReductionFactor);
+        if(this.gradientType == ConceptInterpreter.INTERVAL_TYPE_EXTENT) {
+            preferences.put("gradientType", "extent");
+        } else if(this.gradientType == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT) {
+            preferences.put("gradientType", "contingent");
+        } else {
+            throw new RuntimeException("Unknown gradient type");
+        }
+        preferences.putInt("selectionLineWidth", this.selectionLineWidth);
+        preferences.put("labelFontName", this.labelFont.getFamily());
+        preferences.putInt("labelFontSize", this.labelFont.getSize());
+        if(this.nodeSizeScalingType == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT) {
+            preferences.put("scaleNodeSize", "contingent");
+        } else if(this.nodeSizeScalingType == ConceptInterpreter.INTERVAL_TYPE_EXTENT) {
+            preferences.put("scaleNodeSize", "extent");
+        } else if(this.nodeSizeScalingType == ConceptInterpreter.INTERVAL_TYPE_FIXED) {
+            preferences.put("scaleNodeSize", "none");
+        } else {
+            throw new RuntimeException("Unknown node scaling type");
+        }
+    }
 }

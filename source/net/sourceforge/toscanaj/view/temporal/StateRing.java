@@ -15,13 +15,13 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
-import net.sourceforge.toscanaj.util.ColorStringConverter;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 
 import org.jdom.Element;
 import org.tockit.canvas.CanvasItem;
+import org.tockit.util.ColorStringConverter;
 
 public class StateRing extends CanvasItem implements XMLizable {
     private NodeView nodeView;

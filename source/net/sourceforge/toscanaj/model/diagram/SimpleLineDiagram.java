@@ -13,7 +13,6 @@ import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.events.DiagramChangedEvent;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
-import net.sourceforge.toscanaj.util.IdPool;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
@@ -21,6 +20,7 @@ import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
 import org.tockit.canvas.CanvasItem;
 import org.tockit.events.EventBroker;
+import org.tockit.util.IdPool;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
