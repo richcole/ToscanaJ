@@ -251,7 +251,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		if(!newNameField.getText().trim().equals("")){
 			if(!collectionContainsString(newNameField.getText(),context.getObjects())){
 				context.getObjects().add(newNameField.getText());
-				scrollpane.updateUI();
+				updateScrollPane();
 				newNameField.setText("");
 			}else{
 				JOptionPane.showMessageDialog(contextTableScaleEditorDialog,
@@ -270,12 +270,17 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		doneButton.setEnabled(true);
 	}
 
+	private void updateScrollPane() {
+		scrollpane.updateUI();
+		this.tableView.revalidate();
+	}
+
 	private void addAttribute(final JButton doneButton, final JTextField newNameField)
 		throws HeadlessException {
 		if(!newNameField.getText().trim().equals("")){
 			if(!collectionContainsString(newNameField.getText(),context.getAttributes())){
 				context.getAttributes().add(new Attribute(newNameField.getText()));
-				scrollpane.updateUI();
+				updateScrollPane();
 				newNameField.setText("");
 			}else{
 				JOptionPane.showMessageDialog(contextTableScaleEditorDialog,
@@ -535,7 +540,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 							remove.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent e) {
 									objectsArrayList.remove(pos.getRow()-1);
-									scrollpane.updateUI();
+									updateScrollPane();
 							}});
 							popupMenu.add(rename);
 							popupMenu.add(remove);
@@ -552,7 +557,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 							remove.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent e) {
 										attributeArrayList.remove(pos.getCol()-1);
-										scrollpane.updateUI();
+										updateScrollPane();
 							}});
 							popupMenu.add(rename);
 							popupMenu.add(remove);
@@ -580,7 +585,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 							remove.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent e) {
 									objectsArrayList.remove(pos.getRow()-1);
-									scrollpane.updateUI();
+									updateScrollPane();
 							}});
 							popupMenu.add(rename);
 							popupMenu.add(remove);
@@ -598,7 +603,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 							remove.addActionListener(new ActionListener() {
 								public void actionPerformed(ActionEvent e) {
 										attributeArrayList.remove(pos.getCol()-1);
-										scrollpane.updateUI();
+										updateScrollPane();
 							}});
 							popupMenu.add(rename);
 							popupMenu.add(remove);
@@ -662,7 +667,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					if(!collectionContainsString(inputValue, objectsArrayList)){
 						objectsArrayList.remove(yP - 1);
 						objectsArrayList.add(yP - 1, inputValue);
-						scrollpane.updateUI();
+						updateScrollPane();
 						inputValue ="";
 					}else{
 						JOptionPane.showMessageDialog(this,"An object named '"+inputValue+"' already exist. Please enter a different name.","Object exists",JOptionPane.WARNING_MESSAGE);
@@ -682,7 +687,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					if(!collectionContainsString(inputValue, attributeArrayList)){
 						Attribute attribute = (Attribute) attributeArrayList.get(xP - 1);
 						attribute.setData(inputValue);
-						scrollpane.updateUI();
+						updateScrollPane();
 						inputValue = "";
 					}else{
 					JOptionPane.showMessageDialog(this,"An attribute named '"+inputValue+"' already exist. Please enter a different name.","Attribute exists",JOptionPane.WARNING_MESSAGE);
