@@ -9,11 +9,9 @@ package org.tockit.tupelware.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.gui.MainPanel;
-import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.*;
-import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
@@ -24,14 +22,13 @@ import javax.swing.table.DefaultTableModel;
 
 import org.tockit.events.EventBroker;
 import org.tockit.tupelware.model.TupelSet;
-import org.tockit.tupelware.parser.TupelParser;
 import org.tockit.tupelware.scaling.TupelScaling;
+import org.tockit.tupelware.source.TupelSource;
+import org.tockit.tupelware.source.text.TextSource;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.io.FileReader;
-import java.io.Reader;
 import java.util.Iterator;
 
 public class TupelwareMainPanel extends JFrame implements MainPanel {
@@ -56,7 +53,7 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
     private JMenu helpMenu;
     private JToolBar toolBar;
 
-    private String currentFile = null;
+    private File lastFileRead = null;
 
     /**
      * Views
@@ -151,37 +148,6 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         fileMenu.setMnemonic(KeyEvent.VK_F);
         menuBar.add(fileMenu);
 		
-        FileActivity loadTupelsActivity = new FileActivity(){
-            public void processFile(File file) throws Exception {
-                loadTupels(file);
-            }
-            public boolean prepareToProcess() throws Exception {
-                return checkForMissingSave();
-            }
-            public String[] getExtensions() {
-                return new String[]{"tupels"};
-            }
-            public String getDescription() {
-                return "Tupel Sets";
-            }
-        };
-        OpenFileAction openFileAction = new OpenFileAction(
-                this,
-                loadTupelsActivity,
-                currentFile,
-                KeyEvent.VK_L,
-                KeyStroke.getKeyStroke(
-                        KeyEvent.VK_L,
-                        ActionEvent.CTRL_MASK
-                )
-        );
-		openFileAction.addPostOpenActivity(new SimpleActivity() {
-			public boolean doActivity() throws Exception {
-				updateWindowTitle();
-				return true;
-			}
-		});
-
 		this.saveAsFileAction =
 			new SaveFileAction(
 				this,
@@ -190,9 +156,7 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 				KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
 		this.saveAsFileAction.setPostSaveActivity(new SimpleActivity(){
 			public boolean doActivity() throws Exception {
-				currentFile = saveAsFileAction.getLastFileUsed().getPath();
 				conceptualSchema.dataSaved();
-				updateWindowTitle();
 				return true;
 			}
 		});
@@ -221,10 +185,21 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 		JMenu tuplesMenu = new JMenu("Tuples");
 		tuplesMenu.setMnemonic('t');
 		
+		final TupelSource source = new TextSource();
+		final JFrame parent = this;
 		JMenuItem loadTuples = new JMenuItem("Load from tab-delimited data...");
-		loadTuples.addActionListener(openFileAction);
+		loadTuples.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+            	source.show(parent,lastFileRead);
+            	tupels = source.getTupels();
+            	objectIndices = source.getObjectIndices();
+            	lastFileRead = source.getSelectedFile();
+				fillTable();     
+				conceptualSchema = new ConceptualSchema(eventBroker);   
+            }
+		});
 		tuplesMenu.add(loadTuples);
-		
+
 		menuBar.add(tuplesMenu);
 
         editMenu = new JMenu("Edit");
@@ -246,7 +221,6 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
-		final JFrame parent = this;
 		JMenuItem aboutItem = new JMenuItem("About Tupelware...");
 		aboutItem.setMnemonic(KeyEvent.VK_A);
 		aboutItem.addActionListener(new ActionListener() {
@@ -261,21 +235,6 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         menuBar.add(helpMenu);
     }
 
-    protected void loadTupels(File file) {
-        Reader reader;
-        try {
-            reader = new FileReader(file);
-            this.tupels = TupelParser.parseTabDelimitedTupels(reader);
-            IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select object set", this.tupels.getVariableNames());
-            dialog.show();
-            this.objectIndices = dialog.getSelectedIndices();
-            fillTable();     
-            this.conceptualSchema = new ConceptualSchema(this.eventBroker);   
-        } catch (Exception e) {
-            ErrorDialog.showError(this, e, "Could not read file");
-        }
-    }
-
 	private void fillTable() {
         Object[][] data = new Object[this.tupels.getTupels().size()][this.tupels.getVariableNames().length];
         int row = 0;
@@ -288,17 +247,6 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         }
         this.tupelTable.setModel(new DefaultTableModel(data, this.tupels.getVariableNames()));
     }
-
-    private void updateWindowTitle() {
-	// get the current filename without the extension and full path
-	// we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
-		if(currentFile != null){
-			String filename = currentFile.substring(currentFile.lastIndexOf("\\")+1,(currentFile.length()-4));
-			setTitle(filename +" - "+WINDOW_TITLE);
-		} else {
-			setTitle(WINDOW_TITLE);
-		}
-	}
 
     public void closeMainPanel() {
         // store current position

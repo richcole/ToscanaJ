@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupelware.parser;
+package org.tockit.tupelware.source.text;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,7 +23,7 @@ import org.tockit.tupelware.model.TupelSet;
 /**
  * Parser to parse tupels from files.
  */
-public class TupelParser {
+public class TabDelimitedParser {
     /**
      * Reads a list of tupels from a tab-delimited file.
      * 
@@ -38,11 +38,13 @@ public class TupelParser {
     public static TupelSet parseTabDelimitedTupels(Reader input) throws IOException {
         TupelSet retVal = null;
         BufferedReader buffReader = new BufferedReader(input);
+        int lineNum = 0;
         while(true) {
             String line = buffReader.readLine();
             if(line == null) {
                 break;            
             }
+            lineNum++;
             StringTokenizer tokenizer = new StringTokenizer(line, "\t", false);
             // lines without tabs are considered comments
             if(tokenizer.countTokens() <= 1) {
@@ -57,7 +59,11 @@ public class TupelParser {
             if(retVal == null) {
                 retVal = new TupelSet(tupel); 
             } else {
-                retVal.addTupel(tupel);
+            	try {
+					retVal.addTupel(tupel);
+	           	} catch(IllegalArgumentException e) {
+	           		throw new IOException("Illegal tupel in line #" + lineNum);
+	           	}
             }
         }
         return retVal;

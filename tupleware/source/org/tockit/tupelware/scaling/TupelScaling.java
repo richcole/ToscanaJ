@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.tockit.events.EventBroker;
 import org.tockit.tupelware.model.TupelSet;
-import org.tockit.tupelware.parser.TupelParser;
+import org.tockit.tupelware.source.text.TabDelimitedParser;
 
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
@@ -146,7 +146,7 @@ public class TupelScaling {
         } else {
             objectPos = 0;
         }
-        TupelSet input = TupelParser.parseTabDelimitedTupels(new FileReader(new File(args[0])));
+        TupelSet input = TabDelimitedParser.parseTabDelimitedTupels(new FileReader(new File(args[0])));
         ConceptualSchema result = scaleTupels(input, objectPos);
         XMLWriter.write(new File(args[1]), result);
     }
