@@ -81,9 +81,6 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
         } catch (DatabaseException e) {
             System.err.println("Failed to query database:\n" + e.getMessage() + "\n" + e.getOriginal().getMessage());
         }
-        String err = "";
-        String out = "";
-        int exitVal;
         try {
             // add command shell on Win32 platforms
             String osName = System.getProperty("os.name");
@@ -94,22 +91,7 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
             }
 
             Runtime rt = Runtime.getRuntime();
-            Process proc = rt.exec(command);
-            InputStream stderr = proc.getErrorStream();
-            InputStreamReader isr = new InputStreamReader(stderr);
-            BufferedReader br = new BufferedReader(isr);
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                err += line;
-            }
-            InputStream stdout = proc.getInputStream();
-            isr = new InputStreamReader(stdout);
-            br = new BufferedReader(isr);
-            line = null;
-            while ((line = br.readLine()) != null) {
-                out += line;
-            }
-            exitVal = proc.waitFor();
+            rt.exec(command);
         } catch (Exception e) {
             e.printStackTrace();
         }
