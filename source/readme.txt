@@ -1,9 +1,9 @@
-ToscanaJ 0.7 Readme File
+ToscanaJ 1.3 Readme File
 ========================
 
 What is it?
 -----------
-A seventh release of the Java reimplementation of the
+ToscanaJ is a Java reimplementation of the
 classic Formal Concept Analysis tool named "Toscana".
 
 It is open sourced under a BSD-style licence (see the text
@@ -34,8 +34,7 @@ to create some common code base.
 What do I need to run ToscanaJ?
 -------------------------------
 You need a Java runtime environment (JRE) or Java develop-
-ment kit (JDK), with version number 1.4 or above. We use
-JDK 1.4.0_01 for development purposes. 
+ment kit (JDK), with version number 1.4 or above.
 
 
 How do I start ToscanaJ?
@@ -52,7 +51,8 @@ click the JAR file in the explorer.
 
 What can I do with ToscanaJ?
 ----------------------------
-ToscanaJ should open an example on startup, which is a data from 
+ToscanaJ comes with some examples, the most important is in the
+folder examples/sql/pctest, named pctest.csx, which is a data from 
 a PC test that will be loaded into the internal database engine.
 There is a readme text in the directory examples/sql that explains 
 how to set up the database example for other database engines.
@@ -84,47 +84,16 @@ Once you have an open diagram you can do the following things:
   moment)
 - print diagrams (only fit-to-page at the moment)
 - export diagrams as bitmaps (PNG, JPG)
-- export diagrams as vector graphic (SVG)
 
-Changes in ToscanaJ 0.2:
-- connections can be made with all JDBC drivers instead of
-  only the JDBC-ODBC bridge
-- labels are now resizable and scrollable
-- SQL aggregates can be defined in the CSX files to e.g.
-  display an average price in the diagram
-- new class for querying the scales into a simple XML
-  format
-- bugfixes, cleanups
+There are many other features, unfortunately the user manual
+is still work in progress.
 
-Changes in ToscanaJ 0.3:
-- lots of bugfixes, speedups, refactoring
-- color options can be set using the properties file
-
-Changes in ToscanaJ 0.4:
-- a plugin API offers access to database elements, either
-  as forms with one item or as reports (list + summary),
-  some viewers are available (plain text, HTML, program
-  call)
-- descriptions in HTML can be added to schema, diagrams
-  and attributes
-- diagrams in history list can be reordered by dragging
-- PCTest example is available in English and as SQL
-
-Changes in ToscanaJ 0.5:
-- embedded HypersonicSQL into the program as internal
-  database engine
-- label content can be changed on a per-label basis from
-  the context menu
-- enhanced highlighting in nested diagrams
-
-Changes in ToscanaJ 0.6:
-- loads of them, please check the download site for the
-  changelog
-  
-Changed in ToscanaJ 0.7:
-- speedup of ToscanaJ
-- some minor UI features
-- a first completely working editor: Elba
+Can I extent ToscanaJ?
+----------------------
+Yes, there are a number of plugin interfaces. You can add other
+database views and new graphic export options. Check the ToscanaJ
+and Tockit download pages for available plugin downloads. They
+get installed by unzipping them into the plugin directory.
 
 
 How do I create examples?
@@ -196,6 +165,6 @@ Enjoy!
   The ToscanaJ team
 
 ===========================================================
-(1): http://www.int.gu.edu.au/kvo
+(1): http://www.kvocentral.org
 (2): http://tockit.sourceforge.net
 (3): http://jakarta.apache.org/ant/index.html
