@@ -37,7 +37,7 @@ import java.util.ListIterator;
  * @todo Add zooming/panning options.
  */
 
-public class Canvas extends JComponent implements Printable {
+public class Canvas extends JPanel implements Printable {
     /**
      * This is the background item which is assumed to be wherever no other item is.
      */
