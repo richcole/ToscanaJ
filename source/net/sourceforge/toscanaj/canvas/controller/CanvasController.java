@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.canvas.controller;
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.Canvas;
 import net.sourceforge.toscanaj.canvas.events.CanvasItemActivatedEvent;
+import net.sourceforge.toscanaj.canvas.events.CanvasItemContextMenuRequestEvent;
 import net.sourceforge.toscanaj.events.EventBroker;
 
 import java.awt.event.MouseListener;
@@ -94,11 +95,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
         Point screenPos = e.getPoint();
         if (e.isPopupTrigger()) {
             Point2D canvasPos = canvas.getCanvasCoordinates(screenPos);
-            if (selectedCanvasItem != null) {
-                selectedCanvasItem.openPopupMenu(canvasPos, screenPos);
-            } else {
-                canvas.openBackgroundPopupMenu(canvasPos, screenPos);
-            }
+            handlePopupRequest(canvasPos, screenPos);
             popupOpen = true;
         }
         if (dragMode) {
@@ -108,18 +105,6 @@ public class CanvasController implements MouseListener, MouseMotionListener {
         } else {
             Point2D modelPos = null;
             modelPos = canvas.getCanvasCoordinates(screenPos);
-            if (selectedCanvasItem == null) {
-                canvas.backgroundClicked(modelPos);
-                if (e.getClickCount() == 1) {
-                    this.doubleClickTimer = new Timer();
-                    this.doubleClickTimer.schedule(
-                            new BackgroundSingleClickTask(canvas, modelPos, eventBroker), 300);
-                } else if (e.getClickCount() == 2) {
-                    this.doubleClickTimer.cancel();
-                    canvas.backgroundDoubleClicked(modelPos);
-                }
-                return;
-            }
             selectedCanvasItem.clicked(modelPos);
             if (e.getClickCount() == 1) {
                 this.doubleClickTimer = new Timer();
@@ -197,12 +182,14 @@ public class CanvasController implements MouseListener, MouseMotionListener {
         this.selectedCanvasItem = canvas.getCanvasItemAt(canvasPos);
         this.lastMousePos = screenPos;
         if (e.isPopupTrigger()) {
-            if (this.selectedCanvasItem != null) {
-                this.selectedCanvasItem.openPopupMenu(canvasPos, screenPos);
-            } else {
-                canvas.openBackgroundPopupMenu(canvasPos, screenPos);
-            }
+            handlePopupRequest(canvasPos, screenPos);
         }
         this.popupOpen = e.isPopupTrigger();
+    }
+
+    private void handlePopupRequest(Point2D canvasPos, Point screenPos) {
+        this.selectedCanvasItem.openPopupMenu(canvasPos, screenPos);
+        this.eventBroker.processEvent(new CanvasItemContextMenuRequestEvent(
+                this.selectedCanvasItem, canvasPos, screenPos ) );
     }
 }

@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.FilterOperationEventListener;
 import net.sourceforge.toscanaj.controller.HighlightingOperationEventListener;
+import net.sourceforge.toscanaj.controller.HighlightRemovalOperationEventListener;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
@@ -232,6 +233,11 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 new HighlightingOperationEventListener(diagramView),
                 "net.sourceforge.toscanaj.canvas.events.CanvasItemSelectedEvent",
                 "net.sourceforge.toscanaj.view.diagram.NodeView"
+        );
+        diagramView.getController().getEventBroker().subscribe(
+                new HighlightRemovalOperationEventListener(diagramView),
+                "net.sourceforge.toscanaj.canvas.events.CanvasItemSelectedEvent",
+                "net.sourceforge.toscanaj.canvas.CanvasBackground"
         );
         diagramOrganiser = new DiagramOrganiser(this.conceptualSchema);
 

@@ -21,6 +21,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.AffineTransform;
 import java.util.Iterator;
 import java.util.List;
 
@@ -88,6 +89,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
      */
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
+        AffineTransform oldTransform = g2d.getTransform();
 
         // fill the background (without transform)
         g2d.setPaint(DiagramSchema.getDiagramSchema().getBackgroundColor());
@@ -96,10 +98,6 @@ public class DiagramView extends Canvas implements ChangeObserver {
         if (diagram == null) {
             return;
         }
-        // draw diagram title in the top left corner
-        g2d.setPaint(DiagramSchema.getDiagramSchema().getForegroundColor());
-        // title is not scaled on purpose
-        g2d.drawString(diagram.getTitle(), MARGIN, MARGIN);
 
         if (screenTransformDirty) {
             // find current bounds
@@ -112,6 +110,10 @@ public class DiagramView extends Canvas implements ChangeObserver {
 
         // paint all items on canvas
         paintCanvas(g2d);
+        // draw diagram title in the top left corner
+        g2d.setPaint(DiagramSchema.getDiagramSchema().getForegroundColor());
+        g2d.setTransform(oldTransform);
+        g2d.drawString(diagram.getTitle(), MARGIN, MARGIN);
     }
 
     protected void makeScreenTransformClear() {
@@ -267,12 +269,5 @@ public class DiagramView extends Canvas implements ChangeObserver {
         repaint();
         // set the value for new ones
         ObjectLabelView.setDefaultQuery(query);
-    }
-
-    /**
-     * Overwrites Canvas.backgroundSingleClicked(Point2D) to erase the highlighting.
-     */
-    public void backgroundSingleClicked(Point2D point) {
-        this.setSelectedConcepts(null);
     }
 }

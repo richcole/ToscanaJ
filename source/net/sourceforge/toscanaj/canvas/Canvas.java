@@ -30,6 +30,8 @@ import java.util.ListIterator;
 
 public class Canvas extends JComponent implements Printable {
 
+    private CanvasBackground background = new CanvasBackground(this);
+
     /**
      * A list of all canvas items to draw.
      */
@@ -49,8 +51,6 @@ public class Canvas extends JComponent implements Printable {
      */
     private Rectangle2D canvasSize = null;
 
-    private Paint backgroundPaint = null;
-
     private CanvasController controller = null;
 
     public Canvas() {
@@ -66,6 +66,7 @@ public class Canvas extends JComponent implements Printable {
      * Paints the canvas including all CanvasItems on it.
      */
     public void paintCanvas(Graphics2D graphics) {
+        this.background.draw(graphics);
         // paint all items on canvas
         Iterator it = this.canvasItems.iterator();
         while (it.hasNext()) {
@@ -75,7 +76,7 @@ public class Canvas extends JComponent implements Printable {
     }
 
     public void setBackgroundPaint(Paint backgroundPaint) {
-        this.backgroundPaint = backgroundPaint;
+        this.background.setPaint( backgroundPaint );
     }
 
     public void setScreenTransform(AffineTransform transform) {
@@ -182,7 +183,7 @@ public class Canvas extends JComponent implements Printable {
                 return cur;
             }
         }
-        return null;
+        return background;
     }
 
     public Point2D getCanvasCoordinates(Point2D screenPos) {
@@ -210,40 +211,5 @@ public class Canvas extends JComponent implements Printable {
      */
     public void addCanvasItem(CanvasItem node) {
         this.canvasItems.add(node);
-    }
-
-    /**
-     * This callback will be executed when the background was clicked.
-     *
-     * This can be overwritten in subclasses to get effects, the default
-     * implementation does nothing. There is no distinction between single
-     * and double clicks, overwrite backgroundSingleClicked(Point2D) and
-     * backgroundDoubleClicked(Point2D) if you need this.
-     */
-    public void backgroundClicked(Point2D point) {
-    }
-
-    /**
-     * This callback will be executed when the background was clicked once.
-     *
-     * This can be overwritten in subclasses to get effects, the default
-     * implementation does nothing.
-     */
-    public void backgroundSingleClicked(Point2D point) {
-    }
-
-    /**
-     * This callback will be executed when the background was double-clicked.
-     *
-     * This can be overwritten in subclasses to get effects, the default
-     * implementation does nothing.
-     */
-    public void backgroundDoubleClicked(Point2D point) {
-    }
-
-    /**
-     * A callback for showing context menus on the background.
-     */
-    public void openBackgroundPopupMenu(Point2D canvasPosition, Point2D screenPosition) {
     }
 }
