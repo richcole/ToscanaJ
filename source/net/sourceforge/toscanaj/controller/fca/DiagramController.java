@@ -299,9 +299,14 @@ public class DiagramController implements ChangeObservable {
      * Returns the current diagram to be displayed.
      *
      * This is currently an instance of SimpleLineDiagram which is filtered
-     * by the extent of the zoomed concepts in the past diagrams.
+     * by the extent of the zoomed concepts in the past diagrams. If there is
+     * no diagram selected this will return null.
      */
     public Diagram2D getCurrentDiagram() {
+        if(history.currentDiagrams.size() == 0) {
+            // we don't have a diagram to display
+            return null;
+        }
         DiagramReference ref = (DiagramReference) history.currentDiagrams.get(0);
         Diagram2D diag = ref.getDiagram();
         SimpleLineDiagram retVal = new SimpleLineDiagram();
