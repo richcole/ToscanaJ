@@ -18,7 +18,10 @@ import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
+import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -67,7 +70,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
     /**
      * Views
      */
-    private DiagramEditingView diagramView;
+    private DiagramEditingView diagramEditingView;
     private XMLEditorDialog schemaDescriptionView;
 	private SaveFileAction saveAsFileAction;
 	private SaveConceptualSchemaActivity saveActivity;
@@ -107,7 +110,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
     private Component createTabPanel() {
         JTabbedPane tabPanel = new JTabbedPane();
         tabPanel.addTab("Tuples", createTuplePanel());
-        tabPanel.addTab("Diagrams", diagramView);
+        tabPanel.addTab("Diagrams", diagramEditingView);
         tabPanel.setBorder(BorderFactory.createLoweredBevelBorder());
         return tabPanel;
     }
@@ -137,14 +140,15 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
     }
 
     public void createViews() {
-        diagramView = new DiagramEditingView(this, conceptualSchema, eventBroker);
-        diagramView.setDividerLocation(ConfigurationManager.fetchInt(CONFIGURATION_SECTION, "diagramViewDivider", 200));
+        diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
+        diagramEditingView.setDividerLocation(ConfigurationManager.fetchInt(CONFIGURATION_SECTION, "diagramViewDivider", 200));
 
         schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
     }
 
 
     public void createMenuBar() {
+        final DiagramView diagramView = this.diagramEditingView.getDiagramView();
     	
 	    // --- menu bar ---
         menuBar = new JMenuBar();
@@ -222,6 +226,72 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
             }
         });
         editMenu.add(editSchemaDescriptionMenuItem);
+
+        JMenu viewMenu = new JMenu("View");
+        viewMenu.setMnemonic(KeyEvent.VK_V);
+        ButtonGroup fontSizeGroup = new ButtonGroup();
+        JMenu setMinLabelSizeSubMenu = new JMenu("Set minimum label size");
+        setMinLabelSizeSubMenu.setMnemonic(KeyEvent.VK_S);
+        JMenuItem fontRangeMenuItem = new JRadioButtonMenuItem("None");
+        fontSizeGroup.add(fontRangeMenuItem);
+        fontRangeMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JMenuItem source = (JMenuItem) e.getSource();
+                diagramView.setMinimumFontSize(0);
+                source.setSelected(true);
+            }
+        });
+        fontRangeMenuItem.setSelected(true);
+        setMinLabelSizeSubMenu.add(fontRangeMenuItem);
+        int fontRange = 6; //min font size
+        while (fontRange < 26) {
+            fontRangeMenuItem = new JRadioButtonMenuItem(fontRange + "");
+            fontSizeGroup.add(fontRangeMenuItem);
+            fontRangeMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    JMenuItem source = (JMenuItem) e.getSource();
+                    int newFontSize = Integer.parseInt(source.getText());
+                    diagramView.setMinimumFontSize(newFontSize);
+                    source.setSelected(true);
+                }
+            });
+            if (diagramView.getMinimumFontSize() == fontRange) {
+                fontRangeMenuItem.setSelected(true);
+            }
+            fontRange += 2;
+            setMinLabelSizeSubMenu.add(fontRangeMenuItem);
+        }
+        viewMenu.add(setMinLabelSizeSubMenu);
+
+        final JCheckBoxMenuItem showAttributeLabels =
+            new JCheckBoxMenuItem("Show Attribute Labels");
+        showAttributeLabels.setMnemonic(KeyEvent.VK_A);
+        showAttributeLabels.setSelected(true);
+        showAttributeLabels.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean newState = !AttributeLabelView.allAreHidden();
+                showAttributeLabels.setSelected(!newState);
+                AttributeLabelView.setAllHidden(newState);
+                diagramView.repaint();
+            }
+        });
+        viewMenu.add(showAttributeLabels);
+
+        final JCheckBoxMenuItem showObjectLabels =
+            new JCheckBoxMenuItem("Show Object Labels");
+        showObjectLabels.setMnemonic(KeyEvent.VK_O);
+        showObjectLabels.setSelected(true);
+        showObjectLabels.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean newState = !ObjectLabelView.allAreHidden();
+                showObjectLabels.setSelected(!newState);
+                ObjectLabelView.setAllHidden(newState);
+                diagramView.repaint();
+            }
+        });
+        viewMenu.add(showObjectLabels);
+
+        menuBar.add(viewMenu);
 
         // --- help menu ---
         // create a help menu
@@ -323,7 +393,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
         // store current position
         ConfigurationManager.storePlacement(CONFIGURATION_SECTION, this);
         ConfigurationManager.storeInt(CONFIGURATION_SECTION, "diagramViewDivider",
-                diagramView.getDividerLocation()
+                diagramEditingView.getDividerLocation()
         );
         ConfigurationManager.saveConfiguration();
         System.exit(0);
