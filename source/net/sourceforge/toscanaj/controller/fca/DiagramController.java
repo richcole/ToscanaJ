@@ -251,11 +251,12 @@ public class DiagramController implements ChangeObservable {
         this.nestingLevel = level;
         int lastPos = history.currentDiagrams.size() - 1;
         while( lastPos < level ) {
-            if( !history.futureDiagrams.isEmpty() ) {
-                history.currentDiagrams.add(history.futureDiagrams.get(0));
-                history.futureDiagrams.remove(0);
-                lastPos++;
+            if( history.futureDiagrams.isEmpty() ) {
+                break; // nothing more to get
             }
+            history.currentDiagrams.add(history.futureDiagrams.get(0));
+            history.futureDiagrams.remove(0);
+            lastPos++;
         }
         while( lastPos > level ) {
             history.futureDiagrams.add(0, history.currentDiagrams.get(lastPos));
