@@ -169,11 +169,11 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver
      */
     public void showDiagram(SimpleLineDiagram diagram ) {
         this.diagram = diagram;
+        clearCanvas();
         if(diagram == null) {
             repaint();
             return;
         }
-        newCanvasItemsList();
         // add all lines to the canvas
         for( int i = 0; i < diagram.getNumberOfLines(); i++ ) {
             DiagramLine dl = diagram.getLine(i);

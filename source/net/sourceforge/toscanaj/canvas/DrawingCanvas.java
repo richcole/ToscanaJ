@@ -28,11 +28,10 @@ import net.sourceforge.toscanaj.view.diagram.ToscanajGraphics2D;
  */
 
 public class DrawingCanvas extends JComponent implements MouseListener, MouseMotionListener {
-
     /**
      * A list of all canvas items to draw.
      */
-    protected List canvasItems;
+    protected List canvasItems = new LinkedList();
 
     /**
      * Stores the drawing context used for scaling.
@@ -178,10 +177,10 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
     }
 
     /**
-     * create a new list of canvasItems
+     * Removes all canvas items from the canvas.
      */
-    public void newCanvasItemsList() {
-        canvasItems = new LinkedList();
+    public void clearCanvas() {
+        canvasItems.clear();
     }
 
     /**
