@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ToscanaJ" default="compile" basedir="..">
+	<!-- change this to a fixed value for releases -->
+	<target name="setBuildName">
+		<tstamp>
+    		<format property="timestamp" pattern="yyyyMMdd-HHmm"/>
+		</tstamp>
+		<property name="dist.name" value="ToscanaJ-CVSbuild-${timestamp}"/>
+  	</target>	
+
 	<property name="app.name" value="ToscanaJ"/>
-	<property name="dist.name" value="ToscanaJ-CVSbuild"/>
 	<property name="build.dev.dir" value="build/dev"/>
 	<property name="build.release.dir" value="build/release"/>
 	<property name="dist.dir" value="dist"/>
@@ -43,7 +50,7 @@
             <include name="**/*.zip"/>
         </fileset>
     </path>
-	<target name="prepare">
+	<target name="prepare" depends="setBuildName">
 		<mkdir dir="${build.dev.dir}"/>
 		<mkdir dir="${build.release.dir}"/>
 	</target>
