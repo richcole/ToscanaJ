@@ -16,7 +16,6 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
 import java.util.*;
-import java.sql.SQLException;
 
 public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, BrokerEventListener {
 
@@ -160,6 +159,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                     return false;
                 }
             }
+            /// @todo check lower neighbours along the outer diagram, too
             return true;
         } catch (DatabaseException e) {
             e.getOriginal().printStackTrace();
