@@ -40,6 +40,11 @@ public class PropertiesDialog extends JDialog{
 	private PropertiesDialog dialog = this;
 	private ManyValuedContext context;
 	
+	/**
+	 * @todo this dialog could probably go with just the types instead of the whole context
+	 * @todo use session management
+	 * @todo either get object dialog to call show() in the constructor or remove it here
+	 */
 	public PropertiesDialog(Frame parent,
 										WritableManyValuedAttribute property, 
 										ManyValuedContext context){

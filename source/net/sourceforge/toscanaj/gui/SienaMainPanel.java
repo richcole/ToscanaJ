@@ -88,10 +88,12 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttributeImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContextImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableFCAObject;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
@@ -339,6 +341,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		WritableManyValuedAttribute property = (WritableManyValuedAttribute)
 										propertyList.get(column);
 		PropertiesDialog propertiesDialog = new PropertiesDialog(tFrame,property,conceptualSchema.getManyValuedContext());
+		this.tableView.updateSize();
+		this.colHeader.updateSize();
 	}
 
 	private Component createContextToolbar() {
@@ -355,7 +359,10 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		final JButton addAttributeButton = new JButton("Add attribute...");
 		addAttributeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(addAttributeButton,"Not yet implemented");
+				WritableManyValuedContext manyValuedContext = conceptualSchema.getManyValuedContext();
+				AttributeType firstType = (AttributeType) manyValuedContext.getTypes().iterator().next();
+				manyValuedContext.add(new ManyValuedAttributeImplementation(firstType,""));
+				editAttribute(manyValuedContext.getAttributes().size() - 1);
 			}
 		});
 

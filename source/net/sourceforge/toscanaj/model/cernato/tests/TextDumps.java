@@ -11,7 +11,6 @@ import net.sourceforge.toscanaj.model.BinaryRelation;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
-import net.sourceforge.toscanaj.model.cernato.Property;
 import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -20,6 +19,7 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContextImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttributeImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 
@@ -33,19 +33,19 @@ public class TextDumps {
         Collection properties = context.getAttributes();
         stream.print("\t");
         for (Iterator iterator = properties.iterator(); iterator.hasNext();) {
-            Property property = (Property) iterator.next();
+            ManyValuedAttributeImplementation property = (ManyValuedAttributeImplementation) iterator.next();
             stream.print(property.getName() + "\t");
         }
         stream.println();
         stream.print("\t");
         for (Iterator iterator = properties.iterator(); iterator.hasNext();) {
-            Property property = (Property) iterator.next();
+            ManyValuedAttributeImplementation property = (ManyValuedAttributeImplementation) iterator.next();
             stream.print(property.getType().getName() + "\t");
         }
         stream.println();
         stream.print("\t");
         for (Iterator iterator = properties.iterator(); iterator.hasNext();) {
-            Property property = (Property) iterator.next();
+            ManyValuedAttributeImplementation property = (ManyValuedAttributeImplementation) iterator.next();
             AttributeType type = property.getType();
             if (type instanceof TextualType) {
                 stream.print("T\t");
@@ -59,7 +59,7 @@ public class TextDumps {
             FCAObjectImplementation object = (FCAObjectImplementation) it1.next();
             stream.print(object.getName() + "\t");
             for (Iterator it2 = properties.iterator(); it2.hasNext();) {
-                Property property = (Property) it2.next();
+                ManyValuedAttributeImplementation property = (ManyValuedAttributeImplementation) it2.next();
                 stream.print(context.getRelationship(object, property).getDisplayString() + "\t");
             }
             stream.println();

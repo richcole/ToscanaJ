@@ -5,16 +5,14 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
 
-public class Property implements WritableManyValuedAttribute {
+public class ManyValuedAttributeImplementation implements WritableManyValuedAttribute {
     private AttributeType type;
     private String name;
 
-    public Property(AttributeType type, String name) {
+    public ManyValuedAttributeImplementation(AttributeType type, String name) {
         this.type = type;
         this.name = name;
     }

@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.model.cernato.tests;
 
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
-import net.sourceforge.toscanaj.model.cernato.Property;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.*;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValue;
@@ -38,12 +37,12 @@ public class TestData {
     public static TextualValueGroup TextGroup4;
     public static TextualType TextType2;
     public static TextualValueGroup TextGroup5;
-    public static Property Property1;
-    public static Property Property2;
-    public static Property Property3;
-    public static Property Property4;
-    public static Property Property5;
-    public static Property Property6;
+    public static ManyValuedAttributeImplementation Property1;
+    public static ManyValuedAttributeImplementation Property2;
+    public static ManyValuedAttributeImplementation Property3;
+    public static ManyValuedAttributeImplementation Property4;
+    public static ManyValuedAttributeImplementation Property5;
+    public static ManyValuedAttributeImplementation Property6;
     public static FCAObjectImplementation Object1;
     public static FCAObjectImplementation Object2;
     public static FCAObjectImplementation Object3;
@@ -96,12 +95,12 @@ public class TestData {
 
         ManyValuedContextImplementation context = Model.getContext();
 
-        Property1 = new Property(NumType1, "prop1");
-        Property2 = new Property(NumType1, "prop2");
-        Property3 = new Property(TextType1, "prop3");
-        Property4 = new Property(TextType1, "prop4");
-        Property5 = new Property(TextType2, "prop5");
-        Property6 = new Property(TextType2, "prop6");
+        Property1 = new ManyValuedAttributeImplementation(NumType1, "prop1");
+        Property2 = new ManyValuedAttributeImplementation(NumType1, "prop2");
+        Property3 = new ManyValuedAttributeImplementation(TextType1, "prop3");
+        Property4 = new ManyValuedAttributeImplementation(TextType1, "prop4");
+        Property5 = new ManyValuedAttributeImplementation(TextType2, "prop5");
+        Property6 = new ManyValuedAttributeImplementation(TextType2, "prop6");
 
         context.add(Property1);
         context.add(Property2);

@@ -8,10 +8,10 @@
 package net.sourceforge.toscanaj.parser;
 
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
-import net.sourceforge.toscanaj.model.cernato.Property;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttributeImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.*;
 
@@ -165,7 +165,7 @@ public class CernatoXMLParser {
             String id = propElem.getAttributeValue("id");
             String name = propElem.getChild("name").getText();
             String typeref = propElem.getChild("type_ref").getAttributeValue("type");
-            Property property = new Property((AttributeType) types.get(typeref), name);
+            ManyValuedAttributeImplementation property = new ManyValuedAttributeImplementation((AttributeType) types.get(typeref), name);
             properties.put(id, property);
             model.getContext().add(property);
         }
@@ -207,7 +207,7 @@ public class CernatoXMLParser {
                 	continue;
                 }
                 String propertyid = cellElem.getAttributeValue("property");
-                Property property = (Property) properties.get(propertyid);
+                ManyValuedAttributeImplementation property = (ManyValuedAttributeImplementation) properties.get(propertyid);
                 if (property.getType() instanceof TextualType) {
                     model.getContext().setRelationship(object, property, new TextualValue(content));
                 } else if (property.getType() instanceof NumericalType) {
@@ -231,7 +231,7 @@ public class CernatoXMLParser {
             List criteriaElems = viewElem.getChildren("criterion");
             for (Iterator iterator2 = criteriaElems.iterator(); iterator2.hasNext();) {
                 Element criterionElem = (Element) iterator2.next();
-                Property property = (Property) properties.get(criterionElem.getChild("property_ref").
+                ManyValuedAttributeImplementation property = (ManyValuedAttributeImplementation) properties.get(criterionElem.getChild("property_ref").
                         getAttributeValue("property"));
                 ScaleColumn valgroup = property.getType().getScales()[0].getColumn(criterionElem.getChild("value_group_ref").
                         getAttributeValue("value_group"));
