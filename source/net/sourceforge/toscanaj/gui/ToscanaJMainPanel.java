@@ -40,6 +40,10 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.*;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
@@ -63,7 +67,7 @@ import java.util.ListIterator;
  *
  * @todo store view settings (contingent/extent labels/gradient) in session management
  */
-public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeObserver {
+public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeObserver, ClipboardOwner {
 
     /**
      * The central event broker for the main panel
@@ -1102,22 +1106,23 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
 				if(this.diagramExportSettings.getSaveCommentsToFile()==true){
 					/// @todo The text file might be overwritten without user interaction, check if it exists before overwriting
 					//write the textual description of the diagram view history to a text file
-				try{
-					PrintWriter out = new PrintWriter(new FileWriter(new File(selectedFile.getAbsolutePath()+".txt")));
-					out.println("The diagram(s) you have viewed for the resulting image: "+System.getProperty("line.separator")+selectedFile.getAbsolutePath());
-					DateFormat dateFormatter = DateFormat.getDateTimeInstance();
-					out.println("as at "+dateFormatter.format(new Date(System.currentTimeMillis()))+" is(are): ");
-					out.println();
-					out.println(DiagramController.getController().getDiagramHistory().getTextualDescription());
-					out.close();
-				}catch(IOException e){
-					ErrorDialog.showError(this, e, "Exporting text file error");
-				}
+					try{
+						PrintWriter out = new PrintWriter(new FileWriter(new File(selectedFile.getAbsolutePath()+".txt")));
+						out.println("The diagram(s) you have viewed for the resulting image: "+System.getProperty("line.separator")+selectedFile.getAbsolutePath());
+						DateFormat dateFormatter = DateFormat.getDateTimeInstance();
+						out.println("as at "+dateFormatter.format(new Date(System.currentTimeMillis()))+" is(are): ");
+						out.println();
+						out.println(DiagramController.getController().getDiagramHistory().getTextualDescription());
+						out.close();
+					}catch(IOException e){
+						ErrorDialog.showError(this, e, "Exporting text file error");
+					}
 				}
 				if(this.diagramExportSettings.getSaveCommentToClipboard()==true){
-					System.out.println("Save history comments to clipboard");
-					System.err.println("Not yet implemented");
-					//do the handling of adding the history comments the system clipboard here
+					//copy the history comments to the system clipboard
+					StringSelection comments = new StringSelection(DiagramController.getController().getDiagramHistory().getTextualDescription());
+					Clipboard systemClipboard = getToolkit().getSystemClipboard();
+					systemClipboard.setContents(comments,ToscanaJMainPanel.this);
 				}
 		} catch (ImageGenerationException e) {
 			ErrorDialog.showError(this, e, "Exporting image error");
@@ -1269,6 +1274,12 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
                 "See http://toscanaj.sourceforge.net for more information.",
                 "About ToscanaJ",
                 JOptionPane.PLAIN_MESSAGE);
+    }
+    
+    public void lostOwnership(Clipboard clipboard, Transferable comments) {
+    //mandatory method to implement for the copy to systemClipboard function
+    //don't have to do anything
+    //see exportImage(File selectedFile) method
     }
 }
 
