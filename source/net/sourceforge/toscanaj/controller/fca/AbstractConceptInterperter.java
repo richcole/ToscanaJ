@@ -266,7 +266,28 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                 return executeObjectCountQuery(concept, context);
             }
 		} else if (query == AggregateQuery.PERCENT_QUERY) {
-			int objectCount = getObjectCount(concept, context);
+            if(this.showDeviation) {
+                if(!(context.getNestingContexts().size() == 0)) {
+                    DeviationValuesRef deviationValues = new DeviationValuesRef(concept, context);
+                    double expectedSize = deviationValues.getExpectedSize();
+                    int objectCount = getObjectCount(concept, context); 
+                    if ((objectCount == 0) && (expectedSize == 0)) {
+                        return null;
+                    }
+                    if (objectCount != expectedSize) {
+                        boolean oldMode = context.getObjectDisplayMode();
+                        context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
+                        int fullExtent = getObjectCount(concept.getTopConcept(), context);
+                        context.setObjectDisplayMode(oldMode);
+                        NumberFormat format = DecimalFormat.getPercentInstance();
+                        format.setMaximumFractionDigits(2);
+                        String returnValue = format.format(objectCount/(double)fullExtent) + 
+                                                " [exp: " + format.format(expectedSize/(double)fullExtent) + "]";
+                        return new Object[]{getObject(returnValue, concept, context)};              
+                    } // else fall back into normal behaviour
+                } // else fall back into normal behaviour
+            }
+        	int objectCount = getObjectCount(concept, context);
 			if( objectCount != 0) {
 				boolean oldMode = context.getObjectDisplayMode();
 				context.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
