@@ -326,9 +326,9 @@ public class DatabaseInfo implements XMLizable {
             if (url.indexOf(';') == -1) {
                 // a semicolon is not allowed in DSN names, only in file URLs
                 return ODBC;
-            } else if (url.indexOf("Access") != -1) {
+            } else if (url.startsWith(ACCESS_FILE_URL_PREFIX)) {
                 return ACCESS_FILE;
-            } else if (url.indexOf("Excel") != -1) {
+            } else if (url.startsWith(EXCEL_FILE_URL_PREFIX)) {
                 return EXCEL_FILE;
             } else {
                 throw new IllegalStateException("Undefined JDBC URL: " + url);
