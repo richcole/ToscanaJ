@@ -28,7 +28,7 @@
 			<entry name="Participate" sourceFile="index.xhtml" targetFile="index.html" type="XHTML" id="participate"/>
 		</section>
 		<file sourceFile="style.css" targetFile="style.css" type="copy" id="style"/>
-
+		<file sourceFile="logo.png" targetFile="logo.png" type="copy" id="firstLogo"/>
 	</structure>
         <layout>
                 <documentStyle type="XHTML">
