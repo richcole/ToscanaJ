@@ -11,9 +11,9 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.events.CanvasItemEvent;
 import org.tockit.events.Event;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
-public class HighlightingOperationEventListener implements EventListener {
+public class HighlightingOperationEventListener implements EventBrokerListener {
     private DiagramView diagramView;
 
     public HighlightingOperationEventListener(DiagramView diagramView) {

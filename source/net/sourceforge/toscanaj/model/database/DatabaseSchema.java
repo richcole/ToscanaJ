@@ -18,13 +18,13 @@ import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class DatabaseSchema implements XMLizable, EventListener {
+public class DatabaseSchema implements XMLizable, EventBrokerListener {
 
     EventBroker broker;
     List tables;

@@ -36,7 +36,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.cernato.NDimDiagramEditingView;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,7 +51,7 @@ import java.util.ListIterator;
 
 /// @todo check if the file we save to exists, warn if it does
 
-public class LuccaMainPanel extends JFrame implements MainPanel, EventListener {
+public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     static private final int MaxMruFiles = 8;
 
     /**

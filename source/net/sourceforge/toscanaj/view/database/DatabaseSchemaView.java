@@ -16,7 +16,7 @@ import net.sourceforge.toscanaj.model.events.TableChangedEvent;
 import net.sourceforge.toscanaj.util.STD_Iterator;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -24,7 +24,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class DatabaseSchemaView extends JPanel implements EventListener {
+public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 
     DefaultListModel unkeyedTableList;
     DefaultListModel keyedTableList;

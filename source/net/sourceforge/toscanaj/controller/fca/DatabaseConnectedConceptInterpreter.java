@@ -16,11 +16,11 @@ import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import org.tockit.events.Event;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import java.util.*;
 
-public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, EventListener {
+public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, EventBrokerListener {
     private DatabaseInfo databaseInfo;
 
     private Hashtable extentSizes = new Hashtable();

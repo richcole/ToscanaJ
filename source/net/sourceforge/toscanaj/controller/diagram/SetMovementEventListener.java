@@ -13,11 +13,11 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import org.tockit.events.Event;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import java.awt.geom.Point2D;
 
-public abstract class SetMovementEventListener implements EventListener {
+public abstract class SetMovementEventListener implements EventBrokerListener {
     public void processEvent(Event e) {
         CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
         NodeView nodeView = (NodeView) dragEvent.getSubject();

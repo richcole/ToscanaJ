@@ -16,7 +16,7 @@ import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -25,7 +25,7 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.List;
 
-public class ObjectLabelViewPopupMenuHandler implements EventListener {
+public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
     private DiagramView diagramView;
     private List queries;
 

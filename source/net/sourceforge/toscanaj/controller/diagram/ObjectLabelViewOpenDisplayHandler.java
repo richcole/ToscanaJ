@@ -12,9 +12,9 @@ import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
-public class ObjectLabelViewOpenDisplayHandler implements EventListener {
+public class ObjectLabelViewOpenDisplayHandler implements EventBrokerListener {
     public void processEvent(Event e) {
         CanvasItemEventWithPosition itemEvent = null;
         try {

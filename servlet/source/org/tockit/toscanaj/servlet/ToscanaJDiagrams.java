@@ -7,7 +7,6 @@
  */
 package org.tockit.toscanaj.servlet;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
-import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.ConceptualSchema;

@@ -13,7 +13,7 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import org.tockit.canvas.CanvasItem;
 import org.tockit.events.Event;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -30,7 +30,7 @@ import java.util.Vector;
  * which are distinguished by position (above vs. below the node) and default
  * display type (list vs. number).
  */
-abstract public class LabelView extends CanvasItem implements ChangeObserver, EventListener {
+abstract public class LabelView extends CanvasItem implements ChangeObserver, EventBrokerListener {
     /**
      * Used when the label should be drawn above the given point.
      *

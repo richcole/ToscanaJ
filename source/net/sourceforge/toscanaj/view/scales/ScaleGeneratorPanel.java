@@ -13,7 +13,7 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 import util.CollectionFactory;
 
 import javax.swing.*;
@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class ScaleGeneratorPanel extends JPanel implements EventListener {
+public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
     private List scaleGenerators = null;
     private JFrame parentFrame;
     ConceptualSchema conceptualSchema;

@@ -22,7 +22,7 @@ import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -33,7 +33,7 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
-public class DiagramEditingView extends JPanel implements EventListener {
+public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private DiagramCollection conceptualSchema;
     private DefaultListModel diagramListModel;
     private JSplitPane splitPane;

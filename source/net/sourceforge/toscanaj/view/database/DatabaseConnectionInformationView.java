@@ -17,7 +17,7 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -26,7 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-public class DatabaseConnectionInformationView extends JDialog implements EventListener {
+public class DatabaseConnectionInformationView extends JDialog implements EventBrokerListener {
     protected DatabaseInfo info;
 
     private DatabaseConnectEvent databaseConnectEvent;

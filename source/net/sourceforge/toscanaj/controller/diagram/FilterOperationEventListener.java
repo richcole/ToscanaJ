@@ -11,9 +11,9 @@ import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 import org.tockit.canvas.events.CanvasItemEvent;
 import org.tockit.events.Event;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
-public class FilterOperationEventListener implements EventListener {
+public class FilterOperationEventListener implements EventBrokerListener {
     private DiagramController controller;
 
     public FilterOperationEventListener(DiagramController controller) {

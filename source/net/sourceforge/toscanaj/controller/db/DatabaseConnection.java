@@ -17,7 +17,7 @@ import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -34,7 +34,7 @@ import java.util.Vector;
  * This class facilitates connection to and communication with a database
  * via JDBC.
  */
-public class DatabaseConnection implements EventListener {
+public class DatabaseConnection implements EventBrokerListener {
     /**
      * The JDBC database connection we use.
      */

@@ -30,7 +30,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingView;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,7 +45,7 @@ import java.util.ListIterator;
 
 /// @todo check if the file we save to exists, warn if it does
 
-public class ElbaMainPanel extends JFrame implements MainPanel, EventListener {
+public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     static private final int MaxMruFiles = 8;
 
     /**

@@ -18,7 +18,7 @@ import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -28,7 +28,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 
-public class ScaleEditingView extends JPanel implements EventListener, TableColumnPairsSelectionSource {
+public class ScaleEditingView extends JPanel implements EventBrokerListener, TableColumnPairsSelectionSource {
     private ConceptualSchema conceptualSchema;
     private DefaultListModel tableColumnListModel;
     private DefaultListModel scalesListModel;

@@ -12,11 +12,11 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.util.xmlize.XMLWriter;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
-import org.tockit.events.EventListener;
+import org.tockit.events.EventBrokerListener;
 
 import java.io.File;
 
-public class SaveConceptualSchemaActivity implements FileActivity, EventListener {
+public class SaveConceptualSchemaActivity implements FileActivity, EventBrokerListener {
     private ConceptualSchema conceptualSchema;
     private EventBroker eventBroker;
 
