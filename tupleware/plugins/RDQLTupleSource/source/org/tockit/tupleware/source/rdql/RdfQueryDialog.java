@@ -39,13 +39,7 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import org.tockit.tupleware.model.TupleSet;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFReader;
-import com.hp.hpl.jena.rdf.model.RDFReaderF;
-import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
 import com.hp.hpl.jena.rdql.Query;
-import com.hp.hpl.jena.rdql.QueryEngine;
-import com.hp.hpl.jena.rdql.QueryExecution;
 import com.hp.hpl.jena.rdql.QueryResults;
 import com.hp.hpl.jena.rdql.ResultBinding;
 
@@ -141,19 +135,10 @@ public class RdfQueryDialog extends JDialog {
 		
 		boolean executeStep() {
 			File file = new File(fileLocationField.getText());
-			String readerLang = "RDF/XML";
-			if (file.getAbsolutePath().endsWith(".n3")) {
-				readerLang = "N3";
-			}
-		
-			RDFReaderF rdfReaderFactory = new RDFReaderFImpl();
-			RDFReader rdfReader = rdfReaderFactory.getReader(readerLang);
-		
-			rdfModel = ModelFactory.createDefaultModel();
 			try {
-				rdfReader.read(rdfModel, file.toURL().toString());
+				rdfModel = RdfQueryUtil.createModel(file);
 			} catch (Exception e) {
-				ErrorDialog.showError(this, e, "Error parsing " + readerLang + " file");
+				ErrorDialog.showError(this, e, "Error parsing file " + file.getAbsolutePath());
 				return false;
 			}
 			ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, CONFIGURATION_FILE_STRING, file.getAbsolutePath());
@@ -161,7 +146,6 @@ public class RdfQueryDialog extends JDialog {
 		}
 		
 	}
-    
 
 	class RdfQueryPanel extends WizardPanel {
 
@@ -200,15 +184,12 @@ public class RdfQueryDialog extends JDialog {
 		boolean executeStep() {
 			try {
 				String queryString = rdfQueryArea.getText();
-				System.out.println("Query: " + queryString);
 
 				Query query = new Query(queryString) ;
 				List resultVars = query.getResultVars();
 				tupleSet = new TupleSet(
 									(String[]) resultVars.toArray(new String[resultVars.size()]));
-				query.setSource(rdfModel);	
-				QueryExecution qe = new QueryEngine(query) ;
-				QueryResults results = qe.exec();
+				QueryResults results = RdfQueryUtil.executeRDQL(rdfModel, query);
 				for ( Iterator iter = results ; iter.hasNext() ; ) {
 					ResultBinding resBinding = (ResultBinding)iter.next() ;
 					Object[] tuple = new Object[resultVars.size()];
@@ -217,7 +198,6 @@ public class RdfQueryDialog extends JDialog {
 						Object obj = resBinding.get(queryVar);
 						tuple[i] = obj;				
 					} 
-					System.out.println("---" + TupleSet.toString(tuple));
 					tupleSet.addTuple(tuple);
 				}
 				results.close() ;
