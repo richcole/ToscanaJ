@@ -59,17 +59,18 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
     }
 
     public void openPopupMenu(final ObjectLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
-        final DatabaseRetrievedObject object =
-                (DatabaseRetrievedObject) labelView.getObjectAtPosition(canvasPosition);
-        if (object == null) {
+        Object object = labelView.getObjectAtPosition(canvasPosition);
+        if (! (object instanceof DatabaseRetrievedObject) ) {
             return;
         }
+        final DatabaseRetrievedObject dbObject =
+                (DatabaseRetrievedObject) object;
         int numberOfQueries = 0;
         if (this.queries != null) {
             numberOfQueries = this.queries.size();
         }
-        List objectViewNames = DatabaseViewerManager.getObjectViewNames(object);
-        List objectListViewNames = DatabaseViewerManager.getObjectListViewNames(object);
+        List objectViewNames = DatabaseViewerManager.getObjectViewNames(dbObject);
+        List objectListViewNames = DatabaseViewerManager.getObjectListViewNames(dbObject);
         if (numberOfQueries + objectViewNames.size() + objectListViewNames.size() == 0) { // nothing to display
             return;
         }
@@ -79,10 +80,10 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
             addQueryOptions(queries, labelView, popupMenu);
         }
         if (objectViewNames.size() != 0) {
-            addObjectViewOptions(objectViewNames, object, popupMenu);
+            addObjectViewOptions(objectViewNames, dbObject, popupMenu);
         }
         if (objectListViewNames.size() != 0) {
-            addObjectListViewOptions(objectListViewNames, object, popupMenu);
+            addObjectListViewOptions(objectListViewNames, dbObject, popupMenu);
         }
         popupMenu.show(this.diagramView, (int) screenPosition.getX(), (int) screenPosition.getY());
     }
