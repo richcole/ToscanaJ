@@ -279,8 +279,8 @@ public class ConceptImplementation implements Concept {
     /**
      * Adds a concept to the ideal.
      */
-    public void addSubConcept(Concept superConcept) {
-        this.ideal.add(superConcept);
+    public void addSubConcept(Concept subConcept) {
+        this.ideal.add(subConcept);
     }
 
     /**
