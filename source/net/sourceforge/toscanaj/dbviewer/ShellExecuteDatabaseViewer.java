@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.dbviewer;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -89,17 +90,24 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
         }
         
         URL baseURL = DatabaseViewerManager.getBaseURL();
-        final URL resourceURL;
+        URL resourceURL;
         try {
+        	// first try proper URL resolving, using baseURL for relative locations
             resourceURL = new URL(baseURL, resourceLocation);
         } catch (MalformedURLException e) {
-            throw new DatabaseViewerException("Can not resolve URL for item", e);
+        	try {
+        		// if that fails, assume it is a file system location 
+				resourceURL = new File(resourceLocation).toURL();
+			} catch (MalformedURLException e1) {
+	            throw new DatabaseViewerException("Can not resolve URL for item", e);
+			}
         }
         
+        final URL finalURL = resourceURL;
         Runnable external = new Runnable() {
             public void run() {
                 try {
-                    BrowserLauncher.openURL(resourceURL.toExternalForm());
+                    BrowserLauncher.openURL(finalURL.toExternalForm());
                 } catch (IOException e) {
                     e.printStackTrace();
                     logger.severe("Launching external program failed: " + e.getMessage());

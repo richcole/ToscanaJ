@@ -10,6 +10,8 @@ Affecting different programs:
 
 Specific for ToscanaJ:
 ======================
+- Bugfix: the ShellExecuteDatabaseViewer can now handle absolute file system locations 
+  again (in addition to URLs and relative locations).
 
 Specific for Elba:
 ==================
