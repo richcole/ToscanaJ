@@ -174,7 +174,7 @@ public class TableViewPanel extends JFrame {
 					double x = e.getPoint().getX();
 					double y = e.getPoint().getY();
 					Point p = new Point(x,y);
-					cernatoTableView.setSelectedColumn(new TableView.
+					cernatoTableView.setSelectedCell(new TableView.
 															SelectedCell(p.getCol(), p.getRow()));
 				} 
 				

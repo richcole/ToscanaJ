@@ -7,6 +7,53 @@
  */
 package net.sourceforge.toscanaj.gui;
 
+/** 
+ * @todo this class is too big in many senses, most noticably in the fact that it knows about
+ * way too much stuff
+ */ 
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.HeadlessException;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Vector;
+
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
+
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.cernato.CernatoDimensionStrategy;
 import net.sourceforge.toscanaj.controller.diagram.ObjectEditingLabelViewPopupMenuHandler;
@@ -38,9 +85,15 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContextImplementation;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableFCAObject;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalValue;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 import net.sourceforge.toscanaj.parser.BurmeisterParser;
 import net.sourceforge.toscanaj.parser.CSCParser;
@@ -64,19 +117,6 @@ import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Vector;
-import java.util.List;
-import java.util.ListIterator;
 
 /**
  * @todo make sure all changes to the context will propagate to make the schema dirty.
@@ -240,7 +280,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		final Frame tFrame = JOptionPane.getFrameForComponent(tableView);
 		
 		final ObjectDialog objectDialog = new ObjectDialog(tFrame, this.conceptualSchema.getManyValuedContext());
-		
+
+		tableView.addMouseListener(getTableViewMouseListener());
+				
 		colHeader.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
@@ -280,6 +322,42 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		JPanel retVal = new JPanel(new BorderLayout());
 		retVal.add(scrollPane, BorderLayout.CENTER);
 		return retVal;
+	}
+
+	protected MouseListener getTableViewMouseListener() {
+		MouseListener mouseListener = new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getButton() == MouseEvent.BUTTON1) {
+					double x = e.getPoint().getX();
+					double y = e.getPoint().getY();
+					Point p = new Point(x,y);
+					tableView.setSelectedCell(new TableView.SelectedCell(p.getCol(), p.getRow()));
+				} 
+				
+				if(e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1){
+					double x = e.getPoint().getX();
+					double y = e.getPoint().getY();
+					Point p = new Point(x,y);
+					WritableManyValuedContext context = conceptualSchema.getManyValuedContext();
+                    ArrayList propertyList = (ArrayList)context.getAttributes();
+					WritableManyValuedAttribute attribute = (WritableManyValuedAttribute)
+															propertyList.get(p.getRow());
+					ArrayList objectList = (ArrayList) context.getObjects();
+					WritableFCAObject obj = (WritableFCAObject)objectList.get(p.getCol());
+					double xPos = e.getPoint().getX();
+					double yPos = e.getPoint().getY();
+					
+					if(attribute.getType() instanceof TextualType){
+						showPopupMenu(xPos,yPos, attribute, obj);
+					}
+					else {
+						showNumericInputDialog(attribute, obj);
+					}
+					tableView.repaint();
+				}
+			}
+		};
+		return mouseListener;
 	}
 
     public void createMenuBar() {
@@ -939,4 +1017,65 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             }
         }
     }
+
+	protected void showNumericInputDialog(WritableManyValuedAttribute attribute,
+												WritableFCAObject obj) {
+		WritableManyValuedContext context = this.conceptualSchema.getManyValuedContext();
+        String content = context.getRelationship(obj,attribute).toString();
+		String value = (String) JOptionPane.showInputDialog(this,"Enter Value","Edit Value",
+																JOptionPane.PLAIN_MESSAGE,null,null,
+																content);
+		if(value!=null){
+			try{
+				double val = Double.parseDouble(value);
+				NumericalValue numericalValue = new NumericalValue(val);
+				context.setRelationship(obj,attribute,numericalValue);
+				validate();
+			}catch(NumberFormatException e){
+				JOptionPane.showMessageDialog(this,
+							"Enter numbers only.",
+							"Warning",
+							JOptionPane.WARNING_MESSAGE);
+				showNumericInputDialog(attribute,obj);
+			}
+		}
+	}
+	
+	protected void showPopupMenu(double xPos, double yPos, ManyValuedAttribute 
+										property, FCAObject obj) {
+		TextualType attributeType = (TextualType)property.getType();
+		AttributeValue[] textualValueList = attributeType.getValueRange();
+		JPopupMenu menu = new JPopupMenu();
+		
+		if(textualValueList.length<=15){
+			menu = createPopupMenu(1,textualValueList.length,textualValueList,
+														property,obj);
+		}
+		else{
+			int numOfRows = 15;
+			menu = createPopupMenu(textualValueList.length/numOfRows,numOfRows,
+											textualValueList,property,obj );
+		}
+		menu.show(this,(int)xPos,(int)yPos);
+	}
+
+	protected JPopupMenu createPopupMenu(int numOfCol,int numOfRows, AttributeValue[] textualValueList,
+											final ManyValuedAttribute property, 
+												final FCAObject obj) {
+		final WritableManyValuedContext context = this.conceptualSchema.getManyValuedContext();
+		JPopupMenu menu = new JPopupMenu();
+		menu.setLayout(new GridLayout(numOfRows ,numOfCol));
+		for(int i = 0 ; i < textualValueList.length ; i++){
+			final AttributeValue textualValue = (AttributeValue) textualValueList[i];
+			JMenuItem menuItem = new JMenuItem(textualValue.getDisplayString());
+			menuItem.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e){
+					context.setRelationship(obj,property,textualValue);
+					validate();
+				}
+			});
+			menu.add(menuItem);
+		}
+		return menu;
+	}
 }

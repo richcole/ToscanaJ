@@ -58,7 +58,7 @@ public class TableView extends JComponent implements Scrollable{
 		Iterator attriIt = context.getAttributes().iterator();
 		while(attriIt.hasNext()){
 			ManyValuedAttribute attribute = (ManyValuedAttribute) attriIt.next();
-			if(selectedCell.getColumn()-1 == col){
+			if(selectedCell.getColumn() == col){
 				drawColumn(g2d, col, true, attribute);
 			}else{
 				drawColumn(g2d,col,false, attribute);
@@ -114,14 +114,14 @@ public class TableView extends JComponent implements Scrollable{
 	}
 	
 	protected boolean checkCellSelected(int row, boolean columnSelected){
-		if(selectedCell.getRow()-1 == row || columnSelected){
+		if(selectedCell.getRow() == row || columnSelected){
 				return true;
 		}
 		return false;
 	}
 	
-	public void setSelectedColumn(SelectedCell col){
-		selectedCell = col;
+	public void setSelectedCell(SelectedCell cell){
+		selectedCell = cell;
 		repaint();
 	}
 
