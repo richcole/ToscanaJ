@@ -21,6 +21,7 @@ import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.cernato.View;
 import net.sourceforge.toscanaj.model.cernato.Criterion;
 import net.sourceforge.toscanaj.model.cernato.PartialOrderNode;
+import net.sourceforge.toscanaj.model.cernato.tests.TextDumps;
 import net.sourceforge.toscanaj.model.events.*;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.ToscanaJ;
@@ -206,14 +207,16 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
         Vector dimensions = LayoutOperations.calculateDimensions(cernatoModel);
         for (Iterator iterator = views.iterator(); iterator.hasNext();) {
             View view = (View) iterator.next();
+            TextDumps.dump(cernatoModel, view, System.out);
             addDiagram(schema, view, dimensions);
+            System.out.println("============================================================");
+            System.out.println();
         }
     }
 
     private void addDiagram(ConceptualSchema schema, View view, Vector dimensions) {
         SimpleLineDiagram diagram = new SimpleLineDiagram();
         diagram.setTitle(view.getName());
-        System.out.println("View: " + view.getName());
         List criteria = view.getCriteria();
         for (Iterator iterator = criteria.iterator(); iterator.hasNext();) {
             Criterion criterion = (Criterion) iterator.next();

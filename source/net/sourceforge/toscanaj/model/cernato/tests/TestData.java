@@ -436,4 +436,13 @@ public class TestData {
         }
         return positives.contains(criterion.getValueGroup());
     }
+
+    public static void main(String[] args) {
+        TextDumps.dump(Model.getContext(), System.out);
+        for (Iterator iterator = Model.getViews().iterator(); iterator.hasNext();) {
+            System.out.println();
+            View view = (View) iterator.next();
+            TextDumps.dump(Model, view, System.out);
+        }
+    }
 }

@@ -23,4 +23,8 @@ public class Criterion {
     public ValueGroup getValueGroup() {
         return valueGroup;
     }
+
+    public String getDisplayString() {
+        return property.getName() + ":" + valueGroup.getName();
+    }
 }
