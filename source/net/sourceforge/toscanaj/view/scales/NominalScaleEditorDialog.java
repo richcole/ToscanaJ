@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
@@ -24,6 +25,8 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -50,6 +53,12 @@ public class NominalScaleEditorDialog extends JDialog {
     private JButton andButton;
     private JButton orButton;
     
+	private static final String CONFIGURATION_SECTION_NAME = "NominalScaleEditorDialog";
+	private static final int MINIMUM_WIDTH = 500;
+	private static final int MINIMUM_HEIGHT = 300;
+	private static final int DEFAULT_X_POS = 10;
+	private static final int DEFAULT_Y_POS = 10;
+	
     public interface SqlFragment {
     	String getAttributeLabel();
     	String getSqlClause();
@@ -131,6 +140,22 @@ public class NominalScaleEditorDialog extends JDialog {
         this.databaseConnection = databaseConnection;
         this.databaseSchema = databaseSchema;
 
+		ConfigurationManager.restorePlacement(CONFIGURATION_SECTION_NAME, 
+		this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
+		//	to enforce the minimum size during resizing of the JDialog
+		 addComponentListener( new ComponentAdapter() {
+			 public void componentResized(ComponentEvent e) {
+				 int width = getWidth();
+				 int height = getHeight();
+				 if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
+				 if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
+				 setSize(width, height);
+			 }
+			 public void componentShown(ComponentEvent e) {
+				 componentResized(e);
+			 }
+		 });
+
         createControls();
         fillControls();
 
@@ -141,7 +166,6 @@ public class NominalScaleEditorDialog extends JDialog {
         setModal(true);
         setTitle("Nominal Scale Generator");
         getContentPane().setLayout(new GridBagLayout());
-
         // -- title pane ---
         this.scaleTitleField = new JTextField();
         this.scaleTitleField.addKeyListener(new KeyListener(){
@@ -334,8 +358,7 @@ public class NominalScaleEditorDialog extends JDialog {
         cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                result = false;
-                hide();
+                closeDialog(false);
             }
         });
         createButton = new JButton("Create");
@@ -343,8 +366,7 @@ public class NominalScaleEditorDialog extends JDialog {
         attributeListView.getModel().getSize()!=0);
         createButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                result = true;
-                hide();
+				closeDialog(true);
             }
         });
 	
@@ -373,7 +395,11 @@ public class NominalScaleEditorDialog extends JDialog {
 		});
         pack();
     }
-
+	private void closeDialog(boolean res) {
+		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
+		result = res;
+		hide();
+	}
     private void addValuesToSelection() {
         for (int i = this.columnValuesListView.getSelectedValues().length - 1; i >= 0; i--) {
             String value = (String)this.columnValuesListView.getSelectedValues()[i];
