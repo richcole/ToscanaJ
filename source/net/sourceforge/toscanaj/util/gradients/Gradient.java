@@ -5,12 +5,12 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.view.diagram;
+package net.sourceforge.toscanaj.util.gradients;
 
 import java.awt.Color;
 
 
-public interface LinearGradient {
+public interface Gradient {
 	/**
 	 * Returns the color at a certain position.
 	 * 

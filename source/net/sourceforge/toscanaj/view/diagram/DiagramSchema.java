@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.util.gradients.*;
 
 import java.awt.*;
 
@@ -57,6 +58,8 @@ public class DiagramSchema {
      * The color used for the bottom of the gradient.
      */
     private Color bottomColor;
+
+	private Gradient gradient;
 
     /**
      * The color for the circles around the nodes.
@@ -110,6 +113,7 @@ public class DiagramSchema {
 		retVal.background = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "backgroundColor", null);
 		retVal.topColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "topColor", new Color(0, 0, 150));
 		retVal.bottomColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "bottomColor", new Color(255, 255, 150));
+		retVal.gradient = retVal.getDefaultGradient();
 		retVal.foreground = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "foregroundColor", new Color(0, 0, 0));
 		retVal.nestedDiagramNodeColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "nestedDiagramNodeColor", new Color(255, 255, 255));
 		retVal.notRealisedDiagramNodeColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "notRealisedDiagramNodeColor", null);
@@ -158,6 +162,7 @@ public class DiagramSchema {
 		retVal.background = null;
 		retVal.topColor = new Color(0, 0, 0);
 		retVal.bottomColor = new Color(255, 255, 255);
+		retVal.gradient = retVal.getDefaultGradient();
 		retVal.foreground = new Color(0, 0, 0);
 		retVal.nestedDiagramNodeColor = new Color(255, 255, 255);
 		retVal.notRealisedDiagramNodeColor = null;
@@ -187,6 +192,7 @@ public class DiagramSchema {
         retVal.background = null;
         retVal.topColor = new Color(255,255,255);
         retVal.bottomColor = new Color(255, 255, 255);
+		retVal.gradient = retVal.getDefaultGradient();
         retVal.foreground = new Color(0, 0, 0);
         retVal.nestedDiagramNodeColor = new Color(255, 255, 255);
         retVal.notRealisedDiagramNodeColor = null;
@@ -217,6 +223,7 @@ public class DiagramSchema {
         retVal.topColor = new Color(0,0,0);
         retVal.bottomColor = new Color(0,0,0);
         retVal.foreground = new Color(0, 0, 0);
+		retVal.gradient = retVal.getDefaultGradient();
         retVal.nestedDiagramNodeColor = new Color(255, 255, 255);
         retVal.notRealisedDiagramNodeColor = null;
         retVal.circleColor = new Color(0, 0, 0);
@@ -245,22 +252,20 @@ public class DiagramSchema {
         return background;
     }
 
+	public Gradient getGradient() {
+		return this.gradient;
+	}
+	
+	public void setGradient(Gradient gradient) {
+		this.gradient = gradient;
+	}
+
 	/**
 	 * Returns a gradient to be used for the node colors.
 	 */
-    public LinearGradient getDefaultGradient() {
-    	return new LinearGradient() {
-            public Color getColor(double position) {
-				if (position < 0 || position > 1) {
-					throw new IllegalArgumentException("Gradient position not in [0,1]");
-				}
-				return new Color((int) (topColor.getRed() * position + bottomColor.getRed() * (1 - position)),
-						(int) (topColor.getGreen() * position + bottomColor.getGreen() * (1 - position)),
-						(int) (topColor.getBlue() * position + bottomColor.getBlue() * (1 - position)),
-						(int) (topColor.getAlpha() * position + bottomColor.getAlpha() * (1 - position)));
-            }
-    	};
-    }
+	public Gradient getDefaultGradient() {
+        return new LinearGradient(this.bottomColor, this.topColor);
+	}
 
     /**
      * Returns color for the circles around the nodes.

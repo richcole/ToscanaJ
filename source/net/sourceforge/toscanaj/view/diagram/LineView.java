@@ -123,7 +123,7 @@ public class LineView extends CanvasItem {
 		if(extentRatio == 1 && this.groupingMode != NO_GROUPING) {
 			NormedIntervalSource intervalSource = interpreter.getIntervalSource(ConceptInterpreter.INTERVAL_TYPE_EXTENT);
             double gradientPosition = intervalSource.getValue(upperConcept,interpretationContext);
-            Color fillColor = diagramSchema.getDefaultGradient().getColor(gradientPosition);
+            Color fillColor = diagramSchema.getGradient().getColor(gradientPosition);
 			if (this.getSelectionState() == DiagramView.NOT_SELECTED) {
 				fillColor = diagramSchema.fadeOut(fillColor);
 				strokeWidth = 1;

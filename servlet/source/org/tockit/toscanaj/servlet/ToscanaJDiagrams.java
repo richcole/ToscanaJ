@@ -239,7 +239,7 @@ public class ToscanaJDiagrams extends HttpServlet {
             NormedIntervalSource extentSizeIntervalSource = GlobalVariables.getConceptInterpreter().getIntervalSource(ConceptInterpreter.INTERVAL_TYPE_EXTENT);
             gradientPosition = extentSizeIntervalSource.getValue(concept, interpretationContext);
             
-            Color nodeColor = GlobalVariables.getDiagramSchema().getDefaultGradient().getColor(gradientPosition);
+            Color nodeColor = GlobalVariables.getDiagramSchema().getGradient().getColor(gradientPosition);
             
             LabelInfo attrLabel = node.getAttributeLabelInfo();
 
