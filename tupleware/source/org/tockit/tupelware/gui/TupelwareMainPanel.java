@@ -31,14 +31,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.Reader;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-
-/// @todo check if the file we save to exists, warn if it does
 
 public class TupelwareMainPanel extends JFrame implements MainPanel {
     private int[] objectIndices;
@@ -58,12 +52,10 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
      */
     private JMenuBar menuBar;
     private JMenu fileMenu;
-    private JMenu mruMenu;
     private JMenu editMenu;
     private JMenu helpMenu;
     private JToolBar toolBar;
 
-    private List mruList = new LinkedList();
     private String currentFile = null;
 
     /**
@@ -81,15 +73,6 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         conceptualSchema = new ConceptualSchema(eventBroker);
 
         createViews();
-
-        mruList = ConfigurationManager.fetchStringList("TupelwareMainPanel", "mruFiles", MaxMruFiles);
-        // if we have at least one MRU file try to open it
-        if (this.mruList.size() > 0) {
-            File schemaFile = new File((String) mruList.get(mruList.size() - 1));
-            if (schemaFile.canRead()) {
-                loadTupels(schemaFile);
-            }
-        }
 
         createMenuBar();
         createToolBar();
@@ -199,10 +182,6 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 			}
 		});
 
-        JMenuItem openMenuItem = new JMenuItem("Load tupels...");
-        openMenuItem.addActionListener(openFileAction);
-        fileMenu.add(openMenuItem);
-
 		this.saveAsFileAction =
 			new SaveFileAction(
 				this,
@@ -212,7 +191,6 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 		this.saveAsFileAction.setPostSaveActivity(new SimpleActivity(){
 			public boolean doActivity() throws Exception {
 				currentFile = saveAsFileAction.getLastFileUsed().getPath();
-				addFileToMRUList(saveAsFileAction.getLastFileUsed());
 				conceptualSchema.dataSaved();
 				updateWindowTitle();
 				return true;
@@ -222,10 +200,6 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 		saveAsMenuItem.setMnemonic(KeyEvent.VK_A);
 		saveAsMenuItem.addActionListener(saveAsFileAction);
 		fileMenu.add(saveAsMenuItem);
-
-        mruMenu = new JMenu("Reload tuples");
-        recreateMruMenu();
-        fileMenu.add(mruMenu);
 
         fileMenu.addSeparator();
 
@@ -243,6 +217,15 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
                 )
         );
         fileMenu.add(exitMenuItem);
+
+		JMenu tuplesMenu = new JMenu("Tuples");
+		tuplesMenu.setMnemonic('t');
+		
+		JMenuItem loadTuples = new JMenuItem("Load from tab-delimited data...");
+		loadTuples.addActionListener(openFileAction);
+		tuplesMenu.add(loadTuples);
+		
+		menuBar.add(tuplesMenu);
 
         editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
@@ -317,43 +300,9 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
 		}
 	}
 
-    private void recreateMruMenu() {
-        if (mruMenu == null) { // no menu yet
-            return;
-        }
-        this.mruMenu.removeAll();
-        boolean empty = true; // will be used to check if we have at least one entry
-        if (this.mruList.size() > 0) {
-            ListIterator it = mruList.listIterator(mruList.size() - 1);
-            while (it.hasPrevious()) {
-                String cur = (String) it.previous();
-                if (cur.equals(currentFile)) {
-                    // don't enlist the current file
-                    continue;
-                }
-                empty = false;
-                JMenuItem mruItem = new JMenuItem(cur);
-                mruItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        JMenuItem menuItem = (JMenuItem) e.getSource();
-                        loadTupels(new File(menuItem.getText()));
-                    }
-                });
-                this.mruMenu.add(mruItem);
-            }
-        }
-        // we have now at least one file
-        this.mruMenu.setEnabled(!empty);
-    }
-
-    public EventBroker getEventBroker() {
-        return eventBroker;
-    }
-
     public void closeMainPanel() {
         // store current position
         ConfigurationManager.storePlacement("TupelwareMainPanel", this);
-        ConfigurationManager.storeStringList("TupelwareMainPanel", "mruFiles", this.mruList);
         ConfigurationManager.storeInt("TupelwareMainPanel", "diagramViewDivider",
                 diagramView.getDividerLocation()
         );
@@ -361,25 +310,6 @@ public class TupelwareMainPanel extends JFrame implements MainPanel {
         System.exit(0);
     }
 
-    private void addFileToMRUList(File file) {
-        try {
-            this.currentFile = file.getCanonicalPath();
-        } catch (IOException ex) { // could not resolve canonical path
-            ex.printStackTrace();
-            this.currentFile = file.getAbsolutePath();
-            /// @todo what could be done here?
-        }
-        if (this.mruList.contains(this.currentFile)) {
-            // if it is already in, just remove it and add it at the end
-            this.mruList.remove(this.currentFile);
-        }
-        this.mruList.add(this.currentFile);
-        if (this.mruList.size() > MaxMruFiles) {
-            this.mruList.remove(0);
-        }
-        recreateMruMenu();
-    }
-    
 	protected boolean checkForMissingSave() throws HeadlessException {
 		boolean closeOk;
 		if (!conceptualSchema.isDataSaved()) {
