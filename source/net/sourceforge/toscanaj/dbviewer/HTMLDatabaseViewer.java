@@ -29,7 +29,7 @@ import java.util.Vector;
  * Shows a database view using HTML.
  *
  * A definition for this viewer looks like this:
- * <objectListView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseReportGenerator"
+ * <objectListView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer"
  *         name="Show objects..."/>
  *     <template url="somedir/somefile.html"/>
  * </objectListView>
