@@ -85,7 +85,7 @@
 	</target>
 	<target name="makeDebugJar" depends="compile,prepareDist">
 		<createManifest targetApp="${app.name}" targetLoc="${build.dev.dir}"/>
-		<jar jarfile="${dist.dir}/${dist.name}/${app.name}.jar" basedir="${build.dev.dir}" manifest="${build.dev.dir}/manifest.mf"/>
+		<jar jarfile="${dist.dir}/${dist.name}/${app.name}.jar" basedir="${build.dev.dir}" manifest="${build.dev.dir}/${app.name}.mf"/>
 	</target>
 	<target name="makeReleaseJar" depends="compileRelease,prepareDist">
 		<createManifest targetApp="${app.name}" targetLoc="${build.release.dir}"/>
