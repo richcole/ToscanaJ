@@ -95,7 +95,7 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
             Runtime rt = Runtime.getRuntime();
             rt.exec(command);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("There was a problem running external viewer",e);
         }
     }
 }

@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -194,11 +195,16 @@ public class DiagramView extends Canvas implements ChangeObserver {
         addLayer("nodes-1");
         addLayer("connectors-1");
         addLayer("labels");
-        addDiagram(diagram, conceptInterpretationContext, 0);
-        requestScreenTransformUpdate();
-        repaint();
-        this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
-        getParent().setCursor(Cursor.getDefaultCursor());
+        try{
+        	addDiagram(diagram, conceptInterpretationContext, 0);
+            requestScreenTransformUpdate();
+            repaint();
+            this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
+            getParent().setCursor(Cursor.getDefaultCursor());
+        } catch (Exception e) {
+        	ErrorDialog.showError(this, e, "Showing diagram failed", "The selected diagram can not be shown");
+        	showDiagram(null);
+        }
     }
 
     private void removeSubscriptions() {

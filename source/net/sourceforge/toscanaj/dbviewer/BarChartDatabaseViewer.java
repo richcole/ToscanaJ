@@ -130,7 +130,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
             }
 
         } catch (DatabaseException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Could not query database", e);
         }
 
     }

@@ -209,9 +209,7 @@ public class DatabaseViewerManager implements XMLizable {
                 // remove "url" so we don't insert again
                 elem.removeAttribute("url");
             } catch (Exception e) {
-                /// @todo handle exceptions properly, give feedback
-                e.printStackTrace();
-                throw new RuntimeException("Could not insert XML/XHTML template for database viewer from file");
+                throw new RuntimeException("Could not insert XML/XHTML template for database viewer from file", e);
             }
         }
         return;
@@ -233,9 +231,7 @@ public class DatabaseViewerManager implements XMLizable {
                 // remove "url" so we don't insert again
                 elem.removeAttribute("url");
             } catch (Exception e) {
-                /// @todo handle exceptions properly, give feedback
-                e.printStackTrace();
-                throw new RuntimeException("Could not insert text template for database viewer from file");
+                throw new RuntimeException("Could not insert text template for database viewer from file", e);
             }
         }
     }

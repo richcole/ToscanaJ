@@ -154,9 +154,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
             try {
                 DatabaseViewerManager.listsReadXML(viewsElem, databaseInfo, DatabaseConnection.getConnection());
             } catch (DatabaseViewerInitializationException e) {
-                /// @todo we loose information here, fix and remove stack trace
-                e.printStackTrace();
-                throw new XMLSyntaxError("Could not initialize database viewer.");
+                throw new XMLSyntaxError("Could not initialize database viewer.", e);
             }
         }
         Element queriesElem = elem.getChild(QUERIES_ELEMENT_NAME);
