@@ -11,6 +11,8 @@ Specific for ToscanaJ:
 
 Specific for Elba:
 ==================
+- Elba can now connect to Excel files directly, using a new option in the DB
+  connection dialog. This avoids having to set up a data source manually
 - Bugfix: ordinal scale generation works again
 - Bugfix: nominal scale generator allows re-adding values after removal from
   selection
