@@ -199,7 +199,11 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
         else if( query instanceof DatabaseInfo.DatabaseQuery ) {
             DatabaseInfo.DatabaseQuery dbQuery = (DatabaseInfo.DatabaseQuery) query;
             List retVal = new LinkedList();
-            if( this.objectClause != null ) {
+            // do a query only if there will be something to query
+            // either: there is a contingent in this concept or we query extent and we
+            // have subconcepts (at least one should have a contingent, otherwise this
+            // concept shouldn't exist)
+            if( this.objectClause != null || (!contingentOnly && this.ideal.size() != 1) ) {
                 try {
                     String whereClause = " WHERE (";
                     if(contingentOnly) {

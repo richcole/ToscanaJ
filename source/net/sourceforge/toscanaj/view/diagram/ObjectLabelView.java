@@ -68,17 +68,13 @@ public class ObjectLabelView extends LabelView {
     public void setDisplayType(boolean contingentOnly) {
         super.setDisplayType(contingentOnly);
         doQuery();
-        if( this.getNumberOfEntries() < this.displayLines ) {
+        if( this.getNumberOfEntries() > DEFAULT_DISPLAY_LINES ) {
+            this.displayLines = DEFAULT_DISPLAY_LINES;
+        }
+        else {
             this.displayLines = this.getNumberOfEntries();
         }
-        if( this.displayLines < DEFAULT_DISPLAY_LINES && this.getNumberOfEntries() != 0 ) {
-            if( this.getNumberOfEntries() > DEFAULT_DISPLAY_LINES ) {
-                this.displayLines = DEFAULT_DISPLAY_LINES;
-            }
-            else {
-                this.displayLines = this.getNumberOfEntries();
-            }
-        }
+        update(this);
     }
 
     /**
