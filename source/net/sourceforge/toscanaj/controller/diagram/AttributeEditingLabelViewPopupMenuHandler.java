@@ -7,8 +7,6 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
-import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
@@ -24,8 +22,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
-import java.util.Iterator;
-import java.util.List;
 
 public class AttributeEditingLabelViewPopupMenuHandler implements EventBrokerListener {
 	private DiagramView diagramView;
@@ -88,30 +84,6 @@ public class AttributeEditingLabelViewPopupMenuHandler implements EventBrokerLis
 		popupMenu.add(menuItem);
 		popupMenu.add(renameAttrMenuItem);
 		
-		List attributeViewNames = DatabaseViewerManager.getAttributeViewNames();
-		if (!attributeViewNames.isEmpty()) { 
-			addAttributeViewOptions(attributeViewNames, attribute.toString(), popupMenu);
-		}
 		popupMenu.show(this.diagramView, (int) screenPosition.getX(), (int) screenPosition.getY());
-	}
-
-	private void addAttributeViewOptions(List attributeViewNames, final String attribute, JPopupMenu popupMenu) {
-		JMenuItem menuItem;
-		Iterator it = attributeViewNames.iterator();
-		while (it.hasNext()) {
-			final String attributeViewName = (String) it.next();
-			menuItem = new JMenuItem(attributeViewName);
-			menuItem.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					try {
-						DatabaseViewerManager.showAttribute(attributeViewName, attribute);
-					} catch(Exception exc) { // we catch any exception and show it to the user
-						ErrorDialog.showError(diagramView, exc, "Database View Failed", "The database view could not be shown,\n" +
-																						"possibly due to a misconfiguration.");
-					}
-				}
-			});
-			popupMenu.add(menuItem);
-		}
 	}
 }
