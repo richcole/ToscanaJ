@@ -184,8 +184,7 @@ public class ContextTableView extends JComponent {
 
 		if (pos != null) {
 			if (pos.getCol() == 0 && pos.getRow() != 0) {
-				Attribute attr = (Attribute) objectsArrayList.get(pos.getRow() - 1);
-				tooltipText = (String) attr.getData();
+				tooltipText = (String) objectsArrayList.get(pos.getRow() - 1);
 			} else if (pos.getCol() != 0 && pos.getRow() == 0) {
 				Attribute attr = (Attribute) attributeArrayList.get(pos.getCol() - 1);
 				tooltipText = (String) attr.getData();

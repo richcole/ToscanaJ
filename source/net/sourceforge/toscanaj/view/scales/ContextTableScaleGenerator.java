@@ -38,6 +38,7 @@ public class ContextTableScaleGenerator implements ScaleGenerator {
         Column column = columns[0].getColumn();
         ContextTableScaleEditorDialog dialog = new ContextTableScaleEditorDialog(
                 parent,
+                scheme,
                 databaseConnection
         );
         if (!dialog.execute()) {

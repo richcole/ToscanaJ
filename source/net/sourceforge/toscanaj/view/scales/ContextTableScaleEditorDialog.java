@@ -9,24 +9,33 @@ package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
+import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.ContextImplementation;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import javax.swing.*;
+
+import org.jdom.Element;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 public class ContextTableScaleEditorDialog extends JDialog {
 
-	private static final int MINIMUM_WIDTH = 550;
+	private static final int MINIMUM_WIDTH = 700;
 	private static final int MINIMUM_HEIGHT = 500;
-	private static final int DEFAULT_X_POS = 250;
+	private static final int DEFAULT_X_POS = 50;
 	private static final int DEFAULT_Y_POS = 100;
 
 	private ContextTableScaleEditorDialog contextTableScaleEditorDialog;
+	private ConceptualSchema conceptualSchema;
 	private ContextImplementation context;
 	private ContextTableView tableView;
 	private DatabaseConnection databaseConnection;
@@ -41,8 +50,10 @@ public class ContextTableScaleEditorDialog extends JDialog {
 
 	public ContextTableScaleEditorDialog(
 		Frame owner,
+		ConceptualSchema conceptualSchema,
 		DatabaseConnection databaseConnection) {
 		super(owner,true);
+		this.conceptualSchema = conceptualSchema;
 		this.databaseConnection = databaseConnection;
 		this.contextTableScaleEditorDialog = this;
 		this.context = new ContextImplementation();
@@ -62,6 +73,9 @@ public class ContextTableScaleEditorDialog extends JDialog {
 				if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
 				if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
 				setSize(width, height);
+			}
+			public void componentShown(ComponentEvent e) {
+				componentResized(e);
 			}
 		});
 		
@@ -341,6 +355,12 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		buttonsPane = new JPanel(new GridBagLayout());
 		JButton addObjButton = new JButton(" Add Objects ");
 		JButton addAttrButton = new JButton(" Add Attributes ");
+		JButton checkConsistencyButton = new JButton(" Check Consistency... ");
+		checkConsistencyButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				checkConsistency();
+			}
+		});
 		this.createButton = new JButton(" Create ");
 		createButton.setEnabled((scaleTitleField.getText()!=null && 
 						!scaleTitleField.getText().equals("")));
@@ -395,7 +415,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 				0,
 				0));
 		buttonsPane.add(
-			createButton,
+			checkConsistencyButton,
 			new GridBagConstraints(
 				2,
 				0,
@@ -403,15 +423,29 @@ public class ContextTableScaleEditorDialog extends JDialog {
 				1,
 				1,
 				0,
+				GridBagConstraints.CENTER,
+				GridBagConstraints.HORIZONTAL,
+				new Insets(0, 50, 0, 5),
+				0,
+				0));
+		buttonsPane.add(
+			createButton,
+			new GridBagConstraints(
+				3,
+				0,
+				1,
+				1,
+				1,
+				0,
 				GridBagConstraints.EAST,
 				GridBagConstraints.HORIZONTAL,
-				new Insets(0, 100, 0, 5),
+				new Insets(0, 50, 0, 5),
 				0,
 				0));
 		buttonsPane.add(
 			cancelButton,
 			new GridBagConstraints(
-				3,
+				4,
 				0,
 				1,
 				1,
@@ -686,6 +720,87 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		super.paint(g);
 		if(this.scaleTitleField.getText().length() == 0 && onFirstLoad==true) {
 			getInput();
+		}
+	}
+	
+	protected void checkConsistency() {
+		List problems = new ArrayList();
+		DatabaseInfo dbinfo = this.conceptualSchema.getDatabaseInfo();
+		int sumCounts = 0;
+		List validClauses = new ArrayList();
+
+		// check if all objects are WHERE clauses
+		Iterator it = this.context.getObjects().iterator();
+		while (it.hasNext()) {
+			String clause = (String) it.next();
+			String query = "SELECT count(*) FROM " + dbinfo.getTableName() + 
+			                  " WHERE (" + clause + ");";
+			try {
+				sumCounts += this.databaseConnection.queryNumber(query, 1);
+				validClauses.add(clause);
+			} catch (DatabaseException e) {
+				problems.add("Object '" + clause + "' is not a valid clause for the database.\n" +
+							 "The database returned:\n\t" + e.getCause().getMessage());
+			}
+		}
+
+		// check if all conjunctions are empty
+		it = this.context.getObjects().iterator();
+		while (it.hasNext()) {
+			String clause = (String) it.next();
+			validClauses.remove(clause);
+			Iterator it2 = validClauses.iterator();
+			while (it2.hasNext()) {
+				String otherClause = (String) it2.next();
+				String query = "SELECT count(*) FROM " + dbinfo.getTableName() +
+				               " WHERE (" + clause + ") AND (" + otherClause + ");";
+				try {
+					int count = this.databaseConnection.queryNumber(query, 1);
+					if(count != 0) {
+						problems.add("Object clauses '" + clause + "' and '" +
+						             otherClause + "' overlap.");
+					}
+				} catch (DatabaseException e) {
+					// should not happen
+					throw new RuntimeException("Failed to query the database.", e);
+				}
+			}
+		}
+
+		// check if disjunction of all contingents covers the data set
+		if(problems.isEmpty()) { // doesn't make sense if we have problems so far
+			String query = "SELECT count(*) FROM " + dbinfo.getTableName() + ";";
+			try {
+				int count = this.databaseConnection.queryNumber(query, 1);
+				if(count != sumCounts) {
+					problems.add("Object clauses do not cover database.");
+				}
+			} catch (DatabaseException e) {
+				// should not happen
+				throw new RuntimeException("Failed to query the database.", e);
+			}
+		}
+
+		// give feedback
+		if(problems.isEmpty()) {
+			JOptionPane.showMessageDialog(this, "No problems found","Objects correct",
+			                              JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			// show problems
+			Iterator strIt = problems.iterator();
+			Element problemDescription = new Element("description");
+			Element htmlElement = new Element("html");
+			htmlElement.addContent(new Element("title").addContent("Consistency problems"));
+			problemDescription.addContent(htmlElement);
+			Element body = new Element("body");
+			htmlElement.addContent(body);
+			body.addContent(new Element("h1").addContent("Problems found:"));
+			while (strIt.hasNext()) {
+				String problem = (String) strIt.next();
+				body.addContent(new Element("pre").addContent(problem));
+			}
+			Frame frame = JOptionPane.getFrameForComponent(this);
+			DescriptionViewer.show(frame,problemDescription);
 		}
 	}
 }
