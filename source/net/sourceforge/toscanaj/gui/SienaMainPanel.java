@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.gui;
 
-import net.sourceforge.toscanaj.ToscanaJ;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.cernato.CernatoDimensionStrategy;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
@@ -313,14 +312,15 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
-        JMenuItem aboutItem = new JMenuItem("About Siena");
-        aboutItem.setMnemonic(KeyEvent.VK_A);
-        aboutItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showAboutDialog();
-            }
-        });
-        helpMenu.add(aboutItem);
+		final JFrame parent = this;
+		JMenuItem aboutItem = new JMenuItem("About Siena");
+		aboutItem.setMnemonic(KeyEvent.VK_A);
+		aboutItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ToscanaJMainPanel.showAboutDialog(parent);
+			}
+		});
+		helpMenu.add(aboutItem);
 
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(helpMenu);
@@ -448,16 +448,6 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         Lattice lattice = lgen.createLattice(context);
         Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, name, dimensionStrategy);
         schema.addDiagram(diagram);
-    }
-
-    protected void showAboutDialog() {
-        JOptionPane.showMessageDialog(this,
-                "This is Siena " + ToscanaJ.VersionString + ".\n\n" +
-                "Copyright (c) DSTC Pty Ltd, Technische Universitaet Darmstadt and the\n" +
-                "University of Queensland\n\n" +
-                "See http://toscanaj.sourceforge.net for more information.",
-                "About Siena",
-                JOptionPane.PLAIN_MESSAGE);
     }
 
     public EventBroker getEventBroker() {

@@ -662,6 +662,17 @@ public class ElbaMainPanel
 		// create a help menu
 		helpMenu = new JMenu("Help");
 		helpMenu.setMnemonic(KeyEvent.VK_H);
+
+		final JFrame parent = this;
+		JMenuItem aboutItem = new JMenuItem("About Elba");
+		aboutItem.setMnemonic(KeyEvent.VK_A);
+		aboutItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ToscanaJMainPanel.showAboutDialog(parent);
+			}
+		});
+		helpMenu.add(aboutItem);
+
 		menuBar.add(Box.createHorizontalGlue());
 		menuBar.add(helpMenu);
 	}

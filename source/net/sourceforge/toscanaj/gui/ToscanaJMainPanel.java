@@ -729,11 +729,12 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                 helpMenu.addSeparator();
             }
         }
+        final JFrame parent = this;
         JMenuItem aboutItem = new JMenuItem("About ToscanaJ");
         aboutItem.setMnemonic(KeyEvent.VK_A);
         aboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showAboutDialog();
+                showAboutDialog(parent);
             }
         });
         helpMenu.add(aboutItem);
@@ -1105,14 +1106,15 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     	}
     }
 
-    protected void showAboutDialog() {
-        JOptionPane.showMessageDialog(this,
-                "This is ToscanaJ " + ToscanaJ.VersionString + ".\n\n" +
-                "Copyright (c) DSTC Pty Ltd\n\n" +
-                "See http://toscanaj.sourceforge.net for more information.",
-                "About ToscanaJ",
-                JOptionPane.PLAIN_MESSAGE);
-    }
+	public static void showAboutDialog(JFrame parent) {
+		JOptionPane.showMessageDialog(parent,
+				"This program is part of ToscanaJ " + ToscanaJ.VersionString + ".\n\n" +
+				"Copyright (c) DSTC Pty Ltd, Technische Universität Darmstadt and the\n" +
+				"University of Queensland\n\n" +
+				"See http://toscanaj.sourceforge.net for more information.",
+				"About this program",
+				JOptionPane.PLAIN_MESSAGE);
+	}
     
     public void lostOwnership(Clipboard clipboard, Transferable comments) {
     //mandatory method to implement for the copy to systemClipboard function

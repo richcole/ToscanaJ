@@ -284,6 +284,17 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
         // create a help menu
         helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
+
+		final JFrame parent = this;
+		JMenuItem aboutItem = new JMenuItem("About Lucca");
+		aboutItem.setMnemonic(KeyEvent.VK_A);
+		aboutItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ToscanaJMainPanel.showAboutDialog(parent);
+			}
+		});
+		helpMenu.add(aboutItem);
+
         menuBar.add(Box.createHorizontalGlue());
         menuBar.add(helpMenu);
     }
