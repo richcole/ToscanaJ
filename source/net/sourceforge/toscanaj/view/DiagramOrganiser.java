@@ -13,6 +13,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.ListSelectionModel;
@@ -65,8 +67,8 @@ public class DiagramOrganiser extends JPanel {
         selectedDiagramsListview.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
         // label the buttons
-        addButton.setText("Add");
-        removeButton.setText("Remove");
+        addButton.setText("Add Selected");
+        removeButton.setText("Remove Last");
 
         // fill the upper listview
         setConceptualSchema(schema);
@@ -100,19 +102,7 @@ public class DiagramOrganiser extends JPanel {
 
         removeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int index = selectedDiagramsListview.getSelectedIndex();
-                DiagramController.getController().removeDiagram(index);
-                int size = selectedDiagramsListview.getModel().getSize();
-                if (size == 0) {
-                    //clearSelection() will disable remove button
-                    selectedDiagramsListview.clearSelection();
-                } else {
-                    if (index == size) {
-                        //move selected index up one
-                        index--;
-                        selectedDiagramsListview.setSelectedIndex(index);
-                    }
-                }
+                DiagramController.getController().removeLastDiagram();
             }
         });
 
@@ -139,15 +129,21 @@ public class DiagramOrganiser extends JPanel {
         addButton.setEnabled(false);
 
         // The remove button can only be used if a diagram in the history is selected
-        selectedDiagramsListview.addListSelectionListener(new ListSelectionListener(){
-            public void valueChanged(ListSelectionEvent e){
-                if(selectedDiagramsListview.getSelectedValue() == null) {
-                    removeButton.setEnabled(false);
-                } else {
-                    removeButton.setEnabled(true);
+        DiagramController.getController().getDiagramHistory().addListDataListener(
+            new ListDataListener(){
+                public void contentsChanged(ListDataEvent ev) {
+                    // nothing to do
+                }
+                public void intervalAdded(ListDataEvent ev) {
+                    int size = DiagramController.getController().getDiagramHistory().getSize();
+                    removeButton.setEnabled(size != 0);
+                }
+                public void intervalRemoved(ListDataEvent ev) {
+                    int size = DiagramController.getController().getDiagramHistory().getSize();
+                    removeButton.setEnabled(size != 0);
                 }
             }
-        });
+        );
         removeButton.setEnabled(false);
     }
 

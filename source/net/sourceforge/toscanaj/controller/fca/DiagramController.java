@@ -122,6 +122,28 @@ public class DiagramController implements ChangeObservable {
         void fireIntervalRemoved(int from, int to) {
             this.fireIntervalRemoved(this, from, to);
         }
+
+        /**
+         * Debug output.
+         */
+        public String toString() {
+            String retVal = "Past Diagrams:\n";
+            Iterator it = this.pastDiagrams.iterator();
+            while(it.hasNext()) {
+                retVal += it.next().toString() + "\n";
+            }
+            retVal += "Current Diagrams:\n";
+            it = this.currentDiagrams.iterator();
+            while(it.hasNext()) {
+                retVal += it.next().toString() + "\n";
+            }
+            retVal += "Future Diagrams:\n";
+            it = this.futureDiagrams.iterator();
+            while(it.hasNext()) {
+                retVal += it.next().toString() + "\n";
+            }
+            return retVal;
+        }
     }
 
     /**
@@ -257,7 +279,7 @@ public class DiagramController implements ChangeObservable {
      * Returns true if an undo step can be made.
      */
     public boolean undoIsPossible() {
-        return history.pastDiagrams.size() != 0;
+        return history.pastDiagrams.size() + history.currentDiagrams.size() > 1;
     }
 
     /**
@@ -297,12 +319,13 @@ public class DiagramController implements ChangeObservable {
     }
 
     /**
-     * Removes a diagram from the model.
+     * Removes a specific diagram from the model.
      *
      * Throws NoSuchElementException if there is no such diagram. If it is tried
-     * to remove the current diagram nothing will happen.
+     * to remove a currently displayed diagram nothing will happen.
      *
-     * @TODO Find something useful when removing the current diagram.
+     * @TODO Find something useful when removing a current diagram.
+     * @TODO Do some testing on this, it might be broken.
      */
     public void removeDiagram(int position) {
         if(position < history.pastDiagrams.size()) {
@@ -323,6 +346,38 @@ public class DiagramController implements ChangeObservable {
             return;
         }
         throw new NoSuchElementException("Tried to remove diagram beyond range");
+    }
+
+    /**
+     * Removes the last diagram from the list.
+     *
+     * If this is a currently visible diagram this will include an undo operation.
+     *
+     * If no diagram is left a NoSuchElementException will be raised.
+     */
+    public void removeLastDiagram() {
+        if( !history.futureDiagrams.isEmpty() ) {
+            history.futureDiagrams.remove(history.futureDiagrams.size()-1);
+            history.fireIntervalRemoved(history.getSize(),history.getSize());
+            notifyObservers();
+            return;
+        }
+        // no future diagrams, check if we can undo
+        if( undoIsPossible() ) {
+            back();
+            history.futureDiagrams.remove(0);
+            history.fireIntervalRemoved(history.getSize(),history.getSize());
+            notifyObservers();
+            return;
+        }
+        // no future diagrams, no undo -- do we have at least one diagram?
+        if( !history.currentDiagrams.isEmpty() ) {
+            history.currentDiagrams.clear();
+            history.fireIntervalRemoved(history.getSize(),history.getSize());
+            notifyObservers();
+            return;
+        }
+        throw new NoSuchElementException("The list of diagrams is already empty.");
     }
 
     /**
@@ -383,6 +438,8 @@ public class DiagramController implements ChangeObservable {
      * Goes one step back in the history.
      *
      * This is the undo operation for next().
+     *
+     * @TODO This does not allow going back trom nested to flat mode -- change.
      *
      * @see next()
      */
