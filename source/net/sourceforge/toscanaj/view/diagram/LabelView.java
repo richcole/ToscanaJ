@@ -206,14 +206,15 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         double lh = getHeight( fm );
         height = tg.inverseScaleY(lh);
         xPos = x - tg.inverseScaleX(lw/2) + this.labelInfo.getOffset().getX();
+        double radius = node.getRadius();
         if( getPlacement() == ABOVE )
         {
-            y = y - tg.inverseScaleY(node.getRadius());
+            y = y - tg.inverseScaleY(radius);
             yPos = y - tg.inverseScaleY(lh) + this.labelInfo.getOffset().getY();
         }
         else
         {
-            y = y + tg.inverseScaleY(node.getRadius());
+            y = y + tg.inverseScaleY(radius);
             yPos = y + this.labelInfo.getOffset().getY();
         }
         // draw a dashed line from the given point to the calculated

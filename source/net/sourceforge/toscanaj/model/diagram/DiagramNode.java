@@ -103,7 +103,12 @@ public class DiagramNode {
      * Get the radius set for the node.
      */
     public double getRadius() {
-        return RADIUS;
+        if(this.concept.isRealised()) {
+            return RADIUS;
+        }
+        else {
+            return RADIUS/3;
+        }
     }
 
     /**

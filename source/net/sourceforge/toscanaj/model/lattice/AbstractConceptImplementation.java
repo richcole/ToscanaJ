@@ -239,6 +239,25 @@ public abstract class AbstractConceptImplementation implements Concept
     }
 
     /**
+     * Checks if the concept is realised.
+     *
+     * This is done be looking if any concept in the ideal has the same extent.
+     */
+    public boolean isRealised() {
+        int extentSize = this.getExtentSize();
+        Iterator it = this.ideal.iterator();
+        while(it.hasNext()) {
+            Concept cur = (Concept) it.next();
+            if(cur != this) {
+                if(cur.getExtentSize() == extentSize) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * Calculates the intent size based on the contingent sizes in the filter.
      */
     public int getIntentSize() {
