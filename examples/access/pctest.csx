@@ -32,8 +32,8 @@
 	<context>
         <databaseConnection>
             <url driver="sun.jdbc.odbc.JdbcOdbcDriver">jdbc:odbc:PCTest80</url>
-            <table>[PC-Test]</table>
-            <key>[PCBezeichnung]</key>
+            <table>PC-Test</table>
+            <key>PCBezeichnung</key>
             <queries dropDefaults="false">
                 <listQuery name="Cases" distinct="true">
                     <column>[Gehäusetyp]</column>
