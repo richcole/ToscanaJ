@@ -7,7 +7,7 @@
 ###
 
 ### This sets the first file loaded
-mainPanel-mruFiles-1=./examples/sql/pctest/pctest.csx
+ToscanaJMainPanel-mruFiles-1=./examples/sql/pctest/pctest.csx
 
 ###
 ### different options for the diagram schema
