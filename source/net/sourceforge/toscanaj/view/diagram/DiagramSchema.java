@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 
 import java.awt.*;
 
@@ -19,20 +20,6 @@ import java.awt.*;
  */
 public class DiagramSchema {
     private static final String PROPERTY_SECTION_NAME = "DiagramSchema";
-    
-    /**
-     * Used when the gradient should use the extent size of a concept as measure.
-     */
-    public static final int GRADIENT_TYPE_EXTENT = 1;
-
-    /**
-     * Used when the gradient should use the contingent size of a concept as measure.
-     */
-    public static final int GRADIENT_TYPE_CONTINGENT = 2;
-
-    public static final int NODE_SIZE_SCALING_NONE = 0;
-    public static final int NODE_SIZE_SCALING_CONTINGENT = 1;
-    public static final int NODE_SIZE_SCALING_EXTENT = 2;
 
     /**
      * The amount of fade out for unselected nodes.
@@ -103,7 +90,7 @@ public class DiagramSchema {
      *
      * @see #setGradientType(int)
      */
-    private int gradientType = GRADIENT_TYPE_EXTENT;
+    private ConceptInterpreter.IntervalType gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
 
     private int selectionLineWidth;
 
@@ -111,7 +98,7 @@ public class DiagramSchema {
 
     private float notRealizedNodeSizeReductionFactor;
     
-    private int nodeSizeScalingType = NODE_SIZE_SCALING_NONE;
+    private ConceptInterpreter.IntervalType nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_FIXED;
     
     private Font labelFont;
 
@@ -137,9 +124,9 @@ public class DiagramSchema {
 		String propVal = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "gradientType", "extent");
 		propVal = propVal.toLowerCase();
 		if (propVal.equals("extent")) {
-			retVal.gradientType = GRADIENT_TYPE_EXTENT;
+			retVal.gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
 		} else if (propVal.equals("contingent")) {
-			retVal.gradientType = GRADIENT_TYPE_CONTINGENT;
+			retVal.gradientType = ConceptInterpreter.INTERVAL_TYPE_CONTINGENT;
 		} else {
 			System.err.println("Caught unknown gradient type for DiagramSchema: " + propVal);
 			System.err.println("-- using default");
@@ -151,11 +138,11 @@ public class DiagramSchema {
 		propVal = propVal.toLowerCase();
 		retVal.labelFont = new Font(labelFontName, Font.PLAIN, labelFontSize);
 		if (propVal.equals("contingent")) {
-			retVal.nodeSizeScalingType = NODE_SIZE_SCALING_CONTINGENT;
+			retVal.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_CONTINGENT;
 		} else if (propVal.equals("extent")) {
-			retVal.nodeSizeScalingType = NODE_SIZE_SCALING_EXTENT;
+			retVal.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
 		} else if (propVal.equals("none")) {
-			retVal.nodeSizeScalingType = NODE_SIZE_SCALING_NONE;
+			retVal.nodeSizeScalingType = ConceptInterpreter.INTERVAL_TYPE_FIXED;
 		} else {
 			System.err.println("Caught unknown node size scaling value for DiagramSchema: " + propVal);
 			System.err.println("-- using default");
@@ -306,10 +293,8 @@ public class DiagramSchema {
 
     /**
      * Returns the type of information that should be used to create the diagram.
-     *
-     * This can be either GRADIENT_TYPE_EXTENT or GRADIENT_TYPE_CONTINGENT.
      */
-    public int getGradientType() {
+    public ConceptInterpreter.IntervalType getGradientType() {
         return this.gradientType;
     }
 
@@ -351,15 +336,8 @@ public class DiagramSchema {
 
     /**
      * Sets the type of information that should be used to create the diagram.
-     *
-     * This can be either GRADIENT_TYPE_EXTENT or GRADIENT_TYPE_CONTINGENT.
-     *
-     * @throws IllegalArgumentException  If argument is not one of the two allowed values.
      */
-    public void setGradientType(int gradientType) {
-        if (gradientType != GRADIENT_TYPE_EXTENT && gradientType != GRADIENT_TYPE_CONTINGENT) {
-            throw new IllegalArgumentException("Unknown value for gradient type");
-        }
+    public void setGradientType(ConceptInterpreter.IntervalType gradientType) {
         this.gradientType = gradientType;
     }
 
@@ -384,16 +362,11 @@ public class DiagramSchema {
         return notRealizedNodeSizeReductionFactor;
     }
     
-    public int getNodeSizeScalingType() {
+    public ConceptInterpreter.IntervalType getNodeSizeScalingType() {
         return nodeSizeScalingType;
     }
     
-    public void setNodeSizeScalingType(int nodeSizeScalingType) {
-        if (nodeSizeScalingType != NODE_SIZE_SCALING_CONTINGENT &&
-	        nodeSizeScalingType != NODE_SIZE_SCALING_EXTENT &&
-	        nodeSizeScalingType != NODE_SIZE_SCALING_NONE) {
-            throw new IllegalArgumentException("Unknown value for node size scaling");
-        }
+    public void setNodeSizeScalingType(ConceptInterpreter.IntervalType nodeSizeScalingType) {
         this.nodeSizeScalingType = nodeSizeScalingType;
     }
 

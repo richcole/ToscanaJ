@@ -618,7 +618,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK));
             showExactMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    diagramView.getDiagramSchema().setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT);
+                    diagramView.getDiagramSchema().setGradientType(ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
                     diagramView.update(this);
                 }
             });
@@ -631,7 +631,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             showAllMenuItem.setSelected(true);
             showAllMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    diagramView.getDiagramSchema().setGradientType(DiagramSchema.GRADIENT_TYPE_EXTENT);
+                    diagramView.getDiagramSchema().setGradientType(ConceptInterpreter.INTERVAL_TYPE_EXTENT);
                     diagramView.update(this);
                 }
             });
@@ -699,7 +699,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     KeyEvent.VK_N, ActionEvent.CTRL_MASK));
             nodeSizeExactMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    diagramView.getDiagramSchema().setNodeSizeScalingType(DiagramSchema.NODE_SIZE_SCALING_CONTINGENT);
+                    diagramView.getDiagramSchema().setNodeSizeScalingType(ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
                     diagramView.update(this);
                 }
             });
@@ -711,7 +711,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     KeyEvent.VK_N, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
             nodeSizeAllMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    diagramView.getDiagramSchema().setNodeSizeScalingType(DiagramSchema.NODE_SIZE_SCALING_EXTENT);
+                    diagramView.getDiagramSchema().setNodeSizeScalingType(ConceptInterpreter.INTERVAL_TYPE_EXTENT);
                     diagramView.update(this);
                 }
             });
@@ -721,25 +721,20 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             JRadioButtonMenuItem nodeSizeFixedMenuItem = new JRadioButtonMenuItem("Fixed node sizes");
             nodeSizeFixedMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    diagramView.getDiagramSchema().setNodeSizeScalingType(DiagramSchema.NODE_SIZE_SCALING_NONE);
+                    diagramView.getDiagramSchema().setNodeSizeScalingType(ConceptInterpreter.INTERVAL_TYPE_FIXED);
                     diagramView.update(this);
                 }
             });
             nodeSizeScalingGroup.add(nodeSizeFixedMenuItem);
             viewMenu.add(nodeSizeFixedMenuItem);
             
-            switch (diagramView.getDiagramSchema().getNodeSizeScalingType()) {
-                case DiagramSchema.NODE_SIZE_SCALING_CONTINGENT:
-                    nodeSizeExactMenuItem.setSelected(true);
-                    break;
-                case DiagramSchema.NODE_SIZE_SCALING_EXTENT:
-                    nodeSizeAllMenuItem.setSelected(true);
-                    break;
-                case DiagramSchema.NODE_SIZE_SCALING_NONE:
-                    nodeSizeFixedMenuItem.setSelected(true);
-                    break;
-                default:
-                	System.err.println("Unknown case for DiagramSchema.getNodeSizeScalingType() encountered in ToscanaJMainPanel");
+            ConceptInterpreter.IntervalType nodeSizeScaling = diagramView.getDiagramSchema().getNodeSizeScalingType();
+            if(nodeSizeScaling == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT) {
+                nodeSizeExactMenuItem.setSelected(true);
+            } else if(nodeSizeScaling == ConceptInterpreter.INTERVAL_TYPE_EXTENT) {
+                nodeSizeAllMenuItem.setSelected(true);
+            } else if(nodeSizeScaling == ConceptInterpreter.INTERVAL_TYPE_FIXED) {
+                nodeSizeFixedMenuItem.setSelected(true);
             }
         }
 

@@ -118,21 +118,6 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
     }
 
     /**
-     * Gives the relation of the contingent size of the concept given and the largest contingent size queried in the
-     * given context up to now.
-     *
-     * Note that it is not ensured that all contingent sizes have been queried before this call, this is up to the
-     * caller.
-     */
-    public double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
-        int contingentSize = getObjectContingentSize(concept, context);
-        if (contingentSize == 0) {
-            return 0; //avoids division by zero
-        }
-        return (double) contingentSize / (double) getMaximalContingentSize();
-    }
-
-    /**
      * This returns the maximal contingent found up to now.
      */
     private int getMaximalContingentSize() {
@@ -149,33 +134,60 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
         return maxVal;
     }
 
-    public double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context) {
-        int extentSize = getExtentSize(concept, context);
-        if (extentSize == 0) {
-            return 0; //avoids division by zero
-        }
-        /// @todo add way to find top compareConcept more easily
-        Concept compareConcept;
-        ConceptInterpretationContext compareContext;
-        List nesting = context.getNestingConcepts();
-        if (nesting.size() != 0) {
-            // go outermost
-            compareConcept = (Concept) nesting.get(0);
-            compareContext = (ConceptInterpretationContext) context.getNestingContexts().get(0);
+    /**
+     * Gives the relation of the contingent size of the concept given and the largest contingent size queried in the
+     * given context up to now.
+     *
+     * Note that it is not ensured that all contingent sizes have been queried before this call, this is up to the
+     * caller.
+     */
+    public NormedIntervalSource getIntervalSource(IntervalType type) {
+        if(type == INTERVAL_TYPE_CONTINGENT) {
+            return new NormedIntervalSource(){
+                public double getValue(Concept concept, ConceptInterpretationContext context) {
+                    int contingentSize = getObjectContingentSize(concept, context);
+                    if (contingentSize == 0) {
+                        return 0; //avoids division by zero
+                    }
+                    return (double) contingentSize / (double) getMaximalContingentSize();
+                }
+            };
+        } else if(type == INTERVAL_TYPE_EXTENT) {
+            return new NormedIntervalSource(){
+                public double getValue(Concept concept, ConceptInterpretationContext context) {
+                    int extentSize = getExtentSize(concept, context);
+                    if (extentSize == 0) {
+                        return 0; //avoids division by zero
+                    }
+                    /// @todo add way to find top compareConcept more easily
+                    Concept compareConcept;
+                    ConceptInterpretationContext compareContext;
+                    List nesting = context.getNestingConcepts();
+                    if (nesting.size() != 0) {
+                        // go outermost
+                        compareConcept = (Concept) nesting.get(0);
+                        compareContext = (ConceptInterpretationContext) context.getNestingContexts().get(0);
+                    } else {
+                        compareConcept = concept;
+                        compareContext = context;
+                    }
+                    while (!compareConcept.isTop()) {
+                        Concept other = compareConcept;
+                        Iterator it = compareConcept.getUpset().iterator();
+                        do {
+                            other = (Concept) it.next();
+                        } while (other == compareConcept);
+                        compareConcept = other;
+                    }
+                    return (double) extentSize /
+                            (double) getExtentSize(compareConcept, compareContext);
+                }
+            };
+        } else if(type == INTERVAL_TYPE_FIXED) {
+            return new FixedValueIntervalSource(1);
         } else {
-            compareConcept = concept;
-            compareContext = context;
+            throw new IllegalArgumentException("Unknown interval type");
         }
-        while (!compareConcept.isTop()) {
-            Concept other = compareConcept;
-            Iterator it = compareConcept.getUpset().iterator();
-            do {
-                other = (Concept) it.next();
-            } while (other == compareConcept);
-            compareConcept = other;
-        }
-        return (double) extentSize /
-                (double) getExtentSize(compareConcept, compareContext);
     }
 
     public boolean isRealized(Concept concept, ConceptInterpretationContext context) {

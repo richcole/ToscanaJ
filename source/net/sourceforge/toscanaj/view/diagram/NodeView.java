@@ -10,10 +10,12 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.NormedIntervalSource;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
+
 import org.tockit.canvas.CanvasItem;
 
 import java.awt.*;
@@ -80,7 +82,7 @@ public class NodeView extends CanvasItem {
         if (diagramNode instanceof NestedDiagramNode) {
             nodeColor = diagramSchema.getNestedDiagramNodeColor();
         } else {
-            nodeColor = diagramSchema.getGradientColor(calculateRelativeSize(diagramSchema));
+            nodeColor = diagramSchema.getGradientColor(calculateRelativeSize(diagramSchema.getGradientType()));
         	if( !isRealized() ) {
         		nodeColor = diagramSchema.getNotRealisedNodeColor(nodeColor);
         	}
@@ -151,20 +153,8 @@ public class NodeView extends CanvasItem {
         	if(this.diagramNode instanceof NestedDiagramNode) {
         		return maxRadius;
         	}
-        	double relativeSize;
-            if( this.diagramView.getDiagramSchema().getNodeSizeScalingType() == DiagramSchema.NODE_SIZE_SCALING_CONTINGENT ) {
-                relativeSize = diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
-                                this.diagramNode.getConcept(),
-                                conceptInterpretationContext
-                );
-            } else if( this.diagramView.getDiagramSchema().getNodeSizeScalingType() == DiagramSchema.NODE_SIZE_SCALING_EXTENT ) {
-                relativeSize = diagramView.getConceptInterpreter().getRelativeExtentSize(
-                                this.diagramNode.getConcept(),
-                                conceptInterpretationContext
-                );
-        	} else {
-            	relativeSize = 1;
-        	}
+            ConceptInterpreter.IntervalType nodeSizeScalingType = this.diagramView.getDiagramSchema().getNodeSizeScalingType();
+            double relativeSize = calculateRelativeSize(nodeSizeScalingType);
             return maxRadius * relativeSize + minRadius * (1 - relativeSize);
         } else {
             return minRadius;
@@ -184,18 +174,9 @@ public class NodeView extends CanvasItem {
     /**
      *  calculates relative size in order to calculate node color
      */
-    private double calculateRelativeSize(DiagramSchema diagramSchema) {
-        if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
-            return diagramView.getConceptInterpreter().getRelativeExtentSize(
-                    this.diagramNode.getConcept(),
-                    conceptInterpretationContext
-            );
-        } else {
-            return diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
-                    this.diagramNode.getConcept(),
-                    conceptInterpretationContext
-            );
-        }
+    private double calculateRelativeSize(ConceptInterpreter.IntervalType intervalType) {
+        NormedIntervalSource intervalSource = diagramView.getConceptInterpreter().getIntervalSource(intervalType);
+        return intervalSource.getValue(this.diagramNode.getConcept(), conceptInterpretationContext);
     }
 
     /**

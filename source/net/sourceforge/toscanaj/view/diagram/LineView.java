@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.NormedIntervalSource;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
@@ -120,7 +121,8 @@ public class LineView extends CanvasItem {
 		}
 
 		if(extentRatio == 1 && this.groupingMode != NO_GROUPING) {
-			double gradientPosition = interpreter.getRelativeExtentSize(upperConcept,interpretationContext);
+			NormedIntervalSource intervalSource = interpreter.getIntervalSource(ConceptInterpreter.INTERVAL_TYPE_EXTENT);
+            double gradientPosition = intervalSource.getValue(upperConcept,interpretationContext);
             Color fillColor = diagramSchema.getGradientColor(gradientPosition);
 			if (this.getSelectionState() == DiagramView.NOT_SELECTED) {
 				fillColor = diagramSchema.fadeOut(fillColor);

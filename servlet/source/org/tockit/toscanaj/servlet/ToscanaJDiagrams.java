@@ -12,8 +12,10 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.NormedIntervalSource;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -234,10 +236,8 @@ public class ToscanaJDiagrams extends HttpServlet {
             }
 
 			// get the gradient position of this node            
-            gradientPosition = GlobalVariables.getConceptInterpreter().getRelativeExtentSize(
-                    concept,
-                    interpretationContext
-            );
+            NormedIntervalSource extentSizeIntervalSource = GlobalVariables.getConceptInterpreter().getIntervalSource(ConceptInterpreter.INTERVAL_TYPE_EXTENT);
+            gradientPosition = extentSizeIntervalSource.getValue(concept, interpretationContext);
             
             Color nodeColor = GlobalVariables.getDiagramSchema().getGradientColor(gradientPosition);
             

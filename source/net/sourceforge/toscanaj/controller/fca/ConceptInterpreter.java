@@ -40,6 +40,12 @@ import java.util.Iterator;
  */
 
 public interface ConceptInterpreter {
+    public static class IntervalType {}
+    
+    public static final IntervalType INTERVAL_TYPE_FIXED = new IntervalType();
+    public static final IntervalType INTERVAL_TYPE_CONTINGENT = new IntervalType();
+    public static final IntervalType INTERVAL_TYPE_EXTENT = new IntervalType();
+
     /** is dependent on displayMode and filterMode */
     Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context);
 
@@ -58,11 +64,7 @@ public interface ConceptInterpreter {
 	/** these are independent of displayMode and dependent on filterMode */
 	int getExtentSize(Concept concept, ConceptInterpretationContext context);
 
-	/** these are independent of displayMode and dependent on filterMode */
-	double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context);
-
-	/** these are independent of displayMode and dependent on filterMode */
-	double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context);
+	NormedIntervalSource getIntervalSource(IntervalType type);
 
     boolean isRealized(Concept concept, ConceptInterpretationContext context);
 
