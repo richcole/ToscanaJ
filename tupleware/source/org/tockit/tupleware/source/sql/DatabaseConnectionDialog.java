@@ -37,7 +37,6 @@ import java.sql.Statement;
 
 /**
  * @todo this is just copy & paste code from ToscanaJ's DatabaseConnectionInformationView for now.
- * @todo we don't get the variable names this way -- fix that
  */
 public class DatabaseConnectionDialog extends JDialog {
     private static final String CONFIGURATION_SECTION_NAME = "SqlQueryDialog";
