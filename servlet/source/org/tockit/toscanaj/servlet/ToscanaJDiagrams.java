@@ -6,8 +6,8 @@
  * $Id$
  */
 package org.tockit.toscanaj.servlet;
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
@@ -264,7 +264,7 @@ public class ToscanaJDiagrams extends HttpServlet {
                 // iterate through the attribute list
                 while (attrIt.hasNext()) 
                 {
-                    Attribute attribute = (Attribute) attrIt.next();
+                    FCAElement attribute = (FCAElement) attrIt.next();
                     attrList.add(attribute.getData().toString());
                 }
                 
@@ -332,14 +332,10 @@ public class ToscanaJDiagrams extends HttpServlet {
 
                 attrIt = concept.getAttributeContingentIterator();
                 
-                while (attrIt.hasNext()) 
-                {
-                	
-                    Attribute attribute = (Attribute) attrIt.next();
+                while (attrIt.hasNext()) {
+                    FCAElement attribute = (FCAElement) attrIt.next();
 					
-                    if (textAlignment == 1) 
-                    {
-                    	
+                    if (textAlignment == 1) {
 						buffer.append("<text font-family=\"" + GlobalConstants.FONT_FAMILY 
 							+ "\" font-size=\"" + GlobalConstants.FONT_SIZE + "\" x=\"" 
 							+ (addXPos((pos.getX() + offset.getX())) 
@@ -349,11 +345,7 @@ public class ToscanaJDiagrams extends HttpServlet {
 							+ "," + textColor.getGreen() + "," + textColor.getBlue() 
 							+ ")\" >");
 						buffer.append("\n");
-							
-                    }
-                    else if (textAlignment == 2) 
-                    {
-                    	
+                    } else if (textAlignment == 2) {
 						buffer.append("<text font-family=\"" + GlobalConstants.FONT_FAMILY 
 							+ "\" font-size=\"" + GlobalConstants.FONT_SIZE + "\" x=\"" 
 							+ (addXPos((pos.getX() + offset.getX())) 
@@ -363,11 +355,7 @@ public class ToscanaJDiagrams extends HttpServlet {
 							+ textColor.getGreen() + "," + textColor.getBlue() 
 							+ ")\" >");
 						buffer.append("\n");
-							
-                    }
-                    else 
-                    {                   	
-            
+                    } else {                   	
 						buffer.append("<text font-family=\"" + GlobalConstants.FONT_FAMILY 
 							+ "\" font-size=\"" + GlobalConstants.FONT_SIZE + "\" x=\"" 
 							+ (addXPos((pos.getX() + offset.getX())) 
@@ -377,24 +365,19 @@ public class ToscanaJDiagrams extends HttpServlet {
 							+ "," + textColor.getGreen() + "," + textColor.getBlue() 
 							+ ")\" >");
 						buffer.append("\n");
-						
                     }
-                    
 					String attributeName = attribute.getData().toString();
 					buffer.append(escapeEntities(attributeName));
 					buffer.append("\n");
 					buffer.append("</text>");
 					buffer.append("\n");
-					
                 }
-
             }
             
             LabelInfo objLabel = node.getObjectLabelInfo();
 
 			System.out.println("checking object label");
-            if(objLabel != null) 
-            {
+            if(objLabel != null) {
             	System.out.println("object label exists !!!!!!!!!!!!!!!!!!!");
             	
 				Color backgroundColor = objLabel.getBackgroundColor();

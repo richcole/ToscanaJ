@@ -8,11 +8,10 @@
 package net.sourceforge.toscanaj.model.cernato.tests;
 
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelation;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
@@ -56,7 +55,7 @@ public class TextDumps {
         }
         stream.println();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
-            FCAElementImplementation object = (FCAElementImplementation) it1.next();
+            FCAElement object = (FCAElement) it1.next();
             stream.print(object.toString() + "\t");
             for (Iterator it2 = properties.iterator(); it2.hasNext();) {
                 ManyValuedAttributeImplementation property = (ManyValuedAttributeImplementation) it2.next();
@@ -85,7 +84,7 @@ public class TextDumps {
         }
         stream.println();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
-            FCAElementImplementation object = (FCAElementImplementation) it1.next();
+            FCAElement object = (FCAElement) it1.next();
             stream.print(object.toString() + "\t");
             for (Iterator it2 = attributes.iterator(); it2.hasNext();) {
                 Criterion criterion = (Criterion) it2.next();
@@ -105,7 +104,7 @@ public class TextDumps {
             stream.print(concept + "[objectContingent: {");
             Iterator extIt = concept.getObjectContingentIterator();
             while (extIt.hasNext()) {
-                FCAElementImplementation obj = (FCAElementImplementation) extIt.next();
+                FCAElement obj = (FCAElement) extIt.next();
                 stream.print(obj.toString());
                 if (extIt.hasNext()) {
                     stream.print(", ");
@@ -114,7 +113,7 @@ public class TextDumps {
             stream.print("}, attributeContingent: {");
             Iterator intIt = concept.getAttributeContingentIterator();
             while (intIt.hasNext()) {
-                Attribute attribute = (Attribute) intIt.next();
+                FCAElement attribute = (FCAElement) intIt.next();
                 stream.print(attribute.toString());
                 if (intIt.hasNext()) {
                     stream.print(", ");

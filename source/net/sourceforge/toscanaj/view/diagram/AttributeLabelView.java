@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 
 import java.awt.geom.Point2D;
@@ -88,9 +88,9 @@ public class AttributeLabelView extends LabelView {
         return true;
     }
 
-    public Attribute getEntryAtPosition(Point2D canvasPosition) {
+    public FCAElement getEntryAtPosition(Point2D canvasPosition) {
         int i = getIndexOfPosition(canvasPosition);
-        return (Attribute) getEntryAt(i);
+        return (FCAElement) getEntryAt(i);
     }
 
     protected boolean isFaded() {

@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.controller.ndimlayout;
 
 import net.sourceforge.toscanaj.controller.cernato.PartialOrderOperations;
-import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
@@ -43,7 +43,7 @@ public class DefaultDimensionStrategy implements DimensionCreationStrategy {
                 Iterator attrCont = concept.getAttributeContingentIterator();
                 // we just take one attribute for the dimension (if instead of while)
                 if (attrCont.hasNext()) {
-                    Attribute attribute = (Attribute) attrCont.next();
+                    FCAElement attribute = (FCAElement) attrCont.next();
                     attributes.add(attribute);
                 }
             }

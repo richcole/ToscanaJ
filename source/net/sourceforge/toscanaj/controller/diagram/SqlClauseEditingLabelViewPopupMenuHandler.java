@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
@@ -64,11 +65,11 @@ public class SqlClauseEditingLabelViewPopupMenuHandler implements EventBrokerLis
     public void openPopupMenu(final SqlClauseLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
 
 		Iterator objIt = labelView.getNodeView().getDiagramNode().getConcept().getObjectContingentIterator();
-		Object curObjectValue = null;
+        FCAElement curObjectValue = null;
 		if (objIt.hasNext()) {
-			curObjectValue = objIt.next();
+			curObjectValue = (FCAElement) objIt.next();
 		}
-		final Object currentValue = curObjectValue;
+		final FCAElement currentValue = curObjectValue;
         final String currentValueString = curObjectValue.toString();
                
         // create the menu

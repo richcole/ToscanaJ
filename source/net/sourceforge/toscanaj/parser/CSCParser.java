@@ -24,7 +24,6 @@ import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
@@ -211,7 +210,7 @@ public class CSCParser {
             while(!tokenizer.getCurrentToken().equals("RELATION")) { // find attributes until relation comes
                 tokenizer.advance(); // skip number
                 tokenizer.advance(); // skip id
-                attributes.add(new Attribute(tokenizer.getCurrentToken(), null)); // use name
+                attributes.add(new FCAElementImplementation(tokenizer.getCurrentToken(), null)); // use name
                 tokenizer.advance(); // next
             }
             tokenizer.advance(); // skip "RELATION"
@@ -333,7 +332,7 @@ public class CSCParser {
                 }
                 
                 ConceptImplementation concept = (ConceptImplementation) node.getConcept();
-                concept.addObject(content);
+                concept.addObject(new FCAElementImplementation(content));
                 
                 node.setObjectLabelInfo(labelInfo);
             }
@@ -360,7 +359,7 @@ public class CSCParser {
                 }
 
                 ConceptImplementation concept = (ConceptImplementation) node.getConcept();
-                concept.addAttribute(new Attribute(content));
+                concept.addAttribute(new FCAElementImplementation(content));
                 node.setAttributeLabelInfo(labelInfo);
             }
             tokenizer.advance();
@@ -606,7 +605,7 @@ public class CSCParser {
                 Object object = objIt.next();
                 if(queryMap.map.containsKey(object)) {
                 	objIt.remove();
-                	concept.addObject(queryMap.map.get(object));
+                	concept.addObject(new FCAElementImplementation(queryMap.map.get(object)));
                 }
             }
         }

@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.parser;
 
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElement;
@@ -53,10 +52,10 @@ public class BurmeisterParser {
                 objectArray[i] = object;
             }
             Collection attributes = context.getAttributes();
-            Attribute[] attributeArray = new Attribute[numberOfAttributes];
+            FCAElement[] attributeArray = new FCAElement[numberOfAttributes];
             for (int i = 0; i < numberOfAttributes; i++) {
                 curLine = getNextNonEmptyLine(in);
-                Attribute attribute = new Attribute(curLine, null);
+                FCAElement attribute = new FCAElementImplementation(curLine, null);
                 attributes.add(attribute);
                 attributeArray[i] = attribute;
             }

@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -52,7 +53,7 @@ public class ObjectLabelView extends LabelView {
 
 	// do not initialize this with null -- it happens after the superconstructor call which initializes
 	// it by calling back through updateEntries(), which causes double queries
-    private Object[] contents;
+    private FCAElement[] contents;
 
     public static LabelFactory getFactory() {
         return new LabelFactory(){
@@ -145,7 +146,7 @@ public class ObjectLabelView extends LabelView {
         }
     }
 
-    public Object getObjectAtPosition(Point2D position) {
+    public FCAElement getObjectAtPosition(Point2D position) {
         int itemHit = getIndexOfPosition(position);
         if (itemHit == -1) {
             return null;

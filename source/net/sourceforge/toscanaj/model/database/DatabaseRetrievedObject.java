@@ -7,6 +7,10 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
+import org.jdom.Element;
+
+import net.sourceforge.toscanaj.model.context.FCAElement;
+
 /**
  * @todo drop distinctions between objects with or without keys and with or without special
  *     clauses. The object should have only one clause attached which gives whatever this
@@ -16,7 +20,7 @@ package net.sourceforge.toscanaj.model.database;
  *     This change needs first dropping the distinction between different viewers in the
  *     DatabaseViewerManager.
  */
-public class DatabaseRetrievedObject {
+public class DatabaseRetrievedObject implements FCAElement {
     private Object key = null;
     private String displayString;
     private String queryWhereClause;
@@ -61,5 +65,17 @@ public class DatabaseRetrievedObject {
 
     public String toString() {
         return getDisplayString();
+    }
+
+    public Object getData() {
+        return this.displayString;
+    }
+
+    public Element getDescription() {
+        return null;
+    }
+
+    public int getContextPosition() {
+        return -1;
     }
 }

@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
@@ -68,7 +69,7 @@ public class ObjectEditingLabelViewPopupMenuHandler implements EventBrokerListen
         popupMenu.add(queryTypeMenu);
         
         if(labelView.getQuery() instanceof ListQuery) {
-            final Object object = labelView.getObjectAtPosition(canvasPosition);
+            final FCAElement object = labelView.getObjectAtPosition(canvasPosition);
             final String currentValue =  object.toString();
             
             JMenuItem renameObjectMenuItem = new JMenuItem("Rename object...");

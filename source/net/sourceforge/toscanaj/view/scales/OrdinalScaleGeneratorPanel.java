@@ -14,7 +14,6 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
@@ -74,11 +73,11 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 				String attributeName = createAttributeName(dividers, i);
 				context.getObjects().add(object);
 				if(attributeName != null) {
-					context.getAttributes().add(new Attribute(attributeName));
+					context.getAttributes().add(new FCAElementImplementation(attributeName));
 				}
 				Iterator it = context.getAttributes().iterator();
 				while (it.hasNext()) {
-					Attribute attribute = (Attribute) it.next();
+                    WritableFCAElement attribute = (WritableFCAElement) it.next();
 					context.getRelationImplementation().insert(object,attribute);
 				}
 			}
@@ -178,8 +177,8 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 			ContextImplementation context = new ContextImplementation();
 			context.setName(name);
 			int numDiv = dividers.size();
-			Attribute[] upwardsAttributes = new Attribute[numDiv];
-			Attribute[] downwardsAttributes = new Attribute[numDiv];
+            WritableFCAElement[] upwardsAttributes = new WritableFCAElement[numDiv];
+            WritableFCAElement[] downwardsAttributes = new WritableFCAElement[numDiv];
 			for (int i = 0; i < numDiv; i++) {
 				upwardsAttributes[i] = getUpwardsAttribute(dividers, i);
 				downwardsAttributes[i] = getDownwardsAttribute(dividers, i);
@@ -208,16 +207,16 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 			return context;
 		}
 
-		protected abstract Attribute getUpwardsAttribute(List dividers, int i);
-		protected abstract Attribute getDownwardsAttribute(List dividers, int i);
+		protected abstract WritableFCAElement getUpwardsAttribute(List dividers, int i);
+		protected abstract WritableFCAElement getDownwardsAttribute(List dividers, int i);
 	}
     
 	private static class Type1InterordinalGenerator extends InterordinalGenerator {
-		protected Attribute getUpwardsAttribute(List dividers, int i) {
-			return new Attribute(">= " + dividers.get(i));
+		protected WritableFCAElement getUpwardsAttribute(List dividers, int i) {
+			return new FCAElementImplementation(">= " + dividers.get(i));
 		}
-		protected Attribute getDownwardsAttribute(List dividers, int i) {
-			return new Attribute("< " + dividers.get(i));
+		protected WritableFCAElement getDownwardsAttribute(List dividers, int i) {
+			return new FCAElementImplementation("< " + dividers.get(i));
 		}
 		public String toString() {
 			return "both, increasing side includes bounds";
@@ -225,11 +224,11 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 	}
 
 	private static class Type2InterordinalGenerator extends InterordinalGenerator {
-		protected Attribute getUpwardsAttribute(List dividers, int i) {
-			return new Attribute("> " + dividers.get(i));
+		protected WritableFCAElement getUpwardsAttribute(List dividers, int i) {
+			return new FCAElementImplementation("> " + dividers.get(i));
 		}
-		protected Attribute getDownwardsAttribute(List dividers, int i) {
-			return new Attribute("<= " + dividers.get(i));
+		protected WritableFCAElement getDownwardsAttribute(List dividers, int i) {
+			return new FCAElementImplementation("<= " + dividers.get(i));
 		}
 		public String toString() {
 			return "both, decreasing side includes bounds";

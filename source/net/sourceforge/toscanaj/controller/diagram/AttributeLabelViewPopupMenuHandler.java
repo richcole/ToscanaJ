@@ -10,7 +10,7 @@ package net.sourceforge.toscanaj.controller.diagram;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 
@@ -52,7 +52,7 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
     }
 
     public void openPopupMenu(final AttributeLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
-        final Attribute attribute = labelView.getEntryAtPosition(canvasPosition);
+        final FCAElement attribute = labelView.getEntryAtPosition(canvasPosition);
         if (attribute == null) {
             return;
         }

@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
+import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
@@ -130,11 +132,11 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
         return retVal;
     }
     
-	protected Object getObject(String value, Concept concept, ConceptInterpretationContext context) {
-		return value;
+	protected FCAElement getObject(String value, Concept concept, ConceptInterpretationContext context) {
+		return new FCAElementImplementation(value);
 	}
 	
-	protected Object[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) { 
+	protected FCAElement[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) { 
 		throw new RuntimeException("Query not supported by this class (" + this.getClass().getName() + ")");
 	}    
 }

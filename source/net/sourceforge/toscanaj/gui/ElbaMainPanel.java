@@ -31,6 +31,7 @@ import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.Context;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
@@ -1149,7 +1150,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 														" SET " + newWhereClause +
 														" WHERE " + oldWhereClause + ";");
 						concept.removeObjectContingent();
-						concept.addObject(newWhereClause);
+						concept.addObject(new FCAElementImplementation(newWhereClause));
 						contingentCount ++;
 	                }
 	            }

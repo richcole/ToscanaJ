@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
-import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 
@@ -49,7 +49,7 @@ public class AttributeEditingLabelViewPopupMenuHandler implements EventBrokerLis
 	}
 
 	public void openPopupMenu(final AttributeLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
-		final Attribute attribute = labelView.getEntryAtPosition(canvasPosition);
+		final WritableFCAElement attribute = (WritableFCAElement) labelView.getEntryAtPosition(canvasPosition);
 		if (attribute == null) {
 			return;
 		}

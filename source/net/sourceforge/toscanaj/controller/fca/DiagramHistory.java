@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
-import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
@@ -387,7 +387,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
 			Concept concept = diagramReference.getFilterConcept();
 			Iterator attrIt = concept.getIntentIterator();
 			while (attrIt.hasNext()) {
-				Attribute curAttr = (Attribute) attrIt.next();
+                FCAElement curAttr = (FCAElement) attrIt.next();
 				comments += "   - " + curAttr.getData().toString() + lineSeparator;
 			}
 		}

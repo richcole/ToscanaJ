@@ -17,9 +17,10 @@ import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
@@ -40,9 +41,9 @@ public class DividesContextTester {
 		}
 		System.out.println("Generating 'divides'-lattice for numbers up to " + max);
 		
-        Attribute[] attributes = new Attribute[max];
+        FCAElement[] attributes = new FCAElement[max];
         for(int i = 1; i<=max; i++) {
-            attributes[i-1] = new Attribute(new Integer(i));
+            attributes[i-1] = new FCAElementImplementation(new Integer(i));
             finalAttributes.add(attributes[i-1]);
         }
 		

@@ -37,12 +37,13 @@ import javax.swing.ToolTipManager;
 import org.tockit.util.ListSet;
 
 import net.sourceforge.toscanaj.gui.dialog.*;
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 
 public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	private ContextTableEditorDialog dialog;
-	private Attribute[] attributes;
+	private WritableFCAElement[] attributes;
 
 	public ContextTableColumnHeader(ContextTableEditorDialog dialog) {
 		super();
@@ -69,7 +70,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 
 	public Dimension calculateNewSize() {
 		Set attributesSet = this.dialog.getContext().getAttributes();
-		this.attributes = (Attribute[]) attributesSet.toArray(new Attribute[attributesSet.size()]);
+		this.attributes = (WritableFCAElement[]) attributesSet.toArray(new WritableFCAElement[attributesSet.size()]);
 		int numCol = this.attributes.length + 1;
 		return new Dimension(numCol * ContextTableView.CELL_WIDTH + 1, ContextTableView.CELL_HEIGHT + 1);
 	}
@@ -77,7 +78,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	protected void drawColumnHeader(Graphics2D g2d) {
 		g2d.setPaint(ContextTableView.TABLE_HEADER_COLOR);
 		for (int i = 0; i < this.attributes.length; i++) {
-			Attribute attribute = this.attributes[i];
+            WritableFCAElement attribute = this.attributes[i];
 			drawCell(g2d, attribute.toString(), i * ContextTableView.CELL_WIDTH, 0);			
 		}
 	}
@@ -120,7 +121,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 
 		if (pos != null) {
 			if (pos.getCol() != this.attributes.length) {
-				Attribute attr =  this.attributes[pos.getCol()];
+                WritableFCAElement attr =  this.attributes[pos.getCol()];
 				tooltipText = attr.toString();
 			}
 		}
@@ -173,14 +174,14 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	}
 	
 	private void removeAttribute(int pos) {
-		Attribute attrToRemove = this.attributes[pos];
+        WritableFCAElement attrToRemove = this.attributes[pos];
 		this.dialog.getContext().getAttributes().remove(attrToRemove);
 		this.dialog.updateView();
 	}
 	
 	protected boolean addAttribute(String newAttributeName) {
 		if (!this.dialog.collectionContainsString(newAttributeName, this.attributes)) {
-			this.dialog.getContext().getAttributes().add(new Attribute(newAttributeName));
+			this.dialog.getContext().getAttributes().add(new FCAElementImplementation(newAttributeName));
 			return true;
 		} else {
 			return false;
@@ -208,7 +209,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
                     
                     JMenu sortMenu = new JMenu("Move before");
                     for (int i = 0; i < attributes.length; i++) {
-                        final Attribute attribute = attributes[i];
+                        final WritableFCAElement attribute = attributes[i];
                         JMenuItem menuItem = new JMenuItem(attribute.toString());
                         menuItem.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
@@ -282,14 +283,14 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	private void renameAttribute(int num) {
 		String inputValue = "";
 		do {
-			Attribute oldAttr = this.attributes[num];
+            WritableFCAElement oldAttr = this.attributes[num];
 			InputTextDialog dialog = new InputTextDialog(this.dialog, "Rename Attribute", "attribute", oldAttr.toString());
 			if (!dialog.isCancelled()) {
                 inputValue = dialog.getInput();
                 if (!this.dialog.collectionContainsString(inputValue, this.attributes)) {
                     ContextImplementation context = this.dialog.getContext();
                     Set attributes = context.getAttributes();
-                    Attribute newAttr = new Attribute(inputValue);
+                    WritableFCAElement newAttr = new FCAElementImplementation(inputValue);
                     attributes.remove(oldAttr);
                     if(attributes instanceof List) {
                         List attributesList = (List) attributes;
@@ -324,7 +325,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 		repaint();
 	}
 
-    private void moveAttribute(int from, Attribute target) {
+    private void moveAttribute(int from, WritableFCAElement target) {
         ListSet attributeList = this.dialog.getContext().getAttributeList();
         if(target != null) {
             int targetPos = attributeList.indexOf(target);

@@ -3,10 +3,10 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 
@@ -51,11 +51,11 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 
 		Object[][] tableData = scaleDialog.getData();
 		int dimensions = tableData.length;
-		Attribute[] attributes = new Attribute[dimensions];
+		FCAElement[] attributes = new FCAElement[dimensions];
 
 		for (int i = 0; i < dimensions; i++) {
 			String attributeName = createAttributeName(tableData, i);
-			attributes[i] = new Attribute(attributeName);
+			attributes[i] = new FCAElementImplementation(attributeName);
 			context.getAttributes().add(attributes[i]);
 		}
 		
@@ -81,7 +81,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 				context.getObjects().add(object);
 				Iterator it = relatedAttributes.iterator();
 				while (it.hasNext()) {
-					Attribute attrib = (Attribute) it.next();
+					Object attrib = it.next();
 					relation.insert(object, attrib);
 				}
 			}else{
@@ -98,7 +98,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 						context.getObjects().add(object);
 						Iterator it = relatedAttributes.iterator();
 						while (it.hasNext()) {
-							Attribute attrib = (Attribute) it.next();
+							Object attrib = it.next();
 							relation.insert(object, attrib);
 						}
 					}	

@@ -11,10 +11,10 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelation;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
@@ -30,10 +30,10 @@ public class ViewContext implements Context{
 				  return false;
 			  }
 			  FCAElement fcaObject = (FCAElement) domainObject;
-			  if (!(rangeObject instanceof Attribute)) {
+			  if (!(rangeObject instanceof FCAElement)) {
 				  return false;
 			  }
-			  Attribute attribute = (Attribute) rangeObject;
+              FCAElement attribute = (FCAElement) rangeObject;
 			  if (!(attribute.getData() instanceof Criterion)) {
 				  return false;
 			  }
@@ -49,7 +49,7 @@ public class ViewContext implements Context{
 		attributes = new HashSet();
 		for (Iterator iterator = view.getCriteria().iterator(); iterator.hasNext();) {
 			Criterion criterion = (Criterion) iterator.next();
-			attributes.add(new Attribute(criterion, null));
+			attributes.add(new FCAElementImplementation(criterion, null));
 		}
 		this.name = view.getName();
 	}

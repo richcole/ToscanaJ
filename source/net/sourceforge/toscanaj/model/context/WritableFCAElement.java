@@ -7,6 +7,10 @@
  */	
 package net.sourceforge.toscanaj.model.context;
 
+import org.jdom.Element;
+
 public interface WritableFCAElement extends FCAElement {
 	void setData(Object data);
+    void setDescription(Element description);
+    void setContextPosition(int contextPosition);
 }

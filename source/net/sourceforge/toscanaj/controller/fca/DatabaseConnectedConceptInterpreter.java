@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.controller.fca;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import net.sourceforge.toscanaj.model.database.ListQuery;
@@ -52,7 +53,7 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
 		}
 	}
 
-	protected Object getObject(String value, Concept concept, ConceptInterpretationContext context) {
+	protected FCAElement getObject(String value, Concept concept, ConceptInterpretationContext context) {
 		String whereClause = WhereClauseGenerator.createWhereClause(concept,
 										context.getDiagramHistory(),
 										context.getNestingConcepts(),
@@ -61,7 +62,7 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
 		return new DatabaseRetrievedObject(whereClause, value);		
 	}
 	
-	protected Object[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) {
+	protected FCAElement[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) {
 		String whereClause = WhereClauseGenerator.createWhereClause(concept,
 									context.getDiagramHistory(),
 									context.getNestingConcepts(),
@@ -82,18 +83,18 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
 				return execute(query, whereClause, null);
 			}
 		} else {
-			return new Object[0];
+			return new FCAElement[0];
 		}
 	}
 
-    private Object[] execute(Query query, String whereClause, String referenceWhereClause) {
-        Object[] retVal = null;
+    private FCAElement[] execute(Query query, String whereClause, String referenceWhereClause) {
+        FCAElement[] retVal = null;
         if (whereClause != null) {
         	String statement = query.getQueryHead() + whereClause;
             try {
                 // submit the query
                 List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
-                retVal = new Object[queryResults.size()];
+                retVal = new FCAElement[queryResults.size()];
 				Vector reference = null;
 				if(referenceWhereClause != null){
 					/// @todo this should be cached since it gets reused for every single object label in a diagram

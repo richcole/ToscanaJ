@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
@@ -106,7 +107,7 @@ public class DataDump {
 	        diagramHistory.addDiagram(new SimpleLineDiagram());
 	        diagramHistory.addDiagram(new SimpleLineDiagram());
 	        ConceptImplementation filterConcept = new ConceptImplementation();
-	        filterConcept.addObject(filterClause);
+	        filterConcept.addObject(new FCAElementImplementation(filterClause));
 	        diagramHistory.next(filterConcept);
         	output.getRootElement().setAttribute("filterClause", filterClause);
         }

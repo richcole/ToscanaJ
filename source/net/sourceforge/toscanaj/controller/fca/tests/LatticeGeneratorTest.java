@@ -11,9 +11,10 @@ import java.util.Arrays;
 
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
-import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 
 import junit.framework.Test;
@@ -24,38 +25,38 @@ public class LatticeGeneratorTest extends TestCase {
     final static Class THIS = LatticeGeneratorTest.class;
 
     protected static final String CONTEXT_TITLE = "animals";
-    protected static final Attribute[] ATTRIBUTES = new Attribute[]{
-        new Attribute("small"),
-        new Attribute("medium"),
-        new Attribute("big"),
-        new Attribute("twolegs"),
-        new Attribute("fourlegs"),
-        new Attribute("feathers"),
-        new Attribute("hair"),
-        new Attribute("fly"),
-        new Attribute("hunt"),
-        new Attribute("run"),
-        new Attribute("swim"),
-        new Attribute("mane"),
-        new Attribute("hooves")
+    protected static final FCAElement[] ATTRIBUTES = new FCAElement[]{
+        new FCAElementImplementation("small"),
+        new FCAElementImplementation("medium"),
+        new FCAElementImplementation("big"),
+        new FCAElementImplementation("twolegs"),
+        new FCAElementImplementation("fourlegs"),
+        new FCAElementImplementation("feathers"),
+        new FCAElementImplementation("hair"),
+        new FCAElementImplementation("fly"),
+        new FCAElementImplementation("hunt"),
+        new FCAElementImplementation("run"),
+        new FCAElementImplementation("swim"),
+        new FCAElementImplementation("mane"),
+        new FCAElementImplementation("hooves")
     };
-    protected static final String[] OBJECTS = new String[]{
-        "dove", 
-        "hen",
-        "duck",
-        "goose",
-        "owl", // 4
-        "hawk",
-        "eagle",
-        "fox",
-        "dog",
-        "wolf", // 9
-        "cat",
-        "tiger",
-        "lion",
-        "horse",
-        "zebra",
-        "cow"
+    protected static final FCAElement[] OBJECTS = new FCAElement[]{
+        new FCAElementImplementation("dove"), 
+        new FCAElementImplementation("hen"),
+        new FCAElementImplementation("duck"),
+        new FCAElementImplementation("goose"),
+        new FCAElementImplementation("owl"), // 4
+        new FCAElementImplementation("hawk"),
+        new FCAElementImplementation("eagle"),
+        new FCAElementImplementation("fox"),
+        new FCAElementImplementation("dog"),
+        new FCAElementImplementation("wolf"), // 9
+        new FCAElementImplementation("cat"),
+        new FCAElementImplementation("tiger"),
+        new FCAElementImplementation("lion"),
+        new FCAElementImplementation("horse"),
+        new FCAElementImplementation("zebra"),
+        new FCAElementImplementation("cow")
     };
 
     protected ContextImplementation context;

@@ -1220,7 +1220,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 			}
 			
 			for (Iterator diffIt = difference.iterator(); diffIt.hasNext();) {
-                Object object = diffIt.next();
+                FCAElement object = (FCAElement) diffIt.next();
                 concept.addObject(object);
             }
 		}

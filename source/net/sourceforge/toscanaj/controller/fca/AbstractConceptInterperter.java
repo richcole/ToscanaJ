@@ -17,6 +17,7 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
 import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
@@ -103,9 +104,9 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 
 	public abstract Iterator getObjectSetIterator(Concept concept,ConceptInterpretationContext context) ;
 
-	protected abstract Object getObject(String value, Concept concept, ConceptInterpretationContext context);
+	protected abstract FCAElement getObject(String value, Concept concept, ConceptInterpretationContext context);
 
-	protected abstract Object[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context); 
+	protected abstract FCAElement[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context); 
 	
 	protected abstract int calculateContingentSize (Concept concept, ConceptInterpretationContext context);
 
@@ -228,18 +229,18 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 		}
 	}
 	
-	public Object[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
+	public FCAElement[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
 		if(!isRealized(concept, context) && !this.showDeviation) {
 			return null;
 		}
 		if (query == ListQuery.KEY_LIST_QUERY) {
 			int objectCount = getObjectCount(concept, context);
 			if( objectCount != 0) {
-				Object[] retVal = new Object[objectCount];
+                FCAElement[] retVal = new FCAElement[objectCount];
 				Iterator it = getObjectSetIterator(concept, context);
 				int pos = 0;
 				while (it.hasNext()) {
-					Object o = it.next();
+                    FCAElement o = (FCAElement) it.next();
 					retVal[pos] = o;
 					pos++;
 				}
@@ -261,7 +262,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                 NumberFormat format = DecimalFormat.getNumberInstance();
                 format.setMaximumFractionDigits(1);
                 String expectedValue = "[exp: " + format.format(expectedSize) + "]";
-                return new Object[]{getObject(""+objectCount, concept, context),
+                return new FCAElement[]{getObject(""+objectCount, concept, context),
                                     getObject(expectedValue, concept, context)}; 
             } else {
                 return executeObjectCountQuery(concept, context);
@@ -278,7 +279,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                         format.setMaximumFractionDigits(2);
                         String returnValue = format.format(objectCount/(double)fullExtent);
                         String expectedValue = "[exp: " + format.format(expectedSize/fullExtent) + "]";
-                        return new Object[]{getObject(returnValue, concept, context),
+                        return new FCAElement[]{getObject(returnValue, concept, context),
                                             getObject(expectedValue, concept, context)};              
                     } // else fall back into normal behaviour
                 } // else fall back into normal behaviour
@@ -289,7 +290,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 				NumberFormat format = DecimalFormat.getPercentInstance();
 				format.setMaximumFractionDigits(2);
 				String objectValue = format.format(objectCount/(double)fullExtent);
-                return new Object[]{getObject(objectValue, concept, context)};				
+                return new FCAElement[]{getObject(objectValue, concept, context)};				
 			} else {
 				return null;
 			}
@@ -298,10 +299,10 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 		}
 	}
 
-	private Object[] executeObjectCountQuery (Concept concept, ConceptInterpretationContext context) {
+	private FCAElement[] executeObjectCountQuery (Concept concept, ConceptInterpretationContext context) {
 		int objectCount = getObjectCount(concept, context);
 		if( objectCount != 0) {
-			Object[] retVal = new Object[1];
+            FCAElement[] retVal = new FCAElement[1];
 			retVal[0] = getObject(Integer.toString(objectCount), concept, context);
 			return retVal;
 		} else {

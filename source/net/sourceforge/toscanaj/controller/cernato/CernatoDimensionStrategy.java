@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.controller.cernato;
 
 import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
-import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
@@ -30,7 +30,7 @@ public class CernatoDimensionStrategy implements DimensionCreationStrategy {
         Hashtable map = new Hashtable();
         int count = 0;
         while (it.hasNext()) {
-            Attribute attribute = (Attribute) it.next();
+            FCAElement attribute = (FCAElement) it.next();
             criteria[count] = (Criterion) attribute.getData();
             map.put(attribute.getData(), attribute);
             count++;

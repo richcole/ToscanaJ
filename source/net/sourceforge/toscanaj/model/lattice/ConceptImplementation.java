@@ -499,31 +499,31 @@ public class ConceptImplementation implements Concept {
         List attributes = attributeContingentElem.getChildren(ATTRIBUTE_ELEMENT_NAME);
         for (Iterator iterator = attributes.iterator(); iterator.hasNext();) {
             Element attrElem = (Element) iterator.next();
-            this.attributeContingent.add(new Attribute(attrElem.getText(), attrElem.getChild(DESCRIPTION_ELEMENT_NAME)));
+            this.attributeContingent.add(new FCAElementImplementation(attrElem.getText(), attrElem.getChild(DESCRIPTION_ELEMENT_NAME)));
         }
         this.filter.add(this);
         this.ideal.add(this);
     }
 
-    public void addObject(Object object) {
+    public void addObject(FCAElement object) {
         this.objectContingent.add(object);
     }
 
-    public void addAttribute(Attribute attribute) {
+    public void addAttribute(FCAElement attribute) {
         this.attributeContingent.add(attribute);
     }
     
-    public void replaceObject (Object objectToReplace, Object newObject) {
+    public void replaceObject(FCAElement objectToReplace, FCAElement newObject) {
 		// @todo make sure new object is inserted at the same position where old one was
     	this.objectContingent.remove(objectToReplace);
     	this.objectContingent.add(newObject);
     }
 
-    public void removeObject(Object object) {
+    public void removeObject(FCAElement object) {
         this.objectContingent.remove(object);
     }
 
-    public void removeAttribute(Attribute attribute) {
+    public void removeAttribute(FCAElement attribute) {
         this.attributeContingent.remove(attribute);
     }
 

@@ -14,9 +14,9 @@ import org.tockit.swing.preferences.ExtendedPreferences;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 
 import java.awt.*;
@@ -214,7 +214,7 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 	private void extendAttributeNames(Collection attributes, String colName) {
 		Iterator it = attributes.iterator();
 		while (it.hasNext()) {
-			Attribute attribute = (Attribute) it.next();
+            WritableFCAElement attribute = (WritableFCAElement) it.next();
 			attribute.setData(colName + " " + attribute.toString());
 		}
 	}

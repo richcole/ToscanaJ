@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.model.diagram;
 
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.events.DiagramChangedEvent;
@@ -151,8 +150,8 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 		ConceptImplementation concept = new ConceptImplementation();
 		Iterator attrIterator = originalNodeConcept.getAttributeContingentIterator();
 		while (attrIterator.hasNext()) {
-			Attribute curAttr = (Attribute) attrIterator.next();
-			concept.addAttribute(new Attribute(curAttr.getData(), curAttr.getDescription()));
+            FCAElement curAttr = (FCAElement) attrIterator.next();
+			concept.addAttribute(new FCAElementImplementation(curAttr.getData(), curAttr.getDescription()));
 		}
 		Iterator objIterator = originalNodeConcept.getObjectContingentIterator();
 		while (objIterator.hasNext()) {

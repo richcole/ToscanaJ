@@ -12,7 +12,7 @@ import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.context.Attribute;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.database.Column;
@@ -252,7 +252,7 @@ public class CSXParser {
                     descriptionElem = descriptionElem.detach();
                 }
                 _Attributes.put(attribute.getAttribute("id").getValue(),
-                        new Attribute(name.getValue(), descriptionElem)
+                        new FCAElementImplementation(name.getValue(), descriptionElem)
                 );
             }
         }
@@ -374,7 +374,7 @@ public class CSXParser {
         Iterator iterator = contingent.iterator();
         while (iterator.hasNext()) {
             Element ref = (Element) iterator.next();
-            Object object = _Objects.get(ref.getText());
+            FCAElement object = (FCAElement) _Objects.get(ref.getText());
             if (object != null) {
                 concept.addObject(object);
             }
@@ -386,7 +386,7 @@ public class CSXParser {
         iterator = contingent.iterator();
         while (iterator.hasNext()) {
             Element ref = (Element) iterator.next();
-            Attribute attr = (Attribute) _Attributes.get(ref.getText());
+            FCAElement attr = (FCAElement) _Attributes.get(ref.getText());
             if (attr != null) {
                 concept.addAttribute(attr);
             }

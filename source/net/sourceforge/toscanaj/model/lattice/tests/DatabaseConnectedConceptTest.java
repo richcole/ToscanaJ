@@ -11,6 +11,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.tests.*;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 public class DatabaseConnectedConceptTest extends ConceptTest {
@@ -26,7 +27,7 @@ public class DatabaseConnectedConceptTest extends ConceptTest {
         try {
             DatabaseConnection.setConnection(new MockDBConnection());
             ConceptImplementation databaseConnectedConcept = new ConceptImplementation();
-            databaseConnectedConcept.addObject("clause");
+            databaseConnectedConcept.addObject(new FCAElementImplementation("clause"));
             //should be set, otherwise query will no be executed
             return databaseConnectedConcept;
         } catch (Exception e) {

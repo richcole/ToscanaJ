@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
@@ -71,7 +72,7 @@ public interface ConceptInterpreter {
 
     boolean isRealized(Concept concept, ConceptInterpretationContext context);
 
-    Object[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context);
+    FCAElement[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context);
     
     void showDeviation(boolean show);
     

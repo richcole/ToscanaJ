@@ -10,8 +10,8 @@ package net.sourceforge.toscanaj.model.cernato.tests;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.Context;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
@@ -44,11 +44,11 @@ public class ViewContextTest extends TestCase {
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
             FCAElementImplementation object = (FCAElementImplementation) it1.next();
             for (Iterator it2 = attributes.iterator(); it2.hasNext();) {
-                Attribute attribute = (Attribute) it2.next();
+                FCAElement attribute = (FCAElement) it2.next();
                 Criterion criterion = (Criterion) attribute.getData();
                 assertEquals(object.toString() + " x " + criterion.getProperty().getName() + ":" + criterion.getValueGroup().getName(),
                         TestData.isInScaledRelation(object, criterion),
-                        scaledContext.getRelation().contains(object, new Attribute(criterion, null)));
+                        scaledContext.getRelation().contains(object, new FCAElementImplementation(criterion, null)));
             }
         }
     }

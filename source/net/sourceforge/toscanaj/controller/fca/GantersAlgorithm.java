@@ -23,7 +23,7 @@ import net.sourceforge.toscanaj.model.lattice.*;
 
 public class GantersAlgorithm implements LatticeGenerator {
     private Context context;
-    private Object[] objects;
+    private FCAElement[] objects;
     private Hashtable intents;
     public Vector extents;
 
@@ -44,13 +44,13 @@ public class GantersAlgorithm implements LatticeGenerator {
 	/**
 	 * This is similar to Collection.toArray(), but also checks for duplicates.
 	 */
-    public Object[] createObjectArray(Collection objectCol) {
-    	Object[] retVal = new Object[objectCol.size()];
+    public FCAElement[] createObjectArray(Collection objectCol) {
+        FCAElement[] retVal = new FCAElement[objectCol.size()];
     	HashSet testSet = new HashSet();
     	Iterator it = objectCol.iterator();
     	int pos = 0;
     	while (it.hasNext()) {
-            Object cur = it.next();
+            FCAElement cur = (FCAElement) it.next();
             if(testSet.contains(cur)) {
             	throw new IllegalArgumentException("Context '" + context.getName() + "' contains duplicate object");
             }
@@ -107,7 +107,7 @@ public class GantersAlgorithm implements LatticeGenerator {
             for (Iterator iterator = downset.iterator(); iterator.hasNext();) {
                 ConceptImplementation concept2 = (ConceptImplementation) iterator.next();
                 for (Iterator iterator2 = concept2.getObjectContingentIterator(); iterator2.hasNext();) {
-                    Object object = iterator2.next();
+                    FCAElement object = (FCAElement) iterator2.next();
                     concept.removeObject(object);
                 }
             }
@@ -116,7 +116,7 @@ public class GantersAlgorithm implements LatticeGenerator {
             for (Iterator iterator = upset.iterator(); iterator.hasNext();) {
                 ConceptImplementation concept2 = (ConceptImplementation) iterator.next();
                 for (Iterator iterator2 = concept2.getAttributeContingentIterator(); iterator2.hasNext();) {
-                    Attribute attribute = (Attribute) iterator2.next();
+                    FCAElement attribute = (FCAElement) iterator2.next();
                     concept.removeAttribute(attribute);
                 }
             }
@@ -142,14 +142,14 @@ public class GantersAlgorithm implements LatticeGenerator {
     private void createConcepts(LatticeImplementation lattice) {
         for (Iterator iterator = extents.iterator(); iterator.hasNext();) {
             ConceptImplementation concept = new ConceptImplementation();
-            ListSet ext = (ListSet) iterator.next();
-            for (Iterator intit = ext.iterator(); intit.hasNext();) {
-                Object fcaObject = intit.next();
+            ListSet extent = (ListSet) iterator.next();
+            for (Iterator extIt = extent.iterator(); extIt.hasNext();) {
+                FCAElement fcaObject = (FCAElement) extIt.next();
                 concept.addObject(fcaObject);
             }
-            ListSet intent = (ListSet) intents.get(ext);
-            for (Iterator intit = intent.iterator(); intit.hasNext();) {
-                Attribute attribute = (Attribute) intit.next();
+            ListSet intent = (ListSet) intents.get(extent);
+            for (Iterator intIt = intent.iterator(); intIt.hasNext();) {
+                FCAElement attribute = (FCAElement) intIt.next();
                 concept.addAttribute(attribute);
             }
             lattice.addConcept(concept);

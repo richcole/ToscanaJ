@@ -16,6 +16,7 @@ import net.sourceforge.toscanaj.controller.db.tests.MockDBConnection;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.Table;
@@ -49,13 +50,13 @@ public class DatabaseConnectedConceptInterpreterTest extends TestCase {
         ConceptInterpretationContext context3 = new ConceptInterpretationContext(history2, new EventBroker());
 
         ConceptImplementation concept1 = new ConceptImplementation();
-        concept1.addObject("dummy clause to get queries to be created");
+        concept1.addObject(new FCAElementImplementation("dummy clause to get queries to be created"));
         ConceptImplementation concept2 = new ConceptImplementation();
-        concept2.addObject("dummy clause to get queries to be created");
+        concept2.addObject(new FCAElementImplementation("dummy clause to get queries to be created"));
         ConceptImplementation concept3 = new ConceptImplementation();
-        concept3.addObject("dummy clause to get queries to be created");
+        concept3.addObject(new FCAElementImplementation("dummy clause to get queries to be created"));
         ConceptImplementation concept4 = new ConceptImplementation();
-        concept4.addObject("dummy clause to get queries to be created");
+        concept4.addObject(new FCAElementImplementation("dummy clause to get queries to be created"));
 
         MockDBConnection dbConnection = (MockDBConnection) DatabaseConnection.getConnection();
 

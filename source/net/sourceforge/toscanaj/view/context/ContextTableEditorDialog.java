@@ -12,8 +12,8 @@ import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
@@ -596,9 +596,9 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		Set objectsSet = this.context.getObjects();
 		WritableFCAElement[] objects = (WritableFCAElement[]) objectsSet.toArray(new WritableFCAElement[objectsSet.size()]);
 		Set attributesSet = this.context.getAttributes();
-		Attribute[] attributes = (Attribute[]) attributesSet.toArray(new Attribute[attributesSet.size()]);
+        FCAElement[] attributes = (FCAElement[]) attributesSet.toArray(new FCAElement[attributesSet.size()]);
 		WritableFCAElement object = objects[objectPos];
-		Attribute attribute = attributes[attributePos];
+        FCAElement attribute = attributes[attributePos];
 		if (context.getRelationImplementation().contains(object, attribute)) {
 			context.getRelationImplementation().remove(object, attribute);
 		} else {
