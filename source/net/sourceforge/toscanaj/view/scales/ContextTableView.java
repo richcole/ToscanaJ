@@ -26,12 +26,16 @@ import javax.swing.ToolTipManager;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 
 public class ContextTableView extends JComponent implements Scrollable {
-	private static final Color TEXT_COLOR = Color.BLACK;
-	private static final Color TABLE_CELL_COLOR = Color.WHITE;
+	static final Color TEXT_COLOR = Color.BLACK;
+	static final Color TABLE_CELL_COLOR = Color.WHITE;
+	static final Color TABLE_HEADER_COLOR = Color.LIGHT_GRAY;
+	static final int CELL_WIDTH = 150;
+	static final int CELL_HEIGHT = 30;
+
+	static final Dimension TABLE_HEADER_PREFERRED_VIEWPORT_SIZE = new Dimension(CELL_WIDTH,CELL_HEIGHT);
+	
 	private ContextImplementation context;
 	private ContextTableScaleEditorDialog dialog;
-	private static final int CELL_WIDTH = 150;
-	private static final int CELL_HEIGHT = 30;
     private static final Dimension PREFERRED_VIEWPORT_SIZE = new Dimension(6 * CELL_WIDTH, 6 * CELL_HEIGHT);
 
 	public static class Position {

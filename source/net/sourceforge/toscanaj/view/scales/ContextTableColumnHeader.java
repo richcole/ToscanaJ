@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -38,30 +37,8 @@ import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 
 public class ContextTableColumnHeader extends JComponent implements Scrollable {
-	private static final Color TEXT_COLOR = Color.BLACK;
-	private static final Color TABLE_HEADER_COLOR = Color.LIGHT_GRAY;
 	private ContextImplementation context;
-	private static final int CELL_WIDTH = 150;
-	private static final int CELL_HEIGHT = 30;
-	private static final Dimension PREFERRED_VIEWPORT_SIZE = new Dimension(CELL_WIDTH, CELL_HEIGHT);
 	private ContextTableScaleEditorDialog dialog;
-
-	public static class Position {
-		private int row;
-		private int col;
-		public Position(int row, int col) {
-			this.row = row;
-			this.col = col;
-		}
-
-		public int getCol() {
-			return col;
-		}
-
-		public int getRow() {
-			return row;
-		}
-	}
 
 	public ContextTableColumnHeader(ContextImplementation context, ContextTableScaleEditorDialog dialog) {
 		super();
@@ -90,33 +67,33 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	public Dimension calculateNewSize() {
 		int numCol = this.context.getAttributes().size()+1;
 		int numRow = this.context.getObjects().size()+1;
-		return new Dimension(numCol * CELL_WIDTH + 1, numRow * CELL_HEIGHT + 1);
+		return new Dimension(numCol * ContextTableView.CELL_WIDTH + 1, numRow * ContextTableView.CELL_HEIGHT + 1);
 	}
 
 	protected void drawColumnHeader(Graphics2D g2d) {
-		g2d.setPaint(TABLE_HEADER_COLOR);
+		g2d.setPaint(ContextTableView.TABLE_HEADER_COLOR);
 		Iterator attrIt = this.context.getAttributes().iterator();
 		int col = 0;
 		while (attrIt.hasNext()) {
 			Object attribute = attrIt.next();
-			drawCell(g2d, attribute.toString(), col * CELL_WIDTH, 0);
+			drawCell(g2d, attribute.toString(), col * ContextTableView.CELL_WIDTH, 0);
 			col += 1;
 		}
 	}
 
 	protected void drawCell(Graphics2D g2d, String content, int x, int y) {
-		g2d.fill(new Rectangle2D.Double(x, y, CELL_WIDTH, CELL_HEIGHT));
+		g2d.fill(new Rectangle2D.Double(x, y, ContextTableView.CELL_WIDTH, ContextTableView.CELL_HEIGHT));
 		Paint oldPaint = g2d.getPaint();
-		g2d.setPaint(TEXT_COLOR);
-		g2d.draw(new Rectangle2D.Double(x, y, CELL_WIDTH, CELL_HEIGHT));
+		g2d.setPaint(ContextTableView.TEXT_COLOR);
+		g2d.draw(new Rectangle2D.Double(x, y, ContextTableView.CELL_WIDTH, ContextTableView.CELL_HEIGHT));
 
 		FontMetrics fontMetrics = g2d.getFontMetrics();
 		String newContent = reduceStringDisplayWidth(content, g2d);
 
 		g2d.drawString(
 			newContent,
-			x + CELL_WIDTH / 2 - fontMetrics.stringWidth(newContent) / 2,
-			y + CELL_HEIGHT / 2 + fontMetrics.getMaxAscent() / 2);
+			x + ContextTableView.CELL_WIDTH / 2 - fontMetrics.stringWidth(newContent) / 2,
+			y + ContextTableView.CELL_HEIGHT / 2 + fontMetrics.getMaxAscent() / 2);
 		g2d.setPaint(oldPaint);
 	}
 
@@ -125,8 +102,8 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 		String tail = "...";
 		int stringWidth = g2d.getFontMetrics().stringWidth(newContent);
 		int tailWidth = g2d.getFontMetrics().stringWidth(tail);
-		if (stringWidth > (CELL_WIDTH - 10)) {
-			while ((stringWidth + tailWidth) > (CELL_WIDTH - 10)) {
+		if (stringWidth > (ContextTableView.CELL_WIDTH - 10)) {
+			while ((stringWidth + tailWidth) > (ContextTableView.CELL_WIDTH - 10)) {
 				newContent = newContent.substring(0, (newContent.length() - 1));
 				stringWidth = g2d.getFontMetrics().stringWidth(newContent);
 			}
@@ -136,18 +113,18 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	}
 
 	public int getCellHeight() {
-		return CELL_HEIGHT;
+		return ContextTableView.CELL_HEIGHT;
 	}
 
 	public int getCellWidth() {
-		return CELL_WIDTH;
+		return ContextTableView.CELL_WIDTH;
 	}
 
 	public String getToolTipText(MouseEvent e) {
 		String tooltipText = null;
 
 		ArrayList attributeArrayList = (ArrayList) context.getAttributes();
-		Position pos = getTablePosition(e.getX(), e.getY());
+		ContextTableView.Position pos = getTablePosition(e.getX(), e.getY());
 
 		if (pos != null) {
 			if (pos.getCol() != attributeArrayList.size()) {
@@ -158,14 +135,14 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 		return tooltipText;
 	}
 
-	protected Position getTablePosition(int xLoc, int yLoc) {
+	protected ContextTableView.Position getTablePosition(int xLoc, int yLoc) {
 		int col = xLoc / getCellWidth();
 		int row = yLoc / getCellHeight();
 		if ((col > this.context.getAttributes().size() )
 			|| (row > this.context.getObjects().size() )) {
 			return null;
 		}
-		return new Position(row, col);
+		return new ContextTableView.Position(row, col);
 	}
 	
 	public ContextImplementation getModel() {
@@ -173,21 +150,21 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	}
 	
     public Dimension getPreferredScrollableViewportSize() {
-    	return PREFERRED_VIEWPORT_SIZE;
+    	return ContextTableView.TABLE_HEADER_PREFERRED_VIEWPORT_SIZE;
     }
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
     	if(orientation == SwingConstants.HORIZONTAL) {
-    		return CELL_WIDTH;
+    		return ContextTableView.CELL_WIDTH;
     	} else {
-    	    return CELL_HEIGHT;
+    	    return ContextTableView.CELL_HEIGHT;
     	}
     }
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
     	// round the size in any direction down to a multiple of the cell size
         if(orientation == SwingConstants.HORIZONTAL) {
-            return (visibleRect.width / CELL_WIDTH) * CELL_WIDTH;
+            return (visibleRect.width / ContextTableView.CELL_WIDTH) * ContextTableView.CELL_WIDTH;
         } else {
-            return (visibleRect.height / CELL_HEIGHT) * CELL_HEIGHT;
+            return (visibleRect.height / ContextTableView.CELL_HEIGHT) * ContextTableView.CELL_HEIGHT;
         }
     }
  
@@ -244,7 +221,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 		MouseListener mouseListener = new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				if (e.isPopupTrigger()) {
-					final Position pos =
+					final ContextTableView.Position pos =
 						getTablePosition(e.getX(), e.getY());
 					if (pos == null) {
 						return;
@@ -256,7 +233,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 
 			public void showPopupMenu(
 				MouseEvent e,
-				final Position pos) {
+				final ContextTableView.Position pos) {
 					JPopupMenu popupMenu = new JPopupMenu();
 					JMenuItem rename = new JMenuItem("Rename Attribute");
 					rename.addActionListener(new ActionListener() {
@@ -277,7 +254,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 
 			public void mouseReleased(MouseEvent e) {
 				if (e.isPopupTrigger()) {
-					final Position pos =
+					final ContextTableView.Position pos =
 						getTablePosition(e.getX(), e.getY());
 					if (pos == null) {
 						return;
@@ -288,7 +265,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 			}
 
 			public void mouseClicked(MouseEvent e) {
-				final Position pos =
+				final ContextTableView.Position pos =
 					getTablePosition(e.getX(), e.getY());
 				if (pos == null) {
 					return;
