@@ -294,7 +294,6 @@ public class CSXParser {
                             posElem.getAttribute("x").getDoubleValue(),
                             posElem.getAttribute("y").getDoubleValue());
                 } catch (DataConversionException e) {
-                    /// @todo: give more info here
                     throw new DataFormatException(
                             "Position of some concept does not contain double.");
                 }
@@ -436,7 +435,6 @@ public class CSXParser {
             } else if (text.compareTo("left") == 0) {
                 label.setTextAlignment(LabelInfo.ALIGNLEFT);
             } else {
-                /// @todo give more info here
                 throw new DataFormatException("Unknown text alignment");
             }
         }
@@ -506,7 +504,6 @@ public class CSXParser {
             throw new DataFormatException("<table> but not <key> given in <databaseConnection> element");
         }
         String keyName = elem.getText();
-        /// @todo it is probably not ok to assume VARCHAR here
         dbInfo.setKey(new Column(keyName, Types.VARCHAR, dbInfo.getTable()));
         // check for additional queries
         Element queryElem = dbElement.getChild("queries");
@@ -524,9 +521,7 @@ public class CSXParser {
             Iterator it = queryElem.getChildren("listQuery").iterator();
             while (it.hasNext()) {
                 Element cur = (Element) it.next();
-                /// @todo add error handling
                 String name = cur.getAttributeValue("name");
-                /// @todo handle the head
                 String header = cur.getAttributeValue("head");
                 String distinct = cur.getAttributeValue("distinct");
                 boolean isDistinct = (distinct != null) && (distinct.equals("true"));
@@ -545,9 +540,7 @@ public class CSXParser {
             it = queryElem.getChildren("aggregateQuery").iterator();
             while (it.hasNext()) {
                 Element cur = (Element) it.next();
-                /// @todo add error handling
                 String name = cur.getAttributeValue("name");
-                /// @todo handle the head
                 String header = cur.getAttributeValue("header");
                 Query query = dbInfo.createAggregateQuery(name, header);
                 Iterator it2 = cur.getChildren("column").iterator();
