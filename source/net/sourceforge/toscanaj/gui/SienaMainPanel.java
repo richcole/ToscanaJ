@@ -313,7 +313,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		Frame tFrame = JOptionPane.getFrameForComponent(tableView);
 		List objectList = (List) conceptualSchema.getManyValuedContext().getObjects();
 		WritableFCAObject object = (WritableFCAObject) objectList.get(row);
-		ObjectDialog objectDialog = new ObjectDialog(tFrame, object);
+		new ObjectDialog(tFrame, object);
 		this.conceptualSchema.getManyValuedContext().update();
 		this.tableView.updateSize();
 		this.rowHeader.updateSize();
@@ -323,8 +323,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		Frame tFrame = JOptionPane.getFrameForComponent(tableView);
 		List manyValuedAttributeList = (List) conceptualSchema.getManyValuedContext().getAttributes();
 		WritableManyValuedAttribute attribute = (WritableManyValuedAttribute) manyValuedAttributeList.get(column);
-		PropertiesDialog attributeDialog = new PropertiesDialog(tFrame, attribute, 
-					conceptualSchema.getManyValuedContext());
+		new PropertiesDialog(tFrame, attribute,	conceptualSchema.getManyValuedContext());
 		this.conceptualSchema.getManyValuedContext().update();
 		this.tableView.updateSize();
 		this.colHeader.updateSize();
