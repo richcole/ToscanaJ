@@ -16,11 +16,18 @@ import org.tockit.events.EventBroker;
 import com.mockobjects.sql.MockConnection;
 
 public class MockDBConnection extends DatabaseConnection {
+    public int queryNumberCallCounter = 0;
+
     public MockDBConnection() throws DatabaseException {
         super(new EventBroker(), new MockConnection());
     }
     public List executeQuery(List fields, String tableName, String whereClause)
         throws DatabaseException {
         return new ArrayList();
+    }
+    
+    public int queryNumber(String statement, int column) throws DatabaseException {
+    	this.queryNumberCallCounter ++;
+        return 0;
     }
 }

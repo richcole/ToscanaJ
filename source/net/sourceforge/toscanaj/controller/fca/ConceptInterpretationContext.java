@@ -33,7 +33,7 @@ public class ConceptInterpretationContext implements ChangeObserver {
     private List nestingConcepts = CollectionFactory.createDefaultList();
 
     /// @todo use something else than diagramHistory as first parameter -- not useful in anything but Toscana, even not
-    /// in Anaconda
+    /// in the editors
     public ConceptInterpretationContext(DiagramHistory diagramHistory, EventBroker eventBroker) {
         this.diagramHistory = diagramHistory;
         this.objectDisplayMode = CONTINGENT;
