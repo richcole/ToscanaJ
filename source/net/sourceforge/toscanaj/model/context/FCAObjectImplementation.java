@@ -53,6 +53,6 @@ public class FCAObjectImplementation implements WritableFCAObject {
 			Comparable comparableData = (Comparable) this.data;
 			return comparableData.compareTo(other.getData());
 		}
-		return this.hashCode() - other.hashCode();
+		return this.hashCode()/2 - other.hashCode()/2;
 	}
 }

@@ -57,6 +57,6 @@ public class Attribute implements Comparable {
     		Comparable comparableData = (Comparable) this.data;
     		return comparableData.compareTo(other.data);
     	}
-        return this.hashCode() - other.hashCode();
+        return this.hashCode()/2 - other.hashCode()/2;
     }
 }
