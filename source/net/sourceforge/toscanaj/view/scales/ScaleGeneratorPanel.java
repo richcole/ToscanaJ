@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.util.CollectionFactory;
 
@@ -98,8 +99,70 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
                             generator.generateScale(selectionSource.getSelectedTableColumnPairs(),
                                     conceptualSchema, databaseConnection);
                     if (null != returnValue) {
-                        conceptualSchema.addDiagram(returnValue);
+                    	Diagram2D diagramWithSameTitle = null;
+                    	for(int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
+                    		if(conceptualSchema.getDiagram(i).getTitle().equalsIgnoreCase(returnValue.getTitle())) {
+                    			diagramWithSameTitle = conceptualSchema.getDiagram(i); 
+                    		}
+                    	}
+                    	if(diagramWithSameTitle != null) {
+    							int rv = showTitleExistsDialog(returnValue);
+								if(rv==JOptionPane.OK_OPTION){
+									replaceTitle(returnValue, diagramWithSameTitle);
+								}else if(rv==JOptionPane.CANCEL_OPTION){
+									renameTitle(returnValue, diagramWithSameTitle);
+								}		
+                    	}else{
+							conceptualSchema.addDiagram(returnValue);
+                    	}
                     }
+                }
+				private void replaceTitle(Diagram2D returnValue, Diagram2D diagramWithSameTitle) {
+					conceptualSchema.removeDiagram(diagramWithSameTitle);
+					conceptualSchema.addDiagram(returnValue);
+				}
+				private void renameTitle(Diagram2D returnValue, Diagram2D diagramWithSameTitle) {
+					String inputValue = "";
+					String currentValue = returnValue.getTitle(); 
+					do {
+						inputValue = (String)JOptionPane.showInputDialog(
+								null,
+								"Enter title: ",
+								"Rename title",
+								JOptionPane.PLAIN_MESSAGE,
+								null,
+								null, 
+								currentValue);
+								if(inputValue!=null){
+									inputValue = inputValue.trim();
+									currentValue = inputValue;
+								}
+					} while (inputValue!=null && (inputValue.equals("") || 
+						inputValue.equalsIgnoreCase(diagramWithSameTitle.getTitle().trim())));
+						//to set the edited title to the Diagram2D
+						SimpleLineDiagram lineDiag = (SimpleLineDiagram) returnValue;
+						lineDiag.setTitle(inputValue);
+						conceptualSchema.addDiagram(lineDiag);
+				}
+				
+                private int showTitleExistsDialog(Diagram2D returnValue){
+                	Object[] options;
+                	if(returnValue instanceof SimpleLineDiagram){
+						options = new Object[]{ "Replace Old Diagram", "Discard New Diagram", "Rename New Diagram" };
+                	} else {
+						options = new Object[]{ "Replace Old Diagram", "Discard New Diagram" };
+                	}
+					return JOptionPane.showOptionDialog( 
+									parentFrame, 
+									"A diagram with the title '"+
+									returnValue.getTitle()+
+									"' already exists.", 
+									"Title exists",
+									JOptionPane.YES_NO_CANCEL_OPTION,
+									JOptionPane.WARNING_MESSAGE,
+									null,
+									options,
+									options[2]);
                 }
             });
             add(generatorButton);

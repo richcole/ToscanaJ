@@ -32,6 +32,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	private DatabaseConnection databaseConnection;
 
 	private boolean result;
+	private boolean onFirstLoad; 
 
 	private JTextField scaleTitleField;
 	private JButton createButton;
@@ -52,6 +53,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		setTitle("Context Table Scale Generator");
 		ConfigurationManager.restorePlacement("ContextTableScaleEditorDialog", 
 			this, new Rectangle(DEFAULT_X_POS, DEFAULT_Y_POS, MINIMUM_WIDTH, MINIMUM_HEIGHT));
+		onFirstLoad = true; 
 		// to enforce the minimum size during resizing of the JDialog
 		addComponentListener( new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
@@ -113,6 +115,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	}
 
 	private void getInput(){
+		onFirstLoad=false;
 		String title = showTextInputDialog("New Title", "title","");
 		scaleTitleField.setText(title);
 		showObjectInputDialog();
@@ -267,7 +270,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 			}
 		}else{
 			JOptionPane.showMessageDialog(contextTableScaleEditorDialog, 
-				"Please provide an object name", "No name provided",
+				"Please provide an attribute name", "No name provided",
 				JOptionPane.WARNING_MESSAGE);
 		}			
 		newNameField.grabFocus();	
@@ -661,7 +664,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	}
 	/*
 	 * Checks against the context whether there are any objects/attributes. If
-	 * either one doesn't exist, disable the  button.
+	 * either one doesn't exist, disable the button.
 	 */ 
 	protected void setCreateButtonStatus(){
 		if(context.getAttributes().isEmpty() || context.getObjects().isEmpty()){
@@ -681,7 +684,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	
 	public void paint(Graphics g) {
 		super.paint(g);
-		if(this.scaleTitleField.getText().length() == 0) {
+		if(this.scaleTitleField.getText().length() == 0 && onFirstLoad==true) {
 			getInput();
 		}
 	}
