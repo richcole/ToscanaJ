@@ -30,6 +30,9 @@ public class TupelParser {
      * The format used is one tupel per line, the elements delimited
      * with tabs. No escaping, so no tabs in the elements are allowed.
      * 
+     * If a line doesn't contain at least two entries it is consider a
+     * comment.
+     * 
      * @return a Set of Object[] representing the tupels parsed
      */
     public static TupelSet parseTabDelimitedTupels(Reader input) throws IOException {
@@ -41,6 +44,10 @@ public class TupelParser {
                 break;            
             }
             StringTokenizer tokenizer = new StringTokenizer(line, "\t", false);
+            // lines without tabs are considered comments
+            if(tokenizer.countTokens() <= 1) {
+                continue;
+            }
             String[] tupel = new String[tokenizer.countTokens()];
             int i = 0;
             while(tokenizer.hasMoreTokens()) {
