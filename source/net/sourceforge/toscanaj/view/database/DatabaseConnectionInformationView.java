@@ -26,9 +26,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
-/**
- * @todo the buttons are stupid, there should be a cancel button and an ok button, maybe "apply" as third
- */
 public class DatabaseConnectionInformationView extends JDialog implements EventListener {
     protected DatabaseInfo info;
 
@@ -77,12 +74,19 @@ public class DatabaseConnectionInformationView extends JDialog implements EventL
                 getFileURL();
             }
         });
+        fileButton.setMnemonic('f');
 
         JButton connectButton = new JButton();
         databaseConnectEvent = new DatabaseConnectEvent(this, this.info);
         SimpleAction action = new SimpleAction(frame, "Connect");
         action.add(new SaveControlActivity());
         action.add(new EmitEventActivity(eventBroker, databaseConnectEvent));
+        action.add(new SimpleActivity() {
+            public boolean doActivity() throws Exception {
+                hide();
+                return true;
+            }
+        });
         connectButton.setAction(action);
 
         JButton closeButton = new JButton("Close Dialog");
