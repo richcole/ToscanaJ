@@ -26,6 +26,7 @@ import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
@@ -171,13 +172,18 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     }
 
 	protected JPanel createEditPanel() {
+		final Component component = this;
 		JPanel editPanel = new JPanel(new GridBagLayout());
 		editPanel.setBorder(BorderFactory.createTitledBorder("Edit"));
 		editContextButton = new JButton("Context...");
 		editContextButton.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        editContext();
-		    }
+			public void actionPerformed(ActionEvent e) {
+				try {
+					editContext();
+				} catch (Throwable t) {
+					ErrorDialog.showError(component, t, "Context editing failed");
+				}
+			}
 		});
 		editContextButton.setEnabled(false);
 		editPanel.add(editContextButton, new GridBagConstraints(
