@@ -33,13 +33,14 @@ public class XMLEditorDialog extends JDialog {
         init();
     }
 
-	public void init(){
+    public void init() {
         textPane.setHighlighter(highlighter);
 
-		JScrollPane scrollPane = new JScrollPane(textPane);
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		Dimension scrollPaneSize = new Dimension(5*screenSize.width/8,5*screenSize.height/8);
-		scrollPane.setPreferredSize(scrollPaneSize);
+        JScrollPane scrollPane = new JScrollPane(textPane);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension scrollPaneSize =
+            new Dimension(5 * screenSize.width / 8, 5 * screenSize.height / 8);
+        scrollPane.setPreferredSize(scrollPaneSize);
 
         textPane.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
@@ -56,17 +57,21 @@ public class XMLEditorDialog extends JDialog {
         });
         getContentPane().add(scrollPane, BorderLayout.CENTER);
         getContentPane().add(statusBar, BorderLayout.SOUTH);
-		pack();
-	}
+        pack();
+    }
 
     public void setContent(Element content) {
-        XMLOutputter outputter = new XMLOutputter("  ", false);
-        textPane.setText(outputter.outputString(content));
+        if (content != null) {
+            XMLOutputter outputter = new XMLOutputter("  ", false);
+            textPane.setText(outputter.outputString(content));
+        } else {
+            textPane.setText("<html>\n  <head>\n    <title></title>\n  </head>\n  <body>\n  </body>\n</html>");
+        }
     }
 
     public Element getContent() {
         checkXML();
-        if(document == null) {
+        if (document == null) {
             return null;
         }
         return document.getRootElement();
@@ -84,17 +89,19 @@ public class XMLEditorDialog extends JDialog {
             String message = e.getMessage();
             statusBar.setText(message);
             int posLine = message.indexOf("line");
-            if(posLine > 0) {
+            if (posLine > 0) {
                 String rest = message.substring(posLine + 5);
-                int errorLine = Integer.parseInt(rest.substring(0, rest.indexOf(":")));
+                int errorLine =
+                    Integer.parseInt(rest.substring(0, rest.indexOf(":")));
                 addErrorHighlight(errorLine);
                 posLine = rest.lastIndexOf(" ");
-                if(posLine > 0) {
+                if (posLine > 0) {
                     rest = rest.substring(posLine + 1);
                     try {
                         int dotIndex = rest.indexOf(".");
                         if (dotIndex != -1) {
-                            int openTagLine = Integer.parseInt(rest.substring(0, dotIndex));
+                            int openTagLine =
+                                Integer.parseInt(rest.substring(0, dotIndex));
                             addErrorHighlight(openTagLine);
                         }
                     } catch (NumberFormatException e1) {
@@ -112,18 +119,21 @@ public class XMLEditorDialog extends JDialog {
         int lineCount = 1;
         for (int i = 0; i < text.length; i++) {
             char c = text[i];
-            if(c == '\n') {
+            if (c == '\n') {
                 lineCount++;
-                if(lineCount == errorLine) {
+                if (lineCount == errorLine) {
                     startPos = i;
                 }
-                if(lineCount == errorLine + 1) {
+                if (lineCount == errorLine + 1) {
                     endPos = i;
                 }
             }
         }
         try {
-            highlighter.addHighlight(startPos, endPos, new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
+            highlighter.addHighlight(
+                startPos,
+                endPos,
+                new DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
         } catch (BadLocationException e1) {
             e1.printStackTrace();
         }
