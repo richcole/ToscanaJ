@@ -23,6 +23,7 @@ import net.sourceforge.toscanaj.gui.activity.LoadConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.activity.SaveConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.TemporalMainDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
@@ -36,6 +37,7 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.parser.BurmeisterParser;
+import net.sourceforge.toscanaj.parser.CSCParser;
 import net.sourceforge.toscanaj.parser.CernatoXMLParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
@@ -87,6 +89,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private TemporalMainDialog temporalControls;
     private DiagramExportSettings diagramExportSettings;
     private ExportDiagramAction exportDiagramAction;
+    private File lastCSCFile;
 
     public SienaMainPanel() {
         super("Siena");
@@ -201,6 +204,15 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             }
         });
         fileMenu.add(importBurmeisterItem);
+
+        JMenuItem importCSCMenuItem = new JMenuItem("Import CSC File...");
+        importCSCMenuItem.setMnemonic(KeyEvent.VK_I);
+        importCSCMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                importCSC();
+            }
+        });
+        fileMenu.add(importCSCMenuItem);
 
         fileMenu.addSeparator();
 
@@ -434,6 +446,41 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             return;
         }
         addDiagram(conceptualSchema, context, context.getName(), new DefaultDimensionStrategy());
+    }
+
+    private void importCSC() {
+        final JFileChooser openDialog;
+        if (this.lastCSCFile != null) {
+            // use position of last file for dialog
+            openDialog = new JFileChooser(this.lastCSCFile);
+        } else {
+            openDialog = new JFileChooser(System.getProperty("user.dir"));
+        }
+        openDialog.setApproveButtonText("Import");
+        openDialog.setFileFilter(
+            new ExtensionFileFilter(new String[] { "csc" }, "Conscript Files"));
+        int rv = openDialog.showOpenDialog(this);
+        if (rv != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        try {
+            importCSC(openDialog.getSelectedFile());
+            this.lastCSCFile = openDialog.getSelectedFile();
+        } catch (Exception e) {
+            ErrorDialog.showError(this, e, "Import failed");
+        }
+    }
+
+    private void importCSC(File file) {
+        try {
+            new CSCParser().importCSCFile(file, this.conceptualSchema);
+        } catch (FileNotFoundException e) {
+            ErrorDialog.showError(this, e, "Could not find file");
+            return;
+        } catch (DataFormatException e) {
+            ErrorDialog.showError(this, e, "Could not parse file");
+            return;
+        }
     }
 
     private void addDiagrams(ConceptualSchema schema, CernatoModel cernatoModel) {
