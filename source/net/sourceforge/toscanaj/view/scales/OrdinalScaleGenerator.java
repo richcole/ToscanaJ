@@ -6,31 +6,19 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.diagram.WriteableDiagram2D;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Query;
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
-import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
+import net.sourceforge.toscanaj.model.diagram.*;
+import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+import util.Assert;
+import util.CollectionFactory;
+import util.NullIterator;
 
 import javax.swing.*;
-
-import util.Assert;
-import util.NullIterator;
-import util.CollectionFactory;
-
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 import java.util.List;
-
-import org.jdom.Element;
 
 public class OrdinalScaleGenerator implements ScaleGenerator {
     private JFrame parent;
@@ -47,60 +35,27 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         return columns.length == 1;
     }
 
-    static class DummyConcept implements Concept{
-        public Element toXML() {
-            return null;
+    static class DummyConcept extends AbstractConceptImplementation {
+        public DummyConcept(List attributeContigent) {
+            this.attributeContigent = attributeContigent;
         }
 
-        public void readXML(Element elem) throws XML_SyntaxError {
+        public DummyConcept() {
+            this(CollectionFactory.createDefaultList());
         }
 
-        public boolean isRealised() {
-            return false;
-        }
-
-        public int getIntentSize() {
-            return 0;
-        }
-
-        public double getIntentSizeRelative() {
-            return 0;
-        }
-
-        public int getExtentSize() {
-            return 0;
-        }
-
-        public double getExtentSizeRelative() {
-            return 0;
-        }
+        List attributeContigent;
 
         public int getAttributeContingentSize() {
-            return 0;
-        }
-
-        public double getAttributeContingentSizeRelative() {
-            return 0;
+            return attributeContigent.size();
         }
 
         public int getObjectContingentSize() {
             return 0;
         }
 
-        public double getObjectContingentSizeRelative() {
-            return 0;
-        }
-
-        public Iterator getIntentIterator() {
-            return NullIterator.makeNull();
-        }
-
-        public Iterator getExtentIterator() {
-            return NullIterator.makeNull();
-        }
-
         public Iterator getAttributeContingentIterator() {
-            return NullIterator.makeNull();
+            return attributeContigent.iterator();
         }
 
         public List executeQuery(Query query, boolean contingentOnly) {
@@ -122,46 +77,68 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         public Concept getCollapsedConcept() {
             return this;
         }
-
-        public boolean isTop() {
-            return false;
-        }
-
-        public boolean isBottom() {
-            return false;
-        }
-
-        public boolean hasSuperConcept(Concept concept) {
-            return false;
-        }
-
-        public boolean hasSubConcept(Concept concept) {
-            return false;
-        }
     }
 
     public Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme) {
         Assert.isTrue(canHandleColumns(columns));
         TableColumnPair pair = columns[0];
-        OrdinalScaleEditorDialog scaleDialog =  new OrdinalScaleEditorDialog(parent, pair.getColumn());
-        if(!scaleDialog.execute()){
+        OrdinalScaleEditorDialog scaleDialog = new OrdinalScaleEditorDialog(parent, pair.getColumn());
+        if (!scaleDialog.execute()) {
             return null;
         }
+
+        List dividers = scaleDialog.getDividers();
+
 
         WriteableDiagram2D ret = new SimpleLineDiagram();
         ret.setTitle(scaleDialog.getDiagramTitle());
 
-         Concept concept = new DummyConcept();
-         DiagramNode node = new DiagramNode( "dummy",
-                 new Point2D.Double(0., 0.),
-                 concept,
-                 null,
-                 null,
-                 null
-         );
-        ret.addNode(node);
+
+        String id = "Ordinal";
+        double x = 0.;
+        double y = 0.;
+        AbstractConceptImplementation top = makeConcept();
+        DiagramNode topNode = new DiagramNode(id,
+                new Point2D.Double(x, y),
+                top,
+                new LabelInfo(),
+                new LabelInfo(),
+                null
+        );
+        ret.addNode(topNode);
+        AbstractConceptImplementation prevConcept = top;
+        DiagramNode prevNode = topNode;
+        for (int i = 0; i < dividers.size(); i++) {
+            y += 30;
+            AbstractConceptImplementation currentConcept = makeConcept("<"+String.valueOf(dividers.get(i)));
+
+            DiagramNode node = new DiagramNode(id,
+                    new Point2D.Double(x, y),
+                    currentConcept,
+                    new LabelInfo(),
+                    new LabelInfo(),
+                    null
+            );
+            prevConcept.addSubConcept(currentConcept);
+            currentConcept.addSuperConcept(prevConcept);
+
+            ret.addNode(node);
+            ret.addLine(prevNode, node);
+            prevNode = node;
+            prevConcept = currentConcept;
+        }
 
         return ret;
+    }
+
+    private AbstractConceptImplementation makeConcept() {
+        return new DummyConcept();
+    }
+
+    private AbstractConceptImplementation makeConcept(String label) {
+        final List list = CollectionFactory.createDefaultList();
+        list.add(label);
+        return new DummyConcept(list);
     }
 
     public Diagram2D generateScale(Diagram2D oldVersion) {
