@@ -385,8 +385,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 					WritableFCAObject obj = (WritableFCAObject)objectList.get(col);
 					
 					if(attribute.getType() instanceof TextualType){
-						showPopupMenu(e.getPoint().getX() + tableView.getX(), 
-                                      e.getPoint().getY() + tableView.getY(), 
+						showPopupMenu(e.getPoint().getX(), 
+                                      e.getPoint().getY(), 
                                       attribute, obj);
 					}
 					else {
@@ -1271,7 +1271,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 			menu = createPopupMenu(textualValueList.length/NUMBER_OF_VALUE_POPUP_MENU_ROWS,NUMBER_OF_VALUE_POPUP_MENU_ROWS,
 											textualValueList,property,obj );
 		}
-		menu.show(this,(int)xPos,(int)yPos);
+		menu.show(tableView,(int)xPos,(int)yPos);
 	}
 
 	protected JPopupMenu createPopupMenu(int numOfCol,int numOfRows, AttributeValue[] textualValueList,
