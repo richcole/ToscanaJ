@@ -9,6 +9,7 @@ package org.tockit.tupleware.gui;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
+import net.sourceforge.toscanaj.controller.fca.TupleConceptInterpreter;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.gui.MainPanel;
@@ -257,6 +258,9 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
             }
             nonObjectDims[i] = i + offset;
         }
+        this.conceptualSchema = new ConceptualSchema(this.eventBroker);
+        TupleConceptInterpreter interpreter = new TupleConceptInterpreter(this.objectIndices);
+        this.conceptualSchema.setConceptInterpreter(interpreter);
         for (int i = 0; i < nonObjectDims.length; i++) {
         	int dim = nonObjectDims[i];
 			String dimensionName = dimensionNames[dim];
