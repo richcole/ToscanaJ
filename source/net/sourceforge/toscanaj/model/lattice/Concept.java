@@ -75,17 +75,26 @@ public interface Concept {
     Iterator getObjectContingentIterator();
 
     /**
-     * Creates the direct product of two concepts.
+     * Returns the concept that is using only objects from the other concepts
+     * extent.
      *
-     * This is the concept in the direct product of the two lattices of the
-     * input concepts which is created by the union of the intents and the
-     * join on the extents.
+     * This is at the moment not necessarily a concept in the sense of FCA: the
+     * concept returned might be not realised in the diagram we currently have
+     * (not realised as in Toscana 2/3).
      *
      * If the other concept is null, the original concept will be returned.
-     *
-     * @TODO check terms here. This is basically the infimum of the two input
-     * concepts in the new lattice, plus some additional information on realized
-     * or not.
      */
-    Concept directProduct(Concept other);
+    Concept filterByExtent(Concept other);
+
+    /**
+     * Returns the concept that is using only objects from the other concepts
+     * object contingent.
+     *
+     * This is at the moment not necessarily a concept in the sense of FCA: the
+     * concept returned might be not realised in the diagram we currently have
+     * (not realised as in Toscana 2/3).
+     *
+     * If the other concept is null, the original concept will be returned.
+     */
+    Concept filterByContingent(Concept other);
 }

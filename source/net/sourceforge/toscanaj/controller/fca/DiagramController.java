@@ -310,7 +310,7 @@ public class DiagramController implements ChangeObservable {
         while(it.hasNext()) {
             DiagramReference curRef = (DiagramReference) it.next();
             Concept curZC = curRef.getZoomedConcept();
-            filter = curZC.directProduct(filter);
+            filter = curZC.filterByExtent(filter);
         }
         Hashtable nodeMap = new Hashtable();
 
@@ -318,7 +318,7 @@ public class DiagramController implements ChangeObservable {
         for(int i = 0; i<diag.getNumberOfNodes(); i++) {
             DiagramNode oldNode = diag.getNode(i);
             DiagramNode newNode = new DiagramNode( oldNode.getPosition(),
-                                                   oldNode.getConcept().directProduct(filter),
+                                                   oldNode.getConcept().filterByExtent(filter),
                                                    oldNode.getAttributeLabelInfo(),
                                                    oldNode.getObjectLabelInfo() );
             retVal.addNode(newNode);

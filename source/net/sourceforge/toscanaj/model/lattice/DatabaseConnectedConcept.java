@@ -141,9 +141,17 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
     }
 
     /**
-     * Implements AbstractConceptImplementation.directProdct(Concept).
+     * Implements Concept.filterByExtent(Concept).
      */
-    public Concept directProduct(Concept other) {
+    public Concept filterByExtent(Concept other) {
+        /// @TODO Implement this properly
+        return this;
+    }
+
+    /**
+     * Implements Concept.filterByContingent(Concept).
+     */
+    public Concept filterByContingent(Concept other) {
         /// @TODO Implement this properly
         return this;
     }
