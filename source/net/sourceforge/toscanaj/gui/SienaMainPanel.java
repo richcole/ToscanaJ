@@ -360,6 +360,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         } else {
             openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
+        openDialog.setFileFilter(
+            new ExtensionFileFilter(new String[] { "xml" }, "Cernato XML Files"));
         openDialog.setApproveButtonText("Import");
         int rv = openDialog.showOpenDialog(this);
         if (rv != JFileChooser.APPROVE_OPTION) {
@@ -407,6 +409,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         } else {
             openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
+        openDialog.setFileFilter(
+            new ExtensionFileFilter(new String[] { "cxt" }, "Context Files"));
+        openDialog.setApproveButtonText("Import");
         int rv = openDialog.showOpenDialog(this);
         if (rv != JFileChooser.APPROVE_OPTION) {
             return;
