@@ -48,6 +48,8 @@ public class AddCriterionDialog extends JDialog{
 		private JButton createButton;
 		private List checkBoxList = new ArrayList();
 		private JTextField minTextField,maxTextField,name;
+        private JCheckBox minIncluded;
+        private JCheckBox maxIncluded;
 		
 		public AddCriterionDialog(ManyValuedAttribute attr, Frame parent, View view){
 			super(parent,"Conditions",true);
@@ -99,8 +101,18 @@ public class AddCriterionDialog extends JDialog{
 			JLabel maxLabel = new JLabel("To:");
 			maxTextField = new JTextField();
 			maxTextField.addKeyListener(getNumericalTypeViewKeyListener(numericalType));
-			final JCheckBox minIncluded = new JCheckBox(">=");
-			final JCheckBox maxIncluded = new JCheckBox("<=");
+			this.minIncluded = new JCheckBox(">=");
+            this.minIncluded.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    setCreateButtonState(numericalType);
+                }
+            });
+			this.maxIncluded = new JCheckBox("<=");
+            this.maxIncluded.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    setCreateButtonState(numericalType);
+                }
+            });
 			
 			criteriaPane.add(minLabel, new GridBagConstraints(
 								0,1,1,1,1,1,
@@ -260,8 +272,7 @@ public class AddCriterionDialog extends JDialog{
 						}
 						if( !boxsSelected || (nameField.getText().trim()).equals("")){
 							createButton.setEnabled(false);
-						}
-						else if(boxsSelected && !(nameField.getText().trim()).equals("")){
+						} else if(boxsSelected && !(nameField.getText().trim()).equals("")){
 							createButton.setEnabled(true);
 						}
 					}
@@ -351,18 +362,18 @@ public class AddCriterionDialog extends JDialog{
 		protected KeyListener getNumericalTypeViewKeyListener(final NumericalType numericalType){
 			return new KeyListener(){
 				public void keyTyped(KeyEvent e) {
-					keyListenerConditions(numericalType);
+					setCreateButtonState(numericalType);
 				}
 				public void keyPressed(KeyEvent e) {
-					keyListenerConditions(numericalType);
+					setCreateButtonState(numericalType);
 				}
 				public void keyReleased(KeyEvent e) {
-					keyListenerConditions(numericalType);
+					setCreateButtonState(numericalType);
 				}
 			};
 		}
 		
-		protected void keyListenerConditions(NumericalType numericalType){
+		protected void setCreateButtonState(NumericalType numericalType){
 			if(blankTextFields() || !maxMinValuesWithinRange(numericalType)){
 				createButton.setEnabled(false);
 			}	
@@ -384,10 +395,12 @@ public class AddCriterionDialog extends JDialog{
 				catch(NumberFormatException e){
 					return false;
 				}
-				if(fromValue>=numericalType.getMinimumValue() && toValue<=numericalType.getMaximumValue()){
-					if(fromValue<toValue){
-					return true;
-					}
+				if(fromValue >= numericalType.getMinimumValue() && toValue <= numericalType.getMaximumValue()){
+					if(fromValue < toValue){
+					    return true;
+					} else if (fromValue == toValue) {
+                        return this.minIncluded.isSelected() && this.maxIncluded.isSelected();
+                    }
 				}
 			}
 			return false;
