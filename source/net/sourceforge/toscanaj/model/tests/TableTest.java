@@ -10,8 +10,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.events.EventBroker;
-import net.sourceforge.toscanaj.model.Column;
-import net.sourceforge.toscanaj.model.Table;
+import net.sourceforge.toscanaj.model.database.Column;
+import net.sourceforge.toscanaj.model.database.Table;
 
 public class TableTest extends TestCase {
     final static Class THIS = TableTest.class;

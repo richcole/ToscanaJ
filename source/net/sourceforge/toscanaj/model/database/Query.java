@@ -4,7 +4,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model;
+package net.sourceforge.toscanaj.model.database;
 
 import java.util.ArrayList;
 import java.util.List;

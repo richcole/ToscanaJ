@@ -7,7 +7,9 @@
 package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import net.sourceforge.toscanaj.model.Query;
+import net.sourceforge.toscanaj.model.database.Query;
+import net.sourceforge.toscanaj.model.database.DatabaseAggregateQuery;
+import net.sourceforge.toscanaj.model.database.DatabaseListQuery;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
@@ -151,7 +153,7 @@ public class ObjectLabelView extends LabelView {
             return;
         }
         /// @todo Get rid of RTTI here.
-        if (this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.ListQuery) {
+        if (this.query instanceof DatabaseListQuery) {
             if (DatabaseViewerManager.getNumberOfObjectViews() == 0) {
                 return;
             }
@@ -159,7 +161,7 @@ public class ObjectLabelView extends LabelView {
             int itemHit = lineHit + this.firstItem;
             DatabaseViewerManager.showObject(0, this.queryKeyValues.get(itemHit).toString());
         }
-        if (this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.AggregateQuery) {
+        if (this.query instanceof DatabaseAggregateQuery) {
             if (DatabaseViewerManager.getNumberOfObjectListViews() == 0) {
                 return;
             }
@@ -175,7 +177,7 @@ public class ObjectLabelView extends LabelView {
         List queries = Query.getQueries();
         // find available object views if list is displayed
         List objectViewNames;
-        if (this.query instanceof net.sourceforge.toscanaj.model.DatabaseInfo.ListQuery) {
+        if (this.query instanceof DatabaseListQuery) {
             objectViewNames = DatabaseViewerManager.getObjectViewNames();
         } else { // no views for aggregates
             objectViewNames = new LinkedList();

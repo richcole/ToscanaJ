@@ -6,7 +6,7 @@
  * To change template for new class use
  * Code Style | Class Templates options (Tools | IDE Options).
  */
-package net.sourceforge.toscanaj.model;
+package net.sourceforge.toscanaj.model.database;
 
 import util.CollectionFactory;
 
@@ -16,6 +16,9 @@ import java.util.Iterator;
 
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.model.events.TableChangedEvent;
+import net.sourceforge.toscanaj.model.XML_Serializable;
+import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.model.XML_Helper;
 import org.jdom.Element;
 
 public class Table implements XML_Serializable {

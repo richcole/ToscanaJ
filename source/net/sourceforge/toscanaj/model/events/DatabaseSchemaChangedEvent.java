@@ -8,7 +8,7 @@
  */
 package net.sourceforge.toscanaj.model.events;
 
-import net.sourceforge.toscanaj.model.DatabaseSchema;
+import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.events.Event;
 

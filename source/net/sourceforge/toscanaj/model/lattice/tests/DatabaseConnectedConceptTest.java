@@ -11,7 +11,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseQuery;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.events.EventBroker;
@@ -33,7 +34,7 @@ public class DatabaseConnectedConceptTest extends ConceptTest {
             super(new EventBroker(), new MockConnection());
         }
 
-        public List executeQuery(DatabaseInfo.DatabaseQuery query, String whereClause) throws DatabaseException {
+        public List executeQuery(DatabaseQuery query, String whereClause) throws DatabaseException {
             List list = new ArrayList();
             return list;
         }

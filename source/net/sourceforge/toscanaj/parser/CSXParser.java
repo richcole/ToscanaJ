@@ -11,7 +11,8 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseQuery;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -513,7 +514,7 @@ public class CSXParser {
         if (queryElem == null || queryElem.getAttribute("dropDefaults") == null ||
                 queryElem.getAttributeValue("dropDefaults").equals("false")) {
             // add default queries
-            DatabaseInfo.DatabaseQuery query = dbInfo.createAggregateQuery("Number of Objects", "");
+            DatabaseQuery query = dbInfo.createAggregateQuery("Number of Objects", "");
             query.insertQueryColumn("Count", "0", null, "count(*)");
             query = dbInfo.createListQuery("List of Objects", "", false);
             query.insertQueryColumn("Object Name", null, null, keyName);
@@ -528,7 +529,7 @@ public class CSXParser {
                 String header = cur.getAttributeValue("header");
                 String distinct = cur.getAttributeValue("distinct");
                 boolean isDistinct = (distinct != null) && (distinct.equals("true"));
-                DatabaseInfo.DatabaseQuery query = dbInfo.createListQuery(name, header, isDistinct);
+                DatabaseQuery query = dbInfo.createListQuery(name, header, isDistinct);
                 Iterator it2 = cur.getChildren("column").iterator();
                 while (it2.hasNext()) {
                     Element curCol = (Element) it2.next();
@@ -546,7 +547,7 @@ public class CSXParser {
                 String name = cur.getAttributeValue("name");
                 /// @todo handle the head
                 String header = cur.getAttributeValue("header");
-                DatabaseInfo.DatabaseQuery query = dbInfo.createAggregateQuery(name, header);
+                DatabaseQuery query = dbInfo.createAggregateQuery(name, header);
                 Iterator it2 = cur.getChildren("column").iterator();
                 while (it2.hasNext()) {
                     Element curCol = (Element) it2.next();

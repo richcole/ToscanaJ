@@ -8,7 +8,7 @@
  */
 package net.sourceforge.toscanaj.model.events;
 
-import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 
 public class DatabaseInfoChangedEvent extends ConceptualSchemaChangeEvent {

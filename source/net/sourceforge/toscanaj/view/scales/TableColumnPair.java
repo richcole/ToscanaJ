@@ -6,8 +6,8 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
-import net.sourceforge.toscanaj.model.Table;
-import net.sourceforge.toscanaj.model.Column;
+import net.sourceforge.toscanaj.model.database.Table;
+import net.sourceforge.toscanaj.model.database.Column;
 
 public class TableColumnPair {
     Table table;

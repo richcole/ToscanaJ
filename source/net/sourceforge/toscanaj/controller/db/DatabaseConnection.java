@@ -13,9 +13,8 @@ import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-import net.sourceforge.toscanaj.model.Column;
-import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.model.Table;
+import net.sourceforge.toscanaj.model.*;
+import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
 
 import java.io.BufferedReader;
@@ -235,7 +234,7 @@ public class DatabaseConnection implements BrokerEventListener {
      *
      * If the query is an aggregate, the key value is an empty string.
      */
-    public List executeQuery(DatabaseInfo.DatabaseQuery query, String whereClause) throws DatabaseException {
+    public List executeQuery(DatabaseQuery query, String whereClause) throws DatabaseException {
         ResultSet resultSet = null;
         Statement stmt = null;
         List result = new LinkedList();
@@ -272,7 +271,7 @@ public class DatabaseConnection implements BrokerEventListener {
         // figure out which aggregates are called on nothing (others might return zero although being
         // useful, e.g. an average). So if the count is zero, we remove the entry.
         /// @todo This is so ugly it really needs to be changed
-        if (query instanceof DatabaseInfo.AggregateQuery) {
+        if (query instanceof DatabaseAggregateQuery) {
             Vector firstRow = (Vector) result.get(0);
             if (firstRow.get(0).equals("0")) {
                 result.clear();

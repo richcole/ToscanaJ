@@ -4,7 +4,7 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model;
+package net.sourceforge.toscanaj.model.database;
 
 import org.jdom.Element;
 
@@ -18,6 +18,9 @@ import java.net.URL;
 import java.net.MalformedURLException;
 
 import net.sourceforge.toscanaj.parser.DataFormatException;
+import net.sourceforge.toscanaj.model.XML_Serializable;
+import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.model.XML_Helper;
 
 /**
  * This class contains information how to connect to a database.
@@ -68,139 +71,21 @@ public class DatabaseInfo implements XML_Serializable {
         info.setUserName("sa");
         info.setPassword("");
         return info;
-    };
-
-    public static abstract class DatabaseQuery extends Query {
-        public class Column {
-            String name;
-            String format;
-            String separator;
-            String queryPart;
-        };
-
-        public String header;
-        public List columnList = new LinkedList();
-
-        public DatabaseQuery(String name, String header) {
-            super(name);
-            this.header = header;
-        }
-
-        public void insertQueryColumn(String columnName, String columnFormat,
-                                      String separator, String queryPart) {
-            Column col = new Column();
-            col.name = columnName;
-            col.format = columnFormat;
-            col.separator = separator;
-            col.queryPart = queryPart;
-            columnList.add(col);
-        };
-
-        /**
-         * Formats a row of a result set for this query.
-         *
-         * The input is a ResultSet which is supposed to point to an existing
-         * row. Column one is supposed to be the first column of the query
-         * definition and so on.
-         *
-         * The return value is a String which returns a formatted version of the
-         * row
-         */
-        public String formatResults(ResultSet results) throws SQLException {
-            String rowRes = new String();
-            if (header != null) {
-                rowRes += header;
-            }
-            Iterator colDefIt = this.columnList.iterator();
-            // skip key, start with 1
-            int i = 1;
-            while (colDefIt.hasNext()) {
-                Column col = (Column) colDefIt.next();
-                i++;
-                if (col.format != null) {
-                    DecimalFormat format = new DecimalFormat(col.format);
-                    rowRes += format.format(results.getDouble(i));
-                } else {
-                    rowRes += results.getString(i);
-                }
-                if (col.separator != null) {
-                    rowRes += col.separator;
-                }
-            }
-            return rowRes;
-        }
-
-        abstract public String getQueryHead();
-    };
-
-    /**
-     * @todo This one is public only to use RTTI in ObjectLabelView. Ugly. Fix.
-     */
-    public class ListQuery extends DatabaseQuery {
-        public boolean isDistinct;
-
-        public ListQuery(String name, String header, boolean isDistinct) {
-            super(name, header);
-            this.isDistinct = isDistinct;
-        }
-
-        public String getQueryHead() {
-            String retValue = "SELECT ";
-            if (isDistinct) {
-                retValue += "DISTINCT ";
-            }
-            retValue += objectKey + ", ";
-            Iterator it = columnList.iterator();
-            while (it.hasNext()) {
-                Column col = (Column) it.next();
-                retValue += col.queryPart;
-                if (it.hasNext()) {
-                    retValue += ", ";
-                }
-            }
-            retValue += " FROM " + table + " ";
-            return retValue;
-        };
-    };
-
-    /**
-     * @todo This one is public only to use RTTI in ObjectLabelView. Ugly. Fix.
-     */
-    public class AggregateQuery extends DatabaseQuery {
-
-        public AggregateQuery(String name, String header) {
-            super(name, header);
-        }
-
-        public String getQueryHead() {
-            // this gives an additional column replacing the key (used only in lists)
-            String retValue = "SELECT count(*),";
-            Iterator it = columnList.iterator();
-            while (it.hasNext()) {
-                Column col = (Column) it.next();
-                retValue += col.queryPart;
-                if (it.hasNext()) {
-                    retValue += ", ";
-                }
-            }
-            retValue += " FROM " + table + " ";
-            return retValue;
-        };
-    };
+    }
 
     /**
      * Creates a new Query that will query a list.
      */
     public DatabaseQuery createListQuery(String name, String header, boolean isDistinct) {
-        return new ListQuery(name, header, isDistinct);
-    };
+        return new DatabaseListQuery(this, name, header, isDistinct);
+    }
 
     /**
      * Creates a new Query that will query a single number as aggregate.
      */
     public DatabaseQuery createAggregateQuery(String name, String header) {
-        return new AggregateQuery(name, header);
-    };
+        return new DatabaseAggregateQuery(this, name, header);
+    }
 
     /**
      * Creates an empty instance.

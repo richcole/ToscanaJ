@@ -6,7 +6,7 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
-import net.sourceforge.toscanaj.model.Query;
+import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
 import net.sourceforge.toscanaj.model.XML_Serializable;
 

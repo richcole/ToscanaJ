@@ -9,7 +9,7 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
-import net.sourceforge.toscanaj.model.Column;
+import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 

@@ -6,11 +6,15 @@
  * To change template for new class use
  * Code Style | Class Templates options (Tools | IDE Options).
  */
-package net.sourceforge.toscanaj.model;
+package net.sourceforge.toscanaj.model.database;
 
 import org.jdom.*;
 
 import java.sql.Types;
+
+import net.sourceforge.toscanaj.model.XML_Serializable;
+import net.sourceforge.toscanaj.model.XML_SyntaxError;
+import net.sourceforge.toscanaj.model.XML_Helper;
 
 public class Column implements XML_Serializable {
 
@@ -22,13 +26,13 @@ public class Column implements XML_Serializable {
     public static final String COLUMN_NAME_ATTRIBUTE_NAME = "name";
     public static final String COLUMN_TYPE_ATTRIBUTE_NAME = "type";
 
-    public Column(String name, int type, Table table) {
+    public Column(String name, int type, net.sourceforge.toscanaj.model.database.Table table) {
         this.table = table;
         this.name = name;
         this.type = type;
     }
 
-    public Column(Element elem, Table table) throws XML_SyntaxError {
+    public Column(Element elem, net.sourceforge.toscanaj.model.database.Table table) throws XML_SyntaxError {
         this.table = table;
         readXML(elem);
     }
@@ -54,7 +58,7 @@ public class Column implements XML_Serializable {
         return type;
     }
 
-    public Table getTable() {
+    public net.sourceforge.toscanaj.model.database.Table getTable() {
         return table;
     }
 }

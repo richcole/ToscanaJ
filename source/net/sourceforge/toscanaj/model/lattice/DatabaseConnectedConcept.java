@@ -8,10 +8,10 @@ package net.sourceforge.toscanaj.model.lattice;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.model.DatabaseInfo;
-import net.sourceforge.toscanaj.model.Query;
-import net.sourceforge.toscanaj.model.XML_SyntaxError;
-import net.sourceforge.toscanaj.model.XML_Helper;
+import net.sourceforge.toscanaj.model.*;
+import net.sourceforge.toscanaj.model.database.DatabaseQuery;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.Query;
 
 import java.util.*;
 
@@ -225,14 +225,14 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * Implements Concept.executeQuery(Query, boolean).
      */
     public List executeQuery(Query query, boolean contingentOnly) {
-        if (query instanceof DatabaseInfo.DatabaseQuery) {
-            return executeDatabaseQuery((DatabaseInfo.DatabaseQuery) query, contingentOnly);
+        if (query instanceof DatabaseQuery) {
+            return executeDatabaseQuery((DatabaseQuery) query, contingentOnly);
         } else {
             throw new RuntimeException("Unknown Query type");
         }
     }
 
-    private List executeDatabaseQuery(DatabaseInfo.DatabaseQuery dbQuery, boolean contingentOnly) {
+    private List executeDatabaseQuery(DatabaseQuery dbQuery, boolean contingentOnly) {
         List retVal = new ArrayList();
         // do a query only if there will be something to query
         // either: there is a contingent in this concept or we query extent and we

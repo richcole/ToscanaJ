@@ -7,8 +7,9 @@
 package net.sourceforge.toscanaj.model.lattice.tests;
 
 import junit.framework.TestCase;
-import net.sourceforge.toscanaj.model.Query;
-import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.Query;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseQuery;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public abstract class ConceptTest extends TestCase {
 
     public void testObjectNumberQueryOnConceptWithEmptyExtentAndContigent() {
         Concept concept = makeConceptWithEmptyContingentAndExtent();
-        DatabaseInfo.DatabaseQuery query = dbInfo.createAggregateQuery("Number of Objects", "");
+        DatabaseQuery query = dbInfo.createAggregateQuery("Number of Objects", "");
         query.insertQueryColumn("count", "0", null, "count(*)");
         List result = concept.executeQuery(query, false);
         assertEquals(true, result.isEmpty());
@@ -37,7 +38,7 @@ public abstract class ConceptTest extends TestCase {
 
     public void testObjectListQueryOnConceptWithEmptyExtentAndContigent() {
         Concept concept = makeConceptWithEmptyContingentAndExtent();
-        DatabaseInfo.DatabaseQuery query = dbInfo.createListQuery("List of Objects", "", false);
+        DatabaseQuery query = dbInfo.createListQuery("List of Objects", "", false);
         query.insertQueryColumn("list", null, null, "unknown");
         List result = concept.executeQuery(query, false);
         assertEquals(true, result.isEmpty());

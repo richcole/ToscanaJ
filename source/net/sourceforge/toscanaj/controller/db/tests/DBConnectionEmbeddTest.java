@@ -15,7 +15,7 @@ import net.sourceforge.toscanaj.events.tests.EventBrokerTest;
 import net.sourceforge.toscanaj.events.EventBroker;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 
 import java.net.URL;
 

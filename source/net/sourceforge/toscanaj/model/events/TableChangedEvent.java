@@ -9,7 +9,7 @@
 package net.sourceforge.toscanaj.model.events;
 
 import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.model.Table;
+import net.sourceforge.toscanaj.model.database.Table;
 
 public class TableChangedEvent implements Event {
     Object source;

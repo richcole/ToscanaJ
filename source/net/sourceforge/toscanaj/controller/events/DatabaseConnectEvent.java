@@ -10,7 +10,7 @@ package net.sourceforge.toscanaj.controller.events;
 
 import net.sourceforge.toscanaj.events.Event;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 
 public class DatabaseConnectEvent implements Event {
 

@@ -7,7 +7,7 @@
 package net.sourceforge.toscanaj.dbviewer;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.model.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import org.jdom.Element;
 import org.jdom.input.DOMBuilder;
 
