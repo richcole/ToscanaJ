@@ -11,5 +11,9 @@ package net.sourceforge.toscanaj.gui.action;
 import java.io.File;
 
 public interface SimpleActivity {
-    public void doActivity() throws Exception;
+
+    /* return success if the activity succeeded, throw an exception
+     * if the user should hear that something went wrong.
+    */
+    public boolean doActivity() throws Exception;
 }

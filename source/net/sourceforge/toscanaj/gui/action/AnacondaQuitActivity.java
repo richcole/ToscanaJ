@@ -21,9 +21,10 @@ public class AnacondaQuitActivity implements SimpleActivity
         frame = a_frame;
     }
 
-    public void doActivity()
+    public boolean doActivity()
     {
         frame.closeMainPanel();
+        return true;
     }
 }
 

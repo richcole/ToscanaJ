@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 
 public class SaveFileAction extends KeyboardMappedAction {
+
     FileActivity activity;
     File previousFile;
 
@@ -39,24 +40,39 @@ public class SaveFileAction extends KeyboardMappedAction {
     public void actionPerformed(ActionEvent e) {
         final JFileChooser saveDialog;
 
-        if (previousFile != null) {
-            saveDialog = new JFileChooser(previousFile);
-        } else {
-            saveDialog = new JFileChooser(System.getProperty("user.dir"));
+        boolean result = false;
+        try {
+            result = activity.prepareToProcess();
+        }
+        catch (Exception ex) {
+            JOptionPane.showMessageDialog(
+                    frame,
+                    "Unable to initiate file saving:" + ex.getMessage(),
+                    "Error preparing to save",
+                    JOptionPane.ERROR_MESSAGE);
         }
 
-        if (saveDialog.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = saveDialog.getSelectedFile();
-            try {
-                activity.processFile(selectedFile);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(
-                        frame,
-                        "Failure to save the file:" + ex.getMessage(),
-                        "Error saving file",
-                        JOptionPane.ERROR_MESSAGE);
+        if ( result ) {
+            if (previousFile != null) {
+                saveDialog = new JFileChooser(previousFile);
+            } else {
+                saveDialog = new JFileChooser(System.getProperty("user.dir"));
             }
-            previousFile = selectedFile;
+
+            if (saveDialog.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+                File selectedFile = saveDialog.getSelectedFile();
+                try {
+                    activity.processFile(selectedFile);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(
+                            frame,
+                            "Failure to save the file:" + ex.getMessage(),
+                            "Error saving file",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+                previousFile = selectedFile;
+            }
         }
     }
 

@@ -40,7 +40,9 @@ public class SimpleAction extends KeyboardMappedAction {
         try {
             for (Iterator it = activityList.iterator(); it.hasNext();) {
                 SimpleActivity activity = (SimpleActivity) it.next();
-                activity.doActivity();
+                if ( ! activity.doActivity() ) {
+                    break;
+                }
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(

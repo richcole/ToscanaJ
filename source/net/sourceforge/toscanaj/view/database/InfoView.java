@@ -8,6 +8,7 @@ import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.action.ConnectDatabaseActivity;
 import net.sourceforge.toscanaj.gui.action.SimpleActivity;
+import net.sourceforge.toscanaj.view.ModelView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +28,7 @@ import java.util.Observable;
  * retrieved with the methods getFormat(), getWidth() and getHeight().  
  *
  */
-public class InfoView extends JPanel implements Observer
+public class InfoView extends ModelView implements Observer
 {
     protected AnacondaModel model;
     protected DatabaseInfo info;
@@ -40,9 +41,26 @@ public class InfoView extends JPanel implements Observer
     private JTextField driverField;
 
     class SaveControlActivity implements SimpleActivity {
-        public void doActivity() throws Exception {
+        public boolean doActivity() throws Exception {
             copyFromControls(info);
+            return true;
         }
+    }
+
+    public boolean areControlsChanged() {
+        if ( ! urlField.getText().equals(info.url) ) {
+            return true;
+        }
+        if ( ! userField.getText().equals(info.user) ) {
+            return true;
+        }
+        if ( ! passwordField.getText().equals(info.password) ) {
+            return true;
+        }
+        if ( ! driverField.getText().equals(info.driver) ) {
+            return true;
+        }
+        return false;
     }
 
     public void copyFromControls(DatabaseInfo info)
@@ -79,11 +97,15 @@ public class InfoView extends JPanel implements Observer
      */
     public InfoView(JFrame frame, JPanel rightPane, AnacondaModel model)
     {
-        super(new BorderLayout());
+        super(frame, rightPane);
+        setLayout(new BorderLayout());
         this.model = model;
         this.info = model.getDatabase().getInfo();
         this.rightPane = rightPane;
         this.frame = frame;
+
+        model.getModelViewList().register("Database Info", "InfoView", null);
+        System.out.println("register model view");
 
         model.getDatabase().addObserver(this);
         model.getDatabase().getInfo().addObserver(this);
@@ -135,5 +157,28 @@ public class InfoView extends JPanel implements Observer
     public void setInfo(DatabaseInfo info)
     {
         copyToControls(info);
+    };
+
+    public boolean prepareToSave()
+    {
+        if ( areControlsChanged() ) {
+
+            CardLayout layout = (CardLayout) this.rightPane.getLayout();
+            layout.show(rightPane, "InfoView");
+
+            switch(askUser("Save these changes", "InfoView")) {
+                case JOptionPane.OK_OPTION:
+                    copyFromControls(info);
+                    return true;
+                case JOptionPane.NO_OPTION:
+                    return true;
+                case JOptionPane.CANCEL_OPTION:
+                    return false;
+                default:
+                    return false;
+            }
+
+        }
+        return true;
     };
 }

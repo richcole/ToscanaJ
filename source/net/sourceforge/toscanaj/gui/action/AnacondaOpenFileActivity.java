@@ -16,6 +16,7 @@ import java.io.File;
 
 public class AnacondaOpenFileActivity implements FileActivity {
 
+    SimpleActivity activity;
     AnacondaModel model;
     JFrame        frame;
 
@@ -28,4 +29,18 @@ public class AnacondaOpenFileActivity implements FileActivity {
     public void processFile(File file) throws Exception {
         new XML_Reader(file, model);
     }
+
+    public void setPrepareActivity(SimpleActivity activity) {
+        this.activity = activity;
+    }
+
+    public boolean prepareToProcess() throws Exception {
+        if (activity != null) {
+            return activity.doActivity();
+        }
+        else {
+            return true;
+        }
+    }
+
 }

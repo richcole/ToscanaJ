@@ -17,6 +17,7 @@ import java.io.File;
 
 public class AnacondaSaveFileActivity implements FileActivity {
 
+    SimpleActivity activity;
     AnacondaModel model;
     JFrame        frame;
 
@@ -29,4 +30,18 @@ public class AnacondaSaveFileActivity implements FileActivity {
     public void processFile(File file) throws Exception {
         new XML_Writer(file, model, "anaconda");
     }
+
+    public void setPrepareActivity(SimpleActivity activity) {
+        this.activity = activity;
+    }
+
+    public boolean prepareToProcess() throws Exception {
+        if (activity != null) {
+            return activity.doActivity();
+        }
+        else {
+            return true;
+        }
+    }
+
 }

@@ -13,8 +13,8 @@ import org.jdom.*;
 
 public class Database extends Model implements XML_Serializable
 {
-    public DatabaseInfo m_info;
-    public DBConnection m_connection;
+    public DatabaseInfo info;
+    public DBConnection connection;
     // public DBScheme     m_scheme;
 
     /**
@@ -29,7 +29,7 @@ public class Database extends Model implements XML_Serializable
      * Construct an empty database.
      */
     public Database() {
-        m_info = new DatabaseInfo("","","","");
+        info = new DatabaseInfo("","","","");
     }
 
     /**
@@ -39,7 +39,7 @@ public class Database extends Model implements XML_Serializable
 
         Element databaseElem = XML_Helper.insertElement("database", elem);
 
-        m_info.writeXML(databaseElem);
+        info.writeXML(databaseElem);
         //	m_database_info.writeXML(databaseElement);
         //	m_connecion.writeXML(databaseElement);
         //	m_scheme.writeXML(databaseElement);
@@ -51,11 +51,11 @@ public class Database extends Model implements XML_Serializable
     public void readXML(Element elem) throws XML_SyntaxError {
 
         Element databaseElem = XML_Helper.mustbe("database", elem);
-        if (m_info == null) {
-            m_info = new DatabaseInfo(databaseElem);
+        if (info == null) {
+            info = new DatabaseInfo(databaseElem);
         }
         else {
-            m_info.readXML(databaseElem);
+            info.readXML(databaseElem);
         }
         //	m_database_info.readXML(databaseElement);
         //	m_connecion.readXML(databaseElement);
@@ -64,19 +64,27 @@ public class Database extends Model implements XML_Serializable
     };
 
     public void setInfo(DatabaseInfo info) {
-        m_info = info;
+        this.info = info;
         this.setChanged();
         this.notifyObservers();
     }
 
     public DatabaseInfo getInfo() {
-        return m_info;
+        return info;
     }
 
     /**
      * Connect to the database by creating a database connection.
      */
     public void connect() throws Exception {
-        m_connection = new DBConnection(getInfo().url, getInfo().user, getInfo().password);
+        try {
+            Class.forName(info.driver);
+        } catch (ClassNotFoundException e) {
+            throw new Exception(
+                "Could not load class \"" +
+                    info.driver + "\" as database driver.");
+        }
+
+        connection = new DBConnection(getInfo().url, getInfo().user, getInfo().password);
     };
 };

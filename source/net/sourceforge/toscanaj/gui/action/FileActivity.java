@@ -15,4 +15,5 @@ public interface FileActivity {
  *  @todo reconsider the exception, perhaps it should be more explicit.
  */
     public void processFile(File file) throws Exception;
+    public boolean prepareToProcess() throws Exception;
 }

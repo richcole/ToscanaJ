@@ -22,12 +22,13 @@ public class AnacondaNewModelActivity implements SimpleActivity
         this.rightPane = rightPane;
     }
 
-    public void doActivity()
+    public boolean doActivity()
     {
         DatabaseInfo info = new DatabaseInfo("","","","");
         model.getDatabase().setInfo(info);
         CardLayout layout = (CardLayout) this.rightPane.getLayout();
         layout.show(rightPane, "InfoView");
+        return true;
     }
 }
 

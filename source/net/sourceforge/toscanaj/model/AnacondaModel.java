@@ -13,7 +13,12 @@ import javax.swing.JOptionPane;
 public class AnacondaModel extends Model implements XML_Serializable
 {
     private Database database;
+    private ViewListModel modelViewList = new ViewListModel();
     //    public ScaleSet m_scaleSet;
+
+    public ViewListModel getModelViewList() {
+        return modelViewList;
+    }
 
     /**
      * Construct a new anaconda model using the XML definition

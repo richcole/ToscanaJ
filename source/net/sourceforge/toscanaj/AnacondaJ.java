@@ -32,6 +32,17 @@ public class AnacondaJ extends JFrame
     JSplitPane          splitPane;
     AnacondaModelView   modelView;
     JPanel              rightPane;
+    JPanel              leftPane;
+
+    public class PrepareToSaveActivity implements SimpleActivity
+    {
+
+        public boolean doActivity() throws Exception
+        {
+            return prepareToSave();
+        }
+    }
+
 
     public AnacondaJ() {
         super("AnacondaJ");
@@ -112,17 +123,20 @@ public class AnacondaJ extends JFrame
         fileMenu.add(openMenuItem);
 
         JMenuItem saveMenuItem = new JMenuItem("Save...");
+        AnacondaSaveFileActivity saveActivity =
+            new AnacondaSaveFileActivity(model, this);
         saveMenuItem.addActionListener(
-                new SaveFileAction(
-                        this,
-                        new AnacondaSaveFileActivity(model, this),
-                        KeyEvent.VK_O,
-                        KeyStroke.getKeyStroke(
-                                KeyEvent.VK_O,
-                                ActionEvent.CTRL_MASK
-                        )
-                )
+            new SaveFileAction(
+                    this,
+                    saveActivity,
+                    KeyEvent.VK_O,
+                    KeyStroke.getKeyStroke(
+                            KeyEvent.VK_O,
+                            ActionEvent.CTRL_MASK
+                    )
+            )
         );
+        saveActivity.setPrepareActivity(new PrepareToSaveActivity());
         fileMenu.add(saveMenuItem);
 
         // --- file exit item ---
@@ -167,5 +181,7 @@ public class AnacondaJ extends JFrame
         mainWindow.setVisible(true);
     }
 
-
+    public boolean prepareToSave() {
+       return this.modelView.prepareToSave();
+    };
 }
