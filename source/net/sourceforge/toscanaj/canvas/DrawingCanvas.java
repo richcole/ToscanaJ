@@ -294,6 +294,9 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      * @TODO Use system double click timing instead of hard-coded 300ms
      */
     public void mouseReleased(MouseEvent e) {
+        if(transform == null) { // nothing displayed yet
+            return;
+        }
         if(dragMode) {
             dragMode = false;
             repaint();
