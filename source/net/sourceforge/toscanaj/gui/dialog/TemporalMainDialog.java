@@ -701,6 +701,9 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     		count++;
             FCAObject object = (FCAObject) objectIt.next();
     	    NodeView curView = findObjectConceptView(object, nodeViewMap);
+    	    if(curView == null) {
+    	    	continue;
+    	    }
     	    if(highlightStates) {
     	        this.diagramView.addCanvasItem(new StateRing(curView, color, count, this.timeController),
     	                                       TRANSITION_LAYER_NAME);
