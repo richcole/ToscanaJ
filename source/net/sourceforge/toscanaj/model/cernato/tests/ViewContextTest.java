@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.Context;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.ViewContext;
@@ -42,7 +42,7 @@ public class ViewContextTest extends TestCase {
         Collection objects = scaledContext.getObjects();
         Collection attributes = scaledContext.getAttributes();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
-            FCAObjectImplementation object = (FCAObjectImplementation) it1.next();
+            FCAElementImplementation object = (FCAElementImplementation) it1.next();
             for (Iterator it2 = attributes.iterator(); it2.hasNext();) {
                 Attribute attribute = (Attribute) it2.next();
                 Criterion criterion = (Criterion) attribute.getData();

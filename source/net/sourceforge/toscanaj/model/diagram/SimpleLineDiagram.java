@@ -8,8 +8,8 @@
 package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.model.context.Attribute;
-import net.sourceforge.toscanaj.model.context.FCAObject;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.events.DiagramChangedEvent;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
@@ -156,8 +156,8 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 		}
 		Iterator objIterator = originalNodeConcept.getObjectContingentIterator();
 		while (objIterator.hasNext()) {
-			FCAObject curObj = (FCAObject) objIterator.next();
-			concept.addObject(new FCAObjectImplementation(curObj.getData()));
+			FCAElement curObj = (FCAElement) objIterator.next();
+			concept.addObject(new FCAElementImplementation(curObj.getData()));
 		}
 		
 		LabelInfo attributeLabelInfo = new LabelInfo(node.getAttributeLabelInfo());

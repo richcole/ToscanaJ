@@ -4,9 +4,9 @@
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
- */
+ */	
 package net.sourceforge.toscanaj.model.context;
 
-public interface FCAObject {
-    Object getData();
+public interface WritableFCAElement extends FCAElement {
+	void setData(Object data);
 }

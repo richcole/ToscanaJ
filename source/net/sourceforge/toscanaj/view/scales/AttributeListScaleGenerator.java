@@ -7,8 +7,8 @@ import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
-import net.sourceforge.toscanaj.model.context.WritableFCAObject;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 
 import java.awt.Frame;
 import java.util.ArrayList;
@@ -75,7 +75,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 				objectData += "(" + tableData[j][1] + ")";
 			}
 
-			WritableFCAObject object = new FCAObjectImplementation(objectData);
+			WritableFCAElement object = new FCAElementImplementation(objectData);
 	
 			if(useAllCombi){
 				context.getObjects().add(object);

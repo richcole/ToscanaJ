@@ -12,7 +12,7 @@ import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelation;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
@@ -56,7 +56,7 @@ public class TextDumps {
         }
         stream.println();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
-            FCAObjectImplementation object = (FCAObjectImplementation) it1.next();
+            FCAElementImplementation object = (FCAElementImplementation) it1.next();
             stream.print(object.toString() + "\t");
             for (Iterator it2 = properties.iterator(); it2.hasNext();) {
                 ManyValuedAttributeImplementation property = (ManyValuedAttributeImplementation) it2.next();
@@ -85,7 +85,7 @@ public class TextDumps {
         }
         stream.println();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
-            FCAObjectImplementation object = (FCAObjectImplementation) it1.next();
+            FCAElementImplementation object = (FCAElementImplementation) it1.next();
             stream.print(object.toString() + "\t");
             for (Iterator it2 = attributes.iterator(); it2.hasNext();) {
                 Criterion criterion = (Criterion) it2.next();
@@ -105,7 +105,7 @@ public class TextDumps {
             stream.print(concept + "[objectContingent: {");
             Iterator extIt = concept.getObjectContingentIterator();
             while (extIt.hasNext()) {
-                FCAObjectImplementation obj = (FCAObjectImplementation) extIt.next();
+                FCAElementImplementation obj = (FCAElementImplementation) extIt.next();
                 stream.print(obj.toString());
                 if (extIt.hasNext()) {
                     stream.print(", ");

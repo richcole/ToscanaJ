@@ -37,16 +37,16 @@ import org.tockit.util.ListSet;
 
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAObject;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
-import net.sourceforge.toscanaj.model.context.WritableFCAObject;
+import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 
 public class ContextTableRowHeader extends JComponent implements Scrollable {
 	private ContextTableEditorDialog dialog;
     /**
      * @todo remove and use object list from context instead.
      */
-	private WritableFCAObject[] objects;
+	private WritableFCAElement[] objects;
 	
 	public ContextTableRowHeader (ContextTableEditorDialog dialog) {
 		super();
@@ -66,7 +66,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 
 		g2d.setFont(oldFont.deriveFont(Font.BOLD));
 		for (int i = 0; i < this.objects.length; i++) {
-			FCAObject object = this.objects[i];
+			FCAElement object = this.objects[i];
 			drawRow(g2d, object, i);
 		}
 
@@ -77,7 +77,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 	public Dimension calculateNewSize() {
 		Set objectsSet = this.dialog.getContext().getObjects();
 		
-		this.objects = (WritableFCAObject[]) objectsSet.toArray(new WritableFCAObject[objectsSet.size()]);
+		this.objects = (WritableFCAElement[]) objectsSet.toArray(new WritableFCAElement[objectsSet.size()]);
 		int numRow = this.objects.length + 1;
 		return new Dimension(ContextTableView.CELL_WIDTH + 1, numRow * ContextTableView.CELL_HEIGHT + 1);
 	}
@@ -199,7 +199,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 					});
                     JMenu sortMenu = new JMenu("Move before");
                     for (int i = 0; i < objects.length; i++) {
-                        final WritableFCAObject object = objects[i];
+                        final WritableFCAElement object = objects[i];
                         JMenuItem menuItem = new JMenuItem(object.toString());
                         menuItem.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent e) {
@@ -269,7 +269,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 	
 	protected boolean addObject(String newObjectName){
 		if (!collectionContainsString(newObjectName, this.objects)) {
-			WritableFCAObject object = new FCAObjectImplementation(newObjectName);
+			WritableFCAElement object = new FCAElementImplementation(newObjectName);
 			this.dialog.getContext().getObjects().add(object);
 			return true;
 		} else {
@@ -280,14 +280,14 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 	private void renameObject(int num) {
 		String inputValue = "";
 		do {
-			WritableFCAObject oldObject = this.objects[num];
+			WritableFCAElement oldObject = this.objects[num];
 			InputTextDialog dialog = new InputTextDialog(this.dialog, "Rename Object", "object", oldObject.toString());
 			if (!dialog.isCancelled()) {
 				inputValue = dialog.getInput();
 				if (!collectionContainsString(inputValue, this.objects)) {
 				    ContextImplementation context = this.dialog.getContext();
                     Set objects = context.getObjects();
-                    WritableFCAObject newObject = new FCAObjectImplementation(inputValue);
+                    WritableFCAElement newObject = new FCAElementImplementation(inputValue);
                     objects.remove(oldObject);
                     if(objects instanceof List) {
                         List objectList = (List) objects;
@@ -324,7 +324,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
 	}
 	
 
-    private void moveObject(int from, WritableFCAObject target) {
+    private void moveObject(int from, WritableFCAElement target) {
         ListSet objectList = this.dialog.getContext().getObjectList();
         if(target != null) {
             int targetPos = objectList.indexOf(target);

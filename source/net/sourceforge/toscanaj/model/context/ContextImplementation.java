@@ -116,13 +116,13 @@ public class ContextImplementation implements ListsContext {
 		}
 		Iterator objIt = this.getObjects().iterator();
 		while (objIt.hasNext()) {
-			FCAObject objectL = (FCAObject) objIt.next();
+			FCAElement objectL = (FCAElement) objIt.next();
 			Iterator objIt2 = other.getObjects().iterator();
 			while (objIt2.hasNext()) {
-				FCAObject objectR = (FCAObject) objIt2.next();
+				FCAElement objectR = (FCAElement) objIt2.next();
 				String newObjectData = "(" + objectL.getData().toString() 
 									+ ") AND (" + objectR.getData().toString() + ")";
-				FCAObject newObject = new FCAObjectImplementation(newObjectData);
+				FCAElement newObject = new FCAElementImplementation(newObjectData);
 				objects.add(newObject);
 				attrIt = this.getAttributes().iterator();
 				while (attrIt.hasNext()) {
@@ -155,8 +155,8 @@ public class ContextImplementation implements ListsContext {
         int pos = 0;
         for (Iterator it = this.objects.iterator(); it.hasNext(); ) {
             Object object = it.next();
-            if(object instanceof FCAObjectImplementation) {
-                ((FCAObjectImplementation)object).setContextPosition(pos);
+            if(object instanceof FCAElementImplementation) {
+                ((FCAElementImplementation)object).setContextPosition(pos);
             }
             pos++;
         }

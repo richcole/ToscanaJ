@@ -52,7 +52,7 @@ import org.tockit.events.EventBrokerListener;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-import net.sourceforge.toscanaj.model.context.FCAObject;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
@@ -760,8 +760,8 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 
             if(lastSequence != null) {
                 Color nextColor = styles[seqNum % styles.length].getColor();
-                DiagramNode endLast = findObjectConceptNode((FCAObject) lastSequence.get(lastSequence.size()-1));
-                DiagramNode startNew = findObjectConceptNode((FCAObject) sequence.get(0));
+                DiagramNode endLast = findObjectConceptNode((FCAElement) lastSequence.get(lastSequence.size()-1));
+                DiagramNode startNew = findObjectConceptNode((FCAElement) sequence.get(0));
                 if(endLast == null) {
                 	continue;
                 }
@@ -798,7 +798,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     	int count = countStart;
     	objLoop: while (objectIt.hasNext()) {
     		count++;
-            FCAObject object = (FCAObject) objectIt.next();
+            FCAElement object = (FCAElement) objectIt.next();
     	    DiagramNode curNode = findObjectConceptNode(object);
     	    if(curNode == null) {
     	    	continue;
@@ -813,13 +813,13 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         }
     }
 
-	private DiagramNode findObjectConceptNode(FCAObject object) {
+	private DiagramNode findObjectConceptNode(FCAElement object) {
 	    Iterator nodeIt = this.diagramView.getDiagram().getNodes();
 	    while (nodeIt.hasNext()) {
 	        DiagramNode node = (DiagramNode) nodeIt.next();
 	        Iterator objIt = node.getConcept().getObjectContingentIterator();
 	        while (objIt.hasNext()) {
-	            FCAObject contObj = (FCAObject) objIt.next();
+	            FCAElement contObj = (FCAElement) objIt.next();
 	            if(contObj.equals(object)) {
 	            	return node;
 	            }
@@ -841,7 +841,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 
 	    Iterator objIt = this.context.getObjects().iterator();
 	    while(objIt.hasNext()) {
-	        FCAObject object = (FCAObject) objIt.next();
+	        FCAElement object = (FCAElement) objIt.next();
 	        AttributeValue value = this.context.getRelationship(object, sequenceAttribute);
 	        if(!sequenceValues.contains(value) && value != null) {
 	            boolean inserted = false;
@@ -910,7 +910,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         	    boolean objectFound = false;
         	    Iterator objIt = this.context.getObjects().iterator();
         	    while (objIt.hasNext()) {
-        	        FCAObject object = (FCAObject) objIt.next();
+        	        FCAElement object = (FCAElement) objIt.next();
         			if( this.context.getRelationship(object, sequenceAttribute).equals(sequenceValue) && 
         	        	this.context.getRelationship(object, timelineAttribute).equals(timelineValue) ) {
         	        		sequence.add(object);

@@ -14,8 +14,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import net.sourceforge.toscanaj.model.context.FCAObject;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TypeImplementation;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
@@ -55,12 +55,12 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		readXML(elem);
 	}
 
-    public void add(FCAObject object) {
+    public void add(FCAElement object) {
         this.objects.add(object);
         this.relation.put(object, new Hashtable());
     }
 
-    public void remove(FCAObject object) {
+    public void remove(FCAElement object) {
         this.objects.remove(object);
         this.relation.remove(object);
     }
@@ -93,12 +93,12 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
     	return ListSetImplementation.unmodifiableListSet(this.types);
     }
 
-    public void setRelationship(FCAObject object, ManyValuedAttribute attribute, AttributeValue value) {
+    public void setRelationship(FCAElement object, ManyValuedAttribute attribute, AttributeValue value) {
         Hashtable row = (Hashtable) this.relation.get(object);
         row.put(attribute, value);
     }
 
-    public AttributeValue getRelationship(FCAObject object, ManyValuedAttribute attribute) {
+    public AttributeValue getRelationship(FCAElement object, ManyValuedAttribute attribute) {
         Hashtable row = (Hashtable) this.relation.get(object);
         return (AttributeValue) row.get(attribute);
     }
@@ -109,7 +109,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
     	Set checkObjectNames = new HashSet();
     	for (Iterator iter = entries.iterator(); iter.hasNext();) {
 			Entry entry = (Entry) iter.next();
-			FCAObject object = (FCAObject) entry.getKey();
+			FCAElement object = (FCAElement) entry.getKey();
 			if (checkObjectNames.contains(object.getData())) {
 				throw new IllegalStateException("Object appears twice in object set of many-valued context.");
 			}
@@ -148,7 +148,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		
 		Element objectsElement = new Element(OBJECTS_ELEMENT_NAME);
 		for (Iterator iter = objects.iterator(); iter.hasNext();) {
-			FCAObjectImplementation itObject = (FCAObjectImplementation) iter.next();
+			FCAElementImplementation itObject = (FCAElementImplementation) iter.next();
 			Element objectElement = itObject.toXML();
 			String id = oidpool.getFreeId(itObject.toString());
 			objectIdMapping.put(itObject, id);
@@ -216,7 +216,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 
 		for (Iterator iter = objectsElement.getChildren().iterator(); iter.hasNext();) {
 			Element objectElement = (Element) iter.next();
-			FCAObjectImplementation newObject = new FCAObjectImplementation(objectElement);
+			FCAElementImplementation newObject = new FCAElementImplementation(objectElement);
 			String id = XMLHelper.getAttribute(objectElement, OBJECT_ID_ATTRIBUTE_NAME).getValue();
 			objectIdMapping.put(id,newObject);
 			add(newObject);
@@ -245,7 +245,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		for (Iterator iter = relationElement.getChildren().iterator(); iter.hasNext();) {
 			Element row = (Element) iter.next();
 			String objectRef = XMLHelper.getAttribute(row, ROW_OBJECT_REF_ATTRIBUTE_NAME).getValue();
-			FCAObjectImplementation rowObject = (FCAObjectImplementation) objectIdMapping.get(objectRef);
+			FCAElementImplementation rowObject = (FCAElementImplementation) objectIdMapping.get(objectRef);
 			ManyValuedAttribute tempAttribute;
 			AttributeValue tempValue;
 			Hashtable tempRow = new Hashtable();

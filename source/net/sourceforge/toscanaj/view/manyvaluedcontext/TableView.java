@@ -22,7 +22,7 @@ import javax.swing.JComponent;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 
-import net.sourceforge.toscanaj.model.context.FCAObject;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
@@ -71,7 +71,7 @@ public class TableView extends JComponent implements Scrollable{
 		Iterator objIt = context.getObjects().iterator();
 		int row = 0;
 		while(objIt.hasNext()){
-			FCAObject object = (FCAObject) objIt.next();
+			FCAElement object = (FCAElement) objIt.next();
 			AttributeValue relationship = context.getRelationship(object,attribute);
 					
 			boolean selected = checkCellSelected(row,columnSelected);

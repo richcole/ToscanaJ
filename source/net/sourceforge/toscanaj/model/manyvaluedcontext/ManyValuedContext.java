@@ -15,5 +15,5 @@ public interface ManyValuedContext {
     ListSet getObjects();
     ListSet getAttributes();
     ListSet getTypes();
-    AttributeValue getRelationship(FCAObject object, ManyValuedAttribute attribute);
+    AttributeValue getRelationship(FCAElement object, ManyValuedAttribute attribute);
 }

@@ -14,7 +14,7 @@ import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.WritableFCAObject;
+import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -594,10 +594,10 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		int attributePos) {
 			
 		Set objectsSet = this.context.getObjects();
-		WritableFCAObject[] objects = (WritableFCAObject[]) objectsSet.toArray(new WritableFCAObject[objectsSet.size()]);
+		WritableFCAElement[] objects = (WritableFCAElement[]) objectsSet.toArray(new WritableFCAElement[objectsSet.size()]);
 		Set attributesSet = this.context.getAttributes();
 		Attribute[] attributes = (Attribute[]) attributesSet.toArray(new Attribute[attributesSet.size()]);
-		WritableFCAObject object = objects[objectPos];
+		WritableFCAElement object = objects[objectPos];
 		Attribute attribute = attributes[attributePos];
 		if (context.getRelationImplementation().contains(object, attribute)) {
 			context.getRelationImplementation().remove(object, attribute);

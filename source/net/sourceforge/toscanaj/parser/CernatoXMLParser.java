@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.parser;
 
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttributeImplementation;
@@ -182,7 +182,7 @@ public class CernatoXMLParser {
             Element objElem = (Element) iterator.next();
             String id = objElem.getAttributeValue("id");
             String name = objElem.getChild("name").getText();
-            FCAObjectImplementation object = new FCAObjectImplementation(name);
+            FCAElementImplementation object = new FCAElementImplementation(name);
             objects.put(id, object);
             model.getContext().add(object);
         }
@@ -198,7 +198,7 @@ public class CernatoXMLParser {
         for (Iterator iterator = rowElems.iterator(); iterator.hasNext();) {
             Element rowElem = (Element) iterator.next();
             String objectid = rowElem.getAttributeValue("object");
-            FCAObjectImplementation object = (FCAObjectImplementation) objects.get(objectid);
+            FCAElementImplementation object = (FCAElementImplementation) objects.get(objectid);
             List cellElems = rowElem.getChildren("cell");
             for (Iterator iterator2 = cellElems.iterator(); iterator2.hasNext();) {
                 Element cellElem = (Element) iterator2.next();

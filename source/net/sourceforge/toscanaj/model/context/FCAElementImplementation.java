@@ -19,7 +19,7 @@ import org.jdom.Element;
  * @todo consider using a cache to reuse existing FCAObjects, i.e. don't have two FCAObjects with the same data (and description).
  * Should descriptions be functionally dependend on the data? How to model this in CSX?
  */
-public class FCAObjectImplementation implements WritableFCAObject, XMLizable, Comparable {
+public class FCAElementImplementation implements WritableFCAElement, XMLizable, Comparable {
 	private Object data;
 	private Element description;
     private int contextPosition = -1; // -1 means "not set"
@@ -29,16 +29,16 @@ public class FCAObjectImplementation implements WritableFCAObject, XMLizable, Co
 	private static final String CLASS_ATTRIBUTE_NAME = "class";
     private static final String CONTEXT_POSITION_ATTRIBUT_NAME = "contextPosition";
 
-	public FCAObjectImplementation(Object data) {
+	public FCAElementImplementation(Object data) {
 		this(data,null);
 	}
 
-	public FCAObjectImplementation(Object data, Element description) {
+	public FCAElementImplementation(Object data, Element description) {
 		this.data = data;
 		this.description = description;
 	}
 	
-	public FCAObjectImplementation(Element xmlelement) throws XMLSyntaxError {
+	public FCAElementImplementation(Element xmlelement) throws XMLSyntaxError {
 		readXML(xmlelement);
 	}
 
@@ -82,7 +82,7 @@ public class FCAObjectImplementation implements WritableFCAObject, XMLizable, Co
 		if(this.getClass() != other.getClass()) {
 			return false;
 		}
-		FCAObjectImplementation otherImp = (FCAObjectImplementation) other;
+		FCAElementImplementation otherImp = (FCAElementImplementation) other;
 		return this.data.equals(otherImp.data);
 	}
 	
@@ -153,6 +153,6 @@ public class FCAObjectImplementation implements WritableFCAObject, XMLizable, Co
      * considered greater than those without.
      */
     public int compareTo(Object o) {
-        return this.contextPosition - ((FCAObjectImplementation)o).contextPosition;
+        return this.contextPosition - ((FCAElementImplementation)o).contextPosition;
     }
 }

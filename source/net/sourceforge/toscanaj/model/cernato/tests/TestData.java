@@ -47,13 +47,13 @@ public class TestData {
     public static ManyValuedAttributeImplementation Property4;
     public static ManyValuedAttributeImplementation Property5;
     public static ManyValuedAttributeImplementation Property6;
-    public static FCAObjectImplementation Object1;
-    public static FCAObjectImplementation Object2;
-    public static FCAObjectImplementation Object3;
-    public static FCAObjectImplementation Object4;
-    public static FCAObjectImplementation Object5;
-    public static FCAObjectImplementation Object6;
-    public static FCAObjectImplementation Object7;
+    public static FCAElementImplementation Object1;
+    public static FCAElementImplementation Object2;
+    public static FCAElementImplementation Object3;
+    public static FCAElementImplementation Object4;
+    public static FCAElementImplementation Object5;
+    public static FCAElementImplementation Object6;
+    public static FCAElementImplementation Object7;
     public static View View1;
     public static View View2;
     public static View View3;
@@ -113,13 +113,13 @@ public class TestData {
         context.add(Property5);
         context.add(Property6);
 
-        Object1 = new FCAObjectImplementation("object1");
-        Object2 = new FCAObjectImplementation("object2");
-        Object3 = new FCAObjectImplementation("object3");
-        Object4 = new FCAObjectImplementation("object4");
-        Object5 = new FCAObjectImplementation("object5");
-        Object6 = new FCAObjectImplementation("object6");
-        Object7 = new FCAObjectImplementation("object7");
+        Object1 = new FCAElementImplementation("object1");
+        Object2 = new FCAElementImplementation("object2");
+        Object3 = new FCAElementImplementation("object3");
+        Object4 = new FCAElementImplementation("object4");
+        Object5 = new FCAElementImplementation("object5");
+        Object6 = new FCAElementImplementation("object6");
+        Object7 = new FCAElementImplementation("object7");
 
         context.add(Object1);
         context.add(Object2);
@@ -437,7 +437,7 @@ public class TestData {
         ScaledRelation.put(Object7, propMap);
     }
 
-    static boolean isInScaledRelation(FCAObjectImplementation object, Criterion criterion) {
+    static boolean isInScaledRelation(FCAElementImplementation object, Criterion criterion) {
         Hashtable propMap = (Hashtable) ScaledRelation.get(object);
         if (propMap == null) {
             return false;

@@ -83,9 +83,9 @@ import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAObject;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
-import net.sourceforge.toscanaj.model.context.WritableFCAObject;
+import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
@@ -305,7 +305,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	private void editObject(int row) {
 		Frame tFrame = JOptionPane.getFrameForComponent(tableView);
 		List objectList = (List) conceptualSchema.getManyValuedContext().getObjects();
-		WritableFCAObject object = (WritableFCAObject) objectList.get(row);
+		WritableFCAElement object = (WritableFCAElement) objectList.get(row);
 		new ObjectDialog(tFrame, object);
 		this.conceptualSchema.getManyValuedContext().update();
 		this.tableView.updateSize();
@@ -328,7 +328,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		addObjectButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	WritableManyValuedContext manyValuedContext = conceptualSchema.getManyValuedContext();
-                manyValuedContext.add(new FCAObjectImplementation(""));
+                manyValuedContext.add(new FCAElementImplementation(""));
             	editObject(manyValuedContext.getObjects().size() - 1);
             }
         });
@@ -375,7 +375,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 					WritableManyValuedAttribute attribute = (WritableManyValuedAttribute)
 															propertyList.get(row);
 					List objectList = (List) context.getObjects();
-					WritableFCAObject obj = (WritableFCAObject)objectList.get(col);
+					WritableFCAElement obj = (WritableFCAElement)objectList.get(col);
 					
 					if(attribute.getType() instanceof TextualType){
 						showPopupMenu(e.getPoint().getX(), 
@@ -1229,7 +1229,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
     protected void showNumericInputDialog(WritableManyValuedAttribute attribute,
-												WritableFCAObject obj) {
+												WritableFCAElement obj) {
 		WritableManyValuedContext context = this.conceptualSchema.getManyValuedContext();
         AttributeValue relationship = context.getRelationship(obj,attribute);
         String content;
@@ -1258,7 +1258,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	}
 	
 	protected void showPopupMenu(double xPos, double yPos, ManyValuedAttribute 
-										property, FCAObject obj) {
+										property, FCAElement obj) {
 		TextualType attributeType = (TextualType)property.getType();
 		AttributeValue[] textualValueList = attributeType.getValueRange();
 		JPopupMenu menu = new JPopupMenu();
@@ -1275,7 +1275,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
 	protected JPopupMenu createPopupMenu(int numOfCol,int numOfRows, AttributeValue[] textualValueList,
 											final ManyValuedAttribute property, 
-												final FCAObject obj) {
+												final FCAElement obj) {
 		final WritableManyValuedContext context = this.conceptualSchema.getManyValuedContext();
 		JPopupMenu menu = new JPopupMenu();
 		menu.setLayout(new GridLayout(numOfRows ,numOfCol));

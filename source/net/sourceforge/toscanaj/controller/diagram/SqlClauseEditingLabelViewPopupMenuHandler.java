@@ -8,8 +8,8 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
-import net.sourceforge.toscanaj.model.context.WritableFCAObject;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.SqlClauseLabelView;
@@ -81,7 +81,7 @@ public class SqlClauseEditingLabelViewPopupMenuHandler implements EventBrokerLis
 				if (!dialog.isCancelled()) {
 					String newValue = dialog.getInput();
 					ConceptImplementation concept = (ConceptImplementation) labelView.getNodeView().getDiagramNode().getConcept();
-					WritableFCAObject newObject = new FCAObjectImplementation(newValue);
+					WritableFCAElement newObject = new FCAElementImplementation(newValue);
 					concept.replaceObject(currentValue, newObject);
 					labelView.updateEntries();
 				}

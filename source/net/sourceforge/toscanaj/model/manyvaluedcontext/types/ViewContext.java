@@ -14,7 +14,7 @@ import java.util.Iterator;
 import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelation;
 import net.sourceforge.toscanaj.model.context.Context;
-import net.sourceforge.toscanaj.model.context.FCAObject;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
@@ -26,10 +26,10 @@ public class ViewContext implements Context{
 	private String name;
 	private class ScalingRelation implements BinaryRelation {
 		  public boolean contains(Object domainObject, Object rangeObject) {
-			  if (!(domainObject instanceof FCAObject)) {
+			  if (!(domainObject instanceof FCAElement)) {
 				  return false;
 			  }
-			  FCAObject fcaObject = (FCAObject) domainObject;
+			  FCAElement fcaObject = (FCAElement) domainObject;
 			  if (!(rangeObject instanceof Attribute)) {
 				  return false;
 			  }

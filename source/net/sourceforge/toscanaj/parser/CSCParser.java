@@ -27,7 +27,7 @@ import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -202,7 +202,7 @@ public class CSCParser {
             while(!tokenizer.getCurrentToken().equals("ATTRIBUTES")) { // find objects until attributes come
                 tokenizer.advance(); // skip number
                 tokenizer.advance(); // skip id
-                objects.add(new FCAObjectImplementation(tokenizer.getCurrentToken())); // use name
+                objects.add(new FCAElementImplementation(tokenizer.getCurrentToken())); // use name
                 tokenizer.advance(); // next
             }
             tokenizer.advance(); // skip "ATTRIBUTES"

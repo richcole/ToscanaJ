@@ -18,7 +18,7 @@ import java.util.Iterator;
 
 import javax.swing.JComponent;
 
-import net.sourceforge.toscanaj.model.context.FCAObject;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 
 
@@ -42,7 +42,7 @@ public class RowHeader extends JComponent{
 		int row = 0;
 		Iterator objectIt = this.context.getObjects().iterator();
 		while(objectIt.hasNext()){
-			FCAObject object = (FCAObject)objectIt.next();
+			FCAElement object = (FCAElement)objectIt.next();
 			drawCell(g2d , object.toString() , 0 , row * TableView.CELL_HEIGHT);
 			row += 1;
 		}

@@ -14,8 +14,8 @@ import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
-import net.sourceforge.toscanaj.model.context.WritableFCAObject;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 
 /**
  * @todo this generator can easily generate scales which are not nominal, and then in
@@ -54,7 +54,7 @@ public class NominalScaleGenerator implements ScaleGenerator {
 
 		for (int i = 0; i < values.length; i++) {
 		    NominalScaleEditorDialog.SqlFragment sqlFrag = (NominalScaleEditorDialog.SqlFragment) values[i];
-			WritableFCAObject object = new FCAObjectImplementation(sqlFrag.getSqlClause());
+			WritableFCAElement object = new FCAElementImplementation(sqlFrag.getSqlClause());
 			String attributeName = sqlFrag.getAttributeLabel();
 			Attribute attribute = new Attribute(attributeName);
 
@@ -69,7 +69,7 @@ public class NominalScaleGenerator implements ScaleGenerator {
 			}
 		}
 		
-		WritableFCAObject topNodeObject = new FCAObjectImplementation(topNodeClause);
+		WritableFCAElement topNodeObject = new FCAElementImplementation(topNodeClause);
 		context.getObjects().add(topNodeObject);
 		
 		return context;
