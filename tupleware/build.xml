@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Tupleware" default="run" basedir=".">
+	<!-- change this to a fixed value for releases -->
+	<target name="setBuildName">
+		<tstamp>
+    		<format property="timestamp" pattern="yyyyMMdd-HHmm"/>
+		</tstamp>
+		<property name="dist.name" value="Tupleware-CVSbuild-${timestamp}"/>
+		<property name="dist.dir" value="${dist.base.dir}/${dist.name}"/>
+  	</target>
+  	
+  	<!-- IMPORTANT! We assume the source and libs of ToscanaJ in these spots. -->
+  	<!-- BIG TODO: move all resued code into Tockit -->
+  	<property name="toscanaj.src.dir" value="../ToscanaJ/source"/>
+  	<property name="toscanaj.libs.dir" value="../ToscanaJ/libs"/>
+
+	<property name="app.name" value="Tuppleware"/>
+	<property name="build.dev.dir" value="build/dev"/>
+	<property name="build.release.dir" value="build/release"/>
+	<property name="dist.base.dir" value="dist"/>
+	<property name="src.dir" value="source"/>
+	<property name="libs.dir" value="libs"/>
+    <property name="tupleware.class" value="org.tockit.tupleware.Tupleware"/>
+	<property name="plugins.dir" value="plugins"/>
+
+    <path id="project.dev.class.path">
+        <pathelement path="${classpath}"/>
+        <pathelement path="${build.dev.dir}"/>
+        <fileset dir="${libs.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${libs.dir}">
+            <include name="**/*.zip"/>
+        </fileset>
+        <fileset dir="${toscanaj.libs.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${toscanaj.libs.dir}">
+            <include name="**/*.zip"/>
+        </fileset>
+        <fileset dir="${toscanaj.libs.dir}/testing">
+            <include name="**/*.zip"/>
+        </fileset>
+    </path>
+    <path id="project.release.class.path">
+        <pathelement path="${classpath}"/>
+        <pathelement path="${build.release.dir}"/>
+        <fileset dir="${libs.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${libs.dir}">
+            <include name="**/*.zip"/>
+        </fileset>
+        <fileset dir="${toscanaj.libs.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${toscanaj.libs.dir}">
+            <include name="**/*.zip"/>
+        </fileset>
+        <fileset dir="${toscanaj.libs.dir}/testing">
+            <include name="**/*.zip"/>
+        </fileset>
+    </path>
+	<target name="_prepare" depends="setBuildName">
+		<mkdir dir="${build.dev.dir}"/>
+		<mkdir dir="${build.release.dir}"/>
+	</target>
+	<target name="clean">
+		<delete dir="${build.release.dir}"/>
+		<delete dir="${build.dev.dir}"/>
+		<delete dir="${dist.base.dir}"/>
+		<ant antfile="build.xml" dir="plugins" target="clean"/>
+	</target>
+	<target name="compile" depends="_prepare">
+		<javac srcdir="${toscanaj.src.dir}" destdir="${build.dev.dir}" debug="on" optimize="off" deprecation="on">
+			<classpath refid="project.dev.class.path"/>
+		</javac>
+		<javac srcdir="${src.dir}" destdir="${build.dev.dir}" debug="on" optimize="off" deprecation="on">
+			<classpath refid="project.dev.class.path"/>
+		</javac>
+	</target>
+	<target name="_compileRelease" depends="_prepare">
+		<javac srcdir="${toscanaj.src.dir}" destdir="${build.release.dir}" debug="off" optimize="on" deprecation="off">
+			<classpath refid="project.release.class.path"/>
+		</javac>
+		<javac srcdir="${src.dir}" destdir="${build.release.dir}" debug="off" optimize="on" deprecation="off">
+			<classpath refid="project.release.class.path"/>
+		</javac>
+	</target>
+    <target name="rebuild" depends="clean,compile"/>
+    <target name="_prepareDist">
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/plugins"/>
+	</target>
+	<target name="_makeDebugJar" depends="compile,_prepareDist">
+		<jar jarfile="${dist.dir}/${app.name}.jar" basedir="${build.dev.dir}" manifest="manifest.mf"/>
+	</target>
+	<target name="_makeReleaseJar" depends="_compileRelease,_prepareDist">
+		<jar jarfile="${dist.dir}/${app.name}.jar" basedir="${build.release.dir}" manifest="manifest.mf"/>
+	</target>
+	<target name="_copyFiles">
+		<copy todir="${dist.dir}/libs" includeEmptyDirs="no">
+			<fileset dir="${libs.dir}">
+		        <include name="*"/>
+            </fileset>
+		</copy>
+		<fixcrlf srcDir="${dist.dir}/libs" eol="crlf" includes="LICENSE.*"/>
+		<copy todir="${dist.dir}">
+			<fileset dir=".">
+				<include name="*.txt"/>
+				<include name="*.bat"/>
+				<include name="*.sh"/>
+				<include name="tupleware.prop"/>
+			</fileset>
+		</copy>
+		<fixcrlf srcDir="${dist.dir}" eol="crlf" includes="*.txt, *.bat, tupleware.prop"/>
+		<fixcrlf srcDir="${dist.dir}" eol="lf" includes="*.sh"/>
+    </target>
+	<target name="dist" depends="_makeReleaseJar,_copyFiles,_zipFile">
+	</target>
+	<target name="fullDist" depends="_makeReleaseJar,_copyFiles,pluginsReleaseDist,_zipFile">
+	</target>
+	<target name="_zipFile">
+		<zip destfile="${dist.dir}.zip">
+			<fileset dir="${dist.base.dir}">
+				<include name="${dist.name}/**"/>
+			</fileset>
+		</zip>
+	</target>
+	<target name="run" depends="_compileRelease">
+		<java classname="${tupleware.class}" fork="true">
+			<classpath refid="project.release.class.path"/>
+		</java>
+	</target>
+
+	<target name="pluginsReleaseDist" depends="_compileRelease">
+		<ant antfile="build.xml" dir="plugins" target="dist">
+			<property name="mainApp.libs.dir" value="../${libs.dir}"/>
+			<property name="mainApp.classes" value="../${build.release.dir}"/>
+			<property name="mainApp.dist.dir" value="../${dist.base.dir}"/>
+			<property name="pluginArchitecture.classes" value="../${libs.dir}/pluginArchitecture.jar"/>			
+		</ant>
+	</target>
+
+	<target name="pluginsDebugDist" depends="compile">
+		<ant antfile="build.xml" dir="plugins" target="dist">
+			<property name="mainApp.libs.dir" value="../${libs.dir}"/>
+			<property name="mainApp.classes" value="../${build.dev.dir}"/>
+			<property name="mainApp.dist.dir" value="../${dist.base.dir}"/>
+			<property name="pluginArchitecture.classes" value="../${libs.dir}/pluginArchitecture.jar"/>
+		</ant>
+	</target>
+	
+</project>
