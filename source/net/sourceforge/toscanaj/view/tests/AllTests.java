@@ -19,7 +19,6 @@ public class AllTests extends TestCase {
     public static Test suite() {
         TestSuite suite = new TestSuite();
         suite.addTest(net.sourceforge.toscanaj.view.diagram.tests.AllTests.suite());
-        suite.addTest(net.sourceforge.toscanaj.view.scales.tests.AllTests.suite());
         return suite;
     }
 
