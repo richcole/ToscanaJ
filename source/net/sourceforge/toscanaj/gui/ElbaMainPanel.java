@@ -82,6 +82,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     private DiagramEditingView diagramView;
     private DatabaseConnectionInformationView connectionInformationView;
     private XMLEditorDialog schemaDescriptionView;
+    private JMenuItem dumpSQLMenuItem;
+    private JMenuItem dumpStatisticalDataMenuItem;
 
     public class PrepareToSaveActivity implements SimpleActivity {
 
@@ -267,14 +269,22 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         
         JMenu toolMenu = new JMenu("Tools");
         toolMenu.setMnemonic(KeyEvent.VK_T);
-        JMenuItem dumpStatisticalDataMenuItem = new JMenuItem("Export Statistical Data...");
+        dumpStatisticalDataMenuItem = new JMenuItem("Export Statistical Data...");
         dumpStatisticalDataMenuItem.setMnemonic(KeyEvent.VK_S);
         dumpStatisticalDataMenuItem.addActionListener(new ActionListener(){
-        	public void actionPerformed(ActionEvent e) {
-        		exportStatisticalData();
-        	}
+            public void actionPerformed(ActionEvent e) {
+                exportStatisticalData();
+            }
         });
         toolMenu.add(dumpStatisticalDataMenuItem);
+        dumpSQLMenuItem = new JMenuItem("Export Database as SQL...");
+        dumpSQLMenuItem.setMnemonic(KeyEvent.VK_D);
+        dumpSQLMenuItem.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                exportSQLScript();
+            }
+        });
+        toolMenu.add(dumpSQLMenuItem);
 		menuBar.add(toolMenu);
 
         // --- help menu ---
@@ -376,18 +386,20 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             addFileToMRUList(schemaFile);
             schemaDescriptionView.setContent(conceptualSchema.getDescription());
         }
-        if (e instanceof DatabaseInfoChangedEvent) {
-            DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
-            if (databaseInformation.getDriverClass() != null && databaseInformation.getURL() != null) {
-                if (databaseConnection.isConnected()) {
-                    try {
-                        databaseConnection.disconnect();
-                    } catch (DatabaseException ex) {
-                        ErrorDialog.showError(this, ex, "Closing database error",
-                                "Some error closing the old database:\n" + ex.getMessage());
-                        return;
-                    }
+        if (e instanceof DatabaseInfoChangedEvent || e instanceof NewConceptualSchemaEvent ||
+            e instanceof ConceptualSchemaLoadedEvent) {
+            if (databaseConnection.isConnected()) {
+                try {
+                    databaseConnection.disconnect();
+                } catch (DatabaseException ex) {
+                    ErrorDialog.showError(this, ex, "Closing database error",
+                            "Some error closing the old database:\n" + ex.getMessage());
+                    return;
                 }
+            }
+            DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
+            if (databaseInformation != null && databaseInformation.getDriverClass() != null && 
+                databaseInformation.getURL() != null) {
                 try {
                     databaseConnection.connect(databaseInformation);
                     URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
@@ -461,9 +473,9 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         ExportStatisticalDataSettingsDialog expSettingsDialog = new ExportStatisticalDataSettingsDialog(this);
         expSettingsDialog.show();
         if(!expSettingsDialog.hasPositiveResult()) {
-        	return;
+            return;
         }
-        
+
         final JFileChooser saveDialog;
         if (this.currentFile != null) {
             // use position of last file for dialog
@@ -476,17 +488,43 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         if (rv != JFileChooser.APPROVE_OPTION) {
             return;
         }
-        exportStatisticalData(saveDialog.getSelectedFile(), 
-        							expSettingsDialog.getFilterClause(), 
-							        expSettingsDialog.hasIncludeContingentListsSet(),
-							        expSettingsDialog.hasIncludeIntentExtentListsSet());
+        exportStatisticalData(saveDialog.getSelectedFile(),
+                                    expSettingsDialog.getFilterClause(),
+                                    expSettingsDialog.hasIncludeContingentListsSet(),
+                                    expSettingsDialog.hasIncludeIntentExtentListsSet());
     }
 
-    private void exportStatisticalData(File file, String filterClause, 
-    									boolean includeContingentLists, boolean includeIntentExtent) {
+    private void exportStatisticalData(File file, String filterClause,
+                                        boolean includeContingentLists, boolean includeIntentExtent) {
         try {
             FileOutputStream outputStream = new FileOutputStream(file);
             DataDump.dumpData(this.conceptualSchema, outputStream, filterClause, includeContingentLists, includeIntentExtent);
+            outputStream.close();
+        } catch (Exception e) {
+            ErrorDialog.showError(this, e, "Could not export file");
+            return;
+        }
+    }
+
+    private void exportSQLScript() {
+        final JFileChooser saveDialog;
+        if (this.currentFile != null) {
+            // use position of last file for dialog
+            saveDialog = new JFileChooser(this.currentFile);
+        } else {
+            saveDialog = new JFileChooser(System.getProperty("user.dir"));
+        }
+        saveDialog.setApproveButtonText("Export");
+        int rv = saveDialog.showSaveDialog(this);
+        if (rv != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        exportSQLScript(saveDialog.getSelectedFile());
+    }
+
+    private void exportSQLScript(File file) {
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
             outputStream.close();
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Could not export file");

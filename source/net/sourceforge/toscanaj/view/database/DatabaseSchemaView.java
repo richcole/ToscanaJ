@@ -11,7 +11,10 @@ import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.Table;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.events.TableChangedEvent;
 import net.sourceforge.toscanaj.util.STD_Iterator;
 import org.tockit.events.Event;
@@ -48,12 +51,11 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
         public void actionPerformed(ActionEvent event) {
             int[] selectedList = keyedTableListPanel.getSelectedIndices();
             for (int i = 0; i < selectedList.length; ++i) {
-                KeyTableInfo info = (KeyTableInfo)
-                        keyedTableList.elementAt(selectedList[i]);
+                KeyTableInfo info =
+                    (KeyTableInfo) keyedTableList.elementAt(selectedList[i]);
                 info.getTable().setKey(null);
             }
         }
-
 
     }
 
@@ -68,7 +70,8 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
                 if (model.isSelectionEmpty()) {
                     displayTable(null);
                 } else {
-                    TableInfo info = (TableInfo) unkeyedTableList.elementAt(
+                    TableInfo info =
+                        (TableInfo) unkeyedTableList.elementAt(
                             model.getMinSelectionIndex());
                     displayTable(info.getTable());
                 }
@@ -103,17 +106,14 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
             }
 
             ColumnInfo columnInfo =
-                    (ColumnInfo) columnsList.elementAt(
-                            model.getMinSelectionIndex()
-                    );
+                (ColumnInfo) columnsList.elementAt(
+                    model.getMinSelectionIndex());
             final int selectedIndex = unkeyedTableListPanel.getSelectedIndex();
             if (selectedIndex < 0) {
                 return;
             }
             TableInfo tableInfo =
-                    (TableInfo) unkeyedTableList.elementAt(
-                            selectedIndex
-                    );
+                (TableInfo) unkeyedTableList.elementAt(selectedIndex);
             setObjectKey(tableInfo.getTable(), columnInfo.getColumn());
         }
     }
@@ -141,8 +141,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
         /// @todo remove workaround for a bug in swing ver. < 1.3rel03
         if (unkeyedTableList.size() == 0) {
             displayTable(null);
-        }
-        ;
+        };
     }
 
     private void removeKeyedTable(Table table) {
@@ -179,30 +178,40 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
         columnsPanel = new JList(this.columnsList);
 
         unkeyedTableListPanel.addListSelectionListener(
-                new TableSelectionListener()
-        );
+            new TableSelectionListener());
 
-        columnsPanel.addListSelectionListener(
-                new ColumnSelectionListener()
-        );
+        columnsPanel.addListSelectionListener(new ColumnSelectionListener());
 
         this.removeTableAction = new RemoveTableKeyAction("Remove Key");
         JButton removeButton = new JButton(removeTableAction);
 
-        leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                new LabeledScrollPaneView("Available Tables:", unkeyedTableListPanel),
-                new LabeledScrollPaneView("Selected Keys:", keyedTableListPanel, removeButton));
+        leftPane =
+            new JSplitPane(
+                JSplitPane.VERTICAL_SPLIT,
+                new LabeledScrollPaneView(
+                    "Available Tables:",
+                    unkeyedTableListPanel),
+                new LabeledScrollPaneView(
+                    "Selected Keys:",
+                    keyedTableListPanel,
+                    removeButton));
         leftPane.setOneTouchExpandable(true);
         leftPane.setResizeWeight(0);
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+        splitPane =
+            new JSplitPane(
+                JSplitPane.HORIZONTAL_SPLIT,
                 leftPane,
-                new LabeledScrollPaneView("Available Object Keys:", columnsPanel));
+                new LabeledScrollPaneView(
+                    "Available Object Keys:",
+                    columnsPanel));
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);
 
         broker.subscribe(this, DatabaseSchemaChangedEvent.class, Object.class);
+        broker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+        broker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
         broker.subscribe(this, TableChangedEvent.class, Object.class);
     }
 
@@ -230,7 +239,9 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
         }
 
         public String toString() {
-            return column.getName() + ": " + SQLTypeMapper.getTypeName(column.getType());
+            return column.getName()
+                + ": "
+                + SQLTypeMapper.getTypeName(column.getType());
         }
 
         public Column getColumn() {
@@ -262,23 +273,35 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
     }
 
     public void processEvent(Event e) {
+        if (e instanceof NewConceptualSchemaEvent || e instanceof ConceptualSchemaLoadedEvent) {
+        	ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
+            this.dbScheme = csce.getConceptualSchema().getDatabaseSchema();
+            updateTableViews();
+        }
 
         if (e instanceof DatabaseSchemaChangedEvent) {
             DatabaseSchemaChangedEvent event = (DatabaseSchemaChangedEvent) e;
             this.dbScheme = event.getDBScheme();
-
-            clear();
-
-            STD_Iterator it = new STD_Iterator(dbScheme.getTables());
-            for (it.reset(); !it.atEnd(); it.next()) {
-                updateViewOfTable((Table) it.val());
-            }
+            updateTableViews();
         }
 
         if (e instanceof TableChangedEvent) {
             TableChangedEvent event = (TableChangedEvent) e;
             Table table = event.getTable();
             updateViewOfTable(table);
+        }
+    }
+
+    protected void updateTableViews() {
+        clear();
+        
+        if(this.dbScheme == null) {
+        	return;
+        }
+        
+        STD_Iterator it = new STD_Iterator(dbScheme.getTables());
+        for (it.reset(); !it.atEnd(); it.next()) {
+            updateViewOfTable((Table) it.val());
         }
     }
 
