@@ -636,13 +636,14 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
         if (preferences.getBoolean("offerGradientOptions", false)) {
             viewMenu.addSeparator();
+            final DiagramSchema diagramSchema = diagramView.getDiagramSchema();
             ButtonGroup colorGradientGroup = new ButtonGroup();
             JRadioButtonMenuItem showExactMenuItem = new JRadioButtonMenuItem("Use colors for exact matches");
             showExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK));
+            showExactMenuItem.setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
             showExactMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-					DiagramSchema diagramSchema = diagramView.getDiagramSchema();
 					setDiagramGradient(diagramSchema.getDefaultGradient(), ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
                 }
             });
@@ -652,10 +653,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             JRadioButtonMenuItem showAllMenuItem = new JRadioButtonMenuItem("Use colors for all matches");
             showAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
-            showAllMenuItem.setSelected(true);
+            showAllMenuItem.setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_EXTENT);
             showAllMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    DiagramSchema diagramSchema = diagramView.getDiagramSchema();
 					setDiagramGradient(diagramSchema.getDefaultGradient(), ConceptInterpreter.INTERVAL_TYPE_EXTENT);
                 }
             });
