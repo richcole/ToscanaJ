@@ -14,6 +14,8 @@ import java.util.Properties;
  * Handles all persistent configuration information.
  *
  * @TODO document
+ * @TODO what do to with exceptions? At the moment they are caught and the default
+ *       value is returned.
  */
 public class ConfigurationManager {
     /**
@@ -106,6 +108,31 @@ public class ConfigurationManager {
         catch(NumberFormatException e) {
             return defaultValue;
         }
+        catch(NullPointerException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * Stores a float value.
+     */
+    static public void storeFloat(String section, String key, float value) {
+        properties.setProperty(section + "-" + key, String.valueOf(value));
+    }
+
+    /**
+     * Retrieves a float value.
+     */
+    static public float fetchFloat(String section, String key, float defaultValue) {
+        try {
+            return Float.parseFloat(properties.getProperty(section + "-" + key));
+        }
+        catch(NumberFormatException e) {
+            return defaultValue;
+        }
+        catch(NullPointerException e) {
+            return defaultValue;
+        }
     }
 
     /**
@@ -163,14 +190,27 @@ public class ConfigurationManager {
      * Retrieves a Color value.
      */
     static public Color fetchColor(String section, String key, Color defaultValue) {
-        try {
-            return Color.decode(properties.getProperty(section + "-" + key));
-        }
-        catch(NumberFormatException e) {
+        String propVal = properties.getProperty(section + "-" + key);
+        if( propVal == null ) {
             return defaultValue;
         }
-        catch(NullPointerException e) {
-            return defaultValue;
+        else if( propVal.charAt(0) == '#') {
+            try {
+                propVal = propVal.substring(1);
+                int colorValue = Integer.parseInt(propVal,16);
+                return new Color(colorValue);
+            }
+            catch(NumberFormatException e) {
+                return defaultValue;
+            }
+        }
+        else {
+            try {
+                return Color.decode(propVal);
+            }
+            catch(NumberFormatException e) {
+                return defaultValue;
+            }
         }
     }
 }

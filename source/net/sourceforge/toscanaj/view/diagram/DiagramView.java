@@ -81,15 +81,15 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
      * Paints the diagram on the screen.
      */
     public void paintComponent(Graphics g) {
-        if (diagram == null) {
-            return;
-        }
         Graphics2D g2d = (Graphics2D) g;
 
         // fill the background (without transform)
         g2d.setPaint(DiagramSchema.getDiagramSchema().getBackgroundColor());
         g2d.fill(new Rectangle2D.Double(0,0,getWidth(),getHeight()));
 
+        if (diagram == null) {
+            return;
+        }
         // draw diagram title in the top left corner
         g2d.setPaint(DiagramSchema.getDiagramSchema().getForegroundColor());
         // title is not scaled on purpose

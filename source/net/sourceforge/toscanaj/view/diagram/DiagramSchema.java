@@ -41,7 +41,7 @@ public class DiagramSchema {
     /**
      * The amount of fade out for unselected nodes.
      */
-    private static float fadeOut = 0.7F;
+    private float fadeOut = 0.7F;
 
     /**
      * Holds diagram canvas foreground color
@@ -107,7 +107,7 @@ public class DiagramSchema {
      *
      * @see #setGradientReference(int)
      */
-    private int gradientReference = GRADIENT_REFERENCE_DIAGRAM;
+    private int gradientReference = GRADIENT_REFERENCE_SCHEMA;
 
     /**
      * Default constructor.
@@ -116,6 +116,38 @@ public class DiagramSchema {
         background = ConfigurationManager.fetchColor("diagramSchema","backgroundColor",background);
         topColor = ConfigurationManager.fetchColor("diagramSchema","topColor",topColor);
         bottomColor = ConfigurationManager.fetchColor("diagramSchema","bottomColor",bottomColor);
+        foreground = ConfigurationManager.fetchColor("diagramSchema","foregroundColor",foreground);
+        nestedDiagramNodeColor = ConfigurationManager.fetchColor("diagramSchema","nestedDiagramNodeColor",nestedDiagramNodeColor);
+        circleColor = ConfigurationManager.fetchColor("diagramSchema","circleColor",circleColor);
+        lineColor = ConfigurationManager.fetchColor("diagramSchema","lineColor",lineColor);
+        circleSelectionColor = ConfigurationManager.fetchColor("diagramSchema","circleSelectionColor",circleSelectionColor);
+        circleIdealColor = ConfigurationManager.fetchColor("diagramSchema","circleIdealColor",circleIdealColor);
+        circleFilterColor = ConfigurationManager.fetchColor("diagramSchema","circleFilterColor",circleFilterColor);
+        fadeOut = ConfigurationManager.fetchFloat("diagramSchema","fadeOutValue",fadeOut);
+        String propVal = ConfigurationManager.fetchString("diagramSchema","gradientType","extent");
+        propVal = propVal.toLowerCase();
+        if(propVal.equals("extent")) {
+            gradientType = GRADIENT_TYPE_EXTENT;
+        }
+        else if(propVal.equals("contingent")) {
+            gradientType = GRADIENT_TYPE_CONTINGENT;
+        }
+        else {
+            System.err.println("Caught unknown gradient type for DiagramSchema: " + propVal);
+            System.err.println("-- using default");
+        }
+        propVal = ConfigurationManager.fetchString("diagramSchema","gradientReference","diagram");
+        propVal = propVal.toLowerCase();
+        if(propVal.equals("diagram")) {
+            gradientReference = GRADIENT_REFERENCE_DIAGRAM;
+        }
+        else if(propVal.equals("schema")) {
+            gradientReference = GRADIENT_REFERENCE_SCHEMA;
+        }
+        else {
+            System.err.println("Caught unknown gradient reference for DiagramSchema: " + propVal);
+            System.err.println("-- using default");
+        }
     }
 
     /**
