@@ -455,6 +455,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         openFileAction.addPostOpenActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
                 updateWindowTitle();
+                rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
+                colHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
+                tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
                 return true;
             }
         });

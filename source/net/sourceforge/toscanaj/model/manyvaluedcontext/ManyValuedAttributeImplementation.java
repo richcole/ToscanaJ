@@ -9,6 +9,9 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
 import java.util.Hashtable;
 
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+
 import org.jdom.Element;
 
 
@@ -22,6 +25,10 @@ public class ManyValuedAttributeImplementation implements WritableManyValuedAttr
     public ManyValuedAttributeImplementation(AttributeType type, String name) {
         this.type = type;
         this.name = name;
+    }
+    
+    public ManyValuedAttributeImplementation(Element element, Hashtable typeIdMapping) throws XMLSyntaxError {
+    	readXML(element, typeIdMapping);
     }
 
     public AttributeType getType() {
@@ -51,8 +58,9 @@ public class ManyValuedAttributeImplementation implements WritableManyValuedAttr
 		return retVal;
 	}
 
-	public void readXML(Element elem) { //throws XMLSyntaxError {
-		// TODO Auto-generated method stub
-		
+	public void readXML(Element elem, Hashtable typesIdMapping) throws XMLSyntaxError { 
+		String typeRef = XMLHelper.getAttribute(elem, TYPE_REF_ATTRIBUTE_NAME).getValue();
+		this.type = (AttributeType) typesIdMapping.get(typeRef);
+		this.name = XMLHelper.getAttribute(elem, NAME_ATTRIBUTE_NAME).getValue();
 	}
 }

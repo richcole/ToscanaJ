@@ -48,7 +48,7 @@ public abstract class XMLHelper {
 
     static public void checkName(Element element, String name) throws XMLSyntaxError {
         if (!element.getName().equals(name)) {
-            throw new XMLSyntaxError("Expected Element <" + name + ">. Found <" +
+            throw new XMLSyntaxError("Expected element <" + name + ">. Found <" +
             		element.getName() + "> instead.");
         }
 
@@ -57,7 +57,7 @@ public abstract class XMLHelper {
     static public Attribute getAttribute(Element elem, String attributeName) throws XMLSyntaxError {
         Attribute attribute = elem.getAttribute(attributeName);
         if (attribute == null) {
-            throw new XMLSyntaxError("Expected Attribute " + attributeName + " in Element " + elem.getName());
+            throw new XMLSyntaxError("Expected attribute " + attributeName + " in element " + elem.getName());
         }
         return attribute;
     }
@@ -65,26 +65,26 @@ public abstract class XMLHelper {
     static public int getIntAttribute(Element elem, String attributeName) throws XMLSyntaxError {
         Attribute attribute = elem.getAttribute(attributeName);
         if (attribute == null) {
-            throw new XMLSyntaxError("Expected Attribute " + attributeName + " in Element " + elem.getName());
+            throw new XMLSyntaxError("Expected attribute " + attributeName + " in element " + elem.getName());
         }
         try {
             return attribute.getIntValue();
         } catch (DataConversionException e) {
-            throw new XMLSyntaxError("Expected Integer Value for Attribute " + attributeName
-                    + " in Element " + elem.getName());
+            throw new XMLSyntaxError("Expected integer value for attribute " + attributeName
+                    + " in element " + elem.getName());
         }
     }
 
     static public double getDoubleAttribute(Element elem, String attributeName) throws XMLSyntaxError {
         Attribute attribute = elem.getAttribute(attributeName);
         if (attribute == null) {
-            throw new XMLSyntaxError("Expected Attribute " + attributeName + " in Element " + elem.getName());
+            throw new XMLSyntaxError("Expected attribute " + attributeName + " in element " + elem.getName());
         }
         try {
             return attribute.getDoubleValue();
         } catch (DataConversionException e) {
-            throw new XMLSyntaxError("Expected Double Value for Attribute " + attributeName
-                    + " in Element " + elem.getName());
+            throw new XMLSyntaxError("Expected double value for attribute " + attributeName
+                    + " in element " + elem.getName());
         }
     }
 

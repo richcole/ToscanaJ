@@ -35,6 +35,10 @@ public class FCAObjectImplementation implements WritableFCAObject, XMLizable {
 		this.data = data;
 		this.description = description;
 	}
+	
+	public FCAObjectImplementation(Element xmlelement) throws XMLSyntaxError {
+		readXML(xmlelement);
+	}
 
 	public Object getData() {
 		return this.data;
@@ -101,16 +105,14 @@ public class FCAObjectImplementation implements WritableFCAObject, XMLizable {
 	}
 
 	public void readXML(Element elem) throws XMLSyntaxError {
-		// TODO Auto-generated method stub
-		description = XMLHelper.getMandatoryChild(elem, DESCRIPTION_ELEMENT_NAME);
+		description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
 		Element dataElement = XMLHelper.getMandatoryChild(elem, DATA_ELEMENT_NAME);
-		String className = XMLHelper.getAttribute(elem, CLASS_ATTRIBUTE_NAME).getValue();
+		String className = XMLHelper.getAttribute(dataElement, CLASS_ATTRIBUTE_NAME).getValue();
 		if (className.equals(String.class.getName())) {
 			data = dataElement.getTextTrim();
 		} else {
-			Constructor construct;
 			try {
-				construct = Class.forName(className).getConstructor(new Class[] {Element.class});
+				Constructor construct = Class.forName(className).getConstructor(new Class[] {Element.class});
 				data = construct.newInstance(new Object[] {dataElement});
 			} catch (Exception e) {
 				throw new XMLSyntaxError("Initialization of object of type " + className + "failed.", e);

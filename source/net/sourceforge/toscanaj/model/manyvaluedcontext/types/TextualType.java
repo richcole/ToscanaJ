@@ -16,16 +16,19 @@ import org.jdom.Element;
 
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ScaleColumn;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 
 public class TextualType extends TypeImplementation {
 	private List valueList ;
-	private static final String VALUE_ELEMENT_NAME = "value";
-	private static final String TEXTUAL_TYPE_VALUE_ELEMENT_NAME = "value";
 	
     public TextualType(String name) {
         super(name);
         valueList = new ArrayList();
+    }
+    
+    public TextualType(Element elem) throws XMLSyntaxError {
+    	super(elem);
     }
 
     public void addValueGroup(ScaleColumn column, String id) {
@@ -101,10 +104,11 @@ public class TextualType extends TypeImplementation {
 	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.types.TypeImplementation#readRangeElement(org.jdom.Element)
 	 */
 	protected void readRangeElement(Element rangeElement) {
+		this.valueList = new ArrayList();
 		List valueListElements = rangeElement.getChildren();
 		for (Iterator iter = valueListElements.iterator(); iter.hasNext();) {
 			Element valueElement = (Element) iter.next();
-			valueList.add(valueElement.getText());
+			valueList.add(new TextualValue(valueElement.getText()));
 		}
 	}
 
@@ -119,7 +123,7 @@ public class TextualType extends TypeImplementation {
 	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType#toElement(net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue)
 	 */
 	public Element toElement(AttributeValue value) {
-		Element retVal = new Element(TEXTUAL_TYPE_VALUE_ELEMENT_NAME);
+		Element retVal = new Element(VALUE_ELEMENT_NAME);
 		retVal.addContent(((TextualValue) value).getDisplayString());
 		return retVal;
 	}

@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
+import java.lang.reflect.Constructor;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -15,6 +16,9 @@ import java.util.Map.Entry;
 
 import net.sourceforge.toscanaj.model.context.FCAObject;
 import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TypeImplementation;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 import org.jdom.Element;
@@ -25,24 +29,31 @@ import org.tockit.util.ListSetImplementation;
 
 public class ManyValuedContextImplementation implements WritableManyValuedContext, XMLizable {
 
-	private static final String ATTRIBUTE_VALUE_ATTRIBUTE_ID_ATTRIBUTE_NAME = "attributeId";
 	private ListSet objects = new ListSetImplementation();
-    private ListSet properties = new ListSetImplementation();
+    private ListSet attributes = new ListSetImplementation();
     private Hashtable relation = new Hashtable();
 	private ListSet types = new ListSetImplementation();
-	private static final String MANY_VALUED_CONTEXT_ELEMENT_NAME = "manyValuedContext";
+	
+	
+	public static final String MANY_VALUED_CONTEXT_ELEMENT_NAME = "manyValuedContext";
+	private static final String ATTRIBUTE_ID_ATTRIBUTE_NAME = "attributeId";
 	private static final String OBJECTS_ELEMENT_NAME = "objects";
-	private static final String PROPERTIES_ELEMENT_NAME = "attributes";
+	private static final String ATTRIBUTES_ELEMENT_NAME = "attributes";
 	private static final String TYPES_ELEMENT_NAME = "types";
 	private static final String RELATION_ELEMENT_NAME = "relation";
 	private static final String ROW_ELEMENT_NAME = "object";
 	private static final String OBJECT_ID_ATTRIBUTE_NAME = "objectId";
-	private static final String ATTRIBUTE_ID_ATTRIBUTE_NAME = "attributeId";
 	private static final String TYPE_ID_ATTRIBUTE_NAME = "typeId";
 	private static final String ROW_OBJECT_REF_ATTRIBUTE_NAME = "objectRef";
 	private static final String ATTRIBUTE_VALUE_PAIR_ELEMENT_NAME = "attribute";
+	private static final String ATTRIBUTE_VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME = "attributeRef";
+	
 	public ManyValuedContextImplementation() {
     }
+	
+	public ManyValuedContextImplementation(Element elem) throws XMLSyntaxError {
+		readXML(elem);
+	}
 
     public void add(FCAObject object) {
         this.objects.add(object);
@@ -59,15 +70,15 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
     }
 
     public void add(ManyValuedAttribute attribute) {
-        this.properties.add(attribute);
+        this.attributes.add(attribute);
     }
 
     public void remove(ManyValuedAttribute attribute) {
-        this.properties.remove(attribute);
+        this.attributes.remove(attribute);
     }
 
     public ListSet getAttributes() {
-        return ListSetImplementation.unmodifiableListSet(this.properties);
+        return ListSetImplementation.unmodifiableListSet(this.attributes);
     }
     
     public void add(AttributeType type) {
@@ -128,9 +139,6 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 	public Element toXML() {
 		// TODO Auto-generated method stub
 		Element retVal = new Element(MANY_VALUED_CONTEXT_ELEMENT_NAME);
-/*		private Hashtable relation = new Hashtable();
-		private ListSet types = new ListSetImplementation();
-*/
 		IdPool oidpool = new IdPool();
 		IdPool aidpool = new IdPool();
 		IdPool tidpool = new IdPool();
@@ -162,20 +170,20 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 			typesElement.addContent(typeElement);
 		}
 		retVal.addContent(typesElement);
-		Element propertiesElement = new Element(PROPERTIES_ELEMENT_NAME);
-		for (Iterator iter = properties.iterator(); iter.hasNext();) {
-			ManyValuedAttribute itProp = (ManyValuedAttribute) iter.next();
-			if (! (itProp instanceof ManyValuedAttributeImplementation)) {
+		Element attributesElement = new Element(ATTRIBUTES_ELEMENT_NAME);
+		for (Iterator iter = attributes.iterator(); iter.hasNext();) {
+			ManyValuedAttribute itAttribute = (ManyValuedAttribute) iter.next();
+			if (! (itAttribute instanceof ManyValuedAttributeImplementation)) {
 				throw new RuntimeException("Found attribute \"" +
-						itProp.getName() + "\" not to be XMLizable.");
+						itAttribute.getName() + "\" not to be XMLizable.");
 			}
-			Element propertyElement = ((ManyValuedAttributeImplementation)itProp).toXML(typeIdMapping);
-			String id = aidpool.getFreeId(itProp.toString());
-			attributeIdMapping.put(itProp, id);
-			propertyElement.setAttribute(ATTRIBUTE_ID_ATTRIBUTE_NAME, id);
-			propertiesElement.addContent(propertyElement);
+			Element attributeElement = ((ManyValuedAttributeImplementation)itAttribute).toXML(typeIdMapping);
+			String id = aidpool.getFreeId(itAttribute.toString());
+			attributeIdMapping.put(itAttribute, id);
+			attributeElement.setAttribute(ATTRIBUTE_ID_ATTRIBUTE_NAME, id);
+			attributesElement.addContent(attributeElement);
 		}
-		retVal.addContent(propertiesElement);
+		retVal.addContent(attributesElement);
 		Element relationElement = new Element(RELATION_ELEMENT_NAME);
 		for (Iterator iter = relation.entrySet().iterator(); iter.hasNext();) {
 			Entry itRow = (Entry) iter.next();
@@ -187,7 +195,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 				Element attributeValueElement = new Element(ATTRIBUTE_VALUE_PAIR_ELEMENT_NAME);
 				ManyValuedAttributeImplementation mvAttribute = (ManyValuedAttributeImplementation) itAttributeValue.getKey();
 				String attributeId = (String) attributeIdMapping.get(mvAttribute);
-				attributeValueElement.setAttribute(ATTRIBUTE_VALUE_ATTRIBUTE_ID_ATTRIBUTE_NAME, attributeId);
+				attributeValueElement.setAttribute(ATTRIBUTE_VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME, attributeId);
 				attributeValueElement.addContent(mvAttribute.getType().toElement((AttributeValue)itAttributeValue.getValue()));
 				rowElement.addContent(attributeValueElement);
 			}
@@ -197,12 +205,60 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		return retVal;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.sourceforge.toscanaj.util.xmlize.XMLizable#readXML(org.jdom.Element)
-	 */
-	public void readXML(Element elem) {
-		// TODO Auto-generated method stub
-		
+	public void readXML(Element elem) throws XMLSyntaxError {
+		Hashtable objectIdMapping = new Hashtable();
+		Hashtable attributeIdMapping = new Hashtable();
+		Hashtable typeIdMapping = new Hashtable();
+		Element objectsElement = XMLHelper.getMandatoryChild(elem, OBJECTS_ELEMENT_NAME);
+		Element typesElement = XMLHelper.getMandatoryChild(elem, TYPES_ELEMENT_NAME);
+		Element attributesElement = XMLHelper.getMandatoryChild(elem, ATTRIBUTES_ELEMENT_NAME);
+		Element relationElement = XMLHelper.getMandatoryChild(elem, RELATION_ELEMENT_NAME);
+
+		for (Iterator iter = objectsElement.getChildren().iterator(); iter.hasNext();) {
+			Element objectElement = (Element) iter.next();
+			FCAObjectImplementation newObject = new FCAObjectImplementation(objectElement);
+			String id = XMLHelper.getAttribute(objectElement, OBJECT_ID_ATTRIBUTE_NAME).getValue();
+			objectIdMapping.put(id,newObject);
+			add(newObject);
+		}
+		for (Iterator iter = typesElement.getChildren().iterator(); iter.hasNext();) {
+			Element typeElement = (Element) iter.next();
+			String className = XMLHelper.getAttribute(typeElement, TypeImplementation.CLASS_ATTRIBUTE_NAME).getValue();
+			AttributeType newType;
+			try {
+				Constructor construct = Class.forName(className).getConstructor(new Class[] {Element.class});
+				newType = (AttributeType) construct.newInstance(new Object[] {typeElement});
+			} catch (Exception e) {
+				throw new XMLSyntaxError("Initialization of attribute type \"" + className + "\" failed.", e);
+			}
+			String id = XMLHelper.getAttribute(typeElement, TYPE_ID_ATTRIBUTE_NAME).getValue();
+			typeIdMapping.put(id, newType);
+			types.add(newType);
+		}
+		for (Iterator iter = attributesElement.getChildren().iterator(); iter.hasNext();) {
+			Element attributeElement = (Element) iter.next();
+			ManyValuedAttribute newAttribute = new ManyValuedAttributeImplementation(attributeElement, typeIdMapping);
+			String id = XMLHelper.getAttribute(attributeElement, ATTRIBUTE_ID_ATTRIBUTE_NAME).getValue();
+			attributeIdMapping.put(id, newAttribute);
+			attributes.add(newAttribute);
+		}
+		for (Iterator iter = relationElement.getChildren().iterator(); iter.hasNext();) {
+			Element row = (Element) iter.next();
+			String objectRef = XMLHelper.getAttribute(row, ROW_OBJECT_REF_ATTRIBUTE_NAME).getValue();
+			FCAObjectImplementation rowObject = (FCAObjectImplementation) objectIdMapping.get(objectRef);
+			ManyValuedAttribute tempAttribute;
+			AttributeValue tempValue;
+			Hashtable tempRow = new Hashtable();
+			for (Iterator it = row.getChildren().iterator(); it.hasNext();) {
+				Element attributeValueElement = (Element) it.next();
+				String attributeRef = XMLHelper.getAttribute(attributeValueElement, ATTRIBUTE_VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME).getValue();
+				tempAttribute = (ManyValuedAttribute) attributeIdMapping.get(attributeRef);
+				Element valueElement = XMLHelper.getMandatoryChild(attributeValueElement, TypeImplementation.VALUE_ELEMENT_NAME);
+				tempValue = tempAttribute.getType().toValue(valueElement);
+				tempRow.put(tempAttribute, tempValue);
+			}
+			relation.put(rowObject, tempRow);
+		}
 	}
 }
 

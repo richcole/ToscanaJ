@@ -21,6 +21,7 @@ import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.DiagramChangedEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContextImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
@@ -162,6 +163,9 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
             description = (Element) descriptionChild.clone();
         } else {
             description = null;
+        }
+        if (XMLHelper.contains(elem, ManyValuedContextImplementation.MANY_VALUED_CONTEXT_ELEMENT_NAME)) {
+        	this.manyValuedContext = new ManyValuedContextImplementation(elem.getChild(ManyValuedContextImplementation.MANY_VALUED_CONTEXT_ELEMENT_NAME));
         }
         if (XMLHelper.contains(elem, DatabaseInfo.DATABASE_CONNECTION_ELEMENT_NAME)) {
             databaseInfo = new DatabaseInfo(elem.getChild(DatabaseInfo.DATABASE_CONNECTION_ELEMENT_NAME));

@@ -17,9 +17,11 @@ import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 public abstract class TypeImplementation implements WritableAttributeType, XMLizable {
+
+	public static final String CLASS_ATTRIBUTE_NAME = "class";
+	public static final String VALUE_ELEMENT_NAME = "value";
 	
 	private static final String TYPE_ELEMENT_NAME = "type";
-	private static final String CLASS_ATTRIBUTE_NAME = "class";
 	private static final String RANGE_ELEMENT_NAME = "range";
 	private static final String NAME_ATTRIBUTE_NAME = "name";
 	
@@ -32,6 +34,7 @@ public abstract class TypeImplementation implements WritableAttributeType, XMLiz
     }
     
     public TypeImplementation(Element element) throws XMLSyntaxError {
+    	this.scale = new ScaleImplementation(name);
     	readXML(element);
     }
     

@@ -22,12 +22,13 @@ public class NumericalType extends TypeImplementation {
 	private static final String MIN_ATTRIBUTE_NAME = "min";
 	private static final String MAX_ATTRIBUTE_NAME = "max";
 	private static final String NUMBER_OF_DECIMALS_ATTRIBUTE_NAME = "numberOfDecimals";
-	private static final String NUMERICAL_TYPE_VALUE_ELEMENT_NAME = "value";
 	
     public NumericalType(String name) {
         super(name);
     }
-
+    
+    
+    
     public void addValueGroup(ScaleColumn column, String id) {
         if (column instanceof NumericalValueGroup) {
             scale.addColumn(column, id);
@@ -101,8 +102,13 @@ public class NumericalType extends TypeImplementation {
 	 * @see net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType#toElement(net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue)
 	 */
 	public Element toElement(AttributeValue value) {
-		Element retVal = new Element(NUMERICAL_TYPE_VALUE_ELEMENT_NAME);
+		Element retVal = new Element(VALUE_ELEMENT_NAME);
 		retVal.addContent(String.valueOf(((NumericalValue) value).getValue()));
 		return retVal;
 	}
+
+	public NumericalType(Element element) throws XMLSyntaxError {
+		super(element);
+	}
+
 }
