@@ -7,9 +7,6 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
-
 import java.util.*;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
@@ -68,43 +65,6 @@ public abstract class Query {
         fieldList.add(field);
     }
 
-    public List execute(String whereClause) {
-        List retVal = new ArrayList();
-        if (whereClause != null) {
-            try {
-                String statement = this.getQueryHead() + whereClause;
-
-                // submit the query
-                List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
-                Iterator it = queryResults.iterator();
-                while (it.hasNext()) {
-                    Vector item = (Vector) it.next();
-                    DatabaseRetrievedObject object = createDatabaseRetrievedObject(whereClause, item);
-                    if (object != null) {
-                        retVal.add(object);
-                    }
-                }
-            } catch (DatabaseException e) {
-                handleDBException(e);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return retVal;
-    }
-
-    protected abstract DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) throws SQLException;
-
-    private void handleDBException(DatabaseException e) {
-        /// @todo Find something useful to do here.
-        if (e.getOriginal() != null) {
-            System.err.println(e.getMessage());
-            e.getOriginal().printStackTrace();
-        } else {
-            e.printStackTrace(System.err);
-        }
-    }
-
     /**
      * Formats a row of a result set for this query.
      *
@@ -115,7 +75,7 @@ public abstract class Query {
      * The return value is a String which returns a formatted version of the
      * row
      */
-    public String formatResults(Vector values, int startPosition) throws SQLException {
+    public String formatResults(Vector values, int startPosition) {
         String rowRes = new String();
         if (header != null) {
             rowRes += header;
@@ -141,4 +101,6 @@ public abstract class Query {
     }
 
     abstract public String getQueryHead();
+
+    abstract public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values);
 }

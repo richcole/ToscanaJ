@@ -11,12 +11,12 @@ import net.sourceforge.toscanaj.controller.db.*;
 import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
 import net.sourceforge.toscanaj.events.BrokerEventListener;
 import net.sourceforge.toscanaj.events.Event;
-import net.sourceforge.toscanaj.model.database.DatabaseInfo;
-import net.sourceforge.toscanaj.model.database.Query;
+import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
 import java.util.*;
+import java.sql.SQLException;
 
 public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, BrokerEventListener {
 
@@ -188,9 +188,44 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                     context.getNestingConcepts(),
                     objectDisplayMode,
                     filterMode);
-            return query.execute(whereClause);
+            return execute(query, whereClause);
         } else {
             return null;
         }
     }
+
+    private List execute(Query query, String whereClause) {
+        List retVal = new ArrayList();
+        if (whereClause != null) {
+            try {
+                String statement = query.getQueryHead() + whereClause;
+
+                // submit the query
+                List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
+                Iterator it = queryResults.iterator();
+                while (it.hasNext()) {
+                    Vector item = (Vector) it.next();
+                    DatabaseRetrievedObject object =
+                            query.createDatabaseRetrievedObject(whereClause, item);
+                    if (object != null) {
+                        retVal.add(object);
+                    }
+                }
+            } catch (DatabaseException e) {
+                handleDBException(e);
+            }
+        }
+        return retVal;
+    }
+
+    private void handleDBException(DatabaseException e) {
+        /// @todo Find something useful to do here.
+        if (e.getOriginal() != null) {
+            System.err.println(e.getMessage());
+            e.getOriginal().printStackTrace();
+        } else {
+            e.printStackTrace(System.err);
+        }
+    }
+
 }

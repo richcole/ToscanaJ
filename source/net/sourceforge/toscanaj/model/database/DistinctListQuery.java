@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -33,7 +32,7 @@ public class DistinctListQuery extends Query {
         return retValue;
     }
 
-    protected DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) throws SQLException {
+    public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) {
         String displayString = this.formatResults(values, 0);
         DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
         String specialWhereClause = whereClause.substring(0, whereClause.lastIndexOf(';'));

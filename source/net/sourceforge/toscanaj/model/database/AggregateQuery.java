@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -34,7 +33,7 @@ public class AggregateQuery extends Query {
         return retValue;
     }
 
-    protected DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) throws SQLException {
+    public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) {
         if (values.get(0).toString().equals("0")) {
             return null;
         }
