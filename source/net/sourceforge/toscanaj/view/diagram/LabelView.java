@@ -450,17 +450,16 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     }
     
     protected Point2D getConnectorEndPosition() {
-    	
     	DiagramNode node=this.labelInfo.getNode();
 		double rectX = this.rect.getX();
 		double y = getConnectorStartPosition().getY();
 		double lw = rect.getWidth() - this.currentScrollBarWidth;
     	double endY = y + this.labelInfo.getOffset().getY();
 		if(rectX>node.getX()){
-			return new Point2D.Double(rectX + 10, endY);
+			return new Point2D.Double(rectX, endY);
     	}
     	else if(rectX+lw < node.getX()){
-			return new Point2D.Double(rectX + lw - 10, endY);
+			return new Point2D.Double(rectX + lw, endY);
     	}
     	else{
 			return new Point2D.Double(rectX + lw / 2, endY);

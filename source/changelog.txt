@@ -7,6 +7,8 @@ Affecting different programs:
   three refinements the nodes are all on a grid location again
 - CSC import is greatly enhanced, most importantly it supports include files now
 - Bugfix: saving files with descriptions on objects or attributes works again
+- Bugfix: lines now connect properly to the corners of the labels -- in some 
+  situations there was a visible offset before
 
 Specific for ToscanaJ:
 ======================
