@@ -344,5 +344,23 @@ public class DiagramView extends Canvas implements ChangeObserver {
 		this.screenTransformDirty = true;
 		repaint();
 	}
+	
+    public LabelView.LabelFactory getAttributeLabelFactory() {
+        return attributeLabelFactory;
+    }
+
+    public LabelView.LabelFactory getObjectLabelFactory() {
+        return objectLabelFactory;
+    }
+
+    public void setAttributeLabelFactory(
+        LabelView.LabelFactory attributeLabelFactory) {
+        this.attributeLabelFactory = attributeLabelFactory;
+    }
+
+    public void setObjectLabelFactory(
+        LabelView.LabelFactory objectLabelFactory) {
+        this.objectLabelFactory = objectLabelFactory;
+    }
 }
 

@@ -58,6 +58,9 @@ public class AttributeLabelView extends LabelView {
         return this.labelInfo.getNode().getConcept().getAttributeContingentIterator();
     }
 
+	/**
+	 * @todo it should be possible to delete this.
+	 */
     public void openPopupMenu(MouseEvent event, Point2D pos) {
         int itemHit = getIndexOfPosition(pos);
         Iterator it = getEntryIterator();

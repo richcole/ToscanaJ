@@ -32,6 +32,7 @@ import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
+import net.sourceforge.toscanaj.view.diagram.SqlClauseLabelView;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingViewDialog;
 
 import org.tockit.events.Event;
@@ -188,6 +189,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         
         diagramView = new DiagramEditingView(conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("ElbaMainPanel", "diagramViewDivider", 200));
+        diagramView.getDiagramView().setObjectLabelFactory(SqlClauseLabelView.getFactory());
 		
 		
 		mainView.add(buttonPane, new GridBagConstraints(
