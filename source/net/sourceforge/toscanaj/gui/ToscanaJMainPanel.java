@@ -185,9 +185,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 	 */
     public ToscanaJMainPanel() {
         super(WINDOW_TITLE);
-        broker = new EventBroker();
-        conceptualSchema = new ConceptualSchema(broker);
-        DatabaseConnection.initialize(broker);
+        this.broker = new EventBroker();
+        this.conceptualSchema = new ConceptualSchema(this.broker);
+        DatabaseConnection.initialize(this.broker);
 
     	this.diagramExportSettings = new DiagramExportSettings();
 
@@ -198,12 +198,12 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         // we are the parent window for anything database viewers / report generators want to display
         DatabaseViewerManager.setParentComponent(this);
         // restore the old MRU list
-        mruList = preferences.getStringList("mruFiles");
+        this.mruList = preferences.getStringList("mruFiles");
         // set up the menu for the MRU files
         recreateMruMenu();
         // if we have at least one MRU file try to open it
         if (this.mruList.size() > 0) {
-            File schemaFile = new File((String) mruList.get(mruList.size() - 1));
+            File schemaFile = new File((String) this.mruList.get(this.mruList.size() - 1));
             if (schemaFile.canRead()) {
                 openSchemaFile(schemaFile);
             }
@@ -233,11 +233,11 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
      */
     private void buildUI() {
         this.diagramView = new DiagramView();
-		// set the minimum font size of the label into diagramView from the properties file
+		// set the minimum font size of the label into this.diagramView from the properties file
         // this has to happen before the menu gets created, since the menu uses the information
 		double minLabelFontSize = preferences.getDouble("minLabelFontSize", 
 														this.diagramView.getMinimumFontSize());
-		diagramView.setMinimumFontSize(minLabelFontSize);
+		this.diagramView.setMinimumFontSize(minLabelFontSize);
 
 		createActions();
 		buildToolBar();
@@ -247,23 +247,23 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         contentPane.setLayout(new BorderLayout());
         DiagramController controller = DiagramController.getController();
         /// @todo move the subscriptions into the handlers
-        EventBroker diagramEventBroker = diagramView.getController().getEventBroker();
+        EventBroker diagramEventBroker = this.diagramView.getController().getEventBroker();
         new FilterOperationEventListener(controller, diagramEventBroker);
-        new HighlightingOperationEventListener(diagramView, diagramEventBroker);
-        new HighlightRemovalOperationEventListener(diagramView, diagramEventBroker);
+        new HighlightingOperationEventListener(this.diagramView, diagramEventBroker);
+        new HighlightRemovalOperationEventListener(this.diagramView, diagramEventBroker);
         diagramEventBroker.subscribe(
-                new ObjectLabelViewPopupMenuHandler(diagramView, this.broker),
+                new ObjectLabelViewPopupMenuHandler(this.diagramView, this.broker),
                 CanvasItemContextMenuRequestEvent.class,
                 ObjectLabelView.class
         );
         new ObjectLabelViewOpenDisplayHandler(diagramEventBroker);
         diagramEventBroker.subscribe(
-                new AttributeLabelViewPopupMenuHandler(diagramView, this.broker),
+                new AttributeLabelViewPopupMenuHandler(this.diagramView, this.broker),
                 CanvasItemContextMenuRequestEvent.class,
                 AttributeLabelView.class
         );
-		new NodeViewPopupMenuHandler(diagramView, diagramEventBroker);
-		new BackgroundPopupMenuHandler(diagramView, diagramEventBroker, this);
+		new NodeViewPopupMenuHandler(this.diagramView, diagramEventBroker);
+		new BackgroundPopupMenuHandler(this.diagramView, diagramEventBroker, this);
 		
 		new LabelClickEventHandler(diagramEventBroker);
         new LabelDragEventHandler(diagramEventBroker);
@@ -271,7 +271,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
 		Dimension minimumSize = new Dimension(50, 50);
 
-        diagramOrganiser = new DiagramOrganiser(this.conceptualSchema, broker);
+		this.diagramOrganiser = new DiagramOrganiser(this.conceptualSchema, this.broker);
 		if (preferences.getBoolean("showDiagramPreview", true)) {
             // set preference in case it is not yet there -- otherwise the options dialog 
             // will show the wrong setting
@@ -284,7 +284,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 			this.diagramPreview.setMinimumFontSize(8.0);
 			this.diagramPreview.setMinimumSize(minimumSize);
 			/// @todo clean/restructure/outsource some of this if we keep it
-			broker.subscribe(new EventBrokerListener() {
+			this.broker.subscribe(new EventBrokerListener() {
 				class FilterChangeHandler implements EventBrokerListener {
 					private DiagramReference diagramReference;
 					FilterChangeHandler(DiagramReference diagramReference) {
@@ -305,67 +305,67 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 							throw new RuntimeException(getClass().getName() +
 									" has to be subscribed to events from NodeViews only");
 						}
-						diagramPreview.setSelectedConcepts(nodeView.getDiagramNode().getConceptNestingList());
+						ToscanaJMainPanel.this.diagramPreview.setSelectedConcepts(nodeView.getDiagramNode().getConceptNestingList());
 						this.diagramReference.setFilterConcept(nodeView.getDiagramNode().getConcept());
 						/// @todo evil hack, creates weird dependencies
-						if(diagramView.getConceptInterpreter() instanceof DatabaseConnectedConceptInterpreter) {
+						if(ToscanaJMainPanel.this.diagramView.getConceptInterpreter() instanceof DatabaseConnectedConceptInterpreter) {
 							DatabaseConnectedConceptInterpreter dbint = 
-										(DatabaseConnectedConceptInterpreter) diagramView.getConceptInterpreter();
+										(DatabaseConnectedConceptInterpreter) ToscanaJMainPanel.this.diagramView.getConceptInterpreter();
 							dbint.clearCache();
 						} 
-						diagramView.showDiagram(diagramView.getDiagram());
+						ToscanaJMainPanel.this.diagramView.showDiagram(ToscanaJMainPanel.this.diagramView.getDiagram());
 					}
 				}
 				FilterChangeHandler selectionListener;
 				public void processEvent(Event e) {
 					DiagramReference diagramReference = ((DiagramClickedEvent)e).getDiagramReference();
-					diagramPreview.showDiagram(diagramReference.getDiagram());
+					ToscanaJMainPanel.this.diagramPreview.showDiagram(diagramReference.getDiagram());
 					Concept zoomedConcept = diagramReference.getFilterConcept();
-					EventBroker canvasBroker = diagramPreview.getController().getEventBroker();
-					if(selectionListener != null) {
-						canvasBroker.removeSubscriptions(selectionListener);
+					EventBroker canvasBroker = ToscanaJMainPanel.this.diagramPreview.getController().getEventBroker();
+					if(this.selectionListener != null) {
+						canvasBroker.removeSubscriptions(this.selectionListener);
 					}
 					if(zoomedConcept != null) {
-						diagramPreview.setSelectedConcepts(new Concept[]{zoomedConcept});
-						selectionListener = new FilterChangeHandler(diagramReference);
-						canvasBroker.subscribe(selectionListener,CanvasItemSelectedEvent.class,NodeView.class);
+						ToscanaJMainPanel.this.diagramPreview.setSelectedConcepts(new Concept[]{zoomedConcept});
+						this.selectionListener = new FilterChangeHandler(diagramReference);
+						canvasBroker.subscribe(this.selectionListener,CanvasItemSelectedEvent.class,NodeView.class);
 					}
 				}
 			}, DiagramClickedEvent.class, DiagramReference.class);
 
-			leftHandPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, 
+			this.leftHandPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, 
 															 this.diagramOrganiser, 
 															 this.diagramPreview);
-			leftHandPane.setOneTouchExpandable(true);
-			leftHandPane.setResizeWeight(0);
+			this.leftHandPane.setOneTouchExpandable(true);
+			this.leftHandPane.setResizeWeight(0);
 
-			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-									   leftHandPane, this.diagramView);
+			this.splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+									   this.leftHandPane, this.diagramView);
 		} else {
-			splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+			this.splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
 									   this.diagramOrganiser, this.diagramView);
 		}
         
-        splitPane.setOneTouchExpandable(true);
-        splitPane.setResizeWeight(0);
+		this.splitPane.setOneTouchExpandable(true);
+		this.splitPane.setResizeWeight(0);
 
-        diagramView.setMinimumSize(minimumSize);
-        diagramOrganiser.setMinimumSize(minimumSize);
+        this.diagramView.setMinimumSize(minimumSize);
+        this.diagramOrganiser.setMinimumSize(minimumSize);
         contentPane.add(this.toolbar, BorderLayout.NORTH);
-        contentPane.add(splitPane, BorderLayout.CENTER);
+        contentPane.add(this.splitPane, BorderLayout.CENTER);
         setContentPane(contentPane);
         // restore old position
 		this.setVisible(true);
         preferences.restoreWindowPlacement(this, new Rectangle(10, 10, 900, 700));
 		int mainDividerPos = preferences.getInt("mainDivider", 200);
-		splitPane.setDividerLocation(mainDividerPos);
+		this.splitPane.setDividerLocation(mainDividerPos);
 		int secondaryDividerPos = preferences.getInt("secondaryDivider", 420);
-		if(leftHandPane != null) {
-			leftHandPane.setDividerLocation(secondaryDividerPos);
+		if(this.leftHandPane != null) {
+			this.leftHandPane.setDividerLocation(secondaryDividerPos);
 		}
 
 		buildMenuBar();
-		setJMenuBar(menubar);
+		setJMenuBar(this.menubar);
         
         this.readingHelpDialog = new ReadingHelpDialog(this, diagramEventBroker);
     }
@@ -401,79 +401,79 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
      *  build the MenuBar
      */
     private void buildMenuBar() {
-        if (menubar == null) {
+        if (this.menubar == null) {
             // create menu bar
-            menubar = new JMenuBar();
+        	this.menubar = new JMenuBar();
         } else {
-            menubar.removeAll();
+        	this.menubar.removeAll();
         }
 
         // create the FILE menu
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
 
-        menubar.add(fileMenu);
+        this.menubar.add(fileMenu);
         fileMenu.add(this.openFileAction);
 
         // we add the export options only if we can export at all
         if (this.diagramExportSettings != null) {
-            fileMenu.add(exportDiagramAction);
+            fileMenu.add(this.exportDiagramAction);
         }
 
         // separator
         fileMenu.addSeparator();
 
         // menu item PRINT
-        printMenuItem = new JMenuItem("Print...");
-        printMenuItem.setMnemonic(KeyEvent.VK_P);
-        printMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+        this.printMenuItem = new JMenuItem("Print...");
+        this.printMenuItem.setMnemonic(KeyEvent.VK_P);
+        this.printMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_P, ActionEvent.CTRL_MASK));
-        printMenuItem.addActionListener(new ActionListener(){
+        this.printMenuItem.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				printDiagram();
 			}
 		});
-        printMenuItem.setEnabled(false);
-        fileMenu.add(printMenuItem);
+        this.printMenuItem.setEnabled(false);
+        fileMenu.add(this.printMenuItem);
 
         // menu item PRINT SETUP
-        printSetupMenuItem = new JMenuItem("Print Setup...");
-        printSetupMenuItem.addActionListener(new ActionListener(){
+        this.printSetupMenuItem = new JMenuItem("Print Setup...");
+        this.printSetupMenuItem.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				pageFormat = PrinterJob.getPrinterJob().pageDialog(pageFormat);
+				ToscanaJMainPanel.this.pageFormat = PrinterJob.getPrinterJob().pageDialog(ToscanaJMainPanel.this.pageFormat);
 		  		printDiagram();
 			}
 		});
-        printSetupMenuItem.setEnabled(true);
-        fileMenu.add(printSetupMenuItem);
+        this.printSetupMenuItem.setEnabled(true);
+        fileMenu.add(this.printSetupMenuItem);
         
         // separator
         fileMenu.addSeparator();
 
         // recent edited files will be in this menu
-        mruMenu = new JMenu("Reopen");
-        mruMenu.setMnemonic(KeyEvent.VK_R);
-        fileMenu.add(mruMenu);
+        this.mruMenu = new JMenu("Reopen");
+        this.mruMenu.setMnemonic(KeyEvent.VK_R);
+        fileMenu.add(this.mruMenu);
 
         // separator
         fileMenu.addSeparator();
 
         // menu item EXIT
-        exitMenuItem = new JMenuItem("Exit");
-        exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+        this.exitMenuItem = new JMenuItem("Exit");
+        this.exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_F4, ActionEvent.ALT_MASK));
-        exitMenuItem.addActionListener(new ActionListener(){
+        this.exitMenuItem.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				closeMainPanel();
 			}
 		});
-        fileMenu.add(exitMenuItem);
+        fileMenu.add(this.exitMenuItem);
 
         // create the DIAGRAM menu
         JMenu diagrMenu = new JMenu("Diagram");
         diagrMenu.setMnemonic(KeyEvent.VK_D);
-        menubar.add(diagrMenu);
-        diagrMenu.add(goBackAction);
+        this.menubar.add(diagrMenu);
+        diagrMenu.add(this.goBackAction);
         diagrMenu.addSeparator();
 
         // menu radio buttons group:
@@ -484,7 +484,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                 KeyEvent.VK_F, ActionEvent.CTRL_MASK));
         this.filterExactMenuItem.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				diagramView.setFilterMode(ConceptInterpretationContext.CONTINGENT);
+				ToscanaJMainPanel.this.diagramView.setFilterMode(ConceptInterpretationContext.CONTINGENT);
 				updateLabelViews();
 			}
 		});
@@ -497,7 +497,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         this.filterAllMenuItem.setSelected(true);
         this.filterAllMenuItem.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				diagramView.setFilterMode(ConceptInterpretationContext.EXTENT);
+				ToscanaJMainPanel.this.diagramView.setFilterMode(ConceptInterpretationContext.EXTENT);
 		  		updateLabelViews();
 			}
 		});
@@ -519,8 +519,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 			}
 		});        
         this.noNestingMenuItem.setSelected(true);
-        nestingGroup.add(noNestingMenuItem);
-        diagrMenu.add(noNestingMenuItem);
+        nestingGroup.add(this.noNestingMenuItem);
+        diagrMenu.add(this.noNestingMenuItem);
         this.nestingLevel1MenuItem = new JRadioButtonMenuItem("Nested Diagram");
         this.nestingLevel1MenuItem.setMnemonic(KeyEvent.VK_N);
         this.nestingLevel1MenuItem.setAccelerator(KeyStroke.getKeyStroke(
@@ -530,13 +530,13 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 				DiagramController.getController().setNestingLevel(1);
 			}
 		}); 
-        nestingGroup.add(nestingLevel1MenuItem);
-        diagrMenu.add(nestingLevel1MenuItem);
+        nestingGroup.add(this.nestingLevel1MenuItem);
+        diagrMenu.add(this.nestingLevel1MenuItem);
 
         // create the view menu
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
-        menubar.add(viewMenu);
+        this.menubar.add(viewMenu);
 
         ButtonGroup documentsDisplayGroup = new ButtonGroup();
         this.showExactMenuItem = new JRadioButtonMenuItem("Show only exact matches");
@@ -574,7 +574,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 				boolean newState = !AttributeLabelView.allAreHidden();
 				showAttributeLabels.setSelected(!newState);
 				AttributeLabelView.setAllHidden(newState);
-				diagramView.repaint();
+				ToscanaJMainPanel.this.diagramView.repaint();
 			}
 		});
 		viewMenu.add(showAttributeLabels);
@@ -587,7 +587,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 				boolean newState = !ObjectLabelView.allAreHidden();
 				showObjectLabels.setSelected(!newState);
 				ObjectLabelView.setAllHidden(newState);
-				diagramView.repaint();
+				ToscanaJMainPanel.this.diagramView.repaint();
 			}
 		});
 		viewMenu.add(showObjectLabels);
@@ -597,7 +597,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		JMenuItem showInfoViewItem = new JMenuItem("Show Concept Information...");
         showInfoViewItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                readingHelpDialog.setVisible(true);
+            	ToscanaJMainPanel.this.readingHelpDialog.setVisible(true);
             }
         });
         
@@ -612,22 +612,22 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 			final SignificanceLegend legendItem = new SignificanceLegend(new Font("sans-serif",Font.PLAIN, 12),new Point2D.Double(0,0),redGreenGradient);
 			if(this.legendMoveManipulator == null) {
 				this.legendMoveManipulator = 
-					new ItemMovementManipulator(diagramView, SignificanceLegend.class, diagramView.getController().getEventBroker());
+					new ItemMovementManipulator(this.diagramView, SignificanceLegend.class, this.diagramView.getController().getEventBroker());
 			}
             final JCheckBoxMenuItem showOrthogonalityMenuItem = new JCheckBoxMenuItem("Analyze orthogonality");
             showOrthogonalityMenuItem.addActionListener(new ActionListener() {
                 private IntervalType lastIntervalType; 
                 public void actionPerformed(ActionEvent e) {
-                    DiagramSchema diagramSchema = diagramView.getDiagramSchema();
+                    DiagramSchema diagramSchema = ToscanaJMainPanel.this.diagramView.getDiagramSchema();
                     if(showOrthogonalityMenuItem.isSelected()) {
                         this.lastIntervalType = diagramSchema.getGradientType();
                         setDiagramGradient(redGreenGradient, ConceptInterpreter.INTERVAL_TYPE_ORTHOGONALTIY);
-                        diagramView.getConceptInterpreter().showDeviation(true);
+                        ToscanaJMainPanel.this.diagramView.getConceptInterpreter().showDeviation(true);
                     } else {
                         setDiagramGradient(diagramSchema.getDefaultGradient(), this.lastIntervalType);
-                        diagramView.getConceptInterpreter().showDeviation(false);
+                        ToscanaJMainPanel.this.diagramView.getConceptInterpreter().showDeviation(false);
                     }
-                    diagramView.updateLabelEntries();
+                    ToscanaJMainPanel.this.diagramView.updateLabelEntries();
                 }
             });
             viewMenu.add(showOrthogonalityMenuItem);
@@ -635,8 +635,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             JMenuItem showSignificanceLegendMenuItem = new JMenuItem("Show Significance Legend");
             showSignificanceLegendMenuItem.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e) {
-					diagramView.addCanvasItem(legendItem);
-					diagramView.repaint();
+                	ToscanaJMainPanel.this.diagramView.addCanvasItem(legendItem);
+                	ToscanaJMainPanel.this.diagramView.repaint();
                 }
             });
             viewMenu.add(showSignificanceLegendMenuItem);
@@ -644,31 +644,31 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
         if (preferences.getBoolean("offerGradientOptions", false)) {
             viewMenu.addSeparator();
-            final DiagramSchema diagramSchema = diagramView.getDiagramSchema();
+            final DiagramSchema diagramSchema = this.diagramView.getDiagramSchema();
             ButtonGroup colorGradientGroup = new ButtonGroup();
-            JRadioButtonMenuItem showExactMenuItem = new JRadioButtonMenuItem("Use colors for exact matches");
-            showExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+            JRadioButtonMenuItem showExactGradientMenuItem = new JRadioButtonMenuItem("Use colors for exact matches");
+            showExactGradientMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK));
-            showExactMenuItem.setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
-            showExactMenuItem.addActionListener(new ActionListener() {
+            showExactGradientMenuItem.setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
+            showExactGradientMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
 					setDiagramGradient(diagramSchema.getDefaultGradient(), ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
                 }
             });
-            colorGradientGroup.add(showExactMenuItem);
-            viewMenu.add(showExactMenuItem);
+            colorGradientGroup.add(showExactGradientMenuItem);
+            viewMenu.add(showExactGradientMenuItem);
 
-            JRadioButtonMenuItem showAllMenuItem = new JRadioButtonMenuItem("Use colors for all matches");
-            showAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+            JRadioButtonMenuItem showAllGradientMenuItem = new JRadioButtonMenuItem("Use colors for all matches");
+            showAllGradientMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
-            showAllMenuItem.setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_EXTENT);
-            showAllMenuItem.addActionListener(new ActionListener() {
+            showAllGradientMenuItem.setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_EXTENT);
+            showAllGradientMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
 					setDiagramGradient(diagramSchema.getDefaultGradient(), ConceptInterpreter.INTERVAL_TYPE_EXTENT);
                 }
             });
-            colorGradientGroup.add(showAllMenuItem);
-            viewMenu.add(showAllMenuItem);
+            colorGradientGroup.add(showAllGradientMenuItem);
+            viewMenu.add(showAllGradientMenuItem);
 
         }
 
@@ -680,8 +680,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     KeyEvent.VK_N, ActionEvent.CTRL_MASK));
             nodeSizeExactMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    diagramView.getDiagramSchema().setNodeSizeScalingType(ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
-                    diagramView.update(this);
+                	ToscanaJMainPanel.this.diagramView.getDiagramSchema().setNodeSizeScalingType(ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
+                	ToscanaJMainPanel.this.diagramView.update(this);
                 }
             });
             nodeSizeScalingGroup.add(nodeSizeExactMenuItem);
@@ -692,8 +692,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     KeyEvent.VK_N, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
             nodeSizeAllMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    diagramView.getDiagramSchema().setNodeSizeScalingType(ConceptInterpreter.INTERVAL_TYPE_EXTENT);
-                    diagramView.update(this);
+                	ToscanaJMainPanel.this.diagramView.getDiagramSchema().setNodeSizeScalingType(ConceptInterpreter.INTERVAL_TYPE_EXTENT);
+                	ToscanaJMainPanel.this.diagramView.update(this);
                 }
             });
             nodeSizeScalingGroup.add(nodeSizeAllMenuItem);
@@ -702,14 +702,14 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             JRadioButtonMenuItem nodeSizeFixedMenuItem = new JRadioButtonMenuItem("Fixed node sizes");
             nodeSizeFixedMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    diagramView.getDiagramSchema().setNodeSizeScalingType(ConceptInterpreter.INTERVAL_TYPE_FIXED);
-                    diagramView.update(this);
+                	ToscanaJMainPanel.this.diagramView.getDiagramSchema().setNodeSizeScalingType(ConceptInterpreter.INTERVAL_TYPE_FIXED);
+                	ToscanaJMainPanel.this.diagramView.update(this);
                 }
             });
             nodeSizeScalingGroup.add(nodeSizeFixedMenuItem);
             viewMenu.add(nodeSizeFixedMenuItem);
             
-            ConceptInterpreter.IntervalType nodeSizeScaling = diagramView.getDiagramSchema().getNodeSizeScalingType();
+            ConceptInterpreter.IntervalType nodeSizeScaling = this.diagramView.getDiagramSchema().getNodeSizeScalingType();
             if(nodeSizeScaling == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT) {
                 nodeSizeExactMenuItem.setSelected(true);
             } else if(nodeSizeScaling == ConceptInterpreter.INTERVAL_TYPE_EXTENT) {
@@ -757,7 +757,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     } // others don't get an accelerator
                     menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            diagramView.setQuery(query);
+                        	ToscanaJMainPanel.this.diagramView.setQuery(query);
                         }
                     });
                     labelContentGroup.add(menuItem);
@@ -765,7 +765,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     if (first == true) {
                         first = false;
                         menuItem.setSelected(true);
-                        diagramView.setQuery(query);
+                        this.diagramView.setQuery(query);
                     }
                 }
             }
@@ -779,7 +779,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 			fontRangeMenuItem.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					JMenuItem source = (JMenuItem) e.getSource();
-					diagramView.setMinimumFontSize(0);
+					ToscanaJMainPanel.this.diagramView.setMinimumFontSize(0);
 					source.setSelected(true);
 				}
 			});
@@ -793,11 +793,11 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 					public void actionPerformed(ActionEvent e) {
 						JMenuItem source = (JMenuItem) e.getSource();
 						int newFontSize = Integer.parseInt(source.getText());					
-						diagramView.setMinimumFontSize(newFontSize);
+						ToscanaJMainPanel.this.diagramView.setMinimumFontSize(newFontSize);
 						source.setSelected(true);
 					}
 				});
-				if(diagramView.getMinimumFontSize() == fontRange){
+				if(this.diagramView.getMinimumFontSize() == fontRange){
 					fontRangeMenuItem.setSelected(true);
 				}				
 				fontRange+=2;
@@ -860,9 +860,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     setDiagramSchema(DiagramSchema.getCurrentSchema());
                     // at least the line grouping for the equivalence classes need 
                     // a full update of the diagram
-                    diagramView.showDiagram(diagramView.getDiagram());
-                    if(diagramPreview != null) {
-                        diagramPreview.showDiagram(diagramPreview.getDiagram());
+                    ToscanaJMainPanel.this.diagramView.showDiagram(ToscanaJMainPanel.this.diagramView.getDiagram());
+                    if(ToscanaJMainPanel.this.diagramPreview != null) {
+                    	ToscanaJMainPanel.this.diagramPreview.showDiagram(ToscanaJMainPanel.this.diagramPreview.getDiagram());
                     }
                     buildMenuBar();
                 }
@@ -873,8 +873,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         // create a help menu
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic(KeyEvent.VK_H);
-        menubar.add(Box.createHorizontalGlue());
-        menubar.add(helpMenu);
+        this.menubar.add(Box.createHorizontalGlue());
+        this.menubar.add(helpMenu);
 
         // add description entries if available
         if (this.conceptualSchema != null) {
@@ -894,17 +894,17 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                 entriesAdded = true;
             }
             if (this.conceptualSchema.hasDiagramDescription()) {
-                diagramDescriptionMenuItem = new JMenuItem("Diagram Description...");
-                diagramDescriptionMenuItem.setMnemonic(KeyEvent.VK_D);
-                diagramDescriptionMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+            	this.diagramDescriptionMenuItem = new JMenuItem("Diagram Description...");
+            	this.diagramDescriptionMenuItem.setMnemonic(KeyEvent.VK_D);
+            	this.diagramDescriptionMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                         KeyEvent.VK_F1, ActionEvent.SHIFT_MASK));
-                diagramDescriptionMenuItem.addActionListener(new ActionListener() {
+            	this.diagramDescriptionMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         showDiagramDescription();
                     }
                 });
-                diagramDescriptionMenuItem.setEnabled(false);
-                helpMenu.add(diagramDescriptionMenuItem);
+            	this.diagramDescriptionMenuItem.setEnabled(false);
+                helpMenu.add(this.diagramDescriptionMenuItem);
                 entriesAdded = true;
             }
             if (entriesAdded) {
@@ -924,7 +924,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     }
 
 	private void setDiagramGradient(Gradient gradient, IntervalType intervalType) {
-		DiagramSchema diagramSchema = diagramView.getDiagramSchema();
+		DiagramSchema diagramSchema = this.diagramView.getDiagramSchema();
 		diagramSchema.setGradientType(intervalType);
 		diagramSchema.setGradient(gradient);
 		this.diagramView.update(this);
@@ -944,37 +944,37 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
      *  Build the ToolBar.
      */
     private void buildToolBar() {
-        toolbar = new JToolBar();
-        toolbar.setFloatable(true);
-        toolbar.add(this.openFileAction);
-        toolbar.add(this.goBackAction);
-        toolbar.add(Box.createHorizontalGlue());
-        diagramContextDescriptionButton = new JButton("Analysis History...");
-		diagramContextDescriptionButton.addActionListener(new ActionListener() {
+        this.toolbar = new JToolBar();
+        this.toolbar.setFloatable(true);
+        this.toolbar.add(this.openFileAction);
+        this.toolbar.add(this.goBackAction);
+        this.toolbar.add(Box.createHorizontalGlue());
+        this.diagramContextDescriptionButton = new JButton("Analysis History...");
+        this.diagramContextDescriptionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showDiagramContextDescription();
 			}
 		});
-		diagramContextDescriptionButton.setVisible(true);
-		diagramContextDescriptionButton.setEnabled(false);
-		toolbar.add(diagramContextDescriptionButton);
-		schemaDescriptionButton = new JButton("About System...");
-        schemaDescriptionButton.addActionListener(new ActionListener() {
+        this.diagramContextDescriptionButton.setVisible(true);
+        this.diagramContextDescriptionButton.setEnabled(false);
+        this.toolbar.add(this.diagramContextDescriptionButton);
+        this.schemaDescriptionButton = new JButton("About System...");
+        this.schemaDescriptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showSchemaDescription();
             }
         });
-        schemaDescriptionButton.setVisible(false);
-        toolbar.add(schemaDescriptionButton);
-        diagramDescriptionButton = new JButton("About Diagram...");
-        diagramDescriptionButton.addActionListener(new ActionListener() {
+        this.schemaDescriptionButton.setVisible(false);
+        this.toolbar.add(this.schemaDescriptionButton);
+        this.diagramDescriptionButton = new JButton("About Diagram...");
+        this.diagramDescriptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showDiagramDescription();
             }
         });
-        diagramDescriptionButton.setVisible(false);
-        diagramDescriptionButton.setEnabled(false);
-        toolbar.add(diagramDescriptionButton);
+        this.diagramDescriptionButton.setVisible(false);
+        this.diagramDescriptionButton.setEnabled(false);
+        this.toolbar.add(this.diagramDescriptionButton);
     }
 
     /**
@@ -1041,9 +1041,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         
         // store current position
         preferences.storeWindowPlacement(this);
-		preferences.putInt("mainDivider", splitPane.getDividerLocation());
-		if(leftHandPane != null) {
-			preferences.putInt("secondaryDivider", leftHandPane.getDividerLocation());
+		preferences.putInt("mainDivider", this.splitPane.getDividerLocation());
+		if(this.leftHandPane != null) {
+			preferences.putInt("secondaryDivider", this.leftHandPane.getDividerLocation());
 		}
         // save the MRU list
         preferences.putStringList("mruFiles", this.mruList);
@@ -1108,8 +1108,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         }
         DatabaseInfo databaseInfo;
         try {
-            conceptualSchema = CSXParser.parse(broker, schemaFile);
-            databaseInfo = conceptualSchema.getDatabaseInfo();
+            this.conceptualSchema = CSXParser.parse(this.broker, schemaFile);
+            databaseInfo = this.conceptualSchema.getDatabaseInfo();
             if (databaseInfo != null) {
                 DatabaseConnection.getConnection().connect(databaseInfo);
                 URL location = databaseInfo.getEmbeddedSQLLocation();
@@ -1135,32 +1135,32 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             e.printStackTrace();
             return;
         }
-		diagramView.showDiagram(null);
-		if(diagramPreview != null) {
-			diagramPreview.showDiagram(null);
+		this.diagramView.showDiagram(null);
+		if(this.diagramPreview != null) {
+			this.diagramPreview.showDiagram(null);
 		}
         DiagramController controller = DiagramController.getController();
         ConceptInterpretationContext interpretationContext = new ConceptInterpretationContext(controller.getDiagramHistory(),
-                broker);
-        diagramView.setConceptInterpreter(this.conceptualSchema.getConceptInterpreter());
-        diagramView.setConceptInterpretationContext(interpretationContext);
+                this.broker);
+        this.diagramView.setConceptInterpreter(this.conceptualSchema.getConceptInterpreter());
+        this.diagramView.setConceptInterpretationContext(interpretationContext);
         updateLabelViews();
-        diagramOrganiser.setConceptualSchema(conceptualSchema);
+        this.diagramOrganiser.setConceptualSchema(this.conceptualSchema);
         DiagramController.getController().reset();
         DiagramController.getController().addObserver(this.diagramView);
 
         // enable relevant buttons and menus
-        fileIsOpen = true;
-        resetButtons(fileIsOpen);
-        if (conceptualSchema.getDescription() != null) {
-            schemaDescriptionButton.setVisible(true);
+        this.fileIsOpen = true;
+        resetButtons(this.fileIsOpen);
+        if (this.conceptualSchema.getDescription() != null) {
+        	this.schemaDescriptionButton.setVisible(true);
         } else {
-            schemaDescriptionButton.setVisible(false);
+        	this.schemaDescriptionButton.setVisible(false);
         }
-        if (conceptualSchema.hasDiagramDescription()) {
-            diagramDescriptionButton.setVisible(true);
+        if (this.conceptualSchema.hasDiagramDescription()) {
+        	this.diagramDescriptionButton.setVisible(true);
         } else {
-            diagramDescriptionButton.setVisible(false);
+        	this.diagramDescriptionButton.setVisible(false);
         }
 
         // update MRU list
@@ -1196,10 +1196,10 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         this.mruMenu.removeAll();
         boolean empty = true; // will be used to check if we have at least one entry
         if (this.mruList.size() > 0) {
-            ListIterator it = mruList.listIterator(mruList.size() - 1);
+            ListIterator it = this.mruList.listIterator(this.mruList.size() - 1);
             while (it.hasPrevious()) {
                 String cur = (String) it.previous();
-                if (cur.equals(currentFile)) {
+                if (cur.equals(this.currentFile)) {
                     // don't enlist the current file
                     continue;
                 }
@@ -1228,7 +1228,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             PrinterJob printJob = PrinterJob.getPrinterJob();
             if (printJob.printDialog()) {
                 try {
-					printJob.setPrintable(this.diagramView, pageFormat);
+					printJob.setPrintable(this.diagramView, this.pageFormat);
                     printJob.print();
                 } catch (Exception e) {
                 	ErrorDialog.showError(this, e, "Printing failed");
@@ -1309,14 +1309,14 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     }
 
 	public ConceptualSchema getConceptualSchema() {
-		return conceptualSchema;
+		return this.conceptualSchema;
 	}
 
 	private void updateWindowTitle() {
 		// get the current filename without the extension and full path
 		// we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
-		if(currentFile != null){
-			String filename = currentFile.substring(currentFile.lastIndexOf("\\")+1,(currentFile.length()-4));
+		if(this.currentFile != null){
+			String filename = this.currentFile.substring(this.currentFile.lastIndexOf("\\")+1,(this.currentFile.length()-4));
 			setTitle(filename +" - "+WINDOW_TITLE);
 		} else {
 			setTitle(WINDOW_TITLE);

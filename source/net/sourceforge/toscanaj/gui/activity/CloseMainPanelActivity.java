@@ -13,11 +13,11 @@ public class CloseMainPanelActivity implements SimpleActivity {
     MainPanel frame;
 
     public CloseMainPanelActivity(MainPanel a_frame) {
-        frame = a_frame;
+    	this.frame = a_frame;
     }
 
     public boolean doActivity() {
-        frame.closeMainPanel();
+    	this.frame.closeMainPanel();
         return true;
     }
 }

@@ -132,8 +132,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         super("Elba");
 
         this.eventBroker = new EventBroker();
-        this.conceptualSchema = new ConceptualSchema(eventBroker);
-        this.databaseConnection = new DatabaseConnection(eventBroker);
+        this.conceptualSchema = new ConceptualSchema(this.eventBroker);
+        this.databaseConnection = new DatabaseConnection(this.eventBroker);
         DatabaseConnection.setConnection(this.databaseConnection);
 
         this.diagramExportSettings = new DiagramExportSettings();
@@ -156,7 +156,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                                                         diagramView.getMinimumFontSize());
         diagramView.setMinimumFontSize(minLabelFontSize);
 
-        mruList = preferences.getStringList("mruFiles");
+        this.mruList = preferences.getStringList("mruFiles");
         createMenuBar();
         
         this.lastCSCFile = new File(preferences.get("lastCSCFile", ""));
@@ -165,7 +165,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         // if we have at least one MRU file try to open it
         if (this.mruList.size() > 0) {
             File schemaFile =
-                new File((String) mruList.get(mruList.size() - 1));
+                new File((String) this.mruList.get(this.mruList.size() - 1));
             if (schemaFile.canRead()) {
                 openSchemaFile(schemaFile);
             }
@@ -184,15 +184,15 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
     public void createViews() {
         JPanel mainView = new JPanel(new BorderLayout());
-        connectionInformationView =
+        this.connectionInformationView =
             new DatabaseConnectionInformationView(
                 this,
-                conceptualSchema,
-                eventBroker);
-        schemaDescriptionView = new XMLEditorDialog(this, "System description");
-        toolbar = new JToolBar();
-        newDiagramButton = new JButton("New Diagram...");
-        newDiagramButton.addActionListener(new ActionListener() {
+                this.conceptualSchema,
+                this.eventBroker);
+        this.schemaDescriptionView = new XMLEditorDialog(this, "System description");
+        this.toolbar = new JToolBar();
+        this.newDiagramButton = new JButton("New Diagram...");
+        this.newDiagramButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showScaleGeneratorMenu();
             }
@@ -201,11 +201,11 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         JButton schemaDescriptionButton = new JButton("System Description...");
         schemaDescriptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                schemaDescriptionView.setContent(
-                    conceptualSchema.getDescription());
-                schemaDescriptionView.setVisible(true);
-                conceptualSchema.setDescription(
-                    schemaDescriptionView.getContent());
+            	ElbaMainPanel.this.schemaDescriptionView.setContent(
+            			ElbaMainPanel.this.conceptualSchema.getDescription());
+            	ElbaMainPanel.this.schemaDescriptionView.setVisible(true);
+            	ElbaMainPanel.this.conceptualSchema.setDescription(
+            			ElbaMainPanel.this.schemaDescriptionView.getContent());
             }
         });
 
@@ -217,14 +217,14 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             }
         });
 
-        toolbar.add(newDiagramButton);
-        toolbar.add(schemaDescriptionButton);
-        toolbar.add(databaseConnectionButton);
+        this.toolbar.add(this.newDiagramButton);
+        this.toolbar.add(schemaDescriptionButton);
+        this.toolbar.add(databaseConnectionButton);
 
-        diagramEditingView =
-            new DiagramEditingView(this, conceptualSchema, eventBroker);
-        diagramEditingView.setDividerLocation(preferences.getInt("diagramViewDivider", 200));
-        DiagramView diagramView = diagramEditingView.getDiagramView();
+        this.diagramEditingView =
+            new DiagramEditingView(this, this.conceptualSchema, this.eventBroker);
+        this.diagramEditingView.setDividerLocation(preferences.getInt("diagramViewDivider", 200));
+        DiagramView diagramView = this.diagramEditingView.getDiagramView();
         diagramView.setObjectLabelFactory(SqlClauseLabelView.getFactory());
 
         diagramView.getController().getEventBroker().subscribe(
@@ -235,12 +235,12 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         diagramView.getController().getEventBroker().subscribe(
             new SqlClauseEditingLabelViewPopupMenuHandler(
                 diagramView,
-                eventBroker),
+                this.eventBroker),
             CanvasItemContextMenuRequestEvent.class,
             SqlClauseLabelView.getFactory().getLabelClass());
 
-        mainView.add(toolbar,BorderLayout.NORTH);
-        mainView.add(diagramEditingView,BorderLayout.CENTER);
+        mainView.add(this.toolbar,BorderLayout.NORTH);
+        mainView.add(this.diagramEditingView,BorderLayout.CENTER);
         setContentPane(mainView);
     }
 
@@ -258,8 +258,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                     try {
                         Context context =
                             generator.generateScale(
-                                conceptualSchema,
-                                databaseConnection);
+                            		ElbaMainPanel.this.conceptualSchema,
+                            		ElbaMainPanel.this.databaseConnection);
                         Diagram2D newDiagram = null;
                         Lattice lattice = null;
                         if (context != null) {
@@ -274,15 +274,15 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                                 Diagram2D diagramWithSameTitle = null;
                                 int indexOfExistingDiagram = -1;
                                 for (int i = 0;
-                                    i < conceptualSchema.getNumberOfDiagrams();
+                                    i < ElbaMainPanel.this.conceptualSchema.getNumberOfDiagrams();
                                     i++) {
-                                    if (conceptualSchema
+                                    if (ElbaMainPanel.this.conceptualSchema
                                         .getDiagram(i)
                                         .getTitle()
                                         .equalsIgnoreCase(
                                             newDiagram.getTitle())) {
                                         diagramWithSameTitle =
-                                            conceptualSchema.getDiagram(i);
+                                        	ElbaMainPanel.this.conceptualSchema.getDiagram(i);
                                         indexOfExistingDiagram = i;
                                     }
                                 }
@@ -300,8 +300,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                                             diagramWithSameTitle);
                                     }
                                 } else {
-                                    conceptualSchema.addDiagram(newDiagram);
-                                    diagramEditingView
+                                	ElbaMainPanel.this.conceptualSchema.addDiagram(newDiagram);
+                                	ElbaMainPanel.this.diagramEditingView
                                         .getDiagramView()
                                         .showDiagram(
                                         newDiagram);
@@ -319,14 +319,14 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                     Diagram2D returnValue,
                     Diagram2D diagramWithSameTitle,
                     int indexOfExistingDiagram) {
-                    conceptualSchema.addDiagram(returnValue);
+                	ElbaMainPanel.this.conceptualSchema.addDiagram(returnValue);
                     if (indexOfExistingDiagram != -1) {
-                        conceptualSchema.exchangeDiagrams(
-                            (conceptualSchema.getNumberOfDiagrams() - 1),
+                    	ElbaMainPanel.this.conceptualSchema.exchangeDiagrams(
+                            (ElbaMainPanel.this.conceptualSchema.getNumberOfDiagrams() - 1),
                             indexOfExistingDiagram);
-                        conceptualSchema.removeDiagram(diagramWithSameTitle);
+                    	ElbaMainPanel.this.conceptualSchema.removeDiagram(diagramWithSameTitle);
                     } else {
-                        conceptualSchema.removeDiagram(diagramWithSameTitle);
+                    	ElbaMainPanel.this.conceptualSchema.removeDiagram(diagramWithSameTitle);
                     }
                 }
                 private void renameTitle(
@@ -357,7 +357,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                     SimpleLineDiagram lineDiag =
                         (SimpleLineDiagram) returnValue;
                     lineDiag.setTitle(inputValue);
-                    conceptualSchema.addDiagram(lineDiag);
+                    ElbaMainPanel.this.conceptualSchema.addDiagram(lineDiag);
                 }
 
                 private int showTitleExistsDialog(Diagram2D returnValue) {
@@ -409,25 +409,25 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
     protected void fillScaleGeneratorList() {
         this.scaleGenerators = new ArrayList();
-        scaleGenerators.add(new AttributeListScaleGenerator(this));
-        scaleGenerators.add(
+        this.scaleGenerators.add(new AttributeListScaleGenerator(this));
+        this.scaleGenerators.add(
             new ContextTableScaleGenerator(this, this.eventBroker));
-        scaleGenerators.add(new NominalScaleGenerator(this));
-        scaleGenerators.add(new OrdinalScaleGenerator(this));
-        scaleGenerators.add(new CrossordinalScaleGenerator(this));
+        this.scaleGenerators.add(new NominalScaleGenerator(this));
+        this.scaleGenerators.add(new OrdinalScaleGenerator(this));
+        this.scaleGenerators.add(new CrossordinalScaleGenerator(this));
     }
 
     public void createMenuBar() {
-        final DiagramView diagramView = diagramEditingView.getDiagramView();
+        final DiagramView diagramView = this.diagramEditingView.getDiagramView();
         final JFrame parent = this;
 
-        saveActivity =
-            new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
+        this.saveActivity =
+            new SaveConceptualSchemaActivity(this.conceptualSchema, this.eventBroker);
         if(this.saveAsFileAction == null) {
             this.saveAsFileAction =
                         new SaveFileAction(
                             this,
-                            saveActivity,
+                            this.saveActivity,
                             KeyEvent.VK_A,
                             KeyStroke.getKeyStroke(
                                 KeyEvent.VK_S,
@@ -435,8 +435,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         }
         this.saveAsFileAction.setPostSaveActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
-                setCurrentFile(saveAsFileAction.getLastFileUsed());
-                conceptualSchema.dataSaved();
+                setCurrentFile(ElbaMainPanel.this.saveAsFileAction.getLastFileUsed());
+                ElbaMainPanel.this.conceptualSchema.dataSaved();
                 return true;
             }
         });
@@ -447,13 +447,13 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         });
 
         // --- menu bar ---
-        menuBar = new JMenuBar();
-        setJMenuBar(menuBar);
+        this.menuBar = new JMenuBar();
+        setJMenuBar(this.menuBar);
 
         // --- file menu ---
-        fileMenu = new JMenu("File");
-        fileMenu.setMnemonic(KeyEvent.VK_F);
-        menuBar.add(fileMenu);
+        this.fileMenu = new JMenu("File");
+        this.fileMenu.setMnemonic(KeyEvent.VK_F);
+        this.menuBar.add(this.fileMenu);
 
         SimpleActivity testSchemaSavedActivity = new SimpleActivity() {
             public boolean doActivity() throws Exception {
@@ -461,15 +461,15 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             }
         };
         NewConceptualSchemaActivity newSchemaActivity =
-            new NewConceptualSchemaActivity(eventBroker);
+            new NewConceptualSchemaActivity(this.eventBroker);
         newSchemaActivity.setTestNewOkActivity(testSchemaSavedActivity);
         newSchemaActivity.setPostNewActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
-                currentFile = null;
+            	ElbaMainPanel.this.currentFile = null;
                 updateWindowTitle();
                 showDatabaseConnectionDialog();
                 DatabaseViewerManager.resetRegistry();
-                return databaseConnection.isConnected();
+                return ElbaMainPanel.this.databaseConnection.isConnected();
             }
         });
         SimpleAction newAction =
@@ -483,26 +483,26 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         JMenuItem newMenuItem = new JMenuItem("New");
         newMenuItem.setMnemonic(KeyEvent.VK_N);
         newMenuItem.addActionListener(newAction);
-        fileMenu.add(newMenuItem);
+        this.fileMenu.add(newMenuItem);
 
         LoadConceptualSchemaActivity loadSchemaActivity =
-            new LoadConceptualSchemaActivity(eventBroker);
+            new LoadConceptualSchemaActivity(this.eventBroker);
         loadSchemaActivity.setTestOpenOkActivity(testSchemaSavedActivity);
         OpenFileAction openFileAction =
             new OpenFileAction(
                 this,
                 loadSchemaActivity,
-                currentFile,
+                this.currentFile,
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         openFileAction.addPostOpenActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
                 updateWindowTitle();
-                if (conceptualSchema.getDatabaseInfo() != null) {
+                if (ElbaMainPanel.this.conceptualSchema.getDatabaseInfo() != null) {
                     return true;
                 }
                 showDatabaseConnectionDialog();
-                return databaseConnection.isConnected();
+                return ElbaMainPanel.this.databaseConnection.isConnected();
             }
         });
 
@@ -511,14 +511,14 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         openMenuItem.setAccelerator(
             KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         openMenuItem.addActionListener(openFileAction);
-        fileMenu.add(openMenuItem);
+        this.fileMenu.add(openMenuItem);
 
-        mruMenu = new JMenu("Reopen");
-        mruMenu.setMnemonic(KeyEvent.VK_R);
+        this.mruMenu = new JMenu("Reopen");
+        this.mruMenu.setMnemonic(KeyEvent.VK_R);
         recreateMruMenu();
-        fileMenu.add(mruMenu);
+        this.fileMenu.add(this.mruMenu);
 
-        fileMenu.addSeparator();
+        this.fileMenu.addSeparator();
 
         JMenuItem saveMenuItem = new JMenuItem("Save");
         saveMenuItem.setMnemonic(KeyEvent.VK_S);
@@ -529,14 +529,14 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 saveFile();
             }
         });
-        fileMenu.add(saveMenuItem);
+        this.fileMenu.add(saveMenuItem);
 
         JMenuItem saveAsMenuItem = new JMenuItem("Save As...");
         saveAsMenuItem.setMnemonic(KeyEvent.VK_A);
-        saveAsMenuItem.addActionListener(saveAsFileAction);
-        fileMenu.add(saveAsMenuItem);
+        saveAsMenuItem.addActionListener(this.saveAsFileAction);
+        this.fileMenu.add(saveAsMenuItem);
 
-        fileMenu.addSeparator();
+        this.fileMenu.addSeparator();
 
         JMenuItem importCSCMenuItem = new JMenuItem("Import CSC File...");
         importCSCMenuItem.setMnemonic(KeyEvent.VK_I);
@@ -545,13 +545,13 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 importCSC();
             }
         });
-        fileMenu.add(importCSCMenuItem);
+        this.fileMenu.add(importCSCMenuItem);
 
         // we add the export options only if we can export at all
         /// @todo reduce duplicate code with ToscanaJMainPanel
         if (this.diagramExportSettings != null) {
             Frame frame = JOptionPane.getFrameForComponent(this);
-            exportDiagramAction =
+            this.exportDiagramAction =
                 new ExportDiagramAction(
                     frame,
                     this.diagramExportSettings,
@@ -560,10 +560,10 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                     KeyStroke.getKeyStroke(
                         KeyEvent.VK_E,
                         ActionEvent.CTRL_MASK));
-            fileMenu.add(exportDiagramAction);
-            exportDiagramAction.setEnabled(false);
+            this.fileMenu.add(this.exportDiagramAction);
+            this.exportDiagramAction.setEnabled(false);
 
-            fileMenu.addSeparator();
+            this.fileMenu.addSeparator();
         }
 
         // --- file exit item ---
@@ -577,13 +577,13 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 "Exit",
                 KeyEvent.VK_X,
                 KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK)));
-        fileMenu.add(exitMenuItem);
+        this.fileMenu.add(exitMenuItem);
 
         JMenu editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
         editMenu.add(diagramView.getUndoManager().getUndoAction());
         editMenu.add(diagramView.getUndoManager().getRedoAction());
-        menuBar.add(editMenu);
+        this.menuBar.add(editMenu);
         
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
@@ -649,32 +649,32 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         });
         viewMenu.add(showObjectLabels);
 
-        menuBar.add(viewMenu);
+        this.menuBar.add(viewMenu);
 
         JMenu toolMenu = new JMenu("Tools");
         toolMenu.setMnemonic(KeyEvent.VK_T);
-        dumpStatisticalDataMenuItem =
+        this.dumpStatisticalDataMenuItem =
             new JMenuItem("Export Realized Scales...");
-        dumpStatisticalDataMenuItem.setMnemonic(KeyEvent.VK_S);
-        dumpStatisticalDataMenuItem.addActionListener(new ActionListener() {
+        this.dumpStatisticalDataMenuItem.setMnemonic(KeyEvent.VK_S);
+        this.dumpStatisticalDataMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 exportStatisticalData();
             }
         });
-        dumpStatisticalDataMenuItem.setEnabled(false);
-		toolMenu.add(dumpStatisticalDataMenuItem);
-		dumpSQLMenuItem = new JMenuItem("Export Database as SQL...");
-		dumpSQLMenuItem.setMnemonic(KeyEvent.VK_D);
-		dumpSQLMenuItem.addActionListener(new ActionListener() {
+        this.dumpStatisticalDataMenuItem.setEnabled(false);
+		toolMenu.add(this.dumpStatisticalDataMenuItem);
+		this.dumpSQLMenuItem = new JMenuItem("Export Database as SQL...");
+		this.dumpSQLMenuItem.setMnemonic(KeyEvent.VK_D);
+		this.dumpSQLMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				exportSQLScript();
 			}
 		});
-		dumpSQLMenuItem.setEnabled(false);
-		toolMenu.add(dumpSQLMenuItem);
-		createOptimizedSystemMenuItem = new JMenuItem("Create Speed Optimized System...");
-		createOptimizedSystemMenuItem.setMnemonic(KeyEvent.VK_O);
-		createOptimizedSystemMenuItem.addActionListener(new ActionListener() {
+		this.dumpSQLMenuItem.setEnabled(false);
+		toolMenu.add(this.dumpSQLMenuItem);
+		this.createOptimizedSystemMenuItem = new JMenuItem("Create Speed Optimized System...");
+		this.createOptimizedSystemMenuItem.setMnemonic(KeyEvent.VK_O);
+		this.createOptimizedSystemMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
                 checkForMissingSave();
                 int result = JOptionPane.showOptionDialog(parent, 
@@ -693,21 +693,21 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 }
 			}
 		});
-		createOptimizedSystemMenuItem.setEnabled(false);
-        toolMenu.add(createOptimizedSystemMenuItem);
+		this.createOptimizedSystemMenuItem.setEnabled(false);
+        toolMenu.add(this.createOptimizedSystemMenuItem);
         
         toolMenu.addSeparator();
         
 		this.checkContextAction = new CheckContextConsistencyAction(this.conceptualSchema,
     													this.databaseConnection, 
     													this, this.eventBroker);
-        toolMenu.add(checkContextAction);
-        menuBar.add(toolMenu);
+        toolMenu.add(this.checkContextAction);
+        this.menuBar.add(toolMenu);
 
         // --- help menu ---
         // create a help menu
-        helpMenu = new JMenu("Help");
-        helpMenu.setMnemonic(KeyEvent.VK_H);
+        this.helpMenu = new JMenu("Help");
+        this.helpMenu.setMnemonic(KeyEvent.VK_H);
 
         JMenuItem aboutItem = new JMenuItem("About Elba...");
         aboutItem.setMnemonic(KeyEvent.VK_A);
@@ -716,18 +716,18 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 ToscanaJMainPanel.showAboutDialog(parent);
             }
         });
-        helpMenu.add(aboutItem);
+        this.helpMenu.add(aboutItem);
 
-        menuBar.add(Box.createHorizontalGlue());
-        menuBar.add(helpMenu);
+        this.menuBar.add(Box.createHorizontalGlue());
+        this.menuBar.add(this.helpMenu);
     }
 
     private void updateWindowTitle() {
         // get the current filename without the extension and full path
         // we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
-        if (currentFile != null) {
+        if (this.currentFile != null) {
             String filename =
-                currentFile.getName().substring(0,currentFile.getName().length() - 4);
+            	this.currentFile.getName().substring(0,this.currentFile.getName().length() - 4);
             setTitle(filename + " - " + WINDOW_TITLE);
         } else {
             setTitle(WINDOW_TITLE);
@@ -765,7 +765,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
     private void openSchemaFile(File schemaFile) {
         try {
-            conceptualSchema = CSXParser.parse(eventBroker, schemaFile);
+        	this.conceptualSchema = CSXParser.parse(this.eventBroker, schemaFile);
             setCurrentFile(schemaFile);
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(
@@ -773,21 +773,21 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 e,
                 "Could not find file",
                 e.getMessage());
-            conceptualSchema = new ConceptualSchema(eventBroker);
+            this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         } catch (IOException e) {
             ErrorDialog.showError(
                 this,
                 e,
                 "Could not open file",
                 e.getMessage());
-            conceptualSchema = new ConceptualSchema(eventBroker);
+            this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         } catch (DataFormatException e) {
             ErrorDialog.showError(
                 this,
                 e,
                 "Could not read file",
                 e.getMessage());
-            conceptualSchema = new ConceptualSchema(eventBroker);
+            this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         } catch (Exception e) {
             ErrorDialog.showError(
                 this,
@@ -795,19 +795,19 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 "Could not open file",
                 e.getMessage());
             e.printStackTrace();
-            conceptualSchema = new ConceptualSchema(eventBroker);
+            this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         }
     }
 
     private void recreateMruMenu() {
-        if (mruMenu == null) { // no menu yet
+        if (this.mruMenu == null) { // no menu yet
             return;
         }
         this.mruMenu.removeAll();
         boolean empty = true;
         // will be used to check if we have at least one entry
         if (this.mruList.size() > 0) {
-            ListIterator it = mruList.listIterator(mruList.size());
+            ListIterator it = this.mruList.listIterator(this.mruList.size());
             while (it.hasPrevious()) {
                 String cur = (String) it.previous();
                 if (this.currentFile != null && 
@@ -831,7 +831,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     }
 
     public EventBroker getEventBroker() {
-        return eventBroker;
+        return this.eventBroker;
     }
 
     public void closeMainPanel() {
@@ -853,7 +853,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
     protected boolean checkForMissingSave() throws HeadlessException {
         boolean closeOk;
-        if (!conceptualSchema.isDataSaved()) {
+        if (!this.conceptualSchema.isDataSaved()) {
             int returnValue = showFileChangedDialog();
             if (returnValue == 0) {
                 // save
@@ -884,9 +884,9 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 schemaEvent.getConceptualSchema();
             if (newConceptualSchema != this.conceptualSchema) {
                 this.conceptualSchema = newConceptualSchema;
-                if (schemaDescriptionView != null) {
-                    schemaDescriptionView.setContent(
-                        conceptualSchema.getDescription());
+                if (this.schemaDescriptionView != null) {
+                	this.schemaDescriptionView.setContent(
+                			this.conceptualSchema.getDescription());
                 }
                 connectDatabase();
             }
@@ -911,17 +911,17 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         this.dumpSQLMenuItem.setEnabled(false);
         this.createOptimizedSystemMenuItem.setEnabled(false);
         disconnectDatabase();
-        DatabaseInfo databaseInformation = conceptualSchema.getDatabaseInfo();
+        DatabaseInfo databaseInformation = this.conceptualSchema.getDatabaseInfo();
         if (databaseInformation != null
             && databaseInformation.getDriverClass() != null
             && databaseInformation.getURL() != null) {
             try {
-                DatabaseConnection.setConnection(databaseConnection);
-                databaseConnection.connect(databaseInformation);
+                DatabaseConnection.setConnection(this.databaseConnection);
+                this.databaseConnection.connect(databaseInformation);
                 URL location =
-                    conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
+                	this.conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
                 if (location != null) {
-                    databaseConnection.executeScript(location);
+                	this.databaseConnection.executeScript(location);
                 }
             } catch (DatabaseException ex) {
                 ErrorDialog.showError(
@@ -937,9 +937,9 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     }
 
     protected void disconnectDatabase() {
-        if (databaseConnection.isConnected()) {
+        if (this.databaseConnection.isConnected()) {
             try {
-                databaseConnection.disconnect();
+            	this.databaseConnection.disconnect();
             } catch (DatabaseException ex) {
                 ErrorDialog.showError(
                     this,
@@ -986,7 +986,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             ErrorDialog.showError(this, e, "Import failed");
         }
         if (openNewSchema.isSelected()) {
-			currentFile = null;
+        	this.currentFile = null;
 			updateWindowTitle();
             if(this.conceptualSchema.getDatabaseInfo() == null) {
     			showDatabaseConnectionDialog();
@@ -1136,8 +1136,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 			for (int i = 0; i < this.conceptualSchema.getNumberOfDiagrams(); i++) {
 				String columnName = "__diagram" + i + "__";
 				try {
-					databaseConnection.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " INTEGER;");
-					databaseConnection.executeUpdate("CREATE INDEX " + columnName + "index ON " + tableName + "("+ columnName + ");");
+					this.databaseConnection.executeUpdate("ALTER TABLE " + tableName + " ADD COLUMN " + columnName + " INTEGER;");
+					this.databaseConnection.executeUpdate("CREATE INDEX " + columnName + "index ON " + tableName + "("+ columnName + ");");
 				} catch (DatabaseException e) {
 					// that is ok, we just had this column before
 				}
@@ -1150,7 +1150,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 	                if(concept.getObjectContingentSize() != 0) {
 						String oldWhereClause = WhereClauseGenerator.createClause(concept.getObjectContingentIterator());
 						String newWhereClause = columnName + " = " + contingentCount;
-                        databaseConnection.executeUpdate("UPDATE " + tableName + 
+						this.databaseConnection.executeUpdate("UPDATE " + tableName + 
 														" SET " + newWhereClause +
 														" WHERE " + oldWhereClause + ";");
 						concept.removeObjectContingent();
@@ -1165,7 +1165,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 		}
     	
     	/// @todo it is not really obvious in the UI what is going on -- this is just a hack to get things going
-    	saveAsFileAction.actionPerformed(null);
+		this.saveAsFileAction.actionPerformed(null);
     }
 
     private void saveFile() {
@@ -1173,7 +1173,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             this.saveAsFileAction.saveFile();
         } else {
             try {
-                saveActivity.processFile(this.currentFile);
+            	this.saveActivity.processFile(this.currentFile);
                 this.conceptualSchema.dataSaved();
             } catch (Exception e) {
                 ErrorDialog.showError(this, e, "Saving file failed");
@@ -1200,8 +1200,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
     protected void showDatabaseConnectionDialog() {
         disconnectDatabase();
-        connectionInformationView.setVisible(true);
-        if (!connectionInformationView.newConnectionWasSet()) {
+        this.connectionInformationView.setVisible(true);
+        if (!this.connectionInformationView.newConnectionWasSet()) {
             // reconnect to the old connection
             connectDatabase();
         }

@@ -84,7 +84,7 @@ public class DescriptionViewer {
             contentPane.add(scrollview, BorderLayout.CENTER);
             contentPane.add(buttonPane, BorderLayout.SOUTH);
             
-            this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+            this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
             this.addWindowListener(new WindowAdapter() {
             	public void windowClosing(WindowEvent e) {
                     closeDialog();
@@ -97,7 +97,7 @@ public class DescriptionViewer {
             this.setVisible(false);
         }
 
-        private void showDescription(Element description, URL baseURL) {
+        private void showDescription(Element description) {
             if (description.getName().equalsIgnoreCase("externalHTML")) {
                 String urlAttr = description.getAttributeValue("url");
                 if (urlAttr != null) {
@@ -130,6 +130,7 @@ public class DescriptionViewer {
     }
 
     private DescriptionViewer() {
+    	// not to be used
     }
 
     public static void setBaseLocation(String baseLocation) {
@@ -148,7 +149,7 @@ public class DescriptionViewer {
     public static void show(Frame parent, Element description) {
         ViewerDialog dialog = new ViewerDialog(parent);
         preferences.restoreWindowPlacement(dialog, new Rectangle(100, 100, 300, 300));
-        dialog.showDescription(description, baseURL);
+        dialog.showDescription(description);
         dialog.setVisible(true);
     }
 }

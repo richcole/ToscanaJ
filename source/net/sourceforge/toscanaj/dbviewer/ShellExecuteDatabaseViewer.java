@@ -65,18 +65,18 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
         this.viewerManager = manager;
 
         // @todo need errorchecking on columnName here
-        String columnName = (String) viewerManager.getParameters().get("columnName");
+        String columnName = (String) this.viewerManager.getParameters().get("columnName");
         if(columnName == null) {
             throw new DatabaseViewerException("Parameter 'columnName' not given.");
         }
-        fieldNames.add(columnName);
+        this.fieldNames.add(columnName);
     }
 
     public void showView(String whereClause) throws DatabaseViewerException {
         String resourceLocation = "";
         try {
-            List results = this.viewerManager.getConnection().executeQuery(fieldNames,
-                    viewerManager.getTableName(),
+            List results = this.viewerManager.getConnection().executeQuery(this.fieldNames,
+            		this.viewerManager.getTableName(),
                     whereClause);
             Vector fields = (Vector) results.get(0);
             Iterator itFields = fields.iterator();

@@ -30,7 +30,7 @@ public class CanvasFeedbackMessage extends CanvasItem {
 	private String message;
 	private Canvas canvas;
 	private Rectangle2D bounds;
-	private Point2D pos;
+	private Point2D position;
 	
 	private static final long HOLD_TIME = 3000;
 	private static final long FADE_TIME = 300;
@@ -44,7 +44,7 @@ public class CanvasFeedbackMessage extends CanvasItem {
 	
 	private class CanvasCallbackHandler implements EventBrokerListener {
         public void processEvent(Event e) {
-        	canvas.repaint();
+        	CanvasFeedbackMessage.this.canvas.repaint();
         }
 	}
 	
@@ -56,12 +56,12 @@ public class CanvasFeedbackMessage extends CanvasItem {
 		this.fadeOutTime = this.fadeInTime + HOLD_TIME;
 		this.endTime = this.fadeOutTime + FADE_TIME;
 		
-		this.pos = pos;
+		this.position = pos;
 		
 		this.canvas.addCanvasItem(this);
-        canvasCallbackHandler = new CanvasCallbackHandler();
+		this.canvasCallbackHandler = new CanvasCallbackHandler();
         this.canvas.getController().getEventBroker().subscribe(
-					canvasCallbackHandler, CanvasDrawnEvent.class, Object.class
+        		this.canvasCallbackHandler, CanvasDrawnEvent.class, Object.class
 		);
 		
 		canvas.repaint();
@@ -123,7 +123,7 @@ public class CanvasFeedbackMessage extends CanvasItem {
 
     public Point2D getPosition() {
     	if(this.bounds == null) {
-    		return pos;
+    		return this.position;
     	}
         return new Point2D.Double(this.bounds.getCenterX(), this.bounds.getCenterY());
     }
@@ -137,8 +137,8 @@ public class CanvasFeedbackMessage extends CanvasItem {
     	g.setFont(getRescaledMessageFont(g));
         double marginX = getRescaledXMargin(g);
         double marginY = getRescaledYMargin(g);
-        double cx = pos.getX();
-        double cy = pos.getY();
+        double cx = this.position.getX();
+        double cy = this.position.getY();
         double width = g.getFontMetrics().stringWidth(this.message);
         double height = g.getFontMetrics().getHeight();
         this.bounds = new Rectangle2D.Double(cx -width/2 - marginX, cy - height/2 - marginY, width + 2 * marginX, height + 2 * marginY);

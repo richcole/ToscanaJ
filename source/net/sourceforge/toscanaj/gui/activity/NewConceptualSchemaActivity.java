@@ -26,7 +26,7 @@ public class NewConceptualSchemaActivity implements SimpleActivity {
     			return false;
     		}
     	}
-		new ConceptualSchema(broker);
+		new ConceptualSchema(this.broker);
 		if(this.postNewActivity != null) {
 			this.postNewActivity.doActivity();
 		}

@@ -62,19 +62,19 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
 
         protected void showView(String whereClause) {
             try {
-                fieldNames = new LinkedList();
-                fieldNames.add(viewerManager.getKeyName());
-                List results = viewerManager.getConnection().executeQuery(fieldNames,
-                        viewerManager.getTableName(),
+            	this.fieldNames = new LinkedList();
+            	this.fieldNames.add(PagingDatabaseViewer.this.viewerManager.getKeyName());
+                List results = PagingDatabaseViewer.this.viewerManager.getConnection().executeQuery(this.fieldNames,
+                		PagingDatabaseViewer.this.viewerManager.getTableName(),
                         whereClause);
-                keyValues = new String[results.size()];
+                this.keyValues = new String[results.size()];
                 int i = 0;
                 for (Iterator iterator = results.iterator(); iterator.hasNext();) {
                     Vector vector = (Vector) iterator.next();
-                    keyValues[i] = (String) vector.get(0);
+                    this.keyValues[i] = (String) vector.get(0);
                     i++;
                 }
-                position = 0;
+                this.position = 0;
                 enableButtons();
                 showCurrentItem();
                 setVisible(true);
@@ -102,44 +102,44 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
             this.viewPanel = createPanel();
             
             getRootPane().setDefaultButton(closeButton);
-            navStartButton = new JButton("<<");
-            navStartButton.addActionListener(new ActionListener() {
+            this.navStartButton = new JButton("<<");
+            this.navStartButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     start();
                 }
             });
-            navPrevButton = new JButton("<");
-            navPrevButton.addActionListener(new ActionListener() {
+            this.navPrevButton = new JButton("<");
+            this.navPrevButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     prev();
                 }
             });
-            navNextButton = new JButton(">");
-            navNextButton.addActionListener(new ActionListener() {
+            this.navNextButton = new JButton(">");
+            this.navNextButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     next();
                 }
             });
-            navEndButton = new JButton(">>");
-            navEndButton.addActionListener(new ActionListener() {
+            this.navEndButton = new JButton(">>");
+            this.navEndButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     end();
                 }
             });
 
-            infoLabel = new JLabel("");
+            this.infoLabel = new JLabel("");
 
             //Lay out the buttons from left to right.
             JPanel buttonPane = new JPanel();
             buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.X_AXIS));
             buttonPane.setBorder(BorderFactory.createEtchedBorder());//(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-            buttonPane.add(navStartButton);
-            buttonPane.add(navPrevButton);
-            buttonPane.add(navNextButton);
-            buttonPane.add(navEndButton);
+            buttonPane.add(this.navStartButton);
+            buttonPane.add(this.navPrevButton);
+            buttonPane.add(this.navNextButton);
+            buttonPane.add(this.navEndButton);
             buttonPane.add(Box.createHorizontalGlue());
-            buttonPane.add(infoLabel);
+            buttonPane.add(this.infoLabel);
             buttonPane.add(Box.createHorizontalGlue());
             buttonPane.add(closeButton);
 
@@ -157,41 +157,41 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
 
         private void enableButtons() {
             int last = this.keyValues.length - 1;
-            this.navStartButton.setEnabled(position != 0);
-            this.navEndButton.setEnabled(position != last);
-            this.navPrevButton.setEnabled(position != 0);
-            this.navNextButton.setEnabled(position != last);
+            this.navStartButton.setEnabled(this.position != 0);
+            this.navEndButton.setEnabled(this.position != last);
+            this.navPrevButton.setEnabled(this.position != 0);
+            this.navNextButton.setEnabled(this.position != last);
         }
 
         private void next() {
-            position++;
+        	this.position++;
             showCurrentItem();
             enableButtons();
         }
 
         private void prev() {
-            position--;
+        	this.position--;
             showCurrentItem();
             enableButtons();
         }
 
         private void showCurrentItem() {
             try {
-                this.viewPanel.showItem(keyValues[position]);
+                this.viewPanel.showItem(this.keyValues[this.position]);
             } catch (DatabaseViewerException e) {
                 ErrorDialog.showError(this, e, "Failed to show item");
             }
-            infoLabel.setText((position + 1) + "/" + keyValues.length);
+            this.infoLabel.setText((this.position + 1) + "/" + this.keyValues.length);
         }
 
         private void start() {
-            position = 0;
+        	this.position = 0;
             showCurrentItem();
             enableButtons();
         }
 
         private void end() {
-            position = keyValues.length - 1;
+        	this.position = this.keyValues.length - 1;
             showCurrentItem();
             enableButtons();
         }

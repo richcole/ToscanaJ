@@ -64,95 +64,95 @@ public class DiagramOrganiser extends JPanel {
         this.schema = conceptualSchema;
 		
         // create view components
-        removeButton = new JButton();
-        addButton = new JButton();
+        this.removeButton = new JButton();
+        this.addButton = new JButton();
         JScrollPane availableDiagramsPanel = new JScrollPane();
         JScrollPane selectedDiagramsPanel = new JScrollPane();
-        availableDiagramsListview = new JList();
-		availableDiagramsListview.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        selectedDiagramsListview = new DiagramHistoryView(DiagramController.getController().getDiagramHistory());
-        selectedDiagramsListview.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.availableDiagramsListview = new JList();
+        this.availableDiagramsListview.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.selectedDiagramsListview = new DiagramHistoryView(DiagramController.getController().getDiagramHistory());
+        this.selectedDiagramsListview.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	    
         // label the buttons
-        addButton.setText("Add Selected");
-        removeButton.setText("Remove Last");
+        this.addButton.setText("Add Selected");
+        this.removeButton.setText("Remove Last");
 
         // fill the upper listview
-        setConceptualSchema(schema);
+        setConceptualSchema(this.schema);
 
         // create the layout
         GridBagLayout mainLayout = new GridBagLayout();
         setLayout(mainLayout);
         add(availableDiagramsPanel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0
                 , GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 50, 800));
-        availableDiagramsPanel.getViewport().add(availableDiagramsListview, null);
+        availableDiagramsPanel.getViewport().add(this.availableDiagramsListview, null);
 
-        add(addButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
+        add(this.addButton, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0
                 , GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 0, 5), 0, 0));
 
         add(selectedDiagramsPanel, new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0
                 , GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 5, 5), 50, 800));
-        selectedDiagramsPanel.getViewport().add(selectedDiagramsListview, null);
+        selectedDiagramsPanel.getViewport().add(this.selectedDiagramsListview, null);
 
-        add(removeButton, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0
+        add(this.removeButton, new GridBagConstraints(0, 3, 1, 1, 0.0, 0.0
                 , GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 5, 5, 5), 0, 0));
 
         // connect the buttons and lists
-        addButton.addActionListener(new ActionListener() {
+        this.addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int index = availableDiagramsListview.getSelectedIndex();
+                int index = DiagramOrganiser.this.availableDiagramsListview.getSelectedIndex();
                 if (index >= 0) {
-                    DiagramController.getController().addDiagram(schema.getDiagram(index));
+                    DiagramController.getController().addDiagram(DiagramOrganiser.this.schema.getDiagram(index));
                 }
             }
         });
 
-        removeButton.addActionListener(new ActionListener() {
+        this.removeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DiagramController.getController().removeLastDiagram();
             }
         });
 
-		availableDiagramsListview.addMouseListener(new MouseAdapter() {
+        this.availableDiagramsListview.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					/// @todo this should be done using an event
-					int index = availableDiagramsListview.locationToIndex(e.getPoint());
-					Diagram2D diagram = schema.getDiagram(index);
+					int index = DiagramOrganiser.this.availableDiagramsListview.locationToIndex(e.getPoint());
+					Diagram2D diagram = DiagramOrganiser.this.schema.getDiagram(index);
 					DiagramController.getController().addDiagram(diagram);
-					selectedDiagramsListview.setSelectedIndices(new int[0]);
+					DiagramOrganiser.this.selectedDiagramsListview.setSelectedIndices(new int[0]);
 					e.consume();
 				}
 			}
 		});
 
-		selectedDiagramsListview.addListSelectionListener(new ListSelectionListener() {
+        this.selectedDiagramsListview.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
-				int index = selectedDiagramsListview.getSelectedIndex();
+				int index = DiagramOrganiser.this.selectedDiagramsListview.getSelectedIndex();
 				if (index == -1) {
 					return;
 				}
 				DiagramHistory diagramHistory = DiagramController.getController().getDiagramHistory();
 				DiagramReference diagramReference = diagramHistory.getReferenceAt(index); 
 				eventBroker.processEvent(new DiagramClickedEvent(diagramReference));            	
-				availableDiagramsListview.setSelectedIndices(new int[0]);
+				DiagramOrganiser.this.availableDiagramsListview.setSelectedIndices(new int[0]);
 			}
 		});
 
-        availableDiagramsListview.addListSelectionListener(new ListSelectionListener() {
+        this.availableDiagramsListview.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-				int index = availableDiagramsListview.getSelectedIndex();
+				int index = DiagramOrganiser.this.availableDiagramsListview.getSelectedIndex();
                 if (index == -1) {
-                    addButton.setEnabled(false);
+                	DiagramOrganiser.this.addButton.setEnabled(false);
                 } else {
-					Diagram2D diagram = schema.getDiagram(index);
+					Diagram2D diagram = DiagramOrganiser.this.schema.getDiagram(index);
 					eventBroker.processEvent(new DiagramClickedEvent(new DiagramReference(diagram, null)));
-					selectedDiagramsListview.setSelectedIndices(new int[0]);
-                    addButton.setEnabled(true);
+					DiagramOrganiser.this.selectedDiagramsListview.setSelectedIndices(new int[0]);
+					DiagramOrganiser.this.addButton.setEnabled(true);
                 }
             }
         });
-        addButton.setEnabled(false);
+        this.addButton.setEnabled(false);
 
         // The remove button can only be used if a diagram in the history is selected
         DiagramController.getController().getDiagramHistory().addListDataListener(
@@ -163,21 +163,20 @@ public class DiagramOrganiser extends JPanel {
 
                     public void intervalAdded(ListDataEvent ev) {
                         int size = DiagramController.getController().getDiagramHistory().getSize();
-                        removeButton.setEnabled(size != 0);
+                        DiagramOrganiser.this.removeButton.setEnabled(size != 0);
                     }
 
                     public void intervalRemoved(ListDataEvent ev) {
                         int size = DiagramController.getController().getDiagramHistory().getSize();
-                        removeButton.setEnabled(size != 0);
+                        DiagramOrganiser.this.removeButton.setEnabled(size != 0);
                     }
                 }
         );
-        removeButton.setEnabled(false);
+        this.removeButton.setEnabled(false);
         
-        new DiagramOrganiserDnDController(availableDiagramsListview , selectedDiagramsListview , this);
+        new DiagramOrganiserDnDController(this.availableDiagramsListview , this.selectedDiagramsListview , this);
     }
     
-
     /**
      * This changes the conceptual schema used for the list of available diagrams.
      */
@@ -194,13 +193,7 @@ public class DiagramOrganiser extends JPanel {
         this.availableDiagramsListview.setListData(listEntries);
     } 
     
-    
-    
     public DiagramCollection getSchema(){
-    	
-    	return schema;
+    	return this.schema;
     }
-    
-  
-
 }

@@ -20,7 +20,7 @@ public class EmitEventActivity implements SimpleActivity {
     }
 
     public boolean doActivity() throws Exception {
-        broker.processEvent(event);
+    	this.broker.processEvent(this.event);
         return true;
     }
 }

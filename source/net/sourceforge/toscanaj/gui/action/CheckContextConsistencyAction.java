@@ -55,7 +55,7 @@ public class CheckContextConsistencyAction extends AbstractAction implements Eve
 	public void actionPerformed(ActionEvent event) {
 		try {
 			Hashtable allProblems = new Hashtable();
-			Iterator it = conceptualSchema.getDiagramsIterator();
+			Iterator it = this.conceptualSchema.getDiagramsIterator();
 			while (it.hasNext()) {
 				Diagram2D curDiagram = (Diagram2D) it.next();
 				List curPoblems = ContextConsistencyChecker.checkConsistency(this.conceptualSchema, curDiagram, this.databaseConnection, this.parent);
@@ -99,7 +99,7 @@ public class CheckContextConsistencyAction extends AbstractAction implements Eve
 			}												
 		}
 		catch (Exception e ) {
-			ErrorDialog.showError(parent, e, "Error checking consistency", "Couldn't check database consistency");
+			ErrorDialog.showError(this.parent, e, "Error checking consistency", "Couldn't check database consistency");
 		}
 		
 	}
@@ -133,7 +133,7 @@ public class CheckContextConsistencyAction extends AbstractAction implements Eve
 			return;
 		}
 		else {
-			if (conceptualSchema.getNumberOfDiagrams() == 0) {
+			if (this.conceptualSchema.getNumberOfDiagrams() == 0) {
 				setEnabled(false);
 				return;
 			}

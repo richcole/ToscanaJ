@@ -205,25 +205,25 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	public SienaMainPanel(boolean loadLastFile) {
         super(WINDOW_TITLE);
 
-        eventBroker = new EventBroker();
-        conceptualSchema = new ConceptualSchema(eventBroker);
+        this.eventBroker = new EventBroker();
+        this.conceptualSchema = new ConceptualSchema(this.eventBroker);
 
         this.diagramExportSettings = new DiagramExportSettings();
 
-        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
-        eventBroker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
+        this.eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+        this.eventBroker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
             
         initializeModel();
 
         createViews();
 
-        mruList = preferences.getStringList("mruFiles");
+        this.mruList = preferences.getStringList("mruFiles");
         createMenuBar();
         
         // if we have at least one MRU file try to open it
         if (loadLastFile && this.mruList.size() > 0) {
             File schemaFile =
-                new File((String) mruList.get(mruList.size() - 1));
+                new File((String) this.mruList.get(this.mruList.size() - 1));
             if (schemaFile.canRead()) {
                 openSchemaFile(schemaFile);
             }
@@ -261,24 +261,24 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	}
 
 	protected void createDiagramEditingView() {
-        this.diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
+        this.diagramEditingView = new DiagramEditingView(this, this.conceptualSchema, this.eventBroker);
         this.temporalControlsLabel = new JLabel("Temporal Concept Analysis:");
         this.temporalControls = new TemporalControlsPanel(
                                             this.diagramEditingView.getDiagramView(),
-                                            diagramExportSettings,
-                                            eventBroker);
+                                            this.diagramExportSettings,
+                                            this.eventBroker);
         boolean temporalControlsEnabled = preferences.getBoolean("temporalControlsEnabled", false); 
         this.temporalControlsLabel.setVisible(temporalControlsEnabled);
         this.temporalControls.setVisible(temporalControlsEnabled);                                    
-        this.diagramEditingView.addAccessory(temporalControlsLabel);
-        this.diagramEditingView.addAccessory(temporalControls);
+        this.diagramEditingView.addAccessory(this.temporalControlsLabel);
+        this.diagramEditingView.addAccessory(this.temporalControls);
 		this.diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
 										this, DisplayedDiagramChangedEvent.class, Object.class);
-		DiagramView diagramView = diagramEditingView.getDiagramView();
+		DiagramView diagramView = this.diagramEditingView.getDiagramView();
 		diagramView.getController().getEventBroker().subscribe(
 			new ObjectEditingLabelViewPopupMenuHandler(
 				diagramView,
-				eventBroker),
+				this.eventBroker),
 			CanvasItemContextMenuRequestEvent.class,
 			ObjectLabelView.getFactory().getLabelClass());
 		this.diagramEditingView.setDividerLocation(preferences.getInt("diagramViewDivider", 200));
@@ -288,19 +288,19 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	 * @todo this method is inconsistent with createDiagramEditingView() in terms of return value.
 	 */
 	protected Component createContextEditingView() {
-		rowHeader = new RowHeader(this.conceptualSchema.getManyValuedContext());
-		tableView = new TableView(this.conceptualSchema.getManyValuedContext());
+		this.rowHeader = new RowHeader(this.conceptualSchema.getManyValuedContext());
+		this.tableView = new TableView(this.conceptualSchema.getManyValuedContext());
 				
-		JScrollPane scrollPane = new JScrollPane(tableView);
-		scrollPane.setRowHeaderView(rowHeader);
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		JScrollPane scrollPane = new JScrollPane(this.tableView);
+		scrollPane.setRowHeaderView(this.rowHeader);
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-		JTableHeader corner = rowHeader.getTableHeader();
+		JTableHeader corner = this.rowHeader.getTableHeader();
         corner.setReorderingAllowed(false);
         corner.setResizingAllowed(false);
 
-        scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, corner);
+        scrollPane.setCorner(ScrollPaneConstants.UPPER_LEFT_CORNER, corner);
 
         new TableRowHeaderResizer(scrollPane).setEnabled(true);
         
@@ -311,18 +311,18 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	}
 
 	private void editObject(int row) {
-		Frame tFrame = JOptionPane.getFrameForComponent(tableView);
-		List objectList = (List) conceptualSchema.getManyValuedContext().getObjects();
+		Frame tFrame = JOptionPane.getFrameForComponent(this.tableView);
+		List objectList = (List) this.conceptualSchema.getManyValuedContext().getObjects();
 		WritableFCAElement object = (WritableFCAElement) objectList.get(row);
 		new ObjectDialog(tFrame, object);
 		this.conceptualSchema.getManyValuedContext().update();
 	}
 
 	private void editAttribute(int column) {
-		Frame tFrame = JOptionPane.getFrameForComponent(tableView);
-		List manyValuedAttributeList = (List) conceptualSchema.getManyValuedContext().getAttributes();
+		Frame tFrame = JOptionPane.getFrameForComponent(this.tableView);
+		List manyValuedAttributeList = (List) this.conceptualSchema.getManyValuedContext().getAttributes();
 		WritableManyValuedAttribute attribute = (WritableManyValuedAttribute) manyValuedAttributeList.get(column);
-		new ManyValuedAttributeDialog(tFrame, attribute, conceptualSchema.getManyValuedContext());
+		new ManyValuedAttributeDialog(tFrame, attribute, this.conceptualSchema.getManyValuedContext());
 		this.conceptualSchema.getManyValuedContext().update();
 	}
 
@@ -331,7 +331,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		final JButton addObjectButton = new JButton("Add object...");
 		addObjectButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	WritableManyValuedContext manyValuedContext = conceptualSchema.getManyValuedContext();
+            	WritableManyValuedContext manyValuedContext = SienaMainPanel.this.conceptualSchema.getManyValuedContext();
                 manyValuedContext.add(new FCAElementImplementation(""));
             	editObject(manyValuedContext.getObjects().size() - 1);
             }
@@ -340,7 +340,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		final JButton addAttributeButton = new JButton("Add attribute...");
 		addAttributeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				WritableManyValuedContext manyValuedContext = conceptualSchema.getManyValuedContext();
+				WritableManyValuedContext manyValuedContext = SienaMainPanel.this.conceptualSchema.getManyValuedContext();
 				Datatype firstType;
 				if (manyValuedContext.getTypes().isEmpty()) {
 					firstType = null;
@@ -367,17 +367,17 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
     public void createMenuBar() {
-        if (menuBar == null) {
-            menuBar = new JMenuBar();
-            setJMenuBar(menuBar);
+        if (this.menuBar == null) {
+        	this.menuBar = new JMenuBar();
+            setJMenuBar(this.menuBar);
         } else {
-            menuBar.removeAll();
+        	this.menuBar.removeAll();
         }
         
         // --- file menu ---
-        fileMenu = new JMenu("File");
-        fileMenu.setMnemonic(KeyEvent.VK_F);
-        menuBar.add(fileMenu);
+        this.fileMenu = new JMenu("File");
+        this.fileMenu.setMnemonic(KeyEvent.VK_F);
+        this.menuBar.add(this.fileMenu);
 
         SimpleActivity testSchemaSavedActivity = new SimpleActivity() {
             public boolean doActivity() throws Exception {
@@ -385,15 +385,15 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             }
         };
         NewConceptualSchemaActivity newSchemaActivity =
-            new NewConceptualSchemaActivity(eventBroker);
+            new NewConceptualSchemaActivity(this.eventBroker);
         newSchemaActivity.setPostNewActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
-                currentFile = null;
+            	SienaMainPanel.this.currentFile = null;
                 updateWindowTitle();
-                conceptualSchema.setManyValuedContext(new ManyValuedContextImplementation());
-				conceptualSchema.dataSaved();
-                rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
-                tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
+                SienaMainPanel.this.conceptualSchema.setManyValuedContext(new ManyValuedContextImplementation());
+                SienaMainPanel.this.conceptualSchema.dataSaved();
+                SienaMainPanel.this.rowHeader.setManyValuedContext(SienaMainPanel.this.conceptualSchema.getManyValuedContext());
+                SienaMainPanel.this.tableView.setManyValuedContext(SienaMainPanel.this.conceptualSchema.getManyValuedContext());
                 return true;
             }
         });
@@ -408,34 +408,34 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         JMenuItem newMenuItem = new JMenuItem("New");
         newMenuItem.setMnemonic(KeyEvent.VK_N);
         newMenuItem.addActionListener(newAction);
-        fileMenu.add(newMenuItem);
+        this.fileMenu.add(newMenuItem);
 
         // @todo check why this code doesn't use openSchema(File)
         LoadConceptualSchemaActivity loadSchemaActivity =
-            new LoadConceptualSchemaActivity(eventBroker);
+            new LoadConceptualSchemaActivity(this.eventBroker);
         loadSchemaActivity.setTestOpenOkActivity(testSchemaSavedActivity);
         OpenFileAction openFileAction =
             new OpenFileAction(
                 this,
                 loadSchemaActivity,
-                currentFile,
+                this.currentFile,
                 KeyEvent.VK_O,
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         openFileAction.addPostOpenActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
                 updateWindowTitle();
-                rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
-                tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
+                SienaMainPanel.this.rowHeader.setManyValuedContext(SienaMainPanel.this.conceptualSchema.getManyValuedContext());
+                SienaMainPanel.this.tableView.setManyValuedContext(SienaMainPanel.this.conceptualSchema.getManyValuedContext());
                 return true;
             }
         });
         JMenuItem openMenuItem = new JMenuItem("Open...");
         openMenuItem.addActionListener(openFileAction);
-        fileMenu.add(openMenuItem);
+        this.fileMenu.add(openMenuItem);
 
-        mruMenu = new JMenu("Reopen");
-        mruMenu.setMnemonic(KeyEvent.VK_R);
-        fileMenu.add(mruMenu);
+        this.mruMenu = new JMenu("Reopen");
+        this.mruMenu.setMnemonic(KeyEvent.VK_R);
+        this.fileMenu.add(this.mruMenu);
 
         JMenuItem saveMenuItem = new JMenuItem("Save...");
         saveMenuItem.setMnemonic(KeyEvent.VK_S);
@@ -446,33 +446,33 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 saveFile();
             }
         });
-        saveActivity =
-            new SaveConceptualSchemaActivity(conceptualSchema, eventBroker);
+        this.saveActivity =
+            new SaveConceptualSchemaActivity(this.conceptualSchema, this.eventBroker);
         if(this.saveAsFileAction == null) {
             this.saveAsFileAction =
                 new SaveFileAction(
                     this,
-                    saveActivity,
+                    this.saveActivity,
                     KeyEvent.VK_S,
                     KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
         }
-        saveAsFileAction.setPostSaveActivity(new SimpleActivity() {
+        this.saveAsFileAction.setPostSaveActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
-                setCurrentFile(saveAsFileAction.getLastFileUsed());
-                conceptualSchema.dataSaved();
+                setCurrentFile(SienaMainPanel.this.saveAsFileAction.getLastFileUsed());
+                SienaMainPanel.this.conceptualSchema.dataSaved();
                 recreateMruMenu();
                 return true;
             }
         });
 
-        fileMenu.add(saveMenuItem);
+        this.fileMenu.add(saveMenuItem);
 
         JMenuItem saveAsMenuItem = new JMenuItem("Save As...");
         saveAsMenuItem.setMnemonic(KeyEvent.VK_A);
-        saveAsMenuItem.addActionListener(saveAsFileAction);
-        fileMenu.add(saveAsMenuItem);
+        saveAsMenuItem.addActionListener(this.saveAsFileAction);
+        this.fileMenu.add(saveAsMenuItem);
 
-        fileMenu.addSeparator();
+        this.fileMenu.addSeparator();
 
         JMenuItem importCernatoXMLItem = new JMenuItem("Import Cernato XML...");
         importCernatoXMLItem.setMnemonic(KeyEvent.VK_C);
@@ -481,7 +481,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 importCernatoXML();
             }
         });
-        fileMenu.add(importCernatoXMLItem);
+        this.fileMenu.add(importCernatoXMLItem);
 
         JMenuItem importBurmeisterItem =
             new JMenuItem("Import Burmeister Format...");
@@ -491,7 +491,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 importBurmeister();
             }
         });
-        fileMenu.add(importBurmeisterItem);
+        this.fileMenu.add(importBurmeisterItem);
 
         JMenuItem importOALItem =
             new JMenuItem("Import Object Attribute List...");
@@ -501,7 +501,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 importObjectAttributeList();
             }
         });
-        fileMenu.add(importOALItem);
+        this.fileMenu.add(importOALItem);
 
         JMenuItem importCSCMenuItem = new JMenuItem("Import CSC File...");
         importCSCMenuItem.setMnemonic(KeyEvent.VK_I);
@@ -510,15 +510,15 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 importCSC();
             }
         });
-        fileMenu.add(importCSCMenuItem);
+        this.fileMenu.add(importCSCMenuItem);
 
-        fileMenu.addSeparator();
+        this.fileMenu.addSeparator();
 
         // we add the export options only if we can export at all
         /// @todo reduce duplicate code with ToscanaJMainPanel
         if (this.diagramExportSettings != null) {
             Frame frame = JOptionPane.getFrameForComponent(this);
-            exportDiagramAction =
+            this.exportDiagramAction =
                 new ExportDiagramAction(
                     frame,
                     this.diagramExportSettings,
@@ -527,36 +527,36 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                     KeyStroke.getKeyStroke(
                         KeyEvent.VK_E,
                         ActionEvent.CTRL_MASK));
-            fileMenu.add(exportDiagramAction);
-            exportDiagramAction.setEnabled(false);
-            fileMenu.addSeparator();
+            this.fileMenu.add(this.exportDiagramAction);
+            this.exportDiagramAction.setEnabled(false);
+            this.fileMenu.addSeparator();
         }
 
         // menu item PRINT
-        printMenuItem = new JMenuItem("Print...");
-        printMenuItem.setMnemonic(KeyEvent.VK_P);
-        printMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+        this.printMenuItem = new JMenuItem("Print...");
+        this.printMenuItem.setMnemonic(KeyEvent.VK_P);
+        this.printMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_P, ActionEvent.CTRL_MASK));
-        printMenuItem.addActionListener(new ActionListener(){
+        this.printMenuItem.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 printDiagram();
             }
         });
-        printMenuItem.setEnabled(false);
-        fileMenu.add(printMenuItem);
+        this.printMenuItem.setEnabled(false);
+        this.fileMenu.add(this.printMenuItem);
 
         // menu item PRINT SETUP
-        printSetupMenuItem = new JMenuItem("Print Setup...");
-        printSetupMenuItem.addActionListener(new ActionListener(){
+        this.printSetupMenuItem = new JMenuItem("Print Setup...");
+        this.printSetupMenuItem.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                pageFormat = PrinterJob.getPrinterJob().pageDialog(pageFormat);
+            	SienaMainPanel.this.pageFormat = PrinterJob.getPrinterJob().pageDialog(SienaMainPanel.this.pageFormat);
                 printDiagram();
             }
         });
-        printSetupMenuItem.setEnabled(true);
-        fileMenu.add(printSetupMenuItem);
+        this.printSetupMenuItem.setEnabled(true);
+        this.fileMenu.add(this.printSetupMenuItem);
         
-        fileMenu.addSeparator();
+        this.fileMenu.addSeparator();
 
         // --- file exit item ---
         JMenuItem exitMenuItem;
@@ -568,7 +568,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 "Exit",
                 KeyEvent.VK_X,
                 KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK)));
-        fileMenu.add(exitMenuItem);
+        this.fileMenu.add(exitMenuItem);
 
         final DiagramView diagramView =
             this.diagramEditingView.getDiagramView();
@@ -577,7 +577,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         editMenu.setMnemonic(KeyEvent.VK_E);
         editMenu.add(diagramView.getUndoManager().getUndoAction());
         editMenu.add(diagramView.getUndoManager().getRedoAction());
-        menuBar.add(editMenu);
+        this.menuBar.add(editMenu);
         
         JMenu viewMenu = new JMenu("View");
         viewMenu.setMnemonic(KeyEvent.VK_V);
@@ -590,7 +590,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         this.showExactMenuItem.setSelected(true);
         this.showExactMenuItem.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                diagramEditingView.getDiagramView().setDisplayType(true);
+            	SienaMainPanel.this.diagramEditingView.getDiagramView().setDisplayType(true);
             }
         }); 
         documentsDisplayGroup.add(this.showExactMenuItem);
@@ -602,7 +602,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 KeyEvent.VK_S, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
         this.showAllMenuItem.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                diagramEditingView.getDiagramView().setDisplayType(false);
+            	SienaMainPanel.this.diagramEditingView.getDiagramView().setDisplayType(false);
             }
         }); 
         documentsDisplayGroup.add(this.showAllMenuItem);
@@ -690,7 +690,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             colorSchemaItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     schema.setAsCurrent();
-                    diagramEditingView.getDiagramView().setDiagramSchema(schema);
+                    SienaMainPanel.this.diagramEditingView.getDiagramView().setDiagramSchema(schema);
                 }
             });
             if(schema == DiagramSchema.getCurrentSchema()) {
@@ -709,19 +709,19 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         showTemporalControls.setSelected(preferences.getBoolean("temporalControlsEnabled", false));
         showTemporalControls.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                boolean newState = !temporalControls.isVisible();
-                temporalControlsLabel.setVisible(newState);
-                temporalControls.setVisible(newState);
+                boolean newState = !SienaMainPanel.this.temporalControls.isVisible();
+                SienaMainPanel.this.temporalControlsLabel.setVisible(newState);
+                SienaMainPanel.this.temporalControls.setVisible(newState);
             }
         });
         viewMenu.add(showTemporalControls);
 
-        menuBar.add(viewMenu);
+        this.menuBar.add(viewMenu);
 
         // --- help menu ---
         // create a help menu
-        helpMenu = new JMenu("Help");
-        helpMenu.setMnemonic(KeyEvent.VK_H);
+        this.helpMenu = new JMenu("Help");
+        this.helpMenu.setMnemonic(KeyEvent.VK_H);
 
         final JFrame parent = this;
         JMenuItem aboutItem = new JMenuItem("About Siena...");
@@ -731,10 +731,10 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 ToscanaJMainPanel.showAboutDialog(parent);
             }
         });
-        helpMenu.add(aboutItem);
+        this.helpMenu.add(aboutItem);
 
-        menuBar.add(Box.createHorizontalGlue());
-        menuBar.add(helpMenu);
+        this.menuBar.add(Box.createHorizontalGlue());
+        this.menuBar.add(this.helpMenu);
     }
     private void addQueryMenuItem(final Query query, JMenu viewMenu, ButtonGroup labelContentGroup, int mnemonic) {
         String name = query.getName();
@@ -742,12 +742,12 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         menuItem.setMnemonic(mnemonic);
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                diagramEditingView.getDiagramView().setQuery(query);
+            	SienaMainPanel.this.diagramEditingView.getDiagramView().setQuery(query);
             }
         });
         if(labelContentGroup.getSelection() == null) {
             menuItem.setSelected(true);
-            diagramEditingView.getDiagramView().setQuery(query);
+            this.diagramEditingView.getDiagramView().setQuery(query);
         }
         labelContentGroup.add(menuItem);
         viewMenu.add(menuItem);
@@ -791,7 +791,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         WritableManyValuedContext model = createManyValuedContext(inputModel);
         this.conceptualSchema.setManyValuedContext(model);
-        addDiagrams(conceptualSchema, inputModel);
+        addDiagrams(this.conceptualSchema, inputModel);
 		this.tableView.setManyValuedContext(model);
 		this.rowHeader.setManyValuedContext(model);
         
@@ -955,7 +955,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
         if (newSchemaButton.isSelected()) {
             this.conceptualSchema = new ConceptualSchema(this.eventBroker);
-            currentFile = null;
+            this.currentFile = null;
             updateWindowTitle();
         }
         File[] files = openDialog.getSelectedFiles();
@@ -978,7 +978,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             return;
         }
         addDiagram(
-            conceptualSchema,
+        	this.conceptualSchema,
             context,
             context.getName(),
             new DefaultDimensionStrategy());
@@ -1055,7 +1055,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         }
         if (newSchemaButton.isSelected()) {
             this.conceptualSchema = new ConceptualSchema(this.eventBroker);
-            currentFile = null;
+            this.currentFile = null;
             updateWindowTitle();
         }
         File[] files = openDialog.getSelectedFiles();
@@ -1078,7 +1078,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             return;
         }
         addDiagram(
-            conceptualSchema,
+        	this.conceptualSchema,
             context,
             context.getName(),
             new DefaultDimensionStrategy());
@@ -1172,7 +1172,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
     public EventBroker getEventBroker() {
-        return eventBroker;
+        return this.eventBroker;
     }
 
     public void closeMainPanel() {
@@ -1204,7 +1204,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         // store current position
         preferences.storeWindowPlacement(this);
         preferences.putInt("diagramViewDivider",
-                           diagramEditingView.getDividerLocation());
+        		this.diagramEditingView.getDividerLocation());
         
         System.exit(0);
     }
@@ -1213,7 +1213,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         if (e instanceof ConceptualSchemaChangeEvent) {
             ConceptualSchemaChangeEvent schemaEvent =
                 (ConceptualSchemaChangeEvent) e;
-            conceptualSchema = schemaEvent.getConceptualSchema();
+            this.conceptualSchema = schemaEvent.getConceptualSchema();
         }
         if (e instanceof ConceptualSchemaLoadedEvent) {
             ConceptualSchemaLoadedEvent loadEvent =
@@ -1221,8 +1221,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             if(this.conceptualSchema.getManyValuedContext() == null) {
                 this.conceptualSchema.setManyValuedContext(createManyValuedContextFromDiagrams());
             }
-            this.rowHeader.setManyValuedContext(conceptualSchema.getManyValuedContext());
-            this.tableView.setManyValuedContext(conceptualSchema.getManyValuedContext());
+            this.rowHeader.setManyValuedContext(this.conceptualSchema.getManyValuedContext());
+            this.tableView.setManyValuedContext(this.conceptualSchema.getManyValuedContext());
             setCurrentFile(loadEvent.getFile());
         } else if (e instanceof NewConceptualSchemaEvent) {
             setCurrentFile(null);
@@ -1238,7 +1238,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	 */
     private void updateWindowTitle() {
         // get the current filename without the extension and full path
-        if (currentFile != null) {
+        if (this.currentFile != null) {
             String filename =
                 this.currentFile.getName().substring(0,this.currentFile.getName().length() - 4);
             setTitle(filename + " - " + WINDOW_TITLE);
@@ -1248,14 +1248,14 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
     private void recreateMruMenu() {
-        if (mruMenu == null) { // no menu yet
+        if (this.mruMenu == null) { // no menu yet
             return;
         }
         this.mruMenu.removeAll();
         boolean empty = true;
         // will be used to check if we have at least one entry
         if (this.mruList.size() > 0) {
-            ListIterator it = mruList.listIterator(mruList.size());
+            ListIterator it = this.mruList.listIterator(this.mruList.size());
             while (it.hasPrevious()) {
                 String cur = (String) it.previous();
                 if (this.currentFile != null && 
@@ -1280,28 +1280,28 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     private void openSchemaFile(File schemaFile) {
         try {
-            this.conceptualSchema = CSXParser.parse(eventBroker, schemaFile);
+            this.conceptualSchema = CSXParser.parse(this.eventBroker, schemaFile);
         } catch (FileNotFoundException e) {
             ErrorDialog.showError(
                 this,
                 e,
                 "Could not find file",
                 e.getMessage());
-            conceptualSchema = new ConceptualSchema(eventBroker);
+            this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         } catch (IOException e) {
             ErrorDialog.showError(
                 this,
                 e,
                 "Could not open file",
                 e.getMessage());
-            conceptualSchema = new ConceptualSchema(eventBroker);
+            this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         } catch (DataFormatException e) {
             ErrorDialog.showError(
                 this,
                 e,
                 "Could not read file",
                 e.getMessage());
-            conceptualSchema = new ConceptualSchema(eventBroker);
+            this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         } catch (Exception e) {
             ErrorDialog.showError(
                 this,
@@ -1309,7 +1309,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 "Could not open file",
                 e.getMessage());
             e.printStackTrace();
-            conceptualSchema = new ConceptualSchema(eventBroker);
+            this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         }
     }
 
@@ -1346,7 +1346,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     protected boolean checkForMissingSave() throws HeadlessException {
         boolean closeOk;
-        if (!conceptualSchema.isDataSaved()) {
+        if (!this.conceptualSchema.isDataSaved()) {
             int returnValue = showFileChangedDialog();
             if (returnValue == 0) {
                 // save
@@ -1393,7 +1393,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             this.saveAsFileAction.saveFile();
         } else {
             try {
-                saveActivity.processFile(this.currentFile);
+            	this.saveActivity.processFile(this.currentFile);
                 this.conceptualSchema.dataSaved();
             } catch (Exception e) {
                 ErrorDialog.showError(this, e, "Saving file failed");
@@ -1524,7 +1524,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             PrinterJob printJob = PrinterJob.getPrinterJob();
             if (printJob.printDialog()) {
                 try {
-                    printJob.setPrintable(this.diagramEditingView.getDiagramView(), pageFormat);
+                    printJob.setPrintable(this.diagramEditingView.getDiagramView(), this.pageFormat);
                     printJob.print();
                 } catch (Exception e) {
                     ErrorDialog.showError(this, e, "Printing failed");

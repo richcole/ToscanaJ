@@ -47,11 +47,11 @@ public class SimpleDatabaseViewer extends PagingDatabaseViewer {
 	    public void showItem(String keyValue) {
 	        try {
 	            DatabaseViewerManager viewerManager = getManager();
-	            List results = viewerManager.getConnection().executeQuery(fieldNames,
+	            List results = viewerManager.getConnection().executeQuery(this.fieldNames,
 	                    viewerManager.getTableName(),
 	                    "WHERE " + viewerManager.getKeyName() + "='" + keyValue + "'");
 	            Vector fields = (Vector) results.get(0);
-	            Iterator itText = textFragments.iterator();
+	            Iterator itText = this.textFragments.iterator();
 	            Iterator itFields = fields.iterator();
 	            String output = "";
 	            while (itFields.hasNext()) { // we assume length(textFragements) = length(results) + 1
@@ -81,12 +81,12 @@ public class SimpleDatabaseViewer extends PagingDatabaseViewer {
 	            throw new DatabaseViewerException("No template found");
 	        }
 	        while (template.indexOf(openDelimiter) != -1) {
-	            textFragments.add(template.substring(0, template.indexOf(openDelimiter)));
+	        	this.textFragments.add(template.substring(0, template.indexOf(openDelimiter)));
 	            template = template.substring(template.indexOf(openDelimiter) + openDelimiter.length());
-	            fieldNames.add(template.substring(0, template.indexOf(closeDelimiter)));
+	            this.fieldNames.add(template.substring(0, template.indexOf(closeDelimiter)));
 	            template = template.substring(template.indexOf(closeDelimiter) + closeDelimiter.length());
 	        }
-	        textFragments.add(template);
+	        this.textFragments.add(template);
 	
 	        this.textArea = new JTextArea();
 	        this.textArea.setEditable(false);

@@ -52,26 +52,26 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
     public void initialize(DatabaseViewerManager manager) {
         this.viewerManager = manager;
 
-        String openDelimiter = (String) viewerManager.getParameters().get("openDelimiter");
-        String closeDelimiter = (String) viewerManager.getParameters().get("closeDelimiter");
-        String commandLine = (String) viewerManager.getParameters().get("commandLine");
+        String openDelimiter = (String) this.viewerManager.getParameters().get("openDelimiter");
+        String closeDelimiter = (String) this.viewerManager.getParameters().get("closeDelimiter");
+        String commandLine = (String) this.viewerManager.getParameters().get("commandLine");
         while (commandLine.indexOf(openDelimiter) != -1) {
-            textFragments.add(commandLine.substring(0, commandLine.indexOf(openDelimiter)));
+        	this.textFragments.add(commandLine.substring(0, commandLine.indexOf(openDelimiter)));
             commandLine = commandLine.substring(commandLine.indexOf(openDelimiter) + openDelimiter.length());
-            fieldNames.add(commandLine.substring(0, commandLine.indexOf(closeDelimiter)));
+            this.fieldNames.add(commandLine.substring(0, commandLine.indexOf(closeDelimiter)));
             commandLine = commandLine.substring(commandLine.indexOf(closeDelimiter) + closeDelimiter.length());
         }
-        textFragments.add(commandLine);
+        this.textFragments.add(commandLine);
     }
 
     public void showView(String whereClause) throws DatabaseViewerException {
         String command = "";
         try {
-            List results = this.viewerManager.getConnection().executeQuery(fieldNames,
-                    viewerManager.getTableName(),
+            List results = this.viewerManager.getConnection().executeQuery(this.fieldNames,
+            		this.viewerManager.getTableName(),
                     whereClause);
             Vector fields = (Vector) results.get(0);
-            Iterator itText = textFragments.iterator();
+            Iterator itText = this.textFragments.iterator();
             Iterator itFields = fields.iterator();
             while (itFields.hasNext()) { // we assume length(textFragements) = length(results) + 1
                 String text = (String) itText.next();
