@@ -35,7 +35,7 @@ public class Criterion implements Ordered {
     }
 
     public boolean isLesserThan(Ordered other) {
-        if(! (other instanceof Criterion)) {
+        if (!(other instanceof Criterion)) {
             return false;
         }
         Criterion crit = (Criterion) other;
@@ -43,7 +43,7 @@ public class Criterion implements Ordered {
     }
 
     public boolean isEqual(Ordered other) {
-        if(! (other instanceof Criterion)) {
+        if (!(other instanceof Criterion)) {
             return false;
         }
         Criterion crit = (Criterion) other;

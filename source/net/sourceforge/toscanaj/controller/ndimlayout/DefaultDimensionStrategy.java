@@ -7,17 +7,17 @@
  */
 package net.sourceforge.toscanaj.controller.ndimlayout;
 
-import net.sourceforge.toscanaj.model.lattice.Lattice;
-import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.controller.cernato.PartialOrderOperations;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
 import net.sourceforge.toscanaj.model.order.PartialOrderNode;
-import net.sourceforge.toscanaj.controller.cernato.PartialOrderOperations;
 
-import java.util.Vector;
-import java.util.Set;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.Vector;
 
 public class DefaultDimensionStrategy implements DimensionCreationStrategy {
     public Vector calculateDimensions(Lattice lattice) {
@@ -25,7 +25,7 @@ public class DefaultDimensionStrategy implements DimensionCreationStrategy {
         Vector redCons = new Vector();
         for (int i = 0; i < concepts.length; i++) {
             Concept concept = concepts[i];
-            if(concept.isMeetIrreducible()) {
+            if (concept.isMeetIrreducible()) {
                 redCons.add(concept);
             }
         }

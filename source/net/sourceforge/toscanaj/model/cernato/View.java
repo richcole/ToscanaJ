@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class View {
     private String name;

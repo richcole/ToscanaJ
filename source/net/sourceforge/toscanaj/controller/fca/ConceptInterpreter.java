@@ -8,10 +8,8 @@
 package net.sourceforge.toscanaj.controller.fca;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.database.Query;
 
 import java.util.Iterator;
-import java.util.List;
 
 
 /*

@@ -7,13 +7,13 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
-import org.tockit.canvas.events.CanvasItemDraggedEvent;
-import org.tockit.events.EventListener;
-import org.tockit.events.Event;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
+import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.events.Event;
+import org.tockit.events.EventListener;
 
 import java.awt.geom.Point2D;
 

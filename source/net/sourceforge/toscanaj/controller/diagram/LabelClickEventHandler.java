@@ -7,10 +7,11 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
-import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import net.sourceforge.toscanaj.view.diagram.LabelView;
 import org.tockit.canvas.events.CanvasItemClickedEvent;
-import org.tockit.events.*;
-import net.sourceforge.toscanaj.view.diagram.*;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventListener;
 
 public class LabelClickEventHandler implements EventListener {
     public LabelClickEventHandler(EventBroker eventBroker) {

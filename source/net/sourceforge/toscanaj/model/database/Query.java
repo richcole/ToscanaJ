@@ -7,12 +7,16 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import net.sourceforge.toscanaj.util.xmlize.*;
-
-import java.util.*;
-import java.text.DecimalFormat;
-
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 public abstract class Query implements XMLizable {
     private static final String QUERY_NAME_ATTRIBUTE_NAME = "name";

@@ -7,12 +7,12 @@
  */
 package net.sourceforge.toscanaj.controller.cernato.tests;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import net.sourceforge.toscanaj.controller.cernato.PartialOrderOperations;
 import net.sourceforge.toscanaj.model.cernato.*;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
-import net.sourceforge.toscanaj.controller.cernato.PartialOrderOperations;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
 
 import java.util.Set;
 
@@ -40,8 +40,8 @@ public class PartialOrderOperationsTest extends TestCase {
         NumericalValueGroup numGroup8 = new NumericalValueGroup(numType1, "num8", "num8", 3, true, 3, true);
 
         DirectedGraph graph = PartialOrderOperations.createGraphFromOrder(
-                                        new ValueGroup[]{numGroup1, numGroup2, numGroup3, numGroup4, numGroup5,
-                                                         numGroup6, numGroup7, numGroup8});
+                new ValueGroup[]{numGroup1, numGroup2, numGroup3, numGroup4, numGroup5,
+                                 numGroup6, numGroup7, numGroup8});
         Set sources;
         Set sinks;
         Set maximalPaths;
@@ -68,7 +68,7 @@ public class PartialOrderOperationsTest extends TestCase {
         textGroup5.addValue(new TextualValue("two"));
 
         graph = PartialOrderOperations.createGraphFromOrder(
-                                        new ValueGroup[]{textGroup1, textGroup2, textGroup3, textGroup4, textGroup5});
+                new ValueGroup[]{textGroup1, textGroup2, textGroup3, textGroup4, textGroup5});
         sources = graph.getSources();
         assertEquals(2, sources.size());
 

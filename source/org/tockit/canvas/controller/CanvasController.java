@@ -109,7 +109,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
             modelPos = canvas.getCanvasCoordinates(screenPos);
             this.eventBroker.processEvent(
                     new CanvasItemClickedEvent(this.selectedCanvasItem,
-                                               e.getModifiers(), modelPos, screenPos));
+                            e.getModifiers(), modelPos, screenPos));
             if (e.getClickCount() == 1) {
                 this.doubleClickTimer = new Timer();
                 this.doubleClickTimer.schedule(
@@ -119,7 +119,7 @@ public class CanvasController implements MouseListener, MouseMotionListener {
                 this.doubleClickTimer.cancel();
                 this.eventBroker.processEvent(
                         new CanvasItemActivatedEvent(selectedCanvasItem,
-                                                     e.getModifiers(), modelPos, screenPos));
+                                e.getModifiers(), modelPos, screenPos));
             }
         }
         selectedCanvasItem = null;
@@ -191,12 +191,12 @@ public class CanvasController implements MouseListener, MouseMotionListener {
             return;
         }
         this.eventBroker.processEvent(new CanvasItemMouseMovementEvent(
-                                            pointedItem, e.getModifiers(),
-                                            canvasPos, mousePos));
+                pointedItem, e.getModifiers(),
+                canvasPos, mousePos));
         if (this.pointedCanvasItem != pointedItem) {
             this.eventBroker.processEvent(new CanvasItemPointedEvent(
-                                                pointedItem, e.getModifiers(),
-                                                canvasPos, mousePos));
+                    pointedItem, e.getModifiers(),
+                    canvasPos, mousePos));
             this.pointedCanvasItem = pointedItem;
         }
     }

@@ -8,8 +8,12 @@
 package net.sourceforge.toscanaj.events.tests;
 
 import com.mockobjects.ExpectationCounter;
-import junit.framework.*;
-import net.sourceforge.toscanaj.events.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import net.sourceforge.toscanaj.events.Event;
+import net.sourceforge.toscanaj.events.EventBroker;
+import net.sourceforge.toscanaj.events.EventListener;
 
 public class EventBrokerTest extends TestCase {
     public EventBrokerTest(String s) {

@@ -7,21 +7,22 @@
  */
 package net.sourceforge.toscanaj.view.database;
 
-import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-import org.tockit.events.*;
-import org.tockit.events.Event;
+import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.EmitEventActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @todo the buttons are stupid, there should be a cancel button and an ok button, maybe "apply" as third
@@ -95,7 +96,7 @@ public class DatabaseConnectionInformationView extends JDialog implements EventL
         contentPane.add(buttonPane, BorderLayout.SOUTH);
 
         ConfigurationManager.restorePlacement("DatabaseConnectionInformationView", this,
-                                              new Rectangle(100,100,300,200));
+                new Rectangle(100, 100, 300, 200));
 
         eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class);
     }

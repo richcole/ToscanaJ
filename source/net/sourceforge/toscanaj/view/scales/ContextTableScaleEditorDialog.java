@@ -61,9 +61,11 @@ public class ContextTableScaleEditorDialog extends JDialog {
             public int getColumnCount() {
                 return 10;
             }
+
             public int getRowCount() {
                 return 10;
             }
+
             public Object getValueAt(int row, int col) {
                 return new Integer(row * col);
             }

@@ -7,16 +7,19 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import org.tockit.canvas.CanvasItem;
-import org.tockit.events.Event;
-import org.tockit.events.EventListener;
 import net.sourceforge.toscanaj.controller.diagram.SelectionChangedEvent;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
+import org.tockit.canvas.CanvasItem;
+import org.tockit.events.Event;
+import org.tockit.events.EventListener;
 
 import java.awt.*;
-import java.awt.geom.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.Vector;
 

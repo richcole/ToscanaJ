@@ -1,16 +1,12 @@
 package concept.context.enumcallbacks;
 
-import concept.context.*;
-
-import java.util.Iterator;
-import java.util.LinkedList;
 
 /**
  * Insert the type's description here.
  * Creation date: (10.07.01 7:02:32)
  * @author:
  */
-public class NextClosedSetLatticeBuilderCallback extends DefaultConceptEnumCallback{
+public class NextClosedSetLatticeBuilderCallback extends DefaultConceptEnumCallback {
 
     protected concept.context.BinaryRelation rel;
 

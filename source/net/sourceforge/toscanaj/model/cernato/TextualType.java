@@ -13,7 +13,7 @@ public class TextualType extends TypeImplementation {
     }
 
     public void addValueGroup(ValueGroup group, String id) {
-        if(group instanceof TextualValueGroup) {
+        if (group instanceof TextualValueGroup) {
             valueGroups.put(id, group);
             return;
         }

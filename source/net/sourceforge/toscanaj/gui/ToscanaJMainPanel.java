@@ -8,36 +8,50 @@
 package net.sourceforge.toscanaj.gui;
 
 import net.sourceforge.toscanaj.ToscanaJ;
-import org.tockit.canvas.CanvasBackground;
-import org.tockit.canvas.events.*;
-import org.tockit.canvas.imagewriter.*;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.fca.*;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import org.tockit.events.EventBroker;
-import net.sourceforge.toscanaj.gui.dialog.*;
+import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
+import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
-import net.sourceforge.toscanaj.view.diagram.*;
+import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
+import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import net.sourceforge.toscanaj.view.diagram.NodeView;
+import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 import org.jdom.Element;
+import org.tockit.canvas.CanvasBackground;
+import org.tockit.canvas.events.CanvasItemActivatedEvent;
+import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
+import org.tockit.canvas.events.CanvasItemSelectedEvent;
+import org.tockit.canvas.imagewriter.DiagramExportSettings;
+import org.tockit.canvas.imagewriter.GraphicFormat;
+import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
+import org.tockit.canvas.imagewriter.ImageGenerationException;
+import org.tockit.events.EventBroker;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 
 /**

@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.cernato;
 
-import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.BinaryRelation;
+import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import java.util.Collection;
@@ -22,15 +22,15 @@ public class ViewContext implements Context {
 
     private class ScalingRelation implements BinaryRelation {
         public boolean contains(Object domainObject, Object rangeObject) {
-            if(!(domainObject instanceof FCAObject)) {
+            if (!(domainObject instanceof FCAObject)) {
                 return false;
             }
             FCAObject fcaObject = (FCAObject) domainObject;
-            if(!(rangeObject instanceof Attribute)) {
+            if (!(rangeObject instanceof Attribute)) {
                 return false;
             }
             Attribute attribute = (Attribute) rangeObject;
-            if(!(attribute.getData() instanceof Criterion)) {
+            if (!(attribute.getData() instanceof Criterion)) {
                 return false;
             }
             Criterion criterion = (Criterion) attribute.getData();

@@ -8,17 +8,17 @@
 package net.sourceforge.toscanaj.controller.ndimlayout;
 
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.model.lattice.Lattice;
-import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
-import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 
-import java.util.*;
 import java.awt.geom.Point2D;
+import java.util.*;
 
 public abstract class NDimLayoutOperations {
     // constants for base vector calculation
@@ -43,11 +43,11 @@ public abstract class NDimLayoutOperations {
                 Attribute attribute = (Attribute) attributes.next();
                 addVector(ndimVector, attribute, dimensions);
             }
-            if(concept.isTop()) {
+            if (concept.isTop()) {
                 topVector = ndimVector;
             }
             DiagramNode node = new NDimDiagramNode(String.valueOf(i), ndimVector, concept,
-                                               new LabelInfo(), new LabelInfo(), null, base);
+                    new LabelInfo(), new LabelInfo(), null, base);
             nodemap.put(concept, node);
             diagram.addNode(node);
         }
@@ -55,7 +55,7 @@ public abstract class NDimLayoutOperations {
         Iterator it = nodemap.values().iterator();
         while (it.hasNext()) {
             NDimDiagramNode node = (NDimDiagramNode) it.next();
-            node.setNdimVector(substract(node.getNdimVector(),topVector));
+            node.setNdimVector(substract(node.getNdimVector(), topVector));
         }
         createConnections(diagram, nodemap);
         return diagram;
@@ -79,13 +79,13 @@ public abstract class NDimLayoutOperations {
         Vector base = new Vector();
         int n = dimensions.size();
         int i = 0;
-        double scale = BASE_SCALE / (Math.pow(2,n));
+        double scale = BASE_SCALE / (Math.pow(2, n));
         for (Iterator iterator = dimensions.iterator(); iterator.hasNext();) {
             iterator.next();
-            double a = Math.pow(2,i);
-            double b = Math.pow(2,n-i-1);
-            base.add(new Point2D.Double( (a-b + BASE_X_SHEAR) * BASE_X_STRETCH * scale,
-                                         (a+b) * scale));
+            double a = Math.pow(2, i);
+            double b = Math.pow(2, n - i - 1);
+            base.add(new Point2D.Double((a - b + BASE_X_SHEAR) * BASE_X_STRETCH * scale,
+                    (a + b) * scale));
             i++;
         }
         return base;

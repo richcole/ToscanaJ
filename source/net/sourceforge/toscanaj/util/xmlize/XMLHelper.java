@@ -7,7 +7,9 @@
  */
 package net.sourceforge.toscanaj.util.xmlize;
 
-import org.jdom.*;
+import org.jdom.Attribute;
+import org.jdom.DataConversionException;
+import org.jdom.Element;
 
 
 /**
@@ -24,7 +26,7 @@ public abstract class XMLHelper {
     }
 
     static public void addOptionalAttribute(Element target, String attributeName, String attributeValue) {
-        if(attributeName != null && attributeValue != null) {
+        if (attributeName != null && attributeValue != null) {
             target.setAttribute(attributeName, attributeValue);
         }
     }

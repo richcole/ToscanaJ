@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
-import org.tockit.canvas.imagewriter.ImageGenerationException;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.parser.DataFormatException;
+import org.tockit.canvas.imagewriter.ImageGenerationException;
 
 import javax.swing.*;
 

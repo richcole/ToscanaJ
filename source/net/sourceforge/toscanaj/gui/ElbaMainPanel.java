@@ -10,31 +10,40 @@ package net.sourceforge.toscanaj.gui;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import org.tockit.events.*;
-import org.tockit.events.Event;
-import org.tockit.events.EventListener;
-import net.sourceforge.toscanaj.gui.action.*;
+import net.sourceforge.toscanaj.gui.action.OpenFileAction;
+import net.sourceforge.toscanaj.gui.action.SaveFileAction;
+import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
-import net.sourceforge.toscanaj.model.events.*;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
+import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
 import net.sourceforge.toscanaj.view.database.DatabaseSchemaView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingView;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventListener;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 /// @todo check if the file we save to exists, warn if it does
+
 public class ElbaMainPanel extends JFrame implements MainPanel, EventListener {
     static private final int MaxMruFiles = 8;
 

@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.diagram;
 
-import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;

@@ -48,11 +48,11 @@ public class JSplitPaneWithFixedRightPane extends JSplitPane {
     private int calcMinimalDividerLocation() {
         Dimension currentSize = getSize();
         Dimension rightPaneMaximumSize = getRightComponent().getMaximumSize();
-        int minimalDividerLocation =0;
-        if(getOrientation()==JSplitPane.HORIZONTAL_SPLIT){
+        int minimalDividerLocation = 0;
+        if (getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
             minimalDividerLocation = currentSize.width - rightPaneMaximumSize.width - getDividerSize();
-        }else{
-            minimalDividerLocation = currentSize.height - rightPaneMaximumSize.height -getDividerSize();
+        } else {
+            minimalDividerLocation = currentSize.height - rightPaneMaximumSize.height - getDividerSize();
         }
         return minimalDividerLocation;
     }

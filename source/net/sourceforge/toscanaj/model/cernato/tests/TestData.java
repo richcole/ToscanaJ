@@ -215,7 +215,7 @@ public class TestData {
         positives = new HashSet();
         positives.add(NumGroup1);
         positives.add(NumGroup2);
-        propMap.put(Property1,positives);
+        propMap.put(Property1, positives);
         positives = new HashSet();
         positives.add(NumGroup1);
         positives.add(NumGroup2);
@@ -223,20 +223,20 @@ public class TestData {
         positives.add(NumGroup4);
         positives.add(NumGroup5);
         positives.add(NumGroup6);
-        propMap.put(Property2,positives);
+        propMap.put(Property2, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup2);
-        propMap.put(Property3,positives);
+        propMap.put(Property3, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup3);
-        propMap.put(Property4,positives);
+        propMap.put(Property4, positives);
         positives = new HashSet();
-        propMap.put(Property5,positives);
+        propMap.put(Property5, positives);
         positives = new HashSet();
         positives.add(TextGroup5);
-        propMap.put(Property6,positives);
+        propMap.put(Property6, positives);
         ScaledRelation.put(Object1, propMap);
 
         // object 2
@@ -246,7 +246,7 @@ public class TestData {
         positives.add(NumGroup2);
         positives.add(NumGroup3);
         positives.add(NumGroup6);
-        propMap.put(Property1,positives);
+        propMap.put(Property1, positives);
         positives = new HashSet();
         positives.add(NumGroup1);
         positives.add(NumGroup2);
@@ -254,20 +254,20 @@ public class TestData {
         positives.add(NumGroup4);
         positives.add(NumGroup5);
         positives.add(NumGroup6);
-        propMap.put(Property2,positives);
+        propMap.put(Property2, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup3);
-        propMap.put(Property3,positives);
+        propMap.put(Property3, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup3);
-        propMap.put(Property4,positives);
+        propMap.put(Property4, positives);
         positives = new HashSet();
-        propMap.put(Property5,positives);
+        propMap.put(Property5, positives);
         positives = new HashSet();
         positives.add(TextGroup5);
-        propMap.put(Property6,positives);
+        propMap.put(Property6, positives);
         ScaledRelation.put(Object2, propMap);
 
         // object 3
@@ -279,7 +279,7 @@ public class TestData {
         positives.add(NumGroup4);
         positives.add(NumGroup5);
         positives.add(NumGroup6);
-        propMap.put(Property1,positives);
+        propMap.put(Property1, positives);
         positives = new HashSet();
         positives.add(NumGroup1);
         positives.add(NumGroup2);
@@ -287,21 +287,21 @@ public class TestData {
         positives.add(NumGroup4);
         positives.add(NumGroup5);
         positives.add(NumGroup6);
-        propMap.put(Property2,positives);
+        propMap.put(Property2, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup2);
-        propMap.put(Property3,positives);
+        propMap.put(Property3, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup3);
-        propMap.put(Property4,positives);
+        propMap.put(Property4, positives);
         positives = new HashSet();
         positives.add(TextGroup5);
-        propMap.put(Property5,positives);
+        propMap.put(Property5, positives);
         positives = new HashSet();
         positives.add(TextGroup5);
-        propMap.put(Property6,positives);
+        propMap.put(Property6, positives);
         ScaledRelation.put(Object3, propMap);
 
         // object 4
@@ -313,26 +313,26 @@ public class TestData {
         positives.add(NumGroup4);
         positives.add(NumGroup5);
         positives.add(NumGroup6);
-        propMap.put(Property1,positives);
+        propMap.put(Property1, positives);
         positives = new HashSet();
         positives.add(NumGroup1);
         positives.add(NumGroup2);
         positives.add(NumGroup3);
         positives.add(NumGroup6);
-        propMap.put(Property2,positives);
+        propMap.put(Property2, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup2);
-        propMap.put(Property3,positives);
+        propMap.put(Property3, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup2);
-        propMap.put(Property4,positives);
+        propMap.put(Property4, positives);
         positives = new HashSet();
-        propMap.put(Property5,positives);
+        propMap.put(Property5, positives);
         positives = new HashSet();
         positives.add(TextGroup5);
-        propMap.put(Property6,positives);
+        propMap.put(Property6, positives);
         ScaledRelation.put(Object4, propMap);
 
         // object 5
@@ -342,25 +342,25 @@ public class TestData {
         positives.add(NumGroup2);
         positives.add(NumGroup3);
         positives.add(NumGroup6);
-        propMap.put(Property1,positives);
+        propMap.put(Property1, positives);
         positives = new HashSet();
         positives.add(NumGroup1);
         positives.add(NumGroup2);
         positives.add(NumGroup3);
         positives.add(NumGroup6);
-        propMap.put(Property2,positives);
+        propMap.put(Property2, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup2);
-        propMap.put(Property3,positives);
+        propMap.put(Property3, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup3);
-        propMap.put(Property4,positives);
+        propMap.put(Property4, positives);
         positives = new HashSet();
-        propMap.put(Property5,positives);
+        propMap.put(Property5, positives);
         positives = new HashSet();
-        propMap.put(Property6,positives);
+        propMap.put(Property6, positives);
         ScaledRelation.put(Object5, propMap);
 
         // object 6
@@ -372,25 +372,25 @@ public class TestData {
         positives.add(NumGroup4);
         positives.add(NumGroup5);
         positives.add(NumGroup6);
-        propMap.put(Property1,positives);
+        propMap.put(Property1, positives);
         positives = new HashSet();
         positives.add(NumGroup1);
         positives.add(NumGroup2);
-        propMap.put(Property2,positives);
+        propMap.put(Property2, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup2);
-        propMap.put(Property3,positives);
+        propMap.put(Property3, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup2);
-        propMap.put(Property4,positives);
+        propMap.put(Property4, positives);
         positives = new HashSet();
         positives.add(TextGroup5);
-        propMap.put(Property5,positives);
+        propMap.put(Property5, positives);
         positives = new HashSet();
         positives.add(TextGroup5);
-        propMap.put(Property6,positives);
+        propMap.put(Property6, positives);
         ScaledRelation.put(Object6, propMap);
 
         // object 7
@@ -400,7 +400,7 @@ public class TestData {
         positives.add(NumGroup6);
         positives.add(NumGroup7);
         positives.add(NumGroup8);
-        propMap.put(Property1,positives);
+        propMap.put(Property1, positives);
         positives = new HashSet();
         positives.add(NumGroup1);
         positives.add(NumGroup2);
@@ -408,30 +408,30 @@ public class TestData {
         positives.add(NumGroup4);
         positives.add(NumGroup5);
         positives.add(NumGroup6);
-        propMap.put(Property2,positives);
+        propMap.put(Property2, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup3);
-        propMap.put(Property3,positives);
+        propMap.put(Property3, positives);
         positives = new HashSet();
         positives.add(TextGroup1);
         positives.add(TextGroup2);
-        propMap.put(Property4,positives);
+        propMap.put(Property4, positives);
         positives = new HashSet();
-        propMap.put(Property5,positives);
+        propMap.put(Property5, positives);
         positives = new HashSet();
         positives.add(TextGroup5);
-        propMap.put(Property6,positives);
+        propMap.put(Property6, positives);
         ScaledRelation.put(Object7, propMap);
     }
 
     static boolean isInScaledRelation(FCAObject object, Criterion criterion) {
         Hashtable propMap = (Hashtable) ScaledRelation.get(object);
-        if(propMap == null) {
+        if (propMap == null) {
             return false;
         }
         Set positives = (Set) propMap.get(criterion.getProperty());
-        if(positives == null) {
+        if (positives == null) {
             return false;
         }
         return positives.contains(criterion.getValueGroup());

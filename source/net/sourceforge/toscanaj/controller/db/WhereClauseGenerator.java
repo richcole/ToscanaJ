@@ -65,15 +65,14 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
     }
 
     static private String createClause(Iterator objectIterator) {
-        if(!objectIterator.hasNext()) {
+        if (!objectIterator.hasNext()) {
             return null;
-        }
-        else {
+        } else {
             String retVal = "(";
             for (Iterator iterator = objectIterator; iterator.hasNext();) {
                 Object o = iterator.next();
                 retVal += o.toString();
-                if(iterator.hasNext()) {
+                if (iterator.hasNext()) {
                     retVal += " OR ";
                 }
             }

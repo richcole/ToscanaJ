@@ -14,9 +14,11 @@ import net.sourceforge.toscanaj.model.database.Column;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Iterator;
-import java.util.List;
 
 public class NominalScaleEditorDialog extends JDialog {
     private boolean result;
@@ -70,12 +72,12 @@ public class NominalScaleEditorDialog extends JDialog {
         this.columnValuesListView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                if(e.getClickCount() == 2) {
+                if (e.getClickCount() == 2) {
                     addValuesToSelection();
                 }
             }
         });
-        JPanel moveButtonPane = new JPanel(new GridLayout(2,1));
+        JPanel moveButtonPane = new JPanel(new GridLayout(2, 1));
         JButton addButton = new JButton(">");
         addButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -95,19 +97,19 @@ public class NominalScaleEditorDialog extends JDialog {
         this.attributeListView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                if(e.getClickCount() == 2) {
+                if (e.getClickCount() == 2) {
                     removeValuesFromSelection();
                 }
             }
         });
         tablePane.add(new LabeledScrollPaneView("Available Values", this.columnValuesListView),
-            new GridBagConstraints(
-                    0, 0, 1, 1, 1, 1,
-                    GridBagConstraints.CENTER,
-                    GridBagConstraints.BOTH,
-                    new Insets(5, 5, 5, 5),
-                    0, 0
-            )
+                new GridBagConstraints(
+                        0, 0, 1, 1, 1, 1,
+                        GridBagConstraints.CENTER,
+                        GridBagConstraints.BOTH,
+                        new Insets(5, 5, 5, 5),
+                        0, 0
+                )
         );
         tablePane.add(moveButtonPane,
                 new GridBagConstraints(
@@ -170,7 +172,7 @@ public class NominalScaleEditorDialog extends JDialog {
     }
 
     private void addValuesToSelection() {
-        for (int i = this.columnValuesListView.getSelectedValues().length - 1; i>=0; i--) {
+        for (int i = this.columnValuesListView.getSelectedValues().length - 1; i >= 0; i--) {
             Object o = this.columnValuesListView.getSelectedValues()[i];
             this.columnValuesListModel.removeElement(o);
             this.attributeListModel.addElement(o);
@@ -178,7 +180,7 @@ public class NominalScaleEditorDialog extends JDialog {
     }
 
     private void removeValuesFromSelection() {
-        for (int i = this.attributeListView.getSelectedValues().length - 1; i>=0; i--) {
+        for (int i = this.attributeListView.getSelectedValues().length - 1; i >= 0; i--) {
             Object o = this.attributeListView.getSelectedValues()[i];
             this.attributeListModel.removeElement(o);
             this.columnValuesListModel.addElement(o);

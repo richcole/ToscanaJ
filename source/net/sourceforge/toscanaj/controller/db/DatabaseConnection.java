@@ -10,16 +10,25 @@ package net.sourceforge.toscanaj.controller.db;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectEvent;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
-import org.tockit.events.*;
-import org.tockit.events.EventListener;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-import net.sourceforge.toscanaj.model.database.*;
+import net.sourceforge.toscanaj.model.database.Column;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventListener;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.URL;
 import java.sql.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * This class facilitates connection to and communication with a database
@@ -79,7 +88,7 @@ public class DatabaseConnection implements EventListener {
      * @todo Throw exceptions instead of just printing them.
      */
     public DatabaseConnection(EventBroker broker, String url, String driver, String account, String password)
-                throws DatabaseException {
+            throws DatabaseException {
         this.broker = broker;
         connect(url, driver, account, password);
     }

@@ -55,6 +55,7 @@ public class NextClosedSetCalculator extends AbstractConceptCalcStrategy impleme
         }
         return ret;
     }
+
     //-----------------------------------------------------
     private boolean closureAttr(concept.context.ModifiableSet set, int j, concept.context.ModifiableSet notJ) {
         tempAttrSet.copy(allAttrSet);
@@ -72,6 +73,7 @@ public class NextClosedSetCalculator extends AbstractConceptCalcStrategy impleme
         set.remove(j);
         return set.equals(tempAttrSet2);
     }
+
     //-----------------------------------------------------
     public void calculateConceptSet() {
         startCalc();
@@ -80,6 +82,7 @@ public class NextClosedSetCalculator extends AbstractConceptCalcStrategy impleme
         nextClosedSetAttr();
         callback.finishCalc();
     }
+
     //-----------------------------------------------------
     private boolean isAttrSetClosed(concept.context.Set set) {
         tempAttrSet.copy(allAttrSet);
@@ -127,6 +130,7 @@ public class NextClosedSetCalculator extends AbstractConceptCalcStrategy impleme
             }
         }
     }
+
     //-----------------------------------------------------
     private void nextClosedSetAttr() {
         final int numAttr = rel.getColCount();
@@ -166,6 +170,7 @@ public class NextClosedSetCalculator extends AbstractConceptCalcStrategy impleme
         tempAttrSet = ContextFactoryRegistry.createSet(col);
         tempAttrSet2 = ContextFactoryRegistry.createSet(col);
     }
+
     //-----------------------------------------------------
     private ModifiableSet zeroClosure() {
         int numObj = rel.getRowCount();
@@ -178,6 +183,7 @@ public class NextClosedSetCalculator extends AbstractConceptCalcStrategy impleme
         }
         return ret;
     }
+
     //-----------------------------------------------------
     private void zeroClosureAttr() {
         int numObj = rel.getRowCount();
@@ -188,6 +194,7 @@ public class NextClosedSetCalculator extends AbstractConceptCalcStrategy impleme
             attrSet.and(rel.getSet(j));
         }
     }
+
     //-----------------------------------------------------
     public void buildLattice() {
         Assert.isTrue(callback instanceof concept.context.enumcallbacks.NextClosedSetLatticeBuilderCallback);

@@ -7,17 +7,19 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import org.tockit.canvas.CanvasItem;
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
+import org.tockit.canvas.CanvasItem;
 
 import java.awt.*;
-import java.awt.geom.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.List;
 
@@ -109,7 +111,7 @@ public class NodeView extends CanvasItem {
         graphics.fill(ellipse);
         graphics.setPaint(circleColor);
         graphics.draw(ellipse);
-        if(ConfigurationManager.fetchInt("NodeView","displayVectors",0) != 0) {
+        if (ConfigurationManager.fetchInt("NodeView", "displayVectors", 0) != 0) {
             String vector;
             if (diagramNode instanceof NDimDiagramNode) {
                 NDimDiagramNode node = (NDimDiagramNode) diagramNode;
@@ -117,17 +119,17 @@ public class NodeView extends CanvasItem {
                 vector = "(";
                 for (int i = 0; i < ndimVec.length; i++) {
                     double v = ndimVec[i];
-                    vector += (int)v;
-                    if(i != ndimVec.length-1) {
+                    vector += (int) v;
+                    if (i != ndimVec.length - 1) {
                         vector += ",";
                     }
                 }
                 vector += ")";
             } else {
-                vector = "(" + (int)diagramNode.getPosition().getX() + "/" + (int)diagramNode.getPosition().getY() + ")";
+                vector = "(" + (int) diagramNode.getPosition().getX() + "/" + (int) diagramNode.getPosition().getY() + ")";
             }
             graphics.drawString(vector, (float) (diagramNode.getPosition().getX() + getRadiusX()),
-                                         (float) diagramNode.getPosition().getY());
+                    (float) diagramNode.getPosition().getY());
         }
         graphics.setPaint(oldPaint);
         graphics.setStroke(oldStroke);
@@ -152,7 +154,7 @@ public class NodeView extends CanvasItem {
     }
 
     private boolean isRealized() {
-        if(!isRealizedCalculated) {
+        if (!isRealizedCalculated) {
             ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
             Concept concept = this.diagramNode.getConcept();
             isRealized = interpreter.isRealized(concept, conceptInterpretationContext);
@@ -245,10 +247,9 @@ public class NodeView extends CanvasItem {
         while (it.hasNext()) {
             Concept selectedConcept = (Concept) it.next();
             Concept ourConcept = (Concept) it2.next();
-            if( !onOurLevel && ourConcept != this.getDiagramNode().getConcept()) {
+            if (!onOurLevel && ourConcept != this.getDiagramNode().getConcept()) {
                 continue;
-            }
-            else {
+            } else {
                 onOurLevel = true;
             }
             if (ourConcept == selectedConcept) {
@@ -258,16 +259,14 @@ public class NodeView extends CanvasItem {
             } else if (ourConcept.hasSuperConcept(selectedConcept)) {
                 if (this.selectionState == DiagramView.NOT_SELECTED) {
                     this.selectionState = DiagramView.SELECTED_IDEAL;
-                }
-                else if (this.selectionState == DiagramView.SELECTED_FILTER) {
+                } else if (this.selectionState == DiagramView.SELECTED_FILTER) {
                     this.selectionState = DiagramView.NOT_SELECTED;
                     return;
                 }
             } else if (ourConcept.hasSubConcept(selectedConcept)) {
                 if (this.selectionState == DiagramView.NOT_SELECTED) {
                     this.selectionState = DiagramView.SELECTED_FILTER;
-                }
-                else if (this.selectionState == DiagramView.SELECTED_IDEAL) {
+                } else if (this.selectionState == DiagramView.SELECTED_IDEAL) {
                     this.selectionState = DiagramView.NOT_SELECTED;
                     return;
                 }

@@ -145,11 +145,10 @@ public class OrdinalScaleEditorDialog extends JDialog {
     private JPanel makeAddDividerPanel() {
         JPanel addPanel = new JPanel();
         addPanel.setLayout(new BoxLayout(addPanel, BoxLayout.X_AXIS));
-        if(scaleType == FLOAT) {
-            addField = new NumberField(10,NumberField.FLOAT);
-        }
-        else {
-            addField = new NumberField(10,NumberField.INTEGER);
+        if (scaleType == FLOAT) {
+            addField = new NumberField(10, NumberField.FLOAT);
+        } else {
+            addField = new NumberField(10, NumberField.INTEGER);
         }
         addButton = new JButton("Add");
         addButton.setEnabled(false);
@@ -190,10 +189,9 @@ public class OrdinalScaleEditorDialog extends JDialog {
     }
 
     private void addDelimiter() {
-        if(scaleType == FLOAT) {
+        if (scaleType == FLOAT) {
             addDelimiter(addField.getDoubleValue());
-        }
-        else {
+        } else {
             addDelimiter(addField.getIntegerValue());
         }
     }

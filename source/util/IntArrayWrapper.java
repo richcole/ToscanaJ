@@ -5,49 +5,49 @@
  */
 package util;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class IntArrayWrapper {
-    final int [] array;
+    final int[] array;
 
     public IntArrayWrapper(int[] array) {
         this.array = array;
     }
 
     public boolean equals(Object other) {
-        if(!(other instanceof IntArrayWrapper)){
+        if (!(other instanceof IntArrayWrapper)) {
             return false;
         }
-        if(other == this){
+        if (other == this) {
             return true;
         }
-        return Arrays.equals(array, ((IntArrayWrapper)other).array);
+        return Arrays.equals(array, ((IntArrayWrapper) other).array);
     }
 
     public int hashCode() {
         int ret = 0;
-        if(array==null){
+        if (array == null) {
             return ret;
         }
-        for(int i=0; i<array.length; i++){
-            ret+= (array[i] << (i % 32));
+        for (int i = 0; i < array.length; i++) {
+            ret += (array[i] << (i % 32));
         }
-        return  ret;
+        return ret;
     }
 
-    public List toList(){
+    public List toList() {
         ArrayList ret = new ArrayList(array.length);
-        for(int i=0; i<array.length; i++){
+        for (int i = 0; i < array.length; i++) {
             ret.add(new Integer(array[i]));
         }
         return ret;
     }
 
     public String toString() {
-        if(array==null){
+        if (array == null) {
             return "Null array";
         }
         StringBuffer buffer = new StringBuffer();
@@ -55,10 +55,10 @@ public class IntArrayWrapper {
         buffer.append(array.length);
         buffer.append("] { ");
         boolean first = true;
-        for(int i=0; i<array.length; i++){
-            if(first){
+        for (int i = 0; i < array.length; i++) {
+            if (first) {
                 first = false;
-            }else{
+            } else {
                 buffer.append(" , ");
             }
             buffer.append(array[i]);

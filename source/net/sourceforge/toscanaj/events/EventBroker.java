@@ -7,7 +7,10 @@
  */
 package net.sourceforge.toscanaj.events;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A class distributing events to listeners.
@@ -142,16 +145,15 @@ public class EventBroker implements EventListener {
      * Processes the current event queue until it is empty.
      */
     private void processEvents() {
-        if(processingEvents) {
+        if (processingEvents) {
             return;
         }
         processingEvents = true;
-        while(!eventQueue.isEmpty()) {
+        while (!eventQueue.isEmpty()) {
             Event event = (Event) eventQueue.remove(0);
-            if(event instanceof SubscriptionEvent) {
+            if (event instanceof SubscriptionEvent) {
                 this.subscriptions.add(event.getSubject());
-            }
-            else if (event instanceof SubscriptionRemovalEvent) {
+            } else if (event instanceof SubscriptionRemovalEvent) {
                 this.subscriptions.remove(event.getSubject());
             }
             processExternalEvent(event);

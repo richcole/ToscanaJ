@@ -7,11 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.directedgraph;
 
-import net.sourceforge.toscanaj.model.order.PartialOrderNode;
-
-import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
 public class DirectedGraph {
@@ -21,13 +19,13 @@ public class DirectedGraph {
         nodes.add(node);
         for (Iterator iterator = node.getInboundNodes().iterator(); iterator.hasNext();) {
             Node curNode = (Node) iterator.next();
-            if(! nodes.contains(curNode)) {
+            if (!nodes.contains(curNode)) {
                 addNode(curNode);
             }
         }
         for (Iterator iterator = node.getOutboundNodes().iterator(); iterator.hasNext();) {
             Node curNode = (Node) iterator.next();
-            if(! nodes.contains(curNode)) {
+            if (!nodes.contains(curNode)) {
                 addNode(curNode);
             }
         }
@@ -35,7 +33,7 @@ public class DirectedGraph {
 
     public void removeNode(Node node, boolean keepConnections) {
         nodes.remove(node);
-        if(keepConnections) {
+        if (keepConnections) {
             Set inboundNodes = node.getInboundNodes();
             Set outboundNodes = node.getOutboundNodes();
             for (Iterator iterator = inboundNodes.iterator(); iterator.hasNext();) {
@@ -56,7 +54,7 @@ public class DirectedGraph {
         Set retVal = new HashSet();
         for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
             Node node = (Node) iterator.next();
-            if(node.getInboundNodes().isEmpty()) {
+            if (node.getInboundNodes().isEmpty()) {
                 retVal.add(node);
             }
         }
@@ -67,7 +65,7 @@ public class DirectedGraph {
         Set retVal = new HashSet();
         for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
             Node node = (Node) iterator.next();
-            if(node.getOutboundNodes().isEmpty()) {
+            if (node.getOutboundNodes().isEmpty()) {
                 retVal.add(node);
             }
         }
@@ -76,8 +74,8 @@ public class DirectedGraph {
 
     public Set getMaximalPaths() {
         /** @todo this algorithm is pretty much brute force since it reiterates the whole set all over again in each
-                  turn, we could do better, but we don't care at the moment.
-            @todo we assume an acyclic graph here, otherwise we will get stuck
+         turn, we could do better, but we don't care at the moment.
+         @todo we assume an acyclic graph here, otherwise we will get stuck
          */
         Set paths = new HashSet();
         Set sources = getSources();
@@ -96,11 +94,11 @@ public class DirectedGraph {
         Set newPaths = new HashSet();
         for (Iterator iterator = paths.iterator(); iterator.hasNext();) {
             Vector path = (Vector) iterator.next();
-            Node lastNode = (Node) path.get(path.size()-1);
+            Node lastNode = (Node) path.get(path.size() - 1);
             Set outboundNodes = lastNode.getOutboundNodes();
             for (Iterator iterator2 = outboundNodes.iterator(); iterator2.hasNext();) {
                 Node node = (Node) iterator2.next();
-                if(iterator2.hasNext()) {
+                if (iterator2.hasNext()) {
                     // copy path for all but last branch
                     Vector newPath = new Vector();
                     newPath.addAll(path);
@@ -113,7 +111,7 @@ public class DirectedGraph {
             }
         }
         paths.addAll(newPaths);
-        if(changed) {
+        if (changed) {
             calculateMaximalPaths(paths);
         }
     }

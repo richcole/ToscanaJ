@@ -8,20 +8,21 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import org.tockit.events.*;
-import org.tockit.events.Event;
-import org.tockit.events.EventListener;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventListener;
 import util.CollectionFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class ScaleGeneratorPanel extends JPanel implements EventListener {
     private List scaleGenerators = null;

@@ -14,7 +14,9 @@ import net.sourceforge.toscanaj.observer.ChangeObserver;
 import util.CollectionFactory;
 
 import javax.swing.*;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * This stores the diagram references for visited, shown and forthcoming

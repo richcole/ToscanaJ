@@ -7,11 +7,11 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
+import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import org.tockit.canvas.CanvasItem;
 import org.tockit.canvas.events.CanvasItemEvent;
-import org.tockit.events.EventListener;
 import org.tockit.events.Event;
-import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import org.tockit.events.EventListener;
 
 public class HighlightRemovalOperationEventListener implements EventListener {
     private DiagramView diagramView;

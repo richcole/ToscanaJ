@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
-import net.sourceforge.toscanaj.model.lattice.*;
-import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.BinaryRelation;
+import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.lattice.*;
 
 import java.util.*;
 
@@ -40,7 +40,7 @@ public class GantersAlgorithm implements LatticeGenerator {
             ConceptImplementation concept1 = (ConceptImplementation) concepts[i];
             for (int j = 0; j < concepts.length; j++) {
                 ConceptImplementation concept2 = (ConceptImplementation) concepts[j];
-                if(isSubConcept(concept2, concept1)) {
+                if (isSubConcept(concept2, concept1)) {
                     concept1.addSubConcept(concept2);
                     concept2.addSuperConcept(concept1);
                 }
@@ -54,7 +54,7 @@ public class GantersAlgorithm implements LatticeGenerator {
 
     private boolean isSubConcept(Concept concept1, Concept concept2) {
         // the extents are still stored as contingents
-        if( concept1.getObjectContingentSize() > concept2.getObjectContingentSize() ) {
+        if (concept1.getObjectContingentSize() > concept2.getObjectContingentSize()) {
             return false;
         }
         Set extent2 = new HashSet();
@@ -64,7 +64,7 @@ public class GantersAlgorithm implements LatticeGenerator {
         }
         for (Iterator iterator = concept1.getObjectContingentIterator(); iterator.hasNext();) {
             Object obj = iterator.next();
-            if(!extent2.contains(obj)) {
+            if (!extent2.contains(obj)) {
                 return false;
             }
         }
@@ -101,15 +101,15 @@ public class GantersAlgorithm implements LatticeGenerator {
         createClosure(extent);
         extents.add(extent);
         do {
-            for (int i = objects.length-1; i >= 0; i--) {
+            for (int i = objects.length - 1; i >= 0; i--) {
                 Set newExtent = calculateNewExtent(extent, i);
-                if(iLargerThan(newExtent, extent, i)) {
+                if (iLargerThan(newExtent, extent, i)) {
                     extents.add(newExtent);
                     extent = newExtent;
                     break;
                 }
             }
-        } while(extent.size() != objects.length);
+        } while (extent.size() != objects.length);
     }
 
     private void createConcepts(LatticeImplementation lattice) {
@@ -130,15 +130,15 @@ public class GantersAlgorithm implements LatticeGenerator {
     }
 
     private boolean iLargerThan(Set largerSet, Set smallerSet, int i) {
-        for(int j = 0; j <= i-1; j++) {
-            if(largerSet.contains(objects[j]) != smallerSet.contains(objects[j])) {
+        for (int j = 0; j <= i - 1; j++) {
+            if (largerSet.contains(objects[j]) != smallerSet.contains(objects[j])) {
                 return false;
             }
         }
-        if(smallerSet.contains(objects[i])) {
+        if (smallerSet.contains(objects[i])) {
             return false;
         }
-        if(!largerSet.contains(objects[i])) {
+        if (!largerSet.contains(objects[i])) {
             return false;
         }
         return true;
@@ -146,8 +146,8 @@ public class GantersAlgorithm implements LatticeGenerator {
 
     private Set calculateNewExtent(Set extent, int i) {
         Set newExtent = new HashSet();
-        for(int j = 0; j <= i-1; j++) {
-            if(extent.contains(objects[j])) {
+        for (int j = 0; j <= i - 1; j++) {
+            if (extent.contains(objects[j])) {
                 newExtent.add(objects[j]);
             }
         }
@@ -165,7 +165,7 @@ public class GantersAlgorithm implements LatticeGenerator {
             Set unrelatedAttributes = new HashSet();
             for (Iterator it2 = intent.iterator(); it2.hasNext();) {
                 Object attribute = it2.next();
-                if(!relation.contains(object, attribute)) {
+                if (!relation.contains(object, attribute)) {
                     unrelatedAttributes.add(attribute);
                 }
             }
@@ -178,7 +178,7 @@ public class GantersAlgorithm implements LatticeGenerator {
             Set unrelatedObjects = new HashSet();
             for (Iterator it2 = extent.iterator(); it2.hasNext();) {
                 Object object = it2.next();
-                if(!relation.contains(object, attribute)) {
+                if (!relation.contains(object, attribute)) {
                     unrelatedObjects.add(object);
                 }
             }

@@ -9,15 +9,20 @@ package net.sourceforge.toscanaj.model.database;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
-import org.tockit.events.*;
-import org.tockit.events.EventListener;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
 import net.sourceforge.toscanaj.util.STD_Iterator;
-import net.sourceforge.toscanaj.util.xmlize.*;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventListener;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class DatabaseSchema implements XMLizable, EventListener {
 

@@ -7,43 +7,49 @@
  */
 package net.sourceforge.toscanaj.gui;
 
+import net.sourceforge.toscanaj.ToscanaJ;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.cernato.CernatoDimensionStrategy;
-import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
-import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
-import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
-import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
-import org.tockit.events.*;
-import org.tockit.events.Event;
-import org.tockit.events.EventListener;
-import net.sourceforge.toscanaj.gui.action.*;
-import net.sourceforge.toscanaj.gui.activity.*;
+import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
+import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
+import net.sourceforge.toscanaj.gui.action.SaveFileAction;
+import net.sourceforge.toscanaj.gui.action.SimpleAction;
+import net.sourceforge.toscanaj.gui.activity.CloseMainPanelActivity;
+import net.sourceforge.toscanaj.gui.activity.SaveConceptualSchemaActivity;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.burmeister.BurmeisterContext;
-import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.model.cernato.CernatoModel;
+import net.sourceforge.toscanaj.model.cernato.View;
+import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.cernato.*;
-import net.sourceforge.toscanaj.model.events.*;
-import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
-import net.sourceforge.toscanaj.view.diagram.cernato.NDimDiagramEditingView;
-import net.sourceforge.toscanaj.ToscanaJ;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.parser.BurmeisterParser;
 import net.sourceforge.toscanaj.parser.CernatoXMLParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
-import net.sourceforge.toscanaj.parser.BurmeisterParser;
+import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
+import net.sourceforge.toscanaj.view.diagram.cernato.NDimDiagramEditingView;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventListener;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.io.IOException;
 import java.io.FileNotFoundException;
-import java.util.Vector;
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.Vector;
 
 /// @todo check if the file we save to exists, warn if it does
+
 public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
     /**
      *  Main Controllers
@@ -229,14 +235,14 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventListener {
         }
         String newSchemaString = "Create new schema";
         String keepSchemaString = "Extend existing schema";
-        Object retVal = JOptionPane.showInputDialog(this,"Do you want to keep the current schema?", "Keep Schema?",
-                                                    JOptionPane.QUESTION_MESSAGE, null,
-                                                    new Object[]{keepSchemaString,newSchemaString},
-                                                    keepSchemaString);
-        if(retVal == null) {
+        Object retVal = JOptionPane.showInputDialog(this, "Do you want to keep the current schema?", "Keep Schema?",
+                JOptionPane.QUESTION_MESSAGE, null,
+                new Object[]{keepSchemaString, newSchemaString},
+                keepSchemaString);
+        if (retVal == null) {
             return;
         }
-        if(retVal == newSchemaString) {
+        if (retVal == newSchemaString) {
             this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         }
         importBurmeister(openDialog.getSelectedFile());

@@ -9,9 +9,9 @@ package net.sourceforge.toscanaj.model.cernato;
 
 import net.sourceforge.toscanaj.model.order.Ordered;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class TextualValueGroup implements ValueGroup {
     private TextualType type;
@@ -29,7 +29,7 @@ public class TextualValueGroup implements ValueGroup {
     }
 
     public void addValue(Value value) {
-        if(value instanceof TextualValue) {
+        if (value instanceof TextualValue) {
             TextualValue textVal = (TextualValue) value;
             values.add(textVal.getDisplayString());
             return;
@@ -38,7 +38,7 @@ public class TextualValueGroup implements ValueGroup {
     }
 
     public boolean containsValue(Value value) {
-        if(value instanceof TextualValue) {
+        if (value instanceof TextualValue) {
             TextualValue textVal = (TextualValue) value;
             return values.contains(textVal.getDisplayString());
         }
@@ -46,16 +46,16 @@ public class TextualValueGroup implements ValueGroup {
     }
 
     public boolean isSuperSetOf(ValueGroup otherGroup) {
-        if(!(otherGroup instanceof TextualValueGroup)) {
+        if (!(otherGroup instanceof TextualValueGroup)) {
             return false;
         }
         TextualValueGroup otherTVGroup = (TextualValueGroup) otherGroup;
-        if(otherTVGroup.type != type) {
+        if (otherTVGroup.type != type) {
             return false;
         }
         for (Iterator iterator = otherTVGroup.values.iterator(); iterator.hasNext();) {
             String value = (String) iterator.next();
-            if(!this.values.contains(value)) {
+            if (!this.values.contains(value)) {
                 return false;
             }
         }
@@ -63,16 +63,16 @@ public class TextualValueGroup implements ValueGroup {
     }
 
     public boolean isLesserThan(Ordered other) {
-        if(! (other instanceof TextualValueGroup) ) {
+        if (!(other instanceof TextualValueGroup)) {
             return false;
         }
         TextualValueGroup otherVG = (TextualValueGroup) other;
-        if(otherVG.type != type) {
+        if (otherVG.type != type) {
             return false;
         }
         for (Iterator iterator = values.iterator(); iterator.hasNext();) {
             String value = (String) iterator.next();
-            if(!otherVG.values.contains(value)) {
+            if (!otherVG.values.contains(value)) {
                 return false;
             }
         }
@@ -80,7 +80,7 @@ public class TextualValueGroup implements ValueGroup {
     }
 
     public boolean isEqual(Ordered other) {
-        if(! (other instanceof TextualValueGroup) ) {
+        if (!(other instanceof TextualValueGroup)) {
             return false;
         }
         TextualValueGroup otherVG = (TextualValueGroup) other;

@@ -7,17 +7,17 @@
  */
 package net.sourceforge.toscanaj.controller.cernato.tests;
 
-import net.sourceforge.toscanaj.model.cernato.*;
-import net.sourceforge.toscanaj.model.cernato.tests.TestData;
-import net.sourceforge.toscanaj.model.lattice.Lattice;
-import net.sourceforge.toscanaj.model.Context;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.controller.cernato.CernatoDimensionStrategy;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
-import junit.framework.Test;
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
+import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.cernato.ViewContext;
+import net.sourceforge.toscanaj.model.cernato.tests.TestData;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
 
 import java.util.Vector;
 

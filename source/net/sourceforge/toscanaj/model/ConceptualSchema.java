@@ -7,19 +7,27 @@
  */
 package net.sourceforge.toscanaj.model;
 
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import org.tockit.events.EventBroker;
-import net.sourceforge.toscanaj.model.database.*;
-import net.sourceforge.toscanaj.model.diagram.*;
-import net.sourceforge.toscanaj.model.events.*;
-import net.sourceforge.toscanaj.util.xmlize.*;
-import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
+import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.model.database.*;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
+import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
+import org.tockit.events.EventBroker;
 import util.CollectionFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * This is the main interface for the data structures.
@@ -102,8 +110,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         if (dbScheme != null) {
             retVal.addContent(dbScheme.toXML());
         }
-        if(DatabaseViewerManager.getNumberOfObjectListViews() != 0 ||
-           DatabaseViewerManager.getNumberOfObjectViews() != 0 ) {
+        if (DatabaseViewerManager.getNumberOfObjectListViews() != 0 ||
+                DatabaseViewerManager.getNumberOfObjectViews() != 0) {
             Element viewsElem = new Element(VIEWS_ELEMENT_NAME);
             DatabaseViewerManager.listsToXML(viewsElem);
             retVal.addContent(viewsElem);
@@ -139,7 +147,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         }
         /// @todo change this once DatabaseViewers are one the schema itself
         Element viewsElem = elem.getChild(VIEWS_ELEMENT_NAME);
-        if(viewsElem != null) {
+        if (viewsElem != null) {
             try {
                 DatabaseViewerManager.listsReadXML(viewsElem, databaseInfo, DatabaseConnection.getConnection());
             } catch (DatabaseViewerInitializationException e) {
@@ -152,13 +160,11 @@ public class ConceptualSchema implements XMLizable, DiagramCollection {
         if (queriesElem != null) {
             for (Iterator iterator = queriesElem.getChildren().iterator(); iterator.hasNext();) {
                 Element queryElem = (Element) iterator.next();
-                if(queryElem.getName().equals(AggregateQuery.QUERY_ELEMENT_NAME)) {
+                if (queryElem.getName().equals(AggregateQuery.QUERY_ELEMENT_NAME)) {
                     this.queries.add(new AggregateQuery(databaseInfo, queryElem));
-                }
-                else if(queryElem.getName().equals(ListQuery.QUERY_ELEMENT_NAME)) {
+                } else if (queryElem.getName().equals(ListQuery.QUERY_ELEMENT_NAME)) {
                     this.queries.add(new ListQuery(databaseInfo, queryElem));
-                }
-                else if(queryElem.getName().equals(DistinctListQuery.QUERY_ELEMENT_NAME)) {
+                } else if (queryElem.getName().equals(DistinctListQuery.QUERY_ELEMENT_NAME)) {
                     this.queries.add(new DistinctListQuery(databaseInfo, queryElem));
                 }
             }

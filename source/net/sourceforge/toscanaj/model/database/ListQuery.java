@@ -7,12 +7,11 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 
 import java.util.Iterator;
 import java.util.Vector;
-
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 public class ListQuery extends Query {
     private DatabaseInfo info;

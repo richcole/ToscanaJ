@@ -7,16 +7,16 @@
  */
 package net.sourceforge.toscanaj.controller.cernato;
 
-import org.tockit.canvas.events.CanvasItemDraggedEvent;
-import org.tockit.canvas.events.CanvasItemDroppedEvent;
-import org.tockit.events.EventListener;
-import org.tockit.events.Event;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
+import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.canvas.events.CanvasItemDroppedEvent;
+import org.tockit.events.Event;
+import org.tockit.events.EventListener;
 
 import java.awt.geom.Point2D;
 import java.util.Iterator;
@@ -28,7 +28,7 @@ public class NDimNodeMovementEventListener implements EventListener {
         DiagramView diagramView = nodeView.getDiagramView();
         Diagram2D diagram = diagramView.getDiagram();
         DiagramNode node = nodeView.getDiagramNode();
-        if(! (node instanceof NDimDiagramNode) ){
+        if (!(node instanceof NDimDiagramNode)) {
             throw new RuntimeException("NDimNodeMovementEventListener usable only for NDimDiagramNodes");
         }
         NDimDiagramNode ndimNode = (NDimDiagramNode) node;
@@ -46,7 +46,7 @@ public class NDimNodeMovementEventListener implements EventListener {
             double v = diffUpperNeighbours[i];
             Point2D baseVec = (Point2D) baseIt.next();
             baseVec.setLocation(baseVec.getX() + diffX * v / (sumCoord + ndimNode.getNdimVector()[i]),
-                                baseVec.getY() + diffY * v / (sumCoord + ndimNode.getNdimVector()[i]));
+                    baseVec.getY() + diffY * v / (sumCoord + ndimNode.getNdimVector()[i]));
         }
         if (dragEvent instanceof CanvasItemDroppedEvent) {
             diagramView.requestScreenTransformUpdate();
@@ -60,12 +60,12 @@ public class NDimNodeMovementEventListener implements EventListener {
         Iterator it = diagram.getLines();
         while (it.hasNext()) {
             DiagramLine line = (DiagramLine) it.next();
-            if(line.getToNode() == node) {
+            if (line.getToNode() == node) {
                 NDimDiagramNode upperNeighbour = (NDimDiagramNode) line.getFromNode();
                 double[] upperVec = upperNeighbour.getNdimVector();
                 for (int i = 0; i < upperVec.length; i++) {
                     double v = upperVec[i];
-                    if(v < nodeVec[i]) {
+                    if (v < nodeVec[i]) {
                         retVal[i] = 1;
                     }
                 }

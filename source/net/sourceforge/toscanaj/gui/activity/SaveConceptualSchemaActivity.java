@@ -7,10 +7,12 @@
  */
 package net.sourceforge.toscanaj.gui.activity;
 
-import org.tockit.events.*;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.util.xmlize.XMLWriter;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventListener;
 
 import java.io.File;
 

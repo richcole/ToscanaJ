@@ -1,6 +1,8 @@
 package concept.context.tests;
 
-import concept.context.*;
+import concept.context.Context;
+import concept.context.ContextChangeEvent;
+import concept.context.ContextObject;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -97,7 +99,6 @@ public class ContextTest extends TestCase {
         expectStructureChangedCall(cxt, expectedNumberOfCalls, modification);
 
     }
-
 
 
     private static void expectStructureChangedCall(Context cxt, int expectedNumberOfCalls, ContextStructureModification modification) {
@@ -321,28 +322,28 @@ public class ContextTest extends TestCase {
         listener.verify();
     }
 
-    MockContextListener makeAttributeInsertionListener(){
-        return new MockContextListener(){
+    MockContextListener makeAttributeInsertionListener() {
+        return new MockContextListener() {
             public void attributeChanged(ContextChangeEvent changeEvent) {
-                if(changeEvent.getType()==ContextChangeEvent.ATTRIBUTE_ADDED){
+                if (changeEvent.getType() == ContextChangeEvent.ATTRIBUTE_ADDED) {
                     counter.inc();
                 }
             }
         };
     }
 
-    MockContextListener makeAttributeRemovalListener(){
-        return new MockContextListener(){
+    MockContextListener makeAttributeRemovalListener() {
+        return new MockContextListener() {
             public void attributeChanged(ContextChangeEvent changeEvent) {
-                if(changeEvent.getType()==ContextChangeEvent.ATTRIBUTE_REMOVED){
+                if (changeEvent.getType() == ContextChangeEvent.ATTRIBUTE_REMOVED) {
                     counter.inc();
                 }
             }
         };
     }
 
-    public void testAttributeAddRemoveNotification(){
-        cxt = new Context(2,3);
+    public void testAttributeAddRemoveNotification() {
+        cxt = new Context(2, 3);
 
         MockContextListener insertionListener = makeAttributeInsertionListener();
         cxt.addContextListener(insertionListener);

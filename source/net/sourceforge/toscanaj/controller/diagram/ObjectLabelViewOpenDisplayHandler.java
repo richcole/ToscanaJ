@@ -7,12 +7,12 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
-import org.tockit.canvas.events.CanvasItemEventWithPosition;
-import org.tockit.events.EventListener;
-import org.tockit.events.Event;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
+import org.tockit.canvas.events.CanvasItemEventWithPosition;
+import org.tockit.events.Event;
+import org.tockit.events.EventListener;
 
 public class ObjectLabelViewOpenDisplayHandler implements EventListener {
     public void processEvent(Event e) {
@@ -31,7 +31,7 @@ public class ObjectLabelViewOpenDisplayHandler implements EventListener {
                     " has to be subscribed to events from ObjectLabelViews only");
         }
         DatabaseRetrievedObject object =
-             (DatabaseRetrievedObject) labelView.getObjectAtPosition(itemEvent.getCanvasPosition());
+                (DatabaseRetrievedObject) labelView.getObjectAtPosition(itemEvent.getCanvasPosition());
         showObject(object);
     }
 

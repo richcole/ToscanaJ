@@ -12,15 +12,15 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import java.util.*;
 
 ///@todo this class does not allow nesting and filtering at the moment
+
 public class DirectConceptInterpreter implements ConceptInterpreter {
     private Hashtable contingents = new Hashtable();
     private Hashtable extents = new Hashtable();
 
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
-        if( context.getObjectDisplayMode() == ConceptInterpretationContext.CONTINGENT) {
+        if (context.getObjectDisplayMode() == ConceptInterpretationContext.CONTINGENT) {
             return getContingent(concept, context).iterator();
-        }
-        else {
+        } else {
             return getExtent(concept, context).iterator();
         }
     }
@@ -65,12 +65,11 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
             Concept compareConcept;
             ConceptInterpretationContext compareContext;
             List nesting = context.getNestingConcepts();
-            if(nesting.size() != 0) {
+            if (nesting.size() != 0) {
                 // go outermost
                 compareConcept = (Concept) nesting.get(0);
                 compareContext = new ConceptInterpretationContext(context.getDiagramHistory(), context.getEventBroker());
-            }
-            else {
+            } else {
                 compareConcept = concept;
                 compareContext = context;
             }
@@ -91,10 +90,9 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
     }
 
     private int getCount(Concept concept, ConceptInterpretationContext context, boolean extent) {
-        if(extent == ConceptInterpretationContext.CONTINGENT) {
+        if (extent == ConceptInterpretationContext.CONTINGENT) {
             return getContingent(concept, context).size();
-        }
-        else {
+        } else {
             return getExtent(concept, context).size();
         }
     }
@@ -117,12 +115,12 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
             Concept outerConcept = (Concept) iterator.next();
             for (Iterator iterator2 = outerConcept.getDownset().iterator(); iterator2.hasNext();) {
                 Concept otherConcept = (Concept) iterator2.next();
-                if(otherConcept != outerConcept) {
+                if (otherConcept != outerConcept) {
                     for (Iterator iterator3 = this.contingents.keySet().iterator(); iterator3.hasNext();) {
                         ConceptInterpretationContext otherContext = (ConceptInterpretationContext) iterator3.next();
                         List nesting = otherContext.getNestingConcepts();
-                        if(nesting.size() != 0) {
-                            if(nesting.get(nesting.size()-1).equals(otherConcept)) {
+                        if (nesting.size() != 0) {
+                            if (nesting.get(nesting.size() - 1).equals(otherConcept)) {
                                 int otherExtentSize = getCount(concept, otherContext, ConceptInterpretationContext.EXTENT);
                                 if (otherExtentSize == extentSize) {
                                     return false;
@@ -138,12 +136,12 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
 
     private Collection getContingent(Concept concept, ConceptInterpretationContext context) {
         Hashtable contextContingents = (Hashtable) contingents.get(context);
-        if(contextContingents == null) {
+        if (contextContingents == null) {
             contextContingents = new Hashtable();
             contingents.put(context, contextContingents);
         }
         Vector contingent = (Vector) contingents.get(concept);
-        if(contingent == null) {
+        if (contingent == null) {
             contingent = calculateContingent(concept, context);
             contextContingents.put(concept, contingent);
         }
@@ -165,7 +163,7 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
     private void filterObjects(final Vector retVal, ConceptInterpretationContext context) {
         DiagramHistory.ConceptVisitor visitor;
         final Vector toRemove = new Vector();
-        if(context.getFilterMode() == ConceptInterpretationContext.EXTENT) {
+        if (context.getFilterMode() == ConceptInterpretationContext.EXTENT) {
             visitor = new DiagramHistory.ConceptVisitor() {
                 public void visitConcept(Concept concept) {
                     for (Iterator iterator = retVal.iterator(); iterator.hasNext();) {
@@ -174,12 +172,12 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
                         Iterator extentIterator = concept.getExtentIterator();
                         while (extentIterator.hasNext()) {
                             Object o2 = extentIterator.next();
-                            if(o == o2) {
+                            if (o == o2) {
                                 found = true;
                                 break;
                             }
                         }
-                        if(!found) {
+                        if (!found) {
                             toRemove.add(o);
                         }
                     }
@@ -194,12 +192,12 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
                         Iterator contingentIterator = concept.getObjectContingentIterator();
                         while (contingentIterator.hasNext()) {
                             Object o2 = contingentIterator.next();
-                            if(o == o2) {
+                            if (o == o2) {
                                 found = true;
                                 break;
                             }
                         }
-                        if(!found) {
+                        if (!found) {
                             toRemove.add(o);
                         }
                     }
@@ -224,12 +222,12 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
                 Iterator contingentIterator = concept.getObjectContingentIterator();
                 while (contingentIterator.hasNext()) {
                     Object o2 = contingentIterator.next();
-                    if(o == o2) {
+                    if (o == o2) {
                         found = true;
                         break;
                     }
                 }
-                if(!found) {
+                if (!found) {
                     toRemove.add(o);
                 }
             }
@@ -242,12 +240,12 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
 
     private Collection getExtent(Concept concept, ConceptInterpretationContext context) {
         Hashtable contextExtents = (Hashtable) extents.get(context);
-        if(contextExtents == null) {
+        if (contextExtents == null) {
             contextExtents = new Hashtable();
             extents.put(context, contextExtents);
         }
         Vector extent = (Vector) contextExtents.get(concept);
-        if(extent == null) {
+        if (extent == null) {
             extent = calculateExtent(concept, context);
             contextExtents.put(concept, extent);
         }

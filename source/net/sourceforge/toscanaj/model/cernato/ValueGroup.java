@@ -11,6 +11,8 @@ import net.sourceforge.toscanaj.model.order.Ordered;
 
 public interface ValueGroup extends Ordered {
     String getName();
+
     boolean containsValue(Value value);
+
     boolean isSuperSetOf(ValueGroup otherGroup);
 }

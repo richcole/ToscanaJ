@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
-import java.util.Set;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 public class LatticeImplementation implements Lattice {
     private Set concepts = new HashSet();
@@ -34,7 +34,7 @@ public class LatticeImplementation implements Lattice {
     public Concept getTop() {
         for (Iterator iterator = concepts.iterator(); iterator.hasNext();) {
             Concept concept = (Concept) iterator.next();
-            if(concept.isTop()) {
+            if (concept.isTop()) {
                 return concept;
             }
         }
@@ -44,7 +44,7 @@ public class LatticeImplementation implements Lattice {
     public Concept getBottom() {
         for (Iterator iterator = concepts.iterator(); iterator.hasNext();) {
             Concept concept = (Concept) iterator.next();
-            if(concept.isBottom()) {
+            if (concept.isBottom()) {
                 return concept;
             }
         }

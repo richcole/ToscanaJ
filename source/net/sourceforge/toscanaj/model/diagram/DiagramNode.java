@@ -9,7 +9,9 @@ package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
-import net.sourceforge.toscanaj.util.xmlize.*;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
 import util.CollectionFactory;
 
@@ -302,34 +304,33 @@ public class DiagramNode implements XMLizable {
     }
 
     public boolean equals(Object obj) {
-        if(!(obj instanceof DiagramNode)){
+        if (!(obj instanceof DiagramNode)) {
             return false;
         }
-        DiagramNode other = (DiagramNode)obj;
-        if(!this.getIdentifier().equals(other.getIdentifier())){
+        DiagramNode other = (DiagramNode) obj;
+        if (!this.getIdentifier().equals(other.getIdentifier())) {
             return false;
         }
-        if(!this.getPosition().equals(other.getPosition())){
+        if (!this.getPosition().equals(other.getPosition())) {
             return false;
         }
 
-        if(this.getObjectLabelInfo() != null) {
-            if(!this.getObjectLabelInfo().equals(other.getObjectLabelInfo())){
+        if (this.getObjectLabelInfo() != null) {
+            if (!this.getObjectLabelInfo().equals(other.getObjectLabelInfo())) {
                 return false;
             }
-        }
-        else {
-            if(other.getObjectLabelInfo() != null) {
+        } else {
+            if (other.getObjectLabelInfo() != null) {
                 return false;
             }
         }
 
         if (this.getAttributeLabelInfo() != null) {
-            if(!this.getAttributeLabelInfo().equals(other.getAttributeLabelInfo())){
+            if (!this.getAttributeLabelInfo().equals(other.getAttributeLabelInfo())) {
                 return false;
             }
         } else {
-            if(other.getAttributeLabelInfo() != null) {
+            if (other.getAttributeLabelInfo() != null) {
                 return false;
             }
         }

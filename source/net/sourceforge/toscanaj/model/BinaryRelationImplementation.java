@@ -7,16 +7,16 @@
  */
 package net.sourceforge.toscanaj.model;
 
-import java.util.Hashtable;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Hashtable;
 
 public class BinaryRelationImplementation implements BinaryRelation {
     private Hashtable rows = new Hashtable();
 
     public boolean contains(Object domainObject, Object rangeObject) {
         Collection objectAttributes = (Collection) rows.get(domainObject);
-        if(objectAttributes == null) {
+        if (objectAttributes == null) {
             return false;
         }
         return objectAttributes.contains(rangeObject);
@@ -24,7 +24,7 @@ public class BinaryRelationImplementation implements BinaryRelation {
 
     public void insert(Object domainObject, Object rangeObject) {
         Collection objectAttributes = (Collection) rows.get(domainObject);
-        if(objectAttributes == null) {
+        if (objectAttributes == null) {
             objectAttributes = new HashSet();
             rows.put(domainObject, objectAttributes);
         }
@@ -33,7 +33,7 @@ public class BinaryRelationImplementation implements BinaryRelation {
 
     public void remove(Object domainObject, Object rangeObject) {
         Collection objectAttributes = (Collection) rows.get(domainObject);
-        if(objectAttributes == null) {
+        if (objectAttributes == null) {
             return; // nothing to remove
         }
         objectAttributes.remove(rangeObject);

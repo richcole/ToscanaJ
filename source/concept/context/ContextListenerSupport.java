@@ -44,7 +44,7 @@ public class ContextListenerSupport {
             }
         }
 
-        protected EventObject getEvent(){
+        protected EventObject getEvent() {
             return null;
         }
 
@@ -117,7 +117,7 @@ public class ContextListenerSupport {
             }
 
             protected void fireEventFor(ContextListener listener, EventObject evt) {
-                listener.objectNameChanged((PropertyChangeEvent)evt);
+                listener.objectNameChanged((PropertyChangeEvent) evt);
             }
         });
     }
@@ -129,7 +129,7 @@ public class ContextListenerSupport {
             }
 
             protected void fireEventFor(ContextListener listener, EventObject evt) {
-                listener.attributeNameChanged((PropertyChangeEvent)evt);
+                listener.attributeNameChanged((PropertyChangeEvent) evt);
             }
         });
     }
@@ -158,14 +158,14 @@ public class ContextListenerSupport {
         listeners.remove(lst);
     }
 
-    static class  AttributeEventBinder extends ContextListenerEventBinder{
+    static class AttributeEventBinder extends ContextListenerEventBinder {
         protected void fireEventFor(ContextListener listener, EventObject evt) {
-            listener.attributeChanged((ContextChangeEvent)evt);
+            listener.attributeChanged((ContextChangeEvent) evt);
         }
     }
 
     public void fireAttributeInserted(final int j) {
-        eventFireHelper(new AttributeEventBinder(){
+        eventFireHelper(new AttributeEventBinder() {
             protected EventObject getEvent() {
                 return ContextChangeEvent.makeAttributeInsertedEvent(cxt, j);
             }
@@ -174,7 +174,7 @@ public class ContextListenerSupport {
     }
 
     public void fireAttributeRemoved(final int index) {
-        eventFireHelper(new AttributeEventBinder(){
+        eventFireHelper(new AttributeEventBinder() {
             protected EventObject getEvent() {
                 return ContextChangeEvent.makeAttributeRemovedEvent(cxt, index);
             }

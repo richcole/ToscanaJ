@@ -10,8 +10,7 @@ public class FileNameMangler {
      *  @return file name without extension
      */
     public String getBasicName() {
-        if(currFileName == null)
-        {
+        if (currFileName == null) {
             return "Unnamed";
         }
         return getBaseFileName(currFileName);
@@ -42,7 +41,7 @@ public class FileNameMangler {
      */
 
     public String getFileName() {
-        if(null == currFileName) {
+        if (null == currFileName) {
             return "Unknown";
         }
         return getFileName(currFileName);
@@ -70,11 +69,10 @@ public class FileNameMangler {
 
     public static String getFileExtension(String strPath) {
         int nCommaLastIndex = strPath.lastIndexOf(".");
-        if((-1 == nCommaLastIndex)||(strPath.length()-1 == nCommaLastIndex))
-        {
+        if ((-1 == nCommaLastIndex) || (strPath.length() - 1 == nCommaLastIndex)) {
             return "";
         }
-        return strPath.substring(nCommaLastIndex+1, strPath.length());
+        return strPath.substring(nCommaLastIndex + 1, strPath.length());
     }
 
     /**
@@ -85,27 +83,22 @@ public class FileNameMangler {
         this.currFileName = v;
     }
 
-    public static String normalizeDirectoryName(String dir){
+    public static String normalizeDirectoryName(String dir) {
         dir = normalizeFileName(dir);
-        if(!dir.endsWith(File.separator)){
+        if (!dir.endsWith(File.separator)) {
             dir = dir + File.separator;
         }
         return dir;
     }
 
-    public static String getFileName(String strFullPath)
-    {
-        if (strFullPath!= null)
-        {
+    public static String getFileName(String strFullPath) {
+        if (strFullPath != null) {
             strFullPath = normalizeFileName(strFullPath);
 
             int pos = strFullPath.lastIndexOf(File.separatorChar);
-            if (pos >= 0)
-            {
+            if (pos >= 0) {
                 return strFullPath.substring(pos + 1);
-            }
-            else
-            {
+            } else {
                 return new String(strFullPath);
             }
         }

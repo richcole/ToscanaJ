@@ -11,6 +11,8 @@ import java.util.Collection;
 
 public interface Context {
     Collection getObjects();
+
     Collection getAttributes();
+
     BinaryRelation getRelation();
 }

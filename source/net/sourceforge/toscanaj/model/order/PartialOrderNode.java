@@ -8,8 +8,6 @@
 package net.sourceforge.toscanaj.model.order;
 
 import net.sourceforge.toscanaj.model.directedgraph.Node;
-import net.sourceforge.toscanaj.model.cernato.ValueGroup;
-import net.sourceforge.toscanaj.model.order.Ordered;
 
 public class PartialOrderNode extends Node {
     private Ordered data;

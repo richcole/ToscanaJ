@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.model.cernato;
 
 public class FCAObject {
     private String name;
+
     public FCAObject(String name) {
         this.name = name;
     }

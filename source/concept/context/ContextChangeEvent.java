@@ -7,9 +7,9 @@ package concept.context;
 
 import java.util.EventObject;
 
-public class ContextChangeEvent extends EventObject{
+public class ContextChangeEvent extends EventObject {
     public final static int ATTRIBUTE_REMOVED = 1;
-    public final static int ATTRIBUTE_ADDED = ATTRIBUTE_REMOVED+1;
+    public final static int ATTRIBUTE_ADDED = ATTRIBUTE_REMOVED + 1;
 
     public ContextChangeEvent(Object source, int type, int column) {
         super(source);
@@ -17,7 +17,7 @@ public class ContextChangeEvent extends EventObject{
         this.column = column;
     }
 
-    public static ContextChangeEvent makeAttributeInsertedEvent(Context cxt, int attrIndex){
+    public static ContextChangeEvent makeAttributeInsertedEvent(Context cxt, int attrIndex) {
         return new ContextChangeEvent(cxt, ATTRIBUTE_ADDED, attrIndex);
     }
 

@@ -7,12 +7,14 @@
  */
 package net.sourceforge.toscanaj.view.scales.tests;
 
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingView;
+import org.tockit.events.EventBroker;
 
 public class ScaleEditingViewTest extends TestCase {
     public ScaleEditingViewTest(String s) {

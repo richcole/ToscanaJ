@@ -12,9 +12,14 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * Shows an object in a simple dialog.
@@ -43,7 +48,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
 
     private class PagingDatabaseViewerDialog extends JDialog {
         private List fieldNames;
-        private String [] keyValues;
+        private String[] keyValues;
         private int position;
         private JButton navStartButton;
         private JButton navPrevButton;
@@ -69,10 +74,10 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
                 enableButtons();
                 showCurrentItem();
             } catch (DatabaseException e) {
-                                        JOptionPane.showMessageDialog(this,
-                                "Failed to query database:\n" + e.getMessage() + "\n" + e.getOriginal().getMessage(),
-                                "Database connection failed",
-                                JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "Failed to query database:\n" + e.getMessage() + "\n" + e.getOriginal().getMessage(),
+                        "Database connection failed",
+                        JOptionPane.ERROR_MESSAGE);
 
             }
         }
@@ -169,7 +174,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
 
         private void showCurrentItem() {
             showItem(keyValues[position]);
-            infoLabel.setText((position +1 ) + "/" + keyValues.length);
+            infoLabel.setText((position + 1) + "/" + keyValues.length);
         }
 
         private void start() {

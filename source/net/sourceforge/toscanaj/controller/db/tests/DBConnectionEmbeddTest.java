@@ -7,11 +7,13 @@
  */
 package net.sourceforge.toscanaj.controller.db.tests;
 
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import org.tockit.events.EventBroker;
 
 public class DBConnectionEmbeddTest extends TestCase {
 

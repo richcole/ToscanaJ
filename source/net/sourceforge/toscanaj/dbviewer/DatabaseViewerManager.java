@@ -10,8 +10,8 @@ package net.sourceforge.toscanaj.dbviewer;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
 import org.jdom.input.DOMBuilder;
 
@@ -159,7 +159,7 @@ public class DatabaseViewerManager implements XMLizable {
     }
 
     public Element getTemplate() {
-        if(templateElement != null) {
+        if (templateElement != null) {
             String url = this.templateElement.getAttributeValue("url");
             if (url != null) {
                 insertXML(templateElement);
@@ -299,8 +299,7 @@ public class DatabaseViewerManager implements XMLizable {
     }
 
     public static void listsReadXML(Element parentElem, DatabaseInfo databaseInfo, DatabaseConnection connection)
-            throws DatabaseViewerInitializationException
-    {
+            throws DatabaseViewerInitializationException {
         for (Iterator iterator = parentElem.getChildren(OBJECT_VIEW_ELEMENT_NAME).iterator(); iterator.hasNext();) {
             Element element = (Element) iterator.next();
             new DatabaseViewerManager(element, databaseInfo, connection);
@@ -313,26 +312,24 @@ public class DatabaseViewerManager implements XMLizable {
 
     public Element toXML() {
         Element retVal;
-        if(objectViewerRegistry.contains(this)) {
+        if (objectViewerRegistry.contains(this)) {
             retVal = new Element(OBJECT_VIEW_ELEMENT_NAME);
-        }
-        else if (objectListViewerRegistry.contains(this)) {
+        } else if (objectListViewerRegistry.contains(this)) {
             retVal = new Element(OBJECT_LIST_VIEW_ELEMENT_NAME);
-        }
-        else {
+        } else {
             throw new RuntimeException("Totally unexpected situation");
         }
         retVal.setAttribute(SCREEN_NAME_ATTRIBUTE_NAME, screenName);
         retVal.setAttribute(CLASS_ATTRIBUTE_NAME, this.viewer.getClass().getName());
-        if(originalTemplateElement != null) {
+        if (originalTemplateElement != null) {
             retVal.addContent((Element) originalTemplateElement.clone());
         }
-        if(tableName != null) {
+        if (tableName != null) {
             Element tableElem = new Element(TABLE_ELEMENT_NAME);
             tableElem.addContent(tableName);
             retVal.addContent(tableElem);
         }
-        if(keyName != null) {
+        if (keyName != null) {
             Element keyElem = new Element(KEY_ELEMENT_NAME);
             keyElem.addContent(keyName);
             retVal.addContent(keyElem);
@@ -351,7 +348,7 @@ public class DatabaseViewerManager implements XMLizable {
     public void readXML(Element elem) throws XMLSyntaxError {
         screenName = elem.getAttributeValue(SCREEN_NAME_ATTRIBUTE_NAME);
         originalTemplateElement = elem.getChild(TEMPLATE_ELEMENT_NAME);
-        if(originalTemplateElement != null) {
+        if (originalTemplateElement != null) {
             templateElement = (Element) originalTemplateElement.clone();
         }
         tableName = elem.getChildText(TABLE_ELEMENT_NAME);
@@ -361,7 +358,7 @@ public class DatabaseViewerManager implements XMLizable {
         while (it.hasNext()) {
             Element parameterElem = (Element) it.next();
             this.parameters.put(parameterElem.getAttributeValue(PARAMETER_NAME_ATTRIBUTE_NAME),
-                                parameterElem.getAttributeValue(PARAMETER_VALUE_ATTRIBUTE_NAME));
+                    parameterElem.getAttributeValue(PARAMETER_VALUE_ATTRIBUTE_NAME));
         }
     }
 

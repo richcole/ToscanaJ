@@ -7,7 +7,9 @@
  */
 package net.sourceforge.toscanaj.controller.db.tests;
 
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class AllTestControllerDB extends TestCase {
     public AllTestControllerDB(String s) {

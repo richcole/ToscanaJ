@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.controller.cernato;
 
+import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
 import net.sourceforge.toscanaj.model.cernato.Criterion;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
@@ -14,12 +15,11 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
 import net.sourceforge.toscanaj.model.order.PartialOrderNode;
-import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
 
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
-import java.util.Hashtable;
 
 public class CernatoDimensionStrategy implements DimensionCreationStrategy {
     public Vector calculateDimensions(Lattice lattice) {

@@ -14,5 +14,6 @@ package net.sourceforge.toscanaj.model.order;
  */
 public interface Ordered {
     boolean isLesserThan(Ordered other);
+
     boolean isEqual(Ordered other);
 }

@@ -7,11 +7,13 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import org.tockit.canvas.CanvasItem;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
+import org.tockit.canvas.CanvasItem;
 
 import java.awt.*;
-import java.awt.geom.*;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 /**
  * class DiagramLine drawsdsfdfs a line between two points

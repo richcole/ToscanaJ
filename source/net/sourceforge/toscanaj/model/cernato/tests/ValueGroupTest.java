@@ -7,7 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.cernato.tests;
 
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.cernato.*;
 
 public class ValueGroupTest extends TestCase {

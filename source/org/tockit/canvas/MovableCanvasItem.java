@@ -7,8 +7,6 @@
  */
 package org.tockit.canvas;
 
-import org.tockit.canvas.CanvasItem;
-
 import java.awt.geom.Point2D;
 
 public abstract class MovableCanvasItem extends CanvasItem {

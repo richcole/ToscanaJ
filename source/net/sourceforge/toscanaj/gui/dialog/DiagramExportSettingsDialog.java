@@ -7,12 +7,17 @@
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
-import org.tockit.canvas.imagewriter.*;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
+import org.tockit.canvas.imagewriter.DiagramExportSettings;
+import org.tockit.canvas.imagewriter.GraphicFormat;
+import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Iterator;
 
 /**

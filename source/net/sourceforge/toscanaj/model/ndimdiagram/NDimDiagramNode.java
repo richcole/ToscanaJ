@@ -11,9 +11,9 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.util.Vector;
-import java.util.Iterator;
 import java.awt.geom.Point2D;
+import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * Implements a diagram node using an n-dimensional space and projection onto the plane.
@@ -29,7 +29,7 @@ public class NDimDiagramNode extends DiagramNode {
     public NDimDiagramNode(String identifier, double[] ndimVector, Concept concept,
                            LabelInfo attributeLabel, LabelInfo objectLabel,
                            DiagramNode outerNode, Vector base) {
-        super(identifier, new Point2D.Double(0,0), concept, attributeLabel, objectLabel, outerNode);
+        super(identifier, new Point2D.Double(0, 0), concept, attributeLabel, objectLabel, outerNode);
         this.ndimVector = ndimVector;
         this.base = base;
     }
@@ -46,13 +46,13 @@ public class NDimDiagramNode extends DiagramNode {
     }
 
     protected Point2D getProjectedPosition() {
-        Point2D pos = new Point2D.Double(0,0);
+        Point2D pos = new Point2D.Double(0, 0);
         Iterator baseIt = base.iterator();
         for (int i = 0; i < ndimVector.length; i++) {
             double v = ndimVector[i];
             Point2D baseVec = (Point2D) baseIt.next();
             pos.setLocation(pos.getX() + baseVec.getX() * v,
-                                 pos.getY() + baseVec.getY() * v);
+                    pos.getY() + baseVec.getY() * v);
         }
         return pos;
     }

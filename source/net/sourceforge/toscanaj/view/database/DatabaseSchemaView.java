@@ -7,13 +7,16 @@
  */
 package net.sourceforge.toscanaj.view.database;
 
-import org.tockit.events.*;
-import org.tockit.events.Event;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
-import net.sourceforge.toscanaj.model.database.*;
+import net.sourceforge.toscanaj.model.database.Column;
+import net.sourceforge.toscanaj.model.database.DatabaseSchema;
+import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
 import net.sourceforge.toscanaj.model.events.TableChangedEvent;
 import net.sourceforge.toscanaj.util.STD_Iterator;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventListener;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;

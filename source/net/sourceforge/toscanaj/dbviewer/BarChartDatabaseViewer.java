@@ -8,18 +8,20 @@
 package net.sourceforge.toscanaj.dbviewer;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import org.jdom.Element;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-
-import java.awt.font.TextLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-
-import org.jdom.Element;
+import java.util.Vector;
 
 public class BarChartDatabaseViewer extends PagingDatabaseViewer {
     private JPanel barChartPanel;
@@ -298,6 +300,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                     g2.drawString("" + hoverVal, (int) (hoverPos - bounds.getWidth() / 2), (getHeight() / 2) + (int) bounds.getHeight() + TEXT_BOX_BUFFER_SIZE * 2);
                 }
             }
+
             public void setColors(Color min, Color max, Color line) {
                 minCol = min;
                 maxCol = max;

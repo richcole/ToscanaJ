@@ -47,6 +47,6 @@ class CanvasItemSingleClickTask extends TimerTask {
      */
     public void run() {
         context.processEvent(new CanvasItemSelectedEvent(target, modifiers,
-                                                         this.canvasPosition, this.awtPosition));
+                this.canvasPosition, this.awtPosition));
     }
 }

@@ -24,10 +24,9 @@ public class NumberField extends JTextField {
 
     public NumberField(int columns, int formatType) {
         super(columns);
-        if(formatType == FLOAT) {
+        if (formatType == FLOAT) {
             formatter = NumberFormat.getNumberInstance(Locale.US);
-        }
-        else {
+        } else {
             formatter = NumberFormat.getIntegerInstance(Locale.US);
         }
     }

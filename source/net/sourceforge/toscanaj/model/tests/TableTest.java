@@ -7,10 +7,12 @@
  */
 package net.sourceforge.toscanaj.model.tests;
 
-import junit.framework.*;
-import org.tockit.events.EventBroker;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.Table;
+import org.tockit.events.EventBroker;
 
 public class TableTest extends TestCase {
     final static Class THIS = TableTest.class;

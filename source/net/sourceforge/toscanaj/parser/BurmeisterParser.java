@@ -7,15 +7,16 @@
  */
 package net.sourceforge.toscanaj.parser;
 
+import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.burmeister.BurmeisterContext;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
-import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
 
 import java.io.*;
 import java.util.Collection;
 
 public class BurmeisterParser {
     public static final String DEFAULT_NAME = "<unnamed>";
+
     public static BurmeisterContext importBurmeisterFile(File file) throws FileNotFoundException, DataFormatException {
         BufferedReader in;
         in = new BufferedReader(new FileReader(file));
@@ -23,13 +24,13 @@ public class BurmeisterParser {
         try {
             // check id
             String curLine = in.readLine();
-            if(!curLine.equals("B")) {
+            if (!curLine.equals("B")) {
                 throw new DataFormatException("Burmeister identifier missing ('B' as first line)");
             }
 
             // fetch context name and initialize context
             curLine = in.readLine();
-            if(curLine.equals("")) {
+            if (curLine.equals("")) {
                 curLine = DEFAULT_NAME;
             }
             BurmeisterContext context = new BurmeisterContext(curLine);
@@ -43,14 +44,14 @@ public class BurmeisterParser {
             // grab objects and attributes, store additional arrays to get indizes
             Collection objects = context.getObjects();
             Object[] objectArray = new Object[numberOfObjects];
-            for(int i = 0; i<numberOfObjects; i++) {
+            for (int i = 0; i < numberOfObjects; i++) {
                 curLine = getNextNonEmptyLine(in);
                 objects.add(curLine);
                 objectArray[i] = curLine;
             }
             Collection attributes = context.getAttributes();
             Attribute[] attributeArray = new Attribute[numberOfAttributes];
-            for(int i = 0; i<numberOfAttributes; i++) {
+            for (int i = 0; i < numberOfAttributes; i++) {
                 curLine = getNextNonEmptyLine(in);
                 Attribute attribute = new Attribute(curLine, null);
                 attributes.add(attribute);
@@ -59,11 +60,11 @@ public class BurmeisterParser {
 
             // process relation
             BinaryRelationImplementation relation = (BinaryRelationImplementation) context.getRelation();
-            for(int i = 0; i<numberOfObjects; i++) {
+            for (int i = 0; i < numberOfObjects; i++) {
                 curLine = getNextNonEmptyLine(in);
-                for(int j = 0; j<numberOfAttributes; j++) {
+                for (int j = 0; j < numberOfAttributes; j++) {
                     char c = curLine.charAt(j);
-                    if(c == 'x' || c == 'X') {
+                    if (c == 'x' || c == 'X') {
                         relation.insert(objectArray[i], attributeArray[j]);
                     }
                 }
@@ -79,7 +80,7 @@ public class BurmeisterParser {
         String curLine;
         do {
             curLine = in.readLine();
-        } while(curLine.equals(""));
+        } while (curLine.equals(""));
         return curLine;
     }
 }

@@ -558,7 +558,7 @@ public class BitSetTest extends TestCase {
         assertEquals(Set.NOT_IN_SET, i);
     }
 
-    public void testLengthSizeInteraction(){
+    public void testLengthSizeInteraction() {
         temp = new BitSet(3);
         temp.fillByOne(3);
         assertEquals(3, temp.size());

@@ -7,13 +7,16 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
-import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import org.tockit.events.*;
-import net.sourceforge.toscanaj.model.database.*;
+import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
+import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
+import org.tockit.canvas.events.CanvasItemEventWithPosition;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventListener;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -29,11 +32,11 @@ public class ObjectLabelViewPopupMenuHandler implements EventListener {
     public ObjectLabelViewPopupMenuHandler(DiagramView diagramView, EventBroker schemaBroker) {
         this.diagramView = diagramView;
         this.queries = null;
-        schemaBroker.subscribe(this,ConceptualSchemaChangeEvent.class,Object.class);
+        schemaBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
     }
 
     public void processEvent(Event e) {
-        if(e instanceof ConceptualSchemaChangeEvent) {
+        if (e instanceof ConceptualSchemaChangeEvent) {
             ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
             this.queries = csce.getConceptualSchema().getQueries();
             return;
@@ -57,12 +60,12 @@ public class ObjectLabelViewPopupMenuHandler implements EventListener {
 
     public void openPopupMenu(final ObjectLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
         final DatabaseRetrievedObject object =
-                        (DatabaseRetrievedObject) labelView.getObjectAtPosition(canvasPosition);
+                (DatabaseRetrievedObject) labelView.getObjectAtPosition(canvasPosition);
         if (object == null) {
             return;
         }
         int numberOfQueries = 0;
-        if(this.queries != null) {
+        if (this.queries != null) {
             numberOfQueries = this.queries.size();
         }
         List objectViewNames = DatabaseViewerManager.getObjectViewNames(object);
@@ -124,7 +127,7 @@ public class ObjectLabelViewPopupMenuHandler implements EventListener {
         Iterator it = queries.iterator();
         while (it.hasNext()) {
             final Query query = (Query) it.next();
-            menuItem = new JRadioButtonMenuItem(query.getName(),query.equals(labelView.getQuery()));
+            menuItem = new JRadioButtonMenuItem(query.getName(), query.equals(labelView.getQuery()));
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     labelView.setQuery(query);

@@ -13,7 +13,7 @@ public class NumericalType extends TypeImplementation {
     }
 
     public void addValueGroup(ValueGroup group, String id) {
-        if(group instanceof NumericalValueGroup) {
+        if (group instanceof NumericalValueGroup) {
             valueGroups.put(id, group);
             return;
         }

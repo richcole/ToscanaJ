@@ -61,25 +61,25 @@ public class ContextFunctions {
         BinaryRelation relation = cxt.getRelation();
         ModifiableSet temp = ContextFactoryRegistry.createSet(queryIntent.size());
         int ret = 0;
-        for(int i=0; i<relation.getRowCount(); i++){
+        for (int i = 0; i < relation.getRowCount(); i++) {
             temp.copy(relation.getSet(i));
             temp.and(attributeMask);
-            if(queryIntent.isSubsetOf(temp)){
-               ret++;
+            if (queryIntent.isSubsetOf(temp)) {
+                ret++;
             }
         }
         return ret;
     }
 
-    public static int contingentSize(Set queryIntent, Context cxt, Set attributeMask){
+    public static int contingentSize(Set queryIntent, Context cxt, Set attributeMask) {
         BinaryRelation relation = cxt.getRelation();
         ModifiableSet temp = ContextFactoryRegistry.createSet(queryIntent.size());
         int ret = 0;
-        for(int i=0; i<relation.getRowCount(); i++){
+        for (int i = 0; i < relation.getRowCount(); i++) {
             temp.copy(relation.getSet(i));
             temp.and(attributeMask);
-            if(queryIntent.isEquals(temp)){
-               ret++;
+            if (queryIntent.isEquals(temp)) {
+                ret++;
             }
         }
         return ret;

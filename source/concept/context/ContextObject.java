@@ -30,13 +30,13 @@ public class ContextObject {
     }
 
     public void setName(String newName) {
-        newName=StringUtil.safeTrim(newName);
-        if((this.name==null) ||
-            (!this.name.equals(newName))) {
+        newName = StringUtil.safeTrim(newName);
+        if ((this.name == null) ||
+                (!this.name.equals(newName))) {
             String oldValue = this.name;
             this.name = newName;
             if (null != listener) {
-                listener.nameChanged(new PropertyChangeEvent(this, obj ? "CONTEXT_OBJECT_NAME": "CONTEXT_ATTRIBUTE_NAME", oldValue, this.name));
+                listener.nameChanged(new PropertyChangeEvent(this, obj ? "CONTEXT_OBJECT_NAME" : "CONTEXT_ATTRIBUTE_NAME", oldValue, this.name));
             }
         }
     }
@@ -58,21 +58,21 @@ public class ContextObject {
     }
 
     public boolean equals(Object obj) {
-        if(!(obj instanceof ContextObject)){
+        if (!(obj instanceof ContextObject)) {
             return false;
         }
         ContextObject that = (ContextObject) obj;
-        if(!(this.getName().equals(that.getName()))){
+        if (!(this.getName().equals(that.getName()))) {
             return false;
         }
 
-        if(this.isObject()!=that.isObject()){
+        if (this.isObject() != that.isObject()) {
             return false;
         }
         return true;
     }
 
     public String toString() {
-        return (isObject()? "Object " : "Attribute ")+getName();
+        return (isObject() ? "Object " : "Attribute ") + getName();
     }
 }

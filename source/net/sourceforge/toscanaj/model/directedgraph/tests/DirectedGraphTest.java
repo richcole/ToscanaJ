@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.directedgraph.tests;
 
-import junit.framework.TestCase;
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
 import net.sourceforge.toscanaj.model.directedgraph.Node;

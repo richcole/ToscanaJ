@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.model.order.Ordered;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 
 import java.util.*;
@@ -76,7 +76,7 @@ public class ConceptImplementation implements Concept {
          * yet.
          */
         public boolean hasNext() {
-            if(this.secondaryIterator == null) {
+            if (this.secondaryIterator == null) {
                 return false;
             }
             // make sure that we point to the next object, even if there are
@@ -152,7 +152,7 @@ public class ConceptImplementation implements Concept {
          * yet.
          */
         public boolean hasNext() {
-            if(this.secondaryIterator == null) {
+            if (this.secondaryIterator == null) {
                 return false;
             }
             // make sure that we point to the next object, even if there are
@@ -522,10 +522,10 @@ public class ConceptImplementation implements Concept {
     }
 
     public boolean isLesserThan(Ordered other) {
-        if(! (other instanceof ConceptImplementation)) {
+        if (!(other instanceof ConceptImplementation)) {
             return false;
         }
-        return !(other == this) && this.hasSuperConcept((Concept)other);
+        return !(other == this) && this.hasSuperConcept((Concept) other);
     }
 
     public boolean isEqual(Ordered other) {
@@ -535,7 +535,7 @@ public class ConceptImplementation implements Concept {
     public boolean isMeetIrreducible() {
         for (Iterator iterator = filter.iterator(); iterator.hasNext();) {
             ConceptImplementation conceptImplementation = (ConceptImplementation) iterator.next();
-            if(conceptImplementation.filter.size() == this.filter.size() - 1) {
+            if (conceptImplementation.filter.size() == this.filter.size() - 1) {
                 return true;
             }
         }
@@ -545,7 +545,7 @@ public class ConceptImplementation implements Concept {
     public boolean isJoinIrreducible() {
         for (Iterator iterator = filter.iterator(); iterator.hasNext();) {
             ConceptImplementation conceptImplementation = (ConceptImplementation) iterator.next();
-            if(conceptImplementation.filter.size() == this.filter.size() - 1) {
+            if (conceptImplementation.filter.size() == this.filter.size() - 1) {
                 return true;
             }
         }

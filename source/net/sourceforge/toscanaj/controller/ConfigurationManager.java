@@ -8,9 +8,13 @@
 package net.sourceforge.toscanaj.controller;
 
 import java.awt.*;
-import java.io.*;
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Handles all persistent configuration information.

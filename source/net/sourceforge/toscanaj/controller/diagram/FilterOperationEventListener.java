@@ -7,11 +7,11 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
-import org.tockit.canvas.events.CanvasItemEvent;
-import org.tockit.events.EventListener;
-import org.tockit.events.Event;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
+import org.tockit.canvas.events.CanvasItemEvent;
+import org.tockit.events.Event;
+import org.tockit.events.EventListener;
 
 public class FilterOperationEventListener implements EventListener {
     private DiagramController controller;

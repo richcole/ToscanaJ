@@ -7,11 +7,11 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
-import org.tockit.canvas.events.CanvasItemEvent;
-import org.tockit.events.EventListener;
-import org.tockit.events.Event;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
+import org.tockit.canvas.events.CanvasItemEvent;
+import org.tockit.events.Event;
+import org.tockit.events.EventListener;
 
 public class HighlightingOperationEventListener implements EventListener {
     private DiagramView diagramView;

@@ -10,7 +10,9 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Column;
-import net.sourceforge.toscanaj.model.diagram.*;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.diagram.WriteableDiagram2D;
 
 import javax.swing.*;
 
@@ -35,7 +37,7 @@ public class ContextTableScaleGenerator implements ScaleGenerator {
                 parent,
                 databaseConnection
         );
-        if(!dialog.execute()) {
+        if (!dialog.execute()) {
             return null;
         }
 

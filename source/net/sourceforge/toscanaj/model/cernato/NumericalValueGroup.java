@@ -33,90 +33,90 @@ public class NumericalValueGroup implements ValueGroup {
     }
 
     public boolean containsValue(Value value) {
-        if(!(value instanceof NumericalValue)) {
+        if (!(value instanceof NumericalValue)) {
             return false;
         }
         NumericalValue numVal = (NumericalValue) value;
         double number = numVal.getValue();
-        if(number < min) {
+        if (number < min) {
             return false;
         }
-        if(number == min && !minIncluded) {
+        if (number == min && !minIncluded) {
             return false;
         }
-        if(number > max) {
+        if (number > max) {
             return false;
         }
-        if(number == max && !maxIncluded) {
+        if (number == max && !maxIncluded) {
             return false;
         }
         return true;
     }
 
     public boolean isSuperSetOf(ValueGroup otherGroup) {
-        if(! (otherGroup instanceof NumericalValueGroup)) {
+        if (!(otherGroup instanceof NumericalValueGroup)) {
             return false;
         }
         NumericalValueGroup otherNVGroup = (NumericalValueGroup) otherGroup;
-        if(otherNVGroup.type != type) {
+        if (otherNVGroup.type != type) {
             return false;
         }
-        if(otherNVGroup.min < min) {
+        if (otherNVGroup.min < min) {
             return false;
         }
-        if(otherNVGroup.min == min && !minIncluded && otherNVGroup.minIncluded) {
+        if (otherNVGroup.min == min && !minIncluded && otherNVGroup.minIncluded) {
             return false;
         }
-        if(otherNVGroup.max > max) {
+        if (otherNVGroup.max > max) {
             return false;
         }
-        if(otherNVGroup.max == max && !maxIncluded && otherNVGroup.maxIncluded) {
+        if (otherNVGroup.max == max && !maxIncluded && otherNVGroup.maxIncluded) {
             return false;
         }
         return true;
     }
 
     public boolean isLesserThan(Ordered other) {
-        if(! (other instanceof NumericalValueGroup) ) {
+        if (!(other instanceof NumericalValueGroup)) {
             return false;
         }
         NumericalValueGroup otherVG = (NumericalValueGroup) other;
-        if(otherVG.type != type) {
+        if (otherVG.type != type) {
             return false;
         }
-        if(otherVG.min > min) {
+        if (otherVG.min > min) {
             return false;
         }
-        if(otherVG.min == min && minIncluded && !otherVG.minIncluded) {
+        if (otherVG.min == min && minIncluded && !otherVG.minIncluded) {
             return false;
         }
-        if(otherVG.max < max) {
+        if (otherVG.max < max) {
             return false;
         }
-        if(otherVG.max == max && maxIncluded && !otherVG.maxIncluded) {
+        if (otherVG.max == max && maxIncluded && !otherVG.maxIncluded) {
             return false;
         }
         return true;
     }
 
     public boolean isEqual(Ordered other) {
-        if(! (other instanceof NumericalValueGroup) ) {
+        if (!(other instanceof NumericalValueGroup)) {
             return false;
         }
         NumericalValueGroup otherVG = (NumericalValueGroup) other;
-        if(otherVG.type != type) {
+        if (otherVG.type != type) {
             return false;
         }
-        if(otherVG.min != min) {
+        if (otherVG.min != min) {
             return false;
         }
-        if(otherVG.minIncluded != minIncluded) {
+        if (otherVG.minIncluded != minIncluded) {
             return false;
         }
-        if(otherVG.max != max) {
+        if (otherVG.max != max) {
             return false;
         }
-        if(otherVG.maxIncluded != maxIncluded) {
+        if (otherVG.maxIncluded != maxIncluded) {
             return false;
         }
         return true;

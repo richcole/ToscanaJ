@@ -10,13 +10,15 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Column;
-import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
-import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.diagram.*;
+import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 
 import javax.swing.*;
-import java.util.*;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class NominalScaleGenerator implements ScaleGenerator {
     private JFrame parent;
@@ -42,7 +44,7 @@ public class NominalScaleGenerator implements ScaleGenerator {
                 column,
                 databaseConnection
         );
-        if(!dialog.execute()) {
+        if (!dialog.execute()) {
             return null;
         }
 
@@ -52,9 +54,9 @@ public class NominalScaleGenerator implements ScaleGenerator {
         ret.setTitle(dialog.getDiagramTitle());
 
         List conceptList = new ArrayList();
-        ConceptImplementation top = makeConcept(null,null);
+        ConceptImplementation top = makeConcept(null, null);
         DiagramNode topNode = new DiagramNode("top",
-                new Point2D.Double(0,0),
+                new Point2D.Double(0, 0),
                 top,
                 new LabelInfo(),
                 new LabelInfo(),
@@ -62,9 +64,9 @@ public class NominalScaleGenerator implements ScaleGenerator {
         );
         ret.addNode(topNode);
         conceptList.add(top);
-        ConceptImplementation bottom = makeConcept(null,null);
+        ConceptImplementation bottom = makeConcept(null, null);
         DiagramNode bottomNode = new DiagramNode("bottom",
-                new Point2D.Double(0,100),
+                new Point2D.Double(0, 100),
                 top,
                 new LabelInfo(),
                 new LabelInfo(),
@@ -74,9 +76,9 @@ public class NominalScaleGenerator implements ScaleGenerator {
         conceptList.add(bottom);
         int numberOfValues = values.length;
         for (int i = 0; i < numberOfValues; i++) {
-            double x = -DIAGRAM_WIDTH/2 + i*DIAGRAM_WIDTH/(double)(numberOfValues-1);
+            double x = -DIAGRAM_WIDTH / 2 + i * DIAGRAM_WIDTH / (double) (numberOfValues - 1);
             ConceptImplementation currentConcept = makeConcept(String.valueOf(values[i]),
-                                                       getSQLClause(column.getName(), values, i));
+                    getSQLClause(column.getName(), values, i));
             conceptList.add(currentConcept);
 
             DiagramNode node = new DiagramNode((new Integer(i)).toString(),
@@ -107,10 +109,10 @@ public class NominalScaleGenerator implements ScaleGenerator {
 
     private ConceptImplementation makeConcept(String label, String queryClause) {
         ConceptImplementation retVal = new ConceptImplementation();
-        if(label != null) {
+        if (label != null) {
             retVal.addAttribute(new Attribute(label, null));
         }
-        if(queryClause != null) {
+        if (queryClause != null) {
             retVal.addObject(queryClause);
         }
         return retVal;

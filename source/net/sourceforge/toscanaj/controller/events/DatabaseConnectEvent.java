@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.controller.events;
 
-import org.tockit.events.Event;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import org.tockit.events.Event;
 
 public class DatabaseConnectEvent implements Event {
 

@@ -12,9 +12,10 @@ import java.sql.Types;
 /// @todo this is just a quick hack to get rid of the numbers. We should probably put something like
 ///     this somewhere earlier where we still have access to the whole information, types like varchar
 ///     should give extra information like their size
+
 public class SQLTypeMapper {
     public static final String getTypeName(int sqlType) {
-        switch(sqlType) {
+        switch (sqlType) {
             case Types.ARRAY:
                 return "Array";
             case Types.BIGINT:

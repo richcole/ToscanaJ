@@ -81,7 +81,7 @@ public class CanvasBackground extends CanvasItem {
     }
 
     public Point2D getPosition() {
-        return new Point2D.Double(0,0);
+        return new Point2D.Double(0, 0);
     }
 
     public boolean hasAutoRaise() {

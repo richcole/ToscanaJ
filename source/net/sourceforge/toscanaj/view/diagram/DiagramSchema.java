@@ -139,7 +139,7 @@ public class DiagramSchema {
         circleFilterColor = ConfigurationManager.fetchColor("diagramSchema", "circleFilterColor", circleFilterColor);
         fadeOut = ConfigurationManager.fetchFloat("diagramSchema", "fadeOutValue", fadeOut);
         margin = ConfigurationManager.fetchInt("diagramSchema", "margin", margin);
-        notRealizedNodeSizeReductionFactor = ConfigurationManager.fetchFloat("diagramSchema","notRealizedNodeSizeReductionFactor",notRealizedNodeSizeReductionFactor);
+        notRealizedNodeSizeReductionFactor = ConfigurationManager.fetchFloat("diagramSchema", "notRealizedNodeSizeReductionFactor", notRealizedNodeSizeReductionFactor);
         String propVal = ConfigurationManager.fetchString("diagramSchema", "gradientType", "extent");
         propVal = propVal.toLowerCase();
         if (propVal.equals("extent")) {

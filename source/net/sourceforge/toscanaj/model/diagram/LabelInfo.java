@@ -10,7 +10,9 @@ package net.sourceforge.toscanaj.model.diagram;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.util.ColorWriter;
-import net.sourceforge.toscanaj.util.xmlize.*;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
 
 import java.awt.*;

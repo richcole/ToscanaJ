@@ -42,13 +42,12 @@ public class ContextObjectTest extends TestCaseMo {
         counter.verify();
     }
 
-    public void testEquals(){
+    public void testEquals() {
         final String firstName = "One";
         final String secondName = "Two";
         ContextObject attr1 = new ContextObject(firstName, false);
         ContextObject attr2 = new ContextObject(firstName, false);
         assertEquals(attr1, attr2);
-
 
 
         assertEquals(false, attr1.equals(new Object()));

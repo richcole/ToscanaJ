@@ -11,7 +11,10 @@ import java.util.Collection;
 
 public interface Type {
     String getName();
+
     void addValueGroup(ValueGroup group, String id);
+
     ValueGroup getValueGroup(String id);
+
     Collection getValueGroups();
 }

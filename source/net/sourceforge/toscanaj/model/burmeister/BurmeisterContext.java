@@ -7,9 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.burmeister;
 
-import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.BinaryRelation;
 import net.sourceforge.toscanaj.model.BinaryRelationImplementation;
+import net.sourceforge.toscanaj.model.Context;
 
 import java.util.Collection;
 import java.util.HashSet;

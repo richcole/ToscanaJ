@@ -7,12 +7,16 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.model.events.TableChangedEvent;
-import net.sourceforge.toscanaj.util.xmlize.*;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
+import org.tockit.events.EventBroker;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class Table implements XMLizable {
 

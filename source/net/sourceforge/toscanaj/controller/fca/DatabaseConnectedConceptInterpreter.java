@@ -7,12 +7,16 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
-import net.sourceforge.toscanaj.controller.db.*;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
-import org.tockit.events.EventListener;
-import org.tockit.events.Event;
-import net.sourceforge.toscanaj.model.database.*;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.DatabaseRetrievedObject;
+import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
+import org.tockit.events.Event;
+import org.tockit.events.EventListener;
 
 import java.util.*;
 
@@ -143,7 +147,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
             Hashtable contSizes = (Hashtable) iterator.next();
             for (Iterator iterator2 = contSizes.values().iterator(); iterator2.hasNext();) {
                 Integer curVal = (Integer) iterator2.next();
-                if(curVal.intValue() > maxVal) {
+                if (curVal.intValue() > maxVal) {
                     maxVal = curVal.intValue();
                 }
             }
@@ -162,12 +166,11 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                 Concept compareConcept;
                 ConceptInterpretationContext compareContext;
                 List nesting = context.getNestingConcepts();
-                if(nesting.size() != 0) {
+                if (nesting.size() != 0) {
                     // go outermost
                     compareConcept = (Concept) nesting.get(0);
                     compareContext = new ConceptInterpretationContext(context.getDiagramHistory(), context.getEventBroker());
-                }
-                else {
+                } else {
                     compareConcept = concept;
                     compareContext = context;
                 }
@@ -180,7 +183,7 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                     compareConcept = other;
                 }
                 return (double) extentSize /
-                               (double) getCount(compareConcept, compareContext, ConceptInterpretationContext.EXTENT);
+                        (double) getCount(compareConcept, compareContext, ConceptInterpretationContext.EXTENT);
             } else {
                 /// @todo implement or remove the distinction
                 return 1;
@@ -211,12 +214,12 @@ public class DatabaseConnectedConceptInterpreter implements ConceptInterpreter, 
                 Concept outerConcept = (Concept) iterator.next();
                 for (Iterator iterator2 = outerConcept.getDownset().iterator(); iterator2.hasNext();) {
                     Concept otherConcept = (Concept) iterator2.next();
-                    if(otherConcept != outerConcept) {
+                    if (otherConcept != outerConcept) {
                         for (Iterator iterator3 = this.contingentSizes.keySet().iterator(); iterator3.hasNext();) {
                             ConceptInterpretationContext otherContext = (ConceptInterpretationContext) iterator3.next();
                             List nesting = otherContext.getNestingConcepts();
-                            if(nesting.size() != 0) {
-                                if(nesting.get(nesting.size()-1).equals(otherConcept)) {
+                            if (nesting.size() != 0) {
+                                if (nesting.get(nesting.size() - 1).equals(otherConcept)) {
                                     int otherExtentSize = getCount(concept, otherContext, ConceptInterpretationContext.EXTENT);
                                     if (otherExtentSize == extentSize) {
                                         return false;

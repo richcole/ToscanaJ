@@ -13,8 +13,8 @@ import java.awt.geom.Point2D;
 
 public class CanvasItemDroppedEvent extends CanvasItemDraggedEvent {
     public CanvasItemDroppedEvent(CanvasItem item, int modifiers,
-                 Point2D canvasFromPosition, Point2D awtFromPosition,
-                 Point2D canvasToPosition, Point2D awtToPosition) {
+                                  Point2D canvasFromPosition, Point2D awtFromPosition,
+                                  Point2D canvasToPosition, Point2D awtToPosition) {
         super(item, modifiers, canvasFromPosition, awtFromPosition, canvasToPosition, awtToPosition);
     }
 }

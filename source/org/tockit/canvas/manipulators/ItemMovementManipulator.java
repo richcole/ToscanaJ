@@ -7,9 +7,14 @@
  */
 package org.tockit.canvas.manipulators;
 
-import org.tockit.events.*;
-import org.tockit.canvas.events.*;
-import org.tockit.canvas.*;
+import org.tockit.canvas.Canvas;
+import org.tockit.canvas.MovableCanvasItem;
+import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.canvas.events.CanvasItemDroppedEvent;
+import org.tockit.canvas.events.CanvasItemPickupEvent;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventListener;
 
 import java.awt.geom.Point2D;
 
@@ -21,7 +26,7 @@ public class ItemMovementManipulator implements EventListener {
     }
 
     public ItemMovementManipulator(Canvas canvas, Class itemType, EventBroker eventBroker) {
-        if(! eventBroker.extendsOrImplements(itemType, MovableCanvasItem.class) ){
+        if (!eventBroker.extendsOrImplements(itemType, MovableCanvasItem.class)) {
             throw new RuntimeException("ItemMovementManipulator can only be subscribed to MovableCanvasItem or subtypes");
         }
         eventBroker.subscribe(this, CanvasItemDraggedEvent.class, itemType);
@@ -29,9 +34,9 @@ public class ItemMovementManipulator implements EventListener {
     }
 
     public void processEvent(Event e) {
-        if( e instanceof CanvasItemPickupEvent ) {
+        if (e instanceof CanvasItemPickupEvent) {
             dragStart((CanvasItemPickupEvent) e);
-        } else if( e instanceof CanvasItemDroppedEvent ) {
+        } else if (e instanceof CanvasItemDroppedEvent) {
             dragEnd((CanvasItemDroppedEvent) e);
         } else {
             moveItem((CanvasItemDraggedEvent) e);
@@ -44,7 +49,7 @@ public class ItemMovementManipulator implements EventListener {
         Point2D fromPosition = dragEvent.getCanvasFromPosition();
         Point2D toPosition = dragEvent.getCanvasToPosition();
         item.moveBy(toPosition.getX() - fromPosition.getX(),
-                    toPosition.getY() - fromPosition.getY());
+                toPosition.getY() - fromPosition.getY());
     }
 
     protected void dragStart(CanvasItemPickupEvent dragEvent) {

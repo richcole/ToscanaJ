@@ -72,7 +72,6 @@ public interface ContextEditingInterface {
     public void setDimension(int numObj, int numAttr);
 
 
-
     /**
      * Insert the method's description here.
      * Creation date: (19.04.01 2:19:10)

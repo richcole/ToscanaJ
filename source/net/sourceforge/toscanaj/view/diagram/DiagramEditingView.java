@@ -7,25 +7,30 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import net.sourceforge.toscanaj.controller.diagram.*;
-import net.sourceforge.toscanaj.controller.fca.*;
-import org.tockit.events.*;
-import org.tockit.events.Event;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
+import net.sourceforge.toscanaj.controller.fca.DirectConceptInterpreter;
 import net.sourceforge.toscanaj.gui.LabeledScrollPaneView;
 import net.sourceforge.toscanaj.model.DiagramCollection;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.events.*;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventListener;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
 import java.util.Iterator;
 
 public class DiagramEditingView extends JPanel implements EventListener {
@@ -64,7 +69,7 @@ public class DiagramEditingView extends JPanel implements EventListener {
         EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
         DirectConceptInterpreter interpreter = new DirectConceptInterpreter();
         ConceptInterpretationContext interpretationContext =
-                    new ConceptInterpretationContext(new DiagramHistory(),canvasEventBroker);
+                new ConceptInterpretationContext(new DiagramHistory(), canvasEventBroker);
         diagramView.setConceptInterpreter(interpreter);
         diagramView.setConceptInterpretationContext(interpretationContext);
         new LabelDragEventHandler(canvasEventBroker);
@@ -138,7 +143,7 @@ public class DiagramEditingView extends JPanel implements EventListener {
     }
 
     private void zoomIntoDiagram() {
-        changeZoom(1/ZOOM_FACTOR);
+        changeZoom(1 / ZOOM_FACTOR);
     }
 
     private void zoomOutOfDiagram() {

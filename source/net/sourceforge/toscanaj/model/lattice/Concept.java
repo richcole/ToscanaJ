@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import net.sourceforge.toscanaj.model.order.Ordered;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 import java.util.Collection;
 import java.util.Iterator;

@@ -7,13 +7,13 @@
  */
 package net.sourceforge.toscanaj.model.cernato.tests;
 
-import net.sourceforge.toscanaj.model.cernato.*;
-import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.BinaryRelation;
+import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.burmeister.BurmeisterContext;
-import net.sourceforge.toscanaj.model.lattice.Lattice;
-import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.cernato.*;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
 
 import java.io.PrintStream;
 import java.util.Collection;
@@ -39,7 +39,7 @@ public class TextDumps {
         for (Iterator iterator = properties.iterator(); iterator.hasNext();) {
             Property property = (Property) iterator.next();
             Type type = property.getType();
-            if(type instanceof TextualType) {
+            if (type instanceof TextualType) {
                 stream.print("T\t");
             } else {
                 // NumericalType numtype = (NumericalType) type;
@@ -60,7 +60,7 @@ public class TextDumps {
 
     public static final void dump(CernatoModel model, View view, PrintStream stream) {
         stream.println(view.getName());
-        for(int i = 0; i<view.getName().length(); i++) {
+        for (int i = 0; i < view.getName().length(); i++) {
             stream.print("=");
         }
         stream.println();
@@ -81,7 +81,7 @@ public class TextDumps {
             stream.print(object.getName() + "\t");
             for (Iterator it2 = attributes.iterator(); it2.hasNext();) {
                 Criterion criterion = (Criterion) it2.next();
-                if(relation.contains(object,criterion)) {
+                if (relation.contains(object, criterion)) {
                     stream.print("X");
                 }
                 stream.print("\t");
@@ -99,7 +99,7 @@ public class TextDumps {
             while (extIt.hasNext()) {
                 FCAObject obj = (FCAObject) extIt.next();
                 stream.print(obj.getName());
-                if(extIt.hasNext()) {
+                if (extIt.hasNext()) {
                     stream.print(", ");
                 }
             }
@@ -108,7 +108,7 @@ public class TextDumps {
             while (intIt.hasNext()) {
                 Attribute attribute = (Attribute) intIt.next();
                 stream.print(attribute.toString());
-                if(intIt.hasNext()) {
+                if (intIt.hasNext()) {
                     stream.print(", ");
                 }
             }
@@ -117,7 +117,7 @@ public class TextDumps {
             while (subIt.hasNext()) {
                 Object subConcept = subIt.next();
                 stream.print(subConcept);
-                if(subIt.hasNext()) {
+                if (subIt.hasNext()) {
                     stream.print(", ");
                 }
             }
@@ -130,7 +130,7 @@ public class TextDumps {
      */
     public static final void dump(Context context, PrintStream stream) {
         stream.println("B");
-        if(context instanceof BurmeisterContext) {
+        if (context instanceof BurmeisterContext) {
             BurmeisterContext burCon = (BurmeisterContext) context;
             stream.println(burCon.getName());
         } else {
@@ -155,7 +155,7 @@ public class TextDumps {
             Object o = it1.next();
             for (Iterator it2 = attributes.iterator(); it2.hasNext();) {
                 Object a = it2.next();
-                if(relation.contains(o,a)) {
+                if (relation.contains(o, a)) {
                     stream.print("x");
                 } else {
                     stream.print(".");

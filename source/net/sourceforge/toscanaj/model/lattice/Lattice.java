@@ -7,10 +7,11 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
-import net.sourceforge.toscanaj.model.lattice.Concept;
 
 public interface Lattice {
     Concept[] getConcepts();
+
     Concept getTop();
+
     Concept getBottom();
 }

@@ -16,10 +16,9 @@ package concept.context.bitset;
 import concept.context.Fragment;
 import concept.context.ModifiableSet;
 import concept.context.Set;
+import util.Assert;
 
 import java.io.Serializable;
-
-import util.Assert;
 
 
 public class BitSet extends BasicBitSet implements Cloneable, Serializable {
@@ -590,7 +589,7 @@ public class BitSet extends BasicBitSet implements Cloneable, Serializable {
             long xorMask = unit[k] ^ other.unit[k];
             while (mask != 0) {
                 if ((mask & xorMask) != 0) {
-                    return ((mask & unit[k]) != 0) ? 1: -1;
+                    return ((mask & unit[k]) != 0) ? 1 : -1;
                 }
                 mask <<= 1;
             }
@@ -600,7 +599,7 @@ public class BitSet extends BasicBitSet implements Cloneable, Serializable {
         int i = upperBound * BITS_PER_UNIT;
         while (i < size) {
             if ((mask & xorMask) != 0) {
-                return ((mask & unit[upperBound]) != 0) ? 1: -1;
+                return ((mask & unit[upperBound]) != 0) ? 1 : -1;
             }
             mask <<= 1;
             i++;
@@ -675,7 +674,7 @@ public class BitSet extends BasicBitSet implements Cloneable, Serializable {
     public boolean out(int bitIndex) {
         if (bitIndex < 0)
             throw new IndexOutOfBoundsException(Integer.toString(bitIndex));
-        Assert.isTrue(bitIndex<size(), "index bigger than size");
+        Assert.isTrue(bitIndex < size(), "index bigger than size");
         int unitIndex = unitIndex(bitIndex);
         if (unitIndex >= unit.length)
             return true;

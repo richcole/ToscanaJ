@@ -7,7 +7,9 @@
  */
 package net.sourceforge.toscanaj.controller.cernato.tests;
 
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 public class AllTests extends TestCase {
     public AllTests(String s) {

@@ -8,12 +8,12 @@
 package net.sourceforge.toscanaj.controller.cernato;
 
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
-import net.sourceforge.toscanaj.model.order.PartialOrderNode;
 import net.sourceforge.toscanaj.model.order.Ordered;
+import net.sourceforge.toscanaj.model.order.PartialOrderNode;
 
-import java.util.Set;
-import java.util.Iterator;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class PartialOrderOperations {
     static public DirectedGraph createGraphFromOrder(Ordered[] order) {
@@ -27,7 +27,7 @@ public class PartialOrderOperations {
             for (Iterator iterator = nodes.iterator(); iterator.hasNext();) {
                 PartialOrderNode otherNode = (PartialOrderNode) iterator.next();
                 Ordered otherItem = otherNode.getData();
-                if(otherItem.isEqual(item) ) {
+                if (otherItem.isEqual(item)) {
                     for (Iterator iterator2 = otherNode.getInboundNodes().iterator(); iterator2.hasNext();) {
                         PartialOrderNode inbNode = (PartialOrderNode) iterator2.next();
                         inbNode.connectTo(node);
@@ -50,7 +50,7 @@ public class PartialOrderOperations {
                 PartialOrderNode smallerNode = (PartialOrderNode) iterator.next();
                 for (Iterator iterator2 = smallerNode.getInboundNodes().iterator(); iterator2.hasNext();) {
                     PartialOrderNode inbNode = (PartialOrderNode) iterator2.next();
-                    if(smallerNodes.contains(inbNode)) {
+                    if (smallerNodes.contains(inbNode)) {
                         nonNeighbours.add(smallerNode);
                         continue smallerLoop;
                     }
@@ -62,7 +62,7 @@ public class PartialOrderOperations {
                 PartialOrderNode largerNode = (PartialOrderNode) iterator.next();
                 for (Iterator iterator2 = largerNode.getOutboundNodes().iterator(); iterator2.hasNext();) {
                     PartialOrderNode outbNode = (PartialOrderNode) iterator2.next();
-                    if(largerNodes.contains(outbNode)) {
+                    if (largerNodes.contains(outbNode)) {
                         nonNeighbours.add(largerNode);
                         continue largerLoop;
                     }

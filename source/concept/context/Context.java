@@ -32,7 +32,6 @@ public class Context implements AttributeInformationSupplier, ContextEditingInte
     }
 
 
-
     public String makeUniqueAttributeName() {
         int startValue = getAttributeCount();
         String candName;
@@ -92,11 +91,13 @@ public class Context implements AttributeInformationSupplier, ContextEditingInte
             getContextListenersSupport().fireAttributeNameChanged(evt);
         }
     };
+
     //---------------------------------------------------------------
     public Context(int objCnt, int arrCnt) {
         createDummyObjectsAndAttribs(objCnt, arrCnt);
         allocateRelation(objCnt, arrCnt);
     }
+
     //---------------------------------------------------------------
     private void allocateRelation(int sizeX, int sizeY) {
         if (null == rel) {
@@ -105,34 +106,42 @@ public class Context implements AttributeInformationSupplier, ContextEditingInte
             rel.setDimension(sizeX, sizeY);
         }
     }
+
     //---------------------------------------------------------------
     private void ensureRelationsSizes(int rows, int cols) {
         rel.setDimension(rows, cols);
     }
+
     //---------------------------------------------------------------
     public ContextObject getAttribute(int index) {
         return (ContextObject) attributes.get(index);
     }
+
     //---------------------------------------------------------------
     public int getAttributeCount() {
         return attributes.size();
     }
+
     //---------------------------------------------------------------
     public ContextObject getObject(int index) {
         return (ContextObject) objects.get(index);
     }
+
     //---------------------------------------------------------------
     public int getObjectCount() {
         return objects.size();
     }
+
     //---------------------------------------------------------------
     public BinaryRelation getRelation() {
         return rel;
     }
+
     //---------------------------------------------------------------
     public boolean getRelationAt(int x, int y) {
         return rel.getRelationAt(x, y);
     }
+
     //---------------------------------------------------------------
     public void increaseAttributes(int incrAttr) {
         util.Assert.isTrue(incrAttr > 0, "Attrib increment should be greater than zero");
@@ -143,14 +152,14 @@ public class Context implements AttributeInformationSupplier, ContextEditingInte
         getContextListenersSupport().fireContextStructureChanged();
     }
 
-    public void addAttribute(ContextObject newAttrib){
+    public void addAttribute(ContextObject newAttrib) {
         final int newAttributeIndex = rel.getColCount();
         ensureRelationsSizes(rel.getRowCount(), newAttributeIndex + 1);
         addAttributeToAttributeList(newAttrib, newAttributeIndex);
         getContextListenersSupport().fireContextStructureChanged();
     }
 
-    public void addObject(ContextObject newObject){
+    public void addObject(ContextObject newObject) {
         ensureRelationsSizes(rel.getRowCount() + 1, rel.getColCount());
         addObjectToObjectList(newObject);
         getContextListenersSupport().fireContextStructureChanged();
@@ -217,6 +226,7 @@ public class Context implements AttributeInformationSupplier, ContextEditingInte
             }
         }
     }
+
     //---------------------------------------------------------------
     public void purifyObjects() {
         doPurifyObjects();
@@ -238,6 +248,7 @@ public class Context implements AttributeInformationSupplier, ContextEditingInte
             }
         }
     }
+
     //---------------------------------------------------------------
     public void removeAttribute(int index) {
         doRemoveAttribute(index);
@@ -253,6 +264,7 @@ public class Context implements AttributeInformationSupplier, ContextEditingInte
         getContextListenersSupport().fireAttributeRemoved(index);
         getContextListenersSupport().madePostponedStructureChange();
     }
+
     //---------------------------------------------------------------
     public void removeObject(int index) {
         doRemoveObject(index);
@@ -371,23 +383,23 @@ public class Context implements AttributeInformationSupplier, ContextEditingInte
     }
 
     public boolean equals(Object obj) {
-        if(!(obj instanceof Context)){
+        if (!(obj instanceof Context)) {
             return false;
         }
-        Context that = (Context)obj;
-        if(!(this.getRelation().equals(that.getRelation()))){
+        Context that = (Context) obj;
+        if (!(this.getRelation().equals(that.getRelation()))) {
             return false;
         }
-        if(!this.attributes.equals(that.attributes)){
+        if (!this.attributes.equals(that.attributes)) {
             return false;
         }
-        if(!this.objects.equals(that.objects)){
+        if (!this.objects.equals(that.objects)) {
             return false;
         }
         return true;
     }
 
     public String toString() {
-        return "Attributes["+attributes+"] Objects["+objects+"] Relation ["+getRelation()+"]";
+        return "Attributes[" + attributes + "] Objects[" + objects + "] Relation [" + getRelation() + "]";
     }
 }

@@ -7,9 +7,14 @@
  */
 package net.sourceforge.toscanaj.model.cernato.tests;
 
-import junit.framework.*;
-import net.sourceforge.toscanaj.model.cernato.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.cernato.Criterion;
+import net.sourceforge.toscanaj.model.cernato.FCAObject;
+import net.sourceforge.toscanaj.model.cernato.View;
+import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import java.util.Collection;
@@ -42,8 +47,8 @@ public class ViewContextTest extends TestCase {
                 Attribute attribute = (Attribute) it2.next();
                 Criterion criterion = (Criterion) attribute.getData();
                 assertEquals(object.getName() + " x " + criterion.getProperty().getName() + ":" + criterion.getValueGroup().getName(),
-                             TestData.isInScaledRelation(object, criterion),
-                             scaledContext.getRelation().contains(object, new Attribute(criterion,null)));
+                        TestData.isInScaledRelation(object, criterion),
+                        scaledContext.getRelation().contains(object, new Attribute(criterion, null)));
             }
         }
     }

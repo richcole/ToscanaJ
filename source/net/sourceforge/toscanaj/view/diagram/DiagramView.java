@@ -7,21 +7,27 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import org.tockit.canvas.Canvas;
-import org.tockit.canvas.CanvasItem;
-import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.controller.diagram.SelectionChangedEvent;
-import net.sourceforge.toscanaj.controller.fca.*;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.DiagramController;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
+import org.tockit.canvas.Canvas;
+import org.tockit.canvas.CanvasItem;
+import org.tockit.events.EventBroker;
 
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -245,8 +251,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
                     NestedDiagramNode ndNode = (NestedDiagramNode) node;
                     addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept));
                 }
-            }
-            else {
+            } else {
                 /**
                  * Inititalize the contingent sizes to allow contingent gradients to work properly on first draw.
                  *

@@ -3,16 +3,16 @@
  * User: Serhiy Yevtushenko
  * Date: May 31, 2002
  * Time: 8:34:28 PM
- * To change template for new class use 
+ * To change template for new class use
  * Code Style | Class Templates options (Tools | IDE Options).
  */
 package util;
 
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 
-public class ReverseListIterator implements Iterator{
+public class ReverseListIterator implements Iterator {
     List originalList;
     ListIterator reverseIterator;
 
@@ -30,6 +30,6 @@ public class ReverseListIterator implements Iterator{
     }
 
     public void remove() {
-         reverseIterator.remove();
+        reverseIterator.remove();
     }
 }

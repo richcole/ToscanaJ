@@ -300,7 +300,7 @@ public class Canvas extends JPanel implements Printable {
         Set retVal = new HashSet();
         for (Iterator iterator = canvasItems.iterator(); iterator.hasNext();) {
             CanvasItem canvasItem = (CanvasItem) iterator.next();
-            if( EventBroker.extendsOrImplements(canvasItem.getClass(), type)) {
+            if (EventBroker.extendsOrImplements(canvasItem.getClass(), type)) {
                 retVal.add(canvasItem);
             }
         }

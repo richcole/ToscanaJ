@@ -11,14 +11,16 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.diagram.*;
-import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import util.Assert;
 
 import javax.swing.*;
 import java.awt.geom.Point2D;
-import java.util.*;
 import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class OrdinalScaleGenerator implements ScaleGenerator {
     private JFrame parent;
@@ -34,20 +36,19 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
     /// @todo should check type of column, too -- we need at least two versions for int and float values (should be
     /// transparent to the user
     public boolean canHandleColumns(TableColumnPair[] columns) {
-        if(columns.length != 1) {
+        if (columns.length != 1) {
             return false;
         }
         int columnType = columns[0].getColumn().getType();
-        if(determineDataType(columnType) == OrdinalScaleEditorDialog.UNSUPPORTED) {
+        if (determineDataType(columnType) == OrdinalScaleEditorDialog.UNSUPPORTED) {
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }
 
     private int determineDataType(int columnType) {
-        switch(columnType) {
+        switch (columnType) {
             case Types.DOUBLE:
                 return OrdinalScaleEditorDialog.FLOAT;
             case Types.FLOAT:
@@ -89,7 +90,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         double y = 0.;
         /// @todo handle or avoid the case where there is no divider
         ConceptImplementation top = makeConcept(null,
-                                "(" + columnName + "<=" + String.valueOf(dividers.get(0)) + ")");
+                "(" + columnName + "<=" + String.valueOf(dividers.get(0)) + ")");
         DiagramNode topNode = new DiagramNode("top",
                 new Point2D.Double(x, y),
                 top,
@@ -104,7 +105,7 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         for (int i = 0; i < dividers.size(); i++) {
             y += 60;
             ConceptImplementation currentConcept = makeConcept(">" + String.valueOf(dividers.get(i)),
-                                                               getSQLClause(columnName, dividers, i));
+                    getSQLClause(columnName, dividers, i));
             conceptList.add(currentConcept);
 
             DiagramNode node = new DiagramNode((new Integer(i)).toString(),
@@ -132,15 +133,15 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
 
     private String getSQLClause(String columnName, List dividers, int i) {
         String retVal = "(" + columnName + ">" + String.valueOf(dividers.get(i)) + ")";
-        if(i < dividers.size()-1 ) {
-            retVal += "AND (" + columnName + "<=" + String.valueOf(dividers.get(i+1)) + ")";
+        if (i < dividers.size() - 1) {
+            retVal += "AND (" + columnName + "<=" + String.valueOf(dividers.get(i + 1)) + ")";
         }
         return retVal;
     }
 
     private ConceptImplementation makeConcept(String label, String queryClause) {
         ConceptImplementation retVal = new ConceptImplementation();
-        if(label != null) {
+        if (label != null) {
             retVal.addAttribute(new Attribute(label, null));
         }
         retVal.addObject(queryClause);

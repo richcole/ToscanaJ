@@ -7,15 +7,20 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.controller.fca.*;
-import net.sourceforge.toscanaj.model.database.*;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
+import net.sourceforge.toscanaj.model.database.AggregateQuery;
+import net.sourceforge.toscanaj.model.database.ListQuery;
+import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -124,7 +129,7 @@ public class ObjectLabelView extends LabelView {
             contents.add(new Integer(this.diagramView.getConceptInterpreter().getObjectCount(node.getConcept(), context)));
         } else {
             DatabaseConnectedConceptInterpreter conceptInterpreter =
-                                (DatabaseConnectedConceptInterpreter) this.diagramView.getConceptInterpreter();
+                    (DatabaseConnectedConceptInterpreter) this.diagramView.getConceptInterpreter();
             contents = conceptInterpreter.executeQuery(query, node.getConcept(), context);
         }
     }

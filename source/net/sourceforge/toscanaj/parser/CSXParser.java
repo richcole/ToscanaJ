@@ -11,22 +11,34 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerInitializationException;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
-import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.database.*;
-import net.sourceforge.toscanaj.model.diagram.*;
+import net.sourceforge.toscanaj.model.database.AggregateQuery;
+import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.database.ListQuery;
+import net.sourceforge.toscanaj.model.database.Query;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
-import net.sourceforge.toscanaj.model.lattice.*;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
-import org.jdom.*;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
+import org.jdom.DataConversionException;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.adapters.DOMAdapter;
 import org.jdom.input.DOMBuilder;
+import org.tockit.events.EventBroker;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -108,8 +120,7 @@ public class CSXParser {
         if (element.getName().equals("conceptualSchema")) {
             if (element.getAttributeValue("version").equals("TJ0.6")) {
                 _Schema = new ConceptualSchema(eventBroker, element);
-            }
-            else {
+            } else {
                 // create data structure
                 _Schema = new ConceptualSchema(eventBroker);
 
@@ -118,8 +129,7 @@ public class CSXParser {
                 parseContext();
                 parseDiagrams();
             }
-        }
-        else {
+        } else {
             throw new DataFormatException("Root element name is not <conceptualSchema>");
         }
         eventBroker.processEvent(new ConceptualSchemaLoadedEvent(CSXParser.class, _Schema, csxFile));
