@@ -60,13 +60,11 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
 
         // @todo need errorchecking on columnName here
         columnName = (String) viewerManager.getParameters().get("columnName");
-        System.out.println("column name = " + columnName);
         fieldNames.add(columnName);
     }
 
     public void showView(String whereClause) {
         String resourceLocation = "";
-        String command = "";
         try {
             List results = this.viewerManager.getConnection().executeQuery(fieldNames,
                     viewerManager.getTableName(),
@@ -77,50 +75,12 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
                 String result = (String) itFields.next();
 				resourceLocation += result;
             }
-            System.out.println("resourceLocation = " + resourceLocation);
         } catch (DatabaseException e) {
         	/// @todo maybe we should introduce a proper DatabaseViewerException in the signature
             throw new RuntimeException("Failed to query database.", e);
         }
         try {
-            // add command shell on Win32 platforms
-            String osName = System.getProperty("os.name");
-            if (osName.startsWith("Windows ")) {
-            	// This command will open specified file with an appropriate
-            	// application registered for it's file type. 
-            	// The only issue I can see at the moment with this approach is 
-            	// that if we are opening an html file - last active browser
-            	// window will get reused rather then opening new browser 
-            	// window (not sure if the behaviour is the same for other 
-            	// file types, certainly not for .txt).
-				String windowsCommand = "rundll32 url.dll,FileProtocolHandler ";
-				
-				// followind addition to the windowsCommand
-				// opens new browser window for this, may be not what we want if 
-				// we want to display word doc - in this case we will get browser 
-				// window with a dialog box saying that you are downloading a word
-				// document and options to open or save it. Also have to add "%22" 
-				// at the end of command, otherwise we get an error.
-				//windowsCommand = windowsCommand + "javascript:location.href=%22";
-				
-				//command = windowsCommand + resourceLocation;
-				
-				//command = command + "%22";
-				
-				// This approach is better since it behaves in the same manner
-				// as the above approach, but also has a good working feature:
-				// if there a file type is unknown - user gets a dialog
-				// allowing them to choose an appropriate application.
-				command = "cmd.exe /c start " + resourceLocation;
-            }
-//            if (osName.equals("Windows NT")) {
-//                command = "cmd.exe /C " + command;
-//            } else if (osName.equals("Windows 95")) {
-//                command = "command.com /C " + command;
-//            }
-
-            Runtime rt = Runtime.getRuntime();
-            rt.exec(command);
+			BrowserLauncher.openURL(resourceLocation);
         } catch (Exception e) {
             throw new RuntimeException("There was a problem running external viewer",e);
         }
