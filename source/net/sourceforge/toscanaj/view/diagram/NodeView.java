@@ -92,7 +92,8 @@ public class NodeView extends CanvasItem {
         	}
         }
         Stroke oldStroke = graphics.getStroke();
-        int selectionLineWidth = diagramSchema.getSelectionLineWidth();
+        graphics.setStroke(new BasicStroke(diagramSchema.getNodeStrokeWidth()));
+        float selectionLineWidth = diagramSchema.getSelectionLineWidth();
         if (this.selectionState != DiagramView.NO_SELECTION) {
             if (this.selectionState == DiagramView.SELECTED_DIRECTLY) {
                 graphics.setStroke(new BasicStroke(selectionLineWidth));

@@ -165,9 +165,11 @@ public class DiagramSchema implements Comparable {
      */
     private ConceptInterpreter.IntervalType gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
 
-    private int defaultLineWidth;
+    private float defaultLineWidth;
 
-    private int selectionLineWidth;
+    private float selectionLineWidth;
+
+    private float nodeStrokeWidth;
 
     private int margin;
 
@@ -425,20 +427,28 @@ public class DiagramSchema implements Comparable {
         return this.gradientType;
     }
 
-    public int getDefaultLineWidth() {
+    public float getDefaultLineWidth() {
         return this.defaultLineWidth;
     }
 
-    public void setDeafultLineWidth(int lineWidth) {
+    public void setDefaultLineWidth(float lineWidth) {
         this.defaultLineWidth = lineWidth;
     }
 
-    public int getSelectionLineWidth() {
+    public float getSelectionLineWidth() {
         return this.selectionLineWidth;
     }
 
-    public void setSelectionLineWidth(int lineWidth) {
+    public void setSelectionLineWidth(float lineWidth) {
         this.selectionLineWidth = lineWidth;
+    }
+
+    public float getNodeStrokeWidth() {
+        return nodeStrokeWidth;
+    }
+
+    public void setNodeStrokeWidth(float nodeStrokeWidth) {
+        this.nodeStrokeWidth = nodeStrokeWidth;
     }
 
     /**
@@ -552,8 +562,9 @@ public class DiagramSchema implements Comparable {
         } else {
             throw new RuntimeException("Unknown gradient type");
         }
-        extPrefs.putInt("defaultLineWidth", this.defaultLineWidth);
-        extPrefs.putInt("selectionLineWidth", this.selectionLineWidth);
+        extPrefs.putFloat("defaultLineWidth", this.defaultLineWidth);
+        extPrefs.putFloat("selectionLineWidth", this.selectionLineWidth);
+        extPrefs.putFloat("nodeStrokeWidth", this.nodeStrokeWidth);
         extPrefs.put("labelFontName", this.labelFont.getFamily());
         extPrefs.putInt("labelFontSize", this.labelFont.getSize());
         if(this.nodeSizeScalingType == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT) {
@@ -619,8 +630,9 @@ public class DiagramSchema implements Comparable {
             System.err.println("Caught unknown gradient type for DiagramSchema: " + propVal);
             System.err.println("-- using default");
         }
-        this.defaultLineWidth = extPrefs.getInt("defaultLineWidth", 1);
-        this.selectionLineWidth = extPrefs.getInt("selectionLineWidth", 3);
+        this.defaultLineWidth = extPrefs.getFloat("defaultLineWidth", 1);
+        this.selectionLineWidth = extPrefs.getFloat("selectionLineWidth", 3);
+        this.nodeStrokeWidth = extPrefs.getFloat("nodeStrokeWidth", 1);
         String labelFontName = extPrefs.get("labelFontName", "SansSerif");
         int labelFontSize = extPrefs.getInt("labelFontSize", 10);
         propVal = extPrefs.get("scaleNodeSize", "none");

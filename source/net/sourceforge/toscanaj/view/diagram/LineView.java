@@ -102,8 +102,8 @@ public class LineView extends CanvasItem {
 			extentRatio = (double)lowerExtent / (double)upperExtent;
 		}
 
-		int defaultLineWidth = diagramSchema.getDefaultLineWidth();
-		int selectionLineWidth = diagramSchema.getSelectionLineWidth();
+		float defaultLineWidth = diagramSchema.getDefaultLineWidth();
+		float selectionLineWidth = diagramSchema.getSelectionLineWidth();
 		Color lineColor = null;
 		float strokeWidth = defaultLineWidth;
 		if (this.diagramLine.getFromNode().getY() > this.diagramLine.getToNode().getY()) {
