@@ -7,7 +7,6 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-import java.lang.reflect.Constructor;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -23,7 +22,9 @@ import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 
 import org.jdom.Element;
 import org.tockit.datatype.Datatype;
+import org.tockit.datatype.DatatypeFactory;
 import org.tockit.datatype.Value;
+import org.tockit.datatype.xsd.AbstractXSDDatatype;
 import org.tockit.util.IdPool;
 import org.tockit.util.ListSet;
 import org.tockit.util.ListSetImplementation;
@@ -46,7 +47,10 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 	private static final String TYPE_ID_ATTRIBUTE_NAME = "typeId";
 	private static final String VALUE_OBJECT_REF_ATTRIBUTE_NAME = "objectRef";
 	private static final String VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME = "attributeRef";
-	private static final String CLASS_ATTRIBUTE_NAME = "class";
+    
+    static {
+        AbstractXSDDatatype.registerTypeCreators();
+    }
 	
 	public ManyValuedContextImplementation() {
     }
@@ -223,14 +227,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		}
 		for (Iterator iter = typesElement.getChildren().iterator(); iter.hasNext();) {
 			Element typeElement = (Element) iter.next();
-			String className = XMLHelper.getAttribute(typeElement, CLASS_ATTRIBUTE_NAME).getValue();
-			Datatype newType;
-			try {
-				Constructor construct = Class.forName(className).getConstructor(new Class[] {Element.class});
-				newType = (Datatype) construct.newInstance(new Object[] {typeElement});
-			} catch (Exception e) {
-				throw new XMLSyntaxError("Initialization of attribute type \"" + className + "\" failed.", e);
-			}
+			Datatype newType = DatatypeFactory.readType(typeElement);
 			String id = XMLHelper.getAttribute(typeElement, TYPE_ID_ATTRIBUTE_NAME).getValue();
 			typeIdMapping.put(id, newType);
 			types.add(newType);

@@ -7,6 +7,8 @@
  */
 package org.tockit.datatype.xsd;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +16,8 @@ import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 
 import org.jdom.Element;
 import org.tockit.datatype.ConversionException;
+import org.tockit.datatype.Datatype;
+import org.tockit.datatype.DatatypeFactory;
 import org.tockit.datatype.Value;
 
 
@@ -21,6 +25,39 @@ import org.tockit.datatype.Value;
  * @todo XSD allows combining the restrictions, we don't
  */
 public class StringType extends AbstractXSDDatatype {
+    public static DatatypeFactory.TypeCreator getTypeCreator() {
+        return new TypeCreator("string") {
+            public Datatype create(Element element) {
+                String name = getTypeName(element);
+                Element restElem = getRestrictionElement(element);
+                Element child = restElem.getChild("enumeration", XSD_NAMESPACE);
+                if(child != null) {
+                    List enumChildren = restElem.getChildren("enumeration", XSD_NAMESPACE);
+                    StringValue[] enum = new StringValue[enumChildren.size()];
+                    int i = 0;
+                    for (Iterator iter = enumChildren.iterator(); iter.hasNext();) {
+                        Element enumElem = (Element) iter.next();
+                        enum[i] = new StringValue(enumElem.getAttributeValue("value"));
+                        i++;
+                    }
+                    return createEnumerationRestrictedType(name, enum);
+                }
+                child = restElem.getChild("pattern", XSD_NAMESPACE);
+                if(child != null) {
+                    return createPatternRestrictedType(name, child.getAttributeValue("value"));
+                }
+                child = restElem.getChild("minLength", XSD_NAMESPACE);
+                if(child != null) {
+                    int minLen = Integer.parseInt(child.getAttributeValue("value"));
+                    Element maxLength = restElem.getChild("maxLength", XSD_NAMESPACE);
+                    int maxLen = Integer.parseInt(child.getAttributeValue("value"));
+                    return createLengthRestrictedType(name, minLen, maxLen);
+                }
+                return createUnrestrictedType(name);
+            }
+        };
+    }
+    
     protected StringType(String name) {
         super(name);
     }
@@ -81,7 +118,7 @@ public class StringType extends AbstractXSDDatatype {
     }
     
     public Value toValue(Element element) {
-        return null;
+        return new StringValue(element.getAttributeValue("value"));
     }
 
     public void insertValue(Element element, Value value) {

@@ -7,6 +7,8 @@
  */
 package org.tockit.datatype;
 
+import org.jdom.Element;
+
 
 public abstract class AbstractDatatype implements Datatype {
     private String name;
@@ -16,6 +18,10 @@ public abstract class AbstractDatatype implements Datatype {
      */
     protected AbstractDatatype(String name) {
         this.name = name;
+    }
+    
+    protected AbstractDatatype(Element element) {
+        this.name = element.getAttributeValue("name");
     }
     
     public String getName() {

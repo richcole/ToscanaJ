@@ -13,6 +13,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.table.TableCellEditor;
 import javax.swing.text.NumberFormatter;
 
@@ -32,10 +33,23 @@ public abstract class DatatypeViewFactory {
             JComboBox comp = new JComboBox(stringType.getEnumeration());
             return new DefaultCellEditor(comp);
         }
+        if(datatype instanceof StringType) {
+            final StringType stringType = (StringType) datatype;
+            final JTextField comp = new JTextField();
+            return new DefaultCellEditor(comp) {
+                public Object getCellEditorValue() {
+                    try {
+                        return stringType.parse(comp.getText());
+                    } catch (ConversionException e) {
+                        // @todo provide error feedback somehow
+                        return Value.NULL;
+                    }
+                }
+            };
+        }
         if(datatype instanceof DecimalType) {
             final DecimalType decType = (DecimalType) datatype;
             NumberFormat format = NumberFormat.getNumberInstance();
-            format.setMaximumFractionDigits(1);
             final JFormattedTextField comp = new JFormattedTextField(new NumberFormatter(format));
             return new DefaultCellEditor(comp) {
                 public Object getCellEditorValue() {
