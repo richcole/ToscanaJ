@@ -129,7 +129,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
             //Lay out the buttons from left to right.
             JPanel buttonPane = new JPanel();
             buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.X_AXIS));
-            buttonPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+            buttonPane.setBorder(BorderFactory.createEtchedBorder());//BorderFactory.createEmptyBorder(0, 10, 10, 10));
             buttonPane.add(Box.createHorizontalGlue());
             buttonPane.add(closeButton);
 
@@ -196,6 +196,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
                 XMLOutputter outputter = new XMLOutputter();
                 outputter.setOmitDeclaration(true);
                 this.textArea.setText(outputter.outputString(this.template.getChild("html")));
+                this.textArea.setCaretPosition(0);
             } catch (DatabaseException e) {
                 this.textArea.setText("Failed to query database:\n" + e.getMessage() + "\n" + e.getOriginal().getMessage());
             } finally {
