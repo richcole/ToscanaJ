@@ -17,6 +17,8 @@ Specific for ToscanaJ:
 - a new database viewer called "InfoDatabaseViewer" allows showing plain text or
   HTML found either directly in the database or via a URL found in the database
 - Bugfix: when changing diagram schemas, the background can be erased again.
+- result lists from the database are now sorted using an ORDER BY on each column
+  used (in the given order). This can be turned off in the preferences.
 
 Specific for Elba:
 ==================

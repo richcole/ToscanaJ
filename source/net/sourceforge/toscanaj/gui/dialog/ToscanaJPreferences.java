@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.prefs.BackingStoreException;
 
+import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
 import net.sourceforge.toscanaj.gui.ToscanaJMainPanel;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.LineView;
@@ -101,6 +102,7 @@ public class ToscanaJPreferences {
     
     private final static ExtendedPreferences MAINPANEL_NODE = ExtendedPreferences.userNodeForClass(ToscanaJMainPanel.class);
     private final static ExtendedPreferences NODE_VIEW_NODE = ExtendedPreferences.userNodeForClass(NodeView.class);
+    private final static ExtendedPreferences DATABASE_CONNECTED_CONCEPT_INTERPRETER_NODE = ExtendedPreferences.userNodeForClass(DatabaseConnectedConceptInterpreter.class);
     
     private static final ConfigurationSection MAINPANEL_SECTION = new ConfigurationSection(
             new ConfigurationSubsection[] {
@@ -111,10 +113,12 @@ public class ToscanaJPreferences {
                 }, 
                 "Extra Menu Options"),
                 new ConfigurationSubsection(new ConfigurationEntry[] {
-                    new ConfigurationEntry(MAINPANEL_NODE, "showDiagramPreview", ConfigurationType.BOOLEAN, "Diagram Preview (needs restart)"),
-                    new ConfigurationEntry(NODE_VIEW_NODE, "displayVectors", ConfigurationType.BOOLEAN, "Show Node Vectors (debug option)")
+                        new ConfigurationEntry(MAINPANEL_NODE, "showDiagramPreview", ConfigurationType.BOOLEAN, "Diagram Preview (needs restart)"),
+                        new ConfigurationEntry(NODE_VIEW_NODE, "displayVectors", ConfigurationType.BOOLEAN, "Show Node Vectors (debug option)"),
+                        new ConfigurationEntry(DATABASE_CONNECTED_CONCEPT_INTERPRETER_NODE,
+                                "useOrderBy", ConfigurationType.BOOLEAN, "Sort results from database")
                 }, 
-                "Extra Views")
+                "Miscellaneous")
             },
             "Extra Features"
     );

@@ -47,6 +47,10 @@ public class AggregateQuery extends Query {
         retValue += " FROM " + info.getTable().getSqlExpression() + " ";
         return retValue;
     }
+    
+    public String getOrderClause() {
+        return "";
+    }
 
     public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values, Vector referenceValues) {
         if (values.get(0).toString().equals("0")) {

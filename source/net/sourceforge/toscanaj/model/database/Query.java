@@ -157,7 +157,16 @@ public abstract class Query implements XMLizable {
 
     abstract public String getQueryHead();
 
-	/**
+    /**
+     * Returns an SQL clause to order the results if possible.
+     * 
+     * This is a clause of the form "ORDER BY [field1],...,[fieldN]", which is
+     * typically used only for list queries, all other query implementations should
+     * return an empty string.
+     */
+    abstract public String getOrderClause();
+
+    /**
 	 * @param whereClause       The SQL WHERE clause to query.
 	 * @param values            The query results to turn into objects
 	 * @param referenceValues   The reference values that can be used for relative results, usually the same values for the top node 

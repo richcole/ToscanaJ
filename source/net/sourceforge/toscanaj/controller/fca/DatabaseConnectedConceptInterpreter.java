@@ -19,10 +19,23 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.util.*;
 
+import org.tockit.swing.preferences.ExtendedPreferences;
+
 public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterperter {
+    private static final ExtendedPreferences preferences = 
+                ExtendedPreferences.userNodeForClass(DatabaseConnectedConceptInterpreter.class);
+
     private DatabaseInfo databaseInfo;
 
     private ListQuery listQuery = null;
+    
+    /**
+     * Makes sure the default value for the preferences is set in the preference store.
+     */
+    static {
+        preferences.putBoolean("useOrderBy", 
+                               preferences.getBoolean("useOrderBy", true) );
+    }
 
     public DatabaseConnectedConceptInterpreter(DatabaseInfo databaseInfo) {
         this.databaseInfo = databaseInfo;
@@ -46,7 +59,7 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
 				return 0;
 			}
 			DatabaseConnection connection = DatabaseConnection.getConnection();
-			String statement = "SELECT count(*) FROM " + databaseInfo.getTable().getSqlExpression() + " " + whereClause;
+			String statement = "SELECT count(*) FROM " + databaseInfo.getTable().getSqlExpression() + " " + whereClause + ";";
 			return connection.queryInt(statement, 1);
 		} catch (DatabaseException e) {
 			throw new RuntimeException("Error querying the database", e);
@@ -91,6 +104,10 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterper
         FCAElement[] retVal = null;
         if (whereClause != null) {
         	String statement = query.getQueryHead() + whereClause;
+            if(preferences.getBoolean("useOrderBy", true)) {
+                statement += " " + query.getOrderClause();
+            }
+            statement += ";";
             try {
                 // submit the query
                 List queryResults = DatabaseConnection.getConnection().executeQuery(statement);

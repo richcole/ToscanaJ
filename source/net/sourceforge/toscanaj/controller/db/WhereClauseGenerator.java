@@ -27,7 +27,6 @@ public class WhereClauseGenerator implements DiagramHistory.ConceptVisitor {
             createClauseStart(startClause);
             addFilterPart(filterDiagrams, filterMode);
             addNestingPart(outerConcepts, displayMode);
-            clause += ";";
         } catch (NoClauseCreatedException e) {
             clause = null;
         }

@@ -33,19 +33,28 @@ public class ListQuery extends Query {
     }
 
     public String getQueryHead() {
-        String retValue = "SELECT ";
-        retValue += info.getKey().getSqlExpression() + ", ";
+        return "SELECT " + info.getKey().getSqlExpression() + ", " +
+                getFieldList() + " FROM " + 
+                info.getTable().getSqlExpression() + " ";
+    }
+
+    public String getOrderClause() {
+        return "ORDER BY " + getFieldList();
+    }
+
+    private String getFieldList() {
+        String retVal = "";
         Iterator it = fieldList.iterator();
         while (it.hasNext()) {
             QueryField field = (QueryField) it.next();
-            retValue += field.getQueryPart();
+            retVal += field.getQueryPart();
             if (it.hasNext()) {
-                retValue += ", ";
+                retVal += ", ";
             }
         }
-        retValue += " FROM " + info.getTable().getSqlExpression() + " ";
-        return retValue;
+        return retVal;
     }
+
 
     public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values, Vector referenceValues) {
         String displayString = this.formatResults(values, 1);

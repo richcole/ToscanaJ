@@ -31,23 +31,31 @@ public class DistinctListQuery extends Query {
     }
 
     public String getQueryHead() {
-        String retValue = "SELECT DISTINCT ";
+        return "SELECT DISTINCT " + getFieldList() + " FROM " + 
+                info.getTable().getSqlExpression() + " ";
+    }
+
+    public String getOrderClause() {
+        return "ORDER BY " + getFieldList();
+    }
+
+    private String getFieldList() {
+        String retVal = "";
         Iterator it = fieldList.iterator();
         while (it.hasNext()) {
             QueryField field = (QueryField) it.next();
-            retValue += field.getQueryPart();
+            retVal += field.getQueryPart();
             if (it.hasNext()) {
-                retValue += ", ";
+                retVal += ", ";
             }
         }
-        retValue += " FROM " + info.getTable().getSqlExpression() + " ";
-        return retValue;
+        return retVal;
     }
 
     public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values, Vector referenceValues) {
         String displayString = this.formatResults(values, 0);
         DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
-        String specialWhereClause = whereClause.substring(0, whereClause.lastIndexOf(';'));
+        String specialWhereClause = whereClause;
         Iterator it = fieldList.iterator();
         Iterator it2 = values.iterator();
         while (it.hasNext() && it2.hasNext()) {
@@ -55,7 +63,6 @@ public class DistinctListQuery extends Query {
             String value = (String) it2.next();
             specialWhereClause += " AND (" + field.getQueryPart() + "='" + value + "')";
         }
-        specialWhereClause += ";";
         retVal.setSpecialWhereClause(specialWhereClause);
         return retVal;
     }
