@@ -31,10 +31,10 @@ public class ColorStringConverter {
     }
 
     public static Color stringToColor(String s) {
-        Color color = new Color(fromHex(s.substring(2, 4)),
-                fromHex(s.substring(4, 6)),
-                fromHex(s.substring(6, 8)),
-                fromHex(s.substring(0, 2)));
+        Color color = new Color(fromHex(s.substring(3, 5)),
+                fromHex(s.substring(5, 7)),
+                fromHex(s.substring(7, 9)),
+                fromHex(s.substring(1, 3)));
         return color;
 
     }
