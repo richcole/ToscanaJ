@@ -8,6 +8,7 @@
 package org.tockit.toscanaj.servlet;
 
 import net.sourceforge.toscanaj.parser.CSXParser;
+import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -33,7 +34,7 @@ import javax.servlet.http.*;
  * @todo
  */
 public class ToscanaJServlet extends HttpServlet {
-    private static final String SERVLET_URL = "http://localhost:8080/toscanaj";
+    private static String SERVLET_URL;
     private ConceptualSchema conceptualSchema = null;
     private DatabaseConnectedConceptInterpreter conceptInterpreter = null;
     private static final int NODE_SIZE = 10;
@@ -42,10 +43,19 @@ public class ToscanaJServlet extends HttpServlet {
     private static final int FONT_SIZE = 12;
     private static final String FONT_FAMILY = "Arial";
     private DiagramSchema diagramSchema = new DiagramSchema();
+    private static final String PopupOptions = "toolbar=no,location=no,directories=no,status=no,menubar=yes,scrollbars=yes,resizable=no,copyhistory=yes,width=400,height=400";
 
     public void init() throws ServletException {
         super.init();
-        parseSchemaFile();
+        SERVLET_URL = getInitParameter("baseURL");
+        if(SERVLET_URL == null) {
+            throw new ServletException("No baseURL given as init parameter");
+        }
+        try {
+            parseSchemaFile();
+        } catch (Exception e) {
+            throw new ServletException("Parsing Schema failed", e);
+        }
         DatabaseInfo databaseInfo = conceptualSchema.getDatabaseInfo();
         conceptInterpreter = new DatabaseConnectedConceptInterpreter(databaseInfo);
         try {
@@ -133,7 +143,7 @@ public class ToscanaJServlet extends HttpServlet {
     private void printScript(PrintWriter out) {
         out.println("<script type=\"text/javascript\">");
         out.println("function openWindow(URL) {");
-        out.println("window1 = window.open(URL,\"my_new_window\",\"toolbar=no,location=no,directories=no,status=no,menubar=yes,scrollbars=yes,resizable=no,copyhistory=yes,width=400,height=400\")");
+        out.println("window1 = window.open(URL,\"my_new_window\",\"" + PopupOptions + "\")");
         out.println("}");
         out.println("</script>");
     }
@@ -336,10 +346,10 @@ public class ToscanaJServlet extends HttpServlet {
                     int maxLabelHeight = getHeight(fm);
 
                     if ((textAlignment == 1) && (maxLabelWidth != 0.0)) {
-//                        out.println("<a xlink:href=\"onclick=\"openWindow('" + SERVLET_URL + "?concept=" + node.getIdentifier() +
-//                                    "&amp;diagram=" + diagramNumber + "\" target=\"objectView\">");
-                        out.println("<a xlink:href=\"\" onclick=\"openWindow('" + SERVLET_URL + "?concept=" + node.getIdentifier() +
-                                    "&amp;diagram=" + diagramNumber + "')\">");
+//                        out.println("<a onclick=\"openWindow('" + SERVLET_URL + "?concept=" + node.getIdentifier() +
+//                                    "&amp;diagram=" + diagramNumber + "')\">");
+                        out.println("<a xlink:href=\"" + SERVLET_URL + "?concept=" + node.getIdentifier() +
+                                    "&amp;diagram=" + diagramNumber + "\" target=\"_blank\">");
                         out.println("<rect width=\"" + maxLabelWidth + "\" height=\"" + maxLabelHeight + "\" x=\"" + (addXPos((pos.getX() + offset.getX())) - 3.0 - (0.5 * maxLabelWidth)) + "\" y=\"" + addYPos((pos.getY() + offset.getY() - 10.0 + maxLabelHeight )) + "\" style=\"fill:RGB(" + backgroundColor.getRed() + "," + backgroundColor.getGreen() + "," + backgroundColor.getBlue() +")\" stroke=\"Black\" />");
 //                        out.println("<rect width=\"" + maxLabelWidth + "\" height=\"" + maxLabelHeight + "\" x=\"" + (addXPos((pos.getX() + offset.getX())) - 3.0 - (0.5 * maxLabelWidth)) + "\" y=\"" + addYPos((pos.getY() + offset.getY() - 10.0 + maxLabelHeight )) + "\" style=\"fill:RGB(" + backgroundColor.getRed() + "," + backgroundColor.getGreen() + "," + backgroundColor.getBlue() +")\" stroke=\"Black\" />");
 //                        out.println("<rect onclick=\"openWindow('" + SERVLET_URL + "?concept=" + node.getIdentifier() + "&amp;diagram=" + diagramNumber + "')\" width=\"" + maxLabelWidth + "\" height=\"" + maxLabelHeight + "\" x=\"" + (addXPos((pos.getX() + offset.getX())) - 3.0 - (0.5 * maxLabelWidth)) + "\" y=\"" + addYPos((pos.getY() + offset.getY() - 10.0 + maxLabelHeight )) + "\" style=\"fill:RGB(" + backgroundColor.getRed() + "," + backgroundColor.getGreen() + "," + backgroundColor.getBlue() +")\" stroke=\"Black\" />");
@@ -428,18 +438,14 @@ public class ToscanaJServlet extends HttpServlet {
         out.println("</body></html>");
     }
 
-    private void parseSchemaFile() {
+    private void parseSchemaFile() throws Exception, IOException {
         String initParameter = getInitParameter("schemaFile");
 //        String initParameter = "/Adrian/examples/sql/pctest/pctest.csx";
         if(initParameter == null) {
             throw new RuntimeException("No file given as parameter");
         }
         File schemaFile = new File(initParameter);
-        try {
-            conceptualSchema = CSXParser.parse(new EventBroker(), schemaFile);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        conceptualSchema = CSXParser.parse(new EventBroker(), schemaFile);
     }
 
     private void printHead(PrintWriter out) {
