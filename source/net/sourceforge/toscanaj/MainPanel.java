@@ -509,48 +509,17 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
             openSchema();
         }
         if (actionSource == exportDiagramMenuItem) {
-            if( this.lastImageExportFile == null ) {
-                this.lastImageExportFile = new File(System.getProperty("user.dir"));
-            }
-            final JFileChooser openDialog = new JFileChooser(this.lastImageExportFile);
-            int rv=openDialog.showOpenDialog( this );
-            if( rv == JFileChooser.APPROVE_OPTION )
-            {
-                this.lastImageExportFile = openDialog.getSelectedFile();
-                try {
-                    ImageWriter.exportGraphic(this.diagramView, this.diagramExportSettings, openDialog.getSelectedFile());
-                }
-                catch ( ImageGenerationException e ) {
-                    /// @TODO Give feedback here
-                    e.printStackTrace();
-                }
-            }
+            exportImage();
         }
         if (actionSource == exportDiagramSetupMenuItem) {
-            if(this.diagramExportSettings.usesAutoMode()) {
-                this.diagramExportSettings.setImageSize(this.diagramView.getWidth(), this.diagramView.getHeight());
-            }
-            DiagramExportSettingsDialog.initialize(this, this.diagramExportSettings);
-            DiagramExportSettings rv=DiagramExportSettingsDialog.showDialog(this);
-            if( rv != null )
-            {
-                this.diagramExportSettings = rv;
-            }
+            showImageExportOptions();
         }
         if (actionSource == printMenuItem) {
-            PrinterJob printJob = PrinterJob.getPrinterJob();
-            if (printJob.printDialog()) {
-                try {
-                    printJob.setPrintable(this.diagramView,pageFormat);
-                    printJob.print();
-                }
-                catch (Exception PrintException) {
-                    PrintException.printStackTrace();
-                }
-            }
+            printDiagram();
         }
         if (actionSource == printSetupMenuItem) {
             pageFormat = PrinterJob.getPrinterJob().pageDialog(pageFormat);
+            printDiagram();
         }
         if (actionSource == exitMenuItem) {
             closeMainPanel();
@@ -729,6 +698,74 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         }
         else {
             this.diagramView.setDisplayType(LabelView.DISPLAY_LIST, this.showExactMenuItem.isSelected());
+        }
+    }
+
+    /**
+     * Ask the user for a file name and then exports the current diagram as graphic to it.
+     *
+     * If there is no diagram to print we will just return.
+     *
+     * @see showImageExportOptions()
+     */
+    protected void exportImage() {
+        if(DiagramController.getController().getDiagramHistory().getSize() != 0 ) {
+            if( this.lastImageExportFile == null ) {
+                this.lastImageExportFile = new File(System.getProperty("user.dir"));
+            }
+            final JFileChooser openDialog = new JFileChooser(this.lastImageExportFile);
+            int rv=openDialog.showOpenDialog( this );
+            if( rv == JFileChooser.APPROVE_OPTION )
+            {
+                this.lastImageExportFile = openDialog.getSelectedFile();
+                try {
+                    ImageWriter.exportGraphic(this.diagramView, this.diagramExportSettings, openDialog.getSelectedFile());
+                }
+                catch ( ImageGenerationException e ) {
+                    /// @TODO Give feedback here
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * Shows the dialog to change the image export options.
+     *
+     * If the dialog is closed by pressing ok, the settings will be stored and an
+     * export will be initiated.
+     */
+    protected void showImageExportOptions() {
+        if(this.diagramExportSettings.usesAutoMode()) {
+            this.diagramExportSettings.setImageSize(this.diagramView.getWidth(), this.diagramView.getHeight());
+        }
+        DiagramExportSettingsDialog.initialize(this, this.diagramExportSettings);
+        DiagramExportSettings rv=DiagramExportSettingsDialog.showDialog(this);
+        if( rv != null )
+        {
+            this.diagramExportSettings = rv;
+            // probably the user wants to export now -- just give him the chance if possible
+            exportImage();
+        }
+    }
+
+    /**
+     * Prints the diagram using the current settings.
+     *
+     * If we don't have a diagram at the moment we just return.
+     */
+    protected void printDiagram() {
+        if( DiagramController.getController().getDiagramHistory().getSize() != 0 ) {
+            PrinterJob printJob = PrinterJob.getPrinterJob();
+            if (printJob.printDialog()) {
+                try {
+                    printJob.setPrintable(this.diagramView,pageFormat);
+                    printJob.print();
+                }
+                catch (Exception PrintException) {
+                    PrintException.printStackTrace();
+                }
+            }
         }
     }
 
