@@ -16,6 +16,9 @@ import net.sourceforge.toscanaj.controller.fca.*;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.dialog.*;
 import net.sourceforge.toscanaj.gui.action.ExportDiagramAction;
+import net.sourceforge.toscanaj.gui.action.OpenFileAction;
+import net.sourceforge.toscanaj.gui.activity.LoadConceptualSchemaActivity;
+import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
@@ -90,7 +93,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     private JSplitPane splitPane = null;
 
     // the actions used in the UI
-    private Action openFileAction;
+    private OpenFileAction openFileAction;
     private ExportDiagramAction exportDiagramAction;
     private Action goBackAction;
 
@@ -317,14 +320,20 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     }
 
     private void createActions() {
-        this.openFileAction = new AbstractAction("Open...") {
-            public void actionPerformed(ActionEvent e) {
-                openSchema();
-            }
-        };
-        this.openFileAction.putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_O));
-        this.openFileAction.putValue(Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+		LoadConceptualSchemaActivity loadSchemaActivity = new LoadConceptualSchemaActivity(broker);
+		this.openFileAction =
+			new OpenFileAction(
+				this,
+				loadSchemaActivity,
+				currentFile,
+				KeyEvent.VK_O,
+				KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+		openFileAction.addPostOpenActivity(new SimpleActivity() {
+			public boolean doActivity() throws Exception {
+				updateWindowTitle();
+					return true;
+			}
+		});
 		this.exportDiagramAction = new ExportDiagramAction( this, 
         		this.diagramExportSettings, this.diagramView, 
         		KeyEvent.VK_E, KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
@@ -1151,6 +1160,17 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
 	public ConceptualSchema getConceptualSchema() {
 		return conceptualSchema;
+	}
+
+	private void updateWindowTitle() {
+		// get the current filename without the extension and full path
+		// we have to use '\\' instead of '\' although we're checking for the occurrence of '\'.
+		if(currentFile != null){
+			String filename = currentFile.substring(currentFile.lastIndexOf("\\")+1,(currentFile.length()-4));
+			setTitle(filename +" - "+WINDOW_TITLE);
+		} else {
+			setTitle(WINDOW_TITLE);
+		}
 	}
 
 }
