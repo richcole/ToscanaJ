@@ -43,7 +43,6 @@ import java.util.List;
  *  This class provides the main GUI panel with menus and a toolbar
  *  for ToscanaJ.
  *
- *
  * @todo store view settings (contingent/extent labels/gradient) in session management
  */
 public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeObserver {
