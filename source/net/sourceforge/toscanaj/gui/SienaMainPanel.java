@@ -40,7 +40,6 @@ import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
-import net.sourceforge.toscanaj.view.diagram.cernato.NDimDiagramEditingView;
 
 import org.jdom.JDOMException;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
@@ -130,7 +129,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
     public void createViews() {
-        diagramEditingView = new NDimDiagramEditingView(conceptualSchema, eventBroker);
+        diagramEditingView = new DiagramEditingView(conceptualSchema, eventBroker);
         diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
         								this, DisplayedDiagramChangedEvent.class, Object.class);
         diagramEditingView.setDividerLocation(ConfigurationManager.fetchInt("SienaMainPanel", "diagramViewDivider", 200));

@@ -34,7 +34,6 @@ import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
-import net.sourceforge.toscanaj.view.diagram.cernato.NDimDiagramEditingView;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -171,7 +170,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
     }
 
     public void createViews() {
-        diagramView = new NDimDiagramEditingView(conceptualSchema, eventBroker);
+        diagramView = new DiagramEditingView(conceptualSchema, eventBroker);
         diagramView.setDividerLocation(ConfigurationManager.fetchInt("LuccaMainPanel", "diagramViewDivider", 200));
         connectionInformationView =
                 new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);

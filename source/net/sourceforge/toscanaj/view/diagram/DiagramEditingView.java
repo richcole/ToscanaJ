@@ -7,6 +7,12 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
+import net
+    .sourceforge
+    .toscanaj
+    .controller
+    .cernato
+    .NDimNodeMovementEventListener;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.diagram.*;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
@@ -29,6 +35,7 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
 import net.sourceforge.toscanaj.view.scales.ContextTableScaleEditorDialog;
 
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
@@ -46,6 +53,8 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 
 public class DiagramEditingView extends JPanel implements EventBrokerListener {
+    private static final String[] FULL_MOVEMENT_OPTION_NAMES = {"NDim", "Node", "Ideal", "Filter"};
+    private static final String[] SIMPLE_MOVEMENT_OPTION_NAMES = {"Node", "Ideal", "Filter"};
     private ConceptualSchema conceptualSchema;
     private DefaultListModel diagramListModel;
     private JSplitPane splitPane;
@@ -53,11 +62,13 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     protected NodeMovementEventListener nodeMovementEventListener = new NodeMovementEventListener();
     protected SetMovementEventListener idealMovementEventListener = new IdealMovementEventListener();
     protected FilterMovementEventListener filterMovementEventListener = new FilterMovementEventListener();
+    protected NDimNodeMovementEventListener ndimMovementEventListener = new NDimNodeMovementEventListener();
     private static final double ZOOM_FACTOR = 1.1;
     private JButton editContextButton;
     private DatabaseConnection databaseConnection = null;
 	private JButton zoomInButton;
 	private JButton zoomOutButton;
+    private JComboBox movementChooser;
 
     /**
      * Construct an instance of this view
@@ -129,46 +140,92 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     protected void createMovementManipulators(JPanel toolPanel) {
         toolPanel.add(new JLabel("Movement:"));
-        final EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
-        canvasEventBroker.subscribe(
-                nodeMovementEventListener,
-                CanvasItemDraggedEvent.class,
-                NodeView.class
-        );
-        String[] movementNames = {"Node", "Ideal", "Filter"};
-        JComboBox movementChooser = new JComboBox(movementNames);
+        movementChooser = new JComboBox();
+        setMovementManipulators();
         toolPanel.add(movementChooser);
         movementChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JComboBox combobox = (JComboBox) e.getSource();
                 String selection = combobox.getSelectedItem().toString();
-                if (selection.equals("Node")) {
-                    canvasEventBroker.removeSubscriptions(idealMovementEventListener);
-                    canvasEventBroker.removeSubscriptions(filterMovementEventListener);
-                    canvasEventBroker.subscribe(
-                            nodeMovementEventListener,
-                            CanvasItemDraggedEvent.class,
-                            NodeView.class
-                    );
+                if (selection.equals("NDim")) {
+                    setNDimManipulator();
+                } else if (selection.equals("Node")) {
+                	setNodeManipulator();
                 } else if (selection.equals("Ideal")) {
-                    canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
-                    canvasEventBroker.removeSubscriptions(filterMovementEventListener);
-                    canvasEventBroker.subscribe(
-                            idealMovementEventListener,
-                            CanvasItemDraggedEvent.class,
-                            NodeView.class
-                    );
+                	setIdealManipulator();
                 } else if (selection.equals("Filter")) {
-                    canvasEventBroker.removeSubscriptions(idealMovementEventListener);
-                    canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
-                    canvasEventBroker.subscribe(
-                            filterMovementEventListener,
-                            CanvasItemDraggedEvent.class,
-                            NodeView.class
-                    );
+                	setFilterManipulator();
                 }
             }
         });
+    }
+
+    protected void setMovementManipulators() {
+        Diagram2D diagram = this.diagramView.getDiagram();
+        if(diagram == null) {
+        	movementChooser.setEnabled(false);
+        } else {
+        	movementChooser.setEnabled(true);
+        	if (diagram instanceof NDimDiagram) {
+        		if(movementChooser.getModel().getSize() != FULL_MOVEMENT_OPTION_NAMES.length) {
+		        	movementChooser.setModel(new DefaultComboBoxModel(FULL_MOVEMENT_OPTION_NAMES));
+		        	setNDimManipulator();
+        		}
+	        } else {
+        	    if(movementChooser.getModel().getSize() != SIMPLE_MOVEMENT_OPTION_NAMES.length) {
+		            movementChooser.setModel(new DefaultComboBoxModel(SIMPLE_MOVEMENT_OPTION_NAMES));
+		            setNodeManipulator();
+        	    }
+	        }
+        }
+    }
+
+    protected void setNDimManipulator() {
+        EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
+        canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
+        canvasEventBroker.removeSubscriptions(idealMovementEventListener);
+        canvasEventBroker.removeSubscriptions(filterMovementEventListener);
+        canvasEventBroker.subscribe(
+                ndimMovementEventListener,
+                CanvasItemDraggedEvent.class,
+                NodeView.class
+        );
+    }
+
+    protected void setNodeManipulator() {
+        EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
+        canvasEventBroker.removeSubscriptions(ndimMovementEventListener);
+        canvasEventBroker.removeSubscriptions(idealMovementEventListener);
+        canvasEventBroker.removeSubscriptions(filterMovementEventListener);
+        canvasEventBroker.subscribe(
+                nodeMovementEventListener,
+                CanvasItemDraggedEvent.class,
+                NodeView.class
+        );
+    }
+
+    protected void setFilterManipulator() {
+        EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
+        canvasEventBroker.removeSubscriptions(ndimMovementEventListener);
+        canvasEventBroker.removeSubscriptions(idealMovementEventListener);
+        canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
+        canvasEventBroker.subscribe(
+                filterMovementEventListener,
+                CanvasItemDraggedEvent.class,
+                NodeView.class
+        );
+    }
+
+    protected void setIdealManipulator() {
+        EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
+        canvasEventBroker.removeSubscriptions(ndimMovementEventListener);
+        canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
+        canvasEventBroker.removeSubscriptions(filterMovementEventListener);
+        canvasEventBroker.subscribe(
+                idealMovementEventListener,
+                CanvasItemDraggedEvent.class,
+                NodeView.class
+        );
     }
 
     private void zoomIntoDiagram() {
@@ -317,7 +374,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     public void processEvent(Event event) {
     	if(event instanceof DisplayedDiagramChangedEvent) {
-    	    updateButtons();
+    	    updateToolbar();
     	    return;
     	}
     	if(event instanceof DatabaseConnectedEvent) {
@@ -330,15 +387,18 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 	            conceptualSchema = changeEvent.getConceptualSchema();
 	        }
 	        fillDiagramListView();
-	        updateButtons();
+	        updateToolbar();
     	}
     }
     
-    private void updateButtons() {
+    private void updateToolbar() {
     	boolean diagramAvailable = this.diagramView.getDiagram() != null;
 		this.zoomInButton.setEnabled(diagramAvailable);
 		this.zoomOutButton.setEnabled(diagramAvailable);
 		this.editContextButton.setEnabled(diagramAvailable);
+		if(movementChooser != null) {
+			setMovementManipulators();
+		}
     }
 
     public void setDividerLocation(int location) {
