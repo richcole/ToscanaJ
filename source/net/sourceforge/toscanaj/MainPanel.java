@@ -578,15 +578,17 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
                 (this.diagramExportSettings != null));
         this.backMenuItem.setEnabled(diagContr.undoIsPossible());
         this.backButton.setEnabled(diagContr.undoIsPossible());
-        Diagram2D curDiag = diagContr.getCurrentDiagram();
-        if(curDiag != null) {
-            Element diagDesc = curDiag.getDescription();
-            this.diagramDescriptionButton.setEnabled(diagDesc != null);
-            this.diagramDescriptionMenuItem.setEnabled(diagDesc != null);
-        }
-        else {
-            this.diagramDescriptionButton.setEnabled(false);
-            this.diagramDescriptionMenuItem.setEnabled(false);
+        if((this.diagramDescriptionButton != null) && (this.diagramDescriptionMenuItem != null)) {
+            Diagram2D curDiag = diagContr.getCurrentDiagram();
+            if(curDiag != null) {
+                Element diagDesc = curDiag.getDescription();
+                this.diagramDescriptionButton.setEnabled(diagDesc != null);
+                this.diagramDescriptionMenuItem.setEnabled(diagDesc != null);
+            }
+            else {
+                this.diagramDescriptionButton.setEnabled(false);
+                this.diagramDescriptionMenuItem.setEnabled(false);
+            }
         }
     }
 

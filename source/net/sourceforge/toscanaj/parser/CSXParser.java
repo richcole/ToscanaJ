@@ -533,59 +533,35 @@ public class CSXParser
         throws DataFormatException
     {
         // try to find the different possible information
-        Element dsnElem = dbElement.getChild("dsn");
-        Element pathElem = dbElement.getChild("path");
         Element urlElem = dbElement.getChild("url");
-        if( dsnElem != null ) {
-            if((pathElem != null) || (urlElem != null)) {
-                throw new DataFormatException("More than one of <dsn>, <path> and <url> given in <database> section.");
-            }
-            // we have DSN, set it
-            dbInfo.setUrl("jdbc:odbc:" + dsnElem.getText());
-            // load the ODBC bridge
+        if( urlElem == null ) {
+            throw new DataFormatException("<url> expected in <databaseConnection> element.");
+        }
+
+        dbInfo.setUrl(urlElem.getText());
+        String driver = urlElem.getAttributeValue("driver");
+        if( driver != null ) {
+            // try to load the driver
             try {
-                Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+                Class.forName(driver);
             }
             catch( ClassNotFoundException e ) {
-                /// @todo Do we want to do something here?
+                throw new DataFormatException("Could not load class \"" +
+                                driver + "\" as database driver.");
             }
         }
-        else if( pathElem != null ) {
-            if(urlElem != null) {
-                throw new DataFormatException("More than one of <dsn>, <path> and <url> given in <database> section.");
-            }
-            // set path information
-            throw new DataFormatException("Sorry -- file access not yet supported.");
-        }
-        else if( urlElem != null ) {
-            // set the url directly
-            dbInfo.setUrl(urlElem.getText());
-            String driver = urlElem.getAttributeValue("driver");
-            if( driver != null ) {
-                // try to load the driver
-                try {
-                    Class.forName(driver);
-                }
-                catch( ClassNotFoundException e ) {
-                    throw new DataFormatException("Could not load class \"" +
-                                    driver + "\" as database driver.");
-                }
-            }
-            dbInfo.setUserName(urlElem.getAttributeValue("user"));
-            dbInfo.setPassword(urlElem.getAttributeValue("password"));
-        }
-        else {
-            throw new DataFormatException("One of <dsn>, <path> or <url> expected in <database> element.");
-        }
+        dbInfo.setUserName(urlElem.getAttributeValue("user"));
+        dbInfo.setPassword(urlElem.getAttributeValue("password"));
+
         // let's try to find the query
         Element elem = dbElement.getChild("table");
         if( elem == null ) {
-            throw new DataFormatException("No <table> given for <database>");
+            throw new DataFormatException("No <table> given for <databaseConenction>");
         }
         dbInfo.setTableName( elem.getText() );
         elem = dbElement.getChild("key");
         if( elem == null ) {
-            throw new DataFormatException("<table> but not <key> given in <database> element");
+            throw new DataFormatException("<table> but not <key> given in <databaseConenction> element");
         }
         String keyName = elem.getText();
         dbInfo.setKey(keyName);
