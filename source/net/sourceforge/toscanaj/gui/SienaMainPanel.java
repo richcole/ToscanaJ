@@ -202,6 +202,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         } else {
             openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
+        openDialog.setApproveButtonText("Import");
         int rv = openDialog.showOpenDialog(this);
         if (rv != JFileChooser.APPROVE_OPTION) {
             return;

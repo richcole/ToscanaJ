@@ -415,7 +415,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         } else {
             openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
-        int rv = openDialog.showOpenDialog(this);
+        openDialog.setApproveButtonText("Import");
+		int rv = openDialog.showOpenDialog(this);
         if (rv != JFileChooser.APPROVE_OPTION) {
             return;
         }
