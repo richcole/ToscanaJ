@@ -129,15 +129,11 @@ public class TuplewareMainPanel extends JFrame implements MainPanel {
     }
 
     private void createNewDiagram() {
-        String result = JOptionPane.showInputDialog(this, "Please enter a name for the new diagram.",
-                                                    "Enter name", JOptionPane.OK_CANCEL_OPTION);
-        if(result != null) {
-            IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tuples.getVariableNames());
-            dialog.show();
-            int[] attributeIndices = dialog.getSelectedIndices();
-            Diagram2D diagram = TupleScaling.scaleTuples(this.tuples, this.objectIndices, attributeIndices);
-            this.conceptualSchema.addDiagram(diagram);
-        }
+        IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tuples.getVariableNames());
+        dialog.show();
+        int[] attributeIndices = dialog.getSelectedIndices();
+        Diagram2D diagram = TupleScaling.scaleTuples(this.tuples, this.objectIndices, attributeIndices);
+        this.conceptualSchema.addDiagram(diagram);
     }
 
     public void createViews() {
