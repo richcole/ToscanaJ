@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
     private JPanel buttonsPane;
     private JPanel titlePane;
 	private ContextTableScaleEditorDialog contextTableScaleEditorDialog;
+	private JScrollPane scrollpane;
 	 
     public ContextTableScaleEditorDialog(Frame owner, DatabaseConnection databaseConnection) {
         super(owner);
@@ -47,7 +49,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
      	createTitlePane();
 				
 		tableView = new ContextTableView(context);
-        JScrollPane scrollpane = new JScrollPane(tableView);
+        scrollpane = new JScrollPane(tableView);
 
 		scrollpane.addMouseListener(getMouseListener(context,tableView));
 		
@@ -123,7 +125,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 				String inputValue = showAddInputDialog("Add Object", "object");
 				if(inputValue!=null && !inputValue.trim().equals("")){
 					context.getObjects().add(inputValue);
-					tableView.update(context);
+					scrollpane.updateUI();
 				}
 			}
 		});
@@ -131,7 +133,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				String inputValue = showAddInputDialog("Add Attribute", "attribute");
 				context.getAttributes().add(inputValue);
-				tableView.update(context);
+				scrollpane.updateUI();
 			}
 		});
 		create.addActionListener(new ActionListener() {
@@ -260,44 +262,34 @@ public class ContextTableScaleEditorDialog extends JDialog {
 					ArrayList attributeArrayList = (ArrayList) context.getAttributes();
 					ArrayList objectsArrayList = (ArrayList) context.getObjects();
 					//User clicks within the table
-					if (e.getY()<= (objectsArrayList.size() + 1)* tableView.getCellHeight() && 
-								e.getX()<= (attributeArrayList.size() + 1)* tableView.getCellWidth()) {
+					int xPos = e.getX() - tableView.getX();
+					int yPos = e.getY() - tableView.getY();
+					if (yPos<= (objectsArrayList.size() + 1)* tableView.getCellHeight() && 
+								xPos<= (attributeArrayList.size() + 1)* tableView.getCellWidth()) {
 						//User clicks within the relation cell
-						if (e.getY() > tableView.getCellHeight()
-							&& e.getX() > tableView.getCellWidth()) {
-							String attribute = (String)attributeArrayList.get((e.getX()/tableView.getCellWidth())-1);
-										
-							String object = (String)objectsArrayList.get((e.getY()/tableView.getCellHeight())-1);
+						if (yPos > tableView.getCellHeight()
+							&& xPos > tableView.getCellWidth()) {
+							String attribute = (String)attributeArrayList.get((xPos/tableView.getCellWidth())-1);
+							String object = (String)objectsArrayList.get((yPos/tableView.getCellHeight())-1);
 							//Check if there is relation between the object and attribute
 							if(context.getRelationImplementation().contains(object , attribute)){
 								context.getRelationImplementation().remove( object , attribute);
-							}
-							else{
+							}else{
 								context.getRelationImplementation().insert( object , attribute );
 							}
-							tableView.update(context);
-														
-
+							tableView.repaint();
 						} 
 						//User clicks on the first cell of the table
 						else if (
-							e.getY() < tableView.getCellHeight()
-								&& e.getX() < tableView.getCellWidth()) {
+							yPos < tableView.getCellHeight()
+								&& xPos < tableView.getCellWidth()) {
 						}
-						//User clicks on object or attribute cell 
+						//User clicks on object or attribute cell to change the name 
 						else {
 						}
-
 					}
-					//User clicks out of table 
-					else {
-						System.out.println("Out Of Bounds");
-					}
-
 				}
-
 			}
-
 		};
 		return mouseListener;
 	}

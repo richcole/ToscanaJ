@@ -23,9 +23,9 @@ import net.sourceforge.toscanaj.model.Context;
 
 public class ContextTableView extends JComponent {
 	private static final Color TEXT_COLOR = Color.BLACK;
-	private static final Color TABLE_CORNER_COLOR = Color.WHITE;
-	private static final Color TABLE_HEADER_COLOR = Color.DARK_GRAY;
-	private static final Color TABLE_CELL_COLOR = Color.LIGHT_GRAY;
+	private static final Color TABLE_CORNER_COLOR = Color.LIGHT_GRAY;
+	private static final Color TABLE_HEADER_COLOR = Color.LIGHT_GRAY;
+	private static final Color TABLE_CELL_COLOR = Color.WHITE;
 	private Context context;
 	private static final int CELL_WIDTH = 100;
 	private static final int CELL_HEIGHT = 30;
@@ -54,17 +54,28 @@ public class ContextTableView extends JComponent {
 			row += 1;
 		}
 		
-		int numCol = this.context.getAttributes().size() + 1;
-		int numRow = this.context.getObjects().size() + 1;
-		Dimension size = new Dimension(numCol * CELL_WIDTH + 1, numRow * CELL_HEIGHT + 1);
-		setMinimumSize(size);
-		setPreferredSize(size);
-		setMaximumSize(size);
-		
 		g2d.setPaint(oldPaint);
 		g2d.setFont(oldFont);
 	}
 
+	public Dimension getSize() {
+		int numCol = this.context.getAttributes().size() + 1;
+		int numRow = this.context.getObjects().size() + 1;
+		return new Dimension(numCol * CELL_WIDTH + 1, numRow * CELL_HEIGHT + 1);
+	}
+
+	public Dimension getMinimumSize() {
+		return getSize();
+	}
+	
+	public Dimension getPreferredSize() {
+		return getSize();
+	}
+	
+	public Dimension getMaximumSize() {
+		return getSize();
+	}
+	
 	protected void drawColumnHeader(Graphics2D g2d) {
 		g2d.setPaint(TABLE_CORNER_COLOR);
 		drawCell(g2d, "", 0,0);
@@ -130,11 +141,6 @@ public class ContextTableView extends JComponent {
 		return newContent;
 	}
 	
-	protected void update(Context ctx){
-		this.context = ctx;
-		repaint();
-	}
-
 	public int getCellHeight() {
 		return CELL_HEIGHT;
 	}
