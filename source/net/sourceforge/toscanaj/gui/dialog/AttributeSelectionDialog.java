@@ -24,10 +24,17 @@ import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.view.database.SQLTypeMapper;
 
 import java.awt.*;
+import java.sql.Types;
 import java.util.Iterator;
 
 public class AttributeSelectionDialog extends JDialog implements EventBrokerListener {
-	private DatabaseConnection connection;
+    private static final String ID_BOOLEAN_SELECTOR = "boolean selector";
+    private static final String ID_INTERVAL_SELECTOR = "interval selector";
+    private static final String ID_NAME_SELECTOR = "name set selector";
+    private static final String ID_UNKNOWN_TYPE_LABEL = "unknown type label";
+    private static final String ID_NOTHING_SELECTED_LABEL = "no selection";
+
+    private DatabaseConnection connection;
 
     private DefaultListModel tablesList;
     private DefaultListModel columnsList;
@@ -35,6 +42,9 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
     private JList tableListView;
     private JList columnListView;
     private EventBroker eventBroker;
+    private JPanel cardPanel;
+    private JSplitPane listSplitPane;
+    private JSplitPane mainSplitPane;
 
     class TableInfo {
         Table table;
@@ -106,7 +116,9 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
             }
             JList list = (JList) event.getSource();
             ListSelectionModel model = list.getSelectionModel();
+            CardLayout cardLayout = (CardLayout) cardPanel.getLayout();
             if (model.isSelectionEmpty()) {
+            	cardLayout.show(cardPanel, ID_NOTHING_SELECTED_LABEL);
                 return;
             }
             if (model.getValueIsAdjusting()) {
@@ -117,15 +129,42 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
                     (ColumnInfo) columnsList.elementAt(
                             model.getMinSelectionIndex()
                     );
-            final int selectedIndex = tableListView.getSelectedIndex();
-            if (selectedIndex < 0) {
-                return;
+            int colType = columnInfo.getColumn().getType();
+            if( isTextType(colType) ) {
+            	cardLayout.show(cardPanel, ID_NAME_SELECTOR);
+            } else if ( isRangeType(colType) ) {
+                cardLayout.show(cardPanel, ID_INTERVAL_SELECTOR);
+            } else if ( isBooleanType(colType) ) {
+                cardLayout.show(cardPanel, ID_BOOLEAN_SELECTOR);
+            } else {
+            	cardLayout.show(cardPanel, ID_UNKNOWN_TYPE_LABEL);
             }
-            TableInfo tableInfo =
-                    (TableInfo) tablesList.elementAt(
-                            selectedIndex
-                    );
-//            setObjectKey(tableInfo.getTable(), columnInfo.getColumn());
+        }
+        
+        private boolean isRangeType(int colType) {
+        	return (colType == Types.BIGINT) ||
+		            (colType == Types.CHAR) ||
+		            (colType == Types.TIME) ||
+		            (colType == Types.DECIMAL) ||
+		            (colType == Types.DOUBLE) ||
+		            (colType == Types.FLOAT) ||
+		            (colType == Types.INTEGER) ||
+		            (colType == Types.NUMERIC) ||
+		            (colType == Types.REAL) ||
+		            (colType == Types.SMALLINT) ||
+		            (colType == Types.TIME) ||
+		            (colType == Types.TIME) ||
+		            (colType == Types.TINYINT);
+        }
+        
+        private boolean isTextType(int colType) {
+            return (colType == Types.LONGVARCHAR) ||
+                    (colType == Types.VARCHAR);
+        }
+
+        private boolean isBooleanType(int colType) {
+            return (colType == Types.BINARY) ||
+                    (colType == Types.BIT);
         }
     }
 
@@ -136,7 +175,11 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
         this.eventBroker = eventBroker;
         init();
         eventBroker.subscribe(this, DatabaseConnectEvent.class, Object.class);
-        ConfigurationManager.restorePlacement("ColumnChooserDialog", this,
+        int divPos = ConfigurationManager.fetchInt(this.getClass().getName(), "verticalDivider", 100);
+        listSplitPane.setDividerLocation(divPos);
+        divPos = ConfigurationManager.fetchInt(this.getClass().getName(), "horizontalDivider", 100);
+        mainSplitPane.setDividerLocation(divPos);
+        ConfigurationManager.restorePlacement(this.getClass().getName(), this,
                                               new Rectangle(100, 100, 300, 200));
     }
 
@@ -153,15 +196,24 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
         LabeledScrollPaneView tableView = new LabeledScrollPaneView("Tables:", tableListView);
         LabeledScrollPaneView columnView = new LabeledScrollPaneView("Columns:", columnListView);
         
-        Container contentPane = this.getContentPane();
-        contentPane.setLayout(new GridBagLayout());
-    	
-        contentPane.add(tableView, new GridBagConstraints(0, 0, 1, 1, 1, 1, GridBagConstraints.EAST, GridBagConstraints.BOTH,
-                                                    new Insets(5,5,5,5), 0, 0));
-        contentPane.add(columnView, new GridBagConstraints(0, 1, 1, 1, 1, 5, GridBagConstraints.EAST, GridBagConstraints.BOTH,
-                                                    new Insets(5,5,5,5), 0, 0));
-    	
-        pack();
+        listSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, tableView, columnView);
+
+        JLabel nothingSelectedLabel = new JLabel("Please select a table and a column");
+        JLabel unknownTypeLabel = new JLabel("Sorry, the type of this column\nis not supported");
+        JLabel nameSetSelector = new JLabel("select names...");
+        JLabel intervalSelector = new JLabel("select interval...");
+        JLabel booleanSelector = new JLabel("select binary value...");
+        
+        cardPanel = new JPanel();
+        cardPanel.setLayout(new CardLayout());
+        cardPanel.add(nothingSelectedLabel, ID_NOTHING_SELECTED_LABEL);
+        cardPanel.add(unknownTypeLabel, ID_UNKNOWN_TYPE_LABEL);
+        cardPanel.add(nameSetSelector, ID_NAME_SELECTOR);
+        cardPanel.add(intervalSelector, ID_INTERVAL_SELECTOR);
+        cardPanel.add(booleanSelector, ID_BOOLEAN_SELECTOR);
+        
+        mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, listSplitPane, cardPanel);
+        setContentPane(mainSplitPane);
     }
     
     private void fillTableList() {
@@ -186,6 +238,8 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
 
     public void hide() {
         super.hide();
-        ConfigurationManager.storePlacement("ColumnChooserDialog", this);
+        ConfigurationManager.storeInt(this.getClass().getName(), "verticalDivider", listSplitPane.getDividerLocation());
+        ConfigurationManager.storeInt(this.getClass().getName(), "horizontalDivider", mainSplitPane.getDividerLocation());
+        ConfigurationManager.storePlacement(this.getClass().getName(), this);
     }
 }
