@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.database;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.controller.db.SQLTypeInfo;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.Column;
@@ -35,6 +36,10 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.net.MalformedURLException;
+
+import java.util.Collection;
+import java.util.Iterator;
+
 
 /**
  * @todo at the moment we connect and then disconnect instead of passing the
@@ -69,6 +74,8 @@ public class DatabaseConnectionInformationView extends JDialog
     private DatabaseTypePanel dbTypePanel;
     private DatabaseSchema databaseSchema;
     private boolean newConnectionSet;
+    
+    private Frame owner;
     
     abstract class WizardPanel extends JPanel {
     	WizardPanel() {
@@ -201,6 +208,7 @@ public class DatabaseConnectionInformationView extends JDialog
     
     class EmbeddedDbConnectionPanel extends ConnectionPanel {
         private JTextField scriptLocationField;
+		private JTextField csvFileLocationField;
 
     	EmbeddedDbConnectionPanel() {
     		super();
@@ -213,10 +221,18 @@ public class DatabaseConnectionInformationView extends JDialog
     	        }
     	    });
     	    fileButton.setMnemonic('f');
-    	    
-            updateContents();
 
+			JLabel csvFileLabel = new JLabel("CSV File Location:");
+			csvFileLocationField = new JTextField();
+			JButton csvFileButton = new JButton("Browse...");
+			csvFileButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					getFileURL(csvFileLocationField, "csv", "Comma Separated Files (*.csv)");
+				}
+			});
+            updateContents();
     	    this.setLayout(new GridBagLayout());
+
     	    this.add(sqlFileLabel,new GridBagConstraints(
     	            0,0,2,1,1,0,
     	            GridBagConstraints.NORTHWEST,
@@ -236,6 +252,33 @@ public class DatabaseConnectionInformationView extends JDialog
     	            GridBagConstraints.NONE,
     	            new Insets(5, 5, 5, 5),
     	            2,2));
+
+			/*
+			this.add(csvFileLabel,new GridBagConstraints(
+					0,3,2,1,1,0,
+					GridBagConstraints.NORTHWEST,
+					GridBagConstraints.HORIZONTAL,
+					new Insets(5, 5, 5, 5),
+					2,2));
+			this.add(csvFileLocationField,new GridBagConstraints(
+					0,4,1,1,1,0,
+					GridBagConstraints.NORTHWEST,
+					GridBagConstraints.HORIZONTAL,
+					new Insets( 5, 15, 5, 5),
+					2,2));
+			this.add(csvFileButton,new GridBagConstraints(
+					0,5,1,1,0,0,
+					GridBagConstraints.NORTHEAST,
+					GridBagConstraints.NONE,
+					new Insets(5, 5, 5, 5),
+					2,2));
+    	    this.add(new JPanel(),new GridBagConstraints(
+    	            0,6,1,1,1,1,
+    	            GridBagConstraints.WEST,
+    	            GridBagConstraints.BOTH,
+    	            new Insets(5, 5, 5, 5),
+    	            2,2));
+			*/
     	    this.add(new JPanel(),new GridBagConstraints(
     	            0,3,1,1,1,1,
     	            GridBagConstraints.WEST,
@@ -273,6 +316,22 @@ public class DatabaseConnectionInformationView extends JDialog
             } catch (DatabaseException e) {
             	ErrorDialog.showError(this, e, "Script error");
             	return false;
+            }
+            if (csvFileLocationField.getText().length() > 0) {
+            	try {
+            		Collection typeNames = connection.getDatabaseSupportedTypeNames();
+            		Iterator it = typeNames.iterator();
+            		while (it.hasNext()) {
+						SQLTypeInfo cur = (SQLTypeInfo) it.next();
+						System.out.println(cur);
+						
+					}
+					CSVImportDetailsDialog csvImportDialog = new CSVImportDetailsDialog(owner, csvFileLocationField.getText(), connection);
+            	}
+            	catch (DatabaseException e) {
+            		ErrorDialog.showError(this, e, "Error retrieving types supported by database");
+            		return false;
+            	}
             }
             return true;
         }
@@ -608,6 +667,7 @@ public class DatabaseConnectionInformationView extends JDialog
 		this.databaseInfo = new DatabaseInfo();
 		this.connection = new DatabaseConnection(internalBroker);
         this.databaseSchema = new DatabaseSchema(internalBroker);
+        this.owner = frame;
 		
         initializePanels();
 

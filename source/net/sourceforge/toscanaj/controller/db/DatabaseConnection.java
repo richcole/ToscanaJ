@@ -16,6 +16,7 @@ import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.database.Table;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo.Type;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
+
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -26,6 +27,8 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.URL;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -672,5 +675,40 @@ public class DatabaseConnection implements EventBrokerListener {
 		long statementStopTime = System.currentTimeMillis();
         printLogMessage(statementStopTime + ": done (" + (statementStopTime - this.lastStatementStartTime) + " ms).");
 	}
+
+	public DatabaseMetaData getDatabaseMetaData () throws DatabaseException {
+		try {
+			return this.jdbcConnection.getMetaData();
+		}
+		catch (SQLException e) {
+			throw new DatabaseException("Could not get Database Metadata", e);
+		}
+	}
+	
+	/**
+	 * Returns a Collection of SQLTypeInfo objects. 
+	 */
+	public Collection getDatabaseSupportedTypeNames () throws DatabaseException {
+		Collection result = new ArrayList();
+		try {
+			DatabaseMetaData dbMetadata = getDatabaseMetaData();
+	
+			ResultSet typeInfo = dbMetadata.getTypeInfo();
+	
+			while (typeInfo.next()) {
+				ResultSetMetaData cur = typeInfo.getMetaData();
+				int colCount = cur.getColumnCount();
+				// according to java documentation the first column should
+				// contain TYPE_NAME and the second column should contain DATA_TYPE.
+				result.add(new SQLTypeInfo( typeInfo.getInt(2), typeInfo.getString(1) )); 
+			}
+			return result;
+		}
+		catch (SQLException e) {
+			throw new DatabaseException ("Error retrieving types supported by database", e);
+		}
+		
+	}
+	
 }
 
