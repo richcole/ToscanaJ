@@ -89,8 +89,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
 
         public PagingDatabaseViewerDialog(Frame frame)
                 throws DatabaseViewerInitializationException {
-            super(frame, "View Items", true);
-			this.setModal(false);
+            super(frame, "View Items", false);
             this.addWindowListener(new WindowAdapter() {
                 public void windowClosing(WindowEvent e) {
                     closeDialog();

@@ -153,6 +153,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     private DiagramView diagramView;
     
     private DiagramView diagramPreview;
+    
+    private ReadingHelpDialog readingHelpDialog;
 
     /**
      * The pane for selecting the diagrams.
@@ -204,7 +206,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     	this.diagramExportSettings = new DiagramExportSettings();
 
         // then build the panel (order is important for checking if we want export options)
-        buildPanel();
+        buildUI();
         // listen to changes on DiagramController
         DiagramController.getController().addObserver(this);
         // we are the parent window for anything database viewers / report generators want to display
@@ -243,7 +245,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     /**
      * Build the GUI.
      */
-    private void buildPanel() {
+    private void buildUI() {
         this.diagramView = new DiagramView();
 		// set the minimum font size of the label into diagramView from the properties file
         // this has to happen before the menu gets created, since the menu uses the information
@@ -378,6 +380,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 
 		buildMenuBar();
 		setJMenuBar(menubar);
+        
+        this.readingHelpDialog = new ReadingHelpDialog(this, diagramEventBroker);
     }
 
     private void createActions() {
@@ -601,6 +605,17 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 			}
 		});
 		viewMenu.add(showObjectLabels);
+        
+        viewMenu.addSeparator();
+        
+		JMenuItem showInfoViewItem = new JMenuItem("Show Concept Information...");
+        showInfoViewItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                readingHelpDialog.show();
+            }
+        });
+        
+        viewMenu.add(showInfoViewItem);
 
         // @todo rename property entry
         // @todo disable gradient options while deviation is analyzed
@@ -1080,6 +1095,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
      * Close Main Window (Exit the program).
      */
     private void closeMainPanel() {
+        // close dialogs to make sure their settings are stored properly
+        this.readingHelpDialog.closeDialog();
+        
         // store current position
         preferences.storeWindowPlacement(this);
 		preferences.putInt("mainDivider", splitPane.getDividerLocation());

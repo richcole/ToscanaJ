@@ -28,12 +28,9 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
 import java.util.Iterator;
-
-import javax.swing.ToolTipManager;
 
 /**
  * This class paints a diagram defined by the SimpleLineDiagram class.
@@ -41,7 +38,6 @@ import javax.swing.ToolTipManager;
  * @todo get rid of ChangeObserver, use EventBroker.
  */
 public class DiagramView extends Canvas implements ChangeObserver {
-    private static final int MAX_TOOLTIP_OBJECTS = 10;
     /**
      * The diagram to display.
      */
@@ -50,6 +46,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
     private ConceptInterpreter conceptInterpreter;
 
     private ConceptInterpretationContext conceptInterpretationContext;
+    
     /**
      * Currently we don't use selection.
      */
@@ -98,8 +95,6 @@ public class DiagramView extends Canvas implements ChangeObserver {
         this.diagramSchema = DiagramSchema.getDefaultSchema();
         addComponentListener(new ResizeListener());
         getBackgroundItem().setPaint(diagramSchema.getBackgroundColor());
-
-        ToolTipManager.sharedInstance().registerComponent(this);
     }
 
     public ConceptInterpreter getConceptInterpreter() {
@@ -419,56 +414,13 @@ public class DiagramView extends Canvas implements ChangeObserver {
         this.objectLabelFactory = objectLabelFactory;
     }
 
-    public String getToolTipText(MouseEvent me) {
-        Point2D canvasPos = getCanvasCoordinates(me.getPoint());
-        CanvasItem item = getCanvasItemAt(canvasPos);
-        NodeView nodeView = null;
-        if(item instanceof NodeView) {
-            nodeView = (NodeView) item;
-        }
-        if(item instanceof LabelView) {
-            LabelView labelView = (LabelView) item;
-            nodeView = labelView.getNodeView();
-        }
-        if(nodeView == null) {
-            return null;
-        }
-        Concept concept = nodeView.getDiagramNode().getConcept();
-        StringBuffer tooltip = new StringBuffer("<html>");
-        tooltip.append("<hr><i>Attributes:</i><hr>");
-        Iterator it = concept.getIntentIterator();
-        if(!it.hasNext()) {
-            return null;
-        }
-        while(it.hasNext()) {
-            tooltip.append("- ");
-            tooltip.append(it.next().toString());
-            tooltip.append("<br>");
-        }
-        tooltip.append("<hr><i>Objects:</i><hr>");
-        boolean originalObjectMode = this.conceptInterpretationContext.getObjectDisplayMode();
-        this.conceptInterpretationContext.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
-        int extentSize = this.conceptInterpreter.getExtentSize(concept, this.conceptInterpretationContext);
-        if(extentSize <= MAX_TOOLTIP_OBJECTS) {
-            it = this.conceptInterpreter.getObjectSetIterator(concept, this.conceptInterpretationContext);
-            while(it.hasNext()) {
-                tooltip.append("- ");
-                tooltip.append(it.next().toString());
-                if(it.hasNext()) {
-                    tooltip.append("<br>");
-                }
-            }
-        } else {
-            tooltip.append(extentSize + " total");
-        }
-        this.conceptInterpretationContext.setObjectDisplayMode(originalObjectMode);
-        tooltip.append("</html>");
-        return tooltip.toString();
-    }
-
     public void setColorChanger(ColorChanger colorChanger) {
         this.colorChanger = colorChanger;
         repaint();
+    }
+
+    public ConceptInterpretationContext getConceptInterpretationContext() {
+        return this.conceptInterpretationContext;
     }
 }
 

@@ -1,19 +1,24 @@
 Changes between version 1.3 and the CVS version of the ToscanaJ 
 program suite:
 
-Affecting all programs:
-=======================
+Affecting different programs:
+=============================
 - contexts do have a notion of object and attribute order now,
-  which they remember
+  which they remember, the order can be changed using the context
+  menus in the context editor
 
-ToscanaJ:
-=========
+Specific for ToscanaJ:
+======================
+- the tooltip on the labels and nodes, showing the intent and extent
+  of the concept, has been replaced with a non-modal dialog, which can
+  be opened to show the same information for the concept underneath
+  the mouse (the tooltip was found distracting by many users)
 
-Elba:
-=====
+Specific for Elba:
+==================
 
-Siena (still not fully complete):
-=================================
+Specific for Siena (still not fully complete):
+==============================================
 - the way grayscale and black&white views are created has been
   changed to cover all visual objects (affects transition arrows)
 - many-valued contexts imported from Cernato XML can be seen (and
