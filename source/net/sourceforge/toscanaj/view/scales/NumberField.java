@@ -16,13 +16,13 @@ import java.util.Locale;
 /**
  * @todo restrict data entered to be integer instead of turning it into integer at the end
  */
-public class DoubleNumberField extends JTextField {
+public class NumberField extends JTextField {
     public static final int INTEGER = 0;
     public static final int FLOAT = 1;
 
     private NumberFormat formatter;
 
-    public DoubleNumberField(int columns, int formatType) {
+    public NumberField(int columns, int formatType) {
         super(columns);
         if(formatType == FLOAT) {
             formatter = NumberFormat.getNumberInstance(Locale.US);

@@ -21,7 +21,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
     private JTextField titleEditor = new JTextField();
 
     private JButton addButton;
-    private DoubleNumberField addField;
+    private NumberField addField;
     private JList dividersList;
     private int scaleType;
 
@@ -146,10 +146,10 @@ public class OrdinalScaleEditorDialog extends JDialog {
         JPanel addPanel = new JPanel();
         addPanel.setLayout(new BoxLayout(addPanel, BoxLayout.X_AXIS));
         if(scaleType == FLOAT) {
-            addField = new DoubleNumberField(10,DoubleNumberField.FLOAT);
+            addField = new NumberField(10,NumberField.FLOAT);
         }
         else {
-            addField = new DoubleNumberField(10,DoubleNumberField.INTEGER);
+            addField = new NumberField(10,NumberField.INTEGER);
         }
         addButton = new JButton("Add");
         addButton.setEnabled(false);
