@@ -9,6 +9,10 @@ package net.sourceforge.toscanaj.model.context;
 
 import org.jdom.Element;
 
+/**
+ * @todo consider using a cache to reuse existing FCAObjects, i.e. don't have two FCAObjects with the same data (and description).
+ * Should descriptions be functionally dependend on the data? How to model this in CSX?
+ */
 public class FCAObjectImplementation implements WritableFCAObject {
 	private Object data;
 	private Element description;
@@ -54,5 +58,17 @@ public class FCAObjectImplementation implements WritableFCAObject {
 			return comparableData.compareTo(other.getData());
 		}
 		return this.hashCode()/2 - other.hashCode()/2;
+	}
+	
+	public boolean equals(Object other) {
+		if(this.getClass() != other.getClass()) {
+			return false;
+		}
+		FCAObjectImplementation otherImp = (FCAObjectImplementation) other;
+		return this.data.equals(otherImp.data);
+	}
+	
+	public int hashCode() {
+		return this.data.hashCode();
 	}
 }
