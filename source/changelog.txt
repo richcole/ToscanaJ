@@ -9,6 +9,8 @@ Affecting different programs:
 - Bugfix: saving files with descriptions on objects or attributes works again.
 - Bugfix: lines now connect properly to the corners of the labels -- in some 
   situations there was a visible offset before.
+- creating lattice diagrams is now a lot faster (noticable esp. when importing
+  Cernato or Burmeister files).
 
 Specific for ToscanaJ:
 ======================

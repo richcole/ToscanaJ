@@ -7,14 +7,12 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
-
-import org.tockit.util.ListSet;
-import org.tockit.util.ListSetImplementation;
 
 import net.sourceforge.toscanaj.model.context.*;
 import net.sourceforge.toscanaj.model.context.BinaryRelation;
@@ -22,18 +20,21 @@ import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.lattice.*;
 
 public class GantersAlgorithm implements LatticeGenerator {
-    private Context context;
     private FCAElement[] objects;
+	private FCAElement[] attributes;
+    private BitSet[] relation;
+    
     private Hashtable intents;
-    public Vector extents;
+    private Vector extents;
 
     public Lattice createLattice(Context inputContext) {
         LatticeImplementation lattice = new LatticeImplementation();
-        context = inputContext;
-        Collection objectCol = context.getObjects();
-        objects = createObjectArray(objectCol);
-        intents = new Hashtable();
-        extents = new Vector();
+        this.objects = createElementArray(inputContext.getObjects());
+        this.attributes = createElementArray(inputContext.getAttributes());
+        this.relation = createRelation(inputContext.getRelation());
+        
+        this.intents = new Hashtable();
+        this.extents = new Vector();
         findExtents();
         createConcepts(lattice);
         connectConcepts(lattice);
@@ -41,18 +42,38 @@ public class GantersAlgorithm implements LatticeGenerator {
         return lattice;
     }
 
+    /**
+     * Maps the relation into a BitSet array, assuming the members "objects"
+     * and "attributes" are set.
+     */
+	private BitSet[] createRelation(BinaryRelation relation) {
+        BitSet[] retVal = new BitSet[this.objects.length];
+        for (int i = 0; i < this.objects.length; i++) {
+			FCAElement object = this.objects[i];
+			BitSet derivation = new BitSet(this.attributes.length);
+            for (int j = 0; j < this.attributes.length; j++) {
+				FCAElement attribute = this.attributes[j];
+				if(relation.contains(object, attribute)) {
+					derivation.set(j);
+                }
+			}
+            retVal[i] = derivation;
+		}
+		return retVal;
+	}
+
 	/**
 	 * This is similar to Collection.toArray(), but also checks for duplicates.
 	 */
-    public FCAElement[] createObjectArray(Collection objectCol) {
-        FCAElement[] retVal = new FCAElement[objectCol.size()];
+    public FCAElement[] createElementArray(Collection collection) {
+        FCAElement[] retVal = new FCAElement[collection.size()];
     	HashSet testSet = new HashSet();
-    	Iterator it = objectCol.iterator();
+    	Iterator it = collection.iterator();
     	int pos = 0;
     	while (it.hasNext()) {
             FCAElement cur = (FCAElement) it.next();
             if(testSet.contains(cur)) {
-            	throw new IllegalArgumentException("Context '" + context.getName() + "' contains duplicate object");
+            	throw new IllegalArgumentException("Context contains duplicate object or attribute");
             }
             retVal[pos] = cur;
             testSet.add(cur);
@@ -84,7 +105,7 @@ public class GantersAlgorithm implements LatticeGenerator {
         if (concept1.getObjectContingentSize() > concept2.getObjectContingentSize()) {
             return false;
         }
-        ListSet extent2 = new ListSetImplementation();
+        HashSet extent2 = new HashSet();
         for (Iterator iterator = concept2.getObjectContingentIterator(); iterator.hasNext();) {
             Object obj = iterator.next();
             extent2.add(obj);
@@ -124,93 +145,91 @@ public class GantersAlgorithm implements LatticeGenerator {
     }
 
     private void findExtents() {
-        ListSet extent = new ListSetImplementation();
-        createClosure(extent);
-        extents.add(extent);
+        BitSet extent = new BitSet(this.objects.length);
+        extent = createClosure(extent);
+        this.extents.add(extent);
         do {
             for (int i = objects.length - 1; i >= 0; i--) {
-                ListSet newExtent = calculateNewExtent(extent, i);
+                BitSet newExtent = calculateNewExtent(extent, i);
                 if (iLargerThan(newExtent, extent, i)) {
-                    extents.add(newExtent);
+                    this.extents.add(newExtent);
                     extent = newExtent;
                     break;
                 }
             }
-        } while (extent.size() != objects.length);
+        } while (extent.cardinality() != objects.length);
     }
 
     private void createConcepts(LatticeImplementation lattice) {
         for (Iterator iterator = extents.iterator(); iterator.hasNext();) {
             ConceptImplementation concept = new ConceptImplementation();
-            ListSet extent = (ListSet) iterator.next();
-            for (Iterator extIt = extent.iterator(); extIt.hasNext();) {
-                FCAElement fcaObject = (FCAElement) extIt.next();
-                concept.addObject(fcaObject);
-            }
-            ListSet intent = (ListSet) intents.get(extent);
-            for (Iterator intIt = intent.iterator(); intIt.hasNext();) {
-                FCAElement attribute = (FCAElement) intIt.next();
-                concept.addAttribute(attribute);
+            BitSet extent = (BitSet) iterator.next();
+            for (int i = 0; i < this.objects.length; i++) {
+                if(extent.get(i)) {
+                	concept.addObject(this.objects[i]);
+                }
+			}
+            BitSet intent = (BitSet) this.intents.get(extent);
+            for (int i = 0; i < this.attributes.length; i++) {
+                if(intent.get(i)) {
+                	concept.addAttribute(this.attributes[i]);
+                }
             }
             lattice.addConcept(concept);
         }
     }
 
-    private boolean iLargerThan(ListSet largerSet, ListSet smallerSet, int i) {
+    private boolean iLargerThan(BitSet largerSet, BitSet smallerSet, int i) {
         for (int j = 0; j <= i - 1; j++) {
-            if (largerSet.contains(objects[j]) != smallerSet.contains(objects[j])) {
+            if (largerSet.get(j) != smallerSet.get(j)) {
                 return false;
             }
         }
-        if (smallerSet.contains(objects[i])) {
+        if (smallerSet.get(i)) {
             return false;
         }
-        if (!largerSet.contains(objects[i])) {
+        if (!largerSet.get(i)) {
             return false;
         }
         return true;
     }
 
-    private ListSet calculateNewExtent(ListSet extent, int i) {
-        ListSet newExtent = new ListSetImplementation();
+    private BitSet calculateNewExtent(BitSet extent, int i) {
+        BitSet newExtent = new BitSet(this.objects.length);
         for (int j = 0; j <= i - 1; j++) {
-            if (extent.contains(objects[j])) {
-                newExtent.add(objects[j]);
+            if (extent.get(j)) {
+                newExtent.set(j);
             }
         }
-        newExtent.add(objects[i]);
-        createClosure(newExtent);
-        return newExtent;
+        newExtent.set(i);
+        return createClosure(newExtent);
     }
 
-    private void createClosure(ListSet extent) {
-        Collection attributes = context.getAttributes();
-        BinaryRelation relation = context.getRelation();
-        ListSet intent = new ListSetImplementation(attributes);
-        for (Iterator it1 = extent.iterator(); it1.hasNext();) {
-            Object object = it1.next();
-            ListSet unrelatedAttributes = new ListSetImplementation();
-            for (Iterator it2 = intent.iterator(); it2.hasNext();) {
-                Object attribute = it2.next();
-                if (!relation.contains(object, attribute)) {
-                    unrelatedAttributes.add(attribute);
-                }
+    private BitSet createClosure(BitSet extent) {
+        BitSet intent = new BitSet();
+        intent.set(0, this.attributes.length);
+        for (int i = 0; i < this.objects.length; i++) {
+            if(extent.get(i)) {
+                BitSet derivation = this.relation[i];
+    			for (int j = 0; j < this.attributes.length; j++) {
+    				if(!derivation.get(j)) {
+    					intent.clear(j);
+                    }
+    			}
             }
-            intent.removeAll(unrelatedAttributes);
-        }
-        extent.clear();
-        extent.addAll(context.getObjects());
-        for (Iterator it1 = intent.iterator(); it1.hasNext();) {
-            Object attribute = it1.next();
-            ListSet unrelatedObjects = new ListSetImplementation();
-            for (Iterator it2 = extent.iterator(); it2.hasNext();) {
-                Object object = it2.next();
-                if (!relation.contains(object, attribute)) {
-                    unrelatedObjects.add(object);
-                }
+		}
+        BitSet retVal = new BitSet();
+        retVal.set(0, this.objects.length);
+        for (int i = 0; i < this.attributes.length; i++) {
+            if(intent.get(i)) {
+        	    for (int j = 0; j < this.objects.length; j++) {
+    				if(!this.relation[j].get(i)) {
+    					retVal.clear(j);
+                    }
+    			}
             }
-            extent.removeAll(unrelatedObjects);
-        }
-        intents.put(extent, intent);
+		}
+        intents.put(retVal, intent);
+        return retVal;
     }
 }
