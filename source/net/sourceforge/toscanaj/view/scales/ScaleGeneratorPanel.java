@@ -172,20 +172,31 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
                 	Object[] options;
                 	if(returnValue instanceof SimpleLineDiagram){
 						options = new Object[]{ "Replace Old Diagram", "Discard New Diagram", "Rename New Diagram" };
+                	    return JOptionPane.showOptionDialog(
+                	                    parent,
+                	                    "A diagram with the title '"+
+                	                    returnValue.getTitle()+
+                	                    "' already exists.",
+                	                    "Title exists",
+                	                    JOptionPane.YES_NO_CANCEL_OPTION,
+                	                    JOptionPane.ERROR_MESSAGE,
+                	                    null,
+                	                    options,
+                	                    options[2]);
                 	} else {
 						options = new Object[]{ "Replace Old Diagram", "Discard New Diagram" };
+                	    return JOptionPane.showOptionDialog(
+                	                    parent,
+                	                    "A diagram with the title '"+
+                	                    returnValue.getTitle()+
+                	                    "' already exists.",
+                	                    "Title exists",
+                	                    JOptionPane.YES_NO_OPTION,
+                	                    JOptionPane.ERROR_MESSAGE,
+                	                    null,
+                	                    options,
+                	                    null);
                 	}
-					return JOptionPane.showOptionDialog( 
-									parent, 
-									"A diagram with the title '"+
-									returnValue.getTitle()+
-									"' already exists.", 
-									"Title exists",
-									JOptionPane.YES_NO_CANCEL_OPTION,
-									JOptionPane.WARNING_MESSAGE,
-									null,
-									options,
-									options[2]);
                 }
             });
             add(generatorButton);
