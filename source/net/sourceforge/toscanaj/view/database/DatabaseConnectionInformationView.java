@@ -687,7 +687,12 @@ public class DatabaseConnectionInformationView extends JDialog
     }
     
     protected boolean executeCurrentStep() {
-   		return this.currentStep.executeStep();
+    	try {
+   			return this.currentStep.executeStep();
+    	} catch(Exception e) {
+    		ErrorDialog.showError(this,e,"Step failed");
+    	}
+    	return false;
     }
 
     protected void gotoNextStep() {
