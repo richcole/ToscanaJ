@@ -186,6 +186,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
 			this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
             return;
         }
+        getParent().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         addLayer("lines-0");
         addLayer("nodes-0");
         addLayer("connectors-0");
@@ -197,6 +198,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         requestScreenTransformUpdate();
         repaint();
         this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
+        getParent().setCursor(Cursor.getDefaultCursor());
     }
 
     private void removeSubscriptions() {
