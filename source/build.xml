@@ -101,6 +101,7 @@
 			</fileset>
 		</copy>
 		<fixcrlf srcDir="${dist.dir}/${dist.name}" eol="crlf" includes="*.txt, *.bat, toscanaj.prop"/>
+		<fixcrlf srcDir="${dist.dir}/${dist.name}" eol="lf" includes="*.sh"/>
     </target>
 	<target name="dist" depends="prepareDist">
 		<zip destfile="${dist.dir}/${dist.name}-bin.zip">
