@@ -831,7 +831,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         toolbar.add(this.openFileAction);
         toolbar.add(this.goBackAction);
         toolbar.add(Box.createHorizontalGlue());
-        diagramContextDescriptionButton = new JButton(" Analysis History... ");
+        diagramContextDescriptionButton = new JButton("Analysis History...");
 		diagramContextDescriptionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showDiagramContextDescription();
@@ -840,7 +840,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		diagramContextDescriptionButton.setVisible(true);
 		diagramContextDescriptionButton.setEnabled(false);
 		toolbar.add(diagramContextDescriptionButton);
-		schemaDescriptionButton = new JButton(" About Schema... ");
+		schemaDescriptionButton = new JButton("About Schema...");
         schemaDescriptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showSchemaDescription();
@@ -848,7 +848,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         });
         schemaDescriptionButton.setVisible(false);
         toolbar.add(schemaDescriptionButton);
-        diagramDescriptionButton = new JButton(" About Diagram... ");
+        diagramDescriptionButton = new JButton("About Diagram...");
         diagramDescriptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showDiagramDescription();
