@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.DataDump;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
 import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
@@ -390,6 +391,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             /// @todo make sure the events come in the proper order
             ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
             conceptualSchema = schemaEvent.getConceptualSchema();
+            /// @todo since we don't support the db viewers yet, we just reset all of them --> change
+            DatabaseViewerManager.resetRegistry();
         }
         if (e instanceof ConceptualSchemaLoadedEvent) {
             ConceptualSchemaLoadedEvent loadEvent = (ConceptualSchemaLoadedEvent) e;

@@ -38,7 +38,7 @@ public class LabelInfo implements XMLizable, ChangeObservable {
     /**
      * The offset for the label position.
      */
-    private Point2D offset = null;
+    private Point2D offset;
 
     /**
      * The background color for the label.

@@ -128,12 +128,18 @@ public class DiagramNode implements XMLizable {
         );
         if (XMLHelper.contains(elem, ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)) {
             attributeLabelInfo = new LabelInfo(elem.getChild(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME));
-            attributeLabelInfo.attachNode(this);
+        } else {
+        	attributeLabelInfo = new LabelInfo();
         }
+        attributeLabelInfo.attachNode(this);
+
         if (XMLHelper.contains(elem, OBJECT_LABEL_STYLE_ELEMENT_NAME)) {
             objectLabelInfo = new LabelInfo(elem.getChild(OBJECT_LABEL_STYLE_ELEMENT_NAME));
-            objectLabelInfo.attachNode(this);
+        } else {
+            objectLabelInfo = new LabelInfo();
         }
+        objectLabelInfo.attachNode(this);
+
         concept = new ConceptImplementation(
                 XMLHelper.mustbe(ConceptImplementation.CONCEPT_ELEMENT_NAME, elem)
         );
