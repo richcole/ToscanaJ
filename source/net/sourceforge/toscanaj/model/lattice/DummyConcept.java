@@ -8,15 +8,45 @@
 package net.sourceforge.toscanaj.model.lattice;
 
 import net.sourceforge.toscanaj.model.database.Query;
+import net.sourceforge.toscanaj.util.CollectionFactory;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
-import util.CollectionFactory;
-import util.NullIterator;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class DummyConcept extends ConceptImplementation {
+    private final NullIterator nullIterator = new NullIterator();
+
+    class NullIterator implements Iterator {
+        /**
+         * NullIterator constructor comment.
+         */
+        private NullIterator() {
+            super();
+        }
+
+        /**
+         * hasNext method comment.
+         */
+        public boolean hasNext() {
+            return false;
+        }
+
+        /**
+         * next method comment.
+         */
+        public Object next() {
+            return null;
+        }
+
+        /**
+         * remove method comment.
+         */
+        public void remove() {
+        }
+    }
+    
     public DummyConcept(List attributeContigent) {
         this.attributeContigent = attributeContigent;
     }
@@ -47,7 +77,7 @@ public class DummyConcept extends ConceptImplementation {
     }
 
     public Iterator getObjectContingentIterator() {
-        return NullIterator.makeNull();
+        return nullIterator;
     }
 
     public Concept filterByExtent(Concept other) {

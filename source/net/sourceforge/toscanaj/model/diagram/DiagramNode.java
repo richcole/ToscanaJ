@@ -9,11 +9,11 @@ package net.sourceforge.toscanaj.model.diagram;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
+import net.sourceforge.toscanaj.util.CollectionFactory;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import org.jdom.Element;
-import util.CollectionFactory;
 
 import java.awt.geom.Point2D;
 import java.util.List;

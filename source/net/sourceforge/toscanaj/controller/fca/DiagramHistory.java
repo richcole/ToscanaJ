@@ -11,7 +11,7 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-import util.CollectionFactory;
+import net.sourceforge.toscanaj.util.CollectionFactory;
 
 import javax.swing.*;
 import java.util.LinkedList;

@@ -13,7 +13,6 @@ import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
-import util.Assert;
 
 import javax.swing.*;
 import java.awt.geom.Point2D;
@@ -71,7 +70,9 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
     public Diagram2D generateScale(TableColumnPair[] columns, ConceptualSchema scheme, DatabaseConnection databaseConnection) {
         Column column = columns[0].getColumn();
         int scaleType = determineDataType(column.getType());
-        Assert.isTrue(scaleType != OrdinalScaleEditorDialog.UNSUPPORTED);
+        if(scaleType == OrdinalScaleEditorDialog.UNSUPPORTED) {
+        	throw new RuntimeException("Unsupported scale type");
+        }
         String columnName = column.getName();
         OrdinalScaleEditorDialog scaleDialog = new OrdinalScaleEditorDialog(parent, columnName, scaleType);
         if (!scaleDialog.execute()) {

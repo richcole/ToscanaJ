@@ -13,7 +13,6 @@ import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
-import util.StringUtil;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -39,7 +38,7 @@ public class LabelInfoTest extends TestCase {
             LabelInfo other = new LabelInfo(xmlDesc);
             assertEquals(node, other);
         } catch (XMLSyntaxError error) {
-            fail(StringUtil.stackTraceToString(error));
+            fail(error.toString());
         }
 
     }

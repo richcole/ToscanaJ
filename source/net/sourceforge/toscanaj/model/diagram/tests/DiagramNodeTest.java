@@ -15,7 +15,6 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
-import util.StringUtil;
 
 import java.awt.geom.Point2D;
 
@@ -42,7 +41,7 @@ public class DiagramNodeTest extends TestCase {
             DiagramNode other = new DiagramNode(xmlDesc);
             assertEquals(node, other);
         } catch (XMLSyntaxError error) {
-            fail(StringUtil.stackTraceToString(error));
+            fail(error.toString());
         }
 
     }

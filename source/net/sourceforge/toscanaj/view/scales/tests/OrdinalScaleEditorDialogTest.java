@@ -12,9 +12,9 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.Table;
+import net.sourceforge.toscanaj.util.CollectionFactory;
 import net.sourceforge.toscanaj.view.scales.OrdinalScaleEditorDialog;
 import org.tockit.events.EventBroker;
-import util.CollectionFactory;
 
 import java.util.List;
 

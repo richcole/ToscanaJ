@@ -10,8 +10,9 @@ package net.sourceforge.toscanaj.controller.fca;
 import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
+import net.sourceforge.toscanaj.util.CollectionFactory;
+
 import org.tockit.events.EventBroker;
-import util.CollectionFactory;
 
 import java.util.List;
 
