@@ -105,7 +105,7 @@ public class DatabaseChooser extends JDialog
                 try {
                     Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
                 }
-                catch( ClassNotFoundException e ) {
+                catch( ClassNotFoundException cnfe ) {
                     System.err.println("Could not load ODBC driver -- please check Java installation.");
                 }
                 _databaseInfo.setQuery( (String) _tableList.getSelectedValue(),
