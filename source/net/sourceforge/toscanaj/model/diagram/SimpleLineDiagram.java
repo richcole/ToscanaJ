@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.events.DiagramChangedEvent;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
+import net.sourceforge.toscanaj.util.IdPool;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
@@ -59,6 +60,8 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     private boolean coordinateSystemChecked;
 
     private Element description = null;
+    
+    private IdPool idPool = new IdPool();
 
     /**
      * The default constructor creates a diagram with just nothing in it at all.
@@ -134,7 +137,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     private DiagramNode makeDiagramNodeCopy (DiagramNode node) {   	
 
 		Point2D position = (Point2D) node.getPosition().clone();
-		
+			
 		Concept originalNodeConcept = node.getConcept();
 		ConceptImplementation concept = new ConceptImplementation();
 		Iterator attrIterator = originalNodeConcept.getAttributeContingentIterator();
@@ -151,7 +154,15 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 		LabelInfo attributeLabelInfo = new LabelInfo(node.getAttributeLabelInfo());
 		LabelInfo objectLabelInfo = new LabelInfo(node.getObjectLabelInfo());
 
-		DiagramNode newNode = new DiagramNode(this, node.getIdentifier(), position, concept, attributeLabelInfo, objectLabelInfo, null);
+		String identifier = node.getIdentifier();
+		String newIdentifier = identifier;
+		try  {
+			this.idPool.reserveId(identifier);
+		}
+		catch (IllegalArgumentException e) {
+			newIdentifier = this.idPool.getFreeId();
+		}
+		DiagramNode newNode = new DiagramNode(this, newIdentifier, position, concept, attributeLabelInfo, objectLabelInfo, null);
 		attributeLabelInfo.attachNode(newNode);
 		objectLabelInfo.attachNode(newNode);
 		return newNode;
@@ -182,7 +193,14 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         List nodeElems = elem.getChildren(DiagramNode.NODE_ELEMENT_NAME);
         for (Iterator iterator = nodeElems.iterator(); iterator.hasNext();) {
             Element diagramNode = (Element) iterator.next();
-            nodes.add(createNewDiagramNode(diagramNode));
+            DiagramNode newNode = createNewDiagramNode(diagramNode);
+            try {
+            	this.idPool.reserveId(newNode.getIdentifier()); 
+            }
+            catch (IllegalArgumentException e) {
+            	throw new XMLSyntaxError("Node identifier '" + newNode.getIdentifier() + "' is already used in the diagram '" + title + "'", e);
+            }
+            nodes.add(newNode);
         }
         List lineElems = elem.getChildren(DiagramLine.DIAGRAM_LINE_ELEMENT_NAME);
         for (Iterator iterator = lineElems.iterator(); iterator.hasNext();) {
@@ -485,4 +503,9 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 		}
 		return bottom;
     }
+    
+    public IdPool getIdPool () {
+    	return this.idPool;
+    }
+    
 }

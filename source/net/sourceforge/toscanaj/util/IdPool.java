@@ -10,6 +10,9 @@ package net.sourceforge.toscanaj.util;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * IdPool is a copy of ort.tockit.util.IdPool with added checking.
+ */
 public class IdPool {
     private Set allocatedIds = new HashSet();
     private int nextNumber = 1;
@@ -19,7 +22,7 @@ public class IdPool {
         do {
             retVal = String.valueOf(nextNumber);
             nextNumber++;
-        } while (allocatedIds.contains(retVal));
+        } while (idIsReserved(retVal));
         reserveId(retVal);
         return retVal;
     }
@@ -28,11 +31,14 @@ public class IdPool {
         this.allocatedIds.remove(id);
     }
 
-    public void reserveId(String id) {
+    public void reserveId(String id) throws IllegalArgumentException {
+        if (idIsReserved(id)) {
+        	throw new IllegalArgumentException("Id " + id + " is already reserved");
+        }
         this.allocatedIds.add(id);
     }
     
-    public boolean IdIsReserved (String id) {
+    public boolean idIsReserved (String id) {
     	return this.allocatedIds.contains(id);
     }
 }
