@@ -146,8 +146,10 @@ public class CSXParser
         while( it.hasNext() )
         {
             Element object = (Element) it.next();
-            _Objects.put( object.getAttribute( "id" ).getValue(),
-                         object.getText() );
+            if(object.getText().length() != 0) {
+                _Objects.put( object.getAttribute( "id" ).getValue(),
+                             object.getText() );
+            }
         }
 
         // build hashtable for attributes
@@ -159,8 +161,10 @@ public class CSXParser
         while( it.hasNext() )
         {
             Element attribute = (Element) it.next();
-            _Attributes.put( attribute.getAttribute( "id" ).getValue(),
-                         attribute.getText() );
+            if(attribute.getText().length() != 0) {
+                _Attributes.put( attribute.getAttribute( "id" ).getValue(),
+                             attribute.getText() );
+            }
         }
     }
 
@@ -301,12 +305,20 @@ public class CSXParser
         while( it3.hasNext() )
         {
             Element ref = (Element) it3.next();
-            query = query + "(" + (String) _Objects.get( ref.getText() ) + ")";
-            if( it3.hasNext() ) {
-                query = query + " OR ";
+            String objClause = (String) _Objects.get( ref.getText() );
+            if(objClause != null) {
+                query = query + "(" + objClause + ")";
+                if( it3.hasNext() ) {
+                    query = query + " OR ";
+                }
             }
         }
-        concept.setObjectClause(query);
+        if( query != null && query.length() != 0 ) {
+            concept.setObjectClause(query);
+        }
+        else {
+            concept.setObjectClause(null);
+        }
 
         // get the attribute contingent
         contElem = conceptElem.getChild( "attributeContingent" );
@@ -315,7 +327,10 @@ public class CSXParser
         while( it3.hasNext() )
         {
             Element ref = (Element) it3.next();
-            concept.addAttribute((String) _Attributes.get( ref.getText() ));
+            String attr = (String)_Attributes.get( ref.getText() );
+            if(attr != null) {
+                concept.addAttribute(attr);
+            }
         }
         return concept;
     }
@@ -335,7 +350,10 @@ public class CSXParser
         while( it3.hasNext() )
         {
             Element ref = (Element) it3.next();
-            concept.addObject((String) _Objects.get( ref.getText() ));
+            String obj = (String)_Attributes.get( ref.getText() );
+            if(obj != null) {
+                concept.addObject(obj);
+            }
         }
 
         // get the attribute contingent
@@ -345,7 +363,10 @@ public class CSXParser
         while( it3.hasNext() )
         {
             Element ref = (Element) it3.next();
-            concept.addAttribute((String) _Attributes.get( ref.getText() ));
+            String attr = (String)_Attributes.get( ref.getText() );
+            if(attr != null) {
+                concept.addAttribute(attr);
+            }
         }
         return concept;
     }
