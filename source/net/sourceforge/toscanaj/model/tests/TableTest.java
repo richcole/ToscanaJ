@@ -9,17 +9,13 @@ package net.sourceforge.toscanaj.model.tests;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.model.Table;
-import net.sourceforge.toscanaj.model.Column;
 import net.sourceforge.toscanaj.events.EventBroker;
-
-import java.util.NoSuchElementException;
+import net.sourceforge.toscanaj.model.Column;
+import net.sourceforge.toscanaj.model.Table;
 
 public class TableTest extends TestCase {
     final static Class THIS = TableTest.class;
+
     public TableTest(String s) {
         super(s);
     }
@@ -28,7 +24,7 @@ public class TableTest extends TestCase {
         return new TestSuite(THIS);
     }
 
-    public void testAddColumns(){
+    public void testAddColumns() {
         Table table = new Table(new EventBroker(), "Table");
         table.addColumn(new Column("Second"));
 
