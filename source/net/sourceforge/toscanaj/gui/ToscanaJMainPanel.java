@@ -909,41 +909,71 @@ public class ToscanaJMainPanel extends JFrame implements ActionListener, ChangeO
      *
      * @see #showImageExportOptions()
      */
-    protected void exportImage() {
-        if (DiagramController.getController().getDiagramHistory().getSize() != 0) {
-            if (this.lastImageExportFile == null) {
-                this.lastImageExportFile = new File(System.getProperty("user.dir"));
-            }
-            final JFileChooser saveDialog = new JFileChooser(this.lastImageExportFile);
-            int rv = saveDialog.showSaveDialog(this);
-            if (rv == JFileChooser.APPROVE_OPTION) {
-                this.lastImageExportFile = saveDialog.getSelectedFile();
-                if (this.diagramExportSettings.usesAutoMode()) {
-                    GraphicFormat format = GraphicFormatRegistry.getTypeByExtension(saveDialog.getSelectedFile());
-                    if (format != null) {
-                        this.diagramExportSettings.setGraphicFormat(format);
-                    } else {
-                        JOptionPane.showMessageDialog(this,
-                                "Sorry, no type with this extension known.\n" +
-                                "Please use either another extension or try\n" +
-                                "manual settings.",
-                                "Export failed",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-                try {
-                    this.diagramExportSettings.getGraphicFormat().getWriter().exportGraphic(
-                            this.diagramView, this.diagramExportSettings, saveDialog.getSelectedFile());
-                } catch (ImageGenerationException e) {
-                    ErrorDialog.showError(this, e, "Exporting image error");
-                } catch (OutOfMemoryError e) {
-                    ErrorDialog.showError(this, "Out of memory", "Not enough memory available to export\n" +
-                            "the diagram in this size");
-                }
-            }
-        }
-    }
+	protected void exportImage() {
+		if (DiagramController.getController().getDiagramHistory().getSize() != 0) {
+			if (this.lastImageExportFile == null) {
+				this.lastImageExportFile =
+					new File(System.getProperty("user.dir"));
+			}
+			final JFileChooser saveDialog =
+				new JFileChooser(this.lastImageExportFile);
 
+			boolean formatDefined;
+			do {
+				formatDefined = true;
+				int rv = saveDialog.showSaveDialog(this);
+				if (rv == JFileChooser.APPROVE_OPTION) {
+					File selectedFile = saveDialog.getSelectedFile();
+					this.lastImageExportFile = selectedFile;
+					if (this.diagramExportSettings.usesAutoMode()) {
+						GraphicFormat format =
+							GraphicFormatRegistry.getTypeByExtension(
+								selectedFile);
+						if (format != null) {
+							this.diagramExportSettings.setGraphicFormat(format);
+						} else {
+							JOptionPane.showMessageDialog(
+								this,
+								"Sorry, no type with this extension known.\n"
+									+ "Please use either another extension or try\n"
+									+ "manual settings.",
+								"Export failed",
+								JOptionPane.ERROR_MESSAGE);
+							formatDefined = false;
+						}
+					} else { // manual settings
+						if(selectedFile.getName().indexOf('.') == -1) { // check for extension
+							// add default
+							GraphicFormat format = this.diagramExportSettings.getGraphicFormat();
+							String[] extensions = format.getExtensions();
+							selectedFile = new File(selectedFile.getAbsolutePath() + "." + extensions[0]);
+						}
+					}
+					if (formatDefined) {
+						try {
+							this
+								.diagramExportSettings
+								.getGraphicFormat()
+								.getWriter()
+								.exportGraphic(
+								this.diagramView,
+								this.diagramExportSettings,
+								selectedFile);
+						} catch (ImageGenerationException e) {
+							ErrorDialog.showError(this, e, "Exporting image error");
+						} catch (OutOfMemoryError e) {
+							ErrorDialog.showError(
+								this,
+								"Out of memory",
+								"Not enough memory available to export\n"
+									+ "the diagram in this size");
+						}
+					}
+				}
+			} while (formatDefined == false);
+		}
+    }
+ 
     /**
      * Shows the dialog to change the image export options.
      *
