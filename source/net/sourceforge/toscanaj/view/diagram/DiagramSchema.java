@@ -37,66 +37,66 @@ public class DiagramSchema {
     /**
      * The amount of fade out for unselected nodes.
      */
-    private float fadeOut = 0.7F;
+    private float fadeOut;
 
     /**
      * Holds diagram canvas foreground color
      */
-    private Color foreground = Color.black;
+    private Color foreground;
 
     /**
      * Holds diagram canvas background color.
      */
-    private Color background = null;
+    private Color background;
 
     /**
      * Holds background color for the nested diagrams.
      */
-    private Color nestedDiagramNodeColor = Color.white;
+    private Color nestedDiagramNodeColor;
 
     /**
      * Holds color for the not realised nodes.
      * 
      * If set to null, the normal node color will be used.
      */
-    private Color notRealisedDiagramNodeColor = null;
+    private Color notRealisedDiagramNodeColor;
 
     /**
      * The color used for the top of the gradient.
      */
-    private Color topColor = new Color(0, 0, 150);
+    private Color topColor;
 
     /**
      * The color used for the bottom of the gradient.
      */
-    private Color bottomColor = new Color(255, 255, 150);
+    private Color bottomColor;
 
     /**
      * The color for the circles around the nodes.
      */
-    private Color circleColor = new Color(0, 0, 0);
+    private Color circleColor;
 
     /**
      * The color for lines between nodes.
      */
-    private Color lineColor = new Color(0, 0, 0);
+    private Color lineColor;
 
     /**
      * The color for the circles around the node with the selected concept.
      */
-    private Color circleSelectionColor = new Color(255, 0, 0);
+    private Color circleSelectionColor;
 
     /**
      * The color for the circles around the nodes in the ideal of the selected.
      * concept.
      */
-    private Color circleIdealColor = new Color(0, 0, 0);
+    private Color circleIdealColor;
 
     /**
      * The color for the circles around the nodes in the filter of the selected.
      * concept.
      */
-    private Color circleFilterColor = new Color(0, 0, 0);
+    private Color circleFilterColor;
 
     /**
      * The gradient type set.
@@ -105,65 +105,62 @@ public class DiagramSchema {
      */
     private int gradientType = GRADIENT_TYPE_EXTENT;
 
-    private int selectionLineWidth = 3;
+    private int selectionLineWidth;
 
-    private String labelFontName = "SansSerif";
+    private int margin;
 
-    private int labelFontSize = 10;
-
-    private int margin = 20;
-
-    private float notRealizedNodeSizeReductionFactor = 3;
+    private float notRealizedNodeSizeReductionFactor;
     
     private int nodeSizeScalingType = NODE_SIZE_SCALING_NONE;
     
     private Font labelFont;
 
-    /**
-     * Default constructor.
-     */
-    public DiagramSchema() {
-        background = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "backgroundColor", background);
-        topColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "topColor", topColor);
-        bottomColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "bottomColor", bottomColor);
-        foreground = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "foregroundColor", foreground);
-        nestedDiagramNodeColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "nestedDiagramNodeColor", nestedDiagramNodeColor);
-        notRealisedDiagramNodeColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "notRealisedDiagramNodeColor", notRealisedDiagramNodeColor);
-        circleColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleColor", circleColor);
-        lineColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "lineColor", lineColor);
-        circleSelectionColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleSelectionColor", circleSelectionColor);
-        circleIdealColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleIdealColor", circleIdealColor);
-        circleFilterColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleFilterColor", circleFilterColor);
-        fadeOut = ConfigurationManager.fetchFloat(PROPERTY_SECTION_NAME, "fadeOutValue", fadeOut);
-        margin = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "margin", margin);
-        notRealizedNodeSizeReductionFactor = ConfigurationManager.fetchFloat(PROPERTY_SECTION_NAME, "notRealizedNodeSizeReductionFactor", notRealizedNodeSizeReductionFactor);
-        String propVal = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "gradientType", "extent");
-        propVal = propVal.toLowerCase();
-        if (propVal.equals("extent")) {
-            gradientType = GRADIENT_TYPE_EXTENT;
-        } else if (propVal.equals("contingent")) {
-            gradientType = GRADIENT_TYPE_CONTINGENT;
-        } else {
-            System.err.println("Caught unknown gradient type for DiagramSchema: " + propVal);
-            System.err.println("-- using default");
-        }
-        selectionLineWidth = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "selectionLineWidth",
-                selectionLineWidth);
-        labelFontName = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "labelFontName", labelFontName);
-        labelFontSize = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "labelFontSize", labelFontSize);
-        propVal = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "scaleNodeSize", "none");
-        propVal = propVal.toLowerCase();
-        if (propVal.equals("contingent")) {
-            this.nodeSizeScalingType = NODE_SIZE_SCALING_CONTINGENT;
-        } else if (propVal.equals("extent")) {
-            this.nodeSizeScalingType = NODE_SIZE_SCALING_EXTENT;
-        } else if (propVal.equals("none")) {
-            this.nodeSizeScalingType = NODE_SIZE_SCALING_NONE;
-        } else {
-            System.err.println("Caught unknown node size scaling value for DiagramSchema: " + propVal);
-            System.err.println("-- using default");
-        }
-        this.labelFont = new Font(labelFontName, Font.PLAIN ,labelFontSize);
+    private DiagramSchema() {
+    }
+    
+    public static DiagramSchema getDefaultSchema() {
+    	DiagramSchema retVal = new DiagramSchema();
+		retVal.background = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "backgroundColor", null);
+		retVal.topColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "topColor", new Color(0, 0, 150));
+		retVal.bottomColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "bottomColor", new Color(255, 255, 150));
+		retVal.foreground = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "foregroundColor", new Color(0, 0, 0));
+		retVal.nestedDiagramNodeColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "nestedDiagramNodeColor", new Color(255, 255, 255));
+		retVal.notRealisedDiagramNodeColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "notRealisedDiagramNodeColor", null);
+		retVal.circleColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleColor", new Color(0, 0, 0));
+		retVal.lineColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "lineColor", new Color(0, 0, 0));
+		retVal.circleSelectionColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleSelectionColor", new Color(255, 0, 0));
+		retVal.circleIdealColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleIdealColor", new Color(0, 0, 0));
+		retVal.circleFilterColor = ConfigurationManager.fetchColor(PROPERTY_SECTION_NAME, "circleFilterColor", new Color(0, 0, 0));
+		retVal.fadeOut = ConfigurationManager.fetchFloat(PROPERTY_SECTION_NAME, "fadeOutValue", 0.7F);
+		retVal.margin = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "margin", 20);
+		retVal.notRealizedNodeSizeReductionFactor = ConfigurationManager.fetchFloat(PROPERTY_SECTION_NAME, "notRealizedNodeSizeReductionFactor", 3);
+		String propVal = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "gradientType", "extent");
+		propVal = propVal.toLowerCase();
+		if (propVal.equals("extent")) {
+			retVal.gradientType = GRADIENT_TYPE_EXTENT;
+		} else if (propVal.equals("contingent")) {
+			retVal.gradientType = GRADIENT_TYPE_CONTINGENT;
+		} else {
+			System.err.println("Caught unknown gradient type for DiagramSchema: " + propVal);
+			System.err.println("-- using default");
+		}
+		retVal.selectionLineWidth = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "selectionLineWidth", 3);
+		String labelFontName = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "labelFontName", "SansSerif");
+		int labelFontSize = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "labelFontSize", 10);
+		propVal = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "scaleNodeSize", "none");
+		propVal = propVal.toLowerCase();
+		if (propVal.equals("contingent")) {
+			retVal.nodeSizeScalingType = NODE_SIZE_SCALING_CONTINGENT;
+		} else if (propVal.equals("extent")) {
+			retVal.nodeSizeScalingType = NODE_SIZE_SCALING_EXTENT;
+		} else if (propVal.equals("none")) {
+			retVal.nodeSizeScalingType = NODE_SIZE_SCALING_NONE;
+		} else {
+			System.err.println("Caught unknown node size scaling value for DiagramSchema: " + propVal);
+			System.err.println("-- using default");
+		}
+		retVal.labelFont = new Font(labelFontName, Font.PLAIN, labelFontSize);
+    	return retVal;
     }
 
     /**
@@ -312,14 +309,6 @@ public class DiagramSchema {
             throw new IllegalArgumentException("Unknown value for gradient type");
         }
         this.gradientType = gradientType;
-    }
-
-    public String getLabelFontName() {
-        return this.labelFontName;
-    }
-
-    public int getLabelFontSize() {
-        return this.labelFontSize;
     }
 
     /**
