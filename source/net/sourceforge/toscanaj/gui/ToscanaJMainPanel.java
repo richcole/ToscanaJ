@@ -230,6 +230,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
      */
     private void buildPanel() {
         diagramView = new DiagramView();
+		//set the minimum font size of the label into diagramView from the properties file
+		int minLabelFontSize = ConfigurationManager.fetchInt("ToscanaJMainPanel", "minLabelFontSize", (int)this.diagramView.getMinimumFontSize());
+		diagramView.setMinimumFontSize(minLabelFontSize);
 
         createActions();
         buildMenuBar();
@@ -667,6 +670,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 						source.setSelected(true);
 					}
 				});
+				if(diagramView.getMinimumFontSize() == fontRange){
+					fontRangeMenuItem.setSelected(true);
+				}				
 				fontRange+=2;
 				setMinLabelSizeSubMenu.add(fontRangeMenuItem);
 			}			
@@ -826,6 +832,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         ConfigurationManager.storeInt("ToscanaJMainPanel", "divider", splitPane.getDividerLocation());
         // save the MRU list
         ConfigurationManager.storeStringList("ToscanaJMainPanel", "mruFiles", this.mruList);
+        // store the minimum label size
+		ConfigurationManager.storeInt("ToscanaJMainPanel", "minLabelFontSize", (int)this.diagramView.getMinimumFontSize());
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
 
