@@ -223,4 +223,12 @@ public class ConfigurationManager {
             }
         }
     }
+
+    public static void storeBoolean(String section, String key, boolean value) {
+        storeInt(section, key, value?1:0);
+    }
+
+    public static boolean fetchBoolean(String section, String key, boolean defaultValue) {
+        return fetchInt(section, key, defaultValue?1:0) == 1;
+    }
 }

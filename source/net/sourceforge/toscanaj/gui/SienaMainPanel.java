@@ -156,6 +156,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private JMenu fileMenu;
     private JMenu mruMenu;
     private DiagramEditingView diagramEditingView;
+    private TemporalControlsPanel temporalControls;
     private List mruList = new LinkedList();
     private String currentFile = null;
     private DiagramExportSettings diagramExportSettings;
@@ -270,16 +271,13 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	}
 
 	protected void createDiagramEditingView() {
-        if (ConfigurationManager.fetchInt("SienaTemporalControls", "enabled", 0) == 1) {
-            this.diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
-            TemporalControlsPanel temporalControls = new TemporalControlsPanel(
-                this.diagramEditingView.getDiagramView(),
-                diagramExportSettings,
-                eventBroker);
-            this.diagramEditingView.addAccessory(temporalControls);
-        } else {
-            this.diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
-        }        
+        this.diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
+        this.temporalControls = new TemporalControlsPanel(
+                                            this.diagramEditingView.getDiagramView(),
+                                            diagramExportSettings,
+                                            eventBroker);
+        this.temporalControls.setVisible(ConfigurationManager.fetchBoolean("SienaTemporalControls", "enabled", false));                                    
+        this.diagramEditingView.addAccessory(temporalControls);
 		this.diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
 										this, DisplayedDiagramChangedEvent.class, Object.class);
 		DiagramView diagramView = diagramEditingView.getDiagramView();
@@ -643,6 +641,21 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         });
         viewMenu.add(showObjectLabels);
 
+        viewMenu.addSeparator();
+        
+        final JCheckBoxMenuItem showTemporalControls =
+            new JCheckBoxMenuItem("Show Temporal Controls");
+        showTemporalControls.setMnemonic(KeyEvent.VK_T);
+        showTemporalControls.setSelected(
+                        ConfigurationManager.fetchBoolean("SienaTemporalControls", "enabled", true));
+        showTemporalControls.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                boolean newState = !temporalControls.isVisible();
+                temporalControls.setVisible(newState);
+            }
+        });
+        viewMenu.add(showTemporalControls);
+
         menuBar.add(viewMenu);
 
         // --- help menu ---
@@ -910,7 +923,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                                              "lastCSCImport", 
                                              this.lastCSCFile.getAbsolutePath());
         }
-
+        ConfigurationManager.storeBoolean("SienaTemporalControls", "enabled", this.temporalControls.isVisible());
         // store current position
         ConfigurationManager.storePlacement("SienaMainPanel", this);
         ConfigurationManager.storeInt(
