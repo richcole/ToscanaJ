@@ -37,13 +37,9 @@ import java.util.Iterator;
  * 
  * @todo it might be better not to have the objectDisplayMode but two methods for extent/contingent instead. This allows more caching
  *       since the context would be the same more often.
- * @todo remove the REFERENCE_SCHEMA, it doesn't work anyway and probably noone needs it
  */
 
 public interface ConceptInterpreter {
-    int REFERENCE_DIAGRAM = 0;
-    int REFERENCE_SCHEMA = 1;
-
     /** is dependent on displayMode and filterMode */
     Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context);
 
@@ -63,10 +59,10 @@ public interface ConceptInterpreter {
 	int getExtentSize(Concept concept, ConceptInterpretationContext context);
 
 	/** these are independent of displayMode and dependent on filterMode */
-	double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context, int reference);
+	double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context);
 
 	/** these are independent of displayMode and dependent on filterMode */
-	double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context, int reference);
+	double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context);
 
     boolean isRealized(Concept concept, ConceptInterpretationContext context);
 

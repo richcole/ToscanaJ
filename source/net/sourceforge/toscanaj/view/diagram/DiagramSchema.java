@@ -33,17 +33,6 @@ public class DiagramSchema {
      */
     public static final int GRADIENT_TYPE_CONTINGENT = 2;
 
-    /**
-     * Used when the gradient should compare to the number of objects in the diagram.
-     */
-    public static final int GRADIENT_REFERENCE_DIAGRAM = 1;
-
-    /**
-     * Used when the gradient should compare to the number of objects in the conceptual
-     * schema.
-     */
-    public static final int GRADIENT_REFERENCE_SCHEMA = 2;
-    
     public static final int NODE_SIZE_SCALING_NONE = 0;
     public static final int NODE_SIZE_SCALING_CONTINGENT = 1;
     public static final int NODE_SIZE_SCALING_EXTENT = 2;
@@ -119,13 +108,6 @@ public class DiagramSchema {
      */
     private int gradientType = GRADIENT_TYPE_EXTENT;
 
-    /**
-     * The gradient reference set.
-     *
-     * @see #setGradientReference(int)
-     */
-    private int gradientReference = GRADIENT_REFERENCE_SCHEMA;
-
     private int selectionLineWidth = 3;
 
     private String labelFontName = "SansSerif";
@@ -166,16 +148,6 @@ public class DiagramSchema {
             gradientType = GRADIENT_TYPE_CONTINGENT;
         } else {
             System.err.println("Caught unknown gradient type for DiagramSchema: " + propVal);
-            System.err.println("-- using default");
-        }
-        propVal = ConfigurationManager.fetchString(PROPERTY_SECTION_NAME, "gradientReference", "diagram");
-        propVal = propVal.toLowerCase();
-        if (propVal.equals("diagram")) {
-            gradientReference = GRADIENT_REFERENCE_DIAGRAM;
-        } else if (propVal.equals("schema")) {
-            gradientReference = GRADIENT_REFERENCE_SCHEMA;
-        } else {
-            System.err.println("Caught unknown gradient reference for DiagramSchema: " + propVal);
             System.err.println("-- using default");
         }
         selectionLineWidth = ConfigurationManager.fetchInt(PROPERTY_SECTION_NAME, "selectionLineWidth",
@@ -295,17 +267,6 @@ public class DiagramSchema {
         return this.gradientType;
     }
 
-    /**
-     * Returns the reference point for creating the gradient.
-     *
-     * This can be either GRADIENT_REFERENCE_DIAGRAM to compare extent/contingent
-     * to the number of objects in the diagram or GRADIENT_REFERENCE_SCHEMA to
-     * compare it to the full set of objects in the schema.
-     */
-    public int getGradientReference() {
-        return this.gradientReference;
-    }
-
     public int getSelectionLineWidth() {
         return this.selectionLineWidth;
     }
@@ -354,21 +315,6 @@ public class DiagramSchema {
             throw new IllegalArgumentException("Unknown value for gradient type");
         }
         this.gradientType = gradientType;
-    }
-
-    /**
-     * Sets the reference point for creating the gradient.
-     *
-     * This can be either GRADIENT_REFERENCE_DIAGRAM to compare extent/contingent
-     * to the number of objects in the diagram or GRADIENT_REFERENCE_SCHEMA to
-     * compare it to the full set of objects in the schema.
-     */
-    public void setGradientReference(int gradientReference) {
-        if (gradientReference != GRADIENT_REFERENCE_DIAGRAM &&
-                gradientReference != GRADIENT_REFERENCE_SCHEMA) {
-            throw new IllegalArgumentException("Unknown value for gradient type");
-        }
-        this.gradientReference = gradientReference;
     }
 
     public String getLabelFontName() {

@@ -155,14 +155,12 @@ public class NodeView extends CanvasItem {
             if( this.diagramView.getDiagramSchema().getNodeSizeScalingType() == DiagramSchema.NODE_SIZE_SCALING_CONTINGENT ) {
                 relativeSize = diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
                                 this.diagramNode.getConcept(),
-                                conceptInterpretationContext,
-                                ConceptInterpreter.REFERENCE_DIAGRAM
+                                conceptInterpretationContext
                 );
             } else if( this.diagramView.getDiagramSchema().getNodeSizeScalingType() == DiagramSchema.NODE_SIZE_SCALING_EXTENT ) {
                 relativeSize = diagramView.getConceptInterpreter().getRelativeExtentSize(
                                 this.diagramNode.getConcept(),
-                                conceptInterpretationContext,
-                                ConceptInterpreter.REFERENCE_DIAGRAM
+                                conceptInterpretationContext
                 );
         	} else {
             	relativeSize = 1;
@@ -187,35 +185,16 @@ public class NodeView extends CanvasItem {
      *  calculates relative size in order to calculate node color
      */
     private double calculateRelativeSize(DiagramSchema diagramSchema) {
-        if (diagramSchema.getGradientReference() == DiagramSchema.GRADIENT_REFERENCE_DIAGRAM) {
-            if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
-                return diagramView.getConceptInterpreter().getRelativeExtentSize(
-                        this.diagramNode.getConcept(),
-                        conceptInterpretationContext,
-                        ConceptInterpreter.REFERENCE_DIAGRAM
-                );
-            } else {
-                return diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
-                        this.diagramNode.getConcept(),
-                        conceptInterpretationContext,
-                        ConceptInterpreter.REFERENCE_DIAGRAM
-                );
-            }
+        if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
+            return diagramView.getConceptInterpreter().getRelativeExtentSize(
+                    this.diagramNode.getConcept(),
+                    conceptInterpretationContext
+            );
         } else {
-            if (diagramSchema.getGradientType() == DiagramSchema.GRADIENT_TYPE_EXTENT) {
-                return diagramView.getConceptInterpreter().getRelativeExtentSize(
-                        this.diagramNode.getConcept(),
-                        conceptInterpretationContext,
-                        ConceptInterpreter.REFERENCE_SCHEMA
-                );
-            } else {
-                /// @todo Check if this one can be avoided -- it is pretty useless
-                return diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
-                        this.diagramNode.getConcept(),
-                        conceptInterpretationContext,
-                        ConceptInterpreter.REFERENCE_SCHEMA
-                );
-            }
+            return diagramView.getConceptInterpreter().getRelativeObjectContingentSize(
+                    this.diagramNode.getConcept(),
+                    conceptInterpretationContext
+            );
         }
     }
 

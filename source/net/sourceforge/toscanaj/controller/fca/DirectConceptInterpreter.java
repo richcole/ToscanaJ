@@ -42,17 +42,12 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
         return concept.getAttributeContingentSize();
     }
 
-    public double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context, int reference) {
+    public double getRelativeObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
         int contingentSize = getCount(concept, context, ConceptInterpretationContext.CONTINGENT);
-        if (reference == REFERENCE_DIAGRAM) {
-            if (contingentSize == 0) {
-                return 0; //avoids division by zero
-            }
-            return (double) contingentSize / (double) getMaximalContingentSize();
-        } else {
-            /// @todo implement or remove the distinction
-            return 1;
+        if (contingentSize == 0) {
+            return 0; //avoids division by zero
         }
+        return (double) contingentSize / (double) getMaximalContingentSize();
     }
 
     private int getMaximalContingentSize() {
@@ -60,38 +55,33 @@ public class DirectConceptInterpreter implements ConceptInterpreter {
         return 1;
     }
 
-    public double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context, int reference) {
+    public double getRelativeExtentSize(Concept concept, ConceptInterpretationContext context) {
         int extentSize = getCount(concept, context, ConceptInterpretationContext.EXTENT);
         if (extentSize == 0) {
             return 0; //avoids division by zero
         }
-        if (reference == REFERENCE_DIAGRAM) {
-            /// @todo add way to find top compareConcept more easily
-            Concept compareConcept;
-            ConceptInterpretationContext compareContext;
-            List nesting = context.getNestingConcepts();
-            if (nesting.size() != 0) {
-                // go outermost
-                compareConcept = (Concept) nesting.get(0);
-                compareContext = new ConceptInterpretationContext(context.getDiagramHistory(), context.getEventBroker());
-            } else {
-                compareConcept = concept;
-                compareContext = context;
-            }
-            while (!compareConcept.isTop()) {
-                Concept other;
-                Iterator it = compareConcept.getUpset().iterator();
-                do {
-                    other = (Concept) it.next();
-                } while (other == compareConcept);
-                compareConcept = other;
-            }
-            int maxExtent = getCount(compareConcept, compareContext, ConceptInterpretationContext.EXTENT);
-            return (double) extentSize / (double) maxExtent;
+        /// @todo add way to find top compareConcept more easily
+        Concept compareConcept;
+        ConceptInterpretationContext compareContext;
+        List nesting = context.getNestingConcepts();
+        if (nesting.size() != 0) {
+            // go outermost
+            compareConcept = (Concept) nesting.get(0);
+            compareContext = new ConceptInterpretationContext(context.getDiagramHistory(), context.getEventBroker());
         } else {
-            /// @todo implement or remove the distinction
-            return 1;
+            compareConcept = concept;
+            compareContext = context;
         }
+        while (!compareConcept.isTop()) {
+            Concept other;
+            Iterator it = compareConcept.getUpset().iterator();
+            do {
+                other = (Concept) it.next();
+            } while (other == compareConcept);
+            compareConcept = other;
+        }
+        int maxExtent = getCount(compareConcept, compareContext, ConceptInterpretationContext.EXTENT);
+        return (double) extentSize / (double) maxExtent;
     }
 
     private int getCount(Concept concept, ConceptInterpretationContext context, boolean extent) {

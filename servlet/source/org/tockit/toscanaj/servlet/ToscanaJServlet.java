@@ -290,8 +290,7 @@ public class ToscanaJServlet extends HttpServlet {
             }
             double gradientPosition = this.conceptInterpreter.getRelativeExtentSize(
                     concept,
-                    interpretationContext,
-                    ConceptInterpreter.REFERENCE_DIAGRAM
+                    interpretationContext
             );
             Color nodeColor = diagramSchema.getGradientColor(gradientPosition);
             Color lineColor = diagramSchema.getLineColor();
@@ -616,8 +615,7 @@ public class ToscanaJServlet extends HttpServlet {
             }
             double gradientPosition = this.conceptInterpreter.getRelativeExtentSize(
                     concept,
-                    interpretationContext,
-                    ConceptInterpreter.REFERENCE_DIAGRAM
+                    interpretationContext
             );
             Color nodeColor = diagramSchema.getGradientColor(gradientPosition);
             Color lineColor = diagramSchema.getLineColor();

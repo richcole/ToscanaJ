@@ -17,7 +17,6 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
@@ -184,8 +183,7 @@ public class ToscanaJDiagrams extends HttpServlet {
             }
             double gradientPosition = this.conceptInterpreter.getRelativeExtentSize(
                     concept,
-                    interpretationContext,
-                    ConceptInterpreter.REFERENCE_DIAGRAM
+                    interpretationContext
             );
             Color nodeColor = diagramSchema.getGradientColor(gradientPosition);
             Color lineColor = diagramSchema.getLineColor();
@@ -433,8 +431,7 @@ public class ToscanaJDiagrams extends HttpServlet {
             }
             double gradientPosition = this.conceptInterpreter.getRelativeExtentSize(
                     concept,
-                    interpretationContext,
-                    ConceptInterpreter.REFERENCE_DIAGRAM
+                    interpretationContext
             );
             Color nodeColor = diagramSchema.getGradientColor(gradientPosition);
             Color lineColor = diagramSchema.getLineColor();

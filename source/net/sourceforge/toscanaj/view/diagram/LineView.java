@@ -120,7 +120,7 @@ public class LineView extends CanvasItem {
 		}
 
 		if(extentRatio == 1 && this.groupingMode != NO_GROUPING) {
-			double gradientPosition = interpreter.getRelativeExtentSize(upperConcept,interpretationContext, ConceptInterpreter.REFERENCE_DIAGRAM);
+			double gradientPosition = interpreter.getRelativeExtentSize(upperConcept,interpretationContext);
             Color fillColor = diagramSchema.getGradientColor(gradientPosition);
 			if (this.getSelectionState() == DiagramView.NOT_SELECTED) {
 				fillColor = diagramSchema.fadeOut(fillColor);
