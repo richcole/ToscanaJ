@@ -353,10 +353,14 @@ public class NominalScaleEditorDialog extends JDialog {
         		Object newTableColumnPair = cb.getSelectedItem();
                 if(newTableColumnPair != selectedTableColumnPair && newTableColumnPair instanceof TableColumnPair) {
         			selectedTableColumnPair = (TableColumnPair) newTableColumnPair;
-        			fillAvailableValueList();
+        			Object firstItem = cb.getItemAt(0);
+        			if(! (firstItem instanceof TableColumnPair) ) {
+        				cb.removeItemAt(0);
+        			}
         		} else {
         			selectedTableColumnPair = null;
         		}
+				fillAvailableValueList();
             }
         });
 
