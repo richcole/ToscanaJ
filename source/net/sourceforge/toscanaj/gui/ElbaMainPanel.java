@@ -17,17 +17,20 @@ import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.gui.action.ExportDiagramAction;
 import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.*;
 import net.sourceforge.toscanaj.gui.dialog.CheckDuplicateFileChooser;
+import net.sourceforge.toscanaj.gui.dialog.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExportStatisticalDataSettingsDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
@@ -43,6 +46,7 @@ import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.SqlClauseLabelView;
 import net.sourceforge.toscanaj.view.scales.AttributeListScaleGenerator;
 import net.sourceforge.toscanaj.view.scales.BiordinalScaleGenerator;
@@ -52,6 +56,7 @@ import net.sourceforge.toscanaj.view.scales.OrdinalScaleGenerator;
 import net.sourceforge.toscanaj.view.scales.ScaleEditingViewDialog;
 import net.sourceforge.toscanaj.view.scales.ScaleGenerator;
 
+import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
@@ -113,6 +118,8 @@ public class ElbaMainPanel
     private JButton newDiagramButton;
     private JPanel toolbar;
     private SaveConceptualSchemaActivity saveActivity;
+	private DiagramExportSettings diagramExportSettings;
+	private ExportDiagramAction exportDiagramAction;
 
 	public ElbaMainPanel() {
 		super("Elba");
@@ -121,6 +128,19 @@ public class ElbaMainPanel
 		this.conceptualSchema = new ConceptualSchema(eventBroker);
 		this.databaseConnection = new DatabaseConnection(eventBroker);
 		DatabaseConnection.setConnection(this.databaseConnection);
+
+		// register all image writers we want to support
+		try {
+			org.tockit.canvas.imagewriter.BatikImageWriter.initialize();
+		} catch (Throwable t) {
+			// do nothing, we just don't support SVG
+		}
+		org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
+
+		Iterator it = GraphicFormatRegistry.getIterator();
+		if (it.hasNext()) {
+			this.diagramExportSettings = new DiagramExportSettings();
+		}
 
 		this.eventBroker.subscribe(
 			this,
@@ -279,8 +299,11 @@ public class ElbaMainPanel
 				CONFIGURATION_SECTION_NAME,
 				"diagramViewDivider",
 				200));
-		diagramEditingView.getDiagramView().setObjectLabelFactory(
+		DiagramView diagramView = diagramEditingView.getDiagramView();
+		diagramView.setObjectLabelFactory(
 			SqlClauseLabelView.getFactory());
+		diagramView.getController().getEventBroker().subscribe(
+						this, DisplayedDiagramChangedEvent.class, Object.class);
 
 		mainView.add(
 			toolbar,
@@ -559,6 +582,30 @@ public class ElbaMainPanel
 		fileMenu.add(importCSCMenuItem);
 
 		fileMenu.addSeparator();
+
+		// we add the export options only if we can export at all
+		/// @todo reduce duplicate code with ToscanaJMainPanel
+		if (this.diagramExportSettings != null) {
+			Frame frame = JOptionPane.getFrameForComponent(this);
+			exportDiagramAction = new ExportDiagramAction(frame, this.diagramExportSettings,
+									   this.diagramEditingView.getDiagramView(), KeyEvent.VK_E, 
+									   KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+			fileMenu.add(exportDiagramAction);
+			exportDiagramAction.setEnabled(false);
+
+			// create the export diagram save options submenu
+			JMenuItem exportDiagramSetupMenuItem = new JMenuItem("Export Diagram Setup...");
+			exportDiagramSetupMenuItem.setMnemonic(KeyEvent.VK_S);
+			exportDiagramSetupMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+					KeyEvent.VK_E, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+			exportDiagramSetupMenuItem.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					showImageExportOptions();
+				}
+			});
+			fileMenu.add(exportDiagramSetupMenuItem);
+			fileMenu.addSeparator();
+		}
 
 		// --- file exit item ---
 		JMenuItem exitMenuItem;
@@ -852,6 +899,9 @@ public class ElbaMainPanel
 			File schemaFile = loadEvent.getFile();
 			addFileToMRUList(schemaFile);
 		}
+		this.exportDiagramAction.setEnabled(
+				(this.diagramEditingView.getDiagramView().getDiagram() != null) &&
+				(this.diagramExportSettings != null));
 	}
 
 	protected void connectDatabase() {
@@ -1096,4 +1146,16 @@ public class ElbaMainPanel
             connectDatabase();
         }
     }
+
+	protected void showImageExportOptions() {
+		DiagramView diagramView = this.diagramEditingView.getDiagramView();
+		if (this.diagramExportSettings.usesAutoMode()) {
+			this.diagramExportSettings.setImageSize(diagramView.getWidth(), diagramView.getHeight());
+		}
+		DiagramExportSettingsDialog.initialize(this, this.diagramExportSettings);
+		boolean changesDone = DiagramExportSettingsDialog.showDialog(this);
+		if (changesDone && this.diagramEditingView.getDiagramView().getDiagram() != null) {
+			this.exportDiagramAction.exportImage();
+		}
+	}
 }
