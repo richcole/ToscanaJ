@@ -128,7 +128,7 @@ public class CSXParser {
 	
 	        return _Schema;
         } catch (OutOfMemoryError exc) {
-        	ErrorDialog.showError(null,"Out of memory", "The system ran out of memory while opening a file.");
+			ErrorDialog.showError(null, exc, "Out of memory", "The system ran out of memory while opening a file.");
         	return new ConceptualSchema(eventBroker);
         }
     }

@@ -479,11 +479,12 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         } catch (ImageGenerationException e) {
             ErrorDialog.showError(this, e, "Exporting image error");
         } catch (OutOfMemoryError e) {
-            ErrorDialog.showError(
-                this,
-                "Out of memory",
-                "Not enough memory available to export\n"
-                    + "the diagram in this size");
+				ErrorDialog.showError(
+				this,
+				e,
+				"Out of memory",
+				"Not enough memory available to export\n"
+					+ "the diagram in this size");
         }
     }
 

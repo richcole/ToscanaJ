@@ -216,7 +216,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 						out.println(description);
 						out.close();
 					}catch(IOException e){
-						ErrorDialog.showError(frame, e.getMessage(), "Exporting text file error");
+						ErrorDialog.showError(frame, e, "Exporting text file error");
 					}
 				}
 				if(this.diagramExportSettings.getSaveCommentToClipboard()==true){
@@ -229,10 +229,10 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 					systemClipboard.setContents(comments,null);
 				}
 		} catch (ImageGenerationException e) {
-			ErrorDialog.showError(frame, e.getMessage(), "Exporting image error");
+			ErrorDialog.showError(frame, e, "Exporting image error");
 		} catch (OutOfMemoryError e) {
 			ErrorDialog.showError(
-				frame,
+				frame,e,
 				"Out of memory",
 				"Not enough memory available to export\n"
 					+ "the diagram in this size");
