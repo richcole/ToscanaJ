@@ -31,6 +31,13 @@ import net.sourceforge.toscanaj.util.xmlize.XMLWriter;
 
 
 public class TupelScaling {
+    /**
+     * Creates a conceptual schema, taking one element as the objects the rest as attributes.
+     * 
+     * The return value is a conceptual schema with n-1 diagrams (n = number of elements in tupels).
+     * Each binary relation for the contexts is the projection of the tupels onto the dimension
+     * given by the objectPosition parameter and one other.
+     */
     public static ConceptualSchema scaleTupels(TupelSet tupels, int objectPosition) {
         ConceptualSchema schema = new ConceptualSchema(new EventBroker());
 
