@@ -3,7 +3,6 @@ package net.sourceforge.toscanaj.model.diagram;
 import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 
 import java.awt.geom.Rectangle2D;
-
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;

@@ -4,63 +4,34 @@ import net.sourceforge.toscanaj.canvas.imagewriter.DiagramExportSettings;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormat;
 import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormatRegistry;
 import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
-import net.sourceforge.toscanaj.canvas.imagewriter.ImageWriter;
-
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
-
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.Query;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
-
 import net.sourceforge.toscanaj.view.DiagramOrganiser;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
-import net.sourceforge.toscanaj.view.diagram.LabelView;
-import net.sourceforge.toscanaj.view.diagram.NodeView;
 import net.sourceforge.toscanaj.view.dialogs.DatabaseChooser;
 import net.sourceforge.toscanaj.view.dialogs.DiagramExportSettingsDialog;
 import net.sourceforge.toscanaj.view.dialogs.ErrorDialog;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JColorChooser;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
 
 /**
  *  This class provides the main GUI panel with menus and a toolbar
@@ -140,7 +111,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
     /**
      * The pane for selecting the diagrams.
      */
-    DiagramOrganiser diagramOrganiser;
+    private DiagramOrganiser diagramOrganiser;
 
     /**
      * Flag to indicate if the save icon and menu options should be
@@ -185,8 +156,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         Iterator it = GraphicFormatRegistry.getIterator();
         // if we have at least one format we use it, if not the settings stay null and the export options should
         // not be enabled
-        if(it.hasNext()) {
-            this.diagramExportSettings = new DiagramExportSettings((GraphicFormat)it.next(), 0, 0, true );
+        if (it.hasNext()) {
+            this.diagramExportSettings = new DiagramExportSettings((GraphicFormat) it.next(), 0, 0, true);
         }
         // then build the panel (order is important for checking if we want export options)
         buildPanel();
@@ -199,15 +170,15 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // set up the menu for the MRU files
         recreateMruMenu();
         // if we have at least one MRU file try to open it
-        if(this.mruList.size() > 0) {
-            File schemaFile = new File((String) mruList.get(mruList.size()-1));
-            if(schemaFile.canRead()) {
+        if (this.mruList.size() > 0) {
+            File schemaFile = new File((String) mruList.get(mruList.size() - 1));
+            if (schemaFile.canRead()) {
                 openSchemaFile(schemaFile);
             }
         }
         // restore the last image export position
-        String lastImage = ConfigurationManager.fetchString("mainPanel","lastImageExport",null);
-        if(lastImage != null ) {
+        String lastImage = ConfigurationManager.fetchString("mainPanel", "lastImageExport", null);
+        if (lastImage != null) {
             this.lastImageExportFile = new File(lastImage);
         }
     }
@@ -217,11 +188,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      *
      * Used when opening ToscanaJ with a file name on the command line.
      */
-    public MainPanel( String schemaFileURL ) {
+    public MainPanel(String schemaFileURL) {
         // do the normal initialisation first
         this();
         // open the file
-        openSchemaFile( new File(schemaFileURL) );
+        openSchemaFile(new File(schemaFileURL));
     }
 
 
@@ -243,22 +214,22 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
 
         //Create a split pane with the two scroll panes in it.
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                                   diagramOrganiser, diagramView);
+                diagramOrganiser, diagramView);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
 
         //Provide minimum sizes for the two components in the split pane
-        Dimension minimumSize = new Dimension(50,100);
+        Dimension minimumSize = new Dimension(50, 100);
         diagramView.setMinimumSize(minimumSize);
         diagramOrganiser.setMinimumSize(minimumSize);
 
         contentPane.add(this.toolbar, BorderLayout.NORTH);
         contentPane.add(splitPane, BorderLayout.CENTER);
 
-        setContentPane( contentPane );
+        setContentPane(contentPane);
         // restore old position
-        ConfigurationManager.restorePlacement("mainPanel",this, new Rectangle(10,10,600,450));
-        int div = ConfigurationManager.fetchInt("mainPanel","divider",200);
+        ConfigurationManager.restorePlacement("mainPanel", this, new Rectangle(10, 10, 600, 450));
+        int div = ConfigurationManager.fetchInt("mainPanel", "divider", 200);
         splitPane.setDividerLocation(div);
     }
 
@@ -266,11 +237,10 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      *  build the MenuBar
      */
     private void buildMenuBar() {
-        if(menubar == null) {
+        if (menubar == null) {
             // create menu bar
             menubar = new JMenuBar();
-        }
-        else {
+        } else {
             menubar.removeAll();
         }
 
@@ -281,15 +251,15 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
 
         // menu item OPEN
         openMenuItem = new JMenuItem("Open...");
-                        //new ImageIcon(IMAGE_PATH + OPEN_ICON));
+        //new ImageIcon(IMAGE_PATH + OPEN_ICON));
         openMenuItem.setMnemonic(KeyEvent.VK_O);
         openMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                 KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+                KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         openMenuItem.addActionListener(this);
         fileMenu.add(openMenuItem);
 
         // we add the export options only if we can export at all
-        if(this.diagramExportSettings != null) {
+        if (this.diagramExportSettings != null) {
             // menu item export diagram
             exportDiagramMenuItem = new JMenuItem("Export Diagram...");
             exportDiagramMenuItem.setMnemonic(KeyEvent.VK_E);
@@ -311,7 +281,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         printMenuItem = new JMenuItem("Print...");
         printMenuItem.setMnemonic(KeyEvent.VK_P);
         printMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                 KeyEvent.VK_P, ActionEvent.CTRL_MASK));
+                KeyEvent.VK_P, ActionEvent.CTRL_MASK));
         printMenuItem.addActionListener(this);
         printMenuItem.setEnabled(false);
         fileMenu.add(printMenuItem);
@@ -336,7 +306,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // menu item EXIT
         exitMenuItem = new JMenuItem("Exit");
         exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                 KeyEvent.VK_F4, ActionEvent.ALT_MASK));
+                KeyEvent.VK_F4, ActionEvent.ALT_MASK));
         exitMenuItem.setMnemonic(KeyEvent.VK_E);
         exitMenuItem.addActionListener(this);
         fileMenu.add(exitMenuItem);
@@ -410,22 +380,21 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // menu radio buttons group:
         ButtonGroup labelContentGroup = new ButtonGroup();
 
-        if(this.conceptualSchema != null) {
+        if (this.conceptualSchema != null) {
             Iterator it = this.conceptualSchema.getQueries();
             boolean first = true;
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 final Query query = (Query) it.next();
                 String name = query.getName();
                 JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);
                 menuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        JRadioButtonMenuItem item = (JRadioButtonMenuItem) e.getSource();
                         diagramView.setQuery(query);
                     }
                 });
                 labelContentGroup.add(menuItem);
                 viewMenu.add(menuItem);
-                if(first == true) {
+                if (first == true) {
                     first = false;
                     menuItem.setSelected(true);
                     diagramView.setQuery(query);
@@ -479,12 +448,12 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      * on boolean isOpen (referring to the face if any file/s is
      * open ).
      */
-    public void resetButtons(boolean isOpen) {
+    protected void resetButtons(boolean isOpen) {
         // menues
-        this.showAllMenuItem.setEnabled (isOpen);
-        this.showExactMenuItem.setEnabled (isOpen);
-        this.filterExactMenuItem.setEnabled (isOpen);
-        this.filterAllMenuItem.setEnabled (isOpen);
+        this.showAllMenuItem.setEnabled(isOpen);
+        this.showExactMenuItem.setEnabled(isOpen);
+        this.filterExactMenuItem.setEnabled(isOpen);
+        this.filterAllMenuItem.setEnabled(isOpen);
     }
 
     /**
@@ -493,10 +462,10 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      * Updates the buttons / menu entries.
      */
     public void update(Object source) {
-        this.printMenuItem.setEnabled(DiagramController.getController().getDiagramHistory().getSize()!=0);
+        this.printMenuItem.setEnabled(DiagramController.getController().getDiagramHistory().getSize() != 0);
         this.exportDiagramMenuItem.setEnabled(
-                        (DiagramController.getController().getDiagramHistory().getSize()!=0) &&
-                        (this.diagramExportSettings != null ));
+                (DiagramController.getController().getDiagramHistory().getSize() != 0) &&
+                (this.diagramExportSettings != null));
         this.backMenuItem.setEnabled(DiagramController.getController().undoIsPossible());
         this.backButton.setEnabled(DiagramController.getController().undoIsPossible());
     }
@@ -504,22 +473,22 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
     /**
      * Close Main Window (Exit the program).
      */
-    private void closeMainPanel () {
+    private void closeMainPanel() {
         // store current position
-        ConfigurationManager.storePlacement("mainPanel",this);
-        ConfigurationManager.storeInt("mainPanel","divider",splitPane.getDividerLocation());
+        ConfigurationManager.storePlacement("mainPanel", this);
+        ConfigurationManager.storeInt("mainPanel", "divider", splitPane.getDividerLocation());
         // save the MRU list
-        ConfigurationManager.storeStringList("mainPanel","mruFiles",this.mruList);
+        ConfigurationManager.storeStringList("mainPanel", "mruFiles", this.mruList);
         // store last image export position
-        if( this.lastImageExportFile != null ) {
-            ConfigurationManager.storeString("mainPanel","lastImageExport",this.lastImageExportFile.getPath());
+        if (this.lastImageExportFile != null) {
+            ConfigurationManager.storeString("mainPanel", "lastImageExport", this.lastImageExportFile.getPath());
         }
         // and save the whole configuration
         ConfigurationManager.saveConfiguration();
         System.exit(0);
     }
 
-    public void actionPerformed (ActionEvent ae) {
+    public void actionPerformed(ActionEvent ae) {
         Object actionSource = ae.getSource();
         DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
         // Button actions
@@ -573,8 +542,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             return;
         }
         // the back button/menu entry
-        if( (actionSource == this.backButton) ||
-            (actionSource == this.backMenuItem) ) {
+        if ((actionSource == this.backButton) ||
+                (actionSource == this.backMenuItem)) {
             DiagramController.getController().back();
             return;
         }
@@ -589,32 +558,32 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         }
 
         // view menu
-        if( (actionSource == this.showExactMenuItem) ||
-            (actionSource == this.showAllMenuItem) ) {
+        if ((actionSource == this.showExactMenuItem) ||
+                (actionSource == this.showAllMenuItem)) {
             updateLabelViews();
             return;
         }
 
         // the color entries
-        if( actionSource == this.circleColorMenuItem ) {
+        if (actionSource == this.circleColorMenuItem) {
             Color newColor = JColorChooser.showDialog(this, "Change circle color", diagramSchema.getCircleColor());
-            if(newColor != null) {
+            if (newColor != null) {
                 diagramSchema.setCircleColor(newColor);
             }
             repaint();
             return;
         }
-        if( actionSource == this.topColorMenuItem ) {
+        if (actionSource == this.topColorMenuItem) {
             Color newColor = JColorChooser.showDialog(this, "Change gradient color", diagramSchema.getTopColor());
-            if(newColor != null) {
+            if (newColor != null) {
                 diagramSchema.setTopColor(newColor);
             }
             repaint();
             return;
         }
-        if( actionSource == this.bottomColorMenuItem ) {
+        if (actionSource == this.bottomColorMenuItem) {
             Color newColor = JColorChooser.showDialog(this, "Change gradient color", diagramSchema.getBottomColor());
-            if(newColor != null) {
+            if (newColor != null) {
                 diagramSchema.setBottomColor(newColor);
             }
             repaint();
@@ -646,14 +615,13 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             showImageExportOptions();
         }
         if (e.getKeyChar() == 'f') {
-            if(this.filterAllMenuItem.isSelected()) {
+            if (this.filterAllMenuItem.isSelected()) {
                 this.filterExactMenuItem.setSelected(true);
                 // testing only
                 diagramSchema.setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT);
                 // ^^^^^^^^^^^^
                 DiagramController.getController().setFilterMethod(DiagramController.FILTER_CONTINGENT);
-            }
-            else {
+            } else {
                 this.filterAllMenuItem.setSelected(true);
                 // testing only
                 diagramSchema.setGradientType(DiagramSchema.GRADIENT_TYPE_EXTENT);
@@ -662,7 +630,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             }
         }
         if (e.getKeyChar() == 'b') {
-            if(DiagramController.getController().undoIsPossible()) {
+            if (DiagramController.getController().undoIsPossible()) {
                 DiagramController.getController().back();
             }
         }
@@ -676,21 +644,19 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         }
         if (e.getKeyChar() == 'o') {
             // divider location starts with 1 on Windows, we give some more to be sure
-            if(this.splitPane.getDividerLocation() > 5) {
+            if (this.splitPane.getDividerLocation() > 5) {
                 this.dividerPosition = this.splitPane.getDividerLocation();
                 this.splitPane.setDividerLocation(0);
                 // this ensures that the toggle button on the divider still can be used
                 this.splitPane.setLastDividerLocation(this.dividerPosition);
-            }
-            else {
+            } else {
                 this.splitPane.setDividerLocation(this.dividerPosition);
             }
         }
         if (e.getKeyChar() == 's') {
-            if(this.showAllMenuItem.isSelected()) {
+            if (this.showAllMenuItem.isSelected()) {
                 this.showExactMenuItem.setSelected(true);
-            }
-            else {
+            } else {
                 this.showAllMenuItem.setSelected(true);
             }
             updateLabelViews();
@@ -702,19 +668,17 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      */
     protected void openSchema() {
         final JFileChooser openDialog;
-        if(this.currentFile != null) {
+        if (this.currentFile != null) {
             // use position of last file for dialog
             openDialog = new JFileChooser(this.currentFile);
+        } else {
+            openDialog = new JFileChooser(System.getProperty("user.dir"));
         }
-        else {
-            openDialog = new JFileChooser(System.getProperty( "user.dir" ));
-        }
-        int rv=openDialog.showOpenDialog( this );
-        if( rv != JFileChooser.APPROVE_OPTION )
-        {
+        int rv = openDialog.showOpenDialog(this);
+        if (rv != JFileChooser.APPROVE_OPTION) {
             return;
         }
-        openSchemaFile( openDialog.getSelectedFile() );
+        openSchemaFile(openDialog.getSelectedFile());
     }
 
     /**
@@ -724,38 +688,31 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // parse it
         try {
             conceptualSchema = CSXParser.parse(schemaFile);
-        }
-        catch( FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             ErrorDialog.showError(this, e, "File access error", e.getMessage());
             return;
-        }
-        catch( IOException e) {
-            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n"+e.getMessage());
+        } catch (IOException e) {
+            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n" + e.getMessage());
             return;
-        }
-        catch( DataFormatException e) {
-            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n"+e.getMessage());
+        } catch (DataFormatException e) {
+            ErrorDialog.showError(this, e, "Parsing the file error", "Some error happened when parsing the file:\n" + e.getMessage());
             return;
         }
 
         // if database should be used, but is not given --> ask user
-        if( conceptualSchema.usesDatabase() &&
-          ( conceptualSchema.getDatabaseInfo() == null ) ) {
+        if (conceptualSchema.usesDatabase() &&
+                (conceptualSchema.getDatabaseInfo() == null)) {
             boolean stillTrying = true;
-            DatabaseChooser.initialize( this, new DatabaseInfo() );
-            while(stillTrying) {
-                DatabaseInfo dbInfo = DatabaseChooser.showDialog( this );
-                if( dbInfo == null )
-                {
+            DatabaseChooser.initialize(this, new DatabaseInfo());
+            while (stillTrying) {
+                DatabaseInfo dbInfo = DatabaseChooser.showDialog(this);
+                if (dbInfo == null) {
                     stillTrying = false;
-                }
-                else
-                {
+                } else {
                     try {
-                        conceptualSchema.setDatabaseInformation( dbInfo );
+                        conceptualSchema.setDatabaseInformation(dbInfo);
                         stillTrying = false;
-                    }
-                    catch(DatabaseException e ) {
+                    } catch (DatabaseException e) {
                         ErrorDialog.showError(this, e, "Database could not be opened", e.getMessage());
                     }
                 }
@@ -772,12 +729,12 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         resetButtons(fileIsOpen);
 
         // update MRU list
-        if(this.mruList.contains(schemaFile.getPath())) {
+        if (this.mruList.contains(schemaFile.getPath())) {
             // if it is already in, just remove it and add it at the end
             this.mruList.remove(schemaFile.getPath());
         }
         this.mruList.add(schemaFile.getPath());
-        if(this.mruList.size() > MaxMruFiles) {
+        if (this.mruList.size() > MaxMruFiles) {
             this.mruList.remove(0);
         }
 
@@ -792,7 +749,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
     /**
      * Sets all labels to the display options currently selected.
      */
-    private void updateLabelViews(){
+    private void updateLabelViews() {
         this.diagramView.setDisplayType(this.showExactMenuItem.isSelected());
     }
 
@@ -803,11 +760,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
     private void recreateMruMenu() {
         this.mruMenu.removeAll();
         boolean empty = true; // will be used to check if we have at least one entry
-        if(this.mruList.size() > 0) {
-            ListIterator it = mruList.listIterator(mruList.size()-1);
-            while(it.hasPrevious()) {
+        if (this.mruList.size() > 0) {
+            ListIterator it = mruList.listIterator(mruList.size() - 1);
+            while (it.hasPrevious()) {
                 String cur = (String) it.previous();
-                if(cur.equals(currentFile)) {
+                if (cur.equals(currentFile)) {
                     // don't enlist the current file
                     continue;
                 }
@@ -831,42 +788,38 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      *
      * If there is no diagram to print we will just return.
      *
-     * @see showImageExportOptions()
+     * @see #showImageExportOptions()
      */
     protected void exportImage() {
-        if(DiagramController.getController().getDiagramHistory().getSize() != 0 ) {
-            if( this.lastImageExportFile == null ) {
+        if (DiagramController.getController().getDiagramHistory().getSize() != 0) {
+            if (this.lastImageExportFile == null) {
                 this.lastImageExportFile = new File(System.getProperty("user.dir"));
             }
             final JFileChooser saveDialog = new JFileChooser(this.lastImageExportFile);
-            int rv=saveDialog.showSaveDialog( this );
-            if( rv == JFileChooser.APPROVE_OPTION )
-            {
+            int rv = saveDialog.showSaveDialog(this);
+            if (rv == JFileChooser.APPROVE_OPTION) {
                 this.lastImageExportFile = saveDialog.getSelectedFile();
-                if( this.diagramExportSettings.usesAutoMode() ) {
+                if (this.diagramExportSettings.usesAutoMode()) {
                     GraphicFormat format = GraphicFormatRegistry.getTypeByExtension(saveDialog.getSelectedFile());
-                    if(format != null) {
+                    if (format != null) {
                         this.diagramExportSettings.setGraphicFormat(format);
-                    }
-                    else {
+                    } else {
                         JOptionPane.showMessageDialog(this,
-                                            "Sorry, no type with this extension known.\n" +
-                                            "Please use either another extension or try\n" +
-                                            "manual settings.",
-                                            "Export failed",
-                                            JOptionPane.ERROR_MESSAGE);
+                                "Sorry, no type with this extension known.\n" +
+                                "Please use either another extension or try\n" +
+                                "manual settings.",
+                                "Export failed",
+                                JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 try {
                     this.diagramExportSettings.getGraphicFormat().getWriter().exportGraphic(
-                                    this.diagramView, this.diagramExportSettings, saveDialog.getSelectedFile());
-                }
-                catch ( ImageGenerationException e ) {
+                            this.diagramView, this.diagramExportSettings, saveDialog.getSelectedFile());
+                } catch (ImageGenerationException e) {
                     ErrorDialog.showError(this, e, "Exporting image error");
-                }
-                catch ( OutOfMemoryError e ) {
+                } catch (OutOfMemoryError e) {
                     ErrorDialog.showError(this, "Out of memory", "Not enough memory available to export\n" +
-                                                "the diagram in this size");
+                            "the diagram in this size");
                 }
             }
         }
@@ -879,13 +832,12 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      * export will be initiated.
      */
     protected void showImageExportOptions() {
-        if(this.diagramExportSettings.usesAutoMode()) {
+        if (this.diagramExportSettings.usesAutoMode()) {
             this.diagramExportSettings.setImageSize(this.diagramView.getWidth(), this.diagramView.getHeight());
         }
         DiagramExportSettingsDialog.initialize(this, this.diagramExportSettings);
-        DiagramExportSettings rv=DiagramExportSettingsDialog.showDialog(this);
-        if( rv != null )
-        {
+        DiagramExportSettings rv = DiagramExportSettingsDialog.showDialog(this);
+        if (rv != null) {
             this.diagramExportSettings = rv;
             // probably the user wants to export now -- just give him the chance if possible
             exportImage();
@@ -898,14 +850,13 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      * If we don't have a diagram at the moment we just return.
      */
     protected void printDiagram() {
-        if( DiagramController.getController().getDiagramHistory().getSize() != 0 ) {
+        if (DiagramController.getController().getDiagramHistory().getSize() != 0) {
             PrinterJob printJob = PrinterJob.getPrinterJob();
             if (printJob.printDialog()) {
                 try {
-                    printJob.setPrintable(this.diagramView,pageFormat);
+                    printJob.setPrintable(this.diagramView, pageFormat);
                     printJob.print();
-                }
-                catch (Exception PrintException) {
+                } catch (Exception PrintException) {
                     PrintException.printStackTrace();
                 }
             }
@@ -915,12 +866,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
     /**
      *  Main method for running the program
      */
-    public static void main(String [] args) {
+    public static void main(String[] args) {
         final MainPanel mainWindow;
-        if(args.length == 1) {
+        if (args.length == 1) {
             mainWindow = new MainPanel(args[0]);
-        }
-        else {
+        } else {
             mainWindow = new MainPanel();
         }
 

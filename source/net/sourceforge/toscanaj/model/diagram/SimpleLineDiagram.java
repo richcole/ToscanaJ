@@ -2,10 +2,9 @@ package net.sourceforge.toscanaj.model.diagram;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-
 import java.util.Iterator;
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This class is an abstraction of all diagram related information.

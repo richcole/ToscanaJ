@@ -1,7 +1,6 @@
 package net.sourceforge.toscanaj.canvas.imagewriter;
 
 import java.io.File;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,7 +69,7 @@ public class GraphicFormatRegistry {
     /**
      * Convenience method calling the string version.
      *
-     * @see getTypeByExtension(String)
+     * @see #getTypeByExtension(String)
      */
     static public GraphicFormat getTypeByExtension(File file) {
         return getTypeByExtension(file.getName());

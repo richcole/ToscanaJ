@@ -3,10 +3,9 @@ package net.sourceforge.toscanaj.canvas;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;

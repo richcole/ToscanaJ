@@ -1,12 +1,12 @@
 package net.sourceforge.toscanaj.model.diagram;
 
-import net.sourceforge.toscanaj.MainPanel;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * This class encapsulates all information needed to paint a label.

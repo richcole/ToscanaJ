@@ -1,7 +1,5 @@
 package net.sourceforge.toscanaj.model.diagram;
 
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 

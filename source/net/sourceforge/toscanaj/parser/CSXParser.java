@@ -1,29 +1,33 @@
 package net.sourceforge.toscanaj.parser;
 
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.ObjectListQuery;
 import net.sourceforge.toscanaj.model.ObjectNumberQuery;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.model.lattice.MemoryMappedConcept;
-import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-
-import java.awt.Color;
-import java.awt.geom.Point2D;
-
-import java.io.*;
-import java.util.*;
-
-import org.jdom.*;
+import org.jdom.DataConversionException;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.adapters.DOMAdapter;
 import org.jdom.input.DOMBuilder;
-import org.jdom.output.XMLOutputter;
+
+import java.awt.*;
+import java.awt.geom.Point2D;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class reads a CSX file and does nothing with it except complaining.
@@ -132,7 +136,6 @@ public class CSXParser
                 _Schema.setDatabaseInformation(dbInfo);
             }
             catch (DatabaseException e) {
-                dbInfo = null;
                 throw new DataFormatException("Could not open database.", e.getOriginal());
             }
         }
@@ -199,7 +202,6 @@ public class CSXParser
             List concepts = diagElem.getChildren( "concept" );
             Hashtable nodes = new Hashtable( elements.size() );
             Iterator it2 = concepts.iterator();
-            int number = 0; // for counting the points
             while( it2.hasNext() )
             {
                 Element conceptElem = (Element)it2.next();
@@ -259,9 +261,6 @@ public class CSXParser
 
                 // store the node for later retrieval (lines)
                 nodes.put( conceptElem.getAttribute( "id" ).getValue(), node );
-
-                // increase counter (not above since it is used in some places)
-                number++;
             }
 
             // get the edges and map them to the points

@@ -1,13 +1,14 @@
 package net.sourceforge.toscanaj.controller.db;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
-
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.*;
 import java.sql.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 
 /**
  * This class facilitates connection to and communication with a database
@@ -122,7 +123,9 @@ public class DBConnection
                 if(resultSet != null) {
                     resultSet.close();
                 }
-                stmt.close();
+                if(stmt!=null) {
+                    stmt.close();
+                }
             }
             catch(SQLException e) {
             }
@@ -162,7 +165,9 @@ public class DBConnection
                 if(resultSet != null) {
                     resultSet.close();
                 }
-                stmt.close();
+                if(stmt != null) {
+                    stmt.close();
+                }
             }
             catch(SQLException e) {
             }
@@ -186,42 +191,6 @@ public class DBConnection
             printLogMessage(System.currentTimeMillis() + ": done.");
             resultSet.next();
             result = resultSet.getInt(column);
-        }
-        catch( SQLException se ) {
-            throw new DatabaseException("An error occured while querying the database.", se);
-        }
-        finally {
-            try {
-                if(resultSet != null) {
-                    resultSet.close();
-                }
-                if(stmt != null) {
-                    stmt.close();
-                }
-            }
-            catch(SQLException e) {
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Retrieves the first value of the given column as string.
-     */
-    public String queryValue(String statement, int column) throws DatabaseException {
-        ResultSet resultSet = null;
-        Statement stmt = null;
-        String result;
-
-        // submit the query
-        try {
-            stmt = con.createStatement();
-            printLogMessage(System.currentTimeMillis() + ": Executing statement: " + statement);
-            resultSet = stmt.executeQuery(statement);
-            printLogMessage(System.currentTimeMillis() + ": done.");
-            resultSet.next();
-            result = resultSet.getString(column);
         }
         catch( SQLException se ) {
             throw new DatabaseException("An error occured while querying the database.", se);

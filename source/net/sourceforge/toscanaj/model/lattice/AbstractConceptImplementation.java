@@ -1,11 +1,6 @@
 package net.sourceforge.toscanaj.model.lattice;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 /**
  * This implements some shortcuts for implementing concepts.
@@ -174,12 +169,12 @@ public abstract class AbstractConceptImplementation implements Concept
     /**
      * Stores all concepts in the filter, including this.
      */
-    Set filter = null;
+    protected Set filter = null;
 
     /**
      * Stores all concepts in the ideal, including this.
      */
-    Set ideal = null;
+    protected Set ideal = null;
 
     /**
      * Stores the number of objects in the extent to avoid unneccessary

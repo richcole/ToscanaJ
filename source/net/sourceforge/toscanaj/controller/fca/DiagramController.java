@@ -1,25 +1,13 @@
 package net.sourceforge.toscanaj.controller.fca;
 
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.diagram.DiagramLine;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-
+import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-
-import javax.swing.AbstractListModel;
+import javax.swing.*;
+import java.util.*;
 
 /**
  * This class encapsulates all code for handling the diagrams and filtering the
@@ -34,7 +22,7 @@ public class DiagramController implements ChangeObservable {
      * This stores the diagram references for visited, shown and forthcoming
      * diagrams and can be used as a model for JList components.
      */
-    public class DiagramHistory extends AbstractListModel {
+    public static class DiagramHistory extends AbstractListModel {
         /**
          * Stores the diagrams that have already been visited.
          */
@@ -153,7 +141,7 @@ public class DiagramController implements ChangeObservable {
      * diagrams) this gives the references identity, otherwise we would get problems
      * in adding a diagram twice to the history.
      */
-    public class DiagramReference {
+    public static class DiagramReference {
         /**
          * The diagram we refer to.
          */
@@ -201,21 +189,21 @@ public class DiagramController implements ChangeObservable {
     /**
      * Constant for setFilterMethod(int).
      *
-     * @see setFilterMethod(int)
+     * @see #setFilterMethod(int)
      */
     static public int FILTER_CONTINGENT = 0;
 
     /**
      * Constant for setFilterMethod(int).
      *
-     * @see setFilterMethod(int)
+     * @see #setFilterMethod(int)
      */
     static public int FILTER_EXTENT = 1;
 
     /**
      * Stores how to filter when zooming.
      *
-     * @see setFilterMethod(int)
+     * @see #setFilterMethod(int)
      */
     private int filterMethod = FILTER_EXTENT;
 
@@ -300,7 +288,7 @@ public class DiagramController implements ChangeObservable {
      * call back() but the user should not be allowed to, since this changes
      * nesting levels but is not an undo.
      *
-     * @see back()
+     * @see #back()
      */
     public boolean undoIsPossible() {
         return !history.pastDiagrams.isEmpty();
@@ -429,15 +417,15 @@ public class DiagramController implements ChangeObservable {
      * This is done by putting the outermost current one into the history and
      * getting a new one out of the list of future diagrams.
      *
-     * @see back()
+     * @see #back()
      */
     public void next(Concept zoomedConcept)
-           throws NoSuchElementException
     {
         if(history.futureDiagrams.isEmpty()) {
             if(history.currentDiagrams.size() == 1) {
                 // nothing to go to
-                throw new NoSuchElementException("No diagram left");
+                ///@todo Give feedback, when know how
+                return;
             }
             DiagramReference oldRef = (DiagramReference) history.currentDiagrams.get(0);
             history.pastDiagrams.add(new DiagramReference( oldRef.getDiagram(), zoomedConcept ) );
@@ -462,8 +450,8 @@ public class DiagramController implements ChangeObservable {
      * but no past diagrams left this will reduce the nesting level by one until
      * new diagrams are added.
      *
-     * @see next()
-     * @see undoIsPossible()
+     * @see #next(Concept)
+     * @see #undoIsPossible()
      */
     public void back() {
         if(history.pastDiagrams.size() + history.currentDiagrams.size() < 2) {
@@ -521,47 +509,16 @@ public class DiagramController implements ChangeObservable {
         DiagramReference ref = (DiagramReference) history.currentDiagrams.get(pos);
         Diagram2D diag = ref.getDiagram();
         SimpleLineDiagram retVal = new SimpleLineDiagram();
-        Concept filter = null;
-        Iterator it = history.pastDiagrams.iterator();
-        while(it.hasNext()) {
-            DiagramReference curRef = (DiagramReference) it.next();
-            Concept curZC = curRef.getZoomedConcept();
-            if(filter == null) {
-                filter = curZC;
-            }
-            else if(this.filterMethod == FILTER_CONTINGENT) {
-                filter = curZC.filterByContingent(filter);
-            }
-            else {
-                filter = curZC.getCollapsedConcept().filterByExtent(filter);
-            }
-        }
+        Concept filter = calculateFilterFromPastDiagrams();
         Hashtable nodeMap = new Hashtable();
 
         retVal.setTitle(diag.getTitle());
         for(int i = 0; i<diag.getNumberOfNodes(); i++) {
             DiagramNode oldNode = diag.getNode(i);
-            DiagramNode newNode;
-            if(filter == null) {
-                newNode = new DiagramNode( oldNode.getPosition(),
-                                           oldNode.getConcept(),
-                                           oldNode.getAttributeLabelInfo(),
-                                           oldNode.getObjectLabelInfo() );
-            }
-            else if(this.filterMethod == FILTER_CONTINGENT) {
-                newNode = new DiagramNode( oldNode.getPosition(),
-                                           oldNode.getConcept().filterByContingent(filter),
-                                           oldNode.getAttributeLabelInfo(),
-                                           oldNode.getObjectLabelInfo() );
-            }
-            else {
-                newNode = new DiagramNode( oldNode.getPosition(),
-                                           oldNode.getConcept().filterByExtent(filter),
-                                           oldNode.getAttributeLabelInfo(),
-                                           oldNode.getObjectLabelInfo() );
-            }
+            DiagramNode newNode = makeDiagramNode(oldNode, filter);
             retVal.addNode(newNode);
             nodeMap.put(oldNode,newNode);
+
             int contSize = newNode.getConcept().getObjectContingentSize();
             this.numberOfCurrentObjects = this.numberOfCurrentObjects + contSize;
             if(contSize > this.maxContingentSize) {
@@ -589,6 +546,63 @@ public class DiagramController implements ChangeObservable {
         }
 
         return retVal;
+    }
+
+
+    /**
+     * Creates a new node by filtering the old one.
+     *
+     * The way of filtering is defined by the filterMethod member, set with setFilterMethod(int)
+     */
+
+    private DiagramNode makeDiagramNode(DiagramNode oldNode, Concept filter) {
+        Concept concept = null;
+        if (filter == null) {
+            concept = oldNode.getConcept();
+        }
+        else if (this.filterMethod == FILTER_CONTINGENT) {
+            concept = oldNode.getConcept().filterByContingent(filter);
+        }
+        else if (this.filterMethod == FILTER_EXTENT) {
+            concept = oldNode.getConcept().filterByExtent(filter);
+        }
+        else {
+            throwUnknownFilterError();
+        }
+
+        return new DiagramNode(oldNode.getPosition(),
+                               concept,
+                               oldNode.getAttributeLabelInfo(),
+                               oldNode.getObjectLabelInfo());
+    }
+
+    private static void throwUnknownFilterError() {
+        throw new RuntimeException("Unknown filter method");
+    }
+
+    /**
+     * Calculates the filter from all past diagrams.
+     */
+
+    private Concept calculateFilterFromPastDiagrams() {
+        Concept filter = null;
+        Iterator it = history.pastDiagrams.iterator();
+        while(it.hasNext()) {
+            DiagramReference curRef = (DiagramReference) it.next();
+            Concept currentZoomedConcept = curRef.getZoomedConcept();
+            if(filter == null) {
+                filter = currentZoomedConcept;
+            }
+            else if(this.filterMethod == FILTER_CONTINGENT) {
+                filter = currentZoomedConcept.filterByContingent(filter);
+            }
+            else if(this.filterMethod == FILTER_EXTENT) {
+                filter = currentZoomedConcept.getCollapsedConcept().filterByExtent(filter);
+            }else {
+                throwUnknownFilterError();
+            }
+        }
+        return filter;
     }
 
     /**

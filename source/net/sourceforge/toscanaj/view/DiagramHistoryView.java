@@ -1,16 +1,9 @@
 package net.sourceforge.toscanaj.view;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 
-import java.awt.Component;
-import java.awt.Font;
-
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * A view for presenting the list of all diagrams.

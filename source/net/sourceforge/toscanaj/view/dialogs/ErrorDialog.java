@@ -4,10 +4,7 @@ import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
-import java.lang.Exception;
+import javax.swing.*;
 
 
 /**

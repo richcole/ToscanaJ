@@ -1,23 +1,15 @@
 package net.sourceforge.toscanaj.view;
 
-import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
-
-import net.sourceforge.toscanaj.view.DiagramHistoryView;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import net.sourceforge.toscanaj.model.ConceptualSchema;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.ListSelectionModel;
+import java.awt.*;
+import java.awt.event.*;
 
 /**
  * A panel for editing the list of diagrams used.
@@ -40,12 +32,12 @@ public class DiagramOrganiser extends JPanel {
     /**
      * Button to remove a diagram from the history
      */
-    JButton removeButton;
+    private JButton removeButton;
 
     /**
      * Button to add a Diagram to the history
      */
-    JButton addButton;
+    private JButton addButton;
 
     /**
      * The listview for the selected diagrams.

@@ -1,7 +1,7 @@
 package net.sourceforge.toscanaj.model.lattice;
 
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DBConnection;
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.ObjectListQuery;
 import net.sourceforge.toscanaj.model.ObjectNumberQuery;
@@ -10,9 +10,6 @@ import net.sourceforge.toscanaj.model.Query;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Implements a concept whose objects are stored in a relational database.
@@ -53,14 +50,14 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * This is only the part that comes from the current diagram, the rest is
      * stored in a separate list to avoid duplication.
      *
-     * @see filterClauses
+     * @see #filterClauses
      */
     private String objectClause = null;
 
     /**
      * Stores all clauses used to filter into the current concept.
      *
-     * @see objectClause
+     * @see #objectClause
      */
     private List filterClauses = new LinkedList();
 

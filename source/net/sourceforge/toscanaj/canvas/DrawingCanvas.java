@@ -2,29 +2,20 @@ package net.sourceforge.toscanaj.canvas;
 
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 
-import javax.swing.JComponent;
-
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
-
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * DrawingCanvas controls all the updating of CanvasItems contained in a DiagramView
@@ -40,7 +31,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
      *
      * @see DrawingCanvas.mouseReleaseEvent(MouseEvent)
      */
-    private class CanvasItemClickTask extends TimerTask {
+    private static class CanvasItemClickTask extends TimerTask {
         /**
          * The message recipient.
          */
@@ -92,26 +83,6 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
             target.backgroundClicked(point);
         }
     }
-
-    /**
-     * Used to indicate that no graphic format has been set.
-     */
-    static public final int FORMAT_UNSET = 0;
-
-    /**
-     * Used to indicate PNG format.
-     */
-    static public final int FORMAT_PNG = 1;
-
-    /**
-     * Used to indicate JPG format.
-     */
-    static public final int FORMAT_JPG = 2;
-
-    /**
-     * Used to indicate SVG format.
-     */
-    static public final int FORMAT_SVG = 3;
 
     /**
      * A list of all canvas items to draw.
@@ -364,8 +335,8 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
             Point2D mousePosTr = null;
             Point2D lastMousePosTr = null;
             try {
-                mousePosTr = (Point2D)this.transform.inverseTransform(e.getPoint(), null);
-                lastMousePosTr = (Point2D)this.transform.inverseTransform(lastMousePos, null);
+                mousePosTr = this.transform.inverseTransform(e.getPoint(), null);
+                lastMousePosTr = this.transform.inverseTransform(lastMousePos, null);
             }
             catch(NoninvertibleTransformException ex) {
                 //this should not happen
@@ -393,7 +364,7 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
         }
         Point2D point = null;
         try {
-            point = (Point2D)this.transform.inverseTransform(e.getPoint(),null);
+            point = this.transform.inverseTransform(e.getPoint(),null);
         }
         catch (Exception ex ) {
             //this should not happen
@@ -416,20 +387,6 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
                 break;
             }
         }
-    }
-
-    /**
-     * Calculates the distance between the two points.
-     */
-    private double getDistance(double x1, double y1, double x2, double y2){
-      return Math.abs(Math.sqrt(sqr(x2 - x1) + sqr(y2 - y1)));
-    }
-
-    /**
-     * Returns the square of the input.
-     */
-    private double sqr(double x) {
-      return x * x;
     }
 
     /**

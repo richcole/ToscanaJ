@@ -5,13 +5,8 @@ import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -216,7 +211,7 @@ public class NodeView extends CanvasItem {
     /**
      * Recalculates if the node is selected and how.
      *
-     * @see getSelectionState()
+     * @see #getSelectionState()
      */
     public void setSelectedConcept(Concept concept) {
         if(concept == null) {

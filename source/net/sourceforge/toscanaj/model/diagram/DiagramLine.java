@@ -11,12 +11,12 @@ public class DiagramLine {
     /**
      * Holds the starting node in the Diagram the line belongs to.
      */
-    DiagramNode fromNode;
+    private DiagramNode fromNode;
 
     /**
      * Holds the ending node in the Diagram the line belongs to.
      */
-    DiagramNode toNode;
+    private DiagramNode toNode;
 
     /**
      * Initialises a line between the given nodes.

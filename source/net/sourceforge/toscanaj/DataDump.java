@@ -11,19 +11,14 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 
 import java.io.File;
 import java.io.PrintStream;
-
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.jdom.Document;
-import org.jdom.Element;
-
-import org.jdom.output.XMLOutputter;
 
 /**
  * This is an executable application that takes an CSX file and dumps the data

@@ -7,7 +7,6 @@ import net.sourceforge.toscanaj.model.Query;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 /**
  * An implementation of the Concept interface which holds all data in memory.
@@ -19,12 +18,12 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
     /**
      * Stores the information on the attribute contingent.
      */
-    List attributeContingent = new LinkedList();
+    private List attributeContingent = new LinkedList();
 
     /**
      * Stores the information on the object contingent.
      */
-    List objectContingent = new LinkedList();
+    private List objectContingent = new LinkedList();
 
     /**
      * Creates a concept without contingents.

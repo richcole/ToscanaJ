@@ -1,14 +1,11 @@
 package net.sourceforge.toscanaj.model;
 
-import java.util.Hashtable;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import java.text.DecimalFormat;
 
 /**
  * This class contains information how to connect to a database.

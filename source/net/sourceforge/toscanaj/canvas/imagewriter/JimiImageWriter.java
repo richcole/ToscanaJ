@@ -1,23 +1,17 @@
 package net.sourceforge.toscanaj.canvas.imagewriter;
 
-import net.sourceforge.toscanaj.canvas.DrawingCanvas;
-
 import com.sun.jimi.core.Jimi;
 import com.sun.jimi.core.JimiException;
 import com.sun.jimi.core.JimiWriter;
+import net.sourceforge.toscanaj.canvas.DrawingCanvas;
 
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 
 /**
  * This class can be used to save a DrawingCanvas to a bitmap file.

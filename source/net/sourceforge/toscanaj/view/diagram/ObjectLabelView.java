@@ -2,11 +2,9 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import net.sourceforge.toscanaj.model.Query;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.model.lattice.DatabaseConnectedConcept;
 
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**

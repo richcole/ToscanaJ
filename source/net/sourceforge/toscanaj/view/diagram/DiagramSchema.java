@@ -1,6 +1,6 @@
 package net.sourceforge.toscanaj.view.diagram;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * DiagramSchema will hold the palette colors, line widths and similar information
@@ -96,14 +96,14 @@ public class DiagramSchema {
     /**
      * The gradient type set.
      *
-     * @see setGradientType(int)
+     * @see #setGradientType(int)
      */
     private int gradientType = GRADIENT_TYPE_EXTENT;
 
     /**
      * The gradient reference set.
      *
-     * @see setGradientReference(int)
+     * @see #setGradientReference(int)
      */
     private int gradientReference = GRADIENT_REFERENCE_DIAGRAM;
 

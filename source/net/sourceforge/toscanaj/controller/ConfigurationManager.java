@@ -1,17 +1,14 @@
 package net.sourceforge.toscanaj.controller;
 
-import java.awt.Rectangle;
-
+import javax.swing.*;
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-
-import javax.swing.JFrame;
 
 /**
  * Handles all persistent configuration information.

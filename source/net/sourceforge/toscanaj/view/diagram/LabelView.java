@@ -1,17 +1,16 @@
 package net.sourceforge.toscanaj.view.diagram;
 
-import java.awt.*;
-import java.awt.geom.*;
-
-import java.util.Iterator;
-
-import javax.swing.*;
-
 import net.sourceforge.toscanaj.canvas.CanvasItem;
-import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
+
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.Iterator;
 
 /**
  * This class encapsulates all generic label drawing code.
@@ -38,14 +37,14 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * Gives the minimum number of display lines possible.
      *
-     * @see displayLines
+     * @see #displayLines
      */
     protected static final int MIN_DISPLAY_LINES = 3;
 
     /**
      * Gives the number of display lines used on a new label.
      *
-     * @see displayLines
+     * @see #displayLines
      */
     protected static final int DEFAULT_DISPLAY_LINES = 4;
 

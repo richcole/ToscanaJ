@@ -4,30 +4,14 @@ import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.canvas.DrawingCanvas;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.model.Query;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.diagram.DiagramLine;
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
-import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-import net.sourceforge.toscanaj.view.diagram.LabelView;
 
 import java.awt.*;
-import java.awt.geom.*;
-import javax.swing.*;
-
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseEvent;
-
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
 
 /**
  * This class paints a diagram defined by the SimpleLineDiagram class.
@@ -53,11 +37,10 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     /**
      * Implements ChangeObserver.update(Object) by repainting the diagram.
      */
-    public void update(Object source){
-        if(source instanceof DiagramController) {
-            showDiagram((SimpleLineDiagram)DiagramController.getController().getCurrentDiagram());
-        }
-        else {
+    public void update(Object source) {
+        if (source instanceof DiagramController) {
+            showDiagram((SimpleLineDiagram) DiagramController.getController().getCurrentDiagram());
+        } else {
             repaint();
         }
     }
@@ -65,9 +48,8 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     /**
      * Paints the diagram on the screen.
      */
-    public void paintComponent( Graphics g )
-    {
-        if( diagram == null ) {
+    public void paintComponent(Graphics g) {
+        if (diagram == null) {
             return;
         }
         Graphics2D g2d = (Graphics2D) g;
@@ -78,11 +60,11 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
 
         // draw diagram title in the top left corner
         g2d.setPaint(DiagramSchema.getDiagramSchema().getForeground());
-        g2d.drawString( diagram.getTitle(), MARGIN, MARGIN );
+        g2d.drawString(diagram.getTitle(), MARGIN, MARGIN);
 
         // find current bounds
-        Rectangle2D bounds = new Rectangle2D.Double( MARGIN, MARGIN,
-                                                     getWidth() - 2*MARGIN, getHeight() - 2*MARGIN );
+        Rectangle2D bounds = new Rectangle2D.Double(MARGIN, MARGIN,
+                getWidth() - 2 * MARGIN, getHeight() - 2 * MARGIN);
         this.scaleToFit(g2d, bounds);
 
         // paint all items on canvas
@@ -97,14 +79,13 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     public void showDiagram(SimpleLineDiagram diagram) {
         this.diagram = diagram;
         clearCanvas();
-        if(diagram == null) {
+        if (diagram == null) {
             repaint();
             return;
         }
-        if(diagram instanceof NestedLineDiagram) {
-            addDiagram((NestedLineDiagram)diagram);
-        }
-        else {
+        if (diagram instanceof NestedLineDiagram) {
+            addDiagram((NestedLineDiagram) diagram);
+        } else {
             addDiagram(diagram, null);
         }
         repaint();
@@ -118,34 +99,33 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
      */
     private void addDiagram(SimpleLineDiagram diagram, Concept filterConcept) {
         // add all lines to the canvas
-        for( int i = 0; i < diagram.getNumberOfLines(); i++ ) {
+        for (int i = 0; i < diagram.getNumberOfLines(); i++) {
             DiagramLine dl = diagram.getLine(i);
-            addCanvasItem( new LineView(dl) );
+            addCanvasItem(new LineView(dl));
         }
         // add all nodes to the canvas
-        for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
+        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
             NodeView nodeView;
-            if(filterConcept == null) {
+            if (filterConcept == null) {
                 nodeView = new NodeView(node, this);
-            }
-            else {
+            } else {
                 nodeView = new NodeView(node, this, filterConcept);
             }
-            addCanvasItem( nodeView );
+            addCanvasItem(nodeView);
         }
         // add all labels to the canvas
-        for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
-            LabelInfo attrLabelInfo = diagram.getAttributeLabel( i );
-            if( attrLabelInfo != null ) {
-                LabelView labelView = new AttributeLabelView( this, attrLabelInfo );
-                addCanvasItem( labelView );
+        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
+            LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
+            if (attrLabelInfo != null) {
+                LabelView labelView = new AttributeLabelView(this, attrLabelInfo);
+                addCanvasItem(labelView);
                 labelView.addObserver(this);
             }
-            LabelInfo objLabelInfo = diagram.getObjectLabel( i );
-            if( objLabelInfo != null ) {
-                LabelView labelView = new ObjectLabelView( this, objLabelInfo );
-                addCanvasItem( labelView );
+            LabelInfo objLabelInfo = diagram.getObjectLabel(i);
+            if (objLabelInfo != null) {
+                LabelView labelView = new ObjectLabelView(this, objLabelInfo);
+                addCanvasItem(labelView);
                 labelView.addObserver(this);
             }
         }
@@ -156,35 +136,33 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
      */
     private void addDiagram(NestedLineDiagram diagram) {
         // add all outer lines to the canvas
-        for( int i = 0; i < diagram.getNumberOfLines(); i++ ) {
+        for (int i = 0; i < diagram.getNumberOfLines(); i++) {
             DiagramLine dl = diagram.getLine(i);
-            addCanvasItem( new LineView(dl) );
+            addCanvasItem(new LineView(dl));
         }
         // add all outer nodes to the canvas
-        for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
+        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
             DiagramNode node = diagram.getNode(i);
             NodeView nodeView = new NodeView(node, this);
-            addCanvasItem( nodeView );
+            addCanvasItem(nodeView);
         }
         // recurse for the inner diagrams
-        for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
-            NestedDiagramNode node = (NestedDiagramNode)diagram.getNode(i);
-            addDiagram((SimpleLineDiagram)node.getInnerDiagram(),node.getConcept());
+        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
+            NestedDiagramNode node = (NestedDiagramNode) diagram.getNode(i);
+            addDiagram((SimpleLineDiagram) node.getInnerDiagram(), node.getConcept());
         }
         // add all outer labels to the canvas
-        for( int i = 0; i < diagram.getNumberOfNodes(); i++ ) {
-            DiagramNode node = diagram.getNode(i);
-            NodeView nodeView = new NodeView(node, this);
-            LabelInfo attrLabelInfo = diagram.getAttributeLabel( i );
-            if( attrLabelInfo != null ) {
-                LabelView labelView = new AttributeLabelView( this, attrLabelInfo );
-                addCanvasItem( labelView );
+        for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
+            LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
+            if (attrLabelInfo != null) {
+                LabelView labelView = new AttributeLabelView(this, attrLabelInfo);
+                addCanvasItem(labelView);
                 labelView.addObserver(this);
             }
-            LabelInfo objLabelInfo = diagram.getObjectLabel( i );
-            if( objLabelInfo != null ) {
-                LabelView labelView = new ObjectLabelView( this, objLabelInfo );
-                addCanvasItem( labelView );
+            LabelInfo objLabelInfo = diagram.getObjectLabel(i);
+            if (objLabelInfo != null) {
+                LabelView labelView = new ObjectLabelView(this, objLabelInfo);
+                addCanvasItem(labelView);
                 labelView.addObserver(this);
             }
         }
@@ -196,13 +174,12 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     public void setDisplayType(boolean contingentOnly) {
         // change existing labels
         Iterator it = this.canvasItems.iterator();
-        while( it.hasNext() ) {
+        while (it.hasNext()) {
             CanvasItem cur = (CanvasItem) it.next();
-            if(cur instanceof ObjectLabelView) {
+            if (cur instanceof ObjectLabelView) {
                 ObjectLabelView lv = (ObjectLabelView) cur;
                 lv.setDisplayType(contingentOnly);
-            }
-            else if(cur instanceof AttributeLabelView) {
+            } else if (cur instanceof AttributeLabelView) {
                 AttributeLabelView lv = (AttributeLabelView) cur;
                 lv.setDisplayType(true);
             }
@@ -220,13 +197,13 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     public void setSelectedConcept(Concept concept) {
         // notify all nodes and lines
         Iterator it = this.canvasItems.iterator();
-        while( it.hasNext() ) {
+        while (it.hasNext()) {
             CanvasItem cur = (CanvasItem) it.next();
-            if(cur instanceof NodeView) {
+            if (cur instanceof NodeView) {
                 NodeView nv = (NodeView) cur;
                 nv.setSelectedConcept(concept);
             }
-            if(cur instanceof LineView) {
+            if (cur instanceof LineView) {
                 LineView lv = (LineView) cur;
                 lv.setSelectedConcept(concept);
             }
@@ -240,9 +217,9 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     public void setQuery(Query query) {
         // update the current labels
         Iterator it = this.canvasItems.iterator();
-        while( it.hasNext() ) {
+        while (it.hasNext()) {
             CanvasItem cur = (CanvasItem) it.next();
-            if(cur instanceof ObjectLabelView) {
+            if (cur instanceof ObjectLabelView) {
                 ObjectLabelView lv = (ObjectLabelView) cur;
                 lv.setQuery(query);
             }
