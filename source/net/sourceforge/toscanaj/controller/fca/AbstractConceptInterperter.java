@@ -156,44 +156,25 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 			};
         } else if(type == INTERVAL_TYPE_FIXED) {
             return new FixedValueIntervalSource(1);
-        } else if(type == INTERVAL_TYPE_CONTINGENT_ORTHOGONALTIY) {
+        } else if(type == INTERVAL_TYPE_ORTHOGONALTIY) {
             return new NormedIntervalSource() {
                 public double getValue(Concept concept, ConceptInterpretationContext context) {
                     if(context.getNestingContexts().size() == 0) {
                         return 0.5;
                     }
-                    DeviationValuesRef deviationValues = calculateExpectedSize(concept, context, false);
+                    DeviationValuesRef deviationValues = 
+                            calculateExpectedSize(concept, context);
                     double expectedSize = deviationValues.getExpectedSize();
-                    int contingentSize = getObjectContingentSize(concept, context);
-                    if(contingentSize == expectedSize) {
+                    int actualSize = getObjectCount(concept, context);
+                    if(actualSize == expectedSize) {
                         return 0.5;                                        
                     }
-                    if(contingentSize < expectedSize) {
-                        return 0.5 * contingentSize / expectedSize;                                        
+                    if(actualSize < expectedSize) {
+                        return 0.5 * actualSize / expectedSize;                                        
                     }
                     int max = Math.min(deviationValues.getNeutralSize(), deviationValues.getOuterSize());
                     double range = max - expectedSize;
-                    return 0.5 + 0.5 * (contingentSize - expectedSize) / range;                                        
-                }
-            };
-        } else if(type == INTERVAL_TYPE_EXTENT_ORTHOGONALTIY) {
-            return new NormedIntervalSource() {
-                public double getValue(Concept concept, ConceptInterpretationContext context) {
-                    if(context.getNestingContexts().size() == 0) {
-                        return 0.5;
-                    }
-					DeviationValuesRef deviationValues = calculateExpectedSize(concept, context, true);
-                    double expectedSize = deviationValues.getExpectedSize();
-                    int extentSize = getExtentSize(concept, context);
-                    if(extentSize == expectedSize) {
-                        return 0.5;                                        
-                    }
-                    if(extentSize < expectedSize) {
-                        return 0.5 * extentSize / expectedSize;                                        
-                    }
-                    int max = Math.min(deviationValues.getNeutralSize(), deviationValues.getOuterSize());
-                    double range = max - expectedSize;
-                    return 0.5 + 0.5 * (extentSize - expectedSize)/range;                                        
+                    return 0.5 + 0.5 * (actualSize - expectedSize) / range;                                        
                 }
             };
 		} else {
@@ -243,8 +224,7 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 				return executeObjectCountQuery(concept, context);
 			}
 			DeviationValuesRef deviationValues =
-                    calculateExpectedSize(concept, context, 
-                            context.getObjectDisplayMode() == ConceptInterpretationContext.EXTENT); 
+                    calculateExpectedSize(concept, context); 
 			double expectedSize = deviationValues.getExpectedSize();
 			int objectCount = getObjectCount(concept, context); 
 			if ((objectCount == 0) && (expectedSize == 0.0)) {
@@ -264,12 +244,11 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 	}
 
 	private DeviationValuesRef calculateExpectedSize(Concept concept,
-									ConceptInterpretationContext context,
-									boolean isExtent) {
+									ConceptInterpretationContext context) {
 		int neutralSize;
 		int outerSize;
 		Concept nestingConcept = (Concept) context.getNestingConcepts().get(0);
-		if (isExtent) {
+		if (context.getObjectDisplayMode() == ConceptInterpretationContext.EXTENT) {
 			neutralSize = getExtentSize(concept, context.getOutermostContext());
 			outerSize = getExtentSize(nestingConcept, context.getOutermostContext());
 		}

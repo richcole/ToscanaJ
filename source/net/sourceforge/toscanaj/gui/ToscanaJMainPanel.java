@@ -653,23 +653,14 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerOrthogonalityGradient", 0) == 1) {
                 final CombinedGradient redGreenGradient = new CombinedGradient(new LinearGradient(Color.RED, Color.WHITE), 1);
                 redGreenGradient.addGradientPart(new LinearGradient(Color.WHITE, Color.GREEN), 1);
-                JRadioButtonMenuItem showContingentOrthogonalityMenuItem = new JRadioButtonMenuItem("Use colors for orthogonality deviation (exact matches)");
-                showContingentOrthogonalityMenuItem.addActionListener(new ActionListener() {
+                JRadioButtonMenuItem showOrthogonalityMenuItem = new JRadioButtonMenuItem("Use colors for orthogonality deviation");
+                showOrthogonalityMenuItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-						setDiagramGradient(redGreenGradient, ConceptInterpreter.INTERVAL_TYPE_CONTINGENT_ORTHOGONALTIY);
+						setDiagramGradient(redGreenGradient, ConceptInterpreter.INTERVAL_TYPE_ORTHOGONALTIY);
                     }
                 });
-                colorGradientGroup.add(showContingentOrthogonalityMenuItem);
-                viewMenu.add(showContingentOrthogonalityMenuItem);
-
-                JRadioButtonMenuItem showExtentOrthogonalityMenuItem = new JRadioButtonMenuItem("Use colors for orthogonality deviation (all matches)");
-                showExtentOrthogonalityMenuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        setDiagramGradient(redGreenGradient, ConceptInterpreter.INTERVAL_TYPE_EXTENT_ORTHOGONALTIY);
-                    }
-                });
-                colorGradientGroup.add(showExtentOrthogonalityMenuItem);
-                viewMenu.add(showExtentOrthogonalityMenuItem);
+                colorGradientGroup.add(showOrthogonalityMenuItem);
+                viewMenu.add(showOrthogonalityMenuItem);
             }
         }
 
