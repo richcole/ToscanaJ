@@ -8,31 +8,34 @@
 package net.sourceforge.toscanaj.view.scales;
 
 import java.awt.Component;
-import java.awt.Frame;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
+import net.sourceforge.toscanaj.controller.fca.DiagramToContextConverter;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 
-import org.jdom.Element;
 
-// @todo perhaps this should be an action or be used as an action:
-// in ElbaMainPanel corresponding button can be enabled then when context is created.
 public class ContextConsistencyChecker {
+
+	public static List checkConsistency(ConceptualSchema conceptualSchema, Diagram2D diagram,
+									DatabaseConnection databaseConnection, Component parent) {
+		Context context = DiagramToContextConverter.getContext(diagram);										
+		return checkConsistency(conceptualSchema, context, databaseConnection, parent);
+	}									
 	
-	public static void checkConsistency(ConceptualSchema conceptualSchema, Context context,
+	public static List checkConsistency(ConceptualSchema conceptualSchema, Context context,
 									DatabaseConnection databaseConnection, Component parent) {
 		List problems = new ArrayList();
 		DatabaseInfo dbinfo = conceptualSchema.getDatabaseInfo();
+
 		int sumCounts = 0;
 		List validClauses = new ArrayList();
 
@@ -109,33 +112,6 @@ public class ContextConsistencyChecker {
 				throw new RuntimeException("Failed to query the database.", e);
 			}
 		}
-
-		// give feedback
-		if (problems.isEmpty()) {
-			JOptionPane.showMessageDialog(
-				parent,
-				"No problems found",
-				"Objects correct",
-				JOptionPane.INFORMATION_MESSAGE);
-		} else {
-			// show problems
-			Iterator strIt = problems.iterator();
-			Element problemDescription = new Element("description");
-			Element htmlElement = new Element("html");
-			htmlElement.addContent(
-				new Element("title").addContent("Consistency problems"));
-			problemDescription.addContent(htmlElement);
-			Element body = new Element("body");
-			htmlElement.addContent(body);
-			body.addContent(new Element("h1").addContent("Problems found:"));
-			while (strIt.hasNext()) {
-				String problem = (String) strIt.next();
-				body.addContent(new Element("pre").addContent(problem));
-			}
-			Frame frame = JOptionPane.getFrameForComponent(parent);
-			DescriptionViewer.show(frame, problemDescription);
-		}
+		return problems;
 	}
-	
-
 }

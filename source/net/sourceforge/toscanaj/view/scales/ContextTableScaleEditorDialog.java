@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.scales;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
+import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
@@ -19,12 +20,14 @@ import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 import javax.swing.*;
 
+import org.jdom.Element;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -461,6 +464,7 @@ public class ContextTableScaleEditorDialog
 		buttonsPane = new JPanel(new GridBagLayout());
 		JButton addObjButton = new JButton(" Add Objects ");
 		JButton addAttrButton = new JButton(" Add Attributes ");
+
 		this.checkConsistencyButton = new JButton(" Check Consistency... ");
 		this.checkConsistencyButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -643,8 +647,33 @@ public class ContextTableScaleEditorDialog
 	}
 	
 	protected void checkConsistency() {
-		ContextConsistencyChecker.checkConsistency(this.conceptualSchema, this.context,
+		List problems = ContextConsistencyChecker.checkConsistency(this.conceptualSchema, this.context,
 													this.databaseConnection, this);
+		// give feedback
+		if (problems.isEmpty()) {
+			JOptionPane.showMessageDialog(
+				this,
+				"No problems found",
+				"Objects correct",
+				JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			// show problems
+			Iterator strIt = problems.iterator();
+			Element problemDescription = new Element("description");
+			Element htmlElement = new Element("html");
+			htmlElement.addContent(
+				new Element("title").addContent("Consistency problems"));
+			problemDescription.addContent(htmlElement);
+			Element body = new Element("body");
+			htmlElement.addContent(body);
+			body.addContent(new Element("h1").addContent("Problems found:"));
+			while (strIt.hasNext()) {
+				String problem = (String) strIt.next();
+				body.addContent(new Element("pre").addContent(problem));
+			}
+			Frame frame = JOptionPane.getFrameForComponent(this);
+			DescriptionViewer.show(frame, problemDescription);
+		}												
 	}
 	
 	public void processEvent(Event e) {

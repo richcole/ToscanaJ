@@ -23,6 +23,7 @@ import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.dbviewer.DatabaseViewerManager;
+import net.sourceforge.toscanaj.gui.action.CheckContextConsistencyAction;
 import net.sourceforge.toscanaj.gui.action.ExportDiagramAction;
 import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
@@ -129,7 +130,9 @@ public class ElbaMainPanel
     private File lastCSCFile;
 
     private File lastExportFile;
-    public ElbaMainPanel() {
+    private CheckContextConsistencyAction checkContextAction;
+    
+	public ElbaMainPanel() {
         super("Elba");
 
         this.eventBroker = new EventBroker();
@@ -195,6 +198,10 @@ public class ElbaMainPanel
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
+	/**
+	 * @todo wondering if it would be simpler to use JToolBar instead of JPanel with
+	 * GridBagLayout....
+	 */
     public void createViews() {
         final JFrame frame = this;
         JPanel mainView = new JPanel(new GridBagLayout());
@@ -770,6 +777,13 @@ public class ElbaMainPanel
         });
         dumpSQLMenuItem.setEnabled(false);
         toolMenu.add(dumpSQLMenuItem);
+        
+        toolMenu.addSeparator();
+        
+		this.checkContextAction = new CheckContextConsistencyAction(this.conceptualSchema,
+    													this.databaseConnection, 
+    													this, this.eventBroker);
+        toolMenu.add(checkContextAction);
         menuBar.add(toolMenu);
 
         // --- help menu ---

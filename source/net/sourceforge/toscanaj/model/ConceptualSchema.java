@@ -408,4 +408,11 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
 			}
 		}		
 	}
+	
+	/**
+	 * returns an iterator of Diagram2D objects
+	 */
+	public Iterator getDiagramsIterator () {
+		return this.diagrams.iterator();
+	}
 }
