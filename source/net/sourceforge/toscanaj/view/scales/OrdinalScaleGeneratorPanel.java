@@ -18,6 +18,8 @@ import net.sourceforge.toscanaj.model.context.Attribute;
 import net.sourceforge.toscanaj.model.context.BinaryRelationImplementation;
 import net.sourceforge.toscanaj.model.context.Context;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAObjectImplementation;
+import net.sourceforge.toscanaj.model.context.WritableFCAObject;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
 import net.sourceforge.toscanaj.model.database.Table;
@@ -67,7 +69,8 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 			ContextImplementation context = new ContextImplementation();
 			context.setName(name);
 			for (int i = -1; i < dividers.size(); i++) {
-				String object = createSQLClause(column.getSqlExpression(), dividers, i);
+				String objectData = createSQLClause(column.getSqlExpression(), dividers, i);
+				WritableFCAObject object = new FCAObjectImplementation(objectData);
 				String attributeName = createAttributeName(dividers, i);
 				context.getObjects().add(object);
 				if(attributeName != null) {
