@@ -25,7 +25,7 @@ ToscanaJMainPanel-mruFiles-1=./examples/sql/pctest/pctest.csx
 # DiagramSchema-circleFilterColor=[highlighting color for the filter of the selected node]
 # DiagramSchema-fadeOutValue=[a value between 1.0 (complete fade for non-highlighted parts) and 0.0 (no fade at all)]
 # DiagramSchema-margin=[the margin around the diagram]
-# DiagramSchema-notRealizedNodeSizeReductionFactor=[the relation of the size non-realised nodes to the normal size (0.0-1.0)]
+# DiagramSchema-notRealizedNodeSizeReductionFactor=[the relation of the size non-realised nodes to the normal size (1.0+)]
 # DiagramSchema-gradientType=[either "extent" or "contingent" (whithout the quotes), gives the type of the gradient]
 ### the next one is probably broken at the moment, "schema" might not work at all and might be dropped later
 # DiagramSchema-gradientReference=[either "diagram" or "schema" (without the quotes), gives the reference for the gradient color]
