@@ -138,11 +138,11 @@ public class DiagramEditingView extends JPanel implements EventListener {
     }
 
     private void zoomIntoDiagram() {
-        changeZoom(ZOOM_FACTOR);
+        changeZoom(1/ZOOM_FACTOR);
     }
 
     private void zoomOutOfDiagram() {
-        changeZoom(1/ZOOM_FACTOR);
+        changeZoom(ZOOM_FACTOR);
     }
 
     private void changeZoom(double zoomFactor) {
