@@ -340,7 +340,6 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 				}
 			}, DiagramClickedEvent.class, DiagramReference.class);
 
-			/// @todo add this pane to the session management
 			leftHandPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, 
 															 this.diagramOrganiser, 
 															 this.diagramPreview);
