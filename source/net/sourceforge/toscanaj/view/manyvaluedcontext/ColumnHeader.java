@@ -17,8 +17,8 @@ import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
 import java.awt.event.MouseEvent;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JComponent;
 import javax.swing.ToolTipManager;
@@ -101,7 +101,7 @@ public class ColumnHeader extends JComponent{
 		
 		int col = e.getX()/TableView.CELL_WIDTH;
 		
-		ArrayList attributeList = (ArrayList) context.getAttributes();
+		List attributeList = (List) context.getAttributes();
 		ManyValuedAttribute attribute = (ManyValuedAttribute) attributeList.get(col);
 		String tooltipText = attribute.getType().toString();
 	
