@@ -16,7 +16,6 @@ import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
-import net.sourceforge.toscanaj.gui.SienaMainPanel;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
@@ -66,7 +65,6 @@ import org.tockit.events.EventBroker;
 
 public class TableViewPanel extends JFrame {
 
-	private SienaMainPanel sienaPane;
 	private WriteableManyValuedContext context;
 	private RowHeader rowHeader;
 	private ColumnHeader colHeader;
@@ -78,15 +76,6 @@ public class TableViewPanel extends JFrame {
 	private DiagramView diagramView;
 	private View view;
 	
-	public TableViewPanel(WriteableManyValuedContext context, SienaMainPanel sienaPane) {
-		this.context = context;
-		this.sienaPane = sienaPane;
-		createHeaders();
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,createTableView(),createDiagramView());
-		splitPane.setDividerSize(500);
-		splitPane.setOneTouchExpandable(true);
-		setContentPane(splitPane);
-	}
 	public TableViewPanel(WriteableManyValuedContext context) {
 		this.context = context;
 		createHeaders();
@@ -96,7 +85,7 @@ public class TableViewPanel extends JFrame {
 	}
 		
 	protected JScrollPane createTableView(){
-		cernatoObjectDialog = new ObjectDialog(this, sienaPane);
+		cernatoObjectDialog = new ObjectDialog(this);
 
 		cernatoTableView = new TableView(context, colHeader, rowHeader);
 		cernatoTableView.addMouseListener(getTableViewMouseListener());
@@ -124,7 +113,7 @@ public class TableViewPanel extends JFrame {
 		JButton addButton = new JButton ("Add");
 		addButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
-				AddCriterionAttributeDialog dialog = new AddCriterionAttributeDialog(context.getAttributes(),tFrame, sienaPane);
+				AddCriterionAttributeDialog dialog = new AddCriterionAttributeDialog(context.getAttributes(),tFrame);
 				dialog.show();
 			}
 		});
@@ -140,7 +129,6 @@ public class TableViewPanel extends JFrame {
 				new ConceptInterpretationContext(new DiagramHistory(), canvasEventBroker);
 		diagramView.setConceptInterpreter(interpreter);
 		diagramView.setConceptInterpretationContext(interpretationContext);
-		diagramView.setGridEnabled(false);
 		new LabelDragEventHandler(canvasEventBroker);
 		new LabelClickEventHandler(canvasEventBroker);
 		diagramView.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -227,7 +215,7 @@ public class TableViewPanel extends JFrame {
 					List propertyList = (List) context.getAttributes();
 					WriteableManyValuedAttribute property = (WriteableManyValuedAttribute)
 													propertyList.get(p.getRow()-1);
-					PropertiesDialog propertiesDialog = new PropertiesDialog(tFrame,property,context, sienaPane);
+					PropertiesDialog propertiesDialog = new PropertiesDialog(tFrame,property,context);
 				}
 			}
 			public void mousePressed(MouseEvent e) {

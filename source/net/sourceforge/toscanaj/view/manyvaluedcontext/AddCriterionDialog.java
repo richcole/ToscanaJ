@@ -32,7 +32,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
-import net.sourceforge.toscanaj.gui.SienaMainPanel;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
@@ -48,9 +47,8 @@ public class AddCriterionDialog extends JDialog{
 		private List checkBoxList = new ArrayList();
 		private JTextField minTextField,maxTextField,name;
 		
-		public AddCriterionDialog(ManyValuedAttribute attr, TableViewPanel tableView,
-										SienaMainPanel sienaPane){
-			super(sienaPane,"Conditions",false);
+		public AddCriterionDialog(ManyValuedAttribute attr, TableViewPanel tableView){
+			super(tableView,"Conditions",false);
 			this.attr = attr;
 			this.tableView = tableView;
 			if(attr.getType() instanceof TextualType){

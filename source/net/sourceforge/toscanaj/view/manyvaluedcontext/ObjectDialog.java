@@ -21,9 +21,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.sourceforge.toscanaj.gui.SienaMainPanel;
-
-
 public class ObjectDialog extends JDialog{
 	
 	private JTextField objectName;
@@ -34,8 +31,8 @@ public class ObjectDialog extends JDialog{
 	private JDialog dialog = this;
 	
 	
-	public ObjectDialog(TableViewPanel tableView, SienaMainPanel sienaPane){
-		super(sienaPane,"Object", false);
+	public ObjectDialog(TableViewPanel tableView){
+		super(tableView,"Object", false);
 		setResizable(false);
 		createView();
 		pack();

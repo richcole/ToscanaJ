@@ -22,7 +22,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.sourceforge.toscanaj.gui.SienaMainPanel;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WriteableManyValuedAttribute;
@@ -42,9 +41,8 @@ public class PropertiesDialog extends JDialog{
 	
 	public PropertiesDialog(TableViewPanel frame,
 										WriteableManyValuedAttribute property, 
-										ManyValuedContext context,
-										SienaMainPanel sienaPane){
-		super(sienaPane,"Many Valued-Context:Properties",true);
+										ManyValuedContext context){
+		super(frame,"Many Valued-Context:Properties",true);
 		this.frame = frame;
 		this.property = property;
 		this.context = context;

@@ -22,20 +22,16 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sourceforge.toscanaj.gui.SienaMainPanel;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 
 public class AddCriterionAttributeDialog extends JDialog{
-	private SienaMainPanel sienaPane;
 	private TableViewPanel tableView;
 	private List manyValuedAttributeList;
 	private AddCriterionAttributeDialog dialog =this;
 		
-	public AddCriterionAttributeDialog(Collection manyValuedAttributeList,TableViewPanel tableView,
-											SienaMainPanel sienaPane){
-		super(sienaPane,"Many Valued Context:Add Criteria",false);
+	public AddCriterionAttributeDialog(Collection manyValuedAttributeList,TableViewPanel tableView){
+		super(tableView,"Many Valued Context:Add Criteria",false);
 		this.manyValuedAttributeList = (List)manyValuedAttributeList;
-		this.sienaPane = sienaPane;
 		this.tableView = tableView;
 		setSize(300,150);
 		setContentPane(createView());
@@ -52,7 +48,7 @@ public class AddCriterionAttributeDialog extends JDialog{
 		continueButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				ManyValuedAttribute attr = (ManyValuedAttribute) comboBox.getSelectedItem();
-				AddCriterionDialog dialog = new AddCriterionDialog(attr,tableView,sienaPane);
+				AddCriterionDialog dialog = new AddCriterionDialog(attr,tableView);
 			}
 		});
 		
