@@ -205,6 +205,21 @@ public class DiagramNode {
     }
 
     /**
+     * Inverts the y-coordinates of the node and the labels offsets.
+     *
+     * This is used when the diagram given has the y-axis pointing upwards.
+     *
+     * @see SimpleLineDiagram.checkCoordinateSystem()
+     */
+    public void invertY() {
+        this.position.setLocation(this.position.getX(), -this.position.getY());
+        this.attributeLabel.setOffset( this.attributeLabel.getOffset().getX(),
+                                       -this.attributeLabel.getOffset().getY() );
+        this.objectLabel.setOffset( this.objectLabel.getOffset().getX(),
+                                    -this.objectLabel.getOffset().getY() );
+    }
+
+    /**
      * Debug output.
      */
     public String toString() {

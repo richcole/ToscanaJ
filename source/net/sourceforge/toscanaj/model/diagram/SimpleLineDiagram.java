@@ -9,6 +9,14 @@ import java.util.LinkedList;
 
 /**
  * This class is an abstraction of all diagram related information.
+ *
+ * We assume that the first node we get is the top node of the diagram. The order
+ * of all other nodes and the order of the lines does not matter.
+ *
+ * The coordinate system given can use y-coordinates either pointing upwards (the
+ * usual mathematical system) or downwards (the usual computer coordinates). The
+ * first call to getNode() or getBounds() will make sure that the coordinates
+ * will be pointing downwards when reading.
  */
 
 public class SimpleLineDiagram implements Diagram2D
@@ -32,6 +40,11 @@ public class SimpleLineDiagram implements Diagram2D
      * The list of lines in the diagram.
      */
     private List lines = new LinkedList();
+
+    /**
+     * This is set to true once we determined the direction of the y-axis.
+     */
+    private boolean coordinateSystemChecked = false;
 
     /**
      * The default constructor creates a diagram with just nothing in it at all.
@@ -71,6 +84,9 @@ public class SimpleLineDiagram implements Diagram2D
      * Calculates a rectangle that includes all points.
      */
     public Rectangle2D getBounds() {
+        if(!coordinateSystemChecked) {
+            checkCoordinateSystem();
+        }
         double minX = Double.MAX_VALUE;
         double maxX = -Double.MAX_VALUE;
         double minY = Double.MAX_VALUE;
@@ -102,6 +118,9 @@ public class SimpleLineDiagram implements Diagram2D
      * Numbers start with zero.
      */
     public DiagramNode getNode( int nodeNumber ) {
+        if(!coordinateSystemChecked) {
+            checkCoordinateSystem();
+        }
         return (DiagramNode)this.nodes.get(nodeNumber);
     }
 
@@ -114,6 +133,8 @@ public class SimpleLineDiagram implements Diagram2D
 
     /**
      * Adds a node to the diagram (at the end of the list).
+     *
+     * The top node of a diagram always has to be added first.
      */
     public void addNode(DiagramNode node) {
         this.nodes.add(node);
@@ -158,5 +179,24 @@ public class SimpleLineDiagram implements Diagram2D
      */
     public LabelInfo getAttributeLabel( int nodeNumber ) {
         return ((DiagramNode)this.nodes.get(nodeNumber)).getAttributeLabelInfo();
+    }
+
+    /**
+     * Makes sure the y-coordinates increase in the downward direction.
+     */
+    protected void checkCoordinateSystem() {
+        if(this.nodes.size() > 1) { // no point in checking direction otherwise
+            DiagramNode topNode = (DiagramNode) this.nodes.get(0);
+            DiagramNode otherNode = (DiagramNode) this.nodes.get(1);
+            if(topNode.getY() > otherNode.getY()) {
+                // inverse coordinates (mirror using x-axis)
+                Iterator it = this.nodes.iterator();
+                while(it.hasNext()) {
+                    DiagramNode node = (DiagramNode) it.next();
+                    node.invertY();
+                }
+            }
+        }
+        this.coordinateSystemChecked = true;
     }
 }

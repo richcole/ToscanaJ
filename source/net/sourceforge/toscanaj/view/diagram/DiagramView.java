@@ -117,18 +117,6 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         // get the dimensions of the diagram
         Rectangle2D diagBounds = diagram.getBounds();
 
-        // check if the y-coordinate in the file is denoted in math-style, i.e.
-        // up is positive
-        // invY is one unless this is the case, then invY will be minus one
-        // invY has to be used wherever Y coordinates from the diagram are used
-        // in combination with absolute Y coordinates like e.g. the predefined
-        // RADIUS of the points
-        int invY = 1;
-        if( diagram.getNumberOfNodes() > 0 ) {
-            if( diagBounds.getY() < diagram.getNode(0).getPosition().getY() ) {
-                invY = -1;
-            }
-        }
         // we need some values to do the projection -- the initial values are
         // centered and no size change. This is useful if the diagram has no
         // extent in a direction
@@ -150,7 +138,7 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
         }
         if( diagBounds.getHeight() != 0 && diagram.getNumberOfNodes() != 0 )
         {
-            yScale = h / diagBounds.getHeight() * invY;
+            yScale = h / diagBounds.getHeight();
             yOrigin = y - diagram.getNode(0).getPosition().getY() * yScale;
         }
         //store updated ToscanajGraphics2D
