@@ -36,6 +36,16 @@ public class DatabaseDistinctListQuery extends DatabaseQuery {
     protected DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values) throws SQLException {
         String displayString = this.formatResults(values, 0);
         DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
+        String specialWhereClause = whereClause.substring(0,whereClause.lastIndexOf(';'));
+        Iterator it = columnList.iterator();
+        Iterator it2 = values.iterator();
+        while (it.hasNext() && it2.hasNext()) {
+            Column col = (Column) it.next();
+            String value = (String) it2.next();
+            specialWhereClause += " AND (" + col.queryPart + "='" + value + "')";
+        }
+        specialWhereClause += ";";
+        retVal.setSpecialWhereClause(specialWhereClause);
         return retVal;
     }
 }

@@ -12,10 +12,11 @@ import java.sql.ResultSet;
 public class DatabaseRetrievedObject {
     private Object key = null;
     private String displayString;
-    private String whereClause;
+    private String queryWhereClause;
+    private String specialWhereClause;
 
-    public DatabaseRetrievedObject(String whereClause, String displayString) {
-        this.whereClause = whereClause;
+    public DatabaseRetrievedObject(String queryWhereClause, String displayString) {
+        this.queryWhereClause = queryWhereClause;
         this.displayString = displayString;
     }
 
@@ -31,8 +32,20 @@ public class DatabaseRetrievedObject {
         this.key = key;
     }
 
-    public String getWhereClause() {
-        return whereClause;
+    public boolean hasSpecialWhereClause() {
+        return this.specialWhereClause != null;
+    }
+
+    public String getSpecialWhereClause() {
+        return specialWhereClause;
+    }
+
+    public void setSpecialWhereClause(String specialWhereClause) {
+        this.specialWhereClause = specialWhereClause;
+    }
+
+    public String getQueryWhereClause() {
+        return queryWhereClause;
     }
 
     public String getDisplayString() {

@@ -84,7 +84,7 @@ public class ObjectLabelViewPopupMenuHandler implements BrokerEventListener {
 
     private void addObjectListViewOptions(List objectListViewNames, final DatabaseRetrievedObject object, JPopupMenu popupMenu) {
         JMenuItem menuItem;
-        JMenu objectListViewMenu = new JMenu("View summary");
+        JMenu objectListViewMenu = new JMenu("View all objects");
         Iterator it = objectListViewNames.iterator();
         while (it.hasNext()) {
             final String objectListViewName = (String) it.next();
@@ -101,7 +101,7 @@ public class ObjectLabelViewPopupMenuHandler implements BrokerEventListener {
 
     private void addObjectViewOptions(List objectViewNames, final DatabaseRetrievedObject object, JPopupMenu popupMenu) {
         JMenuItem menuItem;
-        JMenu objectViewMenu = new JMenu("View object");
+        JMenu objectViewMenu = new JMenu("View selected");
         Iterator it = objectViewNames.iterator();
         while (it.hasNext()) {
             final String objectViewName = (String) it.next();

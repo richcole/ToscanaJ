@@ -55,18 +55,6 @@ public class ObjectLabelViewOpenDisplayHandler implements BrokerEventListener {
         if (object == null) {
             return;
         }
-        if (object.hasKey()) {
-            if (DatabaseViewerManager.getNumberOfObjectViews() == 0) {
-                return;
-            }
-            DatabaseViewerManager.showObject(0, object);
-        }
-        else {
-            if (DatabaseViewerManager.getNumberOfObjectListViews() == 0) {
-                return;
-            }
-            DatabaseViewerManager.showObjectList(0, object);
-        }
-        return;
+        DatabaseViewerManager.showObject(0, object);
     }
 }
