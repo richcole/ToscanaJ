@@ -131,7 +131,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
             }
 
         } catch (DatabaseException e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
     }
@@ -243,7 +243,6 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 
                 float intensity = 0;
                 float acumm = 0;
-                System.out.println(data.size() + "");
                 for (int i = 0; i < data.size(); i++) {
                     float current = Float.parseFloat((String) ((Vector) data.get(i)).elementAt(0));
                     intensity += current / theSum;
@@ -259,8 +258,6 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                     g2.setColor(new Color(lineCol.getRed(), lineCol.getGreen(), lineCol.getBlue(), 127));
                     g2.drawLine((int) (acumm - current), 10, (int) (acumm - current), (this.getHeight()) - 10);
                 }
-                System.out.println("acumm = " + acumm);
-                System.out.println("intensity = " + intensity);
 
 
                 int cutpoint = (int) ((theCur - theMin) * ((this.getWidth() - 1) / (theMax - theMin)));
