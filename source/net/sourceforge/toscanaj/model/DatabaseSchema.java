@@ -52,7 +52,7 @@ public class DatabaseSchema implements BrokerEventListener {
         this.tables.clear();
         for(it.reset();!it.atEnd();it.next()) {
             String tableName = (String)it.val();
-            Table  table = new Table(tableName, ""); //@todo get key name
+            Table  table = new Table(broker, tableName); //@todo get key name
             STD_Iterator colIt = new STD_Iterator(
                 connection.getColumnNames(tableName)
             );
@@ -73,5 +73,9 @@ public class DatabaseSchema implements BrokerEventListener {
             DatabaseModifiedEvent event = (DatabaseModifiedEvent) e;
             readFromDBConnection(event.getConnection());
         }
+    }
+
+    public EventBroker getBroker() {
+        return broker;
     }
 }
