@@ -30,7 +30,6 @@ import javax.servlet.ServletException;
 
 import org.tockit.events.EventBroker;
 
-import java.net.URL;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.File;
@@ -55,6 +54,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     private static final String PopupOptions = "toolbar=no,location=no,directories=no,status=no,menubar=yes,scrollbars=yes,resizable=no,copyhistory=yes,width=400,height=400";
 
     public void init() throws ServletException {
+		System.out.println("ToscanaJDiagrams: init");
         super.init();
         SERVLET_URL = getInitParameter("baseURL");
         if(SERVLET_URL == null) {
@@ -67,22 +67,10 @@ public class ToscanaJDiagrams extends HttpServlet {
         }
         DatabaseInfo databaseInfo = conceptualSchema.getDatabaseInfo();
         conceptInterpreter = new DatabaseConnectedConceptInterpreter(databaseInfo);
-        URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
-//        try {
-//            DatabaseConnection connection = new DatabaseConnection(new EventBroker());
-//            connection.connect(databaseInfo);
-//            URL location = conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
-//            if (location != null) {
-//                connection.executeScript(location);
-//            }
-//            DatabaseConnection.setConnection(connection);
-//        } catch (DatabaseException e) {
-//            e.getOriginal().printStackTrace();
-//            throw new ServletException("Could not connect to database: " + e.getOriginal().getMessage(), e);
-//        }
     }
 
     public void destroy() {
+		System.out.println("ToscanaJDiagrams: destroy");
         super.destroy();
         try {
             DatabaseConnection.getConnection().disconnect();
@@ -98,6 +86,7 @@ public class ToscanaJDiagrams extends HttpServlet {
 
     public void doGet (HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
+		System.out.println("ToscanaJDiagrams: doGet");
         PrintWriter out = resp.getWriter();
 
         HttpSession session = req.getSession();
@@ -109,7 +98,7 @@ public class ToscanaJDiagrams extends HttpServlet {
 
         if(diagramHistory == null) {
             diagramHistory = new DiagramHistory();
-            session.setAttribute("diagramHistory", diagramHistory);
+//            session.setAttribute("diagramHistory", diagramHistory);
         }
 
         resp.setContentType("image/svg-xml");
@@ -121,8 +110,8 @@ public class ToscanaJDiagrams extends HttpServlet {
     }
 
     private void parseSchemaFile() throws Exception, IOException {
+    	System.out.println("ToscanaJDiagrams: parseSchemaFile");
         String initParameter = getInitParameter("schemaFile");
-//        String initParameter = "/Adrian/examples/sql/pctest/pctest.csx";
         if(initParameter == null) {
             throw new RuntimeException("No file given as parameter");
         }
@@ -131,6 +120,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     }
 
     private void printScript(PrintWriter out) {
+		System.out.println("ToscanaJDiagrams: PrintScript");
         out.println("<script type=\"text/javascript\">");
         out.println("function openWindow(URL) {");
         out.println("window1 = window.open(URL,\"my_new_window\",\"" + PopupOptions + "\")");
@@ -139,6 +129,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     }
 
     private void printHead(int diagramNumber, DiagramHistory diagramHistory, PrintWriter out, HttpServletRequest req) {
+		System.out.println("ToscanaJDiagrams: printHead");
         out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         out.println("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">");
         String screenWidth = req.getParameter("x");
@@ -149,11 +140,10 @@ public class ToscanaJDiagrams extends HttpServlet {
         // calculate the appropriate view box size
         calculateViewBoxSize(diagramNumber, diagramHistory, out);
         out.println("<svg width=\"" + width + "\" height=\"" + height + "\" viewBox=\"" + viewBoxX + " " + viewBoxY + " " + viewBoxWidth + " " + viewBoxHeight + "\" xmlns=\"http://www.w3.org/2000/svg\">");
-        //177.6 122.0 345.29999999999995 358.0
-//        out.println("<svg width=\"" + 1024 + "\" height=\"" + 768 + "\" xmlns=\"http://www.w3.org/2000/svg\">");
     }
 
     private void printDiagram(int diagramNumber, DiagramHistory diagramHistory, PrintWriter out) {
+		System.out.println("ToscanaJDiagrams: printDiagram");
         Diagram2D diagram = conceptualSchema.getDiagram(diagramNumber);
         int numLines = diagram.getNumberOfLines();
         int numLabel;
@@ -295,6 +285,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     }
 
     private void drawLineConnector (PrintWriter out, Point2D centerOfNode, Point2D offset, double labelWidth, int labelHeight, int theTextAlignment) {
+		System.out.println("ToscanaJDiagrams: drawLineConnector");
         if ((theTextAlignment == 1) && (labelWidth != 0.0)) {
             out.println("<path d=\"M " + addXPos(centerOfNode.getX()) + " " + addYPos((centerOfNode.getY() - NODE_SIZE)) + " L " + addXPos((centerOfNode.getX() + offset.getX())) + " " + addYPos((centerOfNode.getY() - NODE_SIZE + offset.getY())) + "\" stroke=\"black\" stroke-width=\"1\" />");
         }
@@ -310,6 +301,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     }
 
     private void drawLineConnector2(PrintWriter out, Point2D centerOfNode, Point2D offset, double labelWidth, int labelHeight, int theTextAlignment) {
+		System.out.println("ToscanaJDiagrams: drawLineConnector2");
         if ((theTextAlignment == 1) && (labelWidth != 0.0)) {
             out.println("<path d=\"M " + addXPos(centerOfNode.getX()) + " " + addYPos((centerOfNode.getY() + NODE_SIZE)) + " L " + addXPos((centerOfNode.getX() + offset.getX())) + " " + addYPos((centerOfNode.getY() + NODE_SIZE - 5.0 + offset.getY())) + "\" stroke=\"black\" stroke-width=\"1\" />");
         }
@@ -325,6 +317,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     }
 
     private String escapeEntities(String string) {
+		System.out.println("ToscanaJDiagrams: escapeEntities");
         String retVal = "";
         for(int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
@@ -352,6 +345,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     }
 
     private Concept getConcept(int diagramNumber, String nodeId) {
+		System.out.println("ToscanaJDiagrams: getConcept");
         Diagram2D diagram = conceptualSchema.getDiagram(diagramNumber);
         DiagramNode node = diagram.getNode(nodeId);
         Concept concept = node.getConcept();
@@ -405,6 +399,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     }
 
     private void calculateViewBoxSize(int diagramNumber, DiagramHistory diagramHistory, PrintWriter out) {
+		System.out.println("ToscanaJDiagrams: calculateViewBoxSize");
         Diagram2D diagram = conceptualSchema.getDiagram(diagramNumber);
 
         double marginLeft = 0.0; // initializes the left most margin
@@ -604,6 +599,7 @@ public class ToscanaJDiagrams extends HttpServlet {
     }
 
     private void printEnd(PrintWriter out) {
+		System.out.println("ToscanaJDiagrams: printEnd");
         out.println("</svg>");
     }
 
