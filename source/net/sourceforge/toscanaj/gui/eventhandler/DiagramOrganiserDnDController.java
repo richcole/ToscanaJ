@@ -54,6 +54,8 @@ public class DiagramOrganiserDnDController implements
 		this.diagramReorderDragSource = new DragSource();
 		this.diagramReorderDragSource.createDefaultDragGestureRecognizer(
 								this.destinationList,DnDConstants.ACTION_MOVE ,this);
+
+        new DropTarget(this.destinationList,DnDConstants.ACTION_COPY_OR_MOVE,this);
 	}
 	
 	
