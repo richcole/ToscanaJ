@@ -234,7 +234,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         Color textColor = this.labelInfo.getTextColor();
         Color scrollbarColorDark = Color.gray;
         Color scrollbarColorLight = Color.lightGray;
-        if (nodeView.getSelectionState() == DiagramView.NOT_SELECTED) {
+        if (isFaded()) {
             // lighten
             lineColor = diagramSchema.fadeOut(lineColor);
             backgroundColor = diagramSchema.fadeOut(backgroundColor);
@@ -357,6 +357,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         // restore old settings
         graphics.setPaint(oldPaint);
     }
+
+    protected abstract boolean isFaded();
 
     /**
      * Returns the placement of the label (above or below the node).

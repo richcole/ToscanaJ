@@ -94,4 +94,8 @@ public class AttributeLabelView extends LabelView {
         }
         return retVal;
     }
+
+    protected boolean isFaded() {
+        return nodeView.getSelectionState() == DiagramView.NOT_SELECTED;
+    }
 }

@@ -153,4 +153,9 @@ public class ObjectLabelView extends LabelView {
     public Query getQuery() {
         return this.query;
     }
+
+    protected boolean isFaded() {
+        int selectionState = nodeView.getSelectionState();
+        return selectionState == DiagramView.NOT_SELECTED || selectionState == DiagramView.SELECTED_FILTER;
+    }
 }
