@@ -34,9 +34,14 @@ public class Column implements XMLizable {
     }
 
     public Element toXML() {
-        Element retVal = new Element(COLUMN_ELEMENT_NAME);
+        return toXML(COLUMN_ELEMENT_NAME);
+    }
+
+    public Element toXML(String elementName) {
+        Element retVal = new Element(elementName);
         retVal.setAttribute(COLUMN_NAME_ATTRIBUTE_NAME, name);
-        retVal.setAttribute(COLUMN_TYPE_ATTRIBUTE_NAME, String.valueOf(type));
+        // @todo either remove this completely or start using it
+        // retVal.setAttribute(COLUMN_TYPE_ATTRIBUTE_NAME, String.valueOf(type));
         return retVal;
     }
 

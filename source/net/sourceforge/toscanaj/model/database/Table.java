@@ -55,14 +55,12 @@ public class Table implements XMLizable {
 
     public Element toXML() {
         Element retVal = new Element(TABLE_ELEMENT_NAME);
-        retVal.setAttribute(TABLE_NAME_ATTRIBUTE_NAME, name);
-        if (key != null) {
-            retVal.addContent(key.toXML());
-        }
-        for (Iterator iterator = columns.iterator(); iterator.hasNext();) {
-            Column column = (Column) iterator.next();
-            retVal.addContent(column.toXML());
-        }
+        retVal.setAttribute(TABLE_NAME_ATTRIBUTE_NAME, this.name);
+        // @todo either remove this completely or start using it
+//        for (Iterator iterator = columns.iterator(); iterator.hasNext();) {
+//            Column column = (Column) iterator.next();
+//            retVal.addContent(column.toXML());
+//        }
         if(this.suppressEscaping) {
         	retVal.setAttribute(SUPPRESS_ESCAPING_ATTRIBUTE_NAME, "true");
         }

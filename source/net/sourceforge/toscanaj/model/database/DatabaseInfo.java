@@ -152,7 +152,7 @@ public class DatabaseInfo implements XMLizable {
             retVal.addContent(urlElem);
         }
         retVal.addContent(this.table.toXML());
-        retVal.addContent(this.objectKey.toXML());
+        retVal.addContent(this.objectKey.toXML(OBJECT_KEY_ELEMENT_NAME));
         return retVal;
     }
 
