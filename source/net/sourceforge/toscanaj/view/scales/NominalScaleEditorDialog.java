@@ -447,7 +447,7 @@ public class NominalScaleEditorDialog extends JDialog {
         TableColumnPair tabCol = (TableColumnPair) this.columnChooser.getSelectedItem();
         List resultSet = null;
         try {
-            String query = "SELECT DISTINCT " + column.getName() + " FROM " +
+            String query = "SELECT DISTINCT " + column.getSqlExpression() + " FROM " +
                     column.getTable().getName() + ";";
             resultSet = databaseConnection.queryColumn(query, 1);
             for (Iterator it = resultSet.iterator(); it.hasNext();) {

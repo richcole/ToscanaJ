@@ -39,7 +39,7 @@ public class DumpSqlScript {
             while (columnIt.hasNext()) {
                 Column column = (Column) columnIt.next();
                 String typeName = SQLTypeMapper.getSQLName(column.getType());
-                out.print("  " + getQuotedIdentifier(column.getName()) + " " + typeName);
+                out.print("  " + column.getSqlExpression() + " " + typeName);
                 if(columnIt.hasNext()) {
                 	out.println(",");
                 } else {

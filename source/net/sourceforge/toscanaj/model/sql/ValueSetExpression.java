@@ -22,7 +22,7 @@ public class ValueSetExpression implements Expression {
     public String getSQL() {
     	String retval = "";
     	for (int i = 0; i < values.length; i++) {
-            retval += "(" + column.getName() + "=" + values[i] + ")";
+            retval += "(" + column.getSqlExpression() + "=" + values[i] + ")";
             if(i != values.length - 1) {
             	retval += " OR ";
             }

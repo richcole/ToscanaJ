@@ -61,7 +61,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 			ContextImplementation context = new ContextImplementation();
 			context.setName(name);
 			for (int i = -1; i < dividers.size(); i++) {
-				String object = createSQLClause(column.getName(), dividers, i);
+				String object = createSQLClause(column.getSqlExpression(), dividers, i);
 				String attributeName = createAttributeName(dividers, i);
 				context.getObjects().add(object);
 				if(attributeName != null) {
@@ -181,12 +181,12 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 			for (int i = -1; i < numDiv; i++) {
 				String object;
 				if( i == -1) {
-					object = column.getName() + " " + downwardsAttributes[i+1];
+					object = column.getSqlExpression() + " " + downwardsAttributes[i+1];
 				} else if (i == numDiv - 1) {
-					object = column.getName() + " " + upwardsAttributes[i];
+					object = column.getSqlExpression() + " " + upwardsAttributes[i];
 				} else {
-					object = column.getName() + " " + upwardsAttributes[i] + " AND " +
-							 column.getName() + " " + downwardsAttributes[i+1];
+					object = column.getSqlExpression() + " " + upwardsAttributes[i] + " AND " +
+							 column.getSqlExpression() + " " + downwardsAttributes[i+1];
 				}
 				for(int j = 0; j <= i; j++) {
 					relation.insert(object, upwardsAttributes[j]);
@@ -292,9 +292,9 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     
 	protected void updateRangeInfo() {
 		String tail = " FROM " + this.column.getTable().getName() + ";";
-		String minQu = "SELECT min(" + this.column.getName() + ")" + tail;
-		String maxQu = "SELECT max(" + this.column.getName() + ")" + tail;
-		String avgQu = "SELECT avg(" + this.column.getName() + ")" + tail;
+		String minQu = "SELECT min(" + this.column.getSqlExpression() + ")" + tail;
+		String maxQu = "SELECT max(" + this.column.getSqlExpression() + ")" + tail;
+		String avgQu = "SELECT avg(" + this.column.getSqlExpression() + ")" + tail;
 		try {
 			if (determineDataType(this.column.getType()) == FLOAT) {
 				double min = this.connection.queryDouble(minQu,1);

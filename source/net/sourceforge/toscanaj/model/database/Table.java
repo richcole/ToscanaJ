@@ -83,10 +83,6 @@ public class Table implements XMLizable {
         return key;
     }
 
-    public String getKeyName() {
-        return key.getName();
-    }
-
     public List getColumns() {
         return columns;
     }
@@ -99,5 +95,4 @@ public class Table implements XMLizable {
     public void setName(String name) {
         this.name = name;
     }
-
 }
