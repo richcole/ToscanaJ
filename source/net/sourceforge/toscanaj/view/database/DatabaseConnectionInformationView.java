@@ -711,7 +711,7 @@ public class DatabaseConnectionInformationView
 
 	private void copyAccessDataToControls(DatabaseInfo info) {
 		int start = ACCESS_FILE_URL_PREFIX.length();
-		int end = info.getURL().length() - ACCESS_FILE_URL_PREFIX.length();
+		int end = info.getURL().length() - ACCESS_FILE_URL_END.length();
 		this.accessUrlField.setText(info.getURL().substring(start, end));
 	}
 
