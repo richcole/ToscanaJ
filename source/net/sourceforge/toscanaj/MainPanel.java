@@ -1,6 +1,8 @@
 package net.sourceforge.toscanaj;
 
 import net.sourceforge.toscanaj.canvas.imagewriter.DiagramExportSettings;
+import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormat;
+import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormatRegistry;
 import net.sourceforge.toscanaj.canvas.imagewriter.ImageGenerationException;
 import net.sourceforge.toscanaj.canvas.imagewriter.ImageWriter;
 
@@ -174,8 +176,16 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
     public MainPanel() {
         super("ToscanaJ");
         buildPanel();
-        // set the default diagram export options: PNG, auto mode, we can't get the size here
-        this.diagramExportSettings = new DiagramExportSettings( DiagramExportSettings.FORMAT_PNG, 0, 0, true );
+        // register all image writers we want to support
+        net.sourceforge.toscanaj.canvas.imagewriter.BatikImageWriter.initialize();
+        net.sourceforge.toscanaj.canvas.imagewriter.JimiImageWriter.initialize();
+        // set the default diagram export options: the very first format, auto mode, we can't get the size here
+        Iterator it = GraphicFormatRegistry.getIterator();
+        // if we have at least one format we use it, if not the settings stay null and the export options should
+        // not be enabled
+        if(it.hasNext()) {
+            this.diagramExportSettings = new DiagramExportSettings((GraphicFormat)it.next(), 0, 0, true );
+        }
         // listen to changes on DiagramController
         DiagramController.getController().addObserver(this);
         // restore the old MRU list
@@ -471,7 +481,9 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      */
     public void update(Object source) {
         this.printMenuItem.setEnabled(DiagramController.getController().getDiagramHistory().getSize()!=0);
-        this.exportDiagramMenuItem.setEnabled(DiagramController.getController().getDiagramHistory().getSize()!=0);
+        this.exportDiagramMenuItem.setEnabled(
+                        (DiagramController.getController().getDiagramHistory().getSize()!=0) &&
+                        (this.diagramExportSettings != null ));
         this.backMenuItem.setEnabled(DiagramController.getController().undoIsPossible());
         this.backButton.setEnabled(DiagramController.getController().undoIsPossible());
     }
@@ -722,12 +734,16 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
             if( rv == JFileChooser.APPROVE_OPTION )
             {
                 this.lastImageExportFile = saveDialog.getSelectedFile();
+                if( this.diagramExportSettings.usesAutoMode() ) {
+                    this.diagramExportSettings.setGraphicFormat(
+                                     GraphicFormatRegistry.getTypeByExtension(saveDialog.getSelectedFile()));
+                }
                 try {
-                    ImageWriter.exportGraphic(this.diagramView, this.diagramExportSettings, saveDialog.getSelectedFile());
+                    this.diagramExportSettings.getGraphicFormat().getWriter().exportGraphic(
+                                    this.diagramView, this.diagramExportSettings, saveDialog.getSelectedFile());
                 }
                 catch ( ImageGenerationException e ) {
                     ErrorDialog.showError(this, e, "Exporting image error");
-                    //e.printStackTrace();
                 }
             }
         }

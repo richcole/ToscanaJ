@@ -1,9 +1,14 @@
 package net.sourceforge.toscanaj.view.dialogs;
 
 import net.sourceforge.toscanaj.canvas.imagewriter.DiagramExportSettings;
+import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormat;
+import net.sourceforge.toscanaj.canvas.imagewriter.GraphicFormatRegistry;
 
 import java.awt.*;
 import java.awt.event.*;
+
+import java.util.Iterator;
+
 import javax.swing.*;
 
 /**
@@ -52,11 +57,12 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
         JLabel formatLabel = new JLabel();
         formatLabel.setText("Format:");
         formatSelector = new JComboBox();
-        formatSelector.addItem("PNG");
-        formatSelector.addItem("JPG");
-        formatSelector.addItem("SVG");
+        Iterator it = GraphicFormatRegistry.getIterator();
+        while(it.hasNext()) {
+            formatSelector.addItem(it.next());
+        }
         formatSelector.setAlignmentX(JComponent.RIGHT_ALIGNMENT);
-        formatSelector.setSelectedIndex(settings.getGraphicFormat()-1);
+        formatSelector.setSelectedItem(settings.getGraphicFormat());
         formatSelector.setEnabled(!settings.usesAutoMode());
 
         JLabel widthLabel = new JLabel();
@@ -87,7 +93,7 @@ public class DiagramExportSettingsDialog extends JDialog implements ActionListen
         final JButton okButton = new JButton("OK");
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                diagramSettings = new DiagramExportSettings( formatSelector.getSelectedIndex() + 1,
+                diagramSettings = new DiagramExportSettings( (GraphicFormat)formatSelector.getSelectedItem(),
                                                              Integer.parseInt(widthField.getText()),
                                                              Integer.parseInt(heightField.getText()),
                                                              auto.isSelected() );

@@ -8,29 +8,9 @@ package net.sourceforge.toscanaj.canvas.imagewriter;
  */
 public class DiagramExportSettings {
     /**
-     * Used to indicate that no graphic format has been set.
-     */
-    static public final int FORMAT_UNSET = 0;
-
-    /**
-     * Used to indicate PNG format.
-     */
-    static public final int FORMAT_PNG = 1;
-
-    /**
-     * Used to indicate JPG format.
-     */
-    static public final int FORMAT_JPG = 2;
-
-    /**
-     * Used to indicate SVG format.
-     */
-    static public final int FORMAT_SVG = 3;
-
-    /**
      * Stores the type of graphic format to be used.
      */
-    private int format;
+    private GraphicFormat format;
 
     /**
      * Stores the target width.
@@ -53,7 +33,7 @@ public class DiagramExportSettings {
      * If autoMode is set, the other values will be overwritten each time a
      * diagram gets exported.
      */
-    public DiagramExportSettings(int format, int width, int height, boolean autoMode) {
+    public DiagramExportSettings(GraphicFormat format, int width, int height, boolean autoMode) {
         this.format = format;
         this.width = width;
         this.height = height;
@@ -63,7 +43,7 @@ public class DiagramExportSettings {
     /**
      * Sets the graphic format to be used when exporting.
      */
-    public void setGraphicFormat(int format) {
+    public void setGraphicFormat(GraphicFormat format) {
         this.format = format;
     }
 
@@ -88,7 +68,7 @@ public class DiagramExportSettings {
     /**
      * Get the current image format
      */
-    public int getGraphicFormat(){
+    public GraphicFormat getGraphicFormat(){
         return this.format;
     }
 
