@@ -19,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class IndexSelectionDialog extends JDialog {
+    private JButton okButton;
     private Object[] data;
     private DefaultListModel availableList;
     private DefaultListModel selectedList;
@@ -48,8 +49,13 @@ public class IndexSelectionDialog extends JDialog {
                     fromModel.removeElement(data);
                     toModel.addElement(data);
                 }
+                updateUIStates();
             }
         }
+    }
+    
+    private void updateUIStates() {
+    	this.okButton.setEnabled(this.selectedList.size() != 0);
     }
     
     public IndexSelectionDialog(Frame aFrame, String title, Object[] data) {
@@ -83,12 +89,13 @@ public class IndexSelectionDialog extends JDialog {
         
         mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, availableView, selectedView);
         
-        JButton okButton = new JButton("Ok");
+        this.okButton = new JButton("Ok");
         okButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent arg0) {
                 hide();
             }
         });
+        this.okButton.setEnabled(false);
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
