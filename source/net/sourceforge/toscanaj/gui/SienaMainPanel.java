@@ -821,7 +821,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                         numType.getName(), min.getValue(), max.getValue(),
                         numType.getNumberOfDecimals());
                 targetType = decType;
-            } else if(cernatoType instanceof org.tockit.cernatoXML.model.TextualType) {
+            } else if(cernatoType instanceof TextualType) {
                 String[] stringValues = new String[valueRange.length];
                 TextualType textType = new TextualType(cernatoType.getName());
                 for (int i = 0; i < valueRange.length; i++) {
@@ -870,8 +870,10 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 } else if(value instanceof TextualValue) {
                     TextualValue textValue = (TextualValue) value;
                     result.setRelationship(targetObject, attribute, new StringValue(textValue.getDisplayString()));
-                } else {
-                    throw new RuntimeException("Unknown Cernato value");
+                } else if(value != null) {
+                    throw new RuntimeException("Unknown Cernato value for relationship between " +
+                    		"object '" + cernatoObject.getName() + "' and " +
+                    		"property '" + property.getName() + "'");
                 }
             }
         }
