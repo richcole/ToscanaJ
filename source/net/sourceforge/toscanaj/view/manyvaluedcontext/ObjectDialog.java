@@ -41,6 +41,7 @@ public class ObjectDialog extends JDialog{
 		pack();
 		this.parent = parent;
 		this.object = object;
+		show();
 	}
 
 	private void createView(String oldName) {

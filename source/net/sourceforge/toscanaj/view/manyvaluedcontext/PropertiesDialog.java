@@ -30,7 +30,7 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
 
 public class PropertiesDialog extends JDialog{
 	
-	private JTextField propertyName;
+	private JTextField nameTextField;
 	private JButton cancelButton;
 	private JButton editTypeButton;
 	private JButton changeButton;
@@ -88,7 +88,7 @@ public class PropertiesDialog extends JDialog{
 	protected JPanel createPropertyNamePane() {
 		JPanel propertyNamePane = new JPanel(new GridBagLayout());
 		JLabel propertyNameLabel = new JLabel ("Name of Property: ");
-		propertyName = new JTextField(property.getName());
+		nameTextField = new JTextField(property.getName());
 		
 		propertyNamePane.add(propertyNameLabel,new GridBagConstraints(
 								0,0,1,1,1,1,
@@ -97,7 +97,7 @@ public class PropertiesDialog extends JDialog{
 								new Insets(0,0,0,0),
 								2,2
 								));
-		propertyNamePane.add(propertyName,new GridBagConstraints(
+		propertyNamePane.add(nameTextField,new GridBagConstraints(
 								0,1,1,1,1,1,
 								GridBagConstraints.NORTHWEST,
 								GridBagConstraints.HORIZONTAL,
@@ -151,20 +151,21 @@ public class PropertiesDialog extends JDialog{
 	protected JPanel createButtonPane(){
 		JPanel buttonPane = new JPanel(new FlowLayout());
 		changeButton = new JButton("Change");
-		cancelButton = new JButton("Cancel");
 		changeButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				AttributeType type = (AttributeType) typeBox.getSelectedItem();
 				property.setType(type);
-				if(!(property.getName().equals(propertyName.getText()))){
-					if(!(propertyName.getText().equals(""))){
-						property.setName(propertyName.getText());
+				//if(!(property.getName().equals(propertyName.getText()))){
+					if(!(nameTextField.getText().equals(""))){
+						property.setName(nameTextField.getText());
 					}
-				}
+				//}
 				parent.validate();
-				dispose();
+				//dispose();
+				hide();
 			}
 		});
+		cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				dispose();

@@ -81,6 +81,7 @@ public class RowHeader extends JComponent{
 	
 	public void updateSize() {
 		this.setPreferredSize(calculateNewSize());
+		this.repaint();
 	}
 	
 	private Dimension calculateNewSize() {

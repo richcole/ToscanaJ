@@ -156,6 +156,7 @@ public class TableView extends JComponent implements Scrollable{
 	 */
 	public void updateSize() {
 		this.setPreferredSize(calculateNewSize());
+		this.repaint();
 	}
 	
 	protected Dimension calculateNewSize() {

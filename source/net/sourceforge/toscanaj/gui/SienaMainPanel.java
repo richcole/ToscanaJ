@@ -122,6 +122,7 @@ import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ColumnHeader;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ObjectDialog;
+import net.sourceforge.toscanaj.view.manyvaluedcontext.PropertiesDialog;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.RowHeader;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.TableView;
 
@@ -313,14 +314,18 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		List objectList = (List) conceptualSchema.getManyValuedContext().getObjects();
 		WritableFCAObject object = (WritableFCAObject) objectList.get(row);
 		ObjectDialog objectDialog = new ObjectDialog(tFrame, object);
-		objectDialog.show();
 		this.tableView.updateSize();
 		this.rowHeader.updateSize();
-		this.rowHeader.repaint();
 	}
 
 	private void editAttribute(int column) {
-		throw new UnsupportedOperationException("Not yet implemented"); 
+		Frame tFrame = JOptionPane.getFrameForComponent(tableView);
+		List manyValuedAttributeList = (List) conceptualSchema.getManyValuedContext().getAttributes();
+		WritableManyValuedAttribute attribute = (WritableManyValuedAttribute) manyValuedAttributeList.get(column);
+		PropertiesDialog attributeDialog = new PropertiesDialog(tFrame, attribute, 
+					conceptualSchema.getManyValuedContext());
+		this.tableView.updateSize();
+		this.colHeader.updateSize();
 	}
 
 	private JToolBar createContextToolbar() {
