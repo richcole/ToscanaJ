@@ -40,7 +40,6 @@ import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
-import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.parser.CSCParser;
@@ -989,8 +988,7 @@ public class ElbaMainPanel
                 (ConceptualSchemaChangeEvent) e;
             ConceptualSchema newConceptualSchema =
                 schemaEvent.getConceptualSchema();
-            if (newConceptualSchema != this.conceptualSchema
-                || e instanceof NewConceptualSchemaEvent) {
+            if (newConceptualSchema != this.conceptualSchema) {
                 this.conceptualSchema = newConceptualSchema;
                 if (schemaDescriptionView != null) {
                     schemaDescriptionView.setContent(
