@@ -77,7 +77,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	private static final String TRANSITION_LAYER_NAME = "transitions";
 
     private ArrowStyle[] styles = new ArrowStyle[] {
-//        new ArrowStyle(Color.RED, new BasicStroke(4, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER, 10, new float[]{10,10,20,10}, 0), 14, 20, 0.75),
         new ArrowStyle(Color.RED, new BasicStroke(4), 14, 20, 0.75),
         new ArrowStyle(Color.BLUE, new BasicStroke(4), 14, 20, 0.75),
         new ArrowStyle(Color.GREEN, new BasicStroke(4), 14, 20, 0.75),
@@ -155,13 +154,17 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                         Graphics2D g2d = (Graphics2D) g;
                         AffineTransform oldTransform = g2d.getTransform();
                         Paint oldPaint = g2d.getPaint();
+                        Stroke oldStroke = g2d.getStroke();
                         
                         Shape arrow = TransitionArrow.getArrowShape(style, this.getWidth() * 0.9);
                         g2d.setPaint(style.getColor());
                         g2d.translate(this.getWidth() * 0.95, this.getHeight() / 2);
                         g2d.fill(arrow);
+                        g2d.setPaint(Color.BLACK);
+                        g2d.draw(arrow);
                         
                         g2d.setPaint(oldPaint);
+                        g2d.setStroke(oldStroke);
                         g2d.setTransform(oldTransform);
                     }
                 };
@@ -181,7 +184,10 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
                 ArrowStyle style = (ArrowStyle) model.getElementAt(index);
                 ArrowStyle newStyle = ArrowStyleChooser.showDialog(listView, "Edit arrow style", style);
                 if(newStyle != null) {
-                    styles[index] = newStyle;
+                    style.setColor(newStyle.getColor());
+                    style.setStroke(newStyle.getStroke());
+                    style.setHeadLength(newStyle.getHeadLength());
+                    style.setHeadWidth(newStyle.getHeadWidth());
                     diagramView.repaint();
                 }
             } 

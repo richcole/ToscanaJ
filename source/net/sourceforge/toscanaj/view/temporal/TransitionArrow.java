@@ -7,10 +7,12 @@
  */
 package net.sourceforge.toscanaj.view.temporal;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
@@ -66,18 +68,23 @@ public class TransitionArrow extends MovableCanvasItem {
     	updateShiftVector();
     	
     	Paint oldPaint = g.getPaint();
+        Stroke oldStroke = g.getStroke();
+        g.setStroke(new BasicStroke(1));
         
         Shape arrow = getArrowShape(this.style, length);
         
 		AffineTransform shapeTransform = new AffineTransform();        
 		shapeTransform.translate(this.manualOffset.getX(), this.manualOffset.getY());
-		shapeTransform.translate(endX, endY);
-		shapeTransform.rotate(Math.atan2(endY - startY, endX - startX));
+		shapeTransform.translate(startX, startY);
+		shapeTransform.rotate(Math.atan2(startY - endY, startX - endX));
 		this.currentShape = shapeTransform.createTransformedShape(arrow);
 
         g.setPaint(paint);
-    	g.fill(currentShape);
+        g.fill(currentShape);
+        g.setPaint(Color.BLACK);
+        g.draw(currentShape);
     	
+        g.setStroke(oldStroke);
     	g.setPaint(oldPaint);
     }
     
@@ -85,7 +92,13 @@ public class TransitionArrow extends MovableCanvasItem {
         float headLength = (float) style.getHeadLength();
         float headWidth = (float) style.getHeadWidth();
 
+        // @todo figure out why things don't match up -- at the moment there is only this hack to fixz
+        // the major issues
         Shape line = style.getStroke().createStrokedShape(new Line2D.Double(-length,0,-headLength,0));
+        double diff = headLength + line.getBounds().getMaxX();
+        if(diff > 0) {
+            line = style.getStroke().createStrokedShape(new Line2D.Double(-length,0,-headLength - diff,0));
+        }
     	
 		GeneralPath arrow = new GeneralPath(line);
         arrow.moveTo(-headLength,-headWidth/2);
