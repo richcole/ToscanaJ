@@ -31,6 +31,12 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * @todo for performance reasons we should start with some extra entry like "<select a column>" instead
+ *       of just taking the first column. On a large database querying the average can take a while.
+ *       Another option would be querying the min/max/avg in another thread, but this would still put
+ *       the load on the RDBMS, while making the code more complex.
+ */
 public class OrdinalScaleGeneratorPanel extends JPanel {
 	boolean result;
 	public static final int INTEGER = 0;
