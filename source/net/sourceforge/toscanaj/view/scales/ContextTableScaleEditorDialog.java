@@ -471,6 +471,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	
 	private void closeDialog(boolean result) {
 		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,this);
+		this.context.setName(this.scaleTitleField.getText());
 		this.result = result;
 		setVisible(false);
 	}
@@ -511,10 +512,6 @@ public class ContextTableScaleEditorDialog extends JDialog {
 	public boolean execute() {
 		show();
 		return result;
-	}
-
-	public String getDiagramTitle() {
-		return this.scaleTitleField.getText();
 	}
 
 	private MouseListener getMouseListener(final ContextTableView tableView) {

@@ -20,6 +20,7 @@ public class ViewContext implements Context {
     private CernatoModel model;
     private ScalingRelation relation;
     private Collection attributes;
+    private String name;
 
     private class ScalingRelation implements BinaryRelation {
         public boolean contains(Object domainObject, Object rangeObject) {
@@ -48,6 +49,7 @@ public class ViewContext implements Context {
             Criterion criterion = (Criterion) iterator.next();
             attributes.add(new Attribute(criterion, null));
         }
+        this.name = view.getName();
     }
 
     public Collection getObjects() {
@@ -61,4 +63,8 @@ public class ViewContext implements Context {
     public BinaryRelation getRelation() {
         return relation;
     }
+
+	public String getName() {
+		return this.name;
+	}
 }

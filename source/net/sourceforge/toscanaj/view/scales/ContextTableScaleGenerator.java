@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
@@ -45,8 +46,9 @@ public class ContextTableScaleGenerator implements ScaleGenerator {
             return null;
         }else{
 			LatticeGenerator lgen = new GantersAlgorithm();
-			Lattice lattice = lgen.createLattice(dialog.getContext());
-			return NDimLayoutOperations.createDiagram(lattice, dialog.getDiagramTitle(), new DefaultDimensionStrategy());
+			Context context = dialog.getContext();
+			Lattice lattice = lgen.createLattice(context);
+			return NDimLayoutOperations.createDiagram(lattice, context.getName(), new DefaultDimensionStrategy());
         }       
     }
 }

@@ -10,6 +10,8 @@ package net.sourceforge.toscanaj.model;
 import java.util.Collection;
 
 public interface Context {
+	String getName();
+	
     Collection getObjects();
 
     Collection getAttributes();
