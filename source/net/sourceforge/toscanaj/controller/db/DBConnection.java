@@ -157,6 +157,42 @@ public class DBConnection
     }
 
     /**
+     * Retrieves the first value of the given column as string.
+     */
+    public String queryValue(String statement, int column) throws DatabaseException {
+        ResultSet resultSet = null;
+        Statement stmt = null;
+        String result;
+
+        // submit the query
+        try {
+            stmt = con.createStatement();
+            printLogMessage(System.currentTimeMillis() + ": Executing statement: " + statement);
+            resultSet = stmt.executeQuery(statement);
+            printLogMessage(System.currentTimeMillis() + ": done.");
+            resultSet.next();
+            result = resultSet.getString(column);
+        }
+        catch( SQLException se ) {
+            throw new DatabaseException("An error occured while querying the database.", se);
+        }
+        finally {
+            try {
+                if(resultSet != null) {
+                    resultSet.close();
+                }
+                if(stmt != null) {
+                    stmt.close();
+                }
+            }
+            catch(SQLException e) {
+            }
+        }
+
+        return result;
+    }
+
+    /**
      * Returns a String vector containing all available database names -- nyi.
      *
      * This class is not yet implemented since I still didn't find the right

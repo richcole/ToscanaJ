@@ -270,9 +270,13 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      *  build the MenuBar
      */
     private void buildMenuBar() {
-        // create menu bar
-
-        menubar = new JMenuBar();
+        if(menubar == null) {
+            // create menu bar
+            menubar = new JMenuBar();
+        }
+        else {
+            menubar.removeAll();
+        }
 
         // create the FILE menu
         JMenu fileMenu = new JMenu("File");
@@ -391,9 +395,6 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         menubar.add(viewMenu);
 
         // menu radio buttons group:
-        ButtonGroup labelContentGroup = new ButtonGroup();
-
-        // menu radio buttons group:
         ButtonGroup documentsDisplayGroup = new ButtonGroup();
 
         this.showExactMenuItem = new JRadioButtonMenuItem("Show only exact matches");
@@ -410,6 +411,9 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // separator
         viewMenu.addSeparator();
 
+        // menu radio buttons group:
+        ButtonGroup labelContentGroup = new ButtonGroup();
+
         // radio button menu item NUMBER OF DOCUMENTS
         numDocMenuItem = new JRadioButtonMenuItem("Number Of Documents");
         numDocMenuItem.setSelected(true);
@@ -422,6 +426,18 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         listDocMenuItem.addActionListener(this);
         labelContentGroup.add(listDocMenuItem);
         viewMenu.add(listDocMenuItem);
+
+        if(this.conceptualSchema != null) {
+            // add extra entries from schema
+            Iterator it = this.conceptualSchema.getDatabaseInfo().getSpecialQueryNames();
+            while(it.hasNext()) {
+                String name = (String) it.next();
+                JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);
+                menuItem.addActionListener(this);
+                labelContentGroup.add(menuItem);
+                viewMenu.add(menuItem);
+            }
+        }
 
         // separator
         viewMenu.addSeparator();
@@ -525,6 +541,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // Button actions
         if (actionSource == openButton) {
             openSchema();
+            return;
         }
 
         // Menus actions
@@ -532,22 +549,28 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // menu FILE
         if (actionSource == openMenuItem) {
             openSchema();
+            return;
         }
         if (actionSource == exportDiagramMenuItem) {
             exportImage();
+            return;
         }
         if (actionSource == exportDiagramSetupMenuItem) {
             showImageExportOptions();
+            return;
         }
         if (actionSource == printMenuItem) {
             printDiagram();
+            return;
         }
         if (actionSource == printSetupMenuItem) {
             pageFormat = PrinterJob.getPrinterJob().pageDialog(pageFormat);
             printDiagram();
+            return;
         }
         if (actionSource == exitMenuItem) {
             closeMainPanel();
+            return;
         }
 
         // diagram view
@@ -556,34 +579,38 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
             diagramSchema.setGradientType(DiagramSchema.GRADIENT_TYPE_CONTINGENT);
             // ^^^^^^^^^^^^
             DiagramController.getController().setFilterMethod(DiagramController.FILTER_CONTINGENT);
+            return;
         }
         if (actionSource == this.filterAllMenuItem) {
             // testing only
             diagramSchema.setGradientType(DiagramSchema.GRADIENT_TYPE_EXTENT);
             // ^^^^^^^^^^^^
             DiagramController.getController().setFilterMethod(DiagramController.FILTER_EXTENT);
+            return;
         }
         // the back button/menu entry
         if( (actionSource == this.backButton) ||
-            (actionSource == this.backMenuItem) )
-        {
+            (actionSource == this.backMenuItem) ) {
             DiagramController.getController().back();
+            return;
         }
         // nesting
         if (actionSource == this.noNestingMenuItem) {
             DiagramController.getController().setNestingLevel(0);
+            return;
         }
         if (actionSource == this.nestingLevel1MenuItem) {
             DiagramController.getController().setNestingLevel(1);
+            return;
         }
 
         // view menu
         if( (actionSource == this.showExactMenuItem) ||
             (actionSource == this.showAllMenuItem) ||
             (actionSource == this.numDocMenuItem) ||
-            (actionSource == this.listDocMenuItem) )
-        {
+            (actionSource == this.listDocMenuItem) ) {
             updateLabelViews();
+            return;
         }
         if (actionSource == this.percDistMenuItem) {
             this.diagramView.setShowPercentage(this.percDistMenuItem.getState());
@@ -595,6 +622,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
                 DiagramSchema.getDiagramSchema().setGradientReference(DiagramSchema.GRADIENT_REFERENCE_DIAGRAM);
             }
             // ^^^^^^^^^^^^
+            return;
         }
 
         // the color entries
@@ -604,6 +632,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
                 diagramSchema.setCircleColor(newColor);
             }
             repaint();
+            return;
         }
         if( actionSource == this.topColorMenuItem ) {
             Color newColor = JColorChooser.showDialog(this, "Change gradient color", diagramSchema.getTopColor());
@@ -611,6 +640,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
                 diagramSchema.setTopColor(newColor);
             }
             repaint();
+            return;
         }
         if( actionSource == this.bottomColorMenuItem ) {
             Color newColor = JColorChooser.showDialog(this, "Change gradient color", diagramSchema.getBottomColor());
@@ -618,6 +648,16 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
                 diagramSchema.setBottomColor(newColor);
             }
             repaint();
+            return;
+        }
+        // we didn't match any known menu entry, let's try if it is a special query
+        if(actionSource instanceof JRadioButtonMenuItem) {
+            JRadioButtonMenuItem item = (JRadioButtonMenuItem) actionSource;
+            String name = item.getText();
+            // force the query string on all object labels
+            this.diagramView.setSpecialQuery(
+                        this.conceptualSchema.getDatabaseInfo().getSpecialQuery(name),
+                        this.conceptualSchema.getDatabaseInfo().getSpecialQueryFormat(name) );
         }
     }
 
@@ -805,7 +845,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // store current file
         this.currentFile = schemaFile.getPath();
 
-        // recreate the menu
+        // recreate the menus
+        buildMenuBar();
         recreateMruMenu();
     }
 
@@ -816,8 +857,11 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         if(this.numDocMenuItem.isSelected()) {
             this.diagramView.setDisplayType(LabelView.DISPLAY_NUMBER, this.showExactMenuItem.isSelected());
         }
-        else {
+        else if(this.listDocMenuItem.isSelected()) {
             this.diagramView.setDisplayType(LabelView.DISPLAY_LIST, this.showExactMenuItem.isSelected());
+        }
+        else {
+            this.diagramView.setDisplayType(LabelView.DISPLAY_SPECIAL, this.showExactMenuItem.isSelected());
         }
     }
 

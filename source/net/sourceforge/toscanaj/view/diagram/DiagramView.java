@@ -255,6 +255,26 @@ public class DiagramView extends DrawingCanvas implements ChangeObserver {
     }
 
     /**
+     * Sets all object label views to use this query when asking their concepts.
+     *
+     * If format is not null, the string will be used as formatting string in a
+     * DecimalFormat instance.
+     *
+     * @see java.text.DecimalFormat
+     */
+    public void setSpecialQuery(String query, String format) {
+        Iterator it = this.canvasItems.iterator();
+        while( it.hasNext() ) {
+            CanvasItem cur = (CanvasItem) it.next();
+            if(cur instanceof ObjectLabelView) {
+                ObjectLabelView lv = (ObjectLabelView) cur;
+                lv.setSpecialQuery(query, format);
+            }
+        }
+        repaint();
+    }
+
+    /**
      * Overwrites DrawingCanvas.backgroundClicked(Point2D) to erase the highlighting.
      */
     protected void backgroundClicked(Point2D point) {

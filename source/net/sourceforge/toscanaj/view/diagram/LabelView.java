@@ -36,6 +36,14 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     static public final int DISPLAY_LIST = 1;
 
     /**
+     * A constant used to set the labels to display something special (used for
+     * special queries in ObjectLabelView).
+     *
+     * @see setDisplayType(int)
+     */
+    static public final int DISPLAY_SPECIAL = 2;
+
+    /**
      * Used when the label should be drawn above the given point.
      *
      * See Draw( Graphics2D, double ,double ,int ).
@@ -54,7 +62,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      *
      * @see setDisplayType(int)
      */
-    private int displayType = DISPLAY_LIST;
+    protected int displayType = DISPLAY_LIST;
 
     /**
      * This is the smallest font size we accept.
@@ -72,7 +80,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * Stores if percentual distribution should be shown behind numbers.
      */
-    private boolean showPercentage = false;
+    protected boolean showPercentage = false;
 
     /**
      * Stores if we display contingents or extent/intent.
@@ -80,7 +88,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      * If set to true we show only the attribute or object contingent (depending
      * on the given label info), otherwise it is intent or extent.
      */
-    private boolean showOnlyContingent = true;
+    protected boolean showOnlyContingent = true;
 
     /**
      * The bounding rectangle for the label itself.
@@ -111,9 +119,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * Sets the type of information displayed by the label: the number or the list
      * of objects.
-     *
-     * This method accepts the values DISPLAY_NUMBER and DISPLAY_LIST, everything
-     * else is ignored.
      */
     public void setDisplayType(int type, boolean contingentOnly) {
         this.displayType = type;
@@ -281,10 +286,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         }
         else {
             // draw the number
-            String num = String.valueOf(this.labelInfo.getNumberOfEntries(this.showOnlyContingent));
-            if(this.showPercentage) {
-                num = num.concat(" (" + (int)(this.labelInfo.getNumberOfEntriesRelative(this.showOnlyContingent) * 100) + "%)");
-            }
+            String num = getNumberDisplay();
+
             if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT )
             {
                 graphics.drawString( num,
@@ -310,6 +313,17 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     }
 
     /**
+     * Returns the number to display when in number mode.
+     */
+    protected String getNumberDisplay() {
+        String num = String.valueOf(this.labelInfo.getNumberOfEntries(this.showOnlyContingent));
+        if(this.showPercentage) {
+            num = num.concat(" (" + (int)(this.labelInfo.getNumberOfEntriesRelative(this.showOnlyContingent) * 100) + "%)");
+        }
+        return num;
+    }
+
+    /**
      * Returns the placement of the label (above or below the node).
      *
      * Possible return values are LabelView.ABOVE or LabelView.BELOW. This is
@@ -327,6 +341,10 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      */
     public double getWidth( FontMetrics fontMetrics )
     {
+        if(this.labelInfo.getNumberOfEntries(this.showOnlyContingent) == 0) {
+            return 0;
+        }
+
         double result = 0;
 
         if(this.displayType == DISPLAY_LIST) {
@@ -343,10 +361,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         }
         else {
             // find width of number
-            String num = String.valueOf(this.labelInfo.getNumberOfEntries(this.showOnlyContingent));
-            if(this.showPercentage) {
-                num = num.concat(" (" + (int)(this.labelInfo.getNumberOfEntriesRelative(this.showOnlyContingent) * 100) + "%)");
-            }
+            String num = getNumberDisplay();
             result = fontMetrics.stringWidth( num );
         }
 

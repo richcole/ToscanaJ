@@ -487,5 +487,23 @@ public class CSXParser
             }
             dbInfo.setQuery(table, elem.getText());
         }
+        // check for additional queries for special queries
+        Iterator it = dbElement.getChildren("specialQuery").iterator();
+        while(it.hasNext()) {
+            Element cur = (Element) it.next();
+            String name = cur.getAttributeValue("name");
+            if(name == null) {
+                throw new DataFormatException("<specialQuery> without name attribute in <database> element found");
+            }
+            if(name.length() == 0) {
+                throw new DataFormatException("<specialQuery> with empty name attribute in <database> element found");
+            }
+            String query = cur.getText();
+            if(query.length() == 0) {
+                throw new DataFormatException("<specialQuery> with empty content in <database> element found");
+            }
+            String format = cur.getAttributeValue("format"); // can be null
+            dbInfo.addSpecialQuery(name, query, format);
+        }
     }
 }
