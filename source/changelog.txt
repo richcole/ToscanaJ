@@ -3,6 +3,14 @@ program suite:
 
 Affecting all programs:
 =======================
+- diagram views now have tooltips on the nodes, showing intent and
+  extent
+- the image writers using libraries have been outsourced into plugins,
+  thus reducing the download size reasonably
+- the user settings and session managment now use Java's Preferences
+  API, which means we don't rely on write access to the installation
+  directory anymore and multi-user systems should now store the settings
+  on a per-user basis
 
 ToscanaJ:
 =========
@@ -12,6 +20,10 @@ Elba:
 
 Siena (still not fully complete):
 =================================
+- the temporal controls are now officially part of the program and
+  can be toggled from the view menu. They appear below the diagram
+  list now in a redesigned layout
+- the color and style of the arrows can be edited
 
 Other new experimental features:
 ================================
