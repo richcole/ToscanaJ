@@ -309,7 +309,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     	Iterator it = this.lines.iterator();
     	while (it.hasNext()) {
             DiagramLine line = (DiagramLine) it.next();
-    	    double deltaX = line.getToPosition().getX() - line.getFromPosition().getX();
+    	    double deltaX = Math.abs(line.getToPosition().getX() - line.getFromPosition().getX());
     	    double deltaY = line.getToPosition().getY() - line.getFromPosition().getY();
             if(deltaY < MINIMUM_STEEPNESS * deltaX) {
             	return false;
