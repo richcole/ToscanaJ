@@ -184,7 +184,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         editContextButton.setEnabled(false);
         toolPanel.add(editContextButton);
 		
-		editDiagramDescButton = new JButton("Edit Diagram Description...");
+		editDiagramDescButton = new JButton("Edit Description...");
 		editDiagramDescButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
 				editDiagramDescription();
