@@ -36,6 +36,7 @@ import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 import org.tockit.plugin.PluginLoader;
 import org.tockit.relations.model.Relation;
+import org.tockit.relations.model.Tuple;
 import org.tockit.tupleware.scaling.TupleScaling;
 import org.tockit.tupleware.source.TupleSource;
 import org.tockit.tupleware.source.TupleSourceRegistry;
@@ -468,9 +469,9 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
         Object[][] data = new Object[this.tuples.getTuples().size()][this.tuples.getDimensionNames().length];
         int row = 0;
         for (Iterator iter = this.tuples.getTuples().iterator(); iter.hasNext();) {
-            Object[] tuple = (Object[]) iter.next();
-            for (int col = 0; col < tuple.length; col++) {
-                data[row][col] = tuple[col];
+            Tuple tuple = (Tuple) iter.next();
+            for (int col = 0; col < tuple.getLength(); col++) {
+                data[row][col] = tuple.getElement(col);
             }
             row ++;
         }
