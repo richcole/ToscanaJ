@@ -25,7 +25,7 @@ import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
-import net.sourceforge.toscanaj.model.Context;
+import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 
 public class ContextTableView extends JComponent implements Scrollable {
@@ -33,7 +33,7 @@ public class ContextTableView extends JComponent implements Scrollable {
 	private static final Color TABLE_CORNER_COLOR = Color.LIGHT_GRAY;
 	private static final Color TABLE_HEADER_COLOR = Color.LIGHT_GRAY;
 	private static final Color TABLE_CELL_COLOR = Color.WHITE;
-	private Context context;
+	private ContextImplementation context;
 	private ContextTableScaleEditorDialog dialog;
 	private static final int CELL_WIDTH = 150;
 	private static final int CELL_HEIGHT = 30;
@@ -56,7 +56,7 @@ public class ContextTableView extends JComponent implements Scrollable {
 		}
 	}
 
-	public ContextTableView(Context context, ContextTableScaleEditorDialog dialog) {
+	public ContextTableView(ContextImplementation context, ContextTableScaleEditorDialog dialog) {
 		super();
 		this.context = context;
 		this.dialog = dialog;
@@ -196,7 +196,7 @@ public class ContextTableView extends JComponent implements Scrollable {
 		return new Position(row, col);
 	}
 	
-	public Context getModel() {
+	public ContextImplementation getModel() {
 		return this.context;
 	}
 	
@@ -229,5 +229,14 @@ public class ContextTableView extends JComponent implements Scrollable {
     
     public void updateSize() {
     	this.setPreferredSize(calculateNewSize());
+    }
+    
+    public ContextImplementation getContext() {
+        return context;
+    }
+
+    public void setContext(ContextImplementation context) {
+        this.context = context;
+        updateSize();
     }
 }

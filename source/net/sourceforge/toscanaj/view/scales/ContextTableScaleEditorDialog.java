@@ -831,5 +831,7 @@ public class ContextTableScaleEditorDialog extends JDialog implements EventBroke
     
     public void setContext(ContextImplementation context) {
         this.context = context;
+        this.tableView.setContext(context);
+        this.scaleTitleField.setText(context.getName());
     }
 }
