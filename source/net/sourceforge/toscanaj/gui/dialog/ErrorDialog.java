@@ -82,7 +82,7 @@ public class ErrorDialog extends JDialog{
 					new Insets(5, 5, 5, 5),
 					0, 0));
 		pack();
-		show();
+		setVisible(true);
     }
 
 	private JPanel createErrorMsgPanel(Throwable e, String extraMessage) {

@@ -61,7 +61,7 @@ public class AttributeEditingLabelViewPopupMenuHandler implements EventBrokerLis
 				XMLEditorDialog xmlEditorDialog = new XMLEditorDialog(
 				JOptionPane.getFrameForComponent(parent),"Edit attribute description");
 				xmlEditorDialog.setContent(attribute.getDescription());
-				xmlEditorDialog.show();
+				xmlEditorDialog.setVisible(true);
 				attribute.setDescription(xmlEditorDialog.getContent());
 			}
 		});

@@ -540,7 +540,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		if(currentDiagram!=null){
 			XMLEditorDialog diagramDescriptionEditor = new XMLEditorDialog(null,"Diagram description editor");
 			diagramDescriptionEditor.setContent(currentDiagram.getDescription());
-			diagramDescriptionEditor.show();
+			diagramDescriptionEditor.setVisible(true);
 			currentDiagram.setDescription(diagramDescriptionEditor.getContent());
 		}
 	}

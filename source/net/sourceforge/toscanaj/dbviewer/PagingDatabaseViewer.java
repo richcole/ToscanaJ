@@ -77,7 +77,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
                 position = 0;
                 enableButtons();
                 showCurrentItem();
-                show();
+                setVisible(true);
             } catch (DatabaseException e) {
                 ErrorDialog.showError(this, e, "Failed to query database");
             }

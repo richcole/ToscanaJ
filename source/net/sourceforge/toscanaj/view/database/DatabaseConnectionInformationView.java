@@ -961,22 +961,30 @@ public class DatabaseConnectionInformationView extends JDialog
 	}
 	
 	public void hide() {
-		super.hide();
-		if(this.connection.isConnected()) {
-			try {
-                this.connection.disconnect();
-            } catch (DatabaseException e) {
-            	ErrorDialog.showError(this,e,"Database not closed properly");
-            }
-		}
-	    setCurrentPanel(this.dbTypePanel);
-		preferences.storeWindowPlacement(this);
+	    setVisible(false);
 	}
 	
 	public void show() {
-		this.newConnectionSet = false;
-		super.show();
+	    setVisible(true);
 	}
+	
+    public void setVisible(boolean visible) {
+        if(visible) {
+    		this.newConnectionSet = false;
+    		super.setVisible(true);
+        } else {
+    		preferences.storeWindowPlacement(this);
+    		super.setVisible(false);
+    		if(this.connection.isConnected()) {
+    			try {
+                    this.connection.disconnect();
+                } catch (DatabaseException e) {
+                	ErrorDialog.showError(this,e,"Database not closed properly");
+                }
+    		}
+    	    setCurrentPanel(this.dbTypePanel);
+        }
+    }
 	
 	public boolean newConnectionWasSet() {
 		return this.newConnectionSet;

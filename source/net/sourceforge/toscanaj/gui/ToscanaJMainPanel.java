@@ -597,7 +597,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		JMenuItem showInfoViewItem = new JMenuItem("Show Concept Information...");
         showInfoViewItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                readingHelpDialog.show();
+                readingHelpDialog.setVisible(true);
             }
         });
         

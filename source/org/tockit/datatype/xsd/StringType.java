@@ -33,14 +33,14 @@ public class StringType extends AbstractXSDDatatype {
                 Element child = restElem.getChild("enumeration", XSD_NAMESPACE);
                 if(child != null) {
                     List enumChildren = restElem.getChildren("enumeration", XSD_NAMESPACE);
-                    StringValue[] enum = new StringValue[enumChildren.size()];
+                    StringValue[] enumeration = new StringValue[enumChildren.size()];
                     int i = 0;
                     for (Iterator iter = enumChildren.iterator(); iter.hasNext();) {
                         Element enumElem = (Element) iter.next();
-                        enum[i] = new StringValue(enumElem.getAttributeValue("value"));
+                        enumeration[i] = new StringValue(enumElem.getAttributeValue("value"));
                         i++;
                     }
-                    return createEnumerationRestrictedType(name, enum);
+                    return createEnumerationRestrictedType(name, enumeration);
                 }
                 child = restElem.getChild("pattern", XSD_NAMESPACE);
                 if(child != null) {

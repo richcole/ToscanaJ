@@ -575,7 +575,7 @@ public class NominalScaleEditorDialog extends JDialog {
 	private void closeDialog(boolean res) {
         preferences.storeWindowPlacement(this);
 		result = res;
-		hide();
+		setVisible(false);
 	}
 	
     private void addValuesToSelection() {
@@ -658,7 +658,7 @@ public class NominalScaleEditorDialog extends JDialog {
 
     public boolean execute() {
         result = false;
-        show();
+        setVisible(true);
         return result;
     }
 

@@ -178,7 +178,7 @@ public class Factorizer {
 
 		mainWindow.pack();
 		mainWindow.setBounds(10,10,900,700);
-		mainWindow.show();
+		mainWindow.setVisible(true);
 		mainWindow.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);

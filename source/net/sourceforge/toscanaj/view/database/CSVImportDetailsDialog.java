@@ -102,7 +102,7 @@ public class CSVImportDetailsDialog extends JDialog {
 		
 		pack();
 		setLocationRelativeTo(owner);
-		show();
+		setVisible(true);
 	}
 	
 

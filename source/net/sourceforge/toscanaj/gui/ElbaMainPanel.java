@@ -203,7 +203,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             public void actionPerformed(ActionEvent e) {
                 schemaDescriptionView.setContent(
                     conceptualSchema.getDescription());
-                schemaDescriptionView.show();
+                schemaDescriptionView.setVisible(true);
                 conceptualSchema.setDescription(
                     schemaDescriptionView.getContent());
             }

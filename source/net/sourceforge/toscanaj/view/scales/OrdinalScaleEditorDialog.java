@@ -65,7 +65,7 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
     public boolean execute() {
         result = false;
-        show();
+        setVisible(true);
         return result;
     }
 

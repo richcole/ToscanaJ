@@ -116,6 +116,6 @@ public class ReadingHelpDialog extends JDialog {
 
     public void closeDialog() {
         preferences.storeWindowPlacement(this);
-        this.hide();
+        this.setVisible(false);
     }
 }

@@ -222,7 +222,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
             } catch (DatabaseException e) {
                 this.textArea.setText("Failed to query database:\n" + e.getMessage() + "\n" + e.getCause().getMessage());
             } finally {
-                this.show();
+                this.setVisible(true);
             }
         }
     }

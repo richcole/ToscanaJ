@@ -246,7 +246,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 				dialog.setVisible(false);
 			}
 		});
-		dialog.show();
+		dialog.setVisible(true);
 	}
 
 	private void showAttributeInputDialog() throws HeadlessException {
@@ -307,7 +307,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 				dialog.setVisible(false);
 			}
 		});
-		dialog.show();
+		dialog.setVisible(true);
 	}
 
 	private void addObject(
@@ -566,7 +566,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 	}
 
 	public boolean execute() {
-		show();
+		setVisible(true);
 		return result;
 	}
 
