@@ -225,8 +225,13 @@ public class DatabaseInfo implements XMLizable {
     }
 
     public void setEmbeddedSQLLocation(String relativePath) {
-        this.embeddedSQLLocation = resolveLocation(relativePath);
-        this.embeddedSQLPath = relativePath;
+    	if(relativePath == null) {
+    		this.embeddedSQLLocation = null;
+    		this.embeddedSQLPath = null;
+    	} else {
+	        this.embeddedSQLLocation = resolveLocation(relativePath);
+	        this.embeddedSQLPath = relativePath;
+    	}
     }
 
     private URL resolveLocation(String relativePath) {
