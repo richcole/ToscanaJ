@@ -16,7 +16,7 @@ import java.util.Map;
 import org.tockit.events.EventBroker;
 import org.tockit.relations.model.Relation;
 import org.tockit.relations.model.Tuple;
-import org.tockit.tupleware.source.text.TabDelimitedParser;
+import org.tockit.tupleware.source.text.SeparatedTextParser;
 
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
@@ -147,7 +147,7 @@ public class TupleScaling {
         } else {
             objectPos = 0;
         }
-        Relation input = TabDelimitedParser.parseTabDelimitedTuples(new FileReader(new File(args[0])));
+        Relation input = SeparatedTextParser.parseTabDelimitedTuples(new FileReader(new File(args[0])),'\t','\"','\000',true);
         ConceptualSchema result = scaleTuples(input, objectPos);
         XMLWriter.write(new File(args[1]), result);
     }

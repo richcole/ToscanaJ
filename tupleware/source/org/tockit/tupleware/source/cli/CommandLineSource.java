@@ -20,7 +20,7 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import org.tockit.relations.model.Relation;
 import org.tockit.tupleware.gui.IndexSelectionDialog;
 import org.tockit.tupleware.source.TupleSource;
-import org.tockit.tupleware.source.text.TabDelimitedParser;
+import org.tockit.tupleware.source.text.SeparatedTextParser;
 
 
 public class CommandLineSource implements TupleSource {
@@ -66,7 +66,7 @@ public class CommandLineSource implements TupleSource {
                 JOptionPane.showMessageDialog(parent, err.toString(), "Execution failed", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            this.tuples = TabDelimitedParser.parseTabDelimitedTuples(new StringReader(out.toString()));
+            this.tuples = SeparatedTextParser.parseTabDelimitedTuples(new StringReader(out.toString()),'\t','\"','\000',true);
 
             IndexSelectionDialog dialog = new IndexSelectionDialog(parent, "Select object set", this.tuples.getDimensionNames());
             dialog.show();

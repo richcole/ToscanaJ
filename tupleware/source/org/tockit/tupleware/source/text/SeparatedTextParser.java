@@ -8,36 +8,31 @@
 package org.tockit.tupleware.source.text;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Iterator;
-import java.util.Set;
 
 import org.tockit.relations.model.Relation;
 import org.tockit.relations.model.RelationImplementation;
-import org.tockit.relations.model.Tuple;
 import org.tockit.util.StringTokenizer;
 
 
 /**
  * Parser to parse tuples from files.
  */
-public class TabDelimitedParser {
+public class SeparatedTextParser {
     /**
-     * Reads a list of tuples from a tab-delimited file.
+     * Reads a list of tuples from a separator-delimited text file.
      * 
      * The format used is one tuple per line, the elements delimited
-     * with tabs. No escaping, so no tabs in the elements are allowed.
+     * with the given separator. Quotes and escapes can be used as defined
+     * in the org.tockit.util.StringTokenizer class.
      * 
      * If a line doesn't contain at least two entries it is consider a
      * comment.
-     * 
-     * @return a Set of Object[] representing the tuples parsed
      */
-    public static Relation parseTabDelimitedTuples(Reader input) throws IOException {
+    public static Relation parseTabDelimitedTuples(
+            Reader input, char separator, char quote, char escape, 
+            boolean firstLineHeader) throws IOException {
         Relation retVal = null;
         BufferedReader buffReader = new BufferedReader(input);
         int lineNum = 0;
@@ -47,14 +42,19 @@ public class TabDelimitedParser {
                 break;            
             }
             lineNum++;
-            StringTokenizer tokenizer = new StringTokenizer(line, '\t', '\"', '\000');
+            StringTokenizer tokenizer = new StringTokenizer(line, separator, quote, escape);
             String[] tuple = tokenizer.tokenizeAll();
-            // lines without tabs are considered comments
+            // lines without separators are considered comments
             if(tuple.length <= 1) {
                 continue;
             }
             if(retVal == null) {
-                retVal = new RelationImplementation(tuple); 
+                if(firstLineHeader) {
+                    retVal = new RelationImplementation(tuple);
+                } else {
+                    retVal = new RelationImplementation(tuple.length);
+                    retVal.addTuple(tuple);
+                }
             } else {
             	try {
 					retVal.addTuple(tuple);
@@ -64,17 +64,5 @@ public class TabDelimitedParser {
             }
         }
         return retVal;
-    }
-    
-    public static void main(String[] args) throws FileNotFoundException, IOException {
-        Relation result = parseTabDelimitedTuples(new FileReader(new File(args[0])));
-        System.out.println("Vars:");
-        System.out.println(new Tuple(result.getDimensionNames()).toString());
-        System.out.println("Tuples:");
-        Set tuples = result.getTuples();
-        for (Iterator iter = tuples.iterator(); iter.hasNext();) {
-            Tuple tuple = (Tuple) iter.next();
-            System.out.println(tuple.toString());
-        }
     }
 }
