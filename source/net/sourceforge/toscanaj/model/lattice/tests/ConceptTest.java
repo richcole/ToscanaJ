@@ -13,6 +13,10 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 
 import java.util.List;
 
+/**
+ * @todo these tests are rather broken, we should test with an embedded database with some objects
+ * in it.
+ */
 public abstract class ConceptTest extends TestCase {
     private DatabaseInfo dbInfo = new DatabaseInfo();
 
@@ -23,7 +27,7 @@ public abstract class ConceptTest extends TestCase {
     public void testObjectNumberQueryOnConceptWithEmptyExtentAndContigent() {
         Concept concept = makeConceptWithEmptyContingentAndExtent();
         DatabaseInfo.DatabaseQuery query = dbInfo.createAggregateQuery("Number of Objects", "");
-        query.insertQueryColumn("Count", "0", null, "count(*)");
+        query.insertQueryColumn("count", "0", null, "count(*)");
         List result = concept.executeQuery(query, false);
         assertEquals(true, result.isEmpty());
 
@@ -34,7 +38,7 @@ public abstract class ConceptTest extends TestCase {
     public void testObjectListQueryOnConceptWithEmptyExtentAndContigent() {
         Concept concept = makeConceptWithEmptyContingentAndExtent();
         DatabaseInfo.DatabaseQuery query = dbInfo.createListQuery("List of Objects", "", false);
-        query.insertQueryColumn("Object Name", null, null, "unknown");
+        query.insertQueryColumn("list", null, null, "unknown");
         List result = concept.executeQuery(query, false);
         assertEquals(true, result.isEmpty());
         result = concept.executeQuery(query, true);
