@@ -44,7 +44,7 @@ public class GantersAlgorithm implements LatticeGenerator {
     	while (it.hasNext()) {
             Object cur = it.next();
             if(testSet.contains(cur)) {
-            	throw new IllegalArgumentException("Context contains duplicate object");
+            	throw new IllegalArgumentException("Context '" + context.getName() + "' contains duplicate object");
             }
             retVal[pos] = cur;
             testSet.add(cur);
