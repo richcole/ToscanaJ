@@ -9,17 +9,35 @@ package net.sourceforge.toscanaj.controller.fca;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import org.tockit.events.Event;
+import org.tockit.events.EventBrokerListener;
+
+import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-public abstract class AbstractConceptInterperter implements ConceptInterpreter {
+public abstract class AbstractConceptInterperter implements ConceptInterpreter, EventBrokerListener {
+	// @this should be private once refactoring is finished.
+	protected Hashtable contingentSizes = new Hashtable();
+	private Hashtable extentSizes = new Hashtable();
 
-	public abstract  Iterator getObjectSetIterator(Concept concept,ConceptInterpretationContext context) ;
+	public abstract Iterator getObjectSetIterator(Concept concept,ConceptInterpretationContext context) ;
+
+	protected abstract Object  getObject (String value, Concept concept, ConceptInterpretationContext context);
+	
+	protected abstract Object[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context); 
+	
+	// @todo implement this here maybe?..
+	protected abstract int getMaximalContingentSize() ;
+
+	protected abstract int calculateContingentSize (Concept concept, ConceptInterpretationContext context);
+	protected abstract int calculateExtentSize (Concept concept, ConceptInterpretationContext context);
 
 	public Iterator getAttributeSetIterator(Concept concept, ConceptInterpretationContext context) {
 		return concept.getAttributeContingentIterator();
@@ -37,9 +55,28 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter {
 		return concept.getAttributeContingentSize();
 	}
 
-	public abstract int getObjectContingentSize(Concept concept,ConceptInterpretationContext context) ;
-
-	public abstract int getExtentSize(Concept concept,ConceptInterpretationContext context);
+	public int getObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
+			Hashtable sizes = getContingentSizesCache(context);
+			Integer cacheVal = (Integer) sizes.get(concept);
+			if (cacheVal != null) {
+				return cacheVal.intValue();
+			}
+			int count = calculateContingentSize(concept, context);
+			sizes.put(concept, new Integer(count));
+			return count;
+	}
+	
+	public int getExtentSize(Concept concept, ConceptInterpretationContext context) {
+		Hashtable sizes = getExtentSizesCache(context);
+		Integer cacheVal = (Integer) sizes.get(concept);
+		if (cacheVal != null) {
+			return cacheVal.intValue();
+		}
+		int count = calculateExtentSize(concept, context);
+		sizes.put(concept, new Integer(count));
+		return count;
+	}
+	
 
 	/**
 	 * Gives the relation of the contingent size of the concept given and the largest contingent size queried in the
@@ -89,9 +126,6 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter {
 		}
 	}
 	
-
-	public abstract boolean isRealized(Concept concept,ConceptInterpretationContext context) ;
-
 	public Object[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
 		if(!isRealized(concept, context)) {
 			return null;
@@ -140,11 +174,94 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter {
 		return retVal;
 	}
 
-	protected abstract Object  getObject (String value, Concept concept, ConceptInterpretationContext context);
+
+	public boolean isRealized(Concept concept, ConceptInterpretationContext context) {
+		/// @todo do check only lower neighbours
+		/// @todo consider going back to creating the lattice product, this is too much hacking
+
+		// first we check the inner diagram if anything below the concept has the same extent
+		// size (iff any subconcept has the same extent size, the concept is not realized) 
+		int extentSize = getExtentSize(concept, context);
+		for (Iterator iterator = concept.getDownset().iterator(); iterator.hasNext();) {
+			Concept otherConcept = (Concept) iterator.next();
+			if (otherConcept == concept) {
+				continue;
+			}
+			int otherExtentSize = getExtentSize(otherConcept, context);
+			if (otherExtentSize == extentSize) {
+				return false;
+			}
+		}
+		// the way it works for the outer diagram is a bit wild -- we assume either all contingent or all
+		// extents have already been calculated (which one depends on the view setting), so the cache for
+		// either the contingent or the extent sizes should contain all interpretation contexts for the
+		// lower nodes of the outer diagrams. Now we look for all whose nesting concepts are subconcepts
+		// of the nesting concepts we are in, then check for the extent of the current concept in these
+		// contexts -- they are all subconcepts of our concept along the outer diagram.
+		List outerConcepts = context.getNestingConcepts();
+		for (Iterator iterator = outerConcepts.iterator(); iterator.hasNext();) {
+			Concept outerConcept = (Concept) iterator.next();
+			for (Iterator iterator2 = outerConcept.getDownset().iterator(); iterator2.hasNext();) {
+				Concept otherConcept = (Concept) iterator2.next();
+				if (otherConcept != outerConcept) {
+					for (Iterator iterator3 = this.contingentSizes.keySet().iterator(); iterator3.hasNext();) {
+						ConceptInterpretationContext otherContext = (ConceptInterpretationContext) iterator3.next();
+						List nesting = otherContext.getNestingConcepts();
+						if (nesting.size() != 0) {
+							if (nesting.get(nesting.size() - 1).equals(otherConcept)) {
+								int otherExtentSize = getExtentSize(concept, otherContext);
+								if (otherExtentSize == extentSize) {
+									return false;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
+
+
+	private Hashtable getContingentSizesCache(ConceptInterpretationContext context) {
+		Hashtable retVal = (Hashtable) contingentSizes.get(context);
+		if (retVal == null) {
+			retVal = new Hashtable();
+			contingentSizes.put(context, retVal);
+			/// @todo can we get around this by being smarter about the hashcodes ???
+			context.getEventBroker().subscribe(this,
+					ConceptInterpretationContextChangedEvent.class,
+					ConceptInterpretationContext.class);
+		}
+		return retVal;
+	}
 	
-	protected abstract Object[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context); 
+	public void processEvent(Event e) {
+		clearCaches((ConceptInterpretationContext) e.getSubject());
+	}
+
+	private void clearCaches(ConceptInterpretationContext context) {
+		this.contingentSizes.remove(context);
+		this.extentSizes.remove(context);
+	}
+
+	private Hashtable getExtentSizesCache(ConceptInterpretationContext context) {
+		Hashtable retVal = (Hashtable) this.extentSizes.get(context);
+		if (retVal == null) {
+			retVal = new Hashtable();
+			extentSizes.put(context, retVal);
+			/// @todo can we get around this by being smarter about the hashcodes ???
+			context.getEventBroker().subscribe(this,
+					ConceptInterpretationContextChangedEvent.class,
+					ConceptInterpretationContext.class);
+		}
+		return retVal;
+	}
+
+	public void clearCache() {
+		this.contingentSizes.clear();
+		this.extentSizes.clear();
+	}
 	
-	// @todo implement this here maybe?..
-	protected abstract int getMaximalContingentSize() ;
 
 }

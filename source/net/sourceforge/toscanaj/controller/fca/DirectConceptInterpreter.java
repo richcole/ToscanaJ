@@ -21,9 +21,34 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
 
     public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
         if (context.getObjectDisplayMode() == ConceptInterpretationContext.CONTINGENT) {
-            return getContingent(concept, context).iterator();
+			//return getContingent(concept, context).iterator();
+			Hashtable contextContingents = (Hashtable) contingents.get(context);
+			if (contextContingents == null) {
+				contextContingents = new Hashtable();
+				contingents.put(context, contextContingents);
+			}
+		  	TreeSet contingent = (TreeSet) contingents.get(concept);
+			if (contingent == null) {
+	            contingent = calculateContingent(concept, context);
+	            contextContingents.put(concept, contingent);
+			}
+			return contingent.iterator();
         } else {
-            return getExtent(concept, context).iterator();
+            //return getExtent(concept, context).iterator();
+			if(context == null) {
+				throw new RuntimeException("Missing context on call to getExtent(..)");
+			}
+			Hashtable contextExtents = (Hashtable) extents.get(context);
+			if (contextExtents == null) {
+				contextExtents = new Hashtable();
+				extents.put(context, contextExtents);
+			}
+			TreeSet extent = (TreeSet) contextExtents.get(concept);
+			if (extent == null) {
+				extent = calculateExtent(concept, context);
+				contextExtents.put(concept, extent);
+			}
+            return extent.iterator();
         }
     }
 
@@ -32,56 +57,15 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
         return 1;
     }
 
-    public boolean isRealized(Concept concept, ConceptInterpretationContext context) {
-        /// @todo there might be some reuse with the same method from the DB version
-        int extentSize = getExtentSize(concept, context);
-        for (Iterator iterator = concept.getDownset().iterator(); iterator.hasNext();) {
-            Concept other = (Concept) iterator.next();
-            if (other == concept) {
-                continue;
-            }
-            int otherExtentSize = getExtentSize(other, context);
-            if (otherExtentSize == extentSize) {
-                return false;
-            }
-        }
-        List outerConcepts = context.getNestingConcepts();
-        for (Iterator iterator = outerConcepts.iterator(); iterator.hasNext();) {
-            Concept outerConcept = (Concept) iterator.next();
-            for (Iterator iterator2 = outerConcept.getDownset().iterator(); iterator2.hasNext();) {
-                Concept otherConcept = (Concept) iterator2.next();
-                if (otherConcept != outerConcept) {
-                    for (Iterator iterator3 = this.contingents.keySet().iterator(); iterator3.hasNext();) {
-                        ConceptInterpretationContext otherContext = (ConceptInterpretationContext) iterator3.next();
-                        List nesting = otherContext.getNestingConcepts();
-                        if (nesting.size() != 0) {
-                            if (nesting.get(nesting.size() - 1).equals(otherConcept)) {
-                                int otherExtentSize = getExtentSize(concept, otherContext);
-                                if (otherExtentSize == extentSize) {
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return true;
+    protected int calculateContingentSize (Concept concept, ConceptInterpretationContext context) {
+    	Set contingent = calculateContingent(concept, context);
+    	return contingent.size();
     }
 
-    private Collection getContingent(Concept concept, ConceptInterpretationContext context) {
-        Hashtable contextContingents = (Hashtable) contingents.get(context);
-        if (contextContingents == null) {
-            contextContingents = new Hashtable();
-            contingents.put(context, contextContingents);
-        }
-		TreeSet contingent = (TreeSet) contingents.get(concept);
-        if (contingent == null) {
-            contingent = calculateContingent(concept, context);
-            contextContingents.put(concept, contingent);
-        }
-        return contingent;
-    }
+	protected int calculateExtentSize (Concept concept, ConceptInterpretationContext context) {
+		Set contingent = calculateExtent(concept, context);
+		return contingent.size();
+	}
 
     private TreeSet calculateContingent(Concept concept, ConceptInterpretationContext context) {
 		TreeSet retVal = new TreeSet();
@@ -178,23 +162,6 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
         }
     }
 
-    private Collection getExtent(Concept concept, ConceptInterpretationContext context) {
-    	if(context == null) {
-    		throw new RuntimeException("Missing context on call to getExtent(..)");
-    	}
-        Hashtable contextExtents = (Hashtable) extents.get(context);
-        if (contextExtents == null) {
-            contextExtents = new Hashtable();
-            extents.put(context, contextExtents);
-        }
-        TreeSet extent = (TreeSet) contextExtents.get(concept);
-        if (extent == null) {
-            extent = calculateExtent(concept, context);
-            contextExtents.put(concept, extent);
-        }
-        return extent;
-    }
-
     private TreeSet calculateExtent(Concept concept, ConceptInterpretationContext context) {
         TreeSet retVal = new TreeSet();
         Iterator extentContingentIterator = concept.getExtentIterator();
@@ -213,16 +180,5 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
 	
 	protected Object[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) { 
 		throw new RuntimeException("Query not supported by this class (" + this.getClass().getName() + ")");
-	}
-    
-
-    public int getObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
-		return getContingent(concept, context).size();
-    }
-
-    public int getExtentSize(Concept concept, ConceptInterpretationContext context) {
-		return getExtent(concept, context).size();
-    }
-    
-    
+	}    
 }
