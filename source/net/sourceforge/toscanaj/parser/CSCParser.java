@@ -522,6 +522,18 @@ public class CSCParser {
             DiagramNode node = (DiagramNode) it.next();
             Point2D pos = node.getPosition();
             node.setPosition(new Point2D.Double(scale * pos.getX(), scale * pos.getY()));
+
+            LabelInfo aLabel = node.getAttributeLabelInfo();
+            if(aLabel != null) {
+                Point2D offset = aLabel.getOffset();
+                aLabel.setOffset(new Point2D.Double(scale * offset.getX(), scale * offset.getY()));
+            }
+
+            LabelInfo oLabel = node.getObjectLabelInfo();
+            if(oLabel != null) {
+                Point2D offset = oLabel.getOffset();
+                oLabel.setOffset(new Point2D.Double(scale * offset.getX(), scale * offset.getY()));
+            }
         }
     }
     
