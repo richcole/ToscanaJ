@@ -13,9 +13,9 @@ import java.sql.Types;
 public class Column {
 
     private String name;
-    private Types type;
+    private int type;
 
-    public Column(String name, Types type) {
+    public Column(String name, int type) {
         this.name = name;
         this.type = type;
     }
@@ -24,7 +24,7 @@ public class Column {
         return name;
     }
 
-    public Types getType() {
+    public int getType() {
         return type;
     }
 }

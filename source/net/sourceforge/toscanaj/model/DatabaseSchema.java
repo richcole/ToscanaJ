@@ -20,6 +20,7 @@ import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.sql.Types;
 
 public class DatabaseSchema implements BrokerEventListener {
 
@@ -57,7 +58,7 @@ public class DatabaseSchema implements BrokerEventListener {
                 connection.getColumnNames(tableName)
             );
             for(colIt.reset(); !colIt.atEnd(); colIt.next()) {
-                table.addColumn(new Column((String)colIt.val()));
+                table.addColumn(new Column((String)colIt.val(), Types.INTEGER));
             }
             addTable(table);
         }
