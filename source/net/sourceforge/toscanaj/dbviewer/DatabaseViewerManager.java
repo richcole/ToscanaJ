@@ -46,7 +46,8 @@ public class DatabaseViewerManager implements XMLizable {
     private String screenName = null;
     private String tableName = null;
     private String keyName = null;
-    private Element template = null;
+    private Element originalTemplateElement = null;
+    private Element templateElement = null;
     private Dictionary parameters = new Hashtable();
     private DatabaseInfo databaseInfo;
     private DatabaseConnection dbConnection;
@@ -158,71 +159,66 @@ public class DatabaseViewerManager implements XMLizable {
     }
 
     public Element getTemplate() {
-        String url = this.template.getAttributeValue("url");
-        if (url != null) {
-            return insertXML(template);
-        } else {
-            return this.template;
+        if(templateElement != null) {
+            String url = this.templateElement.getAttributeValue("url");
+            if (url != null) {
+                insertXML(templateElement);
+            }
         }
+        return this.templateElement;
     }
 
     public String getTemplateString() {
-        if (this.template == null) {
-            return null;
-        } else {
-            String url = this.template.getAttributeValue("url");
+        if (this.templateElement != null) {
+            String url = this.templateElement.getAttributeValue("url");
             if (url != null) {
-                return loadText(template);
-            } else {
-                return this.template.getText();
+                loadText(templateElement);
             }
         }
+        return this.templateElement.getText();
     }
 
-    protected Element insertXML(Element elem) {
+    protected void insertXML(Element elem) {
         String urlAttr = elem.getAttributeValue("url");
-        if (urlAttr == null) {
-            return elem;
-        }
-        try {
-            URL url = new URL(this.baseURL, urlAttr);
-            DOMBuilder builder =
-                    new DOMBuilder("org.jdom.adapters.XercesDOMAdapter");
-            org.jdom.Document doc = builder.build(url);
-            Element root = doc.getRootElement();
-            root.detach();
-            elem.addContent(root);
-            // remove "url" so we don't insert again
-            elem.removeAttribute("url");
-        } catch (Exception e) {
-            /// @todo handle exceptions, give feedback
-            e.printStackTrace();
-        }
-        return elem;
-    }
-
-    protected String loadText(Element elem) {
-        String urlAttr = elem.getAttributeValue("url");
-        if (urlAttr == null) {
-            return null;
-        }
-        String result = "";
-        try {
-            URL url = new URL(this.baseURL, urlAttr);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-            String line = reader.readLine();
-            while (line != null) {
-                result += line + "\n";
-                line = reader.readLine();
+        if (urlAttr != null) {
+            try {
+                URL url = new URL(this.baseURL, urlAttr);
+                DOMBuilder builder =
+                        new DOMBuilder("org.jdom.adapters.XercesDOMAdapter");
+                org.jdom.Document doc = builder.build(url);
+                Element root = doc.getRootElement();
+                root.detach();
+                elem.addContent(root);
+                // remove "url" so we don't insert again
+                elem.removeAttribute("url");
+            } catch (Exception e) {
+                /// @todo handle exceptions, give feedback
+                e.printStackTrace();
             }
-            elem.addContent(result);
-            // remove "url" so we don't insert again
-            elem.removeAttribute("url");
-        } catch (Exception e) {
-            /// @todo handle exceptions, give feedback
-            e.printStackTrace();
         }
-        return result;
+        return;
+    }
+
+    protected void loadText(Element elem) {
+        String urlAttr = elem.getAttributeValue("url");
+        if (urlAttr != null) {
+            String result = "";
+            try {
+                URL url = new URL(this.baseURL, urlAttr);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                String line = reader.readLine();
+                while (line != null) {
+                    result += line + "\n";
+                    line = reader.readLine();
+                }
+                elem.addContent(result);
+                // remove "url" so we don't insert again
+                elem.removeAttribute("url");
+            } catch (Exception e) {
+                /// @todo handle exceptions, give feedback
+                e.printStackTrace();
+            }
+        }
     }
 
     public Dictionary getParameters() {
@@ -328,8 +324,8 @@ public class DatabaseViewerManager implements XMLizable {
         }
         retVal.setAttribute(SCREEN_NAME_ATTRIBUTE_NAME, screenName);
         retVal.setAttribute(CLASS_ATTRIBUTE_NAME, this.viewer.getClass().getName());
-        if(template != null) {
-            retVal.addContent((Element) template.clone());
+        if(originalTemplateElement != null) {
+            retVal.addContent((Element) originalTemplateElement.clone());
         }
         if(tableName != null) {
             Element tableElem = new Element(TABLE_ELEMENT_NAME);
@@ -354,7 +350,10 @@ public class DatabaseViewerManager implements XMLizable {
 
     public void readXML(Element elem) throws XMLSyntaxError {
         screenName = elem.getAttributeValue(SCREEN_NAME_ATTRIBUTE_NAME);
-        template = elem.getChild(TEMPLATE_ELEMENT_NAME);
+        originalTemplateElement = elem.getChild(TEMPLATE_ELEMENT_NAME);
+        if(originalTemplateElement != null) {
+            templateElement = (Element) originalTemplateElement.clone();
+        }
         tableName = elem.getChildText(TABLE_ELEMENT_NAME);
         keyName = elem.getChildText(KEY_ELEMENT_NAME);
         List parameterElems = elem.getChildren(PARAMETER_ELEMENT_NAME);
