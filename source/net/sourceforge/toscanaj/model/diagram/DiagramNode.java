@@ -97,8 +97,8 @@ public class DiagramNode implements XMLizable {
     }
 
     public DiagramNode(WriteableDiagram2D diagram, Element element) throws XMLSyntaxError {
+		this.diagram = diagram;
         readXML(element);
-        this.diagram = diagram;
     }
 
     public Element toXML() {

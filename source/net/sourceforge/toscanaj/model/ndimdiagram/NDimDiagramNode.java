@@ -28,14 +28,12 @@ import org.jdom.Element;
  */
 public class NDimDiagramNode extends DiagramNode {
     private double[] ndimVector;
-    private NDimDiagram diagram;
 
     public NDimDiagramNode(NDimDiagram diagram, String identifier, double[] ndimVector, Concept concept,
                            LabelInfo attributeLabel, LabelInfo objectLabel,
                            DiagramNode outerNode) {
         super(diagram, identifier, new Point2D.Double(0, 0), concept, attributeLabel, objectLabel, outerNode);
         this.ndimVector = ndimVector;
-        this.diagram = diagram;
     }
     
     public NDimDiagramNode(NDimDiagram nDimDiagram, Element diagramNode) throws XMLSyntaxError {
@@ -76,7 +74,8 @@ public class NDimDiagramNode extends DiagramNode {
 
     protected Point2D getProjectedPosition() {
         Point2D pos = new Point2D.Double(0, 0);
-        Iterator baseIt = this.diagram.getBase().iterator();
+        NDimDiagram ndimDiagram = (NDimDiagram) this.diagram;
+		Iterator baseIt = ndimDiagram.getBase().iterator();
         for (int i = 0; i < ndimVector.length; i++) {
             double v = ndimVector[i];
             Point2D baseVec = (Point2D) baseIt.next();
