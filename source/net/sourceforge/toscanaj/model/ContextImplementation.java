@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * @todo hide access to collections and relation by playing middle man.
@@ -49,5 +50,46 @@ public class ContextImplementation implements Context {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public Context combine(Context other, String title) {
+		ContextImplementation context = new ContextImplementation(title);
+		ArrayList objects = (ArrayList) context.getObjects();
+		ArrayList attributes = (ArrayList) context.getAttributes();
+		BinaryRelationImplementation relation = context.getRelationImplementation();
+		
+		Iterator objIt = this.getObjects().iterator();
+		while (objIt.hasNext()) {
+			Object object = (Object) objIt.next();
+			objects.add(object);
+		}
+		objIt = other.getObjects().iterator();
+		while (objIt.hasNext()) {
+			Object object = (Object) objIt.next();
+			objects.add(object);
+		}
+		Iterator attrIt = this.getAttributes().iterator();
+		while (attrIt.hasNext()) {
+			Object attribute = (Object) attrIt.next();
+			attributes.add(attribute);
+		}
+		attrIt = other.getAttributes().iterator();
+		while (attrIt.hasNext()) {
+			Object attribute = (Object) attrIt.next();
+			attributes.add(attribute);
+		}
+		objIt = objects.iterator();
+		while (objIt.hasNext()) {
+			Object object = (Object) objIt.next();
+			attrIt = attributes.iterator();
+			while (attrIt.hasNext()) {
+				Object attribute = (Object) attrIt.next();
+				if(this.getRelation().contains(object,attribute) ||
+				   other.getRelation().contains(object,attribute)) {
+					relation.insert(object,attribute);
+				}
+			}
+		}
+		return context;
 	}
 }

@@ -45,6 +45,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.SqlClauseLabelView;
 import net.sourceforge.toscanaj.view.scales.AttributeListScaleGenerator;
+import net.sourceforge.toscanaj.view.scales.BiordinalScaleGenerator;
 import net.sourceforge.toscanaj.view.scales.ContextTableScaleGenerator;
 import net.sourceforge.toscanaj.view.scales.NominalScaleGenerator;
 import net.sourceforge.toscanaj.view.scales.OrdinalScaleGenerator;
@@ -432,10 +433,11 @@ public class ElbaMainPanel
 
     protected void fillScaleGeneratorList() {
         this.scaleGenerators = new ArrayList();
-        scaleGenerators.add(new OrdinalScaleGenerator(this));
-        scaleGenerators.add(new NominalScaleGenerator(this));
-        scaleGenerators.add(new ContextTableScaleGenerator(this, this.eventBroker));
-        scaleGenerators.add(new AttributeListScaleGenerator(this));
+		scaleGenerators.add(new AttributeListScaleGenerator(this));
+		scaleGenerators.add(new ContextTableScaleGenerator(this, this.eventBroker));
+		scaleGenerators.add(new NominalScaleGenerator(this));
+		scaleGenerators.add(new OrdinalScaleGenerator(this));
+		scaleGenerators.add(new BiordinalScaleGenerator(this));
     }
 
 	public void createMenuBar() {

@@ -75,6 +75,7 @@ public class ScaleGeneratorPanel extends JPanel implements EventBrokerListener {
         scaleGenerators.add(new NominalScaleGenerator(getParentFrame()));
         scaleGenerators.add(new ContextTableScaleGenerator(getParentFrame(), this.eventBroker));
         scaleGenerators.add(new AttributeListScaleGenerator(getParentFrame()));
+		scaleGenerators.add(new BiordinalScaleGenerator(getParentFrame()));
     }
 	
 	private Frame getParentFrame() {

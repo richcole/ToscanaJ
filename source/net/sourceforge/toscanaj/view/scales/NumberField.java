@@ -55,7 +55,7 @@ public class NumberField extends JTextField {
         } catch (ParseException e) {
             // This should never happen because insertString allows
             // only properly formatted data to get in the field.
-            throw new RuntimeException("Could not parse value in NumberField");
+            throw new RuntimeException("Could not parse value in NumberField", e);
         }
         return retVal;
     }
@@ -67,7 +67,7 @@ public class NumberField extends JTextField {
         } catch (ParseException e) {
             // This should never happen because insertString allows
             // only properly formatted data to get in the field.
-            throw new RuntimeException("Could not parse value in NumberField");
+            throw new RuntimeException("Could not parse value in NumberField", e);
         }
         return retVal;
     }
