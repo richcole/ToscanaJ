@@ -17,7 +17,7 @@ import net.sourceforge.toscanaj.gui.action.OpenFileAction;
 import net.sourceforge.toscanaj.gui.action.SaveFileAction;
 import net.sourceforge.toscanaj.gui.action.SimpleAction;
 import net.sourceforge.toscanaj.gui.activity.*;
-import net.sourceforge.toscanaj.gui.dialog.ColumnChooserDialog;
+import net.sourceforge.toscanaj.gui.dialog.AttributeSelectionDialog;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
@@ -85,7 +85,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
     private DiagramEditingView diagramView;
     private DatabaseConnectionInformationView connectionInformationView;
     private XMLEditorDialog schemaDescriptionView;
-    private ColumnChooserDialog columnChooserDialog;
+    private AttributeSelectionDialog columnChooserDialog;
     private static final DimensionCreationStrategy DimensionStrategy = new DefaultDimensionStrategy();
 
     public LuccaMainPanel() {
@@ -177,7 +177,7 @@ public class LuccaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo(), eventBroker);
 
         schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
-        columnChooserDialog = new ColumnChooserDialog(this, "Choose Column", this.databaseConnection, eventBroker);
+        columnChooserDialog = new AttributeSelectionDialog(this, "Choose Column", this.databaseConnection, eventBroker);
     }
 
 

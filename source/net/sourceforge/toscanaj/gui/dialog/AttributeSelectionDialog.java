@@ -3,7 +3,7 @@
  * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
- * $Id: XMLEditorDialog.java,v 1.2 2002/11/27 05:59:17 peterbecker Exp $
+ * $Id$
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
@@ -26,7 +26,7 @@ import net.sourceforge.toscanaj.view.database.SQLTypeMapper;
 import java.awt.*;
 import java.util.Iterator;
 
-public class ColumnChooserDialog extends JDialog implements EventBrokerListener {
+public class AttributeSelectionDialog extends JDialog implements EventBrokerListener {
 	private DatabaseConnection connection;
 
     private DefaultListModel tablesList;
@@ -129,7 +129,7 @@ public class ColumnChooserDialog extends JDialog implements EventBrokerListener 
         }
     }
 
-    public ColumnChooserDialog(Frame aFrame, String title, DatabaseConnection connection, EventBroker eventBroker) {
+    public AttributeSelectionDialog(Frame aFrame, String title, DatabaseConnection connection, EventBroker eventBroker) {
         super(aFrame, true);
         setTitle(title);
         this.connection = connection;
