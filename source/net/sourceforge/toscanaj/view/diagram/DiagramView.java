@@ -46,6 +46,26 @@ public class DiagramView extends Canvas implements ChangeObserver {
     private ConceptInterpreter conceptInterpreter;
 
     private ConceptInterpretationContext conceptInterpretationContext;
+    /**
+     * Currently we don't use selection.
+     */
+    static final public int NO_SELECTION = -1;
+    /**
+     * Node displays nothing selected
+     */
+    static final public int NOT_SELECTED = 0;
+    /**
+     * Node displays the currently selected concept.
+     */
+    static final public int SELECTED_DIRECTLY = 1;
+    /**
+     * Node displays a concept in the filter of the currently selected concept.
+     */
+    static final public int SELECTED_FILTER = 2;
+    /**
+     * Node displays a concept in the ideal of the currently selected concept.
+     */
+    static final public int SELECTED_IDEAL = 4;
 
     class ResizeListener extends ComponentAdapter {
         public void componentResized(ComponentEvent e) {
@@ -246,6 +266,10 @@ public class DiagramView extends Canvas implements ChangeObserver {
             if (cur instanceof NodeView) {
                 NodeView nv = (NodeView) cur;
                 nv.setSelectedConcepts(concepts);
+            }
+            if (cur instanceof LabelView) {
+                LabelView lv = (LabelView) cur;
+                lv.setSelectedConcepts(concepts);
             }
             if (cur instanceof LineView) {
                 LineView lv = (LineView) cur;

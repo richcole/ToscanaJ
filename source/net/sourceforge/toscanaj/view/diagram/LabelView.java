@@ -1,6 +1,6 @@
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
- * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au). 
+ * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
  * $Id$
@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.view.diagram;
 import net.sourceforge.toscanaj.canvas.CanvasItem;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 
@@ -19,6 +20,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class encapsulates all generic label drawing code.
@@ -90,6 +92,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      * This is the number of items currently displayed.
      */
     protected int displayLines = DEFAULT_DISPLAY_LINES;
+
+    private int selectionState = DiagramView.NO_SELECTION;
 
     /**
      * The first item displayed in the list.
@@ -189,6 +193,11 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         if (this.displayLines == 0) {
             return;
         }
+
+        if (hideIfUnselected() && (this.selectionState == DiagramView.NOT_SELECTED)) {
+            return;
+        }
+
         // remember some settings to restore them later
         Paint oldPaint = graphics.getPaint();
 
@@ -222,22 +231,37 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
             y = y + radius;
         }
 
+        // find colors to use
+        DiagramSchema diagramSchema = DiagramSchema.getDiagramSchema();
+        Color lineColor = diagramSchema.getLineColor();
+        Color backgroundColor = this.labelInfo.getBackgroundColor();
+        Color textColor = this.labelInfo.getTextColor();
+        Color scrollbarColorDark = Color.gray;
+        Color scrollbarColorLight = Color.lightGray;
+        if (this.selectionState == DiagramView.NOT_SELECTED) {
+            // lighten
+            lineColor = diagramSchema.fadeOut(lineColor);
+            backgroundColor = diagramSchema.fadeOut(backgroundColor);
+            textColor = diagramSchema.fadeOut(textColor);
+            scrollbarColorDark = diagramSchema.fadeOut(scrollbarColorDark);
+            scrollbarColorLight = diagramSchema.fadeOut(scrollbarColorLight);
+        }
+
         // draw a dashed line from the given point to the calculated
         Stroke oldStroke = graphics.getStroke();
         float[] dashstyle = {4, 4};
-        graphics.setPaint(DiagramSchema.getDiagramSchema().getLineColor());
+        graphics.setPaint(lineColor);
         graphics.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT,
                 BasicStroke.JOIN_BEVEL, 1, dashstyle, 0));
         graphics.draw(new Line2D.Double(x, y, xPos + lw / 2, y + this.labelInfo.getOffset().getY()));
 
-        graphics.setPaint(DiagramSchema.getDiagramSchema().getForegroundColor());
         graphics.setStroke(oldStroke);
 
         // draw the label itself
         this.rect = new Rectangle2D.Double(xPos, yPos, lw, lh);
-        graphics.setPaint(this.labelInfo.getBackgroundColor());
+        graphics.setPaint(backgroundColor);
         graphics.fill(rect);
-        graphics.setPaint(this.labelInfo.getTextColor());
+        graphics.setPaint(textColor);
         graphics.draw(rect);
 
         // draw the object names
@@ -294,9 +318,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
             xpoints[2] = (int) (xleft + width);
             ypoints[2] = (int) (ytop + height);
             if (this.firstItem != 0) {
-                graphics.setPaint(Color.gray);
+                graphics.setPaint(scrollbarColorDark);
             } else {
-                graphics.setPaint(Color.lightGray);
+                graphics.setPaint(scrollbarColorLight);
             }
             graphics.fill(new Polygon(xpoints, ypoints, 3));
             // draw the downwards triangle
@@ -308,9 +332,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
             xpoints[2] = (int) (xleft + width);
             ypoints[2] = (int) (ytop);
             if (this.firstItem + this.displayLines < numItems) {
-                graphics.setPaint(Color.gray);
+                graphics.setPaint(scrollbarColorDark);
             } else {
-                graphics.setPaint(Color.lightGray);
+                graphics.setPaint(scrollbarColorLight);
             }
             graphics.fill(new Polygon(xpoints, ypoints, 3));
             // draw the current position
@@ -318,11 +342,11 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
             width = 0.8 * width;
             xleft = xPos + lw - this.scrollbarWidth + (this.scrollbarWidth - width) / 2;
             ytop = yPos + this.lineHeight;
-            graphics.setPaint(Color.lightGray);
+            graphics.setPaint(scrollbarColorLight);
             graphics.fill(new Rectangle2D.Double(xleft, ytop + this.firstItem * scale,
                     width, this.displayLines * scale));
             // draw the resize handle
-            graphics.setPaint(Color.gray);
+            graphics.setPaint(scrollbarColorDark);
             graphics.fill(new Ellipse2D.Double(xleft,
                     yPos + (this.displayLines - 1) * this.lineHeight +
                     (this.lineHeight - height) / 2,
@@ -394,6 +418,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      */
     public boolean containsPoint(Point2D point) {
         if (this.rect == null) {
+            return false;
+        }
+        if (hideIfUnselected() && (this.selectionState == DiagramView.NOT_SELECTED)) {
             return false;
         }
         return this.rect.contains(point);
@@ -513,6 +540,50 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         }
         int lineHit = (int) ((pos.getY() - this.rect.getY()) / this.lineHeight);
         return lineHit + this.firstItem;
+    }
+
+    public void setSelectedConcepts(List concepts) {
+        if ((concepts == null) || (concepts.size() == 0)) {
+            this.selectionState = DiagramView.NO_SELECTION;
+            return;
+        }
+        Iterator it = concepts.iterator();
+        while (it.hasNext()) {
+            Concept selectedConcept = (Concept) it.next();
+            Concept ourConcept = this.labelInfo.getNode().getConcept();
+            if (ourConcept == selectedConcept) {
+                this.selectionState = DiagramView.SELECTED_DIRECTLY;
+                diagramView.raiseItem(this);
+                return;
+            } else if (highlightedInIdeal() && ourConcept.hasSuperConcept(selectedConcept)) {
+                this.selectionState = DiagramView.SELECTED_IDEAL;
+                diagramView.raiseItem(this);
+                return;
+            } else if (highlightedInFilter() && ourConcept.hasSubConcept(selectedConcept)) {
+                this.selectionState = DiagramView.SELECTED_FILTER;
+                diagramView.raiseItem(this);
+                return;
+            }
+        }
+        this.selectionState = DiagramView.NOT_SELECTED;
+        return;
+    }
+
+    abstract protected boolean highlightedInIdeal();
+
+    abstract protected boolean highlightedInFilter();
+
+    protected boolean hideIfUnselected() {
+        return false;
+    }
+
+    /**
+     * Returns the information if and how the label is selected.
+     *
+     * @see NodeView.setSelectedConcept(Concept)
+     */
+    public int getSelectionState() {
+        return this.selectionState;
     }
 
     abstract protected int getNumberOfEntries();

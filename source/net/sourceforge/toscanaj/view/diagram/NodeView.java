@@ -28,31 +28,6 @@ import java.util.List;
 
 public class NodeView extends CanvasItem {
     /**
-     * Currently we don't use selection.
-     */
-    static final public int NO_SELECTION = -1;
-
-    /**
-     * Node displays nothing selected
-     */
-    static final public int NOT_SELECTED = 0;
-
-    /**
-     * Node displays the currently selected concept.
-     */
-    static final public int SELECTED_DIRECTLY = 1;
-
-    /**
-     * Node displays a concept in the filter of the currently selected concept.
-     */
-    static final public int SELECTED_FILTER = 2;
-
-    /**
-     * Node displays a concept in the ideal of the currently selected concept.
-     */
-    static final public int SELECTED_IDEAL = 4;
-
-    /**
      * Store the node model for this view
      */
     private DiagramNode diagramNode = null;
@@ -67,7 +42,7 @@ public class NodeView extends CanvasItem {
      *
      * @see #getSelectionState()
      */
-    private int selectionState = NO_SELECTION;
+    private int selectionState = DiagramView.NO_SELECTION;
 
     /**
      * Construct a nodeView for a Node.
@@ -101,17 +76,17 @@ public class NodeView extends CanvasItem {
         }
         Stroke oldStroke = graphics.getStroke();
         int selectionLineWidth = diagramSchema.getSelectionLineWidth();
-        if (this.selectionState != NO_SELECTION) {
-            if (this.selectionState == SELECTED_DIRECTLY) {
+        if (this.selectionState != DiagramView.NO_SELECTION) {
+            if (this.selectionState == DiagramView.SELECTED_DIRECTLY) {
                 graphics.setStroke(new BasicStroke(selectionLineWidth));
                 circleColor = diagramSchema.getCircleSelectionColor();
-            } else if (this.selectionState == SELECTED_IDEAL) {
+            } else if (this.selectionState == DiagramView.SELECTED_IDEAL) {
                 graphics.setStroke(new BasicStroke(selectionLineWidth));
                 circleColor = diagramSchema.getCircleIdealColor();
-            } else if (this.selectionState == SELECTED_FILTER) {
+            } else if (this.selectionState == DiagramView.SELECTED_FILTER) {
                 graphics.setStroke(new BasicStroke(selectionLineWidth));
                 circleColor = diagramSchema.getCircleFilterColor();
-            } else if (this.selectionState == NOT_SELECTED) {
+            } else if (this.selectionState == DiagramView.NOT_SELECTED) {
                 // lighten
                 nodeColor = diagramSchema.fadeOut(nodeColor);
                 circleColor = diagramSchema.fadeOut(circleColor);
@@ -196,26 +171,26 @@ public class NodeView extends CanvasItem {
      */
     public void setSelectedConcepts(List concepts) {
         if ((concepts == null) || (concepts.size() == 0)) {
-            this.selectionState = NO_SELECTION;
+            this.selectionState = DiagramView.NO_SELECTION;
             return;
         }
         Iterator it = concepts.iterator();
         while (it.hasNext()) {
             Concept concept = (Concept) it.next();
             if (this.diagramNode.getConcept() == concept) {
-                this.selectionState = SELECTED_DIRECTLY;
+                this.selectionState = DiagramView.SELECTED_DIRECTLY;
                 return;
             }
             if (this.diagramNode.getConcept().hasSuperConcept(concept)) {
-                this.selectionState = SELECTED_IDEAL;
+                this.selectionState = DiagramView.SELECTED_IDEAL;
                 return;
             }
             if (this.diagramNode.getConcept().hasSubConcept(concept)) {
-                this.selectionState = SELECTED_FILTER;
+                this.selectionState = DiagramView.SELECTED_FILTER;
                 return;
             }
         }
-        this.selectionState = NOT_SELECTED;
+        this.selectionState = DiagramView.NOT_SELECTED;
         return;
     }
 

@@ -32,7 +32,7 @@ public class LineView extends CanvasItem {
      *
      * @see setSelectedConcept(Concept)
      */
-    private int selectionState = NodeView.NO_SELECTION;
+    private int selectionState = DiagramView.NO_SELECTION;
 
     /**
      * Creates a view for the given DiagramLine.
@@ -54,16 +54,16 @@ public class LineView extends CanvasItem {
         if (this.diagramLine.getFromNode().getY() > this.diagramLine.getToNode().getY()) {
             graphics.setPaint(Color.red);
             graphics.setStroke(new BasicStroke(3));
-        } else if (this.selectionState == NodeView.NO_SELECTION) {
+        } else if (this.selectionState == DiagramView.NO_SELECTION) {
             graphics.setPaint(diagramSchema.getLineColor());
             graphics.setStroke(new BasicStroke(1));
-        } else if (this.selectionState == NodeView.SELECTED_IDEAL) {
+        } else if (this.selectionState == DiagramView.SELECTED_IDEAL) {
             graphics.setPaint(diagramSchema.getCircleIdealColor());
             graphics.setStroke(new BasicStroke(selectionLineWidth));
-        } else if (this.selectionState == NodeView.SELECTED_FILTER) {
+        } else if (this.selectionState == DiagramView.SELECTED_FILTER) {
             graphics.setPaint(diagramSchema.getCircleFilterColor());
             graphics.setStroke(new BasicStroke(selectionLineWidth));
-        } else if (this.selectionState == NodeView.NOT_SELECTED) {
+        } else if (this.selectionState == DiagramView.NOT_SELECTED) {
             graphics.setPaint(diagramSchema.fadeOut(diagramSchema.getLineColor()));
         }
         graphics.draw(new Line2D.Double(from, to));
@@ -110,7 +110,7 @@ public class LineView extends CanvasItem {
      */
     public void setSelectedConcepts(List concepts) {
         if ((concepts == null) || (concepts.size() == 0)) {
-            this.selectionState = NodeView.NO_SELECTION;
+            this.selectionState = DiagramView.NO_SELECTION;
             return;
         }
         Iterator it = concepts.iterator();
@@ -118,16 +118,16 @@ public class LineView extends CanvasItem {
             Concept concept = (Concept) it.next();
             Concept from = this.diagramLine.getFromNode().getConcept();
             if ((from == concept) || (from.hasSuperConcept(concept))) {
-                this.selectionState = NodeView.SELECTED_IDEAL;
+                this.selectionState = DiagramView.SELECTED_IDEAL;
                 return;
             }
             Concept to = this.diagramLine.getToNode().getConcept();
             if ((to == concept) || (to.hasSubConcept(concept))) {
-                this.selectionState = NodeView.SELECTED_FILTER;
+                this.selectionState = DiagramView.SELECTED_FILTER;
                 return;
             }
         }
-        this.selectionState = NodeView.NOT_SELECTED;
+        this.selectionState = DiagramView.NOT_SELECTED;
         return;
     }
 

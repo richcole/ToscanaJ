@@ -16,10 +16,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * A generic drawing canvas with z-order and controller structure.
@@ -47,7 +45,9 @@ public class Canvas extends JPanel implements Printable {
     /**
      * A list of all canvas items to draw on top of the background.
      */
-    protected List canvasItems = new LinkedList();
+    protected List canvasItems = new ArrayList();
+
+    protected List itemsToRaise = new ArrayList();
 
     /**
      * Stores the transformation matrix we used on the last draw event.
@@ -87,13 +87,24 @@ public class Canvas extends JPanel implements Printable {
      * Paints the canvas including all CanvasItems on it.
      */
     public void paintCanvas(Graphics2D graphics) {
+        /// @todo isn't that superflous?
         this.background.draw(graphics);
+        raiseMarkedItems();
         // paint all items on canvas
         Iterator it = this.canvasItems.iterator();
         while (it.hasNext()) {
             CanvasItem cur = (CanvasItem) it.next();
             cur.draw(graphics);
         }
+    }
+
+    private void raiseMarkedItems() {
+        for (Iterator iterator = itemsToRaise.iterator(); iterator.hasNext();) {
+            CanvasItem canvasItem = (CanvasItem) iterator.next();
+            this.canvasItems.remove(canvasItem);
+            this.canvasItems.add(canvasItem);
+        }
+        this.itemsToRaise.clear();
     }
 
     /**
@@ -231,6 +242,12 @@ public class Canvas extends JPanel implements Printable {
             }
         }
         return background;
+    }
+
+    public void raiseItem(CanvasItem item) {
+        // can not be done here since this would easily cause ConcurrentModificationExceptions whenever someone iterates
+        // over the items and calls this
+        this.itemsToRaise.add(item);
     }
 
     /**

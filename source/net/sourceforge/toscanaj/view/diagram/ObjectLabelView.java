@@ -140,4 +140,16 @@ public class ObjectLabelView extends LabelView {
         }
         return (DatabaseRetrievedObject) this.queryResults.get(itemHit);
     }
+
+    protected boolean highlightedInIdeal() {
+        return true;
+    }
+
+    protected boolean highlightedInFilter() {
+        return false;
+    }
+
+    protected boolean hideIfUnselected() {
+        return true;
+    }
 }
