@@ -23,7 +23,7 @@ import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 public class InterSequenceTransitionArrow extends TransitionArrow {
     private static class Factory implements ExtraCanvasItemFactory {
         public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) {
-            System.out.println("Here ISTA");
+            // @todo implement
             return null;
         }
     }
@@ -41,7 +41,7 @@ public class InterSequenceTransitionArrow extends TransitionArrow {
     	this.endColor = secondColor;
     }
 
-    protected Paint calculatePaint(float arrowLength) {
+    protected Paint calculatePaint(float arrowLength, Color baseColor) {
         AnimationTimeController controller = this.timeController;
 
         double timeOffset = controller.getCurrentTime() - this.timePos;
@@ -57,7 +57,6 @@ public class InterSequenceTransitionArrow extends TransitionArrow {
         } else {
             return null;
         }
-        Color baseColor = this.style.getColor();
         Color finalStartColor = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(),
                           (int) (alpha * baseColor.getAlpha()));
         Color finalEndColor = new Color(this.endColor.getRed(), this.endColor.getGreen(), this.endColor.getBlue(),

@@ -93,7 +93,7 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
         float length = (float) Math.sqrt((startX - endX) * (startX - endX) +
                                           (startY - endY) * (startY - endY));
 
-        Paint paint = calculatePaint(length);
+        Paint paint = calculatePaint(length, this.style.getColor());
         if(paint == null) { // nothing to draw
         	this.currentShape = null;
         	return;
@@ -115,7 +115,7 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
 
         g.setPaint(paint);
         g.fill(currentShape);
-        g.setPaint(Color.BLACK);
+        g.setPaint(calculatePaint(length, Color.BLACK));
         g.draw(currentShape);
     	
         g.setStroke(oldStroke);
@@ -142,8 +142,8 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
         return arrow;
     }
 
-    protected Paint calculatePaint(float arrowLength) {
-        AnimationTimeController controller = this.timeController;
+    protected Paint calculatePaint(float arrowLength, Color baseColor) {
+    	AnimationTimeController controller = this.timeController;
 
         double timeOffset = controller.getCurrentTime() - this.timePos;
         double alpha = 0;
@@ -158,7 +158,6 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
         } else {
             return null;
         }
-        Color baseColor = this.style.getColor();
         Color finalColor = new Color(baseColor.getRed(), baseColor.getGreen(), baseColor.getBlue(),
                           (int) (alpha * baseColor.getAlpha()));
 
