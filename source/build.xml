@@ -31,7 +31,7 @@
 		<delete dir="${doc.dir}"/>
 	</target>
 	<target name="compile" depends="prepare">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" debug="on" optimize="off" deprecation="off">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" debug="on" optimize="off" deprecation="on">
 			<classpath refid="project.class.path"/>
 		</javac>
 	</target>
