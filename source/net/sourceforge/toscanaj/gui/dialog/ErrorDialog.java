@@ -59,7 +59,6 @@ public class ErrorDialog {
      * error message if required.
      */
     private void showDetailedErrorMsg(Component component, Throwable e, String title, String errorMsg) {
-        ///@TODO an interface is requird for all toscanaJ exceptions
         Throwable original = null;
         if (e instanceof ImageGenerationException) {
             original = ((ImageGenerationException) e).getOriginal();
@@ -67,6 +66,8 @@ public class ErrorDialog {
             original = ((DataFormatException) e).getOriginal();
         } else if (e instanceof DatabaseException) {
             original = ((DatabaseException) e).getCause();
+        } else {
+        	original = e.getCause();
         }
         if (original == null) {
             new ErrorDialog(component, title, errorMsg);
@@ -82,10 +83,7 @@ public class ErrorDialog {
                 options,
                 options[0]);
         if (n == 1) {
-            JOptionPane.showMessageDialog(component,
-                    original.getMessage(),
-                    title,
-                    JOptionPane.ERROR_MESSAGE);
+        	ErrorDialog.showError(component, original, title, original.getMessage());
         }
     }
 
