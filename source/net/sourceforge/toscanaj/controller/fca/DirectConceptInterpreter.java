@@ -10,7 +10,11 @@ package net.sourceforge.toscanaj.controller.fca;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Hashtable;
+import java.util.TreeSet;
 
 ///@todo this class does not allow nesting and filtering at the moment (or does it?)
 
@@ -27,7 +31,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
 				contextContingents = new Hashtable();
 				contingents.put(context, contextContingents);
 			}
-		  	TreeSet contingent = (TreeSet) contingents.get(concept);
+		  	Set contingent = (Set) contingents.get(concept);
 			if (contingent == null) {
 	            contingent = calculateContingent(concept, context);
 	            contextContingents.put(concept, contingent);
@@ -43,7 +47,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
 				contextExtents = new Hashtable();
 				extents.put(context, contextExtents);
 			}
-			TreeSet extent = (TreeSet) contextExtents.get(concept);
+			Set extent = (Set) contextExtents.get(concept);
 			if (extent == null) {
 				extent = calculateExtent(concept, context);
 				contextExtents.put(concept, extent);
@@ -67,7 +71,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
 		return contingent.size();
 	}
 
-    private TreeSet calculateContingent(Concept concept, ConceptInterpretationContext context) {
+    private Set calculateContingent(Concept concept, ConceptInterpretationContext context) {
 		TreeSet retVal = new TreeSet();
         Iterator objectContingentIterator = concept.getObjectContingentIterator();
         while (objectContingentIterator.hasNext()) {
@@ -162,7 +166,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterperter
         }
     }
 
-    private TreeSet calculateExtent(Concept concept, ConceptInterpretationContext context) {
+    private Set calculateExtent(Concept concept, ConceptInterpretationContext context) {
         TreeSet retVal = new TreeSet();
         Iterator extentContingentIterator = concept.getExtentIterator();
         while (extentContingentIterator.hasNext()) {
