@@ -109,9 +109,9 @@ public class DatabaseReportGeneratorManager
     {
         return this.parameters;
     }
-    public DatabaseInfo getDatabaseInfo()
+    public String getTableName()
     {
-        return this.databaseInfo;
+        return this.databaseInfo.getTableName();
     }
     public DBConnection getConnection()
     {

@@ -8,6 +8,7 @@ import java.awt.Frame;
 
 import javax.swing.JOptionPane;
 
+import java.net.URL;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.LinkedList;
 
 import org.jdom.Element;
+import org.jdom.input.DOMBuilder;
 
 public class DatabaseViewerManager
 {
@@ -28,7 +30,8 @@ public class DatabaseViewerManager
     private Dictionary parameters = new Hashtable();
     private DatabaseInfo databaseInfo;
     private DBConnection dbConnection;
-    public DatabaseViewerManager(Element viewerDefinition, DatabaseInfo databaseInfo, DBConnection connection)
+    private URL baseURL;
+    public DatabaseViewerManager(Element viewerDefinition, DatabaseInfo databaseInfo, DBConnection connection, URL baseURL)
             throws DatabaseViewerInitializationException
     {
         screenName = viewerDefinition.getAttributeValue("name");
@@ -44,6 +47,7 @@ public class DatabaseViewerManager
         }
         this.databaseInfo = databaseInfo;
         this.dbConnection = connection;
+        this.baseURL = baseURL;
         // register the viewer object as last step, after all info has been set (which is used by the viewer)
         String className = viewerDefinition.getAttributeValue("class");
         if( className == null )
@@ -96,7 +100,13 @@ public class DatabaseViewerManager
     }
     public Element getTemplate()
     {
-        return this.template;
+        String url = this.template.getAttributeValue("url");
+        if( url != null ) {
+            return insertXML(template);
+        }
+        else {
+            return this.template;
+        }
     }
     public String getTemplateString()
     {
@@ -104,7 +114,46 @@ public class DatabaseViewerManager
         {
             return null;
         }
-        return this.template.getText();
+        else {
+            String url = this.template.getAttributeValue("url");
+            if( url != null ) {
+                return loadText(template);
+            }
+            else {
+                return this.template.getText();
+            }
+        }
+    }
+    protected Element insertXML(Element elem)
+    {
+        String urlAttr = elem.getAttributeValue("url");
+        if( urlAttr == null ) {
+            return elem;
+        }
+        try
+        {
+            URL url = new URL(this.baseURL, urlAttr);
+            DOMBuilder builder =
+                            new DOMBuilder( "org.jdom.adapters.XercesDOMAdapter" );
+            org.jdom.Document doc = builder.build( url );
+            Element root = doc.getRootElement();
+            root.detach();
+            elem.addContent(root);
+        }
+        catch(Exception e) {
+            /// @todo handle exceptions, give feedback
+            e.printStackTrace();
+        }
+        return elem;
+        /// @todo implement
+    }
+    protected String loadText(Element elem) {
+        String urlAttr = elem.getAttributeValue("url");
+        if( urlAttr == null ) {
+            return null;
+        }
+        /// @todo implement
+        return "not yet implemented";
     }
     public Dictionary getParameters()
     {

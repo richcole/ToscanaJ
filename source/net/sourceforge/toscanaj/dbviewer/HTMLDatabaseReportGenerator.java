@@ -56,9 +56,13 @@ public class HTMLDatabaseReportGenerator implements DatabaseReportGenerator
         
         private Element repetitionBlock = null;
         
-        private List fieldElements = new LinkedList();
+        private List singleFieldElements = new LinkedList();
 
-        private List fieldNames = new LinkedList();
+        private List singleFieldNames = new LinkedList();
+
+        private List repeatedFieldElements = new LinkedList();
+
+        private List repeatedFieldNames = new LinkedList();
 
         private Document document;
 
@@ -97,6 +101,7 @@ public class HTMLDatabaseReportGenerator implements DatabaseReportGenerator
                 throw new DatabaseViewerInitializationException("Could not parse template.", e);
             }
 
+            // find <repeat> and non-repeat <field>s first
             List queue = new LinkedList();
             queue.add(this.document.getRootElement());
             while(!queue.isEmpty())
@@ -105,24 +110,37 @@ public class HTMLDatabaseReportGenerator implements DatabaseReportGenerator
                 queue.addAll(elem.getChildren());
                 if(elem.getName().equals("repeat"))
                 {
+                    if(repeatElement != null) {
+                        throw new DatabaseViewerInitializationException("Two repeat sections found in template.");
+                    }
                     repeatElement = elem;
                     repetitionBlock = (Element)elem.clone();
                     /// @todo find some way to neutralize <repeat>
                 }
-            }
-
-            queue = new LinkedList();
-            queue.add(repetitionBlock);
-            while(!queue.isEmpty())
-            {
-                Element elem = (Element) queue.remove(0);
-                queue.addAll(elem.getChildren());
                 if(elem.getName().equals("field"))
                 {
-                    fieldElements.add(elem);
-                    fieldNames.add(elem.getAttributeValue("name"));
+                    singleFieldElements.add(elem);
+                    singleFieldNames.add(elem.getAttributeValue("content"));
                     elem.setName("span");
-                    elem.removeAttribute("name");
+                    elem.removeAttribute("content");
+                }
+            }
+
+            // find repeated fields
+            if(repeatElement != null) {
+                queue = new LinkedList();
+                queue.add(repetitionBlock);
+                while(!queue.isEmpty())
+                {
+                    Element elem = (Element) queue.remove(0);
+                    queue.addAll(elem.getChildren());
+                    if(elem.getName().equals("field"))
+                    {
+                        repeatedFieldElements.add(elem);
+                        repeatedFieldNames.add(elem.getAttributeValue("content"));
+                        elem.setName("span");
+                        elem.removeAttribute("content");
+                    }
                 }
             }
 
@@ -159,25 +177,38 @@ public class HTMLDatabaseReportGenerator implements DatabaseReportGenerator
         {
             try
             {
-                List results = this.viewerManager.getConnection().executeQuery(fieldNames,
-                                                                             viewerManager.getDatabaseInfo().getTableName(),
+                List results = this.viewerManager.getConnection().executeQuery(singleFieldNames,
+                                                                             viewerManager.getTableName(),
                                                                              whereClause);
-                /// @todo remove all content, not just children
-                repeatElement.removeChildren();
-                Iterator it = results.iterator();
-                while(it.hasNext()) 
+                Vector fields = (Vector)results.get(0);
+                Iterator itFields = fields.iterator();
+                Iterator itElems = singleFieldElements.iterator();
+                while( itFields.hasNext() )
                 {
-                    Vector fields = (Vector)it.next();
-                    Iterator itFields = fields.iterator();
-                    Iterator itElems = fieldElements.iterator();
-                    while( itFields.hasNext() )
+                    String result = (String) itFields.next();
+                    Element fieldElem = (Element) itElems.next();
+                    fieldElem.setText(result);
+                }
+                if(repeatElement != null) {
+                    results = this.viewerManager.getConnection().executeQuery(repeatedFieldNames,
+                                                                                 viewerManager.getTableName(),
+                                                                                 whereClause);
+                    repeatElement.setContent(null);
+                    Iterator it = results.iterator();
+                    while(it.hasNext()) 
                     {
-                        String result = (String) itFields.next();
-                        Element fieldElem = (Element) itElems.next();
-                        fieldElem.setText(result);
+                        fields = (Vector)it.next();
+                        itFields = fields.iterator();
+                        itElems = repeatedFieldElements.iterator();
+                        while( itFields.hasNext() )
+                        {
+                            String result = (String) itFields.next();
+                            Element fieldElem = (Element) itElems.next();
+                            fieldElem.setText(result);
+                        }
+                        /// @todo only the content of repetitionBlock should be added (but _all_ content, not just elements)
+                        repeatElement.addContent((Element)repetitionBlock.clone());
                     }
-                    /// @todo only the content of repetitionBlock should be added (but _all_ content, not just elements)
-                    repeatElement.addContent((Element)repetitionBlock.clone());
                 }
                 XMLOutputter outputter = new XMLOutputter();
                 outputter.setOmitDeclaration(true);

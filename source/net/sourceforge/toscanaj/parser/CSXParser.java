@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -111,7 +112,7 @@ public class CSXParser
         // parse the different sections
         parseDescription();
         parseDatabaseInformation();
-        parseDatabaseViewerSetups();
+        parseDatabaseViewerSetups(csxFile.toURL());
         parseDatabaseReportSetups();
         parseContext();
         parseDiagrams();
@@ -162,7 +163,7 @@ public class CSXParser
         }
     }
 
-    private static void parseDatabaseViewerSetups()
+    private static void parseDatabaseViewerSetups(URL baseURL)
         throws DataFormatException
     {
         List viewerElems = _Document.getRootElement().getChildren("viewer");
@@ -172,7 +173,7 @@ public class CSXParser
             Element viewerElem = (Element) it.next();
             try
             {
-                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection);
+                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection, baseURL);
             }
             catch( DatabaseViewerInitializationException e )
             {

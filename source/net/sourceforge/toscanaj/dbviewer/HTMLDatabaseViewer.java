@@ -52,6 +52,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer
 
         private List fieldNames = new LinkedList();
 
+        /// @todo use just an Element instead -- no need to have a document
         private Document document;
 
         public HTMLDatabaseViewerDialog( Frame frame, DatabaseViewerManager viewerManager)
@@ -61,34 +62,12 @@ public class HTMLDatabaseViewer implements DatabaseViewer
 
             this.viewerManager = viewerManager;
 
-            String templateFile = (String) viewerManager.getParameters().get("template");
+            this.document = new Document((Element)viewerManager.getTemplate().getChild("html").clone());
+
+            if(this.document.getRootElement() == null) {
+                throw new DatabaseViewerInitializationException("Could not find <html> in the template");
+            }
             
-            if( templateFile == null )
-            {
-                throw new DatabaseViewerInitializationException("No template parameter given.");
-            }
-            InputStream in;
-            try{
-                in = new FileInputStream( templateFile );
-            }
-            catch (Exception e)
-            {
-                throw new DatabaseViewerInitializationException("Could not open file '" + templateFile + "'", e);
-            }
-            try
-            {
-                DOMAdapter domAdapter = new org.jdom.adapters.XercesDOMAdapter();
-                org.w3c.dom.Document w3cdoc = domAdapter.getDocument( in, false );
-
-                DOMBuilder builder =
-                                new DOMBuilder( "org.jdom.adapters.XercesDOMAdapter" );
-                this.document = builder.build( w3cdoc );
-            }
-            catch (Exception e)
-            {
-                throw new DatabaseViewerInitializationException("Could not parse template.", e);
-            }
-
             List queue = new LinkedList();
             queue.add(this.document.getRootElement());
             while(!queue.isEmpty())
@@ -98,9 +77,9 @@ public class HTMLDatabaseViewer implements DatabaseViewer
                 if(elem.getName().equals("field"))
                 {
                     fieldElements.add(elem);
-                    fieldNames.add(elem.getAttributeValue("name"));
+                    fieldNames.add(elem.getAttributeValue("content"));
                     elem.setName("span");
-                    elem.removeAttribute("name");
+                    elem.removeAttribute("content");
                 }
             }
 
