@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import org.tockit.canvas.imagewriter.ImageGenerationException;
 
+import java.awt.Component;
 import javax.swing.*;
 
 
@@ -26,8 +27,8 @@ public class ErrorDialog {
     /**
      * Constructor to show a simple error message
      */
-    private ErrorDialog(JFrame frame, String title, String msg) {
-        JOptionPane.showMessageDialog(frame,
+    private ErrorDialog(Component component, String title, String msg) {
+        JOptionPane.showMessageDialog(component,
                 msg, title, JOptionPane.ERROR_MESSAGE);
     }
 
@@ -37,8 +38,8 @@ public class ErrorDialog {
      * The user has the choice to view more detail of the error
      * based on the original exception thrown.
      */
-    private ErrorDialog(JFrame frame, Throwable e, String title) {
-        showDetailedErrorMsg(frame, e, title, e.getMessage());
+    private ErrorDialog(Component component, Throwable e, String title) {
+        showDetailedErrorMsg(component, e, title, e.getMessage());
     }
 
     /**
@@ -47,15 +48,15 @@ public class ErrorDialog {
      * The user has the choice to view more detail of the error
      * based on the original exception thrown.
      */
-    private ErrorDialog(JFrame frame, Throwable e, String title, String errorMsg) {
-        showDetailedErrorMsg(frame, e, title, errorMsg);
+    private ErrorDialog(Component component, Throwable e, String title, String errorMsg) {
+        showDetailedErrorMsg(component, e, title, errorMsg);
     }
 
     /**
      * Show an error dialog that gives the option to show a more detailed
      * error message if required.
      */
-    private void showDetailedErrorMsg(JFrame frame, Throwable e, String title, String errorMsg) {
+    private void showDetailedErrorMsg(Component component, Throwable e, String title, String errorMsg) {
         ///@TODO an interface is requird for all toscanaJ exceptions
         Throwable original = null;
         if (e instanceof ImageGenerationException) {
@@ -66,11 +67,11 @@ public class ErrorDialog {
             original = ((DatabaseException) e).getCause();
         }
         if (original == null) {
-            new ErrorDialog(frame, title, errorMsg);
+            new ErrorDialog(component, title, errorMsg);
             return;
         }
         Object[] options = {"OK", "Details"};
-        int n = JOptionPane.showOptionDialog(frame,
+        int n = JOptionPane.showOptionDialog(component,
                 errorMsg,
                 title,
                 JOptionPane.OK_CANCEL_OPTION,
@@ -79,7 +80,7 @@ public class ErrorDialog {
                 options,
                 options[0]);
         if (n == 1) {
-            JOptionPane.showMessageDialog(frame,
+            JOptionPane.showMessageDialog(component,
                     original.getMessage(),
                     title,
                     JOptionPane.ERROR_MESSAGE);
@@ -89,8 +90,8 @@ public class ErrorDialog {
     /**
      * Show a simple error message.
      */
-    public static void showError(JFrame frame, String title, String errorMsg) {
-        new ErrorDialog(frame, title, errorMsg);
+    public static void showError(Component component, String title, String errorMsg) {
+        new ErrorDialog(component, title, errorMsg);
     }
 
     /**
@@ -99,8 +100,8 @@ public class ErrorDialog {
      * User can see a more detail error message
      * based on original exception thrown
      */
-    public static void showError(JFrame frame, Throwable e, String title) {
-        new ErrorDialog(frame, e, title);
+    public static void showError(Component component, Throwable e, String title) {
+        new ErrorDialog(component, e, title);
     }
 
     /**
@@ -109,7 +110,7 @@ public class ErrorDialog {
      * User can see a more detail error message
      * based on original exception thrown
      */
-    public static void showError(JFrame frame, Throwable e, String title, String errorMsg) {
-        new ErrorDialog(frame, e, title, errorMsg);
+    public static void showError(Component component, Throwable e, String title, String errorMsg) {
+        new ErrorDialog(component, e, title, errorMsg);
     }
 }
