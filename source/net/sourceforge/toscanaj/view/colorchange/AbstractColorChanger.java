@@ -19,8 +19,15 @@ import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
+import java.util.logging.Logger;
 
 
+/**
+ * @todo check if there is a shorter way to do the same by supplying a ColorSpace
+ * @todo check if we handle other paints than Color somehow. At the moment we do
+ *       GradientPaint, but that won't work properly with the B&W versions -- the
+ *       result will still be grayscale
+ */
 abstract class AbstractColorChanger implements ColorChanger {
     public Graphics2D getGraphics2D(Graphics2D original) {
         return new Graphics2DWrapper(original);
@@ -34,11 +41,17 @@ abstract class AbstractColorChanger implements ColorChanger {
         public void setColor(Color c) {
             g2d.setColor(changeColor(c));
         }
-        public void setPaint(Paint paint) {
+        public void setPaint(final Paint paint) {
             if(paint instanceof Color) {
                 setColor((Color) paint);
+            } else if(paint instanceof GradientPaint){
+                GradientPaint gp = (GradientPaint) paint;
+                g2d.setPaint(new GradientPaint(gp.getPoint1(), changeColor(gp.getColor1()), 
+                                               gp.getPoint2(), changeColor(gp.getColor2()), 
+                                               gp.isCyclic()));
             } else {
                 g2d.setPaint(paint);
+                Logger.getLogger(this.getClass().getName()).warning("Unknown paint type in ColorChanger implementation");
             }
         }
         // rest is just delegation
