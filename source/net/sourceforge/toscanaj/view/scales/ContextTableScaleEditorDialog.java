@@ -19,10 +19,12 @@ public class ContextTableScaleEditorDialog extends JDialog {
     
     private boolean result;
 	private ContextImplementation context;
+	private ContextTableView tableView;
     private DatabaseConnection databaseConnection;
 
     private JTextField scaleTitleField;
     private JPanel buttonsPane;
+    private JPanel titlePane;
 	private ContextTableScaleEditorDialog contextTableScaleEditorDialog;
 	 
     public ContextTableScaleEditorDialog(Frame owner, DatabaseConnection databaseConnection) {
@@ -38,36 +40,12 @@ public class ContextTableScaleEditorDialog extends JDialog {
         setModal(true);
         setTitle("Context Table Scale Generator");
 		ConfigurationManager.restorePlacement("ContextTableScaleEditorDialog", 
-						this, new Rectangle(250, 100, 600, 450));
+						this, new Rectangle(250, 100, 500, 400));
         getContentPane().setLayout(new GridBagLayout());
 
-        // -- title pane ---
-        JPanel titlePane = new JPanel(new GridBagLayout());
-        JLabel titleLabel = new JLabel("Title:");
-        this.scaleTitleField = new JTextField();
-        
-        titlePane.add(
-                titleLabel,
-                new GridBagConstraints(
-                        0, 0, 1, 1, 0, 0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.HORIZONTAL,
-                        new Insets(5, 5, 5, 5),
-                        0, 0
-                )
-        );
-        titlePane.add(
-                scaleTitleField,
-                new GridBagConstraints(
-                        1, 0, 1, 1, 1, 0,
-                        GridBagConstraints.CENTER,
-                        GridBagConstraints.HORIZONTAL,
-                        new Insets(5, 5, 5, 5),
-                        0, 0
-                )
-        );
+     	createTitlePane();
 				
-		ContextTableView tableView = new ContextTableView(context);
+		tableView = new ContextTableView(context);
         JScrollPane scrollpane = new JScrollPane(tableView);
 		
 		createButtonsPane();
@@ -104,6 +82,32 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		);
     }
 	
+	private void createTitlePane(){
+		 titlePane = new JPanel(new GridBagLayout());
+		 JLabel titleLabel = new JLabel("Title:");
+		 this.scaleTitleField = new JTextField();
+		 titlePane.add(
+				 titleLabel,
+				 new GridBagConstraints(
+						 0, 0, 1, 1, 0, 0,
+						 GridBagConstraints.CENTER,
+						 GridBagConstraints.HORIZONTAL,
+						 new Insets(5, 5, 5, 5),
+						 0, 0
+				 )
+		 );
+		 titlePane.add(
+				 scaleTitleField,
+				 new GridBagConstraints(
+						 1, 0, 1, 1, 1, 0,
+						 GridBagConstraints.CENTER,
+						 GridBagConstraints.HORIZONTAL,
+						 new Insets(5, 5, 5, 5),
+						 0, 0
+				 )
+		 );
+	}
+	
 	private void createButtonsPane(){
 		buttonsPane = new JPanel(new GridBagLayout());
 		JButton addObj = new JButton(" Add Object ");	
@@ -115,14 +119,16 @@ public class ContextTableScaleEditorDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				String inputValue = showAddInputDialog("Add Object", "object");
 				if(inputValue!=null && !inputValue.trim().equals("")){
-					System.out.println("add obj to context");
+					context.getObjects().add(inputValue);
+					tableView.update(context);
 				}
 			}
 		});
 		addAttr.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String inputValue = showAddInputDialog("Add Attribute", "attribute");
-				System.out.println("add attr to context");
+				context.getAttributes().add(inputValue);
+				tableView.update(context);
 			}
 		});
 		create.addActionListener(new ActionListener() {
@@ -204,6 +210,7 @@ public class ContextTableScaleEditorDialog extends JDialog {
 		
 		return inputValue;
 	}
+	
 	private ContextImplementation createDummyData(){
 		ContextImplementation context = new ContextImplementation();
 		String o1 = "one";

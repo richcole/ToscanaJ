@@ -113,4 +113,8 @@ public class ContextTableView extends JComponent {
 		g2d.setPaint(oldPaint);
 	}
 	
+	protected void update(Context ctx){
+		this.context = ctx;
+		repaint();
+	}
 }
