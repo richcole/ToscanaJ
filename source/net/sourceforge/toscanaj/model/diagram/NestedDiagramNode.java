@@ -49,12 +49,8 @@ public class NestedDiagramNode extends DiagramNode {
      * Parameter scale is float due to JIT error in JDK 1.3, where in case of double
      * JIT was breaking transmission of value of scale after a while of program usage
      * , that lead to a distorted nested line diagrams.
-     * 
-     * @todo since we require 1.4 by now we could go back to double and see if
-     * it breaks.
      */
-    public NestedDiagramNode(WriteableDiagram2D outerDiagram, DiagramNode outerNode, Diagram2D innerDiagram, float scale,
-                             boolean dropAttributeLabels) {
+    public NestedDiagramNode(WriteableDiagram2D outerDiagram, DiagramNode outerNode, Diagram2D innerDiagram, double scale) {
         super(outerDiagram, "outer:" + outerNode.getIdentifier(),
                 new Point2D.Double(outerNode.getX() * OUTER_SCALE_FACTOR, 
                                    outerNode.getY() * OUTER_SCALE_FACTOR),
@@ -79,12 +75,7 @@ public class NestedDiagramNode extends DiagramNode {
             DiagramNode oldNode = innerDiagram.getNode(i);
             Point2D newPos = new Point2D.Double(oldNode.getX()/innerScale + offset.getX(),
                     oldNode.getY()/innerScale + offset.getY());
-            LabelInfo newAttrLabel;
-            if (dropAttributeLabels) {
-                newAttrLabel = null;
-            } else {
-                newAttrLabel = new LabelInfo(oldNode.getAttributeLabelInfo());
-            }
+            LabelInfo newAttrLabel = new LabelInfo(oldNode.getAttributeLabelInfo());
             LabelInfo newObjLabel = new LabelInfo(oldNode.getObjectLabelInfo());
             DiagramNode newNode = new DiagramNode(newDiag, outerNode.getIdentifier() + " x " + oldNode.getIdentifier(),
                     newPos, oldNode.getConcept(), newAttrLabel, newObjLabel, this, oldNode.getRadiusX()/innerScale, oldNode.getRadiusY()/innerScale);

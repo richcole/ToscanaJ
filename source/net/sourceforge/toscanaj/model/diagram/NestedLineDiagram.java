@@ -26,12 +26,11 @@ public class NestedLineDiagram extends SimpleLineDiagram {
      * for a diagram on top level.
      */
     public NestedLineDiagram(Diagram2D outerDiagram, Diagram2D innerDiagram) {
-        float scale = 1.2f * calculateNeededScaling(outerDiagram, innerDiagram);
+        double scale = 1.2 * calculateNeededScaling(outerDiagram, innerDiagram);
         Hashtable nodeMap = new Hashtable();
         for (int i = 0; i < outerDiagram.getNumberOfNodes(); i++) {
             DiagramNode oldNode = outerDiagram.getNode(i);
-            NestedDiagramNode node = new NestedDiagramNode(this, oldNode, innerDiagram, scale,
-                    !oldNode.getConcept().isTop());
+            NestedDiagramNode node = new NestedDiagramNode(this, oldNode, innerDiagram, scale);
             this.addNode(node);
             nodeMap.put(oldNode, node);
         }
@@ -66,7 +65,7 @@ public class NestedLineDiagram extends SimpleLineDiagram {
      * 
      * @todo handle different X and Y radii. 
      */
-    protected float calculateNeededScaling(Diagram2D outerDiagram, Diagram2D innerDiagram) {
+    protected double calculateNeededScaling(Diagram2D outerDiagram, Diagram2D innerDiagram) {
         // if we have only one node we just don't scale at all (we can make this node as
         // big as we want, if there is no node we shouldn't be called at all
         if (outerDiagram.getNumberOfNodes() < 2) {

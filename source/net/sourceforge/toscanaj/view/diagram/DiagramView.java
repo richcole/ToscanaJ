@@ -199,7 +199,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         addLayer("connectors-1");
         addLayer("labels");
         try{
-        	addDiagram(diagram, conceptInterpretationContext, 0);
+        	addDiagram(diagram, conceptInterpretationContext, 0, true);
             requestScreenTransformUpdate();
             repaint();
             this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
@@ -241,7 +241,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * If the filter concept is non-null all nodes created will use this for
      * filter operations.
      */
-    private void addDiagram(Diagram2D diagram, ConceptInterpretationContext context, int layer) {
+    private void addDiagram(Diagram2D diagram, ConceptInterpretationContext context, int layer, boolean showAttributeLabels) {
 		String lineLayerName = "lines-" + layer;
         String nodeLayerName = "nodes-" + layer;
         String labelConnectorLayerName = "connectors-" + layer;
@@ -260,7 +260,15 @@ public class DiagramView extends Canvas implements ChangeObserver {
             if (conceptInterpreter.isRealized(concept, context)) {
                 if (node instanceof NestedDiagramNode) {
 		            NestedDiagramNode ndNode = (NestedDiagramNode) node;
-		            addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept), layer + 1);
+		            boolean isTopRealizedConcept = true;
+		            for (Iterator iter = concept.getUpset().iterator();iter.hasNext();) {
+                        Concept superConcept = (Concept) iter.next();
+                        if(superConcept != concept && this.conceptInterpreter.isRealized(superConcept, this.conceptInterpretationContext)) {
+                        	isTopRealizedConcept = false;
+                        	break;
+                        }
+                    }
+                    addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept), layer + 1, isTopRealizedConcept);
                 }
                 LabelInfo objLabelInfo = diagram.getObjectLabel(i);
                 if (objLabelInfo != null && this.objectLabelFactory != null) {
@@ -270,13 +278,15 @@ public class DiagramView extends Canvas implements ChangeObserver {
                     labelView.addObserver(this);
                 }
             }
-            LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
-            if (attrLabelInfo != null) {
-                LabelView labelView = this.attributeLabelFactory.createLabelView(this, nodeView, attrLabelInfo);
-                addCanvasItem(labelView, labelLayerName);
-                addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
-                labelView.addObserver(this);
-            }
+            if(showAttributeLabels) {
+	            LabelInfo attrLabelInfo = diagram.getAttributeLabel(i);
+	            if (attrLabelInfo != null) {
+	                LabelView labelView = this.attributeLabelFactory.createLabelView(this, nodeView, attrLabelInfo);
+	                addCanvasItem(labelView, labelLayerName);
+	                addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
+	                labelView.addObserver(this);
+	            }
+			}
         }
         for (int i = 0; i < diagram.getNumberOfLines(); i++) {
             DiagramLine dl = diagram.getLine(i);
