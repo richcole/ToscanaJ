@@ -14,4 +14,8 @@ public class Column {
     public Column(String name) {
         this.name = name;
     }
+
+    public String getName() {
+        return name;
+    }
 }

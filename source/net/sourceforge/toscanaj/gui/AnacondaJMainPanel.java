@@ -20,6 +20,7 @@ import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
 import net.sourceforge.toscanaj.view.database.SchemeView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
+import net.sourceforge.toscanaj.view.scales.ScaleEditingView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -101,7 +102,7 @@ public class AnacondaJMainPanel extends JFrame implements MainPanel, BrokerEvent
 //        JPanel tableView = new JPanel();
 //        tableView.setBackground(Color.black);
 
-        JPanel scaleView = new JPanel();
+        JPanel scaleView = new ScaleEditingView(this, conceptualSchema);
         scaleView.setBackground(Color.green);
 
         diagramView = new DiagramEditingView(this, conceptualSchema);
