@@ -19,17 +19,17 @@ public abstract class KeyboardMappedAction extends AbstractAction {
      */
     public KeyboardMappedAction(
             JFrame frame,
-            int mnemonic,
+            String displayName, int mnemonic,
             KeyStroke keystroke)
     {
-        this(frame);
+        this(frame, displayName);
         this.putValue(Action.MNEMONIC_KEY, new Integer(mnemonic));
         this.putValue(Action.ACCELERATOR_KEY, keystroke);
     }
 
-    public KeyboardMappedAction(JFrame frame)
+    public KeyboardMappedAction(JFrame frame, String displayName)
     {
-        super();
+        super(displayName);
         this.frame = frame;
     }
 }

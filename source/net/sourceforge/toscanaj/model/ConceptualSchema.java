@@ -78,7 +78,7 @@ public class ConceptualSchema {
         if (databaseInfo == null) {
             return;
         }
-        DBConnection conn = new DBConnection(this.databaseInfo.getSource(), this.databaseInfo.getUserName(),
+        DBConnection conn = new DBConnection(this.databaseInfo.getURL(), this.databaseInfo.getUserName(),
                 this.databaseInfo.getPassword());
         // update all concepts
         Iterator diagIt = this.diagrams.iterator();

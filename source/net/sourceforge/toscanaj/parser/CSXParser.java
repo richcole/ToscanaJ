@@ -146,7 +146,7 @@ public class CSXParser {
             dbInfo = new DatabaseInfo();
             parseDBInfo(dbInfo, dbElem);
             /// @TODO Shouldn't this be in the main panel?
-            _DatabaseConnection = new DBConnection(dbInfo.getSource(), dbInfo.getUserName(), dbInfo.getPassword());
+            _DatabaseConnection = new DBConnection(dbInfo.getURL(), dbInfo.getUserName(), dbInfo.getPassword());
             String urlString = dbInfo.getEmbeddedSQLLocation();
             if (urlString != null) {
                 URL sqlURL;

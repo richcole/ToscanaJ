@@ -1,6 +1,6 @@
 package net.sourceforge.toscanaj.gui;
 
-import net.sourceforge.toscanaj.model.AnacondaModel;
+import net.sourceforge.toscanaj.model.ConceptualSchema;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 
@@ -14,22 +14,19 @@ import java.awt.event.*;
 
 public class AnacondaJMainPanel extends JFrame
 {
-    /**
-     * Stores the anaconda model, initially this is an empty model.
-     */
-    AnacondaModel model = new AnacondaModel();
+    private ConceptualSchema conceptualSchema = new ConceptualSchema();
 
     /**
      * Controls
      */
-    JMenuBar menuBar;
-    JMenu    helpMenu;
-    JMenu    fileMenu;
+    private JMenuBar menuBar;
+    private JMenu    helpMenu;
+    private JMenu    fileMenu;
 
     /**
      * Views
      */
-    PanelStackView mainView;
+    private PanelStackView mainView;
 
     public class PrepareToSaveActivity implements SimpleActivity
     {
@@ -62,7 +59,7 @@ public class AnacondaJMainPanel extends JFrame
     {
         mainView = new PanelStackView(this);
         mainView.setDividerLocation(ConfigurationManager.fetchInt("AnacondaJMainPanel", "divider", 200));
-        JPanel connectionInformationView = new DatabaseConnectionInformationView(this, this.model.getDatabase().getInfo());
+        JPanel connectionInformationView = new DatabaseConnectionInformationView(this, conceptualSchema.getDatabaseInfo());
         JPanel tableView = new JPanel();
         tableView.setBackground(Color.black);
         JPanel scaleView = new JPanel();
@@ -110,14 +107,13 @@ public class AnacondaJMainPanel extends JFrame
                 )
         );
         fileMenu.add(newMenuItem);
-        */
 
         // --- file open item ---
         JMenuItem openMenuItem = new JMenuItem("Open...");
         openMenuItem.addActionListener(
                 new OpenFileAction(
                         this,
-                        new AnacondaOpenFileActivity(model, this),
+                        new AnacondaOpenFileActivity(conceptualSchema, this),
                         KeyEvent.VK_O,
                         KeyStroke.getKeyStroke(
                                 KeyEvent.VK_O,
@@ -129,7 +125,7 @@ public class AnacondaJMainPanel extends JFrame
 
         JMenuItem saveMenuItem = new JMenuItem("Save...");
         AnacondaSaveFileActivity saveActivity =
-            new AnacondaSaveFileActivity(model, this);
+            new AnacondaSaveFileActivity(conceptualSchema, this);
         saveMenuItem.addActionListener(
             new SaveFileAction(
                     this,
@@ -143,6 +139,7 @@ public class AnacondaJMainPanel extends JFrame
         );
         saveActivity.setPrepareActivity(new PrepareToSaveActivity());
         fileMenu.add(saveMenuItem);
+        */
 
         // --- file exit item ---
         JMenuItem exitMenuItem;
@@ -151,7 +148,7 @@ public class AnacondaJMainPanel extends JFrame
                 new SimpleAction(
                         this,
                         new AnacondaQuitActivity(this),
-                        KeyEvent.VK_Q,
+                        "!!!unnamed!!!", KeyEvent.VK_Q,
                         KeyStroke.getKeyStroke(
                             KeyEvent.VK_F4, ActionEvent.ALT_MASK
                         )

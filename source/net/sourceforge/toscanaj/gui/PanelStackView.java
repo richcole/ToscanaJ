@@ -6,7 +6,6 @@
  */
 package net.sourceforge.toscanaj.gui;
 
-import net.sourceforge.toscanaj.model.ViewListModel;
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 
 import javax.swing.*;
@@ -16,7 +15,6 @@ import java.awt.event.ActionListener;
 
 public class PanelStackView extends JPanel {
 
-    private ViewListModel viewListModel;
     private JPanel mainPane;
     private JPanel buttonPane;
     private JSplitPane splitPane;

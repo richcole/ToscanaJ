@@ -17,9 +17,9 @@ public class SimpleAction extends KeyboardMappedAction {
     public SimpleAction(
             JFrame frame,
             SimpleActivity activity,
-            int mnemonic,
+            String displayName, int mnemonic,
             KeyStroke keystroke) {
-        super(frame, mnemonic, keystroke);
+        super(frame, displayName, mnemonic, keystroke);
         add(activity);
     }
 
@@ -27,13 +27,13 @@ public class SimpleAction extends KeyboardMappedAction {
         activityList.add(activity);
     }
 
-    public SimpleAction(JFrame frame, SimpleActivity activity) {
-        super(frame);
+    public SimpleAction(JFrame frame, String displayName, SimpleActivity activity) {
+        super(frame, displayName);
         add(activity);
     }
 
-    public SimpleAction(JFrame frame) {
-        super(frame);
+    public SimpleAction(JFrame frame, String displayName) {
+        super(frame, displayName);
     }
 
     public void actionPerformed(ActionEvent e) {

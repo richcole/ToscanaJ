@@ -25,7 +25,7 @@ public class SaveFileAction extends KeyboardMappedAction {
             int mnemonic,
             KeyStroke keystroke)
     {
-        super(frame, mnemonic, keystroke);
+        super(frame, "Save...", mnemonic, keystroke);
         this.activity = activity;
     }
 
@@ -33,7 +33,7 @@ public class SaveFileAction extends KeyboardMappedAction {
             JFrame frame,
             FileActivity activity)
     {
-        super(frame );
+        super(frame, "Save...");
         this.activity = activity;
     }
 

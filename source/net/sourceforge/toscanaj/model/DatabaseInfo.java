@@ -22,7 +22,7 @@ public class DatabaseInfo {
      *
      * This is a JDBC url.
      */
-    private String source = null;
+    private String sourceURL = null;
 
     /**
      * The table (or view) queried in the database.
@@ -39,6 +39,8 @@ public class DatabaseInfo {
     private String password = null;
 
     private String embeddedSQLLocation = null;
+
+    private String driverClass = null;
 
     public static abstract class DatabaseQuery extends Query {
         public class Column {
@@ -181,13 +183,10 @@ public class DatabaseInfo {
     }
 
     /**
-     * Returns the source where the database can be found.
-     *
-     * If type is TYPE_DSN this is the name of a data source that should be
-     * defined in the system. If type is TYPE_FILE it is a filename.
+     * Returns the JDBC url for connecting to the database.
      */
-    public String getSource() {
-        return this.source;
+    public String getURL() {
+        return this.sourceURL;
     }
 
     /**
@@ -218,7 +217,7 @@ public class DatabaseInfo {
      * Sets the given URL as DB connecion point.
      */
     public void setUrl(String url) {
-        this.source = url;
+        this.sourceURL = url;
     }
 
     public void setUserName(String userName) {
@@ -269,13 +268,21 @@ public class DatabaseInfo {
         return this.embeddedSQLLocation;
     }
 
+    public String getDriverClass() {
+        return driverClass;
+    }
+
+    public void setDriverClass(String driverClass) {
+        this.driverClass = driverClass;
+    }
+
     /**
      * Debugging info.
      */
     public String toString() {
         String result = "DatabaseInfo\n";
 
-        result += "\t" + "url: " + this.source + "\n" +
+        result += "\t" + "url: " + this.sourceURL + "\n" +
                 "\t" + "key/table: " + this.objectKey + "/" + this.table;
 
         return result;

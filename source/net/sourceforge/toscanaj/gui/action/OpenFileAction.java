@@ -25,7 +25,7 @@ public class OpenFileAction extends KeyboardMappedAction {
             int mnemonic,
             KeyStroke keystroke)
     {
-        super(frame, mnemonic, keystroke);
+        super(frame, "Open...", mnemonic, keystroke);
         this.activity = activity;
     }
 
@@ -33,7 +33,7 @@ public class OpenFileAction extends KeyboardMappedAction {
             JFrame frame,
             FileActivity activity)
     {
-        super(frame );
+        super(frame, "Open...");
         this.activity = activity;
     }
 

@@ -1,6 +1,5 @@
 package net.sourceforge.toscanaj.gui.action;
 
-import net.sourceforge.toscanaj.model.AnacondaModel;
 import net.sourceforge.toscanaj.gui.AnacondaJMainPanel;
 import net.sourceforge.toscanaj.model.XML_Reader;
 import net.sourceforge.toscanaj.model.XML_SyntaxError;
