@@ -10,9 +10,11 @@ package net.sourceforge.toscanaj.view.diagram;
 import org.tockit.canvas.CanvasItem;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 
 import java.awt.*;
 import java.awt.geom.*;
@@ -107,6 +109,26 @@ public class NodeView extends CanvasItem {
         graphics.fill(ellipse);
         graphics.setPaint(circleColor);
         graphics.draw(ellipse);
+        if(ConfigurationManager.fetchInt("NodeView","displayVectors",0) != 0) {
+            String vector;
+            if (diagramNode instanceof NDimDiagramNode) {
+                NDimDiagramNode node = (NDimDiagramNode) diagramNode;
+                double[] ndimVec = node.getNdimVector();
+                vector = "(";
+                for (int i = 0; i < ndimVec.length; i++) {
+                    double v = ndimVec[i];
+                    vector += v;
+                    if(i != ndimVec.length-1) {
+                        vector += ",";
+                    }
+                }
+                vector += ")";
+            } else {
+                vector = "(" + (int)diagramNode.getPosition().getX() + "/" + (int)diagramNode.getPosition().getY() + ")";
+            }
+            graphics.drawString(vector, (float) (diagramNode.getPosition().getX() + getRadiusX()),
+                                         (float) diagramNode.getPosition().getY());
+        }
         graphics.setPaint(oldPaint);
         graphics.setStroke(oldStroke);
     }
