@@ -957,9 +957,9 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             new ExtensionFileFilter(new String[] { "csc" }, "Conscript Files"));
             
 		JPanel optionsPanel = new JPanel(new BorderLayout());
-		JCheckBox openNewSchema = new JCheckBox("Create a new schema with this file", true);
-		optionsPanel.add(openNewSchema, BorderLayout.CENTER);
-		optionsPanel.setBorder(BorderFactory.createEmptyBorder(20, 10, 10, 10));
+		JCheckBox openNewSchema = new JCheckBox("Create a new schema", true);
+		optionsPanel.add(openNewSchema, BorderLayout.NORTH);
+		optionsPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 		openDialog.setAccessory(optionsPanel);
 
         int rv = openDialog.showOpenDialog(this);
