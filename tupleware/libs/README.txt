@@ -6,3 +6,6 @@ canvas.jar, events.jar:
   
 pluginArhitecture.jar
 	Plugin model we use to load plugins. (Source code is currently located in the Docco CVS. Same license as Tupleware).
+
+jdom.jar: 
+  JDOM, beta 9 (http://www.jdom.org, licence in LICENSE.jdom)
