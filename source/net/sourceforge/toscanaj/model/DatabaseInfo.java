@@ -5,6 +5,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import java.text.DecimalFormat;
+
 /**
  * This class contains information how to connect to a database.
  */
@@ -38,8 +43,9 @@ public class DatabaseInfo
         public String header;
         public List columnList = new LinkedList();
 
-        public DatabaseQuery(String name) {
+        public DatabaseQuery(String name, String header) {
             super(name);
+            this.header = header;
         }
 
         public void insertQueryColumn(String columnName, String columnFormat,
@@ -53,14 +59,49 @@ public class DatabaseInfo
             columnList.add(col);
         };
 
+        /**
+         * Formats a row of a result set for this query.
+         *
+         * The input is a ResultSet which is supposed to point to an existing
+         * row. Column one is supposed to be the first column of the query
+         * definition and so on.
+         *
+         * The return value is a String which returns a formatted version of the
+         * row
+         */
+        public String formatResults(ResultSet results) throws SQLException {
+            String rowRes = new String();
+            if(header != null) {
+                rowRes += header;
+            }
+            Iterator colDefIt = this.columnList.iterator();
+            int i = 0;
+            while(colDefIt.hasNext()) {
+                Column col = (Column)colDefIt.next();
+                i++;
+                if(col.format != null) {
+                    DecimalFormat format = new DecimalFormat(col.format);
+                    rowRes += format.format(results.getDouble(i));
+                }
+                else {
+                    rowRes += results.getString(i);
+                }
+                if(col.separator != null) {
+                    rowRes += col.separator;
+                }
+            }
+            return rowRes;
+        }
+
         abstract public String getQueryHead();
     };
 
     protected class ListQuery extends DatabaseQuery {
         public boolean isDistinct;
 
-        public ListQuery(String name) {
-            super(name);
+        public ListQuery(String name, String header, boolean isDistinct) {
+            super(name,header);
+            this.isDistinct = isDistinct;
         }
 
         public String getQueryHead() {
@@ -83,8 +124,8 @@ public class DatabaseInfo
 
     protected class AggregateQuery extends DatabaseQuery {
 
-        public AggregateQuery(String name) {
-            super(name);
+        public AggregateQuery(String name, String header) {
+            super(name, header);
         }
 
         public String getQueryHead() {
@@ -105,17 +146,15 @@ public class DatabaseInfo
     /**
      * Creates a new Query that will query a list.
      */
-    public DatabaseQuery createListQuery(String name, boolean isDistinct) {
-        ListQuery query = new ListQuery(name);
-        query.isDistinct = isDistinct;
-        return query;
+    public DatabaseQuery createListQuery(String name, String header, boolean isDistinct) {
+        return new ListQuery(name, header, isDistinct);
     };
 
     /**
      * Creates a new Query that will query a single number as aggregate.
      */
-    public DatabaseQuery createAggregateQuery(String name) {
-        return new AggregateQuery(name);
+    public DatabaseQuery createAggregateQuery(String name, String header) {
+        return new AggregateQuery(name, header);
     };
 
     /**

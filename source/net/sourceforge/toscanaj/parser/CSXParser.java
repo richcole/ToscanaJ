@@ -511,10 +511,10 @@ public class CSXParser
         if(queryElem == null || queryElem.getAttribute("dropDefaults") == null ||
            queryElem.getAttributeValue("dropDefaults").equals("false") ) {
             // add default queries
-            DatabaseInfo.DatabaseQuery query = dbInfo.createAggregateQuery("Number of Objects");
+            DatabaseInfo.DatabaseQuery query = dbInfo.createAggregateQuery("Number of Objects", "");
             query.insertQueryColumn("Count","0",null,"count(*)");
             _Schema.addQuery(query);
-            query = dbInfo.createListQuery("List of Objects", false);
+            query = dbInfo.createListQuery("List of Objects", "", false);
             query.insertQueryColumn("Object Name", null, null, keyName);
             _Schema.addQuery(query);
         }
@@ -525,10 +525,10 @@ public class CSXParser
                 /// @todo add error handling
                 String name = cur.getAttributeValue("name");
                 /// @todo handle the head
-                String head = cur.getAttributeValue("head");
+                String header = cur.getAttributeValue("header");
                 String distinct = cur.getAttributeValue("distinct");
                 boolean isDistinct = (distinct != null) && (distinct.equals("true"));
-                DatabaseInfo.DatabaseQuery query = dbInfo.createListQuery(name, isDistinct);
+                DatabaseInfo.DatabaseQuery query = dbInfo.createListQuery(name, header, isDistinct);
                 Iterator it2 = cur.getChildren("column").iterator();
                 while(it2.hasNext()) {
                     Element curCol = (Element) it2.next();
@@ -546,8 +546,8 @@ public class CSXParser
                 /// @todo add error handling
                 String name = cur.getAttributeValue("name");
                 /// @todo handle the head
-                String head = cur.getAttributeValue("head");
-                DatabaseInfo.DatabaseQuery query = dbInfo.createAggregateQuery(name);
+                String header = cur.getAttributeValue("header");
+                DatabaseInfo.DatabaseQuery query = dbInfo.createAggregateQuery(name, header);
                 Iterator it2 = cur.getChildren("column").iterator();
                 while(it2.hasNext()) {
                     Element curCol = (Element) it2.next();

@@ -2,6 +2,8 @@ package net.sourceforge.toscanaj.controller.db;
 
 import net.sourceforge.toscanaj.controller.ConfigurationManager;
 
+import net.sourceforge.toscanaj.model.DatabaseInfo;
+
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.*;
@@ -110,6 +112,46 @@ public class DBConnection
             printLogMessage(System.currentTimeMillis() + ": done.");
             while(resultSet.next()) {
                 result.add(resultSet.getString(column));
+            }
+        }
+        catch( SQLException se ) {
+            throw new DatabaseException("An error occured while querying the database.", se);
+        }
+        finally {
+            try {
+                if(resultSet != null) {
+                    resultSet.close();
+                }
+                stmt.close();
+            }
+            catch(SQLException e) {
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Executes the given query and returns a list of formatted Strings.
+     *
+     * The query is given as Query object given the head of the final query plus
+     * the WHERE clause for specifying the object set used. The results are formatted by
+     * DatabaseInfo.DatabaseQuery.formatResults(ResultSet).
+     */
+    public List executeQuery(DatabaseInfo.DatabaseQuery query, String whereClause) throws DatabaseException {
+        ResultSet resultSet = null;
+        Statement stmt = null;
+        List result = new LinkedList();
+
+        String statement = query.getQueryHead() + whereClause;
+
+        // submit the query
+        try {
+            stmt = con.createStatement();
+            printLogMessage(System.currentTimeMillis() + ": Executing query: " + statement);
+            resultSet = stmt.executeQuery(statement);
+            printLogMessage(System.currentTimeMillis() + ": done.");
+            while(resultSet.next()) {
+                result.add(query.formatResults(resultSet));
             }
         }
         catch( SQLException se ) {

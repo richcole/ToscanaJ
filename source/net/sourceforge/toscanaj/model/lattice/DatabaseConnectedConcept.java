@@ -201,10 +201,10 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
             List retVal = new LinkedList();
             if( this.objectClause != null ) {
                 try {
-                    String sql = dbQuery.getQueryHead() + " WHERE (";
+                    String whereClause = " WHERE (";
                     if(contingentOnly) {
                         // use only the local clause (we assume there is one)
-                        sql += this.objectClause;
+                        whereClause += this.objectClause;
                     }
                     else {
                         // aggregate all clauses from the downset
@@ -219,19 +219,19 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
                                 first = false;
                             }
                             else {
-                                sql += " OR ";
+                                whereClause += " OR ";
                             }
-                            sql += concept.objectClause;
+                            whereClause += concept.objectClause;
                         }
                     }
-                    sql += ") ";
+                    whereClause += ") ";
                     Iterator iter = this.filterClauses.iterator();
                     while (iter.hasNext()) {
                         Object item = iter.next();
-                        sql += " AND " + item;
+                        whereClause += " AND " + item;
                     }
-                    sql += ";";
-                    retVal = this.connection.queryColumn(sql,1);
+                    whereClause += ";";
+                    retVal = this.connection.executeQuery(dbQuery, whereClause);
                 }
                 catch (DatabaseException e) {
                     /// @TODO Find something useful to do here.
