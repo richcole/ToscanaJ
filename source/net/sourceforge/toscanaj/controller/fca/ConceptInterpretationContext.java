@@ -143,4 +143,12 @@ public class ConceptInterpretationContext implements ChangeObserver {
     	result = result * 37 + (this.filterMode ? 1 : 0);
     	return result;
     }
+
+    public ConceptInterpretationContext getOutermostContext() {
+        if(this.nestingContexts.size() == 0) {
+            return this;
+        } else {
+            return (ConceptInterpretationContext) this.nestingContexts.get(0);
+        }
+    }
 }

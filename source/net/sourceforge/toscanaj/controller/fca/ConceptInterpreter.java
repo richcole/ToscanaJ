@@ -45,6 +45,8 @@ public interface ConceptInterpreter {
     public static final IntervalType INTERVAL_TYPE_FIXED = new IntervalType();
     public static final IntervalType INTERVAL_TYPE_CONTINGENT = new IntervalType();
     public static final IntervalType INTERVAL_TYPE_EXTENT = new IntervalType();
+    public static final IntervalType INTERVAL_TYPE_CONTINGENT_ORTHOGONALTIY = new IntervalType();
+    public static final IntervalType INTERVAL_TYPE_EXTENT_ORTHOGONALTIY = new IntervalType();
 
     /** is dependent on displayMode and filterMode */
     Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context);

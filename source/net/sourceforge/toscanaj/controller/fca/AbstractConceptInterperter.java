@@ -103,24 +103,62 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 					if (extentSize == 0) {
 						return 0; //avoids division by zero
 					}
-					/// @todo add way to find top compareConcept more easily
-					Concept compareConcept;
-					ConceptInterpretationContext compareContext;
-					List nesting = context.getNestingConcepts();
-					if (nesting.size() != 0) {
-						// go outermost
-						compareConcept = (Concept) nesting.get(0);
-						compareContext = (ConceptInterpretationContext) context.getNestingContexts().get(0);
-					} else {
-						compareConcept = concept;
-						compareContext = context;
-					}
+					Concept compareConcept = context.getOutermostTopConcept(concept);
+					ConceptInterpretationContext compareContext = context.getOutermostContext();
 					return (double) extentSize /
 							(double) getExtentSize(compareConcept.getTopConcept(), compareContext);
 				}
 			};
-		} else if(type == INTERVAL_TYPE_FIXED) {
-			return new FixedValueIntervalSource(1);
+        } else if(type == INTERVAL_TYPE_FIXED) {
+            return new FixedValueIntervalSource(1);
+        } else if(type == INTERVAL_TYPE_CONTINGENT_ORTHOGONALTIY) {
+            return new NormedIntervalSource() {
+                public double getValue(Concept concept, ConceptInterpretationContext context) {
+                    if(context.getNestingContexts().size() == 0) {
+                        return 0.5;
+                    }
+                    int neutralContingentSize = getObjectContingentSize(concept, context.getOutermostContext());
+                    int outerContingentSize = getObjectContingentSize((Concept) context.getNestingConcepts().get(0), 
+                                                                      context.getOutermostContext());
+                    int numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
+                                                                    context.getOutermostContext());
+                    int expectedSize = neutralContingentSize * outerContingentSize / numberOfAllObjectsInDiagram;
+                    int contingentSize = getObjectContingentSize(concept, context);
+                    if(contingentSize == expectedSize) {
+                        return 0.5;                                        
+                    }
+                    if(contingentSize < expectedSize) {
+                        return 0.5 * contingentSize / expectedSize;                                        
+                    }
+                    int max = Math.min(neutralContingentSize, outerContingentSize);
+                    int range = max - expectedSize;
+                    return 0.5 + 0.5 * (contingentSize - expectedSize)/range;                                        
+                }
+            };
+        } else if(type == INTERVAL_TYPE_EXTENT_ORTHOGONALTIY) {
+            return new NormedIntervalSource() {
+                public double getValue(Concept concept, ConceptInterpretationContext context) {
+                    if(context.getNestingContexts().size() == 0) {
+                        return 0.5;
+                    }
+                    int neutralExtentSize = getExtentSize(concept, context.getOutermostContext());
+                    int outerExtentSize = getExtentSize((Concept) context.getNestingConcepts().get(0), 
+                                                                      context.getOutermostContext());
+                    int numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
+                                                                    context.getOutermostContext());
+                    int expectedSize = neutralExtentSize * outerExtentSize / numberOfAllObjectsInDiagram;
+                    int extentSize = getExtentSize(concept, context);
+                    if(extentSize == expectedSize) {
+                        return 0.5;                                        
+                    }
+                    if(extentSize < expectedSize) {
+                        return 0.5 * extentSize / expectedSize;                                        
+                    }
+                    int max = Math.min(neutralExtentSize, outerExtentSize);
+                    int range = max - expectedSize;
+                    return 0.5 + 0.5 * (extentSize - expectedSize)/range;                                        
+                }
+            };
 		} else {
 			throw new IllegalArgumentException("Unknown interval type");
 		}

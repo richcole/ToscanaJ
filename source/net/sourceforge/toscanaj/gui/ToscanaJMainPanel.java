@@ -26,6 +26,8 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
+import net.sourceforge.toscanaj.util.gradients.CombinedGradient;
+import net.sourceforge.toscanaj.util.gradients.LinearGradient;
 import net.sourceforge.toscanaj.view.diagram.*;
 
 import org.jdom.Element;
@@ -626,7 +628,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK));
             showExactMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    diagramView.getDiagramSchema().setGradientType(ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
+                    DiagramSchema diagramSchema = diagramView.getDiagramSchema();
+                    diagramSchema.setGradientType(ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
+                    diagramSchema.setGradient(diagramSchema.getDefaultGradient());
                     diagramView.update(this);
                 }
             });
@@ -639,12 +643,44 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
             showAllMenuItem.setSelected(true);
             showAllMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    diagramView.getDiagramSchema().setGradientType(ConceptInterpreter.INTERVAL_TYPE_EXTENT);
+                    DiagramSchema diagramSchema = diagramView.getDiagramSchema();
+                    diagramSchema.setGradientType(ConceptInterpreter.INTERVAL_TYPE_EXTENT);
+                    diagramSchema.setGradient(diagramSchema.getDefaultGradient());
                     diagramView.update(this);
                 }
             });
             colorGradientGroup.add(showAllMenuItem);
             viewMenu.add(showAllMenuItem);
+
+            if (ConfigurationManager.fetchInt(CONFIGURATION_SECTION_NAME, "offerOrthogonalityGradient", 0) == 1) {
+                final CombinedGradient redGreenGradient = new CombinedGradient(new LinearGradient(Color.RED, Color.WHITE), 1);
+                redGreenGradient.addGradientPart(new LinearGradient(Color.WHITE, Color.GREEN), 1);
+                JRadioButtonMenuItem showContingentOrthogonalityMenuItem = new JRadioButtonMenuItem("Use colors for orthogonality deviation (exact matches)");
+                showContingentOrthogonalityMenuItem.setSelected(true);
+                showContingentOrthogonalityMenuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        DiagramSchema diagramSchema = diagramView.getDiagramSchema();
+                        diagramSchema.setGradientType(ConceptInterpreter.INTERVAL_TYPE_CONTINGENT_ORTHOGONALTIY);
+                        diagramSchema.setGradient(redGreenGradient);
+                        diagramView.update(this);
+                    }
+                });
+                colorGradientGroup.add(showContingentOrthogonalityMenuItem);
+                viewMenu.add(showContingentOrthogonalityMenuItem);
+
+                JRadioButtonMenuItem showExtentOrthogonalityMenuItem = new JRadioButtonMenuItem("Use colors for orthogonality deviation (all matches)");
+                showExtentOrthogonalityMenuItem.setSelected(true);
+                showExtentOrthogonalityMenuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        DiagramSchema diagramSchema = diagramView.getDiagramSchema();
+                        diagramSchema.setGradientType(ConceptInterpreter.INTERVAL_TYPE_EXTENT_ORTHOGONALTIY);
+                        diagramSchema.setGradient(redGreenGradient);
+                        diagramView.update(this);
+                    }
+                });
+                colorGradientGroup.add(showExtentOrthogonalityMenuItem);
+                viewMenu.add(showExtentOrthogonalityMenuItem);
+            }
         }
 
 		JMenu colorModeMenu = new JMenu("Color mode");
