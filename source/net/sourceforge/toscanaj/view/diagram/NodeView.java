@@ -259,9 +259,9 @@ public class NodeView extends CanvasItem {
     }
 
     /**
-     * Overwritten to avoid raising nodes with diagrams in them/
+     * Overwritten to avoid raising nodes.
      */
     public boolean hasAutoRaise() {
-        return !(this.diagramNode instanceof NestedDiagramNode);
+        return false;
     }
 }
