@@ -132,8 +132,8 @@ public class ToscanaJServlet extends HttpServlet {
                     query = (Query) conceptualSchema.getQueries().get(0);
                 }
             }
-            //out.println(diagramParameter + " " + queryParameter);
             printConceptList(diagramNumber, conceptParameter, query, diagramHistory, out);
+            //out.println(diagramParameter + " " + queryParameter);
         }
 //        else if(diagramParameter != null) {
 //            resp.setContentType("image/svg-xml");
@@ -181,7 +181,12 @@ public class ToscanaJServlet extends HttpServlet {
 
         while (queryIterator.hasNext()) {
             Query curQuery = (Query) queryIterator.next();
-            out.println("<option value=\"" + i + "\">" + curQuery.getName() + "</option>");
+            if (query.getName().equals(curQuery.getName())) {
+                out.println("<option value=\"" + i + "\" selected>" + curQuery.getName() + "</option>");
+            }
+            else {
+                out.println("<option value=\"" + i + "\">" + curQuery.getName() + "</option>");
+            }
             i++;
         }
 
@@ -472,7 +477,12 @@ public class ToscanaJServlet extends HttpServlet {
 
         for(int i = 0; i<numberOfDiagrams; i++) {
             Diagram2D diagram = conceptualSchema.getDiagram(i);
-            out.println("<option value=\"" + i + "\">" + diagram.getTitle() + "</option>");
+            if (diagramNumber == i) {
+                out.println("<option value=\"" + i + "\" selected>" + diagram.getTitle() + "</option>");
+            }
+            else {
+                out.println("<option value=\"" + i + "\">" + diagram.getTitle() + "</option>");
+            }
 //            out.println("menu.addSubItem(\"listofdiagrams\", \"" + diagram.getTitle() + "\", \"" + diagram.getTitle() + "\", \"" + SERVLET_URL + "?diagram=" + i + "\"" + "+url2, \"_self\");");
 //            out.println("menu.addSubItem(\"listofdiagrams\", \"" + diagram.getTitle() + "\", \"" + diagram.getTitle() + "\", \"" + SERVLET_URL + "?diagram=" + i + "\"" + "+url2, \"_self\");");
         }
