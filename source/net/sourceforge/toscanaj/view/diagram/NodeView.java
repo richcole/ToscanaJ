@@ -7,6 +7,16 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.List;
+import java.awt.Paint;
+import java.awt.Stroke;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.NormedIntervalSource;
@@ -16,19 +26,14 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 
 import org.tockit.canvas.CanvasItem;
-
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.prefs.Preferences;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 /**
  * class DiagramNode holds details on node position and size
  */
 
 public class NodeView extends CanvasItem {
-    private static final Preferences preferences = Preferences.userNodeForPackage(NodeView.class);
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(NodeView.class);
     private static final Color WARNING_COLOR = Color.RED;
     private static final BasicStroke WARNING_STROKE = new BasicStroke(2.5f);
     

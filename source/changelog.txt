@@ -13,6 +13,7 @@ Affecting different programs:
   (i.e. not highlighted) lines and for the width of the stroke of the nodes
 - Bugfix: when editing a context in a way that an attribute which was connected to
   the top is not anymore, a NullPointerException was raised -- this is fixed now
+- Bugfix: displaying the n-dimensional vectors for debugging purposes works again
 
 Specific for ToscanaJ:
 ======================

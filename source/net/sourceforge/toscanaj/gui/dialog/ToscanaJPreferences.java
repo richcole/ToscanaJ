@@ -116,7 +116,7 @@ public class ToscanaJPreferences {
                 "Extra Menu Options"),
                 new ConfigurationSubsection(new ConfigurationEntry[] {
                         new ConfigurationEntry(MAINPANEL_NODE, "showDiagramPreview", ConfigurationType.BOOLEAN, "Diagram Preview (needs restart)"),
-                        new ConfigurationEntry(NODE_VIEW_NODE, "displayVectors", ConfigurationType.BOOLEAN, "Show Node Vectors (debug option)"),
+                        new ConfigurationEntry(NODE_VIEW_NODE, "displayCoordinates", ConfigurationType.BOOLEAN, "Show Node Vectors (debug option)"),
                         new ConfigurationEntry(DATABASE_CONNECTED_CONCEPT_INTERPRETER_NODE,
                                 "useOrderBy", ConfigurationType.BOOLEAN, "Sort results from database")
                 }, 
