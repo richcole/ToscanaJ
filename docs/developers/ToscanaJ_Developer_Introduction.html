@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>ToscanaJ Developer Introduction</title>
+</head>
+<body>
+<h1>ToscanaJ Developer Introduction</h1>
+<p>This is a short introduction for people wanting to get involved in
+teh ToscanaJ development. It gives first an introduction how to get all
+the stuff you need and then some hints on how to compile and run it.</p>
+<h2>Getting the sources</h2>
+<p>To compile and run ToscanaJ you need to get some modules from the
+CVS repository on Sourceforge. First you should read the <a
+ href="https://sourceforge.net/cvs/?group_id=37081">introduction to CVS</a>
+on the project pages. You will need to use the developer access to
+commit changes into the repository, if you just want the latest version
+and don't want to commit changes (or you are happy to <a
+ href="https://sourceforge.net/tracker/?group_id=37081&amp;atid=418906">commit
+patches</a>), just use anonymous access. If you think you should have
+write access, please ask on the <a
+ href="https://sourceforge.net/mail/?group_id=37081">developer mailing
+list</a> for it. </p>
+<p>The modules you need for a standard build are: <span
+ style="font-style: italic;">examples</span>, <span
+ style="font-style: italic;">libs</span> and <span
+ style="font-style: italic;">source</span>. These have to be put into
+the same directory since the build script will expect them to be
+colocated. You can safely ignore the other modules first, in case you
+are curious read the <a
+ href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/toscanaj/docs/developers/cvsStructure.xml?rev=HEAD&amp;content-type=text/vnd.viewcvs-markup">XML
+file describing the structure of the CVS</a>. </p>
+<h2>Build tools<br>
+</h2>
+<p>The main build process for ToscanaJ is using the <a
+ href="http://jakarta.apache.org/ant/">Ant build tool</a> from the <a
+ href="http://jakarta.apache.org/">Apache Jakarta project</a>. You just
+need a standard binary distribution to compile and run ToscanaJ. At the
+moment of writing the developers also use <a
+ href="http://www.eclipse.org">Eclipse</a> (very good, Open Source) and <a
+ href="http://www.intellij.com">IDEA</a> (fabulous, commercial
+licencing) for development. Feel free to ask for some help on setting up
+these IDEs if you need it. But any editor/IDE for Java should work, esp.
+if you are willing to use Ant for the actual build process.<br>
+</p>
+<h2>Building with Ant</h2>
+Building ToscanaJ just means running Ant while being in the toplevel
+directory of the <span style="font-style: italic;">source</span> module.
+This directory should contain a <span style="font-style: italic;">build.xml</span>
+file with a couple of different targets. The default one just compiles
+ToscanaJ, and it is invoked by just running the command <span
+ style="font-family: monospace;">ant</span> without any parameters.
+There are other build targets which can be given as a parameter, e.g. <span
+ style="font-family: monospace;">ant run</span> will compile and run
+ToscanaJ. Here is a list of all interesting targets:<br>
+<dl>
+  <dt>compile</dt>
+  <dd>just compiles the code</dd>
+  <dt>rebuild</dt>
+  <dd>compiles a clean version (necessary in case dependencies are
+still held by old files)</dd>
+  <dt>dist</dt>
+  <dd>creates a tarball with the distribution in it. This is exactly
+the same format as the downloads on Sourceforge</dd>
+  <dt>splitDist</dt>
+  <dd>creates the distribution splitted across three files: the program
+itself, the libraries and the examples. This is useful if you want to
+update an installation, since the libraries and examples change far less
+than the code and the file containing the program will be very small</dd>
+  <dt>javadoc</dt>
+  <dd>creates the JavaDoc for the program (we actually don't use that
+call and there is not that much JavaDoc in the code since we rather use
+descriptive names)</dd>
+  <dt>run</dt>
+  <dd>compiles and runs ToscanaJ</dd>
+  <dt>run-elba</dt>
+  <dd>compiles and runs Elba</dd>
+  <dt>run-siena</dt>
+  <dd>compiles and runs Siena</dd>
+  <dt>run-lucca</dt>
+  <dd>compiles and runs Lucca<br>
+  </dd>
+</dl>
+<h2>Using the Sourceforge system</h2>
+<p>We make use of many features of the Sourceforge system. Most
+importantly we use the <a
+ href="https://sourceforge.net/mail/?group_id=37081">mailing lists</a>
+and the <a href="https://sourceforge.net/tracker/?group_id=37081">tracker
+interface</a>, so if you want to be part of the development effort, you
+should at least start reading the developer list and check the trackers
+before asking for features or filing bug reports. Of course we rather
+want duplicates than things slipping through, but you make our life
+easier if you at least scan the tracker item titles before filing your
+bug report or feature request.</p>
+</body>
+</html>
