@@ -60,6 +60,11 @@ public class CSXParser
      * This is done to easily split the parse code in separate parts.
      */
     private static Document _Document;
+    
+    /**
+     * Stores the URL used as based for other files.
+     */
+    private static URL _BaseURL;
 
     /**
      * This stores the objects found in the context to be reused in the
@@ -108,12 +113,12 @@ public class CSXParser
 
         // create data structure
         _Schema = new ConceptualSchema();
+        
+        _BaseURL = csxFile.toURL();
 
         // parse the different sections
         parseDescription();
         parseDatabaseInformation();
-        parseDatabaseViewerSetups(csxFile.toURL());
-        parseDatabaseReportSetups();
         parseContext();
         parseDiagrams();
 
@@ -147,11 +152,17 @@ public class CSXParser
                     parseDBInfo(dbInfo, dbElem);
                     /// @TODO Shouldn't this be in the main panel?
                     _DatabaseConnection = new DBConnection(dbInfo.getSource(), dbInfo.getUserName(), dbInfo.getPassword());
+                    _Schema.setDatabaseInfo(dbInfo);
+                    Element viewsElem = dbElem.getChild("views");
+                    if( viewsElem != null ) {
+                        parseDatabaseObjectViewerSetups(viewsElem);
+                        parseDatabaseObjectListViewerSetups(viewsElem);
+                    }
                 }
                 else {
                     dbInfo = null;
+                    _Schema.setDatabaseInfo(dbInfo);
                 }
-                _Schema.setDatabaseInfo(dbInfo);
             }
             catch (DatabaseException e) {
                 throw new DataFormatException("Could not open database.", e.getOriginal());
@@ -163,17 +174,17 @@ public class CSXParser
         }
     }
 
-    private static void parseDatabaseViewerSetups(URL baseURL)
+    private static void parseDatabaseObjectViewerSetups(Element viewsElem)
         throws DataFormatException
     {
-        List viewerElems = _Document.getRootElement().getChildren("viewer");
+        List viewerElems = viewsElem.getChildren("objectView");
         Iterator it = viewerElems.iterator();
         while( it.hasNext() )
         {
             Element viewerElem = (Element) it.next();
             try
             {
-                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection, baseURL);
+                new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection, _BaseURL);
             }
             catch( DatabaseViewerInitializationException e )
             {
@@ -182,17 +193,17 @@ public class CSXParser
         }
     }
 
-    private static void parseDatabaseReportSetups()
+    private static void parseDatabaseObjectListViewerSetups(Element viewsElem)
         throws DataFormatException
     {
-        List reportElems = _Document.getRootElement().getChildren("report");
-        Iterator it = reportElems.iterator();
+        List viewerElems = viewsElem.getChildren("objectListView");
+        Iterator it = viewerElems.iterator();
         while( it.hasNext() )
         {
-            Element reportElem = (Element) it.next();
+            Element viewerElem = (Element) it.next();
             try
             {
-                new DatabaseReportGeneratorManager(reportElem, _Schema.getDatabaseInfo(), _DatabaseConnection);
+                new DatabaseReportGeneratorManager(viewerElem, _Schema.getDatabaseInfo(), _DatabaseConnection);
             }
             catch( DatabaseViewerInitializationException e )
             {
@@ -255,6 +266,12 @@ public class CSXParser
 
             // set the title of the diagram
             diagram.setTitle( diagElem.getAttribute( "title" ).getValue() );
+            
+            Element descElem = diagElem.getChild( "description" );
+            if( descElem != null ) {
+                diagram.setDescription( descElem );
+                _Schema.setHasDiagramDescription(true);
+            }
 
             // build a list of concepts (as points in the diagram and as
             // Hashtable for building the edges later)

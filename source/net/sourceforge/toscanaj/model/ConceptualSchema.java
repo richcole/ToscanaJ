@@ -54,6 +54,11 @@ public class ConceptualSchema {
      * The XML (XHTML) describing the schema (or null if not found).
      */
     private Element description = null;
+    
+    /**
+     * True if the schema contains at least one diagram with description.
+     */
+    private boolean hasDiagramDescription = false;
 
     /**
      * Creates an empty schema.
@@ -63,6 +68,7 @@ public class ConceptualSchema {
         useDatabase = false;
         databaseInfo = null;
         diagrams = new Vector();
+        hasDiagramDescription = false;
     }
 
     /**
@@ -178,5 +184,15 @@ public class ConceptualSchema {
     public Element getDescription()
     {
         return this.description;
+    }
+    
+    public void setHasDiagramDescription(boolean flag)
+    {
+        this.hasDiagramDescription = flag;
+    }
+    
+    public boolean hasDiagramDescription()
+    {
+        return this.hasDiagramDescription;
     }
 }

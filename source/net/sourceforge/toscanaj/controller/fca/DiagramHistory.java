@@ -101,6 +101,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         diagrams.clear();
         currStartPosition = 0;
         firstFutureDiagramPosition = 0;
+        nestingLevel = 0;
     }
 
     /**

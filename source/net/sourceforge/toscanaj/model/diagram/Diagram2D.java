@@ -3,6 +3,8 @@ package net.sourceforge.toscanaj.model.diagram;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import org.jdom.Element;
+
 /**
  * Interface for getting diagram related information.
  */
@@ -66,4 +68,9 @@ public interface Diagram2D
      * Returns the information on the attribute label of the diagram.
      */
     public LabelInfo getAttributeLabel( int pointNumber );
+    
+    /**
+     * Returns the XML Element describing the diagram (if available, null otherwise).
+     */
+    public Element getDescription();
 }

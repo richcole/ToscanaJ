@@ -1,5 +1,6 @@
 package net.sourceforge.toscanaj.model.diagram;
 
+import org.jdom.Element;
 
 /**
  * This class is an abstraction of all diagram related information.
@@ -11,6 +12,11 @@ public interface WriteableDiagram2D extends Diagram2D {
      * Change the title of the diagram.
      */
     public void setTitle(String title);
+    
+    /**
+     * Gives the diagram a description.
+     */
+    public void setDescription(Element descriptionXML);
 
     /**
      * Adds a point to the diagram (at the end of the list).

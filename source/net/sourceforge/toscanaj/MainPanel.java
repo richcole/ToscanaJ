@@ -12,6 +12,7 @@ import net.sourceforge.toscanaj.dbviewer.DatabaseReportGeneratorManager;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.DatabaseInfo;
 import net.sourceforge.toscanaj.model.Query;
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
@@ -78,6 +79,8 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
     // buttons list
     private JButton openButton = null;
     private JButton backButton = null;
+    private JButton diagramDescriptionButton = null;
+    private JButton schemaDescriptionButton = null;
 
     // menu items list
     // FILE menu
@@ -88,6 +91,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
     private JMenuItem printSetupMenuItem = null;
     private JMenu mruMenu = null;
     private JMenuItem exitMenuItem = null;
+    private JMenuItem diagramDescriptionMenuItem = null;
 
     // DIAGRAM menu
     private JMenuItem backMenuItem = null;
@@ -464,12 +468,13 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         menubar.add(Box.createHorizontalGlue());
         menubar.add(helpMenu);
 
-        // add description entry if available
+        // add description entries if available
         if( this.conceptualSchema != null ) {
+            boolean entriesAdded = false;
             Element description = this.conceptualSchema.getDescription();
             if( description != null ) {
                 JMenuItem descItem = new JMenuItem("Schema Description");
-                descItem.setMnemonic(KeyEvent.VK_D);
+                descItem.setMnemonic(KeyEvent.VK_S);
                 descItem.setAccelerator(KeyStroke.getKeyStroke(
                                                      KeyEvent.VK_F1, 0));
                 descItem.addActionListener(new ActionListener() {
@@ -478,6 +483,23 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
                     }
                 });
                 helpMenu.add(descItem);
+                entriesAdded = true;
+            }
+            if( this.conceptualSchema.hasDiagramDescription() ) {
+                diagramDescriptionMenuItem = new JMenuItem("Diagram Description");
+                diagramDescriptionMenuItem.setMnemonic(KeyEvent.VK_D);
+                diagramDescriptionMenuItem.setAccelerator(KeyStroke.getKeyStroke(
+                                                     KeyEvent.VK_F1, ActionEvent.SHIFT_MASK));
+                diagramDescriptionMenuItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        showDiagramDescription();
+                    }
+                });
+                diagramDescriptionMenuItem.setEnabled(false);
+                helpMenu.add(diagramDescriptionMenuItem);
+                entriesAdded = true;
+            }
+            if( entriesAdded ){
                 helpMenu.addSeparator();
             }
         }
@@ -510,6 +532,27 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         backButton.addActionListener(this);
         backButton.setEnabled(false);
         toolbar.add(backButton);
+        
+        toolbar.add(Box.createHorizontalGlue());
+        
+        schemaDescriptionButton = new JButton(" Schema Description... ");
+        schemaDescriptionButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showSchemaDescription();
+            }
+        });
+        schemaDescriptionButton.setVisible(false);
+        toolbar.add(schemaDescriptionButton);
+
+        diagramDescriptionButton = new JButton(" Diagram Description... ");
+        diagramDescriptionButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showDiagramDescription();
+            }
+        });
+        diagramDescriptionButton.setVisible(false);
+        diagramDescriptionButton.setEnabled(false);
+        toolbar.add(diagramDescriptionButton);
     }
 
     /**
@@ -531,12 +574,23 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
      * Updates the buttons / menu entries.
      */
     public void update(Object source) {
-        this.printMenuItem.setEnabled(DiagramController.getController().getDiagramHistory().getSize() != 0);
+        DiagramController diagContr = DiagramController.getController();
+        this.printMenuItem.setEnabled(diagContr.getDiagramHistory().getSize() != 0);
         this.exportDiagramMenuItem.setEnabled(
-                (DiagramController.getController().getDiagramHistory().getSize() != 0) &&
+                (diagContr.getDiagramHistory().getSize() != 0) &&
                 (this.diagramExportSettings != null));
-        this.backMenuItem.setEnabled(DiagramController.getController().undoIsPossible());
-        this.backButton.setEnabled(DiagramController.getController().undoIsPossible());
+        this.backMenuItem.setEnabled(diagContr.undoIsPossible());
+        this.backButton.setEnabled(diagContr.undoIsPossible());
+        Diagram2D curDiag = diagContr.getCurrentDiagram();
+        if(curDiag != null) {
+            Element diagDesc = curDiag.getDescription();
+            this.diagramDescriptionButton.setEnabled(diagDesc != null);
+            this.diagramDescriptionMenuItem.setEnabled(diagDesc != null);
+        }
+        else {
+            this.diagramDescriptionButton.setEnabled(false);
+            this.diagramDescriptionMenuItem.setEnabled(false);
+        }
     }
 
     /**
@@ -765,6 +819,18 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
         // enable relevant buttons and menus
         fileIsOpen = true;
         resetButtons(fileIsOpen);
+        if(conceptualSchema.getDescription() != null) {
+            schemaDescriptionButton.setVisible(true);
+        }
+        else {
+            schemaDescriptionButton.setVisible(false);
+        }
+        if(conceptualSchema.hasDiagramDescription()) {
+            diagramDescriptionButton.setVisible(true);
+        }
+        else {
+            diagramDescriptionButton.setVisible(false);
+        }
 
         // update MRU list
         if (this.mruList.contains(schemaFile.getPath())) {
@@ -905,6 +971,10 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver,
     
     protected void showSchemaDescription() {
         DescriptionViewer.show(this, this.conceptualSchema.getDescription());
+    }
+
+    protected void showDiagramDescription() {
+        DescriptionViewer.show(this, DiagramController.getController().getCurrentDiagram().getDescription());
     }
 
     protected void showAboutDialog() {

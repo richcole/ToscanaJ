@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jdom.Element;
+
 /**
  * This class is an abstraction of all diagram related information.
  *
@@ -39,6 +41,8 @@ public class SimpleLineDiagram implements WriteableDiagram2D
      * This is set to true once we determined the direction of the y-axis.
      */
     private boolean coordinateSystemChecked = false;
+    
+    private Element description = null;
 
     /**
      * The default constructor creates a diagram with just nothing in it at all.
@@ -194,5 +198,13 @@ public class SimpleLineDiagram implements WriteableDiagram2D
             }
         }
         this.coordinateSystemChecked = true;
+    }
+    
+    public void setDescription(Element desc) {
+        this.description = desc;
+    }
+    
+    public Element getDescription() {
+        return this.description;
     }
 }

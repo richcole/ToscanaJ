@@ -86,7 +86,6 @@ public class DiagramController implements ChangeObservable {
      */
     public void setNestingLevel(int level) {
         history.setNestingLevel(level);
-
     }
 
     /**
@@ -124,7 +123,7 @@ public class DiagramController implements ChangeObservable {
      */
     public void setFilterMethod(int method) {
         this.filterMethod = method;
-
+        notifyObservers();
     }
 
     /**
@@ -146,8 +145,6 @@ public class DiagramController implements ChangeObservable {
      */
     public void removeLastDiagram() {
         history.removeLastDiagram();
-
-
     }
 
     /**
@@ -155,7 +152,6 @@ public class DiagramController implements ChangeObservable {
      */
     public void reset() {
         history.reset();
-
     }
 
     /**
@@ -234,6 +230,7 @@ public class DiagramController implements ChangeObservable {
         Hashtable nodeMap = new Hashtable();
 
         retVal.setTitle(diag.getTitle());
+        retVal.setDescription(diag.getDescription());
         for (int i = 0; i < diag.getNumberOfNodes(); i++) {
             DiagramNode oldNode = diag.getNode(i);
             DiagramNode newNode = makeDiagramNode(oldNode, filter);
