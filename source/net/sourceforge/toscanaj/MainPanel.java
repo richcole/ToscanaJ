@@ -1,5 +1,6 @@
 package net.sourceforge.toscanaj;
 
+import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
@@ -52,9 +53,22 @@ import javax.swing.KeyStroke;
  *  for ToscanaJ.
  */
 public class MainPanel extends JFrame implements ActionListener, ChangeObserver {
-
+    /**
+     * Our toolbar.
+     */
     private JToolBar toolbar = null;
+
+    /**
+     * The main menu.
+     */
     private JMenuBar menubar = null;
+
+    /**
+     * The split main in the main area.
+     *
+     * This is stored for storing the splitter position when closing.
+     */
+    private JSplitPane splitPane = null;
 
     /**
      * switches debug mode
@@ -169,10 +183,9 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         diagramOrganiser = new DiagramOrganiser(this.conceptualSchema);
 
         //Create a split pane with the two scroll panes in it.
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                    diagramView, diagramOrganiser);
         splitPane.setOneTouchExpandable(true);
-        splitPane.setDividerLocation(400);
         splitPane.setResizeWeight(1);
 
         //Provide minimum sizes for the two components in the split pane
@@ -184,7 +197,10 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
         contentPane.add(splitPane, BorderLayout.CENTER);
 
         setContentPane( contentPane );
-        contentPane.setPreferredSize(new Dimension(550, 400));
+        // restore old position
+        ConfigurationManager.restorePlacement("mainWindow",this, new Rectangle(10,10,600,450));
+        int div = ConfigurationManager.fetchInt("mainPanel","divider",400);
+        splitPane.setDividerLocation(div);
     }
 
     /**
@@ -390,8 +406,12 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      * Close Main Window (Exit the program).
      */
     private void closeMainPanel () {
+        // store current position
+        ConfigurationManager.storePlacement("mainWindow",this);
+        ConfigurationManager.storeInt("mainPanel","divider",splitPane.getDividerLocation());
+        // and save the whole configuration
+        ConfigurationManager.saveConfiguration();
         System.exit(0);
-
     }
 
     public void actionPerformed (ActionEvent ae) {
@@ -569,7 +589,7 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
      *  Main method for running the program
      */
     public static void main(String [] args) {
-        MainPanel test;
+        final MainPanel test;
         if(args.length == 1) {
       test = new MainPanel(args[0]);
         } else if(args.length == 2) {
@@ -586,12 +606,10 @@ public class MainPanel extends JFrame implements ActionListener, ChangeObserver 
 
         test.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                System.exit(0);
+                test.closeMainPanel();
             }
         });
 
-        test.setSize(600,450);
-        test.pack();
         test.setVisible(true);
     }
 
