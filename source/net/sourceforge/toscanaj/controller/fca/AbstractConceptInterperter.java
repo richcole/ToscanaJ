@@ -26,15 +26,33 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
     private boolean showDeviation = false;
 	private Hashtable contingentSizes = new Hashtable();
 	private Hashtable extentSizes = new Hashtable();
+    
+    public static final double[] SIGNIFICANCE_LEVELS = new double[]{
+        0.10, 0.05, 0.025, 0.01, 0.005, 0.001
+    };
+    
+    public static final double[] CHI_SQUARE_CRITICAL_VALUES = new double[]{
+        2.706, 3.841, 5.024, 6.635, 7.88, 10.828        
+    };
 	
 	private class DeviationValuesRef {
-		private int neutralSize;
+		private int numberOfAllObjectsInDiagram;
+        private int neutralSize;
 		private int outerSize;
 		private double expectedSize;
-		private DeviationValuesRef (int neutralSize, int outerSize, double expectedSize) {
-			this.neutralSize = neutralSize;
-			this.outerSize = outerSize;
-			this.expectedSize = expectedSize;
+		public DeviationValuesRef (Concept concept, ConceptInterpretationContext context) {
+            Concept nestingConcept = (Concept) context.getNestingConcepts().get(0);
+            if (context.getObjectDisplayMode() == ConceptInterpretationContext.EXTENT) {
+                this.neutralSize = getExtentSize(concept, context.getOutermostContext());
+                this.outerSize = getExtentSize(nestingConcept, context.getOutermostContext());
+            }
+            else {
+                this.neutralSize = getObjectContingentSize(concept, context.getOutermostContext());
+                this.outerSize = getObjectContingentSize(nestingConcept, context.getOutermostContext());             
+            }
+            this.numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
+                                                            context.getOutermostContext());
+            this.expectedSize = neutralSize * outerSize / (double) numberOfAllObjectsInDiagram;
 		}
 		public double getExpectedSize() {
 			return expectedSize;
@@ -45,6 +63,34 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 		public int getOuterSize() {
 			return outerSize;
 		}
+        /**
+         * This is Pearson's Chi Square test for a 2x2 matrix.
+         */
+        public double getChiSquare(int actualSize) {
+            return (this.numberOfAllObjectsInDiagram *
+                    (this.numberOfAllObjectsInDiagram * actualSize - this.neutralSize * this.outerSize) *
+                    (this.numberOfAllObjectsInDiagram * actualSize - this.neutralSize * this.outerSize))
+                /
+                   (double)(this.neutralSize * 
+                            this.outerSize * 
+                            (this.numberOfAllObjectsInDiagram - this.neutralSize) *
+                            (this.numberOfAllObjectsInDiagram - this.outerSize));
+        }
+        
+        /**
+         * Returns the level of significance of deviation.
+         * 
+         * @retVal level of significance as in SIGNIFICANCE_LEVELS, -1 if none reached
+         */
+        public int getChiSquareLevel(int actualSize) {
+            double chiSquare = getChiSquare(actualSize);
+            int i = 0;
+            while(i < CHI_SQUARE_CRITICAL_VALUES.length &&
+                  chiSquare > CHI_SQUARE_CRITICAL_VALUES[i]) {
+                i++;
+            }
+            return i-1;
+        }
 	}
 
 	public abstract Iterator getObjectSetIterator(Concept concept,ConceptInterpretationContext context) ;
@@ -155,19 +201,18 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                     if(context.getNestingContexts().size() == 0) {
                         return 0.5;
                     }
-                    DeviationValuesRef deviationValues = 
-                            calculateExpectedSize(concept, context);
+                    DeviationValuesRef deviationValues = new DeviationValuesRef(concept, context);
                     double expectedSize = deviationValues.getExpectedSize();
                     int actualSize = getObjectCount(concept, context);
                     if(actualSize == expectedSize) {
                         return 0.5;                                        
                     }
                     if(actualSize < expectedSize) {
-                        return 0.5 * actualSize / expectedSize;                                        
+                        int sigLevel = deviationValues.getChiSquareLevel(actualSize);
+                        return 0.5 - 0.5 * (sigLevel + 1) / SIGNIFICANCE_LEVELS.length;                                        
                     }
-                    int max = Math.min(deviationValues.getNeutralSize(), deviationValues.getOuterSize());
-                    double range = max - expectedSize;
-                    return 0.5 + 0.5 * (actualSize - expectedSize) / range;                                        
+                    int sigLevel = deviationValues.getChiSquareLevel(actualSize);
+                    return 0.5 + 0.5 * (sigLevel + 1) / SIGNIFICANCE_LEVELS.length;                                        
                 }
             };
 		} else {
@@ -199,11 +244,10 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
                 if(context.getNestingContexts().size() == 0) {
                     return executeObjectCountQuery(concept, context);
                 }
-                DeviationValuesRef deviationValues =
-                        calculateExpectedSize(concept, context); 
+                DeviationValuesRef deviationValues = new DeviationValuesRef(concept, context);
                 double expectedSize = deviationValues.getExpectedSize();
                 int objectCount = getObjectCount(concept, context); 
-                if ((objectCount == 0) && (expectedSize == 0.0)) {
+                if ((objectCount == 0) && (expectedSize == 0)) {
                     return null;
                 }
                 if (objectCount == expectedSize) {
@@ -235,25 +279,6 @@ public abstract class AbstractConceptInterperter implements ConceptInterpreter, 
 		}
 	}
 
-	private DeviationValuesRef calculateExpectedSize(Concept concept,
-									ConceptInterpretationContext context) {
-		int neutralSize;
-		int outerSize;
-		Concept nestingConcept = (Concept) context.getNestingConcepts().get(0);
-		if (context.getObjectDisplayMode() == ConceptInterpretationContext.EXTENT) {
-			neutralSize = getExtentSize(concept, context.getOutermostContext());
-			outerSize = getExtentSize(nestingConcept, context.getOutermostContext());
-		}
-		else {
-			neutralSize = getObjectContingentSize(concept, context.getOutermostContext());
-			outerSize = getObjectContingentSize(nestingConcept, context.getOutermostContext());				
-		}
-		int numberOfAllObjectsInDiagram = getExtentSize(context.getOutermostTopConcept(concept), 
-														context.getOutermostContext());
-		double expectedSize = neutralSize * outerSize / (double) numberOfAllObjectsInDiagram;
-		return new DeviationValuesRef(neutralSize, outerSize, expectedSize);
-	}
-	
 	private Object[] executeObjectCountQuery (Concept concept, ConceptInterpretationContext context) {
 		int objectCount = getObjectCount(concept, context);
 		if( objectCount != 0) {
