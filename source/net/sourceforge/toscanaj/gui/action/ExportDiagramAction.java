@@ -9,8 +9,8 @@ package net.sourceforge.toscanaj.gui.action;
 
 import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
-import net.sourceforge.toscanaj.gui.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.model.DiagramExportSettings;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 
