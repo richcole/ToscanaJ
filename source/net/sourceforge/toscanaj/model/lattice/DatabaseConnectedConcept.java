@@ -146,22 +146,24 @@ public class DatabaseConnectedConcept extends AbstractConceptImplementation {
      * The other concept is assumed to be a DatabaseConnectedConcept.
      */
     public Concept filterByExtent(Concept other) {
-        if(other == null) {
-            return this;
-        }
-        DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
         DatabaseConnectedConcept retVal = new DatabaseConnectedConcept(this.dbInfo, this.connection);
-        retVal.setObjectClause("(" + this.objectClause + ") AND (" + otherDB.objectClause + ")");
         retVal.attributeContingent.addAll(this.attributeContingent);
+        if(other == null) {
+            retVal.setObjectClause(this.objectClause);
+        }
+        else {
+            DatabaseConnectedConcept otherDB = (DatabaseConnectedConcept) other;
+            retVal.setObjectClause("(" + this.objectClause + ") AND (" + otherDB.objectClause + ")");
+        }
         return retVal;
     }
 
     /**
      * Implements Concept.filterByContingent(Concept).
      *
-     * @TODO implement
+     * @TODO implement correctly (currently just a copy of filterByExtent())
      */
     public Concept filterByContingent(Concept other) {
-        return this;
+        throw new NoSuchMethodError("Not yet implemented");
     }
 }

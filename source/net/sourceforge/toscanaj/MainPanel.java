@@ -44,68 +44,68 @@ import javax.swing.JSplitPane;
  */
 public class MainPanel extends JFrame implements ActionListener {
 
-  private JToolBar toolbar = null;
-  private JMenuBar menubar = null;
-  /**
-   * switches debug mode
-   */
-  public static boolean debug = false;
+    private JToolBar toolbar = null;
+    private JMenuBar menubar = null;
+    /**
+     * switches debug mode
+     */
+    public static boolean debug = false;
 
-      // buttons list
-  private JButton openButton     = null;
-
+    // buttons list
+    private JButton openButton     = null;
 
     // menu items list
     // FILE menu
-  private JMenuItem openMenuItem		= null;
-  private JMenuItem printMenuItem		= null;
-  private JMenuItem printSetupMenuItem= null;
-  private JMenuItem exitMenuItem		= null;
+    private JMenuItem openMenuItem		= null;
+    private JMenuItem printMenuItem		= null;
+    private JMenuItem printSetupMenuItem= null;
+    private JMenuItem exitMenuItem		= null;
 
-  // DIAGRAM menu
-  private ButtonGroup documentsDisplayGroup = null;
-  private JRadioButtonMenuItem showAllMenuItem		= null;
-  private JRadioButtonMenuItem showExactMenuItem		= null;
+    // DIAGRAM menu
+    private ButtonGroup documentsDisplayGroup = null;
+    private JRadioButtonMenuItem showAllMenuItem		= null;
+    private JRadioButtonMenuItem showExactMenuItem		= null;
 
-  private ButtonGroup documentsFilterGroup = null;
-  private JRadioButtonMenuItem filterAllMenuItem		= null;
-  private JRadioButtonMenuItem filterExactMenuItem		= null;
+    private ButtonGroup documentsFilterGroup = null;
+    private JRadioButtonMenuItem filterAllMenuItem		= null;
+    private JRadioButtonMenuItem filterExactMenuItem		= null;
 
-  private ButtonGroup labelContentGroup = null;
-  private JMenuItem numDocMenuItem = null;
-  private JMenuItem percDistMenuItem = null;
-  private JMenuItem listDocMenuItem = null;
+    private ButtonGroup labelContentGroup = null;
+    private JRadioButtonMenuItem numDocMenuItem = null;
+    private JRadioButtonMenuItem listDocMenuItem = null;
 
-  private int currentSelectedIndex;
+    private JCheckBoxMenuItem percDistMenuItem = null;
 
-  // icon images
-  private static final String OPEN_ICON          = "open.gif";
-  private static final String CONTENTS_ICON      = "contents.gif";
-  private static final String CLEAR_ICON          = "clear.gif";
+    private int currentSelectedIndex;
 
-  /**
-   * The main model member.
-   */
-  private ConceptualSchema conceptualSchema;
+    // icon images
+    private static final String OPEN_ICON          = "open.gif";
+    private static final String CONTENTS_ICON      = "contents.gif";
+    private static final String CLEAR_ICON          = "clear.gif";
 
-  /**
-   * The diagram viewing area.
-   */
-  private DiagramView diagramView;
+    /**
+     * The main model member.
+     */
+    private ConceptualSchema conceptualSchema;
 
-  /**
-   * The pane for selecting the diagrams.
-   */
-  DiagramOrganiser diagramOrganiser;
+    /**
+     * The diagram viewing area.
+     */
+    private DiagramView diagramView;
 
-  // specify the location of icon images - this is platform safe
-  // because the String is converted into a URL so the "/" is OK for
-  // all platforms.
-  private static final String IMAGE_PATH         = "resource/icons/";
+    /**
+     * The pane for selecting the diagrams.
+     */
+    DiagramOrganiser diagramOrganiser;
 
-  // flag to indicate if the save icon and menu options should be
-  // enabled
-  public boolean fileIsOpen = false;
+    // specify the location of icon images - this is platform safe
+    // because the String is converted into a URL so the "/" is OK for
+    // all platforms.
+    private static final String IMAGE_PATH         = "resource/icons/";
+
+    // flag to indicate if the save icon and menu options should be
+    // enabled
+    public boolean fileIsOpen = false;
 
     /**
      * Simple initialisation constructor.
@@ -278,17 +278,20 @@ public class MainPanel extends JFrame implements ActionListener {
         labelContentGroup.add(numDocMenuItem);
         diagrMenu.add(numDocMenuItem);
 
-        // radio button menu item PERCENTUAL DISTRIBUTION
-        percDistMenuItem = new JRadioButtonMenuItem("Percentual Distribution");
-        percDistMenuItem.addActionListener(this);
-        labelContentGroup.add(percDistMenuItem);
-        diagrMenu.add(percDistMenuItem);
-
         // radio button menu item LIST OF DOCUMENTS
         listDocMenuItem = new JRadioButtonMenuItem("List Of Documents");
         listDocMenuItem.addActionListener(this);
         labelContentGroup.add(listDocMenuItem);
         diagrMenu.add(listDocMenuItem);
+
+        // separator
+        diagrMenu.addSeparator();
+
+        // menu item PERCENTUAL DISTRIBUTION
+        percDistMenuItem = new JCheckBoxMenuItem("Percentual Distribution");
+        percDistMenuItem.addActionListener(this);
+        percDistMenuItem.setState(false);
+        diagrMenu.add(percDistMenuItem);
     }
 
 
@@ -318,12 +321,12 @@ public class MainPanel extends JFrame implements ActionListener {
         printSetupMenuItem.setEnabled (isOpen);
 
         this.showAllMenuItem.setEnabled (isOpen);
-        this.showAllMenuItem.setEnabled (isOpen);
+        this.showExactMenuItem.setEnabled (isOpen);
         this.filterExactMenuItem.setEnabled (isOpen);
         this.filterAllMenuItem.setEnabled (isOpen);
-        numDocMenuItem.setEnabled (isOpen);
-        percDistMenuItem.setEnabled (isOpen);
-        listDocMenuItem.setEnabled (isOpen);
+        this.numDocMenuItem.setEnabled (isOpen);
+        this.listDocMenuItem.setEnabled (isOpen);
+        this.percDistMenuItem.setEnabled (isOpen);
     }
 
     /**
@@ -362,24 +365,19 @@ public class MainPanel extends JFrame implements ActionListener {
         }
 
         // menu DIAGRAM
-        if (actionSource == this.showExactMenuItem) {
-            this.diagramView.setDisplayType(LabelView.DISPLAY_NUMBER);
-        }
-        if (actionSource == this.showAllMenuItem) {
-            this.diagramView.setDisplayType(LabelView.DISPLAY_LIST);
+        if( (actionSource == this.showExactMenuItem) ||
+            (actionSource == this.showAllMenuItem) ||
+            (actionSource == this.numDocMenuItem) ||
+            (actionSource == this.listDocMenuItem) )
+        {
+            updateLabelViews();
         }
         if (actionSource == this.filterExactMenuItem) {
         }
         if (actionSource == this.filterAllMenuItem) {
         }
-        if (actionSource == numDocMenuItem) {
-            System.out.println("Acton for menu group: Number Of Documents ");
-        }
-        if (actionSource == percDistMenuItem) {
-            System.out.println("Acton for menu group: Percentual Distribution");
-        }
-        if (actionSource == listDocMenuItem) {
-            System.out.println("Acton for menu group: List Of Documents ");
+        if (actionSource == this.percDistMenuItem) {
+            this.diagramView.setShowPercentage(this.percDistMenuItem.getState());
         }
     }
 
@@ -447,6 +445,8 @@ public class MainPanel extends JFrame implements ActionListener {
             }
         }
         diagramView.showDiagram(null);
+        updateLabelViews();
+        diagramView.setShowPercentage(this.percDistMenuItem.isSelected());
         diagramOrganiser.setConceptualSchema(conceptualSchema);
         DiagramController.getController().reset();
         DiagramController.getController().addObserver(this.diagramView);
@@ -454,6 +454,18 @@ public class MainPanel extends JFrame implements ActionListener {
         // enable relevant buttons and menus
         fileIsOpen = true;
         resetButtons(fileIsOpen);
+    }
+
+    /**
+     * Sets all labels to the display options currently selected.
+     */
+    private void updateLabelViews(){
+        if(this.numDocMenuItem.isSelected()) {
+            this.diagramView.setDisplayType(LabelView.DISPLAY_NUMBER, this.showExactMenuItem.isSelected());
+        }
+        else {
+            this.diagramView.setDisplayType(LabelView.DISPLAY_LIST, this.showExactMenuItem.isSelected());
+        }
     }
 
     /**

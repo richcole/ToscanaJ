@@ -9,14 +9,37 @@ public class AttributeLabelInfo extends LabelInfo {
     /**
      * Returns the number of attributes in the contingent of the concept attached.
      */
-    public int getNumberOfEntries() {
-        return this.getNode().getConcept().getAttributeContingentSize();
+    public int getNumberOfEntries(boolean contingentOnly) {
+        if(contingentOnly) {
+            return this.getNode().getConcept().getAttributeContingentSize();
+        }
+        else {
+            return this.getNode().getConcept().getIntentSize();
+        }
+    }
+
+    /**
+     * Returns the number of attributes in the contingent of the concept attached
+     * as relative number in comparison to all attributes in the diagram.
+     */
+    public double getNumberOfEntriesRelative(boolean contingentOnly) {
+        if(contingentOnly) {
+            return this.getNode().getConcept().getAttributeContingentSizeRelative();
+        }
+        else {
+            return this.getNode().getConcept().getIntentSizeRelative();
+        }
     }
 
     /**
      * Returns an attribute from the contingent of the concept attached.
      */
-    public Iterator getEntryIterator() {
-        return this.getNode().getConcept().getAttributeContingentIterator();
+    public Iterator getEntryIterator(boolean contingentOnly) {
+        if(contingentOnly) {
+            return this.getNode().getConcept().getAttributeContingentIterator();
+        }
+        else {
+            return this.getNode().getConcept().getIntentIterator();
+        }
     }
 }

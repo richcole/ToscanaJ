@@ -93,13 +93,31 @@ abstract public class LabelInfo implements ChangeObservable
 
     /**
      * Returns the number of entries in the label.
+     *
+     * If the parameter is set to false the full set (extent or intent) will be
+     * used, if set to true only the contingent is used.
      */
-    abstract public int getNumberOfEntries();
+    abstract public int getNumberOfEntries(boolean contingentOnly);
+
+    /**
+     * Returns the number of entries in the label relative to the complete
+     * number of possible entries.
+     *
+     * The return value will be between 0 (no entry) and 1 (every single object/
+     * attribute is on this label).
+     *
+     * If the parameter is set to false the full set (extent or intent) will be
+     * used, if set to true only the contingent is used.
+     */
+    abstract public double getNumberOfEntriesRelative(boolean contingentOnly);
 
     /**
      * Returns an iterator on the entries in the label.
+     *
+     * If the parameter is set to false the full set (extent or intent) will be
+     * used, if set to true only the contingent is used.
      */
-    abstract public Iterator getEntryIterator();
+    abstract public Iterator getEntryIterator(boolean contingentOnly);
 
     /**
      * Returns the current offset.

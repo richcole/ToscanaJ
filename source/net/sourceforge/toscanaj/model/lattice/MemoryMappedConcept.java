@@ -75,18 +75,20 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
      * Implements Concept.filterByExtent(Concept).
      */
     public Concept filterByExtent(Concept other) {
-        if(other == null) {
-            return this;
-        }
         MemoryMappedConcept retVal = new MemoryMappedConcept();
-        Iterator it = other.getExtentIterator();
-        while(it.hasNext()) {
-            Object cur = it.next();
-            Iterator it2 = this.objectContingent.iterator();
-            while(it2.hasNext()) {
-                Object cur2 = it2.next();
-                if(cur.equals(cur2)) {
-                    retVal.addObject(cur);
+        if(other == null) {
+            retVal.objectContingent.addAll(this.objectContingent);
+        }
+        else{
+            Iterator it = other.getExtentIterator();
+            while(it.hasNext()) {
+                Object cur = it.next();
+                Iterator it2 = this.objectContingent.iterator();
+                while(it2.hasNext()) {
+                    Object cur2 = it2.next();
+                    if(cur.equals(cur2)) {
+                        retVal.addObject(cur);
+                    }
                 }
             }
         }
@@ -98,18 +100,20 @@ public class MemoryMappedConcept extends AbstractConceptImplementation {
      * Implements Concept.filterByContingent(Concept).
      */
     public Concept filterByContingent(Concept other) {
-        if(other == null) {
-            return this;
-        }
         MemoryMappedConcept retVal = new MemoryMappedConcept();
-        Iterator it = other.getObjectContingentIterator();
-        while(it.hasNext()) {
-            Object cur = it.next();
-            Iterator it2 = this.objectContingent.iterator();
-            while(it2.hasNext()) {
-                Object cur2 = it2.next();
-                if(cur.equals(cur2)) {
-                    retVal.addObject(cur);
+        if(other == null) {
+            retVal.objectContingent.addAll(this.objectContingent);
+        }
+        else{
+            Iterator it = other.getObjectContingentIterator();
+            while(it.hasNext()) {
+                Object cur = it.next();
+                Iterator it2 = this.objectContingent.iterator();
+                while(it2.hasNext()) {
+                    Object cur2 = it2.next();
+                    if(cur.equals(cur2)) {
+                        retVal.addObject(cur);
+                    }
                 }
             }
         }

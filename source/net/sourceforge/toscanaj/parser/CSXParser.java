@@ -216,13 +216,9 @@ public class CSXParser
                 }
 
                 // parse the label layout information if needed
-                LabelInfo objLabel;
+                LabelInfo objLabel = new ObjectLabelInfo();
                 // don't use the Concept.getObjectContingentSize() method here, it might cause DB calls
-                if(conceptElem.getChild("objectContingent").getChildren("objectRef").size() == 0) {
-                    objLabel = null;
-                }
-                else {
-                    objLabel = new ObjectLabelInfo();
+                if(conceptElem.getChild("objectContingent").getChildren("objectRef").size() != 0) {
                     Element style = conceptElem.getChild("objectContingent").
                                                 getChild( "labelStyle" );
                     if( style != null )
@@ -231,12 +227,8 @@ public class CSXParser
                     }
                 }
 
-                LabelInfo attrLabel;
-                if(conceptElem.getChild("attributeContingent").getChildren("attributeRef").size() == 0) {
-                    attrLabel = null;
-                }
-                else {
-                    attrLabel = new AttributeLabelInfo();
+                LabelInfo attrLabel = new AttributeLabelInfo();
+                if(conceptElem.getChild("attributeContingent").getChildren("attributeRef").size() != 0) {
                     Element style = conceptElem.getChild( "attributeContingent" ).
                                                 getChild( "labelStyle" );
                     if( style != null )

@@ -7,9 +7,8 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.ObjectLabelInfo;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 
+import net.sourceforge.toscanaj.model.lattice.AbstractConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Concept;
-// testing only:
-import net.sourceforge.toscanaj.model.lattice.MemoryMappedConcept;
 
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
@@ -331,9 +330,24 @@ public class DiagramController implements ChangeObservable {
         }
         for(int i = 0; i < diag.getNumberOfLines(); i++) {
             DiagramLine line = diag.getLine(i);
-            retVal.addLine( (DiagramNode) nodeMap.get(line.getFromNode()),
-                            (DiagramNode) nodeMap.get(line.getToNode()));
+            DiagramNode from = (DiagramNode) nodeMap.get(line.getFromNode());
+            DiagramNode to = (DiagramNode) nodeMap.get(line.getToNode());
+            retVal.addLine( from, to );
+
+            // add direct neighbours to concepts
+            AbstractConceptImplementation concept1 =
+                             (AbstractConceptImplementation) from.getConcept();
+            AbstractConceptImplementation concept2 =
+                             (AbstractConceptImplementation) to.getConcept();
+            concept1.addSubConcept(concept2);
+            concept2.addSuperConcept(concept1);
         }
+
+        // build transitive closures for each concept
+        for(int i = 0; i < retVal.getNumberOfNodes(); i++) {
+            ((AbstractConceptImplementation) retVal.getNode(i).getConcept()).buildClosures();
+        }
+
         return retVal;
     }
 

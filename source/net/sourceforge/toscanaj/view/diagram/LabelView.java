@@ -58,6 +58,19 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     private int displayType = DISPLAY_LIST;
 
     /**
+     * Stores if percentual distribution should be shown behind numbers.
+     */
+    private boolean showPercentage = false;
+
+    /**
+     * Stores if we display contingents or extent/intent.
+     *
+     * If set to true we show only the attribute or object contingent (depending
+     * on the given label info), otherwise it is intent or extent.
+     */
+    private boolean showOnlyContingent = true;
+
+    /**
      * Label current width.
      */
     private double width;
@@ -77,7 +90,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     /**
      * The label information that should be drawn.
      */
-    private LabelInfo _labelInfo;
+    private LabelInfo labelInfo;
 
     /**
      * Store the diagram view that the label belongs to.
@@ -91,8 +104,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      */
     public LabelView( DiagramView diagramView, LabelInfo label ) {
         this.diagramView = diagramView;
-        _labelInfo = label;
-        _labelInfo.addObserver(this);
+        this.labelInfo = label;
+        this.labelInfo.addObserver(this);
     }
 
     /**
@@ -102,15 +115,30 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      * This method accepts the values DISPLAY_NUMBER and DISPLAY_LIST, everything
      * else is ignored.
      */
-    public void setDisplayType(int type) {
+    public void setDisplayType(int type, boolean contingentOnly) {
         this.displayType = type;
+        this.showOnlyContingent = contingentOnly;
         update(this);
     }
 
     /**
-     * Update label view as label info has change
+     * If toggled to true the label will display the percentual distribution
+     * behind the number of entries.
+     */
+    public void setShowPercentage(boolean toggle) {
+        this.showPercentage = toggle;
+        update(this);
+    }
+
+    /**
+     * Update label view as label info has change.
+     *
+     * This implements the callback in ChangeObserver, the parameter is the
+     * object sending the event.
      */
     public void update(Object source){
+        // we expect someone to cause us to redraw if needed, we don't do it ourself
+        // maybe we are off-screen or hidden or whatever ...
         notifyObservers();
     }
 
@@ -156,6 +184,11 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      */
     public void draw( ToscanajGraphics2D tg )
     {
+        // we draw only if we have content to draw
+        if(this.labelInfo.getNumberOfEntries(this.showOnlyContingent) == 0) {
+            return;
+        }
+
         Graphics2D graphics = tg.getGraphics2D();
 
         // remember some settings to restore them later
@@ -165,40 +198,40 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         FontMetrics fm = graphics.getFontMetrics();
 
         // find the size and position
-        DiagramNode node = this._labelInfo.getNode();
+        DiagramNode node = this.labelInfo.getNode();
         double x = node.getX();
         double y = node.getY();
         double lw = getWidth( fm );
         width = tg.inverseScaleX(lw);
         double lh = getHeight( fm );
         height = tg.inverseScaleY(lh);
-        xPos = x - tg.inverseScaleX(lw/2) + _labelInfo.getOffset().getX();
+        xPos = x - tg.inverseScaleX(lw/2) + this.labelInfo.getOffset().getX();
         if( getPlacement() == ABOVE )
         {
             y = y - tg.inverseScaleY(node.getRadius());
-            yPos = y - tg.inverseScaleY(lh) + _labelInfo.getOffset().getY();
+            yPos = y - tg.inverseScaleY(lh) + this.labelInfo.getOffset().getY();
         }
         else
         {
             y = y + tg.inverseScaleY(node.getRadius());
-            yPos = y + _labelInfo.getOffset().getY();
+            yPos = y + this.labelInfo.getOffset().getY();
         }
         // draw a dashed line from the given point to the calculated
         Stroke oldStroke = graphics.getStroke();
         float[] dashstyle = { 4, 4 };
         tg.setStroke( new BasicStroke( 1, BasicStroke.CAP_BUTT,
                                     BasicStroke.JOIN_BEVEL, 1, dashstyle, 0 ) );
-        tg.drawLine( x, y, xPos + tg.inverseScaleX(lw/2),  y + _labelInfo.getOffset().getY() );
+        tg.drawLine( x, y, xPos + tg.inverseScaleX(lw/2),  y + this.labelInfo.getOffset().getY() );
         tg.setStroke( oldStroke );
 
         // draw the label itself
-        tg.drawFilledRectangle(xPos, yPos, lw, lh, _labelInfo.getBackgroundColor(), _labelInfo.getTextColor() );
+        tg.drawFilledRectangle(xPos, yPos, lw, lh, this.labelInfo.getBackgroundColor(), this.labelInfo.getTextColor() );
 
         if(this.displayType == DISPLAY_LIST) {
             // draw the object names
-            if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT )
+            if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT )
             {
-                Iterator it = _labelInfo.getEntryIterator();
+                Iterator it = this.labelInfo.getEntryIterator(this.showOnlyContingent);
                 int j = 0;
                 while(it.hasNext()) {
                     String cur = it.next().toString();
@@ -208,9 +241,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
                     j++;
                 }
             }
-            else if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER )
+            else if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER )
             {
-                Iterator it = _labelInfo.getEntryIterator();
+                Iterator it = this.labelInfo.getEntryIterator(this.showOnlyContingent);
                 int j = 0;
                 while(it.hasNext()) {
                     String cur = it.next().toString();
@@ -220,9 +253,9 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
                     j++;
                 }
             }
-            else if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT )
+            else if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT )
             {
-                Iterator it = _labelInfo.getEntryIterator();
+                Iterator it = this.labelInfo.getEntryIterator(this.showOnlyContingent);
                 int j = 0;
                 while(it.hasNext()) {
                     String cur = it.next().toString();
@@ -235,20 +268,23 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         }
         else {
             // draw the number
-            String num = String.valueOf(_labelInfo.getNumberOfEntries());
-            if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT )
+            String num = String.valueOf(this.labelInfo.getNumberOfEntries(this.showOnlyContingent));
+            if(this.showPercentage) {
+                num = num.concat(" (" + (int)(this.labelInfo.getNumberOfEntriesRelative(this.showOnlyContingent) * 100) + "%)");
+            }
+            if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT )
             {
                 tg.drawString( num ,xPos, yPos, fm.getLeading() +
                                                 fm.getDescent(), fm.getAscent() +
                                                 fm.getLeading() );
             }
-            else if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER )
+            else if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNCENTER )
             {
                 tg.drawString( num , xPos, yPos,
                         (int)(fm.getLeading()/2 + fm.getDescent()/2 + ( lw - fm.stringWidth(num))/2  ),
                         fm.getAscent() + fm.getLeading() );
             }
-            else if( _labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT )
+            else if( this.labelInfo.getTextAlignment() == LabelInfo.ALIGNRIGHT )
             {
                 tg.drawString( num ,xPos ,yPos ,
                             (int)(-fm.getLeading() - fm.getDescent() + lw - fm.stringWidth(num)),
@@ -282,7 +318,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
 
         if(this.displayType == DISPLAY_LIST) {
             // find maximum width of string
-            Iterator it = _labelInfo.getEntryIterator();
+            Iterator it = this.labelInfo.getEntryIterator(this.showOnlyContingent);
             while(it.hasNext()) {
                 String cur = it.next().toString();
                 double w = fontMetrics.stringWidth( cur );
@@ -294,7 +330,10 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
         }
         else {
             // find width of number
-            String num = String.valueOf(_labelInfo.getNumberOfEntries());
+            String num = String.valueOf(this.labelInfo.getNumberOfEntries(this.showOnlyContingent));
+            if(this.showPercentage) {
+                num = num.concat(" (" + (int)(this.labelInfo.getNumberOfEntriesRelative(this.showOnlyContingent) * 100) + "%)");
+            }
             result = fontMetrics.stringWidth( num );
         }
 
@@ -311,7 +350,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
     public int getHeight( FontMetrics fontMetrics )
     {
         if( this.displayType == DISPLAY_LIST ) {
-            return _labelInfo.getNumberOfEntries() * fontMetrics.getHeight();
+            return this.labelInfo.getNumberOfEntries(this.showOnlyContingent) * fontMetrics.getHeight();
         }
         else {
             return fontMetrics.getHeight();
@@ -343,7 +382,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver {
      * Moves the label by the given distance.
      */
     public void moveBy(double deltaX, double deltaY) {
-        _labelInfo.setOffset(_labelInfo.getOffset().getX() + deltaX,
-                             _labelInfo.getOffset().getY() + deltaY );
+        this.labelInfo.setOffset(this.labelInfo.getOffset().getX() + deltaX,
+                                 this.labelInfo.getOffset().getY() + deltaY );
     }
 }

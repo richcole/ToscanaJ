@@ -13,6 +13,11 @@ import java.util.NoSuchElementException;
  * efforts for these operations. The calculation of intent and extent size is
  * done in this class, the joins on the sets themselves are done by creating an
  * iterator which iterates over all contingents in filter and ideal resp.
+ *
+ * To use this class one has to ensure all sub- and superconcept relations
+ * are set up properly. If only the neighbourhood relation is set the method
+ * buildClosures() can be called to extent this to the full sub-/superconcept
+ * relation.
  */
 public abstract class AbstractConceptImplementation implements Concept
 {
@@ -206,7 +211,7 @@ public abstract class AbstractConceptImplementation implements Concept
      * Calculates the ideal and filter for this concept if only direct neighbours
      * are given.
      *
-     * If only direct neighbours in the neighbouthoud relation where given this
+     * If only direct neighbours in the neighbourhoud relation where given this
      * method can be called to create the ideal and filter by building the
      * transitive closures.
      */
@@ -237,7 +242,7 @@ public abstract class AbstractConceptImplementation implements Concept
      * Calculates the intent size based on the contingent sizes in the filter.
      */
     public int getIntentSize() {
-        int retVal = this.getAttributeContingentSize();
+        int retVal = 0;
         Iterator it = ideal.iterator();
         while( it.hasNext() ) {
             Concept cur = (Concept) it.next();
@@ -247,16 +252,30 @@ public abstract class AbstractConceptImplementation implements Concept
     }
 
     /**
+     * Calculates the relative intent size.
+     */
+    public double getIntentSizeRelative() {
+        return getIntentSize() / (double)getNumberOfAttributes();
+    }
+
+    /**
      * Calculates the extent size based on the contingent sizes in the ideal.
      */
     public int getExtentSize() {
-        int retVal = this.getObjectContingentSize();
+        int retVal = 0;
         Iterator it = ideal.iterator();
         while( it.hasNext() ) {
             Concept cur = (Concept) it.next();
             retVal += cur.getObjectContingentSize();
         }
         return retVal;
+    }
+
+    /**
+     * Calculates the relative extent size.
+     */
+    public double getExtentSizeRelative() {
+        return getExtentSize() / (double)getNumberOfObjects();
     }
 
     /**
@@ -271,5 +290,51 @@ public abstract class AbstractConceptImplementation implements Concept
      */
     public Iterator getExtentIterator() {
         return new ObjectIterator( this.ideal.iterator() );
+    }
+
+    /**
+     * Calculates the relative attribute contingent size.
+     */
+    public double getAttributeContingentSizeRelative() {
+        return getAttributeContingentSize() / (double)getNumberOfAttributes();
+    }
+
+    /**
+     * Calculates the relative object contingent size.
+     */
+    public double getObjectContingentSizeRelative() {
+        return getObjectContingentSize() / (double)getNumberOfObjects();
+    }
+
+    /**
+     * Find the number of objects in this diagram.
+     *
+     * This is equal to the size of the extent of the top node.
+     */
+    private int getNumberOfObjects() {
+        AbstractConceptImplementation cur = this;
+        while(cur.filter.size() != 1) {
+            // there is another concept in the filter which is not this
+            // (this is always the first) ==> go up
+            cur = (AbstractConceptImplementation) cur.filter.get(1);
+        }
+        // now we are at the top
+        return cur.getExtentSize();
+    }
+
+    /**
+     * Find the number of attributes in this diagram.
+     *
+     * This is equal to the size of the intent of the bottom node.
+     */
+    private int getNumberOfAttributes() {
+        AbstractConceptImplementation cur = this;
+        while(cur.ideal.size() != 1) {
+            // there is another concept in the ideal which is not this
+            // (this is always the first) ==> go down
+            cur = (AbstractConceptImplementation) cur.ideal.get(1);
+        }
+        // now we are at the bottom
+        return cur.getIntentSize();
     }
 }

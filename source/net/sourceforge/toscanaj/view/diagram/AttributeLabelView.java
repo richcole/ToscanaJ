@@ -16,7 +16,10 @@ public class AttributeLabelView extends LabelView {
      */
     public AttributeLabelView( DiagramView diagramView, LabelInfo label ) {
         super(diagramView,label);
-        setDisplayType(DISPLAY_LIST);
+        // attribute labels always display the list (therefore we don't really mind
+        // about the showPercentage toggle)
+        setDisplayType(DISPLAY_LIST, true);
+        setShowPercentage(false);
     }
 
     /**

@@ -28,9 +28,21 @@ public interface Concept {
     int getIntentSize();
 
     /**
+     * Returns the size of the intent relative to the number of attributes in
+     * the diagram.
+     */
+    double getIntentSizeRelative();
+
+    /**
      * Returns the size of the extent.
      */
     int getExtentSize();
+
+    /**
+     * Returns the size of the extent relative to the number of objects in the
+     * diagram.
+     */
+    double getExtentSizeRelative();
 
     /**
      * Returns the size of the attribute contingent.
@@ -38,9 +50,25 @@ public interface Concept {
     int getAttributeContingentSize();
 
     /**
+     * Returns the size of the attribute contingent relative to all attributes
+     * in the diagram.
+     *
+     * This will always be between 0 and 1.
+     */
+    double getAttributeContingentSizeRelative();
+
+    /**
      * Returns the size of the object contingent.
      */
     int getObjectContingentSize();
+
+    /**
+     * Returns the size of the object contingent relative to all objects in
+     * the current diagram.
+     *
+     * This will always be between 0 and 1.
+     */
+    double getObjectContingentSizeRelative();
 
     /**
      * Returns an iterator returning the attributes from the intent.
@@ -82,7 +110,7 @@ public interface Concept {
      * concept returned might be not realised in the diagram we currently have
      * (not realised as in Toscana 2/3).
      *
-     * If the other concept is null, the original concept will be returned.
+     * If the other concept is null, a copy of the original concept will be returned.
      */
     Concept filterByExtent(Concept other);
 
@@ -94,7 +122,7 @@ public interface Concept {
      * concept returned might be not realised in the diagram we currently have
      * (not realised as in Toscana 2/3).
      *
-     * If the other concept is null, the original concept will be returned.
+     * If the other concept is null, a copy of the original concept will be returned.
      */
     Concept filterByContingent(Concept other);
 }
