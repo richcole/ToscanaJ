@@ -23,6 +23,7 @@ import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.StringReader;
@@ -31,7 +32,7 @@ public class XMLEditorDialog extends JDialog {
 	private static final String CONFIGURATION_SECTION_NAME = "XMLEditorDialog";
 	private JTextArea textPane = new JTextArea();
     private JLabel statusBar = new JLabel();
-    private JButton setDescriptionButton = new JButton("Set Description");
+    private JButton useDescriptionButton = new JButton("Use Description");
     private Document document;
     private Element result;
     private DefaultHighlighter highlighter = new DefaultHighlighter();
@@ -117,9 +118,9 @@ public class XMLEditorDialog extends JDialog {
             statusBar.setForeground(Color.BLACK);
             statusBar.setText("well-formed");
 			statusBar.setToolTipText(null);
-			setDescriptionButton.setEnabled(true);
+			useDescriptionButton.setEnabled(true);
         } catch (JDOMException e) {
-        	setDescriptionButton.setEnabled(false);
+        	useDescriptionButton.setEnabled(false);
             statusBar.setForeground(Color.RED);
             String message = e.getMessage();
             statusBar.setText(message);
@@ -178,7 +179,7 @@ public class XMLEditorDialog extends JDialog {
 	private JPanel createButtonsPanel() {
 		JPanel buttonsPanel = new JPanel();
 
-		setDescriptionButton.addActionListener(new ActionListener() {
+		useDescriptionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				checkXML();
 				if (document == null) {
@@ -189,8 +190,10 @@ public class XMLEditorDialog extends JDialog {
 				dispose();
 			}
 		});
-		JButton clearDescriptionButton = new JButton("Clear Description");
-		clearDescriptionButton.addActionListener(new ActionListener() {
+		useDescriptionButton.setMnemonic(KeyEvent.VK_U);
+		JButton removeDescriptionButton = new JButton("Remove Description");;
+		removeDescriptionButton.setMnemonic(KeyEvent.VK_R);
+		removeDescriptionButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				result = null;
 				ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, dialog);
@@ -199,6 +202,7 @@ public class XMLEditorDialog extends JDialog {
 		});
 
 		JButton cancelEditingButton = new JButton("Cancel Editing");
+		cancelEditingButton.setMnemonic(KeyEvent.VK_C);
 		cancelEditingButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME, dialog);
@@ -206,8 +210,8 @@ public class XMLEditorDialog extends JDialog {
 			}
 		});
 
-		buttonsPanel.add(setDescriptionButton);
-		buttonsPanel.add(clearDescriptionButton);
+		buttonsPanel.add(useDescriptionButton);
+		buttonsPanel.add(removeDescriptionButton);
 		buttonsPanel.add(cancelEditingButton);
 
 		return buttonsPanel;
