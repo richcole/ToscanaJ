@@ -404,7 +404,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
         Concept concept = nodeView.getDiagramNode().getConcept();
         StringBuffer tooltip = new StringBuffer("<html>");
-        tooltip.append("<hr><i>Intent:</i><hr>");
+        tooltip.append("<hr><i>Attributes:</i><hr>");
         Iterator it = concept.getIntentIterator();
         if(!it.hasNext()) {
             return null;
@@ -414,7 +414,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
             tooltip.append(it.next().toString());
             tooltip.append("<br>");
         }
-        tooltip.append("<hr><i>Extent:</i><hr>");
+        tooltip.append("<hr><i>Objects:</i><hr>");
         boolean originalObjectMode = this.conceptInterpretationContext.getObjectDisplayMode();
         this.conceptInterpretationContext.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
         int extentSize = this.conceptInterpreter.getExtentSize(concept, this.conceptInterpretationContext);
@@ -428,7 +428,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
                 }
             }
         } else {
-            tooltip.append(extentSize + " objects");
+            tooltip.append(extentSize + " total");
         }
         this.conceptInterpretationContext.setObjectDisplayMode(originalObjectMode);
         tooltip.append("</html>");
