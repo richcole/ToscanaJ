@@ -74,12 +74,6 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
                     <parameter name="closeDelimiter" value="$"/>
                     <template url="views/simple.txt"/>
                 </objectView>
-                <!-- this one is just showing syntax, it does not do anything useful -->
-                <objectView class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer" name="External View...">
-                    <parameter name="openDelimiter" value="$$$"/>
-                    <parameter name="closeDelimiter" value="%%%"/>
-                    <parameter name="commandLine" value="c:\progra~1\mozilla.org\mozilla\mozilla.exe http://$$$typeCase%%%"/>
-                </objectView>
                 <!-- a report, syntax will change (the file will be included later), we still lack formatting of results... -->
                 <objectListView class="net.sourceforge.toscanaj.dbviewer.HTMLDatabaseViewer" name="HTML Report...">
                     <template url="views/listView.html"/>
@@ -100,6 +94,15 @@ Refer to the documentation of your DBMS which class and URL scheme to use.
                         <column sqlname="price"     displayname="Price"     mincolor="#ff0000" maxcolor="#ffff00" linecolor="#ffffff"/>
                     </template>
                 </objectListView>
+                <!-- this one is just showing syntax, it does not do anything useful. It would if the program would be found
+                     and there would be a table AttributeURLs, mapping AttributeNames to DescriptionURLs-->
+                <attributeView class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer" name="Open description...">
+                    <parameter name="openDelimiter" value="$$$"/>
+                    <parameter name="closeDelimiter" value="%%%"/>
+                    <parameter name="commandLine" value="/some/path/to/mozilla/bin/mozilla $$$DescriptionURL%%%"/>
+                    <table>AttributeURLs</table>
+                    <key>AttributeName</key>
+                </attributeView>
             </views>
         </databaseConnection>
 		<object id="1">price&gt;=5000</object>
