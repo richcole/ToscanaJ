@@ -7,8 +7,6 @@
  */
 package org.tockit.toscanaj.servlet;
 
-import net.sourceforge.toscanaj.parser.CSXParser;
-import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.database.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.diagram.*;
@@ -16,58 +14,35 @@ import org.tockit.events.EventBroker;
 import net.sourceforge.toscanaj.controller.fca.*;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 
 import java.io.*;
 import java.util.*;
-import java.net.URL;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
 public class ToscanaJServlet extends HttpServlet {
-	private static String SERVLET_URL;
-	private static double viewBoxX, viewBoxY, viewBoxWidth, viewBoxHeight;
-	private static int windowWidth, windowHeight;
-	private ConceptualSchema conceptualSchema = null;
-	private DatabaseConnectedConceptInterpreter conceptInterpreter = null;
-	private static final int NODE_SIZE = 10;
-	private static final int IMAGE_HEIGHT = 600;
-	private static final int IMAGE_WIDTH = 800;
-	private static final int FONT_SIZE = 12;
-	private static final String FONT_FAMILY = "Arial";
-	private DiagramSchema diagramSchema = new DiagramSchema();
-	private static final String PopupOptions =
-		"toolbar=no,location=no,directories=no,status=no,menubar=yes,scrollbars=yes,resizable=no,copyhistory=yes,width=400,height=400";
+
+	private static int 		windowWidth, windowHeight;
 
 	public void init() throws ServletException {
+		
 		super.init();
-		SERVLET_URL = getInitParameter("baseURL");
-		if (SERVLET_URL == null) {
-			throw new ServletException("No baseURL given as init parameter");
-		}
-		try {
-			parseSchemaFile();
-		} catch (Exception e) {
-			throw new ServletException("Parsing Schema failed", e);
-		}
-		DatabaseInfo databaseInfo = conceptualSchema.getDatabaseInfo();
-		conceptInterpreter =
-			new DatabaseConnectedConceptInterpreter(databaseInfo);
-		try {
-			DatabaseConnection connection =
-				new DatabaseConnection(new EventBroker());
-			connection.connect(databaseInfo);
-			URL location =
-				conceptualSchema.getDatabaseInfo().getEmbeddedSQLLocation();
-			if (location != null) {
-				connection.executeScript(location);
+		if(!GlobalVariables.isInitialized()) {
+			// get the schema filename from the servlet init parameter
+			String inputFile = getInitParameter("schemaFile");        
+
+			// if no filename defined        
+			if(inputFile == null) {
+				throw new RuntimeException("No file given as parameter");
 			}
-			DatabaseConnection.setConnection(connection);
-		} catch (DatabaseException e) {
-			e.printStackTrace();
-			throw new ServletException(
-				"Could not connect to database: " + e.getCause().getMessage(),
-				e);
+        
+			String servletUrl = getInitParameter("baseURL");
+			if (servletUrl == null) {
+				throw new ServletException("No baseURL given as init parameter");
+			}
+			File schemaFile = new File(inputFile);
+			
+			GlobalVariables.initialize(schemaFile, servletUrl);
 		}
 	}
 
@@ -111,7 +86,7 @@ public class ToscanaJServlet extends HttpServlet {
 		if (filterConceptParameter != null) {
 			int diagramNumber = Integer.parseInt(diagramParameter);
 			diagramHistory.addDiagram(
-				conceptualSchema.getDiagram(diagramNumber));
+				GlobalVariables.getConceptualSchema().getDiagram(diagramNumber));
 			Concept concept = getConcept(diagramNumber, filterConceptParameter);
 			diagramHistory.next(concept);
 			resp.setContentType("text/html");
@@ -124,12 +99,12 @@ public class ToscanaJServlet extends HttpServlet {
 			Query query;
 			if (queryParameter != null) {
 				int queryNumber = Integer.parseInt(queryParameter);
-				query = (Query) conceptualSchema.getQueries().get(queryNumber);
+				query = (Query) GlobalVariables.getConceptualSchema().getQueries().get(queryNumber);
 				session.setAttribute("query", query);
 			} else {
 				query = (Query) session.getAttribute("query");
 				if (query == null) {
-					query = (Query) conceptualSchema.getQueries().get(0);
+					query = (Query) GlobalVariables.getConceptualSchema().getQueries().get(0);
 				}
 			}
 			printConceptList(
@@ -159,14 +134,17 @@ public class ToscanaJServlet extends HttpServlet {
 			"<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"./css/style.css\"><title>ToscanaJServlet</title>");
 		out.println("<meta http-equiv=\"Expires\" content=\"0\">");
 		out.println("<meta http-equiv=\"Pragma\" content=\"no-cache;\">");
-
+		out.println("<script language=\"javascript\">");
+		out.println("function activate(y) { window.status = y; return true; }");
+		out.println("function deactivate() { window.status = ''; return true; }");
+		out.println("</script>");
 		out.println("</head><body>");
 
 		out.println("<table bgcolor=\"#297A01\"><tr><td>");
 
 		out.println(
 			"<form name=\"myForm2\" method=\"get\" action=\""
-				+ SERVLET_URL
+				+ GlobalVariables.getServletUrl()
 				+ "\">");
 		out.println(
 			"<input type=\"hidden\" name=\"diagram\" value=\""
@@ -178,7 +156,7 @@ public class ToscanaJServlet extends HttpServlet {
 				+ "\">");
 		out.println("<select name=\"query\">");
 
-		Iterator queryIterator = conceptualSchema.getQueries().iterator();
+		Iterator queryIterator = GlobalVariables.getConceptualSchema().getQueries().iterator();
 		int i = 0;
 
 		while (queryIterator.hasNext()) {
@@ -210,15 +188,24 @@ public class ToscanaJServlet extends HttpServlet {
 		Concept concept = getConcept(diagramNumber, nodeId);
 		out.println("<ul>");
 		Object[] contents =
-			conceptInterpreter.executeQuery(
+			GlobalVariables.getConceptInterpreter().executeQuery(
 				query,
 				concept,
 				new ConceptInterpretationContext(
 					diagramHistory,
 					new EventBroker()));
+					
+		String searchQuery;
+		
 		for (int j = 0; j < contents.length; j++) {
-			String object = contents[i].toString();
-			out.println("<li>" + object + "</li>");
+			String object = contents[j].toString();
+			if (query.getName().equals("List")) {
+				searchQuery = constructQueryString(object);			
+				out.println("<li><a onMouseOut=\"deactivate();\" onMouseOver=\"activate('Check info for " + escapeEntities(object) + " !!');return true;\" class=\"one\" target=\"_blank\" href=\"http://us.imdb.com/M/title-substring?" + searchQuery + "\">" + object + "</a></li>");
+			}
+			else {
+				out.println("<li>" + object + "</li>");
+			}
 		}
 		out.println("</ul>");
 		//        out.println("<h2>Change query:</h2>");
@@ -226,7 +213,7 @@ public class ToscanaJServlet extends HttpServlet {
 	}
 
 	private Concept getConcept(int diagramNumber, String nodeId) {
-		Diagram2D diagram = conceptualSchema.getDiagram(diagramNumber);
+		Diagram2D diagram = GlobalVariables.getConceptualSchema().getDiagram(diagramNumber);
 		DiagramNode node = diagram.getNode(nodeId);
 		Concept concept = node.getConcept();
 		return concept;
@@ -242,18 +229,18 @@ public class ToscanaJServlet extends HttpServlet {
 
 		out.println("</head><body>");
 
-		int numberOfDiagrams = conceptualSchema.getNumberOfDiagrams();
+		int numberOfDiagrams = GlobalVariables.getConceptualSchema().getNumberOfDiagrams();
 
 		out.println("<table bgcolor=\"#0B70A2\" width=\"2000\"><tr><td>");
 
 		out.println(
 			"<form name=\"myForm\" method=\"get\" action=\""
-				+ SERVLET_URL
+				+ GlobalVariables.getServletUrl()
 				+ "\">");
 		out.println("<select name=\"diagram\">");
 
 		for (int i = 0; i < numberOfDiagrams; i++) {
-			Diagram2D diagram = conceptualSchema.getDiagram(i);
+			Diagram2D diagram = GlobalVariables.getConceptualSchema().getDiagram(i);
 			if (diagramNumber == i) {
 				out.println(
 					"<option value=\""
@@ -278,20 +265,18 @@ public class ToscanaJServlet extends HttpServlet {
 		out.println("</form>");
 		out.println("</td></tr></table>");
 
-		out
-			.println(
+		out.println(
 				"<br><br><center><table><tr>"
-				+ "<td valign=\"center\"><embed type=\"image/svg-xml\" "
+				+ "<td valign=\"center\"><embed " 
+				+ "type=\"image/svg-xml\" "
 				+ "width=\""
-				+ 1024 * 0.7
+				+ 1024 * 0.67
 				+ "\" height=\""
-				+ 768 * 0.8
+				+ 768 * 0.7
 				+ "\" pluginspace=\"http://www.adobe.com/svg/viewer/install/\" "
 				+ 
-		//                "name=\"svg1\" src=\"" + SERVLET_URL + "/ToscanaJDiagrams?&x='+screen.width+'&y='+screen.height+'&diagram=" + diagramNumber + "\"></td></tr></table></center>");
-		//                "name=\"svg1\" src=\"" + SERVLET_URL + "/ToscanaJDiagrams?&x=1024&y=768&diagram=" + diagramNumber + "\"></td></tr></table></center>");
 		"name=\"svg1\" src=\""
-			+ SERVLET_URL
+			+ GlobalVariables.getServletUrl()
 			+ "/ToscanaJDiagrams?diagram="
 			+ diagramNumber
 			+ "&x="
@@ -299,22 +284,6 @@ public class ToscanaJServlet extends HttpServlet {
 			+ "&y="
 			+ windowHeight
 			+ "\"></td></tr></table></center>");
-		//        "name=\"svg1\" src=\"" + SERVLET_URL + "/ToscanaJDiagrams?diagram=" + diagramNumber + "&x=1024&y=768\"></td></tr></table></center>");
-
-		//<A HREF="javascript:alert('Your resolution is '+screen.width+'x'+screen.height);">
-
-		//out.println("<table><tr><td onMouseOver=\"javascript:window.showMenu(window.myMenu);\">Show Diagrams</td></table>");
-		//        out.println("<h1>All Diagrams:</h1>");
-		//        int numberOfDiagrams = conceptualSchema.getNumberOfDiagrams();
-		//        out.println("<ol>");
-		//        for(int i = 0; i<numberOfDiagrams; i++) {
-		//            Diagram2D diagram = conceptualSchema.getDiagram(i);
-		////            out.println("<li><a href=\"" + SERVLET_URL + "?diagram=" + i + "\">" + diagram.getTitle() + "</a></li>");
-		//            out.println("<li><a class=\"one\" href=\"javascript:window.location('" + SERVLET_URL + "?diagram=" + i + "&x='+screen.width+'&y='+screen.height)\" target=\"diagram\">" + diagram.getTitle() + "</a></li>");
-		//            //<A HREF="javascript:alert('Your resolution is '+screen.width+'x'+screen.height);">
-
-		//        }
-		//        out.println("</ol>");
 		out.println("</body></html>");
 	}
 
@@ -329,18 +298,18 @@ public class ToscanaJServlet extends HttpServlet {
 		out.println("}");
 		out.println("</script>");
 		out.println("</head><body>");
-		int numberOfDiagrams = conceptualSchema.getNumberOfDiagrams();
+		int numberOfDiagrams = GlobalVariables.getConceptualSchema().getNumberOfDiagrams();
 
 		out.println(
 			"<table bgcolor=\"#0B70A2\" height=\"20\" width=\"2000\"><tr><td>");
 		out.println(
 			"<form name=\"myForm\" method=\"get\" action=\""
-				+ SERVLET_URL
+				+ GlobalVariables.getServletUrl()
 				+ "\">");
 		out.println("<select name=\"diagram\">");
 
 		for (int i = 0; i < numberOfDiagrams; i++) {
-			Diagram2D diagram = conceptualSchema.getDiagram(i);
+			Diagram2D diagram = GlobalVariables.getConceptualSchema().getDiagram(i);
 			out.println(
 				"<option value=\""
 					+ i
@@ -359,19 +328,20 @@ public class ToscanaJServlet extends HttpServlet {
 		out.println("<script language=\"javascript\">fillForm();</script>");
 		out.println("</td></tr></table>");
 		out.println(
-			"<br><br><center><table><tr><td align=\"center\" width=\"75\" height=\"400\"></td>"
+			"<br><br><center><table><tr>"
 				+ "<td valign=\"center\"><embed type=\"image/svg-xml\" "
-				+ "width=\"350\" height=\"200\" pluginspace=\"http://www.adobe.com/svg/viewer/install/\" "
-				+ "name=\"svg1\" src=\"./images/ToscanaJLogo.svg\"></td></tr></table></center>");
+				+ "pluginspace=\"http://www.adobe.com/svg/viewer/install/\" "
+				+ "name=\"svg1\" width=\"" + 1024 * 0.67 + "\" height=\"" + 768 * 0.7 
+				+ "\" src=\"./images/ToscanaJLogo.svg\"></td></tr></table></center>");
 
 		//<A HREF="javascript:alert('Your resolution is '+screen.width+'x'+screen.height);">
 
 		//out.println("<table><tr><td onMouseOver=\"javascript:window.showMenu(window.myMenu);\">Show Diagrams</td></table>");
 		//        out.println("<h1>All Diagrams:</h1>");
-		//        int numberOfDiagrams = conceptualSchema.getNumberOfDiagrams();
+		//        int numberOfDiagrams = GlobalVariables.getConceptualSchema().getNumberOfDiagrams();
 		//        out.println("<ol>");
 		//        for(int i = 0; i<numberOfDiagrams; i++) {
-		//            Diagram2D diagram = conceptualSchema.getDiagram(i);
+		//            Diagram2D diagram = GlobalVariables.getConceptualSchema().getDiagram(i);
 		////            out.println("<li><a href=\"" + SERVLET_URL + "?diagram=" + i + "\">" + diagram.getTitle() + "</a></li>");
 		//            out.println("<li><a class=\"one\" href=\"javascript:window.location('" + SERVLET_URL + "?diagram=" + i + "&x='+screen.width+'&y='+screen.height)\" target=\"diagram\">" + diagram.getTitle() + "</a></li>");
 		//            //<A HREF="javascript:alert('Your resolution is '+screen.width+'x'+screen.height);">
@@ -380,14 +350,52 @@ public class ToscanaJServlet extends HttpServlet {
 		//        out.println("</ol>");
 		out.println("</body></html>");
 	}
+	
+	public String constructQueryString(String object){
 
-	private void parseSchemaFile() throws Exception, IOException {
-		String initParameter = getInitParameter("schemaFile");
-		//        String initParameter = "/Adrian/examples/sql/pctest/pctest.csx";
-		if (initParameter == null) {
-			throw new RuntimeException("No file given as parameter");
+		StringTokenizer st = new StringTokenizer(object);
+		String result = "";
+		
+		while (st.hasMoreTokens()) {
+			result += escapeEntities(st.nextToken()) + "+";						
 		}
-		File schemaFile = new File(initParameter);
-		conceptualSchema = CSXParser.parse(new EventBroker(), schemaFile);
+		
+		return result;
 	}
+	
+	private String escapeEntities(String string) 
+	{
+    	
+		System.out.println("ToscanaJDiagrams: escapeEntities");
+		String retVal = "";
+		for(int i = 0; i < string.length(); i++) 
+		{
+			char c = string.charAt(i);
+			switch(c) {
+				case '-':
+					retVal += "";
+					break;
+				case '\'':
+					retVal += "";
+					break;
+				case ',':
+					retVal += "";
+					break;
+				case '?':
+					retVal += "";
+					break;
+				case '=':
+					retVal += "";
+					break;
+				case '"':
+					retVal += "";
+					break;
+				default:
+					retVal += c;
+			}
+		}
+		return retVal;
+        
+	}
+
 }
