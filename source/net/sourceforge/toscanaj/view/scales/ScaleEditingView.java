@@ -7,11 +7,9 @@ import net.sourceforge.toscanaj.model.Column;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.Table;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
-import util.CollectionFactory;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -19,16 +17,13 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Iterator;
-import java.util.List;
 
-public class ScaleEditingView extends JPanel implements BrokerEventListener {
+public class ScaleEditingView extends JPanel implements BrokerEventListener, TableColumnPairsSelectionSource {
     private ConceptualSchema conceptualSchema;
     private DefaultListModel tableColumnListModel;
     private DefaultListModel scalesListModel;
     private JSplitPane splitPane;
     private JSplitPane leftPane;
-    private JPanel generatorButtonsPane;
-    private List scaleGenerators = null;
     private JList tableColumnsListView;
 
     private JFrame parentFrame;
@@ -61,49 +56,14 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
     }
 
     private JComponent makeScaleGeneratorPane() {
-        JComponent scaleGeneratorView = null;
-        generatorButtonsPane = new JPanel();
-        fillGeneratorButtonsPane();
-        scaleGeneratorView = generatorButtonsPane;
-        return scaleGeneratorView;
+        return new ScaleGeneratorPanel(getParentFrame(), conceptualSchema, this);
     }
 
-    private List getScaleGenerators() {
-        if (scaleGenerators == null) {
-            scaleGenerators = CollectionFactory.createDefaultList();
-            fillScales();
-        }
-        return scaleGenerators;
-    }
-
-    private void fillScales() {
-        scaleGenerators.add(new OrdinalScaleGenerator(getParentFrame()));
-    }
-
-    private void fillGeneratorButtonsPane() {
-        generatorButtonsPane.setLayout(new FlowLayout());
-        generatorButtonsPane.removeAll();
-        Iterator it = getScaleGenerators().iterator();
-        while (it.hasNext()) {
-            final ScaleGenerator generator = (ScaleGenerator) it.next();
-            JButton generatorButton = new JButton(generator.getScaleName());
-            generatorButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    Diagram2D returnValue = generator.generateScale(getSelectedColumns());
-                    if(null!=returnValue){
-                        conceptualSchema.addDiagram(returnValue);
-                    }
-                }
-            });
-            generatorButtonsPane.add(generatorButton);
-        }
-    }
-
-    private TableColumnPair[] getSelectedColumns(){
+    public TableColumnPair[] getSelectedTableColumnPairs() {
         int[] selections = tableColumnsListView.getSelectedIndices();
         TableColumnPair[] ret = new TableColumnPair[selections.length];
-        for(int i=0;i<selections.length; i++){
-            ret[i] = (TableColumnPair)tableColumnListModel.get(selections[i]);
+        for (int i = 0; i < selections.length; i++) {
+            ret[i] = (TableColumnPair) tableColumnListModel.get(selections[i]);
         }
         return ret;
     }
@@ -115,6 +75,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
         fillTableColumnsList();
 
         tableColumnsListView = new JList(tableColumnListModel);
+/*
         MouseListener mouseListener = new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -123,6 +84,7 @@ public class ScaleEditingView extends JPanel implements BrokerEventListener {
             }
         };
         tableColumnsListView.addMouseListener(mouseListener);
+*/
 
         JPanel tableColumnPane = new JPanel();
         tableColumnPane.setLayout(new GridBagLayout());
