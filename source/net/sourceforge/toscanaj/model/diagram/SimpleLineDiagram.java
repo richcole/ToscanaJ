@@ -127,8 +127,9 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 	/**
 	 * Make a deep copy of the node, copying all properties, with 
 	 * the following exceptions:
-	 *  - concept: we do attempt to do a deep copy, however, at the moment Obects
-	 * in objectContingent are not recreated due to inability to do so.
+	 *  - concept: we do attempt to do a deep copy, however, Obects
+	 * in objectContingent and Attributes in attributeContingents are copied 
+	 * by reference.
 	 * - identifier: at the moment just copy the same identifier over.
 	 */
     private DiagramNode makeDiagramNodeCopy (DiagramNode node) {   	
@@ -140,7 +141,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 		Iterator attrIterator = originalNodeConcept.getAttributeContingentIterator();
 		while (attrIterator.hasNext()) {
 			Attribute curAttr = (Attribute) attrIterator.next();
-			concept.addAttribute(new Attribute(curAttr.getData()));
+			concept.addAttribute(curAttr);
 		}
 		Iterator objIterator = originalNodeConcept.getObjectContingentIterator();
 		while (objIterator.hasNext()) {
