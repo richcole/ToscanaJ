@@ -194,10 +194,8 @@ public class ContextTableView extends JComponent {
 	}
 
 	protected Position getTablePosition(int xLoc, int yLoc) {
-		int xPos = xLoc - this.getX();
-		int yPos = yLoc - this.getY();
-		int col = xPos / getCellWidth();
-		int row = yPos / getCellHeight();
+		int col = xLoc / getCellWidth();
+		int row = yLoc / getCellHeight();
 		if ((col > this.context.getAttributes().size() )
 			|| (row > this.context.getObjects().size() )) {
 			return null;
