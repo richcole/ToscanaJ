@@ -66,7 +66,7 @@ public class Table implements XMLizable {
         columns.add(column);
     }
 
-    public String getPlainName() {
+    public String getDisplayName() {
     	return this.name;
     }
 

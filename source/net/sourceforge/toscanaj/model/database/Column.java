@@ -46,7 +46,7 @@ public class Column implements XMLizable {
         type = XMLHelper.getIntAttribute(elem, COLUMN_TYPE_ATTRIBUTE_NAME);
     }
 
-    public String getName() {
+    public String getDisplayName() {
         return this.name;
     }
     
