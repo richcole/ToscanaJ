@@ -36,25 +36,6 @@ public class DiagramController implements ChangeObservable {
      */
     private DiagramHistory history = new DiagramHistory();
 
-
-    /**
-     * Stores the number of objects in the current diagram.
-     */
-    private int numberOfCurrentObjects = 0;
-
-    /**
-     * Stores the maximal contingent size in the current diagram.
-     */
-    private int maxContingentSize = 0;
-
-    /**
-     * Stores the number of objects in the schema.
-     *
-     * This will currently be calculated by using the number of objects in the
-     * first diagram displayed.
-     */
-    private int numberOfObjects = -1;
-
     /**
      * Returns the only instance of this class.
      */
@@ -162,33 +143,13 @@ public class DiagramController implements ChangeObservable {
      * This is currently an instance of SimpleLineDiagram which is filtered
      * by the extent of the zoomed concepts in the past diagrams. If there is
      * no diagram selected this will return null.
-     * 
-     * @todo the result should be cached, since this method can be called
-     *       multiple times in a row, e.g. if the user changes from flat
-     *       to nested view, both update(..)s of the main panel and the
-     *       diagram view call this, thus the nested diagram gets calculated
-     *       twice. 
      */
     public Diagram2D getCurrentDiagram() {
-        // this code is pretty tricky -- if concepts are filtered they loose
-        // their ideal/filter, this has to be either avoided or fixed. If we
-        // wouldn't check for (filter == null) and just call filterByXX(null)
-        // instead we would loose the ideal/filter information which results
-        // in wrong output (always filtering by contingent, never by extent)
         if (history.getNumberOfCurrentDiagrams() == 0) {
             // we don't have a diagram to display
             return null;
         }
-        /** @todo : Calculating the objects in the diagram is currently a side
-         effect of the diagram calculation --> fix by putting the
-         calculation into Diagram2D. */
-        this.numberOfCurrentObjects = 0;
-        this.maxContingentSize = 0;
-        Diagram2D retVal = getNestedDiagram(history.getNumberOfCurrentDiagrams() - 1);
-        if (this.numberOfObjects == -1) {
-            this.numberOfObjects = this.numberOfCurrentObjects;
-        }
-        return retVal;
+        return getNestedDiagram(history.getNumberOfCurrentDiagrams() - 1);
     }
 
     /**
@@ -211,28 +172,6 @@ public class DiagramController implements ChangeObservable {
         }
         // else created nested diagram recursively
         return new NestedLineDiagram(getNestedDiagram(pos - 1), history.getCurrentDiagram(pos));
-    }
-
-    /**
-     * Returns the number of objects currently displayed.
-     */
-    public int getNumberOfCurrentObjects() {
-        return this.numberOfCurrentObjects;
-    }
-
-    /**
-     * Returns the maximal number of objects in any contingent in the current
-     * diagram.
-     */
-    public int getMaximalObjectContingentSize() {
-        return this.maxContingentSize;
-    }
-
-    /**
-     * Returns the number of objects in the whole schema.
-     */
-    public int getNumberOfObjects() {
-        return this.numberOfObjects;
     }
 
     /**

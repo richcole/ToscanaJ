@@ -135,7 +135,7 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
 		
 		goBackOneDiagramItem.setEnabled(DiagramController.getController().undoIsPossible());
 		
-		if(DiagramController.getController().getNumberOfObjects()==-1){
+		if(this.diagramView.getDiagram() == null){
 			goBackOneDiagramItem.setEnabled(false);
 			showDiagramDescriptionMenu.setEnabled(false);
 			showAnalysisHistory.setEnabled(false);
