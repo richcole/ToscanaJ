@@ -387,7 +387,9 @@ public class DiagramNode implements XMLizable {
                 continue;
             }
             double avRadius = (this.radiusX + this.radiusY)/2;
-            if(line.calculateDistance(this.position) < avRadius) {
+            // call getPosition() instead of using the member since NDimDiagramNode
+            // overrides the method
+            if(line.calculateDistance(getPosition()) < avRadius) {
                 return true;
             }
         }

@@ -114,7 +114,11 @@ public class DiagramLine implements XMLizable {
      * Returns the length of this line.
      */
     public double getLength() {
-        return this.toNode.position.distance(this.fromNode.position);
+        // do not use the position of the nodes, since this might be an offset in the
+        // case of NDimDiagramNode
+        double dx = this.toNode.getX() - this.fromNode.getX();
+        double dy = this.toNode.getY() - this.fromNode.getY();
+        return Math.sqrt(dx * dx + dy * dy);
     }
     
     /**
@@ -132,24 +136,31 @@ public class DiagramLine implements XMLizable {
         double ty = this.toNode.getY();
         double x = point.getX();
         double y = point.getY();
-        double length = getLength();
+        double dx = this.toNode.getX() - this.fromNode.getX();
+        double dy = this.toNode.getY() - this.fromNode.getY();
         
         // calculate distance from line without considering end points
-        double distLine = Math.abs((tx-fx)*(fy-y) - (fx-x)*(ty-fy)) / length;
+        // stay in square values until the end to avoid too many complex operations
+        double lengthSq = (dx*dx + dy*dy);
+        double distLineSq = ((tx-fx)*(fy-y) - (fx-x)*(ty-fy)) *
+                            ((tx-fx)*(fy-y) - (fx-x)*(ty-fy)) / 
+                                    lengthSq;
         // calculate the distance to the end points
-        double distFrom = this.fromNode.position.distance(point);
-        double distTo = this.toNode.position.distance(point);
+        // do not use the node's position since that is only the offset in the
+        // case of NDimDiagramNode
+        double distFromSq = (fx-x)*(fx-x) + (fy-y)*(fy-y);
+        double distToSq = (tx-x)*(tx-x) + (ty-y)*(ty-y);
         // the distance of a point on a perpendicular in an end node, distLine
         // from that end node away, measured from the other end node (Pythagoras)
-        double distOppSq = distLine * distLine + length * length;
+        double distOppSq = distLineSq + lengthSq;
         
         // now check if we are outside the sides
-        if(distFrom > distTo && distFrom * distFrom > distOppSq) {
-            return distTo;
+        if(distFromSq > distToSq && distFromSq > distOppSq) {
+            return Math.sqrt(distToSq);
         }
-        if(distTo > distFrom && distTo * distTo > distOppSq) {
-            return distFrom;
+        if(distToSq > distFromSq && distToSq > distOppSq) {
+            return Math.sqrt(distToSq);
         }
-        return distLine;
+        return Math.sqrt(distLineSq);
     }
 }

@@ -173,6 +173,10 @@ public abstract class NDimLayoutOperations {
 		return minDist;
 	}
 
+    /**
+     * @todo this could probably use DiagramLine.calculateDistance(Point2D), which also
+     * considers the end points
+     */
 	private static double calculateDistanceToLine(DiagramNode node, DiagramLine line) {
 		Point2D from = line.getFromPosition();
 		Point2D to = line.getToPosition();
