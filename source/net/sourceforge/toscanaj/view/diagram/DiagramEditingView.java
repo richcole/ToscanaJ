@@ -47,6 +47,7 @@ import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
@@ -56,6 +57,7 @@ import java.awt.geom.Point2D;
 import java.util.Iterator;
 
 public class DiagramEditingView extends JPanel implements EventBrokerListener {
+    private static final int DEFAULT_GRID_SIZE = 15;
     private static final String[] FULL_MOVEMENT_OPTION_NAMES = {"NDim", "Node", "Ideal", "Filter"};
     private static final String[] SIMPLE_MOVEMENT_OPTION_NAMES = {"Node", "Ideal", "Filter"};
     private ConceptualSchema conceptualSchema;
@@ -74,6 +76,9 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private JComboBox movementChooser;
     private JButton editDiagramDescButton;
     protected ContextTableScaleEditorDialog contextEditingDialog;
+    private JButton gridIncreaseButton;
+    private JButton gridDecreaseButton;
+    private JCheckBox gridEnabledCheckBox;
 
     /**
      * Construct an instance of this view
@@ -85,7 +90,9 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
         setName("DiagramEditingView");
 
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, makeDiagramListView(), makeDiagramViewPanel());
+        JComponent diagramListView = makeDiagramListView();
+        JPanel mainDiagramView = makeDiagramViewPanel();
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, diagramListView, mainDiagramView);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0);
         add(splitPane);
@@ -113,8 +120,10 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 new ConceptInterpretationContext(new DiagramHistory(), canvasEventBroker);
         diagramView.setConceptInterpreter(interpreter);
         diagramView.setConceptInterpretationContext(interpretationContext);
+        diagramView.setGrid(DEFAULT_GRID_SIZE,DEFAULT_GRID_SIZE);
         new LabelDragEventHandler(canvasEventBroker);
         new LabelClickEventHandler(canvasEventBroker);
+        diagramView.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
         JPanel toolPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         createMovementManipulators(toolPanel);
@@ -134,6 +143,35 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
             }
         });
         toolPanel.add(zoomOutButton);
+
+        toolPanel.add(new JLabel("Grid:"));
+        gridIncreaseButton = new JButton("+");
+        gridIncreaseButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                diagramView.increaseGridSize();
+            }
+        });
+        gridIncreaseButton.setEnabled(false);
+        toolPanel.add(gridIncreaseButton);
+        gridDecreaseButton = new JButton("-");
+        gridDecreaseButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                diagramView.decreaseGridSize();
+            }
+        });
+        gridDecreaseButton.setEnabled(false);
+        toolPanel.add(gridDecreaseButton);
+        gridEnabledCheckBox = new JCheckBox("use");
+        gridEnabledCheckBox.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		boolean enabled = gridEnabledCheckBox.isSelected();
+        		gridIncreaseButton.setEnabled(enabled);
+        		gridDecreaseButton.setEnabled(enabled);
+        		diagramView.setGridEnabled(enabled);	
+            }
+        });
+        gridEnabledCheckBox.setEnabled(false);
+        toolPanel.add(gridEnabledCheckBox);
 
         editContextButton = new JButton("Edit Context...");
         editContextButton.addActionListener(new ActionListener() {
@@ -425,6 +463,9 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     	boolean diagramAvailable = this.diagramView.getDiagram() != null;
 		this.zoomInButton.setEnabled(diagramAvailable);
 		this.zoomOutButton.setEnabled(diagramAvailable);
+        this.gridIncreaseButton.setEnabled(diagramAvailable);
+        this.gridDecreaseButton.setEnabled(diagramAvailable);
+        this.gridEnabledCheckBox.setEnabled(diagramAvailable);
 		this.editContextButton.setEnabled(diagramAvailable);
 		this.editDiagramDescButton.setEnabled(diagramAvailable);
 		if(movementChooser != null) {
