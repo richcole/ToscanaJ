@@ -70,6 +70,10 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
 
             this.template = viewerManager.getTemplate();
 
+            if( template == null ) {
+                throw new DatabaseViewerInitializationException("HTMLDatabaseViewer needs <template> in definition");
+            }
+
             // find <repeat> and non-repeat <field>s first
             List queue = new LinkedList();
             queue.add(this.template.getChild("html"));
