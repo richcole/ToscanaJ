@@ -21,7 +21,9 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
 public class CanvasFeedbackMessage extends CanvasItem {
-	private long endTime;
+    private static final int X_MARGIN = 10;
+    private static final int Y_MARGIN = 5;
+    private long endTime;
     private long fadeInTime;
 	private long fadeOutTime;
 	
@@ -33,8 +35,10 @@ public class CanvasFeedbackMessage extends CanvasItem {
 	private static final long HOLD_TIME = 3000;
 	private static final long FADE_TIME = 300;
 	
-	private static final Font MESSAGE_FONT = new Font("SansSerif", Font.PLAIN, 14);
-	private static final Color MESSAGE_COLOR = Color.RED;
+	private static final Font MESSAGE_FONT = new Font("SansSerif", Font.PLAIN, 20);
+    private static final Color MESSAGE_COLOR = Color.WHITE;
+    private static final Color BORDER_COLOR = Color.WHITE;
+    private static final Color LABEL_COLOR = Color.RED;
 	
     private CanvasCallbackHandler canvasCallbackHandler;
 	
@@ -81,15 +85,31 @@ public class CanvasFeedbackMessage extends CanvasItem {
         } else if( time > this.fadeOutTime ) {
     		alpha = (this.endTime - time) / (double) FADE_TIME;
     	}
-    	Color color = new Color(MESSAGE_COLOR.getRed(), MESSAGE_COLOR.getGreen(), MESSAGE_COLOR.getBlue(), (int) (alpha * 255));
-    	
-        g.setPaint(color);
-    	g.setFont(MESSAGE_FONT);
-    	
-    	g.drawString(this.message, (float)this.bounds.getX(), (float)this.bounds.getY());
+        Color textColor = createFadedColor(MESSAGE_COLOR, alpha);
+        Color borderColor = createFadedColor(BORDER_COLOR, alpha);
+        Color labelColor = createFadedColor(LABEL_COLOR, alpha);
+        Font font = getRescaledMessageFont(g);
+        
+        g.setPaint(labelColor);
+		g.fill(this.bounds);
+        g.setPaint(borderColor);
+        g.draw(this.bounds);
+
+        g.setPaint(textColor);
+        g.setFont(font);
+    	g.drawString(this.message, (float) (this.bounds.getMinX() + getRescaledXMargin(g)), 
+    	                           (float) (this.bounds.getMinY() + g.getFontMetrics().getHeight() ) );
     	
     	g.setPaint(oldPaint);
     	g.setFont(oldFont);
+    }
+
+    public Font getRescaledMessageFont(Graphics2D g) {
+        return MESSAGE_FONT.deriveFont((float) (MESSAGE_FONT.getSize2D() / g.getTransform().getScaleY()) );
+    }
+
+    protected Color createFadedColor(Color color, double alpha) {
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), (int) (alpha * 255));
     }
     
     private void cleanUp() {
@@ -114,12 +134,22 @@ public class CanvasFeedbackMessage extends CanvasItem {
     
     private void updateBounds(Graphics2D g) {
     	Font oldFont = g.getFont();
-    	g.setFont(MESSAGE_FONT);
+    	g.setFont(getRescaledMessageFont(g));
+        double marginX = getRescaledXMargin(g);
+        double marginY = getRescaledYMargin(g);
         double cx = pos.getX();
         double cy = pos.getY();
         double width = g.getFontMetrics().stringWidth(this.message);
         double height = g.getFontMetrics().getHeight();
-        this.bounds = new Rectangle2D.Double(cx -width/2, cy - height/2, width, height);
+        this.bounds = new Rectangle2D.Double(cx -width/2 - marginX, cy - height/2 - marginY, width + 2 * marginX, height + 2 * marginY);
         g.setFont(oldFont);
+    }
+
+    private double getRescaledXMargin(Graphics2D g) {
+        return X_MARGIN / g.getTransform().getScaleX();
+    }
+
+    private double getRescaledYMargin(Graphics2D g) {
+        return Y_MARGIN / g.getTransform().getScaleY();
     }
 }
