@@ -177,6 +177,11 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 		} catch (Throwable t) {
 			// do nothing, we just don't support SVG
 		}
+		try {
+			org.tockit.canvas.imagewriter.PDFImageWriter.initialize();
+		} catch (Throwable t) {
+			// do nothing, we just don't support PDF
+		}
 
         // the next one is part of JDK 1.4, so it should give us JPG and PNG all the time
        	org.tockit.canvas.imagewriter.ImageIOImageWriter.initialize();
