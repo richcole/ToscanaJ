@@ -92,7 +92,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         sequenceColumnChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	calculateValueLists();
-                fillSequenceChoosers();
+                fillSequenceChooser();
             }
         });
 
@@ -101,7 +101,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         timelineColumnChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 calculateValueLists();
-                fillSequenceChoosers();
+                fillSequenceChooser();
             }
         });
 
@@ -115,16 +115,6 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
             }
         });
 
-        animateTransitionsButton = new JButton("Animate Transitions");
-        animateTransitionsButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e) {
-                addAnimatedTransitions();
-            }
-        });
-
-        exportImagesButton = new JButton("Export Images");
-        exportAnimationButton = new JButton("Export Animation");
-        
         JLabel speedLabel = new JLabel("Speed (ms/step):");
         speedField = new NumberField(10,NumberField.INTEGER);
         speedField.setText("300");
@@ -138,6 +128,16 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         fadeOutField = new NumberField(10,NumberField.FLOAT);
         fadeOutField.setText("5");
         
+        animateTransitionsButton = new JButton("Animate Transitions");
+        animateTransitionsButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                addAnimatedTransitions();
+            }
+        });
+
+        exportImagesButton = new JButton("Export Images");
+        exportAnimationButton = new JButton("Export Animation");
+
         Container contentPane = this.getContentPane();
         GridBagLayout layout = new GridBagLayout();
         contentPane.setLayout(layout);
@@ -157,8 +157,11 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
                                                         GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
         row++;
-        contentPane.add(sequenceToShowChooser, new GridBagConstraints(1, row, 2, 1, 1, 0,
-                                                        GridBagConstraints.CENTER, GridBagConstraints.NONE,
+        contentPane.add(sequenceLabel, new GridBagConstraints(0, row, 2, 1, 1, 0,
+                                                        GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+                                                        new Insets(2,2,2,2), 0, 0));
+        contentPane.add(sequenceToShowChooser, new GridBagConstraints(2, row, 2, 1, 1, 0,
+                                                        GridBagConstraints.EAST, GridBagConstraints.HORIZONTAL,
                                                         new Insets(2,2,2,2), 0, 0));
         row++;
         contentPane.add(addStaticTransitionsButton, new GridBagConstraints(1, row, 2, 1, 1, 0,
@@ -226,12 +229,12 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         timelineColumnChooser.setEnabled(enabled);
 
 		calculateValueLists();        
-        fillSequenceChoosers();
+        fillSequenceChooser();
 
         setButtonStates(!enabled);
     }
 
-    private void fillSequenceChoosers() {
+    private void fillSequenceChooser() {
     	DefaultComboBoxModel model = new DefaultComboBoxModel();
     	model.addElement("<All Sequences>");
     	Iterator it = this.sequenceValues.iterator();
@@ -281,13 +284,7 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
     private void addFixedTransitions() {
         int length = this.timelineValues.size();
         AnimationTimeController newTimeController = new AnimationTimeController(length,0,Double.MAX_VALUE,0,1);
-        Object selectedSequence = this.sequenceToShowChooser.getSelectedItem();
-        if(selectedSequence instanceof AttributeValue) {
-        	AttributeValue sequenceValue = (AttributeValue) selectedSequence;
-            addTransitions(length, newTimeController, false, sequenceValue);
-        } else {
-        	addTransitions(length, newTimeController, false, null);
-        }
+        addTransitions(length, newTimeController, false);
     }
 
     private void addAnimatedTransitions() {
@@ -297,15 +294,22 @@ public class TemporalMainDialog extends JDialog implements EventBrokerListener {
         double fadeOut = this.fadeOutField.getDoubleValue();
         int speed = this.speedField.getIntegerValue();
         AnimationTimeController newTimeController = new AnimationTimeController(length, fadeIn, hold, fadeOut, speed);
-        addTransitions(newTimeController.getAllFadedTime(), newTimeController, true, null);
+        addTransitions(newTimeController.getAllFadedTime(), newTimeController, true);
     }
 
     private void addTransitions(double newTargetTime, AnimationTimeController newTimeController, 
-                                 boolean highlightStates, AttributeValue selectedSequence) {
+                                 boolean highlightStates) {
         if(this.diagramView.hasLayer(TRANSITION_LAYER_NAME)) {
         	this.diagramView.removeLayer(TRANSITION_LAYER_NAME);
         }
         this.diagramView.addLayer(TRANSITION_LAYER_NAME);
+
+        AttributeValue selectedSequence = null; // no specific sequence selected
+		Object selectedSequenceItem = this.sequenceToShowChooser.getSelectedItem();
+		if(selectedSequenceItem instanceof AttributeValue) {
+ 		    selectedSequence = (AttributeValue) selectedSequenceItem;
+		}
+
         List objectSequences = calculateObjectSequences();
         Hashtable nodeViewMap = createNodeViewMap();
         this.timeController = null;
