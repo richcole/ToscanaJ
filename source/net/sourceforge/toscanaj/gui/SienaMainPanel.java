@@ -12,6 +12,8 @@ package net.sourceforge.toscanaj.gui;
  * way too much stuff
  */ 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -39,6 +41,7 @@ import java.util.Vector;
 
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -87,6 +90,7 @@ import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeValue;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObject;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedAttribute;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContextImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableFCAObject;
@@ -156,7 +160,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	private TableView tableView;
 	private RowHeader rowHeader;
 	private ColumnHeader colHeader;
-	/**
+    /**
 	 * @todo this class is superflous, it should be replaced by putting the calculation into the
 	 * TableView class.
 	 */
@@ -275,14 +279,13 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		this.diagramEditingView.setDividerLocation(ConfigurationManager.fetchInt("SienaMainPanel", "diagramViewDivider", 200));
 	}
 
-	protected JPanel createContextEditingView() {
+	/**
+	 * @todo this method is inconsistent with createDiagramEditingView() in terms of return value.
+	 */
+	protected Component createContextEditingView() {
 		rowHeader = new RowHeader(this.conceptualSchema.getManyValuedContext());
 		colHeader = new ColumnHeader(this.conceptualSchema.getManyValuedContext());
 		tableView = new TableView(this.conceptualSchema.getManyValuedContext(),colHeader, rowHeader);
-		final Frame tFrame = JOptionPane.getFrameForComponent(tableView);
-		
-		final ObjectDialog objectDialog = new ObjectDialog(tFrame, this.conceptualSchema.getManyValuedContext());
-
 		tableView.addMouseListener(getTableViewMouseListener());
 				
 		colHeader.addMouseListener(new MouseAdapter() {
@@ -290,11 +293,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
 					double x = e.getPoint().getX();
 					double y = e.getPoint().getY();
-					Point p = new Point(x,y);
-					List propertyList = (List) conceptualSchema.getManyValuedContext().getAttributes();
-					WritableManyValuedAttribute property = (WritableManyValuedAttribute)
-													propertyList.get(p.getRow());
-					PropertiesDialog propertiesDialog = new PropertiesDialog(tFrame,property,conceptualSchema.getManyValuedContext());
+					int row = new Point(x,y).getRow();
+                    editAttribute(row);
 				}
 			}
 		});
@@ -306,11 +306,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 					double y = e.getPoint().getY();
 					Point p = new Point(x,y);
 					int col = p.getCol();
-					ArrayList objectList = (ArrayList) conceptualSchema.getManyValuedContext().getObjects();
-					FCAObject object = (FCAObject) objectList.get(col);
-					objectDialog.setObjectName(object.getName());
-					objectDialog.setSelectedObjectIndex(col);
-					objectDialog.show();
+                    editObject(col);
 				}
 			}
 		});
@@ -322,11 +318,62 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
 		JPanel retVal = new JPanel(new BorderLayout());
+		retVal.add(createContextToolbar(), BorderLayout.NORTH);
 		retVal.add(scrollPane, BorderLayout.CENTER);
 		return retVal;
 	}
 
-	protected MouseListener getTableViewMouseListener() {
+	private void editObject(int row) {
+		Frame tFrame = JOptionPane.getFrameForComponent(tableView);
+		ArrayList objectList = (ArrayList) conceptualSchema.getManyValuedContext().getObjects();
+		WritableFCAObject object = (WritableFCAObject) objectList.get(row);
+		ObjectDialog objectDialog = new ObjectDialog(tFrame, object);
+		objectDialog.show();
+		this.tableView.updateSize();
+		this.rowHeader.updateSize();
+	}
+
+	private void editAttribute(int column) {
+		Frame tFrame = JOptionPane.getFrameForComponent(tableView);
+		List propertyList = (List) conceptualSchema.getManyValuedContext().getAttributes();
+		WritableManyValuedAttribute property = (WritableManyValuedAttribute)
+										propertyList.get(column);
+		PropertiesDialog propertiesDialog = new PropertiesDialog(tFrame,property,conceptualSchema.getManyValuedContext());
+	}
+
+	private Component createContextToolbar() {
+		JPanel retVal = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		final JButton addObjectButton = new JButton("Add object...");
+		addObjectButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	WritableManyValuedContext manyValuedContext = conceptualSchema.getManyValuedContext();
+                manyValuedContext.add(new FCAObjectImplementation(""));
+            	editObject(manyValuedContext.getObjects().size() - 1);
+            }
+        });
+
+		final JButton addAttributeButton = new JButton("Add attribute...");
+		addAttributeButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(addAttributeButton,"Not yet implemented");
+			}
+		});
+
+		final JButton createDiagramButton = new JButton("Create Diagram...");
+		createDiagramButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JOptionPane.showMessageDialog(createDiagramButton,"Not yet implemented");
+			}
+		});
+		
+		retVal.add(addObjectButton);
+		retVal.add(addAttributeButton);
+		retVal.add(createDiagramButton);
+
+        return retVal;
+    }
+
+    protected MouseListener getTableViewMouseListener() {
 		MouseListener mouseListener = new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getButton() == MouseEvent.BUTTON1) {
@@ -1026,7 +1073,13 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	protected void showNumericInputDialog(WritableManyValuedAttribute attribute,
 												WritableFCAObject obj) {
 		WritableManyValuedContext context = this.conceptualSchema.getManyValuedContext();
-        String content = context.getRelationship(obj,attribute).toString();
+        AttributeValue relationship = context.getRelationship(obj,attribute);
+        String content;
+        if(relationship != null) {
+			content = relationship.toString();
+        } else {
+        	content = "";
+        }
 		String value = (String) JOptionPane.showInputDialog(this,"Enter Value","Edit Value",
 																JOptionPane.PLAIN_MESSAGE,null,null,
 																content);
@@ -1055,8 +1108,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		if(textualValueList.length<=NUMBER_OF_VALUE_POPUP_MENU_ROWS){
 			menu = createPopupMenu(1,textualValueList.length,textualValueList,
 														property,obj);
-		}
-		else{
+		} else {
 			menu = createPopupMenu(textualValueList.length/NUMBER_OF_VALUE_POPUP_MENU_ROWS,NUMBER_OF_VALUE_POPUP_MENU_ROWS,
 											textualValueList,property,obj );
 		}

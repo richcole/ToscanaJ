@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
 
-import net.sourceforge.toscanaj.model.cernato.CernatoObject;
 
 public class ManyValuedContextImplementation implements WritableManyValuedContext {
     private List objects = new ArrayList();
@@ -55,7 +54,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
     }	
     
 	public void updateObject(String objName, int index){
-		CernatoObject obj = (CernatoObject) objects.get(index);
+		FCAObjectImplementation obj = (FCAObjectImplementation) objects.get(index);
 		obj.setName(objName);
 		objects.set(index,obj);
 	}

@@ -5,14 +5,13 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.model.cernato;
+package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableFCAObject;
 
-public class CernatoObject implements WritableFCAObject {
+public class FCAObjectImplementation implements WritableFCAObject {
     private String name;
 
-    public CernatoObject(String name) {
+    public FCAObjectImplementation(String name) {
         this.name = name;
     }
 

@@ -22,7 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContext;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableFCAObject;
 
 public class ObjectDialog extends JDialog{
 	
@@ -32,25 +32,25 @@ public class ObjectDialog extends JDialog{
 	private Frame parent;
 	private int index;
 	private JDialog dialog = this;
-	private WritableManyValuedContext context;
+	private WritableFCAObject object;
 	
 	
-	public ObjectDialog(Frame parent, WritableManyValuedContext context){
+	public ObjectDialog(Frame parent, WritableFCAObject object){
 		super(parent,"Object", false);
 		setResizable(false);
-		createView();
+		createView(object.getName());
 		pack();
 		this.parent = parent;
-		this.context = context;
+		this.object = object;
 	}
 
-	private void createView() {
+	private void createView(String oldName) {
 		
 		JPanel mainPane = new JPanel(new GridBagLayout());
 		JPanel buttonPane = new JPanel();
 		
 		JLabel objectNameLabel = new JLabel("Name Of Object:");
-		objectName = new JTextField();
+		objectName = new JTextField(oldName);
 		
 		mainPane.add(objectNameLabel, new GridBagConstraints(
 						0,0,1,1,0,0,
@@ -73,7 +73,7 @@ public class ObjectDialog extends JDialog{
 		changeButton.addActionListener(new ActionListener (){
 			public void actionPerformed(ActionEvent e){
 				if(!objectName.getText().equals("")){
-					context.updateObject(objectName.getText(),index);
+					object.setName(objectName.getText());
 					parent.validate();
 					hide();
 				}
@@ -103,13 +103,5 @@ public class ObjectDialog extends JDialog{
 						2,2
 		));
 		setContentPane(mainPane);
-	}
-	
-	public void setObjectName(String content){
-		objectName.setText(content);		
-	}
-	
-	public void setSelectedObjectIndex(int index){
-		this.index = index;
 	}
 }

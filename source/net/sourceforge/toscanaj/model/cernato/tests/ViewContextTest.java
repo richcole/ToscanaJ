@@ -11,9 +11,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.Context;
-import net.sourceforge.toscanaj.model.cernato.CernatoObject;
 import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.View;
 
@@ -42,7 +42,7 @@ public class ViewContextTest extends TestCase {
         Collection objects = scaledContext.getObjects();
         Collection attributes = scaledContext.getAttributes();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
-            CernatoObject object = (CernatoObject) it1.next();
+            FCAObjectImplementation object = (FCAObjectImplementation) it1.next();
             for (Iterator it2 = attributes.iterator(); it2.hasNext();) {
                 Attribute attribute = (Attribute) it2.next();
                 Criterion criterion = (Criterion) attribute.getData();

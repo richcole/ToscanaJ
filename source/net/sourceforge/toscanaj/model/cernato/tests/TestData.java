@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.model.cernato.tests;
 
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
-import net.sourceforge.toscanaj.model.cernato.CernatoObject;
 import net.sourceforge.toscanaj.model.cernato.Property;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.*;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.NumericalType;
@@ -45,13 +44,13 @@ public class TestData {
     public static Property Property4;
     public static Property Property5;
     public static Property Property6;
-    public static CernatoObject Object1;
-    public static CernatoObject Object2;
-    public static CernatoObject Object3;
-    public static CernatoObject Object4;
-    public static CernatoObject Object5;
-    public static CernatoObject Object6;
-    public static CernatoObject Object7;
+    public static FCAObjectImplementation Object1;
+    public static FCAObjectImplementation Object2;
+    public static FCAObjectImplementation Object3;
+    public static FCAObjectImplementation Object4;
+    public static FCAObjectImplementation Object5;
+    public static FCAObjectImplementation Object6;
+    public static FCAObjectImplementation Object7;
     public static View View1;
     public static View View2;
     public static View View3;
@@ -111,13 +110,13 @@ public class TestData {
         context.add(Property5);
         context.add(Property6);
 
-        Object1 = new CernatoObject("object1");
-        Object2 = new CernatoObject("object2");
-        Object3 = new CernatoObject("object3");
-        Object4 = new CernatoObject("object4");
-        Object5 = new CernatoObject("object5");
-        Object6 = new CernatoObject("object6");
-        Object7 = new CernatoObject("object7");
+        Object1 = new FCAObjectImplementation("object1");
+        Object2 = new FCAObjectImplementation("object2");
+        Object3 = new FCAObjectImplementation("object3");
+        Object4 = new FCAObjectImplementation("object4");
+        Object5 = new FCAObjectImplementation("object5");
+        Object6 = new FCAObjectImplementation("object6");
+        Object7 = new FCAObjectImplementation("object7");
 
         context.add(Object1);
         context.add(Object2);
@@ -435,7 +434,7 @@ public class TestData {
         ScaledRelation.put(Object7, propMap);
     }
 
-    static boolean isInScaledRelation(CernatoObject object, Criterion criterion) {
+    static boolean isInScaledRelation(FCAObjectImplementation object, Criterion criterion) {
         Hashtable propMap = (Hashtable) ScaledRelation.get(object);
         if (propMap == null) {
             return false;

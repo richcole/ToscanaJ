@@ -11,13 +11,13 @@ import net.sourceforge.toscanaj.model.BinaryRelation;
 import net.sourceforge.toscanaj.model.Context;
 import net.sourceforge.toscanaj.model.ContextImplementation;
 import net.sourceforge.toscanaj.model.cernato.CernatoModel;
-import net.sourceforge.toscanaj.model.cernato.CernatoObject;
 import net.sourceforge.toscanaj.model.cernato.Property;
 import net.sourceforge.toscanaj.model.cernato.ViewContext;
 import net.sourceforge.toscanaj.model.lattice.Attribute;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.AttributeType;
+import net.sourceforge.toscanaj.model.manyvaluedcontext.FCAObjectImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContextImplementation;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.Criterion;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.types.TextualType;
@@ -56,7 +56,7 @@ public class TextDumps {
         }
         stream.println();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
-            CernatoObject object = (CernatoObject) it1.next();
+            FCAObjectImplementation object = (FCAObjectImplementation) it1.next();
             stream.print(object.getName() + "\t");
             for (Iterator it2 = properties.iterator(); it2.hasNext();) {
                 Property property = (Property) it2.next();
@@ -85,7 +85,7 @@ public class TextDumps {
         }
         stream.println();
         for (Iterator it1 = objects.iterator(); it1.hasNext();) {
-            CernatoObject object = (CernatoObject) it1.next();
+            FCAObjectImplementation object = (FCAObjectImplementation) it1.next();
             stream.print(object.getName() + "\t");
             for (Iterator it2 = attributes.iterator(); it2.hasNext();) {
                 Criterion criterion = (Criterion) it2.next();
@@ -105,7 +105,7 @@ public class TextDumps {
             stream.print(concept + "[objectContingent: {");
             Iterator extIt = concept.getObjectContingentIterator();
             while (extIt.hasNext()) {
-                CernatoObject obj = (CernatoObject) extIt.next();
+                FCAObjectImplementation obj = (FCAObjectImplementation) extIt.next();
                 stream.print(obj.getName());
                 if (extIt.hasNext()) {
                     stream.print(", ");
