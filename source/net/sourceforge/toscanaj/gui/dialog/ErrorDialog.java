@@ -8,11 +8,15 @@
 package net.sourceforge.toscanaj.gui.dialog;
 
 import java.awt.Component;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import javax.swing.JOptionPane;
-
 
 /**
  * This is a generic class top handle error messages.
@@ -23,14 +27,29 @@ import javax.swing.JOptionPane;
  * @todo break messages that are too long into multiple lines
  */
 
-public class ErrorDialog {
+public class ErrorDialog implements ClipboardOwner{
 
     /**
      * Constructor to show a simple error message
      */
     private ErrorDialog(Component component, String title, String msg) {
-        JOptionPane.showMessageDialog(component,
-                msg, title, JOptionPane.ERROR_MESSAGE);
+		Object[] options= {"Close", "Copy to Clipboard"};
+				int rv =
+			JOptionPane.showOptionDialog(
+				component,
+				msg,
+				title,
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.ERROR_MESSAGE,
+				null,
+				options,
+				options[0]);
+				if(rv == JOptionPane.NO_OPTION){
+					//Copy to clipboard
+					StringSelection comments = new StringSelection(msg);
+					Clipboard systemClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+					systemClipboard.setContents(comments,null);
+				}
     }
 
     /**
@@ -131,4 +150,9 @@ public class ErrorDialog {
     public static void showError(Component component, Throwable e, String title, String errorMsg) {
         new ErrorDialog(component, e, title, errorMsg);
     }
+	/**
+	 * Implement for Clipboard feature. Don't have to do anything
+	 */
+	public void lostOwnership(Clipboard clipboard, Transferable contents) {
+	}
 }
