@@ -17,6 +17,7 @@ import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.gui.SienaMainPanel;
+import net.sourceforge.toscanaj.model.cernato.CernatoModel;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
@@ -147,20 +148,13 @@ public class TableViewPanel extends JFrame {
 		
 		
 		mainPane.add(buttonPane, new GridBagConstraints(
-							0,0,1,1,1,1,
+							0,0,1,1,1,0,
 							GridBagConstraints.NORTHWEST,
 							GridBagConstraints.HORIZONTAL,
 							new Insets(2,2,2,2),
 							2,2));
 		mainPane.add(diagramView, new GridBagConstraints(
 							0,1,1,1,1,1,
-							GridBagConstraints.CENTER,
-							GridBagConstraints.NONE,
-							new Insets(2,2,2,2),
-							2,2
-							));
-		mainPane.add(new JPanel(), new GridBagConstraints(
-							0,2,1,1,1,1,
 							GridBagConstraints.CENTER,
 							GridBagConstraints.BOTH,
 							new Insets(2,2,2,2),
@@ -370,13 +364,15 @@ public class TableViewPanel extends JFrame {
 		showDiagram(getDiagram());
 	}
 	
-	public static void main(String[] Args) {
-		net.sourceforge.toscanaj.model.cernato.CernatoModel model = null;
+	public static void main(String[] args) {
+		CernatoModel model = null;
 		try {
 			model =
 				CernatoXMLParser.importCernatoXMLFile(
-					new File("C:/Cernato/houses1.xml"));
-		} catch (Exception e) {}
+					new File(args[0]));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		if (model != null) {
 			WriteableManyValuedContext context = model.getContext();
