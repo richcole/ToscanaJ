@@ -135,17 +135,15 @@ public class DrawingCanvas extends JComponent implements MouseListener, MouseMot
             CanvasItem cur = (CanvasItem) it.previous();
             Point2D point = this.graphics.inverseProject(e.getPoint());
             if(cur.containsPoint(point)) {
-                if(cur instanceof LabelView) {
-                    // store the CanvasItem needed for moving
-                    this.selectedCanvasItem = cur;
-                    this.lastMousePos = e.getPoint();
-                    // raise the label
-                    it.remove();
-                    this.canvasItems.add(cur);
-                    // redraw the raised label (needed if it will not be moved)
-                    repaint();
-                    break;
-                }
+                // store the CanvasItem needed for moving
+                this.selectedCanvasItem = cur;
+                this.lastMousePos = e.getPoint();
+                // raise the item
+                it.remove();
+                this.canvasItems.add(cur);
+                // redraw the raised item (needed if it will not be moved)
+                repaint();
+                break;
             }
         }
     }
