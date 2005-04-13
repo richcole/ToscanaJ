@@ -121,7 +121,11 @@
 	
 			<!-- deal with file and path separators in an os independent way -->
 			<replace file="@{targetLoc}/@{targetApp}.MF" token="${file.separator}" value="/" />
-			<replace file="@{targetLoc}/@{targetApp}.MF" token="${path.separator}" value=" " />
+			<!-- we can't just replace the path.separator - on UNIXy systems this would hit
+			     the colons between properties and values. But since all libs should be relative
+			     to basedir, they should now all start with a dot, thus we can add the dot to
+			     distinguish the path.separator from the property:value separator. -->
+			<replace file="@{targetLoc}/@{targetApp}.MF" token="${path.separator}." value=" ." />
 		</sequential>
 	</macrodef>
 	<target name="copyFiles">
