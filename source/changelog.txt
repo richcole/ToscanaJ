@@ -15,6 +15,8 @@ Affecting different programs:
   the top is not anymore, a NullPointerException was raised -- this is fixed now
 - Bugfix: displaying the n-dimensional vectors for debugging purposes works again
 - some undo support: movements in the diagram editor can be undone/redone
+- context menu on diagram list for editors: Siena and Elba both offer the option to
+  duplicate or remove diagrams using a context menu on the list of diagrams
 
 Specific for ToscanaJ:
 ======================
