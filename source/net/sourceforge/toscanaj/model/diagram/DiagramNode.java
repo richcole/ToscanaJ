@@ -82,7 +82,7 @@ public class DiagramNode implements XMLizable {
                        DiagramNode outerNode) {
         this.diagram = diagram;
         this.identifier = identifier;
-        this.position = position;
+        this.position = (Point2D) position.clone();
         this.concept = concept;
         setAttributeLabelInfo(attributeLabelInfo);
         setObjectLabelInfo(objectLabelInfo);
