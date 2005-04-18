@@ -56,6 +56,8 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -670,6 +672,51 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 				}
 			 }
 		 });
+        
+        // add context menu
+        listView.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if(e.isPopupTrigger()) {
+                    openPopupMenu(e);
+                }
+            }
+
+            public void mouseReleased(MouseEvent e) {
+                if(e.isPopupTrigger()) {
+                    openPopupMenu(e);
+                }
+            }
+
+            private void openPopupMenu(MouseEvent e) {
+                final int indexHit = listView.locationToIndex(e.getPoint());
+                if(indexHit < 0) {
+                    return; // no item hit
+                }
+                Object itemHit = listView.getModel().getElementAt(indexHit);
+                JPopupMenu popupMenu = new JPopupMenu();
+                JMenuItem duplicateItem = new JMenuItem("Duplicate '" + itemHit + "'");
+                duplicateItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        Diagram2D diagram = conceptualSchema.getDiagram(indexHit);
+                        Diagram2D copiedDiagram = copyDiagram(diagram);
+                        if (copiedDiagram != null) {
+                            conceptualSchema.addDiagram(copiedDiagram);
+                            int pos = diagramListModel.indexOf(copiedDiagram.getTitle());
+                            listView.setSelectedIndex(pos);
+                        }
+                    }
+                });
+                popupMenu.add(duplicateItem);
+                JMenuItem removeItem = new JMenuItem("Remove '" + itemHit + "'");
+                removeItem.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        conceptualSchema.removeDiagram(indexHit);
+                    }
+                });
+                popupMenu.add(removeItem);
+                popupMenu.show(listView, e.getX(), e.getY());
+            }
+        });
         return new LabeledPanel("Diagrams:", listView, buttonsPane);
     }
 
