@@ -111,8 +111,8 @@ public class NestedDiagramNode extends DiagramNode {
     }
     
 	public void setPosition(double x, double y) {
-		double dx = x - this.position.getX();
-		double dy = y - this.position.getY();
+		double dx = x - getPosition().getX();
+		double dy = y - getPosition().getY();
 		Iterator it = this.innerDiagram.getNodes();
 		while (it.hasNext()) {
 			DiagramNode node = (DiagramNode) it.next();
@@ -121,6 +121,14 @@ public class NestedDiagramNode extends DiagramNode {
 		}
 		super.setPosition(x, y);
 	}
+    
+    /*
+     * @todo the outer scaling should probably happen outside the node -- this getter is just a hack
+     * to fix problems that shouldn't exist 
+     */
+    public double getOuterScaleFactor() {
+        return OUTER_SCALE_FACTOR;
+    }
     
     /**
      * Calculates the ellipse we should use.

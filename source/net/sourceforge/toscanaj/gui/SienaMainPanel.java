@@ -42,13 +42,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.swing.*;
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -58,11 +58,15 @@ import javax.swing.JRadioButton;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.table.JTableHeader;
 
 import net.sourceforge.toscanaj.controller.cernato.CernatoDimensionStrategy;
 import net.sourceforge.toscanaj.controller.diagram.ObjectEditingLabelViewPopupMenuHandler;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.controller.fca.DiagramToContextConverter;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
@@ -92,6 +96,7 @@ import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
@@ -117,9 +122,9 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ManyValuedAttributeDialog;
-import net.sourceforge.toscanaj.view.manyvaluedcontext.TableRowHeaderResizer;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.ObjectDialog;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.RowHeader;
+import net.sourceforge.toscanaj.view.manyvaluedcontext.TableRowHeaderResizer;
 import net.sourceforge.toscanaj.view.manyvaluedcontext.TableView;
 
 import org.jdom.JDOMException;
@@ -272,6 +277,21 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         this.temporalControls.setVisible(temporalControlsEnabled);                                    
         this.diagramEditingView.addAccessory(this.temporalControlsLabel);
         this.diagramEditingView.addAccessory(this.temporalControls);
+        this.diagramEditingView.setExtraContextMenuActions(new DiagramEditingView.DiagramAction[] {
+                new DiagramEditingView.DiagramAction() {
+                    public void actionPerformed(ActionEvent e, Diagram2D diagram) {
+                        insertDiagramIntoView(diagram, true);
+                    }
+
+                    public Object getLabel() {
+                        return "Nest diagram";
+                    }
+                    
+                    public boolean isEnabled() {
+                        return SienaMainPanel.this.diagramEditingView.getDiagramView().getDiagram() != null;
+                    }
+                }
+        });
 		this.diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
 										this, DisplayedDiagramChangedEvent.class, Object.class);
 		DiagramView diagramView = this.diagramEditingView.getDiagramView();
@@ -283,6 +303,71 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 			ObjectLabelView.getFactory().getLabelClass());
 		this.diagramEditingView.setDividerLocation(preferences.getInt("diagramViewDivider", 200));
 	}
+
+    private void insertDiagramIntoView(Diagram2D diagram, boolean nestDiagram) {
+        Diagram2D oldDiagram = this.diagramEditingView.getDiagramView().getDiagram();
+        DiagramHistory diagramHistory = new DiagramHistory();
+
+        if(nestDiagram && oldDiagram != null) {
+            // before nesting make sure apposition is ok by synchronizing object sets to their join
+            Iterator oldObjectSetIterator = oldDiagram.getTopConcept().getExtentIterator();
+            Set oldObjects = new HashSet();
+            while (oldObjectSetIterator.hasNext()) {
+                oldObjects.add(oldObjectSetIterator.next());
+            }
+            Iterator newObjectSetIterator = diagram.getTopConcept().getExtentIterator();
+            while (newObjectSetIterator.hasNext()) {
+                Object object = newObjectSetIterator.next();
+                if(oldObjects.contains(object)) {
+                    // remove the common ones from the old set
+                    oldObjects.remove(object);
+                } else {
+                    // add the ones that are only in new to the top node of the old diagram if its intent is empty
+                    // if the intent is not empty, the diagram needs to be recreated to have a matching concept.
+                    // Since the new diagram will have a concept with empty intent, this should happen only once.
+                    // note that if there is intent which would match, the object should be in both diagrams in the
+                    // first place
+                    if(oldDiagram.getTopConcept().getIntentSize() == 0) {
+                        ((ConceptImplementation)oldDiagram.getTopConcept()).addObject(object);
+                    } else {
+                        oldDiagram = extendDiagram(oldDiagram, object);
+                    }
+                }
+            }
+            // now add the ones that are in the old diagram but not found in the new one to
+            // the new top concept
+            // this is again only happening if there is no intent attached to the top node, else
+            // we have to create a new diagram
+            for (Iterator iter = oldObjects.iterator(); iter.hasNext();) {
+                if (diagram.getTopConcept().getIntentSize() == 0) {
+                    ((ConceptImplementation) diagram.getTopConcept()).addObject(iter.next());
+                } else {
+                    diagram = extendDiagram(diagram, iter.next());
+                }
+            }
+            assert oldDiagram.getTopConcept().getExtentSize() == diagram.getTopConcept().getExtentSize();
+            // nest the results
+            diagram = new NestedLineDiagram(oldDiagram, diagram);
+            diagramHistory.addDiagram(oldDiagram);
+            diagramHistory.addDiagram(diagram);
+            diagramHistory.setNestingLevel(1);
+        } else {
+            diagramHistory.addDiagram(diagram);
+            diagramHistory.setNestingLevel(0);
+        }
+        this.diagramEditingView.getDiagramView().showDiagram(diagram);
+        ConceptInterpretationContext context = new ConceptInterpretationContext(diagramHistory, new EventBroker());
+        this.diagramEditingView.getDiagramView().setConceptInterpretationContext(context);
+    }
+
+    private Diagram2D extendDiagram(Diagram2D oldDiagram, Object newObject) {
+        ContextImplementation context = (ContextImplementation) DiagramToContextConverter.getContext(oldDiagram);
+        context.getObjects().add(newObject);
+        LatticeGenerator lgen = new GantersAlgorithm();
+        return NDimLayoutOperations.createDiagram(lgen.createLattice(context),
+                                                  oldDiagram.getTitle(),
+                                                  new DefaultDimensionStrategy());
+    }
 
 	/**
 	 * @todo this method is inconsistent with createDiagramEditingView() in terms of return value.

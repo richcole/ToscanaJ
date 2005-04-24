@@ -75,7 +75,9 @@ public class NestedLineDiagram extends SimpleLineDiagram {
         for (int i = 0; i < outerDiagram.getNumberOfNodes(); i++) {
             DiagramNode outerNode = outerDiagram.getNode(i);
             NestedDiagramNode node = (NestedDiagramNode) this.getNode(i);
-            node.setPosition(outerNode.getPosition());
+            double outerScaleFactor = node.getOuterScaleFactor();
+            node.setPosition(outerNode.getPosition().getX() * outerScaleFactor,
+                             outerNode.getPosition().getY() * outerScaleFactor);
         }
 	}
 

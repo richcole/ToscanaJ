@@ -28,6 +28,7 @@ Specific for Elba:
 
 Specific for Siena (still not fully complete):
 ==============================================
+- nested diagrams can now be created using the context menu on the diagram list
 - transition arrows now have more sensible lengths
 - better placement of state markers for temporal animations
 

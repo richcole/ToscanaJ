@@ -7,8 +7,52 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.Point2D;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Vector;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.diagram.*;
+import net.sourceforge.toscanaj.controller.diagram.AttributeAdditiveNodeMovementEventListener;
+import net.sourceforge.toscanaj.controller.diagram.AttributeEditingLabelViewPopupMenuHandler;
+import net.sourceforge.toscanaj.controller.diagram.FilterMovementEventListener;
+import net.sourceforge.toscanaj.controller.diagram.IdealMovementEventListener;
+import net.sourceforge.toscanaj.controller.diagram.LabelClickEventHandler;
+import net.sourceforge.toscanaj.controller.diagram.LabelDragEventHandler;
+import net.sourceforge.toscanaj.controller.diagram.LabelScrollEventHandler;
+import net.sourceforge.toscanaj.controller.diagram.NodeMovementEventListener;
+import net.sourceforge.toscanaj.controller.diagram.SetMovementEventListener;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
@@ -18,7 +62,6 @@ import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
-import net.sourceforge.toscanaj.controller.ndimlayout.NDimNodeMovementEventListener;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
@@ -49,22 +92,13 @@ import org.tockit.events.EventBrokerListener;
 import org.tockit.swing.preferences.ExtendedPreferences;
 import org.tockit.swing.undo.ExtendedUndoManager;
 
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Vector;
-
 public class DiagramEditingView extends JPanel implements EventBrokerListener {
+    public static interface DiagramAction {
+        public void actionPerformed(ActionEvent e, Diagram2D diagram);
+        public Object getLabel();
+        public boolean isEnabled();
+    }
+    
 	/**
 	 * The factor by which the grid gets rescaled when a button is clicked.
 	 * 
@@ -77,7 +111,6 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private static final double GRID_SIZE_CHANGE_FACTOR = 1.2599210498948731647672106072782;
     private static final int DEFAULT_GRID_SIZE = 15;
     private static final String[] FULL_MOVEMENT_OPTION_NAMES = {"Additive", "Node", "Ideal", "Filter"};
-    private static final String[] SIMPLE_MOVEMENT_OPTION_NAMES = {"Node", "Ideal", "Filter"};
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramEditingView.class);
     private ConceptualSchema conceptualSchema;
     private DefaultListModel diagramListModel;
@@ -86,7 +119,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     protected NodeMovementEventListener nodeMovementEventListener = new NodeMovementEventListener();
     protected SetMovementEventListener idealMovementEventListener = new IdealMovementEventListener();
     protected FilterMovementEventListener filterMovementEventListener = new FilterMovementEventListener();
-    protected NDimNodeMovementEventListener ndimMovementEventListener = new NDimNodeMovementEventListener();
+    protected AttributeAdditiveNodeMovementEventListener attributeAdditiveMovementEventListener = new AttributeAdditiveNodeMovementEventListener();
     private static final double ZOOM_FACTOR = 1.1;
     private JButton editContextButton;
     private DatabaseConnection databaseConnection = null;
@@ -100,7 +133,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private JCheckBox gridEnabledCheckBox;
     private Frame parent;
     private LabeledPanel diagramListView;
-    
+    private DiagramAction[] extraContextMenuActions;
 
 	public DiagramEditingView(Frame parent, ConceptualSchema conceptualSchema, EventBroker eventBroker) {
 		super();
@@ -326,7 +359,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 JComboBox combobox = (JComboBox) e.getSource();
                 String selection = combobox.getSelectedItem().toString();
                 if (selection.equals(FULL_MOVEMENT_OPTION_NAMES[0])) {
-                    setNDimManipulator();
+                    setAttributeAdditiveManipulator();
                 } else if (selection.equals(FULL_MOVEMENT_OPTION_NAMES[1])) {
                 	setNodeManipulator();
                 } else if (selection.equals(FULL_MOVEMENT_OPTION_NAMES[2])) {
@@ -346,27 +379,20 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         	movementChooser.setPreferredSize(new Dimension(80,25));
         } else {
         	movementChooser.setEnabled(true);
-        	if (diagram instanceof NDimDiagram) {
-        		if(movementChooser.getModel().getSize() != FULL_MOVEMENT_OPTION_NAMES.length) {
-		        	movementChooser.setModel(new DefaultComboBoxModel(FULL_MOVEMENT_OPTION_NAMES));
-		        	setNDimManipulator();
-        		}
-	        } else {
-        	    if(movementChooser.getModel().getSize() != SIMPLE_MOVEMENT_OPTION_NAMES.length) {
-		            movementChooser.setModel(new DefaultComboBoxModel(SIMPLE_MOVEMENT_OPTION_NAMES));
-		            setNodeManipulator();
-        	    }
-	        }
+        	if(movementChooser.getModel().getSize() != FULL_MOVEMENT_OPTION_NAMES.length) {
+            	movementChooser.setModel(new DefaultComboBoxModel(FULL_MOVEMENT_OPTION_NAMES));
+            	setAttributeAdditiveManipulator();
+            }
         }
     }
 
-    protected void setNDimManipulator() {
+    protected void setAttributeAdditiveManipulator() {
         EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
         canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
         canvasEventBroker.removeSubscriptions(idealMovementEventListener);
         canvasEventBroker.removeSubscriptions(filterMovementEventListener);
         canvasEventBroker.subscribe(
-                ndimMovementEventListener,
+                attributeAdditiveMovementEventListener,
                 CanvasItemDraggedEvent.class,
                 NodeView.class
         );
@@ -374,7 +400,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     protected void setNodeManipulator() {
         EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
-        canvasEventBroker.removeSubscriptions(ndimMovementEventListener);
+        canvasEventBroker.removeSubscriptions(attributeAdditiveMovementEventListener);
         canvasEventBroker.removeSubscriptions(idealMovementEventListener);
         canvasEventBroker.removeSubscriptions(filterMovementEventListener);
         canvasEventBroker.subscribe(
@@ -386,7 +412,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     protected void setFilterManipulator() {
         EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
-        canvasEventBroker.removeSubscriptions(ndimMovementEventListener);
+        canvasEventBroker.removeSubscriptions(attributeAdditiveMovementEventListener);
         canvasEventBroker.removeSubscriptions(idealMovementEventListener);
         canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
         canvasEventBroker.subscribe(
@@ -398,7 +424,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     protected void setIdealManipulator() {
         EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
-        canvasEventBroker.removeSubscriptions(ndimMovementEventListener);
+        canvasEventBroker.removeSubscriptions(attributeAdditiveMovementEventListener);
         canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
         canvasEventBroker.removeSubscriptions(filterMovementEventListener);
         canvasEventBroker.subscribe(
@@ -692,8 +718,10 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 if(indexHit < 0) {
                     return; // no item hit
                 }
+                
                 Object itemHit = listView.getModel().getElementAt(indexHit);
                 JPopupMenu popupMenu = new JPopupMenu();
+                
                 JMenuItem duplicateItem = new JMenuItem("Duplicate '" + itemHit + "'");
                 duplicateItem.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
@@ -714,6 +742,29 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                     }
                 });
                 popupMenu.add(removeItem);
+                
+                if(DiagramEditingView.this.extraContextMenuActions != null) {
+                    popupMenu.addSeparator();
+                    for (int i = 0; i < DiagramEditingView.this.extraContextMenuActions.length; i++) {
+                        final DiagramAction action = DiagramEditingView.this.extraContextMenuActions[i];
+                        popupMenu.add(new AbstractAction() {
+                            public void actionPerformed(ActionEvent ae) {
+                                Diagram2D diagram = conceptualSchema.getDiagram(indexHit);
+                                action.actionPerformed(ae, diagram);
+                            }
+                            public Object getValue(String key) {
+                                if(Action.NAME == key) {
+                                    return action.getLabel();
+                                }
+                                return super.getValue(key);
+                            }
+                            public boolean isEnabled() {
+                                return action.isEnabled();
+                            }
+                        });
+                    }
+                }
+                
                 popupMenu.show(listView, e.getX(), e.getY());
             }
         });
@@ -840,5 +891,9 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     public void addAccessory(Component accessory) {
         this.diagramListView.addExtraComponent(accessory);
+    }
+    
+    public void setExtraContextMenuActions(DiagramAction[] extraContextMenuActions) {
+        this.extraContextMenuActions = extraContextMenuActions;
     }
 }
