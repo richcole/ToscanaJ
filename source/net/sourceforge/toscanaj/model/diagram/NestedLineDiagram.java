@@ -9,6 +9,8 @@ package net.sourceforge.toscanaj.model.diagram;
 
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
@@ -161,5 +163,71 @@ public class NestedLineDiagram extends SimpleLineDiagram {
 
     public Diagram2D getOuterDiagram() {
         return this.originalOuterDiagram;
+    }
+    
+    /**
+     * Returns all nodes of all inner diagrams.
+     */
+    public Iterator getNodes() {
+        /**
+         * This class implements an iterator that iterates over all attribute
+         * outer nodes and then through all nodes inside these.
+         */
+        class NodeIterator implements Iterator {
+            /**
+             * Stores the main iterator on the outer nodes.
+             */
+            Iterator mainIterator;
+
+            /**
+             * Stores the secondary iterator on the nodes inside the outer node.
+             */
+            Iterator secondaryIterator;
+
+            /**
+             * We start with the iterator of all outer nodes that we want to visit.
+             */
+            NodeIterator(Iterator main) {
+                this.mainIterator = main;
+                if (main.hasNext()) {
+                    NestedDiagramNode first = (NestedDiagramNode) main.next();
+                    this.secondaryIterator = first.getInnerDiagram().getNodes();
+                } else {
+                    this.secondaryIterator = null;
+                }
+            }
+
+            public boolean hasNext() {
+                if (this.secondaryIterator == null) {
+                    return false;
+                }
+                while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
+                    NestedDiagramNode next = (NestedDiagramNode) this.mainIterator.next();
+                    this.secondaryIterator = next.getInnerDiagram().getNodes();
+                }
+                return this.secondaryIterator.hasNext();
+            }
+
+            public Object next() {
+                if (this.secondaryIterator == null) {
+                    throw new NoSuchElementException();
+                }
+                if (!this.secondaryIterator.hasNext() && !this.mainIterator.hasNext()) {
+                    // we were already finished
+                    throw new NoSuchElementException();
+                }
+                while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
+                    NestedDiagramNode next = (NestedDiagramNode) this.mainIterator.next();
+                    this.secondaryIterator = next.getInnerDiagram().getNodes();
+                }
+                return this.secondaryIterator.next();
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        }
+
+        return new NodeIterator(super.getNodes());
     }
 }

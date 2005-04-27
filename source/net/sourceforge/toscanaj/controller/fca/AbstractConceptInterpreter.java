@@ -181,6 +181,12 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 		}
 	}
 
+    /**
+     * BROKEN !!!
+     * 
+     * @todo this won't work for nested diagrams and returns only the contingent
+     * @deprecated
+     */
 	public int getAttributeCount(Concept concept, ConceptInterpretationContext context) {
 		return concept.getAttributeContingentSize();
 	}

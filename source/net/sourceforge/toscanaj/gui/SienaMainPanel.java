@@ -1052,7 +1052,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     private void importBurmeister(File file) {
         this.lastBurmeisterFile = file;
-        ContextImplementation context;
+        Context context;
         try {
             context = BurmeisterParser.importBurmeisterFile(file);
         } catch (FileNotFoundException e) {

@@ -52,6 +52,8 @@ import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
+import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
@@ -728,7 +730,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             }
             ArrowStyle[] styles = DiagramSchema.getCurrentSchema().getArrowStyles();
             if(selectedSequence == null || selectedSequence == curSequenceValue) {
-                addTransitions(sequence, styles[styleNum], highlightStates);
+                addTransitions(sequence, styles[styleNum], highlightStates, 0);
             }
             styleNum = (styleNum + 1) % styles.length;
         }
@@ -787,10 +789,6 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         }
     }
 
-    private void addTransitions(List sequence, ArrowStyle style, boolean highlightStates) {
-    	addTransitions(sequence, style, highlightStates, 0);
-    }
-
     private void addTransitions(List sequence, ArrowStyle style, boolean highlightStates, int countStart) {
         SimpleLineDiagram diagram = (SimpleLineDiagram) this.diagramView.getDiagram();
         DiagramNode oldNode = null;
@@ -815,9 +813,19 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 
 	private DiagramNode findObjectConceptNode(FCAElement object) {
 	    Iterator nodeIt = this.diagramView.getDiagram().getNodes();
+        ConceptInterpreter conceptInterpreter = this.diagramView.getConceptInterpreter();
+        ConceptInterpretationContext interpretationContext = this.diagramView.getConceptInterpretationContext();
 	    while (nodeIt.hasNext()) {
 	        DiagramNode node = (DiagramNode) nodeIt.next();
-	        Iterator objIt = node.getConcept().getObjectContingentIterator();
+            // resolve nesting
+            ConceptInterpretationContext curContext = interpretationContext;
+            DiagramNode curNode = node.getOuterNode();
+            while(curNode != null) {
+                curContext = curContext.createNestedContext(curNode.getConcept());
+                curNode = curNode.getOuterNode();
+            }
+            // try finding the object in nested context
+	        Iterator objIt = conceptInterpreter.getObjectSetIterator(node.getConcept(),curContext);
 	        while (objIt.hasNext()) {
 	            FCAElement contObj = (FCAElement) objIt.next();
 	            if(contObj.equals(object)) {

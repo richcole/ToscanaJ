@@ -108,7 +108,7 @@ public class Factorizer {
 			return;
 		}
 		File inputFile = fileChooser.getSelectedFile();
-		ContextImplementation context = BurmeisterParser.importBurmeisterFile(inputFile);
+		Context context = BurmeisterParser.importBurmeisterFile(inputFile);
 		Set attributes = context.getAttributes();
 
 		List subsets = findAllSubsetsOfSize(attributes, ((Integer)spinner.getModel().getValue()).intValue());

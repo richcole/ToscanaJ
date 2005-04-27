@@ -15,14 +15,18 @@ import java.io.*;
 import java.util.Collection;
 
 import org.tockit.context.model.BinaryRelationImplementation;
+import org.tockit.context.model.Context;
 
 public class BurmeisterParser {
     public static final String DEFAULT_NAME = "<unnamed>";
 
-    public static ContextImplementation importBurmeisterFile(File file) throws FileNotFoundException, DataFormatException {
-        BufferedReader in;
-        in = new BufferedReader(new FileReader(file));
+    public static Context importBurmeisterFile(File file) throws FileNotFoundException, DataFormatException {
+        return importBurmeisterFromReader(new FileReader(file));
+    }
 
+    public static Context importBurmeisterFromReader(Reader reader) throws DataFormatException {
+        BufferedReader in = new BufferedReader(reader);
+        
         try {
             // check id
             String curLine = in.readLine();
@@ -65,6 +69,9 @@ public class BurmeisterParser {
             BinaryRelationImplementation relation = (BinaryRelationImplementation) context.getRelation();
             for (int i = 0; i < numberOfObjects; i++) {
                 curLine = getNextNonEmptyLine(in);
+                if(curLine == null) {
+                    throw new DataFormatException("Relation contains less lines than expected.");
+                }
                 for (int j = 0; j < numberOfAttributes; j++) {
                     char c = curLine.charAt(j);
                     if (c == 'x' || c == 'X') {
@@ -83,7 +90,9 @@ public class BurmeisterParser {
         String curLine;
         do {
             curLine = in.readLine();
-        } while (curLine.equals(""));
+            // we shouldn't get null for curLine, but we want to exit gracefully,
+            // therefore the test with the literal empty string upfront
+        } while ("".equals(curLine)); 
         return curLine;
     }
 }
