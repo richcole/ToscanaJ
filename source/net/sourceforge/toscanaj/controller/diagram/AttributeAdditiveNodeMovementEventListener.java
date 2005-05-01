@@ -23,7 +23,18 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
 /**
- * Implements node movement in a way that ensures attributeadditivity
+ * Implements node movement in a way that ensures attribute-additivity.
+ * 
+ * Here is the basic idea:
+ * - identify all meet-irreducibles in the upset of the dragged node's concept
+ * - find the minimal elements in this
+ * - distribute the movement along the nodes of these concepts, moving 
+ *   all downsets with them
+ * 
+ * The trick is that this way the movement is restricted to the interval of the
+ * dragged node and the join of the upper neighbours, which is in some way the
+ * smallest change possible. Most noticable the trivial case (only one upper
+ * neighbour) breaks down to moving just the dragged node.
  */
 public class AttributeAdditiveNodeMovementEventListener implements EventBrokerListener {
 
@@ -41,6 +52,19 @@ public class AttributeAdditiveNodeMovementEventListener implements EventBrokerLi
 				meetIrr.add(upper);
 			}
 		}
+        
+        // filter down to the minimal elements
+        Set removable = new HashSet();
+        for (Iterator it1 = meetIrr.iterator(); it1.hasNext();) {
+            Concept concept = (Concept) it1.next();
+            for (Iterator it2 = meetIrr.iterator(); it2.hasNext();) {
+                Concept superCandidate = (Concept) it2.next();
+                if (concept != superCandidate && concept.hasSuperConcept(superCandidate)) {
+                    removable.add(superCandidate);
+                }
+            }
+        }
+        meetIrr.removeAll(removable);
         
         // calculate partial vector
         double dx = dragEvent.getCanvasToPosition().getX() - dragEvent.getCanvasFromPosition().getX();
