@@ -17,6 +17,9 @@ Affecting different programs:
 - some undo support: movements in the diagram editor can be undone/redone
 - context menu on diagram list for editors: Siena and Elba both offer the option to
   duplicate or remove diagrams using a context menu on the list of diagrams
+- new manipulators: the attribute-additive manipulator now should minimize movement
+  while maintaining attribute-additivity, the new chain-based one tries also to
+  respect all chains in the diagram
 
 Specific for ToscanaJ:
 ======================
