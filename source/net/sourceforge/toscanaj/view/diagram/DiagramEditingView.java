@@ -46,13 +46,13 @@ import javax.swing.event.ListSelectionListener;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.diagram.AttributeAdditiveNodeMovementEventListener;
 import net.sourceforge.toscanaj.controller.diagram.AttributeEditingLabelViewPopupMenuHandler;
+import net.sourceforge.toscanaj.controller.diagram.ChainBasedNodeMovementEventListener;
 import net.sourceforge.toscanaj.controller.diagram.FilterMovementEventListener;
 import net.sourceforge.toscanaj.controller.diagram.IdealMovementEventListener;
 import net.sourceforge.toscanaj.controller.diagram.LabelClickEventHandler;
 import net.sourceforge.toscanaj.controller.diagram.LabelDragEventHandler;
 import net.sourceforge.toscanaj.controller.diagram.LabelScrollEventHandler;
 import net.sourceforge.toscanaj.controller.diagram.NodeMovementEventListener;
-import net.sourceforge.toscanaj.controller.diagram.SetMovementEventListener;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
@@ -110,16 +110,36 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 	 */
     private static final double GRID_SIZE_CHANGE_FACTOR = 1.2599210498948731647672106072782;
     private static final int DEFAULT_GRID_SIZE = 15;
-    private static final String[] FULL_MOVEMENT_OPTION_NAMES = {"Additive", "Node", "Ideal", "Filter"};
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramEditingView.class);
+
+    /**
+     * The names used in the GUI for the manipulators.
+     * 
+     * This has to be the same size and order as the #NODE_MANIPULATORS array.
+     */
+    private static final String[] FULL_MOVEMENT_OPTION_NAMES = {
+            "Additive",
+            "Chain",
+            "Node", 
+            "Ideal", 
+            "Filter"
+    };
+    
+    /**
+     * The manipulators offered for moving nodes.
+     */
+    private static final EventBrokerListener[] NODE_MANIPULATORS = {
+            new AttributeAdditiveNodeMovementEventListener(),
+            new ChainBasedNodeMovementEventListener(),
+            new IdealMovementEventListener(),
+            new FilterMovementEventListener(),
+            new NodeMovementEventListener()
+    };
+
     private ConceptualSchema conceptualSchema;
     private DefaultListModel diagramListModel;
     private JSplitPane splitPane;
     protected DiagramView diagramView;
-    protected NodeMovementEventListener nodeMovementEventListener = new NodeMovementEventListener();
-    protected SetMovementEventListener idealMovementEventListener = new IdealMovementEventListener();
-    protected FilterMovementEventListener filterMovementEventListener = new FilterMovementEventListener();
-    protected AttributeAdditiveNodeMovementEventListener attributeAdditiveMovementEventListener = new AttributeAdditiveNodeMovementEventListener();
     private static final double ZOOM_FACTOR = 1.1;
     private JButton editContextButton;
     private DatabaseConnection databaseConnection = null;
@@ -357,16 +377,8 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         movementChooser.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JComboBox combobox = (JComboBox) e.getSource();
-                String selection = combobox.getSelectedItem().toString();
-                if (selection.equals(FULL_MOVEMENT_OPTION_NAMES[0])) {
-                    setAttributeAdditiveManipulator();
-                } else if (selection.equals(FULL_MOVEMENT_OPTION_NAMES[1])) {
-                	setNodeManipulator();
-                } else if (selection.equals(FULL_MOVEMENT_OPTION_NAMES[2])) {
-                	setIdealManipulator();
-                } else if (selection.equals(FULL_MOVEMENT_OPTION_NAMES[3])) {
-                	setFilterManipulator();
-                }
+                int selection = combobox.getSelectedIndex();
+                setManipulator(NODE_MANIPULATORS[selection]);
             }
         });
 		return movementPanel;
@@ -381,54 +393,19 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         	movementChooser.setEnabled(true);
         	if(movementChooser.getModel().getSize() != FULL_MOVEMENT_OPTION_NAMES.length) {
             	movementChooser.setModel(new DefaultComboBoxModel(FULL_MOVEMENT_OPTION_NAMES));
-            	setAttributeAdditiveManipulator();
+            	setManipulator(NODE_MANIPULATORS[0]);
             }
         }
     }
 
-    protected void setAttributeAdditiveManipulator() {
+    protected void setManipulator(EventBrokerListener manipulator) {
         EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
-        canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
-        canvasEventBroker.removeSubscriptions(idealMovementEventListener);
-        canvasEventBroker.removeSubscriptions(filterMovementEventListener);
+        for (int i = 0; i < NODE_MANIPULATORS.length; i++) {
+            EventBrokerListener listener = NODE_MANIPULATORS[i];
+            canvasEventBroker.removeSubscriptions(listener);
+        }
         canvasEventBroker.subscribe(
-                attributeAdditiveMovementEventListener,
-                CanvasItemDraggedEvent.class,
-                NodeView.class
-        );
-    }
-
-    protected void setNodeManipulator() {
-        EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
-        canvasEventBroker.removeSubscriptions(attributeAdditiveMovementEventListener);
-        canvasEventBroker.removeSubscriptions(idealMovementEventListener);
-        canvasEventBroker.removeSubscriptions(filterMovementEventListener);
-        canvasEventBroker.subscribe(
-                nodeMovementEventListener,
-                CanvasItemDraggedEvent.class,
-                NodeView.class
-        );
-    }
-
-    protected void setFilterManipulator() {
-        EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
-        canvasEventBroker.removeSubscriptions(attributeAdditiveMovementEventListener);
-        canvasEventBroker.removeSubscriptions(idealMovementEventListener);
-        canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
-        canvasEventBroker.subscribe(
-                filterMovementEventListener,
-                CanvasItemDraggedEvent.class,
-                NodeView.class
-        );
-    }
-
-    protected void setIdealManipulator() {
-        EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
-        canvasEventBroker.removeSubscriptions(attributeAdditiveMovementEventListener);
-        canvasEventBroker.removeSubscriptions(nodeMovementEventListener);
-        canvasEventBroker.removeSubscriptions(filterMovementEventListener);
-        canvasEventBroker.subscribe(
-                idealMovementEventListener,
+                manipulator,
                 CanvasItemDraggedEvent.class,
                 NodeView.class
         );
