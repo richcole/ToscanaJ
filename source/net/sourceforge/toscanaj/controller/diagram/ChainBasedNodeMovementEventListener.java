@@ -8,17 +8,14 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
-import org.tockit.canvas.events.CanvasItemDroppedEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
@@ -41,48 +38,25 @@ public class ChainBasedNodeMovementEventListener implements EventBrokerListener 
         CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
         NodeView nodeView = (NodeView) dragEvent.getSubject();
 		DiagramView diagramView = nodeView.getDiagramView();
+        Concept concept = nodeView.getDiagramNode().getConcept();
 		
-        // find meet-irreducibles in the upset 
-        Collection upset = nodeView.getDiagramNode().getConcept().getUpset();
-        Set meetIrr = new HashSet();
-        for (Iterator iter = upset.iterator(); iter.hasNext();) {
-			Concept upper = (Concept) iter.next();
-			if(upper.isMeetIrreducible()) {
-				meetIrr.add(upper);
-			}
-		}
+        Set meetIrr = ConceptSetHelperFunctions.getMeetIrreduciblesInUpset(concept);
         
-        // calculate partial vector based on MIs in the upset -- they all affect movement
-        // of the dragged node, the ones in the downset don't
-        double dx = dragEvent.getCanvasToPosition().getX() - dragEvent.getCanvasFromPosition().getX();
-        double dy = dragEvent.getCanvasToPosition().getY() - dragEvent.getCanvasFromPosition().getY();
+        
         int numUpperMeetIrr = meetIrr.size();
-        dx /= numUpperMeetIrr;
-        dy /= numUpperMeetIrr;
         
         // add the concepts in the downset 
-        Collection downset = nodeView.getDiagramNode().getConcept().getDownset();
+        Collection downset = concept.getDownset();
         for (Iterator iter = downset.iterator(); iter.hasNext();) {
             Concept lower = (Concept) iter.next();
             if(lower.isMeetIrreducible()) {
                 meetIrr.add(lower);
             }
         }
-        
-        // apply it to all downsets of meet-irreducibles
-        for (Iterator iter = meetIrr.iterator(); iter.hasNext();) {
-			Concept concept = (Concept) iter.next();
-			for (Iterator iter2 = concept.getDownset().iterator(); iter2.hasNext();) {
-				Concept downConcept = (Concept) iter2.next();
-				DiagramNode node = diagramView.getDiagram().getNodeForConcept(downConcept);
-				node.setPosition(node.getX() + dx, node.getY() + dy);
-			}
-		}
-        
-        if (dragEvent instanceof CanvasItemDroppedEvent) {
-			// on drop we update the screen transform ...
-			diagramView.requestScreenTransformUpdate();
-        }
-        diagramView.repaint();
+
+        ConceptSetHelperFunctions.applyDragToDiagram(dragEvent, 
+                nodeView.getDiagramView(), 
+                meetIrr, 
+                meetIrr.size());
 	}
 }
