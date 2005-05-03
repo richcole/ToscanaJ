@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -42,21 +43,26 @@ public class ChainBasedNodeMovementEventListener implements EventBrokerListener 
 		
         Set meetIrr = ConceptSetHelperFunctions.getMeetIrreduciblesInUpset(concept);
         
-        
         int numUpperMeetIrr = meetIrr.size();
         
-        // add the concepts in the downset 
-        Collection downset = concept.getDownset();
-        for (Iterator iter = downset.iterator(); iter.hasNext();) {
-            Concept lower = (Concept) iter.next();
-            if(lower.isMeetIrreducible()) {
-                meetIrr.add(lower);
+        // add the meet-irreducible concepts in the downsets of all the meet-irreducibles
+        // in the upset
+        Set newMeetIrr = new HashSet();
+        for (Iterator it1 = meetIrr.iterator(); it1.hasNext();) {
+            Concept superConcept = (Concept) it1.next();
+            Collection downset = superConcept.getDownset();
+            for (Iterator it2 = downset.iterator(); it2.hasNext();) {
+                Concept lower = (Concept) it2.next();
+                if(lower.isMeetIrreducible()) {
+                    newMeetIrr.add(lower);
+                }
             }
         }
+        meetIrr.addAll(newMeetIrr);
 
         ConceptSetHelperFunctions.applyDragToDiagram(dragEvent, 
                 nodeView.getDiagramView(), 
                 meetIrr, 
-                meetIrr.size());
+                numUpperMeetIrr);
 	}
 }
