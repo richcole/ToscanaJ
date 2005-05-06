@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj;
 
 import java.io.File;
+import java.io.IOException;
 
 import net.sourceforge.toscanaj.gui.SienaMainPanel;
 
@@ -23,7 +24,12 @@ public class Siena {
             String arg = args[i];
             if( (arg.compareToIgnoreCase("-importCernatoXML") == 0) && (i < args.length - 1) ){
                 mainWindow = new SienaMainPanel(false);
-                mainWindow.importCernatoXML(new File(args[i+1]));
+                try {
+                    mainWindow.importCernatoXML(new File(args[i+1]));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
             	i++;
             }
         }

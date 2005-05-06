@@ -563,7 +563,11 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         importCernatoXMLItem.setMnemonic(KeyEvent.VK_C);
         importCernatoXMLItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                importCernatoXML();
+                try {
+                    importCernatoXML();
+                } catch (IOException e1) {
+                    ErrorDialog.showError(SienaMainPanel.this,e1,"Cernato XML import failed");
+                }
             }
         });
         this.fileMenu.add(importCernatoXMLItem);
@@ -838,7 +842,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         viewMenu.add(menuItem);
     }
 
-    private void importCernatoXML() {
+    private void importCernatoXML() throws IOException {
         final JFileChooser openDialog;
         if (this.lastCernatoFile != null) {
             // use position of last file for dialog
@@ -858,7 +862,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         importCernatoXML(openDialog.getSelectedFile());
     }
 
-    public void importCernatoXML(File file) {
+    public void importCernatoXML(File file) throws IOException {
         this.lastCernatoFile = file;
         CernatoModel inputModel;
         try {
