@@ -131,9 +131,9 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private static final EventBrokerListener[] NODE_MANIPULATORS = {
             new AttributeAdditiveNodeMovementEventListener(),
             new ChainBasedNodeMovementEventListener(),
+            new NodeMovementEventListener(),
             new IdealMovementEventListener(),
-            new FilterMovementEventListener(),
-            new NodeMovementEventListener()
+            new FilterMovementEventListener()
     };
 
     private ConceptualSchema conceptualSchema;
