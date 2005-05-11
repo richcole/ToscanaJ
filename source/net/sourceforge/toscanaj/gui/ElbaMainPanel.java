@@ -222,7 +222,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         this.toolbar.add(databaseConnectionButton);
 
         this.diagramEditingView =
-            new DiagramEditingView(this, this.conceptualSchema, this.eventBroker);
+            new DiagramEditingView(this, this.conceptualSchema, this.eventBroker, true);
         this.diagramEditingView.setDividerLocation(preferences.getInt("diagramViewDivider", 200));
         DiagramView diagramView = this.diagramEditingView.getDiagramView();
         diagramView.setObjectLabelFactory(SqlClauseLabelView.getFactory());

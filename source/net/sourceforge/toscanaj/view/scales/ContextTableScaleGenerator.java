@@ -38,7 +38,8 @@ public class ContextTableScaleGenerator implements ScaleGenerator {
                 parent,
                 scheme,
                 databaseConnection,
-                eventBroker
+                eventBroker,
+                true
         );
         if (!dialog.execute()) {
             return null;

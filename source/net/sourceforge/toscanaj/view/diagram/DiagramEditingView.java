@@ -155,7 +155,8 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private LabeledPanel diagramListView;
     private DiagramAction[] extraContextMenuActions;
 
-	public DiagramEditingView(Frame parent, ConceptualSchema conceptualSchema, EventBroker eventBroker) {
+	public DiagramEditingView(Frame parent, ConceptualSchema conceptualSchema, 
+                              EventBroker eventBroker, boolean offerConsistencyCheck) {
 		super();
 		this.conceptualSchema = conceptualSchema;
 		this.parent = parent;
@@ -171,7 +172,11 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		splitPane.setResizeWeight(0);
 		add(splitPane);
 		
-		this.contextEditingDialog = new ContextTableEditorDialog(parent, this.conceptualSchema, this.databaseConnection, eventBroker);
+		this.contextEditingDialog = new ContextTableEditorDialog(parent, 
+                                                                 this.conceptualSchema,
+                                                                 this.databaseConnection,
+                                                                 eventBroker,
+                                                                 offerConsistencyCheck);
 		
 		eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
 		eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);

@@ -72,7 +72,7 @@ public class DividesContextTester {
         schema.addDiagram(diagram);
         
         JFrame mainPanel = new JFrame();
-        DiagramEditingView edView = new DiagramEditingView(mainPanel, schema, broker);
+        DiagramEditingView edView = new DiagramEditingView(mainPanel, schema, broker, false);
         mainPanel.setContentPane(edView);
         mainPanel.setBounds(10,10,700,500);
         mainPanel.setVisible(true);

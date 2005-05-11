@@ -7,10 +7,44 @@
  */
 package net.sourceforge.toscanaj.view.context;
 
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.HeadlessException;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
-import net.sourceforge.toscanaj.gui.dialog.*;
+import net.sourceforge.toscanaj.gui.action.ExportBurmeisterFormatAction;
+import net.sourceforge.toscanaj.gui.action.ExportContextAction;
+import net.sourceforge.toscanaj.gui.action.ExportOALFormatAction;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElement;
@@ -19,19 +53,12 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 
-import javax.swing.*;
-
 import org.jdom.Element;
+import org.tockit.context.model.Context;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 import org.tockit.swing.preferences.ExtendedPreferences;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @todo use dynamic cell widths
@@ -59,7 +86,8 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 	private JButton createButton;
 	private JPanel buttonsPane, titlePane;
 	private JScrollPane scrollpane;
-	private JButton checkConsistencyButton;
+	private JButton menuButton;
+    private JMenuItem checkConsistenyMenuItem;
 	private ContextTableColumnHeader colHeader;
 	private ContextTableRowHeader rowHeader;
 
@@ -67,13 +95,15 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		Frame owner,
 		ConceptualSchema conceptualSchema,
 		DatabaseConnection databaseConnection,
-		EventBroker eventBroker) {
+		EventBroker eventBroker,
+        boolean offerConsistencyCheck) {
 		this(
 			owner,
 			conceptualSchema,
 			databaseConnection,
 			new ContextImplementation(),
-			eventBroker);
+			eventBroker,
+            offerConsistencyCheck);
 	}
 
 	public ContextTableEditorDialog(
@@ -81,14 +111,15 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		ConceptualSchema conceptualSchema,
 		DatabaseConnection databaseConnection,
 		ContextImplementation context,
-		EventBroker eventBroker) {
+		EventBroker eventBroker,
+        boolean offerConsistencyCheck) {
 		super(owner, true);
 		this.conceptualSchema = conceptualSchema;
 		this.databaseConnection = databaseConnection;
 		this.contextTableScaleEditorDialog = this;
 		this.context = context;
 		
-		createView();
+		createView(offerConsistencyCheck);
 
 		eventBroker.subscribe(
 			this,
@@ -101,7 +132,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
 	}
 
-	private void createView() {
+	private void createView(boolean offerConsistencyCheck) {
 		setTitle("Context Table");
 		preferences.restoreWindowPlacement(this,
                                 			new Rectangle(
@@ -128,7 +159,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 
 		createTitlePane();
 		createTablePane();
-		createButtonsPane();
+		createButtonsPane(offerConsistencyCheck);
 
 		getContentPane().setLayout(new GridBagLayout());
 		getContentPane().add(
@@ -437,18 +468,41 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 				0));
 	}
 
-	private void createButtonsPane() {
+	private void createButtonsPane(boolean offerConsistencyCheck) {
 		buttonsPane = new JPanel(new GridBagLayout());
 		JButton addObjButton = new JButton("Add Objects");
 		JButton addAttrButton = new JButton("Add Attributes");
 
-		this.checkConsistencyButton = new JButton("Check Consistency...");
-		this.checkConsistencyButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				checkConsistency();
-			}
-		});
-		setCheckConsistencyButtonState();
+        // create menu for additional functions
+        this.checkConsistenyMenuItem = new JMenuItem("Check consistency...");
+        this.checkConsistenyMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                checkConsistency();
+            }
+        });
+        
+        final JPopupMenu popupMenu = new JPopupMenu();
+        if(offerConsistencyCheck) {
+            popupMenu.add(this.checkConsistenyMenuItem);
+            popupMenu.addSeparator();
+        }
+        ExportContextAction.ContextSource contextSource = new ExportContextAction.ContextSource() {
+            public Context getContext() {
+                return ContextTableEditorDialog.this.context;
+            }
+        };
+        popupMenu.add(new ExportBurmeisterFormatAction(JOptionPane.getFrameForComponent(this), contextSource));
+        popupMenu.add(new ExportOALFormatAction(JOptionPane.getFrameForComponent(this), contextSource));
+        
+		this.menuButton = new JButton("Menu...");
+        this.menuButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JButton button = ContextTableEditorDialog.this.menuButton;
+                popupMenu.show(button, button.getWidth()/2, button.getHeight()/2);
+            }
+        });
+        
+		setCheckConsistencyState();
 		this.createButton = new JButton("Create");
 		createButton.setEnabled(
 			(scaleTitleField.getText() != null
@@ -504,7 +558,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 				0,
 				0));
 		buttonsPane.add(
-			checkConsistencyButton,
+			menuButton,
 			new GridBagConstraints(
 				2,
 				0,
@@ -547,7 +601,15 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 				0));
 	}
 
-	private void closeDialog(boolean withResult) {
+    protected void exportBurmeisterFormat() {
+        System.out.println("oioi");
+    }
+
+	protected void exportOALFormat() {
+        System.out.println("oi");
+    }
+
+    private void closeDialog(boolean withResult) {
 		preferences.storeWindowPlacement(this);
 		this.context.setName(this.scaleTitleField.getText());
         this.context.updatePositionMarkers();
@@ -665,23 +727,23 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		if (e instanceof ConceptualSchemaChangeEvent) {
 			ConceptualSchemaChangeEvent csce = (ConceptualSchemaChangeEvent) e;
 			this.conceptualSchema = csce.getConceptualSchema();
-			setCheckConsistencyButtonState();
+			setCheckConsistencyState();
 			return;
 		}
 		if (e instanceof DatabaseConnectedEvent) {
 			DatabaseConnectedEvent dbce = (DatabaseConnectedEvent) e;
 			this.databaseConnection = dbce.getConnection();
-			setCheckConsistencyButtonState();
+			setCheckConsistencyState();
 			return;
 		}
 		throw new RuntimeException("Caught event we don't know about");
 	}
 
-	private void setCheckConsistencyButtonState() {
+	private void setCheckConsistencyState() {
 		if(this.databaseConnection == null) {
-			this.checkConsistencyButton.setEnabled(false);		
+			this.checkConsistenyMenuItem.setEnabled(false);		
 		} else {
-			this.checkConsistencyButton.setEnabled(this.databaseConnection.isConnected());
+			this.checkConsistenyMenuItem.setEnabled(this.databaseConnection.isConnected());
 		}
 	}
 

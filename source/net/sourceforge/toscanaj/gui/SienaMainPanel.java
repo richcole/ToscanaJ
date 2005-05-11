@@ -266,7 +266,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	}
 
 	protected void createDiagramEditingView() {
-        this.diagramEditingView = new DiagramEditingView(this, this.conceptualSchema, this.eventBroker);
+        this.diagramEditingView = new DiagramEditingView(this, this.conceptualSchema, this.eventBroker, false);
         this.temporalControlsLabel = new JLabel("Temporal Concept Analysis:");
         this.temporalControls = new TemporalControlsPanel(
                                             this.diagramEditingView.getDiagramView(),
