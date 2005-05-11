@@ -16,6 +16,6 @@ public class IdealMovementEventListener extends SetMovementEventListener {
     }
 
 	protected String getPresentationName() {
-		return "Ideal Movement";
+		return "Ideal movement";
 	}
 }

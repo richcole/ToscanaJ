@@ -15,6 +15,6 @@ public class FilterMovementEventListener extends SetMovementEventListener {
     }
 
 	protected String getPresentationName() {
-		return "Filter Movement";
+		return "Filter movement";
 	}
 }

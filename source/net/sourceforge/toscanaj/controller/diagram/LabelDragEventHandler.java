@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.view.diagram.LabelView;
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.canvas.events.CanvasItemDroppedEvent;
 import org.tockit.canvas.events.CanvasItemPickupEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
@@ -25,7 +26,9 @@ public class LabelDragEventHandler implements EventBrokerListener {
         if(e instanceof CanvasItemPickupEvent) {
             labelView.startDrag(dragEvent.getCanvasFromPosition(), dragEvent.getCanvasToPosition());
         } else {
-            labelView.processDragEvent(dragEvent.getCanvasFromPosition(), dragEvent.getCanvasToPosition());
+            labelView.processDragEvent(dragEvent.getCanvasFromPosition(),
+                                       dragEvent.getCanvasToPosition(),
+                                       dragEvent instanceof CanvasItemDroppedEvent);
         }
     }
 }

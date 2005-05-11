@@ -43,7 +43,6 @@ public class NodeMovementEventListener implements EventBrokerListener {
 		
 		if(!diagramView.getDiagram().isHasseDiagram()) {
 			node.setPosition(oldPosition);
-			return;
 		}
 
 		if (dragEvent instanceof CanvasItemDroppedEvent) {

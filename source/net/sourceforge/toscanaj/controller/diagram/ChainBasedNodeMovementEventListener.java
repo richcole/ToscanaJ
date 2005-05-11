@@ -7,16 +7,25 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
+import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.canvas.events.CanvasItemDroppedEvent;
+import org.tockit.canvas.events.CanvasItemPickupEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
@@ -26,24 +35,26 @@ import org.tockit.events.EventBrokerListener;
  * The way this manipulator works is to find all meet-irreducible concepts
  * in the upset and downset of the dragged node's concept. All of them are
  * moved including their downsets.
- * 
- * @todo it might be better if the behaviour is different when dragging
- * nodes of not meet-irreducibles nodes. In this case one might try applying
- * the algorithm to a set similar to the one calculated for the attribute-
- * additive manipulator (minimal elements in the set of meet-irreducibles
- * in the upset).
  */
 public class ChainBasedNodeMovementEventListener implements EventBrokerListener {
 
-	public void processEvent(Event e) {
+	private Point2D startPosition;
+
+    public void processEvent(Event e) {
         CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
         NodeView nodeView = (NodeView) dragEvent.getSubject();
-		DiagramView diagramView = nodeView.getDiagramView();
-        Concept concept = nodeView.getDiagramNode().getConcept();
-		
-        Set meetIrr = ConceptSetHelperFunctions.getMeetIrreduciblesInUpset(concept);
+
+        final DiagramView diagramView = nodeView.getDiagramView();
+        DiagramNode node = nodeView.getDiagramNode();
+        if(e instanceof CanvasItemPickupEvent) {
+            this.startPosition = nodeView.getPosition();
+        }
         
-        int numUpperMeetIrr = meetIrr.size();
+        Concept concept = node.getConcept();
+        
+        final Set meetIrr = ConceptSetHelperFunctions.getMeetIrreduciblesInUpset(concept);
+        
+        final int numUpperMeetIrr = meetIrr.size();
         
         // add the meet-irreducible concepts in the downsets of all the meet-irreducibles
         // in the upset
@@ -60,9 +71,61 @@ public class ChainBasedNodeMovementEventListener implements EventBrokerListener 
         }
         meetIrr.addAll(newMeetIrr);
 
-        ConceptSetHelperFunctions.applyDragToDiagram(dragEvent, 
-                nodeView.getDiagramView(), 
-                meetIrr, 
-                numUpperMeetIrr);
+        ConceptSetHelperFunctions.applyDragToDiagram(dragEvent.getCanvasFromPosition(), 
+                                                     dragEvent.getCanvasToPosition(),
+                                                     diagramView,
+                                                     meetIrr, 
+                                                     numUpperMeetIrr);
+        
+        if(!diagramView.getDiagram().isHasseDiagram()) {
+            ConceptSetHelperFunctions.applyDragToDiagram(dragEvent.getCanvasToPosition(), 
+                                                         dragEvent.getCanvasFromPosition(),
+                                                         diagramView,
+                                                         meetIrr, 
+                                                         numUpperMeetIrr);
+        }
+
+        if (dragEvent instanceof CanvasItemDroppedEvent) {
+            // on drop we update the screen transform ...
+            diagramView.requestScreenTransformUpdate();
+
+            // ... and add an edit to the undo manager if we find one.
+            UndoManager undoManager = diagramView.getUndoManager();
+            if (undoManager != null) {
+                // make a copy of the current start position
+                final Point2D undoPosition = this.startPosition;
+                // check the actual position of the node -- it might differ from the
+                // requested one due to the Hasse diagram limitations
+                final Point2D toPosition = nodeView.getPosition();
+                undoManager.addEdit(new AbstractUndoableEdit() {
+                    public void undo() throws CannotUndoException {
+                        ConceptSetHelperFunctions.applyDragToDiagram(toPosition, 
+                                                                     undoPosition,
+                                                                     diagramView,
+                                                                     meetIrr, 
+                                                                     numUpperMeetIrr);
+                        diagramView.requestScreenTransformUpdate();
+                        diagramView.repaint();
+                        super.undo();
+                    }
+
+                    public void redo() throws CannotRedoException {
+                        ConceptSetHelperFunctions.applyDragToDiagram(undoPosition, 
+                                                                     toPosition,
+                                                                     diagramView,
+                                                                     meetIrr, 
+                                                                     numUpperMeetIrr);
+                        diagramView.requestScreenTransformUpdate();
+                        diagramView.repaint();
+                        super.redo();
+                    }
+                    
+                    public String getPresentationName() {
+                        return "Chain movement";
+                    }
+                });
+            }
+        }
+        diagramView.repaint();      
 	}
 }

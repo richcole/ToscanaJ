@@ -26,6 +26,11 @@ import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
+
 /**
  * This class encapsulates all generic label drawing code.
  *
@@ -122,6 +127,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     protected static final DragMode SCROLLING = new DragMode();
 
 	private float currentScrollBarWidth;
+
+    private Point2D startOffset;
     
 	public interface LabelFactory {
     	LabelView createLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label);
@@ -502,7 +509,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         return this.rect.contains(point);
     }
 
-    public void processDragEvent(Point2D from, Point2D to) {
+    public void processDragEvent(Point2D from, Point2D to, boolean isDrop) {
     	if(this.dragMode == NOT_DRAGGING) {
     		return;
    	    } else if(this.dragMode == RESIZING) {
@@ -536,8 +543,36 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
    	    } else if(this.dragMode == MOVING) {
     	    double deltaX = to.getX() - from.getX();
     	    double deltaY = to.getY() - from.getY();
-    	    this.labelInfo.setOffset(this.labelInfo.getOffset().getX() + deltaX,
-    	            this.labelInfo.getOffset().getY() + deltaY);
+    	    final double newX = this.labelInfo.getOffset().getX() + deltaX;
+            final double newY = this.labelInfo.getOffset().getY() + deltaY;
+            this.labelInfo.setOffset(newX,newY);
+            if (isDrop) {
+                UndoManager undoManager = diagramView.getUndoManager();
+                if (undoManager != null) {
+                    // make a copy of the current start position
+                    final Point2D undoOffset = this.startOffset;
+                    final LabelInfo info = this.labelInfo;
+                    undoManager.addEdit(new AbstractUndoableEdit() {
+                        public void undo() throws CannotUndoException {
+                            labelInfo.setOffset(undoOffset);
+                            diagramView.requestScreenTransformUpdate();
+                            diagramView.repaint();
+                            super.undo();
+                        }
+
+                        public void redo() throws CannotRedoException {
+                            labelInfo.setOffset(newX, newY);
+                            diagramView.requestScreenTransformUpdate();
+                            diagramView.repaint();
+                            super.redo();
+                        }
+
+                        public String getPresentationName() {
+                            return "Label movement";
+                        }
+                    });
+                }
+            }
     	}
     }
     
@@ -553,9 +588,10 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
             	this.dragMode = NOT_DRAGGING;
             }
         } else {
+            this.startOffset = this.labelInfo.getOffset();
             this.dragMode = MOVING;
         }
-    	processDragEvent(from,to);
+    	processDragEvent(from, to, false);
     }
     
 	/**

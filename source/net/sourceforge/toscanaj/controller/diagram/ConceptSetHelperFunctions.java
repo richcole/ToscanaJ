@@ -7,13 +7,11 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
+import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import org.tockit.canvas.events.CanvasItemDraggedEvent;
-import org.tockit.canvas.events.CanvasItemDroppedEvent;
 
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -48,10 +46,10 @@ class ConceptSetHelperFunctions {
         meetIrr.removeAll(removable);
     }
 
-    static void applyDragToDiagram(CanvasItemDraggedEvent dragEvent, DiagramView diagramView, Set conceptsToMove, int distributionFactor) {
+    static void applyDragToDiagram(Point2D canvasFromPosition, Point2D canvasToPosition, DiagramView diagramView, Set conceptsToMove, int distributionFactor) {
         // calculate partial vector
-        double dx = dragEvent.getCanvasToPosition().getX() - dragEvent.getCanvasFromPosition().getX();
-        double dy = dragEvent.getCanvasToPosition().getY() - dragEvent.getCanvasFromPosition().getY();
+        double dx = canvasToPosition.getX() - canvasFromPosition.getX();
+        double dy = canvasToPosition.getY() - canvasFromPosition.getY();
         dx /= distributionFactor;
         dy /= distributionFactor;
         
@@ -64,11 +62,5 @@ class ConceptSetHelperFunctions {
     			node.setPosition(node.getX() + dx, node.getY() + dy);
     		}
     	}
-        
-        if (dragEvent instanceof CanvasItemDroppedEvent) {
-    		// on drop we update the screen transform ...
-    		diagramView.requestScreenTransformUpdate();
-        }
-        diagramView.repaint();
     }
 }
