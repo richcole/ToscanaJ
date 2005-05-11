@@ -27,21 +27,22 @@ import org.tockit.util.StringTokenizer;
  */
 public class ObjectAttributeListParser {
     public static ContextImplementation importOALFile(File file) throws FileNotFoundException, DataFormatException {
-        BufferedReader in;
-        in = new BufferedReader(new FileReader(file));
+        String name = file.getName();
+        if(name.endsWith(".oal")) {
+            name = name.substring(0, name.length() - 4);
+        }
+        return importOALFromReader(new FileReader(file), name);
+    }
 
+    public static ContextImplementation importOALFromReader(Reader reader, String name) throws DataFormatException {
+        BufferedReader in = new BufferedReader(reader);
         try {
-            String name = file.getName();
-            if(name.endsWith(".oal")) {
-            	name = name.substring(0, name.length() - 4);
-            }
 			ContextImplementation context = new ContextImplementation(name);
 
             Collection objects = context.getObjects();
             Collection attributes = context.getAttributes();
             BinaryRelationImplementation relation = (BinaryRelationImplementation) context.getRelation();
             
-
             String curLine = in.readLine();
             while(curLine != null) {
             	if(curLine.indexOf(':') == -1) {
@@ -68,6 +69,12 @@ public class ObjectAttributeListParser {
             return context;
         } catch (IOException e) {
             throw new DataFormatException("Error reading input file", e);
+        } finally {
+            try {
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace(); // nothing better to do here
+            }
         }
     }
 }
