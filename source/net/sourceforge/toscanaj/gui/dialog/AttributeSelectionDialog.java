@@ -29,6 +29,9 @@ import java.awt.*;
 import java.sql.Types;
 import java.util.Iterator;
 
+/**
+ * @todo this class seems unused
+ */
 public class AttributeSelectionDialog extends JDialog implements EventBrokerListener {
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(AttributeSelectionDialog.class);
     
