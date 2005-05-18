@@ -32,6 +32,7 @@ import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
+import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
@@ -207,6 +208,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
         this.diagram = newDiagram;
         removeSubscriptions();
         clearCanvas();
+        /// @todo we should have different undo managers for each diagram, for now we just forget
+        /// all edits when changing diagrams
+        this.undoManager.discardAllEdits();
         if (newDiagram == null) {
             repaint();
             if(sendEvent) {
@@ -427,6 +431,11 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     public ExtendedUndoManager getUndoManager() {
+        /// @todo workaround to avoid problems that occur when undo is used in nested diagrams,
+        /// remove once the problems are fixed.
+        if(this.diagram instanceof NestedLineDiagram) {
+            return null;
+        }
 		return undoManager;
 	}
     
