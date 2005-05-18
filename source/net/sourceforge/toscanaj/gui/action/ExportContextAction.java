@@ -20,9 +20,17 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 
 import org.tockit.context.model.Context;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 
+/**
+ * @todo it would be better to fold the two subtypes of this into one, just offering two file types
+ * for export. We could also propose a sensible first name (context name + extension).
+ */
 public abstract class ExportContextAction extends KeyboardMappedAction {
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(ExportContextAction.class);
+    private static final String CONFIGURATION_LAST_EXPORT_FILE_ENTRY = "lastContextExport";
+
     public interface ContextSource {
         Context getContext();
     }
@@ -50,7 +58,16 @@ public abstract class ExportContextAction extends KeyboardMappedAction {
     }
 
     private void exportContext() throws FileNotFoundException {
-        final JFileChooser saveDialog = new JFileChooser();
+        String lastExportLocation = preferences.get(CONFIGURATION_LAST_EXPORT_FILE_ENTRY, null);
+        JFileChooser saveDialog;
+        if(lastExportLocation == null) {
+            saveDialog = new JFileChooser();
+        } else {
+            // find parent dir, otherwise the file dialog might display the default location if
+            // the last export file was deleted
+            File lastExportDir = new File(lastExportLocation).getParentFile();
+            saveDialog = new JFileChooser(lastExportDir);
+        }
         
         saveDialog.setFileFilter(getFileFilter());
         
@@ -64,6 +81,7 @@ public abstract class ExportContextAction extends KeyboardMappedAction {
                 selectedFile = new File(selectedFile.getAbsolutePath() + "." + extensions[0]);
             }
             
+            preferences.put(CONFIGURATION_LAST_EXPORT_FILE_ENTRY, selectedFile.getAbsolutePath());
             exportFile(selectedFile);
         }
     }

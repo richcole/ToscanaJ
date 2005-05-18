@@ -14,7 +14,8 @@ Affecting different programs:
 - Bugfix: when editing a context in a way that an attribute which was connected to
   the top is not anymore, a NullPointerException was raised -- this is fixed now
 - Bugfix: displaying the n-dimensional vectors for debugging purposes works again
-- some undo support: movements in the diagram editor can be undone/redone
+- some undo support: movements in the diagram editor can be undone/redone as long as
+  the diagram is visible
 - context menu on diagram list for editors: Siena and Elba both offer the option to
   duplicate or remove diagrams using a context menu on the list of diagrams
 - new manipulators: the attribute-additive manipulator now should minimize movement
