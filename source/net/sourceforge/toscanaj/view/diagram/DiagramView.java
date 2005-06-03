@@ -210,7 +210,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
         clearCanvas();
         /// @todo we should have different undo managers for each diagram, for now we just forget
         /// all edits when changing diagrams
-        this.undoManager.discardAllEdits();
+        if(this.undoManager != null) {
+            this.undoManager.discardAllEdits();
+        }
         if (newDiagram == null) {
             repaint();
             if(sendEvent) {
