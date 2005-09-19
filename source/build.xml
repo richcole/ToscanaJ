@@ -181,6 +181,15 @@
 			</fileset>
 		</zip>
 	</target>
+	<target name="zipSource" depends="setBuildName,prepareDist">
+		<zip destfile="${dist.dir}/${app.name}-source-${dist.name}.zip">
+			<fileset dir="${basedir}">
+				<include name="source/**"/>
+				<include name="libs/**"/>
+				<include name="examples/**"/>
+			</fileset>
+		</zip>
+	</target>
 	<target name="splitDist" depends="makeReleaseJar,createSienaStartJar,createElbaStartJar,copyFiles,zipSplitFiles">
 	</target>
 	<target name="zipSplitFiles">
