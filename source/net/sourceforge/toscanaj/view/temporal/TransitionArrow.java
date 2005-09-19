@@ -205,8 +205,8 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
 		double dy = endY-startY;
 		
 		if(dx == 0) {
-			startY += this.startNode.getRadiusY() * Math.signum(dy);
-			endY -= this.endNode.getRadiusY() * Math.signum(dy);
+			startY += this.startNode.getRadiusY() * signum(dy);
+			endY -= this.endNode.getRadiusY() * signum(dy);
 		} else {
 			double angle = Math.atan2(dy,dx);
 			startX += this.startNode.getRadiusX() * Math.cos(angle);
@@ -235,6 +235,10 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
         }
         
         this.bounds.setFrame(x + this.manualOffset.getX(),y + this.manualOffset.getY(),width,height);
+    }
+
+    private double signum(double dy) {
+        return dy>0 ? 1 : -1;
     }
 
     private void updateShiftVector() {

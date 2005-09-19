@@ -10,6 +10,7 @@ package net.sourceforge.toscanaj.gui.action;
 import java.awt.Frame;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 
 import javax.swing.KeyStroke;
@@ -34,7 +35,7 @@ public class ExportOALFormatAction extends ExportContextAction {
     }
     
     protected void exportFile(File selectedFile) throws FileNotFoundException {
-        ObjectAttributeListWriter.writeObjectAttributeList(getContextSource().getContext(), new PrintStream(selectedFile));
+        ObjectAttributeListWriter.writeObjectAttributeList(getContextSource().getContext(), new PrintStream(new FileOutputStream(selectedFile)));
     }
 
     protected ExtensionFileFilter getFileFilter() {
