@@ -73,6 +73,7 @@ import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.diagram.WriteableDiagram2D;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
@@ -782,8 +783,9 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     
     private void updateToolbar() {
     	boolean diagramAvailable = this.diagramView.getDiagram() != null;
-		this.zoomInButton.setEnabled(diagramAvailable);
-		this.zoomOutButton.setEnabled(diagramAvailable);
+        boolean diagramIsNested = this.diagramView.getDiagram() instanceof NestedLineDiagram;
+		this.zoomInButton.setEnabled(diagramAvailable && !diagramIsNested);
+		this.zoomOutButton.setEnabled(diagramAvailable && !diagramIsNested);
         this.gridIncreaseButton.setEnabled(diagramAvailable && this.gridEnabledCheckBox.isSelected());
         this.gridDecreaseButton.setEnabled(diagramAvailable && this.gridEnabledCheckBox.isSelected());
         this.gridEnabledCheckBox.setEnabled(diagramAvailable);
