@@ -38,6 +38,9 @@ Specific for Siena (still not fully complete):
 - nested diagrams can now be created using the context menu on the diagram list
 - transition arrows now have more sensible lengths
 - better placement of state markers for temporal animations
+- moving transition arrows is now restricted to the central part of an arrow,
+  dragging either end (1/4 of the length) results in moving only the corresponding
+  tip. This way the length and angle can be adjusted if required.
 
 Other new experimental features:
 ================================

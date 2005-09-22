@@ -7,14 +7,18 @@
  */
 package net.sourceforge.toscanaj.gui.temporal;
 
-import java.awt.*;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Paint;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -28,7 +32,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
 
-import javax.swing.*;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
@@ -36,24 +39,19 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
 import javax.swing.border.TitledBorder;
-
-import org.tockit.canvas.events.CanvasDrawnEvent;
-import org.tockit.canvas.imagewriter.DiagramExportSettings;
-import org.tockit.canvas.imagewriter.GraphicFormat;
-import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
-import org.tockit.canvas.imagewriter.ImageGenerationException;
-import org.tockit.canvas.manipulators.ItemMovementManipulator;
-import org.tockit.datatype.Value;
-import org.tockit.events.Event;
-import org.tockit.events.EventBroker;
-import org.tockit.events.EventBrokerListener;
 
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
+import net.sourceforge.toscanaj.controller.temporal.TransitionArrowManipulator;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
@@ -69,6 +67,16 @@ import net.sourceforge.toscanaj.view.temporal.ArrowStyle;
 import net.sourceforge.toscanaj.view.temporal.InterSequenceTransitionArrow;
 import net.sourceforge.toscanaj.view.temporal.StateRing;
 import net.sourceforge.toscanaj.view.temporal.TransitionArrow;
+
+import org.tockit.canvas.events.CanvasDrawnEvent;
+import org.tockit.canvas.imagewriter.DiagramExportSettings;
+import org.tockit.canvas.imagewriter.GraphicFormat;
+import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
+import org.tockit.canvas.imagewriter.ImageGenerationException;
+import org.tockit.datatype.Value;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventBrokerListener;
 
 /**
  * @todo instead of fiddling around everywhere there should be a proper subclass of
@@ -128,7 +136,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
         diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, DiagramView.class);
 		diagramView.getController().getEventBroker().subscribe(this, CanvasDrawnEvent.class, Object.class);
-		new ItemMovementManipulator(diagramView, TransitionArrow.class, diagramView.getController().getEventBroker());
+		new TransitionArrowManipulator(diagramView, diagramView.getController().getEventBroker());
 
         this.diagramExportSettings = diagramExportSettings;
         this.timeController = new AnimationTimeController(0,0,0,0,0);

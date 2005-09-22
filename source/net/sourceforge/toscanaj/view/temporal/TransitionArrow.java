@@ -30,9 +30,8 @@ import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 
 import org.jdom.Element;
 import org.tockit.canvas.CanvasItem;
-import org.tockit.canvas.MovableCanvasItem;
 
-public class TransitionArrow extends MovableCanvasItem implements XMLizable {
+public class TransitionArrow extends CanvasItem implements XMLizable {
     private static class Factory implements ExtraCanvasItemFactory {
         public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) throws XMLSyntaxError {
             TransitionArrow retVal = new TransitionArrow();
@@ -40,10 +39,23 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
             retVal.timeController.setCurrentTime(Double.MAX_VALUE/2);
             retVal.startNode = diagram.getNode(element.getAttributeValue("from"));
             retVal.endNode = diagram.getNode(element.getAttributeValue("to"));
+            // we used to have just a single offset, so we keep parsing that
             Element offsetElem = element.getChild("offset");
-            double offsetX = Double.parseDouble(offsetElem.getAttributeValue("x"));
-            double offsetY = Double.parseDouble(offsetElem.getAttributeValue("y"));
-            retVal.manualOffset = new Point2D.Double(offsetX, offsetY);
+            if(offsetElem != null) {
+                double offsetX = Double.parseDouble(offsetElem.getAttributeValue("x"));
+                double offsetY = Double.parseDouble(offsetElem.getAttributeValue("y"));
+                retVal.manualStartOffset = new Point2D.Double(offsetX, offsetY);
+                retVal.manualEndOffset = new Point2D.Double(offsetX, offsetY);
+            } else {
+                offsetElem = element.getChild("startOffset");
+                double offsetX = Double.parseDouble(offsetElem.getAttributeValue("x"));
+                double offsetY = Double.parseDouble(offsetElem.getAttributeValue("y"));
+                retVal.manualStartOffset = new Point2D.Double(offsetX, offsetY);
+                offsetElem = element.getChild("endOffset");
+                offsetX = Double.parseDouble(offsetElem.getAttributeValue("x"));
+                offsetY = Double.parseDouble(offsetElem.getAttributeValue("y"));
+                retVal.manualEndOffset = new Point2D.Double(offsetX, offsetY);
+            }
             if(element.getAttributeValue("arrowStyle") != null) {
                 retVal.style = DiagramSchema.getCurrentSchema().
                                     getArrowStyles()[XMLHelper.getIntAttribute(element, "arrowStyle")];
@@ -68,7 +80,8 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     protected Point2D startPoint = new Point2D.Double();
     protected Point2D endPoint = new Point2D.Double();
     protected Point2D shiftVector = new Point2D.Double();
-    protected Point2D manualOffset = new Point2D.Double();
+    protected Point2D manualStartOffset = new Point2D.Double();
+    protected Point2D manualEndOffset = new Point2D.Double();
     protected double timePos;
     protected AnimationTimeController timeController;
     protected ArrowStyle style;
@@ -118,7 +131,6 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
         Shape arrow = getArrowShape(this.style, length);
         
 		AffineTransform shapeTransform = new AffineTransform();        
-		shapeTransform.translate(this.manualOffset.getX(), this.manualOffset.getY());
 		shapeTransform.translate(endX, endY);
 		shapeTransform.rotate(Math.atan2(endY - startY, endX - startX));
 		this.currentShape = shapeTransform.createTransformedShape(arrow);
@@ -196,10 +208,10 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
     }
 
     protected void calculateBounds() {
-        double startX = this.startNode.getPosition().getX() + this.shiftVector.getX();
-		double startY = this.startNode.getPosition().getY() + this.shiftVector.getY();
-		double endX = this.endNode.getPosition().getX() + this.shiftVector.getX();
-		double endY = this.endNode.getPosition().getY() + this.shiftVector.getY();
+        double startX = this.startNode.getPosition().getX() + this.shiftVector.getX() + this.manualStartOffset.getX();
+		double startY = this.startNode.getPosition().getY() + this.shiftVector.getY() + this.manualStartOffset.getY();
+		double endX = this.endNode.getPosition().getX() + this.shiftVector.getX() + this.manualEndOffset.getX();
+		double endY = this.endNode.getPosition().getY() + this.shiftVector.getY() + this.manualEndOffset.getY();
 		
 		double dx = endX-startX;
 		double dy = endY-startY;
@@ -234,7 +246,7 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
             height = startY - endY;
         }
         
-        this.bounds.setFrame(x + this.manualOffset.getX(),y + this.manualOffset.getY(),width,height);
+        this.bounds.setFrame(x,y,width,height);
     }
 
     private double signum(double dy) {
@@ -250,20 +262,51 @@ public class TransitionArrow extends MovableCanvasItem implements XMLizable {
         double factor = shiftDist / Math.sqrt(xDiff * xDiff + yDiff * yDiff);
         this.shiftVector = new Point2D.Double(yDiff * factor, -xDiff * factor);
     }
-
-    public void setPosition(Point2D newPosition) {
-    	this.manualOffset.setLocation(this.manualOffset.getX() + (newPosition.getX() - getPosition().getX()), 
-									  this.manualOffset.getY() + (newPosition.getY() - getPosition().getY()));
+    
+    public boolean pointIsInHeadArea(Point2D point) {
+        return point.distance(this.endPoint) < 
+               this.startPoint.distance(this.endPoint)/4;
     }
 
+    public boolean pointIsInTailArea(Point2D point) {
+        return point.distance(this.startPoint) < 
+               this.endPoint.distance(this.startPoint)/4;
+    }
+
+    public void shiftPosition(double dx, double dy) {
+        shiftStartPoint(dx,dy);
+        shiftEndPoint(dx,dy);
+    }
+    
+    public Point2D getStartPoint() {
+        return this.startPoint;
+    }
+    
+    public void shiftStartPoint(double dx, double dy) {
+        this.manualStartOffset.setLocation(this.manualStartOffset.getX() + dx, 
+                this.manualStartOffset.getY() + dy);
+    }
+    
+    public Point2D getEndPoint() {
+        return this.endPoint;
+    }
+
+    public void shiftEndPoint(double dx, double dy) {
+        this.manualEndOffset.setLocation(this.manualEndOffset.getX() + dx, 
+                this.manualEndOffset.getY() + dy);
+    }
+    
     public Element toXML() {
         Element result = new Element(getTagName());
         result.setAttribute("from", this.startNode.getIdentifier());
         result.setAttribute("to", this.endNode.getIdentifier());
-        Element offsetElem = new Element("offset");
-        offsetElem.setAttribute("x", String.valueOf(this.manualOffset.getX()));
-        offsetElem.setAttribute("y", String.valueOf(this.manualOffset.getY()));
+        Element offsetElem = new Element("startOffset");
+        offsetElem.setAttribute("x", String.valueOf(this.manualStartOffset.getX()));
+        offsetElem.setAttribute("y", String.valueOf(this.manualStartOffset.getY()));
         result.addContent(offsetElem);
+        offsetElem = new Element("endOffset");
+        offsetElem.setAttribute("x", String.valueOf(this.manualEndOffset.getX()));
+        offsetElem.setAttribute("y", String.valueOf(this.manualEndOffset.getY()));
         for (int i = 0; i < DiagramSchema.getCurrentSchema().getArrowStyles().length; i++) {
             if(this.style == DiagramSchema.getCurrentSchema().getArrowStyles()[i]) {
                 result.setAttribute("arrowStyle", String.valueOf(i));
