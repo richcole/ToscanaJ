@@ -212,6 +212,7 @@ public class ErrorDialog extends JDialog{
      * based on original exception thrown
      */
     public static void showError(Component component, Throwable e, String title, String errorMsg) {
+        e.printStackTrace(); // for use in IDEs and with similar tools
         new ErrorDialog(component, e, title, errorMsg);
     }
 	
