@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -154,7 +155,15 @@ public class DatabaseConnection implements EventBrokerListener {
 
         // connect to the DB
         try {
-            connection = DriverManager.getConnection(url, account, password);
+            Properties connectionProperties = new Properties();
+            connectionProperties.setProperty("user", account);
+            connectionProperties.setProperty("password", password);
+            // hsqldb does not remove old tables since version 1.7.2 unless we tell
+            // it explicitely to shut down after disconnect (requires 1.8.0+)
+            if(DatabaseInfo.getType(url, driverName) == DatabaseInfo.EMBEDDED) {
+                connectionProperties.setProperty("shutdown", "true");
+            }
+            connection = DriverManager.getConnection(url, connectionProperties);
             logger.fine("Created new DB connection to " + url);
         } catch (SQLException se) {
             throw new DatabaseException("An error occured connecting to the database", se);

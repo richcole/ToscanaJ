@@ -8,7 +8,7 @@ jdom.jar:
   JDOM, beta 9 (http://www.jdom.org, licence in LICENSE.jdom)
 
 hsqldb.jar: 
-  HSQL Database Engine, version 1.7.1.b (http://hsqldb.sourceforge.net/, license in LICENSE.hsqldb.html)
+  HSQL Database Engine, version 1.8.0.2 (http://hsqldb.sourceforge.net/, license in LICENSE.hsqldb.html)
  
 commons-cli.jar:
   Command line parser from the Jakarta Commons project, version 1.0 (http://jakarta.apache.org/commons/), license in LICENSE.apache.txt
