@@ -932,7 +932,7 @@ public class DatabaseConnectionInformationView extends JDialog
 			openedDatabaseFile = openDialog.getSelectedFile();
 			URL schemaURL = conceptualSchema.getLocation();
 	        String dbFilePath;
-			if("file".equals(schemaURL.getProtocol())) {
+			if(schemaURL != null && "file".equals(schemaURL.getProtocol())) {
 			    File csxFile = new File(schemaURL.getPath());
 			    dbFilePath = FileUtils.findRelativePath(csxFile, openedDatabaseFile);
 			} else {
