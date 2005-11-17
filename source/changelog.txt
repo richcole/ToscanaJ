@@ -44,7 +44,8 @@ Specific for Siena (still not fully complete):
 
 Other new experimental features:
 ================================
-
+- DataDump class can now be used to create images for each diagram from the command
+  line
 
 
 Changes between versions 1.5 and 1.5.1 of the ToscanaJ 

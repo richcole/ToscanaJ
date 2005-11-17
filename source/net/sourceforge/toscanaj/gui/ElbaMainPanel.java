@@ -13,6 +13,7 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.controller.db.DumpSqlScript;
 import net.sourceforge.toscanaj.controller.db.WhereClauseGenerator;
 import net.sourceforge.toscanaj.controller.diagram.SqlClauseEditingLabelViewPopupMenuHandler;
+import net.sourceforge.toscanaj.controller.fca.DatabaseConnectedConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.MeetIrreducibleChainsDimensionStrategy;
@@ -1054,10 +1055,12 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             outputStream = new FileOutputStream(file);
             DataDump.dumpData(
                 this.conceptualSchema,
+                new DatabaseConnectedConceptInterpreter(this.conceptualSchema.getDatabaseInfo()),
                 outputStream,
                 filterClause,
                 includeContingentLists,
-                includeIntentExtent);
+                includeIntentExtent,
+                null);
             outputStream.close();
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Could not export file");
