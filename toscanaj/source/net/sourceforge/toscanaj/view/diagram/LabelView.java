@@ -267,7 +267,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
 				cur = getTextLayoutForEntry(i, graphics.getFontRenderContext());
 			}
             int curPos = i - this.firstItem;
-			float curWidth = (float)cur.getAdvance() + 2 * this.textmargin;
+			float curWidth = cur.getAdvance() + 2 * this.textmargin;
         	float textX;
             if (this.labelInfo.getTextAlignment() == LabelInfo.ALIGNLEFT) {
 				textX = (float)xPos;
@@ -551,7 +551,6 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
                 if (undoManager != null) {
                     // make a copy of the current start position
                     final Point2D undoOffset = this.startOffset;
-                    final LabelInfo info = this.labelInfo;
                     undoManager.addEdit(new AbstractUndoableEdit() {
                         public void undo() throws CannotUndoException {
                             labelInfo.setOffset(undoOffset);

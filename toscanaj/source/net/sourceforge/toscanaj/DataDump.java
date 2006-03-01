@@ -129,7 +129,7 @@ public class DataDump {
 
     public static void dumpData(ConceptualSchema schema, ConceptInterpreter interpreter, OutputStream outputStream, String filterClause,
                                   boolean includeContingentLists, boolean includeIntentExtent, GraphicFormat graphicFormat) 
-    					throws IOException, ImageGenerationException, DatabaseException {
+    					throws IOException, ImageGenerationException {
 	    DiagramHistory diagramHistory = new DiagramHistory();
         // create output structure
         Document output = new Document(new Element("csxDump"));
@@ -189,7 +189,7 @@ public class DataDump {
      * @throws DatabaseException 
      */
     protected static void dumpDiagram(Diagram2D diagram, ConceptInterpreter interpreter, DiagramHistory diagramHistory, 
-    								    Element targetElement, boolean includeContingentLists, boolean includeIntentExtent) throws DatabaseException {
+    								    Element targetElement, boolean includeContingentLists, boolean includeIntentExtent) {
         ConceptInterpretationContext extContext =
                     new ConceptInterpretationContext(diagramHistory, new EventBroker());
         extContext.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);

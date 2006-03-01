@@ -37,7 +37,6 @@ public class ManyValuedAttributeDialog extends JDialog{
 	private WritableManyValuedAttribute property;
 	private Frame parent;
 	private JComboBox typeBox;
-	private ManyValuedAttributeDialog dialog = this;
 	private ManyValuedContext context;
 	
 	/**

@@ -140,7 +140,6 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 	private void createTablePane() {
 		this.table = new JTable(new AttributeListTableModel());
 		((DefaultCellEditor)table.getDefaultEditor(String.class)).setClickCountToStart(1); 
-		AttributeListTableModel model = (AttributeListTableModel)table.getModel();
 		this.scrollpane = new JScrollPane(table);
  	    this.scrollpane.setAutoscrolls(true);
 		getContentPane().add(scrollpane, BorderLayout.CENTER);

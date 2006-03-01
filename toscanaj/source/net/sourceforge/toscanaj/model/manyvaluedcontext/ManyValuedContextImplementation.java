@@ -167,10 +167,6 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		Element typesElement = new Element(TYPES_ELEMENT_NAME);
 		for (Iterator iter = types.iterator(); iter.hasNext();) {
             Datatype itType = (Datatype) iter.next();
-			if (! (itType instanceof XMLizable)){
-				throw new RuntimeException("Found type \"" +
-						itType.getName() + "\" not to be XMLizable.");
-			}
 			Element typeElement = ((XMLizable) itType).toXML();
 			typesElement.addContent(typeElement);
 		}
