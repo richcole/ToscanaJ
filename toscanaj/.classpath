@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="source"/>
+	<classpathentry kind="lib" path="libs/testing/junit.jar"/>
+	<classpathentry kind="lib" path="libs/testing/mockobjects.jar"/>
+	<classpathentry kind="lib" path="libs/commons-cli.jar"/>
+	<classpathentry kind="lib" path="libs/hsqldb.jar"/>
+	<classpathentry kind="lib" path="libs/jdom.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-canvas.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-cernatoXML.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-conscript.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-events.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-fca.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-pluginArchitecture.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-relations.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-swing.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-utils.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
