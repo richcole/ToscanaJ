@@ -294,7 +294,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 	}
 
     public void createViews() {
-        diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker);
+        diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker, false);
         diagramEditingView.setDividerLocation(preferences.getInt(CONFIGURATION_ENTRY_DIVIDER, 200));
         this.diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
                                         this, DisplayedDiagramChangedEvent.class, Object.class);
