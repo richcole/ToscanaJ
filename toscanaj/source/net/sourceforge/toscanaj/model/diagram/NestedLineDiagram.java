@@ -23,7 +23,7 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
  *
  * The derivation from SimpleLineDiagram is just implementation, not design.
  *
- * @TODO Create common abstract class for both types of diagrams.
+ * @todo Create common abstract class for both types of diagrams.
  */
 public class NestedLineDiagram extends SimpleLineDiagram {
     private final Diagram2D originalOuterDiagram;

@@ -43,10 +43,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 	 
 	
 	/**
-	 *  @note
-	 *     If you don't want to specify mnemonics
-	 *     then use the other constructor.
-	 * @todo if you want another conmbination then write another constructor.
+	 * If you don't want to specify mnemonics then use the other constructor.
 	 */
 	public ExportDiagramAction (
 			Frame frame,

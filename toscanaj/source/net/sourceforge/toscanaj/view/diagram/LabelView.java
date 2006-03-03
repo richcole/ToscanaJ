@@ -144,7 +144,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      * 
      * Protected since the factory should be used instead.
      * 
-     * @see getFactory()
+     * @see #getFactory()
      */
     protected LabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
         this.diagramView = diagramView;

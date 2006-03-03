@@ -301,7 +301,7 @@ public class NodeView extends CanvasItem {
      * - SELECTED_IN_IDEAL: the node displays a concept which is in the ideal
      *   of the selected concept
      *
-     * @see #setSelectedConcepts(List)
+     * @see DiagramView#setSelectedConcepts(Concept[])
      */
     public int getSelectionState() {
         return this.selectionState;

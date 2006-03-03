@@ -307,7 +307,7 @@ public class DiagramNode implements XMLizable {
      *
      * This is used when the diagram given has the y-axis pointing upwards.
      *
-     * @ see SimpleLineDiagram.checkCoordinateSystem()
+     * @see SimpleLineDiagram#checkCoordinateSystem()
      */
     public void invertY() {
         this.position.setLocation(this.position.getX(), -this.position.getY());
