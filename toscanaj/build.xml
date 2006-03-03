@@ -249,6 +249,7 @@
 		           author="false"
 		           version="false"
 		           use="true"
+			       source="${compiler.source.compliance}"
 		           windowtitle="ToscanaJ API Documentation">
 
 		    <packageset dir="${src.dir}" defaultexcludes="yes">
