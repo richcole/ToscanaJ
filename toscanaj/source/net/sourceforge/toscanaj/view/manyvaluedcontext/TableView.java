@@ -100,4 +100,15 @@ public class TableView extends JTable {
 		Datatype type = mvAttr.getType();
         return DatatypeViewFactory.getValueCellEditor(type);
 	}
+
+	/**
+	 * @todo this is a hack since we don't have change notification on the many valued context, we
+	 *       do it through this backdoor. Not really well maintainable and not efficient either, but 
+	 *       it gets things going...
+	 *       
+	 * @see RowHeader#updateModel()
+	 */
+	public void updateModel() {
+		tableChanged(new TableModelEvent(dataModel, TableModelEvent.HEADER_ROW));
+	}
 }

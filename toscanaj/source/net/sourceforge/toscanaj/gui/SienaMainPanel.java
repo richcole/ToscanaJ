@@ -401,6 +401,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		WritableFCAElement object = (WritableFCAElement) objectList.get(row);
 		new ObjectDialog(tFrame, object);
 		this.conceptualSchema.getManyValuedContext().update();
+		this.tableView.updateModel();
+		this.rowHeader.updateModel();
 	}
 
 	private void editAttribute(int column) {
@@ -409,6 +411,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		WritableManyValuedAttribute attribute = (WritableManyValuedAttribute) manyValuedAttributeList.get(column);
 		new ManyValuedAttributeDialog(tFrame, attribute, this.conceptualSchema.getManyValuedContext());
 		this.conceptualSchema.getManyValuedContext().update();
+		this.tableView.updateModel();
 	}
 
 	private JToolBar createContextToolbar() {

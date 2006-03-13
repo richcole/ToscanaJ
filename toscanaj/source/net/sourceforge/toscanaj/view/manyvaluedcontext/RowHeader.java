@@ -16,6 +16,7 @@ import javax.swing.JTable;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
+import javax.swing.event.TableModelEvent;
 import javax.swing.plaf.BorderUIResource;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -134,5 +135,16 @@ public class RowHeader extends JTable {
         d.width = getPreferredSize().width;
         setPreferredScrollableViewportSize(d);
         validate();
+	}
+
+	/**
+	 * @todo this is a hack since we don't have change notification on the many valued context, we
+	 *       do it through this backdoor. Not really well maintainable and not efficient either, but 
+	 *       it gets things going...
+	 *       
+	 * @see TableView#updateModel()
+	 */
+	public void updateModel() {
+		tableChanged(new TableModelEvent(dataModel, TableModelEvent.HEADER_ROW));
 	}
 }
