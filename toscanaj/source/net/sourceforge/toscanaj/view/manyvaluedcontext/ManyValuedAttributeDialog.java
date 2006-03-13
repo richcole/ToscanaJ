@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.view.manyvaluedcontext;
 
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -16,12 +17,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
 
 import org.tockit.datatype.Datatype;
 
@@ -182,6 +189,51 @@ public class ManyValuedAttributeDialog extends JDialog{
 				typeBox.setSelectedItem(type);
 			}	
 		}
+		typeBox.setRenderer(new DefaultListCellRenderer(){
+			/*
+			 * This is a copy of the implementation of DefaultListCellRenderer from Sun JDK 1.5,
+			 * the only change being the text displayed. A bit of a hack, but it seems better than
+			 * wrapping all content in an extra layer just for the toString() method and we don't
+			 * want to rely on every datatype implementing toString as display method.
+			 */
+		    public Component getListCellRendererComponent(
+		            JList list,
+		    	Object value,
+		            int index,
+		            boolean isSelected,
+		            boolean cellHasFocus)
+		        {
+		            setComponentOrientation(list.getComponentOrientation());
+		    	if (isSelected) {
+		    	    setBackground(list.getSelectionBackground());
+		    	    setForeground(list.getSelectionForeground());
+		    	}
+		    	else {
+		    	    setBackground(list.getBackground());
+		    	    setForeground(list.getForeground());
+		    	}
+
+		    	setText((value == null) ? "" : ((Datatype)value).getName());
+
+		    	setEnabled(list.isEnabled());
+		    	setFont(list.getFont());
+
+		            Border border = null;
+		            if (cellHasFocus) {
+		                if (isSelected) {
+		                    border = UIManager.getBorder("List.focusSelectedCellHighlightBorder");
+		                }
+		                if (border == null) {
+		                    border = UIManager.getBorder("List.focusCellHighlightBorder");
+		                }
+		            } else {
+		                border = noFocusBorder;
+		            }
+		    	setBorder(border);
+
+		    	return this;
+		        }
+		});
 		return typeBox;
 	}
 }
