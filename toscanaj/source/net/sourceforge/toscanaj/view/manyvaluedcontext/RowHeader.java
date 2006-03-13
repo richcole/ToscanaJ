@@ -12,7 +12,6 @@ import java.awt.Dimension;
 import java.awt.Insets;
 
 import javax.swing.BorderFactory;
-import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
@@ -51,44 +50,6 @@ public class RowHeader extends JTable {
 	
 	        noFocusBorder = new BorderUIResource.CompoundBorderUIResource
 	             (cell, BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right));
-	    }
-	
-	    public Component getListCellRendererComponent(JList list, Object value, 
-	        int index, boolean selected, boolean focused) 
-	    {
-	        if (list != null)
-	        {
-	            if (selected)
-	            {
-	                setBackground(list.getSelectionBackground());
-	                setForeground(list.getSelectionForeground());
-	            }
-	            else
-	            {
-	                setBackground(list.getBackground());
-	                setForeground(list.getForeground());
-	            }
-	
-	            setFont(list.getFont());
-	
-	            setEnabled(list.isEnabled());
-	        }
-	        else
-	        {
-	            setBackground(UIManager.getColor("TableHeader.background"));
-	            setForeground(UIManager.getColor("TableHeader.foreground"));
-	            setFont(UIManager.getFont("TableHeader.font"));
-	            setEnabled(true);
-	        }
-	
-	        if (focused)
-	            setBorder(focusBorder);
-	        else
-	            setBorder(noFocusBorder);
-	
-	        setValue(value);
-	 
-	        return this;
 	    }
 	
 	    public Component getTableCellRendererComponent(JTable table, Object value,
