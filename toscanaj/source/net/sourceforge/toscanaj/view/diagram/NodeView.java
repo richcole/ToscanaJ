@@ -10,7 +10,6 @@ package net.sourceforge.toscanaj.view.diagram;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.List;
 import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
