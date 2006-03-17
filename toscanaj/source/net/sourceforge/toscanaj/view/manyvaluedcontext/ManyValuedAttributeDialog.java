@@ -18,7 +18,6 @@ import java.awt.event.ActionListener;
 import java.util.Iterator;
 
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -26,14 +25,13 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
-import org.tockit.datatype.Datatype;
-
 import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttribute;
+
+import org.tockit.datatype.Datatype;
 
 public class ManyValuedAttributeDialog extends JDialog{
 	
