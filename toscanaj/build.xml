@@ -122,13 +122,8 @@
 		</copy>
 		<fixcrlf srcDir="${target.dir}/examples" eol="crlf" includes="nodb/**, sql/**"/>
 		<copy todir="${target.dir}">
-			<fileset dir="${src.dir}">
-				<include name="*.txt"/>
-				<exclude name="databaseDrivers.txt"/>
-				<exclude name="plugins.txt"/>
-				<include name="*.bat"/>
-				<include name="*.sh"/>
-				<include name="toscanaj.prop"/>
+			<fileset dir="${distfiles.dir}">
+				<include name="**"/>
 			</fileset>
 		</copy>
 		<!-- add some empty dirs to tell people where to put stuff -->
