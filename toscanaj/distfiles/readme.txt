@@ -144,12 +144,20 @@ about projects you would like to do with ToscanaJ and what you
 miss to do them.
 
 You can follow the development by getting the latest version
-from the CVS repository:
-  http://sourceforge.net/cvs/?group_id=37081
+from the Subversion (SVN) repository:
+  http://sourceforge.net/svn/?group_id=37081
 
-The CVS contains the source, all libraries needed, a build
-script for usage with Apache Ant (3) and some other useful
-files.
+The repository contains the source, all libraries needed, a 
+build script for usage with Apache Ant (3), a setup for the
+Eclipse IDE (4) and some other useful files.
+
+Alternatively you can try snapshots from this site:
+  http://toscanaj.sourceforge.net/cvsbuilds/
+  
+We put up-to-date versions there whenever it seems worthwhile.
+These builds are not officially supported, but you can use
+them to give early feedback or access a new feature before
+the official release.
 
 You can join the developer mailing list to discuss with us:
   http://sourceforge.net/mail/?group_id=37081
