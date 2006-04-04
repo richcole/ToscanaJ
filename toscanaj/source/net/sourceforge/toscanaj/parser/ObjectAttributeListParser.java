@@ -44,9 +44,11 @@ public class ObjectAttributeListParser {
             BinaryRelationImplementation relation = (BinaryRelationImplementation) context.getRelation();
             
             String curLine = in.readLine();
+            int lineCount = 0;
             while(curLine != null) {
+                lineCount ++;
             	if(curLine.indexOf(':') == -1) {
-                    throw new DataFormatException("Input file contains line without colon");
+                    throw new DataFormatException("Input file contains line without colon in line " + lineCount);
             	}
                 // using the tokenizer allows for quotes and escapes
                 StringTokenizer tokenizer = new StringTokenizer(curLine,':','"','\\');
