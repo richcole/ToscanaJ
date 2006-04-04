@@ -101,20 +101,20 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
             queue.add(this.template.getChild("html"));
             while (!queue.isEmpty()) {
                 Element elem = (Element) queue.remove(0);
-                queue.addAll(elem.getChildren());
                 if (elem.getName().equals("repeat")) {
                     if (this.repeatElement != null) {
                         throw new DatabaseViewerException("Two repeat sections found in template.");
                     }
                     this.repeatElement = elem;
                     this.repetitionBlock = (Element) elem.clone();
-                    /// @todo find some way to neutralize <repeat>
-                }
-                if (elem.getName().equals("field")) {
-                	this.singleFieldElements.add(elem);
-                	this.singleFieldNames.add(elem.getAttributeValue("content"));
-                    elem.setName("span");
-                    elem.removeAttribute("content");
+                } else {
+                    queue.addAll(elem.getChildren());
+                    if (elem.getName().equals("field")) {
+                        this.singleFieldElements.add(elem);
+                        this.singleFieldNames.add(elem.getAttributeValue("content"));
+                        elem.setName("span");
+                        elem.removeAttribute("content");
+                    }
                 }
             }
 
