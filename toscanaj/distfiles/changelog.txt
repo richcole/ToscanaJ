@@ -41,6 +41,7 @@ Specific for Siena (still not fully complete):
 - moving transition arrows is now restricted to the central part of an arrow,
   dragging either end (1/4 of the length) results in moving only the corresponding
   tip. This way the length and angle can be adjusted if required.
+- OAL import now gives line number on error
 
 Other new experimental features:
 ================================
