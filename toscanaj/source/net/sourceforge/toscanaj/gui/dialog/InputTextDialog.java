@@ -22,13 +22,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 /**
- *  Input dialog, constructors have following parameters:
- *  - thingToAdd The string of the element to be added, either an
- * "object" or "attribute" during renaming or the title during creation.
- *  - currentTextValue The value of the current string.
- * To be used in the formatting of the text message prompt in the JDialog
- *  - withCancelButton allows user to specify whether or not they want 
- * dialog to have a "Cancel" button. By default dialog is built with Cancel button.
+ * A basic dialog to input text.
+ * 
+ * The constructors have following parameters:
+ * <dl>
+ *  <dt>thingToAdd</dt><dd>The string of the element to be added, either an
+ * "object" or "attribute" during renaming or the title during creation.</dd>
+ *  <dt>currentTextValue</dt><dd>The value of the current string.
+ * To be used in the formatting of the text message prompt in the JDialog</dd>
+ *  <dt>withCancelButton</dt><dd>Allows the user to specify whether or not they want 
+ * dialog to have a "Cancel" button. By default the dialog is built with a cancel button.</dd>
+ * </dl>
  */
 public class InputTextDialog extends JDialog {
 	

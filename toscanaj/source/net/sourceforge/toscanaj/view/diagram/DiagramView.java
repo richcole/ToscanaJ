@@ -97,7 +97,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     /**
-     * Creates a new view displaying an empty digram (i.e. nothing at all).
+     * Creates a new view displaying an empty diagram (i.e.&#nbsp;nothing at all).
      */
     public DiagramView() {
         super(new EventBroker());
