@@ -883,7 +883,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	            ListIterator tlIt = timelineValues.listIterator();
 	            while(tlIt.hasNext()) {
 	                Value curValue = (Value) tlIt.next();
-	                if(value != null && value.isLesserThan(curValue)) {
+	                if(curValue != null && value.isLesserThan(curValue)) {
 	                    if(tlIt.hasPrevious()) {
 	                        tlIt.previous();
 	                    }
