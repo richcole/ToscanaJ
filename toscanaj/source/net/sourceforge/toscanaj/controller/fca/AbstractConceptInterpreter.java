@@ -321,7 +321,8 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
             }
         	int objectCount = getObjectCount(concept, context);
 			if( objectCount != 0) {
-				int fullExtent = getExtentSize(concept.getTopConcept(), context);
+				int fullExtent = getExtentSize(context.getOutermostTopConcept(concept), 
+                        context.getOutermostContext());
 				NumberFormat format = NumberFormat.getPercentInstance();
 				format.setMaximumFractionDigits(2);
 				String objectValue = format.format(objectCount/(double)fullExtent);

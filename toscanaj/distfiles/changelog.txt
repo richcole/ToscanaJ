@@ -1,4 +1,4 @@
-Changes between version 1.5.1 and the cvs version of the ToscanaJ 
+Changes between version 1.5.1 and the svn version of the ToscanaJ 
 program suite:
 
 Affecting different programs:
@@ -27,6 +27,11 @@ Affecting different programs:
 
 Specific for ToscanaJ:
 ======================
+- the distribution shown in a nested view is now based on the whole diagram, not
+  just the local diagram. For example: if a node of the inner diagram has 100% of
+  the objects of that inner diagram, the old verison would have displayed "100%",
+  the fixed version will display whatever percentage of objects the outer node has
+  in relation to the full object set
 
 Specific for Elba:
 ==================
