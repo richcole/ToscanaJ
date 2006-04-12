@@ -1,4 +1,25 @@
-Changes between version 1.5.1 and the svn version of the ToscanaJ 
+Changes between version 1.6 and the svn version of the ToscanaJ 
+program suite:
+
+Affecting different programs:
+=============================
+
+Specific for ToscanaJ:
+======================
+
+Specific for Elba:
+==================
+
+Specific for Siena (still not fully complete):
+==============================================
+
+Other new experimental features:
+================================
+
+
+
+
+Changes between version 1.5.1 and 1.6 of the ToscanaJ 
 program suite:
 
 Affecting different programs:
