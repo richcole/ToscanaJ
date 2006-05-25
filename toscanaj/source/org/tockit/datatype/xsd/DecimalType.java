@@ -115,6 +115,17 @@ public class DecimalType extends AbstractXSDDatatype {
         return new DecimalType(name, null, true, null, true, null);
     }
 
+    /**
+     * Creates a new decimal type based on the restrictions given.
+     * 
+     * @param name         The name for the new type, must not be null.
+     * @param min          The minimum value, can be null for unrestricted.
+     * @param minIncluded  Determines if the minimum value is allowed or excluded.
+     * @param max          The maximum value, can be null for unrestricted.
+     * @param maxIncluded  Determines if the maximum value is allowed or excluded.
+     * @param numDecimals  The number of allowed decimals, must not be negative, can be null if unrestricted.
+     * @return             A type specification matching the given constraints.
+     */
     public static DecimalType createDecimalType(String name, 
             Double min, boolean minIncluded, Double max, boolean maxIncluded,
             Integer numDecimals) {
@@ -126,10 +137,10 @@ public class DecimalType extends AbstractXSDDatatype {
             return false;
         }
         DecimalValue decValue = (DecimalValue) valueToTest;
-        return isValidValue(decValue.getValue());
+        return isValidDoubleValue(decValue.getValue());
     }
 
-    public boolean isValidValue(double value) {
+    public boolean isValidDoubleValue(double value) {
         if (this.min != null) {
             if (value < this.min.doubleValue()) {
                 return false;
@@ -174,7 +185,7 @@ public class DecimalType extends AbstractXSDDatatype {
     public boolean canParse(String text) {
         try {
             double val = Double.parseDouble(text);
-            return isValidValue(val);
+            return isValidDoubleValue(val);
         } catch(NumberFormatException e) {
             return false;
         }
@@ -183,7 +194,7 @@ public class DecimalType extends AbstractXSDDatatype {
     public Value parse(String text) throws ConversionException {
         try {
             double val = Double.parseDouble(text);
-            if(!isValidValue(val)) {
+            if(!isValidDoubleValue(val)) {
                 throw new ConversionException("Value out of range");
             }
             return new DecimalValue(val);
