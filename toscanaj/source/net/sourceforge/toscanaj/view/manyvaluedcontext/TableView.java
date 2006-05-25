@@ -35,17 +35,25 @@ public class TableView extends JTable {
 	private ManyValuedContext context;
 
 	private class ContextTableModel extends AbstractTableModel {
-
 		public int getColumnCount() {
-			return context.getAttributes().size();
+			return context.getAttributes().size() + 1;
 		}
 
 		public int getRowCount() {
-			return context.getObjects().size();
+			return context.getObjects().size() + 1;
 		}
 
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return (context instanceof WritableManyValuedContext);
+            if(!(context instanceof WritableManyValuedContext)) {
+                return false;
+            }
+            if(columnIndex == context.getAttributes().size()) {
+                return false;
+            }
+            if(rowIndex == context.getObjects().size()) {
+                return false;
+            }
+			return true;
 		}
 
 		public Class getColumnClass(int columnIndex) {
@@ -53,16 +61,28 @@ public class TableView extends JTable {
 		}
 
 		public Object getValueAt(int rowIndex, int columnIndex) {
+            if(columnIndex == context.getAttributes().size()) {
+                return null;
+            }
+            if(rowIndex == context.getObjects().size()) {
+                return null;
+            }
 			FCAElement object = getObjectForRow(rowIndex);
 			ManyValuedAttribute attribute = getAttributeForColumn(columnIndex);
 			Value relationship = context.getRelationship(object, attribute);
 			if(relationship == null) {
-				return null;
+				return ">not set<";
 			}
 			return relationship.getDisplayString();
 		}
 
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            if(columnIndex == context.getAttributes().size()) {
+                throw new IllegalArgumentException("Last column in table is not editable");
+            }
+            if(rowIndex == context.getObjects().size()) {
+                throw new IllegalArgumentException("Last row in table is not editable");
+            }
 			FCAElement object = getObjectForRow(rowIndex);
 			ManyValuedAttribute attribute = getAttributeForColumn(columnIndex);
 			WritableManyValuedContext writableContext = (WritableManyValuedContext) context;
@@ -70,6 +90,10 @@ public class TableView extends JTable {
 		}
 
 		public String getColumnName(int columnIndex) {
+            if(columnIndex == context.getAttributes().size()) {
+                return "<Add new>";
+                  
+            }
 			ManyValuedAttribute attribute = getAttributeForColumn(columnIndex);
 			return attribute.getName();
 		}

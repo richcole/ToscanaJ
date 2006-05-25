@@ -34,7 +34,6 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.ManyValuedContext;
 public class RowHeader extends JTable {
 	private final static TableCellRenderer CELL_RENDERER = new DefaultTableCellRenderer()
 	{
-	    protected Border focusBorder;
 	    {
 	        setOpaque(true);
 	        setBorder(noFocusBorder);
@@ -44,49 +43,29 @@ public class RowHeader extends JTable {
 	        super.updateUI();
 	        Border cell = UIManager.getBorder("TableHeader.cellBorder");
 	        Border focus = UIManager.getBorder("Table.focusCellHighlightBorder");
-	
-	        focusBorder = new BorderUIResource.CompoundBorderUIResource(cell, focus);
-	 
 	        Insets i = focus.getBorderInsets(this);
 	
 	        noFocusBorder = new BorderUIResource.CompoundBorderUIResource
 	             (cell, BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right));
 	    }
 	
-	    public Component getTableCellRendererComponent(JTable table, Object value,
-	                       boolean selected, boolean focused, int row, int column)
-	    {
-	        if (table != null)
-	        {
-	            if (selected)
-	            {
-	                setBackground(table.getSelectionBackground());
-	                setForeground(table.getSelectionForeground());
-	            }
-	            else
-	            {
-	                setBackground(table.getBackground());
-	                setForeground(table.getForeground());
-	            }
-	
-	            setFont(table.getFont());
-	
-	            setEnabled(table.isEnabled());
-	        }
-	        else
-	        {
-	            setBackground(UIManager.getColor("TableHeader.background"));
-	            setForeground(UIManager.getColor("TableHeader.foreground"));
-	            setFont(UIManager.getFont("TableHeader.font"));
-	            setEnabled(true);
-	        }
-	        
-	        if (focused)
-	            setBorder(focusBorder);
-	        else
-	            setBorder(noFocusBorder);
-	
-	        setValue(value);
+	    public Component getTableCellRendererComponent(JTable table,
+                Object value, boolean selected, boolean focused, int row,
+                int column) {
+            if (table != null) {
+                setBackground(table.getBackground());
+                setForeground(table.getForeground());
+                setFont(table.getFont());
+                setEnabled(table.isEnabled());
+            } else {
+                setBackground(UIManager.getColor("TableHeader.background"));
+                setForeground(UIManager.getColor("TableHeader.foreground"));
+                setFont(UIManager.getFont("TableHeader.font"));
+                setEnabled(true);
+            }
+
+            setBorder(noFocusBorder);
+            setValue(value);
 	 
 	        return this;
 	    }
@@ -108,10 +87,13 @@ public class RowHeader extends JTable {
 		}
 		
 		public int getRowCount() {
-			return this.context.getObjects().size();
+			return this.context.getObjects().size() + 1;
 		}
 
 		public Object getValueAt(int rowIndex, int columnIndex) {
+            if(rowIndex == this.context.getObjects().size()) {
+                return "<Add new>";
+            }
 			FCAElement object = (FCAElement) this.context.getObjects().get(rowIndex);
 			return object;
 		}
