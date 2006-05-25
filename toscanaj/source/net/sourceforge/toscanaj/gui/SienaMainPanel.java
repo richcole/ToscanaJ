@@ -218,7 +218,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         this.eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
         this.eventBroker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
             
-        initializeModel();
+        setDefaultManyValuedContext();
 
         createViews();
 
@@ -250,8 +250,16 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 	}
 
-	private void initializeModel() {
-		this.conceptualSchema.setManyValuedContext(new ManyValuedContextImplementation());
+	private void setDefaultManyValuedContext() {
+        WritableManyValuedContext manyValuedContext = new ManyValuedContextImplementation();
+        manyValuedContext.add(StringType.createEnumerationRestrictedType("Single Valued", new String[]{"X"}));
+        manyValuedContext.add(StringType.createEnumerationRestrictedType("Boolean", new String[]{"true", "false"}));
+        manyValuedContext.add(StringType.createUnrestrictedType("String"));
+        manyValuedContext.add(DecimalType.createUnrestrictedType("Number"));
+        manyValuedContext.add(DecimalType.createDecimalType("Integer", null, false, null, false, new Integer(0)));
+        manyValuedContext.add(DecimalType.createDecimalType("Non-Negative Integer", new Double(0), true, null, false, new Integer(0)));
+        manyValuedContext.add(DecimalType.createDecimalType("Positive Integer", new Double(0), false, null, false, new Integer(0)));
+        this.conceptualSchema.setManyValuedContext(manyValuedContext);
 	}
 
 	protected void createViews() {
@@ -478,10 +486,10 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             public boolean doActivity() throws Exception {
             	SienaMainPanel.this.currentFile = null;
                 updateWindowTitle();
-                SienaMainPanel.this.conceptualSchema.setManyValuedContext(new ManyValuedContextImplementation());
-                SienaMainPanel.this.conceptualSchema.dataSaved();
+                setDefaultManyValuedContext();
                 SienaMainPanel.this.rowHeader.setManyValuedContext(SienaMainPanel.this.conceptualSchema.getManyValuedContext());
                 SienaMainPanel.this.tableView.setManyValuedContext(SienaMainPanel.this.conceptualSchema.getManyValuedContext());
+                SienaMainPanel.this.conceptualSchema.dataSaved();
                 return true;
             }
         });
