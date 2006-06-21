@@ -98,8 +98,8 @@ public class DescriptionViewer {
         }
 
         private void showDescription(Element description) {
-            if (description.getName().equalsIgnoreCase("externalHTML")) {
-                String urlAttr = description.getAttributeValue("url");
+            if (description.getChild("externalHTML") != null) {
+                String urlAttr = description.getChild("externalHTML").getAttributeValue("url");
                 if (urlAttr != null) {
                     HTMLDocument doc = (HTMLDocument) this.textArea.getDocument();
                     doc.setBase(baseURL);
@@ -117,10 +117,10 @@ public class DescriptionViewer {
                 this.textArea.setText("Could not find \"url\" attribute on &lt;externalHTML&gt;");
                 return;
             }
-            if (description.getName().equalsIgnoreCase("html")) {
+            if (description.getChild("html") != null) {
                 XMLOutputter outputter = new XMLOutputter();
                 outputter.setOmitDeclaration(true);
-                this.textArea.setText(outputter.outputString(description));
+                this.textArea.setText(outputter.outputString(description.getChild("html")));
                 HTMLDocument doc = (HTMLDocument) this.textArea.getDocument();
                 doc.setBase(baseURL);
                 return;
