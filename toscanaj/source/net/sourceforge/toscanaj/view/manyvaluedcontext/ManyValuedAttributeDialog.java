@@ -37,7 +37,7 @@ public class ManyValuedAttributeDialog extends JDialog{
 	
 	private JTextField nameTextField;
 	private JButton cancelButton;
-	private JButton editTypeButton;
+//	private JButton editTypeButton;
 	private JButton changeButton;
 	private WritableManyValuedAttribute property;
 	private Frame parent;
@@ -114,12 +114,12 @@ public class ManyValuedAttributeDialog extends JDialog{
 	protected JPanel createTypePane() {
 		JLabel typeNameLabel = new JLabel ("Type: ");
 		JPanel typePane = new JPanel(new GridBagLayout());
-		editTypeButton = new JButton ("Edit Type");
-		editTypeButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-                // @todo do something here
-			}
-		});
+//		editTypeButton = new JButton ("Edit Type");
+//		editTypeButton.addActionListener(new ActionListener(){
+//			public void actionPerformed(ActionEvent e) {
+//                // @todo do something here
+//			}
+//		});
 		
 		typePane.add(typeNameLabel,new GridBagConstraints(
 								0,0,1,1,1,1,
@@ -135,15 +135,15 @@ public class ManyValuedAttributeDialog extends JDialog{
 								new Insets(2,2,2,2),
 								2,2
 								));
-		JPanel editTypeButtonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-		editTypeButtonPane.add(editTypeButton);
-		typePane.add(editTypeButtonPane, new GridBagConstraints(
-								1,2,1,1,1,1,
-								GridBagConstraints.NORTHWEST,
-								GridBagConstraints.HORIZONTAL,
-								new Insets(2,2,2,2),
-								2,2
-								));
+//		JPanel editTypeButtonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+//		editTypeButtonPane.add(editTypeButton);
+//		typePane.add(editTypeButtonPane, new GridBagConstraints(
+//								1,2,1,1,1,1,
+//								GridBagConstraints.NORTHWEST,
+//								GridBagConstraints.HORIZONTAL,
+//								new Insets(2,2,2,2),
+//								2,2
+//								));
 		return typePane;
 	}
 	
