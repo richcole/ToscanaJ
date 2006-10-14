@@ -470,6 +470,7 @@ public class CSXParser {
             password = urlElem.getAttributeValue("password");
             embeddedDBlocation = null;
         } else {
+            assert embedElem != null; // either one should be set as checked above
             DatabaseInfo tmpInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
             url = tmpInfo.getURL();
             driver = tmpInfo.getDriverClass();

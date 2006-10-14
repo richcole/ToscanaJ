@@ -68,20 +68,14 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
 			throw new RuntimeException(getClass().getName() +
 					" has to be subscribed to CanvasItemEventWithPositions only");
 		}
-		CanvasBackground background = null;
-		try{
-			 background = (CanvasBackground)itemEvent.getItem();
-			
-		}catch(ClassCastException e1){
-			throw new RuntimeException(getClass().getName() +
-			" has to be subscribed to events from CanvasBackground only");
-		}
+
+        assert itemEvent.getItem() instanceof CanvasBackground: getClass().getName() +
+                        " has to be subscribed to events from CanvasBackground only";
 		
-		openPopupMenu(background, itemEvent.getCanvasPosition(), itemEvent.getAWTPosition());
+		openPopupMenu(itemEvent.getAWTPosition());
 	}
 
-	protected void openPopupMenu(final CanvasBackground background, Point2D canvasPosition,
-	 									Point2D screenPosition) {
+	protected void openPopupMenu(Point2D screenPosition) {
 		this.menu =  new JPopupMenu();
 		this.goBackOneDiagramItem = new JMenuItem("Go back one diagram");
 		this.menu.add(this.goBackOneDiagramItem);

@@ -56,10 +56,10 @@ public class NodeViewPopupMenuHandler implements EventBrokerListener, ClipboardO
             throw new RuntimeException(getClass().getName() +
                     " has to be subscribed to events from ObjectLabelViews only");
         }
-        openPopupMenu(nodeView, itemEvent.getCanvasPosition(), itemEvent.getAWTPosition());
+        openPopupMenu(nodeView, itemEvent.getAWTPosition());
     }
 
-    public void openPopupMenu(final NodeView nodeView, Point2D canvasPosition, Point2D screenPosition) {
+    public void openPopupMenu(final NodeView nodeView, Point2D screenPosition) {
         JPopupMenu popupMenu = new JPopupMenu();
 		JMenuItem menuItem = new JMenuItem("Export concept information");
 		menuItem.addActionListener(new ActionListener(){

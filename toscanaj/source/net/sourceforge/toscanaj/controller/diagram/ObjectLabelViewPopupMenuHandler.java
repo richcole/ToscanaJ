@@ -89,6 +89,8 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
             addQueryOptions(labelView, popupMenu);
         }
 		if (object instanceof DatabaseRetrievedObject) {
+            assert objectViewNames != null; // should be initialized in equivalent if above
+            assert objectListViewNames != null; // should be initialized in equivalent if above
 			final DatabaseRetrievedObject dbObject =
 					(DatabaseRetrievedObject) object;
 	        if (objectViewNames.size() != 0) {

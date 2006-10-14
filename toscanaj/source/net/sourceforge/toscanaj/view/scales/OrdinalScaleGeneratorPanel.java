@@ -497,19 +497,16 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 
 		addField.getDocument().addDocumentListener(new DocumentListener() {
 			public void insertUpdate(DocumentEvent e) {
-				processDocumentEvent(e);
+                setAddButtonState();
 			}
-
 			public void removeUpdate(DocumentEvent e) {
-				processDocumentEvent(e);
+                setAddButtonState();
 			}
-
 			public void changedUpdate(DocumentEvent e) {
-				processDocumentEvent(e);
+                setAddButtonState();
 			}
-
-			private void processDocumentEvent(DocumentEvent e) {
-				addButton.setEnabled(addField.isValid());
+			private void setAddButtonState() {
+			    addButton.setEnabled(addField.isValid());
 			}
 		});
 

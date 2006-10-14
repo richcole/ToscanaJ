@@ -797,7 +797,7 @@ public class DatabaseConnectionInformationView extends JDialog
 		
         this.stepLabel = new JLabel();
 				
-        JPanel buttonPane = createButtonPanel(frame);
+        JPanel buttonPane = createButtonPanel();
 		
 	    contentPane.add(stepLabel,new GridBagConstraints(
 	            0,0,1,1,1,0,
@@ -836,7 +836,7 @@ public class DatabaseConnectionInformationView extends JDialog
         this.keySelectPanel = new KeySelectPanel(this.internalBroker);
     }
 
-    public JPanel createButtonPanel(JFrame frame) {
+    private JPanel createButtonPanel() {
         nextButton = new JButton();
         nextButton.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e) {

@@ -88,11 +88,9 @@ public class ErrorDialog extends JDialog{
     }
 
 	private JPanel createErrorMsgPanel(Throwable e, String extraMessage) {
-		if(extraMessage==null){
-			extraMessage = e.getMessage();
-		}
+        String message = extraMessage!=null ? extraMessage : e.getMessage();
 		
-		JLabel simpleErrorLabel = new JLabel(extraMessage,UIManager.getIcon("OptionPane.errorIcon"),SwingConstants.LEFT);
+		JLabel simpleErrorLabel = new JLabel(message,UIManager.getIcon("OptionPane.errorIcon"),SwingConstants.LEFT);
 		JPanel simpleErrorMsgPanel = new JPanel(new GridBagLayout());
 		
 		simpleErrorMsgPanel.add(simpleErrorLabel, new GridBagConstraints(

@@ -95,7 +95,7 @@ public class StringType extends AbstractXSDDatatype {
     }
 
     protected boolean isValidStringValue(String valueToTest) {
-        return true;
+        return valueToTest != null; // we don't allow nulls since we don't want the pain
     }
     
     public boolean canConvertFrom(Value value) {

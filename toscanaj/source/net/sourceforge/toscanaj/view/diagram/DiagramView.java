@@ -14,7 +14,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
@@ -128,10 +127,6 @@ public class DiagramView extends Canvas implements ChangeObserver {
             NodeView cur = (NodeView) it.next();
             cur.getConceptInterpretationContext().setFilterMode(filterMode);
         }
-    }
-
-    protected void dragFinished(MouseEvent e) {
-        requestScreenTransformUpdate();
     }
 
     public void requestScreenTransformUpdate() {

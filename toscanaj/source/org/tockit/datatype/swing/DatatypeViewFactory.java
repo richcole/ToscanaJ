@@ -66,6 +66,7 @@ public abstract class DatatypeViewFactory {
 	}
 	
 	public static JPanel getSubtypingPanel(Datatype datatype) {
-		return null;
+        assert datatype != null;
+        throw new RuntimeException("Not yet implemented");
 	}
 }

@@ -59,16 +59,18 @@ public class SqlClauseEditingLabelViewPopupMenuHandler implements EventBrokerLis
             throw new RuntimeException(getClass().getName() +
                     " has to be subscribed to events from SqlClauseLabelView only");
         }
-        openPopupMenu(labelView, itemEvent.getCanvasPosition(), itemEvent.getAWTPosition());
+        openPopupMenu(labelView, itemEvent.getAWTPosition());
     }
 
-    public void openPopupMenu(final SqlClauseLabelView labelView, Point2D canvasPosition, Point2D screenPosition) {
+    public void openPopupMenu(final SqlClauseLabelView labelView, Point2D screenPosition) {
 
 		Iterator objIt = labelView.getNodeView().getDiagramNode().getConcept().getObjectContingentIterator();
         FCAElement curObjectValue = null;
 		if (objIt.hasNext()) {
 			curObjectValue = (FCAElement) objIt.next();
-		}
+		} else {
+		    return; // nothing to display
+        }
 		final FCAElement currentValue = curObjectValue;
         final String currentValueString = curObjectValue.toString();
                
