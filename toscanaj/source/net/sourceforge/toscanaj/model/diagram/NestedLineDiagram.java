@@ -43,7 +43,7 @@ public class NestedLineDiagram extends SimpleLineDiagram {
         if(outerDiagram.getEventBroker() != null) {
 			outerDiagram.getEventBroker().subscribe(new EventBrokerListener(){
 				public void processEvent(Event e) {
-					updateOuterDiagram(outerDiagram, innerDiagram);
+					updateOuterDiagram(outerDiagram);
 				}
 	    	}, DiagramChangedEvent.class, Object.class);
         }
@@ -73,7 +73,7 @@ public class NestedLineDiagram extends SimpleLineDiagram {
         }
 	}
 
-    private void updateOuterDiagram(Diagram2D outerDiagram, Diagram2D innerDiagram) {
+    private void updateOuterDiagram(Diagram2D outerDiagram) {
         for (int i = 0; i < outerDiagram.getNumberOfNodes(); i++) {
             DiagramNode outerNode = outerDiagram.getNode(i);
             NestedDiagramNode node = (NestedDiagramNode) this.getNode(i);

@@ -41,7 +41,7 @@ public class CheckDuplicateFileChooser extends JFileChooser{
 					setSelectedFile(selectedFile);
 				}	
 			}
-			if (selectedFile != null && selectedFile.exists()) {
+			if (selectedFile.exists()) {
 				String warningMessage = "The file '"	+ selectedFile.getName() + "' already exists.\nDo you want to overwrite the existing file?";
 				int response =
 					JOptionPane.showOptionDialog(

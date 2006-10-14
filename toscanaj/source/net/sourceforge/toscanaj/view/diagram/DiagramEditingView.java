@@ -533,6 +533,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 						break;
 					}
 				}
+                assert parentPos != null;
 				int contSize = concept.getAttributeContingentSize();
 				Point2D vector = new Point2D.Double((nodePos.getX() - parentPos.getX())/contSize, 
 				                                    (nodePos.getY() - parentPos.getY())/contSize);

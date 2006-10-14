@@ -231,7 +231,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 					setSelectedFile(selectedFile);
 				}	
 			}
-			if (selectedFile != null && selectedFile.exists()) {
+			if (selectedFile.exists()) {
 				String warningMessage = "The image file '"	+ selectedFile.getName() + "' already exists.\nDo you want to overwrite the existing file?";
 				if(ExportDiagramAction.this.diagramExportSettings.getSaveCommentsToFile()==true) {
 					File textFile = new File(selectedFile.getAbsoluteFile()+".txt");
@@ -250,7 +250,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 					return;
 				}
 			}
-			if(selectedFile!=null && !selectedFile.exists() && ExportDiagramAction.this.diagramExportSettings.getSaveCommentsToFile()==true){
+			if(!selectedFile.exists() && ExportDiagramAction.this.diagramExportSettings.getSaveCommentsToFile()==true){
 				File textFile = new File(selectedFile.getAbsoluteFile()+".txt");
 				if(textFile.exists()) {
 					int response =

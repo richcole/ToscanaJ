@@ -1064,11 +1064,14 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             outputStream.close();
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Could not export file");
-            try {
-                outputStream.close();
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException ioe) {
+                    // not much we can do here
+                    e.printStackTrace();
+                }
+            }            
             file.delete();
             return;
         }
@@ -1107,11 +1110,14 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             outputStream.close();
         } catch (Exception e) {
             ErrorDialog.showError(this, e, "Could not export file");
-            try {
-                outputStream.close();
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (IOException ioe) {
+                    // not much we can do here
+                    e.printStackTrace();
+                }
+            }            
             file.delete();
             return;
         }
