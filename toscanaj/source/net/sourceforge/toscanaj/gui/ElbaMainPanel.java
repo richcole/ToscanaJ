@@ -235,8 +235,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
         diagramView.getController().getEventBroker().subscribe(
             new SqlClauseEditingLabelViewPopupMenuHandler(
-                diagramView,
-                this.eventBroker),
+                diagramView),
             CanvasItemContextMenuRequestEvent.class,
             SqlClauseLabelView.getFactory().getLabelClass());
 

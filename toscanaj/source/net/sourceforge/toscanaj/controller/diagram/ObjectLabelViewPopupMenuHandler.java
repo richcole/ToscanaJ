@@ -77,7 +77,7 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
 			final DatabaseRetrievedObject dbObject =
 					(DatabaseRetrievedObject) object;
 			objectViewNames = DatabaseViewerManager.getObjectViewNames(dbObject);
-			objectListViewNames = DatabaseViewerManager.getObjectListViewNames(dbObject);
+			objectListViewNames = DatabaseViewerManager.getObjectListViewNames();
 		}
 		
         if (numberOfQueries + numberOfViews == 0) { // nothing to display

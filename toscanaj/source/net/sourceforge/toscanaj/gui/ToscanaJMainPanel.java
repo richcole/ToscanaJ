@@ -258,7 +258,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         );
         new ObjectLabelViewOpenDisplayHandler(diagramEventBroker);
         diagramEventBroker.subscribe(
-                new AttributeLabelViewPopupMenuHandler(this.diagramView, this.broker),
+                new AttributeLabelViewPopupMenuHandler(this.diagramView),
                 CanvasItemContextMenuRequestEvent.class,
                 AttributeLabelView.class
         );

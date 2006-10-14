@@ -16,7 +16,6 @@ import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
-import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
@@ -29,7 +28,7 @@ import java.util.List;
 public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
     private DiagramView diagramView;
 
-    public AttributeLabelViewPopupMenuHandler(DiagramView diagramView, EventBroker schemaBroker) {
+    public AttributeLabelViewPopupMenuHandler(DiagramView diagramView) {
         this.diagramView = diagramView;
     }
 

@@ -184,7 +184,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 		eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
 		this.diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, Object.class);
 		this.diagramView.getController().getEventBroker().subscribe( 
-							new AttributeEditingLabelViewPopupMenuHandler(diagramView, eventBroker),
+							new AttributeEditingLabelViewPopupMenuHandler(diagramView),
 							CanvasItemContextMenuRequestEvent.class, AttributeLabelView.class);
 	}
 

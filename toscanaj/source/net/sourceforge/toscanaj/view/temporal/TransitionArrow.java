@@ -115,9 +115,7 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
         double endX = this.endPoint.getX();
         double endY = this.endPoint.getY();
 
-        float length = (float) this.startPoint.distance(this.endPoint);
-
-        Paint paint = calculatePaint(length, this.style.getColor());
+        Paint paint = calculatePaint(this.style.getColor());
         if(paint == null) { // nothing to draw
         	this.currentShape = null;
         	return;
@@ -128,6 +126,7 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
     	Paint oldPaint = g.getPaint();
         Stroke oldStroke = g.getStroke();
         
+        float length = (float) this.startPoint.distance(this.endPoint);
         Shape arrow = getArrowShape(this.style, length);
         
 		AffineTransform shapeTransform = new AffineTransform();        
@@ -139,7 +138,7 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
         g.fill(this.currentShape);
         if(this.style.getBorderWidth() != 0) {
             g.setStroke(new BasicStroke(this.style.getBorderWidth()));
-            g.setPaint(calculatePaint(length, Color.BLACK));
+            g.setPaint(calculatePaint(Color.BLACK));
             g.draw(this.currentShape);
         }
     	
@@ -167,7 +166,7 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
         return arrow;
     }
 
-    protected Paint calculatePaint(float arrowLength, Color baseColor) {
+    protected Paint calculatePaint(Color baseColor) {
     	AnimationTimeController controller = this.timeController;
 
         double timeOffset = controller.getCurrentTime() - this.timePos;

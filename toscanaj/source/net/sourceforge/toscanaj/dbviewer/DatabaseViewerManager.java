@@ -308,7 +308,7 @@ public class DatabaseViewerManager implements XMLizable {
         return retVal;
     }
 
-    public static List getObjectListViewNames(DatabaseRetrievedObject object) {
+    public static List getObjectListViewNames() {
         List retVal = new LinkedList();
         Iterator it = objectListViewerRegistry.iterator();
         while (it.hasNext()) {

@@ -17,7 +17,6 @@ import net.sourceforge.toscanaj.view.diagram.SqlClauseLabelView;
 
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
-import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
@@ -40,7 +39,7 @@ import java.util.Iterator;
 public class SqlClauseEditingLabelViewPopupMenuHandler implements EventBrokerListener {
     private DiagramView diagramView;
 
-    public SqlClauseEditingLabelViewPopupMenuHandler(DiagramView diagramView, EventBroker schemaBroker) {
+    public SqlClauseEditingLabelViewPopupMenuHandler(DiagramView diagramView) {
         this.diagramView = diagramView;
     }
 

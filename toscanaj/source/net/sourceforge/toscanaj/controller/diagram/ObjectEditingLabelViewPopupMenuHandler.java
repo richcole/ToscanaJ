@@ -20,7 +20,6 @@ import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
-import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
@@ -37,7 +36,7 @@ import java.awt.geom.Point2D;
 public class ObjectEditingLabelViewPopupMenuHandler implements EventBrokerListener {
     private DiagramView diagramView;
 
-    public ObjectEditingLabelViewPopupMenuHandler(DiagramView diagramView, EventBroker schemaBroker) {
+    public ObjectEditingLabelViewPopupMenuHandler(DiagramView diagramView) {
         this.diagramView = diagramView;
     }
 

@@ -41,7 +41,7 @@ public class InterSequenceTransitionArrow extends TransitionArrow {
     	this.endColor = secondColor;
     }
 
-    protected Paint calculatePaint(float arrowLength, Color baseColor) {
+    protected Paint calculatePaint(Color baseColor) {
         AnimationTimeController controller = this.timeController;
 
         double timeOffset = controller.getCurrentTime() - this.timePos;
@@ -62,6 +62,7 @@ public class InterSequenceTransitionArrow extends TransitionArrow {
         Color finalEndColor = new Color(this.endColor.getRed(), this.endColor.getGreen(), this.endColor.getBlue(),
                           (int) (alpha * this.endColor.getAlpha()));
 
+        float arrowLength = (float) this.startPoint.distance(this.endPoint);
         return new GradientPaint(-arrowLength, 0, finalStartColor, 0, 0, finalEndColor);
     }
     
