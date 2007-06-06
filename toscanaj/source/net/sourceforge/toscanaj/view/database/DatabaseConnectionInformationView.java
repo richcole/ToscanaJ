@@ -324,7 +324,7 @@ public class DatabaseConnectionInformationView extends JDialog
             try {
                 databaseInfo.setEmbeddedSQLLocation(
                         new File(createAbsoluteLocation(
-                                scriptLocationField.getText())).toURL());
+                                scriptLocationField.getText())).toURI().toURL());
             } catch (MalformedURLException e) {
                 ErrorDialog.showError(this,e,"Connection failed");
                 return false;

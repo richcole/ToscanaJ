@@ -27,7 +27,7 @@ public class SaveConceptualSchemaActivity implements FileActivity, EventBrokerLi
 
     public void processFile(File file) throws Exception {
         XMLWriter.write(file, this.conceptualSchema);
-        this.conceptualSchema.setLocation(file.toURL());
+        this.conceptualSchema.setLocation(file.toURI().toURL());
     }
 
     public boolean prepareToProcess() throws Exception {

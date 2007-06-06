@@ -49,7 +49,7 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
     public void importCSCFile(File file, ConceptualSchema schema) 
     								throws DataFormatException, FileNotFoundException {
         try {
-            CSCFile cscFile = importCSCFile(file.toURL(), null);
+            CSCFile cscFile = importCSCFile(file.toURI().toURL(), null);
             List concreteScales = cscFile.getConcreteScales();
             for (Iterator iter = concreteScales.iterator(); iter.hasNext();) {
                 ConcreteScale scale = (ConcreteScale) iter.next();

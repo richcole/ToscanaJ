@@ -103,7 +103,7 @@ public class CSXParser {
 			SAXBuilder parser = new SAXBuilder();
 	        _Document = parser.build(csxFile);
 	
-	        _BaseURL = csxFile.toURL();
+	        _BaseURL = csxFile.toURI().toURL();
 	        DatabaseInfo.baseURL = _BaseURL;
 	        DatabaseViewerManager.setBaseURL(_BaseURL);
 	

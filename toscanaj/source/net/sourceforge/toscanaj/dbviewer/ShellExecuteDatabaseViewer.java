@@ -97,7 +97,7 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
         } catch (MalformedURLException e) {
         	try {
         		// if that fails, assume it is a file system location 
-				resourceURL = new File(resourceLocation).toURL();
+				resourceURL = new File(resourceLocation).toURI().toURL();
 			} catch (MalformedURLException e1) {
 	            throw new DatabaseViewerException("Can not resolve URL for item", e);
 			}
