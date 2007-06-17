@@ -47,7 +47,7 @@
 			<property name="cp" refid="project.libs.class.path"/>
 
 			<!-- copy manifest over, replacing the @classpath@ placeholder -->
-			<copy tofile="@{targetLoc}/@{targetApp}.MF" filtering="true">
+			<copy tofile="@{targetLoc}/@{targetApp}.MF" filtering="true" overwrite="true">
 				<fileset dir="${templates.dir}">
 					<include name="manifest.mf" />
 				</fileset>
