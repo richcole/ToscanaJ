@@ -79,9 +79,7 @@ public class RdfQueryUtil {
 		usage += "\tdataFile - RDF or N3 file\n";
 		usage += "\tqueriesFile - text file containing a RDQL query per line\n";
 		
-		if ((args.length >= 2) && (args.length <= 4)) {
-		}
-		else {
+		if ((args.length < 2) || (args.length > 4)) {
 			System.out.println(usage);
 			System.exit(0);
 		}

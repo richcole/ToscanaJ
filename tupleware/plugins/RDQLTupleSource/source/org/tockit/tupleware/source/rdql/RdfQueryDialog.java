@@ -33,11 +33,12 @@ import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
 import javax.swing.filechooser.FileFilter;
 
-import net.sourceforge.toscanaj.controller.ConfigurationManager;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 
+import org.tockit.canvas.imagewriter.DiagramExportSettings;
 import org.tockit.relations.model.Relation;
 import org.tockit.relations.model.RelationImplementation;
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdql.Query;
@@ -45,7 +46,8 @@ import com.hp.hpl.jena.rdql.QueryResults;
 import com.hp.hpl.jena.rdql.ResultBinding;
 
 public class RdfQueryDialog extends JDialog {
-	private static final String CONFIGURATION_SECTION_NAME = "RdfQueryDialog";
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramExportSettings.class);
+
 	private static final String CONFIGURATION_FILE_STRING = "RDQL Query File";
 	
 	private static final int MINIMUM_WIDTH = 400;
@@ -84,7 +86,7 @@ public class RdfQueryDialog extends JDialog {
 			final String[] fileExtensions = {"rdf","n3"};
 			fileButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					String lastOpenedFileName = ConfigurationManager.fetchString(CONFIGURATION_SECTION_NAME, CONFIGURATION_FILE_STRING, null);
+					String lastOpenedFileName = preferences.get(CONFIGURATION_FILE_STRING, null);
 					getFileURL(fileLocationField, fileExtensions, "RDF and N3 files (*.rdf, *.n3)", lastOpenedFileName);
 				}
 			});
@@ -132,6 +134,7 @@ public class RdfQueryDialog extends JDialog {
 			return rdfQueryPanel;
 		}
 		void updateContents() {
+			// nothing to do
 		}
 		
 		boolean executeStep() {
@@ -142,7 +145,7 @@ public class RdfQueryDialog extends JDialog {
 				ErrorDialog.showError(this, e, "Error parsing file " + file.getAbsolutePath());
 				return false;
 			}
-			ConfigurationManager.storeString(CONFIGURATION_SECTION_NAME, CONFIGURATION_FILE_STRING, file.getAbsolutePath());
+			preferences.put(CONFIGURATION_FILE_STRING, file.getAbsolutePath());
 			return true;
 		}
 		
@@ -180,6 +183,7 @@ public class RdfQueryDialog extends JDialog {
 		}
 
 		void updateContents() {
+			// nothing to do
 		}
         
 		boolean executeStep() {
@@ -248,7 +252,7 @@ public class RdfQueryDialog extends JDialog {
 		
 		this.stepLabel = new JLabel();
 				
-		JPanel buttonPane = createButtonPanel(parent);
+		JPanel buttonPane = createButtonPanel();
 		
 		contentPane.add(stepLabel,new GridBagConstraints(
 				0,0,1,1,1,0,
@@ -265,8 +269,7 @@ public class RdfQueryDialog extends JDialog {
 				
 		setCurrentPanel(this.openFilePanel);
 				
-		ConfigurationManager.restorePlacement(
-			CONFIGURATION_SECTION_NAME,
+		preferences.restoreWindowPlacement(
 			this,
 			new Rectangle(100, 100, MINIMUM_WIDTH, MINIMUM_WIDTH));
 	}
@@ -276,7 +279,7 @@ public class RdfQueryDialog extends JDialog {
 		rdfQueryPanel = new RdfQueryPanel();
 	}
 
-	public JPanel createButtonPanel(JFrame frame) {
+	public JPanel createButtonPanel() {
 		nextButton = new JButton();
 		nextButton.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
@@ -290,7 +293,7 @@ public class RdfQueryDialog extends JDialog {
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				hide();
+				setVisible(false);
 			}
 		});
         
@@ -312,7 +315,7 @@ public class RdfQueryDialog extends JDialog {
 	protected void gotoNextStep() {
 		WizardPanel nextPanel = this.currentStep.getNextPanel();
 		if(nextPanel == null) {
-			hide();
+			setVisible(false);
 		} else {
 			setCurrentPanel(nextPanel);
 		}
@@ -378,10 +381,12 @@ public class RdfQueryDialog extends JDialog {
 		}
 	}
 	
-	public void hide() {
-		super.hide();
-		setCurrentPanel(this.openFilePanel);
-		ConfigurationManager.storePlacement(CONFIGURATION_SECTION_NAME,	this);
+	public void setVisible(boolean visible) {
+		super.setVisible(visible);
+		if(!visible) {
+			setCurrentPanel(this.openFilePanel);
+			preferences.storeWindowPlacement(this);
+		}
 	}
 
 	public Relation getTuples() {

@@ -28,12 +28,12 @@ public class RdqlQueryEngine implements TupleSource, Plugin {
 
 	public void show(JFrame parent, File lastLocation) {
 		RdfQueryDialog rdfQueryDialog = new RdfQueryDialog(parent);
-		rdfQueryDialog.show();
+		rdfQueryDialog.setVisible(true);
 		this.tupleSet = rdfQueryDialog.getTuples();
 		System.out.println("GOT TUPLE SET: " + this.tupleSet);
 		if(this.tupleSet != null) {
 			IndexSelectionDialog objectSetDialog = new IndexSelectionDialog(parent, "Select object set", this.tupleSet.getDimensionNames());
-			objectSetDialog.show();
+			objectSetDialog.setVisible(true);
 			this.objectIndices = objectSetDialog.getSelectedIndices();
 		}
 	}
