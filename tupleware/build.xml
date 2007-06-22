@@ -104,11 +104,10 @@
 				<include name="*.txt"/>
 				<include name="*.bat"/>
 				<include name="*.sh"/>
-				<include name="tupleware.prop"/>
 				<include name="examples/**"/>
 			</fileset>
 		</copy>
-		<fixcrlf srcDir="${dist.dir}" eol="crlf" includes="*.txt, *.bat, tupleware.prop"/>
+		<fixcrlf srcDir="${dist.dir}" eol="crlf" includes="*.txt, *.bat"/>
 		<fixcrlf srcDir="${dist.dir}" eol="lf" includes="*.sh"/>
     </target>
 	<target name="dist" depends="_makeReleaseJar,_copyFiles,_zipFile">
