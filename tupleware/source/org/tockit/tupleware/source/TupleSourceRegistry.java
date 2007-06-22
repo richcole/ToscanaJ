@@ -27,6 +27,7 @@ public class TupleSourceRegistry {
 	}
 	
 	private TupleSourceRegistry() {
+		// just hiding the constructor
 	}
 	
 	public static void registerTupleSource(TupleSource tupleSource) {

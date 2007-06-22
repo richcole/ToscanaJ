@@ -564,6 +564,7 @@ public class DatabaseConnectionDialog extends JDialog {
         }
 
         void updateContents() {
+        	// nothing to do
         }
         
         boolean executeStep() {
@@ -638,7 +639,7 @@ public class DatabaseConnectionDialog extends JDialog {
 		
         this.stepLabel = new JLabel();
 				
-        JPanel buttonPane = createButtonPanel(parent);
+        JPanel buttonPane = createButtonPanel();
 		
 	    contentPane.add(stepLabel,new GridBagConstraints(
 	            0,0,1,1,1,0,
@@ -668,7 +669,7 @@ public class DatabaseConnectionDialog extends JDialog {
         this.sqlQueryPanel = new SqlQueryPanel();
     }
 
-    public JPanel createButtonPanel(JFrame frame) {
+    public JPanel createButtonPanel() {
         nextButton = new JButton();
         nextButton.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e) {
