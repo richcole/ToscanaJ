@@ -9,36 +9,33 @@
 		<property name="dist.dir" value="${dist.base.dir}/${dist.name}"/>
   	</target>
   	
-
 	<property name="app.name" value="Tupleware"/>
-	<property name="build.dev.dir" value="build/dev"/>
-	<property name="build.release.dir" value="build/release"/>
+	<property name="build.dir" value="build"/>
+	<property name="build.dev.dir" value="${build.dir}/dev"/>
+	<property name="build.release.dir" value="${build.dir}/release"/>
 	<property name="dist.base.dir" value="dist"/>
 	<property name="src.dir" value="source"/>
 	<property name="libs.dir" value="libs"/>
     <property name="tupleware.class" value="org.tockit.tupleware.Tupleware"/>
 	<property name="plugins.dir" value="plugins"/>
+	<property name="templates.dir" value="templates"/>
 
-    <path id="project.dev.class.path">
-        <pathelement path="${classpath}"/>
-        <pathelement path="${build.dev.dir}"/>
+    <path id="project.libs.class.path">
         <fileset dir="${libs.dir}">
             <include name="**/*.jar"/>
         </fileset>
-        <fileset dir="${libs.dir}">
-            <include name="**/*.zip"/>
-        </fileset>
+    </path>
+    <path id="project.dev.class.path">
+        <pathelement path="${classpath}"/>
+        <pathelement path="${build.dev.dir}"/>
+    	<path refid="project.libs.class.path"/>
     </path>
     <path id="project.release.class.path">
         <pathelement path="${classpath}"/>
         <pathelement path="${build.release.dir}"/>
-        <fileset dir="${libs.dir}">
-            <include name="**/*.jar"/>
-        </fileset>
-        <fileset dir="${libs.dir}">
-            <include name="**/*.zip"/>
-        </fileset>
+    	<path refid="project.libs.class.path"/>
     </path>
+
 	<target name="_prepare" depends="setBuildName">
 		<mkdir dir="${build.dev.dir}"/>
 		<mkdir dir="${build.release.dir}"/>
@@ -64,11 +61,36 @@
 		<mkdir dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}/plugins"/>
 	</target>
-	<target name="_makeDebugJar" depends="compile,_prepareDist">
-		<jar jarfile="${dist.dir}/${app.name}.jar" basedir="${build.dev.dir}" manifest="manifest.mf"/>
+	<target name="_createManifest">
+			<property name="cp" refid="project.libs.class.path"/>
+
+			<!-- copy manifest over, replacing the @classpath@ placeholder -->
+			<copy tofile="${build.dir}/manifest.mf" filtering="true" overwrite="true">
+				<fileset dir="${templates.dir}">
+					<include name="manifest.mf" />
+				</fileset>
+				<filterset>
+					<filter token="classpath" value="${cp}" />
+					<filter token="app" value="org/tockit/tupleware/Tupleware" />
+				</filterset>
+			</copy>
+	
+			<!-- replace path prefix with relative path -->
+			<replace file="${build.dir}/manifest.mf" token="${basedir}" value="." />
+	
+			<!-- deal with file and path separators in an os independent way -->
+			<replace file="${build.dir}/manifest.mf" token="${file.separator}" value="/" />
+			<!-- we can't just replace the path.separator - on UNIXy systems this would hit
+			     the colons between properties and values. But since all libs should be relative
+			     to basedir, they should now all start with a dot, thus we can add the dot to
+			     distinguish the path.separator from the property:value separator. -->
+			<replace file="${build.dir}/manifest.mf" token="${path.separator}." value=" ." />
 	</target>
-	<target name="_makeReleaseJar" depends="_compileRelease,_prepareDist">
-		<jar jarfile="${dist.dir}/${app.name}.jar" basedir="${build.release.dir}" manifest="manifest.mf"/>
+	<target name="_makeDebugJar" depends="compile,_prepareDist,_createManifest">
+		<jar jarfile="${dist.dir}/${app.name}.jar" basedir="${build.dev.dir}" manifest="${build.dir}/manifest.mf"/>
+	</target>
+	<target name="_makeReleaseJar" depends="_compileRelease,_prepareDist,_createManifest">
+		<jar jarfile="${dist.dir}/${app.name}.jar" basedir="${build.release.dir}" manifest="${build.dir}/manifest.mf"/>
 	</target>
 	<target name="_copyFiles">
 		<copy todir="${dist.dir}/libs" includeEmptyDirs="no">

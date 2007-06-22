@@ -1,2 +1,0 @@
-Main-Class: org/tockit/tupleware/Tupleware
-Class-Path: . libs/pluginArchitecture.jar libs/canvas.jar libs/events.jar libs/jdom.jar libs/ToscanaJ.jar 
