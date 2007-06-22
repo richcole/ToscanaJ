@@ -16,8 +16,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFReader;
@@ -25,11 +30,6 @@ import com.hp.hpl.jena.rdf.model.RDFReaderF;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
-import com.hp.hpl.jena.rdql.Query;
-import com.hp.hpl.jena.rdql.QueryEngine;
-import com.hp.hpl.jena.rdql.QueryExecution;
-import com.hp.hpl.jena.rdql.QueryResults;
-import com.hp.hpl.jena.rdql.ResultBinding;
 
 
 public class RdfQueryUtil {
@@ -48,12 +48,9 @@ public class RdfQueryUtil {
 		return rdfModel;
 	}
 	
-	public static QueryResults executeRDQL (Model rdfModel, Query query) {
-		List resultVars = query.getResultVars();
-		query.setSource(rdfModel);	
-		QueryExecution qe = new QueryEngine(query) ;
-		QueryResults results = qe.exec();
-		return results;
+	public static ResultSet executeARQ (Model rdfModel, Query query) {
+		QueryExecution queryEx = QueryExecutionFactory.create(query, rdfModel);	
+		return queryEx.execSelect();
 	}
 
 	private static List readQueriesFile(String queriesFileName)
@@ -127,18 +124,14 @@ public class RdfQueryUtil {
 			Iterator it = queryStrings.iterator();
 			while (it.hasNext()) {
 				String queryString = (String) it.next();
-				Query query = new Query(queryString);
-				QueryResults results = RdfQueryUtil.executeRDQL(rdfModel, query);
+				Query query = QueryFactory.create(queryString);
+				ResultSet results = RdfQueryUtil.executeARQ(rdfModel, query);
 				System.out.println("---QUERY " + queryString + "------------------");
 				List resultVars = results.getResultVars();
 				int count = 0;
-				for ( Iterator iter = results ; iter.hasNext() ; ) {
+				for ( ; results.hasNext() ; ) {
 					count++;
-					ResultBinding resBinding = (ResultBinding)iter.next() ;
-					Set triples = resBinding.getTriples();
-					if (triples.size() <= 0) {
-						System.out.println("size of result: " + triples.size());
-					}
+					QuerySolution resBinding = (QuerySolution)results.next() ;
 					if (printResults) {
 						for (int i = 0; i < resultVars.size(); i++) {
 							String  queryVar = (String) resultVars.get(i);
@@ -147,7 +140,7 @@ public class RdfQueryUtil {
 						}
 					} 
 				}
-				results.close() ;
+				// TODO: replace calll to results.close() with matching close() form QueryExecution
 				System.out.println("Num of results: " + count);
 			}
 			long time_query = System.currentTimeMillis() - time_start_query;

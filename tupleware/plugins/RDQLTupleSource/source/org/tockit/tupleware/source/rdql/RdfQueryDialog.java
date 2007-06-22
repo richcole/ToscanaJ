@@ -18,7 +18,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -40,10 +39,13 @@ import org.tockit.relations.model.Relation;
 import org.tockit.relations.model.RelationImplementation;
 import org.tockit.swing.preferences.ExtendedPreferences;
 
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdql.Query;
-import com.hp.hpl.jena.rdql.QueryResults;
-import com.hp.hpl.jena.rdql.ResultBinding;
 
 public class RdfQueryDialog extends JDialog {
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramExportSettings.class);
@@ -187,30 +189,32 @@ public class RdfQueryDialog extends JDialog {
 		}
         
 		boolean executeStep() {
+			Query query = QueryFactory.create(rdfQueryArea.getText());
+			List resultVars = query.getResultVars();
+			tupleSet = new RelationImplementation((String[]) resultVars
+					.toArray(new String[resultVars.size()]));
+			QueryExecution queryEx = QueryExecutionFactory.create(query,
+					rdfModel);
 			try {
-				String queryString = rdfQueryArea.getText();
-
-				Query query = new Query(queryString) ;
-				List resultVars = query.getResultVars();
-				tupleSet = new RelationImplementation(
-									(String[]) resultVars.toArray(new String[resultVars.size()]));
-				QueryResults results = RdfQueryUtil.executeRDQL(rdfModel, query);
-				for ( Iterator iter = results ; iter.hasNext() ; ) {
-					ResultBinding resBinding = (ResultBinding)iter.next() ;
+				ResultSet results = queryEx.execSelect();
+				for (; results.hasNext();) {
+					QuerySolution solution = (QuerySolution) results.next();
 					Object[] tuple = new Object[resultVars.size()];
 					for (int i = 0; i < resultVars.size(); i++) {
-						String  queryVar = (String) resultVars.get(i);
-						Object obj = resBinding.get(queryVar);
-						tuple[i] = obj;				
-					} 
+						String queryVar = (String) resultVars.get(i);
+						Object obj = solution.get(queryVar);
+						tuple[i] = obj;
+					}
 					tupleSet.addTuple(tuple);
 				}
-				results.close() ;
 				return true;
 			}
 			catch (Exception e) {
 				ErrorDialog.showError(this, e, "Query Failed");
 				return false;
+			}
+			finally {
+				queryEx.close();
 			}
 		}
 
