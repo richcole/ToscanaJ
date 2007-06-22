@@ -10,7 +10,7 @@
   	</target>
   	
 
-	<property name="app.name" value="Tuppleware"/>
+	<property name="app.name" value="Tupleware"/>
 	<property name="build.dev.dir" value="build/dev"/>
 	<property name="build.release.dir" value="build/release"/>
 	<property name="dist.base.dir" value="dist"/>
