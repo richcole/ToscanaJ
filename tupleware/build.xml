@@ -40,7 +40,7 @@
 		<mkdir dir="${build.dev.dir}"/>
 		<mkdir dir="${build.release.dir}"/>
 	</target>
-	<target name="clean">
+	<target name="clean" description="Removes all generated files">
 		<delete dir="${build.release.dir}"/>
 		<delete dir="${build.dev.dir}"/>
 		<delete dir="${dist.base.dir}"/>
@@ -56,7 +56,7 @@
 			<classpath refid="project.release.class.path"/>
 		</javac>
 	</target>
-    <target name="rebuild" depends="clean,compile"/>
+    <target name="rebuild" depends="clean,compile" description="Creates a clean build"/>
     <target name="_prepareDist">
 		<mkdir dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}/plugins"/>
@@ -110,9 +110,10 @@
 		<fixcrlf srcDir="${dist.dir}" eol="crlf" includes="*.txt, *.bat"/>
 		<fixcrlf srcDir="${dist.dir}" eol="lf" includes="*.sh"/>
     </target>
-	<target name="dist" depends="_makeReleaseJar,_copyFiles,_zipFile">
+	<target name="dist" depends="_makeReleaseJar,_copyFiles,_zipFile" description="Creates the Tupleware distribution file">
 	</target>
-	<target name="fullDist" depends="_makeReleaseJar,_copyFiles,pluginsReleaseDist,_zipFile">
+	<target name="fullDist" depends="_makeReleaseJar,_copyFiles,pluginsReleaseDist,_zipFile"
+		description="Creates the distribution files for Tupleware and the plugins">
 	</target>
 	<target name="_zipFile">
 		<zip destfile="${dist.dir}.zip">
