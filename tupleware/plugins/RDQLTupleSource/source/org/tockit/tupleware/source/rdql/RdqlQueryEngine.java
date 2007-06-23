@@ -17,20 +17,24 @@ import org.tockit.relations.model.Relation;
 import org.tockit.tupleware.source.TupleSource;
 import org.tockit.tupleware.source.TupleSourceRegistry;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 public class RdqlQueryEngine implements TupleSource, Plugin {
 	private int[] objectIndices;
 	private Relation tupleSet;
 	private File selectedFile;
+	private Model rdfModel;
 
 	public String getMenuName() {
-		return "Query RDF or N3 file...";
+		return "Query RDF Model...";
 	}
 
 	public void show(JFrame parent, File lastLocation) {
-		RdfQueryDialog rdfQueryDialog = new RdfQueryDialog(parent);
+		RdfQueryDialog rdfQueryDialog = new RdfQueryDialog(parent, rdfModel);
 		rdfQueryDialog.setVisible(true);
 		this.tupleSet = rdfQueryDialog.getTuples();
 		if(this.tupleSet != null) {
+			this.rdfModel = rdfQueryDialog.getRdfModel();
 			IndexSelectionDialog objectSetDialog = new IndexSelectionDialog(parent, "Select object set", this.tupleSet.getDimensionNames());
 			objectSetDialog.setVisible(true);
 			this.objectIndices = objectSetDialog.getSelectedIndices();

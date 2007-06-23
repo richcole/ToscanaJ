@@ -21,12 +21,14 @@ import java.io.File;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.BevelBorder;
@@ -64,6 +66,8 @@ public class RdfQueryDialog extends JDialog {
 	private Model rdfModel;
 	private Relation tupleSet;
 
+	private ModelSourcePanel modelSourcePanel;
+
 	abstract class WizardPanel extends JPanel {
 		WizardPanel() {
 			super();
@@ -76,13 +80,66 @@ public class RdfQueryDialog extends JDialog {
 		abstract WizardPanel getNextPanel();
 	}
     
+	class ModelSourcePanel extends WizardPanel {
+		private JRadioButton loadModelChoice;
+		
+		public ModelSourcePanel() {
+			super();
+			ButtonGroup choices = new ButtonGroup();
+			JRadioButton keepModelChoice = new JRadioButton("keep current RDF model");
+			loadModelChoice = new JRadioButton("load new RDF model from file");
+			
+			choices.add(keepModelChoice);
+			choices.add(loadModelChoice);
+			keepModelChoice.setSelected(true);
+			
+			this.setLayout(new GridBagLayout());
+			GridBagConstraints constraints = new GridBagConstraints();
+			constraints.gridx = 0;
+			constraints.gridy = GridBagConstraints.RELATIVE;
+			constraints.weightx = 1;
+			constraints.anchor = GridBagConstraints.NORTHWEST;
+			
+			this.add(keepModelChoice,constraints);
+			this.add(loadModelChoice,constraints);
+			
+			constraints.weighty = 1;
+			this.add(new JPanel(),constraints);
+		}
+		
+		boolean executeStep() {
+			// nothing to do
+			return true;
+		}
+
+		String getNextButtonText() {
+			return "Select >>";
+		}
+
+		WizardPanel getNextPanel() {
+			if(loadModelChoice.isSelected()) {
+				return openFilePanel;
+			} else {
+				return rdfQueryPanel;
+			}
+		}
+
+		String getTitle() {
+			return "Select model source";
+		}
+
+		void updateContents() {
+			// nothing to do
+		}
+		
+	}
+	
 	class RdfModelCreationPanel extends WizardPanel {
 		private JTextField fileLocationField = new JTextField();
 		
 		public RdfModelCreationPanel() {
 			super();
-			rdfModel = null;
-			
+
 			JLabel fileLabel = new JLabel("RDF or N3 File Location:");
 			final String lastOpenedFileName = preferences.get(CONFIGURATION_FILE_STRING, null);
 			fileLocationField.setText(lastOpenedFileName);
@@ -232,8 +289,9 @@ public class RdfQueryDialog extends JDialog {
 	/**
 	 * Construct an instance of this view
 	 */
-	public RdfQueryDialog (JFrame parent) {
+	public RdfQueryDialog (JFrame parent, Model rdfModel) {
 		super(parent, "RDF Query", true);
+		this.rdfModel = rdfModel;
 		initializePanels();
 
 		Container contentPane = this.getContentPane();
@@ -269,7 +327,7 @@ public class RdfQueryDialog extends JDialog {
 				new Insets(0, 5, 5, 5),
 				2,2));
 				
-		setCurrentPanel(this.openFilePanel);
+		setCurrentPanel(this.rdfModel==null?this.openFilePanel:this.modelSourcePanel);
 				
 		preferences.restoreWindowPlacement(
 			this,
@@ -277,6 +335,7 @@ public class RdfQueryDialog extends JDialog {
 	}
 
 	protected void initializePanels() {
+		modelSourcePanel = new ModelSourcePanel();
 		openFilePanel = new RdfModelCreationPanel();
 		rdfQueryPanel = new RdfQueryPanel();
 	}
@@ -386,7 +445,7 @@ public class RdfQueryDialog extends JDialog {
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 		if(!visible) {
-			setCurrentPanel(this.openFilePanel);
+			setCurrentPanel(this.rdfModel==null?this.openFilePanel:this.modelSourcePanel);
 			preferences.storeWindowPlacement(this);
 		}
 	}
@@ -395,4 +454,7 @@ public class RdfQueryDialog extends JDialog {
 		return this.tupleSet;
 	}
 
+	public Model getRdfModel() {
+		return this.rdfModel;
+	}
 }
