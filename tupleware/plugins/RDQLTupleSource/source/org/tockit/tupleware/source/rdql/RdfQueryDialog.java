@@ -166,9 +166,6 @@ public class RdfQueryDialog extends JDialog {
 			rdfQueryArea = new JTextArea();
 			rdfQueryArea.setBorder(BorderFactory.createLoweredBevelBorder());
 			
-			/// @todo: temporary set text here so it is faster to test. Remove!
-			rdfQueryArea.setText("SELECT ?a, ?b, ?d WHERE (?a, <implements>, ?c),\n (?c, <is-a>, ?b),\n (?a, <extends>, ?d)");
-
 			this.setLayout(new GridBagLayout());
 			this.add(new JLabel("RDF Query:"),new GridBagConstraints(
 					0,0,1,1,1,0,
