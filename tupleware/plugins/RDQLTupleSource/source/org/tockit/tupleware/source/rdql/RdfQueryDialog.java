@@ -50,7 +50,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 public class RdfQueryDialog extends JDialog {
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramExportSettings.class);
 
-	private static final String CONFIGURATION_FILE_STRING = "RDQL Query File";
+	private static final String CONFIGURATION_FILE_STRING = "lastRdfFile";
 	
 	private static final int MINIMUM_WIDTH = 400;
 	private static final int MINIMUM_HEIGHT = 350;
@@ -84,11 +84,12 @@ public class RdfQueryDialog extends JDialog {
 			rdfModel = null;
 			
 			JLabel fileLabel = new JLabel("RDF or N3 File Location:");
+			final String lastOpenedFileName = preferences.get(CONFIGURATION_FILE_STRING, null);
+			fileLocationField.setText(lastOpenedFileName);
 			JButton fileButton = new JButton("Browse...");
 			final String[] fileExtensions = {"rdf","n3"};
 			fileButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					String lastOpenedFileName = preferences.get(CONFIGURATION_FILE_STRING, null);
 					getFileURL(fileLocationField, fileExtensions, "RDF and N3 files (*.rdf, *.n3)", lastOpenedFileName);
 				}
 			});
