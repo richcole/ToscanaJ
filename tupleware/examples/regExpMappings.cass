@@ -19,5 +19,8 @@
 # API. Note that you might need extra/slash different escaping in
 # a properties file compared to writing strings in Java code.
 #
-^.*\#L(.*).=$1
+^http...tockit.org.cass.packages\#(.*)=$1
+^http...tockit.org.cass.entityTypes\#(.*)=$1
+^http...tockit.org.cass.types\#L(.*).=$1
+^http...tockit.org.cass.methods\#L(.*)V=$1
 /=.
