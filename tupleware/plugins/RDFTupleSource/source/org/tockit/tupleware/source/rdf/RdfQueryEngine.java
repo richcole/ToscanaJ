@@ -3,7 +3,7 @@
  * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
- * $Id$
+ * $Id:RdqlQueryEngine.java 1929 2007-06-24 04:50:48Z peterbecker $
  */
 package org.tockit.tupleware.source.rdf;
 
@@ -19,7 +19,7 @@ import org.tockit.tupleware.source.TupleSourceRegistry;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
-public class RdqlQueryEngine implements TupleSource, Plugin {
+public class RdfQueryEngine implements TupleSource, Plugin {
 	private int[] objectIndices;
 	private Relation tupleSet;
 	private File selectedFile;
