@@ -48,6 +48,8 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.table.DefaultTableModel;
 
+import net.sourceforge.toscanaj.controller.diagram.HighlightRemovalOperationEventListener;
+import net.sourceforge.toscanaj.controller.diagram.HighlightingOperationEventListener;
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.TupleConceptInterpreter;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
@@ -296,8 +298,11 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
     public void createViews() {
         diagramEditingView = new DiagramEditingView(this, conceptualSchema, eventBroker, false);
         diagramEditingView.setDividerLocation(preferences.getInt(CONFIGURATION_ENTRY_DIVIDER, 200));
-        this.diagramEditingView.getDiagramView().getController().getEventBroker().subscribe(
-                                        this, DisplayedDiagramChangedEvent.class, Object.class);
+        DiagramView diagramView = this.diagramEditingView.getDiagramView();
+		EventBroker diagramEventBroker = diagramView.getController().getEventBroker();
+		diagramEventBroker.subscribe(this, DisplayedDiagramChangedEvent.class, Object.class);
+        new HighlightingOperationEventListener(diagramView, diagramEventBroker);
+        new HighlightRemovalOperationEventListener(diagramView, diagramEventBroker);
 
         schemaDescriptionView = new XMLEditorDialog(this, "Schema description");
     }
