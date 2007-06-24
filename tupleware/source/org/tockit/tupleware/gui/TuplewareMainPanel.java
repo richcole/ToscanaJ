@@ -661,14 +661,12 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 	}
 
 	private void loadPlugins() {
-		/// @todo this should be read from config manager?...
-		String pluginsDirName = "plugins";
-
-		String pluginsBaseDir = System.getProperty("user.dir") + File.separator;
-		
-		
+		String pluginsDir = System.getProperty("org.tockit.tupleware.pluginDir");
+		if (pluginsDir == null) {
+			pluginsDir = System.getProperty("user.dir") + File.separator + "plugins";
+		}		
 		try {
-			PluginLoader.Error[] errors = PluginLoader.loadPlugins(new File(pluginsBaseDir + pluginsDirName));
+			PluginLoader.Error[] errors = PluginLoader.loadPlugins(new File(pluginsDir));
 			if (errors.length > 0) {
 				String errorMsg = "";
 				for (int i = 0; i < errors.length; i++) {
