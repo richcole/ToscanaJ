@@ -17,6 +17,8 @@ import org.tockit.events.EventBroker;
 import org.tockit.relations.model.Relation;
 import org.tockit.relations.model.Tuple;
 import org.tockit.tupleware.source.text.SeparatedTextParser;
+import org.tockit.tupleware.util.StringMapper;
+import org.tockit.tupleware.util.IdentityStringMapper;
 
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
@@ -72,7 +74,7 @@ public class TupleScaling {
      * Each binary relation for the contexts is the projection of the tuples onto the dimension
      * given by the objectPosition parameter and one other.
      */
-    public static ConceptualSchema scaleTuples(Relation tuples, int objectPosition) {
+    public static ConceptualSchema scaleTuples(Relation tuples, int objectPosition, StringMapper nameMapper) {
         ConceptualSchema schema = new ConceptualSchema(new EventBroker());
 
         String[] variableNames = tuples.getDimensionNames();
@@ -80,7 +82,7 @@ public class TupleScaling {
             if(i == objectPosition) {
                 continue;
             }
-            schema.addDiagram(scaleTuples(tuples, new int[]{objectPosition}, new int[]{i}));
+            schema.addDiagram(scaleTuples(tuples, new int[]{objectPosition}, new int[]{i}, nameMapper));
         }
 
         return schema;
@@ -90,9 +92,9 @@ public class TupleScaling {
      * Creates a diagram projecting the given indices on the context.
      * 
      * The objectIndices parameter defines the objects, the attributeIndices parameter
-     * the attributes. They incide iff they cooccur in a tuple.
+     * the attributes. They incide iff they co-occur in a tuple.
      */    
-    public static Diagram2D scaleTuples(Relation tuples, int[] objectIndices, int[] attributeIndices) {
+    public static Diagram2D scaleTuples(Relation tuples, int[] objectIndices, int[] attributeIndices, StringMapper nameMapper) {
         Map tupleObjectMap = new HashMap();
         Map valueAttributeMap = new HashMap();
         ContextImplementation context = new ContextImplementation("Tuples");
@@ -101,13 +103,13 @@ public class TupleScaling {
             Tuple tuple = (Tuple) iter.next();
             ObjectTuple objectValues = selectSubset(tuple.getData(), objectIndices);
             if(tupleObjectMap.get(objectValues) == null) {
-                FCAElement newObject = new FCAElementImplementation(createCrossproductName(objectValues));
+                FCAElement newObject = new FCAElementImplementation(nameMapper.mapString(createCrossproductName(objectValues)));
                 tupleObjectMap.put(objectValues, newObject);
                 context.getObjects().add(newObject);
             }
             ObjectTuple attributeValues = selectSubset(tuple.getData(), attributeIndices); 
             if(valueAttributeMap.get(attributeValues) == null) {
-                FCAElement newAttribute = new FCAElementImplementation(createCrossproductName(attributeValues));
+                FCAElement newAttribute = new FCAElementImplementation(nameMapper.mapString(createCrossproductName(attributeValues)));
                 valueAttributeMap.put(attributeValues, newAttribute);
                 context.getAttributes().add(newAttribute);
             }
@@ -148,7 +150,7 @@ public class TupleScaling {
             objectPos = 0;
         }
         Relation input = SeparatedTextParser.parseTabDelimitedTuples(new FileReader(new File(args[0])),'\t','\"','\000',true);
-        ConceptualSchema result = scaleTuples(input, objectPos);
+        ConceptualSchema result = scaleTuples(input, objectPos, new IdentityStringMapper());
         XMLWriter.write(new File(args[1]), result);
     }
 }

@@ -26,6 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
@@ -91,6 +92,11 @@ import org.tockit.swing.preferences.ExtendedPreferences;
 import org.tockit.tupleware.scaling.TupleScaling;
 import org.tockit.tupleware.source.TupleSource;
 import org.tockit.tupleware.source.TupleSourceRegistry;
+import org.tockit.tupleware.util.DecodeUrlStringMapper;
+import org.tockit.tupleware.util.IdentityStringMapper;
+import org.tockit.tupleware.util.JoinedStringMapper;
+import org.tockit.tupleware.util.RegularExpressionStringMapper;
+import org.tockit.tupleware.util.StringMapper;
 
 public class TuplewareMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     private static final ExtendedPreferences preferences = 
@@ -268,7 +274,20 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 		IndexSelectionDialog dialog = new IndexSelectionDialog(this, "Select attribute set", this.tuples.getDimensionNames());
 		dialog.setVisible(true);
 		int[] attributeIndices = dialog.getSelectedIndices();
-		Diagram2D diagram = TupleScaling.scaleTuples(this.tuples, this.objectIndices, attributeIndices);
+		StringMapper mapper = new IdentityStringMapper();
+	    if(getClass().getClassLoader().getResource("decodeUrls") != null) {
+	    	mapper = new DecodeUrlStringMapper();
+	    }
+	    if(getClass().getClassLoader().getResource("regExpMappings") != null) {
+			Properties replacementPatterns = new Properties();
+			try {
+				replacementPatterns.load(getClass().getClassLoader().getResourceAsStream("regExpMappings"));
+			} catch (IOException e) {
+				throw new RuntimeException("Could not load regular expression mappings from 'regExpMappings' file");
+			}
+			mapper = new JoinedStringMapper(mapper, new RegularExpressionStringMapper(replacementPatterns));
+	    }
+		Diagram2D diagram = TupleScaling.scaleTuples(this.tuples, this.objectIndices, attributeIndices, mapper);
 		this.conceptualSchema.addDiagram(diagram);
 	}
 

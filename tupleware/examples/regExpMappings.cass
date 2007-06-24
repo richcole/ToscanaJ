@@ -1,0 +1,23 @@
+#
+# This is an example how to use the regular expression mappings
+# for the attribute/object names, coming from the CASS project.
+# to use this example, just copy this file into the "config"
+# folder as "regExpMappings" without file extension.
+#
+# The patterns are made to replace the URIs CASS uses to identify
+# software components with something more readable, e.g.
+#     http://tockit.org/cass/types#Ljava%2Flang%2FObject%3B
+# should be replaced with:
+#     java.lang.Object
+#
+# This also requires the URLDecoder part, which you enable by
+# creating a file called "decodeUrls" in the "config" folder.
+# The contents of this file are not relevant, its mere existance
+# will trigger URL decoding.
+#
+# Regular expression replacement follows the standard Java RegExp
+# API. Note that you might need extra/slash different escaping in
+# a properties file compared to writing strings in Java code.
+#
+^.*\#L(.*).=$1
+/=.
