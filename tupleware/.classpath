@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="plugins/RDFTupleSource/source"/>
+	<classpathentry kind="src" path="source"/>
+	<classpathentry kind="lib" path="dbdrivers/HypersonicSQL/hsqldb.jar"/>
+	<classpathentry kind="lib" path="libs/ant-contrib.jar"/>
+	<classpathentry kind="lib" path="libs/jdom.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-canvas.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-events.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-fca.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-pluginArchitecture.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-relations.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-swing.jar"/>
+	<classpathentry kind="lib" path="libs/tockit-utils.jar"/>
+	<classpathentry kind="lib" path="libs/ToscanaJ.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/antlr-2.7.5.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/arq-extra.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/arq.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/concurrent.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/icu4j_3_4.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/iri.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/jena.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/jenatest.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/json.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/junit.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/log4j-1.2.12.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/lucene-core-2.0.0.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/stax-api-1.0.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/wstx-asl-3.0.0.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/xml-apis.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
