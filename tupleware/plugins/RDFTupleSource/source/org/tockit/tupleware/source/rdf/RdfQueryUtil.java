@@ -5,7 +5,7 @@
  *
  * $Id$
  */
-package org.tockit.tupleware.source.rdql;
+package org.tockit.tupleware.source.rdf;
 
 import java.io.BufferedReader;
 import java.io.File;
