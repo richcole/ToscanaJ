@@ -3,7 +3,7 @@
  * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
- * $Id$
+ * $Id:RdfQueryDialog.java 1929 2007-06-24 04:50:48Z peterbecker $
  */
 package org.tockit.tupleware.source.rdf;
 
@@ -52,7 +52,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 public class RdfQueryDialog extends JDialog {
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramExportSettings.class);
 
-	private static final String CONFIGURATION_FILE_STRING = "lastRdfFile";
+	private static final String CONFIGURATION_STRING_LAST_FILE = "lastFile";
+	private static final String CONFIGURATION_STRING_LAST_QUERY = "lastQuery";
 	
 	private static final int MINIMUM_WIDTH = 400;
 	private static final int MINIMUM_HEIGHT = 350;
@@ -141,7 +142,7 @@ public class RdfQueryDialog extends JDialog {
 			super();
 
 			JLabel fileLabel = new JLabel("RDF or N3 File Location:");
-			final String lastOpenedFileName = preferences.get(CONFIGURATION_FILE_STRING, null);
+			final String lastOpenedFileName = preferences.get(CONFIGURATION_STRING_LAST_FILE, null);
 			fileLocationField.setText(lastOpenedFileName);
 			JButton fileButton = new JButton("Browse...");
 			final String[] fileExtensions = {"rdf","n3"};
@@ -205,7 +206,7 @@ public class RdfQueryDialog extends JDialog {
 				ErrorDialog.showError(this, e, "Error parsing file " + file.getAbsolutePath());
 				return false;
 			}
-			preferences.put(CONFIGURATION_FILE_STRING, file.getAbsolutePath());
+			preferences.put(CONFIGURATION_STRING_LAST_FILE, file.getAbsolutePath());
 			return true;
 		}
 		
@@ -220,7 +221,7 @@ public class RdfQueryDialog extends JDialog {
 			
 			tupleSet = null;
 			
-			rdfQueryArea = new JTextArea();
+			rdfQueryArea = new JTextArea(preferences.get(CONFIGURATION_STRING_LAST_QUERY, ""));
 			rdfQueryArea.setBorder(BorderFactory.createLoweredBevelBorder());
 			
 			this.setLayout(new GridBagLayout());
@@ -244,6 +245,7 @@ public class RdfQueryDialog extends JDialog {
 		}
         
 		boolean executeStep() {
+			preferences.put(CONFIGURATION_STRING_LAST_QUERY, rdfQueryArea.getText());
 			Query query = QueryFactory.create(rdfQueryArea.getText());
 			List resultVars = query.getResultVars();
 			tupleSet = new RelationImplementation((String[]) resultVars
