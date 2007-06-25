@@ -16,11 +16,29 @@
 # will trigger URL decoding.
 #
 # Regular expression replacement follows the standard Java RegExp
-# API. Note that you might need extra/slash different escaping in
+# API. Note that you might need extra/different escaping in
 # a properties file compared to writing strings in Java code.
 #
-^http...tockit.org.cass.packages\#(.*)=$1
-^http...tockit.org.cass.entityTypes\#(.*)=$1
-^http...tockit.org.cass.types\#L(.*).=$1
-^http...tockit.org.cass.methods\#L(.*)V=$1
+
+# get rid of all prefixes
+^http.*\#=
+# get rid of all prefixes
+L(.*)\\;\\.=$1.
+# fix up types
+^L(.*)\\;=$1
+# non-void return values for methods
+\\)L(.*)\\;$=)
+# non-void return values for methods
+\\)V$=)
+# parameter types
+L(.*)\\;L=$1,
+\\;\\)=)
+\\(L=(
+# constructors
+\\;\\.\\(=(
+# replace slashes with dots to make packages look normal
 /=.
+# abbreviate main package
+net.sourceforge.toscanaj=*
+# temporarily remove the bit the extractor still leaves on the compUnits
+.ToscanaJ.source.=
