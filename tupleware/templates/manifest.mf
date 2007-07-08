@@ -1,2 +1,2 @@
 Main-Class: @app@
-Class-Path: config @classpath@
+Class-Path: @classpath@
