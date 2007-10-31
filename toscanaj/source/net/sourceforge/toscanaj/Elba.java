@@ -14,7 +14,6 @@ public class Elba {
      *  Main method for running the program
      */
     public static void main(String[] args) {
-    	ToscanaJ.testJavaVersion();
         ToscanaJ.loadPlugins();
         final ElbaMainPanel mainWindow;
         mainWindow = new ElbaMainPanel();
