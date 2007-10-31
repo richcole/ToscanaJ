@@ -48,14 +48,16 @@ public class OrdinalScaleEditorDialog extends JDialog {
         preferences.restoreWindowPlacement(this, DEFAULT_PLACEMENT);
 		//	to enforce the minimum size during resizing of the JDialog
 		 addComponentListener( new ComponentAdapter() {
-			 public void componentResized(ComponentEvent e) {
+			 @Override
+			public void componentResized(ComponentEvent e) {
 				 int width = getWidth();
 				 int height = getHeight();
 				 if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
 				 if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
 				 setSize(width, height);
 			 }
-			 public void componentShown(ComponentEvent e) {
+			 @Override
+			public void componentShown(ComponentEvent e) {
 				 componentResized(e);
 			 }
 		 });
@@ -109,10 +111,12 @@ public class OrdinalScaleEditorDialog extends JDialog {
         			okButton.setEnabled(true);
         		}
         	}
-        	public void keyTyped(KeyEvent e) {
+        	@Override
+			public void keyTyped(KeyEvent e) {
         		validateTextField();
         	}
-        	public void keyReleased(KeyEvent e) {
+        	@Override
+			public void keyReleased(KeyEvent e) {
         		validateTextField();
         	}
         });

@@ -61,7 +61,8 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
             this.table = table;
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             return this.table.getSqlExpression();
         }
 
@@ -77,7 +78,8 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
             this.column = column;
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             return this.column.getDisplayName() + ": " + SQLTypeMapper.getTypeDescription(this.column.getType());
         }
 
@@ -169,9 +171,9 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
     	this.columnsList.clear();
 
         if (table != null) {
-            Iterator it = table.getColumns().iterator();
+            Iterator<Column> it = table.getColumns().iterator();
             while(it.hasNext()) {
-                Column col = (Column) it.next();
+                Column col = it.next();
                 this.columnsList.addElement(new ColumnInfo(col));
             }
         }
@@ -233,13 +235,13 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
     		return;
     	}
     	
-    	Iterator it = this.connection.getTableNames().iterator();
+    	Iterator<String> it = this.connection.getTableNames().iterator();
     	while(it.hasNext()) {
-    		String tableName = (String) it.next();
+    		String tableName = it.next();
     		Table table = new Table(this.eventBroker, tableName, false);
-    		Iterator itCol = this.connection.getColumns(table).iterator();
+    		Iterator<Column> itCol = this.connection.getColumns(table).iterator();
     		while(itCol.hasNext()) {
-    			Column col = (Column) itCol.next();
+    			Column col = itCol.next();
     			table.addColumn(col);
     		}
             this.tablesList.addElement(new TableInfo(table));
@@ -250,7 +252,8 @@ public class AttributeSelectionDialog extends JDialog implements EventBrokerList
     	fillTableList();
     }
 
-    public void setVisible(boolean visible) {
+    @Override
+	public void setVisible(boolean visible) {
         super.setVisible(visible);
         if(!visible) {
 	        preferences.putInt("verticalDivider", this.listSplitPane.getDividerLocation());

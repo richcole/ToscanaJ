@@ -50,7 +50,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
     private DatabaseViewerManager viewerManager;
 
     private class PagingDatabaseViewerDialog extends JDialog {
-        private List fieldNames;
+        private List<String> fieldNames;
         private String[] keyValues;
         private int position;
         private JButton navStartButton;
@@ -62,15 +62,15 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
 
         protected void showView(String whereClause) {
             try {
-            	this.fieldNames = new LinkedList();
+            	this.fieldNames = new LinkedList<String>();
             	this.fieldNames.add(PagingDatabaseViewer.this.viewerManager.getKeyName());
-                List results = PagingDatabaseViewer.this.viewerManager.getConnection().executeQuery(this.fieldNames,
+                List<Vector<Object>> results = PagingDatabaseViewer.this.viewerManager.getConnection().executeQuery(this.fieldNames,
                 		PagingDatabaseViewer.this.viewerManager.getTableName(),
                         whereClause);
                 this.keyValues = new String[results.size()];
                 int i = 0;
-                for (Iterator iterator = results.iterator(); iterator.hasNext();) {
-                    Vector vector = (Vector) iterator.next();
+                for (Iterator<Vector<Object>> iterator = results.iterator(); iterator.hasNext();) {
+                    Vector vector = iterator.next();
                     this.keyValues[i] = (String) vector.get(0);
                     i++;
                 }
@@ -87,7 +87,8 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
                 throws DatabaseViewerException {
             super(frame, "View Items", false);
             this.addWindowListener(new WindowAdapter() {
-                public void windowClosing(WindowEvent e) {
+                @Override
+				public void windowClosing(WindowEvent e) {
                     closeDialog();
                 }
             });

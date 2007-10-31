@@ -11,8 +11,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Node {
-    private Set outboundNodes = new HashSet();
-    private Set inboundNodes = new HashSet();
+    private Set<Node> outboundNodes = new HashSet<Node>();
+    private Set<Node> inboundNodes = new HashSet<Node>();
 
     protected void addOutboundNode(Node node) {
         outboundNodes.add(node);
@@ -40,11 +40,11 @@ public class Node {
         node.removeInboundNode(this);
     }
 
-    public Set getOutboundNodes() {
+    public Set<Node> getOutboundNodes() {
         return outboundNodes;
     }
 
-    public Set getInboundNodes() {
+    public Set<Node> getInboundNodes() {
         return inboundNodes;
     }
 }

@@ -26,7 +26,8 @@ public class StringValueTest extends ValueTest {
 		return new TestSuite(THIS);
     }
 
-    protected Value[] setUpValues() {
+    @Override
+	protected Value[] setUpValues() {
 		return new Value[]{
 				new StringValue("one"),    // 0
 				new StringValue("two"),    // 1
@@ -36,6 +37,7 @@ public class StringValueTest extends ValueTest {
 				};
 	}
 
+	@Override
 	protected int[][] setUpEquivalenceSets() {
 		return new int[][]{
 				new int[]{0,3},

@@ -9,6 +9,7 @@ package net.sourceforge.toscanaj.controller.ndimlayout;
 
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
+import net.sourceforge.toscanaj.model.directedgraph.Node;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
@@ -30,9 +31,9 @@ import java.util.Vector;
  * @todo Creating the attribute order externally could be a better idea. 
  */
 public class MeetIrreducibleChainsDimensionStrategy implements DimensionCreationStrategy {
-    public Vector calculateDimensions(Lattice lattice) {
+    public Vector<Dimension> calculateDimensions(Lattice lattice) {
         Concept[] concepts = lattice.getConcepts();
-        Vector redCons = new Vector();
+        Vector<Concept> redCons = new Vector<Concept>();
         for (int i = 0; i < concepts.length; i++) {
             Concept concept = concepts[i];
             if (concept.isMeetIrreducible()) {
@@ -41,11 +42,11 @@ public class MeetIrreducibleChainsDimensionStrategy implements DimensionCreation
         }
         Concept[] reducedConcepts = new Concept[redCons.size()];
         redCons.toArray(reducedConcepts);
-        Vector dimensions = new Vector();
+        Vector<Dimension> dimensions = new Vector<Dimension>();
         DirectedGraph graph = PartialOrderOperations.createGraphFromOrder(reducedConcepts);
-        Set paths = graph.getMaximalPaths();
-        for (Iterator it = paths.iterator(); it.hasNext();) {
-            Vector path = (Vector) it.next();
+        Set<Vector<Node>> paths = graph.getMaximalPaths();
+        for (Iterator<Vector<Node>> it = paths.iterator(); it.hasNext();) {
+            Vector path = it.next();
             Vector attributes = new Vector();
             for (Iterator it2 = path.iterator(); it2.hasNext();) {
                 PartialOrderNode node = (PartialOrderNode) it2.next();

@@ -89,7 +89,8 @@ public class DiagramView extends Canvas implements ChangeObserver {
     private LabelView.LabelFactory objectLabelFactory = ObjectLabelView.getFactory();
 
     private class ResizeListener extends ComponentAdapter {
-        public void componentResized(ComponentEvent e) {
+        @Override
+		public void componentResized(ComponentEvent e) {
             requestScreenTransformUpdate();
             repaint();
         }
@@ -157,7 +158,8 @@ public class DiagramView extends Canvas implements ChangeObserver {
     /**
      * Paints the diagram on the screen.
      */
-    public void paintComponent(Graphics g) {
+    @Override
+	public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         super.paintComponent(g2d);
         
@@ -279,7 +281,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         String nodeLayerName = "nodes-" + layer;
         String labelConnectorLayerName = "connectors-" + layer;
         String labelLayerName = "labels";
-        Hashtable nodeMap = new Hashtable();
+        Hashtable<DiagramNode, NodeView> nodeMap = new Hashtable<DiagramNode, NodeView>();
         for (int i = 0; i < newDiagram.getNumberOfNodes(); i++) {
             DiagramNode node = newDiagram.getNode(i);
             NodeView nodeView = new NodeView(node, this, context);
@@ -294,7 +296,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
                 if (node instanceof NestedDiagramNode) {
 		            NestedDiagramNode ndNode = (NestedDiagramNode) node;
 		            boolean isTopRealizedConcept = true;
-		            for (Iterator iter = concept.getUpset().iterator();iter.hasNext();) {
+		            for (Iterator<Object> iter = concept.getUpset().iterator();iter.hasNext();) {
                         Concept superConcept = (Concept) iter.next();
                         if(superConcept != concept && this.conceptInterpreter.isRealized(superConcept, this.conceptInterpretationContext)) {
                         	isTopRealizedConcept = false;
@@ -323,12 +325,12 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
         for (int i = 0; i < newDiagram.getNumberOfLines(); i++) {
             DiagramLine dl = newDiagram.getLine(i);
-            addCanvasItem(new LineView(dl, (NodeView) nodeMap.get(dl.getFromNode()), (NodeView) nodeMap.get(dl.getToNode())), lineLayerName);
+            addCanvasItem(new LineView(dl, nodeMap.get(dl.getFromNode()), nodeMap.get(dl.getToNode())), lineLayerName);
         }
         if(newDiagram instanceof SimpleLineDiagram) {
             SimpleLineDiagram sld = (SimpleLineDiagram) newDiagram;
-            for (Iterator iter = sld.getExtraCanvasItems().iterator(); iter.hasNext();) {
-                CanvasItem item = (CanvasItem) iter.next();
+            for (Iterator<CanvasItem> iter = sld.getExtraCanvasItems().iterator(); iter.hasNext();) {
+                CanvasItem item = iter.next();
                 addCanvasItem(item, "extraItems");
             }
         }

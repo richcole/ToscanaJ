@@ -55,7 +55,7 @@ public class AttributeAdditiveNodeMovementEventListener implements EventBrokerLi
         
         Concept concept = node.getConcept();
 		
-        final Set meetIrr = ConceptSetHelperFunctions.getMeetIrreduciblesInUpset(concept);
+        final Set<Concept> meetIrr = ConceptSetHelperFunctions.getMeetIrreduciblesInUpset(concept);
         ConceptSetHelperFunctions.removeNonMinimals(meetIrr);
         ConceptSetHelperFunctions.applyDragToDiagram(dragEvent.getCanvasFromPosition(), 
                                                      dragEvent.getCanvasToPosition(),
@@ -84,7 +84,8 @@ public class AttributeAdditiveNodeMovementEventListener implements EventBrokerLi
                 // requested one due to the Hasse diagram limitations
                 final Point2D toPosition = nodeView.getPosition();
                 undoManager.addEdit(new AbstractUndoableEdit() {
-                    public void undo() throws CannotUndoException {
+                    @Override
+					public void undo() throws CannotUndoException {
                         ConceptSetHelperFunctions.applyDragToDiagram(toPosition, 
                                                                      undoPosition,
                                                                      diagramView,
@@ -95,7 +96,8 @@ public class AttributeAdditiveNodeMovementEventListener implements EventBrokerLi
                         super.undo();
                     }
 
-                    public void redo() throws CannotRedoException {
+                    @Override
+					public void redo() throws CannotRedoException {
                         ConceptSetHelperFunctions.applyDragToDiagram(undoPosition, 
                                                                      toPosition,
                                                                      diagramView,
@@ -106,7 +108,8 @@ public class AttributeAdditiveNodeMovementEventListener implements EventBrokerLi
                         super.redo();
                     }
                     
-                    public String getPresentationName() {
+                    @Override
+					public String getPresentationName() {
                         return "Attribute additive movement";
                     }
                 });

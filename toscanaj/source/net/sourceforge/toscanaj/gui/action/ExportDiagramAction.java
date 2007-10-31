@@ -218,6 +218,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
 			super(selectedFile);
 		}
 		
+		@Override
 		public void approveSelection(){
 			ExportDiagramAction.this.exportSettingsPanel.saveSettings();
 			File selectedFile = getSelectedFile();

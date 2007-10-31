@@ -17,7 +17,7 @@ import java.util.Iterator;
 
 public class SimpleAction extends KeyboardMappedAction {
 
-    protected List activityList = new ArrayList();
+    protected List<SimpleActivity> activityList = new ArrayList<SimpleActivity>();
 
     public SimpleAction(
             JFrame frame,
@@ -43,8 +43,8 @@ public class SimpleAction extends KeyboardMappedAction {
 
     public void actionPerformed(ActionEvent e) {
         try {
-            for (Iterator it = this.activityList.iterator(); it.hasNext();) {
-                SimpleActivity activity = (SimpleActivity) it.next();
+            for (Iterator<SimpleActivity> it = this.activityList.iterator(); it.hasNext();) {
+                SimpleActivity activity = it.next();
                 if (!activity.doActivity()) {
                     break;
                 }

@@ -58,7 +58,7 @@ public class NestedLineDiagram extends SimpleLineDiagram {
 
     private void calculateDiagram(Diagram2D outerDiagram, Diagram2D innerDiagram) {
 		double scale = 1.2 * calculateNeededScaling(outerDiagram, innerDiagram);
-        Hashtable nodeMap = new Hashtable();
+        Hashtable<DiagramNode, NestedDiagramNode> nodeMap = new Hashtable<DiagramNode, NestedDiagramNode>();
         for (int i = 0; i < outerDiagram.getNumberOfNodes(); i++) {
             DiagramNode oldNode = outerDiagram.getNode(i);
             NestedDiagramNode node = new NestedDiagramNode(this, oldNode, innerDiagram, scale);
@@ -67,8 +67,8 @@ public class NestedLineDiagram extends SimpleLineDiagram {
         }
         for (int i = 0; i < outerDiagram.getNumberOfLines(); i++) {
             DiagramLine oldLine = outerDiagram.getLine(i);
-            NestedDiagramNode from = (NestedDiagramNode) nodeMap.get(oldLine.getFromNode());
-            NestedDiagramNode to = (NestedDiagramNode) nodeMap.get(oldLine.getToNode());
+            NestedDiagramNode from = nodeMap.get(oldLine.getFromNode());
+            NestedDiagramNode to = nodeMap.get(oldLine.getToNode());
             this.addLine(from, to);
         }
 	}
@@ -144,6 +144,7 @@ public class NestedLineDiagram extends SimpleLineDiagram {
         }
     }
     
+	@Override
 	public DiagramNode getNodeForConcept(Concept concept) {
 		DiagramNode diagramNode = super.getNodeForConcept(concept);
 		if (diagramNode != null) {
@@ -153,7 +154,8 @@ public class NestedLineDiagram extends SimpleLineDiagram {
 		}
 	}
     
-    public String toString() {
+    @Override
+	public String toString() {
     	return this.getTitle();
     }
     
@@ -168,7 +170,8 @@ public class NestedLineDiagram extends SimpleLineDiagram {
     /**
      * Returns all nodes of all inner diagrams.
      */
-    public Iterator getNodes() {
+    @Override
+	public Iterator<DiagramNode> getNodes() {
         /**
          * This class implements an iterator that iterates over all attribute
          * outer nodes and then through all nodes inside these.
@@ -182,7 +185,7 @@ public class NestedLineDiagram extends SimpleLineDiagram {
             /**
              * Stores the secondary iterator on the nodes inside the outer node.
              */
-            Iterator secondaryIterator;
+            Iterator<DiagramNode> secondaryIterator;
 
             /**
              * We start with the iterator of all outer nodes that we want to visit.

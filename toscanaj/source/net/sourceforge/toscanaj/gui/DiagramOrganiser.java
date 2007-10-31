@@ -114,6 +114,7 @@ public class DiagramOrganiser extends JPanel {
         });
 
         this.availableDiagramsListview.addMouseListener(new MouseAdapter() {
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
 					/// @todo this should be done using an event

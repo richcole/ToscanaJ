@@ -67,7 +67,7 @@ public class NestedDiagramNode extends DiagramNode {
                 this.getX() - rect.getX()/innerScale - (rect.getWidth()/innerScale)/2,
                 this.getY() - rect.getY()/innerScale - (rect.getHeight()/innerScale)/2);
         SimpleLineDiagram newDiag = new SimpleLineDiagram();
-        Hashtable nodeMap = new Hashtable();
+        Hashtable<DiagramNode, DiagramNode> nodeMap = new Hashtable<DiagramNode, DiagramNode>();
         for (int i = 0; i < innerDiagram.getNumberOfNodes(); i++) {
             DiagramNode oldNode = innerDiagram.getNode(i);
             Point2D newPos = new Point2D.Double(oldNode.getX()/innerScale + offset.getX(),
@@ -81,8 +81,8 @@ public class NestedDiagramNode extends DiagramNode {
         }
         for (int i = 0; i < innerDiagram.getNumberOfLines(); i++) {
             DiagramLine line = innerDiagram.getLine(i);
-            DiagramNode from = (DiagramNode) nodeMap.get(line.getFromNode());
-            DiagramNode to = (DiagramNode) nodeMap.get(line.getToNode());
+            DiagramNode from = nodeMap.get(line.getFromNode());
+            DiagramNode to = nodeMap.get(line.getToNode());
             newDiag.addLine(from, to);
         }
         newDiag.setEventBroker(innerDiagram.getEventBroker());
@@ -98,24 +98,28 @@ public class NestedDiagramNode extends DiagramNode {
         return this.innerDiagram;
     }
 
-    public double getRadiusX() {
+    @Override
+	public double getRadiusX() {
     	return this.ellipse.getWidth()/2;
     }
 
-    public double getRadiusY() {
+    @Override
+	public double getRadiusY() {
         return this.ellipse.getHeight()/2;
     }
 
-    public Concept[] getConceptNestingList() {
+    @Override
+	public Concept[] getConceptNestingList() {
         return this.innerDiagram.getNode(0).getConceptNestingList();
     }
     
+	@Override
 	public void setPosition(double x, double y) {
 		double dx = x - getPosition().getX();
 		double dy = y - getPosition().getY();
-		Iterator it = this.innerDiagram.getNodes();
+		Iterator<DiagramNode> it = this.innerDiagram.getNodes();
 		while (it.hasNext()) {
-			DiagramNode node = (DiagramNode) it.next();
+			DiagramNode node = it.next();
 			// do not call setPosition() to avoid callbacks
 			node.position.setLocation(node.getX() + dx, node.getY() + dy);
 		}

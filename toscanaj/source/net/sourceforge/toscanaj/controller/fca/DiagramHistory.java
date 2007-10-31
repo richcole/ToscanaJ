@@ -29,7 +29,7 @@ import java.util.NoSuchElementException;
  */
 public class DiagramHistory extends AbstractListModel implements ChangeObservable {
 
-    private List diagrams = new LinkedList();
+    private List<Object> diagrams = new LinkedList<Object>();
 
     private int currStartPosition;
     private int firstFutureDiagramPosition;
@@ -174,7 +174,8 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     /**
      * Debug output.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         final String newLine = "\n";
         int i = 0;
         String retVal = "Past Diagrams:\n";

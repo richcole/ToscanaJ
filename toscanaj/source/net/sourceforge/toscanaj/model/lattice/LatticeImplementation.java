@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class LatticeImplementation implements Lattice {
-    private Set concepts = new HashSet();
+    private Set<Concept> concepts = new HashSet<Concept>();
 
     public LatticeImplementation() {
     	// nothing to do here
@@ -33,8 +33,8 @@ public class LatticeImplementation implements Lattice {
     }
 
     public Concept getTop() {
-        for (Iterator iterator = concepts.iterator(); iterator.hasNext();) {
-            Concept concept = (Concept) iterator.next();
+        for (Iterator<Concept> iterator = concepts.iterator(); iterator.hasNext();) {
+            Concept concept = iterator.next();
             if (concept.isTop()) {
                 return concept;
             }
@@ -43,8 +43,8 @@ public class LatticeImplementation implements Lattice {
     }
 
     public Concept getBottom() {
-        for (Iterator iterator = concepts.iterator(); iterator.hasNext();) {
-            Concept concept = (Concept) iterator.next();
+        for (Iterator<Concept> iterator = concepts.iterator(); iterator.hasNext();) {
+            Concept concept = iterator.next();
             if (concept.isBottom()) {
                 return concept;
             }

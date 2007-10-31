@@ -177,7 +177,7 @@ public class DiagramController implements ChangeObservable {
     /**
      * Stores the observers of the controller.
      */
-    private List observers = new LinkedList();
+    private List<ChangeObserver> observers = new LinkedList<ChangeObserver>();
 
     /**
      * Implements ChangeObservable.addObserver(ChangeObserver).
@@ -201,9 +201,9 @@ public class DiagramController implements ChangeObservable {
      * This should not be called if the changes affect only future diagrams.
      */
     protected void notifyObservers() {
-        Iterator it = this.observers.iterator();
+        Iterator<ChangeObserver> it = this.observers.iterator();
         while (it.hasNext()) {
-            ChangeObserver observer = (ChangeObserver) it.next();
+            ChangeObserver observer = it.next();
             observer.update(this);
         }
     }

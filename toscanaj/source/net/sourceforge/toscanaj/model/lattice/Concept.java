@@ -105,9 +105,9 @@ public interface Concept extends XMLizable, Ordered {
      */
     boolean hasSubConcept(Concept concept);
 
-    Collection getDownset();
+    Collection<Object> getDownset();
 
-    Collection getUpset();
+    Collection<Object> getUpset();
 
     boolean isMeetIrreducible();
 

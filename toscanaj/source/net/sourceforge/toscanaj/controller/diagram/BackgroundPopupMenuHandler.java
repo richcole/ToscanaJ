@@ -146,11 +146,11 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
 		this.changeLabelMenu=new JMenu("Change All Object Labels");
 		ConceptualSchema conceptualSchema = this.mainPanel.getConceptualSchema();
 		if (conceptualSchema != null) {
-			Iterator it = conceptualSchema.getQueries().iterator();
+			Iterator<Query> it = conceptualSchema.getQueries().iterator();
 			if (it.hasNext()) {
 				int count = 0;
 				while (it.hasNext()) {
-					final Query query = (Query) it.next();
+					final Query query = it.next();
 					count++;
 					String name = query.getName();
 					JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);

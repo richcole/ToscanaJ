@@ -63,7 +63,8 @@ public class DatabaseRetrievedObject implements FCAElement {
         return displayString;
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         return getDisplayString();
     }
 

@@ -36,15 +36,16 @@ public class NDimDiagramNode extends DiagramNode {
         this.ndimVector = ndimVector;
     }
     
-    public NDimDiagramNode(NDimDiagram nDimDiagram, Element diagramNode) throws XMLSyntaxError {
+    @SuppressWarnings("unchecked")
+	public NDimDiagramNode(NDimDiagram nDimDiagram, Element diagramNode) throws XMLSyntaxError {
     	super(nDimDiagram, diagramNode);
     	Element ndimPosElem = diagramNode.getChild("ndimVector");
-    	List coordElems = ndimPosElem.getChildren("coordinate");
-        Iterator it = coordElems.iterator();
+    	List<Element> coordElems = ndimPosElem.getChildren("coordinate");
+        Iterator<Element> it = coordElems.iterator();
         this.ndimVector = new double[coordElems.size()];
         int i = 0;
     	while (it.hasNext()) {
-            Element coordElem = (Element) it.next();
+            Element coordElem = it.next();
             this.ndimVector[i] = Double.parseDouble(coordElem.getTextNormalize());
             i++;
         }
@@ -54,7 +55,8 @@ public class NDimDiagramNode extends DiagramNode {
         this.position.setLocation(x,y);
     }
 
-    public Element toXML() {
+    @Override
+	public Element toXML() {
     	Element retVal = super.toXML();
     	Element nDimPosElem = new Element("ndimVector");
     	for (int i = 0; i < ndimVector.length; i++) {
@@ -67,7 +69,8 @@ public class NDimDiagramNode extends DiagramNode {
     	return retVal;
     }
 
-    public Point2D getPosition() {
+    @Override
+	public Point2D getPosition() {
         Point2D projPos = getProjectedPosition();
         return new Point2D.Double(position.getX() + projPos.getX(), position.getY() + projPos.getY());
     }
@@ -75,17 +78,18 @@ public class NDimDiagramNode extends DiagramNode {
     protected Point2D getProjectedPosition() {
         Point2D pos = new Point2D.Double(0, 0);
         NDimDiagram ndimDiagram = (NDimDiagram) this.diagram;
-		Iterator baseIt = ndimDiagram.getBase().iterator();
+		Iterator<Point2D> baseIt = ndimDiagram.getBase().iterator();
         for (int i = 0; i < ndimVector.length; i++) {
             double v = ndimVector[i];
-            Point2D baseVec = (Point2D) baseIt.next();
+            Point2D baseVec = baseIt.next();
             pos.setLocation(pos.getX() + baseVec.getX() * v,
                     pos.getY() + baseVec.getY() * v);
         }
         return pos;
     }
 
-    public void setPosition(double x, double y) {
+    @Override
+	public void setPosition(double x, double y) {
         Point2D projPos = getProjectedPosition();
         this.position.setLocation(x - projPos.getX(), y - projPos.getY());
     }

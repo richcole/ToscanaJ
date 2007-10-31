@@ -35,7 +35,8 @@ public class NumberField extends JTextField {
         }
     }
 
-    public boolean isValid() {
+    @Override
+	public boolean isValid() {
         try {
             formatter.parse(getText());
             return true;
@@ -44,7 +45,8 @@ public class NumberField extends JTextField {
         }
     }
 
-    public Dimension getMaximumSize() {
+    @Override
+	public Dimension getMaximumSize() {
         return getPreferredSize();
     }
 

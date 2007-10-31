@@ -105,7 +105,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     private JMenu mruMenu;
     private JMenu helpMenu;
 
-    private List mruList = new LinkedList();
+    private List<String> mruList = new LinkedList<String>();
     private File currentFile;
 
     /**
@@ -118,7 +118,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 	private JMenuItem dumpStatisticalDataMenuItem;
 	private JMenuItem createOptimizedSystemMenuItem;
     private SaveFileAction saveAsFileAction;
-    private List scaleGenerators;
+    private List<ScaleGenerator> scaleGenerators;
     private JButton newDiagramButton;
     private JToolBar toolbar;
     private SaveConceptualSchemaActivity saveActivity;
@@ -166,7 +166,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         // if we have at least one MRU file try to open it
         if (this.mruList.size() > 0) {
             File schemaFile =
-                new File((String) this.mruList.get(this.mruList.size() - 1));
+                new File(this.mruList.get(this.mruList.size() - 1));
             if (schemaFile.canRead()) {
                 openSchemaFile(schemaFile);
             }
@@ -249,9 +249,9 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         JMenuItem menuItem;
         final JFrame parent = this;
 
-        Iterator it = this.scaleGenerators.iterator();
+        Iterator<ScaleGenerator> it = this.scaleGenerators.iterator();
         while (it.hasNext()) {
-            final ScaleGenerator generator = (ScaleGenerator) it.next();
+            final ScaleGenerator generator = it.next();
             menuItem = new JMenuItem(generator.getScaleName());
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -408,7 +408,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     }
 
     protected void fillScaleGeneratorList() {
-        this.scaleGenerators = new ArrayList();
+        this.scaleGenerators = new ArrayList<ScaleGenerator>();
         this.scaleGenerators.add(new AttributeListScaleGenerator(this));
         this.scaleGenerators.add(
             new ContextTableScaleGenerator(this, this.eventBroker));
@@ -807,9 +807,9 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         boolean empty = true;
         // will be used to check if we have at least one entry
         if (this.mruList.size() > 0) {
-            ListIterator it = this.mruList.listIterator(this.mruList.size());
+            ListIterator<String> it = this.mruList.listIterator(this.mruList.size());
             while (it.hasPrevious()) {
-                String cur = (String) it.previous();
+                String cur = it.previous();
                 if (this.currentFile != null && 
                         cur.equals(this.currentFile.getAbsolutePath())) {
                     // don't enlist the current file
@@ -1150,10 +1150,10 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 					// that is ok, we just had this column before
 				}
 				Diagram2D diagram = this.conceptualSchema.getDiagram(i);
-				Iterator nodeIt = diagram.getNodes();
+				Iterator<DiagramNode> nodeIt = diagram.getNodes();
 				int contingentCount = 0;
 				while (nodeIt.hasNext()) {
-	                DiagramNode node = (DiagramNode) nodeIt.next();
+	                DiagramNode node = nodeIt.next();
 	                ConceptImplementation concept = (ConceptImplementation) node.getConcept();
 	                if(concept.getObjectContingentSize() != 0) {
 						String oldWhereClause = WhereClauseGenerator.createClause(concept.getObjectContingentIterator());

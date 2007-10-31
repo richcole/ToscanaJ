@@ -63,6 +63,7 @@ public class ContextTableView extends JComponent implements Scrollable {
 		updateSize();
 	}
 
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
@@ -70,7 +71,7 @@ public class ContextTableView extends JComponent implements Scrollable {
 		Paint oldPaint = g2d.getPaint();
 		Font oldFont = g2d.getFont();
 
-		Iterator objIt = this.context.getObjects().iterator();
+		Iterator<Object> objIt = this.context.getObjects().iterator();
 		int row = 0;
 		while (objIt.hasNext()) {
 			Object object = objIt.next();
@@ -94,7 +95,7 @@ public class ContextTableView extends JComponent implements Scrollable {
 		int y = row * CELL_HEIGHT;
 		g2d.setFont(font.deriveFont(Font.PLAIN));
 		g2d.setPaint(TABLE_CELL_COLOR);
-		Iterator attrIt = this.context.getAttributes().iterator();
+		Iterator<Object> attrIt = this.context.getAttributes().iterator();
 		int col = 0;
 		while (attrIt.hasNext()) {
 			Object attribute = attrIt.next();

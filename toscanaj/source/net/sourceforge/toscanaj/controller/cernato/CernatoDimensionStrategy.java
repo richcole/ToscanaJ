@@ -11,6 +11,7 @@ import net.sourceforge.toscanaj.controller.ndimlayout.DimensionCreationStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.PartialOrderOperations;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
+import net.sourceforge.toscanaj.model.directedgraph.Node;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
@@ -48,8 +49,8 @@ public class CernatoDimensionStrategy implements DimensionCreationStrategy {
             return this.getCriterion().isEqual(ocOther.getCriterion());
         }
     }
-    public Vector calculateDimensions(Lattice lattice) {
-        Vector dimensions = new Vector();
+    public Vector<Dimension> calculateDimensions(Lattice lattice) {
+        Vector<Dimension> dimensions = new Vector<Dimension>();
         Concept bottom = lattice.getBottom();
         Iterator it = bottom.getIntentIterator();
         OrderedCriterion[] criteria = new OrderedCriterion[bottom.getIntentSize()];
@@ -62,9 +63,9 @@ public class CernatoDimensionStrategy implements DimensionCreationStrategy {
             count++;
         }
         DirectedGraph graph = PartialOrderOperations.createGraphFromOrder(criteria);
-        Set paths = graph.getMaximalPaths();
-        for (Iterator iterator2 = paths.iterator(); iterator2.hasNext();) {
-            Vector path = (Vector) iterator2.next();
+        Set<Vector<Node>> paths = graph.getMaximalPaths();
+        for (Iterator<Vector<Node>> iterator2 = paths.iterator(); iterator2.hasNext();) {
+            Vector path = iterator2.next();
             Vector attributes = new Vector();
             for (Iterator it2 = path.iterator(); it2.hasNext();) {
                 PartialOrderNode node = (PartialOrderNode) it2.next();

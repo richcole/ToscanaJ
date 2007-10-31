@@ -83,6 +83,7 @@ public class Factorizer {
 			this.nestedDiagram = new NestedLineDiagram(this.firstFactor, this.secondFactor);
 		}
 		
+		@Override
 		public String toString() {
 			int numOuterConcepts = this.firstFactor.getNumberOfNodes();
 			int numInnerConcepts = this.secondFactor.getNumberOfNodes();
@@ -109,23 +110,23 @@ public class Factorizer {
 		}
 		File inputFile = fileChooser.getSelectedFile();
 		Context context = BurmeisterParser.importBurmeisterFile(inputFile);
-		Set attributes = context.getAttributes();
+		Set<Object> attributes = context.getAttributes();
 
-		List subsets = findAllSubsetsOfSize(attributes, ((Integer)spinner.getModel().getValue()).intValue());
-		List diagrams = createFactorizedDiagrams(context,subsets);
+		List<Set<Object>> subsets = findAllSubsetsOfSize(attributes, ((Integer)spinner.getModel().getValue()).intValue());
+		List<Factorization> diagrams = createFactorizedDiagrams(context,subsets);
 		showResults(diagrams);
 	}
 
-	private static List createFactorizedDiagrams(Context context, List subsets) {
-		List retVal = new ArrayList();
-		for (Iterator it = subsets.iterator(); it.hasNext();) {
-			Set set = (Set) it.next();
+	private static List<Factorization> createFactorizedDiagrams(Context context, List<Set<Object>> subsets) {
+		List<Factorization> retVal = new ArrayList<Factorization>();
+		for (Iterator<Set<Object>> it = subsets.iterator(); it.hasNext();) {
+			Set set = it.next();
 			retVal.add(new Factorization(context, set));
 		}
 		return retVal;
 	}
 
-	private static void showResults(List diagrams) {
+	private static void showResults(List<Factorization> diagrams) {
 		JFrame mainWindow = new JFrame("Factorizer");
 
 		final JTabbedPane mainPane = new JTabbedPane();
@@ -164,6 +165,7 @@ public class Factorizer {
 				}
 			}
 			MoveAndUpdateListener moveAndUpdateListener = new MoveAndUpdateListener();
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				final Factorization factorization = (Factorization) listView.getSelectedValue();
 				this.moveAndUpdateListener.currentFactorization = factorization;
@@ -180,6 +182,7 @@ public class Factorizer {
 		mainWindow.setBounds(10,10,900,700);
 		mainWindow.setVisible(true);
 		mainWindow.addWindowListener(new WindowAdapter(){
+			@Override
 			public void windowClosing(WindowEvent e) {
 				System.exit(0);
 			}
@@ -191,9 +194,9 @@ public class Factorizer {
 		retVal.setName(context.getName());
 		retVal.getObjects().addAll(context.getObjects());
 		retVal.getAttributes().addAll(context.getAttributes());
-		for (Iterator objIt = retVal.getObjects().iterator(); objIt.hasNext();) {
+		for (Iterator<Object> objIt = retVal.getObjects().iterator(); objIt.hasNext();) {
 			Object obj = objIt.next();
-			for (Iterator attrIt = retVal.getAttributes().iterator(); attrIt.hasNext();) {
+			for (Iterator<Object> attrIt = retVal.getAttributes().iterator(); attrIt.hasNext();) {
 				Object attr = attrIt.next();
 				if(context.getRelation().contains(obj,attr)) {
 					retVal.getRelationImplementation().insert(obj,attr);
@@ -203,17 +206,17 @@ public class Factorizer {
 		return retVal;
 	}
 
-	private static List findAllSubsetsOfSize(Set objects, int n) {
-		List retVal = new ArrayList();
+	private static List<Set<Object>> findAllSubsetsOfSize(Set<Object> objects, int n) {
+		List<Set<Object>> retVal = new ArrayList<Set<Object>>();
 		if(objects.size() == n) {
 			retVal.add(objects);
 		} else if(n != 0) {
 			Object firstObject = objects.iterator().next();
-			Set rest = new HashSet(objects);
+			Set<Object> rest = new HashSet<Object>(objects);
 			rest.remove(firstObject);
-			List smallerSets = findAllSubsetsOfSize(rest, n-1);
-			for (Iterator iter = smallerSets.iterator(); iter.hasNext();) {
-				Set set = (Set) iter.next();
+			List<Set<Object>> smallerSets = findAllSubsetsOfSize(rest, n-1);
+			for (Iterator<Set<Object>> iter = smallerSets.iterator(); iter.hasNext();) {
+				Set<Object> set = iter.next();
 				set.add(firstObject);
 				retVal.add(set);
 			}

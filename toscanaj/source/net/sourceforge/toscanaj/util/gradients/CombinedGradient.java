@@ -23,7 +23,7 @@ import java.util.Iterator;
  */
 public class CombinedGradient implements Gradient {
 	private double totalWeights;
-	private ArrayList gradientParts = new ArrayList();
+	private ArrayList<GradientPart> gradientParts = new ArrayList<GradientPart>();
 	
 	private static class GradientPart {
 		Gradient gradient;
@@ -55,8 +55,8 @@ public class CombinedGradient implements Gradient {
 		}
 		double curPos = 0;
 		double weightedPos = position * this.totalWeights;
-		for (Iterator iter = this.gradientParts.iterator(); iter.hasNext();) {
-			GradientPart part = (GradientPart) iter.next();
+		for (Iterator<GradientPart> iter = this.gradientParts.iterator(); iter.hasNext();) {
+			GradientPart part = iter.next();
             if(curPos + part.weight >= weightedPos) {
             	return part.getColor(weightedPos - curPos);    
             }

@@ -167,7 +167,7 @@ public class ContextSetups {
     
         context.setName("Animal Movement"); 
         context.getObjects().addAll(Arrays.asList(OBJECTS));
-        List attribs = new ArrayList();
+        List<FCAElement> attribs = new ArrayList<FCAElement>();
         attribs.add(ATTRIBUTES[7]);
         attribs.add(ATTRIBUTES[8]);
         attribs.add(ATTRIBUTES[9]);
@@ -208,7 +208,7 @@ public class ContextSetups {
     
         context.setName("Animal Sizes"); 
         context.getObjects().addAll(Arrays.asList(OBJECTS));
-        List attribs = new ArrayList();
+        List<FCAElement> attribs = new ArrayList<FCAElement>();
         attribs.add(ATTRIBUTES[0]);
         attribs.add(ATTRIBUTES[1]);
         attribs.add(ATTRIBUTES[2]);

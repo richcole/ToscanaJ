@@ -20,7 +20,8 @@ import java.util.List;
 public class DirectConceptInterpreter extends AbstractConceptInterpreter
 										implements ConceptInterpreter {
 											
-    public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
+    @Override
+	public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
         if (context.getObjectDisplayMode() == ConceptInterpretationContext.CONTINGENT) {
 	        List contingent = calculateContingent(concept, context);
 			return contingent.iterator();
@@ -30,7 +31,8 @@ public class DirectConceptInterpreter extends AbstractConceptInterpreter
         }
     }
 
-    protected int calculateContingentSize(Concept concept, ConceptInterpretationContext context) {
+    @Override
+	protected int calculateContingentSize(Concept concept, ConceptInterpretationContext context) {
     	List contingent = calculateContingent(concept, context);
     	return contingent.size();
     }
@@ -132,10 +134,12 @@ public class DirectConceptInterpreter extends AbstractConceptInterpreter
         return retVal;
     }
     
+	@Override
 	protected FCAElement getObject(String value, Concept concept, ConceptInterpretationContext context) {
 		return new FCAElementImplementation(value);
 	}
 	
+	@Override
 	protected FCAElement[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) { 
 		throw new RuntimeException("Query not supported by this class (" + this.getClass().getName() + ")");
 	}    

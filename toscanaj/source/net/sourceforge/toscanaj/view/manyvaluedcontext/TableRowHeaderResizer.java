@@ -110,6 +110,7 @@ public class TableRowHeaderResizer extends MouseInputAdapter
 
 	private Cursor oldCursor;
 
+	@Override
 	public void mouseExited(MouseEvent e) {
 		if (oldCursor != null) {
 			corner.setCursor(oldCursor);
@@ -117,10 +118,12 @@ public class TableRowHeaderResizer extends MouseInputAdapter
 		}
 	}
 
+	@Override
 	public void mouseEntered(MouseEvent e) {
 		mouseMoved(e);
 	}
 
+	@Override
 	public void mouseMoved(MouseEvent e) {
 		if (corner.getWidth() - e.getX() <= PIXELS) {
 			if (oldCursor == null) {
@@ -133,6 +136,7 @@ public class TableRowHeaderResizer extends MouseInputAdapter
 		}
 	}
 
+	@Override
 	public void mousePressed(MouseEvent e) {
 		startX = e.getX();
 
@@ -152,10 +156,12 @@ public class TableRowHeaderResizer extends MouseInputAdapter
 		maxWidth = rowHeader.getMaximumSize().width;
 	}
 
+	@Override
 	public void mouseReleased(MouseEvent e) {
 		active = false;
 	}
 
+	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (!active)
 			return;

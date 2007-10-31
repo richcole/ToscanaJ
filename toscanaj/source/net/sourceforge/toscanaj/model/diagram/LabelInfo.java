@@ -28,7 +28,7 @@ public class LabelInfo implements XMLizable, ChangeObservable {
     /**
      * List of LabelObserver implementations currently observing the instance.
      */
-    private Vector labelObservers = new Vector();
+    private Vector<ChangeObserver> labelObservers = new Vector<ChangeObserver>();
 
     /**
      * The node the label belongs to.
@@ -297,9 +297,9 @@ public class LabelInfo implements XMLizable, ChangeObservable {
      */
     private void emitChangeSignal() {
         if (labelObservers != null) {
-            Iterator iterator = labelObservers.iterator();
+            Iterator<ChangeObserver> iterator = labelObservers.iterator();
             while (iterator.hasNext()) {
-                ((ChangeObserver) iterator.next()).update(this);
+                iterator.next().update(this);
             }
         }
         if(this.node != null) {
@@ -307,7 +307,8 @@ public class LabelInfo implements XMLizable, ChangeObservable {
         }
     }
 
-    public boolean equals(Object obj) {
+    @Override
+	public boolean equals(Object obj) {
         if (!(obj instanceof LabelInfo)) {
             return false;
         }
@@ -331,7 +332,8 @@ public class LabelInfo implements XMLizable, ChangeObservable {
     /**
      * Debug output.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         String retVal = "LabelInfo:\n";
         retVal += "Offset: (" + offset.getX() + "," + offset.getY() + ")\n";
         retVal += "Align: " + textAlignment + "\n";

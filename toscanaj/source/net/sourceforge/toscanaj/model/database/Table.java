@@ -29,12 +29,12 @@ public class Table implements XMLizable {
 
     private Column key;
     private EventBroker broker;
-    private List columns;
+    private List<Column> columns;
     public static final String TABLE_ELEMENT_NAME = "table";
     public static final String TABLE_NAME_ATTRIBUTE_NAME = "name";
 
     public Table(EventBroker broker, String name, boolean suppressEscaping) {
-        this.columns = new ArrayList();
+        this.columns = new ArrayList<Column>();
         this.broker = broker;
         this.name = name;
         this.suppressEscaping = suppressEscaping;
@@ -74,9 +74,9 @@ public class Table implements XMLizable {
         if(this.name == null) {
         	this.name = elem.getText();
         }
-        List columnElems = elem.getChildren(Column.COLUMN_ELEMENT_NAME);
-        for (Iterator iterator = columnElems.iterator(); iterator.hasNext();) {
-            Element element = (Element) iterator.next();
+        List<Element> columnElems = elem.getChildren(Column.COLUMN_ELEMENT_NAME);
+        for (Iterator<Element> iterator = columnElems.iterator(); iterator.hasNext();) {
+            Element element = iterator.next();
             this.columns.add(new Column(element, this));
         }
         String attributeValue = elem.getAttributeValue(SUPPRESS_ESCAPING_ATTRIBUTE_NAME);
@@ -99,7 +99,7 @@ public class Table implements XMLizable {
         return key;
     }
 
-    public List getColumns() {
+    public List<Column> getColumns() {
         return columns;
     }
 

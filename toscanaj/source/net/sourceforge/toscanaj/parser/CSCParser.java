@@ -157,8 +157,8 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
             node.setAttributeLabelInfo(labelInfo);
         }
 
-        for (Iterator iter = result.getNodes(); iter.hasNext();) {
-            DiagramNode node = (DiagramNode) iter.next();
+        for (Iterator<DiagramNode> iter = result.getNodes(); iter.hasNext();) {
+            DiagramNode node = iter.next();
             ConceptImplementation concept = (ConceptImplementation) node.getConcept();
             concept.buildClosures();
         }
@@ -198,9 +198,9 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
         
         double scale = (scaleX < scaleY) ? scaleX : scaleY;
         
-        Iterator it = diagram.getNodes();
+        Iterator<DiagramNode> it = diagram.getNodes();
         while (it.hasNext()) {
-            DiagramNode node = (DiagramNode) it.next();
+            DiagramNode node = it.next();
             Point2D pos = node.getPosition();
             node.setPosition(new Point2D.Double(scale * pos.getX(), scale * pos.getY()));
 

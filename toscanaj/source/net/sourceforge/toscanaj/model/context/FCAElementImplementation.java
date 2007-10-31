@@ -50,6 +50,7 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable, 
 		return this.description;
 	}
 
+	@Override
 	public String toString() {
 		return this.data.toString();
 	}
@@ -75,6 +76,7 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable, 
         this.contextPosition = contextPosition;
     }
     
+	@Override
 	public boolean equals(Object other) {
         if(other == null) {
             return false;
@@ -86,6 +88,7 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable, 
 		return this.data.equals(otherImp.data);
 	}
 	
+	@Override
 	public int hashCode() {
 		return this.data.hashCode();
 	}

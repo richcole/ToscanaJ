@@ -43,6 +43,7 @@ public class TableView extends JTable {
 			return context.getObjects().size() + 1;
 		}
 
+		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
             if(!(context instanceof WritableManyValuedContext)) {
                 return false;
@@ -56,6 +57,7 @@ public class TableView extends JTable {
 			return true;
 		}
 
+		@Override
 		public Class getColumnClass(int columnIndex) {
 			return Object.class;
 		}
@@ -76,6 +78,7 @@ public class TableView extends JTable {
 			return relationship.getDisplayString();
 		}
 
+		@Override
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
             if(columnIndex == context.getAttributes().size()) {
                 throw new IllegalArgumentException("Last column in table is not editable");
@@ -89,6 +92,7 @@ public class TableView extends JTable {
 			writableContext.setRelationship(object, attribute, (Value) aValue);
 		}
 
+		@Override
 		public String getColumnName(int columnIndex) {
             if(columnIndex == context.getAttributes().size()) {
                 return "<Add new>";
@@ -119,6 +123,7 @@ public class TableView extends JTable {
 		tableChanged(new TableModelEvent(dataModel, TableModelEvent.HEADER_ROW));
 	}
 	
+	@Override
 	public TableCellEditor getCellEditor(int row, int column) {
 		ManyValuedAttribute	mvAttr = (ManyValuedAttribute) this.context.getAttributes().get(column);
 		Datatype type = mvAttr.getType();

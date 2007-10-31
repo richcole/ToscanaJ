@@ -20,6 +20,7 @@ public class ExtensionFileFilter extends FileFilter {
 		this.fileTypeName = fileTypeName;
 	}
 
+	@Override
 	public boolean accept(File f) {
 		if (f != null) {
 			if (f.isDirectory()) {
@@ -50,6 +51,7 @@ public class ExtensionFileFilter extends FileFilter {
 		return this.extensions;
 	}
 	
+	@Override
 	public String getDescription() {
 		String retVal = this.fileTypeName + " (";
 		for (int i = 0; i < this.extensions.length; i++) {

@@ -26,11 +26,11 @@ import java.util.List;
 public class DatabaseSchema implements XMLizable, EventBrokerListener {
 
     EventBroker broker;
-    List tables;
+    List<Table> tables;
     public static final String DATABASE_SCHEMA_ELEMENT_NAME = "databaseSchema";
 
     public DatabaseSchema(EventBroker broker) {
-        this.tables = new ArrayList();
+        this.tables = new ArrayList<Table>();
         this.broker = broker;
         this.broker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
         this.broker.subscribe(this, DatabaseModifiedEvent.class, Object.class);
@@ -43,8 +43,8 @@ public class DatabaseSchema implements XMLizable, EventBrokerListener {
 
     public Element toXML() {
         Element retVal = new Element(DATABASE_SCHEMA_ELEMENT_NAME);
-        for (Iterator iterator = tables.iterator(); iterator.hasNext();) {
-            Table table = (Table) iterator.next();
+        for (Iterator<Table> iterator = tables.iterator(); iterator.hasNext();) {
+            Table table = iterator.next();
             retVal.addContent(table.toXML());
         }
         return retVal;
@@ -52,9 +52,9 @@ public class DatabaseSchema implements XMLizable, EventBrokerListener {
 
     public void readXML(Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(elem, DATABASE_SCHEMA_ELEMENT_NAME);
-        List tableElems = elem.getChildren(Table.TABLE_ELEMENT_NAME);
-        for (Iterator iterator = tableElems.iterator(); iterator.hasNext();) {
-            Element element = (Element) iterator.next();
+        List<Element> tableElems = elem.getChildren(Table.TABLE_ELEMENT_NAME);
+        for (Iterator<Element> iterator = tableElems.iterator(); iterator.hasNext();) {
+            Element element = iterator.next();
             tables.add(new Table(broker, element));
         }
     }
@@ -63,18 +63,18 @@ public class DatabaseSchema implements XMLizable, EventBrokerListener {
         this.tables.add(table);
     }
 
-    public List getTables() {
+    public List<Table> getTables() {
         return tables;
     }
 
     public void readFromDBConnection(DatabaseConnection connection) {
-        Iterator it = connection.getTableNames().iterator();
+        Iterator<String> it = connection.getTableNames().iterator();
         this.tables.clear();
         while (it.hasNext()) {
-            String tableName = (String) it.next();
+            String tableName = it.next();
             Table table = new Table(broker, tableName, false); ///@todo get key name
-            for (Iterator colIt = connection.getColumns(table).iterator(); colIt.hasNext(); ) {
-                table.addColumn((Column) colIt.next());
+            for (Iterator<Column> colIt = connection.getColumns(table).iterator(); colIt.hasNext(); ) {
+                table.addColumn(colIt.next());
             }
             addTable(table);
         }

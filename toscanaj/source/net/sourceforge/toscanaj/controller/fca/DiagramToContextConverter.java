@@ -27,9 +27,9 @@ public class DiagramToContextConverter {
 		ListSet attributes = context.getAttributeList();
 		BinaryRelationImplementation relation = context.getRelationImplementation();
 		
-		Iterator nodesIt = diagram.getNodes();
+		Iterator<DiagramNode> nodesIt = diagram.getNodes();
 		while (nodesIt.hasNext()) {
-            DiagramNode node = (DiagramNode) nodesIt.next();
+            DiagramNode node = nodesIt.next();
             Concept concept = node.getConcept();
             
             Iterator objCont = concept.getObjectContingentIterator();
@@ -42,7 +42,7 @@ public class DiagramToContextConverter {
             while (attrCont.hasNext()) {
                 Object attrib = attrCont.next();
                 insertIntoList(attributes, attrib);
-                Iterator downset = concept.getDownset().iterator();
+                Iterator<Object> downset = concept.getDownset().iterator();
                 while (downset.hasNext()) {
                     Concept subConcept = (Concept) downset.next();
                     Iterator objIt = subConcept.getObjectContingentIterator();
@@ -57,7 +57,7 @@ public class DiagramToContextConverter {
 		return context;
 	}
 
-    private static void insertIntoList(List list, Object object) {
+    private static void insertIntoList(List<Object> list, Object object) {
         if(list.contains(object)) {
             return;
         }
@@ -67,7 +67,7 @@ public class DiagramToContextConverter {
             Comparable compObj = (Comparable) object;
             while(insertionPos != 0 &&
                     list.get(insertionPos - 1) instanceof Comparable && 
-                    ((Comparable)list.get(insertionPos - 1)).compareTo(compObj) > 0) {
+                    ((Comparable<Comparable>)list.get(insertionPos - 1)).compareTo(compObj) > 0) {
                 insertionPos--;
             }
         }

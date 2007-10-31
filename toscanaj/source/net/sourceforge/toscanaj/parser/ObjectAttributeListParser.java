@@ -39,8 +39,8 @@ public class ObjectAttributeListParser {
         try {
 			ContextImplementation context = new ContextImplementation(name);
 
-            Collection objects = context.getObjects();
-            Collection attributes = context.getAttributes();
+            Collection<Object> objects = context.getObjects();
+            Collection<Object> attributes = context.getAttributes();
             BinaryRelationImplementation relation = (BinaryRelationImplementation) context.getRelation();
             
             String curLine = in.readLine();

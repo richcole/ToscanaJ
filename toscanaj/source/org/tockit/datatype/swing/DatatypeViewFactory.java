@@ -37,7 +37,8 @@ public abstract class DatatypeViewFactory {
             final StringType stringType = (StringType) datatype;
             final JTextField comp = new JTextField();
             return new DefaultCellEditor(comp) {
-                public Object getCellEditorValue() {
+                @Override
+				public Object getCellEditorValue() {
                     try {
                         return stringType.parse(comp.getText());
                     } catch (ConversionException e) {
@@ -52,7 +53,8 @@ public abstract class DatatypeViewFactory {
             NumberFormat format = NumberFormat.getNumberInstance();
             final JFormattedTextField comp = new JFormattedTextField(new NumberFormatter(format));
             return new DefaultCellEditor(comp) {
-                public Object getCellEditorValue() {
+                @Override
+				public Object getCellEditorValue() {
                     try {
                         return decType.parse(comp.getText());
                     } catch (ConversionException e) {

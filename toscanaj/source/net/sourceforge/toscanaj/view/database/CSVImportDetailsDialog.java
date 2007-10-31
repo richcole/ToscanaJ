@@ -205,9 +205,9 @@ public class CSVImportDetailsDialog extends JDialog {
 		});
 
 		JLabel dataTypeLabel = new JLabel("Data Type");
-		List dbTypes = getDatabaseTypes();
+		List<String> dbTypes = getDatabaseTypes();
 		Collections.sort(dbTypes);
-		Vector dbTypesVector = new Vector();
+		Vector<String> dbTypesVector = new Vector<String>();
 		dbTypesVector.add("Choose Column Type");
 		dbTypesVector.addAll(dbTypes);
 		dataTypesComboBox = new JComboBox(dbTypesVector);
@@ -369,13 +369,13 @@ public class CSVImportDetailsDialog extends JDialog {
 		okButton.setEnabled(true);
 	}
 	
-	private List getDatabaseTypes() {
-		List res = new ArrayList();
+	private List<String> getDatabaseTypes() {
+		List<String> res = new ArrayList<String>();
 		try {
-			Collection typeNames = connection.getDatabaseSupportedTypeNames();
-			Iterator it = typeNames.iterator();
+			Collection<SQLTypeInfo> typeNames = connection.getDatabaseSupportedTypeNames();
+			Iterator<SQLTypeInfo> it = typeNames.iterator();
 			while (it.hasNext()) {
-				SQLTypeInfo cur = (SQLTypeInfo) it.next();
+				SQLTypeInfo cur = it.next();
 				res.add(cur.getTypeName().toLowerCase());
 			}
 		}
@@ -416,7 +416,7 @@ public class CSVImportDetailsDialog extends JDialog {
 	private class DBTypesTableModel extends AbstractTableModel {
 		
 		final private String[] columnNames = {"Column Name","Data Type"};
-		private List rows = new ArrayList();
+		private List<List<String>> rows = new ArrayList<List<String>>();
 
 		public int getRowCount() {
 			return rows.size();
@@ -426,21 +426,23 @@ public class CSVImportDetailsDialog extends JDialog {
 			return columnNames.length;
 		}
 		
+		@Override
 		public String getColumnName (int columnIndex) {
 			return columnNames[columnIndex];
 		}
 
 		public Object getValueAt(int rowIndex, int colIndex) {
-			List rowData = (List) rows.get(rowIndex);
+			List rowData = rows.get(rowIndex);
 			return rowData.get(colIndex);
 		}
 		
+		@Override
 		public boolean isCellEditable(int rowIndex, int colIndex) {
 			return true;
 		}
 
 		public void addRow (String newColNameStr, String colDataType) {
-			List rowData = new ArrayList();
+			List<String> rowData = new ArrayList<String>();
 			rowData.add(0, newColNameStr);
 			rowData.add(1, colDataType);
 			rows.add(rowData);

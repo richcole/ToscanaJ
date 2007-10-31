@@ -24,8 +24,8 @@ public class GantersAlgorithm implements LatticeGenerator {
 	private Object[] attributes;
     private BitSet[] relation;
     
-    private Hashtable intents;
-    private Vector extents;
+    private Hashtable<BitSet, BitSet> intents;
+    private Vector<BitSet> extents;
 
     public Lattice createLattice(Context inputContext) {
         LatticeImplementation lattice = new LatticeImplementation();
@@ -33,8 +33,8 @@ public class GantersAlgorithm implements LatticeGenerator {
         this.attributes = createElementArray(inputContext.getAttributes());
         this.relation = createRelation(inputContext.getRelation());
         
-        this.intents = new Hashtable();
-        this.extents = new Vector();
+        this.intents = new Hashtable<BitSet, BitSet>();
+        this.extents = new Vector<BitSet>();
         findExtents();
         createConcepts(lattice);
         connectConcepts(lattice);
@@ -65,10 +65,10 @@ public class GantersAlgorithm implements LatticeGenerator {
 	/**
 	 * This is similar to Collection.toArray(), but also checks for duplicates.
 	 */
-    public Object[] createElementArray(Collection collection) {
+    public Object[] createElementArray(Collection<Object> collection) {
         Object[] retVal = new Object[collection.size()];
-    	HashSet testSet = new HashSet();
-    	Iterator it = collection.iterator();
+    	HashSet<Object> testSet = new HashSet<Object>();
+    	Iterator<Object> it = collection.iterator();
     	int pos = 0;
     	while (it.hasNext()) {
             Object cur = it.next();
@@ -105,7 +105,7 @@ public class GantersAlgorithm implements LatticeGenerator {
         if (concept1.getObjectContingentSize() > concept2.getObjectContingentSize()) {
             return false;
         }
-        HashSet extent2 = new HashSet();
+        HashSet<Object> extent2 = new HashSet<Object>();
         for (Iterator iterator = concept2.getObjectContingentIterator(); iterator.hasNext();) {
             Object obj = iterator.next();
             extent2.add(obj);
@@ -123,18 +123,18 @@ public class GantersAlgorithm implements LatticeGenerator {
         Concept[] concepts = lattice.getConcepts();
         for (int i = 0; i < concepts.length; i++) {
             ConceptImplementation concept = (ConceptImplementation) concepts[i];
-            Collection downset = new HashSet(concept.getDownset());
+            Collection<Object> downset = new HashSet<Object>(concept.getDownset());
             downset.remove(concept);
-            for (Iterator iterator = downset.iterator(); iterator.hasNext();) {
+            for (Iterator<Object> iterator = downset.iterator(); iterator.hasNext();) {
                 ConceptImplementation concept2 = (ConceptImplementation) iterator.next();
                 for (Iterator iterator2 = concept2.getObjectContingentIterator(); iterator2.hasNext();) {
                     Object object = iterator2.next();
                     concept.removeObject(object);
                 }
             }
-            Collection upset = new HashSet(concept.getUpset());
+            Collection<Object> upset = new HashSet<Object>(concept.getUpset());
             upset.remove(concept);
-            for (Iterator iterator = upset.iterator(); iterator.hasNext();) {
+            for (Iterator<Object> iterator = upset.iterator(); iterator.hasNext();) {
                 ConceptImplementation concept2 = (ConceptImplementation) iterator.next();
                 for (Iterator iterator2 = concept2.getAttributeContingentIterator(); iterator2.hasNext();) {
                     Object attribute = iterator2.next();
@@ -161,15 +161,15 @@ public class GantersAlgorithm implements LatticeGenerator {
     }
 
     private void createConcepts(LatticeImplementation lattice) {
-        for (Iterator iterator = this.extents.iterator(); iterator.hasNext();) {
+        for (Iterator<BitSet> iterator = this.extents.iterator(); iterator.hasNext();) {
             ConceptImplementation concept = new ConceptImplementation();
-            BitSet extent = (BitSet) iterator.next();
+            BitSet extent = iterator.next();
             for (int i = 0; i < this.objects.length; i++) {
                 if(extent.get(i)) {
                 	concept.addObject(this.objects[i]);
                 }
 			}
-            BitSet intent = (BitSet) this.intents.get(extent);
+            BitSet intent = this.intents.get(extent);
             for (int i = 0; i < this.attributes.length; i++) {
                 if(intent.get(i)) {
                 	concept.addAttribute(this.attributes[i]);

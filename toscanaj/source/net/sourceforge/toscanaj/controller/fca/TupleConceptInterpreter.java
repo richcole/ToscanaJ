@@ -39,7 +39,8 @@ public class TupleConceptInterpreter extends AbstractConceptInterpreter
 		readXML(elem);
 	}
 											
-    public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
+    @Override
+	public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
     	Set baseSet;
         if (context.getObjectDisplayMode() == ConceptInterpretationContext.CONTINGENT) {
 	        baseSet = calculateContingent(concept, context);
@@ -63,11 +64,13 @@ public class TupleConceptInterpreter extends AbstractConceptInterpreter
         return retVal;
     }
 
-    protected int calculateContingentSize(Concept concept, ConceptInterpretationContext context) {
+    @Override
+	protected int calculateContingentSize(Concept concept, ConceptInterpretationContext context) {
     	Set contingent = calculateContingent(concept, context);
     	return projectSet(contingent).size();
     }
 
+	@Override
 	protected int calculateExtentSize(Concept concept, ConceptInterpretationContext context) {
 		Set extent = calculateExtent(concept, context);
 		return projectSet(extent).size();
@@ -128,10 +131,12 @@ public class TupleConceptInterpreter extends AbstractConceptInterpreter
 		return retVal;
 	}
     
+	@Override
 	protected FCAElement getObject(String value, Concept concept, ConceptInterpretationContext context) {
 		return new FCAElementImplementation(value);
 	}
 	
+	@Override
 	protected FCAElement[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) { 
 		throw new RuntimeException("Query not supported by this class (" + this.getClass().getName() + ")");
 	}
@@ -149,11 +154,11 @@ public class TupleConceptInterpreter extends AbstractConceptInterpreter
     }
 
     public void readXML(Element elem) {
-    	List objColElems = elem.getChildren(OBJECT_COLUMN_ELEMENT_NAME);
+    	List<Element> objColElems = elem.getChildren(OBJECT_COLUMN_ELEMENT_NAME);
     	this.objectColumns = new int[objColElems.size()];
     	int i = 0;
-    	for (Iterator iter = objColElems.iterator(); iter.hasNext();) {
-            Element objColElem = (Element) iter.next();
+    	for (Iterator<Element> iter = objColElems.iterator(); iter.hasNext();) {
+            Element objColElem = iter.next();
             int col = Integer.parseInt(objColElem.getText());
             this.objectColumns[i] = col;
             i++;

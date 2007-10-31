@@ -81,8 +81,8 @@ public class DirectConceptInterpreterTest extends TestCase {
 
         count = 0;
         int[] contingentSizeBuckets = new int[] {0,0,0};
-        for (Iterator iter = nestedDiagram.getNodes(); iter.hasNext();) {
-            DiagramNode node = (DiagramNode) iter.next();
+        for (Iterator<DiagramNode> iter = nestedDiagram.getNodes(); iter.hasNext();) {
+            DiagramNode node = iter.next();
             count++;
             int contSize = interpreter.getObjectContingentSize(node.getConcept(), interpretationContext.createNestedContext(node.getOuterNode().getConcept()));
             contingentSizeBuckets[contSize]++;

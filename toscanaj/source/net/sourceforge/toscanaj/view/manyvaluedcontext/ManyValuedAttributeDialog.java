@@ -194,7 +194,8 @@ public class ManyValuedAttributeDialog extends JDialog{
 			 * wrapping all content in an extra layer just for the toString() method and we don't
 			 * want to rely on every datatype implementing toString as display method.
 			 */
-		    public Component getListCellRendererComponent(
+		    @Override
+			public Component getListCellRendererComponent(
 		            JList list,
 		    	Object value,
 		            int index,

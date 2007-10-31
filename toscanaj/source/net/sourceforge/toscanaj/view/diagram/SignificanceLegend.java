@@ -36,7 +36,8 @@ public class SignificanceLegend extends MovableCanvasItem {
         this.bounds = new Rectangle2D.Double(pos.getX(), pos.getY(), 0, 0);
     }
     
-    public void draw(Graphics2D g) {
+    @Override
+	public void draw(Graphics2D g) {
         TextLayout titleLayout = new TextLayout(TITLE, this.font, g.getFontRenderContext());
         int numEntries = AbstractConceptInterpreter.SIGNIFICANCE_LEVELS.length;
         TextLayout[] numberLayouts = new TextLayout[numEntries];
@@ -88,19 +89,23 @@ public class SignificanceLegend extends MovableCanvasItem {
         g.draw(this.bounds);
     }
 
-    public boolean containsPoint(Point2D point) {
+    @Override
+	public boolean containsPoint(Point2D point) {
         return this.bounds.contains(point);
     }
 
-    public Point2D getPosition() {
+    @Override
+	public Point2D getPosition() {
         return new Point2D.Double(this.bounds.getX(), this.bounds.getY());
     }
 
-    public Rectangle2D getCanvasBounds(Graphics2D g) {
+    @Override
+	public Rectangle2D getCanvasBounds(Graphics2D g) {
         return this.bounds;
     }
 
-    public void setPosition(Point2D newPosition) {
+    @Override
+	public void setPosition(Point2D newPosition) {
         double px = newPosition.getX();
         double py = newPosition.getY();
         double w = this.bounds.getWidth();

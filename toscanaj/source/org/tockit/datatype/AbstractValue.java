@@ -28,7 +28,8 @@ public abstract class AbstractValue implements Value {
     /**
      * Implements the requirement of Value that toString() matched getDisplayString().
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return getDisplayString();
     }
 
@@ -36,7 +37,8 @@ public abstract class AbstractValue implements Value {
      * This implementation just checks the basics (not null, same type) and
      * then delegates to the abstract sameTypeEquals(Object).
      */
-    public final boolean equals(Object other) {
+    @Override
+	public final boolean equals(Object other) {
     	if(other == null) {
     		return false;
     	}
@@ -49,5 +51,6 @@ public abstract class AbstractValue implements Value {
     protected abstract boolean sameTypeEquals(Object other);
 
 	// force overriding hashCode()
-    public abstract int hashCode();
+    @Override
+	public abstract int hashCode();
 }

@@ -427,9 +427,9 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     private void changeZoom(double zoomFactor) {
         Diagram2D diagram = this.diagramView.getDiagram();
-        Iterator nodesIt = diagram.getNodes();
+        Iterator<DiagramNode> nodesIt = diagram.getNodes();
         while (nodesIt.hasNext()) {
-            DiagramNode diagramNode = (DiagramNode) nodesIt.next();
+            DiagramNode diagramNode = nodesIt.next();
             Point2D pos = diagramNode.getPosition();
             diagramNode.setPosition(new Point2D.Double(pos.getX() * zoomFactor, pos.getY() * zoomFactor));
         }
@@ -442,7 +442,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         ContextImplementation context = (ContextImplementation) DiagramToContextConverter.getContext(this.diagramView.getDiagram());
         contextEditingDialog.setContext(context);
     	if(contextEditingDialog.execute()) {
-    		Map attributeVectors = findVectorsForAttributes(this.diagramView.getDiagram());
+    		Map<Object, Point2D> attributeVectors = findVectorsForAttributes(this.diagramView.getDiagram());
     		LatticeGenerator lgen = new GantersAlgorithm();
     		context = contextEditingDialog.getContext();
     		Lattice lattice = lgen.createLattice(context);
@@ -477,16 +477,16 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
      * @param diagram the diagram to relayout
      * @param attributeVectors a map from the attribute data to vectors (Point2D)
      */
-	private void assignOldVectors(NDimDiagram diagram, Map attributeVectors) {
-        Vector base = diagram.getBase();
-        for (Iterator nodeIt = diagram.getNodes(); nodeIt.hasNext();) {
+	private void assignOldVectors(NDimDiagram diagram, Map<Object, Point2D> attributeVectors) {
+        Vector<Point2D> base = diagram.getBase();
+        for (Iterator<DiagramNode> nodeIt = diagram.getNodes(); nodeIt.hasNext();) {
             NDimDiagramNode node = (NDimDiagramNode) nodeIt.next();
             Concept concept = node.getConcept();
             if(concept.isMeetIrreducible()) {
                 double[] ndimVec = node.getNdimVector();
                 int dim = -1;
-                for (Iterator lineIt = diagram.getLines(); lineIt.hasNext(); ) {
-                    DiagramLine line = (DiagramLine) lineIt.next();
+                for (Iterator<DiagramLine> lineIt = diagram.getLines(); lineIt.hasNext(); ) {
+                    DiagramLine line = lineIt.next();
                     if(line.getToNode() == node) {
                         NDimDiagramNode parentNode = (NDimDiagramNode) line.getFromNode();
                         double[] parentVec = parentNode.getNdimVector();
@@ -504,7 +504,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 for (Iterator attrIt = concept.getAttributeContingentIterator(); 
                         attrIt.hasNext();) {
                     FCAElement attribute = (FCAElement) attrIt.next();
-                    Point2D vector = (Point2D) attributeVectors.get(attribute.getData());
+                    Point2D vector = attributeVectors.get(attribute.getData());
                     if (vector != null) { // vector can be null if attribute was attached to top before 
                         projX += vector.getX();
                         projY += vector.getY();
@@ -518,16 +518,16 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         }
     }
 
-    private Map findVectorsForAttributes(Diagram2D diagram) {
-		Map result = new Hashtable();
-		for (Iterator nodeIt = diagram.getNodes(); nodeIt.hasNext();) {
-			DiagramNode node = (DiagramNode) nodeIt.next();
+    private Map<Object, Point2D> findVectorsForAttributes(Diagram2D diagram) {
+		Map<Object, Point2D> result = new Hashtable<Object, Point2D>();
+		for (Iterator<DiagramNode> nodeIt = diagram.getNodes(); nodeIt.hasNext();) {
+			DiagramNode node = nodeIt.next();
 			Concept concept = node.getConcept();
 			if(concept.isMeetIrreducible()) {
 				Point2D nodePos = node.getPosition();
 				Point2D parentPos = null;
-				for (Iterator lineIt = diagram.getLines(); lineIt.hasNext(); ) {
-					DiagramLine line = (DiagramLine) lineIt.next();
+				for (Iterator<DiagramLine> lineIt = diagram.getLines(); lineIt.hasNext(); ) {
+					DiagramLine line = lineIt.next();
 					if(line.getToNode() == node) {
 						parentPos = line.getFromPosition();
 						break;
@@ -685,13 +685,15 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         
         // add context menu
         listView.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
+            @Override
+			public void mousePressed(MouseEvent e) {
                 if(e.isPopupTrigger()) {
                     openPopupMenu(e);
                 }
             }
 
-            public void mouseReleased(MouseEvent e) {
+            @Override
+			public void mouseReleased(MouseEvent e) {
                 if(e.isPopupTrigger()) {
                     openPopupMenu(e);
                 }
@@ -736,13 +738,15 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                                 Diagram2D diagram = conceptualSchema.getDiagram(indexHit);
                                 action.actionPerformed(ae, diagram);
                             }
-                            public Object getValue(String key) {
+                            @Override
+							public Object getValue(String key) {
                                 if(Action.NAME == key) {
                                     return action.getLabel();
                                 }
                                 return super.getValue(key);
                             }
-                            public boolean isEnabled() {
+                            @Override
+							public boolean isEnabled() {
                                 return action.isEnabled();
                             }
                         });

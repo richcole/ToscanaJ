@@ -54,6 +54,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 		updateSize();
 	}
 
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
@@ -69,8 +70,8 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 	}
 
 	public Dimension calculateNewSize() {
-		Set attributesSet = this.dialog.getContext().getAttributes();
-		this.attributes = (WritableFCAElement[]) attributesSet.toArray(new WritableFCAElement[attributesSet.size()]);
+		Set<Object> attributesSet = this.dialog.getContext().getAttributes();
+		this.attributes = attributesSet.toArray(new WritableFCAElement[attributesSet.size()]);
 		int numCol = this.attributes.length + 1;
 		return new Dimension(numCol * ContextTableView.CELL_WIDTH + 1, ContextTableView.CELL_HEIGHT + 1);
 	}
@@ -114,6 +115,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 		return newContent;
 	}
 
+	@Override
 	public String getToolTipText(MouseEvent e) {
 		String tooltipText = null;
 
@@ -164,8 +166,8 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
     
 	protected boolean collectionContainsString(
 		String value,
-		Collection collection) {
-		Iterator it = collection.iterator();
+		Collection<Object> collection) {
+		Iterator<Object> it = collection.iterator();
 		while (it.hasNext()) {
 			Object obj = it.next();
 			if (obj.toString().equalsIgnoreCase(value.trim())) {
@@ -192,6 +194,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 
 	private MouseListener createMouseListener() {
 		MouseListener mouseListener = new MouseAdapter() {
+			@Override
 			public void mousePressed(MouseEvent e) {
 				if (e.isPopupTrigger()) {
 					final ContextTableView.Position pos =
@@ -252,6 +255,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 					popupMenu.show(dialog.getScrollPane(), e.getX() + getX() + ContextTableView.CELL_WIDTH, e.getY() + getY());
 			}
 
+			@Override
 			public void mouseReleased(MouseEvent e) {
 				if (e.isPopupTrigger()) {
 					final ContextTableView.Position pos =
@@ -264,6 +268,7 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
 				}
 			}
 
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				final ContextTableView.Position pos =
 					dialog.getTablePosition(e.getX(), e.getY());
@@ -291,16 +296,16 @@ public class ContextTableColumnHeader extends JComponent implements Scrollable {
                 inputValue = inputDialog.getInput();
                 if (!this.dialog.collectionContainsString(inputValue, this.attributes)) {
                     ContextImplementation context = this.dialog.getContext();
-                    Set attributeSet = context.getAttributes();
+                    Set<Object> attributeSet = context.getAttributes();
                     WritableFCAElement newAttr = new FCAElementImplementation(inputValue);
                     attributeSet.remove(oldAttr);
                     if(attributeSet instanceof List) {
-                        List attributesList = (List) attributeSet;
+                        List<Object> attributesList = (List<Object>) attributeSet;
                         attributesList.add(num, newAttr);
                     } else {
                         attributeSet.add(newAttr);
                     }
-                    for (Iterator iter = context.getObjects().iterator(); iter.hasNext(); ) {
+                    for (Iterator<Object> iter = context.getObjects().iterator(); iter.hasNext(); ) {
                         Object object = iter.next();
                         if(context.getRelation().contains(object,oldAttr)) {
                             context.getRelationImplementation().insert(object,newAttr);

@@ -77,14 +77,16 @@ public class ObjectLabelView extends LabelView {
     /**
      * Avoids drawing object labels for non-realised concepts.
      */
-    public boolean isVisible() {
+    @Override
+	public boolean isVisible() {
         Concept concept = this.labelInfo.getNode().getConcept();
         ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
         ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
         return interpreter.isVisible(concept, context) && super.isVisible() && !allHidden;
     }
 
-    public void updateEntries() {
+    @Override
+	public void updateEntries() {
         doQuery();
         if (this.getNumberOfEntries() > DEFAULT_DISPLAY_LINES) {
             this.displayLines = DEFAULT_DISPLAY_LINES;
@@ -109,7 +111,8 @@ public class ObjectLabelView extends LabelView {
     /**
      * Returns LabelView.BELOW
      */
-    protected int getPlacement() {
+    @Override
+	protected int getPlacement() {
         return LabelView.BELOW;
     }
 
@@ -120,14 +123,16 @@ public class ObjectLabelView extends LabelView {
         updateEntries();
     }
 
-    public int getNumberOfEntries() {
+    @Override
+	public int getNumberOfEntries() {
         if (this.contents == null) {
             return 0;
         }
         return this.contents.length;
     }
 
-    public Object getEntryAt(int position) {
+    @Override
+	public Object getEntryAt(int position) {
         if(this.contents == null) {
             updateEntries();
         }
@@ -154,11 +159,13 @@ public class ObjectLabelView extends LabelView {
         return this.contents[itemHit];
     }
 
-    protected boolean highlightedInIdeal() {
+    @Override
+	protected boolean highlightedInIdeal() {
         return true;
     }
 
-    protected boolean highlightedInFilter() {
+    @Override
+	protected boolean highlightedInFilter() {
         return false;
     }
 
@@ -169,7 +176,8 @@ public class ObjectLabelView extends LabelView {
         return this.query;
     }
 
-    protected boolean isFaded() {
+    @Override
+	protected boolean isFaded() {
         int selectionState = nodeView.getSelectionState();
         return selectionState == DiagramView.NOT_SELECTED || selectionState == DiagramView.SELECTED_FILTER;
     }

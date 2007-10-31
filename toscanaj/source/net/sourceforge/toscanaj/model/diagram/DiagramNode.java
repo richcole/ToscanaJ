@@ -325,7 +325,8 @@ public class DiagramNode implements XMLizable {
     /**
      * Debug output.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         String retVal = "DiagramNode:\n";
         retVal += "- Pos : (" + getX() + "," + getY() + ")\n";
         retVal += "- Size: (" + getRadiusX() + "," + getRadiusY() + ")\n";
@@ -346,7 +347,8 @@ public class DiagramNode implements XMLizable {
         return (Concept[])conceptList.toArray(new Concept[0]);
     }
 
-    public boolean equals(Object obj) {
+    @Override
+	public boolean equals(Object obj) {
         if (!(obj instanceof DiagramNode)) {
             return false;
         }
@@ -388,9 +390,9 @@ public class DiagramNode implements XMLizable {
      * Returns true iff the node connects to a line it does not belong to.
      */
     public boolean hasCollision() {
-        Iterator lineIt = this.diagram.getLines();
+        Iterator<DiagramLine> lineIt = this.diagram.getLines();
         while (lineIt.hasNext()) {
-            DiagramLine line = (DiagramLine) lineIt.next();
+            DiagramLine line = lineIt.next();
             if(line.getFromNode() == this) {
                 continue;
             }

@@ -23,19 +23,19 @@ public class BurmeisterWriter {
         out.println(context.getAttributes().size());
 
         // write objects and attributes
-        for (Iterator itOb = context.getObjects().iterator(); itOb.hasNext();) {
+        for (Iterator<Object> itOb = context.getObjects().iterator(); itOb.hasNext();) {
             Object object = itOb.next();
             out.println(object.toString());
         }
-        for (Iterator itAt = context.getAttributes().iterator(); itAt.hasNext();) {
+        for (Iterator<Object> itAt = context.getAttributes().iterator(); itAt.hasNext();) {
             Object attribute = itAt.next();
             out.println(attribute.toString());
         }
         
         // write relation
-        for (Iterator itOb = context.getObjects().iterator(); itOb.hasNext();) {
+        for (Iterator<Object> itOb = context.getObjects().iterator(); itOb.hasNext();) {
             Object object = itOb.next();
-            for (Iterator itAt = context.getAttributes().iterator(); itAt.hasNext();) {
+            for (Iterator<Object> itAt = context.getAttributes().iterator(); itAt.hasNext();) {
                 Object attribute = itAt.next();
                 if(context.getRelation().contains(object,attribute)) {
                     out.print('x');

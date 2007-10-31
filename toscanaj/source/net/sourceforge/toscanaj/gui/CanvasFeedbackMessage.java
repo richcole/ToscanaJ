@@ -67,7 +67,8 @@ public class CanvasFeedbackMessage extends CanvasItem {
 		canvas.repaint();
 	}
 
-    public void draw(Graphics2D g) {
+    @Override
+	public void draw(Graphics2D g) {
         long time = System.currentTimeMillis();
         if(time > this.endTime) {
         	cleanUp();
@@ -117,18 +118,21 @@ public class CanvasFeedbackMessage extends CanvasItem {
     	this.canvas.removeCanvasItem(this);
     }
 
-    public boolean containsPoint(Point2D point) {
+    @Override
+	public boolean containsPoint(Point2D point) {
         return false;
     }
 
-    public Point2D getPosition() {
+    @Override
+	public Point2D getPosition() {
     	if(this.bounds == null) {
     		return this.position;
     	}
         return new Point2D.Double(this.bounds.getCenterX(), this.bounds.getCenterY());
     }
 
-    public Rectangle2D getCanvasBounds(Graphics2D g) {
+    @Override
+	public Rectangle2D getCanvasBounds(Graphics2D g) {
         return this.bounds;
     }
     

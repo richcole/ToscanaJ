@@ -37,8 +37,8 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		this.columnComboBox.removeAllItems();
 
 		if (table != null) {
-            for (Iterator it = table.getColumns().iterator(); it.hasNext(); ) {
-                Column column = (Column) it.next();
+            for (Iterator<Column> it = table.getColumns().iterator(); it.hasNext(); ) {
+                Column column = it.next();
                 columnComboBox.addItem(new ColumnInfo(column));
             }
 		}
@@ -93,6 +93,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 			this.table = table;
 		}
 
+		@Override
 		public String toString() {
 			return table.getDisplayName();
 		}
@@ -109,6 +110,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 			this.column = column;
 		}
 
+		@Override
 		public String toString() {
 			return column.getDisplayName()
 				+ ": "
@@ -158,8 +160,8 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
 		}
 
         this.tableComboBox.removeAllItems();
-        for (Iterator it = dbScheme.getTables().iterator(); it.hasNext(); ) {
-            Table table = (Table) it.next();
+        for (Iterator<Table> it = dbScheme.getTables().iterator(); it.hasNext(); ) {
+            Table table = it.next();
             TableInfo tableInfo = new TableInfo(table);
             this.tableComboBox.addItem(tableInfo);
             if(this.tableComboBox.getSelectedItem() == null) {

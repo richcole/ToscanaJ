@@ -43,7 +43,8 @@ public class XMLEditorDialog extends JDialog {
         super(aFrame, true);
         setTitle(title);
 		this.addWindowListener(new WindowAdapter() {
-		    public void windowClosing(WindowEvent evt) {
+		    @Override
+			public void windowClosing(WindowEvent evt) {
                 preferences.storeWindowPlacement(XMLEditorDialog.this.dialog);
 				setVisible(false);
 			}

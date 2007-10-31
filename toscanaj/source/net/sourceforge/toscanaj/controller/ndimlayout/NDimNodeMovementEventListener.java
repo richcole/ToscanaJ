@@ -67,6 +67,7 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
 				// make a copy of the current start position
 				final Point2D undoPosition = this.startPosition;
 				undoManager.addEdit(new AbstractUndoableEdit() {
+					@Override
 					public void undo() throws CannotUndoException {
 			            double undoDiffX = undoPosition.getX() - toPosition.getX();
 			            double undoDiffY = undoPosition.getY() - toPosition.getY();
@@ -76,6 +77,7 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
 						super.undo();
 					}
 
+					@Override
 					public void redo() throws CannotRedoException {
 			            double undoDiffX = toPosition.getX() - undoPosition.getX();
 			            double undoDiffY = toPosition.getY() - undoPosition.getY();
@@ -85,6 +87,7 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
 						super.redo();
 					}
 					
+					@Override
 					public String getPresentationName() {
 						return "Attribute Additive Movement";
 					}
@@ -104,9 +107,9 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
         for (int i = 0; i < diffUpperNeighbours.length; i++) {
             numDiffs += diffUpperNeighbours[i];
         }
-        Iterator baseIt = diagram.getBase().iterator();
+        Iterator<Point2D> baseIt = diagram.getBase().iterator();
         for (int i = 0; i < diffUpperNeighbours.length; i++) {
-			Point2D baseVec = (Point2D) baseIt.next();
+			Point2D baseVec = baseIt.next();
 			if(ndimNode.getNdimVector()[i] == 0) {
 				continue;
 			}
@@ -119,9 +122,9 @@ public class NDimNodeMovementEventListener implements EventBrokerListener {
     private int[] findUpperNeighbourDiff(Diagram2D diagram, NDimDiagramNode node) {
         double[] nodeVec = node.getNdimVector();
         int[] retVal = new int[nodeVec.length];
-        Iterator it = diagram.getLines();
+        Iterator<DiagramLine> it = diagram.getLines();
         while (it.hasNext()) {
-            DiagramLine line = (DiagramLine) it.next();
+            DiagramLine line = it.next();
             if (line.getToNode() == node) {
                 NDimDiagramNode upperNeighbour = (NDimDiagramNode) line.getFromNode();
                 double[] upperVec = upperNeighbour.getNdimVector();

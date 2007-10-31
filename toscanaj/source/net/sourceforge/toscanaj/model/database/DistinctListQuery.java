@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
+import net.sourceforge.toscanaj.model.database.Query.QueryField;
+
 import org.jdom.Element;
 
 import java.util.Iterator;
@@ -26,24 +28,27 @@ public class DistinctListQuery extends Query {
         this.info = info;
     }
 
-    protected String getElementName() {
+    @Override
+	protected String getElementName() {
         return QUERY_ELEMENT_NAME;
     }
 
-    public String getQueryHead() {
+    @Override
+	public String getQueryHead() {
         return "SELECT DISTINCT " + getFieldList() + " FROM " + 
                 info.getTable().getSqlExpression() + " ";
     }
 
-    public String getOrderClause() {
+    @Override
+	public String getOrderClause() {
         return "ORDER BY " + getFieldList();
     }
 
     private String getFieldList() {
         String retVal = "";
-        Iterator it = fieldList.iterator();
+        Iterator<QueryField> it = fieldList.iterator();
         while (it.hasNext()) {
-            QueryField field = (QueryField) it.next();
+            QueryField field = it.next();
             retVal += field.getQueryPart();
             if (it.hasNext()) {
                 retVal += ", ";
@@ -52,14 +57,15 @@ public class DistinctListQuery extends Query {
         return retVal;
     }
 
-    public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values, Vector referenceValues) {
+    @Override
+	public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector<Object> values, Vector referenceValues) {
         String displayString = this.formatResults(values, 0);
         DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
         String specialWhereClause = whereClause;
-        Iterator it = fieldList.iterator();
-        Iterator it2 = values.iterator();
+        Iterator<QueryField> it = fieldList.iterator();
+        Iterator<?> it2 = values.iterator();
         while (it.hasNext() && it2.hasNext()) {
-            QueryField field = (QueryField) it.next();
+            QueryField field = it.next();
             String value = (String) it2.next();
             specialWhereClause += " AND (" + field.getQueryPart() + "='" + value + "')";
         }
@@ -67,6 +73,7 @@ public class DistinctListQuery extends Query {
         return retVal;
     }
 
+	@Override
 	public boolean doesNeedReferenceValues() {
 		return false;
 	}

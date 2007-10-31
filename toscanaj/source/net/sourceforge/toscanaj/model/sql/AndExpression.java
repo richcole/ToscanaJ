@@ -13,7 +13,7 @@ import java.util.Vector;
 import java.util.Iterator;
 
 public class AndExpression implements Expression {
-    private Vector subexpressions = new Vector();
+    private Vector<Expression> subexpressions = new Vector<Expression>();
 
     public AndExpression() {
 		// nothing to do here
@@ -32,8 +32,8 @@ public class AndExpression implements Expression {
             return "*";
         }
         String retVal = "";
-        for (Iterator iterator = subexpressions.iterator(); iterator.hasNext();) {
-            Expression expression = (Expression) iterator.next();
+        for (Iterator<Expression> iterator = subexpressions.iterator(); iterator.hasNext();) {
+            Expression expression = iterator.next();
             retVal += "(" + expression.getSQL() + ")";
             if(iterator.hasNext()) {
                 retVal += " AND ";

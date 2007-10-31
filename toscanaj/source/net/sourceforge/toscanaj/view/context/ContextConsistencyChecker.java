@@ -26,22 +26,22 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 
 public class ContextConsistencyChecker {
 
-	public static List checkConsistency(ConceptualSchema conceptualSchema, Diagram2D diagram,
+	public static List<String> checkConsistency(ConceptualSchema conceptualSchema, Diagram2D diagram,
 									DatabaseConnection databaseConnection, Component parent) {
 		Context context = DiagramToContextConverter.getContext(diagram);										
 		return checkConsistency(conceptualSchema, context, databaseConnection, parent);
 	}									
 	
-	public static List checkConsistency(ConceptualSchema conceptualSchema, Context context,
+	public static List<String> checkConsistency(ConceptualSchema conceptualSchema, Context context,
 									DatabaseConnection databaseConnection, Component parent) {
-		List problems = new ArrayList();
+		List<String> problems = new ArrayList<String>();
 		DatabaseInfo dbinfo = conceptualSchema.getDatabaseInfo();
 
 		int sumCounts = 0;
-		List validClauses = new ArrayList();
+		List<String> validClauses = new ArrayList<String>();
 
 		// check if all objects are WHERE clauses
-		Iterator it = context.getObjects().iterator();
+		Iterator<Object> it = context.getObjects().iterator();
 		while (it.hasNext()) {
 			String clause = it.next().toString();
 			String query =
@@ -69,9 +69,9 @@ public class ContextConsistencyChecker {
 			while (it.hasNext()) {
 				String clause = it.next().toString();
 				validClauses.remove(clause);
-				Iterator it2 = validClauses.iterator();
+				Iterator<String> it2 = validClauses.iterator();
 				while (it2.hasNext()) {
-					String otherClause = (String) it2.next();
+					String otherClause = it2.next();
 					String query =
 						"SELECT count(*) FROM "
 							+ dbinfo.getTable().getSqlExpression()

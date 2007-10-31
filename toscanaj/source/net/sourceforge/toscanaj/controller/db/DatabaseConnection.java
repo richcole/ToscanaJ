@@ -209,10 +209,10 @@ public class DatabaseConnection implements EventBrokerListener {
     /**
      * Retrieves a specific column from a query as a list of strings.
      */
-    public List queryColumn(String statement, int column) throws DatabaseException {
+    public List<String> queryColumn(String statement, int column) throws DatabaseException {
         ResultSet resultSet = null;
         Statement stmt = null;
-        List result = new LinkedList();
+        List<String> result = new LinkedList<String>();
 
         // submit the query
         try {
@@ -246,11 +246,11 @@ public class DatabaseConnection implements EventBrokerListener {
      *
      * The return value is a list (matching rows) of vectors (fields).
      */
-    public List executeQuery(List fields, String tableName, String whereClause) throws DatabaseException {
+    public List<Vector<Object>> executeQuery(List<String> fields, String tableName, String whereClause) throws DatabaseException {
         String statement = "SELECT ";
-        Iterator it = fields.iterator();
+        Iterator<String> it = fields.iterator();
         while (it.hasNext()) {
-            String field = (String) it.next();
+            String field = it.next();
             statement += field;
             if (it.hasNext()) {
                 statement += ", ";
@@ -264,8 +264,8 @@ public class DatabaseConnection implements EventBrokerListener {
 	/**
 	 * @todo use String[] instead of Vector for the rows
 	 */
-	public List executeQuery(String statement) throws DatabaseException {
-		List result = new LinkedList();
+	public List<Vector<Object>> executeQuery(String statement) throws DatabaseException {
+		List<Vector<Object>> result = new LinkedList<Vector<Object>>();
 		ResultSet resultSet = null;
 		Statement stmt = null;
 		// submit the query
@@ -276,7 +276,7 @@ public class DatabaseConnection implements EventBrokerListener {
 			logStatementEnd();
 			int numberColumns = resultSet.getMetaData().getColumnCount();
 			while (resultSet.next()) {
-				Vector item = new Vector(numberColumns);
+				Vector<Object> item = new Vector<Object>(numberColumns);
 				for (int i = 0; i < numberColumns; i++) {
 					item.add(i, resultSet.getString(i + 1));
 				}
@@ -413,8 +413,8 @@ public class DatabaseConnection implements EventBrokerListener {
      * Returns a String vector containing the table names for the
      * current database.
      */
-    public Vector getTableNames() {
-        Vector result = new Vector();
+    public Vector<String> getTableNames() {
+        Vector<String> result = new Vector<String>();
         final String[] tableTypes = {"TABLE"};
 
         try {
@@ -444,8 +444,8 @@ public class DatabaseConnection implements EventBrokerListener {
      * Returns a String vector containing the view names for the
      * current database.
      */
-    public Vector getViewNames() {
-        Vector result = new Vector();
+    public Vector<String> getViewNames() {
+        Vector<String> result = new Vector<String>();
         final String[] viewTypes = {"VIEW"};
 
         try {
@@ -476,8 +476,8 @@ public class DatabaseConnection implements EventBrokerListener {
      *
      * The parameter view can be either a table or a view.
      */
-    public Vector getColumns(Table table) {
-        Vector result = new Vector();
+    public Vector<Column> getColumns(Table table) {
+        Vector<Column> result = new Vector<Column>();
 
         try {
             DatabaseMetaData dmd = this.jdbcConnection.getMetaData();
@@ -510,8 +510,8 @@ public class DatabaseConnection implements EventBrokerListener {
      * 
      * The input parameter can be the name of either a table or a view.
      */
-    public Vector getColumns(String table) {
-        Vector result = new Vector();
+    public Vector<String> getColumns(String table) {
+        Vector<String> result = new Vector<String>();
 
         try {
             DatabaseMetaData dmd = this.jdbcConnection.getMetaData();
@@ -545,8 +545,8 @@ public class DatabaseConnection implements EventBrokerListener {
      * SQL types (however you cannot retrieve the new SQL3 datatypes
      * with it)
      */
-    public Vector getColumn(String column, String table) {
-        Vector result = new Vector();
+    public Vector<String> getColumn(String column, String table) {
+        Vector<String> result = new Vector<String>();
 
         try {
             Statement stmt = this.jdbcConnection.createStatement();
@@ -610,21 +610,21 @@ public class DatabaseConnection implements EventBrokerListener {
         System.out.println("The tables:\n-----------");
 
         // get the list of tables
-        Vector tables = test.getTableNames();
+        Vector<String> tables = test.getTableNames();
 
         // print out each table
         for (int i = 0; i < tables.size(); i++) {
             System.out.println("========== " + tables.get(i) + " ==========");
-            Vector columns = test.getColumns(
-                    new Table(new EventBroker(), (String) tables.get(i), false)
+            Vector<Column> columns = test.getColumns(
+                    new Table(new EventBroker(), tables.get(i), false)
             );
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {
-                Column column = (Column) columns.get(j);
+                Column column = columns.get(j);
                 System.out.println("----- " + column.getDisplayName() + " -----");
                 // and querying the contents
                 System.out.println(test.getColumn(column.getDisplayName(),
-                        (String) tables.get(i)));
+                        tables.get(i)));
             }
         }
 
@@ -632,21 +632,21 @@ public class DatabaseConnection implements EventBrokerListener {
         System.out.println("The views:\n-----------");
 
         // get the list of views
-        Vector views = test.getViewNames();
+        Vector<String> views = test.getViewNames();
 
         // print out each view
         for (int i = 0; i < views.size(); i++) {
             System.out.println("========== " + views.get(i) + " ==========");
-            Vector columns = test.getColumns(
-                    new Table(new EventBroker(),(String) views.get(i),false)
+            Vector<Column> columns = test.getColumns(
+                    new Table(new EventBroker(),views.get(i),false)
             );
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {
-                Column column = (Column) columns.get(j);
+                Column column = columns.get(j);
                 System.out.println("----- " + column.getDisplayName() + " -----");
                 // and querying the contents
                 System.out.println(test.getColumn(column.getDisplayName(),
-                        (String) views.get(i)));
+                        views.get(i)));
             }
         }
     }
@@ -677,8 +677,8 @@ public class DatabaseConnection implements EventBrokerListener {
 	/**
 	 * Returns a Collection of SQLTypeInfo objects. 
 	 */
-	public Collection getDatabaseSupportedTypeNames () throws DatabaseException {
-		Collection result = new ArrayList();
+	public Collection<SQLTypeInfo> getDatabaseSupportedTypeNames () throws DatabaseException {
+		Collection<SQLTypeInfo> result = new ArrayList<SQLTypeInfo>();
 		try {
 			DatabaseMetaData dbMetadata = getDatabaseMetaData();
 	

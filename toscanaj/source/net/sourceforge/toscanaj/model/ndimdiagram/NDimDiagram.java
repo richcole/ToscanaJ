@@ -20,18 +20,19 @@ public class NDimDiagram extends SimpleLineDiagram {
 	/**
 	 * @todo this could be an array
 	 */
-	private Vector base;
+	private Vector<Point2D> base;
 	
-    public NDimDiagram(Vector base) {
+    public NDimDiagram(Vector<Point2D> base) {
         this.base = base;
     }
 
-    public NDimDiagram(Element element) throws XMLSyntaxError {
-        this.base = new Vector();
+    @SuppressWarnings("unchecked")
+	public NDimDiagram(Element element) throws XMLSyntaxError {
+        this.base = new Vector<Point2D>();
         Element baseElem = element.getChild("projectionBase");
-        Iterator it = baseElem.getChildren("vector").iterator();
+        Iterator<Element> it = baseElem.getChildren("vector").iterator();
         while (it.hasNext()) {
-            Element vecElem = (Element) it.next();
+            Element vecElem = it.next();
             double x = Double.parseDouble(vecElem.getAttributeValue("x"));
             double y = Double.parseDouble(vecElem.getAttributeValue("y"));
             this.base.add(new Point2D.Double(x,y));
@@ -39,12 +40,13 @@ public class NDimDiagram extends SimpleLineDiagram {
         super.readXML(element); // do this last, since the ndim nodes rely on the initialized base
     }
     
-    public Element toXML() {
+    @Override
+	public Element toXML() {
     	Element retVal = super.toXML();
     	Element baseElem = new Element("projectionBase");
-    	Iterator it = this.base.iterator();
+    	Iterator<Point2D> it = this.base.iterator();
     	while (it.hasNext()) {
-            Point2D baseVec = (Point2D) it.next();
+            Point2D baseVec = it.next();
             Element vecElem = new Element("vector");
     	    vecElem.setAttribute("x", String.valueOf(baseVec.getX()));
     	    vecElem.setAttribute("y", String.valueOf(baseVec.getY()));
@@ -54,15 +56,16 @@ public class NDimDiagram extends SimpleLineDiagram {
     	return retVal;
     }
 
-    protected DiagramNode createNewDiagramNode(Element diagramNode) throws XMLSyntaxError {
+    @Override
+	protected DiagramNode createNewDiagramNode(Element diagramNode) throws XMLSyntaxError {
         return new NDimDiagramNode(this, diagramNode);
     }
 
-	public Vector getBase() {
+	public Vector<Point2D> getBase() {
 		return base;
 	}
 
-	public void setBase(Vector base) {
+	public void setBase(Vector<Point2D> base) {
 		this.base = base;
 	}
 }

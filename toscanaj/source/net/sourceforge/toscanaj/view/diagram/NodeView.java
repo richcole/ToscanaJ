@@ -79,7 +79,8 @@ public class NodeView extends CanvasItem {
     /**
      * Draws the node as circle.
      */
-    public void draw(Graphics2D graphics) {
+    @Override
+	public void draw(Graphics2D graphics) {
         if (diagramNode == null) {
             return;
         }
@@ -199,7 +200,8 @@ public class NodeView extends CanvasItem {
      * This is currently not exact if the node is not a circle, the test is if a
      * circle with the geometric average of the two radii is hit.
      */
-    public boolean containsPoint(Point2D point) {
+    @Override
+	public boolean containsPoint(Point2D point) {
         double deltaX = point.getX() - diagramNode.getPosition().getX();
         double deltaY = point.getY() - diagramNode.getPosition().getY();
         double sqDist = deltaX * deltaX + deltaY * deltaY;
@@ -210,7 +212,8 @@ public class NodeView extends CanvasItem {
     /**
      * Calculates the rectangle around this node.
      */
-    public Rectangle2D getCanvasBounds(Graphics2D g) {
+    @Override
+	public Rectangle2D getCanvasBounds(Graphics2D g) {
         Point2D center = this.diagramNode.getPosition();
         double x = center.getX();
         double y = center.getY();
@@ -224,7 +227,8 @@ public class NodeView extends CanvasItem {
         return new Rectangle2D.Double(x - rx, y - ry, 2 * rx, 2 * ry);
     }
 
-    public Point2D getPosition() {
+    @Override
+	public Point2D getPosition() {
         return this.diagramNode.getPosition();
     }
 
@@ -309,7 +313,8 @@ public class NodeView extends CanvasItem {
     /**
      * Overwritten to avoid raising nodes.
      */
-    public boolean hasAutoRaise() {
+    @Override
+	public boolean hasAutoRaise() {
         return false;
     }
 

@@ -98,19 +98,23 @@ public class StringType extends AbstractXSDDatatype {
         return valueToTest != null; // we don't allow nulls since we don't want the pain
     }
     
-    public boolean canConvertFrom(Value value) {
+    @Override
+	public boolean canConvertFrom(Value value) {
         return isValidStringValue(value.getDisplayString());
     }
     
-    public Value convertType(Value value) throws ConversionException {
+    @Override
+	public Value convertType(Value value) throws ConversionException {
         return parse(value.getDisplayString());
     }
 
-    public boolean canParse(String text) {
+    @Override
+	public boolean canParse(String text) {
         return isValidStringValue(text);
     }
     
-    public Value parse(String text) throws ConversionException {
+    @Override
+	public Value parse(String text) throws ConversionException {
         if(isValidStringValue(text)) {
             return new StringValue(text);
         }
@@ -130,11 +134,13 @@ public class StringType extends AbstractXSDDatatype {
     	// @TODO implement
     }
 
-    protected void addRestrictions(Element restrictionElement) {
+    @Override
+	protected void addRestrictions(Element restrictionElement) {
         // no restrictions needed
     }
     
-    protected String getBaseType() {
+    @Override
+	protected String getBaseType() {
         return "string";
     }
 
@@ -156,7 +162,8 @@ public class StringType extends AbstractXSDDatatype {
             return minLength;
         }
         
-        public boolean isValidStringValue(String valueToTest) {
+        @Override
+		public boolean isValidStringValue(String valueToTest) {
             if(valueToTest.length() < this.minLength) {
                 return false;
             }
@@ -166,7 +173,8 @@ public class StringType extends AbstractXSDDatatype {
             return true;
         }
 
-        protected void addRestrictions(Element restElement) {
+        @Override
+		protected void addRestrictions(Element restElement) {
             Element minElem = createElement("minLength");
             minElem.setAttribute("minLength", String.valueOf(this.minLength));
             restElement.addContent(minElem);
@@ -188,12 +196,14 @@ public class StringType extends AbstractXSDDatatype {
             return pattern;
         }
 
-        public boolean isValidStringValue(String valueToTest) {
+        @Override
+		public boolean isValidStringValue(String valueToTest) {
             Matcher matcher = this.pattern.matcher(valueToTest); 
             return matcher.matches();
         }
 
-        protected void addRestrictions(Element restElement) {
+        @Override
+		protected void addRestrictions(Element restElement) {
             Element pattElem = createElement("pattern");
             pattElem.setAttribute("value", this.pattern.pattern());
             restElement.addContent(pattElem);
@@ -208,7 +218,8 @@ public class StringType extends AbstractXSDDatatype {
             this.enumeration = enumeration;
         }
         
-        public boolean isValidStringValue(String valueToTest) {
+        @Override
+		public boolean isValidStringValue(String valueToTest) {
             for (int i = 0; i < this.enumeration.length; i++) {
                 if(this.enumeration[i].getValue().equals(valueToTest)) {
                     return true;
@@ -221,7 +232,8 @@ public class StringType extends AbstractXSDDatatype {
             return enumeration;
         }
 
-        protected void addRestrictions(Element restElement) {
+        @Override
+		protected void addRestrictions(Element restElement) {
             for (int i = 0; i < this.enumeration.length; i++) {
                 StringValue value = this.enumeration[i];
                 Element enumElem = createElement("enumeration");

@@ -48,16 +48,16 @@ public class DatabaseViewerManager implements XMLizable {
     
     /// @todo look for a better way to get the parent
     private static Component parentComponent = null;
-    private static List objectViewerRegistry = new LinkedList();
-    private static List objectListViewerRegistry = new LinkedList();
-    private static List attributeViewerRegistry = new LinkedList();
+    private static List<DatabaseViewerManager> objectViewerRegistry = new LinkedList<DatabaseViewerManager>();
+    private static List<DatabaseViewerManager> objectListViewerRegistry = new LinkedList<DatabaseViewerManager>();
+    private static List<DatabaseViewerManager> attributeViewerRegistry = new LinkedList<DatabaseViewerManager>();
     private DatabaseViewer viewer = null;
     private String screenName = null;
     private String tableName = null;
     private String keyName = null;
     private Element originalTemplateElement = null;
     private Element templateElement = null;
-    private Dictionary parameters = new Hashtable();
+    private Dictionary<String, String> parameters = new Hashtable<String, String>();
     private DatabaseInfo databaseInfo;
     private DatabaseConnection dbConnection;
     private static URL baseURL;
@@ -135,14 +135,14 @@ public class DatabaseViewerManager implements XMLizable {
         	if(objectViewerRegistry.size() == 0) {
         		return;
         	}
-            DatabaseViewerManager manager = (DatabaseViewerManager) objectViewerRegistry.get(viewerID);
+            DatabaseViewerManager manager = objectViewerRegistry.get(viewerID);
             DatabaseViewer viewer = manager.viewer;
             viewer.showView("WHERE " + manager.getKeyName() + " = '" + object.getKey() + "'");
         } else if (object.hasSpecialWhereClause()) {
 			if(objectListViewerRegistry.size() == 0) {
 				return;
 			}
-            DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(viewerID);
+            DatabaseViewerManager manager = objectListViewerRegistry.get(viewerID);
             DatabaseViewer viewer = manager.viewer;
             viewer.showView(object.getSpecialWhereClause());
         } else {
@@ -153,7 +153,7 @@ public class DatabaseViewerManager implements XMLizable {
     public static void showObject(String viewName, DatabaseRetrievedObject object) throws DatabaseViewerException {
         if (object.hasKey()) {
             for (int i = 0; i < objectViewerRegistry.size(); i++) {
-                DatabaseViewerManager manager = (DatabaseViewerManager) objectViewerRegistry.get(i);
+                DatabaseViewerManager manager = objectViewerRegistry.get(i);
                 if (manager.screenName.equals(viewName)) {
                     DatabaseViewer viewer = manager.viewer;
                     viewer.showView("WHERE " + manager.getKeyName() + " = '" + object.getKey() + "'");
@@ -161,7 +161,7 @@ public class DatabaseViewerManager implements XMLizable {
             }
         } else if (object.hasSpecialWhereClause()) {
             for (int i = 0; i < objectListViewerRegistry.size(); i++) {
-                DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(i);
+                DatabaseViewerManager manager = objectListViewerRegistry.get(i);
                 if (manager.screenName.equals(viewName)) {
                     DatabaseViewer viewer = manager.viewer;
                     viewer.showView(object.getSpecialWhereClause());
@@ -176,13 +176,13 @@ public class DatabaseViewerManager implements XMLizable {
 		if(objectListViewerRegistry.size() == 0) {
 			return;
 		}
-		DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(viewerID);
+		DatabaseViewerManager manager = objectListViewerRegistry.get(viewerID);
         manager.viewer.showView(object.getQueryWhereClause());
     }
 
     public static void showObjectList(String viewName, DatabaseRetrievedObject object) throws DatabaseViewerException {
         for (int i = 0; i < objectListViewerRegistry.size(); i++) {
-            DatabaseViewerManager manager = (DatabaseViewerManager) objectListViewerRegistry.get(i);
+            DatabaseViewerManager manager = objectListViewerRegistry.get(i);
             if (manager.screenName.equals(viewName)) {
                 manager.viewer.showView(object.getQueryWhereClause());
             }
@@ -190,14 +190,14 @@ public class DatabaseViewerManager implements XMLizable {
     }
 
     public static void showAttribute(int viewerID, String attribute) throws DatabaseViewerException {
-            DatabaseViewerManager manager = (DatabaseViewerManager) attributeViewerRegistry.get(viewerID);
+            DatabaseViewerManager manager = attributeViewerRegistry.get(viewerID);
             DatabaseViewer viewer = manager.viewer;
             viewer.showView("WHERE " + manager.getKeyName() + " = '" + attribute + "'");
     }
 
     public static void showAttribute(String viewName, String attribute) throws DatabaseViewerException {
         for (int i = 0; i < attributeViewerRegistry.size(); i++) {
-            DatabaseViewerManager manager = (DatabaseViewerManager) attributeViewerRegistry.get(i);
+            DatabaseViewerManager manager = attributeViewerRegistry.get(i);
             if (manager.screenName.equals(viewName)) {
                 DatabaseViewer viewer = manager.viewer;
                 viewer.showView("WHERE " + manager.getKeyName() + " = '" + attribute + "'");
@@ -265,7 +265,7 @@ public class DatabaseViewerManager implements XMLizable {
         }
     }
 
-    public Dictionary getParameters() {
+    public Dictionary<String, String> getParameters() {
         return this.parameters;
     }
 
@@ -289,40 +289,40 @@ public class DatabaseViewerManager implements XMLizable {
         return this.dbConnection;
     }
 
-    public static List getObjectViewNames(DatabaseRetrievedObject object) {
-        List retVal = new LinkedList();
+    public static List<String> getObjectViewNames(DatabaseRetrievedObject object) {
+        List<String> retVal = new LinkedList<String>();
         if (object.hasKey()) {
-            Iterator it = objectViewerRegistry.iterator();
+            Iterator<DatabaseViewerManager> it = objectViewerRegistry.iterator();
             while (it.hasNext()) {
-                DatabaseViewerManager manager = (DatabaseViewerManager) it.next();
+                DatabaseViewerManager manager = it.next();
                 retVal.add(manager.screenName);
             }
         }
         if (object.hasSpecialWhereClause()) {
-            Iterator it = objectListViewerRegistry.iterator();
+            Iterator<DatabaseViewerManager> it = objectListViewerRegistry.iterator();
             while (it.hasNext()) {
-                DatabaseViewerManager manager = (DatabaseViewerManager) it.next();
+                DatabaseViewerManager manager = it.next();
                 retVal.add(manager.screenName);
             }
         }
         return retVal;
     }
 
-    public static List getObjectListViewNames() {
-        List retVal = new LinkedList();
-        Iterator it = objectListViewerRegistry.iterator();
+    public static List<String> getObjectListViewNames() {
+        List<String> retVal = new LinkedList<String>();
+        Iterator<DatabaseViewerManager> it = objectListViewerRegistry.iterator();
         while (it.hasNext()) {
-            DatabaseViewerManager manager = (DatabaseViewerManager) it.next();
+            DatabaseViewerManager manager = it.next();
             retVal.add(manager.screenName);
         }
         return retVal;
     }
 
-    public static List getAttributeViewNames() {
-        List retVal = new LinkedList();
-        Iterator it = attributeViewerRegistry.iterator();
+    public static List<String> getAttributeViewNames() {
+        List<String> retVal = new LinkedList<String>();
+        Iterator<DatabaseViewerManager> it = attributeViewerRegistry.iterator();
         while (it.hasNext()) {
-            DatabaseViewerManager manager = (DatabaseViewerManager) it.next();
+            DatabaseViewerManager manager = it.next();
             retVal.add(manager.screenName);
         }
         return retVal;
@@ -346,24 +346,24 @@ public class DatabaseViewerManager implements XMLizable {
     }
 
     public static void listsToXML(Element parentElem) {
-        for (Iterator iterator = objectViewerRegistry.iterator(); iterator.hasNext();) {
-            DatabaseViewerManager databaseViewerManager = (DatabaseViewerManager) iterator.next();
+        for (Iterator<DatabaseViewerManager> iterator = objectViewerRegistry.iterator(); iterator.hasNext();) {
+            DatabaseViewerManager databaseViewerManager = iterator.next();
             parentElem.addContent(databaseViewerManager.toXML());
         }
-        for (Iterator iterator = objectListViewerRegistry.iterator(); iterator.hasNext();) {
-            DatabaseViewerManager databaseViewerManager = (DatabaseViewerManager) iterator.next();
+        for (Iterator<DatabaseViewerManager> iterator = objectListViewerRegistry.iterator(); iterator.hasNext();) {
+            DatabaseViewerManager databaseViewerManager = iterator.next();
             parentElem.addContent(databaseViewerManager.toXML());
         }
     }
 
     public static void listsReadXML(Element parentElem, DatabaseInfo databaseInfo, DatabaseConnection connection)
             throws DatabaseViewerException {
-        for (Iterator iterator = parentElem.getChildren(OBJECT_VIEW_ELEMENT_NAME).iterator(); iterator.hasNext();) {
-            Element element = (Element) iterator.next();
+        for (Iterator<Element> iterator = parentElem.getChildren(OBJECT_VIEW_ELEMENT_NAME).iterator(); iterator.hasNext();) {
+            Element element = iterator.next();
             new DatabaseViewerManager(element, databaseInfo, connection);
         }
-        for (Iterator iterator = parentElem.getChildren(OBJECT_LIST_VIEW_ELEMENT_NAME).iterator(); iterator.hasNext();) {
-            Element element = (Element) iterator.next();
+        for (Iterator<Element> iterator = parentElem.getChildren(OBJECT_LIST_VIEW_ELEMENT_NAME).iterator(); iterator.hasNext();) {
+            Element element = iterator.next();
             new DatabaseViewerManager(element, databaseInfo, connection);
         }
     }
@@ -392,12 +392,12 @@ public class DatabaseViewerManager implements XMLizable {
             keyElem.addContent(this.keyName);
             retVal.addContent(keyElem);
         }
-        Enumeration parKeys = this.parameters.keys();
+        Enumeration<String> parKeys = this.parameters.keys();
         while (parKeys.hasMoreElements()) {
-            String key = (String) parKeys.nextElement();
+            String key = parKeys.nextElement();
             Element parElem = new Element(PARAMETER_ELEMENT_NAME);
             parElem.setAttribute(PARAMETER_NAME_ATTRIBUTE_NAME, key);
-            parElem.setAttribute(PARAMETER_VALUE_ATTRIBUTE_NAME, (String) this.parameters.get(key));
+            parElem.setAttribute(PARAMETER_VALUE_ATTRIBUTE_NAME, this.parameters.get(key));
             retVal.addContent(parElem);
         }
         return retVal;
@@ -414,10 +414,10 @@ public class DatabaseViewerManager implements XMLizable {
         }
         this.tableName = elem.getChildText(TABLE_ELEMENT_NAME);
         this.keyName = elem.getChildText(KEY_ELEMENT_NAME);
-        List parameterElems = elem.getChildren(PARAMETER_ELEMENT_NAME);
-        Iterator it = parameterElems.iterator();
+        List<Element> parameterElems = elem.getChildren(PARAMETER_ELEMENT_NAME);
+        Iterator<Element> it = parameterElems.iterator();
         while (it.hasNext()) {
-            Element parameterElem = (Element) it.next();
+            Element parameterElem = it.next();
             this.parameters.put(parameterElem.getAttributeValue(PARAMETER_NAME_ATTRIBUTE_NAME),
                     parameterElem.getAttributeValue(PARAMETER_VALUE_ATTRIBUTE_NAME));
         }

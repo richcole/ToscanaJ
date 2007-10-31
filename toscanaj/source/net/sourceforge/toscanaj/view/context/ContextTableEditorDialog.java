@@ -143,6 +143,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		onFirstLoad = true;
 		// to enforce the minimum size during resizing of the JDialog
 		addComponentListener(new ComponentAdapter() {
+			@Override
 			public void componentResized(ComponentEvent e) {
 				int width = getWidth();
 				int height = getHeight();
@@ -152,6 +153,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 					height = MINIMUM_HEIGHT;
 				setSize(width, height);
 			}
+			@Override
 			public void componentShown(ComponentEvent e) {
 				componentResized(e);
 			}
@@ -231,6 +233,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 			}
 		});
 		newNameField.addKeyListener(new KeyAdapter() {
+			@Override
 			public void keyReleased(KeyEvent e) {
 				doneButton.setEnabled(newNameField.getText().trim().equals(""));
 				boolean createPossible =
@@ -289,6 +292,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 			}
 		});
 		newNameField.addKeyListener(new KeyAdapter() {
+			@Override
 			public void keyReleased(KeyEvent e) {
 				doneButton.setEnabled(newNameField.getText().trim().equals(""));
 				boolean createPossible =
@@ -428,10 +432,12 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 					createButton.setEnabled(true);
 				}
 			}
+			@Override
 			public void keyTyped(KeyEvent e) {
 				validateTextField();
 				setCreateButtonStatus();
 			}
+			@Override
 			public void keyReleased(KeyEvent e) {
 				validateTextField();
 				setCreateButtonStatus();
@@ -624,6 +630,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 
 	private MouseListener getMouseListener(final ContextTableView view) {
 		MouseListener mouseListener = new MouseAdapter() {
+			@Override
 			public void mouseClicked(MouseEvent e) {
 				final ContextTableView.Position pos =
 					view.getTablePosition(e.getX(), e.getY());
@@ -646,10 +653,10 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		int objectPos,
 		int attributePos) {
 			
-		Set objectsSet = this.context.getObjects();
-		WritableFCAElement[] objects = (WritableFCAElement[]) objectsSet.toArray(new WritableFCAElement[objectsSet.size()]);
-		Set attributesSet = this.context.getAttributes();
-        FCAElement[] attributes = (FCAElement[]) attributesSet.toArray(new FCAElement[attributesSet.size()]);
+		Set<Object> objectsSet = this.context.getObjects();
+		WritableFCAElement[] objects = objectsSet.toArray(new WritableFCAElement[objectsSet.size()]);
+		Set<Object> attributesSet = this.context.getAttributes();
+        FCAElement[] attributes = attributesSet.toArray(new FCAElement[attributesSet.size()]);
 		WritableFCAElement object = objects[objectPos];
         FCAElement attribute = attributes[attributePos];
 		if (context.getRelationImplementation().contains(object, attribute)) {
@@ -681,6 +688,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 		return context;
 	}
 
+	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 		if ( onFirstLoad == true &&
@@ -691,7 +699,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 	
 	protected void checkConsistency() {
 		try {
-			List problems = ContextConsistencyChecker.checkConsistency(this.conceptualSchema, this.context,
+			List<String> problems = ContextConsistencyChecker.checkConsistency(this.conceptualSchema, this.context,
 														this.databaseConnection, this);
 			// give feedback
 			if (problems.isEmpty()) {
@@ -702,7 +710,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 					JOptionPane.INFORMATION_MESSAGE);
 			} else {
 				// show problems
-				Iterator strIt = problems.iterator();
+				Iterator<String> strIt = problems.iterator();
 				Element problemDescription = new Element("description");
 				Element htmlElement = new Element("html");
 				htmlElement.addContent(
@@ -712,7 +720,7 @@ public class ContextTableEditorDialog extends JDialog implements EventBrokerList
 				htmlElement.addContent(body);
 				body.addContent(new Element("h1").addContent("Problems found:"));
 				while (strIt.hasNext()) {
-					String problem = (String) strIt.next();
+					String problem = strIt.next();
 					body.addContent(new Element("pre").addContent(problem));
 				}
 				Frame frame = JOptionPane.getFrameForComponent(this);

@@ -86,7 +86,7 @@ public class NodeViewPopupMenuHandler implements EventBrokerListener, ClipboardO
 			                         " attributes):" + lineSeparator;
 			} 
 			Iterator attrContIt = concept.getAttributeContingentIterator();
-			Set attributeContingent = new HashSet();
+			Set<Object> attributeContingent = new HashSet<Object>();
 			while (attrContIt.hasNext()) {
 				Object attrib = attrContIt.next();
 				description += "+ " + attrib.toString() + lineSeparator;
@@ -116,7 +116,7 @@ public class NodeViewPopupMenuHandler implements EventBrokerListener, ClipboardO
 			boolean oldDisplayMode = context.getObjectDisplayMode();
 		    context.setObjectDisplayMode(ConceptInterpretationContext.CONTINGENT);
 			Iterator objContIt = interpreter.getObjectSetIterator(concept, context);
-			Set objectContingent = new HashSet();
+			Set<String> objectContingent = new HashSet<String>();
 			while (objContIt.hasNext()) {
 				Object object = objContIt.next();
 				String objectName = object.toString();

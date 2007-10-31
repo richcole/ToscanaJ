@@ -35,11 +35,13 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterpre
         this.listQuery.insertQueryColumn("", null, "", databaseInfo.getKey().getSqlExpression(), false);
     }
 
-    public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
+    @Override
+	public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
     	// for us a KeyList query is nothing but a normal list query with a specific setup
     	return Arrays.asList(handleNonDefaultQuery(this.listQuery, concept, context)).iterator();
     }
 
+	@Override
 	protected int calculateContingentSize (Concept concept, ConceptInterpretationContext context) {
 		try {
 			String whereClause = WhereClauseGenerator.createWhereClause(concept,
@@ -58,6 +60,7 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterpre
 		}
 	}
 
+	@Override
 	protected FCAElement getObject(String value, Concept concept, ConceptInterpretationContext context) {
 		String whereClause = WhereClauseGenerator.createWhereClause(concept,
 										context.getDiagramHistory(),
@@ -67,6 +70,7 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterpre
 		return new DatabaseRetrievedObject(whereClause, value);		
 	}
 	
+	@Override
 	protected FCAElement[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) {
 		String whereClause = WhereClauseGenerator.createWhereClause(concept,
 									context.getDiagramHistory(),
@@ -102,13 +106,13 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterpre
             statement += ";";
             try {
                 // submit the query
-                List queryResults = DatabaseConnection.getConnection().executeQuery(statement);
+                List<Vector<Object>> queryResults = DatabaseConnection.getConnection().executeQuery(statement);
                 // first of all, check results for NULL values. That can happen if we have the infimum
                 // of the realized lattice and it has an empty contingent but an object label attached.
                 // In that case SQL aggregates will return NULL, if we try to display this we create
                 // either exceptions or some other mess. We return null instead.
                 if (queryResults.size() != 0) {
-                    Vector firstResult = (Vector) queryResults.get(0);
+                    Vector firstResult = queryResults.get(0);
                     for (Iterator iter = firstResult.iterator(); iter.hasNext(); ) {
                         if (iter.next() == null) {
                             return null;
@@ -119,13 +123,13 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterpre
 				Vector reference = null;
 				if(referenceWhereClause != null){
 					/// @todo this should be cached since it gets reused for every single object label in a diagram
-					List referenceResults = DatabaseConnection.getConnection().executeQuery(query.getQueryHead() + referenceWhereClause);
-					reference = (Vector) referenceResults.iterator().next();
+					List<Vector<Object>> referenceResults = DatabaseConnection.getConnection().executeQuery(query.getQueryHead() + referenceWhereClause);
+					reference = referenceResults.iterator().next();
 				}
-                Iterator it = queryResults.iterator();
+                Iterator<Vector<Object>> it = queryResults.iterator();
                 int pos = 0;
                 while (it.hasNext()) {
-                    Vector item = (Vector) it.next();
+                    Vector<Object> item = it.next();
                     DatabaseRetrievedObject object =
                             query.createDatabaseRetrievedObject(whereClause, item, reference);
                     /// @todo what does this check do? what happens if it is null?

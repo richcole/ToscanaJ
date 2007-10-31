@@ -26,7 +26,8 @@ public class DecimalValueTest extends ValueTest {
 		return new TestSuite(THIS);
     }
 
-    protected Value[] setUpValues() {
+    @Override
+	protected Value[] setUpValues() {
 		return new Value[]{
 				new DecimalValue(1),  // 0
 				new DecimalValue(2),  // 1
@@ -36,6 +37,7 @@ public class DecimalValueTest extends ValueTest {
 				};
 	}
 
+	@Override
 	protected int[][] setUpEquivalenceSets() {
 		return new int[][]{
 				new int[]{0,3},

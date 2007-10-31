@@ -69,13 +69,13 @@ public class CSXParser {
      * This stores the objects found in the context to be reused in the
      * diagrams.
      */
-    private static Hashtable _Objects;
+    private static Hashtable<String, FCAElementImplementation> _Objects;
 
     /**
      * This stores the attributes found in the context to be reused in the
      * diagrams.
      */
-    private static Hashtable _Attributes;
+    private static Hashtable<String, FCAElementImplementation> _Attributes;
 
     /**
      * No public constructor -- the class should not be instantiated.
@@ -173,10 +173,10 @@ public class CSXParser {
 
     private static void parseDatabaseObjectViewerSetups(Element viewsElem)
             throws DataFormatException {
-        List viewerElems = viewsElem.getChildren("objectView");
-        Iterator it = viewerElems.iterator();
+        List<Element> viewerElems = viewsElem.getChildren("objectView");
+        Iterator<Element> it = viewerElems.iterator();
         while (it.hasNext()) {
-            Element viewerElem = (Element) it.next();
+            Element viewerElem = it.next();
             try {
                 new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection());
             } catch (DatabaseViewerException e) {
@@ -187,10 +187,10 @@ public class CSXParser {
 
     private static void parseDatabaseObjectListViewerSetups(Element viewsElem)
             throws DataFormatException {
-        List viewerElems = viewsElem.getChildren("objectListView");
-        Iterator it = viewerElems.iterator();
+        List<Element> viewerElems = viewsElem.getChildren("objectListView");
+        Iterator<Element> it = viewerElems.iterator();
         while (it.hasNext()) {
-            Element viewerElem = (Element) it.next();
+            Element viewerElem = it.next();
             try {
                 new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection());
             } catch (DatabaseViewerException e) {
@@ -201,10 +201,10 @@ public class CSXParser {
 
     private static void parseDatabaseAttributeViewerSetups(Element viewsElem)
             throws DataFormatException {
-        List viewerElems = viewsElem.getChildren("attributeView");
-        Iterator it = viewerElems.iterator();
+        List<Element> viewerElems = viewsElem.getChildren("attributeView");
+        Iterator<Element> it = viewerElems.iterator();
         while (it.hasNext()) {
-            Element viewerElem = (Element) it.next();
+            Element viewerElem = it.next();
             try {
                 new DatabaseViewerManager(viewerElem, _Schema.getDatabaseInfo(), DatabaseConnection.getConnection());
             } catch (DatabaseViewerException e) {
@@ -227,12 +227,12 @@ public class CSXParser {
         parseDatabaseInformation(contextElem);
 
         // build hashtable for objects
-        List elements = contextElem.getChildren("object");
-        _Objects = new Hashtable(elements.size());
+        List<Element> elements = contextElem.getChildren("object");
+        _Objects = new Hashtable<String, FCAElementImplementation>(elements.size());
 
-        Iterator it = elements.iterator();
+        Iterator<Element> it = elements.iterator();
         while (it.hasNext()) {
-            Element object = (Element) it.next();
+            Element object = it.next();
             if (object.getText().length() != 0) {
                 _Objects.put(object.getAttribute("id").getValue(),
                         new FCAElementImplementation(object.getText()));
@@ -242,11 +242,11 @@ public class CSXParser {
         // build hashtable for attributes
         elements = _Document.getRootElement()
                 .getChild("context").getChildren("attribute");
-        _Attributes = new Hashtable(elements.size());
+        _Attributes = new Hashtable<String, FCAElementImplementation>(elements.size());
 
         it = elements.iterator();
         while (it.hasNext()) {
-            Element attribute = (Element) it.next();
+            Element attribute = it.next();
             org.jdom.Attribute name = attribute.getAttribute("name");
             if ((name != null) && (name.getValue() != null) && (name.getValue().length() != 0)) {
                 Element descriptionElem = attribute.getChild("description");
@@ -265,10 +265,10 @@ public class CSXParser {
      */
     private static void parseDiagrams() throws DataFormatException {
         // find and store diagrams
-        List elements = _Document.getRootElement().getChildren("diagram");
-        Iterator it = elements.iterator();
+        List<Element> elements = _Document.getRootElement().getChildren("diagram");
+        Iterator<Element> it = elements.iterator();
         while (it.hasNext()) {
-            Element diagElem = (Element) it.next();
+            Element diagElem = it.next();
             SimpleLineDiagram diagram = new SimpleLineDiagram();
 
             // set the title of the diagram
@@ -281,11 +281,11 @@ public class CSXParser {
 
             // build a list of concepts (as points in the diagram and as
             // Hashtable for building the edges later)
-            List concepts = diagElem.getChildren("concept");
-            Hashtable nodes = new Hashtable(elements.size());
-            Iterator it2 = concepts.iterator();
+            List<Element> concepts = diagElem.getChildren("concept");
+            Hashtable<String, DiagramNode> nodes = new Hashtable<String, DiagramNode>(elements.size());
+            Iterator<Element> it2 = concepts.iterator();
             while (it2.hasNext()) {
-                Element conceptElem = (Element) it2.next();
+                Element conceptElem = it2.next();
 
                 // get the position
                 Element posElem = conceptElem.getChild("position");
@@ -334,13 +334,13 @@ public class CSXParser {
             }
 
             // get the edges and map them to the points
-            List edges = diagElem.getChildren("edge");
+            List<Element> edges = diagElem.getChildren("edge");
             it2 = edges.iterator();
             while (it2.hasNext()) {
-                Element edge = (Element) it2.next();
-                DiagramNode from = (DiagramNode) nodes.get(
+                Element edge = it2.next();
+                DiagramNode from = nodes.get(
                         edge.getAttribute("from").getValue());
-                DiagramNode to = (DiagramNode) nodes.get(
+                DiagramNode to = nodes.get(
                         edge.getAttribute("to").getValue());
                 diagram.addLine(from, to);
 
@@ -372,11 +372,11 @@ public class CSXParser {
 
         // get the object contingent
         Element contElem = conceptElem.getChild("objectContingent");
-        List contingent = contElem.getChildren("objectRef");
-        Iterator iterator = contingent.iterator();
+        List<Element> contingent = contElem.getChildren("objectRef");
+        Iterator<Element> iterator = contingent.iterator();
         while (iterator.hasNext()) {
-            Element ref = (Element) iterator.next();
-            FCAElement object = (FCAElement) _Objects.get(ref.getText());
+            Element ref = iterator.next();
+            FCAElement object = _Objects.get(ref.getText());
             if (object != null) {
                 concept.addObject(object);
             }
@@ -387,8 +387,8 @@ public class CSXParser {
         contingent = contElem.getChildren("attributeRef");
         iterator = contingent.iterator();
         while (iterator.hasNext()) {
-            Element ref = (Element) iterator.next();
-            FCAElement attr = (FCAElement) _Attributes.get(ref.getText());
+            Element ref = iterator.next();
+            FCAElement attr = _Attributes.get(ref.getText());
             if (attr != null) {
                 concept.addAttribute(attr);
             }
@@ -519,17 +519,17 @@ public class CSXParser {
             _Schema.addQuery(query);
         }
         if (queryElem != null) {
-            Iterator it = queryElem.getChildren("listQuery").iterator();
+            Iterator<Element> it = queryElem.getChildren("listQuery").iterator();
             while (it.hasNext()) {
-                Element cur = (Element) it.next();
+                Element cur = it.next();
                 String name = cur.getAttributeValue("name");
                 String header = cur.getAttributeValue("head");
                 String distinct = cur.getAttributeValue("distinct");
                 boolean isDistinct = (distinct != null) && (distinct.equals("true"));
                 Query query = dbInfo.createListQuery(name, header, isDistinct);
-                Iterator it2 = cur.getChildren("column").iterator();
+                Iterator<Element> it2 = cur.getChildren("column").iterator();
                 while (it2.hasNext()) {
-                    Element curCol = (Element) it2.next();
+                    Element curCol = it2.next();
                     String colName = curCol.getAttributeValue("name");
                     String format = curCol.getAttributeValue("format");
                     String separator = curCol.getAttributeValue("separator");
@@ -540,13 +540,13 @@ public class CSXParser {
             }
             it = queryElem.getChildren("aggregateQuery").iterator();
             while (it.hasNext()) {
-                Element cur = (Element) it.next();
+                Element cur = it.next();
                 String name = cur.getAttributeValue("name");
                 String header = cur.getAttributeValue("header");
                 Query query = dbInfo.createAggregateQuery(name, header);
-                Iterator it2 = cur.getChildren("column").iterator();
+                Iterator<Element> it2 = cur.getChildren("column").iterator();
                 while (it2.hasNext()) {
-                    Element curCol = (Element) it2.next();
+                    Element curCol = it2.next();
                     String colName = curCol.getAttributeValue("name");
                     String format = curCol.getAttributeValue("format");
                     String separator = curCol.getAttributeValue("separator");

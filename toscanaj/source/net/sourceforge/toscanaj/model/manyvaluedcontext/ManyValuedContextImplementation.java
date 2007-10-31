@@ -33,7 +33,7 @@ import org.tockit.util.ListSetImplementation;
 public class ManyValuedContextImplementation implements WritableManyValuedContext, XMLizable {
     private ListSet objects = new ListSetImplementation();
     private ListSet attributes = new ListSetImplementation();
-    private Hashtable relation = new Hashtable();
+    private Hashtable<FCAElement, Hashtable<ManyValuedAttribute, Value>> relation = new Hashtable<FCAElement, Hashtable<ManyValuedAttribute, Value>>();
 	private ListSet types = new ListSetImplementation();
 	
 	public static final String MANY_VALUED_CONTEXT_ELEMENT_NAME = "manyValuedContext";
@@ -67,7 +67,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
             return; // do not create new hashtable
         }
         this.objects.add(object);
-        this.relation.put(object, new Hashtable());
+        this.relation.put(object, new Hashtable<ManyValuedAttribute, Value>());
     }
 
     public void remove(FCAElement object) {
@@ -104,7 +104,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
     }
 
     public void setRelationship(FCAElement object, ManyValuedAttribute attribute, Value value) {
-        Hashtable row = (Hashtable) this.relation.get(object);
+        Hashtable<ManyValuedAttribute, Value> row = this.relation.get(object);
         if(value == null) {
         	row.remove(attribute);
         } else {
@@ -113,14 +113,14 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
     }
 
     public Value getRelationship(FCAElement object, ManyValuedAttribute attribute) {
-        Hashtable row = (Hashtable) this.relation.get(object);
+        Hashtable row = this.relation.get(object);
         return (Value) row.get(attribute);
     }
     
     public void update(){
-    	Hashtable newRelation = new Hashtable();
+    	Hashtable<FCAElement, Hashtable<ManyValuedAttribute, Value>> newRelation = new Hashtable<FCAElement, Hashtable<ManyValuedAttribute, Value>>();
     	Set entries = this.relation.entrySet();
-    	Set checkObjectNames = new HashSet();
+    	Set<Object> checkObjectNames = new HashSet<Object>();
     	for (Iterator iter = entries.iterator(); iter.hasNext();) {
 			Entry entry = (Entry) iter.next();
 			FCAElement object = (FCAElement) entry.getKey();
@@ -129,9 +129,9 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 			}
 			checkObjectNames.add(object.getData());
 			Hashtable propTable = (Hashtable) entry.getValue();
-			Hashtable newPropTable = new Hashtable();
+			Hashtable<ManyValuedAttribute, Value> newPropTable = new Hashtable<ManyValuedAttribute, Value>();
 			Set propEntries = propTable.entrySet();
-			Set checkPropertyNames = new HashSet();
+			Set<String> checkPropertyNames = new HashSet<String>();
 			for (Iterator iter2 = propEntries.iterator(); iter2.hasNext();) {
 				Entry propEntry = (Entry) iter2.next();
 				ManyValuedAttribute prop = (ManyValuedAttribute) propEntry.getKey();
@@ -139,7 +139,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 					throw new IllegalStateException("Attribute appears twice in attribute set of many-valued context.");
 				}
 				checkPropertyNames.add(prop.getName());
-				Object value = propEntry.getValue();
+				Value value = (Value) propEntry.getValue();
 				newPropTable.put(prop,value);
 			}
 			newRelation.put(object,newPropTable);
@@ -151,8 +151,8 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		Element retVal = new Element(MANY_VALUED_CONTEXT_ELEMENT_NAME);
 		IdPool oidpool = new IdPool();
 		IdPool aidpool = new IdPool();
-		Hashtable objectIdMapping = new Hashtable();
-		Hashtable attributeIdMapping = new Hashtable();
+		Hashtable<FCAElementImplementation, String> objectIdMapping = new Hashtable<FCAElementImplementation, String>();
+		Hashtable<ManyValuedAttribute, String> attributeIdMapping = new Hashtable<ManyValuedAttribute, String>();
 		
 		Element objectsElement = new Element(OBJECTS_ELEMENT_NAME);
 		for (Iterator iter = objects.iterator(); iter.hasNext();) {
@@ -192,10 +192,10 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 			for (Iterator iterator = values.entrySet().iterator(); iterator.hasNext();) {
 				Entry  itAttributeValue = (Entry) iterator.next();
 				ManyValuedAttributeImplementation mvAttribute = (ManyValuedAttributeImplementation) itAttributeValue.getKey();
-				String attributeId = (String) attributeIdMapping.get(mvAttribute);
+				String attributeId = attributeIdMapping.get(mvAttribute);
 				Element valueElement = new Element(RELATIONSHIP_ELEMENT_NAME); 
                 mvAttribute.getType().insertValue(valueElement, (Value)itAttributeValue.getValue());
-				valueElement.setAttribute(VALUE_OBJECT_REF_ATTRIBUTE_NAME, (String) objectIdMapping.get(itRow.getKey()));
+				valueElement.setAttribute(VALUE_OBJECT_REF_ATTRIBUTE_NAME, objectIdMapping.get(itRow.getKey()));
 				valueElement.setAttribute(VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME, attributeId);
 				relationElement.addContent(valueElement);
 			}
@@ -205,40 +205,40 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 	}
 
 	public void readXML(Element elem) throws XMLSyntaxError {
-		Hashtable objectIdMapping = new Hashtable();
-		Hashtable attributeIdMapping = new Hashtable();
-		Hashtable typeIdMapping = new Hashtable();
+		Hashtable<String, FCAElementImplementation> objectIdMapping = new Hashtable<String, FCAElementImplementation>();
+		Hashtable<String, ManyValuedAttribute> attributeIdMapping = new Hashtable<String, ManyValuedAttribute>();
+		Hashtable<String, Datatype> typeIdMapping = new Hashtable<String, Datatype>();
 		Element objectsElement = XMLHelper.getMandatoryChild(elem, OBJECTS_ELEMENT_NAME);
 		Element typesElement = XMLHelper.getMandatoryChild(elem, TYPES_ELEMENT_NAME);
 		Element attributesElement = XMLHelper.getMandatoryChild(elem, ATTRIBUTES_ELEMENT_NAME);
 		Element relationElement = XMLHelper.getMandatoryChild(elem, RELATION_ELEMENT_NAME);
 
-		for (Iterator iter = objectsElement.getChildren().iterator(); iter.hasNext();) {
-			Element objectElement = (Element) iter.next();
+		for (Iterator<Element> iter = objectsElement.getChildren().iterator(); iter.hasNext();) {
+			Element objectElement = iter.next();
 			FCAElementImplementation newObject = new FCAElementImplementation(objectElement);
 			String id = XMLHelper.getAttribute(objectElement, OBJECT_ID_ATTRIBUTE_NAME).getValue();
 			objectIdMapping.put(id,newObject);
 			add(newObject);
 		}
-		for (Iterator iter = typesElement.getChildren().iterator(); iter.hasNext();) {
-			Element typeElement = (Element) iter.next();
+		for (Iterator<Element> iter = typesElement.getChildren().iterator(); iter.hasNext();) {
+			Element typeElement = iter.next();
 			Datatype newType = DatatypeFactory.readType(typeElement);
 			typeIdMapping.put(newType.getName(), newType);
 			types.add(newType);
 		}
-		for (Iterator iter = attributesElement.getChildren().iterator(); iter.hasNext();) {
-			Element attributeElement = (Element) iter.next();
+		for (Iterator<Element> iter = attributesElement.getChildren().iterator(); iter.hasNext();) {
+			Element attributeElement = iter.next();
 			ManyValuedAttribute newAttribute = new ManyValuedAttributeImplementation(attributeElement, typeIdMapping);
 			String id = XMLHelper.getAttribute(attributeElement, ATTRIBUTE_ID_ATTRIBUTE_NAME).getValue();
 			attributeIdMapping.put(id, newAttribute);
 			attributes.add(newAttribute);
 		}
-		for (Iterator iter = relationElement.getChildren().iterator(); iter.hasNext();) {
-			Element valueElement = (Element) iter.next();
+		for (Iterator<Element> iter = relationElement.getChildren().iterator(); iter.hasNext();) {
+			Element valueElement = iter.next();
 			String objectRef = XMLHelper.getAttribute(valueElement, VALUE_OBJECT_REF_ATTRIBUTE_NAME).getValue();
-			FCAElementImplementation rowObject = (FCAElementImplementation) objectIdMapping.get(objectRef);
+			FCAElementImplementation rowObject = objectIdMapping.get(objectRef);
             String attributeRef = XMLHelper.getAttribute(valueElement, VALUE_ATTRIBUTE_REF_ATTRIBUTE_NAME).getValue();
-			ManyValuedAttribute tempAttribute = (ManyValuedAttribute) attributeIdMapping.get(attributeRef);
+			ManyValuedAttribute tempAttribute = attributeIdMapping.get(attributeRef);
 			Value tempValue = tempAttribute.getType().toValue(valueElement);
 			setRelationship(rowObject, tempAttribute, tempValue);
 		}

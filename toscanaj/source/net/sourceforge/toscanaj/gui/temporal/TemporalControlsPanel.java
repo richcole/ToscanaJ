@@ -108,8 +108,8 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     private NumberField fadeInField;
     private NumberField holdField;
     private NumberField fadeOutField;
-    private List sequenceValues;
-    private List timelineValues;
+    private List<Value> sequenceValues;
+    private List<Value> timelineValues;
     private JCheckBox serializeSequencesBox;
     private File lastImageExportFile;
     private DiagramExportSettings diagramExportSettings;
@@ -158,7 +158,8 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 final ArrowStyle style = (ArrowStyle) value;
                 JPanel retVal = new JPanel() {
-                    protected void paintComponent(Graphics g) {
+                    @Override
+					protected void paintComponent(Graphics g) {
                         super.paintComponent(g);
                         Graphics2D g2d = (Graphics2D) g;
                         AffineTransform oldTransform = g2d.getTransform();
@@ -187,7 +188,8 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             }
         });
         listView.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+            @Override
+			public void mouseClicked(MouseEvent e) {
                 if(e.getClickCount() != 2) {
                     return;
                 }
@@ -467,9 +469,9 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     private void fillSequenceChooser() {
     	DefaultComboBoxModel listModel = new DefaultComboBoxModel();
     	listModel.addElement("<All Sequences>");
-    	Iterator it = this.sequenceValues.iterator();
+    	Iterator<Value> it = this.sequenceValues.iterator();
     	while (it.hasNext()) {
-            Value value = (Value) it.next();
+            Value value = it.next();
             listModel.addElement(value);
         }
         
@@ -723,14 +725,14 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             selectedSequence = (Value) selectedSequenceItem;
         }
 
-        List objectSequences = calculateObjectSequences();
-        Iterator seqIt = objectSequences.iterator();
-        Iterator seqValIt = this.sequenceValues.iterator();
+        List<ArrayList> objectSequences = calculateObjectSequences();
+        Iterator<ArrayList> seqIt = objectSequences.iterator();
+        Iterator<Value> seqValIt = this.sequenceValues.iterator();
         int styleNum = 0;
         boolean start = true;
         while (seqIt.hasNext()) {
-            List sequence = (List) seqIt.next();
-            Value curSequenceValue = (Value) seqValIt.next();
+            List sequence = seqIt.next();
+            Value curSequenceValue = seqValIt.next();
             if(start) {
                 start = false;
                 this.targetTime = newTargetTime;
@@ -757,16 +759,16 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             selectedSequence = (Value) selectedSequenceItem;
         }
 
-        List objectSequences = calculateObjectSequences();
-        Iterator seqIt = objectSequences.iterator();
-        Iterator seqValIt = this.sequenceValues.iterator();
+        List<ArrayList> objectSequences = calculateObjectSequences();
+        Iterator<ArrayList> seqIt = objectSequences.iterator();
+        Iterator<Value> seqValIt = this.sequenceValues.iterator();
         int seqNum = 0;
         int seqLength = this.timelineValues.size();
         List lastSequence = null;
         ArrowStyle[] styles = DiagramSchema.getCurrentSchema().getArrowStyles();
         ArrowStyle style = null;
         while (seqIt.hasNext()) {
-            List sequence = (List) seqIt.next();
+            List sequence = seqIt.next();
 
             if(lastSequence != null) {
                 Color nextColor = styles[seqNum % styles.length].getColor();
@@ -784,7 +786,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             }
 
             style = styles[seqNum % styles.length];
-            Value curSequenceValue = (Value) seqValIt.next();
+            Value curSequenceValue = seqValIt.next();
             if(lastSequence == null) {
                 this.targetTime = newTargetTime;
                 this.lastAnimationTime = 0;
@@ -820,11 +822,11 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
     }
 
 	private DiagramNode findObjectConceptNode(FCAElement object) {
-	    Iterator nodeIt = this.diagramView.getDiagram().getNodes();
+	    Iterator<DiagramNode> nodeIt = this.diagramView.getDiagram().getNodes();
         ConceptInterpreter conceptInterpreter = this.diagramView.getConceptInterpreter();
         ConceptInterpretationContext interpretationContext = this.diagramView.getConceptInterpretationContext();
 	    while (nodeIt.hasNext()) {
-	        DiagramNode node = (DiagramNode) nodeIt.next();
+	        DiagramNode node = nodeIt.next();
             // resolve nesting
             ConceptInterpretationContext curContext = interpretationContext;
             DiagramNode curNode = node.getOuterNode();
@@ -845,8 +847,8 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	}
 	
 	private void calculateValueLists() {
-	    sequenceValues = new ArrayList();
-	    timelineValues = new ArrayList();
+	    sequenceValues = new ArrayList<Value>();
+	    timelineValues = new ArrayList<Value>();
 
 	    Object selectedSequenceColumn = this.sequenceColumnChooser.getSelectedItem();
 	    if(!(selectedSequenceColumn instanceof ManyValuedAttribute) ) {
@@ -861,9 +863,9 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	        Value value = this.context.getRelationship(object, sequenceAttribute);
 	        if(!sequenceValues.contains(value) && value != null) {
 	            boolean inserted = false;
-	            ListIterator seqIt = sequenceValues.listIterator();
+	            ListIterator<Value> seqIt = sequenceValues.listIterator();
 	            while(seqIt.hasNext()) {
-	                Value curValue = (Value) seqIt.next();
+	                Value curValue = seqIt.next();
 	                if(value.isLesserThan(curValue)) {
 	                    if(seqIt.hasPrevious()) {
 	                        seqIt.previous();
@@ -880,9 +882,9 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	        value = this.context.getRelationship(object, timelineAttribute);
 	        if(!timelineValues.contains(value)) {
 	            boolean inserted = false;
-	            ListIterator tlIt = timelineValues.listIterator();
+	            ListIterator<Value> tlIt = timelineValues.listIterator();
 	            while(tlIt.hasNext()) {
-	                Value curValue = (Value) tlIt.next();
+	                Value curValue = tlIt.next();
 	                if(curValue != null && value.isLesserThan(curValue)) {
 	                    if(tlIt.hasPrevious()) {
 	                        tlIt.previous();
@@ -899,30 +901,30 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	    }
 	}
 	
-    private List calculateObjectSequences() {
+    private List<ArrayList> calculateObjectSequences() {
         ManyValuedAttribute sequenceAttribute = (ManyValuedAttribute) this.sequenceColumnChooser.getSelectedItem();
         ManyValuedAttribute timelineAttribute = (ManyValuedAttribute) this.timelineColumnChooser.getSelectedItem();
 
-        List objectSequences = new ArrayList();
+        List<ArrayList> objectSequences = new ArrayList<ArrayList>();
         
         // initialise sequences with empty lists
-        Iterator seqValIt = sequenceValues.iterator();
+        Iterator<Value> seqValIt = sequenceValues.iterator();
         while (seqValIt.hasNext()) {
             seqValIt.next();
             objectSequences.add(new ArrayList());
         }
         
         // go over time
-        Iterator timeIt = timelineValues.iterator();
+        Iterator<Value> timeIt = timelineValues.iterator();
         while (timeIt.hasNext()) {
-            Value timelineValue = (Value) timeIt.next();
+            Value timelineValue = timeIt.next();
             
             // try to find matching object for each sequence
             seqValIt = sequenceValues.iterator();
-            Iterator seqIt = objectSequences.iterator();
+            Iterator<ArrayList> seqIt = objectSequences.iterator();
         	while (seqValIt.hasNext()) {
-                Value sequenceValue = (Value) seqValIt.next();
-                List sequence = (List) seqIt.next();
+                Value sequenceValue = seqValIt.next();
+                List<FCAElement> sequence = seqIt.next();
         	    boolean objectFound = false;
         	    Iterator objIt = this.context.getObjects().iterator();
         	    while (objIt.hasNext()) {

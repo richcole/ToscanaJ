@@ -63,7 +63,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 		boolean useAllCombi = scaleDialog.getUseAllCombinations();
 		for (int i = 0; i < Math.pow(2,dimensions); i++) {
 			String objectData = "";
-			List relatedAttributes = new ArrayList();
+			List<FCAElement> relatedAttributes = new ArrayList<FCAElement>();
 			for(int j = 0; j < dimensions; j++) {
 				if( j != 0 ) {
 					objectData += " AND ";
@@ -80,7 +80,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 	
 			if(useAllCombi){
 				context.getObjects().add(object);
-				Iterator it = relatedAttributes.iterator();
+				Iterator<FCAElement> it = relatedAttributes.iterator();
 				while (it.hasNext()) {
 					Object attrib = it.next();
 					relation.insert(object, attrib);
@@ -97,7 +97,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
 						1);
 					if( result != 0 ){
 						context.getObjects().add(object);
-						Iterator it = relatedAttributes.iterator();
+						Iterator<FCAElement> it = relatedAttributes.iterator();
 						while (it.hasNext()) {
 							Object attrib = it.next();
 							relation.insert(object, attrib);

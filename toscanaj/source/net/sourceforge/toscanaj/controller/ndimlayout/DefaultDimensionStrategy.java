@@ -28,8 +28,8 @@ import java.util.Vector;
  * of it in the same way all the other n-dim stuff works).
  */
 public class DefaultDimensionStrategy implements DimensionCreationStrategy {
-    public Vector calculateDimensions(Lattice lattice) {
-        Vector dimensions = new Vector();
+    public Vector<Dimension> calculateDimensions(Lattice lattice) {
+        Vector<Dimension> dimensions = new Vector<Dimension>();
         Concept[] concepts = lattice.getConcepts();
         for (int i = 0; i < concepts.length; i++) {
             Concept concept = concepts[i];

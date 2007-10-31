@@ -28,7 +28,7 @@ import java.util.List;
 
 public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
     private DiagramView diagramView;
-    private List queries;
+    private List<Query> queries;
 
     public ObjectLabelViewPopupMenuHandler(DiagramView diagramView, EventBroker schemaBroker) {
         this.diagramView = diagramView;
@@ -71,8 +71,8 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
         }
         
         int numberOfViews = 0;
-		List objectViewNames = null;
-		List objectListViewNames = null;
+		List<String> objectViewNames = null;
+		List<String> objectListViewNames = null;
 		if (object instanceof DatabaseRetrievedObject) {
 			final DatabaseRetrievedObject dbObject =
 					(DatabaseRetrievedObject) object;
@@ -103,12 +103,12 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
         popupMenu.show(this.diagramView, (int) screenPosition.getX(), (int) screenPosition.getY());
     }
 
-    private void addObjectListViewOptions(List objectListViewNames, final DatabaseRetrievedObject object, JPopupMenu popupMenu) {
+    private void addObjectListViewOptions(List<String> objectListViewNames, final DatabaseRetrievedObject object, JPopupMenu popupMenu) {
         JMenuItem menuItem;
         JMenu objectListViewMenu = new JMenu("View all objects");
-        Iterator it = objectListViewNames.iterator();
+        Iterator<String> it = objectListViewNames.iterator();
         while (it.hasNext()) {
-            final String objectListViewName = (String) it.next();
+            final String objectListViewName = it.next();
             menuItem = new JMenuItem(objectListViewName);
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -124,12 +124,12 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
         popupMenu.add(objectListViewMenu);
     }
 
-    private void addObjectViewOptions(List objectViewNames, final DatabaseRetrievedObject object, JPopupMenu popupMenu) {
+    private void addObjectViewOptions(List<String> objectViewNames, final DatabaseRetrievedObject object, JPopupMenu popupMenu) {
         JMenuItem menuItem;
         JMenu objectViewMenu = new JMenu("View selected");
-        Iterator it = objectViewNames.iterator();
+        Iterator<String> it = objectViewNames.iterator();
         while (it.hasNext()) {
-            final String objectViewName = (String) it.next();
+            final String objectViewName = it.next();
             menuItem = new JMenuItem(objectViewName);
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -148,9 +148,9 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
     private void addQueryOptions(final ObjectLabelView labelView, JPopupMenu popupMenu) {
         JRadioButtonMenuItem menuItem;
         JMenu queryMenu = new JMenu("Change label");
-        Iterator it = this.queries.iterator();
+        Iterator<Query> it = this.queries.iterator();
         while (it.hasNext()) {
-            final Query query = (Query) it.next();
+            final Query query = it.next();
             menuItem = new JRadioButtonMenuItem(query.getName(), query.equals(labelView.getQuery()));
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {

@@ -19,6 +19,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,25 +27,25 @@ import java.util.Vector;
 
 public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	private class BarChartPanel implements PageViewPanel {
-		private List columnDefSQL, columnDefDisplay, panels;
-		private List columnDefLineCol, columnDefMinCol, columnDefMaxCol;
+		private List<Serializable> columnDefSQL, columnDefDisplay, panels;
+		private List<Color> columnDefLineCol, columnDefMinCol, columnDefMaxCol;
 
 	    public Component getComponent() throws DatabaseViewerException {
 	
-	        this.columnDefSQL = new ArrayList();
-	        this.columnDefDisplay = new ArrayList();
-	        this.columnDefLineCol = new ArrayList();
-	        this.columnDefMaxCol = new ArrayList();
-	        this.columnDefMinCol = new ArrayList();
+	        this.columnDefSQL = new ArrayList<Serializable>();
+	        this.columnDefDisplay = new ArrayList<Serializable>();
+	        this.columnDefLineCol = new ArrayList<Color>();
+	        this.columnDefMaxCol = new ArrayList<Color>();
+	        this.columnDefMinCol = new ArrayList<Color>();
 	
-	        this.panels = new ArrayList();
+	        this.panels = new ArrayList<Serializable>();
 	
 	
 	        DatabaseViewerManager viewerManager = getManager();
 	        Element template = viewerManager.getTemplate();
-	        List columnElements = template.getChildren("column");
-	        for (Iterator iterator = columnElements.iterator(); iterator.hasNext();) {
-	            Element columnElement = (Element) iterator.next();
+	        List<Element> columnElements = template.getChildren("column");
+	        for (Iterator<Element> iterator = columnElements.iterator(); iterator.hasNext();) {
+	            Element columnElement = iterator.next();
 	            if (columnElement.getAttributeValue("sqlname") == null) {
 	                throw new DatabaseViewerException();
 	            } else {
@@ -93,7 +94,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	        barChartPanel.setLayout(new BoxLayout(barChartPanel, BoxLayout.Y_AXIS));
 	        for (int i = 0; i < this.columnDefSQL.size(); i++) {
 	            tmpBC = new BarContainer();
-	            tmpBC.setColors((Color) this.columnDefMinCol.get(i), (Color) this.columnDefMaxCol.get(i), (Color) this.columnDefLineCol.get(i));
+	            tmpBC.setColors(this.columnDefMinCol.get(i), this.columnDefMaxCol.get(i), this.columnDefLineCol.get(i));
 	            this.panels.add(tmpBC);
 	            barChartPanel.add(tmpBC);
 	        }
@@ -103,7 +104,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	
 	    public void showItem(String keyValue) throws DatabaseViewerException {
 			DatabaseViewerManager viewerManager = getManager();
-	        List tmpList;
+	        List<Vector<Object>> tmpList;
 	
 	        String tmpS = "";
 	        try {
@@ -115,15 +116,15 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	                        " FROM " + viewerManager.getTableName() +
 	                        " ORDER BY " + tmpS + ";"));
 	
-	                float min = Float.parseFloat((String) ((Vector) (tmpList.get(0))).elementAt(0));
-	                float max = Float.parseFloat((String) ((Vector) (tmpList.get(tmpList.size() - 1))).elementAt(0));
+	                float min = Float.parseFloat((String) (tmpList.get(0)).elementAt(0));
+	                float max = Float.parseFloat((String) (tmpList.get(tmpList.size() - 1)).elementAt(0));
 	                ((BarContainer) this.panels.get(i)).setList(tmpList);
 	                tmpList = (viewerManager.getConnection().executeQuery(
 	                        "SELECT " + tmpS +
 	                        " FROM " + viewerManager.getTableName() +
 	                        " WHERE " + viewerManager.getKeyName() + " = '" + keyValue + "';"));
 	
-	                float cur = Float.parseFloat((String) ((Vector) (tmpList.get(0))).elementAt(0));
+	                float cur = Float.parseFloat((String) (tmpList.get(0)).elementAt(0));
 	                ((BarContainer) this.panels.get(i)).setInfo(cur, min, max, (String) this.columnDefDisplay.get(i));
 	
 	
@@ -175,7 +176,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 
         }
 
-        public void setList(List theList) {
+        public void setList(List<Vector<Object>> theList) {
         	this.prettyPanel.setList(theList);
         }
 
@@ -187,7 +188,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
             private float theCur;
             private float theMax;
             private float theMin;
-            private List data;
+            private List<Vector<Object>> data;
             private Color lineCol;
             private Color maxCol;
             private Color minCol;
@@ -198,14 +199,16 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
             public PrettyPanel() {
                 super();
                 addMouseMotionListener(new MouseMotionAdapter() {
-                    public void mouseMoved(MouseEvent evt) {
+                    @Override
+					public void mouseMoved(MouseEvent evt) {
                     	PrettyPanel.this.hoverPos = evt.getX();
                         repaint();
                     }
                 }
                 );
                 addMouseListener(new MouseAdapter() {
-                    public void mouseReleased(MouseEvent evt) {
+                    @Override
+					public void mouseReleased(MouseEvent evt) {
                         PrettyPanel.this.hoverPos = evt.getX();
                         PrettyPanel.this.drawHover = !PrettyPanel.this.drawHover;
                         repaint();
@@ -222,11 +225,12 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                 repaint();
             }
 
-            public void setList(List theList) {
+            public void setList(List<Vector<Object>> theList) {
             	this.data = theList;
             }
 
-            public void paint(Graphics g) {
+            @Override
+			public void paint(Graphics g) {
                 final int Y_OFFSET = 10; //vert space from edge of panel before lines appear
                 final int LINE_OUTER_SIZE = 3; //outer line size for line indicating 'current'
                 final int LINE_INNER_SIZE = 1; //inner line size for line indicating 'current'
@@ -241,8 +245,8 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                 float dist = this.theMax - this.theMin;
                 float vrel, vrelold;
                 for (int i = 1; i < this.data.size(); i++) {
-                    vrel = Float.parseFloat((String) ((Vector) this.data.get(i)).elementAt(0)) - this.theMin;
-                    vrelold = Float.parseFloat((String) ((Vector) this.data.get(i - 1)).elementAt(0)) - this.theMin;
+                    vrel = Float.parseFloat((String) this.data.get(i).elementAt(0)) - this.theMin;
+                    vrelold = Float.parseFloat((String) this.data.get(i - 1).elementAt(0)) - this.theMin;
 
 
                     g2.setColor(new Color(
@@ -310,6 +314,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
         }
     }
 
+	@Override
 	protected PageViewPanel createPanel() {
 		return new BarChartPanel();
 	}

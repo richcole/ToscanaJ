@@ -12,9 +12,11 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.controller.ndimlayout.PartialOrderOperations;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
+import net.sourceforge.toscanaj.model.directedgraph.Node;
 import net.sourceforge.toscanaj.model.order.Ordered;
 
 import java.util.Set;
+import java.util.Vector;
 
 import org.tockit.cernatoXML.model.NumericalType;
 import org.tockit.cernatoXML.model.NumericalValueGroup;
@@ -81,9 +83,9 @@ public class PartialOrderOperationsTest extends TestCase {
                         new OrderedValueGroup(numGroup7), 
                         new OrderedValueGroup(numGroup8)
                 });
-        Set sources;
-        Set sinks;
-        Set maximalPaths;
+        Set<Node> sources;
+        Set<Node> sinks;
+        Set<Vector<Node>> maximalPaths;
 
         sources = graph.getSources();
         assertEquals(2, sources.size());

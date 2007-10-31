@@ -23,7 +23,8 @@ public class StringValue extends AbstractValue {
         return this.value;
     }
     
-    public boolean isLesserThan(Ordered other) {
+    @Override
+	public boolean isLesserThan(Ordered other) {
         if(!(this.getClass() == other.getClass())) {
             return false;
         }
@@ -31,12 +32,14 @@ public class StringValue extends AbstractValue {
         return this.value.compareTo(otherValue.value) < 0;
     }
 
-    public boolean sameTypeEquals(Object other) {
+    @Override
+	public boolean sameTypeEquals(Object other) {
         StringValue otherValue = (StringValue) other;
         return otherValue.value.equals(this.value);
     }
     
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return value.hashCode();
     }
 

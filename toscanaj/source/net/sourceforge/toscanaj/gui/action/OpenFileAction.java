@@ -24,15 +24,15 @@ public class OpenFileAction extends KeyboardMappedAction {
     private FileActivity openActivity;
     private File previousFile;
 
-    private List postOpenActivities = new ArrayList();
+    private List<SimpleActivity> postOpenActivities = new ArrayList<SimpleActivity>();
 
     public void addPostOpenActivity(SimpleActivity activity) {
         this.postOpenActivities.add(activity);
     }
 
     protected void processPostOpenActivities() throws Exception {
-        for (Iterator it = this.postOpenActivities.iterator(); it.hasNext();) {
-            SimpleActivity activity = (SimpleActivity) it.next();
+        for (Iterator<SimpleActivity> it = this.postOpenActivities.iterator(); it.hasNext();) {
+            SimpleActivity activity = it.next();
             if (!activity.doActivity()) {
                 break;
             }

@@ -23,7 +23,8 @@ public class LabelConnector extends CanvasItem {
     	this.labelView = labelView;
     }
 
-    public void draw(Graphics2D graphics) {
+    @Override
+	public void draw(Graphics2D graphics) {
         this.labelView.updateBounds(graphics);
     	updateLine();
     	
@@ -47,11 +48,13 @@ public class LabelConnector extends CanvasItem {
     	}
     }
 
-    public boolean containsPoint(Point2D point) {
+    @Override
+	public boolean containsPoint(Point2D point) {
         return false;
     }
 
-    public Rectangle2D getCanvasBounds(Graphics2D graphics) {
+    @Override
+	public Rectangle2D getCanvasBounds(Graphics2D graphics) {
         this.labelView.updateBounds(graphics);
         updateLine();
         if(this.labelView.isVisible()) {
@@ -61,7 +64,8 @@ public class LabelConnector extends CanvasItem {
         }
     }
 
-    public Point2D getPosition() {
+    @Override
+	public Point2D getPosition() {
         if(this.labelView.isVisible()) {
             return this.labelView.getPosition();
         } else {

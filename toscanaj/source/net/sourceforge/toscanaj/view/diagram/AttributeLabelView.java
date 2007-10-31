@@ -36,7 +36,8 @@ public class AttributeLabelView extends LabelView {
         return allHidden;
     }
 
-    public boolean isVisible() {
+    @Override
+	public boolean isVisible() {
         return super.isVisible() && !allHidden;
     }
 	
@@ -62,15 +63,18 @@ public class AttributeLabelView extends LabelView {
     /**
      * Returns LabelView.ABOVE
      */
-    protected int getPlacement() {
+    @Override
+	protected int getPlacement() {
         return LabelView.ABOVE;
     }
 
-    public int getNumberOfEntries() {
+    @Override
+	public int getNumberOfEntries() {
         return this.labelInfo.getNode().getConcept().getAttributeContingentSize();
     }
 
-    public Object getEntryAt(int position) {
+    @Override
+	public Object getEntryAt(int position) {
         Iterator attributeContingentIterator = this.labelInfo.getNode().getConcept().getAttributeContingentIterator();
         int i = 0;
         while(i < position) {
@@ -80,11 +84,13 @@ public class AttributeLabelView extends LabelView {
         return attributeContingentIterator.next();
     }
 
-    protected boolean highlightedInIdeal() {
+    @Override
+	protected boolean highlightedInIdeal() {
         return false;
     }
 
-    protected boolean highlightedInFilter() {
+    @Override
+	protected boolean highlightedInFilter() {
         return true;
     }
 
@@ -93,7 +99,8 @@ public class AttributeLabelView extends LabelView {
         return (FCAElement) getEntryAt(i);
     }
 
-    protected boolean isFaded() {
+    @Override
+	protected boolean isFaded() {
 		int selectionState = nodeView.getSelectionState();
 		return selectionState == DiagramView.NOT_SELECTED || selectionState == DiagramView.SELECTED_IDEAL;
     }

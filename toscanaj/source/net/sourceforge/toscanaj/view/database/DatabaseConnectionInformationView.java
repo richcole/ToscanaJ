@@ -169,7 +169,8 @@ public class DatabaseConnectionInformationView extends JDialog
                     new Insets(0, 0, 0, 0),
                     2,2));
         }
-        void updateContents() {
+        @Override
+		void updateContents() {
             if(databaseInfo == null) {
                 embDBMSRadioButton.setSelected(true);
             } else {
@@ -191,17 +192,21 @@ public class DatabaseConnectionInformationView extends JDialog
             	}
             }
         }
-        String getTitle() {
+        @Override
+		String getTitle() {
             return "Database Type:";
         }
-        String getNextButtonText() {
+        @Override
+		String getNextButtonText() {
             return "Use selected type >>";
         }
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
         	// nothing to do here, we just return different panels
         	return true;
         }
-        WizardPanel getNextPanel() {
+        @Override
+		WizardPanel getNextPanel() {
             if(embDBMSRadioButton.isSelected()) {
                 return embeddedDbPanel;
             } else if(jdbcRadioButton.isSelected()) {
@@ -218,13 +223,16 @@ public class DatabaseConnectionInformationView extends JDialog
     }
 
     abstract class ConnectionPanel extends WizardPanel {
-        String getTitle() {
+        @Override
+		String getTitle() {
             return "Connection Details:";
         }
-        String getNextButtonText() {
+        @Override
+		String getNextButtonText() {
             return "Connect >>";
         }
-        WizardPanel getNextPanel() {
+        @Override
+		WizardPanel getNextPanel() {
             return keySelectPanel;
         }
         boolean connectDatabase() {
@@ -307,7 +315,8 @@ public class DatabaseConnectionInformationView extends JDialog
 			
     	}
 
-        void updateContents() {
+        @Override
+		void updateContents() {
             if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.EMBEDDED) {
                 setPathInTextField(this.scriptLocationField, databaseInfo.getEmbeddedSQLLocation().getPath());
             } else {
@@ -315,7 +324,8 @@ public class DatabaseConnectionInformationView extends JDialog
             }
         }
     	
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
             DatabaseInfo embedInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
             databaseInfo.setUrl(embedInfo.getURL());
             databaseInfo.setUserName(embedInfo.getUserName());
@@ -423,7 +433,8 @@ public class DatabaseConnectionInformationView extends JDialog
     	            2,2));
         }
 
-        void updateContents() {
+        @Override
+		void updateContents() {
             if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.JDBC) {
                 this.urlField.setText(databaseInfo.getURL());
                 this.userNameField.setText(databaseInfo.getUserName());
@@ -437,7 +448,8 @@ public class DatabaseConnectionInformationView extends JDialog
             }
         }
 
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
 			databaseInfo.setUrl(urlField.getText());
             databaseInfo.setUserName(userNameField.getText());
             databaseInfo.setPassword(new String(passwordField.getPassword()));
@@ -509,7 +521,8 @@ public class DatabaseConnectionInformationView extends JDialog
     	            new Insets(5, 5, 5, 0),
     	            2,2));
         }
-        void updateContents() {
+        @Override
+		void updateContents() {
             if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.ODBC) {
                 this.dataSourceNameField.setText(databaseInfo.getOdbcDataSourceName());
                 this.userNameField.setText(databaseInfo.getUserName());
@@ -520,7 +533,8 @@ public class DatabaseConnectionInformationView extends JDialog
                 this.passwordField.setText("");
             }
         }
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
             databaseInfo.setOdbcDataSource(dataSourceNameField.getText(), userNameField.getText(), new String(passwordField.getPassword()));
             return connectDatabase();
         }
@@ -603,7 +617,8 @@ public class DatabaseConnectionInformationView extends JDialog
                     new Insets(5, 5, 5, 5),
                     2,2));
         }
-        void updateContents() {
+        @Override
+		void updateContents() {
             if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.ACCESS_FILE) {
                 setPathInTextField(this.fileUrlField, databaseInfo.getAccessFileUrl());
                 this.userNameField.setText(databaseInfo.getUserName());
@@ -614,7 +629,8 @@ public class DatabaseConnectionInformationView extends JDialog
                 this.passwordField.setText("");
             }
         }
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
             databaseInfo.setAccessFileInfo(
                     createAbsoluteLocation(fileUrlField.getText()), 
                     userNameField.getText(), 
@@ -701,7 +717,8 @@ public class DatabaseConnectionInformationView extends JDialog
                     new Insets(5, 5, 5, 5),
                     2,2));
         }
-        void updateContents() {
+        @Override
+		void updateContents() {
             if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.EXCEL_FILE) {
                 setPathInTextField(this.fileUrlField, databaseInfo.getExcelFileUrl());
                 this.userNameField.setText(databaseInfo.getUserName());
@@ -712,7 +729,8 @@ public class DatabaseConnectionInformationView extends JDialog
                 this.passwordField.setText("");
             }
         }
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
             databaseInfo.setExcelFileInfo(
                     createAbsoluteLocation(fileUrlField.getText()), 
                     userNameField.getText(), 
@@ -730,13 +748,16 @@ public class DatabaseConnectionInformationView extends JDialog
         	this.tableView = new DatabaseSchemaView(broker);
         	this.add(tableView, BorderLayout.CENTER);
         }
-        String getTitle() {
+        @Override
+		String getTitle() {
             return "Select Key:";
         }
-        String getNextButtonText() {
+        @Override
+		String getNextButtonText() {
             return "Done";
         }
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
             Table sqlTable = this.tableView.getTable();
             Column sqlKey = this.tableView.getKey();
             if(sqlTable == null || sqlKey == null) {
@@ -750,10 +771,12 @@ public class DatabaseConnectionInformationView extends JDialog
                       JOptionPane.INFORMATION_MESSAGE);
         	return true;
         }
-        WizardPanel getNextPanel() {
+        @Override
+		WizardPanel getNextPanel() {
             return null;
         }
-        void updateContents() {
+        @Override
+		void updateContents() {
             Table table = databaseInfo.getTable();
             Column key = databaseInfo.getKey();
             if(table != null && key != null) {
@@ -783,6 +806,7 @@ public class DatabaseConnectionInformationView extends JDialog
 		contentPane.setLayout(new GridBagLayout());
 		
 		addComponentListener( new ComponentAdapter() {
+			@Override
 			public void componentResized(ComponentEvent e) {
 				int width = getWidth();
 				int height = getHeight();
@@ -790,6 +814,7 @@ public class DatabaseConnectionInformationView extends JDialog
 				if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
 				setSize(width, height);
 			}
+			@Override
 			public void componentShown(ComponentEvent e) {
 				componentResized(e);
 			}
@@ -911,6 +936,7 @@ public class DatabaseConnectionInformationView extends JDialog
 	private void getFileURL(JTextField urlField, final String extension, final String description) {
 		JFileChooser openDialog = new JFileChooser(openedDatabaseFile);
 		openDialog.setFileFilter(new FileFilter() {
+			@Override
 			public boolean accept(File f) {
 				if (f.isDirectory()) {
 					return true;
@@ -923,6 +949,7 @@ public class DatabaseConnectionInformationView extends JDialog
 				}
 				return ext.equals(extension);
 			}
+			@Override
 			public String getDescription() {
 				return description;
 			}
@@ -960,7 +987,8 @@ public class DatabaseConnectionInformationView extends JDialog
         }
 	}
 	
-    public void setVisible(boolean visible) {
+    @Override
+	public void setVisible(boolean visible) {
         if(visible) {
     		this.newConnectionSet = false;
     		super.setVisible(true);

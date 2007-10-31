@@ -50,7 +50,8 @@ public class StateRing extends CanvasItem implements XMLizable {
     	this.timeController = timeController;
     }
 
-    public void draw(Graphics2D g) {
+    @Override
+	public void draw(Graphics2D g) {
         Paint color = calculatePaint();
         if(color == null) { // nothing to draw
         	return;
@@ -87,15 +88,18 @@ public class StateRing extends CanvasItem implements XMLizable {
                           (int) (alpha * this.baseColor.getAlpha()));
     }
     
-    public boolean containsPoint(Point2D point) {
+    @Override
+	public boolean containsPoint(Point2D point) {
         return false;
     }
 
-    public Point2D getPosition() {
+    @Override
+	public Point2D getPosition() {
         return this.node.getPosition();
     }
 
-    public Rectangle2D getCanvasBounds(Graphics2D g) {
+    @Override
+	public Rectangle2D getCanvasBounds(Graphics2D g) {
         Point2D center = this.node.getPosition();
         double x = center.getX();
         double y = center.getY();

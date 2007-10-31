@@ -52,7 +52,8 @@ public class DatabaseInfo implements XMLizable {
         protected Type(String name) {
             this.name = name;
         }
-        public String toString() {
+        @Override
+		public String toString() {
             return name;
         }
     }
@@ -296,7 +297,8 @@ public class DatabaseInfo implements XMLizable {
     /**
      * Debugging info.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         String result = "DatabaseInfo\n";
 
         result += "\t"

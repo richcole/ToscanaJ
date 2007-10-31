@@ -113,7 +113,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      */
     protected float lineHeight = 0;
 
-    protected Vector observers = new Vector();
+    protected Vector<ChangeObserver> observers = new Vector<ChangeObserver>();
     
     protected DragMode dragMode = NOT_DRAGGING;
     
@@ -192,7 +192,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         return this.rect.getHeight();
     }
 
-    public Point2D getPosition() {
+    @Override
+	public Point2D getPosition() {
     	if( this.rect != null ) {
         	return new Point2D.Double(this.rect.getX(), this.rect.getY());
     	} else {
@@ -216,7 +217,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
      *
      * The scaling information is needed to scale the offset.
      */
-    public void draw(Graphics2D graphics) {
+    @Override
+	public void draw(Graphics2D graphics) {
         // we draw only if we have content to draw
         if (!isVisible()) {
             return;
@@ -502,7 +504,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     /**
      * Returns true whenever the point is in the bounding rectangle.
      */
-    public boolean containsPoint(Point2D point) {
+    @Override
+	public boolean containsPoint(Point2D point) {
         if (this.rect == null || isVisible() == false) {
             return false;
         }
@@ -552,21 +555,24 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
                     // make a copy of the current start position
                     final Point2D undoOffset = this.startOffset;
                     undoManager.addEdit(new AbstractUndoableEdit() {
-                        public void undo() throws CannotUndoException {
+                        @Override
+						public void undo() throws CannotUndoException {
                             labelInfo.setOffset(undoOffset);
                             diagramView.requestScreenTransformUpdate();
                             diagramView.repaint();
                             super.undo();
                         }
 
-                        public void redo() throws CannotRedoException {
+                        @Override
+						public void redo() throws CannotRedoException {
                             labelInfo.setOffset(newX, newY);
                             diagramView.requestScreenTransformUpdate();
                             diagramView.repaint();
                             super.redo();
                         }
 
-                        public String getPresentationName() {
+                        @Override
+						public String getPresentationName() {
                             return "Label movement";
                         }
                     });
@@ -650,7 +656,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
         } 
     }
 
-    public Rectangle2D getCanvasBounds(Graphics2D graphics) {
+    @Override
+	public Rectangle2D getCanvasBounds(Graphics2D graphics) {
     	if(this.rect == null) {
     		return null;
     	}
@@ -732,8 +739,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver, Ev
     }
 
     protected void notifyObservers() {
-        for (Iterator iterator = observers.iterator(); iterator.hasNext();) {
-            ChangeObserver changeObserver = (ChangeObserver) iterator.next();
+        for (Iterator<ChangeObserver> iterator = observers.iterator(); iterator.hasNext();) {
+            ChangeObserver changeObserver = iterator.next();
             changeObserver.update(this);
         }
     }

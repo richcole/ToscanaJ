@@ -41,9 +41,9 @@ import java.util.Vector;
 public class ProgramCallDatabaseViewer implements DatabaseViewer {
     private DatabaseViewerManager viewerManager = null;
 
-    private List textFragments = new LinkedList();
+    private List<String> textFragments = new LinkedList<String>();
 
-    private List fieldNames = new LinkedList();
+    private List<String> fieldNames = new LinkedList<String>();
 
     public ProgramCallDatabaseViewer() {
         // initialization has to be done separately, so we can use the dynamic class loading mechanism
@@ -52,9 +52,9 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
     public void initialize(DatabaseViewerManager manager) {
         this.viewerManager = manager;
 
-        String openDelimiter = (String) this.viewerManager.getParameters().get("openDelimiter");
-        String closeDelimiter = (String) this.viewerManager.getParameters().get("closeDelimiter");
-        String commandLine = (String) this.viewerManager.getParameters().get("commandLine");
+        String openDelimiter = this.viewerManager.getParameters().get("openDelimiter");
+        String closeDelimiter = this.viewerManager.getParameters().get("closeDelimiter");
+        String commandLine = this.viewerManager.getParameters().get("commandLine");
         while (commandLine.indexOf(openDelimiter) != -1) {
         	this.textFragments.add(commandLine.substring(0, commandLine.indexOf(openDelimiter)));
             commandLine = commandLine.substring(commandLine.indexOf(openDelimiter) + openDelimiter.length());
@@ -67,18 +67,18 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
     public void showView(String whereClause) throws DatabaseViewerException {
         String command = "";
         try {
-            List results = this.viewerManager.getConnection().executeQuery(this.fieldNames,
+            List<Vector<Object>> results = this.viewerManager.getConnection().executeQuery(this.fieldNames,
             		this.viewerManager.getTableName(),
                     whereClause);
-            Vector fields = (Vector) results.get(0);
-            Iterator itText = this.textFragments.iterator();
+            Vector fields = results.get(0);
+            Iterator<String> itText = this.textFragments.iterator();
             Iterator itFields = fields.iterator();
             while (itFields.hasNext()) { // we assume length(textFragements) = length(results) + 1
-                String text = (String) itText.next();
+                String text = itText.next();
                 String result = (String) itFields.next();
                 command += text + result;
             }
-            command += (String) itText.next();
+            command += itText.next();
         } catch (DatabaseException e) {
         	/// @todo maybe we should introduce a proper DatabaseViewerException in the signature
             throw new DatabaseViewerException("Failed to query database.", e);

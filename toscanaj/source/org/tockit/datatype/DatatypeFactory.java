@@ -20,15 +20,15 @@ public abstract class DatatypeFactory {
         Datatype create(Element element);
     }
     
-    private static List typeCreators = new ArrayList();
+    private static List<TypeCreator> typeCreators = new ArrayList<TypeCreator>();
     
     public static void registerTypeCreator(TypeCreator typeCreator) {
         typeCreators.add(typeCreator);
     }
     
     public static Datatype readType(Element element) {
-        for (Iterator iter = typeCreators.iterator(); iter.hasNext();) {
-            TypeCreator tc = (TypeCreator) iter.next();
+        for (Iterator<TypeCreator> iter = typeCreators.iterator(); iter.hasNext();) {
+            TypeCreator tc = iter.next();
             if(tc.accepts(element)) {
                 return tc.create(element);
             }

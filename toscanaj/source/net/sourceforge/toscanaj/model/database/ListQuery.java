@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
+import net.sourceforge.toscanaj.model.database.Query.QueryField;
+
 import org.jdom.Element;
 
 import java.util.Iterator;
@@ -28,25 +30,28 @@ public class ListQuery extends Query {
         this.info = info;
     }
 
-    protected String getElementName() {
+    @Override
+	protected String getElementName() {
         return QUERY_ELEMENT_NAME;
     }
 
-    public String getQueryHead() {
+    @Override
+	public String getQueryHead() {
         return "SELECT " + info.getKey().getSqlExpression() + ", " +
                 getFieldList() + " FROM " + 
                 info.getTable().getSqlExpression() + " ";
     }
 
-    public String getOrderClause() {
+    @Override
+	public String getOrderClause() {
         return "ORDER BY " + getFieldList();
     }
 
     private String getFieldList() {
         String retVal = "";
-        Iterator it = fieldList.iterator();
+        Iterator<QueryField> it = fieldList.iterator();
         while (it.hasNext()) {
-            QueryField field = (QueryField) it.next();
+            QueryField field = it.next();
             retVal += field.getQueryPart();
             if (it.hasNext()) {
                 retVal += ", ";
@@ -56,13 +61,15 @@ public class ListQuery extends Query {
     }
 
 
-    public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values, Vector referenceValues) {
+    @Override
+	public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector<Object> values, Vector referenceValues) {
         String displayString = this.formatResults(values, 1);
         DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
         retVal.setKey(values.get(0));
         return retVal;
     }
 
+	@Override
 	public boolean doesNeedReferenceValues() {
 		return false;
 	}

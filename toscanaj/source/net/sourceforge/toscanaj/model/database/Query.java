@@ -65,7 +65,7 @@ public abstract class Query implements XMLizable {
     private String name;
 
     private String header;
-    protected List fieldList = new ArrayList();
+    protected List<QueryField> fieldList = new ArrayList<QueryField>();
 
     public Query(String name, String header) {
         this.name = name;
@@ -80,8 +80,8 @@ public abstract class Query implements XMLizable {
         Element retVal = new Element(getElementName());
         retVal.setAttribute(QUERY_NAME_ATTRIBUTE_NAME, this.name);
         XMLHelper.addOptionalAttribute(retVal, QUERY_HEAD_ATTRIBUTE_NAME, this.header);
-        for (Iterator iterator = fieldList.iterator(); iterator.hasNext();) {
-            QueryField queryField = (QueryField) iterator.next();
+        for (Iterator<QueryField> iterator = fieldList.iterator(); iterator.hasNext();) {
+            QueryField queryField = iterator.next();
             Element elem = new Element(QUERY_FIELD_ELEMENT_NAME);
             XMLHelper.addOptionalAttribute(elem, QUERY_FIELD_NAME_ATTRIBUTE_NAME, queryField.getName());
             XMLHelper.addOptionalAttribute(elem, QUERY_FIELD_SEPARATOR_ATTRIBUTE_NAME, queryField.getSeparator());
@@ -95,8 +95,8 @@ public abstract class Query implements XMLizable {
     public void readXML(Element elem) {
         this.name = elem.getAttributeValue(QUERY_FIELD_NAME_ATTRIBUTE_NAME);
         this.header = elem.getAttributeValue(QUERY_HEAD_ATTRIBUTE_NAME);
-        for (Iterator iterator = elem.getChildren(QUERY_FIELD_ELEMENT_NAME).iterator(); iterator.hasNext();) {
-            Element queryFieldElement = (Element) iterator.next();
+        for (Iterator<Element> iterator = elem.getChildren(QUERY_FIELD_ELEMENT_NAME).iterator(); iterator.hasNext();) {
+            Element queryFieldElement = iterator.next();
             QueryField field = new QueryField(
                     queryFieldElement.getAttributeValue(QUERY_FIELD_NAME_ATTRIBUTE_NAME),
                     queryFieldElement.getAttributeValue(QUERY_FIELD_FORMAT_ATTRIBUTE_NAME),
@@ -128,16 +128,16 @@ public abstract class Query implements XMLizable {
      * The return value is a String which returns a formatted version of the
      * row
      */
-    public String formatResults(Vector values, int startPosition) {
+    public String formatResults(Vector<?> values, int startPosition) {
         String rowRes = new String();
         if (header != null) {
             rowRes += header;
         }
-        Iterator colDefIt = this.fieldList.iterator();
+        Iterator<QueryField> colDefIt = this.fieldList.iterator();
         // skip key, start with 1
         int i = startPosition;
         while (colDefIt.hasNext()) {
-            QueryField field = (QueryField) colDefIt.next();
+            QueryField field = colDefIt.next();
             String value = values.get(i).toString();
             i++;
             if (field.getFormat() != null) {
@@ -171,7 +171,7 @@ public abstract class Query implements XMLizable {
 	 * @param values            The query results to turn into objects
 	 * @param referenceValues   The reference values that can be used for relative results, usually the same values for the top node 
 	 */
-    abstract public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector values, Vector referenceValues);
+    abstract public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector<Object> values, Vector referenceValues);
     
     abstract public boolean doesNeedReferenceValues();
 }

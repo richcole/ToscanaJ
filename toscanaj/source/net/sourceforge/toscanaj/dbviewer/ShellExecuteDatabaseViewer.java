@@ -55,7 +55,7 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
     
     private DatabaseViewerManager viewerManager;
 
-    private List fieldNames = new LinkedList();
+    private List<String> fieldNames = new LinkedList<String>();
 
     public ShellExecuteDatabaseViewer() {
         // initialization has to be done separately, so we can use the dynamic class loading mechanism
@@ -65,7 +65,7 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
         this.viewerManager = manager;
 
         // @todo need errorchecking on columnName here
-        String columnName = (String) this.viewerManager.getParameters().get("columnName");
+        String columnName = this.viewerManager.getParameters().get("columnName");
         if(columnName == null) {
             throw new DatabaseViewerException("Parameter 'columnName' not given.");
         }
@@ -75,10 +75,10 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
     public void showView(String whereClause) throws DatabaseViewerException {
         String resourceLocation = "";
         try {
-            List results = this.viewerManager.getConnection().executeQuery(this.fieldNames,
+            List<Vector<Object>> results = this.viewerManager.getConnection().executeQuery(this.fieldNames,
             		this.viewerManager.getTableName(),
                     whereClause);
-            Vector fields = (Vector) results.get(0);
+            Vector fields = results.get(0);
             Iterator itFields = fields.iterator();
             while (itFields.hasNext()) {
                 String result = (String) itFields.next();

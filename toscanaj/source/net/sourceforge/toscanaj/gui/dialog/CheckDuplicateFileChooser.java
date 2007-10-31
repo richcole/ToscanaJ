@@ -29,6 +29,7 @@ public class CheckDuplicateFileChooser extends JFileChooser{
 				}
 			}
 		}
+		@Override
 		public void approveSelection(){
 			File selectedFile = getSelectedFile();
 			if(selectedFile.getName().indexOf('.') == -1) { // check for extension

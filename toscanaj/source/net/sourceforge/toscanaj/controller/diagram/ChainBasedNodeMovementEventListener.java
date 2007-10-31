@@ -52,17 +52,17 @@ public class ChainBasedNodeMovementEventListener implements EventBrokerListener 
         
         Concept concept = node.getConcept();
         
-        final Set meetIrr = ConceptSetHelperFunctions.getMeetIrreduciblesInUpset(concept);
+        final Set<Concept> meetIrr = ConceptSetHelperFunctions.getMeetIrreduciblesInUpset(concept);
         
         final int numUpperMeetIrr = meetIrr.size();
         
         // add the meet-irreducible concepts in the downsets of all the meet-irreducibles
         // in the upset
-        Set newMeetIrr = new HashSet();
-        for (Iterator it1 = meetIrr.iterator(); it1.hasNext();) {
-            Concept superConcept = (Concept) it1.next();
-            Collection downset = superConcept.getDownset();
-            for (Iterator it2 = downset.iterator(); it2.hasNext();) {
+        Set<Concept> newMeetIrr = new HashSet<Concept>();
+        for (Iterator<Concept> it1 = meetIrr.iterator(); it1.hasNext();) {
+            Concept superConcept = it1.next();
+            Collection<Object> downset = superConcept.getDownset();
+            for (Iterator<Object> it2 = downset.iterator(); it2.hasNext();) {
                 Concept lower = (Concept) it2.next();
                 if(lower.isMeetIrreducible()) {
                     newMeetIrr.add(lower);
@@ -98,7 +98,8 @@ public class ChainBasedNodeMovementEventListener implements EventBrokerListener 
                 // requested one due to the Hasse diagram limitations
                 final Point2D toPosition = nodeView.getPosition();
                 undoManager.addEdit(new AbstractUndoableEdit() {
-                    public void undo() throws CannotUndoException {
+                    @Override
+					public void undo() throws CannotUndoException {
                         ConceptSetHelperFunctions.applyDragToDiagram(toPosition, 
                                                                      undoPosition,
                                                                      diagramView,
@@ -109,7 +110,8 @@ public class ChainBasedNodeMovementEventListener implements EventBrokerListener 
                         super.undo();
                     }
 
-                    public void redo() throws CannotRedoException {
+                    @Override
+					public void redo() throws CannotRedoException {
                         ConceptSetHelperFunctions.applyDragToDiagram(undoPosition, 
                                                                      toPosition,
                                                                      diagramView,
@@ -120,7 +122,8 @@ public class ChainBasedNodeMovementEventListener implements EventBrokerListener 
                         super.redo();
                     }
                     
-                    public String getPresentationName() {
+                    @Override
+					public String getPresentationName() {
                         return "Chain movement";
                     }
                 });

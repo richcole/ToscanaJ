@@ -112,7 +112,8 @@ public class ConceptInterpretationContext implements ChangeObserver {
     /**
      * Caution: equals(..) and hashCode() ignore the display mode.
      */
-    public boolean equals(Object other) {
+    @Override
+	public boolean equals(Object other) {
     	if(other.getClass() != this.getClass()) {
     		return false;
     	}
@@ -135,7 +136,8 @@ public class ConceptInterpretationContext implements ChangeObserver {
 	/**
 	 * Caution: equals(..) and hashCode() ignore the display mode.
 	 */
-    public int hashCode() {
+    @Override
+	public int hashCode() {
     	int result = 17;
 		result = result * 37 + this.diagramHistory.hashCode();
 		result = result * 37 + this.nestingContexts.hashCode();

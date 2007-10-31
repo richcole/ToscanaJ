@@ -25,6 +25,7 @@ public class SQLTypeInfo {
 		return this.typeName;
 	}
 	
+	@Override
 	public String toString() {
 		String str = "SQLTypeInfo: SQL type int = " + this.typeInt + ", name = " + this.typeName;
 		return str;

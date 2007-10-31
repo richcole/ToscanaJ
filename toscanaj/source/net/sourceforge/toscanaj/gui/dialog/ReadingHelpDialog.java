@@ -39,7 +39,8 @@ public class ReadingHelpDialog extends JDialog {
         super(frame, "Info", false);
 
         this.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+            @Override
+			public void windowClosing(WindowEvent e) {
                 closeDialog();
             }
         });

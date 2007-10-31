@@ -51,11 +51,13 @@ public class DiagramReference {
     /**
      * Returns the diagram title for usage in a view.
      */
-    public String toString() {
+    @Override
+	public String toString() {
         return this.diagram.getTitle();
     }
     
-    public boolean equals(Object other) {
+    @Override
+	public boolean equals(Object other) {
         if(other.getClass() != this.getClass()) {
         	return false;
         }
@@ -69,7 +71,8 @@ public class DiagramReference {
         return true;
     }
     
-    public int hashCode() {
+    @Override
+	public int hashCode() {
     	return this.diagram.hashCode() + 47*this.filterConcept.hashCode();
     }
 }

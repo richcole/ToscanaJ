@@ -71,9 +71,9 @@ public interface Diagram2D extends XMLizable {
     /**
      * Returns the list of all nodes in the diagram.
      */
-    Iterator getNodes();
+    Iterator<DiagramNode> getNodes();
 
-    Iterator getLines();
+    Iterator<DiagramLine> getLines();
 
     /**
      * Returns the coordinates of a starting point of a line.

@@ -47,7 +47,8 @@ public class ArrowStyleChooser extends JComponent {
             this.stroke = stroke;
         }
 
-        protected void paintComponent(Graphics g) {
+        @Override
+		protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2d = (Graphics2D) g;
             Line2D line = new Line2D.Double(10,this.getHeight()/2, this.getWidth()-5,this.getHeight()/2);
@@ -84,7 +85,8 @@ public class ArrowStyleChooser extends JComponent {
 
     private Component createDisplayPane() {
         JPanel retVal = new JPanel() {
-            protected void paintComponent(Graphics g) {
+            @Override
+			protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 AffineTransform oldTransform = g2d.getTransform();

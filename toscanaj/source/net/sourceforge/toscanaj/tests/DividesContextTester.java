@@ -29,8 +29,8 @@ public class DividesContextTester {
 
     public static void main(String[] args) throws Exception {
     	ContextImplementation context = new ContextImplementation();
-    	Collection objects = context.getObjects();
-    	Collection finalAttributes = context.getAttributes();
+    	Collection<Object> objects = context.getObjects();
+    	Collection<Object> finalAttributes = context.getAttributes();
 		BinaryRelationImplementation relation = context.getRelationImplementation();
 		
 		int max;

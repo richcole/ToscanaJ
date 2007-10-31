@@ -66,6 +66,7 @@ public abstract class SetMovementEventListener implements EventBrokerListener {
 				// make a copy of the current start position
 				final Point2D undoPosition = this.startPosition;
 				undoManager.addEdit(new AbstractUndoableEdit() {
+					@Override
 					public void undo() throws CannotUndoException {
 			            double undoDiffX = undoPosition.getX() - node.getPosition().getX();
 			            double undoDiffY = undoPosition.getY() - node.getPosition().getY();
@@ -75,6 +76,7 @@ public abstract class SetMovementEventListener implements EventBrokerListener {
 						super.undo();
 					}
 
+					@Override
 					public void redo() throws CannotRedoException {
 			            double redoDiffX = node.getPosition().getX() - undoPosition.getX();
 			            double redoDiffY = node.getPosition().getY() - undoPosition.getY();
@@ -84,6 +86,7 @@ public abstract class SetMovementEventListener implements EventBrokerListener {
 						super.redo();
 					}
 					
+					@Override
 					public String getPresentationName() {
 						return SetMovementEventListener.this.getPresentationName();
 					}

@@ -48,7 +48,7 @@ public class BurmeisterParser {
             int numberOfAttributes = Integer.parseInt(curLine);
 
             // grab objects and attributes, store additional arrays to get indizes
-            Collection objects = context.getObjects();
+            Collection<Object> objects = context.getObjects();
             FCAElement[] objectArray = new FCAElement[numberOfObjects];
             for (int i = 0; i < numberOfObjects; i++) {
                 curLine = getNextNonEmptyLine(in);
@@ -56,7 +56,7 @@ public class BurmeisterParser {
                 objects.add(object);
                 objectArray[i] = object;
             }
-            Collection attributes = context.getAttributes();
+            Collection<Object> attributes = context.getAttributes();
             FCAElement[] attributeArray = new FCAElement[numberOfAttributes];
             for (int i = 0; i < numberOfAttributes; i++) {
                 curLine = getNextNonEmptyLine(in);

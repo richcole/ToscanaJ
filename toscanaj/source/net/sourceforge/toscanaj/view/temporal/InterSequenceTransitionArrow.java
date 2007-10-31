@@ -41,7 +41,8 @@ public class InterSequenceTransitionArrow extends TransitionArrow {
     	this.endColor = secondColor;
     }
 
-    protected Paint calculatePaint(Color baseColor) {
+    @Override
+	protected Paint calculatePaint(Color baseColor) {
         AnimationTimeController controller = this.timeController;
 
         double timeOffset = controller.getCurrentTime() - this.timePos;
@@ -66,13 +67,15 @@ public class InterSequenceTransitionArrow extends TransitionArrow {
         return new GradientPaint(-arrowLength, 0, finalStartColor, 0, 0, finalEndColor);
     }
     
-    public Element toXML() {
+    @Override
+	public Element toXML() {
         Element result = super.toXML();
         result.setAttribute("endColor", ColorStringConverter.colorToString(endColor));
         return result;
     }
     
-    protected String getTagName() {
+    @Override
+	protected String getTagName() {
         return "intersequenceTransitionArrow";
     }
 }

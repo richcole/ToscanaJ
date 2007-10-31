@@ -86,7 +86,8 @@ public class DescriptionViewer {
             
             this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
             this.addWindowListener(new WindowAdapter() {
-            	public void windowClosing(WindowEvent e) {
+            	@Override
+				public void windowClosing(WindowEvent e) {
                     closeDialog();
                 }
             });

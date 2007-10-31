@@ -20,10 +20,10 @@ import net.sourceforge.toscanaj.view.diagram.DiagramView;
 
 class ConceptSetHelperFunctions {
 
-    static Set getMeetIrreduciblesInUpset(Concept concept) {
-        Collection upset = concept.getUpset();
-        Set meetIrr = new HashSet();
-        for (Iterator iter = upset.iterator(); iter.hasNext();) {
+    static Set<Concept> getMeetIrreduciblesInUpset(Concept concept) {
+        Collection<Object> upset = concept.getUpset();
+        Set<Concept> meetIrr = new HashSet<Concept>();
+        for (Iterator<Object> iter = upset.iterator(); iter.hasNext();) {
     		Concept upper = (Concept) iter.next();
     		if(upper.isMeetIrreducible()) {
     			meetIrr.add(upper);
@@ -32,12 +32,12 @@ class ConceptSetHelperFunctions {
         return meetIrr;
     }
 
-    static void removeNonMinimals(Set meetIrr) {
-        Set removable = new HashSet();
-        for (Iterator it1 = meetIrr.iterator(); it1.hasNext();) {
-            Concept meetIrreducible = (Concept) it1.next();
-            for (Iterator it2 = meetIrr.iterator(); it2.hasNext();) {
-                Concept superCandidate = (Concept) it2.next();
+    static void removeNonMinimals(Set<Concept> meetIrr) {
+        Set<Concept> removable = new HashSet<Concept>();
+        for (Iterator<Concept> it1 = meetIrr.iterator(); it1.hasNext();) {
+            Concept meetIrreducible = it1.next();
+            for (Iterator<Concept> it2 = meetIrr.iterator(); it2.hasNext();) {
+                Concept superCandidate = it2.next();
                 if (meetIrreducible != superCandidate && meetIrreducible.hasSuperConcept(superCandidate)) {
                     removable.add(superCandidate);
                 }
@@ -46,7 +46,7 @@ class ConceptSetHelperFunctions {
         meetIrr.removeAll(removable);
     }
 
-    static void applyDragToDiagram(Point2D canvasFromPosition, Point2D canvasToPosition, DiagramView diagramView, Set conceptsToMove, int distributionFactor) {
+    static void applyDragToDiagram(Point2D canvasFromPosition, Point2D canvasToPosition, DiagramView diagramView, Set<Concept> conceptsToMove, int distributionFactor) {
         // calculate partial vector
         double dx = canvasToPosition.getX() - canvasFromPosition.getX();
         double dy = canvasToPosition.getY() - canvasFromPosition.getY();
@@ -54,9 +54,9 @@ class ConceptSetHelperFunctions {
         dy /= distributionFactor;
         
         // apply it to all downsets of meet-irreducibles
-        for (Iterator iter = conceptsToMove.iterator(); iter.hasNext();) {
-    		Concept conceptToMove = (Concept) iter.next();
-    		for (Iterator iter2 = conceptToMove.getDownset().iterator(); iter2.hasNext();) {
+        for (Iterator<Concept> iter = conceptsToMove.iterator(); iter.hasNext();) {
+    		Concept conceptToMove = iter.next();
+    		for (Iterator<Object> iter2 = conceptToMove.getDownset().iterator(); iter2.hasNext();) {
     			Concept downConcept = (Concept) iter2.next();
     			DiagramNode node = diagramView.getDiagram().getNodeForConcept(downConcept);
     			node.setPosition(node.getX() + dx, node.getY() + dy);

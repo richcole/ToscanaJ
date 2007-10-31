@@ -34,15 +34,18 @@ public class ExportOALFormatAction extends ExportContextAction {
         super(frame, contextSource, mnemonic, keystroke);
     }
     
-    protected void exportFile(File selectedFile) throws FileNotFoundException {
+    @Override
+	protected void exportFile(File selectedFile) throws FileNotFoundException {
         ObjectAttributeListWriter.writeObjectAttributeList(getContextSource().getContext(), new PrintStream(new FileOutputStream(selectedFile)));
     }
 
-    protected ExtensionFileFilter getFileFilter() {
+    @Override
+	protected ExtensionFileFilter getFileFilter() {
         return new ExtensionFileFilter(new String[] {"oal"}, "Formal Contexts as object-attribute lists");
     }
 
-    protected String getName() {
+    @Override
+	protected String getName() {
         return "Export OAL format...";
     }
 }

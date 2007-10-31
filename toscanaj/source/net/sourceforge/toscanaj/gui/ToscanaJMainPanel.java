@@ -161,7 +161,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
     /**
      * Keeps a list of most recently files.
      */
-    private List mruList = new LinkedList();
+    private List<String> mruList = new LinkedList<String>();
 
     /**
      * Stores the file name of the currently open file.
@@ -203,14 +203,15 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         recreateMruMenu();
         // if we have at least one MRU file try to open it
         if (this.mruList.size() > 0) {
-            File schemaFile = new File((String) this.mruList.get(this.mruList.size() - 1));
+            File schemaFile = new File(this.mruList.get(this.mruList.size() - 1));
             if (schemaFile.canRead()) {
                 openSchemaFile(schemaFile);
             }
         }
 
         this.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+            @Override
+			public void windowClosing(WindowEvent e) {
                 closeMainPanel();
             }
         });
@@ -727,7 +728,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
          *       though I could not find another way to get this. Try again...
          */
         if (this.conceptualSchema != null) {
-            Iterator it = this.conceptualSchema.getQueries().iterator();
+            Iterator<Query> it = this.conceptualSchema.getQueries().iterator();
             if (it.hasNext()) {
                 viewMenu.addSeparator();
                 boolean first = true;
@@ -735,7 +736,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                 String usedChars = "ax";
                 int count = 0;
                 while (it.hasNext()) {
-                    final Query query = (Query) it.next();
+                    final Query query = it.next();
                     count++;
                     String name = query.getName();
                     JRadioButtonMenuItem menuItem = new JRadioButtonMenuItem(name);
@@ -809,9 +810,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         JMenu colorModeMenu = new JMenu("Color schema");
         ButtonGroup colorModeGroup = new ButtonGroup();
         
-        Collection colorSchemas = DiagramSchema.getSchemas();
-        for (Iterator iter = colorSchemas.iterator(); iter.hasNext(); ) {
-            final DiagramSchema schema = (DiagramSchema) iter.next();
+        Collection<DiagramSchema> colorSchemas = DiagramSchema.getSchemas();
+        for (Iterator<DiagramSchema> iter = colorSchemas.iterator(); iter.hasNext(); ) {
+            final DiagramSchema schema = iter.next();
             JRadioButtonMenuItem colorSchemaItem = new JRadioButtonMenuItem(schema.getName());
             colorSchemaItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -1196,9 +1197,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
         this.mruMenu.removeAll();
         boolean empty = true; // will be used to check if we have at least one entry
         if (this.mruList.size() > 0) {
-            ListIterator it = this.mruList.listIterator(this.mruList.size() - 1);
+            ListIterator<String> it = this.mruList.listIterator(this.mruList.size() - 1);
             while (it.hasPrevious()) {
-                String cur = (String) it.previous();
+                String cur = it.previous();
                 if (cur.equals(this.currentFile)) {
                     // don't enlist the current file
                     continue;
@@ -1293,7 +1294,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
 	public static void showAboutDialog(JFrame parent) {
 		JOptionPane.showMessageDialog(parent,
 				"This program is part of ToscanaJ " + ToscanaJ.VersionString + ".\n\n" +
-				"Copyright (c) DSTC Pty Ltd, Technische Universität Darmstadt and the\n" +
+				"Copyright (c) DSTC Pty Ltd, Technische Universitï¿½t Darmstadt and the\n" +
 				"University of Queensland\n\n" +
                 "This product includes software developed by the " +
                 "Apache Software Foundation (http://www.apache.org/).\n\n" +

@@ -166,7 +166,8 @@ public class DecimalType extends AbstractXSDDatatype {
         return true;
     }
     
-    public boolean canConvertFrom(Value value) {
+    @Override
+	public boolean canConvertFrom(Value value) {
         if(value instanceof StringValue) {
             return canParse(((StringValue) value).getValue());
         } else {
@@ -174,7 +175,8 @@ public class DecimalType extends AbstractXSDDatatype {
         }
     }
     
-    public Value convertType(Value value) throws ConversionException {
+    @Override
+	public Value convertType(Value value) throws ConversionException {
         if(value instanceof StringValue) {
             return parse(((StringValue) value).getValue());
         } else {
@@ -182,7 +184,8 @@ public class DecimalType extends AbstractXSDDatatype {
         }
     }
     
-    public boolean canParse(String text) {
+    @Override
+	public boolean canParse(String text) {
         try {
             double val = Double.parseDouble(text);
             return isValidDoubleValue(val);
@@ -191,7 +194,8 @@ public class DecimalType extends AbstractXSDDatatype {
         }
     }
 
-    public Value parse(String text) throws ConversionException {
+    @Override
+	public Value parse(String text) throws ConversionException {
         try {
             double val = Double.parseDouble(text);
             if(!isValidDoubleValue(val)) {
@@ -216,11 +220,13 @@ public class DecimalType extends AbstractXSDDatatype {
     	// @TODO implement
     }
 
-    protected String getBaseType() {
+    @Override
+	protected String getBaseType() {
         return "decimal";
     }
 
-    protected void addRestrictions(Element restrictionElement) {
+    @Override
+	protected void addRestrictions(Element restrictionElement) {
         if (this.min != null) {
             Element minElement;
             if (this.minIncluded) {

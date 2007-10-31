@@ -183,7 +183,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
     private DiagramEditingView diagramEditingView;
     private TemporalControlsPanel temporalControls;
-    private List mruList = new LinkedList();
+    private List<String> mruList = new LinkedList<String>();
     private File currentFile;
     private DiagramExportSettings diagramExportSettings;
     private ExportDiagramAction exportDiagramAction;
@@ -228,7 +228,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         // if we have at least one MRU file try to open it
         if (loadLastFile && this.mruList.size() > 0) {
             File schemaFile =
-                new File((String) this.mruList.get(this.mruList.size() - 1));
+                new File(this.mruList.get(this.mruList.size() - 1));
             if (schemaFile.canRead()) {
                 openSchemaFile(schemaFile);
             }
@@ -783,9 +783,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         JMenu colorModeMenu = new JMenu("Color schema");
         ButtonGroup colorModeGroup = new ButtonGroup();
         
-        Collection colorSchemas = DiagramSchema.getSchemas();
-        for (Iterator iter = colorSchemas.iterator(); iter.hasNext(); ) {
-            final DiagramSchema schema = (DiagramSchema) iter.next();
+        Collection<DiagramSchema> colorSchemas = DiagramSchema.getSchemas();
+        for (Iterator<DiagramSchema> iter = colorSchemas.iterator(); iter.hasNext(); ) {
+            final DiagramSchema schema = iter.next();
             JRadioButtonMenuItem colorSchemaItem = new JRadioButtonMenuItem(schema.getName());
             colorSchemaItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -908,7 +908,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         
         CernatoTable cernatoContext = cernatoModel.getContext();
         Vector types = cernatoModel.getTypes();
-        Map typeMap = new Hashtable();
+        Map<PropertyType, Datatype> typeMap = new Hashtable<PropertyType, Datatype>();
         for (Iterator it = types.iterator(); it.hasNext();) {
             PropertyType cernatoType = (PropertyType) it.next();
             org.tockit.cernatoXML.model.Value[] valueRange = 
@@ -941,17 +941,17 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             typeMap.put(cernatoType, targetType);
         }
         Set properties = cernatoContext.getProperties();
-        Map attributeMap = new Hashtable();
+        Map<Property, ManyValuedAttributeImplementation> attributeMap = new Hashtable<Property, ManyValuedAttributeImplementation>();
         for (Iterator it = properties.iterator(); it.hasNext();) {
             Property property = (Property) it.next();
-            Datatype attributeType = (Datatype)typeMap.get(property.getType());
+            Datatype attributeType = typeMap.get(property.getType());
             ManyValuedAttributeImplementation attribute = 
                 new ManyValuedAttributeImplementation(attributeType, property.getName());
             result.add(attribute);
             attributeMap.put(property, attribute);
         }
         Set objects = cernatoContext.getObjects();
-        Map objectMap = new Hashtable();
+        Map<CernatoObject, FCAElementImplementation> objectMap = new Hashtable<CernatoObject, FCAElementImplementation>();
         for (Iterator it = objects.iterator(); it.hasNext();) {
             CernatoObject cernatoObject = (CernatoObject) it.next();
             FCAElementImplementation targetObject = new FCAElementImplementation(cernatoObject.getName());
@@ -966,8 +966,8 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
                 org.tockit.cernatoXML.model.Value value = 
                     cernatoContext.getRelationship(cernatoObject, property);
 
-                FCAElement targetObject = (FCAElement) objectMap.get(cernatoObject);
-                ManyValuedAttribute attribute = (ManyValuedAttribute) attributeMap.get(property);
+                FCAElement targetObject = objectMap.get(cernatoObject);
+                ManyValuedAttribute attribute = attributeMap.get(property);
                 if(value instanceof NumericalValue) {
                     NumericalValue numValue = (NumericalValue) value;
                     result.setRelationship(targetObject, attribute, new DecimalValue(numValue.getValue()));
@@ -1232,7 +1232,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             Context mappedContext = new ContextImplementation();
             BinaryRelationImplementation mappedRelation = 
                 (BinaryRelationImplementation) mappedContext.getRelation();
-            Map objectMap = new Hashtable();
+            Map<CernatoObject, FCAElement> objectMap = new Hashtable<CernatoObject, FCAElement>();
             for (Iterator objIt = viewContext.getObjects().iterator(); objIt.hasNext();) {
                 CernatoObject object = (CernatoObject) objIt.next();
                 FCAElement newObject = new FCAElementImplementation(object.getName());
@@ -1355,9 +1355,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         boolean empty = true;
         // will be used to check if we have at least one entry
         if (this.mruList.size() > 0) {
-            ListIterator it = this.mruList.listIterator(this.mruList.size());
+            ListIterator<String> it = this.mruList.listIterator(this.mruList.size());
             while (it.hasPrevious()) {
-                String cur = (String) it.previous();
+                String cur = it.previous();
                 if (this.currentFile != null && 
                         cur.equals(this.currentFile.getAbsolutePath())) {
                     // don't enlist the current file
@@ -1417,26 +1417,26 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
         ManyValuedContextImplementation mvContext = new ManyValuedContextImplementation();
         StringType type = StringType.createEnumerationRestrictedType("single valued", new String[]{"X"});
         mvContext.add(type);
-        for (Iterator iter = this.conceptualSchema.getDiagramsIterator(); iter.hasNext(); ) {
-            Diagram2D diagram = (Diagram2D) iter.next();
+        for (Iterator<Diagram2D> iter = this.conceptualSchema.getDiagramsIterator(); iter.hasNext(); ) {
+            Diagram2D diagram = iter.next();
             Context svContext = DiagramToContextConverter.getContext(diagram);
             BinaryRelation relation = svContext.getRelation();
-            HashMap attributeMap = new HashMap(); 
-            for (Iterator attrIt = svContext.getAttributes().iterator(); attrIt.hasNext(); ) {
+            HashMap<FCAElement, ManyValuedAttribute> attributeMap = new HashMap<FCAElement, ManyValuedAttribute>(); 
+            for (Iterator<Object> attrIt = svContext.getAttributes().iterator(); attrIt.hasNext(); ) {
                 FCAElement attribute = (FCAElement) attrIt.next();
                 ManyValuedAttribute mvAttribute = new ManyValuedAttributeImplementation(type,attribute.getData().toString());
                 mvContext.add(mvAttribute);
                 attributeMap.put(attribute, mvAttribute);
             }
-            for (Iterator objIt = svContext.getObjects().iterator(); objIt.hasNext(); ) {
+            for (Iterator<Object> objIt = svContext.getObjects().iterator(); objIt.hasNext(); ) {
                 FCAElement object = (FCAElement) objIt.next();
                 mvContext.add(object);
-                for (Iterator attrIt = svContext.getAttributes().iterator(); attrIt.hasNext(); ) {
+                for (Iterator<Object> attrIt = svContext.getAttributes().iterator(); attrIt.hasNext(); ) {
                     FCAElement attribute = (FCAElement) attrIt.next();
                     if(relation.contains(object, attribute)) {
-                        mvContext.setRelationship(object, (ManyValuedAttribute) attributeMap.get(attribute), new StringValue("X"));
+                        mvContext.setRelationship(object, attributeMap.get(attribute), new StringValue("X"));
                     } else {
-                        mvContext.setRelationship(object, (ManyValuedAttribute) attributeMap.get(attribute), null);
+                        mvContext.setRelationship(object, attributeMap.get(attribute), null);
                     }
                 }
             }
@@ -1506,9 +1506,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 	 *       into the main context
 	 */
 	private void ensureObjectSetConsistency() {
-		Set allObjects = new HashSet();
-		for (Iterator diagIt = this.conceptualSchema.getDiagramsIterator(); diagIt.hasNext();) {
-            Diagram2D diagram = (Diagram2D) diagIt.next();
+		Set<Object> allObjects = new HashSet<Object>();
+		for (Iterator<Diagram2D> diagIt = this.conceptualSchema.getDiagramsIterator(); diagIt.hasNext();) {
+            Diagram2D diagram = diagIt.next();
             Concept concept = diagram.getTopConcept();
             for (Iterator concIt = concept.getExtentIterator(); concIt.hasNext();) {
                 Object object = concIt.next();
@@ -1516,7 +1516,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             }
         }
         
-		for (Iterator diagIt = this.conceptualSchema.getDiagramsIterator(); diagIt.hasNext();) {
+		for (Iterator<Diagram2D> diagIt = this.conceptualSchema.getDiagramsIterator(); diagIt.hasNext();) {
 			NDimDiagram diagram = (NDimDiagram) diagIt.next();
 			
 			ConceptImplementation concept = (ConceptImplementation) diagram.getTopConcept();
@@ -1524,7 +1524,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 				continue;			
 			}
 			
-			Set difference = new HashSet(allObjects);
+			Set<Object> difference = new HashSet<Object>(allObjects);
 			for (Iterator extIt = concept.getExtentIterator(); extIt.hasNext();) {
                 Object object = extIt.next();
                 difference.remove(object);
@@ -1542,7 +1542,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 				DiagramNode newTop = new NDimDiagramNode(diagram,"new top", new double[diagram.getBase().size()], concept, 
 				                                         null, new LabelInfo(),null);
 				                                         
-				for (Iterator nodeIt = diagram.getNodes(); nodeIt.hasNext();) {
+				for (Iterator<DiagramNode> nodeIt = diagram.getNodes(); nodeIt.hasNext();) {
 					NDimDiagramNode node = (NDimDiagramNode) nodeIt.next();
                     double[] newPos = new double[node.getNdimVector().length + 1];
                     for (int i = 0; i < node.getNdimVector().length; i++) {
@@ -1558,7 +1558,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 				diagram.addLine(newTop, topNode);
 			}
 			
-			for (Iterator diffIt = difference.iterator(); diffIt.hasNext();) {
+			for (Iterator<Object> diffIt = difference.iterator(); diffIt.hasNext();) {
                 FCAElement object = (FCAElement) diffIt.next();
                 concept.addObject(object);
             }

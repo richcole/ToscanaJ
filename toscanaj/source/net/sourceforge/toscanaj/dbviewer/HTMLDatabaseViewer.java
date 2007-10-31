@@ -62,13 +62,13 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
 
         private Element repetitionBlock = null;
 
-        private List singleFieldElements = new LinkedList();
+        private List<Element> singleFieldElements = new LinkedList<Element>();
 
-        private List singleFieldNames = new LinkedList();
+        private List<String> singleFieldNames = new LinkedList<String>();
 
-        private List repeatedFieldElements = new LinkedList();
+        private List<Element> repeatedFieldElements = new LinkedList<Element>();
 
-        private List repeatedFieldNames = new LinkedList();
+        private List<String> repeatedFieldNames = new LinkedList<String>();
 
         private Element template = null;
 
@@ -97,10 +97,10 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
             }
 
             // find <repeat> and non-repeat <field>s first
-            List queue = new LinkedList();
+            List<Element> queue = new LinkedList<Element>();
             queue.add(this.template.getChild("html"));
             while (!queue.isEmpty()) {
-                Element elem = (Element) queue.remove(0);
+                Element elem = queue.remove(0);
                 if (elem.getName().equals("repeat")) {
                     if (this.repeatElement != null) {
                         throw new DatabaseViewerException("Two repeat sections found in template.");
@@ -120,10 +120,10 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
 
             // find repeated fields
             if (this.repeatElement != null) {
-                queue = new LinkedList();
+                queue = new LinkedList<Element>();
                 queue.add(this.repetitionBlock);
                 while (!queue.isEmpty()) {
-                    Element elem = (Element) queue.remove(0);
+                    Element elem = queue.remove(0);
                     queue.addAll(elem.getChildren());
                     if (elem.getName().equals("field")) {
                     	this.repeatedFieldElements.add(elem);
@@ -135,7 +135,8 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
             }
 
             this.addWindowListener(new WindowAdapter() {
-                public void windowClosing(WindowEvent e) {
+                @Override
+				public void windowClosing(WindowEvent e) {
                     closeDialog();
                 }
             });
@@ -175,15 +176,15 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
 
         private void showView(String whereClause) {
             try {
-                List results = this.viewerManager.getConnection().executeQuery(this.singleFieldNames,
+                List<Vector<Object>> results = this.viewerManager.getConnection().executeQuery(this.singleFieldNames,
                 		this.viewerManager.getTableName(),
                         whereClause);
-                Vector fields = (Vector) results.get(0);
+                Vector fields = results.get(0);
                 Iterator itFields = fields.iterator();
-                Iterator itElems = this.singleFieldElements.iterator();
+                Iterator<Element> itElems = this.singleFieldElements.iterator();
                 while (itFields.hasNext()) {
                     String result = (String) itFields.next();
-                    Element fieldElem = (Element) itElems.next();
+                    Element fieldElem = itElems.next();
                     if (result == null) {
                         // an empty <span> is displayed as greater than symbol in JEditPane
                         fieldElem.setText(" ");
@@ -196,14 +197,14 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
                     		this.viewerManager.getTableName(),
                             whereClause);
                     this.repeatElement.setContent(null);
-                    Iterator it = results.iterator();
+                    Iterator<Vector<Object>> it = results.iterator();
                     while (it.hasNext()) {
-                        fields = (Vector) it.next();
+                        fields = it.next();
                         itFields = fields.iterator();
                         itElems = this.repeatedFieldElements.iterator();
                         while (itFields.hasNext()) {
                             String result = (String) itFields.next();
-                            Element fieldElem = (Element) itElems.next();
+                            Element fieldElem = itElems.next();
                             if (result == null) {
                                 // an empty <span> is displayed as greater than symbol in JEditPane
                                 fieldElem.setText(" ");

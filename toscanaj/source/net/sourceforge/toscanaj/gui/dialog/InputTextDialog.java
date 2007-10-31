@@ -93,7 +93,8 @@ public class InputTextDialog extends JDialog {
 		setContentPane(this.optionPane);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(new WindowAdapter() {
-		        public void windowClosing(WindowEvent we) {
+		        @Override
+				public void windowClosing(WindowEvent we) {
 		        	if (InputTextDialog.this.withCancelButton) {
 						/*
 						 * Instead of directly closing the window,

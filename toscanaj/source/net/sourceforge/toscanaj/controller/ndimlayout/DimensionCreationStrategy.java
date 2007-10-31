@@ -8,9 +8,10 @@
 package net.sourceforge.toscanaj.controller.ndimlayout;
 
 import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
 
 import java.util.Vector;
 
 public interface DimensionCreationStrategy {
-    Vector calculateDimensions(Lattice lattice);
+    Vector<Dimension> calculateDimensions(Lattice lattice);
 }

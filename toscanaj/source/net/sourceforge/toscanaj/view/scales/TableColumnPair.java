@@ -31,6 +31,7 @@ public class TableColumnPair {
 		return table.getSqlExpression() + "." + column.getSqlExpression();
 	}
 
+	@Override
 	public String toString() {
 		return table.getDisplayName() + "." + column.getDisplayName();
 	}

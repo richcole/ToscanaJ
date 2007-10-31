@@ -134,9 +134,9 @@ public class ToscanaJPreferences {
         boolean okClicked = GenericDialog.showDialog(parent, "Preferences", panel);
         if(okClicked) {
             panel.applyChanges();
-            Collection schemas = DiagramSchema.getSchemas();
-            for (Iterator iter = schemas.iterator(); iter.hasNext(); ) {
-                DiagramSchema schema = (DiagramSchema) iter.next();
+            Collection<DiagramSchema> schemas = DiagramSchema.getSchemas();
+            for (Iterator<DiagramSchema> iter = schemas.iterator(); iter.hasNext(); ) {
+                DiagramSchema schema = iter.next();
                 if(schema.getName().equals("User Defined")) {
                     schema.setAsCurrent();
                     schema.restore(DIAGRAM_SCHEMA_NODE);

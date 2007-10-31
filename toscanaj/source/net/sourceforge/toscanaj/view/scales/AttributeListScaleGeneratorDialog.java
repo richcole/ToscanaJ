@@ -46,6 +46,7 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 		
 		// to enforce the minimum size during resizing of the JDialog
 		addComponentListener( new ComponentAdapter() {
+			@Override
 			public void componentResized(ComponentEvent e) {
 				int width = getWidth();
 				int height = getHeight();
@@ -53,6 +54,7 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
 				setSize(width, height);
 			}
+			@Override
 			public void componentShown(ComponentEvent e) {
 				componentResized(e);
 			}
@@ -211,10 +213,12 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 					createButton.setEnabled(true);
 				}
 			}
+			@Override
 			public void keyTyped(KeyEvent e) {
 				validateTextField();
 				setCreateButtonStatus();
 			}
+			@Override
 			public void keyReleased(KeyEvent e) {
 				validateTextField();
 				setCreateButtonStatus();
@@ -372,6 +376,7 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				return modelData.length;
 			}
 
+			@Override
 			public String getColumnName(int col) {
 				return columnNames[col];
 			}
@@ -380,10 +385,12 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
 				return modelData[row][col];
 			}
 
+			@Override
 			public boolean isCellEditable(int row, int col) {
 					return true;
 			}
 
+			@Override
 			public void setValueAt(Object value, int row, int col) {
 
 				if (modelData[0][col] instanceof Integer && !(value instanceof Integer)) {                  

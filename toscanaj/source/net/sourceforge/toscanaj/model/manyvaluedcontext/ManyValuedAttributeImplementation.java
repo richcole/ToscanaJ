@@ -28,7 +28,7 @@ public class ManyValuedAttributeImplementation implements WritableManyValuedAttr
         this.name = name;
     }
     
-    public ManyValuedAttributeImplementation(Element element, Hashtable typeIdMapping) throws XMLSyntaxError {
+    public ManyValuedAttributeImplementation(Element element, Hashtable<String, Datatype> typeIdMapping) throws XMLSyntaxError {
     	readXML(element, typeIdMapping);
     }
 
@@ -44,7 +44,8 @@ public class ManyValuedAttributeImplementation implements WritableManyValuedAttr
         return name;
     }
     
-    public String toString() {
+    @Override
+	public String toString() {
     	return getName();
     }
 
@@ -59,9 +60,9 @@ public class ManyValuedAttributeImplementation implements WritableManyValuedAttr
 		return retVal;
 	}
 
-	public void readXML(Element elem, Hashtable typesIdMapping) throws XMLSyntaxError { 
+	public void readXML(Element elem, Hashtable<String, Datatype> typesIdMapping) throws XMLSyntaxError { 
 		String typeRef = XMLHelper.getAttribute(elem, TYPE_REF_ATTRIBUTE_NAME).getValue();
-		this.type = (Datatype) typesIdMapping.get(typeRef);
+		this.type = typesIdMapping.get(typeRef);
 		this.name = XMLHelper.getAttribute(elem, NAME_ATTRIBUTE_NAME).getValue();
 	}
 }

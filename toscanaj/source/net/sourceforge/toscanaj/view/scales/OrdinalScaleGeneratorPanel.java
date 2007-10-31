@@ -61,11 +61,11 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 	private DatabaseConnection connection;
   
 	private static interface ContextGenerator {
-		Context createContext(String name, List dividers, Column column);
+		Context createContext(String name, List<Object> dividers, Column column);
 	}
     
 	private static abstract class SingleDimensionScaleGenerator implements ContextGenerator {
-		public Context createContext(String name, List dividers, Column column) {
+		public Context createContext(String name, List<Object> dividers, Column column) {
 			ContextImplementation context = new ContextImplementation();
 			context.setName(name);
 			for (int i = -1; i < dividers.size(); i++) {
@@ -76,7 +76,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 				if(attributeName != null) {
 					context.getAttributes().add(new FCAElementImplementation(attributeName));
 				}
-				Iterator it = context.getAttributes().iterator();
+				Iterator<Object> it = context.getAttributes().iterator();
 				while (it.hasNext()) {
                     WritableFCAElement attribute = (WritableFCAElement) it.next();
 					context.getRelationImplementation().insert(object,attribute);
@@ -85,14 +85,14 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 			return context;
 		}
 
-		public String createAttributeName(List dividers, int i) {
+		public String createAttributeName(List<Object> dividers, int i) {
 			if(i == -1){
 				return null;
 			}
 			return getForwardSymbol() + String.valueOf(dividers.get(getPosition(i, dividers.size())));
 		}
 
-		public String createSQLClause(String columnName, List dividers, int i) {
+		public String createSQLClause(String columnName, List<Object> dividers, int i) {
 			if(i == -1) {
 				return "(" + columnName + getBackwardSymbol() + String.valueOf(dividers.get(getPosition(0, dividers.size()))) + ")";
 			}
@@ -110,60 +110,76 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 	} 
     
 	private static class IncreasingExclusiveGenerator extends SingleDimensionScaleGenerator {
+		@Override
 		public String toString() {
 			return "increasing, exclude bounds";
 		}
+		@Override
 		protected int getPosition(int i, int max) {
 			return i;
 		}
+		@Override
 		protected String getForwardSymbol() {
 			return ">";
 		}
+		@Override
 		protected String getBackwardSymbol() {
 			return "<=";
 		}
 	}
 
 	private static class IncreasingInclusiveGenerator extends SingleDimensionScaleGenerator {
+		@Override
 		public String toString() {
 			return "increasing, include bounds";
 		}
+		@Override
 		protected int getPosition(int i, int max) {
 			return i;
 		}
+		@Override
 		protected String getForwardSymbol() {
 			return ">=";
 		}
+		@Override
 		protected String getBackwardSymbol() {
 			return "<";
 		}
 	}
 
 	private static class DecreasingExclusiveGenerator extends SingleDimensionScaleGenerator {
+		@Override
 		public String toString() {
 			return "decreasing, exclude bounds";
 		}
+		@Override
 		protected int getPosition(int i, int max) {
 			return max - i -1;
 		}
+		@Override
 		protected String getForwardSymbol() {
 			return "<";
 		}
+		@Override
 		protected String getBackwardSymbol() {
 			return ">=";
 		}
 	}
 
 	private static class DecreasingInclusiveGenerator extends SingleDimensionScaleGenerator {
+		@Override
 		public String toString() {
 			return "decreasing, include bounds";
 		}
+		@Override
 		protected int getPosition(int i, int max) {
 			return max - i -1;
 		}
+		@Override
 		protected String getForwardSymbol() {
 			return "<=";
 		}
+		@Override
 		protected String getBackwardSymbol() {
 			return ">";
 		}
@@ -174,7 +190,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 	 * the other direction ==> implement.
 	 */
 	private static abstract class InterordinalGenerator implements ContextGenerator {
-		public Context createContext(String name, List dividers, Column column) {
+		public Context createContext(String name, List<Object> dividers, Column column) {
 			ContextImplementation context = new ContextImplementation();
 			context.setName(name);
 			int numDiv = dividers.size();
@@ -209,29 +225,35 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 			return context;
 		}
 
-		protected abstract WritableFCAElement getUpwardsAttribute(List dividers, int i);
-		protected abstract WritableFCAElement getDownwardsAttribute(List dividers, int i);
+		protected abstract WritableFCAElement getUpwardsAttribute(List<Object> dividers, int i);
+		protected abstract WritableFCAElement getDownwardsAttribute(List<Object> dividers, int i);
 	}
     
 	private static class Type1InterordinalGenerator extends InterordinalGenerator {
-		protected WritableFCAElement getUpwardsAttribute(List dividers, int i) {
+		@Override
+		protected WritableFCAElement getUpwardsAttribute(List<Object> dividers, int i) {
 			return new FCAElementImplementation(">= " + dividers.get(i));
 		}
-		protected WritableFCAElement getDownwardsAttribute(List dividers, int i) {
+		@Override
+		protected WritableFCAElement getDownwardsAttribute(List<Object> dividers, int i) {
 			return new FCAElementImplementation("< " + dividers.get(i));
 		}
+		@Override
 		public String toString() {
 			return "both, increasing side includes bounds";
 		}
 	}
 
 	private static class Type2InterordinalGenerator extends InterordinalGenerator {
-		protected WritableFCAElement getUpwardsAttribute(List dividers, int i) {
+		@Override
+		protected WritableFCAElement getUpwardsAttribute(List<Object> dividers, int i) {
 			return new FCAElementImplementation("> " + dividers.get(i));
 		}
-		protected WritableFCAElement getDownwardsAttribute(List dividers, int i) {
+		@Override
+		protected WritableFCAElement getDownwardsAttribute(List<Object> dividers, int i) {
 			return new FCAElementImplementation("<= " + dividers.get(i));
 		}
+		@Override
 		public String toString() {
 			return "both, decreasing side includes bounds";
 		}
@@ -456,12 +478,12 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 
 	private void fillControls() {
 		this.columnChooser.removeAllItems();
-		List tables = this.databaseSchema.getTables();
-		for (Iterator tableIterator = tables.iterator(); tableIterator.hasNext();) {
-			Table table = (Table) tableIterator.next();
-			List columns = table.getColumns();
-			for (Iterator columnsIterator = columns.iterator(); columnsIterator.hasNext();) {
-				Column currentColumn = (Column) columnsIterator.next();
+		List<Table> tables = this.databaseSchema.getTables();
+		for (Iterator<Table> tableIterator = tables.iterator(); tableIterator.hasNext();) {
+			Table table = tableIterator.next();
+			List<Column> columns = table.getColumns();
+			for (Iterator<Column> columnsIterator = columns.iterator(); columnsIterator.hasNext();) {
+				Column currentColumn = columnsIterator.next();
 				if(determineDataType(currentColumn.getType()) != UNSUPPORTED) {
 					this.columnChooser.addItem(new TableColumnPair(table, currentColumn));
 				}
@@ -604,7 +626,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 		addField.setText("");
 	}
 
-	public java.util.List getDividers() {
+	public java.util.List<Object> getDividers() {
 		return Arrays.asList(dividersModel.toArray());
 	}
 

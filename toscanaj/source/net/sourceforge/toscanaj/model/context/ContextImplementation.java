@@ -35,11 +35,11 @@ public class ContextImplementation implements ListsContext {
     	this.name = name;
     }
 
-    public Set getObjects() {
+    public Set<Object> getObjects() {
         return objects;
     }
 
-    public Set getAttributes() {
+    public Set<Object> getAttributes() {
         return attributes;
     }
 
@@ -61,11 +61,11 @@ public class ContextImplementation implements ListsContext {
 	
 	public Context createSum(Context other, String title) {
 		ContextImplementation context = new ContextImplementation(title);
-		Set newObjects = context.getObjects();
-		Set newAttributes = context.getAttributes();
+		Set<Object> newObjects = context.getObjects();
+		Set<Object> newAttributes = context.getAttributes();
 		BinaryRelationImplementation newRelation = context.getRelationImplementation();
 		
-		Iterator objIt = this.getObjects().iterator();
+		Iterator<Object> objIt = this.getObjects().iterator();
 		while (objIt.hasNext()) {
 			Object object = objIt.next();
 			newObjects.add(object);
@@ -75,7 +75,7 @@ public class ContextImplementation implements ListsContext {
 			Object object = objIt.next();
 			newObjects.add(object);
 		}
-		Iterator attrIt = this.getAttributes().iterator();
+		Iterator<Object> attrIt = this.getAttributes().iterator();
 		while (attrIt.hasNext()) {
 			Object attribute = attrIt.next();
 			newAttributes.add(attribute);
@@ -105,11 +105,11 @@ public class ContextImplementation implements ListsContext {
 	 */
 	public Context createProduct(Context other, String title) {
 		ContextImplementation context = new ContextImplementation(title);
-		Set newObjects = context.getObjects();
-		Set newAttributes = context.getAttributes();
+		Set<Object> newObjects = context.getObjects();
+		Set<Object> newAttributes = context.getAttributes();
 		BinaryRelationImplementation newRelation = context.getRelationImplementation();
 		
-		Iterator attrIt = this.getAttributes().iterator();
+		Iterator<Object> attrIt = this.getAttributes().iterator();
 		while (attrIt.hasNext()) {
 			Object attribute = attrIt.next();
 			newAttributes.add(attribute);
@@ -119,10 +119,10 @@ public class ContextImplementation implements ListsContext {
 			Object attribute = attrIt.next();
 			newAttributes.add(attribute);
 		}
-		Iterator objIt = this.getObjects().iterator();
+		Iterator<Object> objIt = this.getObjects().iterator();
 		while (objIt.hasNext()) {
 			FCAElement objectL = (FCAElement) objIt.next();
-			Iterator objIt2 = other.getObjects().iterator();
+			Iterator<Object> objIt2 = other.getObjects().iterator();
 			while (objIt2.hasNext()) {
 				FCAElement objectR = (FCAElement) objIt2.next();
 				String newObjectData = "(" + objectL.getData().toString() 
@@ -158,7 +158,7 @@ public class ContextImplementation implements ListsContext {
 
     public void updatePositionMarkers() {
         int pos = 0;
-        for (Iterator it = this.objects.iterator(); it.hasNext(); ) {
+        for (Iterator<Object> it = this.objects.iterator(); it.hasNext(); ) {
             Object object = it.next();
             if(object instanceof WritableFCAElement) {
                 ((WritableFCAElement)object).setContextPosition(pos);
@@ -166,7 +166,7 @@ public class ContextImplementation implements ListsContext {
             pos++;
         }
         pos = 0;
-        for (Iterator it = this.attributes.iterator(); it.hasNext(); ) {
+        for (Iterator<Object> it = this.attributes.iterator(); it.hasNext(); ) {
             Object object = it.next();
             if(object instanceof WritableFCAElement) {
                 ((WritableFCAElement)object).setContextPosition(pos);

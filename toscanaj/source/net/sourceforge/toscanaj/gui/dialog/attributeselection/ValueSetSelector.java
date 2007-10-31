@@ -58,9 +58,9 @@ public class ValueSetSelector extends JPanel implements EventBrokerListener, SQL
 		model.removeAllElements();
     	String tableName = column.getTable().getSqlExpression();
     	try {
-            List results = this.connection.executeQuery("SELECT DISTINCT " + column.getSqlExpression() + " FROM " + tableName + ";");
-            for (Iterator iter = results.iterator(); iter.hasNext();) {
-                Vector result = (Vector) iter.next();
+            List<Vector<Object>> results = this.connection.executeQuery("SELECT DISTINCT " + column.getSqlExpression() + " FROM " + tableName + ";");
+            for (Iterator<Vector<Object>> iter = results.iterator(); iter.hasNext();) {
+                Vector result = iter.next();
                 model.addElement(result.get(0));
             }
         } catch (DatabaseException e) {

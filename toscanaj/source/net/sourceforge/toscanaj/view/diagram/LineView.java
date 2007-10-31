@@ -83,7 +83,8 @@ public class LineView extends CanvasItem {
     /**
      * Draws the line.
      */
-    public void draw(Graphics2D graphics) {
+    @Override
+	public void draw(Graphics2D graphics) {
         DiagramSchema diagramSchema = fromView.getDiagramView().getDiagramSchema();
         Point2D from = diagramLine.getFromPosition();
         Point2D to = diagramLine.getToPosition();
@@ -243,14 +244,16 @@ public class LineView extends CanvasItem {
     /**
      * Returns always false since we assume the line to have no width.
      */
-    public boolean containsPoint(Point2D point) {
+    @Override
+	public boolean containsPoint(Point2D point) {
         return false;
     }
 
     /**
      * Calculates the rectangle around this line.
      */
-    public Rectangle2D getCanvasBounds(Graphics2D graphics) {
+    @Override
+	public Rectangle2D getCanvasBounds(Graphics2D graphics) {
         Point2D from = diagramLine.getFromPosition();
         Point2D to = diagramLine.getToPosition();
         double x,y,w,h;
@@ -290,7 +293,8 @@ public class LineView extends CanvasItem {
         return DiagramView.NOT_SELECTED;
     }
 
-    public Point2D getPosition() {
+    @Override
+	public Point2D getPosition() {
         return this.fromView.getPosition();
     }
 }

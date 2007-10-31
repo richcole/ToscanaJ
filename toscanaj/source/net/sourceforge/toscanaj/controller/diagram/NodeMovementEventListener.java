@@ -55,6 +55,7 @@ public class NodeMovementEventListener implements EventBrokerListener {
 				// make a copy of the current start position
 				final Point2D undoPosition = this.startPosition;
 				undoManager.addEdit(new AbstractUndoableEdit() {
+					@Override
 					public void undo() throws CannotUndoException {
 						node.setPosition(undoPosition);
 						diagramView.requestScreenTransformUpdate();
@@ -62,6 +63,7 @@ public class NodeMovementEventListener implements EventBrokerListener {
 						super.undo();
 					}
 
+					@Override
 					public void redo() throws CannotRedoException {
 						node.setPosition(toPosition);
 						diagramView.requestScreenTransformUpdate();
@@ -69,6 +71,7 @@ public class NodeMovementEventListener implements EventBrokerListener {
 						super.redo();
 					}
 					
+					@Override
 					public String getPresentationName() {
 						return "Node movement";
 					}

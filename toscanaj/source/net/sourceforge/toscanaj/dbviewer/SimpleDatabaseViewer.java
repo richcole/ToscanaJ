@@ -23,10 +23,10 @@ import java.util.Vector;
  * <objectView class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer"
  *         name="Show object..."/>
  *     <parameter name="openDelimiter" value="!!"/>
- *     <parameter name="closeDelimiter" value="§§"/>
- *     <template>Name: !!name§§
- * Type: !!type§§
- * Size: !!size§§</template>
+ *     <parameter name="closeDelimiter" value="ï¿½ï¿½"/>
+ *     <template>Name: !!nameï¿½ï¿½
+ * Type: !!typeï¿½ï¿½
+ * Size: !!sizeï¿½ï¿½</template>
  * </objectView>
  *
  * Here the three fields "name", "type" and "size" will be queried and the
@@ -40,26 +40,26 @@ public class SimpleDatabaseViewer extends PagingDatabaseViewer {
 	private class SimpleViewPanel implements PageViewPanel {
 	    private JTextArea textArea;
 	
-	    private List textFragments = new LinkedList();
+	    private List<String> textFragments = new LinkedList<String>();
 	
-	    private List fieldNames = new LinkedList();
+	    private List<String> fieldNames = new LinkedList<String>();
 	
 	    public void showItem(String keyValue) {
 	        try {
 	            DatabaseViewerManager viewerManager = getManager();
-	            List results = viewerManager.getConnection().executeQuery(this.fieldNames,
+	            List<Vector<Object>> results = viewerManager.getConnection().executeQuery(this.fieldNames,
 	                    viewerManager.getTableName(),
 	                    "WHERE " + viewerManager.getKeyName() + "='" + keyValue + "'");
-	            Vector fields = (Vector) results.get(0);
-	            Iterator itText = this.textFragments.iterator();
+	            Vector fields = results.get(0);
+	            Iterator<String> itText = this.textFragments.iterator();
 	            Iterator itFields = fields.iterator();
 	            String output = "";
 	            while (itFields.hasNext()) { // we assume length(textFragements) = length(results) + 1
-	                String text = (String) itText.next();
+	                String text = itText.next();
 	                String result = (String) itFields.next();
 	                output += text + result;
 	            }
-	            output += (String) itText.next();
+	            output += itText.next();
 	            this.textArea.setText(output);
 	        } catch (DatabaseException e) {
 	            this.textArea.setText("Failed to query database:\n" + e.getMessage() + "\n" + e.getCause().getMessage());
@@ -68,11 +68,11 @@ public class SimpleDatabaseViewer extends PagingDatabaseViewer {
 	
 	    public Component getComponent() throws DatabaseViewerException {
 	        DatabaseViewerManager viewerManager = getManager();
-	        String openDelimiter = (String) viewerManager.getParameters().get("openDelimiter");
+	        String openDelimiter = viewerManager.getParameters().get("openDelimiter");
 	        if (openDelimiter == null) {
 	            throw new DatabaseViewerException("Open delimiter not defined");
 	        }
-	        String closeDelimiter = (String) viewerManager.getParameters().get("closeDelimiter");
+	        String closeDelimiter = viewerManager.getParameters().get("closeDelimiter");
 	        if (closeDelimiter == null) {
 	            throw new DatabaseViewerException("Close delimiter not defined");
 	        }
@@ -95,6 +95,7 @@ public class SimpleDatabaseViewer extends PagingDatabaseViewer {
 	    }
 	}
 
+	@Override
 	protected PageViewPanel createPanel() {
 		return new SimpleViewPanel();
 	}

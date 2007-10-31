@@ -103,7 +103,8 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
     	// should be created through factory
     }
 
-    public void draw(Graphics2D g) {
+    @Override
+	public void draw(Graphics2D g) {
     	if(this.startNode == this.endNode) {
     		return;
     	}
@@ -188,18 +189,21 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
         return finalColor;
     }
     
-    public boolean containsPoint(Point2D point) {
+    @Override
+	public boolean containsPoint(Point2D point) {
     	if(this.currentShape == null) {
     		return false;
     	}
     	return this.currentShape.contains(point);
     }
 
-    public Point2D getPosition() {
+    @Override
+	public Point2D getPosition() {
         return new Point2D.Double(this.bounds.getCenterX(), this.bounds.getCenterY());
     }
 
-    public Rectangle2D getCanvasBounds(Graphics2D g) {
+    @Override
+	public Rectangle2D getCanvasBounds(Graphics2D g) {
         // we need to update in case one of the nodes has moved
         // @todo try finding something better
         calculateBounds();

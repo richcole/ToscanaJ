@@ -54,11 +54,11 @@ public class CheckContextConsistencyAction extends AbstractAction implements Eve
 
 	public void actionPerformed(ActionEvent event) {
 		try {
-			Hashtable allProblems = new Hashtable();
-			Iterator it = this.conceptualSchema.getDiagramsIterator();
+			Hashtable<String, List<String>> allProblems = new Hashtable<String, List<String>>();
+			Iterator<Diagram2D> it = this.conceptualSchema.getDiagramsIterator();
 			while (it.hasNext()) {
-				Diagram2D curDiagram = (Diagram2D) it.next();
-				List curPoblems = ContextConsistencyChecker.checkConsistency(this.conceptualSchema, curDiagram, this.databaseConnection, this.parent);
+				Diagram2D curDiagram = it.next();
+				List<String> curPoblems = ContextConsistencyChecker.checkConsistency(this.conceptualSchema, curDiagram, this.databaseConnection, this.parent);
 				if (!curPoblems.isEmpty()) {
 					allProblems.put(curDiagram.getTitle(), curPoblems);
 				}
@@ -82,10 +82,10 @@ public class CheckContextConsistencyAction extends AbstractAction implements Eve
 				htmlElement.addContent(body);
 				body.addContent(new Element("h1").addContent("Problems found:"));
 				
-				Enumeration e = allProblems.keys();
+				Enumeration<String> e = allProblems.keys();
 				while (e.hasMoreElements()) {
-					String diagramTitle = (String) e.nextElement();
-					List problems = (List) allProblems.get(diagramTitle);
+					String diagramTitle = e.nextElement();
+					List problems = allProblems.get(diagramTitle);
 					body.addContent(new Element("h3").addContent("Diagram '" + diagramTitle + "'"));
 					Iterator problemsIterator = problems.iterator();
 					while (problemsIterator.hasNext()) {

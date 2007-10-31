@@ -32,12 +32,13 @@ public class SqlClauseLabelView extends LabelView {
         return allHidden;
     }
 
-    public boolean isVisible() {
+    @Override
+	public boolean isVisible() {
         return super.isVisible() && !allHidden;
     }
 
 	/// @todo use String[] instead
-	private List entries;
+	private List<String> entries;
 	
     public static LabelFactory getFactory() {
         return new LabelFactory(){
@@ -58,32 +59,39 @@ public class SqlClauseLabelView extends LabelView {
         super(diagramView, nodeView, label);
     }
 
-    protected int getPlacement() {
+    @Override
+	protected int getPlacement() {
         return LabelView.BELOW;
     }
 
-    public int getNumberOfEntries() {
+    @Override
+	public int getNumberOfEntries() {
         return this.entries.size();
     }
 
-    public Object getEntryAt(int position) {
+    @Override
+	public Object getEntryAt(int position) {
         return this.entries.get(position);
     }
 
-    protected boolean highlightedInIdeal() {
+    @Override
+	protected boolean highlightedInIdeal() {
         return true;
     }
 
-    protected boolean highlightedInFilter() {
+    @Override
+	protected boolean highlightedInFilter() {
         return false;
     }
 
-    protected boolean isFaded() {
+    @Override
+	protected boolean isFaded() {
         return nodeView.getSelectionState() == DiagramView.NOT_SELECTED;
     }
     
-    public void updateEntries() {
-        this.entries = new ArrayList();
+    @Override
+	public void updateEntries() {
+        this.entries = new ArrayList<String>();
     	Iterator objIt = this.labelInfo.getNode().getConcept().getObjectContingentIterator();
     	while (objIt.hasNext()) {
             String object = objIt.next().toString();

@@ -23,7 +23,8 @@ public class DecimalValue extends AbstractValue {
         return String.valueOf(this.value);
     }
 
-    public boolean isLesserThan(Ordered other) {
+    @Override
+	public boolean isLesserThan(Ordered other) {
         if(other.getClass() != DecimalValue.class) {
             return false;
         }
@@ -35,12 +36,14 @@ public class DecimalValue extends AbstractValue {
         return this.value;
     }
     
-    public boolean sameTypeEquals(Object other) {
+    @Override
+	public boolean sameTypeEquals(Object other) {
         DecimalValue otherValue = (DecimalValue) other;
         return otherValue.value == this.value;
     }
     
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         // create hashCode a la java.lang.Double
         long bits = Double.doubleToLongBits(value);
         return (int)(bits ^ (bits >>> 32));

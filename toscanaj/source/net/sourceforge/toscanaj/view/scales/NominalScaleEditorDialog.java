@@ -156,7 +156,8 @@ public class NominalScaleEditorDialog extends JDialog {
         public String getValue() {
             return colValue.getValue();
         }
-        public String toString() {
+        @Override
+		public String toString() {
         	return this.getSqlClause();
         }
         public String getAttributeLabel() {
@@ -209,7 +210,8 @@ public class NominalScaleEditorDialog extends JDialog {
 			return res;
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
         	return getSqlClause();
         }
 
@@ -252,7 +254,8 @@ public class NominalScaleEditorDialog extends JDialog {
 			return res;
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             return getSqlClause();
         }
 
@@ -275,6 +278,7 @@ public class NominalScaleEditorDialog extends JDialog {
 			return "NOT (" + this.sqlFragment.getSqlClause() + ")";
 		}
 
+		@Override
 		public String toString() {
 			return getSqlClause();
 		}
@@ -285,6 +289,7 @@ public class NominalScaleEditorDialog extends JDialog {
 	}
 	
 	private class ColumnValuesListRenderer extends DefaultListCellRenderer {
+		@Override
 		public Component getListCellRendererComponent(JList list, Object value, 
 										int index,	boolean isSelected, 
 										boolean cellHasFocus) {
@@ -309,14 +314,16 @@ public class NominalScaleEditorDialog extends JDialog {
         preferences.restoreWindowPlacement(this, DEFAULT_PLACEMENT);
 		//	to enforce the minimum size during resizing of the JDialog
 		 addComponentListener( new ComponentAdapter() {
-			 public void componentResized(ComponentEvent e) {
+			 @Override
+			public void componentResized(ComponentEvent e) {
 				 int width = getWidth();
 				 int height = getHeight();
 				 if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
 				 if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
 				 setSize(width, height);
 			 }
-			 public void componentShown(ComponentEvent e) {
+			 @Override
+			public void componentShown(ComponentEvent e) {
 				 componentResized(e);
 			 }
 		 });
@@ -342,10 +349,12 @@ public class NominalScaleEditorDialog extends JDialog {
 					createButton.setEnabled(true);
 				}
 			}
+			@Override
 			public void keyTyped(KeyEvent e) {
 				validateTextField();
 				setCreateButtonStatus();
 			}
+			@Override
 			public void keyReleased(KeyEvent e) {
 				validateTextField();
 				setCreateButtonStatus();
@@ -403,7 +412,8 @@ public class NominalScaleEditorDialog extends JDialog {
         this.columnValuesListView = new JList(columnValuesListModel);
 		this.columnValuesListView.setCellRenderer(new ColumnValuesListRenderer());
         this.columnValuesListView.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+            @Override
+			public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (e.getClickCount() == 2) {
                     addValuesToSelection();
@@ -429,7 +439,8 @@ public class NominalScaleEditorDialog extends JDialog {
         this.attributeListModel = new DefaultListModel();
         this.attributeListView = new JList(attributeListModel);
         this.attributeListView.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+            @Override
+			public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
                 if (e.getClickCount() == 2) {
                     removeValuesFromSelection();
@@ -619,12 +630,12 @@ public class NominalScaleEditorDialog extends JDialog {
     private void fillControls() {
         this.columnChooser.removeAllItems();
         this.columnChooser.addItem("<Please select a column>");
-        List tables = this.databaseSchema.getTables();
-        for (Iterator tableIterator = tables.iterator(); tableIterator.hasNext();) {
-            Table table = (Table) tableIterator.next();
-            List columns = table.getColumns();
-            for (Iterator columnsIterator = columns.iterator(); columnsIterator.hasNext();) {
-                Column column = (Column) columnsIterator.next();
+        List<Table> tables = this.databaseSchema.getTables();
+        for (Iterator<Table> tableIterator = tables.iterator(); tableIterator.hasNext();) {
+            Table table = tableIterator.next();
+            List<Column> columns = table.getColumns();
+            for (Iterator<Column> columnsIterator = columns.iterator(); columnsIterator.hasNext();) {
+                Column column = columnsIterator.next();
                 this.columnChooser.addItem(new TableColumnPair(table, column));
             }
         }
@@ -638,19 +649,19 @@ public class NominalScaleEditorDialog extends JDialog {
         if(selectedTableColumnPair == null) {
         	return;
         }
-        List resultSet = null;
+        List<String> resultSet = null;
         try {
             String query = "SELECT DISTINCT " + selectedTableColumnPair.getSqlExpression() + " FROM " +
                     selectedTableColumnPair.getTable().getSqlExpression() + ";";
             resultSet = databaseConnection.queryColumn(query, 1);
-			Iterator it = resultSet.iterator();
+			Iterator<String> it = resultSet.iterator();
 			if (it.hasNext()) {
 				if (checkIfColumnAllowsNullValues()) {
 					this.columnValuesListModel.addElement(new NullColumnValue("NULL"));
 				}
 			}
             while ( it.hasNext()) {
-            	String value = (String) it.next();
+            	String value = it.next();
             	if(!valueSelected(selectedTableColumnPair, value)) {
                 	this.columnValuesListModel.addElement(new OrdinaryColumnValue(value));
             	}

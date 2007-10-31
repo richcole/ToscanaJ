@@ -54,7 +54,8 @@ public class LatticeGeneratorTest extends TestCase {
         assertEquals(0, lattice.getBottom().getAttributeContingentSize());
     }
 
-    protected void setUp() {
+    @Override
+	protected void setUp() {
         this.context = ContextSetups.createCompleteAnimalContext();
     }
 }

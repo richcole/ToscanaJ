@@ -48,11 +48,12 @@ import java.util.Vector;
  * CSX file the view is defined in.
  */
 public class InfoDatabaseViewer extends PagingDatabaseViewer {
-    protected PageViewPanel createPanel() throws DatabaseViewerException {
+    @Override
+	protected PageViewPanel createPanel() throws DatabaseViewerException {
         final JEditorPane textArea = new JEditorPane();
         textArea.setEditable(false);
         
-        String contentTypeDef = (String) getManager().getParameters().get("contentType");
+        String contentTypeDef = getManager().getParameters().get("contentType");
         if(contentTypeDef.equalsIgnoreCase("html")) {
             textArea.setContentType("text/html");
         } else if(contentTypeDef.equalsIgnoreCase("text")) {
@@ -63,8 +64,8 @@ public class InfoDatabaseViewer extends PagingDatabaseViewer {
         
         final JScrollPane scrollPane = new JScrollPane(textArea);
         
-        String urlColumnDef = (String) getManager().getParameters().get("urlColumn");
-        String contentColumnDef = (String) getManager().getParameters().get("contentColumn");
+        String urlColumnDef = getManager().getParameters().get("urlColumn");
+        String contentColumnDef = getManager().getParameters().get("contentColumn");
         if(urlColumnDef != null && contentColumnDef != null) {
             throw new DatabaseViewerException("Can only handle either \"urlColumn\" or \"contentColumn\" in InfoDatabaseViewer.");
         }
@@ -72,19 +73,19 @@ public class InfoDatabaseViewer extends PagingDatabaseViewer {
             throw new DatabaseViewerException("Either \"urlColumn\" or \"contentColumn\" required in InfoDatabaseViewer.");
         }
 
-        final List columns = new ArrayList();
+        final List<String> columns = new ArrayList<String>();
         if(urlColumnDef != null) {
             columns.add(urlColumnDef);
             return new PageViewPanel() {
                 public void showItem(String keyValue) throws DatabaseViewerException {
                     try {
-                        List results = getManager().getConnection()
+                        List<Vector<Object>> results = getManager().getConnection()
                                 .executeQuery(
                                         columns,
                                         getManager().getTableName(),
                                         "WHERE " + getManager().getKeyName()
                                                 + " = '" + keyValue + "';");
-                        Vector fields = (Vector) results.get(0);
+                        Vector fields = results.get(0);
                         String url = (String) fields.get(0);
                         URL resourceUrl = new URL(DatabaseViewerManager
                                 .getBaseURL(), url);
@@ -103,13 +104,13 @@ public class InfoDatabaseViewer extends PagingDatabaseViewer {
             return new PageViewPanel() {
                 public void showItem(String keyValue) throws DatabaseViewerException {
                     try {
-                        List results = getManager().getConnection()
+                        List<Vector<Object>> results = getManager().getConnection()
                                 .executeQuery(
                                         columns,
                                         getManager().getTableName(),
                                         "WHERE " + getManager().getKeyName()
                                                 + " = '" + keyValue + "';");
-                        Vector fields = (Vector) results.get(0);
+                        Vector fields = results.get(0);
                         String content = (String) fields.get(0);
                         textArea.setText(content);
                     } catch (Exception e) {

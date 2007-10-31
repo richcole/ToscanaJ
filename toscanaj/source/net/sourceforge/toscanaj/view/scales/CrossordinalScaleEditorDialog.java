@@ -50,14 +50,16 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 		preferences.restoreWindowPlacement(this, DEFAULT_PLACEMENT); 
 		//	to enforce the minimum size during resizing of the JDialog
 		 addComponentListener( new ComponentAdapter() {
-			 public void componentResized(ComponentEvent e) {
+			 @Override
+			public void componentResized(ComponentEvent e) {
 				 int width = getWidth();
 				 int height = getHeight();
 				 if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
 				 if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
 				 setSize(width, height);
 			 }
-			 public void componentShown(ComponentEvent e) {
+			 @Override
+			public void componentShown(ComponentEvent e) {
 				 componentResized(e);
 			 }
 		 });
@@ -106,9 +108,11 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 
 	private JPanel makeTitlePane() {
 		this.titleEditor.addKeyListener(new KeyAdapter(){
+			@Override
 			public void keyTyped(KeyEvent e) {
 				setCreateButtonState();
 			}
+			@Override
 			public void keyReleased(KeyEvent e) {
 				setCreateButtonState();
 			}
@@ -215,15 +219,15 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 	}
 	
 	private void extendAttributeNames(ContextImplementation context, String colName) {
-        Collection objects = context.getObjects();
+        Collection<Object> objects = context.getObjects();
         ListSet attributes = context.getAttributeList();
         BinaryRelationImplementation relation = context.getRelationImplementation();
-		Iterator it = attributes.iterator();
+		Iterator<Object> it = attributes.iterator();
 		while (it.hasNext()) {
             FCAElement attribute = (FCAElement) it.next();
             FCAElementImplementation newAttribute = 
                         new FCAElementImplementation(colName + " " + attribute.toString());
-            for (Iterator iter = objects.iterator(); iter.hasNext(); ) {
+            for (Iterator<Object> iter = objects.iterator(); iter.hasNext(); ) {
                 FCAElement object = (FCAElement) iter.next();
                 if(relation.contains(object, attribute)) {
                     relation.remove(object, attribute);

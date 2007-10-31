@@ -61,7 +61,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
      */
     EventBroker eventBroker;
 
-    private List queries = new ArrayList();
+    private List<Query> queries = new ArrayList<Query>();
 
     /**
      * List of tables and views in the database
@@ -71,7 +71,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
     /**
      * The list of diagrams.
      */
-    private Vector diagrams;
+    private Vector<Diagram2D> diagrams;
 
     /**
      * The XML (XHTML) describing the schema (or null if not found).
@@ -141,8 +141,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
         }
         if (this.queries.size() != 0) {
 	        Element queriesElement = new Element(QUERIES_ELEMENT_NAME);
-	        for (Iterator iterator = queries.iterator(); iterator.hasNext();) {
-	            Query query = (Query) iterator.next();
+	        for (Iterator<Query> iterator = queries.iterator(); iterator.hasNext();) {
+	            Query query = iterator.next();
 	            if(query != ListQuery.KEY_LIST_QUERY && 
 	            				query != AggregateQuery.COUNT_QUERY &&
 	            				query != AggregateQuery.PERCENT_QUERY ) {
@@ -152,7 +152,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
 	        retVal.addContent(queriesElement);
         }
         for (int i = 0; i < diagrams.size(); i++) {
-            Diagram2D d = (Diagram2D) diagrams.elementAt(i);
+            Diagram2D d = diagrams.elementAt(i);
             retVal.addContent(d.toXML());
         }
         return retVal;
@@ -222,8 +222,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
             if(dropDefaultsAttribute == null || dropDefaultsAttribute.equals("false")) { 
 				addDefaultQueries();
 			}
-            for (Iterator iterator = queriesElem.getChildren().iterator(); iterator.hasNext();) {
-                Element queryElem = (Element) iterator.next();
+            for (Iterator<Element> iterator = queriesElem.getChildren().iterator(); iterator.hasNext();) {
+                Element queryElem = iterator.next();
                 if (queryElem.getName().equals(AggregateQuery.QUERY_ELEMENT_NAME)) {
                     this.queries.add(new AggregateQuery(databaseInfo, queryElem));
                 } else if (queryElem.getName().equals(ListQuery.QUERY_ELEMENT_NAME)) {
@@ -235,9 +235,9 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
         } else {
             addDefaultQueries();
         }
-        List diagramElems = elem.getChildren(Diagram2D.DIAGRAM_ELEMENT_NAME);
-        for (Iterator iterator = diagramElems.iterator(); iterator.hasNext();) {
-            Element element = (Element) iterator.next();
+        List<Element> diagramElems = elem.getChildren(Diagram2D.DIAGRAM_ELEMENT_NAME);
+        for (Iterator<Element> iterator = diagramElems.iterator(); iterator.hasNext();) {
+            Element element = iterator.next();
             SimpleLineDiagram diagram;
             if(element.getChild("projectionBase") != null) {
                 diagram = new NDimDiagram(element);
@@ -261,7 +261,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
      */
     protected void reset() {
         databaseInfo = null;
-        diagrams = new Vector();
+        diagrams = new Vector<Diagram2D>();
     }
 
     /**
@@ -308,7 +308,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
      * Returns a diagram from the list using the index.
      */
     public Diagram2D getDiagram(int number) {
-        return (Diagram2D) diagrams.get(number);
+        return diagrams.get(number);
     }
 
     /**
@@ -316,9 +316,9 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
      */
     public Diagram2D getDiagram(String title) {
         Diagram2D retVal = null;
-        Iterator it = this.diagrams.iterator();
+        Iterator<Diagram2D> it = this.diagrams.iterator();
         while (it.hasNext()) {
-            Diagram2D cur = (Diagram2D) it.next();
+            Diagram2D cur = it.next();
             if (cur.getTitle().equals(title)) {
                 retVal = cur;
                 break;
@@ -355,8 +355,8 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
     }
     
     public void exchangeDiagrams(int from, int to){
-		Diagram2D indexDiagram = (Diagram2D)diagrams.get( from );
-		Diagram2D diagram = (Diagram2D)diagrams.get( to );
+		Diagram2D indexDiagram = diagrams.get( from );
+		Diagram2D diagram = diagrams.get( to );
 		diagrams.setElementAt(indexDiagram,to);
 		diagrams.setElementAt(diagram,from);  
 		markDataDirty();
@@ -389,9 +389,9 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
     }
 
     public boolean hasDiagramDescription() {
-		Iterator it = this.diagrams.iterator();
+		Iterator<Diagram2D> it = this.diagrams.iterator();
 		while (it.hasNext()) {
-			Diagram2D diagram = (Diagram2D) it.next();
+			Diagram2D diagram = it.next();
 			if(diagram.getDescription() != null) {
 				return true;
 			}
@@ -407,7 +407,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
         this.databaseSchema = schema;
     }
 
-    public List getQueries() {
+    public List<Query> getQueries() {
         return queries;
     }
 
@@ -435,9 +435,9 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
 
 	public void processEvent(Event e) {
 		DiagramChangedEvent dce = (DiagramChangedEvent) e;
-		Iterator it = this.diagrams.iterator();
+		Iterator<Diagram2D> it = this.diagrams.iterator();
 		while (it.hasNext()) {
-			Diagram2D diag = (Diagram2D) it.next();
+			Diagram2D diag = it.next();
 			if(diag == dce.getDiagram()) {
 				this.dataSaved = false;
 			}
@@ -447,7 +447,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
 	/**
 	 * returns an iterator of Diagram2D objects
 	 */
-	public Iterator getDiagramsIterator () {
+	public Iterator<Diagram2D> getDiagramsIterator () {
 		return this.diagrams.iterator();
 	}
 	

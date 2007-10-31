@@ -275,7 +275,8 @@ public class DiagramHistoryTest extends TestCase {
         assertEquals(1, this.diagramHistory.getNumberOfCurrentDiagrams());
     }
 
-    protected void setUp() {
+    @Override
+	protected void setUp() {
         this.diagramHistory = new DiagramHistory();
     }
 

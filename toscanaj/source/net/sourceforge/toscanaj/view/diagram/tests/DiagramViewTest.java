@@ -31,11 +31,13 @@ public class DiagramViewTest extends TestCase {
             super();
         }
 
-        public boolean isScreenTransformDirty() {
+        @Override
+		public boolean isScreenTransformDirty() {
             return super.isScreenTransformDirty();
         }
 
-        public void makeScreenTransformClear() {
+        @Override
+		public void makeScreenTransformClear() {
             super.makeScreenTransformClear();
         }
 
@@ -48,7 +50,8 @@ public class DiagramViewTest extends TestCase {
         view.makeScreenTransformClear();
         assertEquals(false, view.isScreenTransformDirty());
         view.addComponentListener(new ComponentAdapter() {
-            public void componentResized(ComponentEvent e) {
+            @Override
+			public void componentResized(ComponentEvent e) {
                 assertEquals(true, view.isScreenTransformDirty());
             }
         });

@@ -24,16 +24,16 @@ public class DumpSqlScript {
 		if(!connection.isConnected()) {
 			throw new RuntimeException("Database not connected");
 		}
-		Iterator tableNamesIt = connection.getTableNames().iterator();
+		Iterator<String> tableNamesIt = connection.getTableNames().iterator();
 		while (tableNamesIt.hasNext()) {
-            String tableName = (String) tableNamesIt.next();
+            String tableName = tableNamesIt.next();
             out.println("CREATE TABLE " + Table.getQuotedIdentifier(tableName) + " (");
             Table table = new Table(new EventBroker(), tableName, false);
             
-            Vector columns = connection.getColumns(table);
-            Iterator columnIt = columns.iterator();
+            Vector<Column> columns = connection.getColumns(table);
+            Iterator<Column> columnIt = columns.iterator();
             while (columnIt.hasNext()) {
-                Column column = (Column) columnIt.next();
+                Column column = columnIt.next();
                 String typeName = SQLTypeMapper.getSQLName(column.getType());
                 out.print("  " + column.getSqlExpression() + " " + typeName);
                 if(columnIt.hasNext()) {
@@ -45,9 +45,9 @@ public class DumpSqlScript {
 		    out.println(");");
 		    out.println();
 		    
-			Iterator rowIt = connection.executeQuery("SELECT * FROM " + Table.getQuotedIdentifier(tableName) + ";").iterator();
+			Iterator<Vector<Object>> rowIt = connection.executeQuery("SELECT * FROM " + Table.getQuotedIdentifier(tableName) + ";").iterator();
 			while (rowIt.hasNext()) {
-                Vector rowResults = (Vector) rowIt.next();
+                Vector rowResults = rowIt.next();
                 out.print("INSERT INTO " + Table.getQuotedIdentifier(tableName) + " VALUES (");
                 
                 Iterator resultIt = rowResults.iterator();

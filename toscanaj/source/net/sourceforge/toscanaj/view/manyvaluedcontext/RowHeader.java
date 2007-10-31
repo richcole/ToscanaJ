@@ -39,7 +39,8 @@ public class RowHeader extends JTable {
 	        setBorder(noFocusBorder);
 	    }
 	
-	    public void updateUI() {
+	    @Override
+		public void updateUI() {
 	        super.updateUI();
 	        Border cell = UIManager.getBorder("TableHeader.cellBorder");
 	        Border focus = UIManager.getBorder("Table.focusCellHighlightBorder");
@@ -49,7 +50,8 @@ public class RowHeader extends JTable {
 	             (cell, BorderFactory.createEmptyBorder(i.top, i.left, i.bottom, i.right));
 	    }
 	
-	    public Component getTableCellRendererComponent(JTable table,
+	    @Override
+		public Component getTableCellRendererComponent(JTable table,
                 Object value, boolean selected, boolean focused, int row,
                 int column) {
             if (table != null) {
@@ -82,6 +84,7 @@ public class RowHeader extends JTable {
 			return 1;
 		}
 		
+		@Override
 		public String getColumnName(int column) {
 			return "";
 		}

@@ -31,7 +31,7 @@ import org.tockit.swing.preferences.ExtendedPreferences;
 public class DiagramSchema implements Comparable {
     public static ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramSchema.class);
 
-    private static ArrayList schemas = new ArrayList();
+    private static ArrayList<DiagramSchema> schemas = new ArrayList<DiagramSchema>();
 
     private static DiagramSchema currentSchema;
     
@@ -87,7 +87,7 @@ public class DiagramSchema implements Comparable {
         }
     }
     
-    public static Collection getSchemas() {
+    public static Collection<DiagramSchema> getSchemas() {
         return Collections.unmodifiableCollection(schemas);
     }
     
@@ -595,8 +595,8 @@ public class DiagramSchema implements Comparable {
     }
     
     public static void storeAll() {
-        for (Iterator iter = schemas.iterator(); iter.hasNext(); ) {
-            DiagramSchema schema = (DiagramSchema) iter.next();
+        for (Iterator<DiagramSchema> iter = schemas.iterator(); iter.hasNext(); ) {
+            DiagramSchema schema = iter.next();
             schema.store();
         }
     }
@@ -654,7 +654,7 @@ public class DiagramSchema implements Comparable {
             System.err.println("Caught unknown node size scaling value for DiagramSchema: " + propVal);
             System.err.println("-- using default");
         }
-        List arrowStylesList = new ArrayList();
+        List<ArrowStyle> arrowStylesList = new ArrayList<ArrowStyle>();
         int i = 0;
         try {
             while(extPrefs.nodeExists("arrowStyle-" + i)) {
@@ -666,7 +666,7 @@ public class DiagramSchema implements Comparable {
             arrowStylesList.clear();
         }
         if(arrowStylesList.size() != 0) {
-            this.arrowStyles = (ArrowStyle[]) arrowStylesList.toArray(new ArrowStyle[arrowStylesList.size()]);
+            this.arrowStyles = arrowStylesList.toArray(new ArrowStyle[arrowStylesList.size()]);
         } else {
             this.arrowStyles = new ArrowStyle[] {
                     new ArrowStyle(Color.RED),

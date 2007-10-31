@@ -12,7 +12,7 @@ import java.util.Hashtable;
 
 public class ScaleImplementation implements Scale {
     protected String name;
-    protected Hashtable columns = new Hashtable();
+    protected Hashtable<String, ScaleColumn> columns = new Hashtable<String, ScaleColumn>();
 
     public ScaleImplementation(String name) {
         this.name = name;
@@ -27,7 +27,7 @@ public class ScaleImplementation implements Scale {
     }
 
     public ScaleColumn getColumn(String id) {
-        return (ScaleColumn) columns.get(id);
+        return columns.get(id);
     }
 
     public ScaleColumn[] getColumns() {
