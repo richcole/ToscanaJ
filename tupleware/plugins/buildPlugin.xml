@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Build Plugin Script" default="makeJar" basedir=".">
+<project name="Build Plugin Script" default="dist" basedir=".">
 	<description>
 		Build file capable of compiling and building given plugin.
 		Assumptions are that this script is called from build.xml
@@ -22,6 +22,9 @@
 		set the property "plugin.version.name" in it (standard Java
 		property file format).
 	</description>
+
+	<!-- global build properties -->
+	<property file="../../build.properties"/>
 
 	<!-- 
 	These properties should be set if this script is run as 
@@ -97,7 +100,8 @@
 		<javac srcdir="${plugin.src.dir}" 
 				destdir="${plugin.build.dir}" debug="on" 
 				optimize="off" deprecation="on"
-				source="1.4">
+				source="${source.level}"
+			    target="${target.level}">
 			<classpath refid="plugin.class.path"/>
 		</javac>
 	</target>

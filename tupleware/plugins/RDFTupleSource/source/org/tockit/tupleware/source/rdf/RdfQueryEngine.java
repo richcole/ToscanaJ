@@ -12,8 +12,8 @@ import java.io.File;
 import javax.swing.JFrame;
 
 import org.tockit.plugin.Plugin;
-import org.tockit.tupleware.gui.IndexSelectionDialog;
 import org.tockit.relations.model.Relation;
+import org.tockit.tupleware.gui.IndexSelectionDialog;
 import org.tockit.tupleware.source.TupleSource;
 import org.tockit.tupleware.source.TupleSourceRegistry;
 
@@ -21,7 +21,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 public class RdfQueryEngine implements TupleSource, Plugin {
 	private int[] objectIndices;
-	private Relation tupleSet;
+	private Relation<Object> tupleSet;
 	private File selectedFile;
 	private Model rdfModel;
 
@@ -41,7 +41,7 @@ public class RdfQueryEngine implements TupleSource, Plugin {
 		}
 	}
 
-	public Relation getTuples() {
+	public Relation<Object> getTuples() {
 		return tupleSet;
 	}
 

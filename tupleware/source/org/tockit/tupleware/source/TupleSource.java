@@ -36,7 +36,7 @@ public interface TupleSource {
      * 
      * @pre show() has been called
      */
-	Relation getTuples();
+	Relation<Object> getTuples();
     
     /**
      * Returns the indices making up the object (as a crossproduct).

@@ -118,7 +118,8 @@ public class IndexSelectionDialog extends JDialog {
         setContentPane(mainPanel);
     }
     
-    public void setVisible(boolean visible) {
+    @Override
+	public void setVisible(boolean visible) {
         super.setVisible(visible);
         if(!visible) {
             preferences.putInt("verticalDivider", mainSplitPane.getDividerLocation());

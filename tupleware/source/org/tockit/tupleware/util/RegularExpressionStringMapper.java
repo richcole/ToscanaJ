@@ -33,9 +33,9 @@ public class RegularExpressionStringMapper implements StringMapper {
 	 */
 	public String mapString(String originalString) {
 		String result = originalString;
-		Iterator mapEntries = regExpMap.entrySet().iterator();
+		Iterator<Map.Entry<Object,Object>> mapEntries = regExpMap.entrySet().iterator();
 		while (mapEntries.hasNext()) {
-			Map.Entry entry = (Map.Entry) mapEntries.next();
+			Map.Entry<Object,Object> entry = mapEntries.next();
 			result = result.replaceAll((String)entry.getKey(), (String)entry.getValue());
 		}
 		return result;

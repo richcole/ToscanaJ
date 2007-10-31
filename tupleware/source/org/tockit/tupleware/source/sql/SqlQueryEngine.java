@@ -19,7 +19,7 @@ import org.tockit.tupleware.source.TupleSource;
 public class SqlQueryEngine implements TupleSource {
     private File lastFile;
     private int[] objectIndices;
-    private Relation tuples;
+    private Relation<Object> tuples;
 
     public String getMenuName() {
         return "Query from database...";
@@ -37,7 +37,7 @@ public class SqlQueryEngine implements TupleSource {
         }
     }
 
-    public Relation getTuples() {
+    public Relation<Object> getTuples() {
         return this.tuples;
     }
 

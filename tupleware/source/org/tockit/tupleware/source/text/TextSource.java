@@ -29,7 +29,7 @@ public class TextSource implements TupleSource {
 	public static final String FILE_DESCRIPTION = "Tuple Sets";
 	
 	private int[] objectIndices;
-	private Relation tuples;
+	private Relation<Object> tuples;
 	private File selectedFile;
     private RelationImportPanel optionPanel;
     public TextSource() {
@@ -74,7 +74,7 @@ public class TextSource implements TupleSource {
         return this.selectedFile;
     }
 
-    public Relation getTuples() {
+    public Relation<Object> getTuples() {
         return this.tuples;
     }
 

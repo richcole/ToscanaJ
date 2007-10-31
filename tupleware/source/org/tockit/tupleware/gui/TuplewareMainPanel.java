@@ -67,6 +67,7 @@ import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
@@ -77,6 +78,7 @@ import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.diagram.ObjectLabelView;
 
 import org.tockit.canvas.imagewriter.DiagramExportSettings;
+import org.tockit.canvas.imagewriter.GraphicFormat;
 import org.tockit.canvas.imagewriter.GraphicFormatRegistry;
 import org.tockit.context.model.BinaryRelation;
 import org.tockit.context.model.Context;
@@ -102,24 +104,24 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
     private static final ExtendedPreferences preferences = 
         ExtendedPreferences.userNodeForClass(TuplewareMainPanel.class);
 
-    private final class AgreementContext implements Context {
+    private final class AgreementContext implements Context<FCAElement,FCAElement> {
         private String name;
-		private Set objects;
-		private Set attributes;        
-        private BinaryRelation incidenceRelation;
+		private Set<FCAElement> objects;
+		private Set<FCAElement> attributes;        
+        private BinaryRelation<FCAElement, FCAElement> incidenceRelation;
         
         private AgreementContext(int dim) {
             this.name = tuples.getDimensionNames()[dim];
-            Set objectTuples = tuples.getTuples();
-            this.objects = new HashSet();
-            for (Iterator iter = objectTuples.iterator(); iter.hasNext();) {
-                final Tuple tuple = (Tuple) iter.next();
+            Set<Tuple<? extends Object>> objectTuples = tuples.getTuples();
+            this.objects = new HashSet<FCAElement>();
+            for (Iterator<Tuple<? extends Object>> iter = objectTuples.iterator(); iter.hasNext();) {
+                final Tuple<? extends Object> tuple = iter.next();
 				this.objects.add(new FCAElementImplementation(tuple));
             }
-            Set attributeTuples = PickColumnsOperation.pickColumn(tuples, dim).getTuples();
-            this.attributes = new HashSet();
-            for (Iterator iterator = attributeTuples.iterator(); iterator.hasNext();){
-                Tuple tuple = (Tuple) iterator.next();
+            Set<Tuple<? extends Object>> attributeTuples = PickColumnsOperation.pickColumn(tuples, dim).getTuples();
+            this.attributes = new HashSet<FCAElement>();
+            for (Iterator<Tuple<? extends Object>> iterator = attributeTuples.iterator(); iterator.hasNext();){
+                Tuple<? extends Object> tuple = iterator.next();
 				this.attributes.add(new FCAElementImplementation(tuple.getElement(0)));                
             }
 			int[] allButThisDim = new int[tuples.getArity() - 1];
@@ -130,11 +132,12 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 					allButThisDim[j] = j + 1;
 				}
 			}
-            final Relation magicJoin = JoinOperation.join(tuples, allButThisDim, tuples, allButThisDim);
-			incidenceRelation = new BinaryRelation() {
-				public boolean contains(Object domainObject, Object rangeObject) {
-					Tuple left = (Tuple) ((FCAElementImplementation)domainObject).getData();
-					Object right = ((FCAElementImplementation)rangeObject).getData();
+            final Relation<Object> magicJoin = JoinOperation.join(tuples, allButThisDim, tuples, allButThisDim);
+			incidenceRelation = new BinaryRelation<FCAElement, FCAElement>() {
+				@SuppressWarnings("unchecked")
+				public boolean contains(FCAElement domainObject, FCAElement rangeObject) {
+					Tuple<? extends Object> left = (Tuple<? extends Object>) domainObject.getData();
+					Object right = rangeObject.getData();
 					Object[] fullData = new Object[left.getLength() + 1];
 					for (int j = 0; j < left.getLength(); j++) {
 						fullData[j] = left.getElement(j);
@@ -147,13 +150,13 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
         public String getName() {
             return name;
         }
-        public Set getObjects() {
+        public Set<FCAElement> getObjects() {
         	return this.objects;
         }
-        public Set getAttributes() {
+        public Set<FCAElement> getAttributes() {
             return this.attributes;
         }
-        public BinaryRelation getRelation() {
+        public BinaryRelation<FCAElement, FCAElement> getRelation() {
             return this.incidenceRelation;
         }
     }
@@ -170,7 +173,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
      *  Model
      */
     private ConceptualSchema conceptualSchema;
-    private Relation tuples;
+    private Relation<Object> tuples;
 
     private DiagramExportSettings diagramExportSettings;
     private ExportDiagramAction exportDiagramAction;
@@ -199,7 +202,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
     public TuplewareMainPanel() {
         super(WINDOW_TITLE);
 
-        Iterator it = GraphicFormatRegistry.getIterator();
+        Iterator<GraphicFormat> it = GraphicFormatRegistry.getIterator();
         if (it.hasNext()) {
             this.diagramExportSettings = new DiagramExportSettings();
         }
@@ -225,7 +228,8 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
         }
 
         this.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
+            @Override
+			public void windowClosing(WindowEvent e) {
                 closeMainPanel();
             }
         });
@@ -307,7 +311,7 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
         for (int i = 0; i < nonObjectDims.length; i++) {
         	int dim = nonObjectDims[i];
 			String dimensionName = dimensionNames[dim];
-            Context context = new AgreementContext(dim);
+            Context<FCAElement, FCAElement> context = new AgreementContext(dim);
             Lattice lattice = new GantersAlgorithm().createLattice(context);
             Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, dimensionName, new DefaultDimensionStrategy());
             this.conceptualSchema.addDiagram(diagram);
@@ -420,9 +424,9 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 		JMenu tuplesMenu = new JMenu("Tuples");
 		tuplesMenu.setMnemonic('t');
 		
-		Iterator tupleSources = TupleSourceRegistry.getTupleSources().iterator();
+		Iterator<TupleSource> tupleSources = TupleSourceRegistry.getTupleSources().iterator();
 		while (tupleSources.hasNext()) {
-			TupleSource curSource = (TupleSource) tupleSources.next();
+			TupleSource curSource = tupleSources.next();
 			addTupleSourceMenuItem(tuplesMenu, this, curSource);
 		}
 		
@@ -572,10 +576,10 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
                     writer.write(name);
                 }
                 writer.newLine();
-                for (Iterator iter = this.tuples.getTuples().iterator(); iter.hasNext();) {
-                    Object[] tuple = (Object[]) iter.next();
-                    for (int i = 0; i < tuple.length; i++) {
-                        Object object = tuple[i];
+                for (Iterator<Tuple<? extends Object>> iter = this.tuples.getTuples().iterator(); iter.hasNext();) {
+                    Tuple<? extends Object> tuple = iter.next();
+                    for (int i = 0; i < tuple.getLength(); i++) {
+                        Object object = tuple.getElement(i);
 						if(i!=0) {
 							writer.write('\t');
 						}
@@ -615,8 +619,8 @@ public class TuplewareMainPanel extends JFrame implements MainPanel, EventBroker
 	private void fillTable() {
         Object[][] data = new Object[this.tuples.getTuples().size()][this.tuples.getDimensionNames().length];
         int row = 0;
-        for (Iterator iter = this.tuples.getTuples().iterator(); iter.hasNext();) {
-            Tuple tuple = (Tuple) iter.next();
+        for (Iterator<Tuple<? extends Object>> iter = this.tuples.getTuples().iterator(); iter.hasNext();) {
+            Tuple<? extends Object> tuple = iter.next();
             for (int col = 0; col < tuple.getLength(); col++) {
                 data[row][col] = tuple.getElement(col);
             }

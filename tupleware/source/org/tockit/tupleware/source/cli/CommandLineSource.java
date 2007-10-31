@@ -25,7 +25,7 @@ import org.tockit.tupleware.source.text.SeparatedTextParser;
 
 public class CommandLineSource implements TupleSource {
 	private int[] objectIndices;
-	private Relation tuples;
+	private Relation<Object> tuples;
 		
 	public void show(JFrame parent, File lastLocation) {
         String command = JOptionPane.showInputDialog(parent, "Please enter command to call:", 
@@ -84,7 +84,7 @@ public class CommandLineSource implements TupleSource {
         return null;
     }
 
-    public Relation getTuples() {
+    public Relation<Object> getTuples() {
         return this.tuples;
     }
 

@@ -30,10 +30,10 @@ public class SeparatedTextParser {
      * If a line doesn't contain at least two entries it is consider a
      * comment.
      */
-    public static Relation parseTabDelimitedTuples(
+    public static Relation<Object> parseTabDelimitedTuples(
             Reader input, char separator, char quote, char escape, 
             boolean firstLineHeader) throws IOException {
-        Relation retVal = null;
+        Relation<Object> retVal = null;
         BufferedReader buffReader = new BufferedReader(input);
         int lineNum = 0;
         while(true) {
@@ -50,9 +50,9 @@ public class SeparatedTextParser {
             }
             if(retVal == null) {
                 if(firstLineHeader) {
-                    retVal = new RelationImplementation(tuple);
+                    retVal = new RelationImplementation<Object>(tuple);
                 } else {
-                    retVal = new RelationImplementation(tuple.length);
+                    retVal = new RelationImplementation<Object>(tuple.length);
                     retVal.addTuple(tuple);
                 }
             } else {

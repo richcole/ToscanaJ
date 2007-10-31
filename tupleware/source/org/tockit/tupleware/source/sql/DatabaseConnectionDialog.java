@@ -63,7 +63,7 @@ public class DatabaseConnectionDialog extends JDialog {
     private AccessFileConnectionPanel accessDbPanel;
     private SqlQueryPanel sqlQueryPanel;
 
-    private Relation tuples;
+    private Relation<Object> tuples;
 
     private Frame owner;
     
@@ -124,7 +124,8 @@ public class DatabaseConnectionDialog extends JDialog {
                     new Insets(0, 0, 0, 0),
                     2,2));
         }
-        void updateContents() {
+        @Override
+		void updateContents() {
         	Type type = databaseInfo.getType();
 			if (type == DatabaseInfo.UNDEFINED) {
 				jdbcRadioButton.setSelected(true);
@@ -138,17 +139,21 @@ public class DatabaseConnectionDialog extends JDialog {
         		throw new RuntimeException("Unknown database type");
         	}
         }
-        String getTitle() {
+        @Override
+		String getTitle() {
             return "Database Type:";
         }
-        String getNextButtonText() {
+        @Override
+		String getNextButtonText() {
             return "Use selected type >>";
         }
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
         	// nothing to do here, we just return different panels
         	return true;
         }
-        WizardPanel getNextPanel() {
+        @Override
+		WizardPanel getNextPanel() {
             if(jdbcRadioButton.isSelected()) {
                 return jdbcDbPanel;
             } else if(odbcRadioButton.isSelected()) {
@@ -161,13 +166,16 @@ public class DatabaseConnectionDialog extends JDialog {
     }
 
     abstract class ConnectionPanel extends WizardPanel {
-        String getTitle() {
+        @Override
+		String getTitle() {
             return "Connection Details:";
         }
-        String getNextButtonText() {
+        @Override
+		String getNextButtonText() {
             return "Connect >>";
         }
-        WizardPanel getNextPanel() {
+        @Override
+		WizardPanel getNextPanel() {
             return sqlQueryPanel;
         }
         boolean connectDatabase() {
@@ -228,7 +236,8 @@ public class DatabaseConnectionDialog extends JDialog {
 			
     	}
 
-        void updateContents() {
+        @Override
+		void updateContents() {
             if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.EMBEDDED) {
             	this.scriptLocationField.setText(databaseInfo.getEmbeddedSQLLocation().getPath());
             } else {
@@ -236,7 +245,8 @@ public class DatabaseConnectionDialog extends JDialog {
             }
         }
     	
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
             DatabaseInfo embedInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
             databaseInfo.setUrl(embedInfo.getURL());
             databaseInfo.setUserName(embedInfo.getUserName());
@@ -342,7 +352,8 @@ public class DatabaseConnectionDialog extends JDialog {
     	            2,2));
         }
 
-        void updateContents() {
+        @Override
+		void updateContents() {
             if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.JDBC) {
                 this.urlField.setText(databaseInfo.getURL());
                 this.userNameField.setText(databaseInfo.getUserName());
@@ -356,7 +367,8 @@ public class DatabaseConnectionDialog extends JDialog {
             }
         }
 
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
 			databaseInfo.setUrl(urlField.getText());
             databaseInfo.setUserName(userNameField.getText());
             databaseInfo.setPassword(new String(passwordField.getPassword()));
@@ -428,7 +440,8 @@ public class DatabaseConnectionDialog extends JDialog {
     	            new Insets(5, 5, 5, 0),
     	            2,2));
         }
-        void updateContents() {
+        @Override
+		void updateContents() {
             if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.ODBC) {
                 this.dataSourceNameField.setText(databaseInfo.getOdbcDataSourceName());
                 this.userNameField.setText(databaseInfo.getUserName());
@@ -439,7 +452,8 @@ public class DatabaseConnectionDialog extends JDialog {
                 this.passwordField.setText("");
             }
         }
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
             databaseInfo.setOdbcDataSource(dataSourceNameField.getText(), userNameField.getText(), new String(passwordField.getPassword()));
             return connectDatabase();
         }
@@ -522,7 +536,8 @@ public class DatabaseConnectionDialog extends JDialog {
     	            new Insets(5, 5, 5, 5),
     	            2,2));
         }
-        void updateContents() {
+        @Override
+		void updateContents() {
             if(databaseInfo != null && databaseInfo.getType() == DatabaseInfo.ACCESS_FILE) {
             	this.fileUrlField.setText(databaseInfo.getAccessFileUrl());
                 this.userNameField.setText(databaseInfo.getUserName());
@@ -533,7 +548,8 @@ public class DatabaseConnectionDialog extends JDialog {
                 this.passwordField.setText("");
             }
         }
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
             databaseInfo.setAccessFileInfo(fileUrlField.getText(), userNameField.getText(), new String(passwordField.getPassword()));
             return connectDatabase();
         }
@@ -563,11 +579,13 @@ public class DatabaseConnectionDialog extends JDialog {
                     0,0));
         }
 
-        void updateContents() {
+        @Override
+		void updateContents() {
         	// nothing to do
         }
         
-        boolean executeStep() {
+        @Override
+		boolean executeStep() {
             try {
 				Statement stmt = connection.getJdbcConnection().createStatement();
 				ResultSet resultSet = stmt.executeQuery(this.sqlQueryArea.getText());
@@ -577,7 +595,7 @@ public class DatabaseConnectionDialog extends JDialog {
 				for (int i = 0; i < numberColumns; i++) {
                     names[i] = metaData.getColumnLabel(i + 1);
                 }
-				tuples = new RelationImplementation(names);
+				tuples = new RelationImplementation<Object>(names);
 				while (resultSet.next()) {
 					Object[] tuple = new Object[numberColumns];
 					for (int i = 0; i < numberColumns; i++) {
@@ -595,15 +613,18 @@ public class DatabaseConnectionDialog extends JDialog {
             return false;
         }
 
-        String getTitle() {
+        @Override
+		String getTitle() {
             return "Enter SQL Query";
         }
 
-        String getNextButtonText() {
+        @Override
+		String getNextButtonText() {
             return "Query";
         }
 
-        WizardPanel getNextPanel() {
+        @Override
+		WizardPanel getNextPanel() {
             return null;
         }
     }
@@ -625,6 +646,7 @@ public class DatabaseConnectionDialog extends JDialog {
 		contentPane.setLayout(new GridBagLayout());
 		
 		addComponentListener( new ComponentAdapter() {
+			@Override
 			public void componentResized(ComponentEvent e) {
 				int width = getWidth();
 				int height = getHeight();
@@ -632,6 +654,7 @@ public class DatabaseConnectionDialog extends JDialog {
 				if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
 				setSize(width, height);
 			}
+			@Override
 			public void componentShown(ComponentEvent e) {
 				componentResized(e);
 			}
@@ -742,6 +765,7 @@ public class DatabaseConnectionDialog extends JDialog {
 			openDialog = new JFileChooser(System.getProperty("user.dir"));
 		}
 		openDialog.setFileFilter(new FileFilter() {
+			@Override
 			public boolean accept(File f) {
 				if (f.isDirectory()) {
 					return true;
@@ -754,6 +778,7 @@ public class DatabaseConnectionDialog extends JDialog {
 				}
 				return ext.equals(extension);
 			}
+			@Override
 			public String getDescription() {
 				return description;
 			}
@@ -767,7 +792,8 @@ public class DatabaseConnectionDialog extends JDialog {
 	}
 	
 
-    public void setVisible(boolean visible) {
+    @Override
+	public void setVisible(boolean visible) {
         super.setVisible(visible);
         if(!visible) {
     	    setCurrentPanel(this.dbTypePanel);
@@ -775,7 +801,7 @@ public class DatabaseConnectionDialog extends JDialog {
         }
     }
 
-    public Relation getTuples() {
+    public Relation<Object> getTuples() {
         return this.tuples;
     }
     

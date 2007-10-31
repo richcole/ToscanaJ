@@ -8,6 +8,8 @@
 		<property name="dist.name" value="Tupleware-CVSbuild-${timestamp}"/>
 		<property name="dist.dir" value="${dist.base.dir}/${dist.name}"/>
   	</target>
+	
+	<property file="build.properties"/>
   	
 	<property name="app.name" value="Tupleware"/>
 	<property name="build.dir" value="build"/>
@@ -47,12 +49,14 @@
 		<ant antfile="build.xml" dir="plugins" target="clean"/>
 	</target>
 	<target name="compile" depends="_prepare">
-		<javac srcdir="${src.dir}" destdir="${build.dev.dir}" debug="on" optimize="off" deprecation="on">
+		<javac srcdir="${src.dir}" destdir="${build.dev.dir}" debug="on" optimize="off" deprecation="on"
+			source="${source.level}" target="${target.level}">
 			<classpath refid="project.dev.class.path"/>
 		</javac>
 	</target>
 	<target name="_compileRelease" depends="_prepare">
-		<javac srcdir="${src.dir}" destdir="${build.release.dir}" debug="off" optimize="on" deprecation="off">
+		<javac srcdir="${src.dir}" destdir="${build.release.dir}" debug="off" optimize="on" deprecation="off"
+		    source="${source.level}" target="${target.level}">
 			<classpath refid="project.release.class.path"/>
 		</javac>
 	</target>

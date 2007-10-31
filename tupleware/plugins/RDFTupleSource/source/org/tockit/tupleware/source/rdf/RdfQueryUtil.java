@@ -3,7 +3,7 @@
  * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
  *
- * $Id$
+ * $Id:RdfQueryUtil.java 1929 2007-06-24 04:50:48Z peterbecker $
  */
 package org.tockit.tupleware.source.rdf;
 
@@ -53,12 +53,12 @@ public class RdfQueryUtil {
 		return queryEx.execSelect();
 	}
 
-	private static List readQueriesFile(String queriesFileName)
+	private static List<String> readQueriesFile(String queriesFileName)
 		throws FileNotFoundException, IOException {
 		File dataFile = new File(queriesFileName);
 		FileInputStream fis = new FileInputStream(dataFile);
 		BufferedReader bufReader = new BufferedReader(new InputStreamReader(fis));
-		List queryStrings = new ArrayList();
+		List<String> queryStrings = new ArrayList<String>();
 		String line = bufReader.readLine();
 		while (line != null) {
 			queryStrings.add(line);
@@ -68,6 +68,7 @@ public class RdfQueryUtil {
 	}
 
 
+	@SuppressWarnings("unchecked")
 	public static void main (String[] args) {
 		long time_start = System.currentTimeMillis();
 
@@ -106,7 +107,7 @@ public class RdfQueryUtil {
 		
 		try {
 			long time_start_readQueriesFile = System.currentTimeMillis();
-			List queryStrings = readQueriesFile(queriesFileName);
+			List<String> queryStrings = readQueriesFile(queriesFileName);
 			long time_readQueriesFile = System.currentTimeMillis() - time_start_readQueriesFile;
 
 			long time_start_readDataFile = System.currentTimeMillis();
@@ -121,26 +122,26 @@ public class RdfQueryUtil {
 			long time_readDataFile = System.currentTimeMillis() - time_start_readDataFile;
 			
 			long time_start_query = System.currentTimeMillis();
-			Iterator it = queryStrings.iterator();
+			Iterator<String> it = queryStrings.iterator();
 			while (it.hasNext()) {
-				String queryString = (String) it.next();
+				String queryString = it.next();
 				Query query = QueryFactory.create(queryString);
 				ResultSet results = RdfQueryUtil.executeARQ(rdfModel, query);
 				System.out.println("---QUERY " + queryString + "------------------");
-				List resultVars = results.getResultVars();
+				List<String> resultVars = results.getResultVars();
 				int count = 0;
 				for ( ; results.hasNext() ; ) {
 					count++;
 					QuerySolution resBinding = (QuerySolution)results.next() ;
 					if (printResults) {
 						for (int i = 0; i < resultVars.size(); i++) {
-							String  queryVar = (String) resultVars.get(i);
+							String  queryVar = resultVars.get(i);
 							Object obj = resBinding.get(queryVar);
 							System.out.println("?" + queryVar + ": " + obj);
 						}
 					} 
 				}
-				// TODO: replace calll to results.close() with matching close() form QueryExecution
+				// TODO: replace call to results.close() with matching close() form QueryExecution
 				System.out.println("Num of results: " + count);
 			}
 			long time_query = System.currentTimeMillis() - time_start_query;

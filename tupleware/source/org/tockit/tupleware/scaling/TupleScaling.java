@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.tockit.context.model.ContextImplementation;
 import org.tockit.events.EventBroker;
 import org.tockit.relations.model.Relation;
 import org.tockit.relations.model.Tuple;
@@ -24,7 +25,6 @@ import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
@@ -42,7 +42,8 @@ public class TupleScaling {
         public ObjectTuple(Object[] data) {
             this.data = data;    
         }
-        public boolean equals(Object other) {
+        @Override
+		public boolean equals(Object other) {
             if(this.getClass() != other.getClass()) {
                 return false;
             }
@@ -57,7 +58,8 @@ public class TupleScaling {
             }
             return true;
         }
-        public int hashCode() {
+        @Override
+		public int hashCode() {
             int hashCode = 7;
             for (int i = 0; i < this.data.length; i++) {
                 Object element = this.data[i];
@@ -74,7 +76,7 @@ public class TupleScaling {
      * Each binary relation for the contexts is the projection of the tuples onto the dimension
      * given by the objectPosition parameter and one other.
      */
-    public static ConceptualSchema scaleTuples(Relation tuples, int objectPosition, StringMapper nameMapper) {
+    public static ConceptualSchema scaleTuples(Relation<Object> tuples, int objectPosition, StringMapper nameMapper) {
         ConceptualSchema schema = new ConceptualSchema(new EventBroker());
 
         String[] variableNames = tuples.getDimensionNames();
@@ -94,13 +96,13 @@ public class TupleScaling {
      * The objectIndices parameter defines the objects, the attributeIndices parameter
      * the attributes. They incide iff they co-occur in a tuple.
      */    
-    public static Diagram2D scaleTuples(Relation tuples, int[] objectIndices, int[] attributeIndices, StringMapper nameMapper) {
-        Map tupleObjectMap = new HashMap();
-        Map valueAttributeMap = new HashMap();
-        ContextImplementation context = new ContextImplementation("Tuples");
+    public static Diagram2D scaleTuples(Relation<Object> tuples, int[] objectIndices, int[] attributeIndices, StringMapper nameMapper) {
+        Map<ObjectTuple, FCAElement> tupleObjectMap = new HashMap<ObjectTuple, FCAElement>();
+        Map<ObjectTuple, FCAElement> valueAttributeMap = new HashMap<ObjectTuple, FCAElement>();
+        ContextImplementation<FCAElement, FCAElement> context = new ContextImplementation<FCAElement, FCAElement>("Tuples");
         context.getObjects().addAll(tupleObjectMap.values());
-        for (Iterator iter = tuples.getTuples().iterator(); iter.hasNext();) {
-            Tuple tuple = (Tuple) iter.next();
+        for (Iterator<Tuple<? extends Object>> iter = tuples.getTuples().iterator(); iter.hasNext();) {
+            Tuple<? extends Object> tuple = iter.next();
             ObjectTuple objectValues = selectSubset(tuple.getData(), objectIndices);
             if(tupleObjectMap.get(objectValues) == null) {
                 FCAElement newObject = new FCAElementImplementation(nameMapper.mapString(createCrossproductName(objectValues)));
@@ -149,7 +151,7 @@ public class TupleScaling {
         } else {
             objectPos = 0;
         }
-        Relation input = SeparatedTextParser.parseTabDelimitedTuples(new FileReader(new File(args[0])),'\t','\"','\000',true);
+        Relation<Object> input = SeparatedTextParser.parseTabDelimitedTuples(new FileReader(new File(args[0])),'\t','\"','\000',true);
         ConceptualSchema result = scaleTuples(input, objectPos, new IdentityStringMapper());
         XMLWriter.write(new File(args[1]), result);
     }

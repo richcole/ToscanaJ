@@ -18,7 +18,7 @@ import org.tockit.tupleware.source.text.TextSource;
 
 public class TupleSourceRegistry {
 	
-	private static List tupleSources = new ArrayList();
+	private static List<TupleSource> tupleSources = new ArrayList<TupleSource>();
 	
 	static {
 		registerTupleSource(new TextSource());
@@ -34,7 +34,7 @@ public class TupleSourceRegistry {
 		tupleSources.add(tupleSource);
 	}
 	
-	public static List getTupleSources() {
+	public static List<TupleSource> getTupleSources() {
 		return Collections.unmodifiableList(tupleSources);
 	}
 }

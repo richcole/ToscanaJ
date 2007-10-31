@@ -48,6 +48,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 public class RdfQueryDialog extends JDialog {
     private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(DiagramExportSettings.class);
@@ -65,7 +66,7 @@ public class RdfQueryDialog extends JDialog {
 	private JButton nextButton;
 	
 	private Model rdfModel;
-	private Relation tupleSet;
+	private Relation<Object> tupleSet;
 
 	private ModelSourcePanel modelSourcePanel;
 
@@ -108,15 +109,18 @@ public class RdfQueryDialog extends JDialog {
 			this.add(new JPanel(),constraints);
 		}
 		
+		@Override
 		boolean executeStep() {
 			// nothing to do
 			return true;
 		}
 
+		@Override
 		String getNextButtonText() {
 			return "Select >>";
 		}
 
+		@Override
 		WizardPanel getNextPanel() {
 			if(loadModelChoice.isSelected()) {
 				return openFilePanel;
@@ -125,10 +129,12 @@ public class RdfQueryDialog extends JDialog {
 			}
 		}
 
+		@Override
 		String getTitle() {
 			return "Select model source";
 		}
 
+		@Override
 		void updateContents() {
 			// nothing to do
 		}
@@ -185,19 +191,24 @@ public class RdfQueryDialog extends JDialog {
 			
 		}
 		
+		@Override
 		String getTitle() {
 			return "Open source file:";
 		}
+		@Override
 		String getNextButtonText() {
 			return "Open >>";
 		}
+		@Override
 		WizardPanel getNextPanel() {
 			return rdfQueryPanel;
 		}
+		@Override
 		void updateContents() {
 			// nothing to do
 		}
 		
+		@Override
 		boolean executeStep() {
 			File file = new File(fileLocationField.getText());
 			try {
@@ -240,15 +251,18 @@ public class RdfQueryDialog extends JDialog {
 					0,0));
 		}
 
+		@Override
 		void updateContents() {
 			// nothing to do
 		}
         
+		@SuppressWarnings("unchecked")
+		@Override
 		boolean executeStep() {
 			preferences.put(CONFIGURATION_STRING_LAST_QUERY, rdfQueryArea.getText());
 			Query query = QueryFactory.create(rdfQueryArea.getText());
-			List resultVars = query.getResultVars();
-			tupleSet = new RelationImplementation((String[]) resultVars
+			List<String> resultVars = query.getResultVars();
+			tupleSet = new RelationImplementation<Object>(resultVars
 					.toArray(new String[resultVars.size()]));
 			QueryExecution queryEx = QueryExecutionFactory.create(query,
 					rdfModel);
@@ -256,10 +270,10 @@ public class RdfQueryDialog extends JDialog {
 				ResultSet results = queryEx.execSelect();
 				for (; results.hasNext();) {
 					QuerySolution solution = (QuerySolution) results.next();
-					Object[] tuple = new Object[resultVars.size()];
+					RDFNode[] tuple = new RDFNode[resultVars.size()];
 					for (int i = 0; i < resultVars.size(); i++) {
-						String queryVar = (String) resultVars.get(i);
-						Object obj = solution.get(queryVar);
+						String queryVar = resultVars.get(i);
+						RDFNode obj = solution.get(queryVar);
 						tuple[i] = obj;
 					}
 					tupleSet.addTuple(tuple);
@@ -275,14 +289,17 @@ public class RdfQueryDialog extends JDialog {
 			}
 		}
 
+		@Override
 		String getTitle() {
 			return "Enter RDF Query";
 		}
 
+		@Override
 		String getNextButtonText() {
 			return "Query";
 		}
 
+		@Override
 		WizardPanel getNextPanel() {
 			return null;
 		}
@@ -300,6 +317,7 @@ public class RdfQueryDialog extends JDialog {
 		contentPane.setLayout(new GridBagLayout());
 		
 		addComponentListener( new ComponentAdapter() {
+			@Override
 			public void componentResized(ComponentEvent e) {
 				int width = getWidth();
 				int height = getHeight();
@@ -307,6 +325,7 @@ public class RdfQueryDialog extends JDialog {
 				if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
 				setSize(width, height);
 			}
+			@Override
 			public void componentShown(ComponentEvent e) {
 				componentResized(e);
 			}
@@ -420,6 +439,7 @@ public class RdfQueryDialog extends JDialog {
 		}
 		
 		openDialog.setFileFilter(new FileFilter() {
+			@Override
 			public boolean accept(File f) {
 				if (f.isDirectory()) {
 					return true;
@@ -432,6 +452,7 @@ public class RdfQueryDialog extends JDialog {
 				}
 				return false;
 			}
+			@Override
 			public String getDescription() {
 				return description;
 			}
@@ -444,6 +465,7 @@ public class RdfQueryDialog extends JDialog {
 		}
 	}
 	
+	@Override
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 		if(!visible) {
@@ -452,7 +474,7 @@ public class RdfQueryDialog extends JDialog {
 		}
 	}
 
-	public Relation getTuples() {
+	public Relation<Object> getTuples() {
 		return this.tupleSet;
 	}
 
