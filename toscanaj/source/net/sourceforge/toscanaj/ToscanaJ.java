@@ -14,8 +14,6 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
-import javax.swing.JOptionPane;
-
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -78,13 +76,14 @@ public class ToscanaJ {
         mainWindow.setVisible(true);
     }
 
-    private static void showUsage(Options options, PrintStream stream) {
+    @SuppressWarnings("unchecked")
+	private static void showUsage(Options options, PrintStream stream) {
         stream.println("Usage:");
         stream.println("  ToscanaJ [Options] [File]");
         stream.println();
         stream.println("where [File] is one optional file to open and [Options] can be:");
-        for (Iterator iter = options.getOptions().iterator(); iter.hasNext(); ) {
-            Option option = (Option) iter.next();
+        for (Iterator<Option> iter = options.getOptions().iterator(); iter.hasNext(); ) {
+            Option option = iter.next();
             stream.println("  " + option.getOpt() + ": " + option.getDescription());
         }
     }
