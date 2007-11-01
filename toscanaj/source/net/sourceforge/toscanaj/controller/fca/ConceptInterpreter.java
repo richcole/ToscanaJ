@@ -40,7 +40,27 @@ import java.util.Iterator;
  *       since the context would be the same more often.
  */
 // @todo it would be better if the concept interpreter can create the concepts, e.g. the tuple version could store the tuples.
-public interface ConceptInterpreter {
+/**
+ * Maps concepts of a concrete scale to those of the matching realized scale.
+ * 
+ * Instead of using concepts directly, a concept interpreter can be used to replace them with
+ * updated information. A typical use-case is the classic Toscana-system: the objects in the
+ * predefined diagrams are SQL queries, the actual objects of interest are the ones found in the
+ * database. The concept interpreter's role is to map one to the other.
+ * 
+ * Another role of the concept interpreter is to consider the context in which a concept is used.
+ * The concept stored is usually the one of a full data set, filtering and nesting can reduce the
+ * available data, thus changing the concept, potentially even turning it into one that wouldn't
+ * normally be there since it has the same extent/intent as others (a so-called "unrealized concept").
+ * The concept interpreter does this mapping, too. 
+ * 
+ * @todo check if it would be better to separate the two tasks of contextualization and realization.
+ * 
+ * @param <Oc> The type of the objects in the concrete scale.
+ * @param <A> The type of the attributes used in both scales (always the same).
+ * @param <Or> The type of the objects in the realized scale.
+ */
+public interface ConceptInterpreter<Oc,A,Or> {
 	public static final String CONCEPT_INTERPRETER_ELEMENT_NAME = "conceptInterpreter";
 	public static final String CONCEPT_INTERPRETER_CLASS_ATTRIBUTE = "class";
 
@@ -53,33 +73,42 @@ public interface ConceptInterpreter {
     public static final IntervalType INTERVAL_TYPE_ORTHOGONALTIY = new IntervalType();
 
     /** is dependent on displayMode and filterMode */
-    Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context);
+    Iterator<Or> getObjectSetIterator(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context);
 
     /** independent of displayMode and filterMode */
-    Iterator getAttributeContingentIterator(Concept concept, ConceptInterpretationContext context);
+    Iterator<A> getAttributeContingentIterator(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context);
 
     /** independent of displayMode and filterMode */
-    Iterator getIntentIterator(Concept concept, ConceptInterpretationContext context);
+    Iterator<A> getIntentIterator(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context);
 
     /** is dependent on displayMode and filterMode */
-    int getObjectCount(Concept concept, ConceptInterpretationContext context);
+    int getObjectCount(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context);
 
     /** is dependent on displayMode and filterMode */
-    int getAttributeCount(Concept concept, ConceptInterpretationContext context);
+    int getAttributeCount(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context);
 
 	/** these are independent of displayMode and dependent on filterMode */
-	int getObjectContingentSize(Concept concept, ConceptInterpretationContext context);
+	int getObjectContingentSize(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context);
 
 	/** these are independent of displayMode and dependent on filterMode */
-	int getExtentSize(Concept concept, ConceptInterpretationContext context);
+	int getExtentSize(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context);
 
-	NormedIntervalSource getIntervalSource(IntervalType type);
+	NormedIntervalSource<Oc,A> getIntervalSource(IntervalType type);
 
-    boolean isRealized(Concept concept, ConceptInterpretationContext context);
+    boolean isRealized(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context);
 
-    FCAElement[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context);
+    /**
+     * @todo This is all a bit messy :-(
+     * 
+     * @param query The query to execute.
+     * @param concept The concept to execute the query upon.
+     * @param context The context in which the query should be executed.
+     * @return The query result, which can be the realized concepts (same as getObjectSetIterator(..)) or
+     *         aggregates or other mappings.
+     */
+    FCAElement[] executeQuery(Query query, Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context);
     
     void showDeviation(boolean show);
     
-    boolean isVisible(Concept concept, ConceptInterpretationContext context);
+    boolean isVisible(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context);
 }

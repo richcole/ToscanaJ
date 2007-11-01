@@ -54,7 +54,7 @@ public class CernatoDimensionStrategy implements DimensionCreationStrategy {
         Concept bottom = lattice.getBottom();
         Iterator it = bottom.getIntentIterator();
         OrderedCriterion[] criteria = new OrderedCriterion[bottom.getIntentSize()];
-        Hashtable map = new Hashtable();
+        Hashtable<OrderedCriterion, FCAElement> map = new Hashtable<OrderedCriterion, FCAElement>();
         int count = 0;
         while (it.hasNext()) {
             FCAElement attribute = (FCAElement) it.next();
@@ -66,7 +66,7 @@ public class CernatoDimensionStrategy implements DimensionCreationStrategy {
         Set<Vector<Node>> paths = graph.getMaximalPaths();
         for (Iterator<Vector<Node>> iterator2 = paths.iterator(); iterator2.hasNext();) {
             Vector path = iterator2.next();
-            Vector attributes = new Vector();
+            Vector<FCAElement> attributes = new Vector<FCAElement>();
             for (Iterator it2 = path.iterator(); it2.hasNext();) {
                 PartialOrderNode node = (PartialOrderNode) it2.next();
                 attributes.add(map.get(node.getData()));

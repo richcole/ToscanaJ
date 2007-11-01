@@ -229,8 +229,7 @@ public class DataDump {
             conceptElem.addContent(objContElem);
 
             if (includeIntentExtent) {
-                Iterator it;
-                it = cur.getIntentIterator();
+                Iterator it = cur.getIntentIterator();
                 while (it.hasNext()) {
                     String name = it.next().toString();
                     Element newElem = new Element("attribute");
@@ -248,8 +247,7 @@ public class DataDump {
             }
             
             if (includeContingentLists) {
-                Iterator it;
-                it = interpreter.getAttributeContingentIterator(cur, contContext);
+                Iterator it = interpreter.getAttributeContingentIterator(cur, contContext);
                 while (it.hasNext()) {
                     String name = it.next().toString();
                     Element newElem = new Element("attribute");

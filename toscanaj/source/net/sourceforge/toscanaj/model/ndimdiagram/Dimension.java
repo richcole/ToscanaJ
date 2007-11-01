@@ -9,14 +9,22 @@ package net.sourceforge.toscanaj.model.ndimdiagram;
 
 import java.util.Vector;
 
-public class Dimension {
-    private Vector attributes;
+/**
+ * A dimension of a conceptual structure.
+ * 
+ * A dimension is a set of attributes that form an implication chain in the
+ * conceptual structure.
+ * 
+ * @param <R> The underlying type of the attributes.
+ */
+public class Dimension<R> {
+    private Vector<R> attributes;
 
-    public Dimension(Vector attributes) {
+    public Dimension(Vector<R> attributes) {
         this.attributes = attributes;
     }
 
-    public boolean contains(Object attribute) {
+    public boolean contains(R attribute) {
         return attributes.contains(attribute);
     }
 }

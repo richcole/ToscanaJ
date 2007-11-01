@@ -10,7 +10,7 @@ package net.sourceforge.toscanaj.controller.fca;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 
-public class FixedValueIntervalSource implements NormedIntervalSource {
+public class FixedValueIntervalSource<O,A> implements NormedIntervalSource<O,A> {
     private double value;
 
     public FixedValueIntervalSource(double value) {
@@ -20,7 +20,7 @@ public class FixedValueIntervalSource implements NormedIntervalSource {
         this.value = value;
     }
 
-    public double getValue(Concept concept, ConceptInterpretationContext context) {
+    public double getValue(Concept<O,A> concept, ConceptInterpretationContext<O,A> context) {
         return this.value;
     }
 

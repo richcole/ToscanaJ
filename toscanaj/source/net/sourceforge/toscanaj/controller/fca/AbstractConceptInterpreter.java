@@ -25,10 +25,12 @@ import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-public abstract class AbstractConceptInterpreter implements ConceptInterpreter, EventBrokerListener {
+public abstract class AbstractConceptInterpreter<Oc,A,Or> implements ConceptInterpreter<Oc,A,Or>, EventBrokerListener {
     private boolean showDeviation = false;
-	private Hashtable<ConceptInterpretationContext, Hashtable<Concept, Integer>> contingentSizes = new Hashtable<ConceptInterpretationContext, Hashtable<Concept, Integer>>();
-	private Hashtable<ConceptInterpretationContext, Hashtable<Concept, Integer>> extentSizes = new Hashtable<ConceptInterpretationContext, Hashtable<Concept, Integer>>();
+	private Hashtable<ConceptInterpretationContext<Oc,A>, Hashtable<Concept<Oc,A>, Integer>> contingentSizes = 
+		new Hashtable<ConceptInterpretationContext<Oc,A>, Hashtable<Concept<Oc,A>, Integer>>();
+	private Hashtable<ConceptInterpretationContext<Oc,A>, Hashtable<Concept<Oc,A>, Integer>> extentSizes = 
+		new Hashtable<ConceptInterpretationContext<Oc,A>, Hashtable<Concept<Oc,A>, Integer>>();
     
     public static final double[] SIGNIFICANCE_LEVELS = new double[]{
         0.25, 0.20, 0.15, 0.10, 0.05, 0.025, 0.02, 0.01, 0.005, 0.0025, 0.001, 0.0005
@@ -51,8 +53,8 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
         private int neutralSize;
 		private int outerSize;
 		private double expectedSize;
-		public DeviationValuesRef (Concept concept, ConceptInterpretationContext context) {
-            Concept nestingConcept = (Concept) context.getNestingConcepts().get(0);
+		public DeviationValuesRef (Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
+            Concept<Oc,A> nestingConcept = context.getNestingConcepts().get(0);
             if (context.getObjectDisplayMode() == ConceptInterpretationContext.EXTENT) {
                 this.neutralSize = getExtentSize(concept, context.getOutermostContext());
                 this.outerSize = getExtentSize(nestingConcept, context.getOutermostContext());
@@ -104,26 +106,26 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
         }
 	}
 
-	public abstract Iterator getObjectSetIterator(Concept concept,ConceptInterpretationContext context) ;
+	public abstract Iterator<Or> getObjectSetIterator(Concept<Oc,A> concept,ConceptInterpretationContext<Oc,A> context) ;
 
-	protected abstract FCAElement getObject(String value, Concept concept, ConceptInterpretationContext context);
+	protected abstract FCAElement getObject(String value, Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context);
 
-	protected abstract FCAElement[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context); 
+	protected abstract FCAElement[] handleNonDefaultQuery(Query query, Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context); 
 	
-	protected abstract int calculateContingentSize (Concept concept, ConceptInterpretationContext context);
+	protected abstract int calculateContingentSize(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context);
 
-	protected int calculateExtentSize(Concept concept, ConceptInterpretationContext context) {
-		List outerConcepts = context.getNestingConcepts();
+	protected int calculateExtentSize(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
+		List<Concept<Oc,A>> outerConcepts = context.getNestingConcepts();
 		if(outerConcepts.size() > 1) {
 			throw new RuntimeException("multiple levels of nesting not yet supported");
 		}
 		if(outerConcepts.size() == 1) {
 			int retVal = 0;
-			Concept outerConcept = (Concept) outerConcepts.get(0);
-			ConceptInterpretationContext parentContext = (ConceptInterpretationContext) context.getNestingContexts().get(0);
-			for(Iterator<Object> it = outerConcept.getDownset().iterator(); it.hasNext(); ) {
-				Concept currentOuterConcept = (Concept) it.next();
-				ConceptInterpretationContext currentContext = parentContext.createNestedContext(currentOuterConcept);
+			Concept<Oc,A> outerConcept = outerConcepts.get(0);
+			ConceptInterpretationContext<Oc,A> parentContext = context.getNestingContexts().get(0);
+			for(Iterator<Concept<Oc,A>> it = outerConcept.getDownset().iterator(); it.hasNext(); ) {
+				Concept<Oc,A> currentOuterConcept = it.next();
+				ConceptInterpretationContext<Oc,A> currentContext = parentContext.createNestedContext(currentOuterConcept);
 				retVal += getLocalExtentSize(concept, currentContext);
 			}
 			return retVal;
@@ -135,11 +137,11 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 	/**
 	 * Calculates the extent independent of nesting.
 	 */
-	private int getLocalExtentSize(Concept concept, ConceptInterpretationContext context) {
+	private int getLocalExtentSize(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
 		int retVal = 0;
-		Iterator<Object> it = concept.getDownset().iterator();
+		Iterator<Concept<Oc,A>> it = concept.getDownset().iterator();
 		while (it.hasNext()) {
-			Concept subconcept = (Concept) it.next();
+			Concept<Oc,A> subconcept = it.next();
 			retVal += getObjectContingentSize(subconcept, context);
 		}
 		return retVal;
@@ -149,11 +151,11 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 	 * @todo this method and the intent one could probably be merged, including their
 	 * helpers: just iterate through all concepts and join the attribute sets
 	 */
-	public Iterator getAttributeContingentIterator(Concept concept, ConceptInterpretationContext context) {
-        ArrayList retVal = new ArrayList();
-        Iterator attributeContingentIterator = concept.getAttributeContingentIterator();
+	public Iterator<A> getAttributeContingentIterator(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
+        ArrayList<A> retVal = new ArrayList<A>();
+        Iterator<A> attributeContingentIterator = concept.getAttributeContingentIterator();
         while (attributeContingentIterator.hasNext()) {
-            Object a = attributeContingentIterator.next();
+            A a = attributeContingentIterator.next();
             retVal.add(a);
         }
         addAttributesFromNesting(retVal, context, true);
@@ -161,11 +163,11 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
         return retVal.iterator();
 	}
 	
-	public Iterator getIntentIterator(Concept concept, ConceptInterpretationContext context) {
-        ArrayList retVal = new ArrayList();
-        Iterator intentIterator = concept.getIntentIterator();
+	public Iterator<A> getIntentIterator(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
+        ArrayList<A> retVal = new ArrayList<A>();
+        Iterator<A> intentIterator = concept.getIntentIterator();
         while (intentIterator.hasNext()) {
-            Object a = intentIterator.next();
+            A a = intentIterator.next();
             retVal.add(a);
         }
         addAttributesFromNesting(retVal, context, false);
@@ -173,7 +175,7 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
         return retVal.iterator();
 	}
 	
-	public int getObjectCount(Concept concept, ConceptInterpretationContext context) {
+	public int getObjectCount(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
 		if (context.getObjectDisplayMode() == ConceptInterpretationContext.CONTINGENT) {
 			return getObjectContingentSize(concept, context);
 		} else {
@@ -188,12 +190,12 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
      * @deprecated
      */
 	@Deprecated
-	public int getAttributeCount(Concept concept, ConceptInterpretationContext context) {
+	public int getAttributeCount(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
 		return concept.getAttributeContingentSize();
 	}
 
-	public int getObjectContingentSize(Concept concept, ConceptInterpretationContext context) {
-			Hashtable<Concept, Integer> sizes = getContingentSizesCache(context);
+	public int getObjectContingentSize(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
+			Hashtable<Concept<Oc,A>, Integer> sizes = getContingentSizesCache(context);
 			Integer cacheVal = sizes.get(concept);
 			if (cacheVal != null) {
 				return cacheVal.intValue();
@@ -203,8 +205,8 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 			return count;
 	}
 	
-	public int getExtentSize(Concept concept, ConceptInterpretationContext context) {
-		Hashtable<Concept, Integer> sizes = getExtentSizesCache(context);
+	public int getExtentSize(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
+		Hashtable<Concept<Oc,A>, Integer> sizes = getExtentSizesCache(context);
 		Integer cacheVal = sizes.get(concept);
 		if (cacheVal != null) {
 			return cacheVal.intValue();
@@ -214,10 +216,10 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 		return count;
 	}
 	
-	public NormedIntervalSource getIntervalSource(IntervalType type) {
+	public NormedIntervalSource<Oc,A> getIntervalSource(IntervalType type) {
 		if(type == INTERVAL_TYPE_CONTINGENT) {
-			return new NormedIntervalSource(){
-				public double getValue(Concept concept, ConceptInterpretationContext context) {
+			return new NormedIntervalSource<Oc,A>(){
+				public double getValue(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
 					int contingentSize = getObjectContingentSize(concept, context);
 					if (contingentSize == 0) {
 						return 0; //avoids division by zero
@@ -226,23 +228,23 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 				}
 			};
 		} else if(type == INTERVAL_TYPE_EXTENT) {
-			return new NormedIntervalSource(){
-				public double getValue(Concept concept, ConceptInterpretationContext context) {
+			return new NormedIntervalSource<Oc,A>(){
+				public double getValue(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
 					int extentSize = getExtentSize(concept, context);
 					if (extentSize == 0) {
 						return 0; //avoids division by zero
 					}
-					Concept compareConcept = context.getOutermostTopConcept(concept);
-					ConceptInterpretationContext compareContext = context.getOutermostContext();
+					Concept<Oc,A> compareConcept = context.getOutermostTopConcept(concept);
+					ConceptInterpretationContext<Oc,A> compareContext = context.getOutermostContext();
 					return (double) extentSize /
 							(double) getExtentSize(compareConcept.getTopConcept(), compareContext);
 				}
 			};
         } else if(type == INTERVAL_TYPE_FIXED) {
-            return new FixedValueIntervalSource(1);
+            return new FixedValueIntervalSource<Oc,A>(1);
         } else if(type == INTERVAL_TYPE_ORTHOGONALTIY) {
-            return new NormedIntervalSource() {
-                public double getValue(Concept concept, ConceptInterpretationContext context) {
+            return new NormedIntervalSource<Oc,A>() {
+                public double getValue(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
                     if(context.getNestingContexts().size() == 0) {
                         return 0.5;
                     }
@@ -265,7 +267,7 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 		}
 	}
 	
-	public FCAElement[] executeQuery(Query query, Concept concept, ConceptInterpretationContext context) {
+	public FCAElement[] executeQuery(Query query, Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
 		if(!isRealized(concept, context) && !this.showDeviation) {
 			return null;
 		}
@@ -336,7 +338,7 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 		}
 	}
 
-	private FCAElement[] executeObjectCountQuery (Concept concept, ConceptInterpretationContext context) {
+	private FCAElement[] executeObjectCountQuery (Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
 		int objectCount = getObjectCount(concept, context);
 		if( objectCount != 0) {
             FCAElement[] retVal = new FCAElement[1];
@@ -353,10 +355,10 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 	 */
 	protected int getMaximalContingentSize() {
 		int maxVal = 0;
-		for (Iterator<Hashtable<Concept, Integer>> iterator = this.contingentSizes.values().iterator(); iterator.hasNext();) {
-			Hashtable contSizes = iterator.next();
-			for (Iterator iterator2 = contSizes.values().iterator(); iterator2.hasNext();) {
-				Integer curVal = (Integer) iterator2.next();
+		for (Iterator<Hashtable<Concept<Oc,A>, Integer>> iterator = this.contingentSizes.values().iterator(); iterator.hasNext();) {
+			Hashtable<Concept<Oc,A>, Integer> contSizes = iterator.next();
+			for (Iterator<Integer> iterator2 = contSizes.values().iterator(); iterator2.hasNext();) {
+				Integer curVal = iterator2.next();
 				if (curVal.intValue() > maxVal) {
 					maxVal = curVal.intValue();
 				}
@@ -365,15 +367,15 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 		return maxVal;
 	}
 
-	public boolean isRealized(Concept concept, ConceptInterpretationContext context) {
+	public boolean isRealized(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
 		/// @todo do check only lower neighbours
 		/// @todo consider going back to creating the lattice product, this is too much hacking
 
 		// first we check the inner diagram if anything below the concept has the same extent
 		// size (iff any subconcept has the same extent size, the concept is not realized) 
 		int extentSize = getExtentSize(concept, context);
-		for (Iterator<Object> iterator = concept.getDownset().iterator(); iterator.hasNext();) {
-			Concept otherConcept = (Concept) iterator.next();
+		for (Iterator<Concept<Oc,A>> iterator = concept.getDownset().iterator(); iterator.hasNext();) {
+			Concept<Oc,A> otherConcept = iterator.next();
 			if (otherConcept == concept) {
 				continue;
 			}
@@ -388,15 +390,15 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 		// lower nodes of the outer diagrams. Now we look for all whose nesting concepts are subconcepts
 		// of the nesting concepts we are in, then check for the extent of the current concept in these
 		// contexts -- they are all subconcepts of our concept along the outer diagram.
-		List outerConcepts = context.getNestingConcepts();
-		for (Iterator iterator = outerConcepts.iterator(); iterator.hasNext();) {
-			Concept outerConcept = (Concept) iterator.next();
-			for (Iterator<Object> iterator2 = outerConcept.getDownset().iterator(); iterator2.hasNext();) {
-				Concept otherConcept = (Concept) iterator2.next();
+		List<Concept<Oc,A>> outerConcepts = context.getNestingConcepts();
+		for (Iterator<Concept<Oc,A>> iterator = outerConcepts.iterator(); iterator.hasNext();) {
+			Concept<Oc,A> outerConcept = iterator.next();
+			for (Iterator<Concept<Oc,A>> iterator2 = outerConcept.getDownset().iterator(); iterator2.hasNext();) {
+				Concept<Oc,A> otherConcept = iterator2.next();
 				if (otherConcept != outerConcept) {
-					for (Iterator<ConceptInterpretationContext> iterator3 = this.contingentSizes.keySet().iterator(); iterator3.hasNext();) {
-						ConceptInterpretationContext otherContext = iterator3.next();
-						List nesting = otherContext.getNestingConcepts();
+					for (Iterator<ConceptInterpretationContext<Oc,A>> iterator3 = this.contingentSizes.keySet().iterator(); iterator3.hasNext();) {
+						ConceptInterpretationContext<Oc,A> otherContext = iterator3.next();
+						List<Concept<Oc,A>> nesting = otherContext.getNestingConcepts();
 						if (nesting.size() != 0) {
 							if (nesting.get(nesting.size() - 1).equals(otherConcept)) {
 								int otherExtentSize = getExtentSize(concept, otherContext);
@@ -413,10 +415,10 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 	}
 
 
-	private Hashtable<Concept, Integer> getContingentSizesCache(ConceptInterpretationContext context) {
-		Hashtable<Concept, Integer> retVal = this.contingentSizes.get(context);
+	private Hashtable<Concept<Oc,A>, Integer> getContingentSizesCache(ConceptInterpretationContext<Oc,A> context) {
+		Hashtable<Concept<Oc,A>, Integer> retVal = this.contingentSizes.get(context);
 		if (retVal == null) {
-			retVal = new Hashtable<Concept, Integer>();
+			retVal = new Hashtable<Concept<Oc,A>, Integer>();
 			this.contingentSizes.put(context, retVal);
 			/// @todo can we get around this by being smarter about the hashcodes ???
 			context.getEventBroker().subscribe(this,
@@ -427,18 +429,18 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
 	}
 	
 	public void processEvent(Event e) {
-		clearCaches((ConceptInterpretationContext) e.getSubject());
+		clearCaches((ConceptInterpretationContext<Oc,A>) e.getSubject());
 	}
 
-	private void clearCaches(ConceptInterpretationContext context) {
+	private void clearCaches(ConceptInterpretationContext<Oc,A> context) {
 		this.contingentSizes.remove(context);
 		this.extentSizes.remove(context);
 	}
 
-	private Hashtable<Concept, Integer> getExtentSizesCache(ConceptInterpretationContext context) {
-		Hashtable<Concept, Integer> retVal = this.extentSizes.get(context);
+	private Hashtable<Concept<Oc,A>, Integer> getExtentSizesCache(ConceptInterpretationContext<Oc,A> context) {
+		Hashtable<Concept<Oc,A>, Integer> retVal = this.extentSizes.get(context);
 		if (retVal == null) {
-			retVal = new Hashtable<Concept, Integer>();
+			retVal = new Hashtable<Concept<Oc,A>, Integer>();
 			this.extentSizes.put(context, retVal);
 			/// @todo can we get around this by being smarter about the hashcodes ???
 			context.getEventBroker().subscribe(this,
@@ -457,16 +459,16 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
         this.showDeviation = show;    
     }
 
-	public boolean isVisible(Concept concept, ConceptInterpretationContext context) {
+	public boolean isVisible(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
 	    return this.showDeviation || isRealized(concept, context);
 	}
 
-	private void addAttributesFromNesting(List currentSet, ConceptInterpretationContext context, boolean contingentOnly) {
-        Iterator mainIt = context.getNestingConcepts().iterator();
-        Set attributesToAdd = new HashSet();
+	private void addAttributesFromNesting(List<A> currentSet, ConceptInterpretationContext<Oc,A> context, boolean contingentOnly) {
+        Iterator<Concept<Oc,A>> mainIt = context.getNestingConcepts().iterator();
+        Set<A> attributesToAdd = new HashSet<A>();
         while (mainIt.hasNext()) {
-            Concept concept = (Concept) mainIt.next();
-            Iterator attributeIterator;
+            Concept<Oc,A> concept = mainIt.next();
+            Iterator<A> attributeIterator;
             if(contingentOnly) {
             	attributeIterator = concept.getAttributeContingentIterator();
             } else {
@@ -479,12 +481,12 @@ public abstract class AbstractConceptInterpreter implements ConceptInterpreter, 
         currentSet.addAll(attributesToAdd);
     }
 
-    private void addAttributesFromFiltering(List currentSet, ConceptInterpretationContext context, final boolean contingentOnly) {
-        final Set attributesToAdd = new HashSet();
-        DiagramHistory.ConceptVisitor visitor;
-        visitor = new DiagramHistory.ConceptVisitor() {
-            public void visitConcept(Concept concept) {
-                Iterator attributeIterator;
+    private void addAttributesFromFiltering(List<A> currentSet, ConceptInterpretationContext<Oc,A> context, final boolean contingentOnly) {
+        final Set<A> attributesToAdd = new HashSet<A>();
+        DiagramHistory.ConceptVisitor<Oc,A> visitor;
+        visitor = new DiagramHistory.ConceptVisitor<Oc,A>() {
+            public void visitConcept(Concept<Oc,A> concept) {
+                Iterator<A> attributeIterator;
                 if(contingentOnly) {
                 	attributeIterator = concept.getAttributeContingentIterator();
                 } else {

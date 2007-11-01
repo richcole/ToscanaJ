@@ -7,23 +7,28 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-import net.sourceforge.toscanaj.util.CollectionFactory;
 
 import org.tockit.events.EventBroker;
-
-import java.util.List;
 
 /**
  * @todo remove the objectDisplayMode out of this class, it is not really part of the interpretetation
  *       context, but an aspect of a certain view. Having it in here caused troubles with requerying
  *       since the interpreter assumed a context change whenever the view was changed and thus
  *       queried the same information again. This is by now avoided by not using the display mode
- *       in equals()/hashCode(), but this is of course only half a solution. 
+ *       in equals()/hashCode(), but this is of course only half a solution.
+ *       
+ * @param <O> The formal objects under consideration.
+ * @param <A> The attributes under consideration.
+ * 
+ * @see ConceptInterpreter
  */
-public class ConceptInterpretationContext implements ChangeObserver {
+public class ConceptInterpretationContext<O,A> implements ChangeObserver {
     /** Constant value which may be used to set displayMode or filterMode */
     public static final boolean CONTINGENT = true;
 
@@ -37,8 +42,8 @@ public class ConceptInterpretationContext implements ChangeObserver {
     /// @todo allow passing null brokers
     private EventBroker eventBroker;
 
-    private List nestingConcepts = CollectionFactory.createDefaultList();
-    private List nestingContexts = CollectionFactory.createDefaultList();
+    private List<Concept<O,A>> nestingConcepts = new ArrayList<Concept<O,A>>();
+    private List<ConceptInterpretationContext<O, A>> nestingContexts = new ArrayList<ConceptInterpretationContext<O, A>>();
 
     /// @todo use something else than diagramHistory as first parameter -- not useful in anything but Toscana, even not
     /// in the editors
@@ -50,8 +55,8 @@ public class ConceptInterpretationContext implements ChangeObserver {
         diagramHistory.addObserver(this);
     }
 
-    public ConceptInterpretationContext createNestedContext(Concept nestingConcept) {
-        ConceptInterpretationContext retVal = new ConceptInterpretationContext(this.diagramHistory, this.eventBroker);
+    public ConceptInterpretationContext<O,A> createNestedContext(Concept<O,A> nestingConcept) {
+        ConceptInterpretationContext<O,A> retVal = new ConceptInterpretationContext<O,A>(this.diagramHistory, this.eventBroker);
         retVal.objectDisplayMode = this.objectDisplayMode;
         retVal.filterMode = this.filterMode;
         retVal.nestingConcepts.addAll(this.nestingConcepts);
@@ -88,19 +93,19 @@ public class ConceptInterpretationContext implements ChangeObserver {
         return this.diagramHistory;
     }
 
-    public List getNestingConcepts() {
+    public List<Concept<O,A>> getNestingConcepts() {
         return this.nestingConcepts;
     }
 
-    public List getNestingContexts() {
+    public List<ConceptInterpretationContext<O, A>> getNestingContexts() {
         return this.nestingContexts;
     }
     
-    public Concept getOutermostTopConcept(Concept concept) {
+    public Concept<O,A> getOutermostTopConcept(Concept<O,A> concept) {
     	if(this.nestingConcepts.size() == 0) {
     		return concept.getTopConcept();
     	} else {
-    		Concept outermostConcept = (Concept) this.nestingConcepts.get(0);
+    		Concept<O,A> outermostConcept = this.nestingConcepts.get(0);
     		return outermostConcept.getTopConcept();
     	}
     }
@@ -117,7 +122,7 @@ public class ConceptInterpretationContext implements ChangeObserver {
     	if(other.getClass() != this.getClass()) {
     		return false;
     	}
-    	ConceptInterpretationContext otherContext = (ConceptInterpretationContext) other;
+    	ConceptInterpretationContext<?,?> otherContext = (ConceptInterpretationContext<?,?>) other;
 		if(!otherContext.diagramHistory.equals(this.diagramHistory)) {
 			return false;
 		}
@@ -146,11 +151,11 @@ public class ConceptInterpretationContext implements ChangeObserver {
     	return result;
     }
 
-    public ConceptInterpretationContext getOutermostContext() {
+    public ConceptInterpretationContext<O,A> getOutermostContext() {
         if(this.nestingContexts.size() == 0) {
             return this;
         } else {
-            return (ConceptInterpretationContext) this.nestingContexts.get(0);
+            return this.nestingContexts.get(0);
         }
     }
 }

@@ -31,8 +31,11 @@ import java.util.Iterator;
  * - object contingent:    all objects matching the intent but nothing else
  *
  * The contingents are usually used for labelling the diagram.
+ * 
+ * @param <O> The type of objects in the extent/object contingent.
+ * @param <A> The type of attributes in the intent/attribute contingent.
  */
-public interface Concept extends XMLizable, Ordered {
+public interface Concept<O,A> extends XMLizable, Ordered {
     /**
      * Returns the size of the intent.
      */
@@ -59,7 +62,7 @@ public interface Concept extends XMLizable, Ordered {
      * The Java objects returned from the iterator should offer a toString()
      * implementation suited for displaying the attributes.
      */
-    Iterator getIntentIterator();
+    Iterator<A> getIntentIterator();
 
     /**
      * Returns an iterator returning the objects from the extent.
@@ -67,7 +70,7 @@ public interface Concept extends XMLizable, Ordered {
      * The Java objects returned from the iterator should offer a toString()
      * implementation suited for displaying the objects.
      */
-    Iterator getExtentIterator();
+    Iterator<O> getExtentIterator();
 
     /**
      * Returns an iterator returning the attributes from the contingent.
@@ -75,7 +78,7 @@ public interface Concept extends XMLizable, Ordered {
      * The Java objects returned from the iterator should offer a toString()
      * implementation suited for displaying the attributes.
      */
-    Iterator getAttributeContingentIterator();
+    Iterator<A> getAttributeContingentIterator();
 
     /**
      * Returns an iterator returning the objects from the contingent.
@@ -83,7 +86,7 @@ public interface Concept extends XMLizable, Ordered {
      * The Java objects returned from the iterator should offer a toString()
      * implementation suited for displaying the objects.
      */
-    Iterator getObjectContingentIterator();
+    Iterator<O> getObjectContingentIterator();
 
     /**
      * Returns true iff this is the top concept.
@@ -98,22 +101,22 @@ public interface Concept extends XMLizable, Ordered {
     /**
      * Returns true iff the given concept is a superconcept of the object.
      */
-    boolean hasSuperConcept(Concept concept);
+    boolean hasSuperConcept(Concept<O,A> concept);
 
     /**
      * Returns true iff the given concept is a subconcept of the object.
      */
-    boolean hasSubConcept(Concept concept);
+    boolean hasSubConcept(Concept<O,A> concept);
 
-    Collection<Object> getDownset();
+    Collection<Concept<O,A>> getDownset();
 
-    Collection<Object> getUpset();
+    Collection<Concept<O,A>> getUpset();
 
     boolean isMeetIrreducible();
 
     boolean isJoinIrreducible();
 
-	public Concept getTopConcept();
+	public Concept<O,A> getTopConcept();
 	
-	public Concept getBottomConcept();
+	public Concept<O,A> getBottomConcept();
 }

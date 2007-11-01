@@ -297,11 +297,11 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
         notifyObservers();
     }
 
-    public interface ConceptVisitor {
-        void visitConcept(Concept concept);
+    public interface ConceptVisitor<O,A> {
+        void visitConcept(Concept<O,A> concept);
     }
 
-    public void visitZoomedConcepts(ConceptVisitor visitor) {
+    public void visitZoomedConcepts(ConceptVisitor<?,?> visitor) {
         for (int i = 0; isInPast(i); i++) {
             visitor.visitConcept(getReferenceAt(i).getFilterConcept());
         }

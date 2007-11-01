@@ -225,7 +225,7 @@ public abstract class NDimLayoutOperations {
     private static void addVector(double[] ndimVector, Object attribute, Vector<Dimension> dimensions) {
         int dimCount = 0;
         for (Iterator<Dimension> it = dimensions.iterator(); it.hasNext();) {
-            Dimension dimension = it.next();
+            Dimension<Object> dimension = it.next();
             if (dimension.contains(attribute)) {
                 ndimVector[dimCount] += 1;
             }

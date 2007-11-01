@@ -9,18 +9,14 @@ package net.sourceforge.toscanaj.view.diagram;
 
 import org.tockit.events.Event;
 
-public class DisplayedDiagramChangedEvent implements Event {
+public class DisplayedDiagramChangedEvent implements Event<DiagramView> {
     private DiagramView subject;
 
     public DisplayedDiagramChangedEvent(DiagramView subject) {
         this.subject = subject;
     }
 
-    public Object getSubject() {
+    public DiagramView getSubject() {
         return subject;
-    }
-    
-    public DiagramView getDiagramView() {
-    	return subject;
     }
 }

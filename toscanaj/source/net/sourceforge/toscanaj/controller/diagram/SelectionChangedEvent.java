@@ -7,10 +7,12 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
+import net.sourceforge.toscanaj.view.diagram.DiagramView;
+
 import org.tockit.events.StandardEvent;
 
-public class SelectionChangedEvent extends StandardEvent {
-    public SelectionChangedEvent(Object source) {
+public class SelectionChangedEvent extends StandardEvent<DiagramView> {
+    public SelectionChangedEvent(DiagramView source) {
         super(source);
     }
 }

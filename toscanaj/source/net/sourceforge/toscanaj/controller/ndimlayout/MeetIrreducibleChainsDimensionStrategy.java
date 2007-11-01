@@ -47,7 +47,7 @@ public class MeetIrreducibleChainsDimensionStrategy implements DimensionCreation
         Set<Vector<Node>> paths = graph.getMaximalPaths();
         for (Iterator<Vector<Node>> it = paths.iterator(); it.hasNext();) {
             Vector path = it.next();
-            Vector attributes = new Vector();
+            Vector<FCAElement> attributes = new Vector<FCAElement>();
             for (Iterator it2 = path.iterator(); it2.hasNext();) {
                 PartialOrderNode node = (PartialOrderNode) it2.next();
                 Concept concept = (Concept) node.getData();

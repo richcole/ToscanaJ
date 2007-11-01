@@ -13,5 +13,5 @@ import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
 import java.util.Vector;
 
 public interface DimensionCreationStrategy {
-    Vector<Dimension> calculateDimensions(Lattice lattice);
+    <T> Vector<Dimension<T>> calculateDimensions(Lattice<?,T> lattice);
 }

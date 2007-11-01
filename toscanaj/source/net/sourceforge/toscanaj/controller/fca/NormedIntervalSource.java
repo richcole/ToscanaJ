@@ -14,7 +14,10 @@ import net.sourceforge.toscanaj.model.lattice.Concept;
  * 
  * Typically an instance of a class implementing this interface will know
  * about a concept interpreter.
+ * 
+ * @param <O> The formal objects under consideration.
+ * @param <A> The attributes under consideration.
  */
-public interface NormedIntervalSource {
-    double getValue(Concept concept, ConceptInterpretationContext context);
+public interface NormedIntervalSource<O,A> {
+    double getValue(Concept<O,A> concept, ConceptInterpretationContext<O,A> context);
 }
