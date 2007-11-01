@@ -7,13 +7,11 @@
  */
  package net.sourceforge.toscanaj.model.sql;
 
-import net.sourceforge.toscanaj.model.order.Ordered;
-
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class OrExpression implements Expression {
-    private Vector<Expression> subexpressions = new Vector<Expression>();
+    private ArrayList<Expression> subexpressions = new ArrayList<Expression>();
 
     public OrExpression() {
 		// nothing to do here
@@ -42,12 +40,12 @@ public class OrExpression implements Expression {
         return retVal;
     }
 
-    public boolean isLesserThan(Ordered other) {
+    public boolean isLesserThan(Expression other) {
         /// @todo implement
         return false;
     }
 
-    public boolean isEqual(Ordered other) {
+    public boolean isEqual(Expression other) {
         /// @todo implement
         return false;
     }

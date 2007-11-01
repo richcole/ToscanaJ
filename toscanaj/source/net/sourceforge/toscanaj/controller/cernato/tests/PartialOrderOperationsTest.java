@@ -26,9 +26,9 @@ import org.tockit.cernatoXML.model.TextualValueGroup;
 import org.tockit.cernatoXML.model.ValueGroup;
 
 public class PartialOrderOperationsTest extends TestCase {
-    final static Class THIS = PartialOrderOperationsTest.class;
+    final static Class<PartialOrderOperationsTest> THIS = PartialOrderOperationsTest.class;
 
-    private static class OrderedValueGroup implements Ordered {
+    private static class OrderedValueGroup implements Ordered<OrderedValueGroup> {
         private ValueGroup valueGroup;
         public OrderedValueGroup(ValueGroup valueGroup) {
             this.valueGroup = valueGroup;
@@ -36,19 +36,17 @@ public class PartialOrderOperationsTest extends TestCase {
         public ValueGroup getValueGroup() {
             return this.valueGroup;
         }
-        public boolean isLesserThan(Ordered other) {
+        public boolean isLesserThan(OrderedValueGroup other) {
             if(other.getClass() != this.getClass()) {
                 return false;
             }
-            OrderedValueGroup ocOther = (OrderedValueGroup) other;
-            return this.getValueGroup().isLesserThan(ocOther.getValueGroup());
+            return this.getValueGroup().isLesserThan(other.getValueGroup());
         }
-        public boolean isEqual(Ordered other) {
+        public boolean isEqual(OrderedValueGroup other) {
             if(other.getClass() != this.getClass()) {
                 return false;
             }
-            OrderedValueGroup ocOther = (OrderedValueGroup) other;
-            return this.getValueGroup().isEqual(ocOther.getValueGroup());
+            return this.getValueGroup().isEqual(other.getValueGroup());
         }
     }
 

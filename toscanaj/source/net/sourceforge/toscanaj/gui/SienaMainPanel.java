@@ -311,7 +311,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 		this.diagramEditingView.setDividerLocation(preferences.getInt("diagramViewDivider", 200));
 	}
 
-    private void insertDiagramIntoView(final Diagram2D diagram, final boolean nestDiagram) {
+    private void insertDiagramIntoView(final Diagram2D<FCAElement,FCAElement> diagram, final boolean nestDiagram) {
         Diagram2D oldDiagram = this.diagramEditingView.getDiagramView().getDiagram();
         Diagram2D newDiagram = diagram;
         DiagramHistory diagramHistory = new DiagramHistory();
@@ -323,9 +323,9 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             while (oldObjectSetIterator.hasNext()) {
                 oldObjects.add(oldObjectSetIterator.next());
             }
-            Iterator newObjectSetIterator = diagram.getTopConcept().getExtentIterator();
+            Iterator<FCAElement> newObjectSetIterator = diagram.getTopConcept().getExtentIterator();
             while (newObjectSetIterator.hasNext()) {
-                Object object = newObjectSetIterator.next();
+            	FCAElement object = newObjectSetIterator.next();
                 if(oldObjects.contains(object)) {
                     // remove the common ones from the old set
                     oldObjects.remove(object);
@@ -346,7 +346,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
             // the new top concept
             // this is again only happening if there is no intent attached to the top node, else
             // we have to create a new diagram
-            for (Iterator iter = oldObjects.iterator(); iter.hasNext();) {
+            for (Iterator<FCAElement> iter = oldObjects.iterator(); iter.hasNext();) {
                 if (newDiagram.getTopConcept().getIntentSize() == 0) {
                     ((ConceptImplementation) newDiagram.getTopConcept()).addObject(iter.next());
                 } else {

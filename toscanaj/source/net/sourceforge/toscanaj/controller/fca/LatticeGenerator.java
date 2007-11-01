@@ -11,6 +11,6 @@ import org.tockit.context.model.Context;
 
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 
-public interface LatticeGenerator {
-    Lattice createLattice(Context context);
+public interface LatticeGenerator<O,A> {
+	Lattice<O,A> createLattice(Context<O,A> context);
 }

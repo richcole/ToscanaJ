@@ -35,7 +35,7 @@ import java.util.Iterator;
  * @param <O> The type of objects in the extent/object contingent.
  * @param <A> The type of attributes in the intent/attribute contingent.
  */
-public interface Concept<O,A> extends XMLizable, Ordered {
+public interface Concept<O,A> extends XMLizable, Ordered<Concept<O,A>> {
     /**
      * Returns the size of the intent.
      */

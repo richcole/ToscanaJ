@@ -42,12 +42,12 @@ public class AndExpression implements Expression {
         return retVal;
     }
 
-    public boolean isLesserThan(Ordered other) {
+    public boolean isLesserThan(Expression other) {
         /// @todo implement
         return false;
     }
 
-    public boolean isEqual(Ordered other) {
+    public boolean isEqual(Expression other) {
         /// @todo implement
         return false;
     }

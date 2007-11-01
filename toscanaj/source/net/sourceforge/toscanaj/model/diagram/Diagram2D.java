@@ -24,7 +24,7 @@ import java.util.Iterator;
  * @todo remove constants from interface
  */
 
-public interface Diagram2D extends XMLizable {
+public interface Diagram2D<O,A> extends XMLizable {
     static final String DIAGRAM_ELEMENT_NAME = "diagram";
     static final String TITLE_ATTRIBUTE_NAME = "title";
     static final String DESCRIPTION_ELEMENT_NAME = "description";
@@ -66,7 +66,7 @@ public interface Diagram2D extends XMLizable {
      * 
      * Returns null if no such node exists in this diagram.
      */
-    DiagramNode getNodeForConcept(Concept concept);
+    DiagramNode getNodeForConcept(Concept<O,A> concept);
 
     /**
      * Returns the list of all nodes in the diagram.
@@ -127,7 +127,7 @@ public interface Diagram2D extends XMLizable {
 	 * 
 	 * @throws IllegalStateException if the diagram has no nodes or is not a lattice.
 	 */
-	Concept getTopConcept();
+	Concept<O,A> getTopConcept();
 
 	/**
 	 * Finds the bottom concept in the underlying lattice.
@@ -136,7 +136,7 @@ public interface Diagram2D extends XMLizable {
 	 * 
 	 * @throws IllegalStateException if the diagram has no nodes or is not a lattice.
 	 */
-	Concept getBottomConcept();
+	Concept<O,A> getBottomConcept();
 	
 	/**
 	 * Returns the event broker this diagram sends change events to.

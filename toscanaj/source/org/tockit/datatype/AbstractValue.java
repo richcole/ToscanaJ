@@ -7,21 +7,19 @@
  */
 package org.tockit.datatype;
 
-import net.sourceforge.toscanaj.model.order.Ordered;
-
 
 public abstract class AbstractValue implements Value {
     /**
      * We default to be a co-chain.
      */
-    public boolean isLesserThan(Ordered other) {
+    public boolean isLesserThan(Value other) {
         return false;
     }
 
     /**
      * Ordered.isEqual() should match equals() since we assume value-identity.
      */
-    public boolean isEqual(Ordered other) {
+    public boolean isEqual(Value other) {
         return equals(other);
     }
     

@@ -11,30 +11,31 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class LatticeImplementation implements Lattice {
-    private Set<Concept> concepts = new HashSet<Concept>();
+public class LatticeImplementation<O,A> implements Lattice<O,A> {
+    private Set<Concept<O,A>> concepts = new HashSet<Concept<O,A>>();
 
     public LatticeImplementation() {
     	// nothing to do here
     }
 
-    public void addConcept(Concept concept) {
+    public void addConcept(Concept<O,A> concept) {
         concepts.add(concept);
     }
 
-    public void removeConcept(Concept concept) {
+    public void removeConcept(Concept<O,A> concept) {
         concepts.remove(concept);
     }
 
-    public Concept[] getConcepts() {
-        Concept[] retVal = new Concept[concepts.size()];
+    @SuppressWarnings("unchecked")
+	public Concept<O,A>[] getConcepts() {
+        Concept<O,A>[] retVal = new Concept[concepts.size()];
         concepts.toArray(retVal);
         return retVal;
     }
 
-    public Concept getTop() {
-        for (Iterator<Concept> iterator = concepts.iterator(); iterator.hasNext();) {
-            Concept concept = iterator.next();
+    public Concept<O,A> getTop() {
+        for (Iterator<Concept<O,A>> iterator = concepts.iterator(); iterator.hasNext();) {
+            Concept<O,A> concept = iterator.next();
             if (concept.isTop()) {
                 return concept;
             }
@@ -42,9 +43,9 @@ public class LatticeImplementation implements Lattice {
         return null;
     }
 
-    public Concept getBottom() {
-        for (Iterator<Concept> iterator = concepts.iterator(); iterator.hasNext();) {
-            Concept concept = iterator.next();
+    public Concept<O,A> getBottom() {
+        for (Iterator<Concept<O,A>> iterator = concepts.iterator(); iterator.hasNext();) {
+            Concept<O,A> concept = iterator.next();
             if (concept.isBottom()) {
                 return concept;
             }

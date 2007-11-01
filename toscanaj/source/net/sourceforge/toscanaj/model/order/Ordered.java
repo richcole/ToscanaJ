@@ -14,7 +14,7 @@ package net.sourceforge.toscanaj.model.order;
  * does not implement the mathematical definition in a single method, which would
  * be comparing on a lesser-or-equal, instead of having these separated.
  */
-public interface Ordered {
+public interface Ordered<T> {
     /**
      * Compares the current with another object on ordering.
      * 
@@ -22,7 +22,7 @@ public interface Ordered {
      * @return true iff the current object is considered less than the one passed
      * @throws NullPointerException iff the parameter is null
      */
-    boolean isLesserThan(Ordered other);
+    boolean isLesserThan(T other);
 
     /**
      * Compare the current with another object on equality.
@@ -39,5 +39,5 @@ public interface Ordered {
      * @return true iff the current object is considered equal to the one passed
      * @throws NullPointerException iff the parameter is null
      */
-    boolean isEqual(Ordered other);
+    boolean isEqual(T other);
 }

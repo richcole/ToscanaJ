@@ -7,9 +7,8 @@
  */
 package org.tockit.datatype.xsd;
 
-import net.sourceforge.toscanaj.model.order.Ordered;
-
 import org.tockit.datatype.AbstractValue;
+import org.tockit.datatype.Value;
 
 
 public class StringValue extends AbstractValue {
@@ -24,7 +23,7 @@ public class StringValue extends AbstractValue {
     }
     
     @Override
-	public boolean isLesserThan(Ordered other) {
+	public boolean isLesserThan(Value other) {
         if(!(this.getClass() == other.getClass())) {
             return false;
         }

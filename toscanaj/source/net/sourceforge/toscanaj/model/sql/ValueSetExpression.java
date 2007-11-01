@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.model.sql;
 
 import net.sourceforge.toscanaj.model.database.Column;
-import net.sourceforge.toscanaj.model.order.Ordered;
 
 public class ValueSetExpression implements Expression {
 	private Column column;
@@ -30,7 +29,7 @@ public class ValueSetExpression implements Expression {
         return retval;
     }
 
-    public boolean isLesserThan(Ordered other) {
+    public boolean isLesserThan(Expression other) {
     	if(! (other instanceof ValueSetExpression)) {
     		return false;
     	}
@@ -41,7 +40,7 @@ public class ValueSetExpression implements Expression {
         return isValueSubset(otherExp);
     }
 
-    public boolean isEqual(Ordered other) {
+    public boolean isEqual(Expression other) {
         if(! (other instanceof ValueSetExpression)) {
             return false;
         }

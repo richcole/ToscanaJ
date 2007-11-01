@@ -17,17 +17,17 @@ import net.sourceforge.toscanaj.model.order.Ordered;
  * of toString should be the same as getDisplayString(). Two values are considered
  * incomparable (i.e. !(a=b), !(a<b) !(a>b)) if the their classes do not match.
  */
-public interface Value extends Ordered {
+public interface Value extends Ordered<Value> {
     String getDisplayString();
     
     static final Value NULL = new Value(){
         public String getDisplayString() {
             return null;
         }
-        public boolean isLesserThan(Ordered other) {
+        public boolean isLesserThan(Value other) {
             return false;
         }
-        public boolean isEqual(Ordered other) {
+        public boolean isEqual(Value other) {
             return other == NULL;
         }
     };

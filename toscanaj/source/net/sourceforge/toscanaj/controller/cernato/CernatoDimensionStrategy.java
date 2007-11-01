@@ -26,7 +26,7 @@ import java.util.Vector;
 import org.tockit.cernatoXML.model.Criterion;
 
 public class CernatoDimensionStrategy implements DimensionCreationStrategy {
-    private static class OrderedCriterion implements Ordered {
+    private static class OrderedCriterion implements Ordered<OrderedCriterion> {
         private Criterion criterion;
         public OrderedCriterion(Criterion criterion) {
             this.criterion = criterion;
@@ -34,18 +34,18 @@ public class CernatoDimensionStrategy implements DimensionCreationStrategy {
         public Criterion getCriterion() {
             return this.criterion;
         }
-        public boolean isLesserThan(Ordered other) {
+        public boolean isLesserThan(OrderedCriterion other) {
             if(other.getClass() != this.getClass()) {
                 return false;
             }
-            OrderedCriterion ocOther = (OrderedCriterion) other;
+            OrderedCriterion ocOther = other;
             return this.getCriterion().isLesserThan(ocOther.getCriterion());
         }
-        public boolean isEqual(Ordered other) {
+        public boolean isEqual(OrderedCriterion other) {
             if(other.getClass() != this.getClass()) {
                 return false;
             }
-            OrderedCriterion ocOther = (OrderedCriterion) other;
+            OrderedCriterion ocOther = other;
             return this.getCriterion().isEqual(ocOther.getCriterion());
         }
     }

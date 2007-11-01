@@ -9,6 +9,6 @@
 
 import net.sourceforge.toscanaj.model.order.Ordered;
 
-public interface Expression extends Ordered {
+public interface Expression extends Ordered<Expression> {
     String getSQL();
 }

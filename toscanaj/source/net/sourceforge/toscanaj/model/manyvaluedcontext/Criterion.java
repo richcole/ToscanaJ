@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
 import net.sourceforge.toscanaj.model.order.Ordered;
 
-public class Criterion implements Ordered {
+public class Criterion implements Ordered<Criterion> {
     private ManyValuedAttribute property;
     private ScaleColumn valueGroup;
 
@@ -35,19 +35,11 @@ public class Criterion implements Ordered {
         return getDisplayString();
     }
 
-    public boolean isLesserThan(Ordered other) {
-        if (!(other instanceof Criterion)) {
-            return false;
-        }
-        Criterion crit = (Criterion) other;
-        return (this.property == crit.property) && this.valueGroup.isLesserThan(crit.valueGroup);
+    public boolean isLesserThan(Criterion other) {
+        return (this.property == other.property) && this.valueGroup.isLesserThan(other.valueGroup);
     }
 
-    public boolean isEqual(Ordered other) {
-        if (!(other instanceof Criterion)) {
-            return false;
-        }
-        Criterion crit = (Criterion) other;
-        return (this.property == crit.property) && this.valueGroup.isEqual(crit.valueGroup);
+    public boolean isEqual(Criterion other) {
+        return (this.property == other.property) && this.valueGroup.isEqual(other.valueGroup);
     }
 }
