@@ -32,9 +32,9 @@ import org.tockit.util.ListSetImplementation;
 
 public class ManyValuedContextImplementation implements WritableManyValuedContext, XMLizable {
     private ListSet objects = new ListSetImplementation();
-    private ListSet attributes = new ListSetImplementation();
+    private ListSet<ManyValuedAttribute> attributes = new ListSetImplementation<ManyValuedAttribute>();
     private Hashtable<FCAElement, Hashtable<ManyValuedAttribute, Value>> relation = new Hashtable<FCAElement, Hashtable<ManyValuedAttribute, Value>>();
-	private ListSet types = new ListSetImplementation();
+	private ListSet<Datatype> types = new ListSetImplementation<Datatype>();
 	
 	public static final String MANY_VALUED_CONTEXT_ELEMENT_NAME = "manyValuedContext";
 	private static final String ATTRIBUTE_ID_ATTRIBUTE_NAME = "attributeId";
@@ -87,7 +87,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
         this.attributes.remove(attribute);
     }
 
-    public ListSet getAttributes() {
+    public ListSet<ManyValuedAttribute> getAttributes() {
         return ListSetImplementation.unmodifiableListSet(this.attributes);
     }
     
@@ -99,7 +99,7 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
         this.types.remove(type);
     }
 
-    public ListSet getTypes(){
+    public ListSet<Datatype> getTypes(){
     	return ListSetImplementation.unmodifiableListSet(this.types);
     }
 
@@ -165,15 +165,15 @@ public class ManyValuedContextImplementation implements WritableManyValuedContex
 		}
 		retVal.addContent(objectsElement);
 		Element typesElement = new Element(TYPES_ELEMENT_NAME);
-		for (Iterator iter = types.iterator(); iter.hasNext();) {
-            Datatype itType = (Datatype) iter.next();
+		for (Iterator<Datatype> iter = types.iterator(); iter.hasNext();) {
+            Datatype itType = iter.next();
 			Element typeElement = ((XMLizable) itType).toXML();
 			typesElement.addContent(typeElement);
 		}
 		retVal.addContent(typesElement);
 		Element attributesElement = new Element(ATTRIBUTES_ELEMENT_NAME);
-		for (Iterator iter = attributes.iterator(); iter.hasNext();) {
-			ManyValuedAttribute itAttribute = (ManyValuedAttribute) iter.next();
+		for (Iterator<ManyValuedAttribute> iter = attributes.iterator(); iter.hasNext();) {
+			ManyValuedAttribute itAttribute = iter.next();
 			if (! (itAttribute instanceof ManyValuedAttributeImplementation)) {
 				throw new RuntimeException("Found attribute \"" +
 						itAttribute.getName() + "\" not to be XMLizable.");

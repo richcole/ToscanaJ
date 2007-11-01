@@ -179,9 +179,9 @@ public class ManyValuedAttributeDialog extends JDialog{
 	
 	protected JComboBox createTypeComboBox(){
 		typeBox = new JComboBox();
-		Iterator typeIt = context.getTypes().iterator();
+		Iterator<Datatype> typeIt = context.getTypes().iterator();
 		while(typeIt.hasNext()){
-            Datatype type = (Datatype) typeIt.next();
+            Datatype type = typeIt.next();
 			typeBox.addItem(type);
 			if(type.getName().equals(property.getType().getName())){
 				typeBox.setSelectedItem(type);

@@ -311,7 +311,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
     /**
      * Stores the observers of the controller.
      */
-    private List observers = new LinkedList();
+    private List<ChangeObserver> observers = new LinkedList<ChangeObserver>();
 
     /**
      * Implements ChangeObservable.addObserver(ChangeObserver).
@@ -333,7 +333,7 @@ public class DiagramHistory extends AbstractListModel implements ChangeObservabl
      */
     protected void notifyObservers() {
         // avoid stupid ConcurrentModificationExceptions by operating on copy of list
-        List observerCopy = CollectionFactory.createDefaultList();
+        List<Object> observerCopy = CollectionFactory.createDefaultList();
         observerCopy.addAll(this.observers);
         while (!observerCopy.isEmpty()) {
             ChangeObserver observer = (ChangeObserver) observerCopy.remove(0);

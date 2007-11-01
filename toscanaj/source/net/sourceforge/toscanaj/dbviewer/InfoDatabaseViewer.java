@@ -79,14 +79,14 @@ public class InfoDatabaseViewer extends PagingDatabaseViewer {
             return new PageViewPanel() {
                 public void showItem(String keyValue) throws DatabaseViewerException {
                     try {
-                        List<Vector<Object>> results = getManager().getConnection()
+                        List<String[]> results = getManager().getConnection()
                                 .executeQuery(
                                         columns,
                                         getManager().getTableName(),
                                         "WHERE " + getManager().getKeyName()
                                                 + " = '" + keyValue + "';");
-                        Vector fields = results.get(0);
-                        String url = (String) fields.get(0);
+                        String[] fields = results.get(0);
+                        String url = fields[0];
                         URL resourceUrl = new URL(DatabaseViewerManager
                                 .getBaseURL(), url);
                         textArea.setPage(resourceUrl);
@@ -104,14 +104,14 @@ public class InfoDatabaseViewer extends PagingDatabaseViewer {
             return new PageViewPanel() {
                 public void showItem(String keyValue) throws DatabaseViewerException {
                     try {
-                        List<Vector<Object>> results = getManager().getConnection()
+                        List<String[]> results = getManager().getConnection()
                                 .executeQuery(
                                         columns,
                                         getManager().getTableName(),
                                         "WHERE " + getManager().getKeyName()
                                                 + " = '" + keyValue + "';");
-                        Vector fields = results.get(0);
-                        String content = (String) fields.get(0);
+                        String[] fields = results.get(0);
+                        String content = fields[0];
                         textArea.setText(content);
                     } catch (Exception e) {
                         throw new DatabaseViewerException("Can not show view");

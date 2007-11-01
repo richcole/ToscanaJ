@@ -127,7 +127,7 @@ public class GantersAlgorithm implements LatticeGenerator {
             downset.remove(concept);
             for (Iterator<Object> iterator = downset.iterator(); iterator.hasNext();) {
                 ConceptImplementation concept2 = (ConceptImplementation) iterator.next();
-                for (Iterator iterator2 = concept2.getObjectContingentIterator(); iterator2.hasNext();) {
+                for (Iterator<Object> iterator2 = concept2.getObjectContingentIterator(); iterator2.hasNext();) {
                     Object object = iterator2.next();
                     concept.removeObject(object);
                 }
@@ -136,7 +136,7 @@ public class GantersAlgorithm implements LatticeGenerator {
             upset.remove(concept);
             for (Iterator<Object> iterator = upset.iterator(); iterator.hasNext();) {
                 ConceptImplementation concept2 = (ConceptImplementation) iterator.next();
-                for (Iterator iterator2 = concept2.getAttributeContingentIterator(); iterator2.hasNext();) {
+                for (Iterator<Object> iterator2 = concept2.getAttributeContingentIterator(); iterator2.hasNext();) {
                     Object attribute = iterator2.next();
                     concept.removeAttribute(attribute);
                 }

@@ -67,15 +67,14 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
     public void showView(String whereClause) throws DatabaseViewerException {
         String command = "";
         try {
-            List<Vector<Object>> results = this.viewerManager.getConnection().executeQuery(this.fieldNames,
+            List<String[]> results = this.viewerManager.getConnection().executeQuery(this.fieldNames,
             		this.viewerManager.getTableName(),
                     whereClause);
-            Vector fields = results.get(0);
+            String[] fields = results.get(0);
             Iterator<String> itText = this.textFragments.iterator();
-            Iterator itFields = fields.iterator();
-            while (itFields.hasNext()) { // we assume length(textFragements) = length(results) + 1
+            for (int i = 0; i < fields.length; i++) {
+				String result = fields[i];
                 String text = itText.next();
-                String result = (String) itFields.next();
                 command += text + result;
             }
             command += itText.next();

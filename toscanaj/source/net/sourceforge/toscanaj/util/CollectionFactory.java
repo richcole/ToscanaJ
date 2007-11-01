@@ -10,8 +10,8 @@ package net.sourceforge.toscanaj.util;
 import java.util.*;
 
 public class CollectionFactory {
-    public static List createDefaultList() {
-        return new ArrayList();
+    public static List<Object> createDefaultList() {
+        return new ArrayList<Object>();
     }
 
     public static List createFastInsertDeleteList() {

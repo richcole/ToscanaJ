@@ -48,8 +48,8 @@ public class ConceptImplementation implements Concept {
     public static final String ATTRIBUTE_ELEMENT_NAME = "attribute";
     public static final String DESCRIPTION_ELEMENT_NAME = "description";
 
-    private ListSet attributeContingent = new ListSetImplementation();
-    private ListSet objectContingent = new ListSetImplementation();
+    private ListSet<Object> attributeContingent = new ListSetImplementation<Object>();
+    private ListSet<Object> objectContingent = new ListSetImplementation<Object>();
 
     /**
      * This class implements an iterator that iterates over all attribute
@@ -256,7 +256,7 @@ public class ConceptImplementation implements Concept {
         return retVal;
     }
 
-    private void fillContingentElement(Element contingentElem, Iterator contingentIterator, String newElementName) {
+    private void fillContingentElement(Element contingentElem, Iterator<Object> contingentIterator, String newElementName) {
         while (contingentIterator.hasNext()) {
             Object obj = contingentIterator.next();
             if(obj instanceof XMLizable) {
@@ -483,11 +483,11 @@ public class ConceptImplementation implements Concept {
         return this.objectContingent.size();
     }
 
-    public Iterator getAttributeContingentIterator() {
+    public Iterator<Object> getAttributeContingentIterator() {
         return this.attributeContingent.iterator();
     }
 
-    public Iterator getObjectContingentIterator() {
+    public Iterator<Object> getObjectContingentIterator() {
         return this.objectContingent.iterator();
     }
 

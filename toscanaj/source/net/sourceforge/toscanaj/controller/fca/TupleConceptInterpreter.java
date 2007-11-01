@@ -83,7 +83,7 @@ public class TupleConceptInterpreter extends AbstractConceptInterpreter
 		return retVal;
 	}
 
-	private Set getObjectSet(Iterator objectContingentIterator) {
+	private Set getObjectSet(Iterator<Object> objectContingentIterator) {
 		Set retVal = new HashSet();
 		while (objectContingentIterator.hasNext()) {
 			Object object = Tuple.fromString(objectContingentIterator.next().toString());
@@ -114,7 +114,7 @@ public class TupleConceptInterpreter extends AbstractConceptInterpreter
         Iterator mainIt = context.getNestingConcepts().iterator();
         while (mainIt.hasNext()) {
             Concept concept = (Concept) mainIt.next();
-			Iterator objectIterator;
+			Iterator<Object> objectIterator;
 			if(contingentOnly) {
 				objectIterator = concept.getObjectContingentIterator();
 			} else {

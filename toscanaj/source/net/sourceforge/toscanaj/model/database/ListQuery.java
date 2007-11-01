@@ -62,10 +62,12 @@ public class ListQuery extends Query {
 
 
     @Override
-	public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector<Object> values, Vector referenceValues) {
-        String displayString = this.formatResults(values, 1);
+	public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, String[] values, String[] referenceValues) {
+    	assert referenceValues == null || values.length == referenceValues.length: 
+    		"We must have the same number of reference values as values if reference values are used.";
+    	String displayString = this.formatResults(values, 1);
         DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
-        retVal.setKey(values.get(0));
+        retVal.setKey(values[0]);
         return retVal;
     }
 

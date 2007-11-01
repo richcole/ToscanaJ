@@ -244,9 +244,9 @@ public class DatabaseConnection implements EventBrokerListener {
     /**
      * Expects a list of field names and a where clause and returns all matches.
      *
-     * The return value is a list (matching rows) of vectors (fields).
+     * The return value is a list (matching rows) of string arrays (fields).
      */
-    public List<Vector<Object>> executeQuery(List<String> fields, String tableName, String whereClause) throws DatabaseException {
+    public List<String[]> executeQuery(List<String> fields, String tableName, String whereClause) throws DatabaseException {
         String statement = "SELECT ";
         Iterator<String> it = fields.iterator();
         while (it.hasNext()) {
@@ -261,11 +261,8 @@ public class DatabaseConnection implements EventBrokerListener {
         return executeQuery(statement);
     }
 
-	/**
-	 * @todo use String[] instead of Vector for the rows
-	 */
-	public List<Vector<Object>> executeQuery(String statement) throws DatabaseException {
-		List<Vector<Object>> result = new LinkedList<Vector<Object>>();
+	public List<String[]> executeQuery(String statement) throws DatabaseException {
+		List<String[]> result = new LinkedList<String[]>();
 		ResultSet resultSet = null;
 		Statement stmt = null;
 		// submit the query
@@ -276,9 +273,9 @@ public class DatabaseConnection implements EventBrokerListener {
 			logStatementEnd();
 			int numberColumns = resultSet.getMetaData().getColumnCount();
 			while (resultSet.next()) {
-				Vector<Object> item = new Vector<Object>(numberColumns);
+				String[] item = new String[numberColumns];
 				for (int i = 0; i < numberColumns; i++) {
-					item.add(i, resultSet.getString(i + 1));
+					item[i] = resultSet.getString(i + 1);
 				}
 				result.add(item);
 			}

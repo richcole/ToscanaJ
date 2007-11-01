@@ -104,7 +104,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	
 	    public void showItem(String keyValue) throws DatabaseViewerException {
 			DatabaseViewerManager viewerManager = getManager();
-	        List<Vector<Object>> tmpList;
+	        List<String[]> tmpList;
 	
 	        String tmpS = "";
 	        try {
@@ -116,15 +116,15 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 	                        " FROM " + viewerManager.getTableName() +
 	                        " ORDER BY " + tmpS + ";"));
 	
-	                float min = Float.parseFloat((String) (tmpList.get(0)).elementAt(0));
-	                float max = Float.parseFloat((String) (tmpList.get(tmpList.size() - 1)).elementAt(0));
+	                float min = Float.parseFloat((tmpList.get(0))[0]);
+	                float max = Float.parseFloat((tmpList.get(tmpList.size() - 1))[0]);
 	                ((BarContainer) this.panels.get(i)).setList(tmpList);
 	                tmpList = (viewerManager.getConnection().executeQuery(
 	                        "SELECT " + tmpS +
 	                        " FROM " + viewerManager.getTableName() +
 	                        " WHERE " + viewerManager.getKeyName() + " = '" + keyValue + "';"));
 	
-	                float cur = Float.parseFloat((String) (tmpList.get(0)).elementAt(0));
+	                float cur = Float.parseFloat((tmpList.get(0))[0]);
 	                ((BarContainer) this.panels.get(i)).setInfo(cur, min, max, (String) this.columnDefDisplay.get(i));
 	
 	
@@ -176,7 +176,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
 
         }
 
-        public void setList(List<Vector<Object>> theList) {
+        public void setList(List<String[]> theList) {
         	this.prettyPanel.setList(theList);
         }
 
@@ -188,7 +188,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
             private float theCur;
             private float theMax;
             private float theMin;
-            private List<Vector<Object>> data;
+            private List<String[]> data;
             private Color lineCol;
             private Color maxCol;
             private Color minCol;
@@ -225,7 +225,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                 repaint();
             }
 
-            public void setList(List<Vector<Object>> theList) {
+            public void setList(List<String[]> theList) {
             	this.data = theList;
             }
 
@@ -245,8 +245,8 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                 float dist = this.theMax - this.theMin;
                 float vrel, vrelold;
                 for (int i = 1; i < this.data.size(); i++) {
-                    vrel = Float.parseFloat((String) this.data.get(i).elementAt(0)) - this.theMin;
-                    vrelold = Float.parseFloat((String) this.data.get(i - 1).elementAt(0)) - this.theMin;
+                    vrel = Float.parseFloat(this.data.get(i)[0]) - this.theMin;
+                    vrelold = Float.parseFloat(this.data.get(i - 1)[0]) - this.theMin;
 
 
                     g2.setColor(new Color(

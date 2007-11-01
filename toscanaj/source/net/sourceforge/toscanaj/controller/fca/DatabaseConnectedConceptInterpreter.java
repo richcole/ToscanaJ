@@ -21,7 +21,7 @@ import java.util.*;
 
 import org.tockit.swing.preferences.ExtendedPreferences;
 
-public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterpreter {
+public class DatabaseConnectedConceptInterpreter<Oc,A> extends AbstractConceptInterpreter<Oc,A,FCAElement> {
     private static final ExtendedPreferences preferences = 
                 ExtendedPreferences.userNodeForClass(DatabaseConnectedConceptInterpreter.class);
 
@@ -36,13 +36,13 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterpre
     }
 
     @Override
-	public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
+	public Iterator<FCAElement> getObjectSetIterator(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
     	// for us a KeyList query is nothing but a normal list query with a specific setup
     	return Arrays.asList(handleNonDefaultQuery(this.listQuery, concept, context)).iterator();
     }
 
 	@Override
-	protected int calculateContingentSize (Concept concept, ConceptInterpretationContext context) {
+	protected int calculateContingentSize(Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
 		try {
 			String whereClause = WhereClauseGenerator.createWhereClause(concept,
 					context.getDiagramHistory(),
@@ -61,7 +61,7 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterpre
 	}
 
 	@Override
-	protected FCAElement getObject(String value, Concept concept, ConceptInterpretationContext context) {
+	protected FCAElement getObject(String value, Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
 		String whereClause = WhereClauseGenerator.createWhereClause(concept,
 										context.getDiagramHistory(),
 										context.getNestingConcepts(),
@@ -71,7 +71,7 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterpre
 	}
 	
 	@Override
-	protected FCAElement[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) {
+	protected FCAElement[] handleNonDefaultQuery(Query query, Concept<Oc,A> concept, ConceptInterpretationContext<Oc,A> context) {
 		String whereClause = WhereClauseGenerator.createWhereClause(concept,
 									context.getDiagramHistory(),
 									context.getNestingConcepts(),
@@ -106,30 +106,30 @@ public class DatabaseConnectedConceptInterpreter extends AbstractConceptInterpre
             statement += ";";
             try {
                 // submit the query
-                List<Vector<Object>> queryResults = DatabaseConnection.getConnection().executeQuery(statement);
+                List<String[]> queryResults = DatabaseConnection.getConnection().executeQuery(statement);
                 // first of all, check results for NULL values. That can happen if we have the infimum
                 // of the realized lattice and it has an empty contingent but an object label attached.
                 // In that case SQL aggregates will return NULL, if we try to display this we create
                 // either exceptions or some other mess. We return null instead.
                 if (queryResults.size() != 0) {
-                    Vector firstResult = queryResults.get(0);
-                    for (Iterator iter = firstResult.iterator(); iter.hasNext(); ) {
-                        if (iter.next() == null) {
-                            return null;
+                	String[] firstResult = queryResults.get(0);
+                	for (int i = 0; i < firstResult.length; i++) {
+						if (firstResult[i] == null) {
+							return null;
                         }
                     }
                 }
                 retVal = new FCAElement[queryResults.size()];
-				Vector reference = null;
+				String[] reference = null;
 				if(referenceWhereClause != null){
 					/// @todo this should be cached since it gets reused for every single object label in a diagram
-					List<Vector<Object>> referenceResults = DatabaseConnection.getConnection().executeQuery(query.getQueryHead() + referenceWhereClause);
+					List<String[]> referenceResults = DatabaseConnection.getConnection().executeQuery(query.getQueryHead() + referenceWhereClause);
 					reference = referenceResults.iterator().next();
 				}
-                Iterator<Vector<Object>> it = queryResults.iterator();
+                Iterator<String[]> it = queryResults.iterator();
                 int pos = 0;
                 while (it.hasNext()) {
-                    Vector<Object> item = it.next();
+                	String[] item = it.next();
                     DatabaseRetrievedObject object =
                             query.createDatabaseRetrievedObject(whereClause, item, reference);
                     /// @todo what does this check do? what happens if it is null?

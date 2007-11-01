@@ -415,7 +415,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 
 	private void editAttribute(int column) {
 		Frame tFrame = JOptionPane.getFrameForComponent(this.tableView);
-		List manyValuedAttributeList = this.conceptualSchema.getManyValuedContext().getAttributes();
+		List<ManyValuedAttribute> manyValuedAttributeList = this.conceptualSchema.getManyValuedContext().getAttributes();
 		WritableManyValuedAttribute attribute = (WritableManyValuedAttribute) manyValuedAttributeList.get(column);
 		new ManyValuedAttributeDialog(tFrame, attribute, this.conceptualSchema.getManyValuedContext());
 		this.conceptualSchema.getManyValuedContext().update();
@@ -441,7 +441,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 				if (manyValuedContext.getTypes().isEmpty()) {
 					firstType = null;
 				} else {
-					firstType = (Datatype) manyValuedContext.getTypes().iterator().next();
+					firstType = manyValuedContext.getTypes().iterator().next();
 				}
 				manyValuedContext.add(new ManyValuedAttributeImplementation(firstType,""));
 				editAttribute(manyValuedContext.getAttributes().size() - 1);

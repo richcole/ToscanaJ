@@ -176,15 +176,14 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
 
         private void showView(String whereClause) {
             try {
-                List<Vector<Object>> results = this.viewerManager.getConnection().executeQuery(this.singleFieldNames,
+                List<String[]> results = this.viewerManager.getConnection().executeQuery(this.singleFieldNames,
                 		this.viewerManager.getTableName(),
                         whereClause);
-                Vector fields = results.get(0);
-                Iterator itFields = fields.iterator();
+                String[] fields = results.get(0);
                 Iterator<Element> itElems = this.singleFieldElements.iterator();
-                while (itFields.hasNext()) {
-                    String result = (String) itFields.next();
-                    Element fieldElem = itElems.next();
+                for (int i = 0; i < fields.length; i++) {
+					String result = fields[i];
+					Element fieldElem = itElems.next();
                     if (result == null) {
                         // an empty <span> is displayed as greater than symbol in JEditPane
                         fieldElem.setText(" ");
@@ -197,13 +196,12 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
                     		this.viewerManager.getTableName(),
                             whereClause);
                     this.repeatElement.setContent(null);
-                    Iterator<Vector<Object>> it = results.iterator();
+                    Iterator<String[]> it = results.iterator();
                     while (it.hasNext()) {
                         fields = it.next();
-                        itFields = fields.iterator();
                         itElems = this.repeatedFieldElements.iterator();
-                        while (itFields.hasNext()) {
-                            String result = (String) itFields.next();
+                        for (int i = 0; i < fields.length; i++) {
+							String result = fields[i];
                             Element fieldElem = itElems.next();
                             if (result == null) {
                                 // an empty <span> is displayed as greater than symbol in JEditPane

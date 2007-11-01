@@ -107,7 +107,7 @@ public class TableView extends JTable {
 		}
 
 		private ManyValuedAttribute getAttributeForColumn(int columnIndex) {
-			return (ManyValuedAttribute) context.getAttributes().get(columnIndex);
+			return context.getAttributes().get(columnIndex);
 		}
 	}
 	
@@ -125,7 +125,7 @@ public class TableView extends JTable {
 	
 	@Override
 	public TableCellEditor getCellEditor(int row, int column) {
-		ManyValuedAttribute	mvAttr = (ManyValuedAttribute) this.context.getAttributes().get(column);
+		ManyValuedAttribute	mvAttr = this.context.getAttributes().get(column);
 		Datatype type = mvAttr.getType();
         return DatatypeViewFactory.getValueCellEditor(type);
 	}

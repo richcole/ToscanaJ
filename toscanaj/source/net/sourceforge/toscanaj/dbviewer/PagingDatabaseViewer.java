@@ -64,14 +64,14 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
             try {
             	this.fieldNames = new LinkedList<String>();
             	this.fieldNames.add(PagingDatabaseViewer.this.viewerManager.getKeyName());
-                List<Vector<Object>> results = PagingDatabaseViewer.this.viewerManager.getConnection().executeQuery(this.fieldNames,
+                List<String[]> results = PagingDatabaseViewer.this.viewerManager.getConnection().executeQuery(this.fieldNames,
                 		PagingDatabaseViewer.this.viewerManager.getTableName(),
                         whereClause);
                 this.keyValues = new String[results.size()];
                 int i = 0;
-                for (Iterator<Vector<Object>> iterator = results.iterator(); iterator.hasNext();) {
-                    Vector vector = iterator.next();
-                    this.keyValues[i] = (String) vector.get(0);
+                for (Iterator<String[]> iterator = results.iterator(); iterator.hasNext();) {
+                	String[] row = iterator.next();
+                    this.keyValues[i] = row[0];
                     i++;
                 }
                 this.position = 0;

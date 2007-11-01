@@ -7,12 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import net.sourceforge.toscanaj.model.database.Query.QueryField;
+import java.util.Iterator;
 
 import org.jdom.Element;
-
-import java.util.Iterator;
-import java.util.Vector;
 
 public class AggregateQuery extends Query {
     private DatabaseInfo info;
@@ -58,30 +55,29 @@ public class AggregateQuery extends Query {
     }
 
     @Override
-	public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector<Object> values, Vector referenceValues) {
-        if (values.get(0).toString().equals("0")) {
+	public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, String[] values, String[] referenceValues) {
+    	assert referenceValues == null || values.length == referenceValues.length: 
+    		"We must have the same number of reference values as values if reference values are used.";
+        if (values[0].equals("0")) {
             return null;
         }
-        Vector<Object> valuesToUse;
+        Object[] valuesToUse;
         if(this.doesNeedReferenceValues()) {
 			///@todo this is all a bit brute force -> be smarter
-			valuesToUse = new Vector<Object>(values.size());
-			Iterator<Object> valIt = values.iterator();
-			Iterator refIt = referenceValues.iterator();
-			Iterator<QueryField> fieldIt = this.fieldList.iterator();
+			valuesToUse = new Object[values.length];
 
 			// skip the first extra field, putting the value straight into the results
-			valuesToUse.add(valIt.next());
-			refIt.next();
+			valuesToUse[0] = values[0];
 			
-			while(valIt.hasNext() && refIt.hasNext()) {
-				String value = valIt.next().toString();
-				String refVal = refIt.next().toString();
+			Iterator<QueryField> fieldIt = this.fieldList.iterator();
+			for (int i = 1; i < values.length; i++) {
+				String value = values[i];
+				String refVal = referenceValues[i];
 				QueryField field = fieldIt.next();
 				if(field.isRelative()) {
-					valuesToUse.add(new Double(Double.parseDouble(value) / Double.parseDouble(refVal)));
+					valuesToUse[i] = new Double(Double.parseDouble(value) / Double.parseDouble(refVal));
 				} else {
-					valuesToUse.add(value);
+					valuesToUse[i] = value;
 				}
 			}
         } else {

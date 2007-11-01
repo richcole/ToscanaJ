@@ -39,7 +39,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterpreter
 
     private List calculateContingent(Concept concept, ConceptInterpretationContext context) {
         ArrayList retVal = new ArrayList();
-        Iterator objectContingentIterator = concept.getObjectContingentIterator();
+        Iterator<Object> objectContingentIterator = concept.getObjectContingentIterator();
         while (objectContingentIterator.hasNext()) {
             Object o = objectContingentIterator.next();
             retVal.add(o);
@@ -57,7 +57,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterpreter
                     for (Iterator iterator = currentSet.iterator(); iterator.hasNext();) {
                         Object o = iterator.next();
                         boolean found = false;
-                        Iterator extentIterator = concept.getExtentIterator();
+                        Iterator<Object> extentIterator = concept.getExtentIterator();
                         while (extentIterator.hasNext()) {
                             Object o2 = extentIterator.next();
                             if (o.equals(o2)) {
@@ -77,7 +77,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterpreter
                     for (Iterator iterator = currentSet.iterator(); iterator.hasNext();) {
                         Object o = iterator.next();
                         boolean found = false;
-                        Iterator contingentIterator = concept.getObjectContingentIterator();
+                        Iterator<Object> contingentIterator = concept.getObjectContingentIterator();
                         while (contingentIterator.hasNext()) {
                             Object o2 = contingentIterator.next();
                             if (o.equals(o2)) {
@@ -124,7 +124,7 @@ public class DirectConceptInterpreter extends AbstractConceptInterpreter
 
     private List calculateExtent(Concept concept, ConceptInterpretationContext context) {
         ArrayList retVal = new ArrayList();
-        Iterator extentIterator = concept.getExtentIterator();
+        Iterator<Object> extentIterator = concept.getExtentIterator();
         while (extentIterator.hasNext()) {
             Object o = extentIterator.next();
             retVal.add(o);

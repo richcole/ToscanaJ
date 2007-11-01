@@ -338,13 +338,13 @@ public class DiagramNode implements XMLizable {
     }
 
     public Concept[] getConceptNestingList() {
-        List conceptList = CollectionFactory.createDefaultList();
+        List<Object> conceptList = CollectionFactory.createDefaultList();
         DiagramNode node = this;
         while (node != null) {
             conceptList.add(node.getConcept());
             node = node.getOuterNode();
         }
-        return (Concept[])conceptList.toArray(new Concept[0]);
+        return conceptList.toArray(new Concept[0]);
     }
 
     @Override

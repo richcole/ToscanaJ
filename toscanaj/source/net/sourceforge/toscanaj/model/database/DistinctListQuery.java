@@ -7,12 +7,9 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import net.sourceforge.toscanaj.model.database.Query.QueryField;
+import java.util.Iterator;
 
 import org.jdom.Element;
-
-import java.util.Iterator;
-import java.util.Vector;
 
 public class DistinctListQuery extends Query {
     private DatabaseInfo info;
@@ -58,17 +55,18 @@ public class DistinctListQuery extends Query {
     }
 
     @Override
-	public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector<Object> values, Vector referenceValues) {
-        String displayString = this.formatResults(values, 0);
+	public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, String[] values, String[] referenceValues) {
+    	assert referenceValues == null || values.length == referenceValues.length: 
+    		"We must have the same number of reference values as values if reference values are used.";
+    	String displayString = this.formatResults(values, 0);
         DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(whereClause, displayString);
         String specialWhereClause = whereClause;
         Iterator<QueryField> it = fieldList.iterator();
-        Iterator<?> it2 = values.iterator();
-        while (it.hasNext() && it2.hasNext()) {
-            QueryField field = it.next();
-            String value = (String) it2.next();
-            specialWhereClause += " AND (" + field.getQueryPart() + "='" + value + "')";
-        }
+        for (int i = 0; i < values.length; i++) {
+        	QueryField field = it.next();
+        	String value = values[i];
+        	specialWhereClause += " AND (" + field.getQueryPart() + "='" + value + "')";
+		}
         retVal.setSpecialWhereClause(specialWhereClause);
         return retVal;
     }

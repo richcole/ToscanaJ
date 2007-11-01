@@ -128,7 +128,7 @@ public abstract class Query implements XMLizable {
      * The return value is a String which returns a formatted version of the
      * row
      */
-    public String formatResults(Vector<?> values, int startPosition) {
+    public String formatResults(Object[] values, int startPosition) {
         String rowRes = new String();
         if (header != null) {
             rowRes += header;
@@ -138,7 +138,7 @@ public abstract class Query implements XMLizable {
         int i = startPosition;
         while (colDefIt.hasNext()) {
             QueryField field = colDefIt.next();
-            String value = values.get(i).toString();
+            String value = values[i].toString();
             i++;
             if (field.getFormat() != null) {
                 DecimalFormat format = new DecimalFormat(field.getFormat());
@@ -167,11 +167,12 @@ public abstract class Query implements XMLizable {
     abstract public String getOrderClause();
 
     /**
-	 * @param whereClause       The SQL WHERE clause to query.
-	 * @param values            The query results to turn into objects
-	 * @param referenceValues   The reference values that can be used for relative results, usually the same values for the top node 
+	 * @param whereClause       The SQL WHERE clause to query. Not null.
+	 * @param values            The query results to turn into objects. Not null.
+	 * @param referenceValues   The reference values that can be used for relative results, usually the same values for the top node.
+	 *                          May be null. Must be the same length as values if supplied.
 	 */
-    abstract public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, Vector<Object> values, Vector referenceValues);
+    abstract public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, String[] values, String[] referenceValues);
     
     abstract public boolean doesNeedReferenceValues();
 }

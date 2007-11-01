@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
+import org.tockit.datatype.Datatype;
 import org.tockit.datatype.Value;
 import org.tockit.util.ListSet;
 
@@ -14,7 +15,7 @@ import net.sourceforge.toscanaj.model.context.*;
 
 public interface ManyValuedContext {
     ListSet getObjects();
-    ListSet getAttributes();
-    ListSet getTypes();
+    ListSet<ManyValuedAttribute> getAttributes();
+    ListSet<Datatype> getTypes();
     Value getRelationship(FCAElement object, ManyValuedAttribute attribute);
 }

@@ -75,13 +75,12 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
     public void showView(String whereClause) throws DatabaseViewerException {
         String resourceLocation = "";
         try {
-            List<Vector<Object>> results = this.viewerManager.getConnection().executeQuery(this.fieldNames,
+            List<String[]> results = this.viewerManager.getConnection().executeQuery(this.fieldNames,
             		this.viewerManager.getTableName(),
                     whereClause);
-            Vector fields = results.get(0);
-            Iterator itFields = fields.iterator();
-            while (itFields.hasNext()) {
-                String result = (String) itFields.next();
+            String[] fields = results.get(0);
+            for (int i = 0; i < fields.length; i++) {
+				String result = fields[i];
 				resourceLocation += result;
             }
         } catch (DatabaseException e) {

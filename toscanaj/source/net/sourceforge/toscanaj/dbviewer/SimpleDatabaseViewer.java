@@ -47,16 +47,16 @@ public class SimpleDatabaseViewer extends PagingDatabaseViewer {
 	    public void showItem(String keyValue) {
 	        try {
 	            DatabaseViewerManager viewerManager = getManager();
-	            List<Vector<Object>> results = viewerManager.getConnection().executeQuery(this.fieldNames,
+	            List<String[]> results = viewerManager.getConnection().executeQuery(this.fieldNames,
 	                    viewerManager.getTableName(),
 	                    "WHERE " + viewerManager.getKeyName() + "='" + keyValue + "'");
-	            Vector fields = results.get(0);
+	            assert textFragments.size() == results.size() + 1: "Database results have to match the the available text fragments";
+	            String[] fields = results.get(0);
 	            Iterator<String> itText = this.textFragments.iterator();
-	            Iterator itFields = fields.iterator();
 	            String output = "";
-	            while (itFields.hasNext()) { // we assume length(textFragements) = length(results) + 1
+	            for (int i = 0; i < fields.length; i++) {
+					String result = fields[i];
 	                String text = itText.next();
-	                String result = (String) itFields.next();
 	                output += text + result;
 	            }
 	            output += itText.next();

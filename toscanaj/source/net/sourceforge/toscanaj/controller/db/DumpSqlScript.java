@@ -45,14 +45,16 @@ public class DumpSqlScript {
 		    out.println(");");
 		    out.println();
 		    
-			Iterator<Vector<Object>> rowIt = connection.executeQuery("SELECT * FROM " + Table.getQuotedIdentifier(tableName) + ";").iterator();
+			Iterator<String[]> rowIt = connection.executeQuery("SELECT * FROM " + Table.getQuotedIdentifier(tableName) + ";").iterator();
 			while (rowIt.hasNext()) {
-                Vector rowResults = rowIt.next();
+                String[] rowResults = rowIt.next();
                 out.print("INSERT INTO " + Table.getQuotedIdentifier(tableName) + " VALUES (");
                 
-                Iterator resultIt = rowResults.iterator();
-                while (resultIt.hasNext()) {
-                    String result = (String) resultIt.next();
+                for (int i = 0; i < rowResults.length; i++) {
+                    if(i != 0) {
+                    	out.print(",");
+                    }					
+					String result = rowResults[i];
                     if(result == null) {
                     	out.print("NULL");
                     } else {
@@ -65,10 +67,7 @@ public class DumpSqlScript {
                             out.print(getQuotedValueString(result));
                         }
                     }
-                    if(resultIt.hasNext()) {
-                    	out.print(",");
-                    }
-                }
+				}
                 out.println(");");
             }		    
 

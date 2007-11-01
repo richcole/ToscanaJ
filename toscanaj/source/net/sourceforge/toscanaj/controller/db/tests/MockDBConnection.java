@@ -8,9 +8,9 @@
 package net.sourceforge.toscanaj.controller.db.tests;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+
 import org.tockit.events.EventBroker;
 
 import com.mockobjects.sql.MockConnection;
@@ -21,9 +21,10 @@ public class MockDBConnection extends DatabaseConnection {
     public MockDBConnection() {
         super(new EventBroker(), new MockConnection());
     }
+    
     @Override
-	public List<Vector<Object>> executeQuery(List<String> fields, String tableName, String whereClause) {
-        return new ArrayList<Vector<Object>>();
+	public List<String[]> executeQuery(List<String> fields, String tableName, String whereClause) {
+        return new ArrayList<String[]>();
     }
     
     @Override
