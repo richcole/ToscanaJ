@@ -725,13 +725,13 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             selectedSequence = (Value) selectedSequenceItem;
         }
 
-        List<ArrayList> objectSequences = calculateObjectSequences();
-        Iterator<ArrayList> seqIt = objectSequences.iterator();
+        List<ArrayList<FCAElement>> objectSequences = calculateObjectSequences();
+        Iterator<ArrayList<FCAElement>> seqIt = objectSequences.iterator();
         Iterator<Value> seqValIt = this.sequenceValues.iterator();
         int styleNum = 0;
         boolean start = true;
         while (seqIt.hasNext()) {
-            List sequence = seqIt.next();
+            List<FCAElement> sequence = seqIt.next();
             Value curSequenceValue = seqValIt.next();
             if(start) {
                 start = false;
@@ -759,21 +759,21 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             selectedSequence = (Value) selectedSequenceItem;
         }
 
-        List<ArrayList> objectSequences = calculateObjectSequences();
-        Iterator<ArrayList> seqIt = objectSequences.iterator();
+        List<ArrayList<FCAElement>> objectSequences = calculateObjectSequences();
+        Iterator<ArrayList<FCAElement>> seqIt = objectSequences.iterator();
         Iterator<Value> seqValIt = this.sequenceValues.iterator();
         int seqNum = 0;
         int seqLength = this.timelineValues.size();
-        List lastSequence = null;
+        List<FCAElement> lastSequence = null;
         ArrowStyle[] styles = DiagramSchema.getCurrentSchema().getArrowStyles();
         ArrowStyle style = null;
         while (seqIt.hasNext()) {
-            List sequence = seqIt.next();
+            List<FCAElement> sequence = seqIt.next();
 
             if(lastSequence != null) {
                 Color nextColor = styles[seqNum % styles.length].getColor();
-                DiagramNode endLast = findObjectConceptNode((FCAElement) lastSequence.get(lastSequence.size()-1));
-                DiagramNode startNew = findObjectConceptNode((FCAElement) sequence.get(0));
+                DiagramNode endLast = findObjectConceptNode(lastSequence.get(lastSequence.size()-1));
+                DiagramNode startNew = findObjectConceptNode(sequence.get(0));
                 if(endLast == null) {
                 	continue;
                 }
@@ -799,14 +799,14 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         }
     }
 
-    private void addTransitions(List sequence, ArrowStyle style, boolean highlightStates, int countStart) {
+    private void addTransitions(List<FCAElement> sequence, ArrowStyle style, boolean highlightStates, int countStart) {
         SimpleLineDiagram diagram = (SimpleLineDiagram) this.diagramView.getDiagram();
         DiagramNode oldNode = null;
-    	Iterator objectIt = sequence.iterator();
+    	Iterator<FCAElement> objectIt = sequence.iterator();
     	int count = countStart;
     	while (objectIt.hasNext()) {
     		count++;
-            FCAElement object = (FCAElement) objectIt.next();
+            FCAElement object = objectIt.next();
     	    DiagramNode curNode = findObjectConceptNode(object);
     	    if(curNode == null) {
     	    	continue;
@@ -857,9 +857,9 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
         ManyValuedAttribute sequenceAttribute = (ManyValuedAttribute) selectedSequenceColumn;
 	    ManyValuedAttribute timelineAttribute = (ManyValuedAttribute) this.timelineColumnChooser.getSelectedItem();
 
-	    Iterator objIt = this.context.getObjects().iterator();
+	    Iterator<FCAElement> objIt = this.context.getObjects().iterator();
 	    while(objIt.hasNext()) {
-	        FCAElement object = (FCAElement) objIt.next();
+	        FCAElement object = objIt.next();
 	        Value value = this.context.getRelationship(object, sequenceAttribute);
 	        if(!sequenceValues.contains(value) && value != null) {
 	            boolean inserted = false;
@@ -901,17 +901,17 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
 	    }
 	}
 	
-    private List<ArrayList> calculateObjectSequences() {
+    private List<ArrayList<FCAElement>> calculateObjectSequences() {
         ManyValuedAttribute sequenceAttribute = (ManyValuedAttribute) this.sequenceColumnChooser.getSelectedItem();
         ManyValuedAttribute timelineAttribute = (ManyValuedAttribute) this.timelineColumnChooser.getSelectedItem();
 
-        List<ArrayList> objectSequences = new ArrayList<ArrayList>();
+        List<ArrayList<FCAElement>> objectSequences = new ArrayList<ArrayList<FCAElement>>();
         
         // initialise sequences with empty lists
         Iterator<Value> seqValIt = sequenceValues.iterator();
         while (seqValIt.hasNext()) {
             seqValIt.next();
-            objectSequences.add(new ArrayList());
+            objectSequences.add(new ArrayList<FCAElement>());
         }
         
         // go over time
@@ -921,7 +921,7 @@ public class TemporalControlsPanel extends JTabbedPane implements EventBrokerLis
             
             // try to find matching object for each sequence
             seqValIt = sequenceValues.iterator();
-            Iterator<ArrayList> seqIt = objectSequences.iterator();
+            Iterator<ArrayList<FCAElement>> seqIt = objectSequences.iterator();
         	while (seqValIt.hasNext()) {
                 Value sequenceValue = seqValIt.next();
                 List<FCAElement> sequence = seqIt.next();

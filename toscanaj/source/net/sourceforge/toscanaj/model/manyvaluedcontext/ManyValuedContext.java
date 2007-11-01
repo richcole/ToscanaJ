@@ -14,7 +14,7 @@ import org.tockit.util.ListSet;
 import net.sourceforge.toscanaj.model.context.*;
 
 public interface ManyValuedContext {
-    ListSet getObjects();
+    ListSet<FCAElement> getObjects();
     ListSet<ManyValuedAttribute> getAttributes();
     ListSet<Datatype> getTypes();
     Value getRelationship(FCAElement object, ManyValuedAttribute attribute);
