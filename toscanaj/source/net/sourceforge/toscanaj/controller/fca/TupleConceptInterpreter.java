@@ -2,8 +2,6 @@
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
  * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
- *
- * $Id$
  */
 package net.sourceforge.toscanaj.controller.fca;
 
@@ -25,8 +23,8 @@ import org.tockit.relations.model.Tuple;
 import org.tockit.relations.operations.PickColumnsOperation;
 
 
-public class TupleConceptInterpreter extends AbstractConceptInterpreter
-										implements ConceptInterpreter, XMLizable {
+public class TupleConceptInterpreter<O,A> extends AbstractConceptInterpreter<O,A,FCAElement>
+										implements XMLizable {
 	private final static String OBJECT_COLUMN_ELEMENT_NAME = "objectColumn"; 
 											
 	private int[] objectColumns;
@@ -40,8 +38,8 @@ public class TupleConceptInterpreter extends AbstractConceptInterpreter
 	}
 											
     @Override
-	public Iterator getObjectSetIterator(Concept concept, ConceptInterpretationContext context) {
-    	Set baseSet;
+	public Iterator<FCAElement> getObjectSetIterator(Concept<O,A> concept, ConceptInterpretationContext<O,A> context) {
+    	Set<FCAElement> baseSet;
         if (context.getObjectDisplayMode() == ConceptInterpretationContext.CONTINGENT) {
 	        baseSet = calculateContingent(concept, context);
         } else {
@@ -50,41 +48,41 @@ public class TupleConceptInterpreter extends AbstractConceptInterpreter
         return projectSet(baseSet).iterator();
     }
 
-    private Set projectSet(Set baseSet) {
+    private Set<FCAElement> projectSet(Set<FCAElement> baseSet) {
     	if(baseSet.size() == 0) {
     		return baseSet;
     	}
-    	Relation relation = RelationImplementation.fromSet(baseSet);
-    	Set projectedRelation = PickColumnsOperation.pickColumns(relation, this.objectColumns).toSet();
-        Set retVal = new HashSet();
-        for (Iterator iter = projectedRelation.iterator(); iter.hasNext(); ) {
-            Object element = iter.next();
+    	Relation<String> relation = RelationImplementation.fromStringSet(baseSet);
+    	Set<Tuple<? extends String>> projectedRelation = PickColumnsOperation.pickColumns(relation, this.objectColumns).toSet();
+        Set<FCAElement> retVal = new HashSet<FCAElement>();
+        for (Iterator<Tuple<? extends String>> iter = projectedRelation.iterator(); iter.hasNext(); ) {
+            Tuple<? extends String> element = iter.next();
             retVal.add(new FCAElementImplementation(element));
         }
         return retVal;
     }
 
     @Override
-	protected int calculateContingentSize(Concept concept, ConceptInterpretationContext context) {
-    	Set contingent = calculateContingent(concept, context);
+	protected int calculateContingentSize(Concept<O,A> concept, ConceptInterpretationContext<O,A> context) {
+    	Set<FCAElement> contingent = calculateContingent(concept, context);
     	return projectSet(contingent).size();
     }
 
 	@Override
-	protected int calculateExtentSize(Concept concept, ConceptInterpretationContext context) {
-		Set extent = calculateExtent(concept, context);
+	protected int calculateExtentSize(Concept<O,A> concept, ConceptInterpretationContext<O,A> context) {
+		Set<FCAElement> extent = calculateExtent(concept, context);
 		return projectSet(extent).size();
 	}
 
-	private Set calculateContingent(Concept concept, ConceptInterpretationContext context) {
-		Set retVal = getObjectSet(concept.getObjectContingentIterator());
+	private Set<FCAElement> calculateContingent(Concept<O,A> concept, ConceptInterpretationContext<O,A> context) {
+		Set<FCAElement> retVal = getObjectSet(concept.getObjectContingentIterator());
 		nestObjects(retVal, context, true);
 		filterObjects(retVal, context);
 		return retVal;
 	}
 
-	private Set getObjectSet(Iterator<Object> objectContingentIterator) {
-		Set retVal = new HashSet();
+	private Set<FCAElement> getObjectSet(Iterator<O> objectContingentIterator) {
+		Set<FCAElement> retVal = new HashSet<FCAElement>();
 		while (objectContingentIterator.hasNext()) {
 			Object object = Tuple.fromString(objectContingentIterator.next().toString());
 			retVal.add(new FCAElementImplementation(object));
@@ -92,17 +90,17 @@ public class TupleConceptInterpreter extends AbstractConceptInterpreter
 		return retVal;
 	}
 
-    private void filterObjects(final Set currentSet, ConceptInterpretationContext context) {
-        DiagramHistory.ConceptVisitor visitor;
+    private void filterObjects(final Set<FCAElement> currentSet, ConceptInterpretationContext<O,A> context) {
+        DiagramHistory.ConceptVisitor<O,A> visitor;
         if (context.getFilterMode() == ConceptInterpretationContext.EXTENT) {
-            visitor = new DiagramHistory.ConceptVisitor() {
-                public void visitConcept(Concept concept) {
+            visitor = new DiagramHistory.ConceptVisitor<O,A>() {
+                public void visitConcept(Concept<O,A> concept) {
                 	currentSet.retainAll(getObjectSet(concept.getExtentIterator()));
                 }
             };
         } else {
-            visitor = new DiagramHistory.ConceptVisitor() {
-                public void visitConcept(Concept concept) {
+            visitor = new DiagramHistory.ConceptVisitor<O,A>() {
+                public void visitConcept(Concept<O,A> concept) {
 					currentSet.retainAll(getObjectSet(concept.getObjectContingentIterator()));
                 }
             };
@@ -110,11 +108,11 @@ public class TupleConceptInterpreter extends AbstractConceptInterpreter
         context.getDiagramHistory().visitZoomedConcepts(visitor);
     }
 
-    private void nestObjects(Set currentSet, ConceptInterpretationContext context, boolean contingentOnly) {
-        Iterator mainIt = context.getNestingConcepts().iterator();
+    private void nestObjects(Set<FCAElement> currentSet, ConceptInterpretationContext<O,A> context, boolean contingentOnly) {
+        Iterator<Concept<O,A>> mainIt = context.getNestingConcepts().iterator();
         while (mainIt.hasNext()) {
-            Concept concept = (Concept) mainIt.next();
-			Iterator<Object> objectIterator;
+            Concept<O,A> concept = mainIt.next();
+			Iterator<O> objectIterator;
 			if(contingentOnly) {
 				objectIterator = concept.getObjectContingentIterator();
 			} else {
@@ -124,20 +122,20 @@ public class TupleConceptInterpreter extends AbstractConceptInterpreter
         }
     }
 
-	private Set calculateExtent(Concept concept, ConceptInterpretationContext context) {
-		Set retVal = getObjectSet(concept.getExtentIterator());
+	private Set<FCAElement> calculateExtent(Concept<O,A> concept, ConceptInterpretationContext<O,A> context) {
+		Set<FCAElement> retVal = getObjectSet(concept.getExtentIterator());
 		nestObjects(retVal, context, false);
 		filterObjects(retVal, context);
 		return retVal;
 	}
     
 	@Override
-	protected FCAElement getObject(String value, Concept concept, ConceptInterpretationContext context) {
+	protected FCAElement getObject(String value, Concept<O,A> concept, ConceptInterpretationContext<O,A> context) {
 		return new FCAElementImplementation(value);
 	}
 	
 	@Override
-	protected FCAElement[] handleNonDefaultQuery(Query query, Concept concept, ConceptInterpretationContext context) { 
+	protected FCAElement[] handleNonDefaultQuery(Query query, Concept<O,A> concept, ConceptInterpretationContext<O,A> context) { 
 		throw new RuntimeException("Query not supported by this class (" + this.getClass().getName() + ")");
 	}
 
@@ -153,7 +151,8 @@ public class TupleConceptInterpreter extends AbstractConceptInterpreter
         return retVal;
     }
 
-    public void readXML(Element elem) {
+    @SuppressWarnings("unchecked")
+	public void readXML(Element elem) {
     	List<Element> objColElems = elem.getChildren(OBJECT_COLUMN_ELEMENT_NAME);
     	this.objectColumns = new int[objColElems.size()];
     	int i = 0;
