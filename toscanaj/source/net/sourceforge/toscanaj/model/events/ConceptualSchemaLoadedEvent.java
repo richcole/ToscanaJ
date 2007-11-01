@@ -15,7 +15,7 @@ public class ConceptualSchemaLoadedEvent extends NewConceptualSchemaEvent {
     private File file;
 
     public ConceptualSchemaLoadedEvent(Object source, ConceptualSchema schema, File file) {
-        super(source, schema);
+        super(schema);
         this.file = file;
     }
 

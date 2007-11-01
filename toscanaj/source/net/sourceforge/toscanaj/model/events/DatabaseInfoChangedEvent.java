@@ -14,12 +14,12 @@ public class DatabaseInfoChangedEvent extends ConceptualSchemaChangeEvent {
 
     private DatabaseInfo info;
 
-    public DatabaseInfoChangedEvent(Object source, ConceptualSchema schema, DatabaseInfo info) {
-        super(source, schema);
+    public DatabaseInfoChangedEvent(ConceptualSchema schema, DatabaseInfo info) {
+        super(schema);
         this.info = info;
     }
 
-    public DatabaseInfo getInfo() {
+    public DatabaseInfo getDatabaseInfo() {
         return info;
     }
 }

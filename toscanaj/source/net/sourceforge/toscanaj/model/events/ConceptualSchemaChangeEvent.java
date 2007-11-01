@@ -10,20 +10,18 @@ package net.sourceforge.toscanaj.model.events;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import org.tockit.events.Event;
 
-public class ConceptualSchemaChangeEvent implements Event {
+public class ConceptualSchemaChangeEvent implements Event<ConceptualSchema> {
     private ConceptualSchema schema;
-    private Object source;
 
-    public ConceptualSchemaChangeEvent(Object source, ConceptualSchema schema) {
+    public ConceptualSchemaChangeEvent(ConceptualSchema schema) {
         this.schema = schema;
-        this.source = source;
     }
 
     public ConceptualSchema getConceptualSchema() {
         return schema;
     }
-
-    public Object getSubject() {
-        return source;
+    
+    public ConceptualSchema getSubject() {
+    	return getConceptualSchema();
     }
 }

@@ -10,7 +10,7 @@ package net.sourceforge.toscanaj.model.events;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 
 public class NewConceptualSchemaEvent extends ConceptualSchemaChangeEvent {
-    public NewConceptualSchemaEvent(Object source, ConceptualSchema schema) {
-        super(source, schema);
+    public NewConceptualSchemaEvent(ConceptualSchema schema) {
+        super(schema);
     }
 }

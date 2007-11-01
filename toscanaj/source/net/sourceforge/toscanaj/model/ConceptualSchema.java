@@ -99,7 +99,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
         reset();
 		this.conceptInterpreter = new DirectConceptInterpreter();
         eventBroker.subscribe(this, DiagramChangedEvent.class, Object.class);
-        eventBroker.processEvent(new NewConceptualSchemaEvent(this, this));
+        eventBroker.processEvent(new NewConceptualSchemaEvent(this));
     }
 
     public ConceptualSchema(EventBroker eventBroker, Element element) throws XMLSyntaxError {
@@ -107,7 +107,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
         reset();
         readXML(element);
 		eventBroker.subscribe(this, DiagramChangedEvent.class, Object.class);
-        eventBroker.processEvent(new NewConceptualSchemaEvent(this, this));
+        eventBroker.processEvent(new NewConceptualSchemaEvent(this));
     }
 
     public Element toXML() {
@@ -290,7 +290,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
             this.databaseInfo = new DatabaseInfo(databaseInfo);
         }
 		markDataDirty();
-        eventBroker.processEvent(new DatabaseInfoChangedEvent(this, this, databaseInfo));
+        eventBroker.processEvent(new DatabaseInfoChangedEvent(this, databaseInfo));
     }
 
 	private void markDataDirty() {
@@ -339,19 +339,19 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
 			wd2d.setEventBroker(this.eventBroker);        	
         }
 		markDataDirty();
-        eventBroker.processEvent(new DiagramListChangeEvent(this, this));
+        eventBroker.processEvent(new DiagramListChangeEvent(this));
     }
 
     public void removeDiagram(int diagramIndex) {
         diagrams.remove(diagramIndex);
 		markDataDirty();
-        eventBroker.processEvent(new DiagramListChangeEvent(this, this));
+        eventBroker.processEvent(new DiagramListChangeEvent(this));
     }
 
 	public void removeDiagram(Diagram2D diagram) {
         diagrams.remove(diagram);
 		markDataDirty();
-        eventBroker.processEvent(new DiagramListChangeEvent(this, this));
+        eventBroker.processEvent(new DiagramListChangeEvent(this));
     }
     
     public void exchangeDiagrams(int from, int to){
@@ -360,7 +360,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
 		diagrams.setElementAt(indexDiagram,to);
 		diagrams.setElementAt(diagram,from);  
 		markDataDirty();
-		eventBroker.processEvent(new DiagramListChangeEvent(this, this));	
+		eventBroker.processEvent(new DiagramListChangeEvent(this));	
     }
     
     public void replaceDiagram(Diagram2D existingDiagram, Diagram2D newDiagram){
@@ -370,7 +370,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection, EventBrok
     	}
     	this.diagrams.set(index, newDiagram);
 		markDataDirty();
-        eventBroker.processEvent(new DiagramListChangeEvent(this, this));
+        eventBroker.processEvent(new DiagramListChangeEvent(this));
     }
 
     public void setDescription(Element description) {
