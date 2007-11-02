@@ -10,41 +10,43 @@ package net.sourceforge.toscanaj.model.directedgraph;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Node {
-    private Set<Node> outboundNodes = new HashSet<Node>();
-    private Set<Node> inboundNodes = new HashSet<Node>();
+public class Node<N extends Node<N>> {
+    private Set<N> outboundNodes = new HashSet<N>();
+    private Set<N> inboundNodes = new HashSet<N>();
 
-    protected void addOutboundNode(Node node) {
+    protected void addOutboundNode(N node) {
         outboundNodes.add(node);
     }
 
-    protected void addInboundNode(Node node) {
+    protected void addInboundNode(N node) {
         inboundNodes.add(node);
     }
 
-    protected void removeOutboundNode(Node node) {
+    protected void removeOutboundNode(N node) {
         outboundNodes.remove(node);
     }
 
-    protected void removeInboundNode(Node node) {
+    protected void removeInboundNode(N node) {
         inboundNodes.remove(node);
     }
 
-    public void connectTo(Node node) {
+    @SuppressWarnings("unchecked")
+	public void connectTo(N node) {
         this.addOutboundNode(node);
-        node.addInboundNode(this);
+        node.addInboundNode((N) this);
     }
 
-    public void disconnectFrom(Node node) {
+    @SuppressWarnings("unchecked")
+	public void disconnectFrom(N node) {
         this.removeOutboundNode(node);
-        node.removeInboundNode(this);
+        node.removeInboundNode((N) this);
     }
 
-    public Set<Node> getOutboundNodes() {
+    public Set<N> getOutboundNodes() {
         return outboundNodes;
     }
 
-    public Set<Node> getInboundNodes() {
+    public Set<N> getInboundNodes() {
         return inboundNodes;
     }
 }

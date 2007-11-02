@@ -27,10 +27,10 @@ import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
  * between the concept and the join of all of its parents -- alternatively just think
  * of it in the same way all the other n-dim stuff works).
  */
-public class DefaultDimensionStrategy implements DimensionCreationStrategy {
-    public<T> Vector<Dimension<T>> calculateDimensions(Lattice<?,T> lattice) {
+public class DefaultDimensionStrategy<T> implements DimensionCreationStrategy<T> {
+    public<O> Vector<Dimension<T>> calculateDimensions(Lattice<O,T> lattice) {
         Vector<Dimension<T>> dimensions = new Vector<Dimension<T>>();
-        Concept<?,T>[] concepts = lattice.getConcepts();
+        Concept<O,T>[] concepts = lattice.getConcepts();
         for (int i = 0; i < concepts.length; i++) {
             Concept<?,T> concept = concepts[i];
             if (concept.isMeetIrreducible()) {

@@ -12,48 +12,48 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
 
-public class DirectedGraph {
-    private Set<Node> nodes = new HashSet<Node>();
+public class DirectedGraph<N extends Node<N>> {
+    private Set<N> nodes = new HashSet<N>();
 
-    public void addNode(Node node) {
+    public void addNode(N node) {
         nodes.add(node);
-        for (Iterator<Node> iterator = node.getInboundNodes().iterator(); iterator.hasNext();) {
-            Node curNode = iterator.next();
+        for (Iterator<N> iterator = node.getInboundNodes().iterator(); iterator.hasNext();) {
+            N curNode = iterator.next();
             if (!nodes.contains(curNode)) {
                 addNode(curNode);
             }
         }
-        for (Iterator<Node> iterator = node.getOutboundNodes().iterator(); iterator.hasNext();) {
-            Node curNode = iterator.next();
+        for (Iterator<N> iterator = node.getOutboundNodes().iterator(); iterator.hasNext();) {
+            N curNode = iterator.next();
             if (!nodes.contains(curNode)) {
                 addNode(curNode);
             }
         }
     }
 
-    public void removeNode(Node node, boolean keepConnections) {
+    public void removeNode(N node, boolean keepConnections) {
         nodes.remove(node);
         if (keepConnections) {
-            Set<Node> inboundNodes = node.getInboundNodes();
-            Set<Node> outboundNodes = node.getOutboundNodes();
-            for (Iterator<Node> iterator = inboundNodes.iterator(); iterator.hasNext();) {
-                Node fromNode = iterator.next();
-                for (Iterator<Node> iterator2 = outboundNodes.iterator(); iterator2.hasNext();) {
-                    Node toNode = iterator2.next();
+            Set<N> inboundNodes = node.getInboundNodes();
+            Set<N> outboundNodes = node.getOutboundNodes();
+            for (Iterator<N> iterator = inboundNodes.iterator(); iterator.hasNext();) {
+                N fromNode = iterator.next();
+                for (Iterator<N> iterator2 = outboundNodes.iterator(); iterator2.hasNext();) {
+                    N toNode = iterator2.next();
                     fromNode.connectTo(toNode);
                 }
             }
         }
     }
 
-    public Set<Node> getNodes() {
+    public Set<N> getNodes() {
         return nodes;
     }
 
-    public Set<Node> getSources() {
-        Set<Node> retVal = new HashSet<Node>();
-        for (Iterator<Node> iterator = nodes.iterator(); iterator.hasNext();) {
-            Node node = iterator.next();
+    public Set<N> getSources() {
+        Set<N> retVal = new HashSet<N>();
+        for (Iterator<N> iterator = nodes.iterator(); iterator.hasNext();) {
+            N node = iterator.next();
             if (node.getInboundNodes().isEmpty()) {
                 retVal.add(node);
             }
@@ -61,10 +61,10 @@ public class DirectedGraph {
         return retVal;
     }
 
-    public Set<Node> getSinks() {
-        Set<Node> retVal = new HashSet<Node>();
-        for (Iterator<Node> iterator = nodes.iterator(); iterator.hasNext();) {
-            Node node = iterator.next();
+    public Set<N> getSinks() {
+        Set<N> retVal = new HashSet<N>();
+        for (Iterator<N> iterator = nodes.iterator(); iterator.hasNext();) {
+            N node = iterator.next();
             if (node.getOutboundNodes().isEmpty()) {
                 retVal.add(node);
             }
@@ -72,16 +72,16 @@ public class DirectedGraph {
         return retVal;
     }
 
-    public Set<Vector<Node>> getMaximalPaths() {
+    public Set<Vector<N>> getMaximalPaths() {
         /** @todo this algorithm is pretty much brute force since it reiterates the whole set all over again in each
          turn, we could do better, but we don't care at the moment.
          @todo we assume an acyclic graph here, otherwise we will get stuck
          */
-        Set<Vector<Node>> paths = new HashSet<Vector<Node>>();
-        Set<Node> sources = getSources();
-        for (Iterator<Node> iterator = sources.iterator(); iterator.hasNext();) {
-            Node source = iterator.next();
-            Vector<Node> path = new Vector<Node>();
+        Set<Vector<N>> paths = new HashSet<Vector<N>>();
+        Set<N> sources = getSources();
+        for (Iterator<N> iterator = sources.iterator(); iterator.hasNext();) {
+            N source = iterator.next();
+            Vector<N> path = new Vector<N>();
             path.add(source);
             paths.add(path);
         }
@@ -89,18 +89,18 @@ public class DirectedGraph {
         return paths;
     }
 
-    protected void calculateMaximalPaths(Set<Vector<Node>> paths) {
+    protected void calculateMaximalPaths(Set<Vector<N>> paths) {
         boolean changed = false;
-        Set<Vector<Node>> newPaths = new HashSet<Vector<Node>>();
-        for (Iterator<Vector<Node>> iterator = paths.iterator(); iterator.hasNext();) {
-            Vector<Node> path = iterator.next();
-            Node lastNode = path.get(path.size() - 1);
-            Set<Node> outboundNodes = lastNode.getOutboundNodes();
-            for (Iterator<Node> iterator2 = outboundNodes.iterator(); iterator2.hasNext();) {
-                Node node = iterator2.next();
+        Set<Vector<N>> newPaths = new HashSet<Vector<N>>();
+        for (Iterator<Vector<N>> iterator = paths.iterator(); iterator.hasNext();) {
+            Vector<N> path = iterator.next();
+            N lastNode = path.get(path.size() - 1);
+            Set<N> outboundNodes = lastNode.getOutboundNodes();
+            for (Iterator<N> iterator2 = outboundNodes.iterator(); iterator2.hasNext();) {
+                N node = iterator2.next();
                 if (iterator2.hasNext()) {
                     // copy path for all but last branch
-                    Vector<Node> newPath = new Vector<Node>();
+                    Vector<N> newPath = new Vector<N>();
                     newPath.addAll(path);
                     newPath.add(node);
                     newPaths.add(newPath);

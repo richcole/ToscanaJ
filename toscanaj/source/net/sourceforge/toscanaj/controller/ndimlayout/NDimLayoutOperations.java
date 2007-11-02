@@ -28,7 +28,7 @@ public abstract class NDimLayoutOperations {
 
     public static final NDimDiagram createDiagram(Lattice lattice, String title,
                                                 DimensionCreationStrategy dimensionStrategy) {
-        Vector<Dimension> dimensions = dimensionStrategy.calculateDimensions(lattice);
+        List<Dimension> dimensions = dimensionStrategy.calculateDimensions(lattice);
         Vector<Point2D> base = createBase(dimensions.size());
         NDimDiagram diagram = new NDimDiagram(base);
         diagram.setTitle(title);
@@ -222,7 +222,7 @@ public abstract class NDimLayoutOperations {
         return base;
     }
 
-    private static void addVector(double[] ndimVector, Object attribute, Vector<Dimension> dimensions) {
+    private static void addVector(double[] ndimVector, Object attribute, List<Dimension> dimensions) {
         int dimCount = 0;
         for (Iterator<Dimension> it = dimensions.iterator(); it.hasNext();) {
             Dimension<Object> dimension = it.next();
