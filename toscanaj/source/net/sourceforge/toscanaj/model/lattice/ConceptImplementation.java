@@ -39,11 +39,8 @@ import org.tockit.util.ListSetImplementation;
  * are set up properly. If only the neighbourhood relation is set the method
  * buildClosures() can be called to extent this to the full sub-/superconcept
  * relation.
- * 
- * @todo Make an implementation not specific for FCAElement (which comes through 
- *       the readXML(..) method only).
  */
-public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
+public class ConceptImplementation<O,A> implements Concept<O,A> {
     public static final String CONCEPT_ELEMENT_NAME = "concept";
     public static final String OBJECT_CONTINGENT_ELEMENT_NAME = "objectContingent";
     public static final String OBJECT_ELEMENT_NAME = "object";
@@ -51,31 +48,31 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
     public static final String ATTRIBUTE_ELEMENT_NAME = "attribute";
     public static final String DESCRIPTION_ELEMENT_NAME = "description";
 
-    private ListSet<FCAElement> attributeContingent = new ListSetImplementation<FCAElement>();
-    private ListSet<FCAElement> objectContingent = new ListSetImplementation<FCAElement>();
+    private ListSet<A> attributeContingent = new ListSetImplementation<A>();
+    private ListSet<O> objectContingent = new ListSetImplementation<O>();
 
     /**
      * This class implements an iterator that iterates over all attribute
      * contingents of a given concept set.
      */
-    class AttributeIterator implements Iterator<FCAElement> {
+    class AttributeIterator implements Iterator<A> {
         /**
          * Stores the main iterator on the concepts.
          */
-        Iterator<Concept<FCAElement,FCAElement>> mainIterator;
+        Iterator<Concept<O,A>> mainIterator;
 
         /**
          * Stores the secondary iterator on the attributes of one concept.
          */
-        Iterator<FCAElement> secondaryIterator;
+        Iterator<A> secondaryIterator;
 
         /**
          * We start with the iterator of all concepts that we want to visit.
          */
-        AttributeIterator(Iterator<Concept<FCAElement,FCAElement>> main) {
+        AttributeIterator(Iterator<Concept<O,A>> main) {
             this.mainIterator = main;
             if (main.hasNext()) {
-                Concept<FCAElement,FCAElement> first = main.next();
+                Concept<O,A> first = main.next();
                 this.secondaryIterator = first.getAttributeContingentIterator();
             } else {
                 this.secondaryIterator = null;
@@ -94,7 +91,7 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
             // empty contingents coming ahead
             while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
                 // go to next concept
-                Concept<FCAElement,FCAElement> next = this.mainIterator.next();
+                Concept<O,A> next = this.mainIterator.next();
                 this.secondaryIterator = next.getAttributeContingentIterator();
             }
             return this.secondaryIterator.hasNext();
@@ -103,7 +100,7 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
         /**
          * Returns the next attribute.
          */
-        public FCAElement next() {
+        public A next() {
             if (this.secondaryIterator == null) {
                 throw new NoSuchElementException();
             }
@@ -116,7 +113,7 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
             // empty contingents coming ahead
             while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
                 // go to next concept
-                Concept<FCAElement,FCAElement> next = this.mainIterator.next();
+                Concept<O,A> next = this.mainIterator.next();
                 this.secondaryIterator = next.getAttributeContingentIterator();
             }
             return this.secondaryIterator.next();
@@ -134,24 +131,24 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
      * This class implements an iterator that iterates over all object
      * contingents of a given concept set.
      */
-    class ObjectIterator implements Iterator<FCAElement> {
+    class ObjectIterator implements Iterator<O> {
         /**
          * Stores the main iterator on the concepts.
          */
-        Iterator<Concept<FCAElement,FCAElement>> mainIterator;
+        Iterator<Concept<O,A>> mainIterator;
 
         /**
          * Stores the secondary iterator on the objects of one concept.
          */
-        Iterator<FCAElement> secondaryIterator;
+        Iterator<O> secondaryIterator;
 
         /**
          * We start with the iterator of all concepts that we want to visit.
          */
-        ObjectIterator(Iterator<Concept<FCAElement,FCAElement>> main) {
+        ObjectIterator(Iterator<Concept<O,A>> main) {
             this.mainIterator = main;
             if (main.hasNext()) {
-                Concept<FCAElement,FCAElement> first = main.next();
+                Concept<O,A> first = main.next();
                 this.secondaryIterator = first.getObjectContingentIterator();
             } else {
                 this.secondaryIterator = null;
@@ -170,7 +167,7 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
             // empty contingents coming ahead
             while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
                 // go to next concept
-                Concept<FCAElement,FCAElement> next = this.mainIterator.next();
+                Concept<O,A> next = this.mainIterator.next();
                 this.secondaryIterator = next.getObjectContingentIterator();
             }
             return this.secondaryIterator.hasNext();
@@ -179,7 +176,7 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
         /**
          * Returns the next object.
          */
-        public FCAElement next() {
+        public O next() {
             if (this.secondaryIterator == null) {
                 throw new NoSuchElementException();
             }
@@ -192,7 +189,7 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
             // empty contingents coming ahead
             while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
                 // go to next concept
-                Concept<FCAElement,FCAElement> next = this.mainIterator.next();
+                Concept<O,A> next = this.mainIterator.next();
                 this.secondaryIterator = next.getObjectContingentIterator();
             }
             return this.secondaryIterator.next();
@@ -209,12 +206,12 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
     /**
      * Stores all concepts in the filter, including this.
      */
-    protected Set<Concept<FCAElement,FCAElement>> filter = new HashSet<Concept<FCAElement,FCAElement>>();
+    protected Set<Concept<O,A>> filter = new HashSet<Concept<O,A>>();
 
     /**
      * Stores all concepts in the ideal, including this.
      */
-    protected Set<Concept<FCAElement,FCAElement>> ideal = new HashSet<Concept<FCAElement,FCAElement>>();
+    protected Set<Concept<O,A>> ideal = new HashSet<Concept<O,A>>();
 
     /**
      * Stores the number of objects in the extent to avoid unneccessary
@@ -259,7 +256,8 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
         return retVal;
     }
 
-    private void fillContingentElement(Element contingentElem, Iterator<?> contingentIterator, String newElementName) {
+    @SuppressWarnings("unchecked")
+	private void fillContingentElement(Element contingentElem, Iterator<?> contingentIterator, String newElementName) {
         while (contingentIterator.hasNext()) {
             Object obj = contingentIterator.next();
             if(obj instanceof XMLizable) {
@@ -279,14 +277,14 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
     /**
      * Adds a concept to the filter.
      */
-    public void addSuperConcept(Concept<FCAElement,FCAElement> superConcept) {
+    public void addSuperConcept(Concept<O,A> superConcept) {
         this.filter.add(superConcept);
     }
 
     /**
      * Adds a concept to the ideal.
      */
-    public void addSubConcept(Concept<FCAElement,FCAElement> subConcept) {
+    public void addSubConcept(Concept<O,A> subConcept) {
         this.ideal.add(subConcept);
     }
 
@@ -299,24 +297,24 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
      * transitive closures.
      */
     public void buildClosures() {
-        List<Concept<FCAElement,FCAElement>> idealList = new LinkedList<Concept<FCAElement,FCAElement>>(ideal);
+        List<Concept<O,A>> idealList = new LinkedList<Concept<O,A>>(ideal);
         while (!idealList.isEmpty()) {
-            ConceptImplementation other = (ConceptImplementation) idealList.remove(0);
-            Iterator<Concept<FCAElement,FCAElement>> it = other.ideal.iterator();
+            Concept<O,A> other = idealList.remove(0);
+            Iterator<Concept<O,A>> it = other.getDownset().iterator();
             while (it.hasNext()) {
-                Concept<FCAElement,FCAElement> trans = it.next();
+                Concept<O,A> trans = it.next();
                 if (ideal.add(trans)) {
                     idealList.add(trans);
                 }
             }
         }
 
-        List<Concept<FCAElement,FCAElement>> filterList = new LinkedList<Concept<FCAElement,FCAElement>>(filter);
+        List<Concept<O,A>> filterList = new LinkedList<Concept<O,A>>(filter);
         while (!filterList.isEmpty()) {
-            ConceptImplementation other = (ConceptImplementation) filterList.remove(0);
-            Iterator<Concept<FCAElement,FCAElement>> it = other.filter.iterator();
+            Concept<O, A> other = filterList.remove(0);
+            Iterator<Concept<O,A>> it = other.getUpset().iterator();
             while (it.hasNext()) {
-                Concept<FCAElement,FCAElement> trans = it.next();
+                Concept<O,A> trans = it.next();
                 if (filter.add(trans)) {
                     filterList.add(trans);
                 }
@@ -330,9 +328,9 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
     public int getIntentSize() {
         if (intentSize < 0) { // not yet calculated
             intentSize = 0;
-            Iterator<Concept<FCAElement,FCAElement>> it = filter.iterator();
+            Iterator<Concept<O,A>> it = filter.iterator();
             while (it.hasNext()) {
-                Concept<FCAElement,FCAElement> cur = it.next();
+                Concept<O,A> cur = it.next();
                 intentSize += cur.getAttributeContingentSize();
             }
         }
@@ -352,9 +350,9 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
     public int getExtentSize() {
         if (extentSize < 0) { // not yet calculated
             extentSize = 0;
-            Iterator<Concept<FCAElement,FCAElement>> it = ideal.iterator();
+            Iterator<Concept<O,A>> it = ideal.iterator();
             while (it.hasNext()) {
-                Concept<FCAElement,FCAElement> cur = it.next();
+                Concept<O,A> cur = it.next();
                 extentSize += cur.getObjectContingentSize();
             }
         }
@@ -371,14 +369,14 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
     /**
      * Iterates over all attribute contingents in the filter.
      */
-    public Iterator<FCAElement> getIntentIterator() {
+    public Iterator<A> getIntentIterator() {
         return new AttributeIterator(this.filter.iterator());
     }
 
     /**
      * Iterates over all object contingents in the ideal.
      */
-    public Iterator<FCAElement> getExtentIterator() {
+    public Iterator<O> getExtentIterator() {
         return new ObjectIterator(this.ideal.iterator());
     }
 
@@ -402,14 +400,14 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
      * This is equal to the size of the extent of the top node.
      */
     private int getNumberOfObjects() {
-        Concept<FCAElement,FCAElement> cur = this;
+        Concept<O,A> cur = this;
         while (cur.getUpset().size() != 1) {
             // there is another concept in the filter which is not this
             // (this is always the first) ==> go up
             // The concept itself is in the filter, too -- we have to avoid
             // infinite recursion here
-            Iterator<Concept<FCAElement,FCAElement>> it = cur.getUpset().iterator();
-            Concept<FCAElement,FCAElement> next = cur;
+            Iterator<Concept<O,A>> it = cur.getUpset().iterator();
+            Concept<O,A> next = cur;
             while (cur == next) { // we know there has to be a next()
                 next = it.next();
             }
@@ -425,14 +423,14 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
      * This is equal to the size of the intent of the bottom node.
      */
     private int getNumberOfAttributes() {
-    	Concept<FCAElement,FCAElement> cur = this;
+    	Concept<O,A> cur = this;
         while (cur.getDownset().size() != 1) {
             // there is another concept in the ideal which is not this
             // (this is always the first) ==> go down
             // The concept itself is in the filter, too -- we have to avoid
             // infinite recursion here
-            Iterator<Concept<FCAElement,FCAElement>> it = cur.getDownset().iterator();
-            Concept<FCAElement,FCAElement> next = cur;
+            Iterator<Concept<O,A>> it = cur.getDownset().iterator();
+            Concept<O,A> next = cur;
             while (cur == next) { // we know there has to be a next()
                 next = it.next();
             }
@@ -459,22 +457,22 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
     /**
      * Returns true iff the given concept is in the filter of this one.
      */
-    public boolean hasSuperConcept(Concept<FCAElement,FCAElement> concept) {
+    public boolean hasSuperConcept(Concept<O,A> concept) {
         return this.filter.contains(concept);
     }
 
     /**
      * Returns true iff the given concept is in the ideal of this one.
      */
-    public boolean hasSubConcept(Concept<FCAElement,FCAElement> concept) {
+    public boolean hasSubConcept(Concept<O,A> concept) {
         return this.ideal.contains(concept);
     }
 
-    public Collection<Concept<FCAElement,FCAElement>> getDownset() {
+    public Collection<Concept<O,A>> getDownset() {
         return this.ideal;
     }
 
-    public Collection<Concept<FCAElement,FCAElement>> getUpset() {
+    public Collection<Concept<O,A>> getUpset() {
         return this.filter;
     }
 
@@ -486,42 +484,46 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
         return this.objectContingent.size();
     }
 
-    public Iterator<FCAElement> getAttributeContingentIterator() {
+    public Iterator<A> getAttributeContingentIterator() {
         return this.attributeContingent.iterator();
     }
 
-    public Iterator<FCAElement> getObjectContingentIterator() {
+    public Iterator<O> getObjectContingentIterator() {
         return this.objectContingent.iterator();
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * @todo this code assumes both O and A are supertypes of FCAElementImplementation. The whole
+     *       approach of serialization is questionable, see comment on XMLizable.
+     */
+	@SuppressWarnings("unchecked")
 	public void readXML(Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(elem, CONCEPT_ELEMENT_NAME);
         Element objectContingentElem = XMLHelper.getMandatoryChild(elem, OBJECT_CONTINGENT_ELEMENT_NAME);
         List<Element> objects = objectContingentElem.getChildren(OBJECT_ELEMENT_NAME);
         for (Iterator<Element> iterator = objects.iterator(); iterator.hasNext();) {
             Element objElem = iterator.next();
-            this.objectContingent.add(new FCAElementImplementation(objElem));
+            this.objectContingent.add((O) new FCAElementImplementation(objElem));
         }
         Element attributeContingentElem = XMLHelper.getMandatoryChild(elem, ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
         List<Element> attributes = attributeContingentElem.getChildren(ATTRIBUTE_ELEMENT_NAME);
         for (Iterator<Element> iterator = attributes.iterator(); iterator.hasNext();) {
             Element attrElem = iterator.next();
-            this.attributeContingent.add(new FCAElementImplementation(attrElem));
+            this.attributeContingent.add((A) new FCAElementImplementation(attrElem));
         }
         this.filter.add(this);
         this.ideal.add(this);
     }
 
-    public void addObject(FCAElement object) {
+    public void addObject(O object) {
         this.objectContingent.add(object);
     }
 
-    public void addAttribute(FCAElement attribute) {
+    public void addAttribute(A attribute) {
         this.attributeContingent.add(attribute);
     }
     
-    public void replaceObject(FCAElement objectToReplace, FCAElement newObject) {
+    public void replaceObject(O objectToReplace, O newObject) {
 		// @todo make sure new object is inserted at the same position where old one was
     	this.objectContingent.remove(objectToReplace);
     	this.objectContingent.add(newObject);
@@ -531,24 +533,24 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
         this.objectContingent.remove(object);
     }
 
-    public void removeAttribute(FCAElement attribute) {
+    public void removeAttribute(A attribute) {
         this.attributeContingent.remove(attribute);
     }
 
-    public boolean isLesserThan(Concept<FCAElement,FCAElement> other) {
+    public boolean isLesserThan(Concept<O,A> other) {
         if (!(other instanceof ConceptImplementation)) {
             return false;
         }
         return !(other == this) && this.hasSuperConcept(other);
     }
 
-    public boolean isEqual(Concept<FCAElement,FCAElement> other) {
+    public boolean isEqual(Concept<O,A> other) {
         return other == this;
     }
 
     public boolean isJoinIrreducible() {
-        for (Iterator<Concept<FCAElement,FCAElement>> iterator = filter.iterator(); iterator.hasNext();) {
-        	Concept<FCAElement,FCAElement> superconcept = iterator.next();
+        for (Iterator<Concept<O,A>> iterator = filter.iterator(); iterator.hasNext();) {
+        	Concept<O,A> superconcept = iterator.next();
             if (superconcept.getUpset().size() == this.filter.size() - 1) {
                 return true;
             }
@@ -557,8 +559,8 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
     }
 
     public boolean isMeetIrreducible() {
-        for (Iterator<Concept<FCAElement,FCAElement>> iterator = filter.iterator(); iterator.hasNext();) {
-        	Concept<FCAElement,FCAElement> subconcept = iterator.next();
+        for (Iterator<Concept<O,A>> iterator = filter.iterator(); iterator.hasNext();) {
+        	Concept<O,A> subconcept = iterator.next();
             if (subconcept.getUpset().size() == this.ideal.size() - 1) {
                 return true;
             }
@@ -570,11 +572,11 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
     	this.objectContingent.clear();
     }
 
-	public Concept<FCAElement,FCAElement> getTopConcept() {
-		Concept<FCAElement,FCAElement> topCandidate = this;
+	public Concept<O,A> getTopConcept() {
+		Concept<O,A> topCandidate = this;
 		while (!topCandidate.isTop()) {
-			Concept<FCAElement,FCAElement> other = topCandidate;
-			Iterator<Concept<FCAElement,FCAElement>> it = topCandidate.getUpset().iterator();
+			Concept<O,A> other = topCandidate;
+			Iterator<Concept<O,A>> it = topCandidate.getUpset().iterator();
 			do {
 				other = it.next();
 			} while (other == topCandidate);
@@ -583,11 +585,11 @@ public class ConceptImplementation implements Concept<FCAElement,FCAElement> {
 		return topCandidate;
 	}
 
-	public Concept<FCAElement,FCAElement> getBottomConcept() {
-		Concept<FCAElement,FCAElement> bottomCandidate = this;
+	public Concept<O,A> getBottomConcept() {
+		Concept<O,A> bottomCandidate = this;
 		while (!bottomCandidate.isBottom()) {
-			Concept<FCAElement,FCAElement> other = bottomCandidate;
-			Iterator<Concept<FCAElement,FCAElement>> it = bottomCandidate.getDownset().iterator();
+			Concept<O,A> other = bottomCandidate;
+			Iterator<Concept<O,A>> it = bottomCandidate.getDownset().iterator();
 			do {
 				other = it.next();
 			} while (other == bottomCandidate);

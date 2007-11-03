@@ -14,7 +14,7 @@ import org.tockit.events.EventBroker;
  * This class is an abstraction of all diagram related information.
  */
 
-public interface WriteableDiagram2D extends Diagram2D {
+public interface WriteableDiagram2D<O,A> extends Diagram2D<O,A> {
 
     /**
      * Change the title of the diagram.
@@ -29,7 +29,7 @@ public interface WriteableDiagram2D extends Diagram2D {
     /**
      * Adds a point to the diagram (at the end of the list).
      */
-    void addNode(DiagramNode node);
+    void addNode(DiagramNode<O,A> node);
 
     /**
      * Adds a line to the diagram (at the end of the list).
@@ -37,7 +37,7 @@ public interface WriteableDiagram2D extends Diagram2D {
      * The from and to parameters are assumed to refer to some points already
      * existing in the points list.
      */
-    void addLine(DiagramNode from, DiagramNode to);
+    void addLine(DiagramNode<O,A> from, DiagramNode<O,A> to);
 
 	/**
 	 * Sets an event broker to send DiagramChangeEvents to.

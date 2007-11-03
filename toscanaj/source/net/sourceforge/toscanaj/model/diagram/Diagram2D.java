@@ -57,21 +57,21 @@ public interface Diagram2D<O,A> extends XMLizable {
      *
      * Numbers start with zero.
      */
-    DiagramNode getNode(int nodeNumber);
+    DiagramNode<O,A> getNode(int nodeNumber);
 
-    DiagramNode getNode(String identifier);
+    DiagramNode<O,A> getNode(String identifier);
     
     /**
      * Finds the node representing the concept given.
      * 
      * Returns null if no such node exists in this diagram.
      */
-    DiagramNode getNodeForConcept(Concept<O,A> concept);
+    DiagramNode<O,A> getNodeForConcept(Concept<O,A> concept);
 
     /**
      * Returns the list of all nodes in the diagram.
      */
-    Iterator<DiagramNode> getNodes();
+    Iterator<DiagramNode<O,A>> getNodes();
 
     Iterator<DiagramLine> getLines();
 
@@ -112,7 +112,7 @@ public interface Diagram2D<O,A> extends XMLizable {
     Element getDescription();
     
     /**
-     * Returns true if the diagram is layouted as Hasse diagram.
+     * Returns true if the diagram is layed out as Hasse diagram.
      * 
      * This means every line is pointing downwards or in other terms: every node
      * is located above all nodes that represent a concept lesser than its

@@ -20,34 +20,34 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 public class DiagramToContextConverter {
-	public static Context getContext(Diagram2D diagram) {
-		ContextImplementation context = new ContextImplementation(diagram.getTitle());
+	public static<O,A> Context<O,A> getContext(Diagram2D<O, A> diagram) {
+		ContextImplementation<O,A> context = new ContextImplementation<O,A>(diagram.getTitle());
 		
-		ListSet objects = context.getObjectList();
-		ListSet attributes = context.getAttributeList();
-		BinaryRelationImplementation relation = context.getRelationImplementation();
+		ListSet<O> objects = context.getObjectList();
+		ListSet<A> attributes = context.getAttributeList();
+		BinaryRelationImplementation<O,A> relation = context.getRelationImplementation();
 		
-		Iterator<DiagramNode> nodesIt = diagram.getNodes();
+		Iterator<DiagramNode<O,A>> nodesIt = diagram.getNodes();
 		while (nodesIt.hasNext()) {
-            DiagramNode node = nodesIt.next();
-            Concept concept = node.getConcept();
+            DiagramNode<O,A> node = nodesIt.next();
+            Concept<O,A> concept = node.getConcept();
             
-            Iterator objCont = concept.getObjectContingentIterator();
+            Iterator<O> objCont = concept.getObjectContingentIterator();
             while (objCont.hasNext()) {
-                Object obj = objCont.next();
+                O obj = objCont.next();
                 insertIntoList(objects, obj);
             }
             
-            Iterator attrCont = concept.getAttributeContingentIterator();
+            Iterator<A> attrCont = concept.getAttributeContingentIterator();
             while (attrCont.hasNext()) {
-                Object attrib = attrCont.next();
+                A attrib = attrCont.next();
                 insertIntoList(attributes, attrib);
-                Iterator<Object> downset = concept.getDownset().iterator();
+                Iterator<Concept<O,A>> downset = concept.getDownset().iterator();
                 while (downset.hasNext()) {
-                    Concept subConcept = (Concept) downset.next();
-                    Iterator objIt = subConcept.getObjectContingentIterator();
+                    Concept<O,A> subConcept = downset.next();
+                    Iterator<O> objIt = subConcept.getObjectContingentIterator();
                     while (objIt.hasNext()) {
-                        Object object = objIt.next();
+                        O object = objIt.next();
                         relation.insert(object,attrib);
                     }
                 }
@@ -57,17 +57,21 @@ public class DiagramToContextConverter {
 		return context;
 	}
 
-    private static void insertIntoList(List<Object> list, Object object) {
+	/**
+	 * @todo the specific behaviour for Comparable could be in a separate class.
+	 */
+    @SuppressWarnings({ "cast", "unchecked" })
+	private static<T> void insertIntoList(List<T> list, T object) {
         if(list.contains(object)) {
             return;
         }
         int insertionPos = list.size();
         if(object instanceof Comparable) {
             // insert in order if possible
-            Comparable compObj = (Comparable) object;
+            T compObj = (T) object;
             while(insertionPos != 0 &&
                     list.get(insertionPos - 1) instanceof Comparable && 
-                    ((Comparable<Comparable>)list.get(insertionPos - 1)).compareTo(compObj) > 0) {
+                    ((Comparable<T>)list.get(insertionPos - 1)).compareTo(compObj) > 0) {
                 insertionPos--;
             }
         }

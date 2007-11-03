@@ -7,13 +7,13 @@
  */
 package net.sourceforge.toscanaj.util.xmlize;
 
+import java.io.File;
+import java.io.FileInputStream;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.adapters.DOMAdapter;
 import org.jdom.input.DOMBuilder;
-
-import java.io.File;
-import java.io.FileInputStream;
 
 /**
  * This class provides a mechanism to read an XMLizable object from a
