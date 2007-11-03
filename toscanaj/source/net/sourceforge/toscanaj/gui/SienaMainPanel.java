@@ -1525,7 +1525,7 @@ public class SienaMainPanel extends JFrame implements MainPanel, EventBrokerList
 			}
 			
 			Set<Object> difference = new HashSet<Object>(allObjects);
-			for (Iterator extIt = concept.getExtentIterator(); extIt.hasNext();) {
+			for (Iterator<FCAElement> extIt = concept.getExtentIterator(); extIt.hasNext();) {
                 Object object = extIt.next();
                 difference.remove(object);
             }

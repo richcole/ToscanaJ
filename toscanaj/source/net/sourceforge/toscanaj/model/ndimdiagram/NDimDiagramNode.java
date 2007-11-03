@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.ndimdiagram;
 
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;

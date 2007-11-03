@@ -14,7 +14,11 @@ import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
 import net.sourceforge.toscanaj.model.directedgraph.Node;
 
 public class DirectedGraphTest extends TestCase {
-    final static Class THIS = DirectedGraphTest.class;
+    final static Class<DirectedGraphTest> THIS = DirectedGraphTest.class;
+    
+    private static class TestNode extends Node<TestNode> {
+    	// nothing to do but binding type parameter
+    }
 
     public DirectedGraphTest(String s) {
         super(s);
@@ -25,17 +29,17 @@ public class DirectedGraphTest extends TestCase {
     }
 
     public void testGraph() {
-        DirectedGraph graph = new DirectedGraph();
-        Node node1 = new Node();
-        Node node2 = new Node();
-        Node node3 = new Node();
-        Node node4 = new Node();
-        Node node5 = new Node();
-        Node node6 = new Node();
-        Node node7 = new Node();
-        Node node8 = new Node();
-        Node node9 = new Node();
-        Node node10 = new Node();
+        DirectedGraph<TestNode> graph = new DirectedGraph<TestNode>();
+        TestNode node1 = new TestNode();
+        TestNode node2 = new TestNode();
+        TestNode node3 = new TestNode();
+        TestNode node4 = new TestNode();
+        TestNode node5 = new TestNode();
+        TestNode node6 = new TestNode();
+        TestNode node7 = new TestNode();
+        TestNode node8 = new TestNode();
+        TestNode node9 = new TestNode();
+        TestNode node10 = new TestNode();
 
         node1.connectTo(node3);
         node2.connectTo(node3);

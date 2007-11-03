@@ -12,8 +12,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.controller.ndimlayout.PartialOrderOperations;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
-import net.sourceforge.toscanaj.model.directedgraph.Node;
 import net.sourceforge.toscanaj.model.order.Ordered;
+import net.sourceforge.toscanaj.model.order.PartialOrderNode;
 
 import java.util.Set;
 import java.util.Vector;
@@ -70,8 +70,8 @@ public class PartialOrderOperationsTest extends TestCase {
         NumericalValueGroup numGroup7 = new NumericalValueGroup(numType1, "num7", "num7", 3, true, 5, true);
         NumericalValueGroup numGroup8 = new NumericalValueGroup(numType1, "num8", "num8", 3, true, 3, true);
 
-        DirectedGraph graph = PartialOrderOperations.createGraphFromOrder(
-                new Ordered[]{
+        DirectedGraph<PartialOrderNode<OrderedValueGroup>> graph = PartialOrderOperations.createGraphFromOrder(
+                new OrderedValueGroup[]{
                         new OrderedValueGroup(numGroup1), 
                         new OrderedValueGroup(numGroup2), 
                         new OrderedValueGroup(numGroup3), 
@@ -81,15 +81,12 @@ public class PartialOrderOperationsTest extends TestCase {
                         new OrderedValueGroup(numGroup7), 
                         new OrderedValueGroup(numGroup8)
                 });
-        Set<Node> sources;
-        Set<Node> sinks;
-        Set<Vector<Node>> maximalPaths;
 
-        sources = graph.getSources();
+        Set<PartialOrderNode<OrderedValueGroup>> sources = graph.getSources();
         assertEquals(2, sources.size());
-        sinks = graph.getSinks();
+        Set<PartialOrderNode<OrderedValueGroup>> sinks = graph.getSinks();
         assertEquals(3, sinks.size());
-        maximalPaths = graph.getMaximalPaths();
+        Set<Vector<PartialOrderNode<OrderedValueGroup>>> maximalPaths = graph.getMaximalPaths();
         assertEquals(6, maximalPaths.size());
 
         TextualType textType1 = new TextualType("texttype1");
@@ -107,7 +104,7 @@ public class PartialOrderOperationsTest extends TestCase {
         textGroup5.addValue(new TextualValue("two"));
 
         graph = PartialOrderOperations.createGraphFromOrder(
-                new Ordered[]{
+                new OrderedValueGroup[]{
                         new OrderedValueGroup(textGroup1), 
                         new OrderedValueGroup(textGroup2), 
                         new OrderedValueGroup(textGroup3), 

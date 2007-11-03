@@ -19,7 +19,7 @@ import org.jdom.Element;
  * @todo consider using a cache to reuse existing FCAObjects, i.e. don't have two FCAObjects with the same data (and description).
  * Should descriptions be functionally dependend on the data? How to model this in CSX?
  */
-public class FCAElementImplementation implements WritableFCAElement, XMLizable, Comparable {
+public class FCAElementImplementation implements WritableFCAElement, XMLizable, Comparable<FCAElementImplementation> {
 	private Object data;
 	private Element description;
     private int contextPosition = -1; // -1 means "not set"
@@ -149,7 +149,7 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable, 
 			this.data = dataElement.getTextTrim();
 		} else {
 			try {
-				Constructor construct = Class.forName(className).getConstructor(new Class[] {Element.class});
+				Constructor<?> construct = Class.forName(className).getConstructor(new Class[] {Element.class});
 				this.data = construct.newInstance(new Object[] {dataElement});
 			} catch (Exception e) {
 				throw new XMLSyntaxError("Initialization of object of type " + className + "failed.", e);
@@ -164,7 +164,7 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable, 
      * will be considered equal. Objects with a context position are always
      * considered greater than those without.
      */
-    public int compareTo(Object o) {
-        return this.contextPosition - ((FCAElementImplementation)o).contextPosition;
+    public int compareTo(FCAElementImplementation other) {
+        return this.contextPosition - other.contextPosition;
     }
 }
