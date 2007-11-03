@@ -391,9 +391,9 @@ public class DiagramNode<O,A> implements XMLizable {
      * Returns true iff the node connects to a line it does not belong to.
      */
     public boolean hasCollision() {
-        Iterator<DiagramLine> lineIt = this.diagram.getLines();
+        Iterator<DiagramLine<O,A>> lineIt = this.diagram.getLines();
         while (lineIt.hasNext()) {
-            DiagramLine line = lineIt.next();
+            DiagramLine<O,A> line = lineIt.next();
             if(line.getFromNode() == this) {
                 continue;
             }

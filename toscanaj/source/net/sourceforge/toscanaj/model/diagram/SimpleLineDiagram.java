@@ -30,6 +30,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is an abstraction of all diagram related information.
@@ -42,7 +43,7 @@ import java.util.List;
  * first call to getNode() or getBounds() will make sure that the coordinates
  * will be pointing downwards when reading.
  */
-public class SimpleLineDiagram implements WriteableDiagram2D {
+public class SimpleLineDiagram<O,A> implements WriteableDiagram2D<O,A> {
 	protected EventBroker eventBroker;
 	
     /**
@@ -53,12 +54,12 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     /**
      * The list of nodes in the diagram.
      */
-    private List<DiagramNode> nodes = new LinkedList<DiagramNode>();
+    private List<DiagramNode<O,A>> nodes = new LinkedList<DiagramNode<O,A>>();
 
     /**
      * The list of lines in the diagram.
      */
-    private List<DiagramLine> lines = new LinkedList<DiagramLine>();
+    private List<DiagramLine<O,A>> lines = new LinkedList<DiagramLine<O,A>>();
 
     /**
      * This is set to true once we determined the direction of the y-axis.
@@ -99,41 +100,41 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 	 * identifiers are unique within each diagram - it should be ok to 
 	 * keep the same identifiers for nodes in a copied diagram.
      */
-    public SimpleLineDiagram (Diagram2D diagram) {
+    public SimpleLineDiagram(Diagram2D<O,A> diagram) {
 		coordinateSystemChecked = false;
 		
-		Hashtable<DiagramNode, DiagramNode> oldToNewNodeMapping = new Hashtable<DiagramNode, DiagramNode>();
+		Map<DiagramNode<O,A>, DiagramNode<O,A>> oldToNewNodeMapping = new Hashtable<DiagramNode<O,A>, DiagramNode<O,A>>();
     	
     	this.title = diagram.getTitle();
     	
-    	Iterator<DiagramNode> diagramNodes = diagram.getNodes();
+    	Iterator<DiagramNode<O,A>> diagramNodes = diagram.getNodes();
     	while (diagramNodes.hasNext()) {
-			DiagramNode curNode = diagramNodes.next();
+			DiagramNode<O,A> curNode = diagramNodes.next();
 			// we are not using DiagramNode copy constructor here for copying 
 			// nodes because it doesn't offer deep copy of a Concept, using 
 			// makeDiagramNodeCopy() method instead.
-			DiagramNode copiedNode = makeDiagramNodeCopy(curNode);
+			DiagramNode<O,A> copiedNode = makeDiagramNodeCopy(curNode);
 			this.nodes.add(copiedNode);
 			oldToNewNodeMapping.put(curNode, copiedNode);
 		}
 		
-		Iterator<DiagramLine> diagramLines = diagram.getLines();
-		while (diagramLines.hasNext()) {
-			DiagramLine curLine = diagramLines.next();
-			DiagramNode copiedFromNode = oldToNewNodeMapping.get(curLine.getFromNode());
-			DiagramNode copiedToNode = oldToNewNodeMapping.get(curLine.getToNode());
-			DiagramLine copiedLine = new DiagramLine(copiedFromNode,copiedToNode, this);
+		Iterator<DiagramLine<O, A>> lines = diagram.getLines();
+		while (lines.hasNext()) {
+			DiagramLine<O,A> curLine = lines.next();
+			DiagramNode<O,A> copiedFromNode = oldToNewNodeMapping.get(curLine.getFromNode());
+			DiagramNode<O,A> copiedToNode = oldToNewNodeMapping.get(curLine.getToNode());
+			DiagramLine<O,A> copiedLine = new DiagramLine<O,A>(copiedFromNode,copiedToNode, this);
 			this.lines.add(copiedLine);
-			ConceptImplementation subConcept = (ConceptImplementation) copiedToNode.getConcept();
-			ConceptImplementation superConcept = (ConceptImplementation) copiedFromNode.getConcept();
+			ConceptImplementation<O,A> subConcept = (ConceptImplementation<O, A>) copiedToNode.getConcept();
+			ConceptImplementation<O,A> superConcept = (ConceptImplementation<O, A>) copiedFromNode.getConcept();
 			subConcept.addSuperConcept(superConcept);
 			superConcept.addSubConcept(subConcept);
 		}
 		
-		Iterator<DiagramNode> it = this.getNodes();
+		Iterator<DiagramNode<O,A>> it = this.getNodes();
 		while (it.hasNext()) {
-			DiagramNode curNode = it.next();
-			((ConceptImplementation) curNode.getConcept()).buildClosures();
+			DiagramNode<O,A> curNode = it.next();
+			((ConceptImplementation<O,A>) curNode.getConcept()).buildClosures();
 		}
     }
 
@@ -141,22 +142,25 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 	 * Make a deep copy of the node, copying all properties, with 
 	 * the following exception:
 	 * - identifier: at the moment just copy the same identifier over.
+	 * 
+	 * @todo this code is specific for FCAElements in a way that is not typesafe
 	 */
-    private DiagramNode makeDiagramNodeCopy (DiagramNode node) {   	
+    @SuppressWarnings("unchecked")
+	private DiagramNode<O,A> makeDiagramNodeCopy (DiagramNode<O,A> node) {   	
 
 		Point2D position = (Point2D) node.getPosition().clone();
 			
-		Concept originalNodeConcept = node.getConcept();
-		ConceptImplementation concept = new ConceptImplementation();
-		Iterator attrIterator = originalNodeConcept.getAttributeContingentIterator();
+		Concept<O,A> originalNodeConcept = node.getConcept();
+		ConceptImplementation<O,A> concept = new ConceptImplementation<O,A>();
+		Iterator<A> attrIterator = originalNodeConcept.getAttributeContingentIterator();
 		while (attrIterator.hasNext()) {
             FCAElement curAttr = (FCAElement) attrIterator.next();
-			concept.addAttribute(new FCAElementImplementation(curAttr.getData(), curAttr.getDescription()));
+			concept.addAttribute((A) new FCAElementImplementation(curAttr.getData(), curAttr.getDescription()));
 		}
-		Iterator objIterator = originalNodeConcept.getObjectContingentIterator();
+		Iterator<O> objIterator = originalNodeConcept.getObjectContingentIterator();
 		while (objIterator.hasNext()) {
 			FCAElement curObj = (FCAElement) objIterator.next();
-			concept.addObject(new FCAElementImplementation(curObj.getData()));
+			concept.addObject((O) new FCAElementImplementation(curObj.getData()));
 		}
 		
 		LabelInfo attributeLabelInfo = new LabelInfo(node.getAttributeLabelInfo());
@@ -170,7 +174,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 		catch (IllegalArgumentException e) {
 			newIdentifier = this.idPool.getFreeId();
 		}
-		DiagramNode newNode = new DiagramNode(this, newIdentifier, position, concept, attributeLabelInfo, objectLabelInfo, null);
+		DiagramNode<O,A> newNode = new DiagramNode<O,A>(this, newIdentifier, position, concept, attributeLabelInfo, objectLabelInfo, null);
 		attributeLabelInfo.setNode(newNode);
 		objectLabelInfo.setNode(newNode);
 		return newNode;
@@ -182,12 +186,12 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         if (description != null) {
             retVal.addContent(description.detach());
         }
-        for (Iterator<DiagramNode> iterator = nodes.iterator(); iterator.hasNext();) {
-            DiagramNode node = iterator.next();
+        for (Iterator<DiagramNode<O,A>> iterator = nodes.iterator(); iterator.hasNext();) {
+            DiagramNode<O,A> node = iterator.next();
             retVal.addContent(node.toXML());
         }
-        for (Iterator<DiagramLine> iterator = lines.iterator(); iterator.hasNext();) {
-            DiagramLine line = iterator.next();
+        for (Iterator<DiagramLine<O,A>> iterator = lines.iterator(); iterator.hasNext();) {
+            DiagramLine<O,A> line = iterator.next();
             retVal.addContent(line.toXML());
         }
         if(!this.extraCanvasItems.isEmpty()) {
@@ -204,7 +208,8 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XMLSyntaxError {
+    @SuppressWarnings("unchecked")
+	public void readXML(Element elem) throws XMLSyntaxError {
         coordinateSystemChecked = true; // don't check while we still build the diagram
         XMLHelper.checkName(elem, DIAGRAM_ELEMENT_NAME);
         title = XMLHelper.getAttribute(elem, TITLE_ATTRIBUTE_NAME).getValue();
@@ -212,7 +217,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         List<Element> nodeElems = elem.getChildren(DiagramNode.NODE_ELEMENT_NAME);
         for (Iterator<Element> iterator = nodeElems.iterator(); iterator.hasNext();) {
             Element diagramNode = iterator.next();
-            DiagramNode newNode = createNewDiagramNode(diagramNode);
+            DiagramNode<O,A> newNode = createNewDiagramNode(diagramNode);
             try {
             	this.idPool.reserveId(newNode.getIdentifier()); 
             }
@@ -224,24 +229,24 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         List<Element> lineElems = elem.getChildren(DiagramLine.DIAGRAM_LINE_ELEMENT_NAME);
         for (Iterator<Element> iterator = lineElems.iterator(); iterator.hasNext();) {
             Element diagramLine = iterator.next();
-            DiagramLine line = new DiagramLine(diagramLine, this);
+            DiagramLine<O,A> line = new DiagramLine<O,A>(diagramLine, this);
             lines.add(line);
-            DiagramNode from = line.getFromNode();
-            DiagramNode to = line.getToNode();
+            DiagramNode<O,A> from = line.getFromNode();
+            DiagramNode<O,A> to = line.getToNode();
 
             // add direct neighbours to concepts
-            ConceptImplementation concept1 =
-                    (ConceptImplementation) from.getConcept();
-            ConceptImplementation concept2 =
-                    (ConceptImplementation) to.getConcept();
+            ConceptImplementation<O,A> concept1 =
+                    (ConceptImplementation<O,A>) from.getConcept();
+            ConceptImplementation<O,A> concept2 =
+                    (ConceptImplementation<O,A>) to.getConcept();
             concept1.addSubConcept(concept2);
             concept2.addSuperConcept(concept1);
         }
 
         // build transitive closures for each concept
-        for (Iterator<DiagramNode> iterator = nodes.iterator(); iterator.hasNext();) {
-            DiagramNode node = iterator.next();
-            ((ConceptImplementation) node.getConcept()).buildClosures();
+        for (Iterator<DiagramNode<O,A>> iterator = nodes.iterator(); iterator.hasNext();) {
+            DiagramNode<O,A> node = iterator.next();
+            ((ConceptImplementation<O,A>) node.getConcept()).buildClosures();
         }
         coordinateSystemChecked = false;
         
@@ -258,8 +263,8 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         }
     }
 
-    protected DiagramNode createNewDiagramNode(Element diagramNode) throws XMLSyntaxError {
-        return new DiagramNode(this, diagramNode);
+    protected DiagramNode<O,A> createNewDiagramNode(Element diagramNode) throws XMLSyntaxError {
+        return new DiagramNode<O,A>(this, diagramNode);
     }
 
     /**
@@ -284,11 +289,11 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         return this.nodes.size();
     }
 
-    public Iterator<DiagramNode> getNodes() {
+    public Iterator<DiagramNode<O,A>> getNodes() {
         return this.nodes.iterator();
     }
 
-    public Iterator<DiagramLine> getLines() {
+    public Iterator<DiagramLine<O,A>> getLines() {
         return this.lines.iterator();
     }
 
@@ -311,7 +316,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         double minY = Double.MAX_VALUE;
         double maxY = -Double.MAX_VALUE;
         for (int i = 0; i < this.nodes.size(); i++) {
-            DiagramNode node = this.nodes.get(i);
+            DiagramNode<O,A> node = this.nodes.get(i);
             double x = node.getX();
             double y = node.getY();
             double rx = node.getRadiusX();
@@ -338,19 +343,19 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      *
      * Numbers start with zero.
      */
-    public DiagramNode getNode(int nodeNumber) {
+    public DiagramNode<O,A> getNode(int nodeNumber) {
         if (!coordinateSystemChecked) {
             checkCoordinateSystem();
         }
         return this.nodes.get(nodeNumber);
     }
 
-    public DiagramNode getNode(String identifier) {
+    public DiagramNode<O,A> getNode(String identifier) {
         if (!coordinateSystemChecked) {
             checkCoordinateSystem();
         }
         for (int i = 0; i < nodes.size(); i++) {
-            DiagramNode node = nodes.get(i);
+            DiagramNode<O,A> node = nodes.get(i);
             if (node.getIdentifier().equals(identifier)) {
                 return node;
             }
@@ -358,12 +363,12 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
         throw new RuntimeException("No diagram node with id '" + identifier + "' found.");
     }
 
-	public DiagramNode getNodeForConcept(Concept concept) {
+	public DiagramNode<O,A> getNodeForConcept(Concept<O,A> concept) {
 		if (!coordinateSystemChecked) {
 			checkCoordinateSystem();
 		}
-		for (Iterator<DiagramNode> nodeIt = this.nodes.iterator(); nodeIt.hasNext();) {
-            DiagramNode node = nodeIt.next();
+		for (Iterator<DiagramNode<O,A>> nodeIt = this.nodes.iterator(); nodeIt.hasNext();) {
+            DiagramNode<O,A> node = nodeIt.next();
             if(node.getConcept() == concept) {
             	return node;
             }
@@ -374,7 +379,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     /**
      * Implements Diagram2D.getLine(int).
      */
-    public DiagramLine getLine(int lineNumber) {
+    public DiagramLine<O,A> getLine(int lineNumber) {
         return this.lines.get(lineNumber);
     }
 
@@ -383,7 +388,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      *
      * The top node of a diagram always has to be added first.
      */
-    public void addNode(DiagramNode node) {
+    public void addNode(DiagramNode<O,A> node) {
         this.nodes.add(node);
 		sendChangeEvent();
     }
@@ -394,7 +399,7 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      * Numbers start with zero.
      */
     public Point2D getFromPosition(int lineNumber) {
-        DiagramLine line = this.lines.get(lineNumber);
+        DiagramLine<O,A> line = this.lines.get(lineNumber);
         return line.getFromPosition();
     }
 
@@ -404,15 +409,15 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      * Numbers start with zero.
      */
     public Point2D getToPosition(int lineNumber) {
-        DiagramLine line = this.lines.get(lineNumber);
+        DiagramLine<O,A> line = this.lines.get(lineNumber);
         return line.getToPosition();
     }
 
     /**
      * Adds a line to the diagram (at the end of the list).
      */
-    public void addLine(DiagramNode from, DiagramNode to) {
-        this.lines.add(new DiagramLine(from, to, this));
+    public void addLine(DiagramNode<O,A> from, DiagramNode<O,A> to) {
+        this.lines.add(new DiagramLine<O,A>(from, to, this));
         this.coordinateSystemChecked = false;
 		sendChangeEvent();
     }
@@ -436,18 +441,18 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
      */
     protected void checkCoordinateSystem() {
         if (this.nodes.size() > 1) { // no point in checking direction otherwise
-            DiagramNode highestNode = this.nodes.get(0);
-            for (Iterator<DiagramNode> iterator = nodes.iterator(); iterator.hasNext();) {
-                DiagramNode node = iterator.next();
+            DiagramNode<O,A> highestNode = this.nodes.get(0);
+            for (Iterator<DiagramNode<O,A>> iterator = nodes.iterator(); iterator.hasNext();) {
+                DiagramNode<O,A> node = iterator.next();
                 if (highestNode.getY() > node.getY()) {
                     highestNode = node;
                 }
             }
             if (!highestNode.getConcept().isTop()) {
                 // inverse coordinates (mirror using x-axis)
-                Iterator<DiagramNode> it = this.nodes.iterator();
+                Iterator<DiagramNode<O,A>> it = this.nodes.iterator();
                 while (it.hasNext()) {
-                    DiagramNode node = it.next();
+                    DiagramNode<O,A> node = it.next();
                     node.invertY();
                 }
             }
@@ -477,9 +482,9 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
     }
     
     public boolean isHasseDiagram() {
-    	Iterator<DiagramLine> it = this.lines.iterator();
+    	Iterator<DiagramLine<O,A>> it = this.lines.iterator();
     	while (it.hasNext()) {
-            DiagramLine line = it.next();
+            DiagramLine<O,A> line = it.next();
     	    double deltaX = Math.abs(line.getToPosition().getX() - line.getFromPosition().getX());
     	    double deltaY = line.getToPosition().getY() - line.getFromPosition().getY();
             if(deltaY < MINIMUM_STEEPNESS * deltaX) {
@@ -496,19 +501,19 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 	/**
 	 * @todo check if we have a lattice
 	 */
-    public Concept getTopConcept() {
+    public Concept<O,A> getTopConcept() {
     	if(this.nodes == null || this.nodes.size() == 0) {
     		throw new IllegalStateException("Diagram has no nodes");
     	}
-    	DiagramNode node = this.nodes.get(0);
-		Concept top = node.getConcept();
+    	DiagramNode<O,A> node = this.nodes.get(0);
+		Concept<O,A> top = node.getConcept();
 		while(top.getUpset().size() > 1) {
-			Iterator<Object> it = top.getUpset().iterator();
-			Concept upper = (Concept) it.next();
+			Iterator<Concept<O,A>> it = top.getUpset().iterator();
+			Concept<O,A> upper = it.next();
 			if(upper != top) {
 				top = upper;
 			} else {
-				top = (Concept) it.next();
+				top = it.next();
 			}
 		}
 		return top;
@@ -517,19 +522,19 @@ public class SimpleLineDiagram implements WriteableDiagram2D {
 	/**
 	 * @todo check if we have a lattice
 	 */
-    public Concept getBottomConcept() {
+    public Concept<O,A> getBottomConcept() {
 		if(this.nodes == null || this.nodes.size() == 0) {
 			throw new IllegalStateException("Diagram has no nodes");
 		}
-		DiagramNode node = this.nodes.get(0);
-		Concept bottom = node.getConcept();
+		DiagramNode<O,A> node = this.nodes.get(0);
+		Concept<O,A> bottom = node.getConcept();
 		while(bottom.getDownset().size() > 1) {
-			Iterator<Object> it = bottom.getDownset().iterator();
-			Concept lower = (Concept) it.next();
+			Iterator<Concept<O, A>> it = bottom.getDownset().iterator();
+			Concept<O,A> lower = it.next();
 			if(lower != bottom) {
 				bottom = lower;
 			} else {
-				bottom = (Concept) it.next();
+				bottom = it.next();
 			}
 		}
 		return bottom;

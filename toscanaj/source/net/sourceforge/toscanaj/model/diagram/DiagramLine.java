@@ -7,30 +7,31 @@
  */
 package net.sourceforge.toscanaj.model.diagram;
 
+import java.awt.geom.Point2D;
+
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import org.jdom.Element;
 
-import java.awt.geom.Point2D;
+import org.jdom.Element;
 
 /**
  * This encapsulates all information about a line in a diagram.
  *
  * This is just the information which nodes the line connects.
  */
-public class DiagramLine implements XMLizable {
+public class DiagramLine<O,A> implements XMLizable {
     /**
      * Holds the starting node in the Diagram the line belongs to.
      */
-    private DiagramNode fromNode;
+    private DiagramNode<O,A> fromNode;
 
-    private Diagram2D diagram;
+    private Diagram2D<O,A> diagram;
 
     /**
      * Holds the ending node in the Diagram the line belongs to.
      */
-    private DiagramNode toNode;
+    private DiagramNode<O,A> toNode;
     public static final String DIAGRAM_LINE_ELEMENT_NAME = "edge";
     public static final String FROM_NODE_ATTRIBUTE_NAME = "from";
     public static final String TO_NODE_ATTRIBUTE_NAME = "to";
@@ -38,13 +39,13 @@ public class DiagramLine implements XMLizable {
     /**
      * Initialises a line between the given nodes.
      */
-    public DiagramLine(DiagramNode fromNode, DiagramNode toNode, Diagram2D diagram) {
+    public DiagramLine(DiagramNode<O,A> fromNode, DiagramNode<O,A> toNode, Diagram2D<O,A> diagram) {
         this.fromNode = fromNode;
         this.toNode = toNode;
         this.diagram = diagram;
     }
 
-    public DiagramLine(Element element, Diagram2D diagram) throws XMLSyntaxError {
+    public DiagramLine(Element element, Diagram2D<O,A> diagram) throws XMLSyntaxError {
         this.diagram = diagram;
         readXML(element);
     }
@@ -67,14 +68,14 @@ public class DiagramLine implements XMLizable {
     /**
      * Returns the starting node in a Diagram in which DiagramLine object will be connecting.
      */
-    public DiagramNode getFromNode() {
+    public DiagramNode<O,A> getFromNode() {
         return this.fromNode;
     }
 
     /**
      * Returns the end node in a Diagram in which DiagramLine object will be connecting.
      */
-    public DiagramNode getToNode() {
+    public DiagramNode<O,A> getToNode() {
         return this.toNode;
     }
 
@@ -90,7 +91,7 @@ public class DiagramLine implements XMLizable {
     /**
      * Returns coordinates of second node in a Diagram in which DiagramLine object will be connecting.
      *
-     * This is just a convenienced method to not having to get the node and then its position.
+     * This is just a convenience method to not having to get the node and then its position.
      */
     public Point2D getToPosition() {
         return this.toNode.getPosition();
@@ -99,14 +100,14 @@ public class DiagramLine implements XMLizable {
     /**
      * Sets the fromPoint to a node in a Diagram.
      */
-    public void setFromPoint(DiagramNode fromNode) {
+    public void setFromPoint(DiagramNode<O,A> fromNode) {
         this.fromNode = fromNode;
     }
 
     /**
      * Sets the toPoint at the position of a node on a Diagram
      */
-    public void setToPoint(DiagramNode toNode) {
+    public void setToPoint(DiagramNode<O,A> toNode) {
         this.toNode = toNode;
     }
 

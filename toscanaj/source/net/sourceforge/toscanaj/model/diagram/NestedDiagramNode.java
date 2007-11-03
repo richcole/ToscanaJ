@@ -14,15 +14,16 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * A class representing a diagram node with an inner diagram.
  */
-public class NestedDiagramNode extends DiagramNode {
+public class NestedDiagramNode<O,A> extends DiagramNode<O,A> {
     /**
      * Stores the inner diagram.
      */
-    private final Diagram2D innerDiagram;
+    private final Diagram2D<O,A> innerDiagram;
     
     /**
      * Determines how much the outer diagram gets scaled.
@@ -47,7 +48,7 @@ public class NestedDiagramNode extends DiagramNode {
      * If the dropAttributeLabels flag is set, the inner nodes will have no
      * attribute labels attached.
      */
-    public NestedDiagramNode(WriteableDiagram2D outerDiagram, DiagramNode outerNode, Diagram2D innerDiagram, double scale) {
+    public NestedDiagramNode(WriteableDiagram2D<O,A> outerDiagram, DiagramNode<O,A> outerNode, Diagram2D<O,A> innerDiagram, double scale) {
         super(outerDiagram, "outer:" + outerNode.getIdentifier(),
                 new Point2D.Double(outerNode.getX() * OUTER_SCALE_FACTOR, 
                                    outerNode.getY() * OUTER_SCALE_FACTOR),
@@ -66,23 +67,23 @@ public class NestedDiagramNode extends DiagramNode {
         Point2D offset = new Point2D.Double(
                 this.getX() - rect.getX()/innerScale - (rect.getWidth()/innerScale)/2,
                 this.getY() - rect.getY()/innerScale - (rect.getHeight()/innerScale)/2);
-        SimpleLineDiagram newDiag = new SimpleLineDiagram();
-        Hashtable<DiagramNode, DiagramNode> nodeMap = new Hashtable<DiagramNode, DiagramNode>();
+        SimpleLineDiagram<O,A> newDiag = new SimpleLineDiagram<O,A>();
+        Map<DiagramNode<O,A>, DiagramNode<O,A>> nodeMap = new Hashtable<DiagramNode<O,A>, DiagramNode<O,A>>();
         for (int i = 0; i < innerDiagram.getNumberOfNodes(); i++) {
-            DiagramNode oldNode = innerDiagram.getNode(i);
+            DiagramNode<O,A> oldNode = innerDiagram.getNode(i);
             Point2D newPos = new Point2D.Double(oldNode.getX()/innerScale + offset.getX(),
                     oldNode.getY()/innerScale + offset.getY());
             LabelInfo newAttrLabel = new LabelInfo(oldNode.getAttributeLabelInfo());
             LabelInfo newObjLabel = new LabelInfo(oldNode.getObjectLabelInfo());
-            DiagramNode newNode = new DiagramNode(newDiag, outerNode.getIdentifier() + " x " + oldNode.getIdentifier(),
+            DiagramNode<O,A> newNode = new DiagramNode<O,A>(newDiag, outerNode.getIdentifier() + " x " + oldNode.getIdentifier(),
                     newPos, oldNode.getConcept(), newAttrLabel, newObjLabel, this, oldNode.getRadiusX()/innerScale, oldNode.getRadiusY()/innerScale);
             nodeMap.put(oldNode, newNode);
             newDiag.addNode(newNode);
         }
         for (int i = 0; i < innerDiagram.getNumberOfLines(); i++) {
-            DiagramLine line = innerDiagram.getLine(i);
-            DiagramNode from = nodeMap.get(line.getFromNode());
-            DiagramNode to = nodeMap.get(line.getToNode());
+            DiagramLine<O,A> line = innerDiagram.getLine(i);
+            DiagramNode<O,A> from = nodeMap.get(line.getFromNode());
+            DiagramNode<O,A> to = nodeMap.get(line.getToNode());
             newDiag.addLine(from, to);
         }
         newDiag.setEventBroker(innerDiagram.getEventBroker());
@@ -94,7 +95,7 @@ public class NestedDiagramNode extends DiagramNode {
     /**
      * Returns the inner diagram of the node.
      */
-    public Diagram2D getInnerDiagram() {
+    public Diagram2D<O,A> getInnerDiagram() {
         return this.innerDiagram;
     }
 
@@ -109,7 +110,7 @@ public class NestedDiagramNode extends DiagramNode {
     }
 
     @Override
-	public Concept[] getConceptNestingList() {
+	public Concept<O,A>[] getConceptNestingList() {
         return this.innerDiagram.getNode(0).getConceptNestingList();
     }
     
@@ -117,9 +118,9 @@ public class NestedDiagramNode extends DiagramNode {
 	public void setPosition(double x, double y) {
 		double dx = x - getPosition().getX();
 		double dy = y - getPosition().getY();
-		Iterator<DiagramNode> it = this.innerDiagram.getNodes();
+		Iterator<DiagramNode<O,A>> it = this.innerDiagram.getNodes();
 		while (it.hasNext()) {
-			DiagramNode node = it.next();
+			DiagramNode<O,A> node = it.next();
 			// do not call setPosition() to avoid callbacks
 			node.position.setLocation(node.getX() + dx, node.getY() + dy);
 		}
@@ -174,7 +175,7 @@ public class NestedDiagramNode extends DiagramNode {
 
         // (3) check all inner nodes if they are inside
         for(int i = 0; i < this.innerDiagram.getNumberOfNodes(); i++) {
-        	DiagramNode node = this.innerDiagram.getNode(i);
+        	DiagramNode<O,A> node = this.innerDiagram.getNode(i);
         	double x = node.getX() - cx;
         	double y = node.getY() - cy;
             if( x > 0 ) {
@@ -203,7 +204,7 @@ public class NestedDiagramNode extends DiagramNode {
 		this.ellipse = new Ellipse2D.Double(cx - rx, cy - ry, 2 * rx, 2 * ry);
     }
     
-    public void updateInnerDiagram(Diagram2D updatedInnerDiagram, double scale) {
+    public void updateInnerDiagram(Diagram2D<O,A> updatedInnerDiagram, double scale) {
         double innerScale = (scale / OUTER_SCALE_FACTOR) * EXTRA_ELLIPSE_SCALING;
 
         // calculate an offset that places center of the inner diagram into the middle of the node
@@ -214,8 +215,8 @@ public class NestedDiagramNode extends DiagramNode {
 
         // update all node positions
         for (int i = 0; i < innerDiagram.getNumberOfNodes(); i++) {
-            DiagramNode oldNode = innerDiagram.getNode(i);
-            DiagramNode updatedNode = updatedInnerDiagram.getNode(i);
+            DiagramNode<O,A> oldNode = innerDiagram.getNode(i);
+            DiagramNode<O,A> updatedNode = updatedInnerDiagram.getNode(i);
             oldNode.position.setLocation(updatedNode.getX()/innerScale + offset.getX(),
             		updatedNode.getY()/innerScale + offset.getY());
         }

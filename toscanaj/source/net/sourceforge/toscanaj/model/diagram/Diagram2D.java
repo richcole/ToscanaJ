@@ -73,7 +73,7 @@ public interface Diagram2D<O,A> extends XMLizable {
      */
     Iterator<DiagramNode<O,A>> getNodes();
 
-    Iterator<DiagramLine> getLines();
+    Iterator<DiagramLine<O,A>> getLines();
 
     /**
      * Returns the coordinates of a starting point of a line.
@@ -87,7 +87,7 @@ public interface Diagram2D<O,A> extends XMLizable {
      *
      * Numbers start with zero.
      */
-    DiagramLine getLine(int lineNumber);
+    DiagramLine<O,A> getLine(int lineNumber);
 
     /**
      * Returns the coordinates of an end point of a line.
