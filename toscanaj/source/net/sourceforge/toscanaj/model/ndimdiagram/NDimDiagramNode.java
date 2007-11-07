@@ -7,15 +7,14 @@
  */
 package net.sourceforge.toscanaj.model.ndimdiagram;
 
-import net.sourceforge.toscanaj.model.context.FCAElement;
+import java.awt.geom.Point2D;
+import java.util.Iterator;
+import java.util.List;
+
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-
-import java.awt.geom.Point2D;
-import java.util.Iterator;
-import java.util.List;
 
 import org.jdom.Element;
 
@@ -27,12 +26,12 @@ import org.jdom.Element;
  * @todo do we want that? Probably we should add at least some way to reset the
  *       offset
  */
-public class NDimDiagramNode extends DiagramNode {
+public class NDimDiagramNode<O,A> extends DiagramNode<O,A> {
     private double[] ndimVector;
 
-    public NDimDiagramNode(NDimDiagram diagram, String identifier, double[] ndimVector, Concept concept,
+    public NDimDiagramNode(NDimDiagram<O,A> diagram, String identifier, double[] ndimVector, Concept<O,A> concept,
                            LabelInfo attributeLabel, LabelInfo objectLabel,
-                           DiagramNode outerNode) {
+                           DiagramNode<O,A> outerNode) {
         super(diagram, identifier, new Point2D.Double(0, 0), concept, attributeLabel, objectLabel, outerNode);
         this.ndimVector = ndimVector;
     }
@@ -78,7 +77,7 @@ public class NDimDiagramNode extends DiagramNode {
 
     protected Point2D getProjectedPosition() {
         Point2D pos = new Point2D.Double(0, 0);
-        NDimDiagram ndimDiagram = (NDimDiagram) this.diagram;
+        NDimDiagram<O,A> ndimDiagram = (NDimDiagram<O,A>) this.diagram;
 		Iterator<Point2D> baseIt = ndimDiagram.getBase().iterator();
         for (int i = 0; i < ndimVector.length; i++) {
             double v = ndimVector[i];

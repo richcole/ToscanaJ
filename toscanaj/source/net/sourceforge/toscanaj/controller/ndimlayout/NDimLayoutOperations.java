@@ -7,7 +7,15 @@
  */
 package net.sourceforge.toscanaj.controller.ndimlayout;
 
-import net.sourceforge.toscanaj.model.context.FCAElement;
+import java.awt.geom.Point2D;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+
 import net.sourceforge.toscanaj.model.diagram.DiagramLine;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -18,44 +26,45 @@ import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 
-import java.awt.geom.Point2D;
-import java.util.*;
-
 public abstract class NDimLayoutOperations {
     // constants for base vector calculation
     private static final double BASE_SCALE = 80;
     private static final double BASE_X_STRETCH = 1;
 	private static final double BASE_X_SHEAR = 0.3;
+	
+	private NDimLayoutOperations(){
+		// no instances
+	}
 
-    public static final NDimDiagram createDiagram(Lattice lattice, String title,
-                                                DimensionCreationStrategy dimensionStrategy) {
-        List<Dimension> dimensions = dimensionStrategy.calculateDimensions(lattice);
+    public static final<O,A> NDimDiagram<O,A> createDiagram(Lattice<O,A> lattice, String title,
+                                                DimensionCreationStrategy<A> dimensionStrategy) {
+        List<Dimension<A>> dimensions = dimensionStrategy.calculateDimensions(lattice);
         Vector<Point2D> base = createBase(dimensions.size());
-        NDimDiagram diagram = new NDimDiagram(base);
+        NDimDiagram<O,A> diagram = new NDimDiagram<O,A>(base);
         diagram.setTitle(title);
-        Concept[] concepts = lattice.getConcepts();
-        Hashtable<Concept, DiagramNode> nodemap = new Hashtable<Concept, DiagramNode>();
+        Concept<O,A>[] concepts = lattice.getConcepts();
+        Hashtable<Concept<O,A>, DiagramNode<O,A>> nodemap = new Hashtable<Concept<O,A>, DiagramNode<O,A>>();
         double[] topVector = null;
         for (int i = 0; i < concepts.length; i++) {
-            Concept concept = concepts[i];
+            Concept<O,A> concept = concepts[i];
             double[] ndimVector = new double[dimensions.size()];
-            Iterator attributes = concept.getIntentIterator();
+            Iterator<A> attributes = concept.getIntentIterator();
             while (attributes.hasNext()) {
-                Object attribute = attributes.next();
+                A attribute = attributes.next();
                 addVector(ndimVector, attribute, dimensions);
             }
             if (concept.isTop()) {
                 topVector = ndimVector;
             }
-            DiagramNode node = new NDimDiagramNode(diagram, String.valueOf(i), ndimVector, concept,
+            DiagramNode<O,A> node = new NDimDiagramNode<O,A>(diagram, String.valueOf(i), ndimVector, concept,
                     								new LabelInfo(), new LabelInfo(), null);
             nodemap.put(concept, node);
             diagram.addNode(node);
         }
         // the top node has to be at (0,0), otherwise base changes will affect the overall position of the diagram
-        Iterator<DiagramNode> it = nodemap.values().iterator();
+        Iterator<DiagramNode<O,A>> it = nodemap.values().iterator();
         while (it.hasNext()) {
-            NDimDiagramNode node = (NDimDiagramNode) it.next();
+            NDimDiagramNode<O,A> node = (NDimDiagramNode<O,A>) it.next();
             node.setNdimVector(substract(node.getNdimVector(), topVector));
         }
         createConnections(diagram, nodemap);
@@ -65,7 +74,7 @@ public abstract class NDimLayoutOperations {
         return diagram;
     }
 
-    private static void changeBase(NDimDiagram diagram) {
+    private static<O,A> void changeBase(NDimDiagram<O,A> diagram) {
     	int n = diagram.getBase().size();
     	int[] perm = new int[n];
     	for (int i = 0; i < perm.length; i++) {
@@ -140,14 +149,14 @@ public abstract class NDimLayoutOperations {
 		return result;
 	}
 
-	private static double calculateMinimumDistance(NDimDiagram diagram) {
-		Iterator<DiagramLine> lineIt = diagram.getLines();
+	private static<O,A> double calculateMinimumDistance(NDimDiagram<O,A> diagram) {
+		Iterator<DiagramLine<O,A>> lineIt = diagram.getLines();
 		double minDist = Double.MAX_VALUE;
 		while(lineIt.hasNext()) {
-			DiagramLine line = lineIt.next();
-			Iterator<DiagramNode> nodeIt = diagram.getNodes();
+			DiagramLine<O,A> line = lineIt.next();
+			Iterator<DiagramNode<O,A>> nodeIt = diagram.getNodes();
 			while(nodeIt.hasNext()) {
-				DiagramNode node = nodeIt.next();
+				DiagramNode<O,A> node = nodeIt.next();
 				if(line.getFromNode() == node) {
 					continue;
 				}
@@ -177,7 +186,7 @@ public abstract class NDimLayoutOperations {
      * @todo this could probably use DiagramLine.calculateDistance(Point2D), which also
      * considers the end points
      */
-	private static double calculateDistanceToLine(DiagramNode node, DiagramLine line) {
+	private static<O,A> double calculateDistanceToLine(DiagramNode<O,A> node, DiagramLine<O,A> line) {
 		Point2D from = line.getFromPosition();
 		Point2D to = line.getToPosition();
 		
@@ -223,10 +232,10 @@ public abstract class NDimLayoutOperations {
         return base;
     }
 
-    private static void addVector(double[] ndimVector, Object attribute, List<Dimension> dimensions) {
+    private static<A> void addVector(double[] ndimVector, A attribute, List<Dimension<A>> dimensions) {
         int dimCount = 0;
-        for (Iterator<Dimension> it = dimensions.iterator(); it.hasNext();) {
-            Dimension<Object> dimension = it.next();
+        for (Iterator<Dimension<A>> it = dimensions.iterator(); it.hasNext();) {
+            Dimension<A> dimension = it.next();
             if (dimension.contains(attribute)) {
                 ndimVector[dimCount] += 1;
             }
@@ -234,23 +243,23 @@ public abstract class NDimLayoutOperations {
         }
     }
 
-    private static void createConnections(SimpleLineDiagram diagram, Hashtable<Concept, DiagramNode> nodemap) {
-        Iterator<DiagramNode> nodesIt = diagram.getNodes();
+    private static<O,A> void createConnections(SimpleLineDiagram<O,A> diagram, Hashtable<Concept<O,A>, DiagramNode<O,A>> nodemap) {
+        Iterator<DiagramNode<O,A>> nodesIt = diagram.getNodes();
         while (nodesIt.hasNext()) {
-            DiagramNode node = nodesIt.next();
-            Concept concept = node.getConcept();
-            Collection<Object> upset = new HashSet<Object>(concept.getUpset());
+            DiagramNode<O,A> node = nodesIt.next();
+            Concept<O,A> concept = node.getConcept();
+            Collection<Concept<O,A>> upset = new HashSet<Concept<O,A>>(concept.getUpset());
             upset.remove(concept);
-            Set<Object> indirectSuperConcepts = new HashSet<Object>();
-            for (Iterator<Object> iterator = upset.iterator(); iterator.hasNext();) {
-                Concept superconcept = (Concept) iterator.next();
-                Collection<Object> upset2 = new HashSet<Object>(superconcept.getUpset());
+            Set<Concept<O,A>> indirectSuperConcepts = new HashSet<Concept<O,A>>();
+            for (Iterator<Concept<O,A>> iterator = upset.iterator(); iterator.hasNext();) {
+                Concept<O,A> superconcept = iterator.next();
+                Collection<Concept<O,A>> upset2 = new HashSet<Concept<O,A>>(superconcept.getUpset());
                 upset2.remove(superconcept);
                 indirectSuperConcepts.addAll(upset2);
             }
             upset.removeAll(indirectSuperConcepts);
-            for (Iterator<Object> iterator = upset.iterator(); iterator.hasNext();) {
-                Concept upperNeighbour = (Concept) iterator.next();
+            for (Iterator<Concept<O,A>> iterator = upset.iterator(); iterator.hasNext();) {
+                Concept<O,A> upperNeighbour = iterator.next();
                 diagram.addLine(nodemap.get(upperNeighbour), node);
             }
         }

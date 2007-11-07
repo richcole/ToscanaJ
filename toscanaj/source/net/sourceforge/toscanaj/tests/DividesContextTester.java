@@ -28,10 +28,10 @@ import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 public class DividesContextTester {
 
     public static void main(String[] args) throws Exception {
-    	ContextImplementation context = new ContextImplementation();
-    	Collection<Object> objects = context.getObjects();
-    	Collection<Object> finalAttributes = context.getAttributes();
-		BinaryRelationImplementation relation = context.getRelationImplementation();
+    	ContextImplementation<FCAElement,FCAElement> context = new ContextImplementation<FCAElement,FCAElement>();
+    	Collection<FCAElement> objects = context.getObjects();
+    	Collection<FCAElement> finalAttributes = context.getAttributes();
+		BinaryRelationImplementation<FCAElement,FCAElement> relation = context.getRelationImplementation();
 		
 		int max;
 		if(args.length == 0) {
@@ -48,7 +48,7 @@ public class DividesContextTester {
         }
 		
         for(int i = 1; i<=max; i++) {
-        	Object object = new Integer(i);
+        	FCAElement object = new FCAElementImplementation(new Integer(i));
         	objects.add(object);
             for(int j = 1; j <=max; j++) {
             	if(i%j == 0) {
@@ -57,14 +57,14 @@ public class DividesContextTester {
             }
         }
         
-        LatticeGenerator lGen = new GantersAlgorithm();
+        LatticeGenerator<FCAElement,FCAElement> lGen = new GantersAlgorithm();
         
         long startMillis = System.currentTimeMillis();
-        Lattice lattice = lGen.createLattice(context);
+        Lattice<FCAElement,FCAElement> lattice = lGen.createLattice(context);
         System.out.println("Lattice generation: " + (System.currentTimeMillis() - startMillis) + " ms");
         
         startMillis = System.currentTimeMillis();
-        Diagram2D diagram = NDimLayoutOperations.createDiagram(lattice, "test", new DefaultDimensionStrategy());
+        Diagram2D<FCAElement,FCAElement> diagram = NDimLayoutOperations.createDiagram(lattice, "test", new DefaultDimensionStrategy<FCAElement>());
         System.out.println("Diagram layout: " + (System.currentTimeMillis() - startMillis) + " ms");
         
         EventBroker broker = new EventBroker();

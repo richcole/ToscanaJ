@@ -26,7 +26,7 @@ import org.tockit.util.StringTokenizer;
  * backslashes as escapes.
  */
 public class ObjectAttributeListParser {
-    public static ContextImplementation importOALFile(File file) throws FileNotFoundException, DataFormatException {
+    public static ContextImplementation<FCAElement,FCAElement> importOALFile(File file) throws FileNotFoundException, DataFormatException {
         String name = file.getName();
         if(name.endsWith(".oal")) {
             name = name.substring(0, name.length() - 4);
@@ -34,14 +34,14 @@ public class ObjectAttributeListParser {
         return importOALFromReader(new FileReader(file), name);
     }
 
-    public static ContextImplementation importOALFromReader(Reader reader, String name) throws DataFormatException {
+	public static ContextImplementation<FCAElement,FCAElement> importOALFromReader(Reader reader, String name) throws DataFormatException {
         BufferedReader in = new BufferedReader(reader);
         try {
-			ContextImplementation context = new ContextImplementation(name);
+			ContextImplementation<FCAElement,FCAElement> context = new ContextImplementation<FCAElement,FCAElement>(name);
 
-            Collection<Object> objects = context.getObjects();
-            Collection<Object> attributes = context.getAttributes();
-            BinaryRelationImplementation relation = (BinaryRelationImplementation) context.getRelation();
+            Collection<FCAElement> objects = context.getObjects();
+            Collection<FCAElement> attributes = context.getAttributes();
+            BinaryRelationImplementation<FCAElement,FCAElement> relation = context.getRelationImplementation();
             
             String curLine = in.readLine();
             int lineCount = 0;

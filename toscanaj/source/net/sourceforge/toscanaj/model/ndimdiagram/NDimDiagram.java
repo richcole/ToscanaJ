@@ -16,7 +16,7 @@ import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 
-public class NDimDiagram extends SimpleLineDiagram {
+public class NDimDiagram<O,A> extends SimpleLineDiagram<O,A> {
 	/**
 	 * @todo this could be an array
 	 */
@@ -57,8 +57,8 @@ public class NDimDiagram extends SimpleLineDiagram {
     }
 
     @Override
-	protected DiagramNode createNewDiagramNode(Element diagramNode) throws XMLSyntaxError {
-        return new NDimDiagramNode(this, diagramNode);
+	protected DiagramNode<O,A> createNewDiagramNode(Element diagramNode) throws XMLSyntaxError {
+        return new NDimDiagramNode<O,A>(this, diagramNode);
     }
 
 	public Vector<Point2D> getBase() {

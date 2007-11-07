@@ -55,15 +55,15 @@ public class ContextSetups {
         new FCAElementImplementation("hooves")
     };
 
-    public static Context createCompleteAnimalContext() {
-        ContextImplementation context = new ContextImplementation();
+    public static Context<FCAElement,FCAElement> createCompleteAnimalContext() {
+        ContextImplementation<FCAElement,FCAElement> context = new ContextImplementation<FCAElement,FCAElement>();
     
         // taken from Bastian Wormuth's example
     	context.setName("Animals"); 
         context.getObjects().addAll(Arrays.asList(OBJECTS));
         context.getAttributes().addAll(Arrays.asList(ATTRIBUTES));
     
-    	BinaryRelationImplementation relation = context.getRelationImplementation();
+    	BinaryRelationImplementation<FCAElement,FCAElement> relation = context.getRelationImplementation();
     	
         relation.insert(OBJECTS[0], ATTRIBUTES[0]);
         relation.insert(OBJECTS[0], ATTRIBUTES[3]);
@@ -162,8 +162,8 @@ public class ContextSetups {
         
         return context;
     }
-    public static Context createAnimalMovementContext() {
-        ContextImplementation context = new ContextImplementation();
+    public static Context<FCAElement,FCAElement> createAnimalMovementContext() {
+        ContextImplementation<FCAElement,FCAElement> context = new ContextImplementation<FCAElement,FCAElement>();
     
         context.setName("Animal Movement"); 
         context.getObjects().addAll(Arrays.asList(OBJECTS));
@@ -174,7 +174,7 @@ public class ContextSetups {
         attribs.add(ATTRIBUTES[10]);
         context.getAttributes().addAll(attribs);
     
-        BinaryRelationImplementation relation = context.getRelationImplementation();
+        BinaryRelationImplementation<FCAElement,FCAElement> relation = context.getRelationImplementation();
         relation.insert(OBJECTS[0], ATTRIBUTES[7]);
         relation.insert(OBJECTS[2], ATTRIBUTES[7]);
         relation.insert(OBJECTS[2], ATTRIBUTES[10]);
@@ -203,8 +203,8 @@ public class ContextSetups {
         return context;
     }
     
-    public static Context createAnimalSizeContext() {
-        ContextImplementation context = new ContextImplementation();
+    public static Context<FCAElement,FCAElement> createAnimalSizeContext() {
+        ContextImplementation<FCAElement,FCAElement> context = new ContextImplementation<FCAElement,FCAElement>();
     
         context.setName("Animal Sizes"); 
         context.getObjects().addAll(Arrays.asList(OBJECTS));
@@ -214,7 +214,7 @@ public class ContextSetups {
         attribs.add(ATTRIBUTES[2]);
         context.getAttributes().addAll(attribs);
     
-        BinaryRelationImplementation relation = context.getRelationImplementation();
+        BinaryRelationImplementation<FCAElement,FCAElement> relation = context.getRelationImplementation();
         relation.insert(OBJECTS[0], ATTRIBUTES[0]);
         relation.insert(OBJECTS[1], ATTRIBUTES[0]);
         relation.insert(OBJECTS[2], ATTRIBUTES[0]);
