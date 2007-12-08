@@ -38,11 +38,11 @@ public class ExtensionFileFilter extends FileFilter {
 			}
 		}
 		return false;
-	} //accept
+	}
 
 	public String getFileTypeName() {
 		return this.fileTypeName;
-	} //get desc
+	}
 
 	/**
 	 * Returns the extensions.
@@ -64,4 +64,4 @@ public class ExtensionFileFilter extends FileFilter {
 		return retVal;
 	}
 
-} //myfilter
+}
