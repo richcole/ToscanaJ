@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 /**
  * Calls an external program as database viewer. Ideally program called is the program
- * associated with file extention of a file we want to display. For example, if 
+ * associated with file extension of a file we want to display. For example, if 
  * we retrieved location of html file from the database - we want default browser to 
  * display this file, or acrobat reader to be launched for pdf file.
  * 
