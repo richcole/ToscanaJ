@@ -91,7 +91,7 @@ public class DataDump {
             System.err.println("- " + e.getMessage());
             System.exit(2);
         }
-        assert schema != null; // stops Eclipse from whinging -- it doesn't grok System.exit
+        assert schema != null; // stops Eclipse from winging -- it doesn't grok System.exit
         try {
             DatabaseInfo databaseInfo = schema.getDatabaseInfo();
             if(databaseInfo != null) {

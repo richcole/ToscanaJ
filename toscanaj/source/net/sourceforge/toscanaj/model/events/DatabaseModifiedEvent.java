@@ -10,7 +10,7 @@ package net.sourceforge.toscanaj.model.events;
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import org.tockit.events.Event;
 
-public class DatabaseModifiedEvent implements Event {
+public class DatabaseModifiedEvent implements Event<Object> {
 
     private Object source;
 

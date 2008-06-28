@@ -10,7 +10,7 @@ package net.sourceforge.toscanaj.controller.db;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.List;
 
 import org.tockit.events.EventBroker;
 
@@ -30,7 +30,7 @@ public class DumpSqlScript {
             out.println("CREATE TABLE " + Table.getQuotedIdentifier(tableName) + " (");
             Table table = new Table(new EventBroker(), tableName, false);
             
-            Vector<Column> columns = connection.getColumns(table);
+            List<Column> columns = connection.getColumns(table);
             Iterator<Column> columnIt = columns.iterator();
             while (columnIt.hasNext()) {
                 Column column = columnIt.next();

@@ -32,7 +32,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -44,7 +43,7 @@ import java.util.prefs.Preferences;
  * @todo there is some chance for more reuse in the different queries, the logging/querying/exception handling
  *       code could be unified in one method
  */
-public class DatabaseConnection implements EventBrokerListener {
+public class DatabaseConnection implements EventBrokerListener<Object> {
 	private static final String DEFAULT_DATABASE_DRIVER_LOCATION = "dbdrivers";
     private static final Preferences preferences = Preferences.userNodeForPackage(DatabaseConnection.class);
     
@@ -53,7 +52,7 @@ public class DatabaseConnection implements EventBrokerListener {
      * The JDBC database connection we use.
      */
     private Connection jdbcConnection = null;
-    private EventBroker broker;
+    private EventBroker<Object> broker;
 
     static private DatabaseConnection singleton = null;
 
@@ -63,7 +62,7 @@ public class DatabaseConnection implements EventBrokerListener {
 
     private long lastStatementStartTime;
 
-    static public void initialize(EventBroker eventBroker) {
+    static public void initialize(EventBroker<Object> eventBroker) {
         singleton = new DatabaseConnection(eventBroker);
     }
 
@@ -81,13 +80,13 @@ public class DatabaseConnection implements EventBrokerListener {
      *
      * @todo Throw exceptions instead of just printing them.
      */
-    public DatabaseConnection(EventBroker broker, String url, String driver, String account, String password)
+    public DatabaseConnection(EventBroker<Object> broker, String url, String driver, String account, String password)
             throws DatabaseException {
         this.broker = broker;
         connect(url, driver, account, password);
     }
 
-    public DatabaseConnection(EventBroker broker, Connection connection) {
+    public DatabaseConnection(EventBroker<Object> broker, Connection connection) {
         this.broker = broker;
         this.jdbcConnection = connection;
     }
@@ -95,7 +94,7 @@ public class DatabaseConnection implements EventBrokerListener {
     /**
      *  Create a connection that isn't connected.
      */
-    public DatabaseConnection(EventBroker broker) {
+    public DatabaseConnection(EventBroker<Object> broker) {
         this.broker = broker;
         broker.subscribe(this, DatabaseConnectEvent.class, Object.class);
     }
@@ -392,7 +391,7 @@ public class DatabaseConnection implements EventBrokerListener {
     }
 
     /**
-     * Returns a String vector containing all available database names -- nyi.
+     * Returns a list containing all available database names -- nyi.
      *
      * This class is not yet implemented since I still didn't find the right
      * methods to do this. The ODBC function is called SQLDataSources but it
@@ -402,16 +401,16 @@ public class DatabaseConnection implements EventBrokerListener {
      * with JNI -- but this is not a good way since we loose platform
      * independence in doing this.
      */
-    public Vector getDatabaseNames() {
-        return new Vector();
+    public List<String> getDatabaseNames() {
+        return new ArrayList<String>();
     }
 
     /**
-     * Returns a String vector containing the table names for the
+     * Returns a list containing the table names for the
      * current database.
      */
-    public Vector<String> getTableNames() {
-        Vector<String> result = new Vector<String>();
+    public List<String> getTableNames() {
+        List<String> result = new ArrayList<String>();
         final String[] tableTypes = {"TABLE"};
 
         try {
@@ -438,11 +437,11 @@ public class DatabaseConnection implements EventBrokerListener {
     }
 
     /**
-     * Returns a String vector containing the view names for the
+     * Returns a String list containing the view names for the
      * current database.
      */
-    public Vector<String> getViewNames() {
-        Vector<String> result = new Vector<String>();
+    public List<String> getViewNames() {
+        List<String> result = new ArrayList<String>();
         final String[] viewTypes = {"VIEW"};
 
         try {
@@ -473,8 +472,8 @@ public class DatabaseConnection implements EventBrokerListener {
      *
      * The parameter view can be either a table or a view.
      */
-    public Vector<Column> getColumns(Table table) {
-        Vector<Column> result = new Vector<Column>();
+    public List<Column> getColumns(Table table) {
+        List<Column> result = new ArrayList<Column>();
 
         try {
             DatabaseMetaData dmd = this.jdbcConnection.getMetaData();
@@ -507,8 +506,8 @@ public class DatabaseConnection implements EventBrokerListener {
      * 
      * The input parameter can be the name of either a table or a view.
      */
-    public Vector<String> getColumns(String table) {
-        Vector<String> result = new Vector<String>();
+    public List<String> getColumns(String table) {
+        List<String> result = new ArrayList<String>();
 
         try {
             DatabaseMetaData dmd = this.jdbcConnection.getMetaData();
@@ -534,7 +533,7 @@ public class DatabaseConnection implements EventBrokerListener {
     }
 
     /**
-     * Return a String vector containing the contents of the given column.
+     * Returns a list containing the contents of the given column.
      *
      * The parameter view can be either a table or a view.
      *
@@ -542,8 +541,8 @@ public class DatabaseConnection implements EventBrokerListener {
      * SQL types (however you cannot retrieve the new SQL3 datatypes
      * with it)
      */
-    public Vector<String> getColumn(String column, String table) {
-        Vector<String> result = new Vector<String>();
+    public List<String> getColumn(String column, String table) {
+        List<String> result = new ArrayList<String>();
 
         try {
             Statement stmt = this.jdbcConnection.createStatement();
@@ -571,7 +570,7 @@ public class DatabaseConnection implements EventBrokerListener {
         return result;
     }
 
-    public void processEvent(Event e) {
+    public void processEvent(Event<? extends Object> e) {
         if (e instanceof DatabaseConnectEvent) {
             DatabaseConnectEvent event = (DatabaseConnectEvent) e;
             try {
@@ -601,19 +600,19 @@ public class DatabaseConnection implements EventBrokerListener {
             System.exit(1);
         }
 
-        DatabaseConnection test = new DatabaseConnection(new EventBroker(), args[1], args[0], "", "");
+        DatabaseConnection test = new DatabaseConnection(new EventBroker<Object>(), args[1], args[0], "", "");
 
         // print the tables
         System.out.println("The tables:\n-----------");
 
         // get the list of tables
-        Vector<String> tables = test.getTableNames();
+        List<String> tables = test.getTableNames();
 
         // print out each table
         for (int i = 0; i < tables.size(); i++) {
             System.out.println("========== " + tables.get(i) + " ==========");
-            Vector<Column> columns = test.getColumns(
-                    new Table(new EventBroker(), tables.get(i), false)
+            List<Column> columns = test.getColumns(
+                    new Table(new EventBroker<Object>(), tables.get(i), false)
             );
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {
@@ -629,13 +628,13 @@ public class DatabaseConnection implements EventBrokerListener {
         System.out.println("The views:\n-----------");
 
         // get the list of views
-        Vector<String> views = test.getViewNames();
+        List<String> views = test.getViewNames();
 
         // print out each view
         for (int i = 0; i < views.size(); i++) {
             System.out.println("========== " + views.get(i) + " ==========");
-            Vector<Column> columns = test.getColumns(
-                    new Table(new EventBroker(),views.get(i),false)
+            List<Column> columns = test.getColumns(
+                    new Table(new EventBroker<Object>(),views.get(i),false)
             );
             // by printing each column
             for (int j = 0; j < columns.size(); j++) {
