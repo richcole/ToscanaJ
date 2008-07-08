@@ -36,7 +36,7 @@ public class HighlightingOperationEventListener implements EventBrokerListener {
         }
         NodeView nodeView = null;
         try {
-            nodeView = (NodeView) itemEvent.getItem();
+            nodeView = (NodeView) itemEvent.getSubject();
         } catch (final ClassCastException e1) {
             throw new RuntimeException(getClass().getName()
                     + " has to be subscribed to events from NodeViews only");

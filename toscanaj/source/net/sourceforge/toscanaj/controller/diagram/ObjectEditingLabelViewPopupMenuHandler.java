@@ -36,7 +36,7 @@ import org.tockit.events.EventBrokerListener;
  * class - an object in the FCA sense is a String.
  */
 public class ObjectEditingLabelViewPopupMenuHandler implements
-        EventBrokerListener {
+EventBrokerListener {
     private final DiagramView diagramView;
 
     public ObjectEditingLabelViewPopupMenuHandler(final DiagramView diagramView) {
@@ -50,15 +50,15 @@ public class ObjectEditingLabelViewPopupMenuHandler implements
         } catch (final ClassCastException exc) {
             throw new RuntimeException(
                     getClass().getName()
-                            + " has to be subscribed to CanvasItemEventWithPositions only");
+                    + " has to be subscribed to CanvasItemEventWithPositions only");
         }
         ObjectLabelView labelView = null;
         try {
-            labelView = (ObjectLabelView) itemEvent.getItem();
+            labelView = (ObjectLabelView) itemEvent.getSubject();
         } catch (final ClassCastException exc) {
             throw new RuntimeException(
                     getClass().getName()
-                            + " has to be subscribed to events from ObjectLabelViews only");
+                    + " has to be subscribed to events from ObjectLabelViews only");
         }
         openPopupMenu(labelView, itemEvent.getCanvasPosition(), itemEvent
                 .getAWTPosition());
@@ -79,7 +79,7 @@ public class ObjectEditingLabelViewPopupMenuHandler implements
 
         if (labelView.getQuery() instanceof ListQuery) {
             final FCAElement object = labelView
-                    .getObjectAtPosition(canvasPosition);
+            .getObjectAtPosition(canvasPosition);
             final String currentValue = object.toString();
 
             final JMenuItem renameObjectMenuItem = new JMenuItem(
@@ -88,12 +88,12 @@ public class ObjectEditingLabelViewPopupMenuHandler implements
                 public void actionPerformed(final ActionEvent event) {
                     final InputTextDialog dialog = new InputTextDialog(
                             JOptionPane
-                                    .getFrameForComponent(ObjectEditingLabelViewPopupMenuHandler.this.diagramView),
+                            .getFrameForComponent(ObjectEditingLabelViewPopupMenuHandler.this.diagramView),
                             "Rename Object", "object", currentValue);
                     if (!dialog.isCancelled()) {
                         final String newValue = dialog.getInput();
                         final ConceptImplementation concept = (ConceptImplementation) labelView
-                                .getNodeView().getDiagramNode().getConcept();
+                        .getNodeView().getDiagramNode().getConcept();
                         final WritableFCAElement newObject = new FCAElementImplementation(
                                 newValue);
                         concept.replaceObject(object, newObject);

@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.gui;
 
-/** 
+/**
  * @todo this class is too big in many senses, most noticably in the fact that it knows about
  * way too much stuff
  */
@@ -162,12 +162,12 @@ import org.tockit.swing.preferences.ExtendedPreferences;
  *       dirty.
  */
 public class SienaMainPanel extends JFrame implements MainPanel,
-        EventBrokerListener {
+EventBrokerListener {
     private static final String WINDOW_TITLE = "Siena";
     private static final int MaxMruFiles = 8;
 
     private static final ExtendedPreferences preferences = ExtendedPreferences
-            .userNodeForClass(SienaMainPanel.class);
+    .userNodeForClass(SienaMainPanel.class);
 
     /**
      * Main Controllers
@@ -251,6 +251,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
                 new Rectangle(10, 10, 900, 700));
 
         this.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(final WindowEvent e) {
                 closeMainPanel();
             }
@@ -301,26 +302,26 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         this.diagramEditingView.addAccessory(this.temporalControlsLabel);
         this.diagramEditingView.addAccessory(this.temporalControls);
         this.diagramEditingView
-                .setExtraContextMenuActions(new DiagramEditingView.DiagramAction[] { new DiagramEditingView.DiagramAction() {
-                    public void actionPerformed(final ActionEvent e,
-                            final Diagram2D diagram) {
-                        insertDiagramIntoView(diagram, true);
-                    }
+        .setExtraContextMenuActions(new DiagramEditingView.DiagramAction[] { new DiagramEditingView.DiagramAction() {
+            public void actionPerformed(final ActionEvent e,
+                    final Diagram2D diagram) {
+                insertDiagramIntoView(diagram, true);
+            }
 
-                    public Object getLabel() {
-                        return "Nest diagram";
-                    }
+            public Object getLabel() {
+                return "Nest diagram";
+            }
 
-                    public boolean isEnabled() {
-                        return SienaMainPanel.this.diagramEditingView
-                                .getDiagramView().getDiagram() != null;
-                    }
-                } });
+            public boolean isEnabled() {
+                return SienaMainPanel.this.diagramEditingView
+                .getDiagramView().getDiagram() != null;
+            }
+        } });
         this.diagramEditingView.getDiagramView().getController()
-                .getEventBroker().subscribe(this,
-                        DisplayedDiagramChangedEvent.class, Object.class);
+        .getEventBroker().subscribe(this,
+                DisplayedDiagramChangedEvent.class, Object.class);
         final DiagramView diagramView = this.diagramEditingView
-                .getDiagramView();
+        .getDiagramView();
         diagramView.getController().getEventBroker().subscribe(
                 new ObjectEditingLabelViewPopupMenuHandler(diagramView),
                 CanvasItemContextMenuRequestEvent.class,
@@ -333,7 +334,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
             final Diagram2D<FCAElement, FCAElement> diagram,
             final boolean nestDiagram) {
         Diagram2D oldDiagram = this.diagramEditingView.getDiagramView()
-                .getDiagram();
+        .getDiagram();
         Diagram2D newDiagram = diagram;
         final DiagramHistory diagramHistory = new DiagramHistory();
 
@@ -341,13 +342,13 @@ public class SienaMainPanel extends JFrame implements MainPanel,
             // before nesting make sure apposition is ok by synchronizing object
             // sets to their join
             final Iterator oldObjectSetIterator = oldDiagram.getTopConcept()
-                    .getExtentIterator();
+            .getExtentIterator();
             final Set oldObjects = new HashSet();
             while (oldObjectSetIterator.hasNext()) {
                 oldObjects.add(oldObjectSetIterator.next());
             }
             final Iterator<FCAElement> newObjectSetIterator = diagram
-                    .getTopConcept().getExtentIterator();
+            .getTopConcept().getExtentIterator();
             while (newObjectSetIterator.hasNext()) {
                 final FCAElement object = newObjectSetIterator.next();
                 if (oldObjects.contains(object)) {
@@ -365,7 +366,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
                     // first place
                     if (oldDiagram.getTopConcept().getIntentSize() == 0) {
                         ((ConceptImplementation) oldDiagram.getTopConcept())
-                                .addObject(object);
+                        .addObject(object);
                     } else {
                         oldDiagram = extendDiagram(oldDiagram, object);
                     }
@@ -378,16 +379,16 @@ public class SienaMainPanel extends JFrame implements MainPanel,
             // the top node, else
             // we have to create a new diagram
             for (final Iterator<FCAElement> iter = oldObjects.iterator(); iter
-                    .hasNext();) {
+            .hasNext();) {
                 if (newDiagram.getTopConcept().getIntentSize() == 0) {
                     ((ConceptImplementation) newDiagram.getTopConcept())
-                            .addObject(iter.next());
+                    .addObject(iter.next());
                 } else {
                     newDiagram = extendDiagram(newDiagram, iter.next());
                 }
             }
             assert oldDiagram.getTopConcept().getExtentSize() == diagram
-                    .getTopConcept().getExtentSize();
+            .getTopConcept().getExtentSize();
             // nest the results
             newDiagram = new NestedLineDiagram(oldDiagram, newDiagram);
             diagramHistory.addDiagram(oldDiagram);
@@ -401,13 +402,13 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         final ConceptInterpretationContext context = new ConceptInterpretationContext(
                 diagramHistory, new EventBroker());
         this.diagramEditingView.getDiagramView()
-                .setConceptInterpretationContext(context);
+        .setConceptInterpretationContext(context);
     }
 
     private Diagram2D extendDiagram(final Diagram2D oldDiagram,
             final Object newObject) {
         final ContextImplementation context = (ContextImplementation) DiagramToContextConverter
-                .getContext(oldDiagram);
+        .getContext(oldDiagram);
         context.getObjects().add(newObject);
         final LatticeGenerator lgen = new GantersAlgorithm();
         return NDimLayoutOperations.createDiagram(lgen.createLattice(context),
@@ -427,9 +428,9 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         final JScrollPane scrollPane = new JScrollPane(this.tableView);
         scrollPane.setRowHeaderView(this.rowHeader);
         scrollPane
-                .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        .setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         scrollPane
-                .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        .setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         final JTableHeader corner = this.rowHeader.getTableHeader();
         corner.setReorderingAllowed(false);
@@ -448,9 +449,9 @@ public class SienaMainPanel extends JFrame implements MainPanel,
     private void editObject(final int row) {
         final Frame tFrame = JOptionPane.getFrameForComponent(this.tableView);
         final List objectList = this.conceptualSchema.getManyValuedContext()
-                .getObjects();
+        .getObjects();
         final WritableFCAElement object = (WritableFCAElement) objectList
-                .get(row);
+        .get(row);
         new ObjectDialog(tFrame, object);
         this.conceptualSchema.getManyValuedContext().update();
         this.tableView.updateModel();
@@ -460,9 +461,9 @@ public class SienaMainPanel extends JFrame implements MainPanel,
     private void editAttribute(final int column) {
         final Frame tFrame = JOptionPane.getFrameForComponent(this.tableView);
         final List<ManyValuedAttribute> manyValuedAttributeList = this.conceptualSchema
-                .getManyValuedContext().getAttributes();
+        .getManyValuedContext().getAttributes();
         final WritableManyValuedAttribute attribute = (WritableManyValuedAttribute) manyValuedAttributeList
-                .get(column);
+        .get(column);
         new ManyValuedAttributeDialog(tFrame, attribute, this.conceptualSchema
                 .getManyValuedContext());
         this.conceptualSchema.getManyValuedContext().update();
@@ -475,7 +476,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         addObjectButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 final WritableManyValuedContext manyValuedContext = SienaMainPanel.this.conceptualSchema
-                        .getManyValuedContext();
+                .getManyValuedContext();
                 manyValuedContext.add(new FCAElementImplementation(""));
                 editObject(manyValuedContext.getObjects().size() - 1);
             }
@@ -485,7 +486,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         addAttributeButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 final WritableManyValuedContext manyValuedContext = SienaMainPanel.this.conceptualSchema
-                        .getManyValuedContext();
+                .getManyValuedContext();
                 Datatype firstType;
                 if (manyValuedContext.getTypes().isEmpty()) {
                     firstType = null;
@@ -538,18 +539,18 @@ public class SienaMainPanel extends JFrame implements MainPanel,
                 updateWindowTitle();
                 setDefaultManyValuedContext();
                 SienaMainPanel.this.rowHeader
-                        .setManyValuedContext(SienaMainPanel.this.conceptualSchema
-                                .getManyValuedContext());
+                .setManyValuedContext(SienaMainPanel.this.conceptualSchema
+                        .getManyValuedContext());
                 SienaMainPanel.this.tableView
-                        .setManyValuedContext(SienaMainPanel.this.conceptualSchema
-                                .getManyValuedContext());
+                .setManyValuedContext(SienaMainPanel.this.conceptualSchema
+                        .getManyValuedContext());
                 SienaMainPanel.this.conceptualSchema.dataSaved();
                 return true;
             }
         });
         final SimpleAction newAction = new SimpleAction(this,
                 newSchemaActivity, "New", KeyEvent.VK_N, KeyStroke
-                        .getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+                .getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
 
         final JMenuItem newMenuItem = new JMenuItem("New");
         newMenuItem.setMnemonic(KeyEvent.VK_N);
@@ -562,16 +563,16 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         loadSchemaActivity.setTestOpenOkActivity(testSchemaSavedActivity);
         final OpenFileAction openFileAction = new OpenFileAction(this,
                 loadSchemaActivity, this.currentFile, KeyEvent.VK_O, KeyStroke
-                        .getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+                .getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         openFileAction.addPostOpenActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
                 updateWindowTitle();
                 SienaMainPanel.this.rowHeader
-                        .setManyValuedContext(SienaMainPanel.this.conceptualSchema
-                                .getManyValuedContext());
+                .setManyValuedContext(SienaMainPanel.this.conceptualSchema
+                        .getManyValuedContext());
                 SienaMainPanel.this.tableView
-                        .setManyValuedContext(SienaMainPanel.this.conceptualSchema
-                                .getManyValuedContext());
+                .setManyValuedContext(SienaMainPanel.this.conceptualSchema
+                        .getManyValuedContext());
                 return true;
             }
         });
@@ -619,7 +620,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         this.fileMenu.addSeparator();
 
         final JMenuItem importCernatoXMLItem = new JMenuItem(
-                "Import Cernato XML...");
+        "Import Cernato XML...");
         importCernatoXMLItem.setMnemonic(KeyEvent.VK_C);
         importCernatoXMLItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -627,14 +628,14 @@ public class SienaMainPanel extends JFrame implements MainPanel,
                     importCernatoXML();
                 } catch (final IOException e1) {
                     ErrorDialog.showError(SienaMainPanel.this, e1,
-                            "Cernato XML import failed");
+                    "Cernato XML import failed");
                 }
             }
         });
         this.fileMenu.add(importCernatoXMLItem);
 
         final JMenuItem importBurmeisterItem = new JMenuItem(
-                "Import Burmeister Format...");
+        "Import Burmeister Format...");
         importBurmeisterItem.setMnemonic(KeyEvent.VK_B);
         importBurmeisterItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -644,7 +645,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         this.fileMenu.add(importBurmeisterItem);
 
         final JMenuItem importOALItem = new JMenuItem(
-                "Import Object Attribute List...");
+        "Import Object Attribute List...");
         importOALItem.setMnemonic(KeyEvent.VK_A);
         importOALItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -670,8 +671,8 @@ public class SienaMainPanel extends JFrame implements MainPanel,
             final Frame frame = JOptionPane.getFrameForComponent(this);
             this.exportDiagramAction = new ExportDiagramAction(frame,
                     this.diagramExportSettings, this.diagramEditingView
-                            .getDiagramView(), KeyEvent.VK_E, KeyStroke
-                            .getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+                    .getDiagramView(), KeyEvent.VK_E, KeyStroke
+                    .getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
             this.fileMenu.add(this.exportDiagramAction);
             this.exportDiagramAction.setEnabled(false);
             this.fileMenu.addSeparator();
@@ -695,7 +696,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         this.printSetupMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 SienaMainPanel.this.pageFormat = PrinterJob.getPrinterJob()
-                        .pageDialog(SienaMainPanel.this.pageFormat);
+                .pageDialog(SienaMainPanel.this.pageFormat);
                 printDiagram();
             }
         });
@@ -713,7 +714,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         this.fileMenu.add(exitMenuItem);
 
         final DiagramView diagramView = this.diagramEditingView
-                .getDiagramView();
+        .getDiagramView();
 
         final JMenu editMenu = new JMenu("Edit");
         editMenu.setMnemonic(KeyEvent.VK_E);
@@ -726,7 +727,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
 
         final ButtonGroup documentsDisplayGroup = new ButtonGroup();
         this.showExactMenuItem = new JRadioButtonMenuItem(
-                "Show only exact matches");
+        "Show only exact matches");
         this.showExactMenuItem.setMnemonic(KeyEvent.VK_X);
         this.showExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_S, ActionEvent.CTRL_MASK));
@@ -734,7 +735,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         this.showExactMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 SienaMainPanel.this.diagramEditingView.getDiagramView()
-                        .setDisplayType(true);
+                .setDisplayType(true);
             }
         });
         documentsDisplayGroup.add(this.showExactMenuItem);
@@ -747,7 +748,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         this.showAllMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 SienaMainPanel.this.diagramEditingView.getDiagramView()
-                        .setDisplayType(false);
+                .setDisplayType(false);
             }
         });
         documentsDisplayGroup.add(this.showAllMenuItem);
@@ -770,7 +771,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         viewMenu.add(showAttributeLabels);
 
         final JCheckBoxMenuItem showObjectLabels = new JCheckBoxMenuItem(
-                "Show Object Labels");
+        "Show Object Labels");
         showObjectLabels.setMnemonic(KeyEvent.VK_O);
         showObjectLabels.setSelected(true);
         showObjectLabels.addActionListener(new ActionListener() {
@@ -832,7 +833,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         final ButtonGroup colorModeGroup = new ButtonGroup();
 
         final Collection<DiagramSchema> colorSchemas = DiagramSchema
-                .getSchemas();
+        .getSchemas();
         for (final DiagramSchema schema : colorSchemas) {
             final JRadioButtonMenuItem colorSchemaItem = new JRadioButtonMenuItem(
                     schema.getName());
@@ -840,7 +841,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
                 public void actionPerformed(final ActionEvent e) {
                     schema.setAsCurrent();
                     SienaMainPanel.this.diagramEditingView.getDiagramView()
-                            .setDiagramSchema(schema);
+                    .setDiagramSchema(schema);
                 }
             });
             if (schema == DiagramSchema.getCurrentSchema()) {
@@ -861,7 +862,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         showTemporalControls.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 final boolean newState = !SienaMainPanel.this.temporalControls
-                        .isVisible();
+                .isVisible();
                 SienaMainPanel.this.temporalControlsLabel.setVisible(newState);
                 SienaMainPanel.this.temporalControls.setVisible(newState);
             }
@@ -897,7 +898,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 SienaMainPanel.this.diagramEditingView.getDiagramView()
-                        .setQuery(query);
+                .setQuery(query);
             }
         });
         if (labelContentGroup.getSelection() == null) {
@@ -966,7 +967,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         for (final Iterator it = types.iterator(); it.hasNext();) {
             final PropertyType cernatoType = (PropertyType) it.next();
             final org.tockit.cernatoXML.model.Value[] valueRange = cernatoType
-                    .getValueRange();
+            .getValueRange();
 
             Datatype targetType;
             if (cernatoType instanceof NumericalType) {
@@ -1019,14 +1020,14 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         for (final Iterator objIt = objects.iterator(); objIt.hasNext();) {
             final CernatoObject cernatoObject = (CernatoObject) objIt.next();
             for (final Iterator propIt = properties.iterator(); propIt
-                    .hasNext();) {
+            .hasNext();) {
                 final Property property = (Property) propIt.next();
                 final org.tockit.cernatoXML.model.Value value = cernatoContext
-                        .getRelationship(cernatoObject, property);
+                .getRelationship(cernatoObject, property);
 
                 final FCAElement targetObject = objectMap.get(cernatoObject);
                 final ManyValuedAttribute attribute = attributeMap
-                        .get(property);
+                .get(property);
                 if (value instanceof NumericalValue) {
                     final NumericalValue numValue = (NumericalValue) value;
                     result.setRelationship(targetObject, attribute,
@@ -1038,9 +1039,9 @@ public class SienaMainPanel extends JFrame implements MainPanel,
                 } else if (value != null) {
                     throw new RuntimeException(
                             "Unknown Cernato value for relationship between "
-                                    + "object '" + cernatoObject.getName()
-                                    + "' and " + "property '"
-                                    + property.getName() + "'");
+                            + "object '" + cernatoObject.getName()
+                            + "' and " + "property '"
+                            + property.getName() + "'");
                 }
             }
         }
@@ -1058,10 +1059,10 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         openDialog.setMultiSelectionEnabled(true);
         // create the options panel to be used in the file chooser
         final JRadioButton keepSchemaButton = new JRadioButton(
-                "Extend existing schema");
+        "Extend existing schema");
         keepSchemaButton.setSelected(true);
         final JRadioButton newSchemaButton = new JRadioButton(
-                "Create new schema");
+        "Create new schema");
         final ButtonGroup schemaOptionGroup = new ButtonGroup();
         schemaOptionGroup.add(keepSchemaButton);
         schemaOptionGroup.add(newSchemaButton);
@@ -1122,10 +1123,10 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         openDialog.setMultiSelectionEnabled(true);
         // create the options panel to be used in the file chooser
         final JRadioButton keepSchemaButton = new JRadioButton(
-                "Extend existing schema");
+        "Extend existing schema");
         keepSchemaButton.setSelected(true);
         final JRadioButton newSchemaButton = new JRadioButton(
-                "Create new schema");
+        "Create new schema");
         final ButtonGroup schemaOptionGroup = new ButtonGroup();
         schemaOptionGroup.add(keepSchemaButton);
         schemaOptionGroup.add(newSchemaButton);
@@ -1209,7 +1210,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
             return;
         } catch (final Error e) {
             ErrorDialog.showError(this, e, "Could not parse file",
-                    "Could not parse CSC file");
+            "Could not parse CSC file");
             return;
         }
     }
@@ -1223,7 +1224,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
                     .getContext(), view);
             final Context mappedContext = new ContextImplementation();
             final BinaryRelationImplementation mappedRelation = (BinaryRelationImplementation) mappedContext
-                    .getRelation();
+            .getRelation();
             final Map<CernatoObject, FCAElement> objectMap = new Hashtable<CernatoObject, FCAElement>();
             for (final Object element : viewContext.getObjects()) {
                 final CernatoObject object = (CernatoObject) element;
@@ -1288,11 +1289,11 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         }
         if (this.lastOALFile != null) {
             preferences
-                    .put("lastOALImport", this.lastOALFile.getAbsolutePath());
+            .put("lastOALImport", this.lastOALFile.getAbsolutePath());
         }
         if (this.lastCSCFile != null) {
             preferences
-                    .put("lastCSCImport", this.lastCSCFile.getAbsolutePath());
+            .put("lastCSCImport", this.lastCSCFile.getAbsolutePath());
         }
         preferences.putBoolean("temporalControlsEnabled", this.temporalControls
                 .isVisible());
@@ -1313,7 +1314,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
             final ConceptualSchemaLoadedEvent loadEvent = (ConceptualSchemaLoadedEvent) e;
             if (this.conceptualSchema.getManyValuedContext() == null) {
                 this.conceptualSchema
-                        .setManyValuedContext(createManyValuedContextFromDiagrams());
+                .setManyValuedContext(createManyValuedContextFromDiagrams());
             }
             this.rowHeader.setManyValuedContext(this.conceptualSchema
                     .getManyValuedContext());
@@ -1353,7 +1354,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         // will be used to check if we have at least one entry
         if (this.mruList.size() > 0) {
             final ListIterator<String> it = this.mruList
-                    .listIterator(this.mruList.size());
+            .listIterator(this.mruList.size());
             while (it.hasPrevious()) {
                 final String cur = it.previous();
                 if (this.currentFile != null
@@ -1409,7 +1410,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
                 .getDiagramsIterator(); iter.hasNext();) {
             final Diagram2D diagram = iter.next();
             final Context svContext = DiagramToContextConverter
-                    .getContext(diagram);
+            .getContext(diagram);
             final BinaryRelation relation = svContext.getRelation();
             final HashMap<FCAElement, ManyValuedAttribute> attributeMap = new HashMap<FCAElement, ManyValuedAttribute>();
             for (final Iterator<Object> attrIt = svContext.getAttributes()
@@ -1472,11 +1473,11 @@ public class SienaMainPanel extends JFrame implements MainPanel,
         // 2 : Go back (cancel save/open/close operation)
         final Object[] options = { "Save", "Discard", "Go back" };
         return JOptionPane
-                .showOptionDialog(
-                        this,
-                        "The conceptual schema has been modified. Do you want to save the changes?",
-                        "Schema changed", JOptionPane.YES_NO_CANCEL_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+        .showOptionDialog(
+                this,
+                "The conceptual schema has been modified. Do you want to save the changes?",
+                "Schema changed", JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.WARNING_MESSAGE, null, options, options[2]);
     }
 
     private void saveFile() {
@@ -1505,7 +1506,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
             final Diagram2D diagram = diagIt.next();
             final Concept concept = diagram.getTopConcept();
             for (final Iterator concIt = concept.getExtentIterator(); concIt
-                    .hasNext();) {
+            .hasNext();) {
                 final Object object = concIt.next();
                 allObjects.add(object);
             }
@@ -1516,14 +1517,14 @@ public class SienaMainPanel extends JFrame implements MainPanel,
             final NDimDiagram diagram = (NDimDiagram) diagIt.next();
 
             ConceptImplementation concept = (ConceptImplementation) diagram
-                    .getTopConcept();
+            .getTopConcept();
             if (concept.getExtentSize() == allObjects.size()) {
                 continue;
             }
 
             final Set<Object> difference = new HashSet<Object>(allObjects);
             for (final Iterator<FCAElement> extIt = concept.getExtentIterator(); extIt
-                    .hasNext();) {
+            .hasNext();) {
                 final Object object = extIt.next();
                 difference.remove(object);
             }
@@ -1532,7 +1533,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
                 final DiagramNode topNode = diagram.getNodeForConcept(concept);
                 concept = new ConceptImplementation();
                 final ConceptImplementation oldTopConcept = (ConceptImplementation) topNode
-                        .getConcept();
+                .getConcept();
                 concept.addSubConcept(oldTopConcept);
                 oldTopConcept.addSuperConcept(concept);
                 concept.buildClosures();
@@ -1545,9 +1546,9 @@ public class SienaMainPanel extends JFrame implements MainPanel,
                         concept, null, new LabelInfo(), null);
 
                 for (final Iterator<DiagramNode> nodeIt = diagram.getNodes(); nodeIt
-                        .hasNext();) {
+                .hasNext();) {
                     final NDimDiagramNode node = (NDimDiagramNode) nodeIt
-                            .next();
+                    .next();
                     final double[] newPos = new double[node.getNdimVector().length + 1];
                     for (int i = 0; i < node.getNdimVector().length; i++) {
                         newPos[i] = node.getNdimVector()[i];
@@ -1555,7 +1556,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
                     newPos[newPos.length - 1] = 1;
                     node.setNdimVector(newPos);
                     final ConceptImplementation curConcept = (ConceptImplementation) node
-                            .getConcept();
+                    .getConcept();
                     curConcept.buildClosures();
                 }
 
@@ -1569,7 +1570,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
             }
         }
         final DiagramView diagramView = this.diagramEditingView
-                .getDiagramView();
+        .getDiagramView();
         diagramView.showDiagram(diagramView.getDiagram());
     }
 
@@ -1577,7 +1578,7 @@ public class SienaMainPanel extends JFrame implements MainPanel,
             final WritableManyValuedAttribute attribute,
             final WritableFCAElement obj) {
         final WritableManyValuedContext context = this.conceptualSchema
-                .getManyValuedContext();
+        .getManyValuedContext();
         final Value relationship = context.getRelationship(obj, attribute);
         String content;
         if (relationship != null) {

@@ -55,15 +55,15 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                            + " has to be subscribed to CanvasItemEventWithPositions only");
+                    + " has to be subscribed to CanvasItemEventWithPositions only");
         }
         ObjectLabelView labelView = null;
         try {
-            labelView = (ObjectLabelView) itemEvent.getItem();
+            labelView = (ObjectLabelView) itemEvent.getSubject();
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                            + " has to be subscribed to events from ObjectLabelViews only");
+                    + " has to be subscribed to events from ObjectLabelViews only");
         }
         openPopupMenu(labelView, itemEvent.getCanvasPosition(), itemEvent
                 .getAWTPosition());
@@ -87,9 +87,9 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
         if (object instanceof DatabaseRetrievedObject) {
             final DatabaseRetrievedObject dbObject = (DatabaseRetrievedObject) object;
             objectViewNames = DatabaseViewerManager
-                    .getObjectViewNames(dbObject);
+            .getObjectViewNames(dbObject);
             objectListViewNames = DatabaseViewerManager
-                    .getObjectListViewNames();
+            .getObjectListViewNames();
         }
 
         if (numberOfQueries + numberOfViews == 0) { // nothing to display
@@ -102,9 +102,9 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
         }
         if (object instanceof DatabaseRetrievedObject) {
             assert objectViewNames != null; // should be initialized in
-                                            // equivalent if above
+            // equivalent if above
             assert objectListViewNames != null; // should be initialized in
-                                                // equivalent if above
+            // equivalent if above
             final DatabaseRetrievedObject dbObject = (DatabaseRetrievedObject) object;
             if (objectViewNames.size() != 0) {
                 addObjectViewOptions(objectViewNames, dbObject, popupMenu);
@@ -134,10 +134,10 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
                                 objectListViewName, object);
                     } catch (final Throwable t) {
                         ErrorDialog
-                                .showError(
-                                        ObjectLabelViewPopupMenuHandler.this.diagramView,
-                                        t, "Database View Failed",
-                                        "Opening the database view failed.");
+                        .showError(
+                                ObjectLabelViewPopupMenuHandler.this.diagramView,
+                                t, "Database View Failed",
+                        "Opening the database view failed.");
                     }
                 }
             });
@@ -158,13 +158,13 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
                 public void actionPerformed(final ActionEvent e) {
                     try {
                         DatabaseViewerManager
-                                .showObject(objectViewName, object);
+                        .showObject(objectViewName, object);
                     } catch (final Throwable t) {
                         ErrorDialog
-                                .showError(
-                                        ObjectLabelViewPopupMenuHandler.this.diagramView,
-                                        t, "Database View Failed",
-                                        "Opening the database view failed.");
+                        .showError(
+                                ObjectLabelViewPopupMenuHandler.this.diagramView,
+                                t, "Database View Failed",
+                        "Opening the database view failed.");
                     }
                 }
             });

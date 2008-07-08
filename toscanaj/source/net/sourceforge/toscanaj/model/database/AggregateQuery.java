@@ -63,12 +63,13 @@ public class AggregateQuery extends Query {
             final String whereClause, final String[] values,
             final String[] referenceValues) {
         assert referenceValues == null
-                || values.length == referenceValues.length : "We must have the same number of reference values as values if reference values are used.";
+        || values.length == referenceValues.length : "We must have the same number of reference values as values if reference values are used.";
         if (values[0].equals("0")) {
             return null;
         }
         Object[] valuesToUse;
         if (this.doesNeedReferenceValues()) {
+            assert referenceValues != null : "Missing reference values for query that requires them";
             // /@todo this is all a bit brute force -> be smarter
             valuesToUse = new Object[values.length];
 

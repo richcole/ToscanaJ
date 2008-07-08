@@ -14,8 +14,8 @@ import net.sourceforge.toscanaj.model.ConceptualSchema;
 public class ConceptualSchemaLoadedEvent extends NewConceptualSchemaEvent {
     private final File file;
 
-    public ConceptualSchemaLoadedEvent(final Object source,
-            final ConceptualSchema schema, final File file) {
+    public ConceptualSchemaLoadedEvent(final ConceptualSchema schema,
+            final File file) {
         super(schema);
         this.file = file;
     }

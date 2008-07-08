@@ -33,15 +33,15 @@ public class ObjectLabelViewOpenDisplayHandler implements EventBrokerListener {
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                            + " has to be subscribed to CanvasItemEventWithPositions only");
+                    + " has to be subscribed to CanvasItemEventWithPositions only");
         }
         ObjectLabelView labelView = null;
         try {
-            labelView = (ObjectLabelView) itemEvent.getItem();
+            labelView = (ObjectLabelView) itemEvent.getSubject();
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                            + " has to be subscribed to events from ObjectLabelViews only");
+                    + " has to be subscribed to events from ObjectLabelViews only");
         }
         final Object object = labelView.getObjectAtPosition(itemEvent
                 .getCanvasPosition());
@@ -49,17 +49,17 @@ public class ObjectLabelViewOpenDisplayHandler implements EventBrokerListener {
             return;
         }
         final DatabaseRetrievedObject dbObject = (DatabaseRetrievedObject) labelView
-                .getObjectAtPosition(itemEvent.getCanvasPosition());
+        .getObjectAtPosition(itemEvent.getCanvasPosition());
         try {
             showObject(dbObject);
         } catch (final DatabaseViewerException exc) {
             ErrorDialog.showError(null, exc, "Failed to open view",
-                    "The object view requested can not be shown.");
+            "The object view requested can not be shown.");
         }
     }
 
     public void showObject(final DatabaseRetrievedObject object)
-            throws DatabaseViewerException {
+    throws DatabaseViewerException {
         if (object == null) {
             return;
         }

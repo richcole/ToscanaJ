@@ -119,13 +119,13 @@ import org.tockit.swing.preferences.ExtendedPreferences;
  *       management
  */
 public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
-        ClipboardOwner {
+ClipboardOwner {
     private ItemMovementManipulator legendMoveManipulator;
 
     private static final String WINDOW_TITLE = "ToscanaJ";
 
     private static final ExtendedPreferences preferences = ExtendedPreferences
-            .userNodeForClass(ToscanaJMainPanel.class);
+    .userNodeForClass(ToscanaJMainPanel.class);
 
     /**
      * The central event broker for the main panel
@@ -304,7 +304,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
         final DiagramController controller = DiagramController.getController();
         // / @todo move the subscriptions into the handlers
         final EventBroker diagramEventBroker = this.diagramView.getController()
-                .getEventBroker();
+        .getEventBroker();
         new FilterOperationEventListener(controller, diagramEventBroker);
         new HighlightingOperationEventListener(this.diagramView,
                 diagramEventBroker);
@@ -336,10 +336,10 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
             preferences.putBoolean("showDiagramPreview", true);
             this.diagramPreview = new DiagramView();
             this.diagramPreview
-                    .setConceptInterpreter(new DirectConceptInterpreter());
+            .setConceptInterpreter(new DirectConceptInterpreter());
             this.diagramPreview
-                    .setConceptInterpretationContext(new ConceptInterpretationContext(
-                            new DiagramHistory(), new EventBroker()));
+            .setConceptInterpretationContext(new ConceptInterpretationContext(
+                    new DiagramHistory(), new EventBroker()));
             this.diagramPreview.setObjectLabelFactory(null);
             this.diagramPreview.setMinimumFontSize(8.0);
             this.diagramPreview.setMinimumSize(minimumSize);
@@ -359,31 +359,31 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
                         } catch (final ClassCastException e1) {
                             throw new RuntimeException(
                                     getClass().getName()
-                                            + " has to be subscribed to CanvasItemEvents only");
+                                    + " has to be subscribed to CanvasItemEvents only");
                         }
                         NodeView nodeView = null;
                         try {
-                            nodeView = (NodeView) itemEvent.getItem();
+                            nodeView = (NodeView) itemEvent.getSubject();
                         } catch (final ClassCastException e1) {
                             throw new RuntimeException(
                                     getClass().getName()
-                                            + " has to be subscribed to events from NodeViews only");
+                                    + " has to be subscribed to events from NodeViews only");
                         }
                         ToscanaJMainPanel.this.diagramPreview
-                                .setSelectedConcepts(nodeView.getDiagramNode()
-                                        .getConceptNestingList());
+                        .setSelectedConcepts(nodeView.getDiagramNode()
+                                .getConceptNestingList());
                         this.diagramReference.setFilterConcept(nodeView
                                 .getDiagramNode().getConcept());
                         // / @todo evil hack, creates weird dependencies
                         if (ToscanaJMainPanel.this.diagramView
                                 .getConceptInterpreter() instanceof DatabaseConnectedConceptInterpreter) {
                             final DatabaseConnectedConceptInterpreter dbint = (DatabaseConnectedConceptInterpreter) ToscanaJMainPanel.this.diagramView
-                                    .getConceptInterpreter();
+                            .getConceptInterpreter();
                             dbint.clearCache();
                         }
                         ToscanaJMainPanel.this.diagramView
-                                .showDiagram(ToscanaJMainPanel.this.diagramView
-                                        .getDiagram());
+                        .showDiagram(ToscanaJMainPanel.this.diagramView
+                                .getDiagram());
                     }
                 }
 
@@ -391,20 +391,20 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
 
                 public void processEvent(final Event e) {
                     final DiagramReference diagramReference = ((DiagramClickedEvent) e)
-                            .getDiagramReference();
+                    .getDiagramReference();
                     ToscanaJMainPanel.this.diagramPreview
-                            .showDiagram(diagramReference.getDiagram());
+                    .showDiagram(diagramReference.getDiagram());
                     final Concept zoomedConcept = diagramReference
-                            .getFilterConcept();
+                    .getFilterConcept();
                     final EventBroker canvasBroker = ToscanaJMainPanel.this.diagramPreview
-                            .getController().getEventBroker();
+                    .getController().getEventBroker();
                     if (this.selectionListener != null) {
                         canvasBroker
-                                .removeSubscriptions(this.selectionListener);
+                        .removeSubscriptions(this.selectionListener);
                     }
                     if (zoomedConcept != null) {
                         ToscanaJMainPanel.this.diagramPreview
-                                .setSelectedConcepts(new Concept[] { zoomedConcept });
+                        .setSelectedConcepts(new Concept[] { zoomedConcept });
                         this.selectionListener = new FilterChangeHandler(
                                 diagramReference);
                         canvasBroker.subscribe(this.selectionListener,
@@ -524,7 +524,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
         this.printSetupMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 ToscanaJMainPanel.this.pageFormat = PrinterJob.getPrinterJob()
-                        .pageDialog(ToscanaJMainPanel.this.pageFormat);
+                .pageDialog(ToscanaJMainPanel.this.pageFormat);
                 printDiagram();
             }
         });
@@ -563,14 +563,14 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
         // menu radio buttons group:
         final ButtonGroup documentsFilterGroup = new ButtonGroup();
         this.filterExactMenuItem = new JRadioButtonMenuItem(
-                "Filter: use only exact matches");
+        "Filter: use only exact matches");
         this.filterExactMenuItem.setMnemonic(KeyEvent.VK_X);
         this.filterExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_F, ActionEvent.CTRL_MASK));
         this.filterExactMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 ToscanaJMainPanel.this.diagramView
-                        .setFilterMode(ConceptInterpretationContext.CONTINGENT);
+                .setFilterMode(ConceptInterpretationContext.CONTINGENT);
                 updateLabelViews();
             }
         });
@@ -585,7 +585,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
         this.filterAllMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 ToscanaJMainPanel.this.diagramView
-                        .setFilterMode(ConceptInterpretationContext.EXTENT);
+                .setFilterMode(ConceptInterpretationContext.EXTENT);
                 updateLabelViews();
             }
         });
@@ -628,7 +628,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
 
         final ButtonGroup documentsDisplayGroup = new ButtonGroup();
         this.showExactMenuItem = new JRadioButtonMenuItem(
-                "Show only exact matches");
+        "Show only exact matches");
         this.showExactMenuItem.setMnemonic(KeyEvent.VK_X);
         this.showExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_S, ActionEvent.CTRL_MASK));
@@ -656,7 +656,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
         viewMenu.addSeparator();
 
         final JCheckBoxMenuItem showAttributeLabels = new JCheckBoxMenuItem(
-                "Show Attribute Labels");
+        "Show Attribute Labels");
         showAttributeLabels.setMnemonic(KeyEvent.VK_A);
         showAttributeLabels.setSelected(true);
         showAttributeLabels.addActionListener(new ActionListener() {
@@ -670,7 +670,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
         viewMenu.add(showAttributeLabels);
 
         final JCheckBoxMenuItem showObjectLabels = new JCheckBoxMenuItem(
-                "Show Object Labels");
+        "Show Object Labels");
         showObjectLabels.setMnemonic(KeyEvent.VK_O);
         showObjectLabels.setSelected(true);
         showObjectLabels.addActionListener(new ActionListener() {
@@ -686,7 +686,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
         viewMenu.addSeparator();
 
         final JMenuItem showInfoViewItem = new JMenuItem(
-                "Show Concept Information...");
+        "Show Concept Information...");
         showInfoViewItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 ToscanaJMainPanel.this.readingHelpDialog.setVisible(true);
@@ -712,24 +712,24 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
                         this.diagramView.getController().getEventBroker());
             }
             final JCheckBoxMenuItem showOrthogonalityMenuItem = new JCheckBoxMenuItem(
-                    "Analyze orthogonality");
+            "Analyze orthogonality");
             showOrthogonalityMenuItem.addActionListener(new ActionListener() {
                 private IntervalType lastIntervalType;
 
                 public void actionPerformed(final ActionEvent e) {
                     final DiagramSchema diagramSchema = ToscanaJMainPanel.this.diagramView
-                            .getDiagramSchema();
+                    .getDiagramSchema();
                     if (showOrthogonalityMenuItem.isSelected()) {
                         this.lastIntervalType = diagramSchema.getGradientType();
                         setDiagramGradient(redGreenGradient,
                                 ConceptInterpreter.INTERVAL_TYPE_ORTHOGONALTIY);
                         ToscanaJMainPanel.this.diagramView
-                                .getConceptInterpreter().showDeviation(true);
+                        .getConceptInterpreter().showDeviation(true);
                     } else {
                         setDiagramGradient(diagramSchema.getDefaultGradient(),
                                 this.lastIntervalType);
                         ToscanaJMainPanel.this.diagramView
-                                .getConceptInterpreter().showDeviation(false);
+                        .getConceptInterpreter().showDeviation(false);
                     }
                     ToscanaJMainPanel.this.diagramView.updateLabelEntries();
                 }
@@ -739,27 +739,27 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
             final JMenuItem showSignificanceLegendMenuItem = new JMenuItem(
                     "Show Significance Legend");
             showSignificanceLegendMenuItem
-                    .addActionListener(new ActionListener() {
-                        public void actionPerformed(final ActionEvent e) {
-                            ToscanaJMainPanel.this.diagramView
-                                    .addCanvasItem(legendItem);
-                            ToscanaJMainPanel.this.diagramView.repaint();
-                        }
-                    });
+            .addActionListener(new ActionListener() {
+                public void actionPerformed(final ActionEvent e) {
+                    ToscanaJMainPanel.this.diagramView
+                    .addCanvasItem(legendItem);
+                    ToscanaJMainPanel.this.diagramView.repaint();
+                }
+            });
             viewMenu.add(showSignificanceLegendMenuItem);
         }
 
         if (preferences.getBoolean("offerGradientOptions", false)) {
             viewMenu.addSeparator();
             final DiagramSchema diagramSchema = this.diagramView
-                    .getDiagramSchema();
+            .getDiagramSchema();
             final ButtonGroup colorGradientGroup = new ButtonGroup();
             final JRadioButtonMenuItem showExactGradientMenuItem = new JRadioButtonMenuItem(
                     "Use colors for exact matches");
             showExactGradientMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK));
             showExactGradientMenuItem
-                    .setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
+            .setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
             showExactGradientMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     setDiagramGradient(diagramSchema.getDefaultGradient(),
@@ -773,9 +773,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
                     "Use colors for all matches");
             showAllGradientMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                     KeyEvent.VK_G, ActionEvent.CTRL_MASK
-                            + ActionEvent.SHIFT_MASK));
+                    + ActionEvent.SHIFT_MASK));
             showAllGradientMenuItem
-                    .setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_EXTENT);
+            .setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_EXTENT);
             showAllGradientMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     setDiagramGradient(diagramSchema.getDefaultGradient(),
@@ -791,15 +791,15 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
             viewMenu.addSeparator();
             final ButtonGroup nodeSizeScalingGroup = new ButtonGroup();
             final JRadioButtonMenuItem nodeSizeExactMenuItem = new JRadioButtonMenuItem(
-                    "Change node sizes with number of exact matches");
+            "Change node sizes with number of exact matches");
             nodeSizeExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                     KeyEvent.VK_N, ActionEvent.CTRL_MASK));
             nodeSizeExactMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     ToscanaJMainPanel.this.diagramView
-                            .getDiagramSchema()
-                            .setNodeSizeScalingType(
-                                    ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
+                    .getDiagramSchema()
+                    .setNodeSizeScalingType(
+                            ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
                     ToscanaJMainPanel.this.diagramView.update(this);
                 }
             });
@@ -810,12 +810,12 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
                     "Change node sizes with number of all matches");
             nodeSizeAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
                     KeyEvent.VK_N, ActionEvent.CTRL_MASK
-                            + ActionEvent.SHIFT_MASK));
+                    + ActionEvent.SHIFT_MASK));
             nodeSizeAllMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     ToscanaJMainPanel.this.diagramView.getDiagramSchema()
-                            .setNodeSizeScalingType(
-                                    ConceptInterpreter.INTERVAL_TYPE_EXTENT);
+                    .setNodeSizeScalingType(
+                            ConceptInterpreter.INTERVAL_TYPE_EXTENT);
                     ToscanaJMainPanel.this.diagramView.update(this);
                 }
             });
@@ -827,8 +827,8 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
             nodeSizeFixedMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     ToscanaJMainPanel.this.diagramView.getDiagramSchema()
-                            .setNodeSizeScalingType(
-                                    ConceptInterpreter.INTERVAL_TYPE_FIXED);
+                    .setNodeSizeScalingType(
+                            ConceptInterpreter.INTERVAL_TYPE_FIXED);
                     ToscanaJMainPanel.this.diagramView.update(this);
                 }
             });
@@ -836,7 +836,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
             viewMenu.add(nodeSizeFixedMenuItem);
 
             final ConceptInterpreter.IntervalType nodeSizeScaling = this.diagramView
-                    .getDiagramSchema().getNodeSizeScalingType();
+            .getDiagramSchema().getNodeSizeScalingType();
             if (nodeSizeScaling == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT) {
                 nodeSizeExactMenuItem.setSelected(true);
             } else if (nodeSizeScaling == ConceptInterpreter.INTERVAL_TYPE_EXTENT) {
@@ -856,7 +856,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
          */
         if (this.conceptualSchema != null) {
             final Iterator<Query> it = this.conceptualSchema.getQueries()
-                    .iterator();
+            .iterator();
             if (it.hasNext()) {
                 viewMenu.addSeparator();
                 boolean first = true;
@@ -880,7 +880,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
                         }
                     }
                     if (count < 10) { // first ones get their number (starting
-                                      // with 1)
+                        // with 1)
                         menuItem.setAccelerator(KeyStroke.getKeyStroke(
                                 KeyEvent.VK_0 + count, ActionEvent.ALT_MASK));
                     }
@@ -907,7 +907,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
 
             final ButtonGroup fontSizeGroup = new ButtonGroup();
             final JMenu setMinLabelSizeSubMenu = new JMenu(
-                    "Set minimum label size");
+            "Set minimum label size");
             JMenuItem fontRangeMenuItem = new JRadioButtonMenuItem("None");
             fontSizeGroup.add(fontRangeMenuItem);
             fontRangeMenuItem.addActionListener(new ActionListener() {
@@ -929,7 +929,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
                         final int newFontSize = Integer.parseInt(source
                                 .getText());
                         ToscanaJMainPanel.this.diagramView
-                                .setMinimumFontSize(newFontSize);
+                        .setMinimumFontSize(newFontSize);
                         source.setSelected(true);
                     }
                 });
@@ -946,7 +946,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
         final ButtonGroup colorModeGroup = new ButtonGroup();
 
         final Collection<DiagramSchema> colorSchemas = DiagramSchema
-                .getSchemas();
+        .getSchemas();
         for (final DiagramSchema schema : colorSchemas) {
             final JRadioButtonMenuItem colorSchemaItem = new JRadioButtonMenuItem(
                     schema.getName());
@@ -972,18 +972,18 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
             public void actionPerformed(final ActionEvent e) {
                 if (!preferences.getBoolean("hidePreferencesWarning", false)) {
                     final Object[] options = { "Return", "Change Preferences",
-                            "Disable Warning" };
+                    "Disable Warning" };
                     final int retVal = JOptionPane
-                            .showOptionDialog(
-                                    parent,
-                                    "Changing the preferences might affect the behaviour of the"
-                                            + "program in unexpected ways.\n"
-                                            + "You can restore the original"
-                                            + "settings by running ToscanaJ with the \"-reset\" option.",
-                                    "Entering preferences",
-                                    JOptionPane.YES_NO_CANCEL_OPTION,
-                                    JOptionPane.WARNING_MESSAGE, null, options,
-                                    options[0]);
+                    .showOptionDialog(
+                            parent,
+                            "Changing the preferences might affect the behaviour of the"
+                            + "program in unexpected ways.\n"
+                            + "You can restore the original"
+                            + "settings by running ToscanaJ with the \"-reset\" option.",
+                            "Entering preferences",
+                            JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.WARNING_MESSAGE, null, options,
+                            options[0]);
                     if (retVal == 0) {
                         return;
                     }
@@ -992,19 +992,19 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
                     }
                 }
                 final boolean okClicked = ToscanaJPreferences
-                        .showPreferences(parent);
+                .showPreferences(parent);
                 if (okClicked) {
                     setDiagramSchema(DiagramSchema.getCurrentSchema());
                     // at least the line grouping for the equivalence classes
                     // need
                     // a full update of the diagram
                     ToscanaJMainPanel.this.diagramView
-                            .showDiagram(ToscanaJMainPanel.this.diagramView
-                                    .getDiagram());
+                    .showDiagram(ToscanaJMainPanel.this.diagramView
+                            .getDiagram());
                     if (ToscanaJMainPanel.this.diagramPreview != null) {
                         ToscanaJMainPanel.this.diagramPreview
-                                .showDiagram(ToscanaJMainPanel.this.diagramPreview
-                                        .getDiagram());
+                        .showDiagram(ToscanaJMainPanel.this.diagramPreview
+                                .getDiagram());
                     }
                     buildMenuBar();
                 }
@@ -1024,7 +1024,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
             final Element description = this.conceptualSchema.getDescription();
             if (description != null) {
                 final JMenuItem descItem = new JMenuItem(
-                        "System Description...");
+                "System Description...");
                 descItem.setMnemonic(KeyEvent.VK_S);
                 descItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1,
                         0));
@@ -1038,16 +1038,16 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
             }
             if (this.conceptualSchema.hasDiagramDescription()) {
                 this.diagramDescriptionMenuItem = new JMenuItem(
-                        "Diagram Description...");
+                "Diagram Description...");
                 this.diagramDescriptionMenuItem.setMnemonic(KeyEvent.VK_D);
                 this.diagramDescriptionMenuItem.setAccelerator(KeyStroke
                         .getKeyStroke(KeyEvent.VK_F1, ActionEvent.SHIFT_MASK));
                 this.diagramDescriptionMenuItem
-                        .addActionListener(new ActionListener() {
-                            public void actionPerformed(final ActionEvent e) {
-                                showDiagramDescription();
-                            }
-                        });
+                .addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        showDiagramDescription();
+                    }
+                });
                 this.diagramDescriptionMenuItem.setEnabled(false);
                 helpMenu.add(this.diagramDescriptionMenuItem);
                 entriesAdded = true;
@@ -1096,13 +1096,13 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
         this.toolbar.add(this.goBackAction);
         this.toolbar.add(Box.createHorizontalGlue());
         this.diagramContextDescriptionButton = new JButton(
-                "Analysis History...");
+        "Analysis History...");
         this.diagramContextDescriptionButton
-                .addActionListener(new ActionListener() {
-                    public void actionPerformed(final ActionEvent e) {
-                        showDiagramContextDescription();
-                    }
-                });
+        .addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                showDiagramContextDescription();
+            }
+        });
         this.diagramContextDescriptionButton.setVisible(true);
         this.diagramContextDescriptionButton.setEnabled(false);
         this.toolbar.add(this.diagramContextDescriptionButton);
@@ -1145,7 +1145,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
     public void update(final Object source) {
         final DiagramController diagContr = DiagramController.getController();
         this.printMenuItem
-                .setEnabled(diagContr.getDiagramHistory().getSize() != 0);
+        .setEnabled(diagContr.getDiagramHistory().getSize() != 0);
         this.exportDiagramAction.setEnabled((diagContr.getDiagramHistory()
                 .getSize() != 0)
                 && (this.diagramExportSettings != null));
@@ -1160,18 +1160,18 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
                     showAboutDiagramComponents = diagDesc != null;
                 } else {
                     final Diagram2D outerDiagram = diagContr
-                            .getDiagramHistory().getCurrentDiagram(0);
+                    .getDiagramHistory().getCurrentDiagram(0);
                     final Element outerDiagDesc = outerDiagram.getDescription();
                     final Diagram2D innerDiagram = diagContr
-                            .getDiagramHistory().getCurrentDiagram(1);
+                    .getDiagramHistory().getCurrentDiagram(1);
                     final Element innerDiagDesc = innerDiagram.getDescription();
                     showAboutDiagramComponents = (outerDiagDesc != null)
-                            || (innerDiagDesc != null);
+                    || (innerDiagDesc != null);
                 }
                 this.diagramDescriptionButton
-                        .setEnabled(showAboutDiagramComponents);
+                .setEnabled(showAboutDiagramComponents);
                 this.diagramDescriptionMenuItem
-                        .setEnabled(showAboutDiagramComponents);
+                .setEnabled(showAboutDiagramComponents);
             } else {
                 this.diagramDescriptionButton.setEnabled(false);
                 this.diagramDescriptionMenuItem.setEnabled(false);
@@ -1212,7 +1212,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
             } catch (final DatabaseException e) {
                 ErrorDialog.showError(this, e, "Closing database error",
                         "Some error closing the old database:\n"
-                                + e.getMessage());
+                        + e.getMessage());
                 e.printStackTrace();
                 return;
             }
@@ -1264,7 +1264,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
             } catch (final DatabaseException e) {
                 ErrorDialog.showError(this, e, "Closing database error",
                         "Some error closing the old database:\n"
-                                + e.getMessage());
+                        + e.getMessage());
                 e.printStackTrace();
                 return;
             }
@@ -1286,23 +1286,23 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
         } catch (final IOException e) {
             ErrorDialog.showError(this, e, "Parsing the file error",
                     "Some error happened when parsing the file:\n"
-                            + e.getMessage());
+                    + e.getMessage());
             return;
         } catch (final DataFormatException e) {
             ErrorDialog.showError(this, e, "Parsing the file error",
                     "Some error happened when parsing the file:\n"
-                            + e.getMessage());
+                    + e.getMessage());
             return;
         } catch (final DatabaseException e) {
             ErrorDialog.showError(this, e,
                     "Error initializing database connection", "Error report:\n"
-                            + e.getMessage());
+                    + e.getMessage());
             e.printStackTrace();
             return;
         } catch (final Exception e) {
             ErrorDialog.showError(this, e, "Parsing the file error",
                     "Some error happened when parsing the file:\n"
-                            + e.getMessage());
+                    + e.getMessage());
             e.printStackTrace();
             return;
         }
@@ -1367,10 +1367,10 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
     private void recreateMruMenu() {
         this.mruMenu.removeAll();
         boolean empty = true; // will be used to check if we have at least one
-                              // entry
+        // entry
         if (this.mruList.size() > 0) {
             final ListIterator<String> it = this.mruList
-                    .listIterator(this.mruList.size() - 1);
+            .listIterator(this.mruList.size() - 1);
             while (it.hasPrevious()) {
                 final String cur = it.previous();
                 if (cur.equals(this.currentFile)) {
@@ -1435,9 +1435,9 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
             JMenuItem menuItem;
             final JFrame window = this;
             final DiagramController diagContr = DiagramController
-                    .getController();
+            .getController();
             final Diagram2D outerDiagram = diagContr.getDiagramHistory()
-                    .getCurrentDiagram(0);
+            .getCurrentDiagram(0);
             final Element outerDiagDesc = outerDiagram.getDescription();
             if (outerDiagDesc != null) {
                 menuItem = new JMenuItem("Outer Diagram");
@@ -1449,7 +1449,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
                 popupMenu.add(menuItem);
             }
             final Diagram2D innerDiagram = diagContr.getDiagramHistory()
-                    .getCurrentDiagram(1);
+            .getCurrentDiagram(1);
             final Element innerDiagDesc = innerDiagram.getDescription();
             if (innerDiagDesc != null) {
                 menuItem = new JMenuItem("Inner Diagram");
@@ -1461,7 +1461,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
                 popupMenu.add(menuItem);
             }
             popupMenu.show(this, -22222, -22222); // show it somewhere where it
-                                                  // is not seen
+            // is not seen
             // we need to show it to get its width afterwards (observed on JDK
             // 1.4.0_01/WinXP)
             // we can't get a really good position, since it can be invoked
@@ -1480,17 +1480,17 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
 
     public static void showAboutDialog(final JFrame parent) {
         JOptionPane
-                .showMessageDialog(
-                        parent,
-                        "This program is part of ToscanaJ "
-                                + ToscanaJ.VersionString
-                                + ".\n\n"
-                                + "Copyright (c) DSTC Pty Ltd, Technische Universit�t Darmstadt and the\n"
-                                + "University of Queensland\n\n"
-                                + "This product includes software developed by the "
-                                + "Apache Software Foundation (http://www.apache.org/).\n\n"
-                                + "See http://toscanaj.sourceforge.net for more information.",
-                        "About this program", JOptionPane.PLAIN_MESSAGE);
+        .showMessageDialog(
+                parent,
+                "This program is part of ToscanaJ "
+                + ToscanaJ.VersionString
+                + ".\n\n"
+                + "Copyright (c) DSTC Pty Ltd, Technische Universit�t Darmstadt and the\n"
+                + "University of Queensland\n\n"
+                + "This product includes software developed by the "
+                + "Apache Software Foundation (http://www.apache.org/).\n\n"
+                + "See http://toscanaj.sourceforge.net for more information.",
+                "About this program", JOptionPane.PLAIN_MESSAGE);
     }
 
     public void lostOwnership(final Clipboard clipboard,

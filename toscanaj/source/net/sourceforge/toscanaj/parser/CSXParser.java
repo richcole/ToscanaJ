@@ -45,6 +45,9 @@ import org.tockit.events.EventBroker;
 
 /**
  * This class reads a CSX file and does nothing with it except complaining.
+ * 
+ * TODO don't do this on the class-level, a parser should be instantiated as an
+ * object
  */
 public class CSXParser {
     /**
@@ -125,17 +128,18 @@ public class CSXParser {
                 }
             } else {
                 throw new DataFormatException(
-                        "Root element name is not <conceptualSchema>");
+                "Root element name is not <conceptualSchema>");
             }
             eventBroker.processEvent(new ConceptualSchemaLoadedEvent(
-                    CSXParser.class, _Schema, csxFile));
+                    _Schema,
+                    csxFile));
 
             _Schema.dataSaved();
 
             return _Schema;
         } catch (final OutOfMemoryError exc) {
             ErrorDialog.showError(null, exc, "Out of memory",
-                    "The system ran out of memory while opening a file.");
+            "The system ran out of memory while opening a file.");
             return new ConceptualSchema(eventBroker);
         }
     }
@@ -145,7 +149,7 @@ public class CSXParser {
      */
     private static void parseDescription() {
         final Element descElem = _Document.getRootElement().getChild(
-                "description");
+        "description");
         if (descElem != null) {
             _Schema.setDescription(descElem.detach());
         }
@@ -155,7 +159,7 @@ public class CSXParser {
      * Parses the database section of the file.
      */
     private static void parseDatabaseInformation(final Element contextElem)
-            throws DataFormatException {
+    throws DataFormatException {
         // check if database should be used and fetch the data if needed
         final Element dbElem = contextElem.getChild("databaseConnection");
         if (dbElem == null) {
@@ -176,7 +180,7 @@ public class CSXParser {
     }
 
     private static void parseDatabaseObjectViewerSetups(final Element viewsElem)
-            throws DataFormatException {
+    throws DataFormatException {
         final List<Element> viewerElems = viewsElem.getChildren("objectView");
         final Iterator<Element> it = viewerElems.iterator();
         while (it.hasNext()) {
@@ -184,7 +188,7 @@ public class CSXParser {
             try {
                 new DatabaseViewerManager(viewerElem,
                         _Schema.getDatabaseInfo(), DatabaseConnection
-                                .getConnection());
+                        .getConnection());
             } catch (final DatabaseViewerException e) {
                 throw new DataFormatException(
                         "A database viewer could not be initialized.", e);
@@ -195,14 +199,14 @@ public class CSXParser {
     private static void parseDatabaseObjectListViewerSetups(
             final Element viewsElem) throws DataFormatException {
         final List<Element> viewerElems = viewsElem
-                .getChildren("objectListView");
+        .getChildren("objectListView");
         final Iterator<Element> it = viewerElems.iterator();
         while (it.hasNext()) {
             final Element viewerElem = it.next();
             try {
                 new DatabaseViewerManager(viewerElem,
                         _Schema.getDatabaseInfo(), DatabaseConnection
-                                .getConnection());
+                        .getConnection());
             } catch (final DatabaseViewerException e) {
                 throw new DataFormatException(
                         "A database viewer could not be initialized.", e);
@@ -213,14 +217,14 @@ public class CSXParser {
     private static void parseDatabaseAttributeViewerSetups(
             final Element viewsElem) throws DataFormatException {
         final List<Element> viewerElems = viewsElem
-                .getChildren("attributeView");
+        .getChildren("attributeView");
         final Iterator<Element> it = viewerElems.iterator();
         while (it.hasNext()) {
             final Element viewerElem = it.next();
             try {
                 new DatabaseViewerManager(viewerElem,
                         _Schema.getDatabaseInfo(), DatabaseConnection
-                                .getConnection());
+                        .getConnection());
             } catch (final DatabaseViewerException e) {
                 throw new DataFormatException(
                         "A database viewer could not be initialized.", e);
@@ -233,7 +237,7 @@ public class CSXParser {
      */
     private static void parseContext() throws DataFormatException {
         final Element contextElem = _Document.getRootElement().getChild(
-                "context");
+        "context");
         if (contextElem == null) {
             throw new DataFormatException("No <context> defined");
         }
@@ -257,7 +261,7 @@ public class CSXParser {
 
         // build hashtable for attributes
         elements = _Document.getRootElement().getChild("context").getChildren(
-                "attribute");
+        "attribute");
         _Attributes = new Hashtable<String, FCAElementImplementation>(elements
                 .size());
 
@@ -284,7 +288,7 @@ public class CSXParser {
     private static void parseDiagrams() throws DataFormatException {
         // find and store diagrams
         final List<Element> elements = _Document.getRootElement().getChildren(
-                "diagram");
+        "diagram");
         final Iterator<Element> it = elements.iterator();
         while (it.hasNext()) {
             final Element diagElem = it.next();
@@ -316,7 +320,7 @@ public class CSXParser {
                             .getDoubleValue());
                 } catch (final DataConversionException e) {
                     throw new DataFormatException(
-                            "Position of some concept does not contain double.");
+                    "Position of some concept does not contain double.");
                 }
 
                 // create the concept
@@ -327,9 +331,9 @@ public class CSXParser {
                 // don't use the Concept.getObjectContingentSize() method here,
                 // it might cause DB calls
                 if (conceptElem.getChild("objectContingent").getChildren(
-                        "objectRef").size() != 0) {
+                "objectRef").size() != 0) {
                     final Element style = conceptElem.getChild(
-                            "objectContingent").getChild("labelStyle");
+                    "objectContingent").getChild("labelStyle");
                     if (style != null) {
                         parseLabelStyle(objLabel, style);
                     }
@@ -337,15 +341,15 @@ public class CSXParser {
 
                 final LabelInfo attrLabel = new LabelInfo();
                 if (conceptElem.getChild("attributeContingent").getChildren(
-                        "attributeRef").size() != 0) {
+                "attributeRef").size() != 0) {
                     final Element style = conceptElem.getChild(
-                            "attributeContingent").getChild("labelStyle");
+                    "attributeContingent").getChild("labelStyle");
                     if (style != null) {
                         parseLabelStyle(attrLabel, style);
                     }
                 }
                 final String identifier = conceptElem.getAttribute("id")
-                        .getValue();
+                .getValue();
 
                 // create the node
                 final DiagramNode node = new DiagramNode(diagram, identifier,
@@ -371,9 +375,9 @@ public class CSXParser {
 
                 // add direct neighbours to concepts
                 final ConceptImplementation concept1 = (ConceptImplementation) from
-                        .getConcept();
+                .getConcept();
                 final ConceptImplementation concept2 = (ConceptImplementation) to
-                        .getConcept();
+                .getConcept();
                 concept1.addSubConcept(concept2);
                 concept2.addSuperConcept(concept1);
             }
@@ -381,7 +385,7 @@ public class CSXParser {
             // build transitive closures for each concept
             for (int i = 0; i < diagram.getNumberOfNodes(); i++) {
                 ((ConceptImplementation) diagram.getNode(i).getConcept())
-                        .buildClosures();
+                .buildClosures();
             }
 
             _Schema.addDiagram(diagram);
@@ -439,7 +443,7 @@ public class CSXParser {
                         .getDoubleValue()));
             } catch (final DataConversionException e) {
                 throw new DataFormatException(
-                        "Offset of some label does not contain double.");
+                "Offset of some label does not contain double.");
             }
         }
         el = styleElement.getChild("textColor");
@@ -478,11 +482,11 @@ public class CSXParser {
         final Element embedElem = dbElement.getChild("embed");
         if ((urlElem == null) && (embedElem == null)) {
             throw new DataFormatException(
-                    "Either <url> or <embed> expected in <databaseConnection> element.");
+            "Either <url> or <embed> expected in <databaseConnection> element.");
         }
         if ((urlElem != null) && (embedElem != null)) {
             throw new DataFormatException(
-                    "Only one of <url> and <embed> expected in <databaseConnection> element.");
+            "Only one of <url> and <embed> expected in <databaseConnection> element.");
         }
 
         String url;
@@ -498,7 +502,7 @@ public class CSXParser {
             embeddedDBlocation = null;
         } else {
             assert embedElem != null; // either one should be set as checked
-                                      // above
+            // above
             final DatabaseInfo tmpInfo = DatabaseInfo.getEmbeddedDatabaseInfo();
             url = tmpInfo.getURL();
             driver = tmpInfo.getDriverClass();
@@ -526,13 +530,13 @@ public class CSXParser {
         Element elem = dbElement.getChild("table");
         if (elem == null) {
             throw new DataFormatException(
-                    "No <table> given for <databaseConnection>");
+            "No <table> given for <databaseConnection>");
         }
         dbInfo.setTable(new Table(elem.getText(), false));
         elem = dbElement.getChild("key");
         if (elem == null) {
             throw new DataFormatException(
-                    "<table> but not <key> given in <databaseConnection> element");
+            "<table> but not <key> given in <databaseConnection> element");
         }
         final String keyName = elem.getText();
         dbInfo.setKey(new Column(keyName, Types.VARCHAR, dbInfo.getTable()));
@@ -550,24 +554,24 @@ public class CSXParser {
         }
         if (queryElem != null) {
             Iterator<Element> it = queryElem.getChildren("listQuery")
-                    .iterator();
+            .iterator();
             while (it.hasNext()) {
                 final Element cur = it.next();
                 final String name = cur.getAttributeValue("name");
                 final String header = cur.getAttributeValue("head");
                 final String distinct = cur.getAttributeValue("distinct");
                 final boolean isDistinct = (distinct != null)
-                        && (distinct.equals("true"));
+                && (distinct.equals("true"));
                 final Query query = dbInfo.createListQuery(name, header,
                         isDistinct);
                 final Iterator<Element> it2 = cur.getChildren("column")
-                        .iterator();
+                .iterator();
                 while (it2.hasNext()) {
                     final Element curCol = it2.next();
                     final String colName = curCol.getAttributeValue("name");
                     final String format = curCol.getAttributeValue("format");
                     final String separator = curCol
-                            .getAttributeValue("separator");
+                    .getAttributeValue("separator");
                     final String sql = curCol.getText();
                     query.insertQueryColumn(colName, format, separator, sql,
                             false);
@@ -581,13 +585,13 @@ public class CSXParser {
                 final String header = cur.getAttributeValue("header");
                 final Query query = dbInfo.createAggregateQuery(name, header);
                 final Iterator<Element> it2 = cur.getChildren("column")
-                        .iterator();
+                .iterator();
                 while (it2.hasNext()) {
                     final Element curCol = it2.next();
                     final String colName = curCol.getAttributeValue("name");
                     final String format = curCol.getAttributeValue("format");
                     final String separator = curCol
-                            .getAttributeValue("separator");
+                    .getAttributeValue("separator");
                     final String sql = curCol.getText();
                     query.insertQueryColumn(colName, format, separator, sql,
                             false);

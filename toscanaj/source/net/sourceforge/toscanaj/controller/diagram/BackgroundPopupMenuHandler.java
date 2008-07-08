@@ -48,7 +48,7 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
     private JMenuItem showOuterDiagramDescription;
     private JMenu changeLabelMenu;
     private final DiagramController diagContr = DiagramController
-            .getController();
+    .getController();
     private JMenuItem showCurrentDiagramDescription;
     private JMenuItem flatDiagramItem;
     private JMenuItem nestedDiagramItem;
@@ -68,12 +68,12 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                            + " has to be subscribed to CanvasItemEventWithPositions only");
+                    + " has to be subscribed to CanvasItemEventWithPositions only");
         }
 
-        assert itemEvent.getItem() instanceof CanvasBackground : getClass()
-                .getName()
-                + " has to be subscribed to events from CanvasBackground only";
+        assert itemEvent.getSubject() instanceof CanvasBackground : getClass()
+        .getName()
+        + " has to be subscribed to events from CanvasBackground only";
 
         openPopupMenu(itemEvent.getAWTPosition());
     }
@@ -101,7 +101,7 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
         this.showAnalysisHistory.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 BackgroundPopupMenuHandler.this.mainPanel
-                        .showDiagramContextDescription();
+                .showDiagramContextDescription();
             }
         });
 
@@ -112,7 +112,7 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
             this.nestedDiagramItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     BackgroundPopupMenuHandler.this.diagContr
-                            .setNestingLevel(1);
+                    .setNestingLevel(1);
                 }
             });
             this.menu.add(this.nestedDiagramItem);
@@ -121,7 +121,7 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
             this.flatDiagramItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     BackgroundPopupMenuHandler.this.diagContr
-                            .setNestingLevel(0);
+                    .setNestingLevel(0);
                 }
             });
 
@@ -152,7 +152,7 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
         final ButtonGroup labelContentGroup = new ButtonGroup();
         this.changeLabelMenu = new JMenu("Change All Object Labels");
         final ConceptualSchema conceptualSchema = this.mainPanel
-                .getConceptualSchema();
+        .getConceptualSchema();
         if (conceptualSchema != null) {
             final Iterator<Query> it = conceptualSchema.getQueries().iterator();
             if (it.hasNext()) {
@@ -166,7 +166,7 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
                     menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(final ActionEvent e) {
                             BackgroundPopupMenuHandler.this.diagramView
-                                    .setQuery(query);
+                            .setQuery(query);
                         }
                     });
                     labelContentGroup.add(menuItem);
@@ -191,112 +191,112 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
                 showAboutDiagramComponents = diagDesc != null;
             } else {
                 final Diagram2D outerDiagram = this.diagContr
-                        .getDiagramHistory().getCurrentDiagram(0);
+                .getDiagramHistory().getCurrentDiagram(0);
                 final Element outerDiagDesc = outerDiagram.getDescription();
                 final Diagram2D innerDiagram = this.diagContr
-                        .getDiagramHistory().getCurrentDiagram(1);
+                .getDiagramHistory().getCurrentDiagram(1);
                 final Element innerDiagDesc = innerDiagram.getDescription();
                 showAboutDiagramComponents = (outerDiagDesc != null)
-                        || (innerDiagDesc != null);
+                || (innerDiagDesc != null);
                 outerDiagramEnabled = outerDiagDesc != null;
                 innerDiagramEnabled = innerDiagDesc != null;
             }
             this.showDiagramDescriptionMenu
-                    .setEnabled(showAboutDiagramComponents);
+            .setEnabled(showAboutDiagramComponents);
             if (this.diagContr.getDiagramHistory().getNestingLevel() == 0) {
                 this.showCurrentDiagramDescription = new JMenuItem(
                         "Current Diagram");
                 this.showCurrentDiagramDescription
-                        .addActionListener(new ActionListener() {
-                            public void actionPerformed(final ActionEvent e) {
-                                DescriptionViewer
-                                        .show(
-                                                BackgroundPopupMenuHandler.this.mainPanel,
-                                                DiagramController
-                                                        .getController()
-                                                        .getCurrentDiagram()
-                                                        .getDescription());
-                            }
-                        });
+                .addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        DescriptionViewer
+                        .show(
+                                BackgroundPopupMenuHandler.this.mainPanel,
+                                DiagramController
+                                .getController()
+                                .getCurrentDiagram()
+                                .getDescription());
+                    }
+                });
                 this.showDiagramDescriptionMenu
-                        .add(this.showCurrentDiagramDescription);
+                .add(this.showCurrentDiagramDescription);
             } else if (innerDiagramEnabled && outerDiagramEnabled) {
                 this.showOuterDiagramDescription = new JMenuItem(
-                        "Outer Diagram");
+                "Outer Diagram");
                 this.showInnerDiagramDescription = new JMenuItem(
-                        "Inner Diagram");
+                "Inner Diagram");
 
                 this.showOuterDiagramDescription
-                        .addActionListener(new ActionListener() {
-                            public void actionPerformed(final ActionEvent e) {
-                                final Diagram2D outerDiagram = BackgroundPopupMenuHandler.this.diagContr
-                                        .getDiagramHistory().getCurrentDiagram(
-                                                0);
-                                final Element outerDiagDesc = outerDiagram
-                                        .getDescription();
-                                DescriptionViewer
-                                        .show(
-                                                BackgroundPopupMenuHandler.this.mainPanel,
-                                                outerDiagDesc);
-                            }
-                        });
+                .addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Diagram2D outerDiagram = BackgroundPopupMenuHandler.this.diagContr
+                        .getDiagramHistory().getCurrentDiagram(
+                                0);
+                        final Element outerDiagDesc = outerDiagram
+                        .getDescription();
+                        DescriptionViewer
+                        .show(
+                                BackgroundPopupMenuHandler.this.mainPanel,
+                                outerDiagDesc);
+                    }
+                });
                 this.showInnerDiagramDescription
-                        .addActionListener(new ActionListener() {
-                            public void actionPerformed(final ActionEvent e) {
-                                final Diagram2D innerDiagram = BackgroundPopupMenuHandler.this.diagContr
-                                        .getDiagramHistory().getCurrentDiagram(
-                                                1);
-                                final Element innerDiagDesc = innerDiagram
-                                        .getDescription();
-                                DescriptionViewer
-                                        .show(
-                                                BackgroundPopupMenuHandler.this.mainPanel,
-                                                innerDiagDesc);
-                            }
-                        });
+                .addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Diagram2D innerDiagram = BackgroundPopupMenuHandler.this.diagContr
+                        .getDiagramHistory().getCurrentDiagram(
+                                1);
+                        final Element innerDiagDesc = innerDiagram
+                        .getDescription();
+                        DescriptionViewer
+                        .show(
+                                BackgroundPopupMenuHandler.this.mainPanel,
+                                innerDiagDesc);
+                    }
+                });
                 this.showDiagramDescriptionMenu
-                        .add(this.showOuterDiagramDescription);
+                .add(this.showOuterDiagramDescription);
                 this.showDiagramDescriptionMenu
-                        .add(this.showInnerDiagramDescription);
+                .add(this.showInnerDiagramDescription);
 
             } else if (outerDiagramEnabled && !innerDiagramEnabled) {
                 this.showOuterDiagramDescription = new JMenuItem(
-                        "Outer Diagram");
+                "Outer Diagram");
                 this.showOuterDiagramDescription
-                        .addActionListener(new ActionListener() {
-                            public void actionPerformed(final ActionEvent e) {
-                                final Diagram2D outerDiagram = BackgroundPopupMenuHandler.this.diagContr
-                                        .getDiagramHistory().getCurrentDiagram(
-                                                0);
-                                final Element outerDiagDesc = outerDiagram
-                                        .getDescription();
-                                DescriptionViewer
-                                        .show(
-                                                BackgroundPopupMenuHandler.this.mainPanel,
-                                                outerDiagDesc);
-                            }
-                        });
+                .addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Diagram2D outerDiagram = BackgroundPopupMenuHandler.this.diagContr
+                        .getDiagramHistory().getCurrentDiagram(
+                                0);
+                        final Element outerDiagDesc = outerDiagram
+                        .getDescription();
+                        DescriptionViewer
+                        .show(
+                                BackgroundPopupMenuHandler.this.mainPanel,
+                                outerDiagDesc);
+                    }
+                });
                 this.showDiagramDescriptionMenu
-                        .add(this.showOuterDiagramDescription);
+                .add(this.showOuterDiagramDescription);
             } else if (innerDiagramEnabled && !outerDiagramEnabled) {
                 this.showInnerDiagramDescription = new JMenuItem(
-                        "Inner Diagram");
+                "Inner Diagram");
                 this.showInnerDiagramDescription
-                        .addActionListener(new ActionListener() {
-                            public void actionPerformed(final ActionEvent e) {
-                                final Diagram2D innerDiagram = BackgroundPopupMenuHandler.this.diagContr
-                                        .getDiagramHistory().getCurrentDiagram(
-                                                1);
-                                final Element innerDiagDesc = innerDiagram
-                                        .getDescription();
-                                DescriptionViewer
-                                        .show(
-                                                BackgroundPopupMenuHandler.this.mainPanel,
-                                                innerDiagDesc);
-                            }
-                        });
+                .addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        final Diagram2D innerDiagram = BackgroundPopupMenuHandler.this.diagContr
+                        .getDiagramHistory().getCurrentDiagram(
+                                1);
+                        final Element innerDiagDesc = innerDiagram
+                        .getDescription();
+                        DescriptionViewer
+                        .show(
+                                BackgroundPopupMenuHandler.this.mainPanel,
+                                innerDiagDesc);
+                    }
+                });
                 this.showDiagramDescriptionMenu
-                        .add(this.showInnerDiagramDescription);
+                .add(this.showInnerDiagramDescription);
             }
         }
 

@@ -38,7 +38,7 @@ import org.tockit.events.EventBrokerListener;
  * here is a ConceptImplementation class
  */
 public class SqlClauseEditingLabelViewPopupMenuHandler implements
-        EventBrokerListener {
+EventBrokerListener {
     private final DiagramView diagramView;
 
     public SqlClauseEditingLabelViewPopupMenuHandler(
@@ -53,15 +53,15 @@ public class SqlClauseEditingLabelViewPopupMenuHandler implements
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                            + " has to be subscribed to CanvasItemEventWithPositions only");
+                    + " has to be subscribed to CanvasItemEventWithPositions only");
         }
         SqlClauseLabelView labelView = null;
         try {
-            labelView = (SqlClauseLabelView) itemEvent.getItem();
+            labelView = (SqlClauseLabelView) itemEvent.getSubject();
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                            + " has to be subscribed to events from SqlClauseLabelView only");
+                    + " has to be subscribed to events from SqlClauseLabelView only");
         }
         openPopupMenu(labelView, itemEvent.getAWTPosition());
     }
@@ -70,7 +70,7 @@ public class SqlClauseEditingLabelViewPopupMenuHandler implements
             final Point2D screenPosition) {
 
         final Iterator objIt = labelView.getNodeView().getDiagramNode()
-                .getConcept().getObjectContingentIterator();
+        .getConcept().getObjectContingentIterator();
         FCAElement curObjectValue = null;
         if (objIt.hasNext()) {
             curObjectValue = (FCAElement) objIt.next();
@@ -83,17 +83,17 @@ public class SqlClauseEditingLabelViewPopupMenuHandler implements
         // create the menu
         final JPopupMenu popupMenu = new JPopupMenu();
         final JMenuItem renameSqlClauseMenuItem = new JMenuItem(
-                "Change sql clause...");
+        "Change sql clause...");
         renameSqlClauseMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
                 final InputTextDialog dialog = new InputTextDialog(
                         JOptionPane
-                                .getFrameForComponent(SqlClauseEditingLabelViewPopupMenuHandler.this.diagramView),
+                        .getFrameForComponent(SqlClauseEditingLabelViewPopupMenuHandler.this.diagramView),
                         "Change SQL Clause", "SQL clause", currentValueString);
                 if (!dialog.isCancelled()) {
                     final String newValue = dialog.getInput();
                     final ConceptImplementation concept = (ConceptImplementation) labelView
-                            .getNodeView().getDiagramNode().getConcept();
+                    .getNodeView().getDiagramNode().getConcept();
                     final WritableFCAElement newObject = new FCAElementImplementation(
                             newValue);
                     concept.replaceObject(currentValue, newObject);
