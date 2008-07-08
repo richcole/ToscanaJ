@@ -7,6 +7,7 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +20,6 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-import net.sourceforge.toscanaj.util.CollectionFactory;
 
 /**
  * This stores the diagram references for visited, shown and forthcoming
@@ -28,7 +28,7 @@ import net.sourceforge.toscanaj.util.CollectionFactory;
  * @todo Use event broker instead of being an observable.
  */
 public class DiagramHistory extends AbstractListModel implements
-        ChangeObservable {
+ChangeObservable {
 
     private final List<Object> diagrams = new LinkedList<Object>();
 
@@ -58,7 +58,7 @@ public class DiagramHistory extends AbstractListModel implements
         if (level < 0) {
             throw new IllegalArgumentException(
                     "Nesting level should be greater than zero, and was :"
-                            + level);
+                    + level);
         }
 
         this.nestingLevel = level;
@@ -116,7 +116,7 @@ public class DiagramHistory extends AbstractListModel implements
      */
     public boolean isInPast(final int elementPosition) {
         return (elementPosition < this.currStartPosition)
-                && (elementPosition >= 0);
+        && (elementPosition >= 0);
     }
 
     /**
@@ -214,7 +214,7 @@ public class DiagramHistory extends AbstractListModel implements
     public void removeLastDiagram() {
         if (getSize() == 0) {
             throw new NoSuchElementException(
-                    "The list of diagrams is already empty.");
+            "The list of diagrams is already empty.");
         }
         final int lastPosition = getSize() - 1;
         if (isInCurrent(lastPosition)) {
@@ -232,7 +232,7 @@ public class DiagramHistory extends AbstractListModel implements
     public void moveDiagram(final int from, final int to) {
         if (getSize() == 0) {
             throw new NoSuchElementException(
-                    "The list of diagrams is already empty.");
+            "The list of diagrams is already empty.");
         }
         if (isInPast(from) || isInPast(to)) {
             throw new RuntimeException("Trying to change past");
@@ -282,7 +282,7 @@ public class DiagramHistory extends AbstractListModel implements
 
     private boolean shouldChangeCurrentStartDiagram() {
         return this.currStartPosition > 0
-                || (getNumberOfCurrentDiagrams() > getNestingLevel());
+        || (getNumberOfCurrentDiagrams() > getNestingLevel());
     }
 
     public void back() {
@@ -337,11 +337,10 @@ public class DiagramHistory extends AbstractListModel implements
     protected void notifyObservers() {
         // avoid stupid ConcurrentModificationExceptions by operating on copy of
         // list
-        final List<Object> observerCopy = CollectionFactory.createDefaultList();
+        final List<ChangeObserver> observerCopy = new ArrayList<ChangeObserver>();
         observerCopy.addAll(this.observers);
         while (!observerCopy.isEmpty()) {
-            final ChangeObserver observer = (ChangeObserver) observerCopy
-                    .remove(0);
+            final ChangeObserver observer = observerCopy.remove(0);
             observer.update(this);
         }
     }
@@ -379,29 +378,29 @@ public class DiagramHistory extends AbstractListModel implements
         String comments = "";
         final String lineSeparator = System.getProperty("line.separator");
         final DiagramHistory diagramHistory = DiagramController.getController()
-                .getDiagramHistory();
+        .getDiagramHistory();
         final int firstCurrentPos = diagramHistory
-                .getFirstCurrentDiagramPosition();
+        .getFirstCurrentDiagramPosition();
         if (firstCurrentPos > 1) {
             comments += "Visited diagrams and selected attributes:"
-                    + lineSeparator;
+                + lineSeparator;
         } else if (firstCurrentPos == 1) {
             comments += "Visited diagram and selected attributes:"
-                    + lineSeparator;
+                + lineSeparator;
         } else {
             // user has no visited diagrams. display nothing
         }
         for (int i = 0; i <= firstCurrentPos - 1; i++) {
             final DiagramReference diagramReference = diagramHistory
-                    .getReferenceAt(i);
+            .getReferenceAt(i);
             comments += (i + 1) + ") "
-                    + diagramReference.getDiagram().getTitle() + lineSeparator;
+            + diagramReference.getDiagram().getTitle() + lineSeparator;
             final Concept concept = diagramReference.getFilterConcept();
             final Iterator attrIt = concept.getIntentIterator();
             while (attrIt.hasNext()) {
                 final FCAElement curAttr = (FCAElement) attrIt.next();
                 comments += "   - " + curAttr.getData().toString()
-                        + lineSeparator;
+                + lineSeparator;
             }
         }
         final int numCurDiag = diagramHistory.getNumberOfCurrentDiagrams();
@@ -413,9 +412,9 @@ public class DiagramHistory extends AbstractListModel implements
         }
         for (int i = 0; i < numCurDiag; i++) {
             comments += (i + 1)
-                    + ") "
-                    + diagramHistory.getElementAt(i + firstCurrentPos)
-                            .toString() + lineSeparator;
+            + ") "
+            + diagramHistory.getElementAt(i + firstCurrentPos)
+            .toString() + lineSeparator;
         }
         return comments;
 
