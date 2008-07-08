@@ -12,17 +12,17 @@ import net.sourceforge.toscanaj.controller.fca.DiagramReference;
 import org.tockit.events.Event;
 
 public class DiagramClickedEvent implements Event {
-	private DiagramReference diagramReference;
-	
-	public DiagramClickedEvent(DiagramReference diagramReference) {
-		this.diagramReference = diagramReference;
-	}
-	
-	public Object getSubject() {
-		return this.diagramReference;
-	}
-	
-	public DiagramReference getDiagramReference() {
-		return this.diagramReference;
-	}
+    private final DiagramReference diagramReference;
+
+    public DiagramClickedEvent(final DiagramReference diagramReference) {
+        this.diagramReference = diagramReference;
+    }
+
+    public Object getSubject() {
+        return this.diagramReference;
+    }
+
+    public DiagramReference getDiagramReference() {
+        return this.diagramReference;
+    }
 }

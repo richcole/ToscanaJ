@@ -7,19 +7,6 @@
  */
 package net.sourceforge.toscanaj.controller.ndimlayout;
 
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.diagram.DiagramLine;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
-import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
-import net.sourceforge.toscanaj.view.diagram.DiagramView;
-import net.sourceforge.toscanaj.view.diagram.NodeView;
-import org.tockit.canvas.events.CanvasItemDraggedEvent;
-import org.tockit.canvas.events.CanvasItemDroppedEvent;
-import org.tockit.canvas.events.CanvasItemPickupEvent;
-import org.tockit.events.Event;
-import org.tockit.events.EventBrokerListener;
-
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
@@ -28,106 +15,127 @@ import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 
+import net.sourceforge.toscanaj.model.diagram.Diagram2D;
+import net.sourceforge.toscanaj.model.diagram.DiagramLine;
+import net.sourceforge.toscanaj.model.diagram.DiagramNode;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
+import net.sourceforge.toscanaj.view.diagram.DiagramView;
+import net.sourceforge.toscanaj.view.diagram.NodeView;
+
+import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.canvas.events.CanvasItemDroppedEvent;
+import org.tockit.canvas.events.CanvasItemPickupEvent;
+import org.tockit.events.Event;
+import org.tockit.events.EventBrokerListener;
+
 public class NDimNodeMovementEventListener implements EventBrokerListener {
     private Point2D startPosition;
 
-    public void processEvent(Event e) {
-        CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
-        NodeView nodeView = (NodeView) dragEvent.getSubject();
+    public void processEvent(final Event e) {
+        final CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
+        final NodeView nodeView = (NodeView) dragEvent.getSubject();
         final DiagramView diagramView = nodeView.getDiagramView();
-        DiagramNode node = nodeView.getDiagramNode();
+        final DiagramNode node = nodeView.getDiagramNode();
         if (!(node instanceof NDimDiagramNode)) {
-            throw new RuntimeException("NDimNodeMovementEventListener usable only for NDimDiagramNodes");
+            throw new RuntimeException(
+                    "NDimNodeMovementEventListener usable only for NDimDiagramNodes");
         }
         if (node.getConcept().getUpset().size() == 1) {
-        	return; // we don't move the top node
+            return; // we don't move the top node
         }
         final NDimDiagramNode ndimNode = (NDimDiagramNode) node;
         final NDimDiagram diagram = (NDimDiagram) diagramView.getDiagram();
         final Point2D toPosition = dragEvent.getCanvasToPosition();
-        Point2D curPosition = ndimNode.getPosition();
+        final Point2D curPosition = ndimNode.getPosition();
 
-        if(e instanceof CanvasItemPickupEvent) {
-			this.startPosition = curPosition;
-		}
-		
-        double diffX = toPosition.getX() - curPosition.getX();
-        double diffY = toPosition.getY() - curPosition.getY();
+        if (e instanceof CanvasItemPickupEvent) {
+            this.startPosition = curPosition;
+        }
+
+        final double diffX = toPosition.getX() - curPosition.getX();
+        final double diffY = toPosition.getY() - curPosition.getY();
         moveNodes(diagram, ndimNode, diffX, diffY);
-        if(!diagram.isHasseDiagram()) {
+        if (!diagram.isHasseDiagram()) {
             moveNodes(diagram, ndimNode, -diffX, -diffY);
         }
         if (dragEvent instanceof CanvasItemDroppedEvent) {
-			// on drop we update the screen transform ...
-			diagramView.requestScreenTransformUpdate();
+            // on drop we update the screen transform ...
+            diagramView.requestScreenTransformUpdate();
 
-		    // ... and add an edit to the undo manager if we find one.
-		    UndoManager undoManager = diagramView.getUndoManager();
-			if (undoManager != null) {
-				// make a copy of the current start position
-				final Point2D undoPosition = this.startPosition;
-				undoManager.addEdit(new AbstractUndoableEdit() {
-					@Override
-					public void undo() throws CannotUndoException {
-			            double undoDiffX = undoPosition.getX() - toPosition.getX();
-			            double undoDiffY = undoPosition.getY() - toPosition.getY();
-						moveNodes(diagram, ndimNode, undoDiffX, undoDiffY);
-						diagramView.requestScreenTransformUpdate();
-						diagramView.repaint();
-						super.undo();
-					}
+            // ... and add an edit to the undo manager if we find one.
+            final UndoManager undoManager = diagramView.getUndoManager();
+            if (undoManager != null) {
+                // make a copy of the current start position
+                final Point2D undoPosition = this.startPosition;
+                undoManager.addEdit(new AbstractUndoableEdit() {
+                    @Override
+                    public void undo() throws CannotUndoException {
+                        final double undoDiffX = undoPosition.getX()
+                                - toPosition.getX();
+                        final double undoDiffY = undoPosition.getY()
+                                - toPosition.getY();
+                        moveNodes(diagram, ndimNode, undoDiffX, undoDiffY);
+                        diagramView.requestScreenTransformUpdate();
+                        diagramView.repaint();
+                        super.undo();
+                    }
 
-					@Override
-					public void redo() throws CannotRedoException {
-			            double undoDiffX = toPosition.getX() - undoPosition.getX();
-			            double undoDiffY = toPosition.getY() - undoPosition.getY();
-						moveNodes(diagram, ndimNode, undoDiffX, undoDiffY);
-						diagramView.requestScreenTransformUpdate();
-						diagramView.repaint();
-						super.redo();
-					}
-					
-					@Override
-					public String getPresentationName() {
-						return "Attribute Additive Movement";
-					}
-				});
-			}
-		}
+                    @Override
+                    public void redo() throws CannotRedoException {
+                        final double undoDiffX = toPosition.getX()
+                                - undoPosition.getX();
+                        final double undoDiffY = toPosition.getY()
+                                - undoPosition.getY();
+                        moveNodes(diagram, ndimNode, undoDiffX, undoDiffY);
+                        diagramView.requestScreenTransformUpdate();
+                        diagramView.repaint();
+                        super.redo();
+                    }
+
+                    @Override
+                    public String getPresentationName() {
+                        return "Attribute Additive Movement";
+                    }
+                });
+            }
+        }
         diagramView.repaint();
     }
 
-    public void moveNodes(
-        NDimDiagram diagram,
-        NDimDiagramNode ndimNode,
-        double diffX,
-        double diffY) {
-        int[] diffUpperNeighbours = findUpperNeighbourDiff(diagram, ndimNode);
+    public void moveNodes(final NDimDiagram diagram,
+            final NDimDiagramNode ndimNode, final double diffX,
+            final double diffY) {
+        final int[] diffUpperNeighbours = findUpperNeighbourDiff(diagram,
+                ndimNode);
         int numDiffs = 0;
-        for (int i = 0; i < diffUpperNeighbours.length; i++) {
-            numDiffs += diffUpperNeighbours[i];
+        for (final int diffUpperNeighbour : diffUpperNeighbours) {
+            numDiffs += diffUpperNeighbour;
         }
-        Iterator<Point2D> baseIt = diagram.getBase().iterator();
+        final Iterator<Point2D> baseIt = diagram.getBase().iterator();
         for (int i = 0; i < diffUpperNeighbours.length; i++) {
-			Point2D baseVec = baseIt.next();
-			if(ndimNode.getNdimVector()[i] == 0) {
-				continue;
-			}
-            double relDiffI = diffUpperNeighbours[i] / (double) numDiffs;
-            baseVec.setLocation(baseVec.getX() + diffX * relDiffI / ndimNode.getNdimVector()[i],
-                    baseVec.getY() + diffY * relDiffI / ndimNode.getNdimVector()[i]);
+            final Point2D baseVec = baseIt.next();
+            if (ndimNode.getNdimVector()[i] == 0) {
+                continue;
+            }
+            final double relDiffI = diffUpperNeighbours[i] / (double) numDiffs;
+            baseVec.setLocation(baseVec.getX() + diffX * relDiffI
+                    / ndimNode.getNdimVector()[i], baseVec.getY() + diffY
+                    * relDiffI / ndimNode.getNdimVector()[i]);
         }
     }
 
-    private int[] findUpperNeighbourDiff(Diagram2D diagram, NDimDiagramNode node) {
-        double[] nodeVec = node.getNdimVector();
-        int[] retVal = new int[nodeVec.length];
-        Iterator<DiagramLine> it = diagram.getLines();
+    private int[] findUpperNeighbourDiff(final Diagram2D diagram,
+            final NDimDiagramNode node) {
+        final double[] nodeVec = node.getNdimVector();
+        final int[] retVal = new int[nodeVec.length];
+        final Iterator<DiagramLine> it = diagram.getLines();
         while (it.hasNext()) {
-            DiagramLine line = it.next();
+            final DiagramLine line = it.next();
             if (line.getToNode() == node) {
-                NDimDiagramNode upperNeighbour = (NDimDiagramNode) line.getFromNode();
-                double[] upperVec = upperNeighbour.getNdimVector();
+                final NDimDiagramNode upperNeighbour = (NDimDiagramNode) line
+                        .getFromNode();
+                final double[] upperVec = upperNeighbour.getNdimVector();
                 for (int i = 0; i < upperVec.length; i++) {
                     if (upperVec[i] < nodeVec[i]) {
                         retVal[i] = 1;

@@ -43,7 +43,7 @@ import org.tockit.swing.undo.ExtendedUndoManager;
 
 /**
  * This class paints a diagram defined by the SimpleLineDiagram class.
- *
+ * 
  * @todo get rid of ChangeObserver, use EventBroker.
  */
 public class DiagramView extends Canvas implements ChangeObserver {
@@ -55,9 +55,9 @@ public class DiagramView extends Canvas implements ChangeObserver {
     private ConceptInterpreter conceptInterpreter;
 
     private ConceptInterpretationContext conceptInterpretationContext;
-    
+
     private ExtendedUndoManager undoManager;
-    
+
     /**
      * Currently we don't use selection.
      */
@@ -80,24 +80,27 @@ public class DiagramView extends Canvas implements ChangeObserver {
     static final public int SELECTED_IDEAL = 4;
 
     private DiagramSchema diagramSchema;
-	
-	private double minimumFontSize = 0;
-	
+
+    private double minimumFontSize = 0;
+
     private boolean screenTransformDirty = false;
 
-    private LabelView.LabelFactory attributeLabelFactory = AttributeLabelView.getFactory();
-    private LabelView.LabelFactory objectLabelFactory = ObjectLabelView.getFactory();
+    private LabelView.LabelFactory attributeLabelFactory = AttributeLabelView
+            .getFactory();
+    private LabelView.LabelFactory objectLabelFactory = ObjectLabelView
+            .getFactory();
 
     private class ResizeListener extends ComponentAdapter {
         @Override
-		public void componentResized(ComponentEvent e) {
+        public void componentResized(final ComponentEvent e) {
             requestScreenTransformUpdate();
             repaint();
         }
     }
 
     /**
-     * Creates a new view displaying an empty diagram (i.e.&#nbsp;nothing at all).
+     * Creates a new view displaying an empty diagram (i.e.&#nbsp;nothing at
+     * all).
      */
     public DiagramView() {
         super(new EventBroker());
@@ -112,20 +115,23 @@ public class DiagramView extends Canvas implements ChangeObserver {
         return conceptInterpreter;
     }
 
-    public void setConceptInterpreter(ConceptInterpreter conceptInterpreter) {
+    public void setConceptInterpreter(
+            final ConceptInterpreter conceptInterpreter) {
         this.conceptInterpreter = conceptInterpreter;
-        /// @todo update parts, redraw
+        // / @todo update parts, redraw
     }
 
-    public void setConceptInterpretationContext(ConceptInterpretationContext conceptInterpretationContext) {
+    public void setConceptInterpretationContext(
+            final ConceptInterpretationContext conceptInterpretationContext) {
         this.conceptInterpretationContext = conceptInterpretationContext;
-        /// @todo update parts, redraw
+        // / @todo update parts, redraw
     }
 
-    public void setFilterMode(boolean filterMode) {
-        Iterator it = this.getCanvasItemsByType(NodeView.class).iterator();
+    public void setFilterMode(final boolean filterMode) {
+        final Iterator it = this.getCanvasItemsByType(NodeView.class)
+                .iterator();
         while (it.hasNext()) {
-            NodeView cur = (NodeView) it.next();
+            final NodeView cur = (NodeView) it.next();
             cur.getConceptInterpretationContext().setFilterMode(filterMode);
         }
     }
@@ -138,15 +144,15 @@ public class DiagramView extends Canvas implements ChangeObserver {
     /**
      * Implements ChangeObserver.update(Object) by repainting the diagram.
      */
-    public void update(Object source) {
-        if (source instanceof DiagramController ||
-                source instanceof DiagramHistory) {
+    public void update(final Object source) {
+        if (source instanceof DiagramController
+                || source instanceof DiagramHistory) {
             showDiagram(DiagramController.getController().getCurrentDiagram());
         } else {
             requestScreenTransformUpdate();
         }
     }
-    
+
     public void updateDiagram() {
         showDiagram(this.diagram, false);
     }
@@ -159,21 +165,22 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * Paints the diagram on the screen.
      */
     @Override
-	public void paintComponent(Graphics g) {
-        Graphics2D g2d = (Graphics2D) g;
+    public void paintComponent(final Graphics g) {
+        final Graphics2D g2d = (Graphics2D) g;
         super.paintComponent(g2d);
-        
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        AffineTransform oldTransform = g2d.getTransform();
+
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        final AffineTransform oldTransform = g2d.getTransform();
 
         if (diagram == null) {
             return;
         }
 
-        int margin = diagramSchema.getMargin();
+        final int margin = diagramSchema.getMargin();
         if (screenTransformDirty) {
             // find current bounds
-            Rectangle2D bounds = new Rectangle2D.Double(margin, margin,
+            final Rectangle2D bounds = new Rectangle2D.Double(margin, margin,
                     getWidth() - 2 * margin, getHeight() - 2 * margin);
             this.setScreenTransform(this.scaleToFit(g2d, bounds));
             makeScreenTransformClear();
@@ -194,30 +201,32 @@ public class DiagramView extends Canvas implements ChangeObserver {
 
     /**
      * Sets the given diagram as new diagram to display.
-     *
+     * 
      * This will automatically cause a repaint of the view.
      */
-    public void showDiagram(Diagram2D newDiagram) {
+    public void showDiagram(final Diagram2D newDiagram) {
         showDiagram(newDiagram, true);
-    }    
-    
-    private void showDiagram(Diagram2D newDiagram, boolean sendEvent) {
+    }
+
+    private void showDiagram(final Diagram2D newDiagram, final boolean sendEvent) {
         this.diagram = newDiagram;
         removeSubscriptions();
         clearCanvas();
-        /// @todo we should have different undo managers for each diagram, for now we just forget
-        /// all edits when changing diagrams
-        if(this.undoManager != null) {
+        // / @todo we should have different undo managers for each diagram, for
+        // now we just forget
+        // / all edits when changing diagrams
+        if (this.undoManager != null) {
             this.undoManager.discardAllEdits();
         }
         if (newDiagram == null) {
             repaint();
-            if(sendEvent) {
-                this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
+            if (sendEvent) {
+                this.getController().getEventBroker().processEvent(
+                        new DisplayedDiagramChangedEvent(this));
             }
             return;
         }
-        if (getParent()!=null) {
+        if (getParent() != null) {
             getParent().setCursor(
                     Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
         }
@@ -229,42 +238,43 @@ public class DiagramView extends Canvas implements ChangeObserver {
         addLayer("connectors-1");
         addLayer("labels");
         addLayer("extraItems");
-        try{
-        	addDiagram(newDiagram, conceptInterpretationContext, 0, true);
+        try {
+            addDiagram(newDiagram, conceptInterpretationContext, 0, true);
             requestScreenTransformUpdate();
             repaint();
-            if(sendEvent) {
-                this.getController().getEventBroker().processEvent(new DisplayedDiagramChangedEvent(this));
+            if (sendEvent) {
+                this.getController().getEventBroker().processEvent(
+                        new DisplayedDiagramChangedEvent(this));
             }
-        } catch (Exception e) {
-        	ErrorDialog.showError(this, e, "Showing diagram failed", "The selected diagram can not be shown");
-        	showDiagram(null);
+        } catch (final Exception e) {
+            ErrorDialog.showError(this, e, "Showing diagram failed",
+                    "The selected diagram can not be shown");
+            showDiagram(null);
         }
-        if (getParent()!=null) {
+        if (getParent() != null) {
             getParent().setCursor(Cursor.getDefaultCursor());
         }
     }
 
-	private void removeSubscriptions() {
-		for (Iterator iterator = this.getCanvasItemsByType(LabelView.class).iterator(); iterator.hasNext();) {
-			LabelView lv = (LabelView) iterator.next();
-			this.getController().getEventBroker().removeSubscriptions(lv);
-		}
-	}
+    private void removeSubscriptions() {
+        for (final Object element : this.getCanvasItemsByType(LabelView.class)) {
+            final LabelView lv = (LabelView) element;
+            this.getController().getEventBroker().removeSubscriptions(lv);
+        }
+    }
 
-	private void setLabelFontSizes() {
-		Font font = diagramSchema.getLabelFont();
-		double scale = this.getScreenTransform().getScaleY();
-		if( (this.minimumFontSize > 0) && 
-		     	(font.getSize() * scale < this.minimumFontSize)
-		   ) {
-		    font = font.deriveFont((float) (this.minimumFontSize / scale));
-		}
-		for (Iterator iterator = this.getCanvasItemsByType(LabelView.class).iterator(); iterator.hasNext();) {
-			LabelView lv = (LabelView) iterator.next();
-			lv.setFont(font);
-		}
-	}
+    private void setLabelFontSizes() {
+        Font font = diagramSchema.getLabelFont();
+        final double scale = this.getScreenTransform().getScaleY();
+        if ((this.minimumFontSize > 0)
+                && (font.getSize() * scale < this.minimumFontSize)) {
+            font = font.deriveFont((float) (this.minimumFontSize / scale));
+        }
+        for (final Object element : this.getCanvasItemsByType(LabelView.class)) {
+            final LabelView lv = (LabelView) element;
+            lv.setFont(font);
+        }
+    }
 
     public Diagram2D getDiagram() {
         return diagram;
@@ -272,75 +282,95 @@ public class DiagramView extends Canvas implements ChangeObserver {
 
     /**
      * Adds a line diagram to the canvas.
-     *
+     * 
      * If the filter concept is non-null all nodes created will use this for
      * filter operations.
      */
-    private void addDiagram(Diagram2D newDiagram, ConceptInterpretationContext context, int layer, boolean showAttributeLabels) {
-		String lineLayerName = "lines-" + layer;
-        String nodeLayerName = "nodes-" + layer;
-        String labelConnectorLayerName = "connectors-" + layer;
-        String labelLayerName = "labels";
-        Hashtable<DiagramNode, NodeView> nodeMap = new Hashtable<DiagramNode, NodeView>();
+    private void addDiagram(final Diagram2D newDiagram,
+            final ConceptInterpretationContext context, final int layer,
+            final boolean showAttributeLabels) {
+        final String lineLayerName = "lines-" + layer;
+        final String nodeLayerName = "nodes-" + layer;
+        final String labelConnectorLayerName = "connectors-" + layer;
+        final String labelLayerName = "labels";
+        final Hashtable<DiagramNode, NodeView> nodeMap = new Hashtable<DiagramNode, NodeView>();
         for (int i = 0; i < newDiagram.getNumberOfNodes(); i++) {
-            DiagramNode node = newDiagram.getNode(i);
-            NodeView nodeView = new NodeView(node, this, context);
+            final DiagramNode node = newDiagram.getNode(i);
+            final NodeView nodeView = new NodeView(node, this, context);
             nodeMap.put(node, nodeView);
             addCanvasItem(nodeView, nodeLayerName);
-            Concept concept = node.getConcept();
-            /// @todo calling isRealized(..) has the side effect of initialising the caches in the DB connected version -- find better way
-            // if the caches are not initialized, the object contingent gradient will be wrong from time to time
-            /// @todo make sure there always is a concept interpreter and an interpretation context. 
-            ///       At the moment both are not initialized automatically
+            final Concept concept = node.getConcept();
+            // / @todo calling isRealized(..) has the side effect of
+            // initialising the caches in the DB connected version -- find
+            // better way
+            // if the caches are not initialized, the object contingent gradient
+            // will be wrong from time to time
+            // / @todo make sure there always is a concept interpreter and an
+            // interpretation context.
+            // / At the moment both are not initialized automatically
             if (conceptInterpreter.isRealized(concept, context)) {
                 if (node instanceof NestedDiagramNode) {
-		            NestedDiagramNode ndNode = (NestedDiagramNode) node;
-		            boolean isTopRealizedConcept = true;
-		            for (Iterator<Object> iter = concept.getUpset().iterator();iter.hasNext();) {
-                        Concept superConcept = (Concept) iter.next();
-                        if(superConcept != concept && this.conceptInterpreter.isRealized(superConcept, this.conceptInterpretationContext)) {
-                        	isTopRealizedConcept = false;
-                        	break;
+                    final NestedDiagramNode ndNode = (NestedDiagramNode) node;
+                    boolean isTopRealizedConcept = true;
+                    for (final Iterator<Object> iter = concept.getUpset()
+                            .iterator(); iter.hasNext();) {
+                        final Concept superConcept = (Concept) iter.next();
+                        if (superConcept != concept
+                                && this.conceptInterpreter.isRealized(
+                                        superConcept,
+                                        this.conceptInterpretationContext)) {
+                            isTopRealizedConcept = false;
+                            break;
                         }
                     }
-                    addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept), layer + 1, isTopRealizedConcept);
+                    addDiagram(ndNode.getInnerDiagram(), context
+                            .createNestedContext(concept), layer + 1,
+                            isTopRealizedConcept);
                 }
             }
-			LabelInfo objLabelInfo = newDiagram.getObjectLabel(i);
-			if (objLabelInfo != null && this.objectLabelFactory != null) {
-				LabelView labelView = this.objectLabelFactory.createLabelView(this, nodeView, objLabelInfo);
-				addCanvasItem(labelView, labelLayerName);
-				addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
-				labelView.addObserver(this);
-			}
-            if(showAttributeLabels) {
-	            LabelInfo attrLabelInfo = newDiagram.getAttributeLabel(i);
-	            if (attrLabelInfo != null) {
-	                LabelView labelView = this.attributeLabelFactory.createLabelView(this, nodeView, attrLabelInfo);
-	                addCanvasItem(labelView, labelLayerName);
-	                addCanvasItem(new LabelConnector(labelView), labelConnectorLayerName);
-	                labelView.addObserver(this);
-	            }
-			}
+            final LabelInfo objLabelInfo = newDiagram.getObjectLabel(i);
+            if (objLabelInfo != null && this.objectLabelFactory != null) {
+                final LabelView labelView = this.objectLabelFactory
+                        .createLabelView(this, nodeView, objLabelInfo);
+                addCanvasItem(labelView, labelLayerName);
+                addCanvasItem(new LabelConnector(labelView),
+                        labelConnectorLayerName);
+                labelView.addObserver(this);
+            }
+            if (showAttributeLabels) {
+                final LabelInfo attrLabelInfo = newDiagram.getAttributeLabel(i);
+                if (attrLabelInfo != null) {
+                    final LabelView labelView = this.attributeLabelFactory
+                            .createLabelView(this, nodeView, attrLabelInfo);
+                    addCanvasItem(labelView, labelLayerName);
+                    addCanvasItem(new LabelConnector(labelView),
+                            labelConnectorLayerName);
+                    labelView.addObserver(this);
+                }
+            }
         }
         for (int i = 0; i < newDiagram.getNumberOfLines(); i++) {
-            DiagramLine dl = newDiagram.getLine(i);
-            addCanvasItem(new LineView(dl, nodeMap.get(dl.getFromNode()), nodeMap.get(dl.getToNode())), lineLayerName);
+            final DiagramLine dl = newDiagram.getLine(i);
+            addCanvasItem(new LineView(dl, nodeMap.get(dl.getFromNode()),
+                    nodeMap.get(dl.getToNode())), lineLayerName);
         }
-        if(newDiagram instanceof SimpleLineDiagram) {
-            SimpleLineDiagram sld = (SimpleLineDiagram) newDiagram;
-            for (Iterator<CanvasItem> iter = sld.getExtraCanvasItems().iterator(); iter.hasNext();) {
-                CanvasItem item = iter.next();
+        if (newDiagram instanceof SimpleLineDiagram) {
+            final SimpleLineDiagram sld = (SimpleLineDiagram) newDiagram;
+            for (final Iterator<CanvasItem> iter = sld.getExtraCanvasItems()
+                    .iterator(); iter.hasNext();) {
+                final CanvasItem item = iter.next();
                 addCanvasItem(item, "extraItems");
             }
         }
     }
 
-    public void setDisplayType(boolean contingentOnly) {
-        Iterator it = this.getCanvasItemsByType(NodeView.class).iterator();
+    public void setDisplayType(final boolean contingentOnly) {
+        final Iterator it = this.getCanvasItemsByType(NodeView.class)
+                .iterator();
         while (it.hasNext()) {
-            NodeView nv = (NodeView) it.next();
-            nv.getConceptInterpretationContext().setObjectDisplayMode(contingentOnly);
+            final NodeView nv = (NodeView) it.next();
+            nv.getConceptInterpretationContext().setObjectDisplayMode(
+                    contingentOnly);
         }
         updateLabelEntries();
         requestScreenTransformUpdate();
@@ -348,32 +378,36 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     public void updateLabelEntries() {
-        Iterator it = this.getCanvasItemsByType(LabelView.class).iterator();
+        final Iterator it = this.getCanvasItemsByType(LabelView.class)
+                .iterator();
         while (it.hasNext()) {
-            LabelView lv = (LabelView) it.next();
+            final LabelView lv = (LabelView) it.next();
             lv.updateEntries();
         }
     }
 
-    public void setSelectedConcepts(Concept[] concepts) {
+    public void setSelectedConcepts(final Concept[] concepts) {
         // notify all nodes and lines
-        Iterator it = this.getCanvasItemsByType(NodeView.class).iterator();
+        final Iterator it = this.getCanvasItemsByType(NodeView.class)
+                .iterator();
         while (it.hasNext()) {
-            NodeView nv = (NodeView) it.next();
+            final NodeView nv = (NodeView) it.next();
             nv.setSelectedConcepts(concepts);
         }
-        getController().getEventBroker().processEvent(new SelectionChangedEvent(this));
+        getController().getEventBroker().processEvent(
+                new SelectionChangedEvent(this));
         repaint();
     }
 
     /**
      * Sets all object label views to use this query when asking their concepts.
      */
-    public void setQuery(Query query) {
+    public void setQuery(final Query query) {
         // update the current labels
-        Iterator it = this.getCanvasItemsByType(ObjectLabelView.class).iterator();
+        final Iterator it = this.getCanvasItemsByType(ObjectLabelView.class)
+                .iterator();
         while (it.hasNext()) {
-            ObjectLabelView lv = (ObjectLabelView) it.next();
+            final ObjectLabelView lv = (ObjectLabelView) it.next();
             lv.setQuery(query);
         }
         requestScreenTransformUpdate();
@@ -385,23 +419,23 @@ public class DiagramView extends Canvas implements ChangeObserver {
     public DiagramSchema getDiagramSchema() {
         return diagramSchema;
     }
-    
-    public void setDiagramSchema(DiagramSchema schema) {
-    	this.diagramSchema = schema;
+
+    public void setDiagramSchema(final DiagramSchema schema) {
+        this.diagramSchema = schema;
         getBackgroundItem().setPaint(schema.getBackgroundColor());
-    	this.repaint();
+        this.repaint();
     }
 
-	public double getMinimumFontSize() {
-		return minimumFontSize;
-	}
+    public double getMinimumFontSize() {
+        return minimumFontSize;
+    }
 
-	public void setMinimumFontSize(double minimumFontSize) {
-		this.minimumFontSize = minimumFontSize;
-		this.screenTransformDirty = true;
-		repaint();
-	}
-	
+    public void setMinimumFontSize(final double minimumFontSize) {
+        this.minimumFontSize = minimumFontSize;
+        this.screenTransformDirty = true;
+        repaint();
+    }
+
     public LabelView.LabelFactory getAttributeLabelFactory() {
         return attributeLabelFactory;
     }
@@ -411,17 +445,19 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     public void setAttributeLabelFactory(
-        LabelView.LabelFactory attributeLabelFactory) {
+            final LabelView.LabelFactory attributeLabelFactory) {
         this.attributeLabelFactory = attributeLabelFactory;
     }
 
-	/**
-	 * This changes the object labels created for new diagrams.
-	 * 
-	 * If a different label factory is given, this factory will be used to create
-	 * the object labels. If null is given, no object labels will be used.
-	 */
-    public void setObjectLabelFactory(LabelView.LabelFactory objectLabelFactory) {
+    /**
+     * This changes the object labels created for new diagrams.
+     * 
+     * If a different label factory is given, this factory will be used to
+     * create the object labels. If null is given, no object labels will be
+     * used.
+     */
+    public void setObjectLabelFactory(
+            final LabelView.LabelFactory objectLabelFactory) {
         this.objectLabelFactory = objectLabelFactory;
     }
 
@@ -430,16 +466,16 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     public ExtendedUndoManager getUndoManager() {
-        /// @todo workaround to avoid problems that occur when undo is used in nested diagrams,
-        /// remove once the problems are fixed.
-        if(this.diagram instanceof NestedLineDiagram) {
+        // / @todo workaround to avoid problems that occur when undo is used in
+        // nested diagrams,
+        // / remove once the problems are fixed.
+        if (this.diagram instanceof NestedLineDiagram) {
             return null;
         }
-		return undoManager;
-	}
-    
-	public void setUndoManager(ExtendedUndoManager undoManager) {
-		this.undoManager = undoManager;
-	}
-}
+        return undoManager;
+    }
 
+    public void setUndoManager(final ExtendedUndoManager undoManager) {
+        this.undoManager = undoManager;
+    }
+}

@@ -22,43 +22,51 @@ import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 public class FilterOperationEventListener implements EventBrokerListener {
-    private DiagramController controller;
+    private final DiagramController controller;
 
-    public FilterOperationEventListener(DiagramController controller, EventBroker eventBroker) {
+    public FilterOperationEventListener(final DiagramController controller,
+            final EventBroker eventBroker) {
         this.controller = controller;
-        eventBroker.subscribe(this, CanvasItemActivatedEvent.class,	NodeView.class);
+        eventBroker.subscribe(this, CanvasItemActivatedEvent.class,
+                NodeView.class);
     }
 
-    public void processEvent(Event e) {
+    public void processEvent(final Event e) {
         CanvasItemEventWithPosition itemEvent = null;
         try {
             itemEvent = (CanvasItemEventWithPosition) e;
-        } catch (ClassCastException e1) {
-            throw new RuntimeException(getClass().getName() +
-                    " has to be subscribed to CanvasItemEventWithPositions only");
+        } catch (final ClassCastException e1) {
+            throw new RuntimeException(
+                    getClass().getName()
+                            + " has to be subscribed to CanvasItemEventWithPositions only");
         }
         NodeView nodeView = null;
         try {
             nodeView = (NodeView) itemEvent.getItem();
-        } catch (ClassCastException e1) {
-            throw new RuntimeException(getClass().getName() +
-                    " has to be subscribed to events from NodeViews only");
+        } catch (final ClassCastException e1) {
+            throw new RuntimeException(getClass().getName()
+                    + " has to be subscribed to events from NodeViews only");
         }
-        Concept filterConcept = nodeView.getDiagramNode().getFilterConcept();
-        ConceptInterpreter interpreter = nodeView.getDiagramView().getConceptInterpreter();
-        ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
-        int extent = interpreter.getExtentSize(filterConcept, context);
-        if(extent != 0) {
-        	try {
-				this.controller.next(filterConcept);
-        	} catch (RuntimeException exc) {
-        		/// @todo create a proper exception for this case
-				Canvas canvas = nodeView.getDiagramView();
-				new CanvasFeedbackMessage("No further diagram selected", canvas, itemEvent.getCanvasPosition());
-        	}
+        final Concept filterConcept = nodeView.getDiagramNode()
+                .getFilterConcept();
+        final ConceptInterpreter interpreter = nodeView.getDiagramView()
+                .getConceptInterpreter();
+        final ConceptInterpretationContext context = nodeView
+                .getConceptInterpretationContext();
+        final int extent = interpreter.getExtentSize(filterConcept, context);
+        if (extent != 0) {
+            try {
+                this.controller.next(filterConcept);
+            } catch (final RuntimeException exc) {
+                // / @todo create a proper exception for this case
+                final Canvas canvas = nodeView.getDiagramView();
+                new CanvasFeedbackMessage("No further diagram selected",
+                        canvas, itemEvent.getCanvasPosition());
+            }
         } else {
-        	Canvas canvas = nodeView.getDiagramView();
-        	new CanvasFeedbackMessage("No objects would be left", canvas, itemEvent.getCanvasPosition());
+            final Canvas canvas = nodeView.getDiagramView();
+            new CanvasFeedbackMessage("No objects would be left", canvas,
+                    itemEvent.getCanvasPosition());
         }
     }
 }

@@ -10,10 +10,11 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext;
 import net.sourceforge.toscanaj.model.order.Ordered;
 
 public class Criterion implements Ordered<Criterion> {
-    private ManyValuedAttribute property;
-    private ScaleColumn valueGroup;
+    private final ManyValuedAttribute property;
+    private final ScaleColumn valueGroup;
 
-    public Criterion(ManyValuedAttribute property, ScaleColumn valueGroup) {
+    public Criterion(final ManyValuedAttribute property,
+            final ScaleColumn valueGroup) {
         this.valueGroup = valueGroup;
         this.property = property;
     }
@@ -31,15 +32,17 @@ public class Criterion implements Ordered<Criterion> {
     }
 
     @Override
-	public String toString() {
+    public String toString() {
         return getDisplayString();
     }
 
-    public boolean isLesserThan(Criterion other) {
-        return (this.property == other.property) && this.valueGroup.isLesserThan(other.valueGroup);
+    public boolean isLesserThan(final Criterion other) {
+        return (this.property == other.property)
+                && this.valueGroup.isLesserThan(other.valueGroup);
     }
 
-    public boolean isEqual(Criterion other) {
-        return (this.property == other.property) && this.valueGroup.isEqual(other.valueGroup);
+    public boolean isEqual(final Criterion other) {
+        return (this.property == other.property)
+                && this.valueGroup.isEqual(other.valueGroup);
     }
 }

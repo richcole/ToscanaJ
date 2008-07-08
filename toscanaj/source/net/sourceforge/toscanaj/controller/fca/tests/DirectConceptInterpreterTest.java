@@ -9,6 +9,9 @@ package net.sourceforge.toscanaj.controller.fca.tests;
 
 import java.util.Iterator;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
@@ -28,15 +31,11 @@ import net.sourceforge.toscanaj.tests.ContextSetups;
 import org.tockit.context.model.Context;
 import org.tockit.events.EventBroker;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 public class DirectConceptInterpreterTest extends TestCase {
     private static final DefaultDimensionStrategy DIMENSION_STRATEGY = new DefaultDimensionStrategy();
     final static Class THIS = DirectConceptInterpreterTest.class;
 
-    public DirectConceptInterpreterTest(String s) {
+    public DirectConceptInterpreterTest(final String s) {
         super(s);
     }
 
@@ -45,57 +44,73 @@ public class DirectConceptInterpreterTest extends TestCase {
     }
 
     public void testNesting() {
-        Context context1 = ContextSetups.createAnimalSizeContext();
-        Context context2 = ContextSetups.createAnimalMovementContext();
-        
-        LatticeGenerator lgen = new GantersAlgorithm();
-        Lattice lattice1 = lgen.createLattice(context1);
-        Lattice lattice2 = lgen.createLattice(context2);
-        
-        Diagram2D outerDiagram = NDimLayoutOperations.createDiagram(lattice1, context1.getName(), DIMENSION_STRATEGY);
-        Diagram2D innerDiagram = NDimLayoutOperations.createDiagram(lattice2, context2.getName(), DIMENSION_STRATEGY);
-        
-        NestedLineDiagram nestedDiagram = new NestedLineDiagram(outerDiagram, innerDiagram);
+        final Context context1 = ContextSetups.createAnimalSizeContext();
+        final Context context2 = ContextSetups.createAnimalMovementContext();
 
-        DiagramHistory diagramHistory = new DiagramHistory();
+        final LatticeGenerator lgen = new GantersAlgorithm();
+        final Lattice lattice1 = lgen.createLattice(context1);
+        final Lattice lattice2 = lgen.createLattice(context2);
+
+        final Diagram2D outerDiagram = NDimLayoutOperations.createDiagram(
+                lattice1, context1.getName(), DIMENSION_STRATEGY);
+        final Diagram2D innerDiagram = NDimLayoutOperations.createDiagram(
+                lattice2, context2.getName(), DIMENSION_STRATEGY);
+
+        final NestedLineDiagram nestedDiagram = new NestedLineDiagram(
+                outerDiagram, innerDiagram);
+
+        final DiagramHistory diagramHistory = new DiagramHistory();
         diagramHistory.addDiagram(outerDiagram);
         diagramHistory.addDiagram(innerDiagram);
         diagramHistory.setNestingLevel(1);
-        
-        NestedDiagramNode someOuterNode = (NestedDiagramNode) nestedDiagram.getNode(0);
-        DiagramNode someInnerNode = someOuterNode.getInnerDiagram().getNode(0);
-        
-        ConceptInterpretationContext interpretationContext = new ConceptInterpretationContext(diagramHistory, new EventBroker());
-        Concept topConcept = interpretationContext.createNestedContext(someOuterNode.getConcept()).getOutermostTopConcept(someInnerNode.getConcept());
-        
-        ConceptInterpreter interpreter = new DirectConceptInterpreter();
+
+        final NestedDiagramNode someOuterNode = (NestedDiagramNode) nestedDiagram
+                .getNode(0);
+        final DiagramNode someInnerNode = someOuterNode.getInnerDiagram()
+                .getNode(0);
+
+        final ConceptInterpretationContext interpretationContext = new ConceptInterpretationContext(
+                diagramHistory, new EventBroker());
+        final Concept topConcept = interpretationContext.createNestedContext(
+                someOuterNode.getConcept()).getOutermostTopConcept(
+                someInnerNode.getConcept());
+
+        final ConceptInterpreter interpreter = new DirectConceptInterpreter();
 
         int count = 0;
-        for (Iterator iter = interpreter.getIntentIterator(topConcept, interpretationContext); iter.hasNext();) {
+        for (final Iterator iter = interpreter.getIntentIterator(topConcept,
+                interpretationContext); iter.hasNext();) {
             iter.next();
             count++;
         }
         assertEquals(0, count);
-        
-        assertEquals(16, interpreter.getExtentSize(topConcept, interpretationContext));
+
+        assertEquals(16, interpreter.getExtentSize(topConcept,
+                interpretationContext));
 
         count = 0;
-        int[] contingentSizeBuckets = new int[] {0,0,0};
-        for (Iterator<DiagramNode> iter = nestedDiagram.getNodes(); iter.hasNext();) {
-            DiagramNode node = iter.next();
+        final int[] contingentSizeBuckets = new int[] { 0, 0, 0 };
+        for (final Iterator<DiagramNode> iter = nestedDiagram.getNodes(); iter
+                .hasNext();) {
+            final DiagramNode node = iter.next();
             count++;
-            int contSize = interpreter.getObjectContingentSize(node.getConcept(), interpretationContext.createNestedContext(node.getOuterNode().getConcept()));
+            final int contSize = interpreter.getObjectContingentSize(node
+                    .getConcept(), interpretationContext
+                    .createNestedContext(node.getOuterNode().getConcept()));
             contingentSizeBuckets[contSize]++;
         }
-        /// @todo this actually tests the nested line diagram, not the interpreter
-        /// we should probably have a separate test case for that
+        // / @todo this actually tests the nested line diagram, not the
+        // interpreter
+        // / we should probably have a separate test case for that
         assertEquals(40, count);
-        
+
         assertEquals(29, contingentSizeBuckets[0]);
         assertEquals(6, contingentSizeBuckets[1]);
         assertEquals(5, contingentSizeBuckets[2]);
-        
-        // @todo test some more, e.g. the object concept for "tiger" is the same as the one for "lion", "fox" takes
-        // you to the same as "wolf", similarly "owl"/"hawk", "duck"/"goose", "horse"/"zebra"
+
+        // @todo test some more, e.g. the object concept for "tiger" is the same
+        // as the one for "lion", "fox" takes
+        // you to the same as "wolf", similarly "owl"/"hawk", "duck"/"goose",
+        // "horse"/"zebra"
     }
 }

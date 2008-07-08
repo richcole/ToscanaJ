@@ -8,7 +8,6 @@
 package net.sourceforge.toscanaj.controller.ndimlayout;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
@@ -16,24 +15,24 @@ import net.sourceforge.toscanaj.model.order.Ordered;
 import net.sourceforge.toscanaj.model.order.PartialOrderNode;
 
 public class PartialOrderOperations {
-    static public<D extends Ordered<D>> DirectedGraph<PartialOrderNode<D>> createGraphFromOrder(D[] order) {
-        DirectedGraph<PartialOrderNode<D>> graph = new DirectedGraph<PartialOrderNode<D>>();
+    static public <D extends Ordered<D>> DirectedGraph<PartialOrderNode<D>> createGraphFromOrder(
+            final D[] order) {
+        final DirectedGraph<PartialOrderNode<D>> graph = new DirectedGraph<PartialOrderNode<D>>();
         for (int i = 0; i < order.length; i++) {
-            D item = order[i];
-            PartialOrderNode<D> node = new PartialOrderNode<D>(item);
-            Set<PartialOrderNode<D>> nodes = graph.getNodes();
-            Set<PartialOrderNode<D>> largerNodes = new HashSet<PartialOrderNode<D>>();
-            Set<PartialOrderNode<D>> smallerNodes = new HashSet<PartialOrderNode<D>>();
-            for (Iterator<PartialOrderNode<D>> iterator = nodes.iterator(); iterator.hasNext();) {
-            	PartialOrderNode<D> otherNode = iterator.next();
-                D otherItem = otherNode.getData();
+            final D item = order[i];
+            final PartialOrderNode<D> node = new PartialOrderNode<D>(item);
+            final Set<PartialOrderNode<D>> nodes = graph.getNodes();
+            final Set<PartialOrderNode<D>> largerNodes = new HashSet<PartialOrderNode<D>>();
+            final Set<PartialOrderNode<D>> smallerNodes = new HashSet<PartialOrderNode<D>>();
+            for (final PartialOrderNode<D> otherNode : nodes) {
+                final D otherItem = otherNode.getData();
                 if (otherItem.isEqual(item)) {
-                    for (Iterator<PartialOrderNode<D>> iterator2 = otherNode.getInboundNodes().iterator(); iterator2.hasNext();) {
-                    	PartialOrderNode<D> inbNode = iterator2.next();
+                    for (final PartialOrderNode<D> inbNode : otherNode
+                            .getInboundNodes()) {
                         inbNode.connectTo(node);
                     }
-                    for (Iterator<PartialOrderNode<D>> iterator2 = otherNode.getOutboundNodes().iterator(); iterator2.hasNext();) {
-                    	PartialOrderNode<D> outbNode = iterator2.next();
+                    for (final PartialOrderNode<D> outbNode : otherNode
+                            .getOutboundNodes()) {
                         node.connectTo(outbNode);
                     }
                     largerNodes.clear();
@@ -45,11 +44,10 @@ public class PartialOrderOperations {
                     smallerNodes.add(otherNode);
                 }
             }
-            Set<PartialOrderNode<D>> nonNeighbours = new HashSet<PartialOrderNode<D>>();
-            smallerLoop: for (Iterator<PartialOrderNode<D>> iterator = smallerNodes.iterator(); iterator.hasNext();) {
-            	PartialOrderNode<D> smallerNode = iterator.next();
-                for (Iterator<PartialOrderNode<D>> iterator2 = smallerNode.getInboundNodes().iterator(); iterator2.hasNext();) {
-                	PartialOrderNode<D> inbNode = iterator2.next();
+            final Set<PartialOrderNode<D>> nonNeighbours = new HashSet<PartialOrderNode<D>>();
+            smallerLoop: for (final PartialOrderNode<D> smallerNode : smallerNodes) {
+                for (final PartialOrderNode<D> inbNode : smallerNode
+                        .getInboundNodes()) {
                     if (smallerNodes.contains(inbNode)) {
                         nonNeighbours.add(smallerNode);
                         continue smallerLoop;
@@ -58,10 +56,9 @@ public class PartialOrderOperations {
             }
             smallerNodes.removeAll(nonNeighbours);
             nonNeighbours.clear();
-            largerLoop: for (Iterator<PartialOrderNode<D>> iterator = largerNodes.iterator(); iterator.hasNext();) {
-            	PartialOrderNode<D> largerNode = iterator.next();
-                for (Iterator<PartialOrderNode<D>> iterator2 = largerNode.getOutboundNodes().iterator(); iterator2.hasNext();) {
-                	PartialOrderNode<D> outbNode = iterator2.next();
+            largerLoop: for (final PartialOrderNode<D> largerNode : largerNodes) {
+                for (final PartialOrderNode<D> outbNode : largerNode
+                        .getOutboundNodes()) {
                     if (largerNodes.contains(outbNode)) {
                         nonNeighbours.add(largerNode);
                         continue largerLoop;
@@ -69,16 +66,13 @@ public class PartialOrderOperations {
                 }
             }
             largerNodes.removeAll(nonNeighbours);
-            for (Iterator<PartialOrderNode<D>> iterator = smallerNodes.iterator(); iterator.hasNext();) {
-            	PartialOrderNode<D> lowerNeighbour = iterator.next();
+            for (final PartialOrderNode<D> lowerNeighbour : smallerNodes) {
                 node.connectTo(lowerNeighbour);
-                for (Iterator<PartialOrderNode<D>> iterator2 = largerNodes.iterator(); iterator2.hasNext();) {
-                	PartialOrderNode<D> upperNeighbour = iterator2.next();
+                for (final PartialOrderNode<D> upperNeighbour : largerNodes) {
                     upperNeighbour.disconnectFrom(lowerNeighbour);
                 }
             }
-            for (Iterator<PartialOrderNode<D>> iterator = largerNodes.iterator(); iterator.hasNext();) {
-            	PartialOrderNode<D> upperNeighbour = iterator.next();
+            for (final PartialOrderNode<D> upperNeighbour : largerNodes) {
                 upperNeighbour.connectTo(node);
             }
             graph.addNode(node);

@@ -7,20 +7,21 @@
  */
 package net.sourceforge.toscanaj.model.diagram.tests;
 
+import java.awt.Color;
+import java.awt.geom.Point2D;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import org.jdom.Element;
 
-import java.awt.*;
-import java.awt.geom.Point2D;
+import org.jdom.Element;
 
 public class LabelInfoTest extends TestCase {
     final static Class THIS = LabelInfoTest.class;
 
-    public LabelInfoTest(String s) {
+    public LabelInfoTest(final String s) {
         super(s);
     }
 
@@ -30,14 +31,14 @@ public class LabelInfoTest extends TestCase {
 
     public void testReadWriteFromXML() {
 
-        LabelInfo node = new LabelInfo();
+        final LabelInfo node = new LabelInfo();
 
-        Element xmlDesc = node.toXML();
+        final Element xmlDesc = node.toXML();
 
         try {
-            LabelInfo other = new LabelInfo(xmlDesc);
+            final LabelInfo other = new LabelInfo(xmlDesc);
             assertEquals(node, other);
-        } catch (XMLSyntaxError error) {
+        } catch (final XMLSyntaxError error) {
             fail(error.toString());
         }
 
@@ -45,7 +46,7 @@ public class LabelInfoTest extends TestCase {
 
     public void testEquals() {
         LabelInfo one = new LabelInfo();
-        LabelInfo two = new LabelInfo();
+        final LabelInfo two = new LabelInfo();
         assertEquals(one, two);
 
         assertEquals(false, one.equals(null));
@@ -69,6 +70,5 @@ public class LabelInfoTest extends TestCase {
         // can't test for attaching node, because it is not in public interface
 
     }
-
 
 }

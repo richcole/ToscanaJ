@@ -7,28 +7,27 @@
  */
 package net.sourceforge.toscanaj.util.xmlize;
 
-import org.jdom.Document;
-import org.jdom.output.XMLOutputter;
-
 import java.io.File;
 import java.io.FileOutputStream;
 
+import org.jdom.Document;
+import org.jdom.output.XMLOutputter;
+
 /**
- * This class provides a mechanism to write an XMLizable object to a
- * file.
+ * This class provides a mechanism to write an XMLizable object to a file.
  */
 public class XMLWriter {
-    public static void write(File file, XMLizable object)
+    public static void write(final File file, final XMLizable object)
             throws Exception {
         // open stream on file
-        FileOutputStream out = new FileOutputStream(file);
-        XMLOutputter outputter = new XMLOutputter();
+        final FileOutputStream out = new FileOutputStream(file);
+        final XMLOutputter outputter = new XMLOutputter();
         outputter.setIndent("    ");
         outputter.setNewlines(true);
 
-        Document document = new Document(object.toXML());
+        final Document document = new Document(object.toXML());
         outputter.output(document, out);
-        
+
         out.close();
     }
 

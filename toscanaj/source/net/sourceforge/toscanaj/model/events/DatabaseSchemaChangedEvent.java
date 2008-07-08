@@ -8,14 +8,16 @@
 package net.sourceforge.toscanaj.model.events;
 
 import net.sourceforge.toscanaj.model.database.DatabaseSchema;
+
 import org.tockit.events.Event;
 
 public class DatabaseSchemaChangedEvent implements Event {
 
-    private DatabaseSchema dbScheme;
-    private Object source;
+    private final DatabaseSchema dbScheme;
+    private final Object source;
 
-    public DatabaseSchemaChangedEvent(Object source, DatabaseSchema dbScheme) {
+    public DatabaseSchemaChangedEvent(final Object source,
+            final DatabaseSchema dbScheme) {
         this.source = source;
         this.dbScheme = dbScheme;
     }

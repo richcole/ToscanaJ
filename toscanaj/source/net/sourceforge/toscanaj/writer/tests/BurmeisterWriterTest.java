@@ -27,7 +27,7 @@ import org.tockit.context.model.Context;
 public class BurmeisterWriterTest extends TestCase {
     final static Class THIS = BurmeisterWriterTest.class;
 
-    public BurmeisterWriterTest(String s) {
+    public BurmeisterWriterTest(final String s) {
         super(s);
     }
 
@@ -38,21 +38,25 @@ public class BurmeisterWriterTest extends TestCase {
     public void testAnimalContext() throws IOException, DataFormatException {
         final Context inContext = ContextSetups.createCompleteAnimalContext();
         final PipedOutputStream out = new PipedOutputStream();
-        Reader in = new InputStreamReader(new PipedInputStream(out));
-        
-        Runnable writeTask = new Runnable() {
+        final Reader in = new InputStreamReader(new PipedInputStream(out));
+
+        final Runnable writeTask = new Runnable() {
             public void run() {
-                BurmeisterWriter.writeToBurmeisterFormat(inContext, new PrintStream(out));
+                BurmeisterWriter.writeToBurmeisterFormat(inContext,
+                        new PrintStream(out));
             }
         };
-        
-        Thread thread = new Thread(writeTask);
+
+        final Thread thread = new Thread(writeTask);
         thread.start();
-        
-        Context resultContext = BurmeisterParser.importBurmeisterFromReader(in);
-        
-        assertEquals(inContext.getAttributes().size(),resultContext.getAttributes().size());
-        assertEquals(inContext.getObjects().size(),resultContext.getObjects().size());
+
+        final Context resultContext = BurmeisterParser
+                .importBurmeisterFromReader(in);
+
+        assertEquals(inContext.getAttributes().size(), resultContext
+                .getAttributes().size());
+        assertEquals(inContext.getObjects().size(), resultContext.getObjects()
+                .size());
         assertEquals(inContext.getName(), resultContext.getName());
     }
 }

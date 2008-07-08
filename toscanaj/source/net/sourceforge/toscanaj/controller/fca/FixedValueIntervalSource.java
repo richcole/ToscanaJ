@@ -9,18 +9,19 @@ package net.sourceforge.toscanaj.controller.fca;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
+public class FixedValueIntervalSource<O, A> implements
+        NormedIntervalSource<O, A> {
+    private final double value;
 
-public class FixedValueIntervalSource<O,A> implements NormedIntervalSource<O,A> {
-    private double value;
-
-    public FixedValueIntervalSource(double value) {
-        if(value < 0 || value > 1) {
+    public FixedValueIntervalSource(final double value) {
+        if (value < 0 || value > 1) {
             throw new IllegalArgumentException("Value must be in [0,1]");
         }
         this.value = value;
     }
 
-    public double getValue(Concept<O,A> concept, ConceptInterpretationContext<O,A> context) {
+    public double getValue(final Concept<O, A> concept,
+            final ConceptInterpretationContext<O, A> context) {
         return this.value;
     }
 

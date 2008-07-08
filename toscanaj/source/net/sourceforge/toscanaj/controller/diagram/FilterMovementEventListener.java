@@ -11,12 +11,13 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 
 public class FilterMovementEventListener extends SetMovementEventListener {
     @Override
-	protected boolean isPartOfSet(DiagramNode node, DiagramNode otherNode) {
+    protected boolean isPartOfSet(final DiagramNode node,
+            final DiagramNode otherNode) {
         return node.getConcept().hasSuperConcept(otherNode.getConcept());
     }
 
-	@Override
-	protected String getPresentationName() {
-		return "Filter movement";
-	}
+    @Override
+    protected String getPresentationName() {
+        return "Filter movement";
+    }
 }

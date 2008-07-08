@@ -7,57 +7,52 @@
  */
 package net.sourceforge.toscanaj.gui.action;
 
-import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
-
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Iterator;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+
+import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 
 public class SimpleAction extends KeyboardMappedAction {
 
     protected List<SimpleActivity> activityList = new ArrayList<SimpleActivity>();
 
-    public SimpleAction(
-            JFrame frame,
-            SimpleActivity activity,
-            String displayName, int mnemonic,
-            KeyStroke keystroke) {
+    public SimpleAction(final JFrame frame, final SimpleActivity activity,
+            final String displayName, final int mnemonic,
+            final KeyStroke keystroke) {
         super(frame, displayName, mnemonic, keystroke);
         add(activity);
     }
 
-    public void add(SimpleActivity activity) {
+    public void add(final SimpleActivity activity) {
         this.activityList.add(activity);
     }
 
-    public SimpleAction(JFrame frame, String displayName, SimpleActivity activity) {
+    public SimpleAction(final JFrame frame, final String displayName,
+            final SimpleActivity activity) {
         super(frame, displayName);
         add(activity);
     }
 
-    public SimpleAction(JFrame frame, String displayName) {
+    public SimpleAction(final JFrame frame, final String displayName) {
         super(frame, displayName);
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         try {
-            for (Iterator<SimpleActivity> it = this.activityList.iterator(); it.hasNext();) {
-                SimpleActivity activity = it.next();
+            for (final SimpleActivity activity : this.activityList) {
                 if (!activity.doActivity()) {
                     break;
                 }
             }
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(
-                    this.frame,
-                    ex.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE
-            );
+        } catch (final Exception ex) {
+            JOptionPane.showMessageDialog(this.frame, ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
 }
-

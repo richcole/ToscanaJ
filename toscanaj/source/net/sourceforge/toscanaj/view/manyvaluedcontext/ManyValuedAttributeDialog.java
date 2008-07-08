@@ -33,206 +33,179 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedAttrib
 
 import org.tockit.datatype.Datatype;
 
-public class ManyValuedAttributeDialog extends JDialog{
-	
-	private JTextField nameTextField;
-	private JButton cancelButton;
-//	private JButton editTypeButton;
-	private JButton changeButton;
-	private WritableManyValuedAttribute property;
-	private Frame parent;
-	private JComboBox typeBox;
-	private ManyValuedContext context;
-	
-	/**
-	 * @todo this dialog could probably go with just the types instead of the whole context
-	 * @todo use session management
-	 * @todo either get object dialog to call show() in the constructor or remove it here
-	 */
-	public ManyValuedAttributeDialog(Frame parent,
-										WritableManyValuedAttribute property, 
-										ManyValuedContext context){
-		super(parent,"Many Valued-Context:Properties",true);
-		this.parent = parent;
-		this.property = property;
-		this.context = context;
-		setContentPane(createView());
-		setSize(300,200);
-		setVisible(true);
-	}
-	
-	protected JPanel createView(){
-		JPanel mainPane = new JPanel(new GridBagLayout());
-		mainPane.add(createPropertyNamePane(), new GridBagConstraints(
-							0,0,1,1,1,1,
-							GridBagConstraints.NORTHWEST,
-							GridBagConstraints.HORIZONTAL,
-							new Insets(2,2,2,2),
-							2,2
-							));
-								
-		mainPane.add(createTypePane(), new GridBagConstraints(
-							0,1,1,1,1,1,
-							GridBagConstraints.NORTHWEST,
-							GridBagConstraints.HORIZONTAL,
-							new Insets(2,2,2,2),
-							2,2
-							));
-							
-		mainPane.add(createButtonPane(), new GridBagConstraints(
-							0,2,1,1,1,1,
-							GridBagConstraints.NORTHWEST,
-							GridBagConstraints.HORIZONTAL,
-							new Insets(2,2,2,2),
-							2,2
-							));
-		return mainPane;
-	}
+public class ManyValuedAttributeDialog extends JDialog {
 
-	protected JPanel createPropertyNamePane() {
-		JPanel propertyNamePane = new JPanel(new GridBagLayout());
-		JLabel propertyNameLabel = new JLabel ("Name of Property: ");
-		nameTextField = new JTextField(property.getName());
-		
-		propertyNamePane.add(propertyNameLabel,new GridBagConstraints(
-								0,0,1,1,1,1,
-								GridBagConstraints.NORTHWEST,
-								GridBagConstraints.NONE,
-								new Insets(0,0,0,0),
-								2,2
-								));
-		propertyNamePane.add(nameTextField,new GridBagConstraints(
-								0,1,1,1,1,1,
-								GridBagConstraints.NORTHWEST,
-								GridBagConstraints.HORIZONTAL,
-								new Insets(0,0,0,0),
-								2,2
-								));
-		return propertyNamePane;
-	}
+    private JTextField nameTextField;
+    private JButton cancelButton;
+    // private JButton editTypeButton;
+    private JButton changeButton;
+    private final WritableManyValuedAttribute property;
+    private final Frame parent;
+    private JComboBox typeBox;
+    private final ManyValuedContext context;
 
-	protected JPanel createTypePane() {
-		JLabel typeNameLabel = new JLabel ("Type: ");
-		JPanel typePane = new JPanel(new GridBagLayout());
-//		editTypeButton = new JButton ("Edit Type");
-//		editTypeButton.addActionListener(new ActionListener(){
-//			public void actionPerformed(ActionEvent e) {
-//                // @todo do something here
-//			}
-//		});
-		
-		typePane.add(typeNameLabel,new GridBagConstraints(
-								0,0,1,1,1,1,
-								GridBagConstraints.NORTHWEST,
-								GridBagConstraints.NONE,
-								new Insets(2,2,2,2),
-								2,2
-								));
-		typePane.add(createTypeComboBox(),new GridBagConstraints(
-								0,1,2,1,1,1,
-								GridBagConstraints.NORTHWEST,
-								GridBagConstraints.HORIZONTAL,
-								new Insets(2,2,2,2),
-								2,2
-								));
-//		JPanel editTypeButtonPane = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-//		editTypeButtonPane.add(editTypeButton);
-//		typePane.add(editTypeButtonPane, new GridBagConstraints(
-//								1,2,1,1,1,1,
-//								GridBagConstraints.NORTHWEST,
-//								GridBagConstraints.HORIZONTAL,
-//								new Insets(2,2,2,2),
-//								2,2
-//								));
-		return typePane;
-	}
-	
-	protected JPanel createButtonPane(){
-		JPanel buttonPane = new JPanel(new FlowLayout());
-		changeButton = new JButton("Change");
-		changeButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				Datatype type = (Datatype) typeBox.getSelectedItem();
-				property.setType(type);
-				//if(!(property.getName().equals(propertyName.getText()))){
-					if(!(nameTextField.getText().equals(""))){
-						property.setName(nameTextField.getText());
-					}
-				//}
-				parent.validate();
-				//dispose();
-				setVisible(false);
-			}
-		});
-		cancelButton = new JButton("Cancel");
-		cancelButton.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-				dispose();
-			}
-		});
-		
-		buttonPane.add(changeButton);
-		buttonPane.add(cancelButton);
-		
-		return buttonPane;
-	}
-	
-	protected JComboBox createTypeComboBox(){
-		typeBox = new JComboBox();
-		Iterator<Datatype> typeIt = context.getTypes().iterator();
-		while(typeIt.hasNext()){
-            Datatype type = typeIt.next();
-			typeBox.addItem(type);
-			if(type.getName().equals(property.getType().getName())){
-				typeBox.setSelectedItem(type);
-			}	
-		}
-		typeBox.setRenderer(new DefaultListCellRenderer(){
-			/*
-			 * This is a copy of the implementation of DefaultListCellRenderer from Sun JDK 1.5,
-			 * the only change being the text displayed. A bit of a hack, but it seems better than
-			 * wrapping all content in an extra layer just for the toString() method and we don't
-			 * want to rely on every datatype implementing toString as display method.
-			 */
-		    @Override
-			public Component getListCellRendererComponent(
-		            JList list,
-		    	Object value,
-		            int index,
-		            boolean isSelected,
-		            boolean cellHasFocus)
-		        {
-		            setComponentOrientation(list.getComponentOrientation());
-		    	if (isSelected) {
-		    	    setBackground(list.getSelectionBackground());
-		    	    setForeground(list.getSelectionForeground());
-		    	}
-		    	else {
-		    	    setBackground(list.getBackground());
-		    	    setForeground(list.getForeground());
-		    	}
+    /**
+     * @todo this dialog could probably go with just the types instead of the
+     *       whole context
+     * @todo use session management
+     * @todo either get object dialog to call show() in the constructor or
+     *       remove it here
+     */
+    public ManyValuedAttributeDialog(final Frame parent,
+            final WritableManyValuedAttribute property,
+            final ManyValuedContext context) {
+        super(parent, "Many Valued-Context:Properties", true);
+        this.parent = parent;
+        this.property = property;
+        this.context = context;
+        setContentPane(createView());
+        setSize(300, 200);
+        setVisible(true);
+    }
 
-		    	setText((value == null) ? "" : ((Datatype)value).getName());
+    protected JPanel createView() {
+        final JPanel mainPane = new JPanel(new GridBagLayout());
+        mainPane.add(createPropertyNamePane(), new GridBagConstraints(0, 0, 1,
+                1, 1, 1, GridBagConstraints.NORTHWEST,
+                GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 2, 2));
 
-		    	setEnabled(list.isEnabled());
-		    	setFont(list.getFont());
+        mainPane.add(createTypePane(), new GridBagConstraints(0, 1, 1, 1, 1, 1,
+                GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,
+                new Insets(2, 2, 2, 2), 2, 2));
 
-		            Border border = null;
-		            if (cellHasFocus) {
-		                if (isSelected) {
-		                    border = UIManager.getBorder("List.focusSelectedCellHighlightBorder");
-		                }
-		                if (border == null) {
-		                    border = UIManager.getBorder("List.focusCellHighlightBorder");
-		                }
-		            } else {
-		                border = noFocusBorder;
-		            }
-		    	setBorder(border);
+        mainPane.add(createButtonPane(), new GridBagConstraints(0, 2, 1, 1, 1,
+                1, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,
+                new Insets(2, 2, 2, 2), 2, 2));
+        return mainPane;
+    }
 
-		    	return this;
-		        }
-		});
-		return typeBox;
-	}
+    protected JPanel createPropertyNamePane() {
+        final JPanel propertyNamePane = new JPanel(new GridBagLayout());
+        final JLabel propertyNameLabel = new JLabel("Name of Property: ");
+        nameTextField = new JTextField(property.getName());
+
+        propertyNamePane.add(propertyNameLabel, new GridBagConstraints(0, 0, 1,
+                1, 1, 1, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
+                new Insets(0, 0, 0, 0), 2, 2));
+        propertyNamePane.add(nameTextField, new GridBagConstraints(0, 1, 1, 1,
+                1, 1, GridBagConstraints.NORTHWEST,
+                GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 2, 2));
+        return propertyNamePane;
+    }
+
+    protected JPanel createTypePane() {
+        final JLabel typeNameLabel = new JLabel("Type: ");
+        final JPanel typePane = new JPanel(new GridBagLayout());
+        // editTypeButton = new JButton ("Edit Type");
+        // editTypeButton.addActionListener(new ActionListener(){
+        // public void actionPerformed(ActionEvent e) {
+        // // @todo do something here
+        // }
+        // });
+
+        typePane.add(typeNameLabel, new GridBagConstraints(0, 0, 1, 1, 1, 1,
+                GridBagConstraints.NORTHWEST, GridBagConstraints.NONE,
+                new Insets(2, 2, 2, 2), 2, 2));
+        typePane.add(createTypeComboBox(), new GridBagConstraints(0, 1, 2, 1,
+                1, 1, GridBagConstraints.NORTHWEST,
+                GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2, 2), 2, 2));
+        // JPanel editTypeButtonPane = new JPanel(new
+        // FlowLayout(FlowLayout.RIGHT));
+        // editTypeButtonPane.add(editTypeButton);
+        // typePane.add(editTypeButtonPane, new GridBagConstraints(
+        // 1,2,1,1,1,1,
+        // GridBagConstraints.NORTHWEST,
+        // GridBagConstraints.HORIZONTAL,
+        // new Insets(2,2,2,2),
+        // 2,2
+        // ));
+        return typePane;
+    }
+
+    protected JPanel createButtonPane() {
+        final JPanel buttonPane = new JPanel(new FlowLayout());
+        changeButton = new JButton("Change");
+        changeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                final Datatype type = (Datatype) typeBox.getSelectedItem();
+                property.setType(type);
+                // if(!(property.getName().equals(propertyName.getText()))){
+                if (!(nameTextField.getText().equals(""))) {
+                    property.setName(nameTextField.getText());
+                }
+                // }
+                parent.validate();
+                // dispose();
+                setVisible(false);
+            }
+        });
+        cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(new ActionListener() {
+            public void actionPerformed(final ActionEvent e) {
+                dispose();
+            }
+        });
+
+        buttonPane.add(changeButton);
+        buttonPane.add(cancelButton);
+
+        return buttonPane;
+    }
+
+    protected JComboBox createTypeComboBox() {
+        typeBox = new JComboBox();
+        final Iterator<Datatype> typeIt = context.getTypes().iterator();
+        while (typeIt.hasNext()) {
+            final Datatype type = typeIt.next();
+            typeBox.addItem(type);
+            if (type.getName().equals(property.getType().getName())) {
+                typeBox.setSelectedItem(type);
+            }
+        }
+        typeBox.setRenderer(new DefaultListCellRenderer() {
+            /*
+             * This is a copy of the implementation of DefaultListCellRenderer
+             * from Sun JDK 1.5, the only change being the text displayed. A bit
+             * of a hack, but it seems better than wrapping all content in an
+             * extra layer just for the toString() method and we don't want to
+             * rely on every datatype implementing toString as display method.
+             */
+            @Override
+            public Component getListCellRendererComponent(final JList list,
+                    final Object value, final int index,
+                    final boolean isSelected, final boolean cellHasFocus) {
+                setComponentOrientation(list.getComponentOrientation());
+                if (isSelected) {
+                    setBackground(list.getSelectionBackground());
+                    setForeground(list.getSelectionForeground());
+                } else {
+                    setBackground(list.getBackground());
+                    setForeground(list.getForeground());
+                }
+
+                setText((value == null) ? "" : ((Datatype) value).getName());
+
+                setEnabled(list.isEnabled());
+                setFont(list.getFont());
+
+                Border border = null;
+                if (cellHasFocus) {
+                    if (isSelected) {
+                        border = UIManager
+                                .getBorder("List.focusSelectedCellHighlightBorder");
+                    }
+                    if (border == null) {
+                        border = UIManager
+                                .getBorder("List.focusCellHighlightBorder");
+                    }
+                } else {
+                    border = noFocusBorder;
+                }
+                setBorder(border);
+
+                return this;
+            }
+        });
+        return typeBox;
+    }
 }

@@ -7,14 +7,16 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Dimension;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 
+import javax.swing.JTextField;
+
 /**
- * @todo restrict data entered to be integer instead of turning it into integer at the end
+ * @todo restrict data entered to be integer instead of turning it into integer
+ *       at the end
  */
 public class NumberField extends JTextField {
     public static final int INTEGER = 0;
@@ -22,12 +24,12 @@ public class NumberField extends JTextField {
 
     private NumberFormat formatter;
 
-    public NumberField(int columns, int formatType) {
+    public NumberField(final int columns, final int formatType) {
         super(columns);
         setNumberType(formatType);
     }
 
-    public void setNumberType(int formatType) {
+    public void setNumberType(final int formatType) {
         if (formatType == FLOAT) {
             formatter = NumberFormat.getNumberInstance(Locale.US);
         } else {
@@ -36,17 +38,17 @@ public class NumberField extends JTextField {
     }
 
     @Override
-	public boolean isValid() {
+    public boolean isValid() {
         try {
             formatter.parse(getText());
             return true;
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             return false;
         }
     }
 
     @Override
-	public Dimension getMaximumSize() {
+    public Dimension getMaximumSize() {
         return getPreferredSize();
     }
 
@@ -54,10 +56,11 @@ public class NumberField extends JTextField {
         double retVal = 0;
         try {
             retVal = formatter.parse(getText()).doubleValue();
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             // This should never happen because insertString allows
             // only properly formatted data to get in the field.
-            throw new RuntimeException("Could not parse value in NumberField", e);
+            throw new RuntimeException("Could not parse value in NumberField",
+                    e);
         }
         return retVal;
     }
@@ -66,19 +69,20 @@ public class NumberField extends JTextField {
         int retVal = 0;
         try {
             retVal = formatter.parse(getText()).intValue();
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             // This should never happen because insertString allows
             // only properly formatted data to get in the field.
-            throw new RuntimeException("Could not parse value in NumberField", e);
+            throw new RuntimeException("Could not parse value in NumberField",
+                    e);
         }
         return retVal;
     }
 
-    public void setIntegerValue(int value) {
+    public void setIntegerValue(final int value) {
         setText(formatter.format(value));
     }
 
-    public void setDoubleValue(double value) {
+    public void setDoubleValue(final double value) {
         setText(formatter.format(value));
     }
 }

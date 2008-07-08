@@ -14,7 +14,7 @@ import org.tockit.events.EventBroker;
  * This class is an abstraction of all diagram related information.
  */
 
-public interface WriteableDiagram2D<O,A> extends Diagram2D<O,A> {
+public interface WriteableDiagram2D<O, A> extends Diagram2D<O, A> {
 
     /**
      * Change the title of the diagram.
@@ -29,25 +29,25 @@ public interface WriteableDiagram2D<O,A> extends Diagram2D<O,A> {
     /**
      * Adds a point to the diagram (at the end of the list).
      */
-    void addNode(DiagramNode<O,A> node);
+    void addNode(DiagramNode<O, A> node);
 
     /**
      * Adds a line to the diagram (at the end of the list).
-     *
+     * 
      * The from and to parameters are assumed to refer to some points already
      * existing in the points list.
      */
-    void addLine(DiagramNode<O,A> from, DiagramNode<O,A> to);
+    void addLine(DiagramNode<O, A> from, DiagramNode<O, A> to);
 
-	/**
-	 * Sets an event broker to send DiagramChangeEvents to.
-	 */
-	void setEventBroker(EventBroker eventBroker);
-	
-	/**
-	 * Sends a notification about a change into the broker attached.
-	 * 
-	 * This is a null-operation if the broker is not set.
-	 */
-	void sendChangeEvent();
+    /**
+     * Sets an event broker to send DiagramChangeEvents to.
+     */
+    void setEventBroker(EventBroker eventBroker);
+
+    /**
+     * Sends a notification about a change into the broker attached.
+     * 
+     * This is a null-operation if the broker is not set.
+     */
+    void sendChangeEvent();
 }

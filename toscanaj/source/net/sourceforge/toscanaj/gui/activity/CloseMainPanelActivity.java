@@ -12,13 +12,12 @@ import net.sourceforge.toscanaj.gui.MainPanel;
 public class CloseMainPanelActivity implements SimpleActivity {
     MainPanel frame;
 
-    public CloseMainPanelActivity(MainPanel a_frame) {
-    	this.frame = a_frame;
+    public CloseMainPanelActivity(final MainPanel a_frame) {
+        this.frame = a_frame;
     }
 
     public boolean doActivity() {
-    	this.frame.closeMainPanel();
+        this.frame.closeMainPanel();
         return true;
     }
 }
-

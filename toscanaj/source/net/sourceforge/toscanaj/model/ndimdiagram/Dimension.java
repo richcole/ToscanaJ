@@ -15,16 +15,17 @@ import java.util.List;
  * A dimension is a set of attributes that form an implication chain in the
  * conceptual structure.
  * 
- * @param <R> The underlying type of the attributes.
+ * @param <R>
+ *            The underlying type of the attributes.
  */
 public class Dimension<R> {
-    private List<R> attributes;
+    private final List<R> attributes;
 
-    public Dimension(List<R> attributes) {
+    public Dimension(final List<R> attributes) {
         this.attributes = attributes;
     }
 
-    public boolean contains(R attribute) {
+    public boolean contains(final R attribute) {
         return attributes.contains(attribute);
     }
 }

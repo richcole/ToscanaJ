@@ -5,12 +5,11 @@
  *
  * $Id$
  */
- 
+
 package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
 import org.tockit.datatype.Value;
 
-
-public interface WritableScaleColumn extends ScaleColumn{
-	public void addValue(Value attributeValue);
+public interface WritableScaleColumn extends ScaleColumn {
+    public void addValue(Value attributeValue);
 }

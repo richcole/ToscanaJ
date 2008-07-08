@@ -7,93 +7,103 @@
  */
 package net.sourceforge.toscanaj.dbviewer;
 
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
+
 /**
  * Calls an external program as database viewer.
- *
- * A definition for this viewer looks like this:
- * <objectView class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer"
- *         name="Start external viewer..."/>
- *     <parameter name="openDelimiter" value="%"/>
- *     <parameter name="closeDelimiter" value="%"/>
- *     <parameter name="commandLine" value="browser %descriptionUrl%"/>
- * </objectView>
- *
+ * 
+ * A definition for this viewer looks like this: <objectView
+ * class="net.sourceforge.toscanaj.dbviewer.ProgramCallDatabaseViewer"
+ * name="Start external viewer..."/> <parameter name="openDelimiter" value="%"/>
+ * <parameter name="closeDelimiter" value="%"/> <parameter name="commandLine"
+ * value="browser %descriptionUrl%"/> </objectView>
+ * 
  * In the example the program called "browser" will be started with the content
  * of the field "descriptionUrl". The delimiters define how the fields are
  * marked, they can be completely different and they are allowed to contain more
  * than one character.
- *
+ * 
  * Note: the external program is at the moment started in the same thread, the
  * UI will block as long as the external program runs.
- *
+ * 
  * Only the first object in the view will be used for a program call, the others
  * will be ignored.
- *
+ * 
  * @todo Handle multiple results somehow.
  */
 public class ProgramCallDatabaseViewer implements DatabaseViewer {
     private DatabaseViewerManager viewerManager = null;
 
-    private List<String> textFragments = new LinkedList<String>();
+    private final List<String> textFragments = new LinkedList<String>();
 
-    private List<String> fieldNames = new LinkedList<String>();
+    private final List<String> fieldNames = new LinkedList<String>();
 
     public ProgramCallDatabaseViewer() {
-        // initialization has to be done separately, so we can use the dynamic class loading mechanism
+        // initialization has to be done separately, so we can use the dynamic
+        // class loading mechanism
     }
 
-    public void initialize(DatabaseViewerManager manager) {
+    public void initialize(final DatabaseViewerManager manager) {
         this.viewerManager = manager;
 
-        String openDelimiter = this.viewerManager.getParameters().get("openDelimiter");
-        String closeDelimiter = this.viewerManager.getParameters().get("closeDelimiter");
-        String commandLine = this.viewerManager.getParameters().get("commandLine");
+        final String openDelimiter = this.viewerManager.getParameters().get(
+                "openDelimiter");
+        final String closeDelimiter = this.viewerManager.getParameters().get(
+                "closeDelimiter");
+        String commandLine = this.viewerManager.getParameters().get(
+                "commandLine");
         while (commandLine.indexOf(openDelimiter) != -1) {
-        	this.textFragments.add(commandLine.substring(0, commandLine.indexOf(openDelimiter)));
-            commandLine = commandLine.substring(commandLine.indexOf(openDelimiter) + openDelimiter.length());
-            this.fieldNames.add(commandLine.substring(0, commandLine.indexOf(closeDelimiter)));
-            commandLine = commandLine.substring(commandLine.indexOf(closeDelimiter) + closeDelimiter.length());
+            this.textFragments.add(commandLine.substring(0, commandLine
+                    .indexOf(openDelimiter)));
+            commandLine = commandLine.substring(commandLine
+                    .indexOf(openDelimiter)
+                    + openDelimiter.length());
+            this.fieldNames.add(commandLine.substring(0, commandLine
+                    .indexOf(closeDelimiter)));
+            commandLine = commandLine.substring(commandLine
+                    .indexOf(closeDelimiter)
+                    + closeDelimiter.length());
         }
         this.textFragments.add(commandLine);
     }
 
-    public void showView(String whereClause) throws DatabaseViewerException {
+    public void showView(final String whereClause)
+            throws DatabaseViewerException {
         String command = "";
         try {
-            List<String[]> results = this.viewerManager.getConnection().executeQuery(this.fieldNames,
-            		this.viewerManager.getTableName(),
-                    whereClause);
-            String[] fields = results.get(0);
-            Iterator<String> itText = this.textFragments.iterator();
-            for (int i = 0; i < fields.length; i++) {
-				String result = fields[i];
-                String text = itText.next();
+            final List<String[]> results = this.viewerManager.getConnection()
+                    .executeQuery(this.fieldNames,
+                            this.viewerManager.getTableName(), whereClause);
+            final String[] fields = results.get(0);
+            final Iterator<String> itText = this.textFragments.iterator();
+            for (final String result : fields) {
+                final String text = itText.next();
                 command += text + result;
             }
             command += itText.next();
-        } catch (DatabaseException e) {
-        	/// @todo maybe we should introduce a proper DatabaseViewerException in the signature
+        } catch (final DatabaseException e) {
+            // / @todo maybe we should introduce a proper
+            // DatabaseViewerException in the signature
             throw new DatabaseViewerException("Failed to query database.", e);
         }
         try {
             // add command shell on Win32 platforms
-            String osName = System.getProperty("os.name");
+            final String osName = System.getProperty("os.name");
             if (osName.equals("Windows NT")) {
                 command = "cmd.exe /C " + command;
             } else if (osName.equals("Windows 95")) {
                 command = "command.com /C " + command;
             }
 
-            Runtime rt = Runtime.getRuntime();
+            final Runtime rt = Runtime.getRuntime();
             rt.exec(command);
-        } catch (Exception e) {
-            throw new DatabaseViewerException("There was a problem running external viewer",e);
+        } catch (final Exception e) {
+            throw new DatabaseViewerException(
+                    "There was a problem running external viewer", e);
         }
     }
 }

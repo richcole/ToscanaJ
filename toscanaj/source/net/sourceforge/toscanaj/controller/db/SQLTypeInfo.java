@@ -8,27 +8,28 @@
 package net.sourceforge.toscanaj.controller.db;
 
 public class SQLTypeInfo {
-	
-	private int typeInt;
-	private String typeName;
-	
-	public SQLTypeInfo (int typeInt, String typeName) {
-		this.typeInt = typeInt;
-		this.typeName = typeName;		
-	}
-	
-	public int getTypeInt() {
-		return this.typeInt;
-	}
 
-	public String getTypeName() {
-		return this.typeName;
-	}
-	
-	@Override
-	public String toString() {
-		String str = "SQLTypeInfo: SQL type int = " + this.typeInt + ", name = " + this.typeName;
-		return str;
-	}
+    private final int typeInt;
+    private final String typeName;
+
+    public SQLTypeInfo(final int typeInt, final String typeName) {
+        this.typeInt = typeInt;
+        this.typeName = typeName;
+    }
+
+    public int getTypeInt() {
+        return this.typeInt;
+    }
+
+    public String getTypeName() {
+        return this.typeName;
+    }
+
+    @Override
+    public String toString() {
+        final String str = "SQLTypeInfo: SQL type int = " + this.typeInt
+                + ", name = " + this.typeName;
+        return str;
+    }
 
 }

@@ -34,318 +34,343 @@ import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
-import org.tockit.util.ListSet;
-
-import net.sourceforge.toscanaj.gui.dialog.*;
+import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 
+import org.tockit.util.ListSet;
+
 public class ContextTableColumnHeader extends JComponent implements Scrollable {
-	private ContextTableEditorDialog dialog;
-	private WritableFCAElement[] attributes;
+    private final ContextTableEditorDialog dialog;
+    private WritableFCAElement[] attributes;
 
-	public ContextTableColumnHeader(ContextTableEditorDialog dialog) {
-		super();
-		this.dialog = dialog;
-		addMouseListener(createMouseListener());
-		setVisible(true);
-		ToolTipManager.sharedInstance().registerComponent(this);
-		updateSize();
-	}
-
-	@Override
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-
-		Graphics2D g2d = (Graphics2D) g;
-		Paint oldPaint = g2d.getPaint();
-		Font oldFont = g2d.getFont();
-
-		g2d.setFont(oldFont.deriveFont(Font.BOLD));
-		drawColumnHeader(g2d);
-
-		g2d.setPaint(oldPaint);
-		g2d.setFont(oldFont);
-	}
-
-	public Dimension calculateNewSize() {
-		Set<Object> attributesSet = this.dialog.getContext().getAttributes();
-		this.attributes = attributesSet.toArray(new WritableFCAElement[attributesSet.size()]);
-		int numCol = this.attributes.length + 1;
-		return new Dimension(numCol * ContextTableView.CELL_WIDTH + 1, ContextTableView.CELL_HEIGHT + 1);
-	}
-
-	protected void drawColumnHeader(Graphics2D g2d) {
-		g2d.setPaint(ContextTableView.TABLE_HEADER_COLOR);
-		for (int i = 0; i < this.attributes.length; i++) {
-            WritableFCAElement attribute = this.attributes[i];
-			drawCell(g2d, attribute.toString(), i * ContextTableView.CELL_WIDTH, 0);			
-		}
-	}
-
-	protected void drawCell(Graphics2D g2d, String content, int x, int y) {
-		g2d.fill(new Rectangle2D.Double(x, y, ContextTableView.CELL_WIDTH, ContextTableView.CELL_HEIGHT));
-		Paint oldPaint = g2d.getPaint();
-		g2d.setPaint(ContextTableView.TEXT_COLOR);
-		g2d.draw(new Rectangle2D.Double(x, y, ContextTableView.CELL_WIDTH, ContextTableView.CELL_HEIGHT));
-
-		FontMetrics fontMetrics = g2d.getFontMetrics();
-		String newContent = reduceStringDisplayWidth(content, g2d);
-
-		g2d.drawString(
-			newContent,
-			x + ContextTableView.CELL_WIDTH / 2 - fontMetrics.stringWidth(newContent) / 2,
-			y + ContextTableView.CELL_HEIGHT / 2 + fontMetrics.getMaxAscent() / 2);
-		g2d.setPaint(oldPaint);
-	}
-
-	protected String reduceStringDisplayWidth(String content, Graphics2D g2d) {
-		String newContent = content;
-		String tail = "...";
-		int stringWidth = g2d.getFontMetrics().stringWidth(newContent);
-		int tailWidth = g2d.getFontMetrics().stringWidth(tail);
-		if (stringWidth > (ContextTableView.CELL_WIDTH - 10)) {
-			while ((stringWidth + tailWidth) > (ContextTableView.CELL_WIDTH - 10)) {
-				newContent = newContent.substring(0, (newContent.length() - 1));
-				stringWidth = g2d.getFontMetrics().stringWidth(newContent);
-			}
-			newContent += tail;
-		}
-		return newContent;
-	}
-
-	@Override
-	public String getToolTipText(MouseEvent e) {
-		String tooltipText = null;
-
-		ContextTableView.Position pos = this.dialog.getTablePosition(e.getX(), e.getY());
-
-		if (pos != null) {
-			if (pos.getCol() != this.attributes.length) {
-                WritableFCAElement attr =  this.attributes[pos.getCol()];
-				tooltipText = attr.toString();
-			}
-		}
-		return tooltipText;
-	}
-
-	
-    public Dimension getPreferredScrollableViewportSize() {
-    	return ContextTableView.TABLE_HEADER_PREFERRED_VIEWPORT_SIZE;
+    public ContextTableColumnHeader(final ContextTableEditorDialog dialog) {
+        super();
+        this.dialog = dialog;
+        addMouseListener(createMouseListener());
+        setVisible(true);
+        ToolTipManager.sharedInstance().registerComponent(this);
+        updateSize();
     }
-    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-    	if(orientation == SwingConstants.HORIZONTAL) {
-    		return ContextTableView.CELL_WIDTH;
-    	} else {
-    	    return ContextTableView.CELL_HEIGHT;
-    	}
+
+    @Override
+    public void paintComponent(final Graphics g) {
+        super.paintComponent(g);
+
+        final Graphics2D g2d = (Graphics2D) g;
+        final Paint oldPaint = g2d.getPaint();
+        final Font oldFont = g2d.getFont();
+
+        g2d.setFont(oldFont.deriveFont(Font.BOLD));
+        drawColumnHeader(g2d);
+
+        g2d.setPaint(oldPaint);
+        g2d.setFont(oldFont);
     }
-    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-    	// round the size in any direction down to a multiple of the cell size
-        if(orientation == SwingConstants.HORIZONTAL) {
-            return (visibleRect.width / ContextTableView.CELL_WIDTH) * ContextTableView.CELL_WIDTH;
-        } else {
-            return (visibleRect.height / ContextTableView.CELL_HEIGHT) * ContextTableView.CELL_HEIGHT;
+
+    public Dimension calculateNewSize() {
+        final Set<Object> attributesSet = this.dialog.getContext()
+                .getAttributes();
+        this.attributes = attributesSet
+                .toArray(new WritableFCAElement[attributesSet.size()]);
+        final int numCol = this.attributes.length + 1;
+        return new Dimension(numCol * ContextTableView.CELL_WIDTH + 1,
+                ContextTableView.CELL_HEIGHT + 1);
+    }
+
+    protected void drawColumnHeader(final Graphics2D g2d) {
+        g2d.setPaint(ContextTableView.TABLE_HEADER_COLOR);
+        for (int i = 0; i < this.attributes.length; i++) {
+            final WritableFCAElement attribute = this.attributes[i];
+            drawCell(g2d, attribute.toString(),
+                    i * ContextTableView.CELL_WIDTH, 0);
         }
     }
- 
+
+    protected void drawCell(final Graphics2D g2d, final String content,
+            final int x, final int y) {
+        g2d.fill(new Rectangle2D.Double(x, y, ContextTableView.CELL_WIDTH,
+                ContextTableView.CELL_HEIGHT));
+        final Paint oldPaint = g2d.getPaint();
+        g2d.setPaint(ContextTableView.TEXT_COLOR);
+        g2d.draw(new Rectangle2D.Double(x, y, ContextTableView.CELL_WIDTH,
+                ContextTableView.CELL_HEIGHT));
+
+        final FontMetrics fontMetrics = g2d.getFontMetrics();
+        final String newContent = reduceStringDisplayWidth(content, g2d);
+
+        g2d.drawString(newContent, x + ContextTableView.CELL_WIDTH / 2
+                - fontMetrics.stringWidth(newContent) / 2, y
+                + ContextTableView.CELL_HEIGHT / 2 + fontMetrics.getMaxAscent()
+                / 2);
+        g2d.setPaint(oldPaint);
+    }
+
+    protected String reduceStringDisplayWidth(final String content,
+            final Graphics2D g2d) {
+        String newContent = content;
+        final String tail = "...";
+        int stringWidth = g2d.getFontMetrics().stringWidth(newContent);
+        final int tailWidth = g2d.getFontMetrics().stringWidth(tail);
+        if (stringWidth > (ContextTableView.CELL_WIDTH - 10)) {
+            while ((stringWidth + tailWidth) > (ContextTableView.CELL_WIDTH - 10)) {
+                newContent = newContent.substring(0, (newContent.length() - 1));
+                stringWidth = g2d.getFontMetrics().stringWidth(newContent);
+            }
+            newContent += tail;
+        }
+        return newContent;
+    }
+
+    @Override
+    public String getToolTipText(final MouseEvent e) {
+        String tooltipText = null;
+
+        final ContextTableView.Position pos = this.dialog.getTablePosition(e
+                .getX(), e.getY());
+
+        if (pos != null) {
+            if (pos.getCol() != this.attributes.length) {
+                final WritableFCAElement attr = this.attributes[pos.getCol()];
+                tooltipText = attr.toString();
+            }
+        }
+        return tooltipText;
+    }
+
+    public Dimension getPreferredScrollableViewportSize() {
+        return ContextTableView.TABLE_HEADER_PREFERRED_VIEWPORT_SIZE;
+    }
+
+    public int getScrollableUnitIncrement(final Rectangle visibleRect,
+            final int orientation, final int direction) {
+        if (orientation == SwingConstants.HORIZONTAL) {
+            return ContextTableView.CELL_WIDTH;
+        } else {
+            return ContextTableView.CELL_HEIGHT;
+        }
+    }
+
+    public int getScrollableBlockIncrement(final Rectangle visibleRect,
+            final int orientation, final int direction) {
+        // round the size in any direction down to a multiple of the cell size
+        if (orientation == SwingConstants.HORIZONTAL) {
+            return (visibleRect.width / ContextTableView.CELL_WIDTH)
+                    * ContextTableView.CELL_WIDTH;
+        } else {
+            return (visibleRect.height / ContextTableView.CELL_HEIGHT)
+                    * ContextTableView.CELL_HEIGHT;
+        }
+    }
+
     public boolean getScrollableTracksViewportWidth() {
         return false;
     }
- 
+
     public boolean getScrollableTracksViewportHeight() {
         return false;
     }
-    
+
     public void updateSize() {
-    	this.setPreferredSize(calculateNewSize());
+        this.setPreferredSize(calculateNewSize());
         invalidate();
         repaint();
     }
-    
-	protected boolean collectionContainsString(
-		String value,
-		Collection<Object> collection) {
-		Iterator<Object> it = collection.iterator();
-		while (it.hasNext()) {
-			Object obj = it.next();
-			if (obj.toString().equalsIgnoreCase(value.trim())) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private void removeAttribute(int pos) {
-        WritableFCAElement attrToRemove = this.attributes[pos];
-		this.dialog.getContext().getAttributes().remove(attrToRemove);
-		this.dialog.updateView();
-	}
-	
-	protected boolean addAttribute(String newAttributeName) {
-		if (!this.dialog.collectionContainsString(newAttributeName, this.attributes)) {
-			this.dialog.getContext().getAttributes().add(new FCAElementImplementation(newAttributeName));
-			return true;
-		} else {
-			return false;
-		}
-	}
 
-	private MouseListener createMouseListener() {
-		MouseListener mouseListener = new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					final ContextTableView.Position pos =
-						dialog.getTablePosition(e.getX(), e.getY());
-					if (pos == null) {
-						return;
-					} else {
-						showPopupMenu(e, pos);
-					}
-				}
-			}
+    protected boolean collectionContainsString(final String value,
+            final Collection<Object> collection) {
+        final Iterator<Object> it = collection.iterator();
+        while (it.hasNext()) {
+            final Object obj = it.next();
+            if (obj.toString().equalsIgnoreCase(value.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-			public void showPopupMenu(
-				MouseEvent e,
-				final ContextTableView.Position pos) {
-					JPopupMenu popupMenu = new JPopupMenu();
-                    
-                    JMenu sortMenu = new JMenu("Move before");
-                    for (int i = 0; i < attributes.length; i++) {
-                        final WritableFCAElement attribute = attributes[i];
-                        JMenuItem menuItem = new JMenuItem(attribute.toString());
-                        menuItem.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent ae) {
-                                moveAttribute(pos.getCol(), attribute);
-                            }
-                        });
-                        if(i == pos.getCol() || i == pos.getCol() + 1) {
-                            menuItem.setEnabled(false);
+    private void removeAttribute(final int pos) {
+        final WritableFCAElement attrToRemove = this.attributes[pos];
+        this.dialog.getContext().getAttributes().remove(attrToRemove);
+        this.dialog.updateView();
+    }
+
+    protected boolean addAttribute(final String newAttributeName) {
+        if (!this.dialog.collectionContainsString(newAttributeName,
+                this.attributes)) {
+            this.dialog.getContext().getAttributes().add(
+                    new FCAElementImplementation(newAttributeName));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private MouseListener createMouseListener() {
+        final MouseListener mouseListener = new MouseAdapter() {
+            @Override
+            public void mousePressed(final MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    final ContextTableView.Position pos = dialog
+                            .getTablePosition(e.getX(), e.getY());
+                    if (pos == null) {
+                        return;
+                    } else {
+                        showPopupMenu(e, pos);
+                    }
+                }
+            }
+
+            public void showPopupMenu(final MouseEvent e,
+                    final ContextTableView.Position pos) {
+                final JPopupMenu popupMenu = new JPopupMenu();
+
+                final JMenu sortMenu = new JMenu("Move before");
+                for (int i = 0; i < attributes.length; i++) {
+                    final WritableFCAElement attribute = attributes[i];
+                    final JMenuItem menuItem = new JMenuItem(attribute
+                            .toString());
+                    menuItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(final ActionEvent ae) {
+                            moveAttribute(pos.getCol(), attribute);
                         }
-                        sortMenu.add(menuItem);
+                    });
+                    if (i == pos.getCol() || i == pos.getCol() + 1) {
+                        menuItem.setEnabled(false);
                     }
-                    popupMenu.add(sortMenu);
-                    
-                    if(pos.getCol() != attributes.length - 1) {
-                        JMenuItem menuItem = new JMenuItem("Move to end");
-                        menuItem.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent ae) {
-                                moveAttribute(pos.getCol(), null);
-                            }
-                        });
-                        popupMenu.add(menuItem);
+                    sortMenu.add(menuItem);
+                }
+                popupMenu.add(sortMenu);
+
+                if (pos.getCol() != attributes.length - 1) {
+                    final JMenuItem menuItem = new JMenuItem("Move to end");
+                    menuItem.addActionListener(new ActionListener() {
+                        public void actionPerformed(final ActionEvent ae) {
+                            moveAttribute(pos.getCol(), null);
+                        }
+                    });
+                    popupMenu.add(menuItem);
+                }
+
+                final JMenuItem rename = new JMenuItem("Rename Attribute");
+                rename.addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent ae) {
+                        renameAttribute(pos.getCol());
                     }
-                    
-                    JMenuItem rename = new JMenuItem("Rename Attribute");
-					rename.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent ae) {
-							renameAttribute(pos.getCol());
-						}
-					});
-					JMenuItem remove = new JMenuItem("Remove Attribute");
-					remove.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent ae) {
-							removeAttribute(pos.getCol());
-						}
-					});
-					popupMenu.add(rename);
-					popupMenu.add(remove);
-					popupMenu.show(dialog.getScrollPane(), e.getX() + getX() + ContextTableView.CELL_WIDTH, e.getY() + getY());
-			}
+                });
+                final JMenuItem remove = new JMenuItem("Remove Attribute");
+                remove.addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent ae) {
+                        removeAttribute(pos.getCol());
+                    }
+                });
+                popupMenu.add(rename);
+                popupMenu.add(remove);
+                popupMenu.show(dialog.getScrollPane(), e.getX() + getX()
+                        + ContextTableView.CELL_WIDTH, e.getY() + getY());
+            }
 
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					final ContextTableView.Position pos =
-						dialog.getTablePosition(e.getX(), e.getY());
-					if (pos == null) {
-						return;
-					} else {
-						showPopupMenu(e, pos);
-					}
-				}
-			}
+            @Override
+            public void mouseReleased(final MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    final ContextTableView.Position pos = dialog
+                            .getTablePosition(e.getX(), e.getY());
+                    if (pos == null) {
+                        return;
+                    } else {
+                        showPopupMenu(e, pos);
+                    }
+                }
+            }
 
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				final ContextTableView.Position pos =
-					dialog.getTablePosition(e.getX(), e.getY());
-				if (pos == null) {
-					return;
-				}
-				if (e.getButton() != MouseEvent.BUTTON1) {
-					return;
-				}
-				if (e.getClickCount() != 2) {
-					return;
-				}
-					renameAttribute(pos.getCol());
-			}
-		};
-		return mouseListener;
-	}
-	
-	private void renameAttribute(int num) {
-		String inputValue = "";
-		do {
-            WritableFCAElement oldAttr = this.attributes[num];
-			InputTextDialog inputDialog = new InputTextDialog(this.dialog, "Rename Attribute", "attribute", oldAttr.toString());
-			if (!inputDialog.isCancelled()) {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                final ContextTableView.Position pos = dialog.getTablePosition(e
+                        .getX(), e.getY());
+                if (pos == null) {
+                    return;
+                }
+                if (e.getButton() != MouseEvent.BUTTON1) {
+                    return;
+                }
+                if (e.getClickCount() != 2) {
+                    return;
+                }
+                renameAttribute(pos.getCol());
+            }
+        };
+        return mouseListener;
+    }
+
+    private void renameAttribute(final int num) {
+        String inputValue = "";
+        do {
+            final WritableFCAElement oldAttr = this.attributes[num];
+            final InputTextDialog inputDialog = new InputTextDialog(
+                    this.dialog, "Rename Attribute", "attribute", oldAttr
+                            .toString());
+            if (!inputDialog.isCancelled()) {
                 inputValue = inputDialog.getInput();
-                if (!this.dialog.collectionContainsString(inputValue, this.attributes)) {
-                    ContextImplementation context = this.dialog.getContext();
-                    Set<Object> attributeSet = context.getAttributes();
-                    WritableFCAElement newAttr = new FCAElementImplementation(inputValue);
+                if (!this.dialog.collectionContainsString(inputValue,
+                        this.attributes)) {
+                    final ContextImplementation context = this.dialog
+                            .getContext();
+                    final Set<Object> attributeSet = context.getAttributes();
+                    final WritableFCAElement newAttr = new FCAElementImplementation(
+                            inputValue);
                     attributeSet.remove(oldAttr);
-                    if(attributeSet instanceof List) {
-                        List<Object> attributesList = (List<Object>) attributeSet;
+                    if (attributeSet instanceof List) {
+                        final List<Object> attributesList = (List<Object>) attributeSet;
                         attributesList.add(num, newAttr);
                     } else {
                         attributeSet.add(newAttr);
                     }
-                    for (Iterator<Object> iter = context.getObjects().iterator(); iter.hasNext(); ) {
-                        Object object = iter.next();
-                        if(context.getRelation().contains(object,oldAttr)) {
-                            context.getRelationImplementation().insert(object,newAttr);
-                            context.getRelationImplementation().remove(object,oldAttr);
+                    for (final Iterator<Object> iter = context.getObjects()
+                            .iterator(); iter.hasNext();) {
+                        final Object object = iter.next();
+                        if (context.getRelation().contains(object, oldAttr)) {
+                            context.getRelationImplementation().insert(object,
+                                    newAttr);
+                            context.getRelationImplementation().remove(object,
+                                    oldAttr);
                         }
                     }
                     calculateNewSize();
                     repaint();
                     inputValue = "";
                 } else {
-                    JOptionPane.showMessageDialog(
-                            this,
-                            "An object named '"
-                            + inputValue
-                            + "' already exist. Please enter a different name.",
-                            "Object exists",
-                            JOptionPane.ERROR_MESSAGE);
+                    JOptionPane
+                            .showMessageDialog(
+                                    this,
+                                    "An object named '"
+                                            + inputValue
+                                            + "' already exist. Please enter a different name.",
+                                    "Object exists", JOptionPane.ERROR_MESSAGE);
                 }
+            } else {
+                break;
             }
-			else {
-				break;
-			}
-		} while (this.dialog.collectionContainsString(inputValue, this.attributes));
-		repaint();
-	}
+        } while (this.dialog.collectionContainsString(inputValue,
+                this.attributes));
+        repaint();
+    }
 
-    private void moveAttribute(int from, WritableFCAElement target) {
-        ListSet attributeList = this.dialog.getContext().getAttributeList();
-        if(target != null) {
+    private void moveAttribute(final int from, final WritableFCAElement target) {
+        final ListSet attributeList = this.dialog.getContext()
+                .getAttributeList();
+        if (target != null) {
             int targetPos = attributeList.indexOf(target);
-            if(from < targetPos) {
-                targetPos --;
+            if (from < targetPos) {
+                targetPos--;
             }
-            Object movingAttribute = attributeList.remove(from);
+            final Object movingAttribute = attributeList.remove(from);
             attributeList.add(targetPos, movingAttribute);
         } else {
-            Object movingAttribute = attributeList.remove(from);
+            final Object movingAttribute = attributeList.remove(from);
             attributeList.add(movingAttribute);
         }
         calculateNewSize();
         this.dialog.repaint();
-    }    
+    }
 }

@@ -10,7 +10,6 @@ package net.sourceforge.toscanaj.controller.diagram;
 import java.awt.geom.Point2D;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.swing.undo.AbstractUndoableEdit;
@@ -32,57 +31,54 @@ import org.tockit.events.EventBrokerListener;
 /**
  * Implements node movement in a way that tries to keep chains.
  * 
- * The way this manipulator works is to find all meet-irreducible concepts
- * in the upset and downset of the dragged node's concept. All of them are
- * moved including their downsets.
+ * The way this manipulator works is to find all meet-irreducible concepts in
+ * the upset and downset of the dragged node's concept. All of them are moved
+ * including their downsets.
  */
 public class ChainBasedNodeMovementEventListener implements EventBrokerListener {
 
-	private Point2D startPosition;
+    private Point2D startPosition;
 
-    public void processEvent(Event e) {
-        CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
-        NodeView nodeView = (NodeView) dragEvent.getSubject();
+    public void processEvent(final Event e) {
+        final CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
+        final NodeView nodeView = (NodeView) dragEvent.getSubject();
 
         final DiagramView diagramView = nodeView.getDiagramView();
-        DiagramNode node = nodeView.getDiagramNode();
-        if(e instanceof CanvasItemPickupEvent) {
+        final DiagramNode node = nodeView.getDiagramNode();
+        if (e instanceof CanvasItemPickupEvent) {
             this.startPosition = nodeView.getPosition();
         }
-        
-        Concept concept = node.getConcept();
-        
-        final Set<Concept> meetIrr = ConceptSetHelperFunctions.getMeetIrreduciblesInUpset(concept);
-        
+
+        final Concept concept = node.getConcept();
+
+        final Set<Concept> meetIrr = ConceptSetHelperFunctions
+                .getMeetIrreduciblesInUpset(concept);
+
         final int numUpperMeetIrr = meetIrr.size();
-        
-        // add the meet-irreducible concepts in the downsets of all the meet-irreducibles
+
+        // add the meet-irreducible concepts in the downsets of all the
+        // meet-irreducibles
         // in the upset
-        Set<Concept> newMeetIrr = new HashSet<Concept>();
-        for (Iterator<Concept> it1 = meetIrr.iterator(); it1.hasNext();) {
-            Concept superConcept = it1.next();
-            Collection<Object> downset = superConcept.getDownset();
-            for (Iterator<Object> it2 = downset.iterator(); it2.hasNext();) {
-                Concept lower = (Concept) it2.next();
-                if(lower.isMeetIrreducible()) {
+        final Set<Concept> newMeetIrr = new HashSet<Concept>();
+        for (final Concept superConcept : meetIrr) {
+            final Collection<Object> downset = superConcept.getDownset();
+            for (final Object object : downset) {
+                final Concept lower = (Concept) object;
+                if (lower.isMeetIrreducible()) {
                     newMeetIrr.add(lower);
                 }
             }
         }
         meetIrr.addAll(newMeetIrr);
 
-        ConceptSetHelperFunctions.applyDragToDiagram(dragEvent.getCanvasFromPosition(), 
-                                                     dragEvent.getCanvasToPosition(),
-                                                     diagramView,
-                                                     meetIrr, 
-                                                     numUpperMeetIrr);
-        
-        if(!diagramView.getDiagram().isHasseDiagram()) {
-            ConceptSetHelperFunctions.applyDragToDiagram(dragEvent.getCanvasToPosition(), 
-                                                         dragEvent.getCanvasFromPosition(),
-                                                         diagramView,
-                                                         meetIrr, 
-                                                         numUpperMeetIrr);
+        ConceptSetHelperFunctions.applyDragToDiagram(dragEvent
+                .getCanvasFromPosition(), dragEvent.getCanvasToPosition(),
+                diagramView, meetIrr, numUpperMeetIrr);
+
+        if (!diagramView.getDiagram().isHasseDiagram()) {
+            ConceptSetHelperFunctions.applyDragToDiagram(dragEvent
+                    .getCanvasToPosition(), dragEvent.getCanvasFromPosition(),
+                    diagramView, meetIrr, numUpperMeetIrr);
         }
 
         if (dragEvent instanceof CanvasItemDroppedEvent) {
@@ -90,45 +86,42 @@ public class ChainBasedNodeMovementEventListener implements EventBrokerListener 
             diagramView.requestScreenTransformUpdate();
 
             // ... and add an edit to the undo manager if we find one.
-            UndoManager undoManager = diagramView.getUndoManager();
+            final UndoManager undoManager = diagramView.getUndoManager();
             if (undoManager != null) {
                 // make a copy of the current start position
                 final Point2D undoPosition = this.startPosition;
-                // check the actual position of the node -- it might differ from the
+                // check the actual position of the node -- it might differ from
+                // the
                 // requested one due to the Hasse diagram limitations
                 final Point2D toPosition = nodeView.getPosition();
                 undoManager.addEdit(new AbstractUndoableEdit() {
                     @Override
-					public void undo() throws CannotUndoException {
-                        ConceptSetHelperFunctions.applyDragToDiagram(toPosition, 
-                                                                     undoPosition,
-                                                                     diagramView,
-                                                                     meetIrr, 
-                                                                     numUpperMeetIrr);
+                    public void undo() throws CannotUndoException {
+                        ConceptSetHelperFunctions.applyDragToDiagram(
+                                toPosition, undoPosition, diagramView, meetIrr,
+                                numUpperMeetIrr);
                         diagramView.requestScreenTransformUpdate();
                         diagramView.repaint();
                         super.undo();
                     }
 
                     @Override
-					public void redo() throws CannotRedoException {
-                        ConceptSetHelperFunctions.applyDragToDiagram(undoPosition, 
-                                                                     toPosition,
-                                                                     diagramView,
-                                                                     meetIrr, 
-                                                                     numUpperMeetIrr);
+                    public void redo() throws CannotRedoException {
+                        ConceptSetHelperFunctions.applyDragToDiagram(
+                                undoPosition, toPosition, diagramView, meetIrr,
+                                numUpperMeetIrr);
                         diagramView.requestScreenTransformUpdate();
                         diagramView.repaint();
                         super.redo();
                     }
-                    
+
                     @Override
-					public String getPresentationName() {
+                    public String getPresentationName() {
                         return "Chain movement";
                     }
                 });
             }
         }
-        diagramView.repaint();      
-	}
+        diagramView.repaint();
+    }
 }

@@ -7,36 +7,37 @@
  */
 package net.sourceforge.toscanaj.model.diagram;
 
-import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
-import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
-import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import org.jdom.Element;
-
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+
+import org.jdom.Element;
+
 /**
  * Stores the information on a node in a diagram.
- *
- * This is mainly the position, the concept for the node and the information
- * on the labels attached to it.
+ * 
+ * This is mainly the position, the concept for the node and the information on
+ * the labels attached to it.
  */
-public class DiagramNode<O,A> implements XMLizable {
+public class DiagramNode<O, A> implements XMLizable {
     /**
      * The size of nodes.
-     *
+     * 
      * This is currently a fixed value common for all nodes, but the access is
-     * already done using a method on each instance, thus allowing easy extension
-     * later.
+     * already done using a method on each instance, thus allowing easy
+     * extension later.
      * 
      * @todo this value should probably be one as default
      */
     private static final int DEFAULT_RADIUS = 10;
-    
+
     private double radiusX = DEFAULT_RADIUS;
     private double radiusY = DEFAULT_RADIUS;
 
@@ -44,12 +45,12 @@ public class DiagramNode<O,A> implements XMLizable {
 
     /**
      * The concept the node represents.
-     *
+     * 
      * If this is set to null the node points to a not realised concept in the
      * diagram, i.e. the concept theoretically could exist but is not supported
      * by the current set of data.
      */
-    protected Concept<O,A> concept = null;
+    protected Concept<O, A> concept = null;
 
     /**
      * The position of the node.
@@ -66,7 +67,7 @@ public class DiagramNode<O,A> implements XMLizable {
      */
     protected LabelInfo objectLabelInfo;
 
-    protected DiagramNode<O,A> outerNode;
+    protected DiagramNode<O, A> outerNode;
     public static final String NODE_ELEMENT_NAME = "node";
     public static final String POSITION_ELEMENT_NAME = "position";
     public static final String POSITION_X_ATTRIBUTE_NAME = "x";
@@ -75,11 +76,12 @@ public class DiagramNode<O,A> implements XMLizable {
     public static final String ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME = "attributeLabelStyle";
     public static final String OBJECT_LABEL_STYLE_ELEMENT_NAME = "objectLabelStyle";
 
-    protected WriteableDiagram2D<O,A> diagram;
+    protected WriteableDiagram2D<O, A> diagram;
 
-	public DiagramNode(WriteableDiagram2D<O,A> diagram, String identifier, Point2D position, Concept<O,A> concept,
-                       LabelInfo attributeLabelInfo, LabelInfo objectLabelInfo,
-                       DiagramNode<O,A> outerNode) {
+    public DiagramNode(final WriteableDiagram2D<O, A> diagram,
+            final String identifier, final Point2D position,
+            final Concept<O, A> concept, final LabelInfo attributeLabelInfo,
+            final LabelInfo objectLabelInfo, final DiagramNode<O, A> outerNode) {
         this.diagram = diagram;
         this.identifier = identifier;
         this.position = (Point2D) position.clone();
@@ -88,34 +90,40 @@ public class DiagramNode<O,A> implements XMLizable {
         setObjectLabelInfo(objectLabelInfo);
         this.outerNode = outerNode;
     }
-    
-    public DiagramNode(WriteableDiagram2D<O,A> diagram, String identifier, Point2D position, Concept<O,A> concept,
-                           LabelInfo attributeLabel, LabelInfo objectLabel,
-                           DiagramNode<O,A> outerNode, double radiusX, double radiusY) {
-        this(diagram, identifier, position, concept, attributeLabel, objectLabel, outerNode);
+
+    public DiagramNode(final WriteableDiagram2D<O, A> diagram,
+            final String identifier, final Point2D position,
+            final Concept<O, A> concept, final LabelInfo attributeLabel,
+            final LabelInfo objectLabel, final DiagramNode<O, A> outerNode,
+            final double radiusX, final double radiusY) {
+        this(diagram, identifier, position, concept, attributeLabel,
+                objectLabel, outerNode);
         this.radiusX = radiusX;
         this.radiusY = radiusY;
     }
 
-    public DiagramNode(WriteableDiagram2D<O,A> diagram, Element element) throws XMLSyntaxError {
-		this.diagram = diagram;
+    public DiagramNode(final WriteableDiagram2D<O, A> diagram,
+            final Element element) throws XMLSyntaxError {
+        this.diagram = diagram;
         readXML(element);
     }
 
     public Element toXML() {
-        Element retVal = new Element(NODE_ELEMENT_NAME);
+        final Element retVal = new Element(NODE_ELEMENT_NAME);
         retVal.setAttribute(ID_ATTRIBUTE_NAME, identifier);
-        Element positionElem = new Element(POSITION_ELEMENT_NAME);
-        positionElem.setAttribute(POSITION_X_ATTRIBUTE_NAME, String.valueOf(getPosition().getX()));
-        positionElem.setAttribute(POSITION_Y_ATTRIBUTE_NAME, String.valueOf(getPosition().getY()));
+        final Element positionElem = new Element(POSITION_ELEMENT_NAME);
+        positionElem.setAttribute(POSITION_X_ATTRIBUTE_NAME, String
+                .valueOf(getPosition().getX()));
+        positionElem.setAttribute(POSITION_Y_ATTRIBUTE_NAME, String
+                .valueOf(getPosition().getY()));
         retVal.addContent(positionElem);
         if (attributeLabelInfo != null) {
-            Element attrLabelInfoElem = attributeLabelInfo.toXML();
+            final Element attrLabelInfoElem = attributeLabelInfo.toXML();
             attrLabelInfoElem.setName(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME);
             retVal.addContent(attrLabelInfoElem);
         }
         if (objectLabelInfo != null) {
-            Element objectLabelInfoElem = objectLabelInfo.toXML();
+            final Element objectLabelInfoElem = objectLabelInfo.toXML();
             objectLabelInfoElem.setName(OBJECT_LABEL_STYLE_ELEMENT_NAME);
             retVal.addContent(objectLabelInfoElem);
         }
@@ -123,49 +131,49 @@ public class DiagramNode<O,A> implements XMLizable {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XMLSyntaxError {
+    public void readXML(final Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(elem, NODE_ELEMENT_NAME);
         identifier = XMLHelper.getAttribute(elem, ID_ATTRIBUTE_NAME).getValue();
-        Element positionElem = XMLHelper.getMandatoryChild(elem, POSITION_ELEMENT_NAME);
-        position = new Point2D.Double(
-                XMLHelper.getDoubleAttribute(positionElem, POSITION_X_ATTRIBUTE_NAME),
-                XMLHelper.getDoubleAttribute(positionElem, POSITION_Y_ATTRIBUTE_NAME)
-        );
+        final Element positionElem = XMLHelper.getMandatoryChild(elem,
+                POSITION_ELEMENT_NAME);
+        position = new Point2D.Double(XMLHelper.getDoubleAttribute(
+                positionElem, POSITION_X_ATTRIBUTE_NAME), XMLHelper
+                .getDoubleAttribute(positionElem, POSITION_Y_ATTRIBUTE_NAME));
         if (XMLHelper.contains(elem, ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)) {
-            attributeLabelInfo = new LabelInfo(elem.getChild(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME));
+            attributeLabelInfo = new LabelInfo(elem
+                    .getChild(ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME));
         } else {
-        	attributeLabelInfo = new LabelInfo();
+            attributeLabelInfo = new LabelInfo();
         }
         attributeLabelInfo.setNode(this);
 
         if (XMLHelper.contains(elem, OBJECT_LABEL_STYLE_ELEMENT_NAME)) {
-            objectLabelInfo = new LabelInfo(elem.getChild(OBJECT_LABEL_STYLE_ELEMENT_NAME));
+            objectLabelInfo = new LabelInfo(elem
+                    .getChild(OBJECT_LABEL_STYLE_ELEMENT_NAME));
         } else {
             objectLabelInfo = new LabelInfo();
         }
         objectLabelInfo.setNode(this);
 
-        concept = new ConceptImplementation<O,A>(
-                XMLHelper.getMandatoryChild(elem, ConceptImplementation.CONCEPT_ELEMENT_NAME)
-        );
+        concept = new ConceptImplementation<O, A>(XMLHelper.getMandatoryChild(
+                elem, ConceptImplementation.CONCEPT_ELEMENT_NAME));
     }
 
     public String getIdentifier() {
         return identifier;
     }
 
-    public DiagramNode<O,A> getOuterNode() {
+    public DiagramNode<O, A> getOuterNode() {
         return outerNode;
     }
 
     /**
      * Returns the concept which should be used for filtering.
-     *
-     * This is not the concept of this node if the node is nested into
-     * another node. In that case we use the concept of the outermost
-     * node.
+     * 
+     * This is not the concept of this node if the node is nested into another
+     * node. In that case we use the concept of the outermost node.
      */
-    public Concept<O,A> getFilterConcept() {
+    public Concept<O, A> getFilterConcept() {
         if (this.outerNode == null) {
             return this.concept;
         } else {
@@ -175,10 +183,11 @@ public class DiagramNode<O,A> implements XMLizable {
 
     /**
      * A copy constructor creating a duplicate of the given node.
-     *
-     * This is a deep copy for position and labels but refers to the same concept.
+     * 
+     * This is a deep copy for position and labels but refers to the same
+     * concept.
      */
-    public DiagramNode(DiagramNode<O,A> other) {
+    public DiagramNode(final DiagramNode<O, A> other) {
         this.position = (Point2D) other.position.clone();
         this.concept = other.concept;
         if (this.attributeLabelInfo != null) {
@@ -199,32 +208,33 @@ public class DiagramNode<O,A> implements XMLizable {
      * Get the current node position.
      */
     public Point2D getPosition() {
-    	// return copy to make sure updates go through the event broker if required
+        // return copy to make sure updates go through the event broker if
+        // required
         return (Point2D) position.clone();
     }
 
     /**
      * Set the node position in the model space.
      * 
-     * This is just a convenience method calling setPosition(double, double).
-     * Do not override to ensure behaviour is consistent.
+     * This is just a convenience method calling setPosition(double, double). Do
+     * not override to ensure behaviour is consistent.
      */
-    public final void setPosition(Point2D position) {
+    public final void setPosition(final Point2D position) {
         setPosition(position.getX(), position.getY());
     }
 
     /**
      * Set the node position in the model space.
      */
-    public void setPosition(double x, double y) {
-        this.position.setLocation(x,y);
+    public void setPosition(final double x, final double y) {
+        this.position.setLocation(x, y);
         this.diagram.sendChangeEvent();
     }
 
     /**
      * Get the concept for this node.
      */
-    public Concept<O,A> getConcept() {
+    public Concept<O, A> getConcept() {
         return concept;
     }
 
@@ -264,7 +274,7 @@ public class DiagramNode<O,A> implements XMLizable {
 
     /**
      * Returns the layout information for the attribute label.
-     *
+     * 
      * This might be null if there is no label attached.
      */
     public LabelInfo getAttributeLabelInfo() {
@@ -273,7 +283,7 @@ public class DiagramNode<O,A> implements XMLizable {
 
     /**
      * Returns the layout information for the object label.
-     *
+     * 
      * This might be null if there is no label attached.
      */
     public LabelInfo getObjectLabelInfo() {
@@ -283,50 +293,51 @@ public class DiagramNode<O,A> implements XMLizable {
     /**
      * Sets the layout information for the attribute label attached.
      */
-    public void setAttributeLabelInfo(LabelInfo labelInfo) {
+    public void setAttributeLabelInfo(final LabelInfo labelInfo) {
         this.attributeLabelInfo = labelInfo;
         if (attributeLabelInfo != null) {
             attributeLabelInfo.setNode(this);
         }
-		this.diagram.sendChangeEvent();
+        this.diagram.sendChangeEvent();
     }
 
     /**
      * Sets the layout information for the object label attached.
      */
-    public void setObjectLabelInfo(LabelInfo labelInfo) {
+    public void setObjectLabelInfo(final LabelInfo labelInfo) {
         this.objectLabelInfo = labelInfo;
         if (objectLabelInfo != null) {
             objectLabelInfo.setNode(this);
         }
-		this.diagram.sendChangeEvent();
+        this.diagram.sendChangeEvent();
     }
 
     /**
      * Inverts the y-coordinates of the node and the labels offsets.
-     *
+     * 
      * This is used when the diagram given has the y-axis pointing upwards.
-     *
+     * 
      * @see SimpleLineDiagram#checkCoordinateSystem()
      */
     public void invertY() {
         this.position.setLocation(this.position.getX(), -this.position.getY());
-        if(this.attributeLabelInfo != null) {
-	        this.attributeLabelInfo.setOffset(this.attributeLabelInfo.getOffset().getX(),
-	                -this.attributeLabelInfo.getOffset().getY());
+        if (this.attributeLabelInfo != null) {
+            this.attributeLabelInfo.setOffset(this.attributeLabelInfo
+                    .getOffset().getX(), -this.attributeLabelInfo.getOffset()
+                    .getY());
         }
-        if(this.objectLabelInfo != null) {
-	        this.objectLabelInfo.setOffset(this.objectLabelInfo.getOffset().getX(),
-	                -this.objectLabelInfo.getOffset().getY());
+        if (this.objectLabelInfo != null) {
+            this.objectLabelInfo.setOffset(this.objectLabelInfo.getOffset()
+                    .getX(), -this.objectLabelInfo.getOffset().getY());
         }
-		this.diagram.sendChangeEvent();
+        this.diagram.sendChangeEvent();
     }
 
     /**
      * Debug output.
      */
     @Override
-	public String toString() {
+    public String toString() {
         String retVal = "DiagramNode:\n";
         retVal += "- Pos : (" + getX() + "," + getY() + ")\n";
         retVal += "- Size: (" + getRadiusX() + "," + getRadiusY() + ")\n";
@@ -338,9 +349,9 @@ public class DiagramNode<O,A> implements XMLizable {
     }
 
     @SuppressWarnings("unchecked")
-	public Concept<O,A>[] getConceptNestingList() {
-        List<Concept<O,A>> conceptList = new ArrayList<Concept<O,A>>();
-        DiagramNode<O,A> node = this;
+    public Concept<O, A>[] getConceptNestingList() {
+        final List<Concept<O, A>> conceptList = new ArrayList<Concept<O, A>>();
+        DiagramNode<O, A> node = this;
         while (node != null) {
             conceptList.add(node.getConcept());
             node = node.getOuterNode();
@@ -348,18 +359,18 @@ public class DiagramNode<O,A> implements XMLizable {
         return conceptList.toArray(new Concept[0]);
     }
 
-	@Override
-	public boolean equals(Object obj) {
+    @Override
+    public boolean equals(final Object obj) {
         if (!(obj instanceof DiagramNode)) {
             return false;
         }
-        DiagramNode<?,?> other = (DiagramNode<?,?>) obj;
-        // @todo a hack to avoid NPE here (after copying diagrams we 
+        final DiagramNode<?, ?> other = (DiagramNode<?, ?>) obj;
+        // @todo a hack to avoid NPE here (after copying diagrams we
         // get nodes without identifiers). Rethink the whole identifier thing
-        if ( (this.getIdentifier() != null ) && (other.getIdentifier() != null)) {
-			if (!this.getIdentifier().equals(other.getIdentifier())) {
-				return false;
-			}
+        if ((this.getIdentifier() != null) && (other.getIdentifier() != null)) {
+            if (!this.getIdentifier().equals(other.getIdentifier())) {
+                return false;
+            }
         }
         if (!this.getPosition().equals(other.getPosition())) {
             return false;
@@ -376,7 +387,8 @@ public class DiagramNode<O,A> implements XMLizable {
         }
 
         if (this.getAttributeLabelInfo() != null) {
-            if (!this.getAttributeLabelInfo().equals(other.getAttributeLabelInfo())) {
+            if (!this.getAttributeLabelInfo().equals(
+                    other.getAttributeLabelInfo())) {
                 return false;
             }
         } else {
@@ -386,24 +398,25 @@ public class DiagramNode<O,A> implements XMLizable {
         }
         return true;
     }
-    
+
     /**
      * Returns true iff the node connects to a line it does not belong to.
      */
     public boolean hasCollision() {
-        Iterator<DiagramLine<O,A>> lineIt = this.diagram.getLines();
+        final Iterator<DiagramLine<O, A>> lineIt = this.diagram.getLines();
         while (lineIt.hasNext()) {
-            DiagramLine<O,A> line = lineIt.next();
-            if(line.getFromNode() == this) {
+            final DiagramLine<O, A> line = lineIt.next();
+            if (line.getFromNode() == this) {
                 continue;
             }
-            if(line.getToNode() == this) {
+            if (line.getToNode() == this) {
                 continue;
             }
-            double avRadius = (this.radiusX + this.radiusY)/2;
-            // call getPosition() instead of using the member since NDimDiagramNode
+            final double avRadius = (this.radiusX + this.radiusY) / 2;
+            // call getPosition() instead of using the member since
+            // NDimDiagramNode
             // overrides the method
-            if(line.calculateDistance(getPosition()) < avRadius) {
+            if (line.calculateDistance(getPosition()) < avRadius) {
                 return true;
             }
         }

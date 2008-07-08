@@ -6,90 +6,95 @@
  */
 package net.sourceforge.toscanaj.dbviewer;
 
-import javax.swing.*;
-
-import java.awt.*;
+import java.awt.Component;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JEditorPane;
+import javax.swing.JScrollPane;
 
 /**
  * Shows additional information coming from the database or external files.
  * 
  * This database viewer queries the database for additional information in form
- * of either plain text or HTML. This extra information can be either stored 
- * directly in the database or it can be accessed using URLs found in the database. 
- *
+ * of either plain text or HTML. This extra information can be either stored
+ * directly in the database or it can be accessed using URLs found in the
+ * database.
+ * 
  * A definition for this viewer looks like this:
  * 
  * <objectListView class="net.sourceforge.toscanaj.dbviewer.InfoDatabaseViewer"
- *         name="Show objects..."/>
- *     <parameter name="contentColumn" value="extraInfo"/>
- *     <parameter name="contentType" value="html"/>
- * </objectListView>
- *
+ * name="Show objects..."/> <parameter name="contentColumn" value="extraInfo"/>
+ * <parameter name="contentType" value="html"/> </objectListView>
+ * 
  * This example will query the information of the column "extraInfo" for the
- * given object and render it as HTML. If multiple objects are given paging 
+ * given object and render it as HTML. If multiple objects are given paging
  * controls will be used.
  * 
  * Another definition can look like this:
  * 
  * <objectListView class="net.sourceforge.toscanaj.dbviewer.InfoDatabaseViewer"
- *         name="Show objects..."/>
- *     <parameter name="urlColumn" value="infoURL"/>
- *     <parameter name="contentType" value="text"/>
- * </objectListView>
- *
+ * name="Show objects..."/> <parameter name="urlColumn" value="infoURL"/>
+ * <parameter name="contentType" value="text"/> </objectListView>
+ * 
  * Here the information is an external text file, which will be loaded into the
  * viewer. The viewer takes either a "contentColumn" parameter, which means the
- * information is in the database itself, or a "urlColumn" parameter, in which case
- * the information is loaded from an external source. This can be relative to the
- * CSX file the view is defined in.
+ * information is in the database itself, or a "urlColumn" parameter, in which
+ * case the information is loaded from an external source. This can be relative
+ * to the CSX file the view is defined in.
  */
 public class InfoDatabaseViewer extends PagingDatabaseViewer {
     @Override
-	protected PageViewPanel createPanel() throws DatabaseViewerException {
+    protected PageViewPanel createPanel() throws DatabaseViewerException {
         final JEditorPane textArea = new JEditorPane();
         textArea.setEditable(false);
-        
-        String contentTypeDef = getManager().getParameters().get("contentType");
-        if(contentTypeDef.equalsIgnoreCase("html")) {
+
+        final String contentTypeDef = getManager().getParameters().get(
+                "contentType");
+        if (contentTypeDef.equalsIgnoreCase("html")) {
             textArea.setContentType("text/html");
-        } else if(contentTypeDef.equalsIgnoreCase("text")) {
+        } else if (contentTypeDef.equalsIgnoreCase("text")) {
             textArea.setContentType("text/plain");
         } else {
-            throw new DatabaseViewerException("Can not identify \"contentType\" parameter for InfoDatabaseViewer.");
+            throw new DatabaseViewerException(
+                    "Can not identify \"contentType\" parameter for InfoDatabaseViewer.");
         }
-        
+
         final JScrollPane scrollPane = new JScrollPane(textArea);
-        
-        String urlColumnDef = getManager().getParameters().get("urlColumn");
-        String contentColumnDef = getManager().getParameters().get("contentColumn");
-        if(urlColumnDef != null && contentColumnDef != null) {
-            throw new DatabaseViewerException("Can only handle either \"urlColumn\" or \"contentColumn\" in InfoDatabaseViewer.");
+
+        final String urlColumnDef = getManager().getParameters().get(
+                "urlColumn");
+        final String contentColumnDef = getManager().getParameters().get(
+                "contentColumn");
+        if (urlColumnDef != null && contentColumnDef != null) {
+            throw new DatabaseViewerException(
+                    "Can only handle either \"urlColumn\" or \"contentColumn\" in InfoDatabaseViewer.");
         }
-        if(urlColumnDef == null && contentColumnDef == null) {
-            throw new DatabaseViewerException("Either \"urlColumn\" or \"contentColumn\" required in InfoDatabaseViewer.");
+        if (urlColumnDef == null && contentColumnDef == null) {
+            throw new DatabaseViewerException(
+                    "Either \"urlColumn\" or \"contentColumn\" required in InfoDatabaseViewer.");
         }
 
         final List<String> columns = new ArrayList<String>();
-        if(urlColumnDef != null) {
+        if (urlColumnDef != null) {
             columns.add(urlColumnDef);
             return new PageViewPanel() {
-                public void showItem(String keyValue) throws DatabaseViewerException {
+                public void showItem(final String keyValue)
+                        throws DatabaseViewerException {
                     try {
-                        List<String[]> results = getManager().getConnection()
-                                .executeQuery(
+                        final List<String[]> results = getManager()
+                                .getConnection().executeQuery(
                                         columns,
                                         getManager().getTableName(),
                                         "WHERE " + getManager().getKeyName()
                                                 + " = '" + keyValue + "';");
-                        String[] fields = results.get(0);
-                        String url = fields[0];
-                        URL resourceUrl = new URL(DatabaseViewerManager
+                        final String[] fields = results.get(0);
+                        final String url = fields[0];
+                        final URL resourceUrl = new URL(DatabaseViewerManager
                                 .getBaseURL(), url);
                         textArea.setPage(resourceUrl);
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         throw new DatabaseViewerException("Can not show view");
                     }
                 }
@@ -101,18 +106,19 @@ public class InfoDatabaseViewer extends PagingDatabaseViewer {
         } else {
             columns.add(contentColumnDef);
             return new PageViewPanel() {
-                public void showItem(String keyValue) throws DatabaseViewerException {
+                public void showItem(final String keyValue)
+                        throws DatabaseViewerException {
                     try {
-                        List<String[]> results = getManager().getConnection()
-                                .executeQuery(
+                        final List<String[]> results = getManager()
+                                .getConnection().executeQuery(
                                         columns,
                                         getManager().getTableName(),
                                         "WHERE " + getManager().getKeyName()
                                                 + " = '" + keyValue + "';");
-                        String[] fields = results.get(0);
-                        String content = fields[0];
+                        final String[] fields = results.get(0);
+                        final String content = fields[0];
                         textArea.setText(content);
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         throw new DatabaseViewerException("Can not show view");
                     }
                 }

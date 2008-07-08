@@ -8,10 +8,11 @@
 package net.sourceforge.toscanaj.gui.dialog.attributeselection;
 
 import net.sourceforge.toscanaj.model.database.Column;
+
 import org.tockit.events.StandardEvent;
 
 public class SelectedColumnChangedEvent extends StandardEvent {
-    public SelectedColumnChangedEvent(Column subject) {
+    public SelectedColumnChangedEvent(final Column subject) {
         super(subject);
     }
 }

@@ -9,18 +9,19 @@ package net.sourceforge.toscanaj.view.scales;
 
 import java.awt.Frame;
 
-import org.tockit.context.model.Context;
-import org.tockit.events.EventBroker;
-
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.view.context.ContextTableEditorDialog;
 
-public class ContextTableScaleGenerator implements ScaleGenerator {
-    private Frame parent;
-    private EventBroker eventBroker;
+import org.tockit.context.model.Context;
+import org.tockit.events.EventBroker;
 
-    public ContextTableScaleGenerator(Frame parent, EventBroker eventBroker) {
+public class ContextTableScaleGenerator implements ScaleGenerator {
+    private final Frame parent;
+    private final EventBroker eventBroker;
+
+    public ContextTableScaleGenerator(final Frame parent,
+            final EventBroker eventBroker) {
         this.parent = parent;
         this.eventBroker = eventBroker;
     }
@@ -29,23 +30,19 @@ public class ContextTableScaleGenerator implements ScaleGenerator {
         return "Context Table";
     }
 
-    public boolean canHandleColumns(TableColumnPair[] columns) {
+    public boolean canHandleColumns(final TableColumnPair[] columns) {
         return true;
     }
 
-    public Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection) {
-        ContextTableEditorDialog dialog = new ContextTableEditorDialog(
-                parent,
-                scheme,
-                databaseConnection,
-                eventBroker,
-                true
-        );
+    public Context generateScale(final ConceptualSchema scheme,
+            final DatabaseConnection databaseConnection) {
+        final ContextTableEditorDialog dialog = new ContextTableEditorDialog(
+                parent, scheme, databaseConnection, eventBroker, true);
         if (!dialog.execute()) {
             return null;
-        }else{
-			return dialog.getContext();
-			
-        }       
+        } else {
+            return dialog.getContext();
+
+        }
     }
 }

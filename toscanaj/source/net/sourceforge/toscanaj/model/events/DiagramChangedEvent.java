@@ -12,10 +12,10 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import org.tockit.events.Event;
 
 public class DiagramChangedEvent implements Event {
-    private Diagram2D diagram;
-    private Object source;
+    private final Diagram2D diagram;
+    private final Object source;
 
-    public DiagramChangedEvent(Object source, Diagram2D diagram) {
+    public DiagramChangedEvent(final Object source, final Diagram2D diagram) {
         this.diagram = diagram;
         this.source = source;
     }

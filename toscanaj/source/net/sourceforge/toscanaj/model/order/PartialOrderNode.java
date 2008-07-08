@@ -9,10 +9,11 @@ package net.sourceforge.toscanaj.model.order;
 
 import net.sourceforge.toscanaj.model.directedgraph.Node;
 
-public class PartialOrderNode<D extends Ordered<D>> extends Node<PartialOrderNode<D>> {
-    private D data;
+public class PartialOrderNode<D extends Ordered<D>> extends
+        Node<PartialOrderNode<D>> {
+    private final D data;
 
-    public PartialOrderNode(D data) {
+    public PartialOrderNode(final D data) {
         this.data = data;
     }
 

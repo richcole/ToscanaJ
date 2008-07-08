@@ -25,22 +25,21 @@ import org.jdom.Element;
 import org.tockit.util.ListSet;
 import org.tockit.util.ListSetImplementation;
 
-
 /**
  * This implements concepts.
- *
+ * 
  * Intent and extent are mapped into filter and ideal resp. to avoid redundant
  * storage. Filter and ideal are explicitely stored to reduce computational
  * efforts for these operations. The calculation of intent and extent size is
  * done in this class, the joins on the sets themselves are done by creating an
  * iterator which iterates over all contingents in filter and ideal resp.
- *
- * To use this class one has to ensure all sub- and superconcept relations
- * are set up properly. If only the neighbourhood relation is set the method
+ * 
+ * To use this class one has to ensure all sub- and superconcept relations are
+ * set up properly. If only the neighbourhood relation is set the method
  * buildClosures() can be called to extent this to the full sub-/superconcept
  * relation.
  */
-public class ConceptImplementation<O,A> implements Concept<O,A> {
+public class ConceptImplementation<O, A> implements Concept<O, A> {
     public static final String CONCEPT_ELEMENT_NAME = "concept";
     public static final String OBJECT_CONTINGENT_ELEMENT_NAME = "objectContingent";
     public static final String OBJECT_ELEMENT_NAME = "object";
@@ -48,8 +47,8 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
     public static final String ATTRIBUTE_ELEMENT_NAME = "attribute";
     public static final String DESCRIPTION_ELEMENT_NAME = "description";
 
-    private ListSet<A> attributeContingent = new ListSetImplementation<A>();
-    private ListSet<O> objectContingent = new ListSetImplementation<O>();
+    private final ListSet<A> attributeContingent = new ListSetImplementation<A>();
+    private final ListSet<O> objectContingent = new ListSetImplementation<O>();
 
     /**
      * This class implements an iterator that iterates over all attribute
@@ -59,7 +58,7 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
         /**
          * Stores the main iterator on the concepts.
          */
-        Iterator<Concept<O,A>> mainIterator;
+        Iterator<Concept<O, A>> mainIterator;
 
         /**
          * Stores the secondary iterator on the attributes of one concept.
@@ -69,10 +68,10 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
         /**
          * We start with the iterator of all concepts that we want to visit.
          */
-        AttributeIterator(Iterator<Concept<O,A>> main) {
+        AttributeIterator(final Iterator<Concept<O, A>> main) {
             this.mainIterator = main;
             if (main.hasNext()) {
-                Concept<O,A> first = main.next();
+                final Concept<O, A> first = main.next();
                 this.secondaryIterator = first.getAttributeContingentIterator();
             } else {
                 this.secondaryIterator = null;
@@ -80,8 +79,8 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
         }
 
         /**
-         * Returns true if we didn't iterate through all attributes in the filter
-         * yet.
+         * Returns true if we didn't iterate through all attributes in the
+         * filter yet.
          */
         public boolean hasNext() {
             if (this.secondaryIterator == null) {
@@ -89,9 +88,10 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
             }
             // make sure that we point to the next object, even if there are
             // empty contingents coming ahead
-            while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
+            while (!this.secondaryIterator.hasNext()
+                    && this.mainIterator.hasNext()) {
                 // go to next concept
-                Concept<O,A> next = this.mainIterator.next();
+                final Concept<O, A> next = this.mainIterator.next();
                 this.secondaryIterator = next.getAttributeContingentIterator();
             }
             return this.secondaryIterator.hasNext();
@@ -105,15 +105,17 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
                 throw new NoSuchElementException();
             }
             // Assume: secIt not null
-            if (!this.secondaryIterator.hasNext() && !this.mainIterator.hasNext()) {
+            if (!this.secondaryIterator.hasNext()
+                    && !this.mainIterator.hasNext()) {
                 // we were already finished
                 throw new NoSuchElementException();
             }
             // make sure that we point to the next attribute, even if there are
             // empty contingents coming ahead
-            while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
+            while (!this.secondaryIterator.hasNext()
+                    && this.mainIterator.hasNext()) {
                 // go to next concept
-                Concept<O,A> next = this.mainIterator.next();
+                final Concept<O, A> next = this.mainIterator.next();
                 this.secondaryIterator = next.getAttributeContingentIterator();
             }
             return this.secondaryIterator.next();
@@ -135,7 +137,7 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
         /**
          * Stores the main iterator on the concepts.
          */
-        Iterator<Concept<O,A>> mainIterator;
+        Iterator<Concept<O, A>> mainIterator;
 
         /**
          * Stores the secondary iterator on the objects of one concept.
@@ -145,10 +147,10 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
         /**
          * We start with the iterator of all concepts that we want to visit.
          */
-        ObjectIterator(Iterator<Concept<O,A>> main) {
+        ObjectIterator(final Iterator<Concept<O, A>> main) {
             this.mainIterator = main;
             if (main.hasNext()) {
-                Concept<O,A> first = main.next();
+                final Concept<O, A> first = main.next();
                 this.secondaryIterator = first.getObjectContingentIterator();
             } else {
                 this.secondaryIterator = null;
@@ -165,9 +167,10 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
             }
             // make sure that we point to the next object, even if there are
             // empty contingents coming ahead
-            while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
+            while (!this.secondaryIterator.hasNext()
+                    && this.mainIterator.hasNext()) {
                 // go to next concept
-                Concept<O,A> next = this.mainIterator.next();
+                final Concept<O, A> next = this.mainIterator.next();
                 this.secondaryIterator = next.getObjectContingentIterator();
             }
             return this.secondaryIterator.hasNext();
@@ -181,15 +184,17 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
                 throw new NoSuchElementException();
             }
             // Assume: secIt not null
-            if (!this.secondaryIterator.hasNext() && !this.mainIterator.hasNext()) {
+            if (!this.secondaryIterator.hasNext()
+                    && !this.mainIterator.hasNext()) {
                 // we were already finished
                 throw new NoSuchElementException();
             }
             // make sure that we point to the next object, even if there are
             // empty contingents coming ahead
-            while (!this.secondaryIterator.hasNext() && this.mainIterator.hasNext()) {
+            while (!this.secondaryIterator.hasNext()
+                    && this.mainIterator.hasNext()) {
                 // go to next concept
-                Concept<O,A> next = this.mainIterator.next();
+                final Concept<O, A> next = this.mainIterator.next();
                 this.secondaryIterator = next.getObjectContingentIterator();
             }
             return this.secondaryIterator.next();
@@ -206,17 +211,17 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
     /**
      * Stores all concepts in the filter, including this.
      */
-    protected Set<Concept<O,A>> filter = new HashSet<Concept<O,A>>();
+    protected Set<Concept<O, A>> filter = new HashSet<Concept<O, A>>();
 
     /**
      * Stores all concepts in the ideal, including this.
      */
-    protected Set<Concept<O,A>> ideal = new HashSet<Concept<O,A>>();
+    protected Set<Concept<O, A>> ideal = new HashSet<Concept<O, A>>();
 
     /**
      * Stores the number of objects in the extent to avoid unneccessary
      * calculations.
-     *
+     * 
      * This is initialized as lazy fetching in getExtentSize().
      */
     private int extentSize = -1;
@@ -224,7 +229,7 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
     /**
      * Stores the number of attribut the intent to avoid unnecc essary
      * calculations.
-     *
+     * 
      * This is initialized as lazy fetching in getIntentSize().
      */
     private int intentSize = -1;
@@ -232,7 +237,7 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
     /**
      * Initializes the ideal and filter with linked list having a reference to
      * this.
-     *
+     * 
      * Use addSuperConcept(Concept) and addSubConcept(Concept) to extent filter
      * and ideal.
      */
@@ -241,33 +246,39 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
         this.ideal.add(this);
     }
 
-    public ConceptImplementation(Element element) throws XMLSyntaxError {
+    public ConceptImplementation(final Element element) throws XMLSyntaxError {
         readXML(element);
     }
-    
+
     public Element toXML() {
-        Element retVal = new Element(CONCEPT_ELEMENT_NAME);
-        Element objectContingentElem = new Element(OBJECT_CONTINGENT_ELEMENT_NAME);
+        final Element retVal = new Element(CONCEPT_ELEMENT_NAME);
+        final Element objectContingentElem = new Element(
+                OBJECT_CONTINGENT_ELEMENT_NAME);
         retVal.addContent(objectContingentElem);
-        fillContingentElement(objectContingentElem, getObjectContingentIterator(), OBJECT_ELEMENT_NAME);
-        Element attributeContingentElem = new Element(ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
+        fillContingentElement(objectContingentElem,
+                getObjectContingentIterator(), OBJECT_ELEMENT_NAME);
+        final Element attributeContingentElem = new Element(
+                ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
         retVal.addContent(attributeContingentElem);
-        fillContingentElement(attributeContingentElem, getAttributeContingentIterator(), ATTRIBUTE_ELEMENT_NAME);
+        fillContingentElement(attributeContingentElem,
+                getAttributeContingentIterator(), ATTRIBUTE_ELEMENT_NAME);
         return retVal;
     }
 
     @SuppressWarnings("unchecked")
-	private void fillContingentElement(Element contingentElem, Iterator<?> contingentIterator, String newElementName) {
+    private void fillContingentElement(final Element contingentElem,
+            final Iterator<?> contingentIterator, final String newElementName) {
         while (contingentIterator.hasNext()) {
-            Object obj = contingentIterator.next();
-            if(obj instanceof XMLizable) {
-                Element element = ((XMLizable)obj).toXML();
-                // @todo this is a hack to keep the old syntax, which distinguishes objects and attributes
+            final Object obj = contingentIterator.next();
+            if (obj instanceof XMLizable) {
+                final Element element = ((XMLizable) obj).toXML();
+                // @todo this is a hack to keep the old syntax, which
+                // distinguishes objects and attributes
                 // should be changed for a 2.0 version
                 element.setName(newElementName);
                 contingentElem.addContent(element);
             } else {
-                Element newElem = new Element(newElementName);
+                final Element newElem = new Element(newElementName);
                 newElem.addContent(obj.toString());
                 contingentElem.addContent(newElem);
             }
@@ -277,44 +288,46 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
     /**
      * Adds a concept to the filter.
      */
-    public void addSuperConcept(Concept<O,A> superConcept) {
+    public void addSuperConcept(final Concept<O, A> superConcept) {
         this.filter.add(superConcept);
     }
 
     /**
      * Adds a concept to the ideal.
      */
-    public void addSubConcept(Concept<O,A> subConcept) {
+    public void addSubConcept(final Concept<O, A> subConcept) {
         this.ideal.add(subConcept);
     }
 
     /**
-     * Calculates the ideal and filter for this concept if only direct neighbours
-     * are given.
-     *
+     * Calculates the ideal and filter for this concept if only direct
+     * neighbours are given.
+     * 
      * If only direct neighbours in the neighbourhoud relation where given this
      * method can be called to create the ideal and filter by building the
      * transitive closures.
      */
     public void buildClosures() {
-        List<Concept<O,A>> idealList = new LinkedList<Concept<O,A>>(ideal);
+        final List<Concept<O, A>> idealList = new LinkedList<Concept<O, A>>(
+                ideal);
         while (!idealList.isEmpty()) {
-            Concept<O,A> other = idealList.remove(0);
-            Iterator<Concept<O,A>> it = other.getDownset().iterator();
+            final Concept<O, A> other = idealList.remove(0);
+            final Iterator<Concept<O, A>> it = other.getDownset().iterator();
             while (it.hasNext()) {
-                Concept<O,A> trans = it.next();
+                final Concept<O, A> trans = it.next();
                 if (ideal.add(trans)) {
                     idealList.add(trans);
                 }
             }
         }
 
-        List<Concept<O,A>> filterList = new LinkedList<Concept<O,A>>(filter);
+        final List<Concept<O, A>> filterList = new LinkedList<Concept<O, A>>(
+                filter);
         while (!filterList.isEmpty()) {
-            Concept<O, A> other = filterList.remove(0);
-            Iterator<Concept<O,A>> it = other.getUpset().iterator();
+            final Concept<O, A> other = filterList.remove(0);
+            final Iterator<Concept<O, A>> it = other.getUpset().iterator();
             while (it.hasNext()) {
-                Concept<O,A> trans = it.next();
+                final Concept<O, A> trans = it.next();
                 if (filter.add(trans)) {
                     filterList.add(trans);
                 }
@@ -328,9 +341,9 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
     public int getIntentSize() {
         if (intentSize < 0) { // not yet calculated
             intentSize = 0;
-            Iterator<Concept<O,A>> it = filter.iterator();
+            final Iterator<Concept<O, A>> it = filter.iterator();
             while (it.hasNext()) {
-                Concept<O,A> cur = it.next();
+                final Concept<O, A> cur = it.next();
                 intentSize += cur.getAttributeContingentSize();
             }
         }
@@ -350,9 +363,9 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
     public int getExtentSize() {
         if (extentSize < 0) { // not yet calculated
             extentSize = 0;
-            Iterator<Concept<O,A>> it = ideal.iterator();
+            final Iterator<Concept<O, A>> it = ideal.iterator();
             while (it.hasNext()) {
-                Concept<O,A> cur = it.next();
+                final Concept<O, A> cur = it.next();
                 extentSize += cur.getObjectContingentSize();
             }
         }
@@ -396,18 +409,18 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
 
     /**
      * Find the number of objects in this diagram.
-     *
+     * 
      * This is equal to the size of the extent of the top node.
      */
     private int getNumberOfObjects() {
-        Concept<O,A> cur = this;
+        Concept<O, A> cur = this;
         while (cur.getUpset().size() != 1) {
             // there is another concept in the filter which is not this
             // (this is always the first) ==> go up
             // The concept itself is in the filter, too -- we have to avoid
             // infinite recursion here
-            Iterator<Concept<O,A>> it = cur.getUpset().iterator();
-            Concept<O,A> next = cur;
+            final Iterator<Concept<O, A>> it = cur.getUpset().iterator();
+            Concept<O, A> next = cur;
             while (cur == next) { // we know there has to be a next()
                 next = it.next();
             }
@@ -419,18 +432,18 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
 
     /**
      * Find the number of attributes in this diagram.
-     *
+     * 
      * This is equal to the size of the intent of the bottom node.
      */
     private int getNumberOfAttributes() {
-    	Concept<O,A> cur = this;
+        Concept<O, A> cur = this;
         while (cur.getDownset().size() != 1) {
             // there is another concept in the ideal which is not this
             // (this is always the first) ==> go down
             // The concept itself is in the filter, too -- we have to avoid
             // infinite recursion here
-            Iterator<Concept<O,A>> it = cur.getDownset().iterator();
-            Concept<O,A> next = cur;
+            final Iterator<Concept<O, A>> it = cur.getDownset().iterator();
+            Concept<O, A> next = cur;
             while (cur == next) { // we know there has to be a next()
                 next = it.next();
             }
@@ -457,22 +470,22 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
     /**
      * Returns true iff the given concept is in the filter of this one.
      */
-    public boolean hasSuperConcept(Concept<O,A> concept) {
+    public boolean hasSuperConcept(final Concept<O, A> concept) {
         return this.filter.contains(concept);
     }
 
     /**
      * Returns true iff the given concept is in the ideal of this one.
      */
-    public boolean hasSubConcept(Concept<O,A> concept) {
+    public boolean hasSubConcept(final Concept<O, A> concept) {
         return this.ideal.contains(concept);
     }
 
-    public Collection<Concept<O,A>> getDownset() {
+    public Collection<Concept<O, A>> getDownset() {
         return this.ideal;
     }
 
-    public Collection<Concept<O,A>> getUpset() {
+    public Collection<Concept<O, A>> getUpset() {
         return this.filter;
     }
 
@@ -493,64 +506,69 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
     }
 
     /**
-     * @todo this code assumes both O and A are supertypes of FCAElementImplementation. The whole
-     *       approach of serialization is questionable, see comment on XMLizable.
+     * @todo this code assumes both O and A are supertypes of
+     *       FCAElementImplementation. The whole approach of serialization is
+     *       questionable, see comment on XMLizable.
      */
-	@SuppressWarnings("unchecked")
-	public void readXML(Element elem) throws XMLSyntaxError {
+    @SuppressWarnings("unchecked")
+    public void readXML(final Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(elem, CONCEPT_ELEMENT_NAME);
-        Element objectContingentElem = XMLHelper.getMandatoryChild(elem, OBJECT_CONTINGENT_ELEMENT_NAME);
-        List<Element> objects = objectContingentElem.getChildren(OBJECT_ELEMENT_NAME);
-        for (Iterator<Element> iterator = objects.iterator(); iterator.hasNext();) {
-            Element objElem = iterator.next();
-            this.objectContingent.add((O) new FCAElementImplementation(objElem));
+        final Element objectContingentElem = XMLHelper.getMandatoryChild(elem,
+                OBJECT_CONTINGENT_ELEMENT_NAME);
+        final List<Element> objects = objectContingentElem
+                .getChildren(OBJECT_ELEMENT_NAME);
+        for (final Element objElem : objects) {
+            this.objectContingent
+                    .add((O) new FCAElementImplementation(objElem));
         }
-        Element attributeContingentElem = XMLHelper.getMandatoryChild(elem, ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
-        List<Element> attributes = attributeContingentElem.getChildren(ATTRIBUTE_ELEMENT_NAME);
-        for (Iterator<Element> iterator = attributes.iterator(); iterator.hasNext();) {
-            Element attrElem = iterator.next();
-            this.attributeContingent.add((A) new FCAElementImplementation(attrElem));
+        final Element attributeContingentElem = XMLHelper.getMandatoryChild(
+                elem, ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
+        final List<Element> attributes = attributeContingentElem
+                .getChildren(ATTRIBUTE_ELEMENT_NAME);
+        for (final Element attrElem : attributes) {
+            this.attributeContingent.add((A) new FCAElementImplementation(
+                    attrElem));
         }
         this.filter.add(this);
         this.ideal.add(this);
     }
 
-    public void addObject(O object) {
+    public void addObject(final O object) {
         this.objectContingent.add(object);
     }
 
-    public void addAttribute(A attribute) {
+    public void addAttribute(final A attribute) {
         this.attributeContingent.add(attribute);
     }
-    
-    public void replaceObject(O objectToReplace, O newObject) {
-		// @todo make sure new object is inserted at the same position where old one was
-    	this.objectContingent.remove(objectToReplace);
-    	this.objectContingent.add(newObject);
+
+    public void replaceObject(final O objectToReplace, final O newObject) {
+        // @todo make sure new object is inserted at the same position where old
+        // one was
+        this.objectContingent.remove(objectToReplace);
+        this.objectContingent.add(newObject);
     }
 
-    public void removeObject(FCAElement object) {
+    public void removeObject(final FCAElement object) {
         this.objectContingent.remove(object);
     }
 
-    public void removeAttribute(A attribute) {
+    public void removeAttribute(final A attribute) {
         this.attributeContingent.remove(attribute);
     }
 
-    public boolean isLesserThan(Concept<O,A> other) {
+    public boolean isLesserThan(final Concept<O, A> other) {
         if (!(other instanceof ConceptImplementation)) {
             return false;
         }
         return !(other == this) && this.hasSuperConcept(other);
     }
 
-    public boolean isEqual(Concept<O,A> other) {
+    public boolean isEqual(final Concept<O, A> other) {
         return other == this;
     }
 
     public boolean isJoinIrreducible() {
-        for (Iterator<Concept<O,A>> iterator = filter.iterator(); iterator.hasNext();) {
-        	Concept<O,A> superconcept = iterator.next();
+        for (final Concept<O, A> superconcept : filter) {
             if (superconcept.getUpset().size() == this.filter.size() - 1) {
                 return true;
             }
@@ -559,8 +577,7 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
     }
 
     public boolean isMeetIrreducible() {
-        for (Iterator<Concept<O,A>> iterator = filter.iterator(); iterator.hasNext();) {
-        	Concept<O,A> subconcept = iterator.next();
+        for (final Concept<O, A> subconcept : filter) {
             if (subconcept.getUpset().size() == this.ideal.size() - 1) {
                 return true;
             }
@@ -569,32 +586,34 @@ public class ConceptImplementation<O,A> implements Concept<O,A> {
     }
 
     public void removeObjectContingent() {
-    	this.objectContingent.clear();
+        this.objectContingent.clear();
     }
 
-	public Concept<O,A> getTopConcept() {
-		Concept<O,A> topCandidate = this;
-		while (!topCandidate.isTop()) {
-			Concept<O,A> other = topCandidate;
-			Iterator<Concept<O,A>> it = topCandidate.getUpset().iterator();
-			do {
-				other = it.next();
-			} while (other == topCandidate);
-			topCandidate = other;
-		}
-		return topCandidate;
-	}
+    public Concept<O, A> getTopConcept() {
+        Concept<O, A> topCandidate = this;
+        while (!topCandidate.isTop()) {
+            Concept<O, A> other = topCandidate;
+            final Iterator<Concept<O, A>> it = topCandidate.getUpset()
+                    .iterator();
+            do {
+                other = it.next();
+            } while (other == topCandidate);
+            topCandidate = other;
+        }
+        return topCandidate;
+    }
 
-	public Concept<O,A> getBottomConcept() {
-		Concept<O,A> bottomCandidate = this;
-		while (!bottomCandidate.isBottom()) {
-			Concept<O,A> other = bottomCandidate;
-			Iterator<Concept<O,A>> it = bottomCandidate.getDownset().iterator();
-			do {
-				other = it.next();
-			} while (other == bottomCandidate);
-			bottomCandidate = other;
-		}
-		return bottomCandidate;
-	}
+    public Concept<O, A> getBottomConcept() {
+        Concept<O, A> bottomCandidate = this;
+        while (!bottomCandidate.isBottom()) {
+            Concept<O, A> other = bottomCandidate;
+            final Iterator<Concept<O, A>> it = bottomCandidate.getDownset()
+                    .iterator();
+            do {
+                other = it.next();
+            } while (other == bottomCandidate);
+            bottomCandidate = other;
+        }
+        return bottomCandidate;
+    }
 }

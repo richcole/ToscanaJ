@@ -12,8 +12,8 @@ import org.jdom.Element;
 /**
  * Models an object or attribute in a formal context.
  * 
- * Objects and attributes are only distinguished by their role, they do not
- * have separate classes.
+ * Objects and attributes are only distinguished by their role, they do not have
+ * separate classes.
  * 
  * We do not use plain Java objects for two reasons:
  * <ol>
@@ -32,22 +32,20 @@ public interface FCAElement {
      * This is not allowed to be null.
      */
     Object getData();
-    
+
     /**
      * Returns the description of the FCAElement.
      * 
      * The return value of this method can be null.
      */
     Element getDescription();
-    
+
     /**
      * Return the position in a context if available.
      * 
-     * The return value is either the position in the according
-     * context (i.e. in the list of objects or attributes, depending
-     * on the usage of this element), or -1 if no position in a 
-     * context is known.
+     * The return value is either the position in the according context (i.e. in
+     * the list of objects or attributes, depending on the usage of this
+     * element), or -1 if no position in a context is known.
      */
     int getContextPosition();
 }
-    

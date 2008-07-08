@@ -6,12 +6,10 @@
  * $Id$
  */
 package net.sourceforge.toscanaj.tests;
+
 import java.util.Collection;
 
 import javax.swing.JFrame;
-
-import org.tockit.context.model.BinaryRelationImplementation;
-import org.tockit.events.EventBroker;
 
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
@@ -25,56 +23,68 @@ import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.view.diagram.DiagramEditingView;
 
+import org.tockit.context.model.BinaryRelationImplementation;
+import org.tockit.events.EventBroker;
+
 public class DividesContextTester {
 
-    public static void main(String[] args) throws Exception {
-    	ContextImplementation<FCAElement,FCAElement> context = new ContextImplementation<FCAElement,FCAElement>();
-    	Collection<FCAElement> objects = context.getObjects();
-    	Collection<FCAElement> finalAttributes = context.getAttributes();
-		BinaryRelationImplementation<FCAElement,FCAElement> relation = context.getRelationImplementation();
-		
-		int max;
-		if(args.length == 0) {
-			max = 100;
-		} else {
-			max = Integer.parseInt(args[0]);
-		}
-		System.out.println("Generating 'divides'-lattice for numbers up to " + max);
-		
-        FCAElement[] attributes = new FCAElement[max];
-        for(int i = 1; i<=max; i++) {
-            attributes[i-1] = new FCAElementImplementation(new Integer(i));
-            finalAttributes.add(attributes[i-1]);
+    public static void main(final String[] args) throws Exception {
+        final ContextImplementation<FCAElement, FCAElement> context = new ContextImplementation<FCAElement, FCAElement>();
+        final Collection<FCAElement> objects = context.getObjects();
+        final Collection<FCAElement> finalAttributes = context.getAttributes();
+        final BinaryRelationImplementation<FCAElement, FCAElement> relation = context
+                .getRelationImplementation();
+
+        int max;
+        if (args.length == 0) {
+            max = 100;
+        } else {
+            max = Integer.parseInt(args[0]);
         }
-		
-        for(int i = 1; i<=max; i++) {
-        	FCAElement object = new FCAElementImplementation(new Integer(i));
-        	objects.add(object);
-            for(int j = 1; j <=max; j++) {
-            	if(i%j == 0) {
-            		relation.insert(object, attributes[j-1]);
-            	}
+        System.out.println("Generating 'divides'-lattice for numbers up to "
+                + max);
+
+        final FCAElement[] attributes = new FCAElement[max];
+        for (int i = 1; i <= max; i++) {
+            attributes[i - 1] = new FCAElementImplementation(new Integer(i));
+            finalAttributes.add(attributes[i - 1]);
+        }
+
+        for (int i = 1; i <= max; i++) {
+            final FCAElement object = new FCAElementImplementation(new Integer(
+                    i));
+            objects.add(object);
+            for (int j = 1; j <= max; j++) {
+                if (i % j == 0) {
+                    relation.insert(object, attributes[j - 1]);
+                }
             }
         }
-        
-        LatticeGenerator<FCAElement,FCAElement> lGen = new GantersAlgorithm();
-        
+
+        final LatticeGenerator<FCAElement, FCAElement> lGen = new GantersAlgorithm();
+
         long startMillis = System.currentTimeMillis();
-        Lattice<FCAElement,FCAElement> lattice = lGen.createLattice(context);
-        System.out.println("Lattice generation: " + (System.currentTimeMillis() - startMillis) + " ms");
-        
+        final Lattice<FCAElement, FCAElement> lattice = lGen
+                .createLattice(context);
+        System.out.println("Lattice generation: "
+                + (System.currentTimeMillis() - startMillis) + " ms");
+
         startMillis = System.currentTimeMillis();
-        Diagram2D<FCAElement,FCAElement> diagram = NDimLayoutOperations.createDiagram(lattice, "test", new DefaultDimensionStrategy<FCAElement>());
-        System.out.println("Diagram layout: " + (System.currentTimeMillis() - startMillis) + " ms");
-        
-        EventBroker broker = new EventBroker();
-        ConceptualSchema schema = new ConceptualSchema(broker);
+        final Diagram2D<FCAElement, FCAElement> diagram = NDimLayoutOperations
+                .createDiagram(lattice, "test",
+                        new DefaultDimensionStrategy<FCAElement>());
+        System.out.println("Diagram layout: "
+                + (System.currentTimeMillis() - startMillis) + " ms");
+
+        final EventBroker broker = new EventBroker();
+        final ConceptualSchema schema = new ConceptualSchema(broker);
         schema.addDiagram(diagram);
-        
-        JFrame mainPanel = new JFrame();
-        DiagramEditingView edView = new DiagramEditingView(mainPanel, schema, broker, false);
+
+        final JFrame mainPanel = new JFrame();
+        final DiagramEditingView edView = new DiagramEditingView(mainPanel,
+                schema, broker, false);
         mainPanel.setContentPane(edView);
-        mainPanel.setBounds(10,10,700,500);
+        mainPanel.setBounds(10, 10, 700, 500);
         mainPanel.setVisible(true);
     }
 }

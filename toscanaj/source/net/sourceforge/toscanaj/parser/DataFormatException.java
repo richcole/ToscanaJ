@@ -12,18 +12,18 @@ package net.sourceforge.toscanaj.parser;
  */
 public class DataFormatException extends Exception {
     public DataFormatException() {
-    super();
+        super();
     }
 
-    public DataFormatException(String message) {
-    super(message);
+    public DataFormatException(final String message) {
+        super(message);
     }
 
-    public DataFormatException(String message, Throwable cause) {
+    public DataFormatException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public DataFormatException(Throwable cause) {
+    public DataFormatException(final Throwable cause) {
         super(cause);
     }
 }

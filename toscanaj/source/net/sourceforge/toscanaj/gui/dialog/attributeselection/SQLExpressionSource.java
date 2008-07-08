@@ -10,5 +10,5 @@ package net.sourceforge.toscanaj.gui.dialog.attributeselection;
 import net.sourceforge.toscanaj.model.sql.Expression;
 
 public interface SQLExpressionSource {
-	Expression getExpression();
+    Expression getExpression();
 }

@@ -8,13 +8,14 @@
 package net.sourceforge.toscanaj.model.events;
 
 import net.sourceforge.toscanaj.model.database.Table;
+
 import org.tockit.events.Event;
 
 public class TableChangedEvent implements Event {
     Object source;
     Table table;
 
-    public TableChangedEvent(Object source, Table table) {
+    public TableChangedEvent(final Object source, final Table table) {
         this.source = source;
         this.table = table;
     }

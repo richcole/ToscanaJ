@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.observer;
 
 /**
  * Interface for adding ChangeObserver instances.
- *
+ * 
  * Needed due to the typical Java problems.
  */
 public interface ChangeObservable {

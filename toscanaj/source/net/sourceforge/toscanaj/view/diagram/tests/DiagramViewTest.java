@@ -7,17 +7,17 @@
  */
 package net.sourceforge.toscanaj.view.diagram.tests;
 
+import java.awt.Dimension;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 
-import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
 public class DiagramViewTest extends TestCase {
-    public DiagramViewTest(String s) {
+    public DiagramViewTest(final String s) {
         super(s);
     }
 
@@ -32,12 +32,12 @@ public class DiagramViewTest extends TestCase {
         }
 
         @Override
-		public boolean isScreenTransformDirty() {
+        public boolean isScreenTransformDirty() {
             return super.isScreenTransformDirty();
         }
 
         @Override
-		public void makeScreenTransformClear() {
+        public void makeScreenTransformClear() {
             super.makeScreenTransformClear();
         }
 
@@ -51,7 +51,7 @@ public class DiagramViewTest extends TestCase {
         assertEquals(false, view.isScreenTransformDirty());
         view.addComponentListener(new ComponentAdapter() {
             @Override
-			public void componentResized(ComponentEvent e) {
+            public void componentResized(final ComponentEvent e) {
                 assertEquals(true, view.isScreenTransformDirty());
             }
         });

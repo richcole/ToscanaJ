@@ -8,15 +8,17 @@
 package net.sourceforge.toscanaj.model.events;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+
 import org.tockit.events.Event;
 
 public class DatabaseModifiedEvent implements Event<Object> {
 
-    private Object source;
+    private final Object source;
 
-    private DatabaseConnection connection;
+    private final DatabaseConnection connection;
 
-    public DatabaseModifiedEvent(Object source, DatabaseConnection connection) {
+    public DatabaseModifiedEvent(final Object source,
+            final DatabaseConnection connection) {
         this.source = source;
         this.connection = connection;
     }

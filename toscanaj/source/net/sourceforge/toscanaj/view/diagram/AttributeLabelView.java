@@ -7,28 +7,28 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import net.sourceforge.toscanaj.model.context.FCAElement;
-import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-
 import java.awt.geom.Point2D;
 import java.util.Iterator;
 
+import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.diagram.LabelInfo;
+
 /**
  * A LabelView for displaying the attributes.
- *
- * This and the ObjectLabelView are used to distinguish between labels above
- * and below the nodes and the default display type (list or number).
- *
+ * 
+ * This and the ObjectLabelView are used to distinguish between labels above and
+ * below the nodes and the default display type (list or number).
+ * 
  * @see ObjectLabelView
  */
 public class AttributeLabelView extends LabelView {
     /**
      * @todo this is a quick hack to get a hide all feature, should be changed
-     * to some controller object or similar
+     *       to some controller object or similar
      */
     protected static boolean allHidden = false;
 
-    public static void setAllHidden(boolean allHidden) {
+    public static void setAllHidden(final boolean allHidden) {
         AttributeLabelView.allHidden = allHidden;
     }
 
@@ -37,26 +37,28 @@ public class AttributeLabelView extends LabelView {
     }
 
     @Override
-	public boolean isVisible() {
+    public boolean isVisible() {
         return super.isVisible() && !allHidden;
     }
-	
+
     public static LabelFactory getFactory() {
-        return new LabelFactory(){
-            public LabelView createLabelView(DiagramView diagramView,NodeView nodeView,LabelInfo label){
+        return new LabelFactory() {
+            public LabelView createLabelView(final DiagramView diagramView,
+                    final NodeView nodeView, final LabelInfo label) {
                 return new AttributeLabelView(diagramView, nodeView, label);
             }
 
-			public Class getLabelClass() {
-				return AttributeLabelView.class;
-			}
+            public Class getLabelClass() {
+                return AttributeLabelView.class;
+            }
         };
     }
 
     /**
      * Creates a view for the given label information.
      */
-    protected AttributeLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
+    protected AttributeLabelView(final DiagramView diagramView,
+            final NodeView nodeView, final LabelInfo label) {
         super(diagramView, nodeView, label);
     }
 
@@ -64,44 +66,47 @@ public class AttributeLabelView extends LabelView {
      * Returns LabelView.ABOVE
      */
     @Override
-	protected int getPlacement() {
+    protected int getPlacement() {
         return LabelView.ABOVE;
     }
 
     @Override
-	public int getNumberOfEntries() {
-        return this.labelInfo.getNode().getConcept().getAttributeContingentSize();
+    public int getNumberOfEntries() {
+        return this.labelInfo.getNode().getConcept()
+                .getAttributeContingentSize();
     }
 
     @Override
-	public Object getEntryAt(int position) {
-        Iterator attributeContingentIterator = this.labelInfo.getNode().getConcept().getAttributeContingentIterator();
+    public Object getEntryAt(final int position) {
+        final Iterator attributeContingentIterator = this.labelInfo.getNode()
+                .getConcept().getAttributeContingentIterator();
         int i = 0;
-        while(i < position) {
-        	attributeContingentIterator.next();
-        	i++;
+        while (i < position) {
+            attributeContingentIterator.next();
+            i++;
         }
         return attributeContingentIterator.next();
     }
 
     @Override
-	protected boolean highlightedInIdeal() {
+    protected boolean highlightedInIdeal() {
         return false;
     }
 
     @Override
-	protected boolean highlightedInFilter() {
+    protected boolean highlightedInFilter() {
         return true;
     }
 
-    public FCAElement getEntryAtPosition(Point2D canvasPosition) {
-        int i = getIndexOfPosition(canvasPosition);
+    public FCAElement getEntryAtPosition(final Point2D canvasPosition) {
+        final int i = getIndexOfPosition(canvasPosition);
         return (FCAElement) getEntryAt(i);
     }
 
     @Override
-	protected boolean isFaded() {
-		int selectionState = nodeView.getSelectionState();
-		return selectionState == DiagramView.NOT_SELECTED || selectionState == DiagramView.SELECTED_IDEAL;
+    protected boolean isFaded() {
+        final int selectionState = nodeView.getSelectionState();
+        return selectionState == DiagramView.NOT_SELECTED
+                || selectionState == DiagramView.SELECTED_IDEAL;
     }
 }

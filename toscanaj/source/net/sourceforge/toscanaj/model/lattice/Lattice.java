@@ -7,17 +7,18 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
-
 /**
  * A formal concept lattice.
  * 
- * @param <O> The formal objects used in the lattice.
- * @param <A> The attributes used in the lattice.
+ * @param <O>
+ *            The formal objects used in the lattice.
+ * @param <A>
+ *            The attributes used in the lattice.
  */
-public interface Lattice<O,A> {
-    Concept<O,A>[] getConcepts();
+public interface Lattice<O, A> {
+    Concept<O, A>[] getConcepts();
 
-    Concept<O,A> getTop();
+    Concept<O, A> getTop();
 
-    Concept<O,A> getBottom();
+    Concept<O, A> getBottom();
 }

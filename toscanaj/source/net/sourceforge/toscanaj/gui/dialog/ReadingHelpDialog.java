@@ -7,7 +7,16 @@
  */
 package net.sourceforge.toscanaj.gui.dialog;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Frame;
+import java.awt.Rectangle;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Iterator;
+
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
 
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
@@ -22,88 +31,95 @@ import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 import org.tockit.swing.preferences.ExtendedPreferences;
 
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.Iterator;
-
 /**
  * @todo add some feature to lock the concept, and add scrollpane
  */
 public class ReadingHelpDialog extends JDialog {
-    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(ReadingHelpDialog.class);
-    private JEditorPane textArea;
-    private static final int MAX_OBJECTS = 100;        
+    private static final ExtendedPreferences preferences = ExtendedPreferences
+            .userNodeForClass(ReadingHelpDialog.class);
+    private final JEditorPane textArea;
+    private static final int MAX_OBJECTS = 100;
 
-    public ReadingHelpDialog(Frame frame, EventBroker diagramEventBroker) {
+    public ReadingHelpDialog(final Frame frame,
+            final EventBroker diagramEventBroker) {
         super(frame, "Info", false);
 
         this.addWindowListener(new WindowAdapter() {
             @Override
-			public void windowClosing(WindowEvent e) {
+            public void windowClosing(final WindowEvent e) {
                 closeDialog();
             }
         });
-        
+
         this.textArea = new JEditorPane();
         this.textArea.setContentType("text/html");
         this.textArea.setEditable(false);
-        
+
         diagramEventBroker.subscribe(new EventBrokerListener() {
-            public void processEvent(Event e) {
-                ReadingHelpDialog.this.textArea.setText(createDescriptiveText((NodeView) e.getSubject()));
+            public void processEvent(final Event e) {
+                ReadingHelpDialog.this.textArea
+                        .setText(createDescriptiveText((NodeView) e
+                                .getSubject()));
             }
         }, CanvasItemMouseEnterEvent.class, NodeView.class);
         diagramEventBroker.subscribe(new EventBrokerListener() {
-            public void processEvent(Event e) {
+            public void processEvent(final Event e) {
                 ReadingHelpDialog.this.textArea.setText("");
             }
         }, CanvasItemMouseExitEvent.class, NodeView.class);
         diagramEventBroker.subscribe(new EventBrokerListener() {
-            public void processEvent(Event e) {
-                ReadingHelpDialog.this.textArea.setText(createDescriptiveText(((LabelView) e.getSubject()).getNodeView()));
+            public void processEvent(final Event e) {
+                ReadingHelpDialog.this.textArea
+                        .setText(createDescriptiveText(((LabelView) e
+                                .getSubject()).getNodeView()));
             }
         }, CanvasItemMouseEnterEvent.class, LabelView.class);
         diagramEventBroker.subscribe(new EventBrokerListener() {
-            public void processEvent(Event e) {
+            public void processEvent(final Event e) {
                 ReadingHelpDialog.this.textArea.setText("");
             }
         }, CanvasItemMouseExitEvent.class, LabelView.class);
-        
-        Container contentPane = getContentPane();
+
+        final Container contentPane = getContentPane();
         contentPane.setLayout(new BorderLayout());
         contentPane.add(this.textArea, BorderLayout.CENTER);
-        preferences.restoreWindowPlacement(this, new Rectangle(50,50,200,300));
+        preferences.restoreWindowPlacement(this,
+                new Rectangle(50, 50, 200, 300));
     }
-    
-    private String createDescriptiveText(NodeView nodeView) {
-        Concept concept = nodeView.getDiagramNode().getConcept();
-        ConceptInterpreter conceptInterpreter = nodeView.getDiagramView().getConceptInterpreter();
-        ConceptInterpretationContext conceptInterpretationContext = 
-            nodeView.getDiagramView().getConceptInterpretationContext();
-        
-        StringBuffer description = new StringBuffer("<html>");
+
+    private String createDescriptiveText(final NodeView nodeView) {
+        final Concept concept = nodeView.getDiagramNode().getConcept();
+        final ConceptInterpreter conceptInterpreter = nodeView.getDiagramView()
+                .getConceptInterpreter();
+        final ConceptInterpretationContext conceptInterpretationContext = nodeView
+                .getDiagramView().getConceptInterpretationContext();
+
+        final StringBuffer description = new StringBuffer("<html>");
         description.append("<hr><i>Attributes (");
         description.append(concept.getIntentSize());
         description.append("):</i><hr>");
         Iterator it = concept.getIntentIterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             description.append("- ");
             description.append(it.next().toString());
             description.append("<br>");
         }
-        boolean originalObjectMode = conceptInterpretationContext.getObjectDisplayMode();
-        conceptInterpretationContext.setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
-        int extentSize = conceptInterpreter.getExtentSize(concept, conceptInterpretationContext);
+        final boolean originalObjectMode = conceptInterpretationContext
+                .getObjectDisplayMode();
+        conceptInterpretationContext
+                .setObjectDisplayMode(ConceptInterpretationContext.EXTENT);
+        final int extentSize = conceptInterpreter.getExtentSize(concept,
+                conceptInterpretationContext);
         description.append("<hr><i>Objects (");
         description.append(extentSize);
         description.append("):</i><hr>");
-        if(extentSize <= MAX_OBJECTS) {
-            it = conceptInterpreter.getObjectSetIterator(concept, conceptInterpretationContext);
-            while(it.hasNext()) {
+        if (extentSize <= MAX_OBJECTS) {
+            it = conceptInterpreter.getObjectSetIterator(concept,
+                    conceptInterpretationContext);
+            while (it.hasNext()) {
                 description.append("- ");
                 description.append(it.next().toString());
-                if(it.hasNext()) {
+                if (it.hasNext()) {
                     description.append("<br>");
                 }
             }

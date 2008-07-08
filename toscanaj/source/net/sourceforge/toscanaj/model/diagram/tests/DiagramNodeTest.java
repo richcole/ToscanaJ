@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.model.diagram.tests;
 
+import java.awt.geom.Point2D;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -15,14 +17,13 @@ import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
-import org.jdom.Element;
 
-import java.awt.geom.Point2D;
+import org.jdom.Element;
 
 public class DiagramNodeTest extends TestCase {
     final static Class THIS = DiagramNodeTest.class;
 
-    public DiagramNodeTest(String s) {
+    public DiagramNodeTest(final String s) {
         super(s);
     }
 
@@ -32,29 +33,32 @@ public class DiagramNodeTest extends TestCase {
 
     public void testReadWriteFromXML() {
 
-        Point2D position = new Point2D.Double(10, 10);
-        DiagramNode node = new DiagramNode(new SimpleLineDiagram(), "Id", position, new ConceptImplementation(),
-                new LabelInfo(), new LabelInfo(), null);
+        final Point2D position = new Point2D.Double(10, 10);
+        final DiagramNode node = new DiagramNode(new SimpleLineDiagram(), "Id",
+                position, new ConceptImplementation(), new LabelInfo(),
+                new LabelInfo(), null);
 
-        Element xmlDesc = node.toXML();
+        final Element xmlDesc = node.toXML();
 
         try {
-            DiagramNode other = new DiagramNode(new SimpleLineDiagram(), xmlDesc);
+            final DiagramNode other = new DiagramNode(new SimpleLineDiagram(),
+                    xmlDesc);
             assertEquals(node, other);
-        } catch (XMLSyntaxError error) {
+        } catch (final XMLSyntaxError error) {
             fail(error.toString());
         }
 
     }
 
     public void testEquals() {
-        Point2D position = new Point2D.Double(0, 0);
+        final Point2D position = new Point2D.Double(0, 0);
         final String identifier = "Id";
-        DiagramNode node = new DiagramNode(new SimpleLineDiagram(), identifier, position, new ConceptImplementation(),
-                new LabelInfo(), new LabelInfo(), null);
+        DiagramNode node = new DiagramNode(new SimpleLineDiagram(), identifier,
+                position, new ConceptImplementation(), new LabelInfo(),
+                new LabelInfo(), null);
 
-
-        DiagramNode node2 = new DiagramNode(new SimpleLineDiagram(), identifier, position, new ConceptImplementation(),
+        final DiagramNode node2 = new DiagramNode(new SimpleLineDiagram(),
+                identifier, position, new ConceptImplementation(),
                 new LabelInfo(), new LabelInfo(), null);
 
         assertEquals(node, node2);
@@ -65,17 +69,18 @@ public class DiagramNodeTest extends TestCase {
         node.setPosition(new Point2D.Double(10, 0));
         assertEquals(false, node.equals(node2));
 
-        node = new DiagramNode(new SimpleLineDiagram(), "Id2", position, new ConceptImplementation(),
-                new LabelInfo(), new LabelInfo(), null);
+        node = new DiagramNode(new SimpleLineDiagram(), "Id2", position,
+                new ConceptImplementation(), new LabelInfo(), new LabelInfo(),
+                null);
         assertEquals(false, node.equals(node2));
 
-        LabelInfo info = new LabelInfo();
+        final LabelInfo info = new LabelInfo();
         info.setOffset(new Point2D.Double(0, 10));
 
-        node = new DiagramNode(new SimpleLineDiagram(), identifier, position, new ConceptImplementation(), info, new LabelInfo(), null);
+        node = new DiagramNode(new SimpleLineDiagram(), identifier, position,
+                new ConceptImplementation(), info, new LabelInfo(), null);
         assertEquals(false, node.equals(node2));
 
     }
-
 
 }

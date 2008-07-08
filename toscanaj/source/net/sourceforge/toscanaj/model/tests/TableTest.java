@@ -12,12 +12,13 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.Table;
+
 import org.tockit.events.EventBroker;
 
 public class TableTest extends TestCase {
     final static Class THIS = TableTest.class;
 
-    public TableTest(String s) {
+    public TableTest(final String s) {
         super(s);
     }
 
@@ -26,10 +27,9 @@ public class TableTest extends TestCase {
     }
 
     public void testAddColumns() {
-        Table table = new Table(new EventBroker(), "Table", false);
+        final Table table = new Table(new EventBroker(), "Table", false);
         table.addColumn(new Column("Second", java.sql.Types.INTEGER, table));
 
     }
-
 
 }

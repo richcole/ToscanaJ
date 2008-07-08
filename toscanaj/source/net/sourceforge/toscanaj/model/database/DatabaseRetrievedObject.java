@@ -7,26 +7,28 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import org.jdom.Element;
-
 import net.sourceforge.toscanaj.model.context.FCAElement;
 
+import org.jdom.Element;
+
 /**
- * @todo drop distinctions between objects with or without keys and with or without special
- *     clauses. The object should have only one clause attached which gives whatever this
- *     object represents, the clause for the full object set of a label should not be part
- *     of instances of this class. Probably it is a good idea if aggregates just return
- *     null as their clause -- they just don't have any clause specific for them.
- *     This change needs first dropping the distinction between different viewers in the
- *     DatabaseViewerManager.
+ * @todo drop distinctions between objects with or without keys and with or
+ *       without special clauses. The object should have only one clause
+ *       attached which gives whatever this object represents, the clause for
+ *       the full object set of a label should not be part of instances of this
+ *       class. Probably it is a good idea if aggregates just return null as
+ *       their clause -- they just don't have any clause specific for them. This
+ *       change needs first dropping the distinction between different viewers
+ *       in the DatabaseViewerManager.
  */
 public class DatabaseRetrievedObject implements FCAElement {
     private Object key = null;
-    private String displayString;
-    private String queryWhereClause;
+    private final String displayString;
+    private final String queryWhereClause;
     private String specialWhereClause;
 
-    public DatabaseRetrievedObject(String queryWhereClause, String displayString) {
+    public DatabaseRetrievedObject(final String queryWhereClause,
+            final String displayString) {
         this.queryWhereClause = queryWhereClause;
         this.displayString = displayString;
     }
@@ -39,7 +41,7 @@ public class DatabaseRetrievedObject implements FCAElement {
         return this.key;
     }
 
-    public void setKey(Object key) {
+    public void setKey(final Object key) {
         this.key = key;
     }
 
@@ -51,7 +53,7 @@ public class DatabaseRetrievedObject implements FCAElement {
         return specialWhereClause;
     }
 
-    public void setSpecialWhereClause(String specialWhereClause) {
+    public void setSpecialWhereClause(final String specialWhereClause) {
         this.specialWhereClause = specialWhereClause;
     }
 
@@ -64,7 +66,7 @@ public class DatabaseRetrievedObject implements FCAElement {
     }
 
     @Override
-	public String toString() {
+    public String toString() {
         return getDisplayString();
     }
 

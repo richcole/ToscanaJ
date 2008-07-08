@@ -5,47 +5,51 @@
  */
 package net.sourceforge.toscanaj.controller.db;
 
+import java.util.Iterator;
+import java.util.List;
+
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.util.Iterator;
-import java.util.List;
-
-public class WhereClauseGenerator<O,A> implements DiagramHistory.ConceptVisitor<O,A> {
+public class WhereClauseGenerator<O, A> implements
+        DiagramHistory.ConceptVisitor<O, A> {
     private static class NoClauseCreatedException extends RuntimeException {
-    	// nothing specific
+        // nothing specific
     }
 
     private String clause;
     private boolean filterMode;
 
-    private WhereClauseGenerator(String startClause, DiagramHistory filterDiagrams,
-                                 List<Concept<O,A>> outerConcepts, boolean displayMode, boolean filterMode) {
+    private WhereClauseGenerator(final String startClause,
+            final DiagramHistory filterDiagrams,
+            final List<Concept<O, A>> outerConcepts, final boolean displayMode,
+            final boolean filterMode) {
         try {
             createClauseStart(startClause);
             addFilterPart(filterDiagrams, filterMode);
             addNestingPart(outerConcepts, displayMode);
-        } catch (NoClauseCreatedException e) {
+        } catch (final NoClauseCreatedException e) {
             this.clause = null;
         }
     }
 
-    private void createClauseStart(String startClause) {
+    private void createClauseStart(final String startClause) {
         if (startClause == null) {
             throw new NoClauseCreatedException();
         }
         this.clause = "WHERE " + startClause;
     }
 
-    private void addFilterPart(DiagramHistory filterDiagrams, boolean newFilterMode) {
+    private void addFilterPart(final DiagramHistory filterDiagrams,
+            final boolean newFilterMode) {
         this.filterMode = newFilterMode;
         filterDiagrams.visitZoomedConcepts(this);
     }
 
-    private void addNestingPart(List<Concept<O,A>> outerConcepts, boolean displayMode) {
-        for (Iterator<Concept<O,A>> iterator = outerConcepts.iterator(); iterator.hasNext();) {
-            Concept<O,A> concept = iterator.next();
+    private void addNestingPart(final List<Concept<O, A>> outerConcepts,
+            final boolean displayMode) {
+        for (final Concept<O, A> concept : outerConcepts) {
             if (displayMode == ConceptInterpretationContext.CONTINGENT) {
                 addClausePart(getObjectClause(concept));
             } else {
@@ -54,21 +58,22 @@ public class WhereClauseGenerator<O,A> implements DiagramHistory.ConceptVisitor<
         }
     }
 
-    static private String getObjectClause(Concept<?,?> concept) {
+    static private String getObjectClause(final Concept<?, ?> concept) {
         return createClause(concept.getObjectContingentIterator());
     }
 
-    static private String getExtentClause(Concept<?,?> concept) {
+    static private String getExtentClause(final Concept<?, ?> concept) {
         return createClause(concept.getExtentIterator());
     }
 
-    static public String createClause(Iterator<?> objectIterator) {
+    static public String createClause(final Iterator<?> objectIterator) {
         if (!objectIterator.hasNext()) {
             return null;
         } else {
             String retVal = "(";
-            for (Iterator<?> iterator = objectIterator; iterator.hasNext();) {
-                Object o = iterator.next();
+            for (final Iterator<?> iterator = objectIterator; iterator
+                    .hasNext();) {
+                final Object o = iterator.next();
                 retVal += o.toString();
                 if (iterator.hasNext()) {
                     retVal += " OR ";
@@ -79,7 +84,7 @@ public class WhereClauseGenerator<O,A> implements DiagramHistory.ConceptVisitor<
         }
     }
 
-    private void addClausePart(String clausePart) {
+    private void addClausePart(final String clausePart) {
         if (clausePart != null) {
             this.clause += " AND " + clausePart;
         } else {
@@ -87,7 +92,7 @@ public class WhereClauseGenerator<O,A> implements DiagramHistory.ConceptVisitor<
         }
     }
 
-    public void visitConcept(Concept<O,A> concept) {
+    public void visitConcept(final Concept<O, A> concept) {
         if (this.filterMode == ConceptInterpretationContext.CONTINGENT) {
             addClausePart(getObjectClause(concept));
         } else {
@@ -99,13 +104,20 @@ public class WhereClauseGenerator<O,A> implements DiagramHistory.ConceptVisitor<
         return this.clause;
     }
 
-    public static<O,A> String createWhereClause(Concept<O,A> forConcept, DiagramHistory filterDiagrams,
-                                           List<Concept<O,A>> outerConcepts, boolean displayMode, boolean filterMode) {
-        WhereClauseGenerator<O,A> generator;
+    public static <O, A> String createWhereClause(
+            final Concept<O, A> forConcept,
+            final DiagramHistory filterDiagrams,
+            final List<Concept<O, A>> outerConcepts, final boolean displayMode,
+            final boolean filterMode) {
+        WhereClauseGenerator<O, A> generator;
         if (displayMode == ConceptInterpretationContext.CONTINGENT) {
-            generator = new WhereClauseGenerator<O,A>(getObjectClause(forConcept), filterDiagrams, outerConcepts, displayMode, filterMode);
+            generator = new WhereClauseGenerator<O, A>(
+                    getObjectClause(forConcept), filterDiagrams, outerConcepts,
+                    displayMode, filterMode);
         } else {
-            generator = new WhereClauseGenerator<O,A>(getExtentClause(forConcept), filterDiagrams, outerConcepts, displayMode, filterMode);
+            generator = new WhereClauseGenerator<O, A>(
+                    getExtentClause(forConcept), filterDiagrams, outerConcepts,
+                    displayMode, filterMode);
         }
         return generator.getClause();
     }

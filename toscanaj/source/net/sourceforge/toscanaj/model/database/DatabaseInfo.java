@@ -7,23 +7,25 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import org.jdom.Element;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import org.jdom.Element;
 
 /**
  * This class contains information how to connect to a database.
  */
 public class DatabaseInfo implements XMLizable {
-    /// @todo yet another hack that should go away after ConceptInterpreter is done
+    // / @todo yet another hack that should go away after ConceptInterpreter is
+    // done
     static public URL baseURL;
     /**
      * The source where the database can be found.
-     *
+     * 
      * This is a JDBC url.
      */
     private String sourceURL = null;
@@ -48,12 +50,14 @@ public class DatabaseInfo implements XMLizable {
     private String driverClass = null;
 
     public static class Type {
-        private String name;
-        protected Type(String name) {
+        private final String name;
+
+        protected Type(final String name) {
             this.name = name;
         }
+
         @Override
-		public String toString() {
+        public String toString() {
             return name;
         }
     }
@@ -66,32 +70,26 @@ public class DatabaseInfo implements XMLizable {
     public static final Type EXCEL_FILE = new Type("ACCESS_FILE");
 
     private static final String ODBC_PREFIX = "jdbc:odbc:";
-    private static final String ACCESS_FILE_URL_PREFIX =
-        "jdbc:odbc:DRIVER=Microsoft Access Driver (*.mdb); DBQ=";
-    private static final String ACCESS_FILE_URL_END =
-        ";UserCommitSync=Yes;Threads=3;SafeTransactions=0;PageTimeout=5;"
+    private static final String ACCESS_FILE_URL_PREFIX = "jdbc:odbc:DRIVER=Microsoft Access Driver (*.mdb); DBQ=";
+    private static final String ACCESS_FILE_URL_END = ";UserCommitSync=Yes;Threads=3;SafeTransactions=0;PageTimeout=5;"
             + "MaxScanRows=8;MaxBufferSize=2048;DriverId=281";
-    private static final String EXCEL_FILE_URL_PREFIX =
-        "jdbc:odbc:Driver={Microsoft Excel Driver (*.xls)};DBQ=";
-    private static final String EXCEL_FILE_URL_END =
-        ";DriverID=22;READONLY=true";
+    private static final String EXCEL_FILE_URL_PREFIX = "jdbc:odbc:Driver={Microsoft Excel Driver (*.xls)};DBQ=";
+    private static final String EXCEL_FILE_URL_END = ";DriverID=22;READONLY=true";
 
-    private static final String JDBC_ODBC_BRIDGE_DRIVER =
-        "sun.jdbc.odbc.JdbcOdbcDriver";
+    private static final String JDBC_ODBC_BRIDGE_DRIVER = "sun.jdbc.odbc.JdbcOdbcDriver";
 
-    public static final String DATABASE_CONNECTION_ELEMENT_NAME =
-        "databaseConnection";
+    public static final String DATABASE_CONNECTION_ELEMENT_NAME = "databaseConnection";
     private static final String EMBEDDED_SOURCE_ELEMENT_NAME = "embed";
     private static final String URL_SOURCE_ELEMENT_NAME = "url";
     private static final String DRIVER_CLASS_ATTRIBUTE_NAME = "driver";
     private static final String USERNAME_ATTRIBUTE_NAME = "user";
     private static final String PASSWORD_ATTRIBUTE_NAME = "password";
     private static final String EMBEDDED_URL_ATTRIBUTE_NAME = "url";
-	private static final String TABLE_ELEMENT_NAME = "table";
-	private static final String OBJECT_KEY_ELEMENT_NAME = "key";
+    private static final String TABLE_ELEMENT_NAME = "table";
+    private static final String OBJECT_KEY_ELEMENT_NAME = "key";
 
     public static DatabaseInfo getEmbeddedDatabaseInfo() {
-        DatabaseInfo info = new DatabaseInfo();
+        final DatabaseInfo info = new DatabaseInfo();
         info.setUrl("jdbc:hsqldb:.");
         info.setDriverClass("org.hsqldb.jdbcDriver");
         info.setUserName("sa");
@@ -102,10 +100,8 @@ public class DatabaseInfo implements XMLizable {
     /**
      * Creates a new Query that will query a list.
      */
-    public Query createListQuery(
-        String name,
-        String header,
-        boolean isDistinct) {
+    public Query createListQuery(final String name, final String header,
+            final boolean isDistinct) {
         if (isDistinct) {
             return new DistinctListQuery(this, name, header);
         } else {
@@ -116,42 +112,41 @@ public class DatabaseInfo implements XMLizable {
     /**
      * Creates a new Query that will query a single number as aggregate.
      */
-    public Query createAggregateQuery(String name, String header) {
+    public Query createAggregateQuery(final String name, final String header) {
         return new AggregateQuery(this, name, header);
     }
 
     /**
      * Creates an empty instance.
      */
-	public DatabaseInfo() {
-		// nothing to initialize here
-	}
+    public DatabaseInfo() {
+        // nothing to initialize here
+    }
 
-	public DatabaseInfo(DatabaseInfo other) {
-		this.sourceURL = other.sourceURL;
-		this.table = other.table;
-		this.objectKey = other.objectKey;
-		this.userName = other.userName;
-		this.password = other.password;
-		this.embeddedSQLLocation = other.embeddedSQLLocation;
-		this.embeddedSQLPath = other.embeddedSQLPath;
-		this.driverClass = other.driverClass;
-	}
+    public DatabaseInfo(final DatabaseInfo other) {
+        this.sourceURL = other.sourceURL;
+        this.table = other.table;
+        this.objectKey = other.objectKey;
+        this.userName = other.userName;
+        this.password = other.password;
+        this.embeddedSQLLocation = other.embeddedSQLLocation;
+        this.embeddedSQLPath = other.embeddedSQLPath;
+        this.driverClass = other.driverClass;
+    }
 
-    public DatabaseInfo(Element element) throws XMLSyntaxError {
+    public DatabaseInfo(final Element element) throws XMLSyntaxError {
         readXML(element);
     }
 
     public Element toXML() {
-        Element retVal = new Element(DATABASE_CONNECTION_ELEMENT_NAME);
+        final Element retVal = new Element(DATABASE_CONNECTION_ELEMENT_NAME);
         if (embeddedSQLPath != null) {
-            Element embedElem = new Element(EMBEDDED_SOURCE_ELEMENT_NAME);
-            embedElem.setAttribute(
-                EMBEDDED_URL_ATTRIBUTE_NAME,
-                embeddedSQLPath);
+            final Element embedElem = new Element(EMBEDDED_SOURCE_ELEMENT_NAME);
+            embedElem
+                    .setAttribute(EMBEDDED_URL_ATTRIBUTE_NAME, embeddedSQLPath);
             retVal.addContent(embedElem);
         } else {
-            Element urlElem = new Element(URL_SOURCE_ELEMENT_NAME);
+            final Element urlElem = new Element(URL_SOURCE_ELEMENT_NAME);
             urlElem.addContent(sourceURL);
             urlElem.setAttribute(DRIVER_CLASS_ATTRIBUTE_NAME, driverClass);
             urlElem.setAttribute(USERNAME_ATTRIBUTE_NAME, getUserName());
@@ -163,37 +158,32 @@ public class DatabaseInfo implements XMLizable {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XMLSyntaxError {
+    public void readXML(final Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(elem, DATABASE_CONNECTION_ELEMENT_NAME);
         if (XMLHelper.contains(elem, EMBEDDED_SOURCE_ELEMENT_NAME)) {
-            Element embedElem = elem.getChild(EMBEDDED_SOURCE_ELEMENT_NAME);
-            setEmbeddedSQLLocation(
-                XMLHelper
-                    .getAttribute(embedElem, EMBEDDED_URL_ATTRIBUTE_NAME)
-                    .getValue());
+            final Element embedElem = elem
+                    .getChild(EMBEDDED_SOURCE_ELEMENT_NAME);
+            setEmbeddedSQLLocation(XMLHelper.getAttribute(embedElem,
+                    EMBEDDED_URL_ATTRIBUTE_NAME).getValue());
             setUrl("jdbc:hsqldb:.");
             setDriverClass("org.hsqldb.jdbcDriver");
             setUserName("sa");
             setPassword("");
         } else {
-            Element urlElement =
-                XMLHelper.getMandatoryChild(elem, URL_SOURCE_ELEMENT_NAME);
+            final Element urlElement = XMLHelper.getMandatoryChild(elem,
+                    URL_SOURCE_ELEMENT_NAME);
             sourceURL = urlElement.getTextNormalize();
-            driverClass =
-                XMLHelper
-                    .getAttribute(urlElement, DRIVER_CLASS_ATTRIBUTE_NAME)
-                    .getValue();
-            userName =
-                XMLHelper
-                    .getAttribute(urlElement, USERNAME_ATTRIBUTE_NAME)
-                    .getValue();
-            password =
-                XMLHelper
-                    .getAttribute(urlElement, PASSWORD_ATTRIBUTE_NAME)
-                    .getValue();
+            driverClass = XMLHelper.getAttribute(urlElement,
+                    DRIVER_CLASS_ATTRIBUTE_NAME).getValue();
+            userName = XMLHelper.getAttribute(urlElement,
+                    USERNAME_ATTRIBUTE_NAME).getValue();
+            password = XMLHelper.getAttribute(urlElement,
+                    PASSWORD_ATTRIBUTE_NAME).getValue();
         }
-        this.table = new Table(XMLHelper.getMandatoryChild(elem, TABLE_ELEMENT_NAME));
-        this.objectKey = new Column(XMLHelper.getMandatoryChild(elem, OBJECT_KEY_ELEMENT_NAME), this.table);
+        this.table = new Table(XMLHelper.getMandatoryChild(elem,
+                TABLE_ELEMENT_NAME));
+        this.objectKey = new Column(XMLHelper.getMandatoryChild(elem,
+                OBJECT_KEY_ELEMENT_NAME), this.table);
     }
 
     /**
@@ -206,11 +196,11 @@ public class DatabaseInfo implements XMLizable {
     /**
      * Sets the given URL as DB connecion point.
      */
-    public void setUrl(String url) {
+    public void setUrl(final String url) {
         this.sourceURL = url;
     }
 
-    public void setUserName(String userName) {
+    public void setUserName(final String userName) {
         this.userName = userName;
     }
 
@@ -221,7 +211,7 @@ public class DatabaseInfo implements XMLizable {
         return this.userName;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
 
@@ -235,7 +225,7 @@ public class DatabaseInfo implements XMLizable {
     /**
      * Sets the database table we want to query.
      */
-    public void setTable(Table table) {
+    public void setTable(final Table table) {
         this.table = table;
     }
 
@@ -246,7 +236,7 @@ public class DatabaseInfo implements XMLizable {
     /**
      * Sets the key we use in queries.
      */
-    public void setKey(Column key) {
+    public void setKey(final Column key) {
         this.objectKey = key;
     }
 
@@ -254,7 +244,7 @@ public class DatabaseInfo implements XMLizable {
         return this.objectKey;
     }
 
-    public void setEmbeddedSQLLocation(String relativePath) {
+    public void setEmbeddedSQLLocation(final String relativePath) {
         if (relativePath == null) {
             this.embeddedSQLLocation = null;
             this.embeddedSQLPath = null;
@@ -264,7 +254,7 @@ public class DatabaseInfo implements XMLizable {
         }
     }
 
-    public void setEmbeddedSQLLocation(URL url) {
+    public void setEmbeddedSQLLocation(final URL url) {
         this.embeddedSQLLocation = url;
         if (url == null) {
             this.embeddedSQLPath = null;
@@ -273,12 +263,12 @@ public class DatabaseInfo implements XMLizable {
         }
     }
 
-    private URL resolveLocation(String relativePath) {
+    private URL resolveLocation(final String relativePath) {
         try {
             return new URL(baseURL, relativePath);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(
-                "Could not create URL for database: " + relativePath);
+        } catch (final MalformedURLException e) {
+            throw new RuntimeException("Could not create URL for database: "
+                    + relativePath);
         }
     }
 
@@ -290,7 +280,7 @@ public class DatabaseInfo implements XMLizable {
         return driverClass;
     }
 
-    public void setDriverClass(String driverClass) {
+    public void setDriverClass(final String driverClass) {
         this.driverClass = driverClass;
     }
 
@@ -298,18 +288,11 @@ public class DatabaseInfo implements XMLizable {
      * Debugging info.
      */
     @Override
-	public String toString() {
+    public String toString() {
         String result = "DatabaseInfo\n";
 
-        result += "\t"
-            + "url: "
-            + this.sourceURL
-            + "\n"
-            + "\t"
-            + "key/table: "
-            + this.objectKey
-            + "/"
-            + this.table;
+        result += "\t" + "url: " + this.sourceURL + "\n" + "\t" + "key/table: "
+                + this.objectKey + "/" + this.table;
 
         return result;
     }
@@ -318,7 +301,7 @@ public class DatabaseInfo implements XMLizable {
         return getType(this.getURL(), this.getDriverClass());
     }
 
-    public static Type getType(String url, String driverClass) {
+    public static Type getType(final String url, final String driverClass) {
         if (url == null) {
             return UNDEFINED;
         }
@@ -340,11 +323,11 @@ public class DatabaseInfo implements XMLizable {
         return JDBC;
     }
 
-    public void setAccessFileInfo(String fileLocation, String userName,
-                                  String password) {
+    public void setAccessFileInfo(final String fileLocation,
+            final String userName, final String password) {
         this.driverClass = JDBC_ODBC_BRIDGE_DRIVER;
-        this.sourceURL =
-            ACCESS_FILE_URL_PREFIX + fileLocation + ACCESS_FILE_URL_END;
+        this.sourceURL = ACCESS_FILE_URL_PREFIX + fileLocation
+                + ACCESS_FILE_URL_END;
         this.userName = userName;
         this.password = password;
         this.embeddedSQLLocation = null;
@@ -352,16 +335,16 @@ public class DatabaseInfo implements XMLizable {
     }
 
     public String getAccessFileUrl() {
-        int start = ACCESS_FILE_URL_PREFIX.length();
-        int end = getURL().length() - ACCESS_FILE_URL_END.length();
+        final int start = ACCESS_FILE_URL_PREFIX.length();
+        final int end = getURL().length() - ACCESS_FILE_URL_END.length();
         return getURL().substring(start, end);
     }
 
-    public void setExcelFileInfo(String fileLocation, String userName,
-                                  String password) {
+    public void setExcelFileInfo(final String fileLocation,
+            final String userName, final String password) {
         this.driverClass = JDBC_ODBC_BRIDGE_DRIVER;
-        this.sourceURL =
-            EXCEL_FILE_URL_PREFIX + fileLocation + EXCEL_FILE_URL_END;
+        this.sourceURL = EXCEL_FILE_URL_PREFIX + fileLocation
+                + EXCEL_FILE_URL_END;
         this.userName = userName;
         this.password = password;
         this.embeddedSQLLocation = null;
@@ -369,15 +352,13 @@ public class DatabaseInfo implements XMLizable {
     }
 
     public String getExcelFileUrl() {
-        int start = EXCEL_FILE_URL_PREFIX.length();
-        int end = getURL().length() - EXCEL_FILE_URL_END.length();
+        final int start = EXCEL_FILE_URL_PREFIX.length();
+        final int end = getURL().length() - EXCEL_FILE_URL_END.length();
         return getURL().substring(start, end);
     }
 
-    public void setOdbcDataSource(
-        String dsn,
-        String userName,
-        String password) {
+    public void setOdbcDataSource(final String dsn, final String userName,
+            final String password) {
         this.driverClass = JDBC_ODBC_BRIDGE_DRIVER;
         this.sourceURL = ODBC_PREFIX + dsn;
         this.userName = userName;

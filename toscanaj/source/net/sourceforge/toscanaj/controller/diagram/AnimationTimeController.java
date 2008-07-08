@@ -8,42 +8,45 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 public class AnimationTimeController {
-	private long startTimeStamp;
-	private double endTime;
-	private double fadeInTime;
-	private double visibleTime;
-	private double fadeOutTime;
-	private long millisecondsPerStep;
+    private long startTimeStamp;
+    private double endTime;
+    private double fadeInTime;
+    private double visibleTime;
+    private double fadeOutTime;
+    private long millisecondsPerStep;
     private double currentTime;
-	
-	public AnimationTimeController(double endTime, double fadeInTime, double visibleTime, double fadeOutTime, long millisecondsPerStep) {
-		this.startTimeStamp = System.currentTimeMillis();
-		this.endTime = endTime;
-		this.fadeInTime = fadeInTime;
-		this.visibleTime = visibleTime;
-		this.fadeOutTime = fadeOutTime;
-		this.millisecondsPerStep = millisecondsPerStep;
-		this.currentTime = 0;
-	}
-	
-    public double getCurrentTime() {
-    	return this.currentTime;
-    }
-    
-    public void calculateCurrentTime() {
-        this.currentTime = (System.currentTimeMillis() - this.startTimeStamp) / (double)this.millisecondsPerStep;
+
+    public AnimationTimeController(final double endTime,
+            final double fadeInTime, final double visibleTime,
+            final double fadeOutTime, final long millisecondsPerStep) {
+        this.startTimeStamp = System.currentTimeMillis();
+        this.endTime = endTime;
+        this.fadeInTime = fadeInTime;
+        this.visibleTime = visibleTime;
+        this.fadeOutTime = fadeOutTime;
+        this.millisecondsPerStep = millisecondsPerStep;
+        this.currentTime = 0;
     }
 
-	public void setCurrentTime(double currentTime) {
-		this.currentTime = currentTime;
-	}
+    public double getCurrentTime() {
+        return this.currentTime;
+    }
+
+    public void calculateCurrentTime() {
+        this.currentTime = (System.currentTimeMillis() - this.startTimeStamp)
+                / (double) this.millisecondsPerStep;
+    }
+
+    public void setCurrentTime(final double currentTime) {
+        this.currentTime = currentTime;
+    }
 
     public double getEndTime() {
         return this.endTime;
     }
-    
+
     public double getAllFadedTime() {
-    	return this.endTime + this.visibleTime + this.fadeOutTime;
+        return this.endTime + this.visibleTime + this.fadeOutTime;
     }
 
     public double getFadeInTime() {
@@ -62,28 +65,28 @@ public class AnimationTimeController {
         return this.visibleTime;
     }
 
-    public void setEndTime(double endTime) {
+    public void setEndTime(final double endTime) {
         this.endTime = endTime;
     }
 
-    public void setFadeInTime(double fadeInTime) {
+    public void setFadeInTime(final double fadeInTime) {
         this.fadeInTime = fadeInTime;
     }
 
-    public void setFadeOutTime(double fadeOutTime) {
+    public void setFadeOutTime(final double fadeOutTime) {
         this.fadeOutTime = fadeOutTime;
     }
 
     public void reset() {
-    	this.startTimeStamp = System.currentTimeMillis();
+        this.startTimeStamp = System.currentTimeMillis();
         this.currentTime = 0;
     }
-    
-    public void setMillisecondsPerStep(long millisecondsPerStep) {
+
+    public void setMillisecondsPerStep(final long millisecondsPerStep) {
         this.millisecondsPerStep = millisecondsPerStep;
     }
 
-    public void setVisibleTime(double visibleTime) {
+    public void setVisibleTime(final double visibleTime) {
         this.visibleTime = visibleTime;
     }
 

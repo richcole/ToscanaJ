@@ -9,7 +9,10 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
 public interface Scale {
     String getName();
+
     void addColumn(ScaleColumn column, String id);
+
     ScaleColumn getColumn(String id);
+
     ScaleColumn[] getColumns();
 }

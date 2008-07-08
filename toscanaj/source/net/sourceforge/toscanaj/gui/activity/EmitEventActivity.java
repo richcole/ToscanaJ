@@ -11,16 +11,16 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 
 public class EmitEventActivity implements SimpleActivity {
-    private EventBroker broker;
-    private Event event;
+    private final EventBroker broker;
+    private final Event event;
 
-    public EmitEventActivity(EventBroker broker, Event event) {
+    public EmitEventActivity(final EventBroker broker, final Event event) {
         this.broker = broker;
         this.event = event;
     }
 
     public boolean doActivity() throws Exception {
-    	this.broker.processEvent(this.event);
+        this.broker.processEvent(this.event);
         return true;
     }
 }

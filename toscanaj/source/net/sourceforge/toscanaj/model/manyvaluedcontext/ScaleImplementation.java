@@ -9,12 +9,11 @@ package net.sourceforge.toscanaj.model.manyvaluedcontext;
 
 import java.util.Hashtable;
 
-
 public class ScaleImplementation implements Scale {
     protected String name;
     protected Hashtable<String, ScaleColumn> columns = new Hashtable<String, ScaleColumn>();
 
-    public ScaleImplementation(String name) {
+    public ScaleImplementation(final String name) {
         this.name = name;
     }
 
@@ -22,15 +21,15 @@ public class ScaleImplementation implements Scale {
         return name;
     }
 
-    public void addColumn(ScaleColumn column, String id) {
-    	this.columns.put(id, column);
+    public void addColumn(final ScaleColumn column, final String id) {
+        this.columns.put(id, column);
     }
 
-    public ScaleColumn getColumn(String id) {
+    public ScaleColumn getColumn(final String id) {
         return columns.get(id);
     }
 
     public ScaleColumn[] getColumns() {
-    	return (ScaleColumn[]) this.columns.values().toArray();
+        return (ScaleColumn[]) this.columns.values().toArray();
     }
 }

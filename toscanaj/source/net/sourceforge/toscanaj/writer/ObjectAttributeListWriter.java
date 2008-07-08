@@ -13,15 +13,18 @@ import java.util.Iterator;
 import org.tockit.context.model.Context;
 
 public class ObjectAttributeListWriter {
-    public static void writeObjectAttributeList(Context context, PrintStream out) {
-        for (Iterator<Object> objIt = context.getObjects().iterator(); objIt.hasNext();) {
-            Object object = objIt.next();
+    public static void writeObjectAttributeList(final Context context,
+            final PrintStream out) {
+        for (final Iterator<Object> objIt = context.getObjects().iterator(); objIt
+                .hasNext();) {
+            final Object object = objIt.next();
             out.print(object);
             out.print(":");
             boolean firstAttr = true;
-            for (Iterator<Object> attrIt = context.getAttributes().iterator(); attrIt.hasNext();) {
-                Object attribute = attrIt.next();
-                if(context.getRelation().contains(object, attribute)) {
+            for (final Iterator<Object> attrIt = context.getAttributes()
+                    .iterator(); attrIt.hasNext();) {
+                final Object attribute = attrIt.next();
+                if (context.getRelation().contains(object, attribute)) {
                     if (firstAttr) {
                         firstAttr = false;
                     } else {

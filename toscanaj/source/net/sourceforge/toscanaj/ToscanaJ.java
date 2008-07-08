@@ -14,6 +14,9 @@ import java.util.Iterator;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 
+import net.sourceforge.toscanaj.gui.ToscanaJMainPanel;
+import net.sourceforge.toscanaj.gui.dialog.ToscanaJPreferences;
+
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -22,9 +25,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.tockit.plugin.PluginLoader;
 
-import net.sourceforge.toscanaj.gui.ToscanaJMainPanel;
-import net.sourceforge.toscanaj.gui.dialog.ToscanaJPreferences;
-
 public class ToscanaJ {
     /**
      * The version name used in the about dialog.
@@ -32,36 +32,39 @@ public class ToscanaJ {
     static public final String VersionString = "CVS Build";
 
     /**
-     *  Main method for running the program
+     * Main method for running the program
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         loadPlugins();
         final ToscanaJMainPanel mainWindow;
-        Options options = new Options();
-        options.addOption("reset", false, "Resets all preferences for the current user and exit");
-        options.addOption("help", false, "Show this command line summary and exit");
-        CommandLineParser parser = new BasicParser();
+        final Options options = new Options();
+        options.addOption("reset", false,
+                "Resets all preferences for the current user and exit");
+        options.addOption("help", false,
+                "Show this command line summary and exit");
+        final CommandLineParser parser = new BasicParser();
         CommandLine cl = null;
         try {
-            cl = parser.parse(options,args);
-        } catch (ParseException e) {
+            cl = parser.parse(options, args);
+        } catch (final ParseException e) {
             showUsage(options, System.err);
             System.exit(1);
         }
-        assert cl != null; // to stop Eclipse from whinging -- it thinks it is possible to get a null here
-        if(cl.getArgs().length > 1) {
+        assert cl != null; // to stop Eclipse from whinging -- it thinks it is
+                           // possible to get a null here
+        if (cl.getArgs().length > 1) {
             showUsage(options, System.err);
             System.exit(1);
         }
-        if(cl.hasOption("help")) {
+        if (cl.hasOption("help")) {
             showUsage(options, System.out);
             System.exit(0);
         }
-        if(cl.hasOption("reset")) {
+        if (cl.hasOption("reset")) {
             try {
                 ToscanaJPreferences.removeSettings();
                 System.out.println("User preferences reset.");
-            } catch (BackingStoreException exception) {
+            } catch (final BackingStoreException exception) {
                 System.err.println("Problem encountered removing preferences:");
                 exception.printStackTrace();
             }
@@ -77,14 +80,18 @@ public class ToscanaJ {
     }
 
     @SuppressWarnings("unchecked")
-	private static void showUsage(Options options, PrintStream stream) {
+    private static void showUsage(final Options options,
+            final PrintStream stream) {
         stream.println("Usage:");
         stream.println("  ToscanaJ [Options] [File]");
         stream.println();
-        stream.println("where [File] is one optional file to open and [Options] can be:");
-        for (Iterator<Option> iter = options.getOptions().iterator(); iter.hasNext(); ) {
-            Option option = iter.next();
-            stream.println("  " + option.getOpt() + ": " + option.getDescription());
+        stream
+                .println("where [File] is one optional file to open and [Options] can be:");
+        for (final Iterator<Option> iter = options.getOptions().iterator(); iter
+                .hasNext();) {
+            final Option option = iter.next();
+            stream.println("  " + option.getOpt() + ": "
+                    + option.getDescription());
         }
     }
 
@@ -94,8 +101,9 @@ public class ToscanaJ {
     public static void loadPlugins() {
         try {
             PluginLoader.loadPlugins(new File("plugins"));
-        } catch (FileNotFoundException e) {
-            Logger.getLogger(ToscanaJ.class.getName()).info("Could not find plugin directory -- no plugins loaded");
+        } catch (final FileNotFoundException e) {
+            Logger.getLogger(ToscanaJ.class.getName()).info(
+                    "Could not find plugin directory -- no plugins loaded");
         }
     }
 }

@@ -8,28 +8,26 @@
 package org.tockit.datatype;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.jdom.Element;
 
-
 public abstract class DatatypeFactory {
     public interface TypeCreator {
         boolean accepts(Element element);
+
         Datatype create(Element element);
     }
-    
+
     private static List<TypeCreator> typeCreators = new ArrayList<TypeCreator>();
-    
-    public static void registerTypeCreator(TypeCreator typeCreator) {
+
+    public static void registerTypeCreator(final TypeCreator typeCreator) {
         typeCreators.add(typeCreator);
     }
-    
-    public static Datatype readType(Element element) {
-        for (Iterator<TypeCreator> iter = typeCreators.iterator(); iter.hasNext();) {
-            TypeCreator tc = iter.next();
-            if(tc.accepts(element)) {
+
+    public static Datatype readType(final Element element) {
+        for (final TypeCreator tc : typeCreators) {
+            if (tc.accepts(element)) {
                 return tc.create(element);
             }
         }

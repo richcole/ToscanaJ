@@ -20,48 +20,51 @@ import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 public class TransitionArrowManipulator implements EventBrokerListener {
-    private Canvas canvas;
-    
+    private final Canvas canvas;
+
     private static final int WAITING = 0;
     private static final int DRAGGING = 1;
     private static final int MOVING_HEAD = 2;
     private static final int MOVING_TAIL = 3;
-    
+
     private int mode = WAITING;
 
-    public TransitionArrowManipulator(Canvas canvas, EventBroker eventBroker) {
-        eventBroker.subscribe(this, CanvasItemDraggedEvent.class, TransitionArrow.class);
+    public TransitionArrowManipulator(final Canvas canvas,
+            final EventBroker eventBroker) {
+        eventBroker.subscribe(this, CanvasItemDraggedEvent.class,
+                TransitionArrow.class);
         this.canvas = canvas;
     }
 
-    public void processEvent(Event e) {
-        CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
-        TransitionArrow arrow = (TransitionArrow) dragEvent.getSubject();
-        Point2D fromPosition = dragEvent.getCanvasFromPosition();
-        Point2D toPosition = dragEvent.getCanvasToPosition();
-        if( e instanceof CanvasItemPickupEvent ) {
-            if(arrow.pointIsInHeadArea(fromPosition)) {
+    public void processEvent(final Event e) {
+        final CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
+        final TransitionArrow arrow = (TransitionArrow) dragEvent.getSubject();
+        final Point2D fromPosition = dragEvent.getCanvasFromPosition();
+        final Point2D toPosition = dragEvent.getCanvasToPosition();
+        if (e instanceof CanvasItemPickupEvent) {
+            if (arrow.pointIsInHeadArea(fromPosition)) {
                 this.mode = MOVING_HEAD;
             } else if (arrow.pointIsInTailArea(fromPosition)) {
                 this.mode = MOVING_TAIL;
             } else {
                 this.mode = DRAGGING;
             }
-        } else if( e instanceof CanvasItemDroppedEvent ) {
+        } else if (e instanceof CanvasItemDroppedEvent) {
             this.mode = WAITING;
         }
         applyChange(arrow, fromPosition, toPosition);
         canvas.repaint();
     }
 
-    public void applyChange(TransitionArrow arrow, Point2D fromPosition, Point2D toPosition) {
-        double dx = toPosition.getX() - fromPosition.getX();
-        double dy = toPosition.getY() - fromPosition.getY();
-        if(this.mode == DRAGGING) {
+    public void applyChange(final TransitionArrow arrow,
+            final Point2D fromPosition, final Point2D toPosition) {
+        final double dx = toPosition.getX() - fromPosition.getX();
+        final double dy = toPosition.getY() - fromPosition.getY();
+        if (this.mode == DRAGGING) {
             arrow.shiftPosition(dx, dy);
-        } else if(this.mode == MOVING_HEAD) {
+        } else if (this.mode == MOVING_HEAD) {
             arrow.shiftEndPoint(dx, dy);
-        } else if(this.mode == MOVING_TAIL) {
+        } else if (this.mode == MOVING_TAIL) {
             arrow.shiftStartPoint(dx, dy);
         }
         canvas.repaint();

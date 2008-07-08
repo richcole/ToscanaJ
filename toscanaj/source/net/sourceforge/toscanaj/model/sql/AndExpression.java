@@ -5,48 +5,49 @@
  *
  * $Id$
  */
- package net.sourceforge.toscanaj.model.sql;
+package net.sourceforge.toscanaj.model.sql;
 
-import java.util.Vector;
 import java.util.Iterator;
+import java.util.Vector;
 
 public class AndExpression implements Expression {
-    private Vector<Expression> subexpressions = new Vector<Expression>();
+    private final Vector<Expression> subexpressions = new Vector<Expression>();
 
     public AndExpression() {
-		// nothing to do here
+        // nothing to do here
     }
 
-    public void addClause(Expression clause) {
+    public void addClause(final Expression clause) {
         subexpressions.add(clause);
     }
 
-    public void removeClause(Expression clause) {
+    public void removeClause(final Expression clause) {
         subexpressions.remove(clause);
     }
 
     public String getSQL() {
-        if(subexpressions.size() == 0) {
+        if (subexpressions.size() == 0) {
             return "*";
         }
         String retVal = "";
-        for (Iterator<Expression> iterator = subexpressions.iterator(); iterator.hasNext();) {
-            Expression expression = iterator.next();
+        for (final Iterator<Expression> iterator = subexpressions.iterator(); iterator
+                .hasNext();) {
+            final Expression expression = iterator.next();
             retVal += "(" + expression.getSQL() + ")";
-            if(iterator.hasNext()) {
+            if (iterator.hasNext()) {
                 retVal += " AND ";
             }
         }
         return retVal;
     }
 
-    public boolean isLesserThan(Expression other) {
-        /// @todo implement
+    public boolean isLesserThan(final Expression other) {
+        // / @todo implement
         return false;
     }
 
-    public boolean isEqual(Expression other) {
-        /// @todo implement
+    public boolean isEqual(final Expression other) {
+        // / @todo implement
         return false;
     }
 }

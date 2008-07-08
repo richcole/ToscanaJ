@@ -11,33 +11,33 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Node<N extends Node<N>> {
-    private Set<N> outboundNodes = new HashSet<N>();
-    private Set<N> inboundNodes = new HashSet<N>();
+    private final Set<N> outboundNodes = new HashSet<N>();
+    private final Set<N> inboundNodes = new HashSet<N>();
 
-    protected void addOutboundNode(N node) {
+    protected void addOutboundNode(final N node) {
         outboundNodes.add(node);
     }
 
-    protected void addInboundNode(N node) {
+    protected void addInboundNode(final N node) {
         inboundNodes.add(node);
     }
 
-    protected void removeOutboundNode(N node) {
+    protected void removeOutboundNode(final N node) {
         outboundNodes.remove(node);
     }
 
-    protected void removeInboundNode(N node) {
+    protected void removeInboundNode(final N node) {
         inboundNodes.remove(node);
     }
 
     @SuppressWarnings("unchecked")
-	public void connectTo(N node) {
+    public void connectTo(final N node) {
         this.addOutboundNode(node);
         node.addInboundNode((N) this);
     }
 
     @SuppressWarnings("unchecked")
-	public void disconnectFrom(N node) {
+    public void disconnectFrom(final N node) {
         this.removeOutboundNode(node);
         node.removeInboundNode((N) this);
     }

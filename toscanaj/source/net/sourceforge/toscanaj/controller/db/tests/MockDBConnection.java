@@ -6,6 +6,7 @@
  * $Id$
  */
 package net.sourceforge.toscanaj.controller.db.tests;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,15 +22,16 @@ public class MockDBConnection extends DatabaseConnection {
     public MockDBConnection() {
         super(new EventBroker(), new MockConnection());
     }
-    
+
     @Override
-	public List<String[]> executeQuery(List<String> fields, String tableName, String whereClause) {
+    public List<String[]> executeQuery(final List<String> fields,
+            final String tableName, final String whereClause) {
         return new ArrayList<String[]>();
     }
-    
+
     @Override
-	public int queryInt(String statement, int column) {
-    	this.queryNumberCallCounter ++;
+    public int queryInt(final String statement, final int column) {
+        this.queryNumberCallCounter++;
         return 0;
     }
 }

@@ -19,33 +19,33 @@ import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.writer.ObjectAttributeListWriter;
 
 public class ExportOALFormatAction extends ExportContextAction {
-    public ExportOALFormatAction (
-            Frame frame,
-            ContextSource contextSource) {
+    public ExportOALFormatAction(final Frame frame,
+            final ContextSource contextSource) {
         super(frame, contextSource);
     }
 
-    public ExportOALFormatAction (
-            Frame frame,
-            ContextSource contextSource,
-            int mnemonic,
-            KeyStroke keystroke
-            ) {
+    public ExportOALFormatAction(final Frame frame,
+            final ContextSource contextSource, final int mnemonic,
+            final KeyStroke keystroke) {
         super(frame, contextSource, mnemonic, keystroke);
     }
-    
+
     @Override
-	protected void exportFile(File selectedFile) throws FileNotFoundException {
-        ObjectAttributeListWriter.writeObjectAttributeList(getContextSource().getContext(), new PrintStream(new FileOutputStream(selectedFile)));
+    protected void exportFile(final File selectedFile)
+            throws FileNotFoundException {
+        ObjectAttributeListWriter.writeObjectAttributeList(getContextSource()
+                .getContext(), new PrintStream(new FileOutputStream(
+                selectedFile)));
     }
 
     @Override
-	protected ExtensionFileFilter getFileFilter() {
-        return new ExtensionFileFilter(new String[] {"oal"}, "Formal Contexts as object-attribute lists");
+    protected ExtensionFileFilter getFileFilter() {
+        return new ExtensionFileFilter(new String[] { "oal" },
+                "Formal Contexts as object-attribute lists");
     }
 
     @Override
-	protected String getName() {
+    protected String getName() {
         return "Export OAL format...";
     }
 }

@@ -31,12 +31,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.SpinnerNumberModel;
 
-import org.tockit.canvas.events.CanvasItemDraggedEvent;
-import org.tockit.context.model.Context;
-import org.tockit.events.Event;
-import org.tockit.events.EventBroker;
-import org.tockit.events.EventBrokerListener;
-
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.controller.fca.DirectConceptInterpreter;
@@ -55,173 +49,206 @@ import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.NodeView;
 
+import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.context.model.Context;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventBrokerListener;
+
 public class Factorizer {
-	static class Factorization {
-		Set attributes;
-		Diagram2D firstFactor;
-		Diagram2D secondFactor;
-		Diagram2D nestedDiagram;
-		
-		Factorization(Context fullContext, Set factorAttributes) {
-			this.attributes = factorAttributes;
-			LatticeGenerator lgen = new GantersAlgorithm();
-					
-			Context context1 = makeContextCopy(fullContext);
-			context1.getAttributes().retainAll(this.attributes);
-			Lattice lattice1 = lgen.createLattice(context1);
-			this.firstFactor = NDimLayoutOperations.createDiagram(lattice1, fullContext.getName(), new DefaultDimensionStrategy());
-					
-			Context context2 = makeContextCopy(fullContext);
-			context2.getAttributes().removeAll(this.attributes);
-			Lattice lattice2 = lgen.createLattice(context2);
-			this.secondFactor = NDimLayoutOperations.createDiagram(lattice2, fullContext.getName(), new DefaultDimensionStrategy());
+    static class Factorization {
+        Set attributes;
+        Diagram2D firstFactor;
+        Diagram2D secondFactor;
+        Diagram2D nestedDiagram;
 
-			updateNestedDiagram();
-		}
+        Factorization(final Context fullContext, final Set factorAttributes) {
+            this.attributes = factorAttributes;
+            final LatticeGenerator lgen = new GantersAlgorithm();
 
-		void updateNestedDiagram() {
-			this.nestedDiagram = new NestedLineDiagram(this.firstFactor, this.secondFactor);
-		}
-		
-		@Override
-		public String toString() {
-			int numOuterConcepts = this.firstFactor.getNumberOfNodes();
-			int numInnerConcepts = this.secondFactor.getNumberOfNodes();
-			return this.attributes.toString() + " (" + numOuterConcepts + "*" + 
-														   numInnerConcepts + "=" +
-														   numOuterConcepts * numInnerConcepts + ")";
-		}
-	}
+            final Context context1 = makeContextCopy(fullContext);
+            context1.getAttributes().retainAll(this.attributes);
+            final Lattice lattice1 = lgen.createLattice(context1);
+            this.firstFactor = NDimLayoutOperations.createDiagram(lattice1,
+                    fullContext.getName(), new DefaultDimensionStrategy());
 
-	public static void main(String[] args) throws FileNotFoundException, DataFormatException {
-		JFileChooser fileChooser = new JFileChooser();
+            final Context context2 = makeContextCopy(fullContext);
+            context2.getAttributes().removeAll(this.attributes);
+            final Lattice lattice2 = lgen.createLattice(context2);
+            this.secondFactor = NDimLayoutOperations.createDiagram(lattice2,
+                    fullContext.getName(), new DefaultDimensionStrategy());
 
-		JPanel numberPanel = new JPanel(new FlowLayout());
-		JSpinner spinner = new JSpinner();
-		spinner.setModel(new SpinnerNumberModel(5,2,20,1));
-		numberPanel.add(new JLabel("Factor size:"));
-		numberPanel.add(spinner);
-		
-		fileChooser.setAccessory(numberPanel);
-		
-		int returnValue = fileChooser.showOpenDialog(null);
-		if(returnValue != JFileChooser.APPROVE_OPTION) {
-			return;
-		}
-		File inputFile = fileChooser.getSelectedFile();
-		Context context = BurmeisterParser.importBurmeisterFile(inputFile);
-		Set<Object> attributes = context.getAttributes();
+            updateNestedDiagram();
+        }
 
-		List<Set<Object>> subsets = findAllSubsetsOfSize(attributes, ((Integer)spinner.getModel().getValue()).intValue());
-		List<Factorization> diagrams = createFactorizedDiagrams(context,subsets);
-		showResults(diagrams);
-	}
+        void updateNestedDiagram() {
+            this.nestedDiagram = new NestedLineDiagram(this.firstFactor,
+                    this.secondFactor);
+        }
 
-	private static List<Factorization> createFactorizedDiagrams(Context context, List<Set<Object>> subsets) {
-		List<Factorization> retVal = new ArrayList<Factorization>();
-		for (Iterator<Set<Object>> it = subsets.iterator(); it.hasNext();) {
-			Set set = it.next();
-			retVal.add(new Factorization(context, set));
-		}
-		return retVal;
-	}
+        @Override
+        public String toString() {
+            final int numOuterConcepts = this.firstFactor.getNumberOfNodes();
+            final int numInnerConcepts = this.secondFactor.getNumberOfNodes();
+            return this.attributes.toString() + " (" + numOuterConcepts + "*"
+                    + numInnerConcepts + "=" + numOuterConcepts
+                    * numInnerConcepts + ")";
+        }
+    }
 
-	private static void showResults(List<Factorization> diagrams) {
-		JFrame mainWindow = new JFrame("Factorizer");
+    public static void main(final String[] args) throws FileNotFoundException,
+            DataFormatException {
+        final JFileChooser fileChooser = new JFileChooser();
 
-		final JTabbedPane mainPane = new JTabbedPane();
-		final JList listView = new JList(diagrams.toArray());
-		JScrollPane scrollPane = new JScrollPane(listView);
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPane, mainPane);
-		mainWindow.getContentPane().add(splitPane);
+        final JPanel numberPanel = new JPanel(new FlowLayout());
+        final JSpinner spinner = new JSpinner();
+        spinner.setModel(new SpinnerNumberModel(5, 2, 20, 1));
+        numberPanel.add(new JLabel("Factor size:"));
+        numberPanel.add(spinner);
 
-		final DiagramView firstDiagramView = new DiagramView();
-		firstDiagramView.setConceptInterpreter(new DirectConceptInterpreter());
-		firstDiagramView.setConceptInterpretationContext(new ConceptInterpretationContext(new DiagramHistory(), new EventBroker()));
-		firstDiagramView.setQuery(AggregateQuery.COUNT_QUERY);
+        fileChooser.setAccessory(numberPanel);
 
-		final DiagramView secondDiagramView = new DiagramView();
-		secondDiagramView.setConceptInterpreter(new DirectConceptInterpreter());
-		secondDiagramView.setConceptInterpretationContext(new ConceptInterpretationContext(new DiagramHistory(), new EventBroker()));
-		secondDiagramView.setQuery(AggregateQuery.COUNT_QUERY);
+        final int returnValue = fileChooser.showOpenDialog(null);
+        if (returnValue != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        final File inputFile = fileChooser.getSelectedFile();
+        final Context context = BurmeisterParser
+                .importBurmeisterFile(inputFile);
+        final Set<Object> attributes = context.getAttributes();
 
-		final DiagramView nestedDiagramView = new DiagramView();
-		nestedDiagramView.setConceptInterpreter(new DirectConceptInterpreter());
-		nestedDiagramView.setConceptInterpretationContext(new ConceptInterpretationContext(new DiagramHistory(), new EventBroker()));
-		nestedDiagramView.setQuery(AggregateQuery.COUNT_QUERY);
+        final List<Set<Object>> subsets = findAllSubsetsOfSize(attributes,
+                ((Integer) spinner.getModel().getValue()).intValue());
+        final List<Factorization> diagrams = createFactorizedDiagrams(context,
+                subsets);
+        showResults(diagrams);
+    }
 
-		mainPane.add(firstDiagramView,"Factor 1");
-		mainPane.add(secondDiagramView,"Factor 2");
-		mainPane.add(nestedDiagramView,"Nested");
+    private static List<Factorization> createFactorizedDiagrams(
+            final Context context, final List<Set<Object>> subsets) {
+        final List<Factorization> retVal = new ArrayList<Factorization>();
+        for (final Iterator<Set<Object>> it = subsets.iterator(); it.hasNext();) {
+            final Set set = it.next();
+            retVal.add(new Factorization(context, set));
+        }
+        return retVal;
+    }
 
-		listView.addMouseListener(new MouseAdapter() {
-			class MoveAndUpdateListener implements EventBrokerListener {
-				NDimNodeMovementEventListener nodeListener = new NDimNodeMovementEventListener();
-				Factorization currentFactorization;
-				public void processEvent(Event e) {
-					this.nodeListener.processEvent(e);
-					this.currentFactorization.updateNestedDiagram();
-					nestedDiagramView.showDiagram(this.currentFactorization.nestedDiagram);
-				}
-			}
-			MoveAndUpdateListener moveAndUpdateListener = new MoveAndUpdateListener();
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				final Factorization factorization = (Factorization) listView.getSelectedValue();
-				this.moveAndUpdateListener.currentFactorization = factorization;
-				
-				firstDiagramView.showDiagram(factorization.firstFactor);
-				firstDiagramView.getController().getEventBroker().subscribe(this.moveAndUpdateListener, CanvasItemDraggedEvent.class, NodeView.class);
-				secondDiagramView.showDiagram(factorization.secondFactor);
-				secondDiagramView.getController().getEventBroker().subscribe(this.moveAndUpdateListener, CanvasItemDraggedEvent.class, NodeView.class);
-				nestedDiagramView.showDiagram(factorization.nestedDiagram);
-			}
-		});
+    private static void showResults(final List<Factorization> diagrams) {
+        final JFrame mainWindow = new JFrame("Factorizer");
 
-		mainWindow.pack();
-		mainWindow.setBounds(10,10,900,700);
-		mainWindow.setVisible(true);
-		mainWindow.addWindowListener(new WindowAdapter(){
-			@Override
-			public void windowClosing(WindowEvent e) {
-				System.exit(0);
-			}
-		});
-	}
+        final JTabbedPane mainPane = new JTabbedPane();
+        final JList listView = new JList(diagrams.toArray());
+        final JScrollPane scrollPane = new JScrollPane(listView);
+        final JSplitPane splitPane = new JSplitPane(
+                JSplitPane.HORIZONTAL_SPLIT, scrollPane, mainPane);
+        mainWindow.getContentPane().add(splitPane);
 
-	protected static Context makeContextCopy(Context context) {
-		ContextImplementation retVal = new ContextImplementation();
-		retVal.setName(context.getName());
-		retVal.getObjects().addAll(context.getObjects());
-		retVal.getAttributes().addAll(context.getAttributes());
-		for (Iterator<Object> objIt = retVal.getObjects().iterator(); objIt.hasNext();) {
-			Object obj = objIt.next();
-			for (Iterator<Object> attrIt = retVal.getAttributes().iterator(); attrIt.hasNext();) {
-				Object attr = attrIt.next();
-				if(context.getRelation().contains(obj,attr)) {
-					retVal.getRelationImplementation().insert(obj,attr);
-				}
-			}
-		}
-		return retVal;
-	}
+        final DiagramView firstDiagramView = new DiagramView();
+        firstDiagramView.setConceptInterpreter(new DirectConceptInterpreter());
+        firstDiagramView
+                .setConceptInterpretationContext(new ConceptInterpretationContext(
+                        new DiagramHistory(), new EventBroker()));
+        firstDiagramView.setQuery(AggregateQuery.COUNT_QUERY);
 
-	private static List<Set<Object>> findAllSubsetsOfSize(Set<Object> objects, int n) {
-		List<Set<Object>> retVal = new ArrayList<Set<Object>>();
-		if(objects.size() == n) {
-			retVal.add(objects);
-		} else if(n != 0) {
-			Object firstObject = objects.iterator().next();
-			Set<Object> rest = new HashSet<Object>(objects);
-			rest.remove(firstObject);
-			List<Set<Object>> smallerSets = findAllSubsetsOfSize(rest, n-1);
-			for (Iterator<Set<Object>> iter = smallerSets.iterator(); iter.hasNext();) {
-				Set<Object> set = iter.next();
-				set.add(firstObject);
-				retVal.add(set);
-			}
-			retVal.addAll(findAllSubsetsOfSize(rest,n));			
-		}
-		return retVal;
-	}
+        final DiagramView secondDiagramView = new DiagramView();
+        secondDiagramView.setConceptInterpreter(new DirectConceptInterpreter());
+        secondDiagramView
+                .setConceptInterpretationContext(new ConceptInterpretationContext(
+                        new DiagramHistory(), new EventBroker()));
+        secondDiagramView.setQuery(AggregateQuery.COUNT_QUERY);
+
+        final DiagramView nestedDiagramView = new DiagramView();
+        nestedDiagramView.setConceptInterpreter(new DirectConceptInterpreter());
+        nestedDiagramView
+                .setConceptInterpretationContext(new ConceptInterpretationContext(
+                        new DiagramHistory(), new EventBroker()));
+        nestedDiagramView.setQuery(AggregateQuery.COUNT_QUERY);
+
+        mainPane.add(firstDiagramView, "Factor 1");
+        mainPane.add(secondDiagramView, "Factor 2");
+        mainPane.add(nestedDiagramView, "Nested");
+
+        listView.addMouseListener(new MouseAdapter() {
+            class MoveAndUpdateListener implements EventBrokerListener {
+                NDimNodeMovementEventListener nodeListener = new NDimNodeMovementEventListener();
+                Factorization currentFactorization;
+
+                public void processEvent(final Event e) {
+                    this.nodeListener.processEvent(e);
+                    this.currentFactorization.updateNestedDiagram();
+                    nestedDiagramView
+                            .showDiagram(this.currentFactorization.nestedDiagram);
+                }
+            }
+
+            MoveAndUpdateListener moveAndUpdateListener = new MoveAndUpdateListener();
+
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                final Factorization factorization = (Factorization) listView
+                        .getSelectedValue();
+                this.moveAndUpdateListener.currentFactorization = factorization;
+
+                firstDiagramView.showDiagram(factorization.firstFactor);
+                firstDiagramView.getController().getEventBroker().subscribe(
+                        this.moveAndUpdateListener,
+                        CanvasItemDraggedEvent.class, NodeView.class);
+                secondDiagramView.showDiagram(factorization.secondFactor);
+                secondDiagramView.getController().getEventBroker().subscribe(
+                        this.moveAndUpdateListener,
+                        CanvasItemDraggedEvent.class, NodeView.class);
+                nestedDiagramView.showDiagram(factorization.nestedDiagram);
+            }
+        });
+
+        mainWindow.pack();
+        mainWindow.setBounds(10, 10, 900, 700);
+        mainWindow.setVisible(true);
+        mainWindow.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(final WindowEvent e) {
+                System.exit(0);
+            }
+        });
+    }
+
+    protected static Context makeContextCopy(final Context context) {
+        final ContextImplementation retVal = new ContextImplementation();
+        retVal.setName(context.getName());
+        retVal.getObjects().addAll(context.getObjects());
+        retVal.getAttributes().addAll(context.getAttributes());
+        for (final Iterator<Object> objIt = retVal.getObjects().iterator(); objIt
+                .hasNext();) {
+            final Object obj = objIt.next();
+            for (final Iterator<Object> attrIt = retVal.getAttributes()
+                    .iterator(); attrIt.hasNext();) {
+                final Object attr = attrIt.next();
+                if (context.getRelation().contains(obj, attr)) {
+                    retVal.getRelationImplementation().insert(obj, attr);
+                }
+            }
+        }
+        return retVal;
+    }
+
+    private static List<Set<Object>> findAllSubsetsOfSize(
+            final Set<Object> objects, final int n) {
+        final List<Set<Object>> retVal = new ArrayList<Set<Object>>();
+        if (objects.size() == n) {
+            retVal.add(objects);
+        } else if (n != 0) {
+            final Object firstObject = objects.iterator().next();
+            final Set<Object> rest = new HashSet<Object>(objects);
+            rest.remove(firstObject);
+            final List<Set<Object>> smallerSets = findAllSubsetsOfSize(rest,
+                    n - 1);
+            for (final Set<Object> set : smallerSets) {
+                set.add(firstObject);
+                retVal.add(set);
+            }
+            retVal.addAll(findAllSubsetsOfSize(rest, n));
+        }
+        return retVal;
+    }
 }

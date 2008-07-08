@@ -19,33 +19,33 @@ import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 import net.sourceforge.toscanaj.writer.BurmeisterWriter;
 
 public class ExportBurmeisterFormatAction extends ExportContextAction {
-	public ExportBurmeisterFormatAction (
-			Frame frame,
-			ContextSource contextSource) {
-		super(frame, contextSource);
-	}
+    public ExportBurmeisterFormatAction(final Frame frame,
+            final ContextSource contextSource) {
+        super(frame, contextSource);
+    }
 
-    public ExportBurmeisterFormatAction (
-			Frame frame,
-            ContextSource contextSource,
-			int mnemonic,
-			KeyStroke keystroke
-			) {
-		super(frame, contextSource, mnemonic, keystroke);
-	}
-	
-    @Override
-	protected void exportFile(File selectedFile) throws FileNotFoundException {
-        BurmeisterWriter.writeToBurmeisterFormat(getContextSource().getContext(), new PrintStream(new FileOutputStream(selectedFile)));
+    public ExportBurmeisterFormatAction(final Frame frame,
+            final ContextSource contextSource, final int mnemonic,
+            final KeyStroke keystroke) {
+        super(frame, contextSource, mnemonic, keystroke);
     }
 
     @Override
-	protected ExtensionFileFilter getFileFilter() {
-        return new ExtensionFileFilter(new String[] {"cxt"}, "Formal Contexts in Burmeister format");
+    protected void exportFile(final File selectedFile)
+            throws FileNotFoundException {
+        BurmeisterWriter.writeToBurmeisterFormat(getContextSource()
+                .getContext(), new PrintStream(new FileOutputStream(
+                selectedFile)));
     }
 
     @Override
-	protected String getName() {
+    protected ExtensionFileFilter getFileFilter() {
+        return new ExtensionFileFilter(new String[] { "cxt" },
+                "Formal Contexts in Burmeister format");
+    }
+
+    @Override
+    protected String getName() {
         return "Export Burmeister format...";
     }
 }

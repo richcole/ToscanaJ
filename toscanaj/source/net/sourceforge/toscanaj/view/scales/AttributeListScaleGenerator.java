@@ -1,5 +1,10 @@
 package net.sourceforge.toscanaj.view.scales;
 
+import java.awt.Frame;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
@@ -8,15 +13,8 @@ import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 
-import java.awt.Frame;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.tockit.context.model.BinaryRelationImplementation;
 import org.tockit.context.model.Context;
-
-
 
 /*
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
@@ -25,10 +23,10 @@ import org.tockit.context.model.Context;
  *
  * $Id$
  */
-public class AttributeListScaleGenerator implements ScaleGenerator{
-    private Frame parent;
+public class AttributeListScaleGenerator implements ScaleGenerator {
+    private final Frame parent;
 
-    public AttributeListScaleGenerator (Frame parent) {
+    public AttributeListScaleGenerator(final Frame parent) {
         this.parent = parent;
     }
 
@@ -36,87 +34,84 @@ public class AttributeListScaleGenerator implements ScaleGenerator{
         return "Attribute List";
     }
 
-    
-    public boolean canHandleColumns(TableColumnPair[] columns) {
-       return true;
+    public boolean canHandleColumns(final TableColumnPair[] columns) {
+        return true;
     }
 
-    public Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection) {
-        AttributeListScaleGeneratorDialog scaleDialog = new AttributeListScaleGeneratorDialog(parent);
+    public Context generateScale(final ConceptualSchema scheme,
+            final DatabaseConnection databaseConnection) {
+        final AttributeListScaleGeneratorDialog scaleDialog = new AttributeListScaleGeneratorDialog(
+                parent);
         if (!scaleDialog.execute()) {
             return null;
         }
-		ContextImplementation context = new ContextImplementation();
-		context.setName(scaleDialog.getDiagramTitle());
-		BinaryRelationImplementation relation = context.getRelationImplementation();		
+        final ContextImplementation context = new ContextImplementation();
+        context.setName(scaleDialog.getDiagramTitle());
+        final BinaryRelationImplementation relation = context
+                .getRelationImplementation();
 
-		Object[][] tableData = scaleDialog.getData();
-		int dimensions = tableData.length;
-		FCAElement[] attributes = new FCAElement[dimensions];
+        final Object[][] tableData = scaleDialog.getData();
+        final int dimensions = tableData.length;
+        final FCAElement[] attributes = new FCAElement[dimensions];
 
-		for (int i = 0; i < dimensions; i++) {
-			String attributeName = createAttributeName(tableData, i);
-			attributes[i] = new FCAElementImplementation(attributeName);
-			context.getAttributes().add(attributes[i]);
-		}
-		
-		boolean useAllCombi = scaleDialog.getUseAllCombinations();
-		for (int i = 0; i < Math.pow(2,dimensions); i++) {
-			String objectData = "";
-			List<FCAElement> relatedAttributes = new ArrayList<FCAElement>();
-			for(int j = 0; j < dimensions; j++) {
-				if( j != 0 ) {
-					objectData += " AND ";
-				}
-				if( (i & (1 << j)) == 0 ) {
-					objectData += " NOT ";
-				} else {
-					relatedAttributes.add(attributes[j]);
-				}
-				objectData += "(" + tableData[j][1] + ")";
-			}
+        for (int i = 0; i < dimensions; i++) {
+            final String attributeName = createAttributeName(tableData, i);
+            attributes[i] = new FCAElementImplementation(attributeName);
+            context.getAttributes().add(attributes[i]);
+        }
 
-			WritableFCAElement object = new FCAElementImplementation(objectData);
-	
-			if(useAllCombi){
-				context.getObjects().add(object);
-				Iterator<FCAElement> it = relatedAttributes.iterator();
-				while (it.hasNext()) {
-					Object attrib = it.next();
-					relation.insert(object, attrib);
-				}
-			}else{
-				try{
-					int result =
-					databaseConnection.queryInt(
-						"SELECT count (*) FROM "
-							+ scheme.getDatabaseInfo().getTable().getSqlExpression()
-							+ " WHERE ( "
-							+ objectData
-							+ " );",
-						1);
-					if( result != 0 ){
-						context.getObjects().add(object);
-						Iterator<FCAElement> it = relatedAttributes.iterator();
-						while (it.hasNext()) {
-							Object attrib = it.next();
-							relation.insert(object, attrib);
-						}
-					}	
-				}catch(DatabaseException e) {
-					throw new RuntimeException(e.getCause().getMessage());
-				}
-			}
-		}
-		return context;
+        final boolean useAllCombi = scaleDialog.getUseAllCombinations();
+        for (int i = 0; i < Math.pow(2, dimensions); i++) {
+            String objectData = "";
+            final List<FCAElement> relatedAttributes = new ArrayList<FCAElement>();
+            for (int j = 0; j < dimensions; j++) {
+                if (j != 0) {
+                    objectData += " AND ";
+                }
+                if ((i & (1 << j)) == 0) {
+                    objectData += " NOT ";
+                } else {
+                    relatedAttributes.add(attributes[j]);
+                }
+                objectData += "(" + tableData[j][1] + ")";
+            }
+
+            final WritableFCAElement object = new FCAElementImplementation(
+                    objectData);
+
+            if (useAllCombi) {
+                context.getObjects().add(object);
+                final Iterator<FCAElement> it = relatedAttributes.iterator();
+                while (it.hasNext()) {
+                    final Object attrib = it.next();
+                    relation.insert(object, attrib);
+                }
+            } else {
+                try {
+                    final int result = databaseConnection.queryInt(
+                            "SELECT count (*) FROM "
+                                    + scheme.getDatabaseInfo().getTable()
+                                            .getSqlExpression() + " WHERE ( "
+                                    + objectData + " );", 1);
+                    if (result != 0) {
+                        context.getObjects().add(object);
+                        final Iterator<FCAElement> it = relatedAttributes
+                                .iterator();
+                        while (it.hasNext()) {
+                            final Object attrib = it.next();
+                            relation.insert(object, attrib);
+                        }
+                    }
+                } catch (final DatabaseException e) {
+                    throw new RuntimeException(e.getCause().getMessage());
+                }
+            }
+        }
+        return context;
     }
 
-	private String createAttributeName(Object[][] data, int i) {
-		String attrLabelName = (String)data[i][0]; 
-		return attrLabelName.trim();
-	}
+    private String createAttributeName(final Object[][] data, final int i) {
+        final String attrLabelName = (String) data[i][0];
+        return attrLabelName.trim();
+    }
 }
-
-
-
-

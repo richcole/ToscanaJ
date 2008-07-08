@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.controller.fca.tests;
 
+import java.util.NoSuchElementException;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -14,13 +16,11 @@ import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 
-import java.util.NoSuchElementException;
-
 public class DiagramHistoryTest extends TestCase {
     final static Class THIS = DiagramHistoryTest.class;
     private DiagramHistory diagramHistory;
 
-    public DiagramHistoryTest(String s) {
+    public DiagramHistoryTest(final String s) {
         super(s);
     }
 
@@ -46,10 +46,10 @@ public class DiagramHistoryTest extends TestCase {
         addDiagram();
         assertEquals(1, this.diagramHistory.getNumberOfCurrentDiagrams());
         try {
-        	this.diagramHistory.next(null);
-        	fail();
-        } catch(RuntimeException e) {
-        	// this is what should happen
+            this.diagramHistory.next(null);
+            fail();
+        } catch (final RuntimeException e) {
+            // this is what should happen
         }
         assertEquals(1, this.diagramHistory.getNumberOfCurrentDiagrams());
     }
@@ -101,18 +101,18 @@ public class DiagramHistoryTest extends TestCase {
         try {
             this.diagramHistory.next(null);
             fail();
-        } catch(RuntimeException e) {
+        } catch (final RuntimeException e) {
             // this is what should happen
         }
         assertEquals(0, this.diagramHistory.getNumberOfCurrentDiagrams());
     }
 
     private void addDiagram() {
-        Diagram2D diagram = new SimpleLineDiagram();
+        final Diagram2D diagram = new SimpleLineDiagram();
         this.diagramHistory.addDiagram(diagram);
     }
 
-    private void addDiagrams(int count) {
+    private void addDiagrams(final int count) {
         for (int i = count; --i >= 0;) {
             addDiagram();
         }
@@ -156,7 +156,6 @@ public class DiagramHistoryTest extends TestCase {
         assertEquals(0, this.diagramHistory.getFirstCurrentDiagramPosition());
     }
 
-
     public void testRemoveLastDiagramWithoutNesting() {
         addDiagrams(2);
         this.diagramHistory.setNestingLevel(0);
@@ -187,7 +186,7 @@ public class DiagramHistoryTest extends TestCase {
         try {
             this.diagramHistory.removeLastDiagram();
             fail();
-        } catch (NoSuchElementException e) {
+        } catch (final NoSuchElementException e) {
             assertTrue("Should throw exception", true);
         }
     }
@@ -204,7 +203,7 @@ public class DiagramHistoryTest extends TestCase {
         try {
             this.diagramHistory.back();
             fail("DiagramHIstory throws exception, when no diagrams are left to go back");
-        } catch (NoSuchElementException e) {
+        } catch (final NoSuchElementException e) {
             assertTrue("Assertion expected", true);
         }
     }
@@ -276,7 +275,7 @@ public class DiagramHistoryTest extends TestCase {
     }
 
     @Override
-	protected void setUp() {
+    protected void setUp() {
         this.diagramHistory = new DiagramHistory();
     }
 

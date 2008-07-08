@@ -26,51 +26,59 @@ import net.sourceforge.toscanaj.model.order.PartialOrderNode;
 
 import org.tockit.cernatoXML.model.Criterion;
 
-public class CernatoDimensionStrategy implements DimensionCreationStrategy<FCAElement> {
+public class CernatoDimensionStrategy implements
+        DimensionCreationStrategy<FCAElement> {
     private static class OrderedCriterion implements Ordered<OrderedCriterion> {
-        private Criterion criterion;
-        public OrderedCriterion(Criterion criterion) {
+        private final Criterion criterion;
+
+        public OrderedCriterion(final Criterion criterion) {
             this.criterion = criterion;
         }
+
         public Criterion getCriterion() {
             return this.criterion;
         }
-        public boolean isLesserThan(OrderedCriterion other) {
-            if(other.getClass() != this.getClass()) {
+
+        public boolean isLesserThan(final OrderedCriterion other) {
+            if (other.getClass() != this.getClass()) {
                 return false;
             }
-            OrderedCriterion ocOther = other;
+            final OrderedCriterion ocOther = other;
             return this.getCriterion().isLesserThan(ocOther.getCriterion());
         }
-        public boolean isEqual(OrderedCriterion other) {
-            if(other.getClass() != this.getClass()) {
+
+        public boolean isEqual(final OrderedCriterion other) {
+            if (other.getClass() != this.getClass()) {
                 return false;
             }
-            OrderedCriterion ocOther = other;
+            final OrderedCriterion ocOther = other;
             return this.getCriterion().isEqual(ocOther.getCriterion());
         }
     }
-    
-    public<O> List<Dimension<FCAElement>> calculateDimensions(Lattice<O,FCAElement> lattice) {
-        List<Dimension<FCAElement>> dimensions = new ArrayList<Dimension<FCAElement>>();
-        Concept<O,FCAElement> bottom = lattice.getBottom();
-        Iterator<FCAElement> it = bottom.getIntentIterator();
-        OrderedCriterion[] criteria = new OrderedCriterion[bottom.getIntentSize()];
-        Hashtable<OrderedCriterion, FCAElement> map = new Hashtable<OrderedCriterion, FCAElement>();
+
+    public <O> List<Dimension<FCAElement>> calculateDimensions(
+            final Lattice<O, FCAElement> lattice) {
+        final List<Dimension<FCAElement>> dimensions = new ArrayList<Dimension<FCAElement>>();
+        final Concept<O, FCAElement> bottom = lattice.getBottom();
+        final Iterator<FCAElement> it = bottom.getIntentIterator();
+        final OrderedCriterion[] criteria = new OrderedCriterion[bottom
+                .getIntentSize()];
+        final Hashtable<OrderedCriterion, FCAElement> map = new Hashtable<OrderedCriterion, FCAElement>();
         int count = 0;
         while (it.hasNext()) {
-            FCAElement attribute = it.next();
-            criteria[count] = new OrderedCriterion((Criterion) attribute.getData());
+            final FCAElement attribute = it.next();
+            criteria[count] = new OrderedCriterion((Criterion) attribute
+                    .getData());
             map.put(criteria[count], attribute);
             count++;
         }
-        DirectedGraph<PartialOrderNode<OrderedCriterion>> graph = PartialOrderOperations.createGraphFromOrder(criteria);
-        Set<Vector<PartialOrderNode<OrderedCriterion>>> paths = graph.getMaximalPaths();
-        for (Iterator<Vector<PartialOrderNode<OrderedCriterion>>> iterator2 = paths.iterator(); iterator2.hasNext();) {
-            Vector<PartialOrderNode<OrderedCriterion>> path = iterator2.next();
-            Vector<FCAElement> attributes = new Vector<FCAElement>();
-            for (Iterator<PartialOrderNode<OrderedCriterion>> it2 = path.iterator(); it2.hasNext();) {
-            	PartialOrderNode<OrderedCriterion> node = it2.next();
+        final DirectedGraph<PartialOrderNode<OrderedCriterion>> graph = PartialOrderOperations
+                .createGraphFromOrder(criteria);
+        final Set<Vector<PartialOrderNode<OrderedCriterion>>> paths = graph
+                .getMaximalPaths();
+        for (final Vector<PartialOrderNode<OrderedCriterion>> path : paths) {
+            final Vector<FCAElement> attributes = new Vector<FCAElement>();
+            for (final PartialOrderNode<OrderedCriterion> node : path) {
                 attributes.add(map.get(node.getData()));
             }
             dimensions.add(new Dimension<FCAElement>(attributes));

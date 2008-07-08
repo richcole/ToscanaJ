@@ -19,75 +19,51 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-
 public class ExportStatisticalDataSettingsPanel extends JComponent {
     private JTextField filterClauseTextField;
     private JCheckBox includeContingentListsCheckBox;
     private JCheckBox includeIntentExtentListsCheckBox;
-	
-    public ExportStatisticalDataSettingsPanel()
-        throws HeadlessException {
+
+    public ExportStatisticalDataSettingsPanel() throws HeadlessException {
         super();
         init();
     }
 
     private void init() {
-    	JLabel clauseFieldLabel = new JLabel("Additional filter clause to use:");
-    	this.filterClauseTextField = new JTextField();
-    	JLabel includeListLabel = new JLabel("Include lists of objects and attributes:");
+        final JLabel clauseFieldLabel = new JLabel(
+                "Additional filter clause to use:");
+        this.filterClauseTextField = new JTextField();
+        final JLabel includeListLabel = new JLabel(
+                "Include lists of objects and attributes:");
         this.includeContingentListsCheckBox = new JCheckBox("contingents");
         this.includeIntentExtentListsCheckBox = new JCheckBox("intent/extent");
 
-    	setLayout(new GridBagLayout());
-        
-        add(clauseFieldLabel, new GridBagConstraints(
-                            0, 0, 3, 1, 1, 0,
-                            GridBagConstraints.NORTHWEST,
-                            GridBagConstraints.HORIZONTAL,
-                            new Insets(5,5,5,5),
-                            2,2)
-        );
-        add(this.filterClauseTextField, new GridBagConstraints(
-                            0, 1, 3, 1, 1, 0,
-                            GridBagConstraints.NORTHEAST,
-                            GridBagConstraints.HORIZONTAL,
-                            new Insets(0,25,5,5),
-                            2,2)
-        );
-        add(includeListLabel, new GridBagConstraints(
-                            0, 2, 3, 1, 1, 0,
-                            GridBagConstraints.NORTHWEST,
-                            GridBagConstraints.HORIZONTAL,
-                            new Insets(5,5,5,5),
-                            2,2)
-        );
-        add(this.includeContingentListsCheckBox, new GridBagConstraints(
-                            0, 3, 1, 1, 1, 0,
-                            GridBagConstraints.NORTHEAST,
-                            GridBagConstraints.HORIZONTAL,
-                            new Insets(0,25,5,5),
-                            2,2)
-        );
-        add(this.includeIntentExtentListsCheckBox, new GridBagConstraints(
-                            1, 3, 2, 1, 1, 0,
-                            GridBagConstraints.NORTHEAST,
-                            GridBagConstraints.HORIZONTAL,
-                            new Insets(0,5,5,5),
-                            2,2)
-        );
-        add(new JPanel(), new GridBagConstraints(
-                            0, 4, 1, 1, 1, 1,
-                            GridBagConstraints.NORTHEAST,
-                            GridBagConstraints.BOTH,
-                            new Insets(5,5,5,5),
-                            2,2)
-        );
+        setLayout(new GridBagLayout());
+
+        add(clauseFieldLabel, new GridBagConstraints(0, 0, 3, 1, 1, 0,
+                GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,
+                new Insets(5, 5, 5, 5), 2, 2));
+        add(this.filterClauseTextField, new GridBagConstraints(0, 1, 3, 1, 1,
+                0, GridBagConstraints.NORTHEAST, GridBagConstraints.HORIZONTAL,
+                new Insets(0, 25, 5, 5), 2, 2));
+        add(includeListLabel, new GridBagConstraints(0, 2, 3, 1, 1, 0,
+                GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,
+                new Insets(5, 5, 5, 5), 2, 2));
+        add(this.includeContingentListsCheckBox, new GridBagConstraints(0, 3,
+                1, 1, 1, 0, GridBagConstraints.NORTHEAST,
+                GridBagConstraints.HORIZONTAL, new Insets(0, 25, 5, 5), 2, 2));
+        add(this.includeIntentExtentListsCheckBox, new GridBagConstraints(1, 3,
+                2, 1, 1, 0, GridBagConstraints.NORTHEAST,
+                GridBagConstraints.HORIZONTAL, new Insets(0, 5, 5, 5), 2, 2));
+        add(new JPanel(), new GridBagConstraints(0, 4, 1, 1, 1, 1,
+                GridBagConstraints.NORTHEAST, GridBagConstraints.BOTH,
+                new Insets(5, 5, 5, 5), 2, 2));
     }
-    
+
     public String getFilterClause() {
-    	return this.filterClauseTextField.getText().trim();
+        return this.filterClauseTextField.getText().trim();
     }
-    
+
     public boolean hasIncludeContingentListsSet() {
         return this.includeContingentListsCheckBox.isSelected();
     }
@@ -95,5 +71,5 @@ public class ExportStatisticalDataSettingsPanel extends JComponent {
     public boolean hasIncludeIntentExtentListsSet() {
         return this.includeIntentExtentListsCheckBox.isSelected();
     }
-    
+
 }

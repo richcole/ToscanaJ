@@ -1,12 +1,12 @@
 package net.sourceforge.toscanaj.controller.fca;
-import java.lang.String;
+
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 /**
  * Used to store references to diagrams, including the concept used for
  * filtering in past diagrams.
- *
+ * 
  * Beneath adding the concept reference (which is null for current and future
  * diagrams) this gives the references identity, otherwise we would get problems
  * in adding a diagram twice to the history.
@@ -15,7 +15,7 @@ public class DiagramReference {
     /**
      * The diagram we refer to.
      */
-    private Diagram2D diagram;
+    private final Diagram2D diagram;
 
     /**
      * The concept used as filter (null for current and future diagrams).
@@ -25,7 +25,7 @@ public class DiagramReference {
     /**
      * Initialises a new reference.
      */
-    public DiagramReference(Diagram2D diagram, Concept filterConcept) {
+    public DiagramReference(final Diagram2D diagram, final Concept filterConcept) {
         this.diagram = diagram;
         this.filterConcept = filterConcept;
     }
@@ -38,13 +38,14 @@ public class DiagramReference {
     }
 
     /**
-     * Returns the concept used as filter (null for current and future diagrams).
+     * Returns the concept used as filter (null for current and future
+     * diagrams).
      */
     public Concept getFilterConcept() {
         return this.filterConcept;
     }
 
-    public void setFilterConcept(Concept filterConcept) {
+    public void setFilterConcept(final Concept filterConcept) {
         this.filterConcept = filterConcept;
     }
 
@@ -52,27 +53,27 @@ public class DiagramReference {
      * Returns the diagram title for usage in a view.
      */
     @Override
-	public String toString() {
+    public String toString() {
         return this.diagram.getTitle();
     }
-    
+
     @Override
-	public boolean equals(Object other) {
-        if(other.getClass() != this.getClass()) {
-        	return false;
+    public boolean equals(final Object other) {
+        if (other.getClass() != this.getClass()) {
+            return false;
         }
-        DiagramReference otherReference = (DiagramReference) other;
-		if(otherReference.diagram != this.diagram) {
-			return false;
-		}
-		if(otherReference.filterConcept != this.filterConcept) {
-			return false;
-		}
+        final DiagramReference otherReference = (DiagramReference) other;
+        if (otherReference.diagram != this.diagram) {
+            return false;
+        }
+        if (otherReference.filterConcept != this.filterConcept) {
+            return false;
+        }
         return true;
     }
-    
+
     @Override
-	public int hashCode() {
-    	return this.diagram.hashCode() + 47*this.filterConcept.hashCode();
+    public int hashCode() {
+        return this.diagram.hashCode() + 47 * this.filterConcept.hashCode();
     }
 }

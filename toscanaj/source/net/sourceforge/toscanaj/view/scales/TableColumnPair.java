@@ -14,7 +14,7 @@ public class TableColumnPair {
     Table table;
     Column column;
 
-    public TableColumnPair(Table table, Column column) {
+    public TableColumnPair(final Table table, final Column column) {
         this.table = table;
         this.column = column;
     }
@@ -27,12 +27,12 @@ public class TableColumnPair {
         return column;
     }
 
-	public String getSqlExpression() {
-		return table.getSqlExpression() + "." + column.getSqlExpression();
-	}
+    public String getSqlExpression() {
+        return table.getSqlExpression() + "." + column.getSqlExpression();
+    }
 
-	@Override
-	public String toString() {
-		return table.getDisplayName() + "." + column.getDisplayName();
-	}
+    @Override
+    public String toString() {
+        return table.getDisplayName() + "." + column.getDisplayName();
+    }
 }

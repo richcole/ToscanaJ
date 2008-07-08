@@ -13,7 +13,8 @@ import java.util.Iterator;
 import org.tockit.context.model.Context;
 
 public class BurmeisterWriter {
-    public static void writeToBurmeisterFormat(Context context, PrintStream out) {
+    public static void writeToBurmeisterFormat(final Context context,
+            final PrintStream out) {
         // write file ID
         out.println("B");
 
@@ -23,29 +24,33 @@ public class BurmeisterWriter {
         out.println(context.getAttributes().size());
 
         // write objects and attributes
-        for (Iterator<Object> itOb = context.getObjects().iterator(); itOb.hasNext();) {
-            Object object = itOb.next();
+        for (final Iterator<Object> itOb = context.getObjects().iterator(); itOb
+                .hasNext();) {
+            final Object object = itOb.next();
             out.println(object.toString());
         }
-        for (Iterator<Object> itAt = context.getAttributes().iterator(); itAt.hasNext();) {
-            Object attribute = itAt.next();
+        for (final Iterator<Object> itAt = context.getAttributes().iterator(); itAt
+                .hasNext();) {
+            final Object attribute = itAt.next();
             out.println(attribute.toString());
         }
-        
+
         // write relation
-        for (Iterator<Object> itOb = context.getObjects().iterator(); itOb.hasNext();) {
-            Object object = itOb.next();
-            for (Iterator<Object> itAt = context.getAttributes().iterator(); itAt.hasNext();) {
-                Object attribute = itAt.next();
-                if(context.getRelation().contains(object,attribute)) {
+        for (final Iterator<Object> itOb = context.getObjects().iterator(); itOb
+                .hasNext();) {
+            final Object object = itOb.next();
+            for (final Iterator<Object> itAt = context.getAttributes()
+                    .iterator(); itAt.hasNext();) {
+                final Object attribute = itAt.next();
+                if (context.getRelation().contains(object, attribute)) {
                     out.print('x');
                 } else {
                     out.print('.');
                 }
             }
             out.println();
-        }        
-        
+        }
+
         out.close();
     }
 }

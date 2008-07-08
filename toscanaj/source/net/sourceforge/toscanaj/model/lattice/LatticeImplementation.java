@@ -8,34 +8,32 @@
 package net.sourceforge.toscanaj.model.lattice;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
-public class LatticeImplementation<O,A> implements Lattice<O,A> {
-    private Set<Concept<O,A>> concepts = new HashSet<Concept<O,A>>();
+public class LatticeImplementation<O, A> implements Lattice<O, A> {
+    private final Set<Concept<O, A>> concepts = new HashSet<Concept<O, A>>();
 
     public LatticeImplementation() {
-    	// nothing to do here
+        // nothing to do here
     }
 
-    public void addConcept(Concept<O,A> concept) {
+    public void addConcept(final Concept<O, A> concept) {
         concepts.add(concept);
     }
 
-    public void removeConcept(Concept<O,A> concept) {
+    public void removeConcept(final Concept<O, A> concept) {
         concepts.remove(concept);
     }
 
     @SuppressWarnings("unchecked")
-	public Concept<O,A>[] getConcepts() {
-        Concept<O,A>[] retVal = new Concept[concepts.size()];
+    public Concept<O, A>[] getConcepts() {
+        final Concept<O, A>[] retVal = new Concept[concepts.size()];
         concepts.toArray(retVal);
         return retVal;
     }
 
-    public Concept<O,A> getTop() {
-        for (Iterator<Concept<O,A>> iterator = concepts.iterator(); iterator.hasNext();) {
-            Concept<O,A> concept = iterator.next();
+    public Concept<O, A> getTop() {
+        for (final Concept<O, A> concept : concepts) {
             if (concept.isTop()) {
                 return concept;
             }
@@ -43,9 +41,8 @@ public class LatticeImplementation<O,A> implements Lattice<O,A> {
         return null;
     }
 
-    public Concept<O,A> getBottom() {
-        for (Iterator<Concept<O,A>> iterator = concepts.iterator(); iterator.hasNext();) {
-            Concept<O,A> concept = iterator.next();
+    public Concept<O, A> getBottom() {
+        for (final Concept<O, A> concept : concepts) {
             if (concept.isBottom()) {
                 return concept;
             }

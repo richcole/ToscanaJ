@@ -7,17 +7,17 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
+import java.awt.Frame;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
-
-import java.awt.Frame;
 
 import org.tockit.context.model.Context;
 
 public class OrdinalScaleGenerator implements ScaleGenerator {
-    private Frame parent;
+    private final Frame parent;
 
-    public OrdinalScaleGenerator(Frame parent) {
+    public OrdinalScaleGenerator(final Frame parent) {
         this.parent = parent;
     }
 
@@ -25,18 +25,21 @@ public class OrdinalScaleGenerator implements ScaleGenerator {
         return "Ordinal Scale";
     }
 
-    /// @todo should check type of column, too -- we need at least two versions for int and float values (should be
-    /// transparent to the user
-    public boolean canHandleColumns(TableColumnPair[] columns) {
+    // / @todo should check type of column, too -- we need at least two versions
+    // for int and float values (should be
+    // / transparent to the user
+    public boolean canHandleColumns(final TableColumnPair[] columns) {
         if (columns.length != 1) {
             return false;
         }
-        int columnType = columns[0].getColumn().getType();
+        final int columnType = columns[0].getColumn().getType();
         return (OrdinalScaleGeneratorPanel.determineDataType(columnType) != OrdinalScaleGeneratorPanel.UNSUPPORTED);
     }
 
-    public Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection) {
-        OrdinalScaleEditorDialog scaleDialog = new OrdinalScaleEditorDialog(parent, scheme.getDatabaseSchema(), databaseConnection);
+    public Context generateScale(final ConceptualSchema scheme,
+            final DatabaseConnection databaseConnection) {
+        final OrdinalScaleEditorDialog scaleDialog = new OrdinalScaleEditorDialog(
+                parent, scheme.getDatabaseSchema(), databaseConnection);
         if (!scaleDialog.execute()) {
             return null;
         }

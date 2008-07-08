@@ -23,14 +23,14 @@ public class DatabaseViewerException extends Exception {
     /**
      * Constructs an exception with detail message.
      */
-    public DatabaseViewerException(String s) {
+    public DatabaseViewerException(final String s) {
         super(s);
     }
 
     /**
      * Constructs an exception with detail message and embedded exception.
      */
-    public DatabaseViewerException(String s, Exception e) {
+    public DatabaseViewerException(final String s, final Exception e) {
         super(s);
         this.exception = e;
     }

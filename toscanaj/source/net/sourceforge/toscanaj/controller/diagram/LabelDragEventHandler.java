@@ -8,6 +8,7 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.view.diagram.LabelView;
+
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import org.tockit.canvas.events.CanvasItemDroppedEvent;
 import org.tockit.canvas.events.CanvasItemPickupEvent;
@@ -16,19 +17,21 @@ import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 public class LabelDragEventHandler implements EventBrokerListener {
-    public LabelDragEventHandler(EventBroker eventBroker) {
-        eventBroker.subscribe(this, CanvasItemDraggedEvent.class, LabelView.class);
+    public LabelDragEventHandler(final EventBroker eventBroker) {
+        eventBroker.subscribe(this, CanvasItemDraggedEvent.class,
+                LabelView.class);
     }
 
-    public void processEvent(Event e) {
-        CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
-        LabelView labelView = (LabelView) e.getSubject();
-        if(e instanceof CanvasItemPickupEvent) {
-            labelView.startDrag(dragEvent.getCanvasFromPosition(), dragEvent.getCanvasToPosition());
+    public void processEvent(final Event e) {
+        final CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
+        final LabelView labelView = (LabelView) e.getSubject();
+        if (e instanceof CanvasItemPickupEvent) {
+            labelView.startDrag(dragEvent.getCanvasFromPosition(), dragEvent
+                    .getCanvasToPosition());
         } else {
             labelView.processDragEvent(dragEvent.getCanvasFromPosition(),
-                                       dragEvent.getCanvasToPosition(),
-                                       dragEvent instanceof CanvasItemDroppedEvent);
+                    dragEvent.getCanvasToPosition(),
+                    dragEvent instanceof CanvasItemDroppedEvent);
         }
     }
 }

@@ -7,11 +7,11 @@
  */
 package net.sourceforge.toscanaj.gui.activity;
 
-
 public interface SimpleActivity {
 
-    /* return success if the activity succeeded, throw an exception
-     * if the user should hear that something went wrong.
-    */
+    /*
+     * return success if the activity succeeded, throw an exception if the user
+     * should hear that something went wrong.
+     */
     public boolean doActivity() throws Exception;
 }

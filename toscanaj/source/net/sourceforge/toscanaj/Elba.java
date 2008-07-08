@@ -11,9 +11,9 @@ import net.sourceforge.toscanaj.gui.ElbaMainPanel;
 
 public class Elba {
     /**
-     *  Main method for running the program
+     * Main method for running the program
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         ToscanaJ.loadPlugins();
         final ElbaMainPanel mainWindow;
         mainWindow = new ElbaMainPanel();

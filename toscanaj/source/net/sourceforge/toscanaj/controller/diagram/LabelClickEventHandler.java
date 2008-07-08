@@ -8,19 +8,21 @@
 package net.sourceforge.toscanaj.controller.diagram;
 
 import net.sourceforge.toscanaj.view.diagram.LabelView;
+
 import org.tockit.canvas.events.CanvasItemClickedEvent;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 public class LabelClickEventHandler implements EventBrokerListener {
-    public LabelClickEventHandler(EventBroker eventBroker) {
-        eventBroker.subscribe(this, CanvasItemClickedEvent.class, LabelView.class);
+    public LabelClickEventHandler(final EventBroker eventBroker) {
+        eventBroker.subscribe(this, CanvasItemClickedEvent.class,
+                LabelView.class);
     }
 
-    public void processEvent(Event e) {
-        CanvasItemClickedEvent clickEvent = (CanvasItemClickedEvent) e;
-        LabelView labelView = (LabelView) e.getSubject();
+    public void processEvent(final Event e) {
+        final CanvasItemClickedEvent clickEvent = (CanvasItemClickedEvent) e;
+        final LabelView labelView = (LabelView) e.getSubject();
         labelView.processClickEvent(clickEvent.getCanvasPosition());
     }
 }

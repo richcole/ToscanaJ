@@ -7,6 +7,8 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
+import java.awt.geom.Point2D;
+
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
@@ -16,24 +18,22 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
-import java.awt.geom.Point2D;
-
 /**
  * A LabelView for displaying the objects.
- *
+ * 
  * This and the AttributeLabelView are used to distinguish between labels above
  * and below the nodes and the default display type (list or number).
- *
+ * 
  * @see AttributeLabelView
  */
 public class ObjectLabelView extends LabelView {
     /**
      * @todo this is a quick hack to get a hide all feature, should be changed
-     * to some controller object or similar
+     *       to some controller object or similar
      */
     protected static boolean allHidden = false;
 
-    public static void setAllHidden(boolean allHidden) {
+    public static void setAllHidden(final boolean allHidden) {
         ObjectLabelView.allHidden = allHidden;
     }
 
@@ -51,26 +51,29 @@ public class ObjectLabelView extends LabelView {
      */
     private Query query = null;
 
-	// do not initialize this with null -- it happens after the superconstructor call which initializes
-	// it by calling back through updateEntries(), which causes double queries
+    // do not initialize this with null -- it happens after the superconstructor
+    // call which initializes
+    // it by calling back through updateEntries(), which causes double queries
     private FCAElement[] contents;
 
     public static LabelFactory getFactory() {
-        return new LabelFactory(){
-            public LabelView createLabelView(DiagramView diagramView,NodeView nodeView,LabelInfo label){
+        return new LabelFactory() {
+            public LabelView createLabelView(final DiagramView diagramView,
+                    final NodeView nodeView, final LabelInfo label) {
                 return new ObjectLabelView(diagramView, nodeView, label);
             }
 
-			public Class getLabelClass() {
-				return ObjectLabelView.class;
-			}
+            public Class getLabelClass() {
+                return ObjectLabelView.class;
+            }
         };
     }
 
     /**
      * Creates a view for the given label information.
      */
-    protected ObjectLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label) {
+    protected ObjectLabelView(final DiagramView diagramView,
+            final NodeView nodeView, final LabelInfo label) {
         super(diagramView, nodeView, label);
     }
 
@@ -78,15 +81,18 @@ public class ObjectLabelView extends LabelView {
      * Avoids drawing object labels for non-realised concepts.
      */
     @Override
-	public boolean isVisible() {
-        Concept concept = this.labelInfo.getNode().getConcept();
-        ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
-        ConceptInterpreter interpreter = diagramView.getConceptInterpreter();
-        return interpreter.isVisible(concept, context) && super.isVisible() && !allHidden;
+    public boolean isVisible() {
+        final Concept concept = this.labelInfo.getNode().getConcept();
+        final ConceptInterpretationContext context = nodeView
+                .getConceptInterpretationContext();
+        final ConceptInterpreter interpreter = diagramView
+                .getConceptInterpreter();
+        return interpreter.isVisible(concept, context) && super.isVisible()
+                && !allHidden;
     }
 
     @Override
-	public void updateEntries() {
+    public void updateEntries() {
         doQuery();
         if (this.getNumberOfEntries() > DEFAULT_DISPLAY_LINES) {
             this.displayLines = DEFAULT_DISPLAY_LINES;
@@ -100,31 +106,31 @@ public class ObjectLabelView extends LabelView {
     /**
      * Sets the default query for new labels.
      */
-	static public void setDefaultQuery(Query query) {
-		ObjectLabelView.defaultQuery = query;
-	}
+    static public void setDefaultQuery(final Query query) {
+        ObjectLabelView.defaultQuery = query;
+    }
 
-	static public Query getDefaultQuery() {
-		return ObjectLabelView.defaultQuery;
-	}
+    static public Query getDefaultQuery() {
+        return ObjectLabelView.defaultQuery;
+    }
 
     /**
      * Returns LabelView.BELOW
      */
     @Override
-	protected int getPlacement() {
+    protected int getPlacement() {
         return LabelView.BELOW;
     }
 
     /**
      */
-    public void setQuery(Query query) {
+    public void setQuery(final Query query) {
         this.query = query;
         updateEntries();
     }
 
     @Override
-	public int getNumberOfEntries() {
+    public int getNumberOfEntries() {
         if (this.contents == null) {
             return 0;
         }
@@ -132,27 +138,31 @@ public class ObjectLabelView extends LabelView {
     }
 
     @Override
-	public Object getEntryAt(int position) {
-        if(this.contents == null) {
+    public Object getEntryAt(final int position) {
+        if (this.contents == null) {
             updateEntries();
         }
         return this.contents[position];
     }
 
     protected void doQuery() {
-        DiagramNode node = this.labelInfo.getNode();
-        Concept concept = node.getConcept();
-        ConceptInterpretationContext context = nodeView.getConceptInterpretationContext();
-        ConceptInterpreter conceptInterpreter = this.diagramView.getConceptInterpreter();
+        final DiagramNode node = this.labelInfo.getNode();
+        final Concept concept = node.getConcept();
+        final ConceptInterpretationContext context = nodeView
+                .getConceptInterpretationContext();
+        final ConceptInterpreter conceptInterpreter = this.diagramView
+                .getConceptInterpreter();
         try {
-			this.contents = conceptInterpreter.executeQuery(getQuery(), concept, context);
-        } catch (Exception e) {
-			ErrorDialog.showError(this.diagramView, e, "Getting object label content failed");
+            this.contents = conceptInterpreter.executeQuery(getQuery(),
+                    concept, context);
+        } catch (final Exception e) {
+            ErrorDialog.showError(this.diagramView, e,
+                    "Getting object label content failed");
         }
     }
 
-    public FCAElement getObjectAtPosition(Point2D position) {
-        int itemHit = getIndexOfPosition(position);
+    public FCAElement getObjectAtPosition(final Point2D position) {
+        final int itemHit = getIndexOfPosition(position);
         if (itemHit == -1) {
             return null;
         }
@@ -160,25 +170,26 @@ public class ObjectLabelView extends LabelView {
     }
 
     @Override
-	protected boolean highlightedInIdeal() {
+    protected boolean highlightedInIdeal() {
         return true;
     }
 
     @Override
-	protected boolean highlightedInFilter() {
+    protected boolean highlightedInFilter() {
         return false;
     }
 
     public Query getQuery() {
-		if(this.query == null) {
-			this.query = defaultQuery;
-		}
+        if (this.query == null) {
+            this.query = defaultQuery;
+        }
         return this.query;
     }
 
     @Override
-	protected boolean isFaded() {
-        int selectionState = nodeView.getSelectionState();
-        return selectionState == DiagramView.NOT_SELECTED || selectionState == DiagramView.SELECTED_FILTER;
+    protected boolean isFaded() {
+        final int selectionState = nodeView.getSelectionState();
+        return selectionState == DiagramView.NOT_SELECTED
+                || selectionState == DiagramView.SELECTED_FILTER;
     }
 }

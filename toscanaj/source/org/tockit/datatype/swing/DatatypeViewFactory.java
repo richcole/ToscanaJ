@@ -23,41 +23,40 @@ import org.tockit.datatype.Value;
 import org.tockit.datatype.xsd.DecimalType;
 import org.tockit.datatype.xsd.StringType;
 
-
 public abstract class DatatypeViewFactory {
     // @todo generalize to cover TreeCellEditor, too
-	public static TableCellEditor getValueCellEditor(Datatype datatype) {
-        if(datatype instanceof StringType.EnumerationRestrictedStringType) {
-            StringType.EnumerationRestrictedStringType stringType = 
-                    (StringType.EnumerationRestrictedStringType) datatype;
-            JComboBox comp = new JComboBox(stringType.getEnumeration());
+    public static TableCellEditor getValueCellEditor(final Datatype datatype) {
+        if (datatype instanceof StringType.EnumerationRestrictedStringType) {
+            final StringType.EnumerationRestrictedStringType stringType = (StringType.EnumerationRestrictedStringType) datatype;
+            final JComboBox comp = new JComboBox(stringType.getEnumeration());
             return new DefaultCellEditor(comp);
         }
-        if(datatype instanceof StringType) {
+        if (datatype instanceof StringType) {
             final StringType stringType = (StringType) datatype;
             final JTextField comp = new JTextField();
             return new DefaultCellEditor(comp) {
                 @Override
-				public Object getCellEditorValue() {
+                public Object getCellEditorValue() {
                     try {
                         return stringType.parse(comp.getText());
-                    } catch (ConversionException e) {
+                    } catch (final ConversionException e) {
                         // @todo provide error feedback somehow
                         return Value.NULL;
                     }
                 }
             };
         }
-        if(datatype instanceof DecimalType) {
+        if (datatype instanceof DecimalType) {
             final DecimalType decType = (DecimalType) datatype;
-            NumberFormat format = NumberFormat.getNumberInstance();
-            final JFormattedTextField comp = new JFormattedTextField(new NumberFormatter(format));
+            final NumberFormat format = NumberFormat.getNumberInstance();
+            final JFormattedTextField comp = new JFormattedTextField(
+                    new NumberFormatter(format));
             return new DefaultCellEditor(comp) {
                 @Override
-				public Object getCellEditorValue() {
+                public Object getCellEditorValue() {
                     try {
                         return decType.parse(comp.getText());
-                    } catch (ConversionException e) {
+                    } catch (final ConversionException e) {
                         // @todo provide error feedback somehow
                         return Value.NULL;
                     }
@@ -65,10 +64,10 @@ public abstract class DatatypeViewFactory {
             };
         }
         throw new RuntimeException("Unknown type");
-	}
-	
-	public static JPanel getSubtypingPanel(Datatype datatype) {
+    }
+
+    public static JPanel getSubtypingPanel(final Datatype datatype) {
         assert datatype != null;
         throw new RuntimeException("Not yet implemented");
-	}
+    }
 }

@@ -18,26 +18,30 @@ import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
 /**
  * This dimension strategy ensure the usual type of attribute-additivity.
  * 
- * One attribute of each meet-irreducible concept gets assigned a dimension, which
- * results in an attribute-additive line diagram based on attributes of 
- * meet-irreducibles. This is the usual layout used e.g. by Anaconda, except that
- * the manipulation always works in a controlled way: moving the meet-irreducible
- * elements moves the ideals (as with the ideal manipulator in our tools or Anaconda), 
- * while moving other nodes splits the movement onto the dimensions involved (I think
- * that can be expressed as moving the ideals of all meet-irreducibles in the interval
- * between the concept and the join of all of its parents -- alternatively just think
- * of it in the same way all the other n-dim stuff works).
+ * One attribute of each meet-irreducible concept gets assigned a dimension,
+ * which results in an attribute-additive line diagram based on attributes of
+ * meet-irreducibles. This is the usual layout used e.g. by Anaconda, except
+ * that the manipulation always works in a controlled way: moving the
+ * meet-irreducible elements moves the ideals (as with the ideal manipulator in
+ * our tools or Anaconda), while moving other nodes splits the movement onto the
+ * dimensions involved (I think that can be expressed as moving the ideals of
+ * all meet-irreducibles in the interval between the concept and the join of all
+ * of its parents -- alternatively just think of it in the same way all the
+ * other n-dim stuff works).
  */
-public class DefaultDimensionStrategy<T> implements DimensionCreationStrategy<T> {
-    public<O> List<Dimension<T>> calculateDimensions(final Lattice<O,T> lattice) {
+public class DefaultDimensionStrategy<T> implements
+        DimensionCreationStrategy<T> {
+    public <O> List<Dimension<T>> calculateDimensions(
+            final Lattice<O, T> lattice) {
         final List<Dimension<T>> dimensions = new ArrayList<Dimension<T>>();
-        final Concept<O,T>[] concepts = lattice.getConcepts();
+        final Concept<O, T>[] concepts = lattice.getConcepts();
         for (final Concept<O, T> concept : concepts) {
             if (concept.isMeetIrreducible()) {
-                final Iterator<T> attrCont = concept.getAttributeContingentIterator();
+                final Iterator<T> attrCont = concept
+                        .getAttributeContingentIterator();
                 final List<T> attribVector = new ArrayList<T>();
                 attribVector.add(attrCont.next());
-				dimensions.add(new Dimension<T>(attribVector));
+                dimensions.add(new Dimension<T>(attribVector));
             }
         }
         return dimensions;

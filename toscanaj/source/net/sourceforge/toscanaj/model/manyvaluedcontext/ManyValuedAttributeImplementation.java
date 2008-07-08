@@ -15,54 +15,61 @@ import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 import org.tockit.datatype.Datatype;
 
-
-public class ManyValuedAttributeImplementation implements WritableManyValuedAttribute {
+public class ManyValuedAttributeImplementation implements
+        WritableManyValuedAttribute {
     private Datatype type;
     private String name;
-	private static final String MANY_VALUED_ATTRIBUTE_ELEMENT_NAME = "attribute";
-	private static final String NAME_ATTRIBUTE_NAME = "name";
-	private static final String TYPE_REF_ATTRIBUTE_NAME = "typeRef";
+    private static final String MANY_VALUED_ATTRIBUTE_ELEMENT_NAME = "attribute";
+    private static final String NAME_ATTRIBUTE_NAME = "name";
+    private static final String TYPE_REF_ATTRIBUTE_NAME = "typeRef";
 
-    public ManyValuedAttributeImplementation(Datatype type, String name) {
+    public ManyValuedAttributeImplementation(final Datatype type,
+            final String name) {
         this.type = type;
         this.name = name;
     }
-    
-    public ManyValuedAttributeImplementation(Element element, Hashtable<String, Datatype> typeIdMapping) throws XMLSyntaxError {
-    	readXML(element, typeIdMapping);
+
+    public ManyValuedAttributeImplementation(final Element element,
+            final Hashtable<String, Datatype> typeIdMapping)
+            throws XMLSyntaxError {
+        readXML(element, typeIdMapping);
     }
 
     public Datatype getType() {
         return type;
     }
-    
-    public void setType(Datatype type){
-    	this.type = type;
+
+    public void setType(final Datatype type) {
+        this.type = type;
     }
 
     public String getName() {
         return name;
     }
-    
+
     @Override
-	public String toString() {
-    	return getName();
+    public String toString() {
+        return getName();
     }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(final String name) {
+        this.name = name;
+    }
 
-	public Element toXML() {
-		Element retVal = new Element(MANY_VALUED_ATTRIBUTE_ELEMENT_NAME);
-		retVal.setAttribute(NAME_ATTRIBUTE_NAME, name);
-		retVal.setAttribute(TYPE_REF_ATTRIBUTE_NAME, type.getName());
-		return retVal;
-	}
+    public Element toXML() {
+        final Element retVal = new Element(MANY_VALUED_ATTRIBUTE_ELEMENT_NAME);
+        retVal.setAttribute(NAME_ATTRIBUTE_NAME, name);
+        retVal.setAttribute(TYPE_REF_ATTRIBUTE_NAME, type.getName());
+        return retVal;
+    }
 
-	public void readXML(Element elem, Hashtable<String, Datatype> typesIdMapping) throws XMLSyntaxError { 
-		String typeRef = XMLHelper.getAttribute(elem, TYPE_REF_ATTRIBUTE_NAME).getValue();
-		this.type = typesIdMapping.get(typeRef);
-		this.name = XMLHelper.getAttribute(elem, NAME_ATTRIBUTE_NAME).getValue();
-	}
+    public void readXML(final Element elem,
+            final Hashtable<String, Datatype> typesIdMapping)
+            throws XMLSyntaxError {
+        final String typeRef = XMLHelper.getAttribute(elem,
+                TYPE_REF_ATTRIBUTE_NAME).getValue();
+        this.type = typesIdMapping.get(typeRef);
+        this.name = XMLHelper.getAttribute(elem, NAME_ATTRIBUTE_NAME)
+                .getValue();
+    }
 }

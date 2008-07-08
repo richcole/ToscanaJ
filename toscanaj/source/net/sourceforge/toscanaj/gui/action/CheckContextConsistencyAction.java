@@ -17,11 +17,6 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 
-import org.jdom.Element;
-import org.tockit.events.Event;
-import org.tockit.events.EventBroker;
-import org.tockit.events.EventBrokerListener;
-
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.gui.dialog.DescriptionViewer;
@@ -32,113 +27,122 @@ import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.view.context.ContextConsistencyChecker;
 
+import org.jdom.Element;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventBrokerListener;
+
 /// @todo rename class once we figured out how to call this
-public class CheckContextConsistencyAction extends AbstractAction implements EventBrokerListener {
-	private ConceptualSchema conceptualSchema;
-	private DatabaseConnection databaseConnection;
-	private Frame parent;
+public class CheckContextConsistencyAction extends AbstractAction implements
+        EventBrokerListener {
+    private ConceptualSchema conceptualSchema;
+    private DatabaseConnection databaseConnection;
+    private final Frame parent;
 
-	public CheckContextConsistencyAction(ConceptualSchema conceptualSchema, 
-										DatabaseConnection databaseConnection, 
-										Frame parent,
-										EventBroker eventBroker) {
-		super("Check Consistency With Database");
+    public CheckContextConsistencyAction(
+            final ConceptualSchema conceptualSchema,
+            final DatabaseConnection databaseConnection, final Frame parent,
+            final EventBroker eventBroker) {
+        super("Check Consistency With Database");
 
-		this.conceptualSchema = conceptualSchema;
-		this.databaseConnection = databaseConnection;
-		this.parent = parent;
-		setActionState();
-		eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
-		eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);	
-	}
+        this.conceptualSchema = conceptualSchema;
+        this.databaseConnection = databaseConnection;
+        this.parent = parent;
+        setActionState();
+        eventBroker.subscribe(this, NewConceptualSchemaEvent.class,
+                Object.class);
+        eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
+    }
 
-	public void actionPerformed(ActionEvent event) {
-		try {
-			Hashtable<String, List<String>> allProblems = new Hashtable<String, List<String>>();
-			Iterator<Diagram2D> it = this.conceptualSchema.getDiagramsIterator();
-			while (it.hasNext()) {
-				Diagram2D curDiagram = it.next();
-				List<String> curPoblems = ContextConsistencyChecker.checkConsistency(this.conceptualSchema, curDiagram, this.databaseConnection, this.parent);
-				if (!curPoblems.isEmpty()) {
-					allProblems.put(curDiagram.getTitle(), curPoblems);
-				}
-			}
-			
-			// give feedback
-			if (allProblems.isEmpty()) {
-				JOptionPane.showMessageDialog(
-					this.parent,
-					"No problems found",
-					"Objects correct",
-					JOptionPane.INFORMATION_MESSAGE);
-			} else {
-				// show problems
-				Element problemDescription = new Element("description");
-				Element htmlElement = new Element("html");
-				htmlElement.addContent(
-					new Element("title").addContent("Consistency problems"));
-				problemDescription.addContent(htmlElement);
-				Element body = new Element("body");
-				htmlElement.addContent(body);
-				body.addContent(new Element("h1").addContent("Problems found:"));
-				
-				Enumeration<String> e = allProblems.keys();
-				while (e.hasMoreElements()) {
-					String diagramTitle = e.nextElement();
-					List problems = allProblems.get(diagramTitle);
-					body.addContent(new Element("h3").addContent("Diagram '" + diagramTitle + "'"));
-					Iterator problemsIterator = problems.iterator();
-					while (problemsIterator.hasNext()) {
-						String problem = (String) problemsIterator.next(); 
-						body.addContent(new Element("pre").addContent(problem));
-					}
-				}
-				
-				Frame frame = JOptionPane.getFrameForComponent(this.parent);
-				DescriptionViewer.show(frame, problemDescription);
-			}												
-		}
-		catch (Exception e ) {
-			ErrorDialog.showError(this.parent, e, "Error checking consistency", "Couldn't check database consistency");
-		}
-		
-	}
+    public void actionPerformed(final ActionEvent event) {
+        try {
+            final Hashtable<String, List<String>> allProblems = new Hashtable<String, List<String>>();
+            final Iterator<Diagram2D> it = this.conceptualSchema
+                    .getDiagramsIterator();
+            while (it.hasNext()) {
+                final Diagram2D curDiagram = it.next();
+                final List<String> curPoblems = ContextConsistencyChecker
+                        .checkConsistency(this.conceptualSchema, curDiagram,
+                                this.databaseConnection, this.parent);
+                if (!curPoblems.isEmpty()) {
+                    allProblems.put(curDiagram.getTitle(), curPoblems);
+                }
+            }
 
-	public void processEvent(Event event) {
-		if(event instanceof DatabaseConnectedEvent) {
-			DatabaseConnectedEvent dbConEv = (DatabaseConnectedEvent) event;
-			this.databaseConnection = dbConEv.getConnection();
-		}
-		if(event instanceof ConceptualSchemaChangeEvent) {
-			ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
-			if (event instanceof NewConceptualSchemaEvent) {
-				this.conceptualSchema = changeEvent.getConceptualSchema();
-			}
-		}
-		setActionState();
-		
-	}
-	
-	private void setActionState () {
-		if(this.databaseConnection == null) {
-			setEnabled(false);		
-			return;
-		} 
-		else if (!this.databaseConnection.isConnected()) {
-			setEnabled(false);
-			return;
-		}
-		if (this.conceptualSchema == null) {
-			setEnabled(false);
-			return;
-		}
-		else {
-			if (this.conceptualSchema.getNumberOfDiagrams() == 0) {
-				setEnabled(false);
-				return;
-			}
-		}
-		setEnabled(true);		
-	}	
+            // give feedback
+            if (allProblems.isEmpty()) {
+                JOptionPane.showMessageDialog(this.parent, "No problems found",
+                        "Objects correct", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                // show problems
+                final Element problemDescription = new Element("description");
+                final Element htmlElement = new Element("html");
+                htmlElement.addContent(new Element("title")
+                        .addContent("Consistency problems"));
+                problemDescription.addContent(htmlElement);
+                final Element body = new Element("body");
+                htmlElement.addContent(body);
+                body
+                        .addContent(new Element("h1")
+                                .addContent("Problems found:"));
+
+                final Enumeration<String> e = allProblems.keys();
+                while (e.hasMoreElements()) {
+                    final String diagramTitle = e.nextElement();
+                    final List problems = allProblems.get(diagramTitle);
+                    body.addContent(new Element("h3").addContent("Diagram '"
+                            + diagramTitle + "'"));
+                    final Iterator problemsIterator = problems.iterator();
+                    while (problemsIterator.hasNext()) {
+                        final String problem = (String) problemsIterator.next();
+                        body.addContent(new Element("pre").addContent(problem));
+                    }
+                }
+
+                final Frame frame = JOptionPane
+                        .getFrameForComponent(this.parent);
+                DescriptionViewer.show(frame, problemDescription);
+            }
+        } catch (final Exception e) {
+            ErrorDialog.showError(this.parent, e, "Error checking consistency",
+                    "Couldn't check database consistency");
+        }
+
+    }
+
+    public void processEvent(final Event event) {
+        if (event instanceof DatabaseConnectedEvent) {
+            final DatabaseConnectedEvent dbConEv = (DatabaseConnectedEvent) event;
+            this.databaseConnection = dbConEv.getConnection();
+        }
+        if (event instanceof ConceptualSchemaChangeEvent) {
+            final ConceptualSchemaChangeEvent changeEvent = (ConceptualSchemaChangeEvent) event;
+            if (event instanceof NewConceptualSchemaEvent) {
+                this.conceptualSchema = changeEvent.getConceptualSchema();
+            }
+        }
+        setActionState();
+
+    }
+
+    private void setActionState() {
+        if (this.databaseConnection == null) {
+            setEnabled(false);
+            return;
+        } else if (!this.databaseConnection.isConnected()) {
+            setEnabled(false);
+            return;
+        }
+        if (this.conceptualSchema == null) {
+            setEnabled(false);
+            return;
+        } else {
+            if (this.conceptualSchema.getNumberOfDiagrams() == 0) {
+                setEnabled(false);
+                return;
+            }
+        }
+        setEnabled(true);
+    }
 
 }

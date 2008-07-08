@@ -8,14 +8,15 @@
 package net.sourceforge.toscanaj.controller.events;
 
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
+
 import org.tockit.events.Event;
 
 public class DatabaseConnectEvent implements Event<Object> {
 
-    private Object source;
+    private final Object source;
     private DatabaseInfo info;
 
-    public DatabaseConnectEvent(Object source, DatabaseInfo info) {
+    public DatabaseConnectEvent(final Object source, final DatabaseInfo info) {
         this.source = source;
         this.info = info;
     }
@@ -28,7 +29,7 @@ public class DatabaseConnectEvent implements Event<Object> {
         return this.info;
     }
 
-    public void setInfo(DatabaseInfo info) {
+    public void setInfo(final DatabaseInfo info) {
         this.info = info;
     }
 }

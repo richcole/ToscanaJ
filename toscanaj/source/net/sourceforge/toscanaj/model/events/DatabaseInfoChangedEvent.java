@@ -12,9 +12,10 @@ import net.sourceforge.toscanaj.model.database.DatabaseInfo;
 
 public class DatabaseInfoChangedEvent extends ConceptualSchemaChangeEvent {
 
-    private DatabaseInfo info;
+    private final DatabaseInfo info;
 
-    public DatabaseInfoChangedEvent(ConceptualSchema schema, DatabaseInfo info) {
+    public DatabaseInfoChangedEvent(final ConceptualSchema schema,
+            final DatabaseInfo info) {
         super(schema);
         this.info = info;
     }

@@ -7,14 +7,15 @@
  */
 package net.sourceforge.toscanaj.model.events;
 
-import net.sourceforge.toscanaj.model.ConceptualSchema;
-
 import java.io.File;
 
-public class ConceptualSchemaLoadedEvent extends NewConceptualSchemaEvent {
-    private File file;
+import net.sourceforge.toscanaj.model.ConceptualSchema;
 
-    public ConceptualSchemaLoadedEvent(Object source, ConceptualSchema schema, File file) {
+public class ConceptualSchemaLoadedEvent extends NewConceptualSchemaEvent {
+    private final File file;
+
+    public ConceptualSchemaLoadedEvent(final Object source,
+            final ConceptualSchema schema, final File file) {
         super(schema);
         this.file = file;
     }

@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.util.xmlize;
 
 public class XMLSyntaxError extends Exception {
-    public XMLSyntaxError(Throwable cause) {
+    public XMLSyntaxError(final Throwable cause) {
         super(cause);
     }
 
@@ -16,11 +16,11 @@ public class XMLSyntaxError extends Exception {
         super();
     }
 
-    public XMLSyntaxError(String reason, Throwable cause) {
+    public XMLSyntaxError(final String reason, final Throwable cause) {
         super(reason, cause);
     }
 
-    public XMLSyntaxError(String reason) {
+    public XMLSyntaxError(final String reason) {
         super(reason);
     }
 }

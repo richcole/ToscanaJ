@@ -10,35 +10,34 @@ package org.tockit.datatype.xsd;
 import org.tockit.datatype.AbstractValue;
 import org.tockit.datatype.Value;
 
-
 public class StringValue extends AbstractValue {
-    private String value;
+    private final String value;
 
-    public StringValue(String value) {
+    public StringValue(final String value) {
         this.value = value;
     }
-    
+
     public String getDisplayString() {
         return this.value;
     }
-    
+
     @Override
-	public boolean isLesserThan(Value other) {
-        if(!(this.getClass() == other.getClass())) {
+    public boolean isLesserThan(final Value other) {
+        if (!(this.getClass() == other.getClass())) {
             return false;
         }
-        StringValue otherValue = (StringValue) other;
+        final StringValue otherValue = (StringValue) other;
         return this.value.compareTo(otherValue.value) < 0;
     }
 
     @Override
-	public boolean sameTypeEquals(Object other) {
-        StringValue otherValue = (StringValue) other;
+    public boolean sameTypeEquals(final Object other) {
+        final StringValue otherValue = (StringValue) other;
         return otherValue.value.equals(this.value);
     }
-    
+
     @Override
-	public int hashCode() {
+    public int hashCode() {
         return value.hashCode();
     }
 

@@ -27,7 +27,7 @@ import org.tockit.context.model.Context;
 public class ObjectAttributeListWriterTest extends TestCase {
     final static Class THIS = ObjectAttributeListWriterTest.class;
 
-    public ObjectAttributeListWriterTest(String s) {
+    public ObjectAttributeListWriterTest(final String s) {
         super(s);
     }
 
@@ -38,20 +38,24 @@ public class ObjectAttributeListWriterTest extends TestCase {
     public void testAnimalContext() throws IOException, DataFormatException {
         final Context inContext = ContextSetups.createCompleteAnimalContext();
         final PipedOutputStream out = new PipedOutputStream();
-        Reader in = new InputStreamReader(new PipedInputStream(out));
-        
-        Runnable writeTask = new Runnable() {
+        final Reader in = new InputStreamReader(new PipedInputStream(out));
+
+        final Runnable writeTask = new Runnable() {
             public void run() {
-                ObjectAttributeListWriter.writeObjectAttributeList(inContext, new PrintStream(out));
+                ObjectAttributeListWriter.writeObjectAttributeList(inContext,
+                        new PrintStream(out));
             }
         };
-        
-        Thread thread = new Thread(writeTask);
+
+        final Thread thread = new Thread(writeTask);
         thread.start();
-        
-        Context resultContext = ObjectAttributeListParser.importOALFromReader(in, inContext.getName());
-        
-        assertEquals(inContext.getAttributes().size(),resultContext.getAttributes().size());
-        assertEquals(inContext.getObjects().size(),resultContext.getObjects().size());
+
+        final Context resultContext = ObjectAttributeListParser
+                .importOALFromReader(in, inContext.getName());
+
+        assertEquals(inContext.getAttributes().size(), resultContext
+                .getAttributes().size());
+        assertEquals(inContext.getObjects().size(), resultContext.getObjects()
+                .size());
     }
 }

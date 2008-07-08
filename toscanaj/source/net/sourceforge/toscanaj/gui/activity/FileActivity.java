@@ -11,13 +11,13 @@ import java.io.File;
 
 public interface FileActivity {
     /**
-     *  @todo reconsider the exception, perhaps it should be more explicit.
+     * @todo reconsider the exception, perhaps it should be more explicit.
      */
     void processFile(File file) throws Exception;
 
     boolean prepareToProcess() throws Exception;
-    
+
     String[] getExtensions();
-    
+
     String getDescription();
 }

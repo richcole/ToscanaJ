@@ -7,6 +7,10 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
 import net.sourceforge.toscanaj.model.events.DatabaseModifiedEvent;
@@ -14,14 +18,11 @@ import net.sourceforge.toscanaj.model.events.DatabaseSchemaChangedEvent;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+
 import org.jdom.Element;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class DatabaseSchema implements XMLizable, EventBrokerListener {
 
@@ -29,37 +30,37 @@ public class DatabaseSchema implements XMLizable, EventBrokerListener {
     List<Table> tables;
     public static final String DATABASE_SCHEMA_ELEMENT_NAME = "databaseSchema";
 
-    public DatabaseSchema(EventBroker broker) {
+    public DatabaseSchema(final EventBroker broker) {
         this.tables = new ArrayList<Table>();
         this.broker = broker;
         this.broker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
         this.broker.subscribe(this, DatabaseModifiedEvent.class, Object.class);
     }
 
-    public DatabaseSchema(EventBroker broker, Element elem) throws XMLSyntaxError {
+    public DatabaseSchema(final EventBroker broker, final Element elem)
+            throws XMLSyntaxError {
         this(broker);
         readXML(elem);
     }
 
     public Element toXML() {
-        Element retVal = new Element(DATABASE_SCHEMA_ELEMENT_NAME);
-        for (Iterator<Table> iterator = tables.iterator(); iterator.hasNext();) {
-            Table table = iterator.next();
+        final Element retVal = new Element(DATABASE_SCHEMA_ELEMENT_NAME);
+        for (final Table table : tables) {
             retVal.addContent(table.toXML());
         }
         return retVal;
     }
 
-    public void readXML(Element elem) throws XMLSyntaxError {
+    public void readXML(final Element elem) throws XMLSyntaxError {
         XMLHelper.checkName(elem, DATABASE_SCHEMA_ELEMENT_NAME);
-        List<Element> tableElems = elem.getChildren(Table.TABLE_ELEMENT_NAME);
-        for (Iterator<Element> iterator = tableElems.iterator(); iterator.hasNext();) {
-            Element element = iterator.next();
+        final List<Element> tableElems = elem
+                .getChildren(Table.TABLE_ELEMENT_NAME);
+        for (final Element element : tableElems) {
             tables.add(new Table(broker, element));
         }
     }
 
-    void addTable(Table table) {
+    void addTable(final Table table) {
         this.tables.add(table);
     }
 
@@ -67,27 +68,29 @@ public class DatabaseSchema implements XMLizable, EventBrokerListener {
         return tables;
     }
 
-    public void readFromDBConnection(DatabaseConnection connection) {
-        Iterator<String> it = connection.getTableNames().iterator();
+    public void readFromDBConnection(final DatabaseConnection connection) {
+        final Iterator<String> it = connection.getTableNames().iterator();
         this.tables.clear();
         while (it.hasNext()) {
-            String tableName = it.next();
-            Table table = new Table(broker, tableName, false); ///@todo get key name
-            for (Iterator<Column> colIt = connection.getColumns(table).iterator(); colIt.hasNext(); ) {
-                table.addColumn(colIt.next());
+            final String tableName = it.next();
+            final Table table = new Table(broker, tableName, false); // /@todo
+                                                                     // get key
+                                                                     // name
+            for (final Column column : connection.getColumns(table)) {
+                table.addColumn(column);
             }
             addTable(table);
         }
         broker.processEvent(new DatabaseSchemaChangedEvent(this, this));
     }
 
-    public void processEvent(Event e) {
+    public void processEvent(final Event e) {
         if (e instanceof DatabaseConnectedEvent) {
-            DatabaseConnectedEvent event = (DatabaseConnectedEvent) e;
+            final DatabaseConnectedEvent event = (DatabaseConnectedEvent) e;
             readFromDBConnection(event.getConnection());
         }
         if (e instanceof DatabaseModifiedEvent) {
-            DatabaseModifiedEvent event = (DatabaseModifiedEvent) e;
+            final DatabaseModifiedEvent event = (DatabaseModifiedEvent) e;
             readFromDBConnection(event.getConnection());
         }
     }

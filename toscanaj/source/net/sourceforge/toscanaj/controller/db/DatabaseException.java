@@ -9,26 +9,26 @@ package net.sourceforge.toscanaj.controller.db;
 
 /**
  * Signals a problem with a database connection.
- *
+ * 
  * There is a large number of reasons why this can happen, the message string
  * and the embedded exception are used to indicate what exactly went wrong.
- *
+ * 
  * @todo build hierarchy for this.
  */
 public class DatabaseException extends Exception {
     public DatabaseException() {
-    super();
+        super();
     }
 
-    public DatabaseException(String message) {
-    super(message);
+    public DatabaseException(final String message) {
+        super(message);
     }
 
-    public DatabaseException(String message, Throwable cause) {
+    public DatabaseException(final String message, final Throwable cause) {
         super(message, cause);
     }
 
-    public DatabaseException(Throwable cause) {
+    public DatabaseException(final Throwable cause) {
         super(cause);
     }
 }

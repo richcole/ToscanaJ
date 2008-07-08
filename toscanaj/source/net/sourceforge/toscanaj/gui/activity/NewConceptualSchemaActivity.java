@@ -8,36 +8,37 @@
 package net.sourceforge.toscanaj.gui.activity;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+
 import org.tockit.events.EventBroker;
 
 public class NewConceptualSchemaActivity implements SimpleActivity {
-    private EventBroker broker;
+    private final EventBroker broker;
     private SimpleActivity testNewOkActivity;
     private SimpleActivity postNewActivity;
 
-    public NewConceptualSchemaActivity(EventBroker broker) {
+    public NewConceptualSchemaActivity(final EventBroker broker) {
         this.broker = broker;
     }
 
     public boolean doActivity() throws Exception {
-    	if(this.testNewOkActivity != null) {
-    		boolean result = this.testNewOkActivity.doActivity();
-    		if(result == false) {
-    			return false;
-    		}
-    	}
-		new ConceptualSchema(this.broker);
-		if(this.postNewActivity != null) {
-			this.postNewActivity.doActivity();
-		}
+        if (this.testNewOkActivity != null) {
+            final boolean result = this.testNewOkActivity.doActivity();
+            if (result == false) {
+                return false;
+            }
+        }
+        new ConceptualSchema(this.broker);
+        if (this.postNewActivity != null) {
+            this.postNewActivity.doActivity();
+        }
         return true;
     }
 
-	public void setTestNewOkActivity(SimpleActivity testNewOkActivity) {
-		this.testNewOkActivity = testNewOkActivity;
-	}
-	
-    public void setPostNewActivity(SimpleActivity postNewActivity) {
+    public void setTestNewOkActivity(final SimpleActivity testNewOkActivity) {
+        this.testNewOkActivity = testNewOkActivity;
+    }
+
+    public void setPostNewActivity(final SimpleActivity postNewActivity) {
         this.postNewActivity = postNewActivity;
     }
 }

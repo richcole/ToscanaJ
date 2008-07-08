@@ -15,15 +15,18 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
-public class HighlightRemovalOperationEventListener implements EventBrokerListener {
-    private DiagramView diagramView;
+public class HighlightRemovalOperationEventListener implements
+        EventBrokerListener {
+    private final DiagramView diagramView;
 
-    public HighlightRemovalOperationEventListener(DiagramView diagramView, EventBroker eventBroker) {
+    public HighlightRemovalOperationEventListener(
+            final DiagramView diagramView, final EventBroker eventBroker) {
         this.diagramView = diagramView;
-        eventBroker.subscribe(this, CanvasItemSelectedEvent.class, CanvasBackground.class);
+        eventBroker.subscribe(this, CanvasItemSelectedEvent.class,
+                CanvasBackground.class);
     }
 
-    public void processEvent(Event e) {
+    public void processEvent(final Event e) {
         this.diagramView.setSelectedConcepts(null);
     }
 }

@@ -7,21 +7,30 @@
  */
 package net.sourceforge.toscanaj.dbviewer;
 
-import net.sourceforge.toscanaj.controller.db.DatabaseException;
-import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-
-import javax.swing.*;
-
-import org.tockit.swing.preferences.ExtendedPreferences;
-
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Frame;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import net.sourceforge.toscanaj.controller.db.DatabaseException;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+
+import org.tockit.swing.preferences.ExtendedPreferences;
 
 /**
  * This abstract class gives a framework for implementing database viewers with
@@ -39,37 +48,41 @@ import java.util.List;
  * getting the table and object key information.
  */
 abstract public class PagingDatabaseViewer implements DatabaseViewer {
-    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(PagingDatabaseViewer.class);
-    
-	protected interface PageViewPanel {
-		void showItem(String keyValue) throws DatabaseViewerException;
-		Component getComponent() throws DatabaseViewerException;
-	}
-	
+    private static final ExtendedPreferences preferences = ExtendedPreferences
+            .userNodeForClass(PagingDatabaseViewer.class);
+
+    protected interface PageViewPanel {
+        void showItem(String keyValue) throws DatabaseViewerException;
+
+        Component getComponent() throws DatabaseViewerException;
+    }
+
     private DatabaseViewerManager viewerManager;
 
     private class PagingDatabaseViewerDialog extends JDialog {
         private List<String> fieldNames;
         private String[] keyValues;
         private int position;
-        private JButton navStartButton;
-        private JButton navPrevButton;
-        private JButton navNextButton;
-        private JButton navEndButton;
-        private JLabel infoLabel;
-        private PageViewPanel viewPanel;
+        private final JButton navStartButton;
+        private final JButton navPrevButton;
+        private final JButton navNextButton;
+        private final JButton navEndButton;
+        private final JLabel infoLabel;
+        private final PageViewPanel viewPanel;
 
-        protected void showView(String whereClause) {
+        protected void showView(final String whereClause) {
             try {
-            	this.fieldNames = new LinkedList<String>();
-            	this.fieldNames.add(PagingDatabaseViewer.this.viewerManager.getKeyName());
-                List<String[]> results = PagingDatabaseViewer.this.viewerManager.getConnection().executeQuery(this.fieldNames,
-                		PagingDatabaseViewer.this.viewerManager.getTableName(),
-                        whereClause);
+                this.fieldNames = new LinkedList<String>();
+                this.fieldNames.add(PagingDatabaseViewer.this.viewerManager
+                        .getKeyName());
+                final List<String[]> results = PagingDatabaseViewer.this.viewerManager
+                        .getConnection().executeQuery(
+                                this.fieldNames,
+                                PagingDatabaseViewer.this.viewerManager
+                                        .getTableName(), whereClause);
                 this.keyValues = new String[results.size()];
                 int i = 0;
-                for (Iterator<String[]> iterator = results.iterator(); iterator.hasNext();) {
-                	String[] row = iterator.next();
+                for (final String[] row : results) {
                     this.keyValues[i] = row[0];
                     i++;
                 }
@@ -77,62 +90,68 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
                 enableButtons();
                 showCurrentItem();
                 setVisible(true);
-            } catch (DatabaseException e) {
+            } catch (final DatabaseException e) {
                 ErrorDialog.showError(this, e, "Failed to query database");
             }
         }
 
-        public PagingDatabaseViewerDialog(Frame frame)
+        public PagingDatabaseViewerDialog(final Frame frame)
                 throws DatabaseViewerException {
             super(frame, "View Items", false);
             this.addWindowListener(new WindowAdapter() {
                 @Override
-				public void windowClosing(WindowEvent e) {
+                public void windowClosing(final WindowEvent e) {
                     closeDialog();
                 }
             });
 
             final JButton closeButton = new JButton("Close");
             closeButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(final ActionEvent e) {
                     closeDialog();
                 }
             });
-            
+
             this.viewPanel = createPanel();
-            
+
             getRootPane().setDefaultButton(closeButton);
             this.navStartButton = new JButton("<<");
             this.navStartButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(final ActionEvent e) {
                     start();
                 }
             });
             this.navPrevButton = new JButton("<");
             this.navPrevButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(final ActionEvent e) {
                     prev();
                 }
             });
             this.navNextButton = new JButton(">");
             this.navNextButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(final ActionEvent e) {
                     next();
                 }
             });
             this.navEndButton = new JButton(">>");
             this.navEndButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
+                public void actionPerformed(final ActionEvent e) {
                     end();
                 }
             });
 
             this.infoLabel = new JLabel("");
 
-            //Lay out the buttons from left to right.
-            JPanel buttonPane = new JPanel();
+            // Lay out the buttons from left to right.
+            final JPanel buttonPane = new JPanel();
             buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.X_AXIS));
-            buttonPane.setBorder(BorderFactory.createEtchedBorder());//(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            buttonPane.setBorder(BorderFactory.createEtchedBorder());// (
+                                                                     // BorderFactory
+                                                                     // .
+                                                                     // createEmptyBorder
+                                                                     // (10, 10,
+                                                                     // 10,
+                                                                     // 10));
 
             buttonPane.add(this.navStartButton);
             buttonPane.add(this.navPrevButton);
@@ -143,12 +162,11 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
             buttonPane.add(Box.createHorizontalGlue());
             buttonPane.add(closeButton);
 
-            //Put everything together, using the content pane's BorderLayout.
-            Container contentPane = getContentPane();
+            // Put everything together, using the content pane's BorderLayout.
+            final Container contentPane = getContentPane();
             contentPane.add(this.viewPanel.getComponent(), BorderLayout.CENTER);
             contentPane.add(buttonPane, BorderLayout.SOUTH);
         }
-
 
         protected void closeDialog() {
             preferences.storeWindowPlacement(this);
@@ -156,7 +174,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         }
 
         private void enableButtons() {
-            int last = this.keyValues.length - 1;
+            final int last = this.keyValues.length - 1;
             this.navStartButton.setEnabled(this.position != 0);
             this.navEndButton.setEnabled(this.position != last);
             this.navPrevButton.setEnabled(this.position != 0);
@@ -164,13 +182,13 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         }
 
         private void next() {
-        	this.position++;
+            this.position++;
             showCurrentItem();
             enableButtons();
         }
 
         private void prev() {
-        	this.position--;
+            this.position--;
             showCurrentItem();
             enableButtons();
         }
@@ -178,48 +196,54 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         private void showCurrentItem() {
             try {
                 this.viewPanel.showItem(this.keyValues[this.position]);
-            } catch (DatabaseViewerException e) {
+            } catch (final DatabaseViewerException e) {
                 ErrorDialog.showError(this, e, "Failed to show item");
             }
-            this.infoLabel.setText((this.position + 1) + "/" + this.keyValues.length);
+            this.infoLabel.setText((this.position + 1) + "/"
+                    + this.keyValues.length);
         }
 
         private void start() {
-        	this.position = 0;
+            this.position = 0;
             showCurrentItem();
             enableButtons();
         }
 
         private void end() {
-        	this.position = this.keyValues.length - 1;
+            this.position = this.keyValues.length - 1;
             showCurrentItem();
             enableButtons();
         }
     }
 
-    protected abstract PageViewPanel createPanel() throws DatabaseViewerException;
+    protected abstract PageViewPanel createPanel()
+            throws DatabaseViewerException;
 
     protected DatabaseViewerManager getManager() {
         return this.viewerManager;
     }
 
     public PagingDatabaseViewer() {
-        // initialization has to be done separately, so we can use the dynamic class loading mechanism
+        // initialization has to be done separately, so we can use the dynamic
+        // class loading mechanism
     }
 
-    public void initialize(DatabaseViewerManager manager) {
+    public void initialize(final DatabaseViewerManager manager) {
         this.viewerManager = manager;
     }
 
-    final public void showView(String whereClause) throws DatabaseViewerException {
-		Frame parentWindow = DatabaseViewerManager.getParentWindow();
-		PagingDatabaseViewerDialog dialog;
-		try {
-			dialog = new PagingDatabaseViewerDialog(parentWindow);
-            preferences.restoreWindowPlacement(dialog, new Rectangle(100, 100, 350, 300));
-			dialog.showView(whereClause);
-		} catch (DatabaseViewerException e) {
-			ErrorDialog.showError(parentWindow,e,"Viewer could not be initialized");
-		}
+    final public void showView(final String whereClause)
+            throws DatabaseViewerException {
+        final Frame parentWindow = DatabaseViewerManager.getParentWindow();
+        PagingDatabaseViewerDialog dialog;
+        try {
+            dialog = new PagingDatabaseViewerDialog(parentWindow);
+            preferences.restoreWindowPlacement(dialog, new Rectangle(100, 100,
+                    350, 300));
+            dialog.showView(whereClause);
+        } catch (final DatabaseViewerException e) {
+            ErrorDialog.showError(parentWindow, e,
+                    "Viewer could not be initialized");
+        }
     }
 }

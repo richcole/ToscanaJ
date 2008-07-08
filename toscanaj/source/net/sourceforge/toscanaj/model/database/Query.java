@@ -7,14 +7,15 @@
  */
 package net.sourceforge.toscanaj.model.database;
 
-import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
-import net.sourceforge.toscanaj.util.xmlize.XMLizable;
-import org.jdom.Element;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
+import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+
+import org.jdom.Element;
 
 public abstract class Query implements XMLizable {
     private static final String QUERY_FIELD_IS_RELATIVE_ATTRIBUTE_NAME = "relative";
@@ -26,13 +27,15 @@ public abstract class Query implements XMLizable {
     private static final String QUERY_FIELD_FORMAT_ATTRIBUTE_NAME = "format";
 
     protected class QueryField {
-        private String fieldName;
-        private String format;
-        private String separator;
-        private String queryPart;
-        private boolean isRelative;
+        private final String fieldName;
+        private final String format;
+        private final String separator;
+        private final String queryPart;
+        private final boolean isRelative;
 
-        public QueryField(String name, String format, String separator, String queryPart, boolean isRelative) {
+        public QueryField(final String name, final String format,
+                final String separator, final String queryPart,
+                final boolean isRelative) {
             this.fieldName = name;
             this.format = format;
             this.separator = separator;
@@ -55,9 +58,9 @@ public abstract class Query implements XMLizable {
         public String getQueryPart() {
             return queryPart;
         }
-        
+
         public boolean isRelative() {
-        	return this.isRelative;
+            return this.isRelative;
         }
     }
 
@@ -66,43 +69,52 @@ public abstract class Query implements XMLizable {
     private String header;
     protected List<QueryField> fieldList = new ArrayList<QueryField>();
 
-    public Query(String name, String header) {
+    public Query(final String name, final String header) {
         this.name = name;
         this.header = header;
     }
 
-    public Query(Element element) {
+    public Query(final Element element) {
         readXML(element);
     }
 
     public Element toXML() {
-        Element retVal = new Element(getElementName());
+        final Element retVal = new Element(getElementName());
         retVal.setAttribute(QUERY_NAME_ATTRIBUTE_NAME, this.name);
-        XMLHelper.addOptionalAttribute(retVal, QUERY_HEAD_ATTRIBUTE_NAME, this.header);
-        for (Iterator<QueryField> iterator = fieldList.iterator(); iterator.hasNext();) {
-            QueryField queryField = iterator.next();
-            Element elem = new Element(QUERY_FIELD_ELEMENT_NAME);
-            XMLHelper.addOptionalAttribute(elem, QUERY_FIELD_NAME_ATTRIBUTE_NAME, queryField.getName());
-            XMLHelper.addOptionalAttribute(elem, QUERY_FIELD_SEPARATOR_ATTRIBUTE_NAME, queryField.getSeparator());
-            XMLHelper.addOptionalAttribute(elem, QUERY_FIELD_FORMAT_ATTRIBUTE_NAME, queryField.getFormat());
+        XMLHelper.addOptionalAttribute(retVal, QUERY_HEAD_ATTRIBUTE_NAME,
+                this.header);
+        for (final QueryField queryField : fieldList) {
+            final Element elem = new Element(QUERY_FIELD_ELEMENT_NAME);
+            XMLHelper.addOptionalAttribute(elem,
+                    QUERY_FIELD_NAME_ATTRIBUTE_NAME, queryField.getName());
+            XMLHelper.addOptionalAttribute(elem,
+                    QUERY_FIELD_SEPARATOR_ATTRIBUTE_NAME, queryField
+                            .getSeparator());
+            XMLHelper.addOptionalAttribute(elem,
+                    QUERY_FIELD_FORMAT_ATTRIBUTE_NAME, queryField.getFormat());
             elem.setText(queryField.getQueryPart());
             retVal.addContent(elem);
         }
         return retVal;
     }
 
-    public void readXML(Element elem) {
+    public void readXML(final Element elem) {
         this.name = elem.getAttributeValue(QUERY_FIELD_NAME_ATTRIBUTE_NAME);
         this.header = elem.getAttributeValue(QUERY_HEAD_ATTRIBUTE_NAME);
-        for (Iterator<Element> iterator = elem.getChildren(QUERY_FIELD_ELEMENT_NAME).iterator(); iterator.hasNext();) {
-            Element queryFieldElement = iterator.next();
-            QueryField field = new QueryField(
-                    queryFieldElement.getAttributeValue(QUERY_FIELD_NAME_ATTRIBUTE_NAME),
-                    queryFieldElement.getAttributeValue(QUERY_FIELD_FORMAT_ATTRIBUTE_NAME),
-                    queryFieldElement.getAttributeValue(QUERY_FIELD_SEPARATOR_ATTRIBUTE_NAME),
+        for (final Iterator<Element> iterator = elem.getChildren(
+                QUERY_FIELD_ELEMENT_NAME).iterator(); iterator.hasNext();) {
+            final Element queryFieldElement = iterator.next();
+            final QueryField field = new QueryField(
+                    queryFieldElement
+                            .getAttributeValue(QUERY_FIELD_NAME_ATTRIBUTE_NAME),
+                    queryFieldElement
+                            .getAttributeValue(QUERY_FIELD_FORMAT_ATTRIBUTE_NAME),
+                    queryFieldElement
+                            .getAttributeValue(QUERY_FIELD_SEPARATOR_ATTRIBUTE_NAME),
                     queryFieldElement.getText(),
-                    "true".equals(queryFieldElement.getAttributeValue(QUERY_FIELD_IS_RELATIVE_ATTRIBUTE_NAME))
-            );
+                    "true"
+                            .equals(queryFieldElement
+                                    .getAttributeValue(QUERY_FIELD_IS_RELATIVE_ATTRIBUTE_NAME)));
             this.fieldList.add(field);
         }
     }
@@ -111,36 +123,38 @@ public abstract class Query implements XMLizable {
         return this.name;
     }
 
-    public void insertQueryColumn(String columnName, String columnFormat,
-                                  String separator, String queryPart, boolean isRelative) {
-        QueryField field = new QueryField(columnName, columnFormat, separator, queryPart, isRelative);
+    public void insertQueryColumn(final String columnName,
+            final String columnFormat, final String separator,
+            final String queryPart, final boolean isRelative) {
+        final QueryField field = new QueryField(columnName, columnFormat,
+                separator, queryPart, isRelative);
         fieldList.add(field);
     }
 
     /**
      * Formats a row of a result set for this query.
-     *
-     * The input is a ResultSet which is supposed to point to an existing
-     * row. Column one is supposed to be the first column of the query
-     * definition and so on.
-     *
-     * The return value is a String which returns a formatted version of the
-     * row
+     * 
+     * The input is a ResultSet which is supposed to point to an existing row.
+     * Column one is supposed to be the first column of the query definition and
+     * so on.
+     * 
+     * The return value is a String which returns a formatted version of the row
      */
-    public String formatResults(Object[] values, int startPosition) {
+    public String formatResults(final Object[] values, final int startPosition) {
         String rowRes = new String();
         if (header != null) {
             rowRes += header;
         }
-        Iterator<QueryField> colDefIt = this.fieldList.iterator();
+        final Iterator<QueryField> colDefIt = this.fieldList.iterator();
         // skip key, start with 1
         int i = startPosition;
         while (colDefIt.hasNext()) {
-            QueryField field = colDefIt.next();
-            String value = values[i].toString();
+            final QueryField field = colDefIt.next();
+            final String value = values[i].toString();
             i++;
             if (field.getFormat() != null) {
-                DecimalFormat format = new DecimalFormat(field.getFormat());
+                final DecimalFormat format = new DecimalFormat(field
+                        .getFormat());
                 rowRes += format.format(Double.parseDouble(value));
             } else {
                 rowRes += value;
@@ -160,18 +174,23 @@ public abstract class Query implements XMLizable {
      * Returns an SQL clause to order the results if possible.
      * 
      * This is a clause of the form "ORDER BY [field1],...,[fieldN]", which is
-     * typically used only for list queries, all other query implementations should
-     * return an empty string.
+     * typically used only for list queries, all other query implementations
+     * should return an empty string.
      */
     abstract public String getOrderClause();
 
     /**
-	 * @param whereClause       The SQL WHERE clause to query. Not null.
-	 * @param values            The query results to turn into objects. Not null.
-	 * @param referenceValues   The reference values that can be used for relative results, usually the same values for the top node.
-	 *                          May be null. Must be the same length as values if supplied.
-	 */
-    abstract public DatabaseRetrievedObject createDatabaseRetrievedObject(String whereClause, String[] values, String[] referenceValues);
-    
+     * @param whereClause
+     *            The SQL WHERE clause to query. Not null.
+     * @param values
+     *            The query results to turn into objects. Not null.
+     * @param referenceValues
+     *            The reference values that can be used for relative results,
+     *            usually the same values for the top node. May be null. Must be
+     *            the same length as values if supplied.
+     */
+    abstract public DatabaseRetrievedObject createDatabaseRetrievedObject(
+            String whereClause, String[] values, String[] referenceValues);
+
     abstract public boolean doesNeedReferenceValues();
 }

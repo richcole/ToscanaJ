@@ -12,7 +12,7 @@ import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import org.jdom.Element;
 import org.tockit.canvas.CanvasItem;
 
-
 public interface ExtraCanvasItemFactory {
-    public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) throws XMLSyntaxError ;
+    public CanvasItem createCanvasItem(SimpleLineDiagram diagram,
+            Element element) throws XMLSyntaxError;
 }

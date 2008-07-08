@@ -12,12 +12,13 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 public class IdealMovementEventListener extends SetMovementEventListener {
 
     @Override
-	protected boolean isPartOfSet(DiagramNode node, DiagramNode otherNode) {
+    protected boolean isPartOfSet(final DiagramNode node,
+            final DiagramNode otherNode) {
         return node.getConcept().hasSubConcept(otherNode.getConcept());
     }
 
-	@Override
-	protected String getPresentationName() {
-		return "Ideal movement";
-	}
+    @Override
+    protected String getPresentationName() {
+        return "Ideal movement";
+    }
 }

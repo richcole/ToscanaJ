@@ -21,40 +21,45 @@ import org.tockit.events.EventBrokerListener;
 
 public class ObjectLabelViewOpenDisplayHandler implements EventBrokerListener {
 
-	public ObjectLabelViewOpenDisplayHandler(EventBroker eventBroker) {
-		eventBroker.subscribe(this, CanvasItemActivatedEvent.class,	ObjectLabelView.class);
-	}
-	
-	
-    public void processEvent(Event e) {
+    public ObjectLabelViewOpenDisplayHandler(final EventBroker eventBroker) {
+        eventBroker.subscribe(this, CanvasItemActivatedEvent.class,
+                ObjectLabelView.class);
+    }
+
+    public void processEvent(final Event e) {
         CanvasItemEventWithPosition itemEvent = null;
         try {
             itemEvent = (CanvasItemEventWithPosition) e;
-        } catch (ClassCastException e1) {
-            throw new RuntimeException(getClass().getName() +
-                    " has to be subscribed to CanvasItemEventWithPositions only");
+        } catch (final ClassCastException e1) {
+            throw new RuntimeException(
+                    getClass().getName()
+                            + " has to be subscribed to CanvasItemEventWithPositions only");
         }
         ObjectLabelView labelView = null;
         try {
             labelView = (ObjectLabelView) itemEvent.getItem();
-        } catch (ClassCastException e1) {
-            throw new RuntimeException(getClass().getName() +
-                    " has to be subscribed to events from ObjectLabelViews only");
+        } catch (final ClassCastException e1) {
+            throw new RuntimeException(
+                    getClass().getName()
+                            + " has to be subscribed to events from ObjectLabelViews only");
         }
-		Object object = labelView.getObjectAtPosition(itemEvent.getCanvasPosition());
-		if(!(object instanceof DatabaseRetrievedObject)) {
-			return;        
-		}
-		DatabaseRetrievedObject dbObject =
-				(DatabaseRetrievedObject) labelView.getObjectAtPosition(itemEvent.getCanvasPosition());
-		try {
+        final Object object = labelView.getObjectAtPosition(itemEvent
+                .getCanvasPosition());
+        if (!(object instanceof DatabaseRetrievedObject)) {
+            return;
+        }
+        final DatabaseRetrievedObject dbObject = (DatabaseRetrievedObject) labelView
+                .getObjectAtPosition(itemEvent.getCanvasPosition());
+        try {
             showObject(dbObject);
-        } catch (DatabaseViewerException exc) {
-            ErrorDialog.showError(null, exc, "Failed to open view", "The object view requested can not be shown.");
+        } catch (final DatabaseViewerException exc) {
+            ErrorDialog.showError(null, exc, "Failed to open view",
+                    "The object view requested can not be shown.");
         }
     }
 
-    public void showObject(DatabaseRetrievedObject object) throws DatabaseViewerException {
+    public void showObject(final DatabaseRetrievedObject object)
+            throws DatabaseViewerException {
         if (object == null) {
             return;
         }

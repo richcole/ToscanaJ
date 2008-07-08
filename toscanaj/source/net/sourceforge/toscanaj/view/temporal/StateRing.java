@@ -26,96 +26,103 @@ import org.tockit.util.ColorStringConverter;
 
 public class StateRing extends CanvasItem implements XMLizable {
     private static class Factory implements ExtraCanvasItemFactory {
-        public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) {
+        public CanvasItem createCanvasItem(final SimpleLineDiagram diagram,
+                final Element element) {
             System.out.println("Here SR");
             return null;
         }
     }
-    
-    public static void registerFactory() {
-        SimpleLineDiagram.registerExtraCanvasItemFactory("stateRing", new Factory());
-    }
-   
-	private static final double EXTRA_RADIUS = 2;
 
-	private DiagramNode node;
-	private Color baseColor;
-    private double timePos;
-    private AnimationTimeController timeController;
-	
-    public StateRing(DiagramNode node, Color color, double timePos, AnimationTimeController timeController) {
-    	this.node = node;
-    	this.baseColor = color;
-    	this.timePos = timePos;
-    	this.timeController = timeController;
+    public static void registerFactory() {
+        SimpleLineDiagram.registerExtraCanvasItemFactory("stateRing",
+                new Factory());
+    }
+
+    private static final double EXTRA_RADIUS = 2;
+
+    private final DiagramNode node;
+    private final Color baseColor;
+    private final double timePos;
+    private final AnimationTimeController timeController;
+
+    public StateRing(final DiagramNode node, final Color color,
+            final double timePos, final AnimationTimeController timeController) {
+        this.node = node;
+        this.baseColor = color;
+        this.timePos = timePos;
+        this.timeController = timeController;
     }
 
     @Override
-	public void draw(Graphics2D g) {
-        Paint color = calculatePaint();
-        if(color == null) { // nothing to draw
-        	return;
+    public void draw(final Graphics2D g) {
+        final Paint color = calculatePaint();
+        if (color == null) { // nothing to draw
+            return;
         }
 
-    	Paint oldPaint = g.getPaint();
+        final Paint oldPaint = g.getPaint();
 
-        Rectangle2D bounds = getCanvasBounds(g);
-        Ellipse2D ellipse = new Ellipse2D.Double(bounds.getX(), bounds.getY(),
-                                       			 bounds.getWidth(), bounds.getHeight());
-    	
+        final Rectangle2D bounds = getCanvasBounds(g);
+        final Ellipse2D ellipse = new Ellipse2D.Double(bounds.getX(), bounds
+                .getY(), bounds.getWidth(), bounds.getHeight());
+
         g.setPaint(color);
         g.fill(ellipse);
-    	
-    	g.setPaint(oldPaint);
+
+        g.setPaint(oldPaint);
     }
-    
+
     private Paint calculatePaint() {
-    	AnimationTimeController controller = this.timeController;
-        double timeOffset = controller.getCurrentTime() - this.timePos;
+        final AnimationTimeController controller = this.timeController;
+        final double timeOffset = controller.getCurrentTime() - this.timePos;
         double alpha = 0;
-    	if(timeOffset < - controller.getFadeInTime()) {
-        	return null;
-    	} else if(timeOffset < 0) {
-    		alpha = 1 + timeOffset / controller.getFadeInTime();
-    	} else if(timeOffset < controller.getVisibleTime()) {
-    		alpha = 1;
-    	} else if(timeOffset < controller.getVisibleTime() + controller.getFadeOutTime()) {
-            alpha = 1 - (timeOffset - controller.getVisibleTime()) / controller.getFadeOutTime();
+        if (timeOffset < -controller.getFadeInTime()) {
+            return null;
+        } else if (timeOffset < 0) {
+            alpha = 1 + timeOffset / controller.getFadeInTime();
+        } else if (timeOffset < controller.getVisibleTime()) {
+            alpha = 1;
+        } else if (timeOffset < controller.getVisibleTime()
+                + controller.getFadeOutTime()) {
+            alpha = 1 - (timeOffset - controller.getVisibleTime())
+                    / controller.getFadeOutTime();
         } else {
             return null;
         }
-        return new Color(this.baseColor.getRed(), this.baseColor.getGreen(), this.baseColor.getBlue(),
-                          (int) (alpha * this.baseColor.getAlpha()));
+        return new Color(this.baseColor.getRed(), this.baseColor.getGreen(),
+                this.baseColor.getBlue(), (int) (alpha * this.baseColor
+                        .getAlpha()));
     }
-    
+
     @Override
-	public boolean containsPoint(Point2D point) {
+    public boolean containsPoint(final Point2D point) {
         return false;
     }
 
     @Override
-	public Point2D getPosition() {
+    public Point2D getPosition() {
         return this.node.getPosition();
     }
 
     @Override
-	public Rectangle2D getCanvasBounds(Graphics2D g) {
-        Point2D center = this.node.getPosition();
-        double x = center.getX();
-        double y = center.getY();
-        double rx = this.node.getRadiusX() + EXTRA_RADIUS;
-        double ry = this.node.getRadiusY() + EXTRA_RADIUS;
+    public Rectangle2D getCanvasBounds(final Graphics2D g) {
+        final Point2D center = this.node.getPosition();
+        final double x = center.getX();
+        final double y = center.getY();
+        final double rx = this.node.getRadiusX() + EXTRA_RADIUS;
+        final double ry = this.node.getRadiusY() + EXTRA_RADIUS;
         return new Rectangle2D.Double(x - rx, y - ry, 2 * rx, 2 * ry);
     }
 
     public Element toXML() {
-        Element result = new Element("stateRing");
-        result.setAttribute("nodeView",this.node.getIdentifier());
-        result.setAttribute("color", ColorStringConverter.colorToString(this.baseColor));
+        final Element result = new Element("stateRing");
+        result.setAttribute("nodeView", this.node.getIdentifier());
+        result.setAttribute("color", ColorStringConverter
+                .colorToString(this.baseColor));
         return result;
     }
 
-    public void readXML(Element elem) {
-    	// @TODO
+    public void readXML(final Element elem) {
+        // @TODO
     }
 }

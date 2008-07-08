@@ -5,7 +5,7 @@
  *
  * $Id$
  */
- package net.sourceforge.toscanaj.model.sql;
+package net.sourceforge.toscanaj.model.sql;
 
 import net.sourceforge.toscanaj.model.order.Ordered;
 

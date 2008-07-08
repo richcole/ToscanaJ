@@ -7,18 +7,19 @@
  */
 package net.sourceforge.toscanaj.model.diagram;
 
+import java.awt.Color;
+import java.awt.geom.Point2D;
+import java.util.Iterator;
+import java.util.Vector;
+
 import net.sourceforge.toscanaj.observer.ChangeObservable;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
+
 import org.jdom.Element;
 import org.tockit.util.ColorStringConverter;
-
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.util.Iterator;
-import java.util.Vector;
 
 /**
  * This class encapsulates all information needed to paint a label.
@@ -28,7 +29,7 @@ public class LabelInfo implements XMLizable, ChangeObservable {
     /**
      * List of LabelObserver implementations currently observing the instance.
      */
-    private Vector<ChangeObserver> labelObservers = new Vector<ChangeObserver>();
+    private final Vector<ChangeObserver> labelObservers = new Vector<ChangeObserver>();
 
     /**
      * The node the label belongs to.
@@ -82,16 +83,17 @@ public class LabelInfo implements XMLizable, ChangeObservable {
 
     /**
      * The default constructor creates a label with default settings.
-     *
-     * A node has to be attached to it by calling attachNode(DiagramNode).
-     * The node is used for finding the position for the diagram line and to
-     * access the concept with the information on the contingents (strings).
+     * 
+     * A node has to be attached to it by calling attachNode(DiagramNode). The
+     * node is used for finding the position for the diagram line and to access
+     * the concept with the information on the contingents (strings).
      */
     public LabelInfo() {
         this(new Point2D.Double(), Color.white, Color.black, ALIGNLEFT);
     }
 
-    private LabelInfo(Point2D offset, Color backColor, Color textColor, int alignment) {
+    private LabelInfo(final Point2D offset, final Color backColor,
+            final Color textColor, final int alignment) {
         this.offset = offset;
         this.backgroundColor = backColor;
         this.textColor = textColor;
@@ -101,39 +103,40 @@ public class LabelInfo implements XMLizable, ChangeObservable {
     /**
      * The copy constructor makes a deep copy without the observers.
      */
-    public LabelInfo(LabelInfo other) {
+    public LabelInfo(final LabelInfo other) {
         this((Point2D) other.offset.clone(),
                 makeColorCopy(other.backgroundColor),
-                makeColorCopy(other.textColor),
-                other.textAlignment
-        );
+                makeColorCopy(other.textColor), other.textAlignment);
         this.node = other.node;
     }
 
-    private static Color makeColorCopy(Color color) {
-        return new Color(color.getRed(),
-                color.getGreen(),
-                color.getBlue(),
+    private static Color makeColorCopy(final Color color) {
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(),
                 color.getAlpha());
     }
 
-    public LabelInfo(Element element) throws XMLSyntaxError {
+    public LabelInfo(final Element element) throws XMLSyntaxError {
         readXML(element);
     }
 
     public Element toXML() {
-        Element retVal = new Element(LABEL_INFO_ELEMENT_NAME);
-        Element offsetElem = new Element(OFFSET_ELEMENT_NAME);
-        offsetElem.setAttribute(OFFSET_X_ATTRIBUTE_NAME, String.valueOf(offset.getX()));
-        offsetElem.setAttribute(OFFSET_Y_ATTRIBUTE_NAME, String.valueOf(offset.getY()));
+        final Element retVal = new Element(LABEL_INFO_ELEMENT_NAME);
+        final Element offsetElem = new Element(OFFSET_ELEMENT_NAME);
+        offsetElem.setAttribute(OFFSET_X_ATTRIBUTE_NAME, String.valueOf(offset
+                .getX()));
+        offsetElem.setAttribute(OFFSET_Y_ATTRIBUTE_NAME, String.valueOf(offset
+                .getY()));
         retVal.addContent(offsetElem);
-        Element backgroundColorElem = new Element(BACKGROUND_COLOR_ELEMENT_NAME);
-        backgroundColorElem.addContent(ColorStringConverter.colorToString(backgroundColor));
+        final Element backgroundColorElem = new Element(
+                BACKGROUND_COLOR_ELEMENT_NAME);
+        backgroundColorElem.addContent(ColorStringConverter
+                .colorToString(backgroundColor));
         retVal.addContent(backgroundColorElem);
-        Element textColorElem = new Element(TEXT_COLOR_ELEMENT_NAME);
+        final Element textColorElem = new Element(TEXT_COLOR_ELEMENT_NAME);
         textColorElem.addContent(ColorStringConverter.colorToString(textColor));
         retVal.addContent(textColorElem);
-        Element textAlignmentElem = new Element(TEXT_ALIGNMENT_ELEMENT_NAME);
+        final Element textAlignmentElem = new Element(
+                TEXT_ALIGNMENT_ELEMENT_NAME);
         switch (textAlignment) {
             case ALIGNLEFT:
                 textAlignmentElem.addContent(TEXT_ALIGNMENT_LEFT_CONTENT);
@@ -149,33 +152,41 @@ public class LabelInfo implements XMLizable, ChangeObservable {
         return retVal;
     }
 
-    public void readXML(Element elem) throws XMLSyntaxError {
+    public void readXML(final Element elem) throws XMLSyntaxError {
         if (!elem.getName().equals(LABEL_INFO_ELEMENT_NAME)) {
-            if (!elem.getName().equals(DiagramNode.ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)) {
-                if (!elem.getName().equals(DiagramNode.OBJECT_LABEL_STYLE_ELEMENT_NAME)) {
-                    throw new XMLSyntaxError("Expected either " +
-                            LABEL_INFO_ELEMENT_NAME + " or " +
-                            DiagramNode.ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME + " or " +
-                            DiagramNode.OBJECT_LABEL_STYLE_ELEMENT_NAME);
+            if (!elem.getName().equals(
+                    DiagramNode.ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME)) {
+                if (!elem.getName().equals(
+                        DiagramNode.OBJECT_LABEL_STYLE_ELEMENT_NAME)) {
+                    throw new XMLSyntaxError("Expected either "
+                            + LABEL_INFO_ELEMENT_NAME + " or "
+                            + DiagramNode.ATTRIBUTE_LABEL_STYLE_ELEMENT_NAME
+                            + " or "
+                            + DiagramNode.OBJECT_LABEL_STYLE_ELEMENT_NAME);
                 }
             }
         }
-        Element offsetElem = XMLHelper.getMandatoryChild(elem, OFFSET_ELEMENT_NAME);
-        setOffset(
-                XMLHelper.getDoubleAttribute(offsetElem, OFFSET_X_ATTRIBUTE_NAME),
-                XMLHelper.getDoubleAttribute(offsetElem, OFFSET_Y_ATTRIBUTE_NAME)
-        );
-        Element backgroundColorElem = XMLHelper.getMandatoryChild(elem, BACKGROUND_COLOR_ELEMENT_NAME);
-        setBackgroundColor(ColorStringConverter.stringToColor(backgroundColorElem.getText()));
-        Element textColorElem = XMLHelper.getMandatoryChild(elem, TEXT_COLOR_ELEMENT_NAME);
-        setTextColor(ColorStringConverter.stringToColor(textColorElem.getText()));
+        final Element offsetElem = XMLHelper.getMandatoryChild(elem,
+                OFFSET_ELEMENT_NAME);
+        setOffset(XMLHelper.getDoubleAttribute(offsetElem,
+                OFFSET_X_ATTRIBUTE_NAME), XMLHelper.getDoubleAttribute(
+                offsetElem, OFFSET_Y_ATTRIBUTE_NAME));
+        final Element backgroundColorElem = XMLHelper.getMandatoryChild(elem,
+                BACKGROUND_COLOR_ELEMENT_NAME);
+        setBackgroundColor(ColorStringConverter
+                .stringToColor(backgroundColorElem.getText()));
+        final Element textColorElem = XMLHelper.getMandatoryChild(elem,
+                TEXT_COLOR_ELEMENT_NAME);
+        setTextColor(ColorStringConverter
+                .stringToColor(textColorElem.getText()));
 
         readTextAlignment(elem);
     }
 
-    private void readTextAlignment(Element elem) throws XMLSyntaxError {
-        Element textAlignmentElem = XMLHelper.getMandatoryChild(elem, TEXT_ALIGNMENT_ELEMENT_NAME);
-        String textAlignmentElemText = textAlignmentElem.getText();
+    private void readTextAlignment(final Element elem) throws XMLSyntaxError {
+        final Element textAlignmentElem = XMLHelper.getMandatoryChild(elem,
+                TEXT_ALIGNMENT_ELEMENT_NAME);
+        final String textAlignmentElemText = textAlignmentElem.getText();
         if (textAlignmentElemText.equals(TEXT_ALIGNMENT_LEFT_CONTENT)) {
             textAlignment = ALIGNLEFT;
         } else if (textAlignmentElemText.equals(TEXT_ALIGNMENT_CENTER_CONTENT)) {
@@ -183,18 +194,18 @@ public class LabelInfo implements XMLizable, ChangeObservable {
         } else if (textAlignmentElemText.equals(TEXT_ALIGNMENT_RIGHT_CONTENT)) {
             textAlignment = ALIGNRIGHT;
         } else {
-            throw new XMLSyntaxError(
-                    "Unknown value " + textAlignmentElemText + " for text alignment."
-            );
+            throw new XMLSyntaxError("Unknown value " + textAlignmentElemText
+                    + " for text alignment.");
         }
     }
 
     /**
      * Attaches the node as the node belonging to the label.
-     *
-     * Access is package level here since this should be called from DiagramNode.
+     * 
+     * Access is package level here since this should be called from
+     * DiagramNode.
      */
-    void setNode(DiagramNode node) {
+    void setNode(final DiagramNode node) {
         this.node = node;
     }
 
@@ -214,14 +225,14 @@ public class LabelInfo implements XMLizable, ChangeObservable {
 
     /**
      * Sets the label offset.
-     *
+     * 
      * The offset defines how far the label is moved from the point. The
      * bahaviour is different for attribute and object labels: the attribute
-     * labels are positioned on top of a point, directly connecting to the
-     * top edge if the offset is (0,0). The object labels are below the points,
+     * labels are positioned on top of a point, directly connecting to the top
+     * edge if the offset is (0,0). The object labels are below the points,
      * contacting them at the bottom.
      */
-    public void setOffset(Point2D offset) {
+    public void setOffset(final Point2D offset) {
         this.offset = offset;
         emitChangeSignal();
     }
@@ -229,7 +240,7 @@ public class LabelInfo implements XMLizable, ChangeObservable {
     /**
      * A convenience method mapping to setOffset(Point2D).
      */
-    public void setOffset(double x, double y) {
+    public void setOffset(final double x, final double y) {
         setOffset(new Point2D.Double(x, y));
     }
 
@@ -243,7 +254,7 @@ public class LabelInfo implements XMLizable, ChangeObservable {
     /**
      * Sets the background color.
      */
-    public void setBackgroundColor(Color color) {
+    public void setBackgroundColor(final Color color) {
         this.backgroundColor = color;
         emitChangeSignal();
     }
@@ -258,7 +269,7 @@ public class LabelInfo implements XMLizable, ChangeObservable {
     /**
      * Sets the text color.
      */
-    public void setTextColor(Color color) {
+    public void setTextColor(final Color color) {
         this.textColor = color;
         emitChangeSignal();
     }
@@ -273,7 +284,7 @@ public class LabelInfo implements XMLizable, ChangeObservable {
     /**
      * Sets the alignment of the text.
      */
-    public void setTextAlignment(int alignment) {
+    public void setTextAlignment(final int alignment) {
         this.textAlignment = alignment;
         emitChangeSignal();
     }
@@ -281,14 +292,14 @@ public class LabelInfo implements XMLizable, ChangeObservable {
     /**
      * Method to add an observer.
      */
-    public void addObserver(ChangeObserver observer) {
+    public void addObserver(final ChangeObserver observer) {
         this.labelObservers.addElement(observer);
     }
 
     /**
      * Method to remove an observer.
      */
-    public void removeObserver(ChangeObserver observer) {
+    public void removeObserver(final ChangeObserver observer) {
         this.labelObservers.remove(observer);
     }
 
@@ -297,22 +308,22 @@ public class LabelInfo implements XMLizable, ChangeObservable {
      */
     private void emitChangeSignal() {
         if (labelObservers != null) {
-            Iterator<ChangeObserver> iterator = labelObservers.iterator();
+            final Iterator<ChangeObserver> iterator = labelObservers.iterator();
             while (iterator.hasNext()) {
                 iterator.next().update(this);
             }
         }
-        if(this.node != null) {
-			this.node.diagram.sendChangeEvent();
+        if (this.node != null) {
+            this.node.diagram.sendChangeEvent();
         }
     }
 
     @Override
-	public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (!(obj instanceof LabelInfo)) {
             return false;
         }
-        LabelInfo that = (LabelInfo) obj;
+        final LabelInfo that = (LabelInfo) obj;
         if (!this.getBackgroundColor().equals(that.getBackgroundColor())) {
             return false;
         }
@@ -333,7 +344,7 @@ public class LabelInfo implements XMLizable, ChangeObservable {
      * Debug output.
      */
     @Override
-	public String toString() {
+    public String toString() {
         String retVal = "LabelInfo:\n";
         retVal += "Offset: (" + offset.getX() + "," + offset.getY() + ")\n";
         retVal += "Align: " + textAlignment + "\n";

@@ -12,12 +12,12 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 public class AllTestControllerDB extends TestCase {
-    public AllTestControllerDB(String s) {
+    public AllTestControllerDB(final String s) {
         super(s);
     }
 
     public static Test suite() {
-        TestSuite suite = new TestSuite();
+        final TestSuite suite = new TestSuite();
         suite.addTest(DBConnectionEmbeddTest.suite());
         suite.addTest(DumpSqlScriptTest.suite());
         return suite;

@@ -20,140 +20,153 @@ import org.tockit.datatype.Datatype;
 import org.tockit.datatype.DatatypeFactory;
 import org.tockit.datatype.Value;
 
-
 /**
  * @todo XSD allows combining the restrictions, we don't
  */
 public class StringType extends AbstractXSDDatatype {
     public static DatatypeFactory.TypeCreator getTypeCreator() {
         return new TypeCreator("string") {
-            public Datatype create(Element element) {
-                String name = getTypeName(element);
-                Element restElem = getRestrictionElement(element);
+            public Datatype create(final Element element) {
+                final String name = getTypeName(element);
+                final Element restElem = getRestrictionElement(element);
                 Element child = restElem.getChild("enumeration", XSD_NAMESPACE);
-                if(child != null) {
-                    List enumChildren = restElem.getChildren("enumeration", XSD_NAMESPACE);
-                    StringValue[] enumeration = new StringValue[enumChildren.size()];
+                if (child != null) {
+                    final List enumChildren = restElem.getChildren(
+                            "enumeration", XSD_NAMESPACE);
+                    final StringValue[] enumeration = new StringValue[enumChildren
+                            .size()];
                     int i = 0;
-                    for (Iterator iter = enumChildren.iterator(); iter.hasNext();) {
-                        Element enumElem = (Element) iter.next();
-                        enumeration[i] = new StringValue(enumElem.getAttributeValue("value"));
+                    for (final Iterator iter = enumChildren.iterator(); iter
+                            .hasNext();) {
+                        final Element enumElem = (Element) iter.next();
+                        enumeration[i] = new StringValue(enumElem
+                                .getAttributeValue("value"));
                         i++;
                     }
                     return createEnumerationRestrictedType(name, enumeration);
                 }
                 child = restElem.getChild("pattern", XSD_NAMESPACE);
-                if(child != null) {
-                    return createPatternRestrictedType(name, child.getAttributeValue("value"));
+                if (child != null) {
+                    return createPatternRestrictedType(name, child
+                            .getAttributeValue("value"));
                 }
                 child = restElem.getChild("minLength", XSD_NAMESPACE);
-                if(child != null) {
-                    int minLen = Integer.parseInt(child.getAttributeValue("value"));
-                    Element maxLength = restElem.getChild("maxLength", XSD_NAMESPACE);
-                    int maxLen = Integer.parseInt(maxLength.getAttributeValue("value"));
+                if (child != null) {
+                    final int minLen = Integer.parseInt(child
+                            .getAttributeValue("value"));
+                    final Element maxLength = restElem.getChild("maxLength",
+                            XSD_NAMESPACE);
+                    final int maxLen = Integer.parseInt(maxLength
+                            .getAttributeValue("value"));
                     return createLengthRestrictedType(name, minLen, maxLen);
                 }
                 return createUnrestrictedType(name);
             }
         };
     }
-    
-    protected StringType(String name) {
+
+    protected StringType(final String name) {
         super(name);
     }
 
-    public static StringType createUnrestrictedType(String name) {
+    public static StringType createUnrestrictedType(final String name) {
         return new StringType(name);
     }
-    
-    public static StringType createLengthRestrictedType(String name, int minLength, int maxLength) {
+
+    public static StringType createLengthRestrictedType(final String name,
+            final int minLength, final int maxLength) {
         return new LengthRestrictedStringType(name, minLength, maxLength);
     }
 
-    public static StringType createPatternRestrictedType(String name, String regExp) {
+    public static StringType createPatternRestrictedType(final String name,
+            final String regExp) {
         return new PatternRestrictedStringType(name, regExp);
     }
 
-    public static StringType createEnumerationRestrictedType(String name, StringValue[] enumeration) {
+    public static StringType createEnumerationRestrictedType(final String name,
+            final StringValue[] enumeration) {
         return new EnumerationRestrictedStringType(name, enumeration);
     }
 
-    public static StringType createEnumerationRestrictedType(String name, String[] enumeration) {
-        StringValue[] stringValues = new StringValue[enumeration.length];
+    public static StringType createEnumerationRestrictedType(final String name,
+            final String[] enumeration) {
+        final StringValue[] stringValues = new StringValue[enumeration.length];
         for (int i = 0; i < stringValues.length; i++) {
             stringValues[i] = new StringValue(enumeration[i]);
         }
         return new EnumerationRestrictedStringType(name, stringValues);
     }
 
-    public boolean isValidValue(Value valueToTest) {
-        if(!(valueToTest instanceof StringValue)) {
+    public boolean isValidValue(final Value valueToTest) {
+        if (!(valueToTest instanceof StringValue)) {
             return false;
         }
-        StringValue stringValue = (StringValue) valueToTest;
+        final StringValue stringValue = (StringValue) valueToTest;
         return isValidStringValue(stringValue.getValue());
     }
 
-    protected boolean isValidStringValue(String valueToTest) {
-        return valueToTest != null; // we don't allow nulls since we don't want the pain
+    protected boolean isValidStringValue(final String valueToTest) {
+        return valueToTest != null; // we don't allow nulls since we don't want
+                                    // the pain
     }
-    
+
     @Override
-	public boolean canConvertFrom(Value value) {
+    public boolean canConvertFrom(final Value value) {
         return isValidStringValue(value.getDisplayString());
     }
-    
+
     @Override
-	public Value convertType(Value value) throws ConversionException {
+    public Value convertType(final Value value) throws ConversionException {
         return parse(value.getDisplayString());
     }
 
     @Override
-	public boolean canParse(String text) {
+    public boolean canParse(final String text) {
         return isValidStringValue(text);
     }
-    
+
     @Override
-	public Value parse(String text) throws ConversionException {
-        if(isValidStringValue(text)) {
+    public Value parse(final String text) throws ConversionException {
+        if (isValidStringValue(text)) {
             return new StringValue(text);
         }
         throw new ConversionException("Invalid string value for type");
     }
-    
-    public Value toValue(Element element) {
+
+    public Value toValue(final Element element) {
         return new StringValue(element.getAttributeValue("value"));
     }
 
-    public void insertValue(Element element, Value value) {
-        StringValue sValue = (StringValue) value;
+    public void insertValue(final Element element, final Value value) {
+        final StringValue sValue = (StringValue) value;
         element.setAttribute("value", sValue.getValue());
     }
 
-    public void readXML(Element elem) throws XMLSyntaxError {
-    	// @TODO implement
+    public void readXML(final Element elem) throws XMLSyntaxError {
+        // @TODO implement
     }
 
     @Override
-	protected void addRestrictions(Element restrictionElement) {
+    protected void addRestrictions(final Element restrictionElement) {
         // no restrictions needed
     }
-    
+
     @Override
-	protected String getBaseType() {
+    protected String getBaseType() {
         return "string";
     }
 
     public static class LengthRestrictedStringType extends StringType {
-        private int minLength;
-        private int maxLength;
-        
-        private LengthRestrictedStringType(String name, int minLength, int maxLength) {
+        private final int minLength;
+        private final int maxLength;
+
+        private LengthRestrictedStringType(final String name,
+                final int minLength, final int maxLength) {
             super(name);
             this.minLength = minLength;
             this.maxLength = maxLength;
         }
-        
+
         public int getMaxLength() {
             return maxLength;
         }
@@ -161,82 +174,83 @@ public class StringType extends AbstractXSDDatatype {
         public int getMinLength() {
             return minLength;
         }
-        
+
         @Override
-		public boolean isValidStringValue(String valueToTest) {
-            if(valueToTest.length() < this.minLength) {
+        public boolean isValidStringValue(final String valueToTest) {
+            if (valueToTest.length() < this.minLength) {
                 return false;
             }
-            if(valueToTest.length() > this.maxLength) {
+            if (valueToTest.length() > this.maxLength) {
                 return false;
             }
             return true;
         }
 
         @Override
-		protected void addRestrictions(Element restElement) {
-            Element minElem = createElement("minLength");
+        protected void addRestrictions(final Element restElement) {
+            final Element minElem = createElement("minLength");
             minElem.setAttribute("minLength", String.valueOf(this.minLength));
             restElement.addContent(minElem);
-            Element maxElem = createElement("maxLength");
+            final Element maxElem = createElement("maxLength");
             maxElem.setAttribute("maxLength", String.valueOf(this.maxLength));
             restElement.addContent(maxElem);
         }
     }
 
     public static class PatternRestrictedStringType extends StringType {
-        private Pattern pattern;
-        
-        private PatternRestrictedStringType(String name, String regExp) {
+        private final Pattern pattern;
+
+        private PatternRestrictedStringType(final String name,
+                final String regExp) {
             super(name);
             this.pattern = Pattern.compile(regExp);
         }
-        
+
         public Pattern getPattern() {
             return pattern;
         }
 
         @Override
-		public boolean isValidStringValue(String valueToTest) {
-            Matcher matcher = this.pattern.matcher(valueToTest); 
+        public boolean isValidStringValue(final String valueToTest) {
+            final Matcher matcher = this.pattern.matcher(valueToTest);
             return matcher.matches();
         }
 
         @Override
-		protected void addRestrictions(Element restElement) {
-            Element pattElem = createElement("pattern");
+        protected void addRestrictions(final Element restElement) {
+            final Element pattElem = createElement("pattern");
             pattElem.setAttribute("value", this.pattern.pattern());
             restElement.addContent(pattElem);
         }
     }
 
     public static class EnumerationRestrictedStringType extends StringType {
-        private StringValue[] enumeration;
-        
-        private EnumerationRestrictedStringType(String name, StringValue[] enumeration) {
+        private final StringValue[] enumeration;
+
+        private EnumerationRestrictedStringType(final String name,
+                final StringValue[] enumeration) {
             super(name);
             this.enumeration = enumeration;
         }
-        
+
         @Override
-		public boolean isValidStringValue(String valueToTest) {
-            for (int i = 0; i < this.enumeration.length; i++) {
-                if(this.enumeration[i].getValue().equals(valueToTest)) {
+        public boolean isValidStringValue(final String valueToTest) {
+            for (final StringValue element : this.enumeration) {
+                if (element.getValue().equals(valueToTest)) {
                     return true;
                 }
             }
             return false;
         }
-        
+
         public StringValue[] getEnumeration() {
             return enumeration;
         }
 
         @Override
-		protected void addRestrictions(Element restElement) {
-            for (int i = 0; i < this.enumeration.length; i++) {
-                StringValue value = this.enumeration[i];
-                Element enumElem = createElement("enumeration");
+        protected void addRestrictions(final Element restElement) {
+            for (final StringValue value : this.enumeration) {
+                final Element enumElem = createElement("enumeration");
                 enumElem.setAttribute("value", value.getValue());
                 restElement.addContent(enumElem);
             }

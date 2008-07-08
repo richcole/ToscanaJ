@@ -7,15 +7,16 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
-import org.tockit.context.model.Context;
-
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+
+import org.tockit.context.model.Context;
 
 public interface ScaleGenerator {
     String getScaleName();
 
     boolean canHandleColumns(TableColumnPair[] columns);
 
-    Context generateScale(ConceptualSchema scheme, DatabaseConnection databaseConnection);
+    Context generateScale(ConceptualSchema scheme,
+            DatabaseConnection databaseConnection);
 }

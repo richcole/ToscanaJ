@@ -11,5 +11,6 @@ import org.tockit.datatype.Datatype;
 
 public interface ManyValuedAttribute {
     Datatype getType();
+
     String getName();
 }

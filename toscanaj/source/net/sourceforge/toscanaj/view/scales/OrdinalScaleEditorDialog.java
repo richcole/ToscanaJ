@@ -7,17 +7,12 @@
  */
 package net.sourceforge.toscanaj.view.scales;
 
-import javax.swing.*;
-import javax.swing.event.*;
-
-import org.tockit.context.model.Context;
-import org.tockit.swing.preferences.ExtendedPreferences;
-
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.gui.LabeledPanel;
-import net.sourceforge.toscanaj.model.database.DatabaseSchema;
-
-import java.awt.*;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -25,42 +20,65 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-public class OrdinalScaleEditorDialog extends JDialog {
-    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(OrdinalScaleEditorDialog.class);
-	
-	private static final int MINIMUM_WIDTH = 400;
-	private static final int MINIMUM_HEIGHT = 600;
-	private static final Rectangle DEFAULT_PLACEMENT = new Rectangle(200,100,MINIMUM_WIDTH, MINIMUM_HEIGHT);
-    
-    private JTextField titleEditor = new JTextField();
-    private JButton okButton; 
-	private OrdinalScaleGeneratorPanel scalePanel;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
-    private DatabaseSchema databaseSchema;
-    private DatabaseConnection connection;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.gui.LabeledPanel;
+import net.sourceforge.toscanaj.model.database.DatabaseSchema;
+
+import org.tockit.context.model.Context;
+import org.tockit.swing.preferences.ExtendedPreferences;
+
+public class OrdinalScaleEditorDialog extends JDialog {
+    private static final ExtendedPreferences preferences = ExtendedPreferences
+            .userNodeForClass(OrdinalScaleEditorDialog.class);
+
+    private static final int MINIMUM_WIDTH = 400;
+    private static final int MINIMUM_HEIGHT = 600;
+    private static final Rectangle DEFAULT_PLACEMENT = new Rectangle(200, 100,
+            MINIMUM_WIDTH, MINIMUM_HEIGHT);
+
+    private final JTextField titleEditor = new JTextField();
+    private JButton okButton;
+    private OrdinalScaleGeneratorPanel scalePanel;
+
+    private final DatabaseSchema databaseSchema;
+    private final DatabaseConnection connection;
 
     private boolean result;
-      
-    public OrdinalScaleEditorDialog(Frame owner, DatabaseSchema databaseSchema, DatabaseConnection connection) {
+
+    public OrdinalScaleEditorDialog(final Frame owner,
+            final DatabaseSchema databaseSchema,
+            final DatabaseConnection connection) {
         super(owner);
-       	this.databaseSchema = databaseSchema;
-      	this.connection = connection;
+        this.databaseSchema = databaseSchema;
+        this.connection = connection;
         preferences.restoreWindowPlacement(this, DEFAULT_PLACEMENT);
-		//	to enforce the minimum size during resizing of the JDialog
-		 addComponentListener( new ComponentAdapter() {
-			 @Override
-			public void componentResized(ComponentEvent e) {
-				 int width = getWidth();
-				 int height = getHeight();
-				 if (width < MINIMUM_WIDTH) width = MINIMUM_WIDTH;
-				 if (height < MINIMUM_HEIGHT) height = MINIMUM_HEIGHT;
-				 setSize(width, height);
-			 }
-			 @Override
-			public void componentShown(ComponentEvent e) {
-				 componentResized(e);
-			 }
-		 });
+        // to enforce the minimum size during resizing of the JDialog
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(final ComponentEvent e) {
+                int width = getWidth();
+                int height = getHeight();
+                if (width < MINIMUM_WIDTH) {
+                    width = MINIMUM_WIDTH;
+                }
+                if (height < MINIMUM_HEIGHT) {
+                    height = MINIMUM_HEIGHT;
+                }
+                setSize(width, height);
+            }
+
+            @Override
+            public void componentShown(final ComponentEvent e) {
+                componentResized(e);
+            }
+        });
         layoutDialog();
         pack();
     }
@@ -74,64 +92,58 @@ public class OrdinalScaleEditorDialog extends JDialog {
     private void layoutDialog() {
         setModal(true);
         setTitle("Ordinal scale editor");
-        JPanel mainPane = new JPanel(new GridBagLayout());
+        final JPanel mainPane = new JPanel(new GridBagLayout());
 
-		mainPane.add(makeTitlePane(),new GridBagConstraints(
-					0,0,1,1,1.0,0,
-					GridBagConstraints.NORTHWEST,
-					GridBagConstraints.HORIZONTAL,
-					new Insets(2,2,2,2),
-					2,2
-		));
-		
-		mainPane.add(makeSelectionPane(), new GridBagConstraints(
-					0,1,1,1,1,1,
-					GridBagConstraints.NORTHWEST,
-					GridBagConstraints.BOTH,
-					new Insets(2,2,2,2),
-					2,2
-		));
+        mainPane.add(makeTitlePane(), new GridBagConstraints(0, 0, 1, 1, 1.0,
+                0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,
+                new Insets(2, 2, 2, 2), 2, 2));
 
-		mainPane.add(makeButtonsPane(), new GridBagConstraints(
-					0,2,1,1,1.0,0,
-					GridBagConstraints.NORTHWEST,
-					GridBagConstraints .HORIZONTAL,
-					new Insets(2,2,2,2),
-					2,2
-		));
-		setContentPane(mainPane);
+        mainPane.add(makeSelectionPane(), new GridBagConstraints(0, 1, 1, 1, 1,
+                1, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH,
+                new Insets(2, 2, 2, 2), 2, 2));
+
+        mainPane.add(makeButtonsPane(), new GridBagConstraints(0, 2, 1, 1, 1.0,
+                0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL,
+                new Insets(2, 2, 2, 2), 2, 2));
+        setContentPane(mainPane);
     }
 
     private JPanel makeTitlePane() {
-        this.titleEditor.addKeyListener(new KeyAdapter(){
-        	private void validateTextField(){
-        		if(titleEditor.getText().equals("") || scalePanel.getDividersList().getModel().getSize()==0){
-        			okButton.setEnabled(false);
-        		}else{
-        			okButton.setEnabled(true);
-        		}
-        	}
-        	@Override
-			public void keyTyped(KeyEvent e) {
-        		validateTextField();
-        	}
-        	@Override
-			public void keyReleased(KeyEvent e) {
-        		validateTextField();
-        	}
+        this.titleEditor.addKeyListener(new KeyAdapter() {
+            private void validateTextField() {
+                if (titleEditor.getText().equals("")
+                        || scalePanel.getDividersList().getModel().getSize() == 0) {
+                    okButton.setEnabled(false);
+                } else {
+                    okButton.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void keyTyped(final KeyEvent e) {
+                validateTextField();
+            }
+
+            @Override
+            public void keyReleased(final KeyEvent e) {
+                validateTextField();
+            }
         });
         return new LabeledPanel("Title:", this.titleEditor, false);
     }
 
     private JPanel makeSelectionPane() {
-        this.scalePanel = new OrdinalScaleGeneratorPanel(databaseSchema, connection);
+        this.scalePanel = new OrdinalScaleGeneratorPanel(databaseSchema,
+                connection);
         this.scalePanel.setVisible(true);
         return scalePanel;
     }
 
     private JButton makeActionOnCorrectScaleButton(final String label) {
-        JButton actionButton = new JButton(label);
-        scalePanel.getDividersModel().addListDataListener(new UpdateButtonForCorrectModelStateListDataListener(actionButton));
+        final JButton actionButton = new JButton(label);
+        scalePanel.getDividersModel().addListDataListener(
+                new UpdateButtonForCorrectModelStateListDataListener(
+                        actionButton));
         actionButton.setEnabled(isScaleCorrect());
         return actionButton;
     }
@@ -141,13 +153,13 @@ public class OrdinalScaleEditorDialog extends JDialog {
     }
 
     private JPanel makeButtonsPane() {
-        JPanel buttonPane = new JPanel();
+        final JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
         okButton = makeActionOnCorrectScaleButton("Create");
         okButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-				closeDialog(true);
+            public void actionPerformed(final ActionEvent e) {
+                closeDialog(true);
             }
         });
 
@@ -155,28 +167,31 @@ public class OrdinalScaleEditorDialog extends JDialog {
 
         final JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-               closeDialog(false);
+            public void actionPerformed(final ActionEvent e) {
+                closeDialog(false);
             }
         });
         buttonPane.add(cancelButton);
         return buttonPane;
     }
-	
-	private void closeDialog(boolean res) {
-        preferences.storeWindowPlacement(this);
-		dispose();
-		this.result = res;
-	}
 
-    private boolean isScaleCorrect() {
-        return scalePanel.getDividersModel().getSize() > 0 && !titleEditor.getText().equals("");
+    private void closeDialog(final boolean res) {
+        preferences.storeWindowPlacement(this);
+        dispose();
+        this.result = res;
     }
 
-    private class UpdateButtonForCorrectModelStateListDataListener implements ListDataListener {
+    private boolean isScaleCorrect() {
+        return scalePanel.getDividersModel().getSize() > 0
+                && !titleEditor.getText().equals("");
+    }
+
+    private class UpdateButtonForCorrectModelStateListDataListener implements
+            ListDataListener {
         private final JButton actionButton;
 
-        public UpdateButtonForCorrectModelStateListDataListener(JButton button) {
+        public UpdateButtonForCorrectModelStateListDataListener(
+                final JButton button) {
             this.actionButton = button;
         }
 
@@ -184,15 +199,15 @@ public class OrdinalScaleEditorDialog extends JDialog {
             actionButton.setEnabled(isScaleCorrect());
         }
 
-        public void contentsChanged(ListDataEvent e) {
+        public void contentsChanged(final ListDataEvent e) {
             updateStateOfOkButton();
         }
 
-        public void intervalAdded(ListDataEvent e) {
+        public void intervalAdded(final ListDataEvent e) {
             updateStateOfOkButton();
         }
 
-        public void intervalRemoved(ListDataEvent e) {
+        public void intervalRemoved(final ListDataEvent e) {
             updateStateOfOkButton();
         }
     }

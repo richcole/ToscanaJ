@@ -7,10 +7,10 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
-import org.tockit.context.model.Context;
-
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 
-public interface LatticeGenerator<O,A> {
-	Lattice<O,A> createLattice(Context<O,A> context);
+import org.tockit.context.model.Context;
+
+public interface LatticeGenerator<O, A> {
+    Lattice<O, A> createLattice(Context<O, A> context);
 }

@@ -29,46 +29,42 @@ import org.tockit.events.EventBrokerListener;
 /**
  * Implements node movement in a way that ensures attribute-additivity.
  * 
- * Here is the basic idea:
- * - identify all meet-irreducibles in the upset of the dragged node's concept
- * - find the minimal elements in this
- * - distribute the movement along the nodes of these concepts, moving 
- *   all downsets with them
+ * Here is the basic idea: - identify all meet-irreducibles in the upset of the
+ * dragged node's concept - find the minimal elements in this - distribute the
+ * movement along the nodes of these concepts, moving all downsets with them
  * 
  * The trick is that this way the movement is restricted to the interval of the
  * dragged node and the join of the upper neighbours, which is in some way the
  * smallest change possible. Most noticably the trivial case (only one upper
  * neighbour) breaks down to moving just the dragged node.
  */
-public class AttributeAdditiveNodeMovementEventListener implements EventBrokerListener {
-	private Point2D startPosition;
+public class AttributeAdditiveNodeMovementEventListener implements
+        EventBrokerListener {
+    private Point2D startPosition;
 
-    public void processEvent(Event e) {
-        CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
-        NodeView nodeView = (NodeView) dragEvent.getSubject();
+    public void processEvent(final Event e) {
+        final CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
+        final NodeView nodeView = (NodeView) dragEvent.getSubject();
 
         final DiagramView diagramView = nodeView.getDiagramView();
-        DiagramNode node = nodeView.getDiagramNode();
-        if(e instanceof CanvasItemPickupEvent) {
+        final DiagramNode node = nodeView.getDiagramNode();
+        if (e instanceof CanvasItemPickupEvent) {
             this.startPosition = nodeView.getPosition();
         }
-        
-        Concept concept = node.getConcept();
-		
-        final Set<Concept> meetIrr = ConceptSetHelperFunctions.getMeetIrreduciblesInUpset(concept);
+
+        final Concept concept = node.getConcept();
+
+        final Set<Concept> meetIrr = ConceptSetHelperFunctions
+                .getMeetIrreduciblesInUpset(concept);
         ConceptSetHelperFunctions.removeNonMinimals(meetIrr);
-        ConceptSetHelperFunctions.applyDragToDiagram(dragEvent.getCanvasFromPosition(), 
-                                                     dragEvent.getCanvasToPosition(),
-                                                     diagramView,
-                                                     meetIrr, 
-                                                     meetIrr.size());
-        
-        if(!diagramView.getDiagram().isHasseDiagram()) {
-            ConceptSetHelperFunctions.applyDragToDiagram(dragEvent.getCanvasToPosition(), 
-                                                         dragEvent.getCanvasFromPosition(),
-                                                         diagramView,
-                                                         meetIrr, 
-                                                         meetIrr.size());
+        ConceptSetHelperFunctions.applyDragToDiagram(dragEvent
+                .getCanvasFromPosition(), dragEvent.getCanvasToPosition(),
+                diagramView, meetIrr, meetIrr.size());
+
+        if (!diagramView.getDiagram().isHasseDiagram()) {
+            ConceptSetHelperFunctions.applyDragToDiagram(dragEvent
+                    .getCanvasToPosition(), dragEvent.getCanvasFromPosition(),
+                    diagramView, meetIrr, meetIrr.size());
         }
 
         if (dragEvent instanceof CanvasItemDroppedEvent) {
@@ -76,45 +72,42 @@ public class AttributeAdditiveNodeMovementEventListener implements EventBrokerLi
             diagramView.requestScreenTransformUpdate();
 
             // ... and add an edit to the undo manager if we find one.
-            UndoManager undoManager = diagramView.getUndoManager();
+            final UndoManager undoManager = diagramView.getUndoManager();
             if (undoManager != null) {
                 // make a copy of the current start position
                 final Point2D undoPosition = this.startPosition;
-                // check the actual position of the node -- it might differ from the
+                // check the actual position of the node -- it might differ from
+                // the
                 // requested one due to the Hasse diagram limitations
                 final Point2D toPosition = nodeView.getPosition();
                 undoManager.addEdit(new AbstractUndoableEdit() {
                     @Override
-					public void undo() throws CannotUndoException {
-                        ConceptSetHelperFunctions.applyDragToDiagram(toPosition, 
-                                                                     undoPosition,
-                                                                     diagramView,
-                                                                     meetIrr, 
-                                                                     meetIrr.size());
+                    public void undo() throws CannotUndoException {
+                        ConceptSetHelperFunctions.applyDragToDiagram(
+                                toPosition, undoPosition, diagramView, meetIrr,
+                                meetIrr.size());
                         diagramView.requestScreenTransformUpdate();
                         diagramView.repaint();
                         super.undo();
                     }
 
                     @Override
-					public void redo() throws CannotRedoException {
-                        ConceptSetHelperFunctions.applyDragToDiagram(undoPosition, 
-                                                                     toPosition,
-                                                                     diagramView,
-                                                                     meetIrr, 
-                                                                     meetIrr.size());
+                    public void redo() throws CannotRedoException {
+                        ConceptSetHelperFunctions.applyDragToDiagram(
+                                undoPosition, toPosition, diagramView, meetIrr,
+                                meetIrr.size());
                         diagramView.requestScreenTransformUpdate();
                         diagramView.repaint();
                         super.redo();
                     }
-                    
+
                     @Override
-					public String getPresentationName() {
+                    public String getPresentationName() {
                         return "Attribute additive movement";
                     }
                 });
             }
         }
-        diagramView.repaint();      
-	}
+        diagramView.repaint();
+    }
 }

@@ -7,68 +7,62 @@
  */
 package net.sourceforge.toscanaj.gui.action;
 
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.KeyStroke;
+
 import net.sourceforge.toscanaj.gui.activity.FileActivity;
 import net.sourceforge.toscanaj.gui.activity.SimpleActivity;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.ExtensionFileFilter;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 public class OpenFileAction extends KeyboardMappedAction {
 
-    private FileActivity openActivity;
+    private final FileActivity openActivity;
     private File previousFile;
 
-    private List<SimpleActivity> postOpenActivities = new ArrayList<SimpleActivity>();
+    private final List<SimpleActivity> postOpenActivities = new ArrayList<SimpleActivity>();
 
-    public void addPostOpenActivity(SimpleActivity activity) {
+    public void addPostOpenActivity(final SimpleActivity activity) {
         this.postOpenActivities.add(activity);
     }
 
     protected void processPostOpenActivities() throws Exception {
-        for (Iterator<SimpleActivity> it = this.postOpenActivities.iterator(); it.hasNext();) {
-            SimpleActivity activity = it.next();
+        for (final SimpleActivity activity : this.postOpenActivities) {
             if (!activity.doActivity()) {
                 break;
             }
         }
     }
 
-    public OpenFileAction(
-            JFrame frame,
-            FileActivity activity,
-            File defaultOpenLocation,
-            int mnemonic,
-            KeyStroke keystroke) {
+    public OpenFileAction(final JFrame frame, final FileActivity activity,
+            final File defaultOpenLocation, final int mnemonic,
+            final KeyStroke keystroke) {
         super(frame, "Open...", mnemonic, keystroke);
         this.openActivity = activity;
         this.previousFile = defaultOpenLocation;
     }
 
-    public OpenFileAction(
-            JFrame frame,
-            FileActivity activity,
-            File defaultOpenLocation) {
+    public OpenFileAction(final JFrame frame, final FileActivity activity,
+            final File defaultOpenLocation) {
         super(frame, "Open...");
         this.openActivity = activity;
         this.previousFile = defaultOpenLocation;
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
         final JFileChooser openDialog;
 
         boolean result = false;
         try {
             result = this.openActivity.prepareToProcess();
-        } catch (Exception ex) {
-            ErrorDialog.showError(
-                    this.frame,
-                    ex,
+        } catch (final Exception ex) {
+            ErrorDialog.showError(this.frame, ex,
                     "Unable to initiate file saving:" + ex.getMessage(),
                     "Error preparing to save");
         }
@@ -80,18 +74,15 @@ public class OpenFileAction extends KeyboardMappedAction {
             } else {
                 openDialog = new JFileChooser(System.getProperty("user.dir"));
             }
-            openDialog.setFileFilter(new ExtensionFileFilter(
-                                                this.openActivity.getExtensions(),
-                                                this.openActivity.getDescription()));
+            openDialog.setFileFilter(new ExtensionFileFilter(this.openActivity
+                    .getExtensions(), this.openActivity.getDescription()));
 
             if (openDialog.showOpenDialog(this.frame) == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = openDialog.getSelectedFile();
+                final File selectedFile = openDialog.getSelectedFile();
                 try {
                     this.openActivity.processFile(selectedFile);
-                } catch (Exception ex) {
-                    ErrorDialog.showError(
-                            this.frame,
-                            ex,
+                } catch (final Exception ex) {
+                    ErrorDialog.showError(this.frame, ex,
                             "Failure to read the file:" + ex.getMessage(),
                             "Error opening file");
                     ex.printStackTrace();
@@ -99,10 +90,8 @@ public class OpenFileAction extends KeyboardMappedAction {
                 this.previousFile = selectedFile;
                 try {
                     processPostOpenActivities();
-                } catch (Exception ex) {
-                    ErrorDialog.showError(
-                            this.frame,
-                            ex,
+                } catch (final Exception ex) {
+                    ErrorDialog.showError(this.frame, ex,
                             "Failure to process the file:" + ex.getMessage(),
                             "Error processing file");
                 }
@@ -111,4 +100,3 @@ public class OpenFileAction extends KeyboardMappedAction {
     }
 
 }
-
