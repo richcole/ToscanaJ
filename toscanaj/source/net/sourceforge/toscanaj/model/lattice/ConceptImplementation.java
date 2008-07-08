@@ -17,6 +17,7 @@ import java.util.Set;
 
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
+import net.sourceforge.toscanaj.util.Formatter;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
@@ -516,15 +517,15 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
         final Element objectContingentElem = XMLHelper.getMandatoryChild(elem,
                 OBJECT_CONTINGENT_ELEMENT_NAME);
         final List<Element> objects = objectContingentElem
-                .getChildren(OBJECT_ELEMENT_NAME);
+        .getChildren(OBJECT_ELEMENT_NAME);
         for (final Element objElem : objects) {
             this.objectContingent
-                    .add((O) new FCAElementImplementation(objElem));
+            .add((O) new FCAElementImplementation(objElem));
         }
         final Element attributeContingentElem = XMLHelper.getMandatoryChild(
                 elem, ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
         final List<Element> attributes = attributeContingentElem
-                .getChildren(ATTRIBUTE_ELEMENT_NAME);
+        .getChildren(ATTRIBUTE_ELEMENT_NAME);
         for (final Element attrElem : attributes) {
             this.attributeContingent.add((A) new FCAElementImplementation(
                     attrElem));
@@ -568,8 +569,8 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
     }
 
     public boolean isJoinIrreducible() {
-        for (final Concept<O, A> superconcept : filter) {
-            if (superconcept.getUpset().size() == this.filter.size() - 1) {
+        for (final Concept<O, A> subconcept : ideal) {
+            if (subconcept.getDownset().size() == this.ideal.size() - 1) {
                 return true;
             }
         }
@@ -577,8 +578,8 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
     }
 
     public boolean isMeetIrreducible() {
-        for (final Concept<O, A> subconcept : filter) {
-            if (subconcept.getUpset().size() == this.ideal.size() - 1) {
+        for (final Concept<O, A> superconcept : filter) {
+            if (superconcept.getUpset().size() == this.filter.size() - 1) {
                 return true;
             }
         }
@@ -594,7 +595,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
         while (!topCandidate.isTop()) {
             Concept<O, A> other = topCandidate;
             final Iterator<Concept<O, A>> it = topCandidate.getUpset()
-                    .iterator();
+            .iterator();
             do {
                 other = it.next();
             } while (other == topCandidate);
@@ -608,12 +609,18 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
         while (!bottomCandidate.isBottom()) {
             Concept<O, A> other = bottomCandidate;
             final Iterator<Concept<O, A>> it = bottomCandidate.getDownset()
-                    .iterator();
+            .iterator();
             do {
                 other = it.next();
             } while (other == bottomCandidate);
             bottomCandidate = other;
         }
         return bottomCandidate;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + Formatter.toSetFormat(getExtentIterator()) + ","
+        + Formatter.toSetFormat(getIntentIterator()) + ")";
     }
 }

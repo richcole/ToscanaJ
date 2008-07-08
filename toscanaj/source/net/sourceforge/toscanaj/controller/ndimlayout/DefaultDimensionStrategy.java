@@ -30,18 +30,18 @@ import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
  * other n-dim stuff works).
  */
 public class DefaultDimensionStrategy<T> implements
-        DimensionCreationStrategy<T> {
+DimensionCreationStrategy<T> {
     public <O> List<Dimension<T>> calculateDimensions(
             final Lattice<O, T> lattice) {
         final List<Dimension<T>> dimensions = new ArrayList<Dimension<T>>();
         final Concept<O, T>[] concepts = lattice.getConcepts();
         for (final Concept<O, T> concept : concepts) {
             if (concept.isMeetIrreducible()) {
-                final Iterator<T> attrCont = concept
-                        .getAttributeContingentIterator();
-                final List<T> attribVector = new ArrayList<T>();
-                attribVector.add(attrCont.next());
-                dimensions.add(new Dimension<T>(attribVector));
+                final Iterator<T> attrContIt = concept
+                .getAttributeContingentIterator();
+                final List<T> attrCont = new ArrayList<T>();
+                attrCont.add(attrContIt.next());
+                dimensions.add(new Dimension<T>(attrCont));
             }
         }
         return dimensions;
