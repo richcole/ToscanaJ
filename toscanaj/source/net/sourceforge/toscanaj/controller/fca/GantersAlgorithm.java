@@ -121,9 +121,9 @@ public class GantersAlgorithm implements LatticeGenerator<FCAElement,FCAElement>
     }
 
     private void cleanContingents(LatticeImplementation<FCAElement,FCAElement> lattice) {
-        ConceptImplementation[] concepts = (ConceptImplementation[]) lattice.getConcepts();
+        Concept<FCAElement,FCAElement>[] concepts = lattice.getConcepts();
         for (int i = 0; i < concepts.length; i++) {
-            ConceptImplementation concept = concepts[i];
+            ConceptImplementation<FCAElement, FCAElement> concept = (ConceptImplementation) concepts[i];
             Collection<Concept<FCAElement,FCAElement>> downset = new HashSet<Concept<FCAElement,FCAElement>>(concept.getDownset());
             downset.remove(concept);
             for (Iterator<Concept<FCAElement,FCAElement>> iterator = downset.iterator(); iterator.hasNext();) {
