@@ -9,7 +9,6 @@ package net.sourceforge.toscanaj.controller.ndimlayout;
 
 import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.directedgraph.DirectedGraph;
-import net.sourceforge.toscanaj.model.directedgraph.Node;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
 import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;

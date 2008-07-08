@@ -9,8 +9,6 @@ package net.sourceforge.toscanaj.gui.dialog.attributeselection;
 import java.awt.BorderLayout;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
-
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;

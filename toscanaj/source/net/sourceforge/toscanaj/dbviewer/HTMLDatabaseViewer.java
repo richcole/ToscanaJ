@@ -23,7 +23,6 @@ import java.awt.event.WindowEvent;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Shows a database view using HTML.

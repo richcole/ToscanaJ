@@ -103,7 +103,7 @@ public class TableView extends JTable {
 		}
 
 		private FCAElement getObjectForRow(int rowIndex) {
-			return (FCAElement) context.getObjects().get(rowIndex);
+			return context.getObjects().get(rowIndex);
 		}
 
 		private ManyValuedAttribute getAttributeForColumn(int columnIndex) {

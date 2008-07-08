@@ -82,7 +82,7 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
         QueryMap queryMap = scale.getQueryMap();
         
         // we always just take the first diagram -- multiple diagrams are hardly used anywhere
-        LineDiagram diagram = (LineDiagram) abstractScale.getLineDiagrams().get(0);
+        LineDiagram diagram = abstractScale.getLineDiagrams().get(0);
 
         SimpleLineDiagram result = new SimpleLineDiagram();
         if(scale.getTitle()!= null) {

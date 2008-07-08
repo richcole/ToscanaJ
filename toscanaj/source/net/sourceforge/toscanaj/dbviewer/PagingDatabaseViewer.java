@@ -22,7 +22,6 @@ import java.awt.event.WindowEvent;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * This abstract class gives a framework for implementing database viewers with

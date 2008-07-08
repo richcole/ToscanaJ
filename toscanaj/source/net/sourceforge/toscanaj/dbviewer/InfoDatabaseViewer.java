@@ -12,7 +12,6 @@ import java.awt.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Shows additional information coming from the database or external files.

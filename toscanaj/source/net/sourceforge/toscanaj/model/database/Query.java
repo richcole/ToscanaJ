@@ -15,7 +15,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 public abstract class Query implements XMLizable {
     private static final String QUERY_FIELD_IS_RELATIVE_ATTRIBUTE_NAME = "relative";

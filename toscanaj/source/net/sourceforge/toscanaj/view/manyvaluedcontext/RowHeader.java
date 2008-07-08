@@ -97,7 +97,7 @@ public class RowHeader extends JTable {
             if(rowIndex == this.context.getObjects().size()) {
                 return "<Add new>";
             }
-			FCAElement object = (FCAElement) this.context.getObjects().get(rowIndex);
+			FCAElement object = this.context.getObjects().get(rowIndex);
 			return object;
 		}
 	}

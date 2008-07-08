@@ -7,8 +7,6 @@
  */
  package net.sourceforge.toscanaj.model.sql;
 
-import net.sourceforge.toscanaj.model.order.Ordered;
-
 import java.util.Vector;
 import java.util.Iterator;
 
