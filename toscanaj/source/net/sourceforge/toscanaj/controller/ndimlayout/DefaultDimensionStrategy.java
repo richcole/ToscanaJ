@@ -7,8 +7,9 @@
  */
 package net.sourceforge.toscanaj.controller.ndimlayout;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.List;
 
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
@@ -28,14 +29,13 @@ import net.sourceforge.toscanaj.model.ndimdiagram.Dimension;
  * of it in the same way all the other n-dim stuff works).
  */
 public class DefaultDimensionStrategy<T> implements DimensionCreationStrategy<T> {
-    public<O> Vector<Dimension<T>> calculateDimensions(Lattice<O,T> lattice) {
-        Vector<Dimension<T>> dimensions = new Vector<Dimension<T>>();
-        Concept<O,T>[] concepts = lattice.getConcepts();
-        for (int i = 0; i < concepts.length; i++) {
-            Concept<?,T> concept = concepts[i];
+    public<O> List<Dimension<T>> calculateDimensions(final Lattice<O,T> lattice) {
+        final List<Dimension<T>> dimensions = new ArrayList<Dimension<T>>();
+        final Concept<O,T>[] concepts = lattice.getConcepts();
+        for (final Concept<O, T> concept : concepts) {
             if (concept.isMeetIrreducible()) {
-                Iterator<T> attrCont = concept.getAttributeContingentIterator();
-                Vector<T> attribVector = new Vector<T>();
+                final Iterator<T> attrCont = concept.getAttributeContingentIterator();
+                final List<T> attribVector = new ArrayList<T>();
                 attribVector.add(attrCont.next());
 				dimensions.add(new Dimension<T>(attribVector));
             }

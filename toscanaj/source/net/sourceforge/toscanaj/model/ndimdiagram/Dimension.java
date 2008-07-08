@@ -7,7 +7,7 @@
  */
 package net.sourceforge.toscanaj.model.ndimdiagram;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  * A dimension of a conceptual structure.
@@ -18,9 +18,9 @@ import java.util.Vector;
  * @param <R> The underlying type of the attributes.
  */
 public class Dimension<R> {
-    private Vector<R> attributes;
+    private List<R> attributes;
 
-    public Dimension(Vector<R> attributes) {
+    public Dimension(List<R> attributes) {
         this.attributes = attributes;
     }
 
