@@ -22,6 +22,8 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
@@ -422,6 +424,14 @@ EventBrokerListener {
     protected Component createContextEditingView() {
         this.rowHeader = new RowHeader(this.conceptualSchema
                 .getManyValuedContext());
+        this.rowHeader.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                final int row = rowHeader.rowAtPoint(e.getPoint());
+                editObject(row);
+            }
+        });
+
         this.tableView = new TableView(this.conceptualSchema
                 .getManyValuedContext());
 
@@ -447,13 +457,19 @@ EventBrokerListener {
     }
 
     private void editObject(final int row) {
+        final WritableManyValuedContext manyValuedContext = this.conceptualSchema
+                .getManyValuedContext();
+        if (row == manyValuedContext.getObjects().size()) {
+            // new object
+            manyValuedContext.add(new FCAElementImplementation(""));
+        }
         final Frame tFrame = JOptionPane.getFrameForComponent(this.tableView);
-        final List objectList = this.conceptualSchema.getManyValuedContext()
+        final List objectList = manyValuedContext
         .getObjects();
         final WritableFCAElement object = (WritableFCAElement) objectList
         .get(row);
         new ObjectDialog(tFrame, object);
-        this.conceptualSchema.getManyValuedContext().update();
+        manyValuedContext.update();
         this.tableView.updateModel();
         this.rowHeader.updateModel();
     }
@@ -477,8 +493,7 @@ EventBrokerListener {
             public void actionPerformed(final ActionEvent e) {
                 final WritableManyValuedContext manyValuedContext = SienaMainPanel.this.conceptualSchema
                 .getManyValuedContext();
-                manyValuedContext.add(new FCAElementImplementation(""));
-                editObject(manyValuedContext.getObjects().size() - 1);
+                editObject(manyValuedContext.getObjects().size());
             }
         });
 
@@ -502,7 +517,7 @@ EventBrokerListener {
         final JButton createDiagramButton = new JButton("Create Diagram...");
         createDiagramButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                // / @todo
+                // @todo
             }
         });
 
