@@ -84,7 +84,7 @@ import net.sourceforge.toscanaj.model.events.DatabaseInfoChangedEvent;
 import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
-import net.sourceforge.toscanaj.parser.CSCParser;
+import net.sourceforge.toscanaj.parser.CSCImport;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.view.database.DatabaseConnectionInformationView;
@@ -970,7 +970,7 @@ EventBrokerListener {
 
     private void importCSC(final File file) {
         try {
-            new CSCParser().importCSCFile(file, this.conceptualSchema);
+            new CSCImport().importCSCFile(file, this.conceptualSchema);
         } catch (final org.tockit.conscript.parser.DataFormatException e) {
             ErrorDialog.showError(this, e, "Could not parse file");
             return;

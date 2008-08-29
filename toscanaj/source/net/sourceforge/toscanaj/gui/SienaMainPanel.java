@@ -111,7 +111,7 @@ import net.sourceforge.toscanaj.model.manyvaluedcontext.WritableManyValuedContex
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
 import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
 import net.sourceforge.toscanaj.parser.BurmeisterParser;
-import net.sourceforge.toscanaj.parser.CSCParser;
+import net.sourceforge.toscanaj.parser.CSCImport;
 import net.sourceforge.toscanaj.parser.CSXParser;
 import net.sourceforge.toscanaj.parser.DataFormatException;
 import net.sourceforge.toscanaj.parser.ObjectAttributeListParser;
@@ -1201,7 +1201,7 @@ EventBrokerListener {
     private void importCSC(final File file) {
         this.lastCSCFile = file;
         try {
-            new CSCParser().importCSCFile(file, this.conceptualSchema);
+            new CSCImport().importCSCFile(file, this.conceptualSchema);
         } catch (final org.tockit.conscript.parser.DataFormatException e) {
             ErrorDialog.showError(this, e, "Could not parse file");
             return;

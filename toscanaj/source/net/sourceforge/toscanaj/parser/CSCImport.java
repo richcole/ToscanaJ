@@ -12,8 +12,12 @@ import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
@@ -29,6 +33,7 @@ import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import org.tockit.conscript.model.AbstractScale;
 import org.tockit.conscript.model.CSCFile;
 import org.tockit.conscript.model.ConcreteScale;
+import org.tockit.conscript.model.ConscriptStructure;
 import org.tockit.conscript.model.DatabaseDefinition;
 import org.tockit.conscript.model.FCAAttribute;
 import org.tockit.conscript.model.FCAObject;
@@ -39,27 +44,69 @@ import org.tockit.conscript.model.Point;
 import org.tockit.conscript.model.QueryMap;
 import org.tockit.conscript.model.StringFormat;
 import org.tockit.conscript.model.StringMap;
+import org.tockit.conscript.parser.CSCParser;
 import org.tockit.conscript.parser.DataFormatException;
 
-/**
- * @todo this is not really a parser, it should be a class using the parser
- *       instead of deriving from it.
- */
-public class CSCParser extends org.tockit.conscript.parser.CSCParser {
+public class CSCImport {
     private static final int TARGET_DIAGRAM_HEIGHT = 460;
     private static final int TARGET_DIAGRAM_WIDTH = 600;
 
     public void importCSCFile(final File file, final ConceptualSchema schema)
-            throws DataFormatException, FileNotFoundException {
+    throws DataFormatException, FileNotFoundException {
         try {
-            final CSCFile cscFile = importCSCFile(file.toURI().toURL(), null);
-            final List concreteScales = cscFile.getConcreteScales();
-            for (final Iterator iter = concreteScales.iterator(); iter
-                    .hasNext();) {
-                final ConcreteScale scale = (ConcreteScale) iter.next();
-                final Diagram2D diagram2D = createDiagram2D(scale);
+            final CSCFile cscFile = CSCParser.importCSCFile(file.toURI()
+                    .toURL(), null);
+            // used to avoid creating diagrams for both a LINEDIAGRAM and a
+            // CONCRETE_SCALE entry
+            final Set<String> namesOfCreatedDiagrams = new HashSet<String>();
+
+            final List<ConscriptStructure> lineDiagrams = cscFile
+            .getLineDiagrams();
+            for (final Object element : lineDiagrams) {
+                final LineDiagram lineDiagram = (LineDiagram) element;
+                final Map<String, String> objectLabels = new HashMap<String, String>();
+                for (final FCAObject object : lineDiagram.getObjects()) {
+                    objectLabels.put(object.getIdentifier(), object
+                            .getDescription().getContent());
+                }
+                final Map<String,FormattedString> attributeLabels = new HashMap<String,FormattedString>();
+                for (final FCAAttribute attribute : lineDiagram.getAttributes()) {
+                    attributeLabels.put(attribute.getIdentifier(), attribute
+                            .getDescription());
+                }
+                final String name = (lineDiagram.getTitle() != null) ? lineDiagram
+                        .getTitle().getContent()
+                        : lineDiagram.getName();
+                namesOfCreatedDiagrams.add(name);
+                // we fake having StringMaps or QueryMaps -- very much a hack
+                final Diagram2D diagram2D = createDiagram2D(name, lineDiagram,
+                        new StringMap("fake") {
+                    @Override
+                    public FormattedString getLabel(final String entry) {
+                        return attributeLabels.get(entry);
+                    }
+                }, new QueryMap("fake") {
+                    @Override
+                    public String getQuery(final String abstractObjectId) {
+                        return objectLabels.get(abstractObjectId);
+                    }
+                });
                 rescale(diagram2D);
                 schema.addDiagram(diagram2D);
+            }
+
+            final List<ConscriptStructure> concreteScales = cscFile
+            .getConcreteScales();
+            for (final Object element : concreteScales) {
+                final ConcreteScale scale = (ConcreteScale) element;
+                final String scaleName = (scale.getTitle() != null) ? scale
+                        .getTitle().getContent() : scale.getName();
+                        if (!namesOfCreatedDiagrams.contains(scaleName)) {
+                            final Diagram2D diagram2D = createDiagram2D(scale,
+                                    scaleName);
+                            rescale(diagram2D);
+                            schema.addDiagram(diagram2D);
+                        }
             }
 
             if (!cscFile.getDatabaseDefinitions().isEmpty()) {
@@ -68,7 +115,7 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
                 // multiple ones are unlikely and we wouldn't know what to do
                 // then anyway
                 final DatabaseDefinition dbDef = (DatabaseDefinition) cscFile
-                        .getDatabaseDefinitions().get(0);
+                .getDatabaseDefinitions().get(0);
                 final DatabaseInfo dbInfo = new DatabaseInfo();
                 dbInfo.setOdbcDataSource(dbDef.getDatabaseName(), null, null);
                 final Table table = new Table(dbDef.getTable(), false);
@@ -78,12 +125,12 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
             }
         } catch (final MalformedURLException e) {
             // should not happen
-            e.printStackTrace();
             throw new RuntimeException("Internal error", e);
         }
     }
 
-    private Diagram2D createDiagram2D(final ConcreteScale scale) {
+    private Diagram2D createDiagram2D(final ConcreteScale scale,
+            final String name) {
         final AbstractScale abstractScale = scale.getAbstractScale();
         final StringMap attributeMap = scale.getAttributeMap();
         final QueryMap queryMap = scale.getQueryMap();
@@ -91,15 +138,17 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
         // we always just take the first diagram -- multiple diagrams are hardly
         // used anywhere
         final LineDiagram diagram = abstractScale.getLineDiagrams().get(0);
+        return createDiagram2D(name, diagram,
+                attributeMap, queryMap);
+    }
 
+    private Diagram2D createDiagram2D(final String diagramName,
+            final LineDiagram originalDiagram, final StringMap attributeMap,
+            final QueryMap queryMap) {
         final SimpleLineDiagram result = new SimpleLineDiagram();
-        if (scale.getTitle() != null) {
-            result.setTitle(scale.getTitle().getContent());
-        } else {
-            result.setTitle(scale.getName());
-        }
+        result.setTitle(diagramName);
 
-        final List points = diagram.getPoints();
+        final List points = originalDiagram.getPoints();
         for (final Iterator iter = points.iterator(); iter.hasNext();) {
             final Point point = (Point) iter.next();
 
@@ -113,7 +162,7 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
             result.addNode(node);
         }
 
-        final List lines = diagram.getLines();
+        final List lines = originalDiagram.getLines();
         for (final Iterator iter = lines.iterator(); iter.hasNext();) {
             final Line line = (Line) iter.next();
             final Point from = line.getFrom();
@@ -123,14 +172,14 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
             result.addLine(fromNode, toNode);
 
             final ConceptImplementation fromConcept = (ConceptImplementation) fromNode
-                    .getConcept();
+            .getConcept();
             final ConceptImplementation toConcept = (ConceptImplementation) toNode
-                    .getConcept();
+            .getConcept();
             fromConcept.addSubConcept(toNode.getConcept());
             toConcept.addSuperConcept(fromConcept);
         }
 
-        final List objects = diagram.getObjects();
+        final List objects = originalDiagram.getObjects();
         for (final Iterator iter = objects.iterator(); iter.hasNext();) {
             final FCAObject object = (FCAObject) iter.next();
             FCAElementImplementation resultObject;
@@ -146,7 +195,7 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
             }
 
             final ConceptImplementation concept = (ConceptImplementation) node
-                    .getConcept();
+            .getConcept();
             concept.addObject(resultObject);
 
             final LabelInfo labelInfo = createLabelInfo(object.getDescription()
@@ -154,7 +203,7 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
             node.setObjectLabelInfo(labelInfo);
         }
 
-        final List attributes = diagram.getAttributes();
+        final List attributes = originalDiagram.getAttributes();
         for (final Iterator iter = attributes.iterator(); iter.hasNext();) {
             final FCAAttribute attribute = (FCAAttribute) iter.next();
             FCAElementImplementation resultAttribute;
@@ -172,7 +221,7 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
             }
 
             final ConceptImplementation concept = (ConceptImplementation) node
-                    .getConcept();
+            .getConcept();
             concept.addAttribute(resultAttribute);
 
             final LabelInfo labelInfo = createLabelInfo(attribute
@@ -181,13 +230,12 @@ public class CSCParser extends org.tockit.conscript.parser.CSCParser {
         }
 
         for (final Iterator<DiagramNode> iter = result.getNodes(); iter
-                .hasNext();) {
+        .hasNext();) {
             final DiagramNode node = iter.next();
             final ConceptImplementation concept = (ConceptImplementation) node
-                    .getConcept();
+            .getConcept();
             concept.buildClosures();
         }
-
         return result;
     }
 
