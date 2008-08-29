@@ -8,7 +8,7 @@
 package net.sourceforge.toscanaj.gui;
 
 /**
- * @todo this class is too big in many senses, most noticably in the fact that it knows about
+ * @todo this class is too big in many senses, most noticeably in the fact that it knows about
  * way too much stuff
  */
 import java.awt.BorderLayout;
@@ -757,7 +757,7 @@ EventBrokerListener {
         viewMenu.addSeparator();
 
         final JCheckBoxMenuItem showAttributeLabels = new JCheckBoxMenuItem(
-                "Show Attribute Labels");
+        "Show Attribute Labels");
         showAttributeLabels.setMnemonic(KeyEvent.VK_A);
         showAttributeLabels.setSelected(true);
         showAttributeLabels.addActionListener(new ActionListener() {
@@ -855,7 +855,7 @@ EventBrokerListener {
         viewMenu.addSeparator();
 
         final JCheckBoxMenuItem showTemporalControls = new JCheckBoxMenuItem(
-                "Show Temporal Controls");
+        "Show Temporal Controls");
         showTemporalControls.setMnemonic(KeyEvent.VK_T);
         showTemporalControls.setSelected(preferences.getBoolean(
                 "temporalControlsEnabled", false));
