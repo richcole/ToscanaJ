@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.toscanaj.controller.fca.events.ConceptInterpretationContextChangedEvent;
-import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.database.ListQuery;
 import net.sourceforge.toscanaj.model.database.Query;
@@ -26,22 +25,22 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
 public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
-        ConceptInterpreter<Oc, A, Or>, EventBrokerListener {
+ConceptInterpreter<Oc, A, Or>, EventBrokerListener {
     private boolean showDeviation = false;
     private final Hashtable<ConceptInterpretationContext<Oc, A>, Hashtable<Concept<Oc, A>, Integer>> contingentSizes = new Hashtable<ConceptInterpretationContext<Oc, A>, Hashtable<Concept<Oc, A>, Integer>>();
     private final Hashtable<ConceptInterpretationContext<Oc, A>, Hashtable<Concept<Oc, A>, Integer>> extentSizes = new Hashtable<ConceptInterpretationContext<Oc, A>, Hashtable<Concept<Oc, A>, Integer>>();
 
     public static final double[] SIGNIFICANCE_LEVELS = new double[] { 0.25,
-            0.20, 0.15, 0.10, 0.05, 0.025, 0.02, 0.01, 0.005, 0.0025, 0.001,
-            0.0005 };
+        0.20, 0.15, 0.10, 0.05, 0.025, 0.02, 0.01, 0.005, 0.0025, 0.001,
+        0.0005 };
 
     /**
      * Chi square values come from
      * http://www.ncat.edu/~warrack/chisquaretable.pdf
      */
     public static final double[] CHI_SQUARE_CRITICAL_VALUES = new double[] {
-            1.32, 1.64, 2.07, 2.71, 3.84, 5.02, 5.41, 6.63, 7.88, 9.14, 10.83,
-            12.12 };
+        1.32, 1.64, 2.07, 2.71, 3.84, 5.02, 5.41, 6.63, 7.88, 9.14, 10.83,
+        12.12 };
 
     /**
      * A good reference for the chi square stuff is:
@@ -58,7 +57,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
         public DeviationValuesRef(final Concept<Oc, A> concept,
                 final ConceptInterpretationContext<Oc, A> context) {
             final Concept<Oc, A> nestingConcept = context.getNestingConcepts()
-                    .get(0);
+            .get(0);
             if (context.getObjectDisplayMode() == ConceptInterpretationContext.EXTENT) {
                 this.neutralSize = getExtentSize(concept, context
                         .getOutermostContext());
@@ -74,7 +73,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
                     .getOutermostTopConcept(concept), context
                     .getOutermostContext());
             this.expectedSize = this.neutralSize * this.outerSize
-                    / (double) this.numberOfAllObjectsInDiagram;
+            / (double) this.numberOfAllObjectsInDiagram;
         }
 
         public double getExpectedSize() {
@@ -96,10 +95,10 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
             return (this.numberOfAllObjectsInDiagram
                     * (this.numberOfAllObjectsInDiagram * actualSize - this.neutralSize
                             * this.outerSize) * (this.numberOfAllObjectsInDiagram
-                    * actualSize - this.neutralSize * this.outerSize))
-                    / (double) (this.neutralSize
-                            * this.outerSize
-                            * (this.numberOfAllObjectsInDiagram - this.neutralSize) * (this.numberOfAllObjectsInDiagram - this.outerSize));
+                                    * actualSize - this.neutralSize * this.outerSize))
+                                    / (double) (this.neutralSize
+                                            * this.outerSize
+                                            * (this.numberOfAllObjectsInDiagram - this.neutralSize) * (this.numberOfAllObjectsInDiagram - this.outerSize));
         }
 
         /**
@@ -122,10 +121,10 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
     public abstract Iterator<Or> getObjectSetIterator(Concept<Oc, A> concept,
             ConceptInterpretationContext<Oc, A> context);
 
-    protected abstract FCAElement getObject(String value,
+    protected abstract Object getObject(String value,
             Concept<Oc, A> concept, ConceptInterpretationContext<Oc, A> context);
 
-    protected abstract FCAElement[] handleNonDefaultQuery(Query query,
+    protected abstract Object[] handleNonDefaultQuery(Query query,
             Concept<Oc, A> concept, ConceptInterpretationContext<Oc, A> context);
 
     protected abstract int calculateContingentSize(Concept<Oc, A> concept,
@@ -136,17 +135,17 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
         final List<Concept<Oc, A>> outerConcepts = context.getNestingConcepts();
         if (outerConcepts.size() > 1) {
             throw new RuntimeException(
-                    "multiple levels of nesting not yet supported");
+            "multiple levels of nesting not yet supported");
         }
         if (outerConcepts.size() == 1) {
             int retVal = 0;
             final Concept<Oc, A> outerConcept = outerConcepts.get(0);
             final ConceptInterpretationContext<Oc, A> parentContext = context
-                    .getNestingContexts().get(0);
+            .getNestingContexts().get(0);
             for (final Concept<Oc, A> currentOuterConcept : outerConcept
                     .getDownset()) {
                 final ConceptInterpretationContext<Oc, A> currentContext = parentContext
-                        .createNestedContext(currentOuterConcept);
+                .createNestedContext(currentOuterConcept);
                 retVal += getLocalExtentSize(concept, currentContext);
             }
             return retVal;
@@ -179,7 +178,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
             final ConceptInterpretationContext<Oc, A> context) {
         final ArrayList<A> retVal = new ArrayList<A>();
         final Iterator<A> attributeContingentIterator = concept
-                .getAttributeContingentIterator();
+        .getAttributeContingentIterator();
         while (attributeContingentIterator.hasNext()) {
             final A a = attributeContingentIterator.next();
             retVal.add(a);
@@ -258,7 +257,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
                         return 0; // avoids division by zero
                     }
                     return (double) contingentSize
-                            / (double) getMaximalContingentSize();
+                    / (double) getMaximalContingentSize();
                 }
             };
         } else if (type == INTERVAL_TYPE_EXTENT) {
@@ -270,12 +269,12 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
                         return 0; // avoids division by zero
                     }
                     final Concept<Oc, A> compareConcept = context
-                            .getOutermostTopConcept(concept);
+                    .getOutermostTopConcept(concept);
                     final ConceptInterpretationContext<Oc, A> compareContext = context
-                            .getOutermostContext();
+                    .getOutermostContext();
                     return (double) extentSize
-                            / (double) getExtentSize(compareConcept
-                                    .getTopConcept(), compareContext);
+                    / (double) getExtentSize(compareConcept
+                            .getTopConcept(), compareContext);
                 }
             };
         } else if (type == INTERVAL_TYPE_FIXED) {
@@ -290,21 +289,21 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
                     final DeviationValuesRef deviationValues = new DeviationValuesRef(
                             concept, context);
                     final double expectedSize = deviationValues
-                            .getExpectedSize();
+                    .getExpectedSize();
                     final int actualSize = getObjectCount(concept, context);
                     if (actualSize == expectedSize) {
                         return 0.5;
                     }
                     if (actualSize < expectedSize) {
                         final int sigLevel = deviationValues
-                                .getChiSquareLevel(actualSize);
+                        .getChiSquareLevel(actualSize);
                         return 0.5 - 0.5 * (sigLevel + 1)
-                                / SIGNIFICANCE_LEVELS.length;
+                        / SIGNIFICANCE_LEVELS.length;
                     }
                     final int sigLevel = deviationValues
-                            .getChiSquareLevel(actualSize);
+                    .getChiSquareLevel(actualSize);
                     return 0.5 + 0.5 * (sigLevel + 1)
-                            / SIGNIFICANCE_LEVELS.length;
+                    / SIGNIFICANCE_LEVELS.length;
                 }
             };
         } else {
@@ -312,7 +311,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
         }
     }
 
-    public FCAElement[] executeQuery(final Query query,
+    public Object[] executeQuery(final Query query,
             final Concept<Oc, A> concept,
             final ConceptInterpretationContext<Oc, A> context) {
         if (!isRealized(concept, context) && !this.showDeviation) {
@@ -321,11 +320,11 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
         if (query == ListQuery.KEY_LIST_QUERY) {
             final int objectCount = getObjectCount(concept, context);
             if (objectCount != 0) {
-                final FCAElement[] retVal = new FCAElement[objectCount];
-                final Iterator it = getObjectSetIterator(concept, context);
+                final Object[] retVal = new Object[objectCount];
+                final Iterator<Or> it = getObjectSetIterator(concept, context);
                 int pos = 0;
                 while (it.hasNext()) {
-                    final FCAElement o = (FCAElement) it.next();
+                    final Or o = it.next();
                     retVal[pos] = o;
                     pos++;
                 }
@@ -348,8 +347,8 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
                 final NumberFormat format = NumberFormat.getNumberInstance();
                 format.setMaximumFractionDigits(1);
                 final String expectedValue = "[exp: "
-                        + format.format(expectedSize) + "]";
-                return new FCAElement[] {
+                    + format.format(expectedSize) + "]";
+                return new Object[] {
                         getObject("" + objectCount, concept, context),
                         getObject(expectedValue, concept, context) };
             } else {
@@ -361,20 +360,20 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
                     final DeviationValuesRef deviationValues = new DeviationValuesRef(
                             concept, context);
                     final double expectedSize = deviationValues
-                            .getExpectedSize();
+                    .getExpectedSize();
                     final int objectCount = getObjectCount(concept, context);
                     if (objectCount != expectedSize) {
                         final int fullExtent = getExtentSize(concept
                                 .getTopConcept(), context);
                         final NumberFormat format = NumberFormat
-                                .getPercentInstance();
+                        .getPercentInstance();
                         format.setMaximumFractionDigits(2);
                         final String returnValue = format.format(objectCount
                                 / (double) fullExtent);
                         final String expectedValue = "[exp: "
-                                + format.format(expectedSize / fullExtent)
-                                + "]";
-                        return new FCAElement[] {
+                            + format.format(expectedSize / fullExtent)
+                            + "]";
+                        return new Object[] {
                                 getObject(returnValue, concept, context),
                                 getObject(expectedValue, concept, context) };
                     } // else fall back into normal behaviour
@@ -389,7 +388,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
                 format.setMaximumFractionDigits(2);
                 final String objectValue = format.format(objectCount
                         / (double) fullExtent);
-                return new FCAElement[] { getObject(objectValue, concept,
+                return new Object[] { getObject(objectValue, concept,
                         context) };
             } else {
                 return null;
@@ -399,11 +398,11 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
         }
     }
 
-    private FCAElement[] executeObjectCountQuery(final Concept<Oc, A> concept,
+    private Object[] executeObjectCountQuery(final Concept<Oc, A> concept,
             final ConceptInterpretationContext<Oc, A> context) {
         final int objectCount = getObjectCount(concept, context);
         if (objectCount != 0) {
-            final FCAElement[] retVal = new FCAElement[1];
+            final Object[] retVal = new Object[1];
             retVal[0] = getObject(Integer.toString(objectCount), concept,
                     context);
             return retVal;
@@ -468,7 +467,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
                     for (final ConceptInterpretationContext<Oc, A> otherContext : this.contingentSizes
                             .keySet()) {
                         final List<Concept<Oc, A>> nesting = otherContext
-                                .getNestingConcepts();
+                        .getNestingConcepts();
                         if (nesting.size() != 0) {
                             if (nesting.get(nesting.size() - 1).equals(
                                     otherConcept)) {
@@ -489,7 +488,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
     private Hashtable<Concept<Oc, A>, Integer> getContingentSizesCache(
             final ConceptInterpretationContext<Oc, A> context) {
         Hashtable<Concept<Oc, A>, Integer> retVal = this.contingentSizes
-                .get(context);
+        .get(context);
         if (retVal == null) {
             retVal = new Hashtable<Concept<Oc, A>, Integer>();
             this.contingentSizes.put(context, retVal);
@@ -514,7 +513,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
     private Hashtable<Concept<Oc, A>, Integer> getExtentSizesCache(
             final ConceptInterpretationContext<Oc, A> context) {
         Hashtable<Concept<Oc, A>, Integer> retVal = this.extentSizes
-                .get(context);
+        .get(context);
         if (retVal == null) {
             retVal = new Hashtable<Concept<Oc, A>, Integer>();
             this.extentSizes.put(context, retVal);
@@ -545,7 +544,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
             final ConceptInterpretationContext<Oc, A> context,
             final boolean contingentOnly) {
         final Iterator<Concept<Oc, A>> mainIt = context.getNestingConcepts()
-                .iterator();
+        .iterator();
         final Set<A> attributesToAdd = new HashSet<A>();
         while (mainIt.hasNext()) {
             final Concept<Oc, A> concept = mainIt.next();
@@ -572,7 +571,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
                 Iterator<A> attributeIterator;
                 if (contingentOnly) {
                     attributeIterator = concept
-                            .getAttributeContingentIterator();
+                    .getAttributeContingentIterator();
                 } else {
                     attributeIterator = concept.getIntentIterator();
                 }

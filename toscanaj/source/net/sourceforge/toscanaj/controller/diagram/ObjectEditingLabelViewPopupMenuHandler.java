@@ -17,7 +17,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
 import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
-import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
@@ -78,12 +77,12 @@ EventBrokerListener {
         popupMenu.add(queryTypeMenu);
 
         if (labelView.getQuery() instanceof ListQuery) {
-            final FCAElement object = labelView
+            final Object object = labelView
             .getObjectAtPosition(canvasPosition);
             final String currentValue = object.toString();
 
             final JMenuItem renameObjectMenuItem = new JMenuItem(
-                    "Rename object...");
+            "Rename object...");
             renameObjectMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent event) {
                     final InputTextDialog dialog = new InputTextDialog(

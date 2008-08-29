@@ -12,7 +12,6 @@ import java.awt.geom.Point2D;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
@@ -54,7 +53,7 @@ public class ObjectLabelView extends LabelView {
     // do not initialize this with null -- it happens after the superconstructor
     // call which initializes
     // it by calling back through updateEntries(), which causes double queries
-    private FCAElement[] contents;
+    private Object[] contents;
 
     public static LabelFactory getFactory() {
         return new LabelFactory() {
@@ -84,11 +83,11 @@ public class ObjectLabelView extends LabelView {
     public boolean isVisible() {
         final Concept concept = this.labelInfo.getNode().getConcept();
         final ConceptInterpretationContext context = nodeView
-                .getConceptInterpretationContext();
+        .getConceptInterpretationContext();
         final ConceptInterpreter interpreter = diagramView
-                .getConceptInterpreter();
+        .getConceptInterpreter();
         return interpreter.isVisible(concept, context) && super.isVisible()
-                && !allHidden;
+        && !allHidden;
     }
 
     @Override
@@ -149,19 +148,19 @@ public class ObjectLabelView extends LabelView {
         final DiagramNode node = this.labelInfo.getNode();
         final Concept concept = node.getConcept();
         final ConceptInterpretationContext context = nodeView
-                .getConceptInterpretationContext();
+        .getConceptInterpretationContext();
         final ConceptInterpreter conceptInterpreter = this.diagramView
-                .getConceptInterpreter();
+        .getConceptInterpreter();
         try {
             this.contents = conceptInterpreter.executeQuery(getQuery(),
                     concept, context);
         } catch (final Exception e) {
             ErrorDialog.showError(this.diagramView, e,
-                    "Getting object label content failed");
+            "Getting object label content failed");
         }
     }
 
-    public FCAElement getObjectAtPosition(final Point2D position) {
+    public Object getObjectAtPosition(final Point2D position) {
         final int itemHit = getIndexOfPosition(position);
         if (itemHit == -1) {
             return null;
@@ -190,6 +189,6 @@ public class ObjectLabelView extends LabelView {
     protected boolean isFaded() {
         final int selectionState = nodeView.getSelectionState();
         return selectionState == DiagramView.NOT_SELECTED
-                || selectionState == DiagramView.SELECTED_FILTER;
+        || selectionState == DiagramView.SELECTED_FILTER;
     }
 }

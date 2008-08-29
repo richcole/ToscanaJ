@@ -15,7 +15,7 @@ import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
 public class DirectConceptInterpreter<O, A> extends
-        AbstractConceptInterpreter<O, A, O> {
+AbstractConceptInterpreter<O, A, O> {
 
     @Override
     public Iterator<O> getObjectSetIterator(final Concept<O, A> concept,
@@ -40,7 +40,7 @@ public class DirectConceptInterpreter<O, A> extends
             final ConceptInterpretationContext<O, A> context) {
         final List<O> retVal = new ArrayList<O>();
         final Iterator<O> objectContingentIterator = concept
-                .getObjectContingentIterator();
+        .getObjectContingentIterator();
         while (objectContingentIterator.hasNext()) {
             final O o = objectContingentIterator.next();
             retVal.add(o);
@@ -57,11 +57,11 @@ public class DirectConceptInterpreter<O, A> extends
             visitor = new DiagramHistory.ConceptVisitor<O, A>() {
                 public void visitConcept(final Concept<O, A> concept) {
                     for (final Iterator<O> iterator = currentSet.iterator(); iterator
-                            .hasNext();) {
+                    .hasNext();) {
                         final Object o = iterator.next();
                         boolean found = false;
                         final Iterator<O> extentIterator = concept
-                                .getExtentIterator();
+                        .getExtentIterator();
                         while (extentIterator.hasNext()) {
                             final O o2 = extentIterator.next();
                             if (o.equals(o2)) {
@@ -79,11 +79,11 @@ public class DirectConceptInterpreter<O, A> extends
             visitor = new DiagramHistory.ConceptVisitor<O, A>() {
                 public void visitConcept(final Concept<O, A> concept) {
                     for (final Iterator<O> iterator = currentSet.iterator(); iterator
-                            .hasNext();) {
+                    .hasNext();) {
                         final O o = iterator.next();
                         boolean found = false;
                         final Iterator<O> contingentIterator = concept
-                                .getObjectContingentIterator();
+                        .getObjectContingentIterator();
                         while (contingentIterator.hasNext()) {
                             final O o2 = contingentIterator.next();
                             if (o.equals(o2)) {
@@ -105,11 +105,11 @@ public class DirectConceptInterpreter<O, A> extends
             final ConceptInterpretationContext<O, A> context,
             final boolean contingentOnly) {
         final Iterator<Concept<O, A>> mainIt = context.getNestingConcepts()
-                .iterator();
+        .iterator();
         while (mainIt.hasNext()) {
             final Concept<O, A> concept = mainIt.next();
             for (final Iterator<O> iterator = currentSet.iterator(); iterator
-                    .hasNext();) {
+            .hasNext();) {
                 final O o = iterator.next();
                 boolean found = false;
                 Iterator<O> objectIterator;
@@ -153,7 +153,7 @@ public class DirectConceptInterpreter<O, A> extends
     }
 
     @Override
-    protected FCAElement[] handleNonDefaultQuery(final Query query,
+    protected O[] handleNonDefaultQuery(final Query query,
             final Concept<O, A> concept,
             final ConceptInterpretationContext<O, A> context) {
         throw new RuntimeException("Query not supported by this class ("

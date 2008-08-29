@@ -14,7 +14,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
-import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
@@ -23,18 +22,16 @@ import net.sourceforge.toscanaj.model.lattice.LatticeImplementation;
 import org.tockit.context.model.BinaryRelation;
 import org.tockit.context.model.Context;
 
-public class GantersAlgorithm implements
-        LatticeGenerator<FCAElement, FCAElement> {
-    private FCAElement[] objects;
-    private FCAElement[] attributes;
+public class GantersAlgorithm<O, A> implements LatticeGenerator<O, A> {
+    private O[] objects;
+    private A[] attributes;
     private BitSet[] relation;
 
     private Hashtable<BitSet, BitSet> intents;
     private Vector<BitSet> extents;
 
-    public Lattice<FCAElement, FCAElement> createLattice(
-            final Context<FCAElement, FCAElement> inputContext) {
-        final LatticeImplementation<FCAElement, FCAElement> lattice = new LatticeImplementation<FCAElement, FCAElement>();
+    public Lattice<O, A> createLattice(final Context<O, A> inputContext) {
+        final LatticeImplementation<O, A> lattice = new LatticeImplementation<O, A>();
         this.objects = createElementArray(inputContext.getObjects());
         this.attributes = createElementArray(inputContext.getAttributes());
         this.relation = createRelation(inputContext.getRelation());
@@ -53,13 +50,13 @@ public class GantersAlgorithm implements
      * "attributes" are set.
      */
     private BitSet[] createRelation(
-            final BinaryRelation<FCAElement, FCAElement> inputRelation) {
+            final BinaryRelation<O, A> inputRelation) {
         final BitSet[] retVal = new BitSet[this.objects.length];
         for (int i = 0; i < this.objects.length; i++) {
-            final FCAElement object = this.objects[i];
+            final O object = this.objects[i];
             final BitSet derivation = new BitSet(this.attributes.length);
             for (int j = 0; j < this.attributes.length; j++) {
-                final FCAElement attribute = this.attributes[j];
+                final A attribute = this.attributes[j];
                 if (inputRelation.contains(object, attribute)) {
                     derivation.set(j);
                 }
@@ -72,17 +69,16 @@ public class GantersAlgorithm implements
     /**
      * This is similar to Collection.toArray(), but also checks for duplicates.
      */
-    public FCAElement[] createElementArray(
-            final Collection<FCAElement> collection) {
-        final FCAElement[] retVal = new FCAElement[collection.size()];
-        final HashSet<FCAElement> testSet = new HashSet<FCAElement>();
-        final Iterator<FCAElement> it = collection.iterator();
+    public <T> T[] createElementArray(final Collection<T> collection) {
+        final T[] retVal = (T[]) new Object[collection.size()];
+        final HashSet<T> testSet = new HashSet<T>();
+        final Iterator<T> it = collection.iterator();
         int pos = 0;
         while (it.hasNext()) {
-            final FCAElement cur = it.next();
+            final T cur = it.next();
             if (testSet.contains(cur)) {
                 throw new IllegalArgumentException(
-                        "Context contains duplicate object or attribute");
+                "Context contains duplicate object or attribute");
             }
             retVal[pos] = cur;
             testSet.add(cur);
@@ -92,12 +88,12 @@ public class GantersAlgorithm implements
     }
 
     private void connectConcepts(
-            final LatticeImplementation<FCAElement, FCAElement> lattice) {
-        final Concept<FCAElement, FCAElement>[] concepts = lattice
-                .getConcepts();
-        for (final Concept<FCAElement, FCAElement> concept : concepts) {
+            final LatticeImplementation<O, A> lattice) {
+        final Concept<O, A>[] concepts = lattice
+        .getConcepts();
+        for (final Concept<O, A> concept : concepts) {
             final ConceptImplementation concept1 = (ConceptImplementation) concept;
-            for (final Concept<FCAElement, FCAElement> concept3 : concepts) {
+            for (final Concept<O, A> concept3 : concepts) {
                 final ConceptImplementation concept2 = (ConceptImplementation) concept3;
                 if (isSubConcept(concept2, concept1)) {
                     concept1.addSubConcept(concept2);
@@ -105,29 +101,29 @@ public class GantersAlgorithm implements
                 }
             }
         }
-        for (final Concept<FCAElement, FCAElement> concept2 : concepts) {
+        for (final Concept<O, A> concept2 : concepts) {
             final ConceptImplementation concept = (ConceptImplementation) concept2;
             concept.buildClosures();
         }
     }
 
     private boolean isSubConcept(
-            final Concept<FCAElement, FCAElement> concept1,
-            final Concept<FCAElement, FCAElement> concept2) {
+            final Concept<O, A> concept1,
+            final Concept<O, A> concept2) {
         // the extents are still stored as contingents
         if (concept1.getObjectContingentSize() > concept2
                 .getObjectContingentSize()) {
             return false;
         }
-        final HashSet<FCAElement> extent2 = new HashSet<FCAElement>();
-        for (final Iterator<FCAElement> iterator = concept2
+        final HashSet<O> extent2 = new HashSet<O>();
+        for (final Iterator<O> iterator = concept2
                 .getObjectContingentIterator(); iterator.hasNext();) {
-            final FCAElement obj = iterator.next();
+            final O obj = iterator.next();
             extent2.add(obj);
         }
-        for (final Iterator<FCAElement> iterator = concept1
+        for (final Iterator<O> iterator = concept1
                 .getObjectContingentIterator(); iterator.hasNext();) {
-            final FCAElement obj = iterator.next();
+            final O obj = iterator.next();
             if (!extent2.contains(obj)) {
                 return false;
             }
@@ -136,28 +132,28 @@ public class GantersAlgorithm implements
     }
 
     private void cleanContingents(
-            final LatticeImplementation<FCAElement, FCAElement> lattice) {
-        final Concept<FCAElement, FCAElement>[] concepts = lattice
-                .getConcepts();
-        for (final Concept<FCAElement, FCAElement> concept3 : concepts) {
-            final ConceptImplementation<FCAElement, FCAElement> concept = (ConceptImplementation) concept3;
-            final Collection<Concept<FCAElement, FCAElement>> downset = new HashSet<Concept<FCAElement, FCAElement>>(
+            final LatticeImplementation<O, A> lattice) {
+        final Concept<O, A>[] concepts = lattice
+        .getConcepts();
+        for (final Concept<O, A> concept3 : concepts) {
+            final ConceptImplementation<O, A> concept = (ConceptImplementation<O, A>) concept3;
+            final Collection<Concept<O, A>> downset = new HashSet<Concept<O, A>>(
                     concept.getDownset());
             downset.remove(concept);
-            for (final Concept<FCAElement, FCAElement> concept2 : downset) {
-                for (final Iterator<FCAElement> iterator2 = concept2
+            for (final Concept<O, A> concept2 : downset) {
+                for (final Iterator<O> iterator2 = concept2
                         .getObjectContingentIterator(); iterator2.hasNext();) {
-                    final FCAElement object = iterator2.next();
+                    final O object = iterator2.next();
                     concept.removeObject(object);
                 }
             }
-            final Collection<Concept<FCAElement, FCAElement>> upset = new HashSet<Concept<FCAElement, FCAElement>>(
+            final Collection<Concept<O, A>> upset = new HashSet<Concept<O, A>>(
                     concept.getUpset());
             upset.remove(concept);
-            for (final Concept<FCAElement, FCAElement> concept2 : upset) {
-                for (final Iterator<FCAElement> iterator2 = concept2
+            for (final Concept<O, A> concept2 : upset) {
+                for (final Iterator<A> iterator2 = concept2
                         .getAttributeContingentIterator(); iterator2.hasNext();) {
-                    final FCAElement attribute = iterator2.next();
+                    final A attribute = iterator2.next();
                     concept.removeAttribute(attribute);
                 }
             }
@@ -181,7 +177,7 @@ public class GantersAlgorithm implements
     }
 
     private void createConcepts(
-            final LatticeImplementation<FCAElement, FCAElement> lattice) {
+            final LatticeImplementation<O, A> lattice) {
         for (final BitSet extent : this.extents) {
             final ConceptImplementation concept = new ConceptImplementation();
             for (int i = 0; i < this.objects.length; i++) {

@@ -9,7 +9,6 @@ package net.sourceforge.toscanaj.controller.fca;
 
 import java.util.Iterator;
 
-import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.database.Query;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 
@@ -123,7 +122,7 @@ public interface ConceptInterpreter<Oc, A, Or> {
      * @return The query result, which can be the realized concepts (same as
      *         getObjectSetIterator(..)) or aggregates or other mappings.
      */
-    FCAElement[] executeQuery(Query query, Concept<Oc, A> concept,
+    Object[] executeQuery(Query query, Concept<Oc, A> concept,
             ConceptInterpretationContext<Oc, A> context);
 
     void showDeviation(boolean show);

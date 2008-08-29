@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.util.Formatter;
 import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
@@ -549,7 +548,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
         this.objectContingent.add(newObject);
     }
 
-    public void removeObject(final FCAElement object) {
+    public void removeObject(final O object) {
         this.objectContingent.remove(object);
     }
 

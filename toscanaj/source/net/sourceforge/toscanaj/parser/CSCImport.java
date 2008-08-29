@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
+import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
+import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.database.Column;
@@ -29,6 +33,7 @@ import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.LabelInfo;
 import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
 import net.sourceforge.toscanaj.model.lattice.ConceptImplementation;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
 
 import org.tockit.conscript.model.AbstractScale;
 import org.tockit.conscript.model.CSCFile;
@@ -37,6 +42,7 @@ import org.tockit.conscript.model.ConscriptStructure;
 import org.tockit.conscript.model.DatabaseDefinition;
 import org.tockit.conscript.model.FCAAttribute;
 import org.tockit.conscript.model.FCAObject;
+import org.tockit.conscript.model.FormalContext;
 import org.tockit.conscript.model.FormattedString;
 import org.tockit.conscript.model.Line;
 import org.tockit.conscript.model.LineDiagram;
@@ -46,6 +52,8 @@ import org.tockit.conscript.model.StringFormat;
 import org.tockit.conscript.model.StringMap;
 import org.tockit.conscript.parser.CSCParser;
 import org.tockit.conscript.parser.DataFormatException;
+import org.tockit.context.model.BinaryRelation;
+import org.tockit.context.model.Context;
 
 public class CSCImport {
     private static final int TARGET_DIAGRAM_HEIGHT = 460;
@@ -77,22 +85,22 @@ public class CSCImport {
                 final String name = (lineDiagram.getTitle() != null) ? lineDiagram
                         .getTitle().getContent()
                         : lineDiagram.getName();
-                namesOfCreatedDiagrams.add(name);
-                // we fake having StringMaps or QueryMaps -- very much a hack
-                final Diagram2D diagram2D = createDiagram2D(name, lineDiagram,
-                        new StringMap("fake") {
-                    @Override
-                    public FormattedString getLabel(final String entry) {
-                        return attributeLabels.get(entry);
-                    }
-                }, new QueryMap("fake") {
-                    @Override
-                    public String getQuery(final String abstractObjectId) {
-                        return objectLabels.get(abstractObjectId);
-                    }
-                });
-                rescale(diagram2D);
-                schema.addDiagram(diagram2D);
+                        // we fake having StringMaps or QueryMaps -- very much a hack
+                        final Diagram2D diagram2D = createDiagram2D(name, lineDiagram,
+                                new StringMap("fake") {
+                            @Override
+                            public FormattedString getLabel(final String entry) {
+                                return attributeLabels.get(entry);
+                            }
+                        }, new QueryMap("fake") {
+                            @Override
+                            public String getQuery(final String abstractObjectId) {
+                                return objectLabels.get(abstractObjectId);
+                            }
+                        });
+                        rescale(diagram2D);
+                        schema.addDiagram(diagram2D);
+                        namesOfCreatedDiagrams.add(name);
             }
 
             final List<ConscriptStructure> concreteScales = cscFile
@@ -104,6 +112,43 @@ public class CSCImport {
                         if (!namesOfCreatedDiagrams.contains(scaleName)) {
                             final Diagram2D diagram2D = createDiagram2D(scale,
                                     scaleName);
+                            rescale(diagram2D);
+                            schema.addDiagram(diagram2D);
+                            namesOfCreatedDiagrams.add(scaleName);
+                        }
+            }
+
+            final List<ConscriptStructure> formalContexts = cscFile
+            .getFormalContexts();
+            for (final ConscriptStructure structure : formalContexts) {
+                final FormalContext formalContext = (FormalContext) structure;
+                final String name = (formalContext.getTitle() != null) ? formalContext
+                        .getTitle().getContent()
+                        : formalContext.getName();
+                        if (!namesOfCreatedDiagrams.contains(name)) {
+                            final Context<FCAObject, FCAAttribute> context = new Context<FCAObject, FCAAttribute>() {
+                                public Set<FCAAttribute> getAttributes() {
+                                    return new HashSet(formalContext.getAttributes());
+                                }
+                                public String getName() {
+                                    return name;
+                                }
+
+                                public Set<FCAObject> getObjects() {
+                                    return new HashSet<FCAObject>(formalContext
+                                            .getObjects());
+                                }
+
+                                public BinaryRelation<FCAObject, FCAAttribute> getRelation() {
+                                    return formalContext.getRelation();
+                                }
+                            };
+                            final LatticeGenerator<FCAObject, FCAAttribute> lgen = new GantersAlgorithm<FCAObject, FCAAttribute>();
+                            final Lattice<FCAObject, FCAAttribute> lattice = lgen
+                            .createLattice(context);
+                            final Diagram2D diagram2D = NDimLayoutOperations
+                            .createDiagram(lattice, name,
+                                    new DefaultDimensionStrategy<FCAAttribute>());
                             rescale(diagram2D);
                             schema.addDiagram(diagram2D);
                         }
