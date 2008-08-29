@@ -19,16 +19,20 @@ import javax.swing.text.NumberFormatter;
 
 import org.tockit.datatype.ConversionException;
 import org.tockit.datatype.Datatype;
-import org.tockit.datatype.Value;
 import org.tockit.datatype.xsd.DecimalType;
 import org.tockit.datatype.xsd.StringType;
+import org.tockit.datatype.xsd.StringValue;
 
 public abstract class DatatypeViewFactory {
     // @todo generalize to cover TreeCellEditor, too
     public static TableCellEditor getValueCellEditor(final Datatype datatype) {
         if (datatype instanceof StringType.EnumerationRestrictedStringType) {
             final StringType.EnumerationRestrictedStringType stringType = (StringType.EnumerationRestrictedStringType) datatype;
-            final JComboBox comp = new JComboBox(stringType.getEnumeration());
+            final StringValue[] enumeration = stringType.getEnumeration();
+            final StringValue[] arrayIncludingUnset = new StringValue[enumeration.length + 1];
+            System.arraycopy(enumeration, 0, arrayIncludingUnset, 1,
+                    enumeration.length);
+            final JComboBox comp = new JComboBox(arrayIncludingUnset);
             return new DefaultCellEditor(comp);
         }
         if (datatype instanceof StringType) {
@@ -37,11 +41,14 @@ public abstract class DatatypeViewFactory {
             return new DefaultCellEditor(comp) {
                 @Override
                 public Object getCellEditorValue() {
+                    if (comp.getText().length() == 0) {
+                        return null; // unset relationship
+                    }
                     try {
                         return stringType.parse(comp.getText());
                     } catch (final ConversionException e) {
                         // @todo provide error feedback somehow
-                        return Value.NULL;
+                        return null;
                     }
                 }
             };
@@ -54,11 +61,14 @@ public abstract class DatatypeViewFactory {
             return new DefaultCellEditor(comp) {
                 @Override
                 public Object getCellEditorValue() {
+                    if (comp.getText().length() == 0) {
+                        return null; // unset relationship
+                    }
                     try {
                         return decType.parse(comp.getText());
                     } catch (final ConversionException e) {
                         // @todo provide error feedback somehow
-                        return Value.NULL;
+                        return null;
                     }
                 }
             };
