@@ -148,6 +148,7 @@ import org.tockit.cernatoXML.parser.CernatoXMLParser;
 import org.tockit.context.model.BinaryRelation;
 import org.tockit.context.model.BinaryRelationImplementation;
 import org.tockit.context.model.Context;
+import org.tockit.datatype.ConversionException;
 import org.tockit.datatype.Datatype;
 import org.tockit.datatype.Value;
 import org.tockit.datatype.xsd.DecimalType;
@@ -434,6 +435,12 @@ EventBrokerListener {
 
         this.tableView = new TableView(this.conceptualSchema
                 .getManyValuedContext());
+        this.tableView.getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                editAttribute(tableView.columnAtPoint(e.getPoint()));
+            }
+        });
 
         final JScrollPane scrollPane = new JScrollPane(this.tableView);
         scrollPane.setRowHeaderView(this.rowHeader);
@@ -458,7 +465,10 @@ EventBrokerListener {
 
     private void editObject(final int row) {
         final WritableManyValuedContext manyValuedContext = this.conceptualSchema
-                .getManyValuedContext();
+        .getManyValuedContext();
+        if((row < 0)||(row>manyValuedContext.getObjects().size())) {
+            return;
+        }
         if (row == manyValuedContext.getObjects().size()) {
             // new object
             manyValuedContext.add(new FCAElementImplementation(""));
@@ -475,15 +485,49 @@ EventBrokerListener {
     }
 
     private void editAttribute(final int column) {
+        final WritableManyValuedContext manyValuedContext = this.conceptualSchema
+        .getManyValuedContext();
+        if((column < 0)||(column>manyValuedContext.getAttributes().size())) {
+            return;
+        }
+        if (column == manyValuedContext.getAttributes().size()) {
+            // TODO create separate dialog for new attributes/objects, since since
+            // doesn't look good and also means that "Cancel" doesn't work
+            Datatype firstType;
+            if (manyValuedContext.getTypes().isEmpty()) {
+                firstType = null;
+            } else {
+                firstType = manyValuedContext.getTypes().iterator().next();
+            }
+            manyValuedContext.add(new ManyValuedAttributeImplementation(firstType,
+            ""));
+        }
+
         final Frame tFrame = JOptionPane.getFrameForComponent(this.tableView);
-        final List<ManyValuedAttribute> manyValuedAttributeList = this.conceptualSchema
-        .getManyValuedContext().getAttributes();
+        final List<ManyValuedAttribute> manyValuedAttributeList = manyValuedContext
+        .getAttributes();
         final WritableManyValuedAttribute attribute = (WritableManyValuedAttribute) manyValuedAttributeList
         .get(column);
-        new ManyValuedAttributeDialog(tFrame, attribute, this.conceptualSchema
-                .getManyValuedContext());
-        this.conceptualSchema.getManyValuedContext().update();
+        final Datatype oldDatatype = attribute.getType();
+        new ManyValuedAttributeDialog(tFrame, attribute, manyValuedContext);
+        if(attribute.getType() != oldDatatype) {
+            convertValues(attribute);
+        }
+        manyValuedContext.update();
         this.tableView.updateModel();
+    }
+
+    private void convertValues(final WritableManyValuedAttribute attribute) {
+        final WritableManyValuedContext manyValuedContext = this.conceptualSchema.getManyValuedContext();
+        for (final FCAElement object : manyValuedContext.getObjects()) {
+            final Value oldValue = manyValuedContext.getRelationship(object, attribute);
+            try {
+                manyValuedContext.setRelationship(object, attribute, attribute.getType().convertType(oldValue));
+            } catch (final ConversionException e) {
+                // can't convert --> unset value
+                manyValuedContext.setRelationship(object, attribute, null);
+            }
+        }
     }
 
     private JToolBar createContextToolbar() {
@@ -502,15 +546,7 @@ EventBrokerListener {
             public void actionPerformed(final ActionEvent e) {
                 final WritableManyValuedContext manyValuedContext = SienaMainPanel.this.conceptualSchema
                 .getManyValuedContext();
-                Datatype firstType;
-                if (manyValuedContext.getTypes().isEmpty()) {
-                    firstType = null;
-                } else {
-                    firstType = manyValuedContext.getTypes().iterator().next();
-                }
-                manyValuedContext.add(new ManyValuedAttributeImplementation(
-                        firstType, ""));
-                editAttribute(manyValuedContext.getAttributes().size() - 1);
+                editAttribute(manyValuedContext.getAttributes().size());
             }
         });
 
