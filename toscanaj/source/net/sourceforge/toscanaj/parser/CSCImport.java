@@ -24,6 +24,7 @@ import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.database.Column;
 import net.sourceforge.toscanaj.model.database.DatabaseInfo;
@@ -126,29 +127,47 @@ public class CSCImport {
                         .getTitle().getContent()
                         : formalContext.getName();
                         if (!namesOfCreatedDiagrams.contains(name)) {
-                            final Context<FCAObject, FCAAttribute> context = new Context<FCAObject, FCAAttribute>() {
-                                public Set<FCAAttribute> getAttributes() {
-                                    return new HashSet(formalContext.getAttributes());
+                            final Map<FCAElement, FCAObject> objects = new HashMap<FCAElement, FCAObject>();
+                            final Map<FCAElement, FCAAttribute> attributes = new HashMap<FCAElement, FCAAttribute>();
+                            for (final FCAObject object : formalContext.getObjects()) {
+                                objects.put(new FCAElementImplementation(object
+                                        .getDescription().getContent()), object);
+                            }
+                            for (final FCAAttribute attribute : formalContext
+                                    .getAttributes()) {
+                                attributes.put(new FCAElementImplementation(attribute
+                                        .getDescription().getContent()), attribute);
+                            }
+                            final Context<FCAElement, FCAElement> context = new Context<FCAElement, FCAElement>() {
+                                public Set<FCAElement> getAttributes() {
+                                    return attributes.keySet();
                                 }
                                 public String getName() {
                                     return name;
                                 }
 
-                                public Set<FCAObject> getObjects() {
-                                    return new HashSet<FCAObject>(formalContext
-                                            .getObjects());
+                                public Set<FCAElement> getObjects() {
+                                    return objects.keySet();
                                 }
 
-                                public BinaryRelation<FCAObject, FCAAttribute> getRelation() {
-                                    return formalContext.getRelation();
+                                public BinaryRelation<FCAElement, FCAElement> getRelation() {
+                                    return new BinaryRelation<FCAElement, FCAElement>() {
+                                        public boolean contains(
+                                                final FCAElement object,
+                                                final FCAElement attribute) {
+                                            return formalContext.getRelation()
+                                            .contains(objects.get(object),
+                                                    attributes.get(attribute));
+                                        }
+                                    };
                                 }
                             };
-                            final LatticeGenerator<FCAObject, FCAAttribute> lgen = new GantersAlgorithm<FCAObject, FCAAttribute>();
-                            final Lattice<FCAObject, FCAAttribute> lattice = lgen
+                            final LatticeGenerator<FCAElement, FCAElement> lgen = new GantersAlgorithm<FCAElement, FCAElement>();
+                    final Lattice<FCAElement, FCAElement> lattice = lgen
                             .createLattice(context);
                             final Diagram2D diagram2D = NDimLayoutOperations
                             .createDiagram(lattice, name,
-                                    new DefaultDimensionStrategy<FCAAttribute>());
+                                    new DefaultDimensionStrategy<FCAElement>());
                             rescale(diagram2D);
                             schema.addDiagram(diagram2D);
                         }
