@@ -5,6 +5,8 @@ Affecting different programs:
 =============================
 - CSC import has been enhanced to import not only diagrams, but also concrete scales
   and contexts for which no diagram exists.
+- OAL export of a context with unassigned attributes will now start with a line
+  containing a colon followed by the list of unassigned attributes  
 
 Specific for ToscanaJ:
 ======================
@@ -15,7 +17,7 @@ Specific for Elba:
 Specific for Siena (still not fully complete):
 ==============================================
 - Bugfix: starting a line with a colon used to create an object with no name, which
-  caused errors when trying to display the object in a label. The behaviour has been
+  caused errors when trying to display the object in a label. The behavior has been
   changed to interpret such a line as a list of attributes that may or may not be
   assigned to any object, thus allowing to define any type of context.
 
