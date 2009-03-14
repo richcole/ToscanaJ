@@ -370,10 +370,10 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
         // returns true if all the cells are empty
         protected boolean isEmpty() {
             final boolean isEmpty = true;
-            for (final Object[] element : this.modelData) {
-                for (int col = 0; col < element.length; col++) {
-                    if (element[col] != null) {
-                        final String cellValue = (String) element[col];
+            for (final Object[] row : this.modelData) {
+                for (final Object cell : row) {
+                    if (cell != null) {
+                        final String cellValue = (String) cell;
                         if (!cellValue.trim().equals("")) {
                             return false;
                         }
