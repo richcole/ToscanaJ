@@ -766,7 +766,7 @@ public class DatabaseConnectionInformationView extends JDialog implements
         this.internalBroker = new EventBroker();
         this.databaseInfo = new DatabaseInfo();
         new DatabaseSchema(internalBroker); // at the moment needed for event
-                                            // processing
+        // processing
         this.connection = new DatabaseConnection(internalBroker);
 
         initializePanels();

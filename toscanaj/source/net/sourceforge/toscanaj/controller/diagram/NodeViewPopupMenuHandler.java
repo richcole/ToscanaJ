@@ -35,7 +35,7 @@ import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
 public class NodeViewPopupMenuHandler implements EventBrokerListener,
-ClipboardOwner {
+        ClipboardOwner {
     private final DiagramView diagramView;
 
     public NodeViewPopupMenuHandler(final DiagramView diagramView,
@@ -52,7 +52,7 @@ ClipboardOwner {
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                    + " has to be subscribed to CanvasItemEventWithPositions only");
+                            + " has to be subscribed to CanvasItemEventWithPositions only");
         }
         NodeView nodeView = null;
         try {
@@ -60,7 +60,7 @@ ClipboardOwner {
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                    + " has to be subscribed to events from ObjectLabelViews only");
+                            + " has to be subscribed to events from ObjectLabelViews only");
         }
         openPopupMenu(nodeView, itemEvent.getAWTPosition());
     }
@@ -83,9 +83,9 @@ ClipboardOwner {
         final String lineSeparator = System.getProperty("line.separator");
         final Concept concept = nodeView.getDiagramNode().getConcept();
         final ConceptInterpreter interpreter = this.diagramView
-        .getConceptInterpreter();
+                .getConceptInterpreter();
         final ConceptInterpretationContext context = nodeView
-        .getConceptInterpretationContext();
+                .getConceptInterpretationContext();
         String description = "";
         final int intentSize = concept.getIntentSize();
         if (intentSize > 0) {
@@ -93,10 +93,10 @@ ClipboardOwner {
                 description = "Intent (1 attribute):" + lineSeparator;
             } else {
                 description = "Intent (" + intentSize + " attributes):"
-                + lineSeparator;
+                        + lineSeparator;
             }
             final Iterator attrContIt = concept
-            .getAttributeContingentIterator();
+                    .getAttributeContingentIterator();
             final Set<Object> attributeContingent = new HashSet<Object>();
             while (attrContIt.hasNext()) {
                 final Object attrib = attrContIt.next();
@@ -122,11 +122,11 @@ ClipboardOwner {
                 description += "Extent (1 object):" + lineSeparator;
             } else {
                 description += "Extent (" + extentSize + " objects):"
-                + lineSeparator;
+                        + lineSeparator;
             }
             final boolean oldDisplayMode = context.getObjectDisplayMode();
             context
-            .setObjectDisplayMode(ConceptInterpretationContext.CONTINGENT);
+                    .setObjectDisplayMode(ConceptInterpretationContext.CONTINGENT);
             final Iterator objContIt = interpreter.getObjectSetIterator(
                     concept, context);
             final Set<String> objectContingent = new HashSet<String>();

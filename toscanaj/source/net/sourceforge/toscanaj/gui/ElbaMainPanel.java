@@ -109,12 +109,12 @@ import org.tockit.events.EventBrokerListener;
 import org.tockit.swing.preferences.ExtendedPreferences;
 
 public class ElbaMainPanel extends JFrame implements MainPanel,
-EventBrokerListener {
+        EventBrokerListener {
     private static final String WINDOW_TITLE = "Elba";
     private static final int MaxMruFiles = 8;
 
     private static final ExtendedPreferences preferences = ExtendedPreferences
-    .userNodeForClass(ElbaMainPanel.class);
+            .userNodeForClass(ElbaMainPanel.class);
 
     /**
      * Main Controllers
@@ -180,7 +180,7 @@ EventBrokerListener {
         // this has to happen before the menu gets created, since the menu uses
         // the information
         final DiagramView diagramView = this.diagramEditingView
-        .getDiagramView();
+                .getDiagramView();
         final double minLabelFontSize = preferences.getDouble(
                 "minLabelFontSize", diagramView.getMinimumFontSize());
         diagramView.setMinimumFontSize(minLabelFontSize);
@@ -218,7 +218,7 @@ EventBrokerListener {
         this.connectionInformationView = new DatabaseConnectionInformationView(
                 this, this.conceptualSchema, this.eventBroker);
         this.schemaDescriptionView = new XMLEditorDialog(this,
-        "System description");
+                "System description");
         this.toolbar = new JToolBar();
         this.newDiagramButton = new JButton("New Diagram...");
         this.newDiagramButton.addActionListener(new ActionListener() {
@@ -228,16 +228,16 @@ EventBrokerListener {
         });
 
         final JButton schemaDescriptionButton = new JButton(
-        "System Description...");
+                "System Description...");
         schemaDescriptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 ElbaMainPanel.this.schemaDescriptionView
-                .setContent(ElbaMainPanel.this.conceptualSchema
-                        .getDescription());
+                        .setContent(ElbaMainPanel.this.conceptualSchema
+                                .getDescription());
                 ElbaMainPanel.this.schemaDescriptionView.setVisible(true);
                 ElbaMainPanel.this.conceptualSchema
-                .setDescription(ElbaMainPanel.this.schemaDescriptionView
-                        .getContent());
+                        .setDescription(ElbaMainPanel.this.schemaDescriptionView
+                                .getContent());
             }
         });
 
@@ -258,7 +258,7 @@ EventBrokerListener {
         this.diagramEditingView.setDividerLocation(preferences.getInt(
                 "diagramViewDivider", 200));
         final DiagramView diagramView = this.diagramEditingView
-        .getDiagramView();
+                .getDiagramView();
         diagramView.setObjectLabelFactory(SqlClauseLabelView.getFactory());
 
         diagramView.getController().getEventBroker().subscribe(this,
@@ -295,21 +295,21 @@ EventBrokerListener {
                             final LatticeGenerator lgen = new GantersAlgorithm();
                             lattice = lgen.createLattice(context);
                             newDiagram = NDimLayoutOperations
-                            .createDiagram(
-                                    lattice,
-                                    context.getName(),
-                                    new MeetIrreducibleChainsDimensionStrategy());
+                                    .createDiagram(
+                                            lattice,
+                                            context.getName(),
+                                            new MeetIrreducibleChainsDimensionStrategy());
                             if (null != newDiagram) {
                                 Diagram2D diagramWithSameTitle = null;
                                 int indexOfExistingDiagram = -1;
                                 for (int i = 0; i < ElbaMainPanel.this.conceptualSchema
-                                .getNumberOfDiagrams(); i++) {
+                                        .getNumberOfDiagrams(); i++) {
                                     if (ElbaMainPanel.this.conceptualSchema
                                             .getDiagram(i).getTitle()
                                             .equalsIgnoreCase(
                                                     newDiagram.getTitle())) {
                                         diagramWithSameTitle = ElbaMainPanel.this.conceptualSchema
-                                        .getDiagram(i);
+                                                .getDiagram(i);
                                         indexOfExistingDiagram = i;
                                     }
                                 }
@@ -325,10 +325,10 @@ EventBrokerListener {
                                     }
                                 } else {
                                     ElbaMainPanel.this.conceptualSchema
-                                    .addDiagram(newDiagram);
+                                            .addDiagram(newDiagram);
                                     ElbaMainPanel.this.diagramEditingView
-                                    .getDiagramView().showDiagram(
-                                            newDiagram);
+                                            .getDiagramView().showDiagram(
+                                                    newDiagram);
                                 }
                             }
                         }
@@ -346,12 +346,12 @@ EventBrokerListener {
                         ElbaMainPanel.this.conceptualSchema.exchangeDiagrams(
                                 (ElbaMainPanel.this.conceptualSchema
                                         .getNumberOfDiagrams() - 1),
-                                        indexOfExistingDiagram);
+                                indexOfExistingDiagram);
                         ElbaMainPanel.this.conceptualSchema
-                        .removeDiagram(diagramWithSameTitle);
+                                .removeDiagram(diagramWithSameTitle);
                     } else {
                         ElbaMainPanel.this.conceptualSchema
-                        .removeDiagram(diagramWithSameTitle);
+                                .removeDiagram(diagramWithSameTitle);
                     }
                 }
 
@@ -385,18 +385,18 @@ EventBrokerListener {
                                 "Discard New Diagram", "Rename New Diagram" };
                         return JOptionPane.showOptionDialog(parent,
                                 "A diagram with the title '"
-                                + returnValue.getTitle()
-                                + "' already exists.", "Title exists",
+                                        + returnValue.getTitle()
+                                        + "' already exists.", "Title exists",
                                 JOptionPane.YES_NO_CANCEL_OPTION,
                                 JOptionPane.ERROR_MESSAGE, null, options,
                                 options[2]);
                     } else {
                         options = new Object[] { "Replace Old Diagram",
-                        "Discard New Diagram" };
+                                "Discard New Diagram" };
                         return JOptionPane.showOptionDialog(parent,
                                 "A diagram with the title '"
-                                + returnValue.getTitle()
-                                + "' already exists.", "Title exists",
+                                        + returnValue.getTitle()
+                                        + "' already exists.", "Title exists",
                                 JOptionPane.YES_NO_OPTION,
                                 JOptionPane.ERROR_MESSAGE, null, options, null);
                     }
@@ -405,9 +405,9 @@ EventBrokerListener {
             popupMenu.add(menuItem);
         }
         final int x = this.newDiagramButton.getLocationOnScreen().x
-        - this.getX() + 20;
+                - this.getX() + 20;
         final int y = this.newDiagramButton.getLocationOnScreen().y
-        - this.getY() + 10;
+                - this.getY() + 10;
         popupMenu.show(this, x, y);
     }
 
@@ -423,7 +423,7 @@ EventBrokerListener {
 
     public void createMenuBar() {
         final DiagramView diagramView = this.diagramEditingView
-        .getDiagramView();
+                .getDiagramView();
         final JFrame parent = this;
 
         this.saveActivity = new SaveConceptualSchemaActivity(
@@ -475,7 +475,7 @@ EventBrokerListener {
         });
         final SimpleAction newAction = new SimpleAction(this,
                 newSchemaActivity, "New", KeyEvent.VK_N, KeyStroke
-                .getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+                        .getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
 
         final JMenuItem newMenuItem = new JMenuItem("New");
         newMenuItem.setMnemonic(KeyEvent.VK_N);
@@ -487,7 +487,7 @@ EventBrokerListener {
         loadSchemaActivity.setTestOpenOkActivity(testSchemaSavedActivity);
         final OpenFileAction openFileAction = new OpenFileAction(this,
                 loadSchemaActivity, this.currentFile, KeyEvent.VK_O, KeyStroke
-                .getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+                        .getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
         openFileAction.addPostOpenActivity(new SimpleActivity() {
             public boolean doActivity() throws Exception {
                 updateWindowTitle();
@@ -546,8 +546,8 @@ EventBrokerListener {
             final Frame frame = JOptionPane.getFrameForComponent(this);
             this.exportDiagramAction = new ExportDiagramAction(frame,
                     this.diagramExportSettings, this.diagramEditingView
-                    .getDiagramView(), KeyEvent.VK_E, KeyStroke
-                    .getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+                            .getDiagramView(), KeyEvent.VK_E, KeyStroke
+                            .getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
             this.fileMenu.add(this.exportDiagramAction);
             this.exportDiagramAction.setEnabled(false);
 
@@ -606,7 +606,7 @@ EventBrokerListener {
         viewMenu.add(setMinLabelSizeSubMenu);
 
         final JCheckBoxMenuItem showAttributeLabels = new JCheckBoxMenuItem(
-        "Show Attribute Labels");
+                "Show Attribute Labels");
         showAttributeLabels.setMnemonic(KeyEvent.VK_A);
         showAttributeLabels.setSelected(true);
         showAttributeLabels.addActionListener(new ActionListener() {
@@ -620,7 +620,7 @@ EventBrokerListener {
         viewMenu.add(showAttributeLabels);
 
         final JCheckBoxMenuItem showObjectLabels = new JCheckBoxMenuItem(
-        "Show Object Labels");
+                "Show Object Labels");
         showObjectLabels.setMnemonic(KeyEvent.VK_O);
         showObjectLabels.setSelected(true);
         showObjectLabels.addActionListener(new ActionListener() {
@@ -638,14 +638,14 @@ EventBrokerListener {
         final JMenu toolMenu = new JMenu("Tools");
         toolMenu.setMnemonic(KeyEvent.VK_T);
         this.dumpStatisticalDataMenuItem = new JMenuItem(
-        "Export Realized Scales...");
+                "Export Realized Scales...");
         this.dumpStatisticalDataMenuItem.setMnemonic(KeyEvent.VK_S);
         this.dumpStatisticalDataMenuItem
-        .addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                exportStatisticalData();
-            }
-        });
+                .addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        exportStatisticalData();
+                    }
+                });
         this.dumpStatisticalDataMenuItem.setEnabled(false);
         toolMenu.add(this.dumpStatisticalDataMenuItem);
         this.dumpSQLMenuItem = new JMenuItem("Export Database as SQL...");
@@ -658,28 +658,28 @@ EventBrokerListener {
         this.dumpSQLMenuItem.setEnabled(false);
         toolMenu.add(this.dumpSQLMenuItem);
         this.createOptimizedSystemMenuItem = new JMenuItem(
-        "Create Speed Optimized System...");
+                "Create Speed Optimized System...");
         this.createOptimizedSystemMenuItem.setMnemonic(KeyEvent.VK_O);
         this.createOptimizedSystemMenuItem
-        .addActionListener(new ActionListener() {
-            public void actionPerformed(final ActionEvent e) {
-                checkForMissingSave();
-                final int result = JOptionPane
-                .showOptionDialog(
-                        parent,
-                        "Creating a speed optimized system will modify your database by adding a column for each diagram\n"
-                        + "and your conceptual schema will be changed to query these new columns.\n\n"
-                        + "The procedure can take some time on a large system. At the end Elba will offer you to save the\n"
-                        + "new conceptual schema, since the changed made are irreversible.\n\n",
-                        "Warning", JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null,
-                        new String[] { "Cancel", "Continue" },
-                "Cancel");
-                if (result == 1) {
-                    createSpeedOptimizedSystem();
-                }
-            }
-        });
+                .addActionListener(new ActionListener() {
+                    public void actionPerformed(final ActionEvent e) {
+                        checkForMissingSave();
+                        final int result = JOptionPane
+                                .showOptionDialog(
+                                        parent,
+                                        "Creating a speed optimized system will modify your database by adding a column for each diagram\n"
+                                                + "and your conceptual schema will be changed to query these new columns.\n\n"
+                                                + "The procedure can take some time on a large system. At the end Elba will offer you to save the\n"
+                                                + "new conceptual schema, since the changed made are irreversible.\n\n",
+                                        "Warning", JOptionPane.YES_NO_OPTION,
+                                        JOptionPane.WARNING_MESSAGE, null,
+                                        new String[] { "Cancel", "Continue" },
+                                        "Cancel");
+                        if (result == 1) {
+                            createSpeedOptimizedSystem();
+                        }
+                    }
+                });
         this.createOptimizedSystemMenuItem.setEnabled(false);
         toolMenu.add(this.createOptimizedSystemMenuItem);
 
@@ -729,15 +729,15 @@ EventBrokerListener {
         final Object[] options = { "Drop database information",
                 "Keep information", "Go back" };
         final int result = JOptionPane
-        .showOptionDialog(
-                this,
-                "No database connection is established, which means the current database\n"
-                + "information might be wrong. Storing a schema with broken database information\n"
-                + "might disallow opening it in ToscanaJ, dropping the database information will\n"
-                + "cause ToscanaJ to display the query clauses. What do you want to do?",
-                "Database not connected",
-                JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+                .showOptionDialog(
+                        this,
+                        "No database connection is established, which means the current database\n"
+                                + "information might be wrong. Storing a schema with broken database information\n"
+                                + "might disallow opening it in ToscanaJ, dropping the database information will\n"
+                                + "cause ToscanaJ to display the query clauses. What do you want to do?",
+                        "Database not connected",
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.WARNING_MESSAGE, null, options, options[2]);
         if (result == 0) {
             this.conceptualSchema.setDatabaseInfo(null);
             return true;
@@ -782,7 +782,7 @@ EventBrokerListener {
         // will be used to check if we have at least one entry
         if (this.mruList.size() > 0) {
             final ListIterator<String> it = this.mruList
-            .listIterator(this.mruList.size());
+                    .listIterator(this.mruList.size());
             while (it.hasPrevious()) {
                 final String cur = it.previous();
                 if (this.currentFile != null
@@ -823,7 +823,7 @@ EventBrokerListener {
                 .getDividerLocation());
         preferences.put("lastCSCFile", this.lastCSCFile.getAbsolutePath());
         preferences
-        .put("lastExportFile", this.lastExportFile.getAbsolutePath());
+                .put("lastExportFile", this.lastExportFile.getAbsolutePath());
         this.diagramEditingView.saveConfigurationSettings();
         System.exit(0);
     }
@@ -857,7 +857,7 @@ EventBrokerListener {
         if (e instanceof ConceptualSchemaChangeEvent) {
             final ConceptualSchemaChangeEvent schemaEvent = (ConceptualSchemaChangeEvent) e;
             final ConceptualSchema newConceptualSchema = schemaEvent
-            .getConceptualSchema();
+                    .getConceptualSchema();
             if (newConceptualSchema != this.conceptualSchema) {
                 this.conceptualSchema = newConceptualSchema;
                 if (this.schemaDescriptionView != null) {
@@ -887,7 +887,7 @@ EventBrokerListener {
         this.createOptimizedSystemMenuItem.setEnabled(false);
         disconnectDatabase();
         final DatabaseInfo databaseInformation = this.conceptualSchema
-        .getDatabaseInfo();
+                .getDatabaseInfo();
         if (databaseInformation != null
                 && databaseInformation.getDriverClass() != null
                 && databaseInformation.getURL() != null) {
@@ -895,7 +895,7 @@ EventBrokerListener {
                 DatabaseConnection.setConnection(this.databaseConnection);
                 this.databaseConnection.connect(databaseInformation);
                 final URL location = this.conceptualSchema.getDatabaseInfo()
-                .getEmbeddedSQLLocation();
+                        .getEmbeddedSQLLocation();
                 if (location != null) {
                     this.databaseConnection.executeScript(location);
                 }
@@ -916,7 +916,7 @@ EventBrokerListener {
             } catch (final DatabaseException ex) {
                 ErrorDialog.showError(this, ex, "Closing database error",
                         "Some error closing the old database:\n"
-                        + ex.getMessage());
+                                + ex.getMessage());
             }
         }
     }
@@ -979,7 +979,7 @@ EventBrokerListener {
             return;
         } catch (final Error e) {
             ErrorDialog.showError(this, e, "Could not parse file",
-            "Could not parse CSC file");
+                    "Could not parse CSC file");
             return;
         }
     }
@@ -1021,8 +1021,8 @@ EventBrokerListener {
             DataDump.dumpData(this.conceptualSchema,
                     new DatabaseConnectedConceptInterpreter(
                             this.conceptualSchema.getDatabaseInfo()),
-                            outputStream, filterClause, includeContingentLists,
-                            includeIntentExtent, null);
+                    outputStream, filterClause, includeContingentLists,
+                    includeIntentExtent, null);
             outputStream.close();
         } catch (final Exception e) {
             ErrorDialog.showError(this, e, "Could not export file");
@@ -1102,7 +1102,7 @@ EventBrokerListener {
         // / @todo do we want to call the consistency check here?
 
         final DatabaseInfo databaseInfo = this.conceptualSchema
-        .getDatabaseInfo();
+                .getDatabaseInfo();
         final String tableName = databaseInfo.getTable().getSqlExpression();
 
         try {
@@ -1124,13 +1124,13 @@ EventBrokerListener {
                 while (nodeIt.hasNext()) {
                     final DiagramNode node = nodeIt.next();
                     final ConceptImplementation concept = (ConceptImplementation) node
-                    .getConcept();
+                            .getConcept();
                     if (concept.getObjectContingentSize() != 0) {
                         final String oldWhereClause = WhereClauseGenerator
-                        .createClause(concept
-                                .getObjectContingentIterator());
+                                .createClause(concept
+                                        .getObjectContingentIterator());
                         final String newWhereClause = columnName + " = "
-                        + contingentCount;
+                                + contingentCount;
                         this.databaseConnection.executeUpdate("UPDATE "
                                 + tableName + " SET " + newWhereClause
                                 + " WHERE " + oldWhereClause + ";");
@@ -1171,11 +1171,11 @@ EventBrokerListener {
         // 2 : Go back (cancel save/open/close operation)
         final Object[] options = { "Save", "Discard", "Go back" };
         return JOptionPane
-        .showOptionDialog(
-                this,
-                "The conceptual schema has been modified. Do you want to save the changes?",
-                "Schema changed", JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.WARNING_MESSAGE, null, options, options[2]);
+                .showOptionDialog(
+                        this,
+                        "The conceptual schema has been modified. Do you want to save the changes?",
+                        "Schema changed", JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.WARNING_MESSAGE, null, options, options[2]);
     }
 
     protected void showDatabaseConnectionDialog() {

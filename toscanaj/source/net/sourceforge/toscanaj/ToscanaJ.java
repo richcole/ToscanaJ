@@ -51,7 +51,7 @@ public class ToscanaJ {
             System.exit(1);
         }
         assert cl != null; // to stop Eclipse from whinging -- it thinks it is
-                           // possible to get a null here
+        // possible to get a null here
         if (cl.getArgs().length > 1) {
             showUsage(options, System.err);
             System.exit(1);

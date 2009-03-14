@@ -51,7 +51,7 @@ public class ObjectAttributeListParser {
             final Collection<FCAElement> objects = context.getObjects();
             final Collection<FCAElement> attributes = context.getAttributes();
             final BinaryRelationImplementation<FCAElement, FCAElement> relation = context
-            .getRelationImplementation();
+                    .getRelationImplementation();
 
             String curLine = in.readLine();
             int lineCount = 0;
@@ -60,7 +60,7 @@ public class ObjectAttributeListParser {
                 if (curLine.indexOf(':') == -1) {
                     throw new DataFormatException(
                             "Input file contains line without colon in line "
-                            + lineCount);
+                                    + lineCount);
                 }
                 // using the tokenizer allows for quotes and escapes
                 StringTokenizer tokenizer = new StringTokenizer(curLine, ':',
@@ -72,7 +72,8 @@ public class ObjectAttributeListParser {
                     objects.add(object);
                     // the rest might be split along more colons, though -- just
                     // ignore that
-                    final String rest = curLine.substring(objectText.length() + 1);
+                    final String rest = curLine
+                            .substring(objectText.length() + 1);
                     tokenizer = new StringTokenizer(rest, ';', '"', '\\');
                     while (tokenizer.hasNext()) {
                         final FCAElement attribute = new FCAElementImplementation(

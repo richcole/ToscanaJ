@@ -114,7 +114,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private static final double GRID_SIZE_CHANGE_FACTOR = 1.2599210498948731647672106072782;
     private static final int DEFAULT_GRID_SIZE = 15;
     private static final ExtendedPreferences preferences = ExtendedPreferences
-    .userNodeForClass(DiagramEditingView.class);
+            .userNodeForClass(DiagramEditingView.class);
 
     /**
      * The names used in the GUI for the manipulators.
@@ -122,16 +122,16 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
      * This has to be the same size and order as the #NODE_MANIPULATORS array.
      */
     private static final String[] FULL_MOVEMENT_OPTION_NAMES = { "Additive",
-        "Chain", "Node", "Ideal", "Filter" };
+            "Chain", "Node", "Ideal", "Filter" };
 
     /**
      * The manipulators offered for moving nodes.
      */
     private static final EventBrokerListener[] NODE_MANIPULATORS = {
-        new AttributeAdditiveNodeMovementEventListener(),
-        new ChainBasedNodeMovementEventListener(),
-        new NodeMovementEventListener(), new IdealMovementEventListener(),
-        new FilterMovementEventListener() };
+            new AttributeAdditiveNodeMovementEventListener(),
+            new ChainBasedNodeMovementEventListener(),
+            new NodeMovementEventListener(), new IdealMovementEventListener(),
+            new FilterMovementEventListener() };
 
     private ConceptualSchema conceptualSchema;
     private DefaultListModel diagramListModel;
@@ -193,7 +193,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         diagramView = new DiagramView();
         diagramView.setQuery(ListQuery.KEY_LIST_QUERY);
         final EventBroker canvasEventBroker = diagramView.getController()
-        .getEventBroker();
+                .getEventBroker();
         final DirectConceptInterpreter interpreter = new DirectConceptInterpreter();
         final ConceptInterpretationContext interpretationContext = new ConceptInterpretationContext(
                 new DiagramHistory(), canvasEventBroker);
@@ -242,7 +242,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                     editContext();
                 } catch (final Throwable t) {
                     ErrorDialog.showError(component, t,
-                    "Context editing failed");
+                            "Context editing failed");
                 }
             }
         });
@@ -370,7 +370,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     protected void setManipulator(final EventBrokerListener manipulator) {
         final EventBroker canvasEventBroker = diagramView.getController()
-        .getEventBroker();
+                .getEventBroker();
         for (final EventBrokerListener listener : NODE_MANIPULATORS) {
             canvasEventBroker.removeSubscriptions(listener);
         }
@@ -402,7 +402,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     protected void editContext() {
         ContextImplementation context = (ContextImplementation) DiagramToContextConverter
-        .getContext(this.diagramView.getDiagram());
+                .getContext(this.diagramView.getDiagram());
         contextEditingDialog.setContext(context);
         if (contextEditingDialog.execute()) {
             final Map<Object, Point2D> attributeVectors = findVectorsForAttributes(this.diagramView
@@ -415,7 +415,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
             do {
                 ok = true;
                 final Diagram2D foundDiagram = this.conceptualSchema
-                .getDiagram(contextName);
+                        .getDiagram(contextName);
                 if (foundDiagram != null
                         && foundDiagram != this.diagramView.getDiagram()) {
                     ok = false;
@@ -450,18 +450,18 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
             final Map<Object, Point2D> attributeVectors) {
         final Vector<Point2D> base = diagram.getBase();
         for (final Iterator<DiagramNode> nodeIt = diagram.getNodes(); nodeIt
-        .hasNext();) {
+                .hasNext();) {
             final NDimDiagramNode node = (NDimDiagramNode) nodeIt.next();
             final Concept concept = node.getConcept();
             if (concept.isMeetIrreducible()) {
                 final double[] ndimVec = node.getNdimVector();
                 int dim = -1;
                 for (final Iterator<DiagramLine> lineIt = diagram.getLines(); lineIt
-                .hasNext();) {
+                        .hasNext();) {
                     final DiagramLine line = lineIt.next();
                     if (line.getToNode() == node) {
                         final NDimDiagramNode parentNode = (NDimDiagramNode) line
-                        .getFromNode();
+                                .getFromNode();
                         final double[] parentVec = parentNode.getNdimVector();
                         for (int i = 0; i < parentVec.length; i++) {
                             if (parentVec[i] < ndimVec[i]) {
@@ -497,14 +497,14 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
             final Diagram2D diagram) {
         final Map<Object, Point2D> result = new Hashtable<Object, Point2D>();
         for (final Iterator<DiagramNode> nodeIt = diagram.getNodes(); nodeIt
-        .hasNext();) {
+                .hasNext();) {
             final DiagramNode node = nodeIt.next();
             final Concept concept = node.getConcept();
             if (concept.isMeetIrreducible()) {
                 final Point2D nodePos = node.getPosition();
                 Point2D parentPos = null;
                 for (final Iterator<DiagramLine> lineIt = diagram.getLines(); lineIt
-                .hasNext();) {
+                        .hasNext();) {
                     final DiagramLine line = lineIt.next();
                     if (line.getToNode() == node) {
                         parentPos = line.getFromPosition();
@@ -528,15 +528,15 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     protected void editDiagramDescription() {
         final WriteableDiagram2D currentDiagram = (WriteableDiagram2D) this.diagramView
-        .getDiagram();
+                .getDiagram();
         if (currentDiagram != null) {
             final XMLEditorDialog diagramDescriptionEditor = new XMLEditorDialog(
                     null, "Diagram description editor");
             diagramDescriptionEditor
-            .setContent(currentDiagram.getDescription());
+                    .setContent(currentDiagram.getDescription());
             diagramDescriptionEditor.setVisible(true);
             currentDiagram
-            .setDescription(diagramDescriptionEditor.getContent());
+                    .setDescription(diagramDescriptionEditor.getContent());
         }
     }
 
@@ -580,7 +580,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                     if (listView.getSelectedIndex() == 0) {
                         upButton.setEnabled(false);
                         downButton
-                        .setEnabled(listView.getSelectedIndex() != -1);
+                                .setEnabled(listView.getSelectedIndex() != -1);
                     } else if (listView.getSelectedIndex() + 1 == listView
                             .getModel().getSize()) {
                         downButton.setEnabled(false);
@@ -588,11 +588,11 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                     } else {
                         upButton.setEnabled(listView.getSelectedIndex() != -1);
                         downButton
-                        .setEnabled(listView.getSelectedIndex() != -1);
+                                .setEnabled(listView.getSelectedIndex() != -1);
                     }
                     removeButton.setEnabled(listView.getSelectedIndex() != -1);
                     duplicateButton
-                    .setEnabled(listView.getSelectedIndex() != -1);
+                            .setEnabled(listView.getSelectedIndex() != -1);
                     final int[] selections = listView.getSelectedIndices();
                     if (selections.length == 1) {
                         diagramView.showDiagram(conceptualSchema
@@ -618,7 +618,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 final int index = listView.getSelectedIndex();
                 if (index != -1) {
                     final Diagram2D diagram = conceptualSchema
-                    .getDiagram(index);
+                            .getDiagram(index);
                     final Diagram2D copiedDiagram = copyDiagram(diagram);
                     if (copiedDiagram != null) {
                         conceptualSchema.addDiagram(copiedDiagram);
@@ -681,12 +681,12 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 duplicateItem.addActionListener(new ActionListener() {
                     public void actionPerformed(final ActionEvent ae) {
                         final Diagram2D diagram = conceptualSchema
-                        .getDiagram(indexHit);
+                                .getDiagram(indexHit);
                         final Diagram2D copiedDiagram = copyDiagram(diagram);
                         if (copiedDiagram != null) {
                             conceptualSchema.addDiagram(copiedDiagram);
                             final int pos = diagramListModel
-                            .indexOf(copiedDiagram.getTitle());
+                                    .indexOf(copiedDiagram.getTitle());
                             listView.setSelectedIndex(pos);
                         }
                     }
@@ -707,7 +707,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                         popupMenu.add(new AbstractAction() {
                             public void actionPerformed(final ActionEvent ae) {
                                 final Diagram2D diagram = conceptualSchema
-                                .getDiagram(indexHit);
+                                        .getDiagram(indexHit);
                                 action.actionPerformed(ae, diagram);
                             }
 
@@ -737,7 +737,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         diagramListModel.clear();
         for (int i = 0; i < conceptualSchema.getNumberOfDiagrams(); i++) {
             final SimpleLineDiagram diagram = (SimpleLineDiagram) conceptualSchema
-            .getDiagram(i);
+                    .getDiagram(i);
             diagramListModel.addElement(diagram.getTitle());
         }
     }
@@ -792,7 +792,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
     public void saveConfigurationSettings() {
         preferences
-        .putBoolean("useGrid", this.gridEnabledCheckBox.isSelected());
+                .putBoolean("useGrid", this.gridEnabledCheckBox.isSelected());
         preferences.putDouble("gridCellHeight", this.diagramView
                 .getGridCellHeight());
         preferences.putDouble("gridCellWidth", this.diagramView
@@ -823,15 +823,15 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         // support SimpleLineDiagram copying
         if (!(diagram instanceof SimpleLineDiagram)) {
             JOptionPane
-            .showMessageDialog(
-                    this,
-                    "Sorry, don't know how to copy a diagram other then SimpleLineDiagram",
-                    "Error copying diagram", JOptionPane.ERROR_MESSAGE);
+                    .showMessageDialog(
+                            this,
+                            "Sorry, don't know how to copy a diagram other then SimpleLineDiagram",
+                            "Error copying diagram", JOptionPane.ERROR_MESSAGE);
             return null;
         }
         String copiedDiagramTitle = createCopiedDiagramTitle(diagram.getTitle());
         Diagram2D foundDiagram = conceptualSchema
-        .getDiagram(copiedDiagramTitle);
+                .getDiagram(copiedDiagramTitle);
         while (foundDiagram != null) {
             copiedDiagramTitle = createCopiedDiagramTitle(foundDiagram
                     .getTitle());
@@ -850,12 +850,12 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
             final int index2 = diagramTitle.lastIndexOf(")");
             if ((index1 > 0) && (index2 > 0)) {
                 final String numStr = diagramTitle
-                .substring(index1 + 1, index2);
+                        .substring(index1 + 1, index2);
                 final String baseStr = diagramTitle.substring(0, index1).trim();
                 try {
                     final Integer num = new Integer(numStr);
                     copiedDiagramTitle = baseStr + " (" + (num.intValue() + 1)
-                    + ")";
+                            + ")";
                 } catch (final NumberFormatException e) {
                     // ignore this exception because if whatever is in
                     // parenthesis

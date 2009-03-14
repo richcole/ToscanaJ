@@ -251,7 +251,7 @@ public class ExportDiagramAction extends KeyboardMappedAction {
             ExportDiagramAction.this.exportSettingsPanel.saveSettings();
             File selectedFile = getSelectedFile();
             if (selectedFile.getName().indexOf('.') == -1) { // check for
-                                                             // extension
+                // extension
                 // add default
                 final FileFilter filter = getFileFilter();
                 if (filter instanceof ExtensionFileFilter) {

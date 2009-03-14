@@ -44,7 +44,7 @@ public class DiagramHistoryView extends JList {
                 final int index, // cell index
                 final boolean isSelected, // is the cell selected
                 final boolean cellHasFocus) // the list and the cell have the
-                                            // focus
+        // focus
         {
             final DiagramHistory history = (DiagramHistory) list.getModel();
 

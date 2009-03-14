@@ -49,8 +49,7 @@ public class GantersAlgorithm<O, A> implements LatticeGenerator<O, A> {
      * Maps the relation into a BitSet array, assuming the members "objects" and
      * "attributes" are set.
      */
-    private BitSet[] createRelation(
-            final BinaryRelation<O, A> inputRelation) {
+    private BitSet[] createRelation(final BinaryRelation<O, A> inputRelation) {
         final BitSet[] retVal = new BitSet[this.objects.length];
         for (int i = 0; i < this.objects.length; i++) {
             final O object = this.objects[i];
@@ -78,7 +77,7 @@ public class GantersAlgorithm<O, A> implements LatticeGenerator<O, A> {
             final T cur = it.next();
             if (testSet.contains(cur)) {
                 throw new IllegalArgumentException(
-                "Context contains duplicate object or attribute");
+                        "Context contains duplicate object or attribute");
             }
             retVal[pos] = cur;
             testSet.add(cur);
@@ -87,10 +86,8 @@ public class GantersAlgorithm<O, A> implements LatticeGenerator<O, A> {
         return retVal;
     }
 
-    private void connectConcepts(
-            final LatticeImplementation<O, A> lattice) {
-        final Concept<O, A>[] concepts = lattice
-        .getConcepts();
+    private void connectConcepts(final LatticeImplementation<O, A> lattice) {
+        final Concept<O, A>[] concepts = lattice.getConcepts();
         for (final Concept<O, A> concept : concepts) {
             final ConceptImplementation concept1 = (ConceptImplementation) concept;
             for (final Concept<O, A> concept3 : concepts) {
@@ -107,8 +104,7 @@ public class GantersAlgorithm<O, A> implements LatticeGenerator<O, A> {
         }
     }
 
-    private boolean isSubConcept(
-            final Concept<O, A> concept1,
+    private boolean isSubConcept(final Concept<O, A> concept1,
             final Concept<O, A> concept2) {
         // the extents are still stored as contingents
         if (concept1.getObjectContingentSize() > concept2
@@ -131,10 +127,8 @@ public class GantersAlgorithm<O, A> implements LatticeGenerator<O, A> {
         return true;
     }
 
-    private void cleanContingents(
-            final LatticeImplementation<O, A> lattice) {
-        final Concept<O, A>[] concepts = lattice
-        .getConcepts();
+    private void cleanContingents(final LatticeImplementation<O, A> lattice) {
+        final Concept<O, A>[] concepts = lattice.getConcepts();
         for (final Concept<O, A> concept3 : concepts) {
             final ConceptImplementation<O, A> concept = (ConceptImplementation<O, A>) concept3;
             final Collection<Concept<O, A>> downset = new HashSet<Concept<O, A>>(
@@ -176,8 +170,7 @@ public class GantersAlgorithm<O, A> implements LatticeGenerator<O, A> {
         } while (extent.cardinality() != this.objects.length);
     }
 
-    private void createConcepts(
-            final LatticeImplementation<O, A> lattice) {
+    private void createConcepts(final LatticeImplementation<O, A> lattice) {
         for (final BitSet extent : this.extents) {
             final ConceptImplementation concept = new ConceptImplementation();
             for (int i = 0; i < this.objects.length; i++) {

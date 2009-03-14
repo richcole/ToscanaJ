@@ -89,7 +89,7 @@ public abstract class Query implements XMLizable {
                     QUERY_FIELD_NAME_ATTRIBUTE_NAME, queryField.getName());
             XMLHelper.addOptionalAttribute(elem,
                     QUERY_FIELD_SEPARATOR_ATTRIBUTE_NAME, queryField
-                    .getSeparator());
+                            .getSeparator());
             XMLHelper.addOptionalAttribute(elem,
                     QUERY_FIELD_FORMAT_ATTRIBUTE_NAME, queryField.getFormat());
             elem.setText(queryField.getQueryPart());
@@ -106,15 +106,15 @@ public abstract class Query implements XMLizable {
             final Element queryFieldElement = iterator.next();
             final QueryField field = new QueryField(
                     queryFieldElement
-                    .getAttributeValue(QUERY_FIELD_NAME_ATTRIBUTE_NAME),
+                            .getAttributeValue(QUERY_FIELD_NAME_ATTRIBUTE_NAME),
                     queryFieldElement
-                    .getAttributeValue(QUERY_FIELD_FORMAT_ATTRIBUTE_NAME),
+                            .getAttributeValue(QUERY_FIELD_FORMAT_ATTRIBUTE_NAME),
                     queryFieldElement
-                    .getAttributeValue(QUERY_FIELD_SEPARATOR_ATTRIBUTE_NAME),
+                            .getAttributeValue(QUERY_FIELD_SEPARATOR_ATTRIBUTE_NAME),
                     queryFieldElement.getText(),
                     "true"
-                    .equals(queryFieldElement
-                            .getAttributeValue(QUERY_FIELD_IS_RELATIVE_ATTRIBUTE_NAME)));
+                            .equals(queryFieldElement
+                                    .getAttributeValue(QUERY_FIELD_IS_RELATIVE_ATTRIBUTE_NAME)));
             this.fieldList.add(field);
         }
     }

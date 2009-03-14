@@ -507,8 +507,8 @@ public class BrowserLauncher {
                                     null, new Object[] { file });
                             if (FINDER_CREATOR.equals(fileCreator.toString())) {
                                 browser = file.toString(); // Actually the
-                                                           // Finder, but that's
-                                                           // OK
+                                // Finder, but that's
+                                // OK
                                 return browser;
                             }
                         }
@@ -588,7 +588,7 @@ public class BrowserLauncher {
                                     + ie.getMessage());
                 } finally {
                     aeDesc = null; // Encourage it to get disposed if it was
-                                   // created
+                    // created
                     currentBrowser = null; // Ditto
                 }
                 break;

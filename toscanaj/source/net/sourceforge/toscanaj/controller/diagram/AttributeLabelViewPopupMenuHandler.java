@@ -42,7 +42,7 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                    + " has to be subscribed to CanvasItemEventWithPositions only");
+                            + " has to be subscribed to CanvasItemEventWithPositions only");
         }
         AttributeLabelView labelView = null;
         try {
@@ -50,7 +50,7 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                    + " has to be subscribed to events from ObjectLabelViews only");
+                            + " has to be subscribed to events from ObjectLabelViews only");
         }
         openPopupMenu(labelView, itemEvent.getCanvasPosition(), itemEvent
                 .getAWTPosition());
@@ -59,7 +59,7 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
     public void openPopupMenu(final AttributeLabelView labelView,
             final Point2D canvasPosition, final Point2D screenPosition) {
         final FCAElement attribute = labelView
-        .getEntryAtPosition(canvasPosition);
+                .getEntryAtPosition(canvasPosition);
         if (attribute == null) {
             return;
         }
@@ -67,7 +67,7 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
         JMenuItem menuItem;
 
         final List<String> attributeViewNames = DatabaseViewerManager
-        .getAttributeViewNames();
+                .getAttributeViewNames();
         if ((attribute.getDescription() == null)
                 && attributeViewNames.isEmpty()) {
             return;
@@ -109,12 +109,12 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
                     } catch (final Exception exc) { // we catch any exception
                         // and show it to the user
                         ErrorDialog
-                        .showError(
-                                AttributeLabelViewPopupMenuHandler.this.diagramView,
-                                exc,
-                                "Database View Failed",
-                                "The database view could not be shown,\n"
-                                + "possibly due to a misconfiguration.");
+                                .showError(
+                                        AttributeLabelViewPopupMenuHandler.this.diagramView,
+                                        exc,
+                                        "Database View Failed",
+                                        "The database view could not be shown,\n"
+                                                + "possibly due to a misconfiguration.");
                     }
                 }
             });

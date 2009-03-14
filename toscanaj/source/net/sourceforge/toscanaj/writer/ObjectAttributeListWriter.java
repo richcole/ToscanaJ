@@ -44,7 +44,7 @@ public class ObjectAttributeListWriter {
             out.println();
         }
         for (final Iterator<Object> objIt = context.getObjects().iterator(); objIt
-        .hasNext();) {
+                .hasNext();) {
             final Object object = objIt.next();
             out.print(object);
             out.print(":");

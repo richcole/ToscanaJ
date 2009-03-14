@@ -34,10 +34,10 @@ public class StringType extends AbstractXSDDatatype {
                     final List enumChildren = restElem.getChildren(
                             "enumeration", XSD_NAMESPACE);
                     final StringValue[] enumeration = new StringValue[enumChildren
-                                                                      .size()];
+                            .size()];
                     int i = 0;
                     for (final Iterator iter = enumChildren.iterator(); iter
-                    .hasNext();) {
+                            .hasNext();) {
                         final Element enumElem = (Element) iter.next();
                         enumeration[i] = new StringValue(enumElem
                                 .getAttributeValue("value"));

@@ -88,7 +88,7 @@ public class DataDump {
             System.exit(2);
         }
         assert schema != null; // stops Eclipse from winging -- it doesn't grok
-                               // System.exit
+        // System.exit
         try {
             final DatabaseInfo databaseInfo = schema.getDatabaseInfo();
             if (databaseInfo != null) {

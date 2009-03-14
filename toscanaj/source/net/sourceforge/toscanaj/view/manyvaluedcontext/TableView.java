@@ -84,11 +84,11 @@ public class TableView extends JTable {
                 final int columnIndex) {
             if (columnIndex == context.getAttributes().size()) {
                 throw new IllegalArgumentException(
-                "Last column in table is not editable");
+                        "Last column in table is not editable");
             }
             if (rowIndex == context.getObjects().size()) {
                 throw new IllegalArgumentException(
-                "Last row in table is not editable");
+                        "Last row in table is not editable");
             }
             final FCAElement object = getObjectForRow(rowIndex);
             final ManyValuedAttribute attribute = getAttributeForColumn(columnIndex);

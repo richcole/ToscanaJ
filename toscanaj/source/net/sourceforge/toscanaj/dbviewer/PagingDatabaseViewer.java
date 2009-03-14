@@ -146,12 +146,12 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
             final JPanel buttonPane = new JPanel();
             buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.X_AXIS));
             buttonPane.setBorder(BorderFactory.createEtchedBorder());// (
-                                                                     // BorderFactory
-                                                                     // .
-                                                                     // createEmptyBorder
-                                                                     // (10, 10,
-                                                                     // 10,
-                                                                     // 10));
+            // BorderFactory
+            // .
+            // createEmptyBorder
+            // (10, 10,
+            // 10,
+            // 10));
 
             buttonPane.add(this.navStartButton);
             buttonPane.add(this.navPrevButton);

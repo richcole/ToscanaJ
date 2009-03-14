@@ -260,11 +260,11 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
             @Override
             public void paint(final Graphics g) {
                 final int Y_OFFSET = 10; // vert space from edge of panel before
-                                         // lines appear
+                // lines appear
                 final int LINE_OUTER_SIZE = 3; // outer line size for line
-                                               // indicating 'current'
+                // indicating 'current'
                 final int LINE_INNER_SIZE = 1; // inner line size for line
-                                               // indicating 'current'
+                // indicating 'current'
 
                 super.paint(g);
 
@@ -329,7 +329,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                 Rectangle2D bounds = text.getBounds();
 
                 final int TEXT_BOX_BUFFER_SIZE = 3; // set the space around
-                                                    // rendered text
+                // rendered text
 
                 if (curpoint <= getWidth() / 2) {
                     g2.setColor(Color.white);

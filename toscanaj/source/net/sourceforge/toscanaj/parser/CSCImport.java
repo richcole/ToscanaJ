@@ -61,7 +61,7 @@ public class CSCImport {
     private static final int TARGET_DIAGRAM_WIDTH = 600;
 
     public void importCSCFile(final File file, final ConceptualSchema schema)
-    throws DataFormatException, FileNotFoundException {
+            throws DataFormatException, FileNotFoundException {
         try {
             final CSCFile cscFile = CSCParser.importCSCFile(file.toURI()
                     .toURL(), null);
@@ -70,7 +70,7 @@ public class CSCImport {
             final Set<String> namesOfCreatedDiagrams = new HashSet<String>();
 
             final List<ConscriptStructure> lineDiagrams = cscFile
-            .getLineDiagrams();
+                    .getLineDiagrams();
             for (final Object element : lineDiagrams) {
                 final LineDiagram lineDiagram = (LineDiagram) element;
                 final Map<String, String> objectLabels = new HashMap<String, String>();
@@ -78,7 +78,7 @@ public class CSCImport {
                     objectLabels.put(object.getIdentifier(), object
                             .getDescription().getContent());
                 }
-                final Map<String,FormattedString> attributeLabels = new HashMap<String,FormattedString>();
+                final Map<String, FormattedString> attributeLabels = new HashMap<String, FormattedString>();
                 for (final FCAAttribute attribute : lineDiagram.getAttributes()) {
                     attributeLabels.put(attribute.getIdentifier(), attribute
                             .getDescription());
@@ -86,9 +86,9 @@ public class CSCImport {
                 final String name = (lineDiagram.getTitle() != null) ? lineDiagram
                         .getTitle().getContent()
                         : lineDiagram.getName();
-                        // we fake having StringMaps or QueryMaps -- very much a hack
-                        final Diagram2D diagram2D = createDiagram2D(name, lineDiagram,
-                                new StringMap("fake") {
+                // we fake having StringMaps or QueryMaps -- very much a hack
+                final Diagram2D diagram2D = createDiagram2D(name, lineDiagram,
+                        new StringMap("fake") {
                             @Override
                             public FormattedString getLabel(final String entry) {
                                 return attributeLabels.get(entry);
@@ -99,78 +99,79 @@ public class CSCImport {
                                 return objectLabels.get(abstractObjectId);
                             }
                         });
-                        rescale(diagram2D);
-                        schema.addDiagram(diagram2D);
-                        namesOfCreatedDiagrams.add(name);
+                rescale(diagram2D);
+                schema.addDiagram(diagram2D);
+                namesOfCreatedDiagrams.add(name);
             }
 
             final List<ConscriptStructure> concreteScales = cscFile
-            .getConcreteScales();
+                    .getConcreteScales();
             for (final Object element : concreteScales) {
                 final ConcreteScale scale = (ConcreteScale) element;
                 final String scaleName = (scale.getTitle() != null) ? scale
                         .getTitle().getContent() : scale.getName();
-                        if (!namesOfCreatedDiagrams.contains(scaleName)) {
-                            final Diagram2D diagram2D = createDiagram2D(scale,
-                                    scaleName);
-                            rescale(diagram2D);
-                            schema.addDiagram(diagram2D);
-                            namesOfCreatedDiagrams.add(scaleName);
-                        }
+                if (!namesOfCreatedDiagrams.contains(scaleName)) {
+                    final Diagram2D diagram2D = createDiagram2D(scale,
+                            scaleName);
+                    rescale(diagram2D);
+                    schema.addDiagram(diagram2D);
+                    namesOfCreatedDiagrams.add(scaleName);
+                }
             }
 
             final List<ConscriptStructure> formalContexts = cscFile
-            .getFormalContexts();
+                    .getFormalContexts();
             for (final ConscriptStructure structure : formalContexts) {
                 final FormalContext formalContext = (FormalContext) structure;
                 final String name = (formalContext.getTitle() != null) ? formalContext
                         .getTitle().getContent()
                         : formalContext.getName();
-                        if (!namesOfCreatedDiagrams.contains(name)) {
-                            final Map<FCAElement, FCAObject> objects = new HashMap<FCAElement, FCAObject>();
-                            final Map<FCAElement, FCAAttribute> attributes = new HashMap<FCAElement, FCAAttribute>();
-                            for (final FCAObject object : formalContext.getObjects()) {
-                                objects.put(new FCAElementImplementation(object
-                                        .getDescription().getContent()), object);
-                            }
-                            for (final FCAAttribute attribute : formalContext
-                                    .getAttributes()) {
-                                attributes.put(new FCAElementImplementation(attribute
-                                        .getDescription().getContent()), attribute);
-                            }
-                            final Context<FCAElement, FCAElement> context = new Context<FCAElement, FCAElement>() {
-                                public Set<FCAElement> getAttributes() {
-                                    return attributes.keySet();
-                                }
-                                public String getName() {
-                                    return name;
-                                }
+                if (!namesOfCreatedDiagrams.contains(name)) {
+                    final Map<FCAElement, FCAObject> objects = new HashMap<FCAElement, FCAObject>();
+                    final Map<FCAElement, FCAAttribute> attributes = new HashMap<FCAElement, FCAAttribute>();
+                    for (final FCAObject object : formalContext.getObjects()) {
+                        objects.put(new FCAElementImplementation(object
+                                .getDescription().getContent()), object);
+                    }
+                    for (final FCAAttribute attribute : formalContext
+                            .getAttributes()) {
+                        attributes.put(new FCAElementImplementation(attribute
+                                .getDescription().getContent()), attribute);
+                    }
+                    final Context<FCAElement, FCAElement> context = new Context<FCAElement, FCAElement>() {
+                        public Set<FCAElement> getAttributes() {
+                            return attributes.keySet();
+                        }
 
-                                public Set<FCAElement> getObjects() {
-                                    return objects.keySet();
-                                }
+                        public String getName() {
+                            return name;
+                        }
 
-                                public BinaryRelation<FCAElement, FCAElement> getRelation() {
-                                    return new BinaryRelation<FCAElement, FCAElement>() {
-                                        public boolean contains(
-                                                final FCAElement object,
-                                                final FCAElement attribute) {
-                                            return formalContext.getRelation()
+                        public Set<FCAElement> getObjects() {
+                            return objects.keySet();
+                        }
+
+                        public BinaryRelation<FCAElement, FCAElement> getRelation() {
+                            return new BinaryRelation<FCAElement, FCAElement>() {
+                                public boolean contains(
+                                        final FCAElement object,
+                                        final FCAElement attribute) {
+                                    return formalContext.getRelation()
                                             .contains(objects.get(object),
                                                     attributes.get(attribute));
-                                        }
-                                    };
                                 }
                             };
-                            final LatticeGenerator<FCAElement, FCAElement> lgen = new GantersAlgorithm<FCAElement, FCAElement>();
+                        }
+                    };
+                    final LatticeGenerator<FCAElement, FCAElement> lgen = new GantersAlgorithm<FCAElement, FCAElement>();
                     final Lattice<FCAElement, FCAElement> lattice = lgen
                             .createLattice(context);
-                            final Diagram2D diagram2D = NDimLayoutOperations
+                    final Diagram2D diagram2D = NDimLayoutOperations
                             .createDiagram(lattice, name,
                                     new DefaultDimensionStrategy<FCAElement>());
-                            rescale(diagram2D);
-                            schema.addDiagram(diagram2D);
-                        }
+                    rescale(diagram2D);
+                    schema.addDiagram(diagram2D);
+                }
             }
 
             if (!cscFile.getDatabaseDefinitions().isEmpty()) {
@@ -179,7 +180,7 @@ public class CSCImport {
                 // multiple ones are unlikely and we wouldn't know what to do
                 // then anyway
                 final DatabaseDefinition dbDef = (DatabaseDefinition) cscFile
-                .getDatabaseDefinitions().get(0);
+                        .getDatabaseDefinitions().get(0);
                 final DatabaseInfo dbInfo = new DatabaseInfo();
                 dbInfo.setOdbcDataSource(dbDef.getDatabaseName(), null, null);
                 final Table table = new Table(dbDef.getTable(), false);
@@ -202,8 +203,7 @@ public class CSCImport {
         // we always just take the first diagram -- multiple diagrams are hardly
         // used anywhere
         final LineDiagram diagram = abstractScale.getLineDiagrams().get(0);
-        return createDiagram2D(name, diagram,
-                attributeMap, queryMap);
+        return createDiagram2D(name, diagram, attributeMap, queryMap);
     }
 
     private Diagram2D createDiagram2D(final String diagramName,
@@ -236,9 +236,9 @@ public class CSCImport {
             result.addLine(fromNode, toNode);
 
             final ConceptImplementation fromConcept = (ConceptImplementation) fromNode
-            .getConcept();
+                    .getConcept();
             final ConceptImplementation toConcept = (ConceptImplementation) toNode
-            .getConcept();
+                    .getConcept();
             fromConcept.addSubConcept(toNode.getConcept());
             toConcept.addSuperConcept(fromConcept);
         }
@@ -259,7 +259,7 @@ public class CSCImport {
             }
 
             final ConceptImplementation concept = (ConceptImplementation) node
-            .getConcept();
+                    .getConcept();
             concept.addObject(resultObject);
 
             final LabelInfo labelInfo = createLabelInfo(object.getDescription()
@@ -285,7 +285,7 @@ public class CSCImport {
             }
 
             final ConceptImplementation concept = (ConceptImplementation) node
-            .getConcept();
+                    .getConcept();
             concept.addAttribute(resultAttribute);
 
             final LabelInfo labelInfo = createLabelInfo(attribute
@@ -294,10 +294,10 @@ public class CSCImport {
         }
 
         for (final Iterator<DiagramNode> iter = result.getNodes(); iter
-        .hasNext();) {
+                .hasNext();) {
             final DiagramNode node = iter.next();
             final ConceptImplementation concept = (ConceptImplementation) node
-            .getConcept();
+                    .getConcept();
             concept.buildClosures();
         }
         return result;

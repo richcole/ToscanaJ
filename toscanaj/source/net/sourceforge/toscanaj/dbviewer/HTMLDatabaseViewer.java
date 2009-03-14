@@ -169,11 +169,11 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
             final JPanel buttonPane = new JPanel();
             buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.X_AXIS));
             buttonPane.setBorder(BorderFactory.createEtchedBorder());// BorderFactory
-                                                                     // .
-                                                                     // createEmptyBorder
-                                                                     // (0, 10,
-                                                                     // 10,
-                                                                     // 10));
+            // .
+            // createEmptyBorder
+            // (0, 10,
+            // 10,
+            // 10));
             buttonPane.add(Box.createHorizontalGlue());
             buttonPane.add(closeButton);
 

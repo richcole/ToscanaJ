@@ -106,8 +106,8 @@ public class DatabaseViewerManager implements XMLizable {
                     PLUGIN_LOCATION));
             viewerClass = loader.findClass(className);
         } catch (final Exception e) { // if anything fails with the plugin
-                                      // loader, fall back to normal class
-                                      // loader
+            // loader, fall back to normal class
+            // loader
             try {
                 viewerClass = Class.forName(className);
             } catch (final ClassNotFoundException e1) {

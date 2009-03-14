@@ -28,7 +28,7 @@ import net.sourceforge.toscanaj.observer.ChangeObserver;
  * @todo Use event broker instead of being an observable.
  */
 public class DiagramHistory extends AbstractListModel implements
-ChangeObservable {
+        ChangeObservable {
 
     private final List<Object> diagrams = new LinkedList<Object>();
 
@@ -58,7 +58,7 @@ ChangeObservable {
         if (level < 0) {
             throw new IllegalArgumentException(
                     "Nesting level should be greater than zero, and was :"
-                    + level);
+                            + level);
         }
 
         this.nestingLevel = level;
@@ -116,7 +116,7 @@ ChangeObservable {
      */
     public boolean isInPast(final int elementPosition) {
         return (elementPosition < this.currStartPosition)
-        && (elementPosition >= 0);
+                && (elementPosition >= 0);
     }
 
     /**
@@ -214,7 +214,7 @@ ChangeObservable {
     public void removeLastDiagram() {
         if (getSize() == 0) {
             throw new NoSuchElementException(
-            "The list of diagrams is already empty.");
+                    "The list of diagrams is already empty.");
         }
         final int lastPosition = getSize() - 1;
         if (isInCurrent(lastPosition)) {
@@ -232,7 +232,7 @@ ChangeObservable {
     public void moveDiagram(final int from, final int to) {
         if (getSize() == 0) {
             throw new NoSuchElementException(
-            "The list of diagrams is already empty.");
+                    "The list of diagrams is already empty.");
         }
         if (isInPast(from) || isInPast(to)) {
             throw new RuntimeException("Trying to change past");
@@ -282,7 +282,7 @@ ChangeObservable {
 
     private boolean shouldChangeCurrentStartDiagram() {
         return this.currStartPosition > 0
-        || (getNumberOfCurrentDiagrams() > getNestingLevel());
+                || (getNumberOfCurrentDiagrams() > getNestingLevel());
     }
 
     public void back() {
@@ -378,29 +378,29 @@ ChangeObservable {
         String comments = "";
         final String lineSeparator = System.getProperty("line.separator");
         final DiagramHistory diagramHistory = DiagramController.getController()
-        .getDiagramHistory();
+                .getDiagramHistory();
         final int firstCurrentPos = diagramHistory
-        .getFirstCurrentDiagramPosition();
+                .getFirstCurrentDiagramPosition();
         if (firstCurrentPos > 1) {
             comments += "Visited diagrams and selected attributes:"
-                + lineSeparator;
+                    + lineSeparator;
         } else if (firstCurrentPos == 1) {
             comments += "Visited diagram and selected attributes:"
-                + lineSeparator;
+                    + lineSeparator;
         } else {
             // user has no visited diagrams. display nothing
         }
         for (int i = 0; i <= firstCurrentPos - 1; i++) {
             final DiagramReference diagramReference = diagramHistory
-            .getReferenceAt(i);
+                    .getReferenceAt(i);
             comments += (i + 1) + ") "
-            + diagramReference.getDiagram().getTitle() + lineSeparator;
+                    + diagramReference.getDiagram().getTitle() + lineSeparator;
             final Concept concept = diagramReference.getFilterConcept();
             final Iterator attrIt = concept.getIntentIterator();
             while (attrIt.hasNext()) {
                 final FCAElement curAttr = (FCAElement) attrIt.next();
                 comments += "   - " + curAttr.getData().toString()
-                + lineSeparator;
+                        + lineSeparator;
             }
         }
         final int numCurDiag = diagramHistory.getNumberOfCurrentDiagrams();
@@ -412,9 +412,9 @@ ChangeObservable {
         }
         for (int i = 0; i < numCurDiag; i++) {
             comments += (i + 1)
-            + ") "
-            + diagramHistory.getElementAt(i + firstCurrentPos)
-            .toString() + lineSeparator;
+                    + ") "
+                    + diagramHistory.getElementAt(i + firstCurrentPos)
+                            .toString() + lineSeparator;
         }
         return comments;
 

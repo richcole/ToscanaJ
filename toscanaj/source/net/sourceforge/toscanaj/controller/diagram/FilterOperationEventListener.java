@@ -38,7 +38,7 @@ public class FilterOperationEventListener implements EventBrokerListener {
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                    + " has to be subscribed to CanvasItemEventWithPositions only");
+                            + " has to be subscribed to CanvasItemEventWithPositions only");
         }
         NodeView nodeView = null;
         try {
@@ -48,11 +48,11 @@ public class FilterOperationEventListener implements EventBrokerListener {
                     + " has to be subscribed to events from NodeViews only");
         }
         final Concept filterConcept = nodeView.getDiagramNode()
-        .getFilterConcept();
+                .getFilterConcept();
         final ConceptInterpreter interpreter = nodeView.getDiagramView()
-        .getConceptInterpreter();
+                .getConceptInterpreter();
         final ConceptInterpretationContext context = nodeView
-        .getConceptInterpretationContext();
+                .getConceptInterpretationContext();
         final int extent = interpreter.getExtentSize(filterConcept, context);
         if (extent != 0) {
             try {

@@ -26,7 +26,7 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
 public class AttributeEditingLabelViewPopupMenuHandler implements
-EventBrokerListener {
+        EventBrokerListener {
     private final DiagramView diagramView;
 
     public AttributeEditingLabelViewPopupMenuHandler(
@@ -41,7 +41,7 @@ EventBrokerListener {
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                    + " has to be subscribed to CanvasItemEventWithPositions only");
+                            + " has to be subscribed to CanvasItemEventWithPositions only");
         }
         AttributeLabelView labelView = null;
         try {
@@ -49,7 +49,7 @@ EventBrokerListener {
         } catch (final ClassCastException e1) {
             throw new RuntimeException(
                     getClass().getName()
-                    + " has to be subscribed to events from ObjectLabelViews only");
+                            + " has to be subscribed to events from ObjectLabelViews only");
         }
         openPopupMenu(labelView, itemEvent.getCanvasPosition(), itemEvent
                 .getAWTPosition());
@@ -58,7 +58,7 @@ EventBrokerListener {
     public void openPopupMenu(final AttributeLabelView labelView,
             final Point2D canvasPosition, final Point2D screenPosition) {
         final WritableFCAElement attribute = (WritableFCAElement) labelView
-        .getEntryAtPosition(canvasPosition);
+                .getEntryAtPosition(canvasPosition);
         if (attribute == null) {
             return;
         }
@@ -69,7 +69,7 @@ EventBrokerListener {
             public void actionPerformed(final ActionEvent e) {
                 final XMLEditorDialog xmlEditorDialog = new XMLEditorDialog(
                         JOptionPane.getFrameForComponent(parent),
-                "Edit attribute description");
+                        "Edit attribute description");
                 xmlEditorDialog.setContent(attribute.getDescription());
                 xmlEditorDialog.setVisible(true);
                 attribute.setDescription(xmlEditorDialog.getContent());
@@ -77,19 +77,19 @@ EventBrokerListener {
         });
 
         final JMenuItem renameAttrMenuItem = new JMenuItem(
-        "Rename attribute...");
+                "Rename attribute...");
         final String currentValue = attribute.getData().toString();
         renameAttrMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
                 final InputTextDialog dialog = new InputTextDialog(
                         JOptionPane
-                        .getFrameForComponent(AttributeEditingLabelViewPopupMenuHandler.this.diagramView),
+                                .getFrameForComponent(AttributeEditingLabelViewPopupMenuHandler.this.diagramView),
                         "Rename Attribute", "attribute", currentValue);
                 if (!dialog.isCancelled()) {
                     final String newValue = dialog.getInput();
                     attribute.setData(newValue);
                     AttributeEditingLabelViewPopupMenuHandler.this.diagramView
-                    .repaint();
+                            .repaint();
                 }
             }
         });

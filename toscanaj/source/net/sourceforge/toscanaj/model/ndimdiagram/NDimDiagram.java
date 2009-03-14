@@ -39,7 +39,7 @@ public class NDimDiagram<O, A> extends SimpleLineDiagram<O, A> {
             this.base.add(new Point2D.Double(x, y));
         }
         super.readXML(element); // do this last, since the ndim nodes rely on
-                                // the initialized base
+        // the initialized base
     }
 
     @Override

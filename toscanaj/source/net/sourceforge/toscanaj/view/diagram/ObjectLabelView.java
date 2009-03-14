@@ -83,11 +83,11 @@ public class ObjectLabelView extends LabelView {
     public boolean isVisible() {
         final Concept concept = this.labelInfo.getNode().getConcept();
         final ConceptInterpretationContext context = nodeView
-        .getConceptInterpretationContext();
+                .getConceptInterpretationContext();
         final ConceptInterpreter interpreter = diagramView
-        .getConceptInterpreter();
+                .getConceptInterpreter();
         return interpreter.isVisible(concept, context) && super.isVisible()
-        && !allHidden;
+                && !allHidden;
     }
 
     @Override
@@ -148,15 +148,15 @@ public class ObjectLabelView extends LabelView {
         final DiagramNode node = this.labelInfo.getNode();
         final Concept concept = node.getConcept();
         final ConceptInterpretationContext context = nodeView
-        .getConceptInterpretationContext();
+                .getConceptInterpretationContext();
         final ConceptInterpreter conceptInterpreter = this.diagramView
-        .getConceptInterpreter();
+                .getConceptInterpreter();
         try {
             this.contents = conceptInterpreter.executeQuery(getQuery(),
                     concept, context);
         } catch (final Exception e) {
             ErrorDialog.showError(this.diagramView, e,
-            "Getting object label content failed");
+                    "Getting object label content failed");
         }
     }
 
@@ -189,6 +189,6 @@ public class ObjectLabelView extends LabelView {
     protected boolean isFaded() {
         final int selectionState = nodeView.getSelectionState();
         return selectionState == DiagramView.NOT_SELECTED
-        || selectionState == DiagramView.SELECTED_FILTER;
+                || selectionState == DiagramView.SELECTED_FILTER;
     }
 }
