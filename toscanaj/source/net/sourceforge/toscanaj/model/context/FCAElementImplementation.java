@@ -22,7 +22,7 @@ import org.jdom.Element;
  *       in CSX?
  */
 public class FCAElementImplementation implements WritableFCAElement, XMLizable,
-        Comparable<FCAElementImplementation> {
+Comparable<FCAElementImplementation> {
     private Object data;
     private Element description;
     private int contextPosition = -1; // -1 means "not set"
@@ -42,7 +42,7 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable,
     }
 
     public FCAElementImplementation(final Element xmlelement)
-            throws XMLSyntaxError {
+    throws XMLSyntaxError {
         readXML(xmlelement);
     }
 
@@ -130,7 +130,7 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable,
 
     public void readXML(final Element elem) throws XMLSyntaxError {
         final Element descriptionElement = elem
-                .getChild(DESCRIPTION_ELEMENT_NAME);
+        .getChild(DESCRIPTION_ELEMENT_NAME);
         if (descriptionElement == null) {
             this.description = null;
         } else {
@@ -138,11 +138,11 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable,
                 this.description = null;
             } else {
                 this.description = (Element) descriptionElement.getChildren()
-                        .get(0);
+                .get(0);
             }
         }
         final String contextPositionAttribute = elem
-                .getAttributeValue(CONTEXT_POSITION_ATTRIBUTE_NAME);
+        .getAttributeValue(CONTEXT_POSITION_ATTRIBUTE_NAME);
         if (contextPositionAttribute != null) {
             this.contextPosition = Integer.parseInt(contextPositionAttribute);
         }
@@ -160,7 +160,7 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable,
         } else {
             try {
                 final Constructor<?> construct = Class.forName(className)
-                        .getConstructor(new Class[] { Element.class });
+                .getConstructor(new Class[] { Element.class });
                 this.data = construct.newInstance(new Object[] { dataElement });
             } catch (final Exception e) {
                 throw new XMLSyntaxError("Initialization of object of type "

@@ -172,7 +172,7 @@ public class GantersAlgorithm<O, A> implements LatticeGenerator<O, A> {
 
     private void createConcepts(final LatticeImplementation<O, A> lattice) {
         for (final BitSet extent : this.extents) {
-            final ConceptImplementation concept = new ConceptImplementation();
+            final ConceptImplementation<O, A> concept = new ConceptImplementation<O, A>();
             for (int i = 0; i < this.objects.length; i++) {
                 if (extent.get(i)) {
                     concept.addObject(this.objects[i]);
