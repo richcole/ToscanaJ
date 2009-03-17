@@ -7,10 +7,10 @@
  */
 package net.sourceforge.toscanaj.model.lattice;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -308,7 +308,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
      * transitive closures.
      */
     public void buildClosures() {
-        final List<Concept<O, A>> idealList = new LinkedList<Concept<O, A>>(
+        final List<Concept<O, A>> idealList = new ArrayList<Concept<O, A>>(
                 ideal);
         while (!idealList.isEmpty()) {
             final Concept<O, A> other = idealList.remove(0);
@@ -321,7 +321,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
             }
         }
 
-        final List<Concept<O, A>> filterList = new LinkedList<Concept<O, A>>(
+        final List<Concept<O, A>> filterList = new ArrayList<Concept<O, A>>(
                 filter);
         while (!filterList.isEmpty()) {
             final Concept<O, A> other = filterList.remove(0);
@@ -516,15 +516,15 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
         final Element objectContingentElem = XMLHelper.getMandatoryChild(elem,
                 OBJECT_CONTINGENT_ELEMENT_NAME);
         final List<Element> objects = objectContingentElem
-                .getChildren(OBJECT_ELEMENT_NAME);
+        .getChildren(OBJECT_ELEMENT_NAME);
         for (final Element objElem : objects) {
             this.objectContingent
-                    .add((O) new FCAElementImplementation(objElem));
+            .add((O) new FCAElementImplementation(objElem));
         }
         final Element attributeContingentElem = XMLHelper.getMandatoryChild(
                 elem, ATTRIBUTE_CONTINGENT_ELEMENT_NAME);
         final List<Element> attributes = attributeContingentElem
-                .getChildren(ATTRIBUTE_ELEMENT_NAME);
+        .getChildren(ATTRIBUTE_ELEMENT_NAME);
         for (final Element attrElem : attributes) {
             this.attributeContingent.add((A) new FCAElementImplementation(
                     attrElem));
@@ -594,7 +594,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
         while (!topCandidate.isTop()) {
             Concept<O, A> other = topCandidate;
             final Iterator<Concept<O, A>> it = topCandidate.getUpset()
-                    .iterator();
+            .iterator();
             do {
                 other = it.next();
             } while (other == topCandidate);
@@ -608,7 +608,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
         while (!bottomCandidate.isBottom()) {
             Concept<O, A> other = bottomCandidate;
             final Iterator<Concept<O, A>> it = bottomCandidate.getDownset()
-                    .iterator();
+            .iterator();
             do {
                 other = it.next();
             } while (other == bottomCandidate);
@@ -620,6 +620,6 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
     @Override
     public String toString() {
         return "(" + Formatter.toSetFormat(getExtentIterator()) + ","
-                + Formatter.toSetFormat(getIntentIterator()) + ")";
+        + Formatter.toSetFormat(getIntentIterator()) + ")";
     }
 }

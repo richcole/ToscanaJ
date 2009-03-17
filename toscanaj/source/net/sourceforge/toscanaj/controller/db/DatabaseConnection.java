@@ -20,7 +20,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -52,7 +51,7 @@ import org.tockit.plugin.DatabaseDriverLoader.Error;
 public class DatabaseConnection implements EventBrokerListener<Object> {
     private static final String DEFAULT_DATABASE_DRIVER_LOCATION = "dbdrivers";
     private static final Preferences preferences = Preferences
-            .userNodeForPackage(DatabaseConnection.class);
+    .userNodeForPackage(DatabaseConnection.class);
 
     /**
      * The JDBC database connection we use.
@@ -63,7 +62,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
     static private DatabaseConnection singleton = null;
 
     private final static Logger logger = Logger
-            .getLogger(DatabaseConnection.class.getName());
+    .getLogger(DatabaseConnection.class.getName());
 
     private Type type;
 
@@ -119,7 +118,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
     public void disconnect() throws DatabaseException {
         if (this.jdbcConnection == null) {
             throw new DatabaseException(
-                    "Disconnect requested but we are not connected.");
+            "Disconnect requested but we are not connected.");
         }
         try {
             this.jdbcConnection.close();
@@ -137,7 +136,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
 
     public void connect(final String url, final String driverName,
             final String account, final String password)
-            throws DatabaseException {
+    throws DatabaseException {
         this.jdbcConnection = getConnection(url, driverName, account, password);
         // / @todo we probably could just ask JDBC if it is Access
         this.type = DatabaseInfo.getType(url, driverName);
@@ -146,14 +145,14 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
 
     private static Connection getConnection(final String url,
             final String driverName, final String account, final String password)
-            throws DatabaseException {
+    throws DatabaseException {
         if ((url == null) || (url.equals(""))) {
             throw new DatabaseException(
-                    "No URL given for connecting to the database");
+            "No URL given for connecting to the database");
         }
         if ((driverName == null) || (driverName.equals(""))) {
             throw new DatabaseException(
-                    "No driver given for connecting to the database");
+            "No driver given for connecting to the database");
         }
         try {
             Class.forName(driverName);
@@ -161,11 +160,11 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
             final String dbDriverLocation = preferences.get("driverDirectory",
                     DEFAULT_DATABASE_DRIVER_LOCATION);
             final DatabaseDriverLoader.Error[] errors = DatabaseDriverLoader
-                    .loadDrivers(new File(dbDriverLocation));
+            .loadDrivers(new File(dbDriverLocation));
             for (final Error error : errors) {
                 logger.log(Level.WARNING,
                         "Error when loading database drivers", error
-                                .getException());
+                        .getException());
             }
         }
 
@@ -221,7 +220,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
     }
 
     public void executeSQLAsString(final String sqlCommand)
-            throws DatabaseException {
+    throws DatabaseException {
         Statement stmt;
         try {
             stmt = this.jdbcConnection.createStatement();
@@ -236,10 +235,10 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
      * Retrieves a specific column from a query as a list of strings.
      */
     public List<String> queryColumn(final String statement, final int column)
-            throws DatabaseException {
+    throws DatabaseException {
         ResultSet resultSet = null;
         Statement stmt = null;
-        final List<String> result = new LinkedList<String>();
+        final List<String> result = new ArrayList<String>();
 
         // submit the query
         try {
@@ -253,7 +252,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
         } catch (final SQLException se) {
             throw new DatabaseException(
                     "An error occured while querying the database.\nThe statement \""
-                            + statement + "\" failed.", se);
+                    + statement + "\" failed.", se);
         } finally {
             try {
                 if (resultSet != null) {
@@ -292,8 +291,8 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
     }
 
     public List<String[]> executeQuery(final String statement)
-            throws DatabaseException {
-        final List<String[]> result = new LinkedList<String[]>();
+    throws DatabaseException {
+        final List<String[]> result = new ArrayList<String[]>();
         ResultSet resultSet = null;
         Statement stmt = null;
         // submit the query
@@ -313,7 +312,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
         } catch (final SQLException se) {
             throw new DatabaseException(
                     "An error occured while querying the database.\nThe statement \""
-                            + statement + "\" failed.", se);
+                    + statement + "\" failed.", se);
         } finally {
             try {
                 if (resultSet != null) {
@@ -341,7 +340,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
         } catch (final SQLException se) {
             throw new DatabaseException(
                     "An error occured while querying the database.\nThe statement \""
-                            + statement + "\" failed.", se);
+                    + statement + "\" failed.", se);
         } finally {
             try {
                 if (stmt != null) {
@@ -358,7 +357,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
      * Retrieves the first value of the given column as integer.
      */
     public int queryInt(final String statement, final int column)
-            throws DatabaseException {
+    throws DatabaseException {
         ResultSet resultSet = null;
         Statement stmt = null;
         int result;
@@ -374,7 +373,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
         } catch (final SQLException se) {
             throw new DatabaseException(
                     "An error occured while querying the database.\nThe statement \""
-                            + statement + "\" failed.", se);
+                    + statement + "\" failed.", se);
         } finally {
             try {
                 if (resultSet != null) {
@@ -395,7 +394,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
      * Retrieves the first value of the given column as double.
      */
     public double queryDouble(final String statement, final int column)
-            throws DatabaseException {
+    throws DatabaseException {
         ResultSet resultSet = null;
         Statement stmt = null;
         double result;
@@ -411,7 +410,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
         } catch (final SQLException se) {
             throw new DatabaseException(
                     "An error occured while querying the database.\nThe statement \""
-                            + statement + "\" failed.", se);
+                    + statement + "\" failed.", se);
         } finally {
             try {
                 if (resultSet != null) {
@@ -611,7 +610,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
     public static void main(final String[] args) throws DatabaseException {
         if (args.length != 2) {
             System.err
-                    .println("Usage: DatabaseConnection [JDBC driver class] [JDBC database url]");
+            .println("Usage: DatabaseConnection [JDBC driver class] [JDBC database url]");
             System.exit(1);
         }
 
@@ -691,7 +690,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
      * Returns a Collection of SQLTypeInfo objects.
      */
     public Collection<SQLTypeInfo> getDatabaseSupportedTypeNames()
-            throws DatabaseException {
+    throws DatabaseException {
         final Collection<SQLTypeInfo> result = new ArrayList<SQLTypeInfo>();
         try {
             final DatabaseMetaData dbMetadata = getDatabaseMetaData();

@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.controller.fca;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
@@ -180,7 +180,7 @@ public class DiagramController implements ChangeObservable {
     /**
      * Stores the observers of the controller.
      */
-    private final List<ChangeObserver> observers = new LinkedList<ChangeObserver>();
+    private final List<ChangeObserver> observers = new ArrayList<ChangeObserver>();
 
     /**
      * Implements ChangeObservable.addObserver(ChangeObserver).

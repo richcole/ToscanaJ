@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -54,12 +53,12 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
     /**
      * The list of nodes in the diagram.
      */
-    private final List<DiagramNode<O, A>> nodes = new LinkedList<DiagramNode<O, A>>();
+    private final List<DiagramNode<O, A>> nodes = new ArrayList<DiagramNode<O, A>>();
 
     /**
      * The list of lines in the diagram.
      */
-    private final List<DiagramLine<O, A>> lines = new LinkedList<DiagramLine<O, A>>();
+    private final List<DiagramLine<O, A>> lines = new ArrayList<DiagramLine<O, A>>();
 
     /**
      * This is set to true once we determined the direction of the y-axis.
@@ -123,16 +122,16 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
         while (origLines.hasNext()) {
             final DiagramLine<O, A> curLine = origLines.next();
             final DiagramNode<O, A> copiedFromNode = oldToNewNodeMapping
-                    .get(curLine.getFromNode());
+            .get(curLine.getFromNode());
             final DiagramNode<O, A> copiedToNode = oldToNewNodeMapping
-                    .get(curLine.getToNode());
+            .get(curLine.getToNode());
             final DiagramLine<O, A> copiedLine = new DiagramLine<O, A>(
                     copiedFromNode, copiedToNode, this);
             this.lines.add(copiedLine);
             final ConceptImplementation<O, A> subConcept = (ConceptImplementation<O, A>) copiedToNode
-                    .getConcept();
+            .getConcept();
             final ConceptImplementation<O, A> superConcept = (ConceptImplementation<O, A>) copiedFromNode
-                    .getConcept();
+            .getConcept();
             subConcept.addSuperConcept(superConcept);
             superConcept.addSubConcept(subConcept);
         }
@@ -141,7 +140,7 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
         while (it.hasNext()) {
             final DiagramNode<O, A> curNode = it.next();
             ((ConceptImplementation<O, A>) curNode.getConcept())
-                    .buildClosures();
+            .buildClosures();
         }
     }
 
@@ -160,19 +159,19 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
         final Concept<O, A> originalNodeConcept = node.getConcept();
         final ConceptImplementation<O, A> concept = new ConceptImplementation<O, A>();
         final Iterator<A> attrIterator = originalNodeConcept
-                .getAttributeContingentIterator();
+        .getAttributeContingentIterator();
         while (attrIterator.hasNext()) {
             final FCAElement curAttr = (FCAElement) attrIterator.next();
             concept.addAttribute((A) new FCAElementImplementation(curAttr
                     .getData(), curAttr.getDescription()));
         }
         final Iterator<O> objIterator = originalNodeConcept
-                .getObjectContingentIterator();
+        .getObjectContingentIterator();
         while (objIterator.hasNext()) {
             final FCAElement curObj = (FCAElement) objIterator.next();
             concept
-                    .addObject((O) new FCAElementImplementation(curObj
-                            .getData()));
+            .addObject((O) new FCAElementImplementation(curObj
+                    .getData()));
         }
 
         final LabelInfo attributeLabelInfo = new LabelInfo(node
@@ -229,7 +228,7 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
         title = XMLHelper.getAttribute(elem, TITLE_ATTRIBUTE_NAME).getValue();
         description = elem.getChild(DESCRIPTION_ELEMENT_NAME);
         final List<Element> nodeElems = elem
-                .getChildren(DiagramNode.NODE_ELEMENT_NAME);
+        .getChildren(DiagramNode.NODE_ELEMENT_NAME);
         for (final Element diagramNode : nodeElems) {
             final DiagramNode<O, A> newNode = createNewDiagramNode(diagramNode);
             try {
@@ -242,7 +241,7 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
             nodes.add(newNode);
         }
         final List<Element> lineElems = elem
-                .getChildren(DiagramLine.DIAGRAM_LINE_ELEMENT_NAME);
+        .getChildren(DiagramLine.DIAGRAM_LINE_ELEMENT_NAME);
         for (final Element diagramLine : lineElems) {
             final DiagramLine<O, A> line = new DiagramLine<O, A>(diagramLine,
                     this);
@@ -252,9 +251,9 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
 
             // add direct neighbours to concepts
             final ConceptImplementation<O, A> concept1 = (ConceptImplementation<O, A>) from
-                    .getConcept();
+            .getConcept();
             final ConceptImplementation<O, A> concept2 = (ConceptImplementation<O, A>) to
-                    .getConcept();
+            .getConcept();
             concept1.addSubConcept(concept2);
             concept2.addSuperConcept(concept1);
         }
@@ -266,12 +265,12 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
         coordinateSystemChecked = false;
 
         final Element extraItemElem = elem
-                .getChild(EXTRA_CANVAS_ITEMS_ELEMENT_NAME);
+        .getChild(EXTRA_CANVAS_ITEMS_ELEMENT_NAME);
         if (extraItemElem != null) {
             final List<Element> children = extraItemElem.getChildren();
             for (final Element child : children) {
                 final ExtraCanvasItemFactory factory = extraCanvasItemFactories
-                        .get(child.getName());
+                .get(child.getName());
                 if (factory != null) {
                     this.extraCanvasItems.add(factory.createCanvasItem(this,
                             child));
@@ -281,7 +280,7 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
     }
 
     protected DiagramNode<O, A> createNewDiagramNode(final Element diagramNode)
-            throws XMLSyntaxError {
+    throws XMLSyntaxError {
         return new DiagramNode<O, A>(this, diagramNode);
     }
 
@@ -505,7 +504,7 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
             final double deltaX = Math.abs(line.getToPosition().getX()
                     - line.getFromPosition().getX());
             final double deltaY = line.getToPosition().getY()
-                    - line.getFromPosition().getY();
+            - line.getFromPosition().getY();
             if (deltaY < MINIMUM_STEEPNESS * deltaX) {
                 return false;
             }
