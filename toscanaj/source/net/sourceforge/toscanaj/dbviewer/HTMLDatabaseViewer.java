@@ -15,8 +15,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -59,7 +59,7 @@ import org.tockit.swing.preferences.ExtendedPreferences;
  */
 public class HTMLDatabaseViewer implements DatabaseViewer {
     private static final ExtendedPreferences preferences = ExtendedPreferences
-            .userNodeForClass(HTMLDatabaseViewer.class);
+    .userNodeForClass(HTMLDatabaseViewer.class);
 
     private DatabaseViewerManager manager;
 
@@ -72,32 +72,32 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
 
         private Element repetitionBlock = null;
 
-        private final List<Element> singleFieldElements = new LinkedList<Element>();
+        private final List<Element> singleFieldElements = new ArrayList<Element>();
 
-        private final List<String> singleFieldNames = new LinkedList<String>();
+        private final List<String> singleFieldNames = new ArrayList<String>();
 
-        private final List<Element> repeatedFieldElements = new LinkedList<Element>();
+        private final List<Element> repeatedFieldElements = new ArrayList<Element>();
 
-        private final List<String> repeatedFieldNames = new LinkedList<String>();
+        private final List<String> repeatedFieldNames = new ArrayList<String>();
 
         private Element template = null;
 
         public HTMLDatabaseViewDialog(final Frame frame,
                 final DatabaseViewerManager viewerManager)
-                throws DatabaseViewerException {
+        throws DatabaseViewerException {
             super(frame, "View Item", false);
             this.viewerManager = viewerManager;
             this.template = viewerManager.getTemplate();
 
             if (this.template == null) {
                 throw new DatabaseViewerException(
-                        "HTMLDatabaseViewer needs <template> in definition");
+                "HTMLDatabaseViewer needs <template> in definition");
             }
 
             final Element htmlElem = this.template.getChild("html");
             if (htmlElem == null) {
                 throw new DatabaseViewerException(
-                        "No <html> tag found in <template> for HTMLDatabaseViewer");
+                "No <html> tag found in <template> for HTMLDatabaseViewer");
             }
 
             // check for <title> tag and use it as dialog title if found
@@ -110,14 +110,14 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
             }
 
             // find <repeat> and non-repeat <field>s first
-            List<Element> queue = new LinkedList<Element>();
+            List<Element> queue = new ArrayList<Element>();
             queue.add(this.template.getChild("html"));
             while (!queue.isEmpty()) {
                 final Element elem = queue.remove(0);
                 if (elem.getName().equals("repeat")) {
                     if (this.repeatElement != null) {
                         throw new DatabaseViewerException(
-                                "Two repeat sections found in template.");
+                        "Two repeat sections found in template.");
                     }
                     this.repeatElement = elem;
                     this.repetitionBlock = (Element) elem.clone();
@@ -135,7 +135,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
 
             // find repeated fields
             if (this.repeatElement != null) {
-                queue = new LinkedList<Element>();
+                queue = new ArrayList<Element>();
                 queue.add(this.repetitionBlock);
                 while (!queue.isEmpty()) {
                     final Element elem = queue.remove(0);
@@ -198,8 +198,8 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
         private void showView(final String whereClause) {
             try {
                 List<String[]> results = this.viewerManager.getConnection()
-                        .executeQuery(this.singleFieldNames,
-                                this.viewerManager.getTableName(), whereClause);
+                .executeQuery(this.singleFieldNames,
+                        this.viewerManager.getTableName(), whereClause);
                 String[] fields = results.get(0);
                 Iterator<Element> itElems = this.singleFieldElements.iterator();
                 for (final String result : fields) {
@@ -234,8 +234,8 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
                         // / @todo only the content of repetitionBlock should be
                         // added (but _all_ content, not just elements)
                         this.repeatElement
-                                .addContent((Element) this.repetitionBlock
-                                        .clone());
+                        .addContent((Element) this.repetitionBlock
+                                .clone());
                     }
                 }
                 final XMLOutputter outputter = new XMLOutputter();
@@ -275,7 +275,7 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
             dialog.showView(whereClause);
         } catch (final DatabaseViewerException e) {
             ErrorDialog.showError(parentWindow, e,
-                    "Viewer could not be initialized");
+            "Viewer could not be initialized");
         }
     }
 }

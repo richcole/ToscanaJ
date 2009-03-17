@@ -16,7 +16,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -49,7 +49,7 @@ import org.tockit.swing.preferences.ExtendedPreferences;
  */
 abstract public class PagingDatabaseViewer implements DatabaseViewer {
     private static final ExtendedPreferences preferences = ExtendedPreferences
-            .userNodeForClass(PagingDatabaseViewer.class);
+    .userNodeForClass(PagingDatabaseViewer.class);
 
     protected interface PageViewPanel {
         void showItem(String keyValue) throws DatabaseViewerException;
@@ -72,14 +72,14 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
 
         protected void showView(final String whereClause) {
             try {
-                this.fieldNames = new LinkedList<String>();
+                this.fieldNames = new ArrayList<String>();
                 this.fieldNames.add(PagingDatabaseViewer.this.viewerManager
                         .getKeyName());
                 final List<String[]> results = PagingDatabaseViewer.this.viewerManager
-                        .getConnection().executeQuery(
-                                this.fieldNames,
-                                PagingDatabaseViewer.this.viewerManager
-                                        .getTableName(), whereClause);
+                .getConnection().executeQuery(
+                        this.fieldNames,
+                        PagingDatabaseViewer.this.viewerManager
+                        .getTableName(), whereClause);
                 this.keyValues = new String[results.size()];
                 int i = 0;
                 for (final String[] row : results) {
@@ -96,7 +96,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
         }
 
         public PagingDatabaseViewerDialog(final Frame frame)
-                throws DatabaseViewerException {
+        throws DatabaseViewerException {
             super(frame, "View Items", false);
             this.addWindowListener(new WindowAdapter() {
                 @Override
@@ -217,7 +217,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
     }
 
     protected abstract PageViewPanel createPanel()
-            throws DatabaseViewerException;
+    throws DatabaseViewerException;
 
     protected DatabaseViewerManager getManager() {
         return this.viewerManager;
@@ -233,7 +233,7 @@ abstract public class PagingDatabaseViewer implements DatabaseViewer {
     }
 
     final public void showView(final String whereClause)
-            throws DatabaseViewerException {
+    throws DatabaseViewerException {
         final Frame parentWindow = DatabaseViewerManager.getParentWindow();
         PagingDatabaseViewerDialog dialog;
         try {

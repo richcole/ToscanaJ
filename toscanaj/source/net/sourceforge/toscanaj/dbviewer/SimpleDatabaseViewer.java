@@ -8,8 +8,8 @@
 package net.sourceforge.toscanaj.dbviewer;
 
 import java.awt.Component;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -23,8 +23,8 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
  * A definition for this viewer looks like this: <objectView
  * class="net.sourceforge.toscanaj.dbviewer.SimpleDatabaseViewer"
  * name="Show object..."/> <parameter name="openDelimiter" value="!!"/>
- * <parameter name="closeDelimiter" value="��"/> <template>Name: !!name�� Type:
- * !!type�� Size: !!size��</template> </objectView>
+ * <parameter name="closeDelimiter" value="$$"/> <template>Name: !!name$$ Type:
+ * !!type$$ Size: !!size$$</template> </objectView>
  * 
  * Here the three fields "name", "type" and "size" will be queried and the
  * template will be filled with the results and then displayed in a dialog. Note
@@ -37,19 +37,19 @@ public class SimpleDatabaseViewer extends PagingDatabaseViewer {
     private class SimpleViewPanel implements PageViewPanel {
         private JTextArea textArea;
 
-        private final List<String> textFragments = new LinkedList<String>();
+        private final List<String> textFragments = new ArrayList<String>();
 
-        private final List<String> fieldNames = new LinkedList<String>();
+        private final List<String> fieldNames = new ArrayList<String>();
 
         public void showItem(final String keyValue) {
             try {
                 final DatabaseViewerManager viewerManager = getManager();
                 final List<String[]> results = viewerManager.getConnection()
-                        .executeQuery(
-                                this.fieldNames,
-                                viewerManager.getTableName(),
-                                "WHERE " + viewerManager.getKeyName() + "='"
-                                        + keyValue + "'");
+                .executeQuery(
+                        this.fieldNames,
+                        viewerManager.getTableName(),
+                        "WHERE " + viewerManager.getKeyName() + "='"
+                        + keyValue + "'");
                 assert textFragments.size() == results.size() + 1 : "Database results have to match the the available text fragments";
                 final String[] fields = results.get(0);
                 final Iterator<String> itText = this.textFragments.iterator();
@@ -69,12 +69,12 @@ public class SimpleDatabaseViewer extends PagingDatabaseViewer {
         public Component getComponent() throws DatabaseViewerException {
             final DatabaseViewerManager viewerManager = getManager();
             final String openDelimiter = viewerManager.getParameters().get(
-                    "openDelimiter");
+            "openDelimiter");
             if (openDelimiter == null) {
                 throw new DatabaseViewerException("Open delimiter not defined");
             }
             final String closeDelimiter = viewerManager.getParameters().get(
-                    "closeDelimiter");
+            "closeDelimiter");
             if (closeDelimiter == null) {
                 throw new DatabaseViewerException("Close delimiter not defined");
             }

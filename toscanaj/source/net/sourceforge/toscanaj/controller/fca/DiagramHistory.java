@@ -9,7 +9,6 @@ package net.sourceforge.toscanaj.controller.fca;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -30,7 +29,7 @@ import net.sourceforge.toscanaj.observer.ChangeObserver;
 public class DiagramHistory extends AbstractListModel implements
 ChangeObservable {
 
-    private final List<Object> diagrams = new LinkedList<Object>();
+    private final List<Object> diagrams = new ArrayList<Object>();
 
     private int currStartPosition;
     private int firstFutureDiagramPosition;

@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -52,11 +52,11 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
  */
 public class ShellExecuteDatabaseViewer implements DatabaseViewer {
     final static Logger logger = Logger
-            .getLogger(ShellExecuteDatabaseViewer.class.getName());
+    .getLogger(ShellExecuteDatabaseViewer.class.getName());
 
     private DatabaseViewerManager viewerManager;
 
-    private final List<String> fieldNames = new LinkedList<String>();
+    private final List<String> fieldNames = new ArrayList<String>();
 
     public ShellExecuteDatabaseViewer() {
         // initialization has to be done separately, so we can use the dynamic
@@ -64,26 +64,26 @@ public class ShellExecuteDatabaseViewer implements DatabaseViewer {
     }
 
     public void initialize(final DatabaseViewerManager manager)
-            throws DatabaseViewerException {
+    throws DatabaseViewerException {
         this.viewerManager = manager;
 
         // @todo need errorchecking on columnName here
         final String columnName = this.viewerManager.getParameters().get(
-                "columnName");
+        "columnName");
         if (columnName == null) {
             throw new DatabaseViewerException(
-                    "Parameter 'columnName' not given.");
+            "Parameter 'columnName' not given.");
         }
         this.fieldNames.add(columnName);
     }
 
     public void showView(final String whereClause)
-            throws DatabaseViewerException {
+    throws DatabaseViewerException {
         String resourceLocation = "";
         try {
             final List<String[]> results = this.viewerManager.getConnection()
-                    .executeQuery(this.fieldNames,
-                            this.viewerManager.getTableName(), whereClause);
+            .executeQuery(this.fieldNames,
+                    this.viewerManager.getTableName(), whereClause);
             final String[] fields = results.get(0);
             for (final String result : fields) {
                 resourceLocation += result;

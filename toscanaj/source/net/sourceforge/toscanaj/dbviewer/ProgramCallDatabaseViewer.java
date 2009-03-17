@@ -7,8 +7,8 @@
  */
 package net.sourceforge.toscanaj.dbviewer;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
@@ -38,9 +38,9 @@ import net.sourceforge.toscanaj.controller.db.DatabaseException;
 public class ProgramCallDatabaseViewer implements DatabaseViewer {
     private DatabaseViewerManager viewerManager = null;
 
-    private final List<String> textFragments = new LinkedList<String>();
+    private final List<String> textFragments = new ArrayList<String>();
 
-    private final List<String> fieldNames = new LinkedList<String>();
+    private final List<String> fieldNames = new ArrayList<String>();
 
     public ProgramCallDatabaseViewer() {
         // initialization has to be done separately, so we can use the dynamic
@@ -51,11 +51,11 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
         this.viewerManager = manager;
 
         final String openDelimiter = this.viewerManager.getParameters().get(
-                "openDelimiter");
+        "openDelimiter");
         final String closeDelimiter = this.viewerManager.getParameters().get(
-                "closeDelimiter");
+        "closeDelimiter");
         String commandLine = this.viewerManager.getParameters().get(
-                "commandLine");
+        "commandLine");
         while (commandLine.indexOf(openDelimiter) != -1) {
             this.textFragments.add(commandLine.substring(0, commandLine
                     .indexOf(openDelimiter)));
@@ -72,12 +72,12 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
     }
 
     public void showView(final String whereClause)
-            throws DatabaseViewerException {
+    throws DatabaseViewerException {
         String command = "";
         try {
             final List<String[]> results = this.viewerManager.getConnection()
-                    .executeQuery(this.fieldNames,
-                            this.viewerManager.getTableName(), whereClause);
+            .executeQuery(this.fieldNames,
+                    this.viewerManager.getTableName(), whereClause);
             final String[] fields = results.get(0);
             final Iterator<String> itText = this.textFragments.iterator();
             for (final String result : fields) {
