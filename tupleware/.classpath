@@ -5,7 +5,6 @@
 	<classpathentry kind="src" path="config"/>
 	<classpathentry kind="lib" path="dbdrivers/HypersonicSQL/hsqldb.jar"/>
 	<classpathentry kind="lib" path="libs/ant-contrib.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Tockit Libraries"/>
 	<classpathentry kind="lib" path="libs/jdom.jar"/>
 	<classpathentry kind="lib" path="libs/tockit-canvas.jar"/>
 	<classpathentry kind="lib" path="libs/tockit-events.jar"/>
@@ -32,6 +31,6 @@
 	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/wstx-asl-3.0.0.jar"/>
 	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="plugins/RDFTupleSource/libs/xml-apis.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
