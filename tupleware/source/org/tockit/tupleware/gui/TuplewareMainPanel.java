@@ -100,6 +100,7 @@ import org.tockit.tupleware.util.JoinedStringMapper;
 import org.tockit.tupleware.util.RegularExpressionStringMapper;
 import org.tockit.tupleware.util.StringMapper;
 
+@SuppressWarnings("serial")
 public class TuplewareMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     private static final ExtendedPreferences preferences = 
         ExtendedPreferences.userNodeForClass(TuplewareMainPanel.class);

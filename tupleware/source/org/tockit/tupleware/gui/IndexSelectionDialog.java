@@ -19,6 +19,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+@SuppressWarnings("serial")
 public class IndexSelectionDialog extends JDialog {
     private static final ExtendedPreferences preferences = 
         ExtendedPreferences.userNodeForClass(IndexSelectionDialog.class);

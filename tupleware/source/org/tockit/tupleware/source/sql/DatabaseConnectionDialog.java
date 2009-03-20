@@ -38,6 +38,7 @@ import java.sql.Statement;
 /**
  * @todo this is just copy & paste code from ToscanaJ's DatabaseConnectionInformationView for now.
  */
+@SuppressWarnings("serial")
 public class DatabaseConnectionDialog extends JDialog {
     private static final ExtendedPreferences preferences = 
         ExtendedPreferences.userNodeForClass(DatabaseConnectionDialog.class);
@@ -165,7 +166,7 @@ public class DatabaseConnectionDialog extends JDialog {
         }
     }
 
-    abstract class ConnectionPanel extends WizardPanel {
+	abstract class ConnectionPanel extends WizardPanel {
         @Override
 		String getTitle() {
             return "Connection Details:";
@@ -459,7 +460,7 @@ public class DatabaseConnectionDialog extends JDialog {
         }
     }
 
-    class AccessFileConnectionPanel extends ConnectionPanel {
+	class AccessFileConnectionPanel extends ConnectionPanel {
         private JTextField fileUrlField;
         private JTextField userNameField;
         private JPasswordField passwordField;
