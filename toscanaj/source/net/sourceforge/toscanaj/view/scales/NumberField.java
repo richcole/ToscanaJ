@@ -37,8 +37,7 @@ public class NumberField extends JTextField {
         }
     }
 
-    @Override
-    public boolean isValid() {
+    public boolean hasValidContent() {
         try {
             formatter.parse(getText());
             return true;

@@ -81,7 +81,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     }
 
     private static abstract class SingleDimensionScaleGenerator implements
-            ContextGenerator {
+    ContextGenerator {
         public Context createContext(final String name,
                 final List<Object> dividers, final Column column) {
             final ContextImplementation context = new ContextImplementation();
@@ -100,7 +100,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
                 final Iterator<Object> it = context.getAttributes().iterator();
                 while (it.hasNext()) {
                     final WritableFCAElement attribute = (WritableFCAElement) it
-                            .next();
+                    .next();
                     context.getRelationImplementation().insert(object,
                             attribute);
                 }
@@ -114,8 +114,8 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
                 return null;
             }
             return getForwardSymbol()
-                    + String.valueOf(dividers.get(getPosition(i, dividers
-                            .size())));
+            + String.valueOf(dividers.get(getPosition(i, dividers
+                    .size())));
         }
 
         public String createSQLClause(final String columnName,
@@ -128,16 +128,16 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
                                 .size()))) + ")";
             }
             String retVal = "("
-                    + columnName
-                    + getForwardSymbol()
-                    + String.valueOf(dividers.get(getPosition(i, dividers
-                            .size()))) + ")";
+                + columnName
+                + getForwardSymbol()
+                + String.valueOf(dividers.get(getPosition(i, dividers
+                        .size()))) + ")";
             if (i < dividers.size() - 1) {
                 retVal += " AND ("
-                        + columnName
-                        + getBackwardSymbol()
-                        + String.valueOf(dividers.get(getPosition(i + 1,
-                                dividers.size()))) + ")";
+                    + columnName
+                    + getBackwardSymbol()
+                    + String.valueOf(dividers.get(getPosition(i + 1,
+                            dividers.size()))) + ")";
             }
             return retVal;
         }
@@ -151,7 +151,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     }
 
     private static class IncreasingExclusiveGenerator extends
-            SingleDimensionScaleGenerator {
+    SingleDimensionScaleGenerator {
         @Override
         public String toString() {
             return "increasing, exclude bounds";
@@ -174,7 +174,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     }
 
     private static class IncreasingInclusiveGenerator extends
-            SingleDimensionScaleGenerator {
+    SingleDimensionScaleGenerator {
         @Override
         public String toString() {
             return "increasing, include bounds";
@@ -197,7 +197,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     }
 
     private static class DecreasingExclusiveGenerator extends
-            SingleDimensionScaleGenerator {
+    SingleDimensionScaleGenerator {
         @Override
         public String toString() {
             return "decreasing, exclude bounds";
@@ -220,7 +220,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     }
 
     private static class DecreasingInclusiveGenerator extends
-            SingleDimensionScaleGenerator {
+    SingleDimensionScaleGenerator {
         @Override
         public String toString() {
             return "decreasing, include bounds";
@@ -247,7 +247,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
      *       the other direction ==> implement.
      */
     private static abstract class InterordinalGenerator implements
-            ContextGenerator {
+    ContextGenerator {
         public Context createContext(final String name,
                 final List<Object> dividers, final Column column) {
             final ContextImplementation context = new ContextImplementation();
@@ -262,20 +262,20 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
                 context.getAttributes().add(downwardsAttributes[i]);
             }
             final BinaryRelationImplementation relation = context
-                    .getRelationImplementation();
+            .getRelationImplementation();
             for (int i = -1; i < numDiv; i++) {
                 String clause;
                 if (i == -1) {
                     clause = column.getSqlExpression() + " "
-                            + downwardsAttributes[i + 1];
+                    + downwardsAttributes[i + 1];
                 } else if (i == numDiv - 1) {
                     clause = column.getSqlExpression() + " "
-                            + upwardsAttributes[i];
+                    + upwardsAttributes[i];
                 } else {
                     clause = column.getSqlExpression() + " "
-                            + upwardsAttributes[i] + " AND "
-                            + column.getSqlExpression() + " "
-                            + downwardsAttributes[i + 1];
+                    + upwardsAttributes[i] + " AND "
+                    + column.getSqlExpression() + " "
+                    + downwardsAttributes[i + 1];
                 }
                 final FCAElementImplementation object = new FCAElementImplementation(
                         clause);
@@ -298,7 +298,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     }
 
     private static class Type1InterordinalGenerator extends
-            InterordinalGenerator {
+    InterordinalGenerator {
         @Override
         protected WritableFCAElement getUpwardsAttribute(
                 final List<Object> dividers, final int i) {
@@ -318,7 +318,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     }
 
     private static class Type2InterordinalGenerator extends
-            InterordinalGenerator {
+    InterordinalGenerator {
         @Override
         protected WritableFCAElement getUpwardsAttribute(
                 final List<Object> dividers, final int i) {
@@ -374,7 +374,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
                 final JComboBox cb = (JComboBox) e.getSource();
                 if (column != cb.getSelectedItem()) {
                     column = ((TableColumnPair) cb.getSelectedItem())
-                            .getColumn();
+                    .getColumn();
                     if (determineDataType(column.getType()) == FLOAT) {
                         addField.setNumberType(NumberField.FLOAT);
                     } else {
@@ -390,13 +390,13 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 
     protected void updateRangeInfo() {
         final String tail = " FROM "
-                + this.column.getTable().getSqlExpression() + ";";
+            + this.column.getTable().getSqlExpression() + ";";
         final String minQu = "SELECT min(" + this.column.getSqlExpression()
-                + ")" + tail;
+        + ")" + tail;
         final String maxQu = "SELECT max(" + this.column.getSqlExpression()
-                + ")" + tail;
+        + ")" + tail;
         final String avgQu = "SELECT avg(" + this.column.getSqlExpression()
-                + ")" + tail;
+        + ")" + tail;
         try {
             if (determineDataType(this.column.getType()) == FLOAT) {
                 final double min = this.connection.queryDouble(minQu, 1);
@@ -442,7 +442,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 
         dividersList = new JList(dividersModel);
         dividersList
-                .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         final JButton removeButton = new JButton("Remove");
         removeButton.setEnabled(hasSelectedDivider());
@@ -585,7 +585,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
             }
 
             private void setAddButtonState() {
-                addButton.setEnabled(addField.isValid());
+                addButton.setEnabled(addField.hasValidContent());
             }
         });
 
@@ -633,7 +633,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
         int i;
         for (i = 0; i < dividersModel.size(); i++) {
             final double currDivider = ((Double) dividersModel.elementAt(i))
-                    .doubleValue();
+            .doubleValue();
             if (value == currDivider) {
                 return;
             }
@@ -649,7 +649,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
         int i;
         for (i = 0; i < dividersModel.size(); i++) {
             final int currDivider = ((Integer) dividersModel.elementAt(i))
-                    .intValue();
+            .intValue();
             if (value == currDivider) {
                 return;
             }
@@ -699,7 +699,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
 
     public Context createContext(final String title) {
         final ContextGenerator generator = (ContextGenerator) this.typeChooser
-                .getSelectedItem();
+        .getSelectedItem();
         return generator.createContext(title, getDividers(), getColumn());
     }
 
