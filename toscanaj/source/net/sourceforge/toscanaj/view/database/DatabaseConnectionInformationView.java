@@ -172,7 +172,7 @@ public class DatabaseConnectionInformationView extends JDialog implements
             if (databaseInfo == null) {
                 embDBMSRadioButton.setSelected(true);
             } else {
-                final Type type = databaseInfo.getType();
+                final DatabaseInfo.Type type = databaseInfo.getType();
                 if (type == DatabaseInfo.EMBEDDED) {
                     embDBMSRadioButton.setSelected(true);
                 } else if (type == DatabaseInfo.UNDEFINED) {
