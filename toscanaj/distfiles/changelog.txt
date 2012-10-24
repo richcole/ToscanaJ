@@ -1,4 +1,25 @@
-Changes between version 1.6 and the svn version of the ToscanaJ 
+Changes between version 1.6.1 and the svn version of the ToscanaJ
+program suite:
+
+Affecting different programs:
+=============================
+
+Specific for ToscanaJ:
+======================
+
+Specific for Elba:
+==================
+
+Specific for Siena (still not fully complete):
+==============================================
+
+Other new experimental features:
+================================
+
+
+
+
+Changes between version 1.6 and 1.6.1 of the ToscanaJ
 program suite:
 
 Affecting different programs:
@@ -6,7 +27,8 @@ Affecting different programs:
 - CSC import has been enhanced to import not only diagrams, but also concrete scales
   and contexts for which no diagram exists.
 - OAL export of a context with unassigned attributes will now start with a line
-  containing a colon followed by the list of unassigned attributes  
+  containing a colon followed by the list of unassigned attributes.
+- Fixes to support running the software on Java 6 and 7 installations.
 
 Specific for ToscanaJ:
 ======================
@@ -27,7 +49,7 @@ Other new experimental features:
 
 
 
-Changes between version 1.5.1 and 1.6 of the ToscanaJ 
+Changes between version 1.5.1 and 1.6 of the ToscanaJ
 program suite:
 
 Affecting different programs:
