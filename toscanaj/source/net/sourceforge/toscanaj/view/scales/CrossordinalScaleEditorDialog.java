@@ -21,6 +21,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -232,13 +233,12 @@ public class CrossordinalScaleEditorDialog extends JDialog {
 
     private void extendAttributeNames(final ContextImplementation context,
             final String colName) {
-        final Collection<Object> objects = context.getObjects();
+        final Set<FCAElementImplementation> objects = context.getObjects();
         final ListSet attributes = context.getAttributeList();
         final BinaryRelationImplementation relation = context
                 .getRelationImplementation();
-        final Iterator<Object> it = attributes.iterator();
-        while (it.hasNext()) {
-            final FCAElement attribute = (FCAElement) it.next();
+        for (Object attribute1 : attributes) {
+            final FCAElement attribute = (FCAElement) attribute1;
             final FCAElementImplementation newAttribute = new FCAElementImplementation(
                     colName + " " + attribute.toString());
             for (final Object object2 : objects) {

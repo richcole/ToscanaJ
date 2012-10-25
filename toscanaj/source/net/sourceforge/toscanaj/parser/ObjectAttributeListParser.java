@@ -16,7 +16,6 @@ import java.io.Reader;
 import java.util.Collection;
 
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 
 import org.tockit.context.model.BinaryRelationImplementation;
@@ -32,7 +31,7 @@ import org.tockit.util.StringTokenizer;
  * used for quotation, backslashes as escapes.
  */
 public class ObjectAttributeListParser {
-    public static ContextImplementation<FCAElement, FCAElement> importOALFile(
+    public static ContextImplementation importOALFile(
             final File file) throws FileNotFoundException, DataFormatException {
         String name = file.getName();
         if (name.endsWith(".oal")) {
@@ -41,17 +40,16 @@ public class ObjectAttributeListParser {
         return importOALFromReader(new FileReader(file), name);
     }
 
-    public static ContextImplementation<FCAElement, FCAElement> importOALFromReader(
+    public static ContextImplementation importOALFromReader(
             final Reader reader, final String name) throws DataFormatException {
         final BufferedReader in = new BufferedReader(reader);
         try {
-            final ContextImplementation<FCAElement, FCAElement> context = new ContextImplementation<FCAElement, FCAElement>(
-                    name);
+            final ContextImplementation context = new ContextImplementation(name);
 
-            final Collection<FCAElement> objects = context.getObjects();
-            final Collection<FCAElement> attributes = context.getAttributes();
-            final BinaryRelationImplementation<FCAElement, FCAElement> relation = context
-                    .getRelationImplementation();
+            final Collection<FCAElementImplementation> objects = context.getObjects();
+            final Collection<FCAElementImplementation> attributes = context.getAttributes();
+            final BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> relation =
+                    context.getRelationImplementation();
 
             String curLine = in.readLine();
             int lineCount = 0;
@@ -67,8 +65,7 @@ public class ObjectAttributeListParser {
                         '"', '\\');
                 final String objectText = tokenizer.nextToken();
                 if (objectText.length() != 0) {
-                    final FCAElement object = new FCAElementImplementation(
-                            objectText);
+                    final FCAElementImplementation object = new FCAElementImplementation(objectText);
                     objects.add(object);
                     // the rest might be split along more colons, though -- just
                     // ignore that
@@ -76,8 +73,7 @@ public class ObjectAttributeListParser {
                             .substring(objectText.length() + 1);
                     tokenizer = new StringTokenizer(rest, ';', '"', '\\');
                     while (tokenizer.hasNext()) {
-                        final FCAElement attribute = new FCAElementImplementation(
-                                tokenizer.next());
+                        final FCAElementImplementation attribute = new FCAElementImplementation(tokenizer.next());
                         attributes.add(attribute);
                         relation.insert(object, attribute);
                     }
@@ -86,8 +82,7 @@ public class ObjectAttributeListParser {
                             .substring(objectText.length() + 1);
                     tokenizer = new StringTokenizer(rest, ';', '"', '\\');
                     while (tokenizer.hasNext()) {
-                        final FCAElement attribute = new FCAElementImplementation(
-                                tokenizer.next());
+                        final FCAElementImplementation attribute = new FCAElementImplementation(tokenizer.next());
                         attributes.add(attribute);
                     }
                 }

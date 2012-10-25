@@ -110,15 +110,15 @@ public class ArrowStyle {
         if (array == null) {
             return "";
         }
-        final StringBuffer buffer = new StringBuffer();
+        final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < array.length; i++) {
             final float f = array[i];
             if (i != 0) {
-                buffer.append(";");
+                builder.append(";");
             }
-            buffer.append(f);
+            builder.append(f);
         }
-        return buffer.toString();
+        return builder.toString();
     }
 
     private float[] parseFloatArray(final String string) {

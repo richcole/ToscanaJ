@@ -82,15 +82,11 @@ public class SimpleDatabaseViewer extends PagingDatabaseViewer {
             if (template == null) {
                 throw new DatabaseViewerException("No template found");
             }
-            while (template.indexOf(openDelimiter) != -1) {
-                this.textFragments.add(template.substring(0, template
-                        .indexOf(openDelimiter)));
-                template = template.substring(template.indexOf(openDelimiter)
-                        + openDelimiter.length());
-                this.fieldNames.add(template.substring(0, template
-                        .indexOf(closeDelimiter)));
-                template = template.substring(template.indexOf(closeDelimiter)
-                        + closeDelimiter.length());
+            while (template.contains(openDelimiter)) {
+                this.textFragments.add(template.substring(0, template.indexOf(openDelimiter)));
+                template = template.substring(template.indexOf(openDelimiter) + openDelimiter.length());
+                this.fieldNames.add(template.substring(0, template.indexOf(closeDelimiter)));
+                template = template.substring(template.indexOf(closeDelimiter) + closeDelimiter.length());
             }
             this.textFragments.add(template);
 

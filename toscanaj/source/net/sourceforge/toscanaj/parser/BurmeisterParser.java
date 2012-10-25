@@ -16,7 +16,6 @@ import java.io.Reader;
 import java.util.Collection;
 
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 
 import org.tockit.context.model.BinaryRelationImplementation;
@@ -25,12 +24,12 @@ import org.tockit.context.model.Context;
 public class BurmeisterParser {
     public static final String DEFAULT_NAME = "<unnamed>";
 
-    public static Context<FCAElement, FCAElement> importBurmeisterFile(
+    public static Context<FCAElementImplementation, FCAElementImplementation> importBurmeisterFile(
             final File file) throws FileNotFoundException, DataFormatException {
         return importBurmeisterFromReader(new FileReader(file));
     }
 
-    public static Context<FCAElement, FCAElement> importBurmeisterFromReader(
+    public static Context<FCAElementImplementation, FCAElementImplementation> importBurmeisterFromReader(
             final Reader reader) throws DataFormatException {
         final BufferedReader in = new BufferedReader(reader);
 
@@ -47,8 +46,7 @@ public class BurmeisterParser {
             if (curLine.equals("")) {
                 curLine = DEFAULT_NAME;
             }
-            final ContextImplementation<FCAElement, FCAElement> context = new ContextImplementation<FCAElement, FCAElement>(
-                    curLine);
+            final ContextImplementation context = new ContextImplementation(curLine);
 
             // get context size
             curLine = getNextNonEmptyLine(in);
@@ -58,8 +56,8 @@ public class BurmeisterParser {
 
             // grab objects and attributes, store additional arrays to get
             // indizes
-            final Collection<FCAElement> objects = context.getObjects();
-            final FCAElement[] objectArray = new FCAElement[numberOfObjects];
+            final Collection<FCAElementImplementation> objects = context.getObjects();
+            final FCAElementImplementation[] objectArray = new FCAElementImplementation[numberOfObjects];
             for (int i = 0; i < numberOfObjects; i++) {
                 curLine = getNextNonEmptyLine(in);
                 final FCAElementImplementation object = new FCAElementImplementation(
@@ -67,19 +65,18 @@ public class BurmeisterParser {
                 objects.add(object);
                 objectArray[i] = object;
             }
-            final Collection<FCAElement> attributes = context.getAttributes();
-            final FCAElement[] attributeArray = new FCAElement[numberOfAttributes];
+            final Collection<FCAElementImplementation> attributes = context.getAttributes();
+            final FCAElementImplementation[] attributeArray = new FCAElementImplementation[numberOfAttributes];
             for (int i = 0; i < numberOfAttributes; i++) {
                 curLine = getNextNonEmptyLine(in);
-                final FCAElement attribute = new FCAElementImplementation(
-                        curLine, null);
+                final FCAElementImplementation attribute = new FCAElementImplementation(curLine, null);
                 attributes.add(attribute);
                 attributeArray[i] = attribute;
             }
 
             // process relation
-            final BinaryRelationImplementation<FCAElement, FCAElement> relation = context
-                    .getRelationImplementation();
+            final BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> relation =
+                    context.getRelationImplementation();
             for (int i = 0; i < numberOfObjects; i++) {
                 curLine = getNextNonEmptyLine(in);
                 if (curLine == null) {

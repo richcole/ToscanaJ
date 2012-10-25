@@ -87,7 +87,7 @@ public class DecimalType extends AbstractXSDDatatype {
             final boolean maxIncluded, final Integer numDecimals) {
         super(name);
         if (min != null && max != null) {
-            if (min.doubleValue() > max.doubleValue()) {
+            if (min > max) {
                 throw new IllegalArgumentException(
                         "Minimum greater than maximum value for type");
             }
@@ -112,8 +112,7 @@ public class DecimalType extends AbstractXSDDatatype {
     public static DecimalType createDecimalType(final String name,
             final double min, final boolean minIncluded, final double max,
             final boolean maxIncluded, final int numDecimals) {
-        return new DecimalType(name, new Double(min), minIncluded, new Double(
-                max), maxIncluded, new Integer(numDecimals));
+        return new DecimalType(name, min, minIncluded, max, maxIncluded, numDecimals);
     }
 
     public static DecimalType createUnrestrictedType(final String name) {

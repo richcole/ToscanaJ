@@ -40,6 +40,8 @@ import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimNodeMovementEventListener;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.database.AggregateQuery;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
@@ -113,22 +115,21 @@ public class Factorizer {
             return;
         }
         final File inputFile = fileChooser.getSelectedFile();
-        final Context context = BurmeisterParser
-                .importBurmeisterFile(inputFile);
-        final Set<Object> attributes = context.getAttributes();
+        final Context<FCAElementImplementation, FCAElementImplementation> context =
+                BurmeisterParser.importBurmeisterFile(inputFile);
+        final Set<FCAElementImplementation> attributes = context.getAttributes();
 
-        final List<Set<Object>> subsets = findAllSubsetsOfSize(attributes,
-                ((Integer) spinner.getModel().getValue()).intValue());
-        final List<Factorization> diagrams = createFactorizedDiagrams(context,
-                subsets);
+        final List<Set<FCAElementImplementation>> subsets = findAllSubsetsOfSize(attributes,
+                (Integer) spinner.getModel().getValue());
+        final List<Factorization> diagrams = createFactorizedDiagrams(context, subsets);
         showResults(diagrams);
     }
 
-    private static List<Factorization> createFactorizedDiagrams(
-            final Context context, final List<Set<Object>> subsets) {
+    private static <T extends Object> List<Factorization> createFactorizedDiagrams(
+            final Context context, final List<Set<T>> subsets) {
         final List<Factorization> retVal = new ArrayList<Factorization>();
-        for (final Iterator<Set<Object>> it = subsets.iterator(); it.hasNext();) {
-            final Set set = it.next();
+        for (final Iterator<Set<T>> it = subsets.iterator(); it.hasNext();) {
+            final Set<T> set = it.next();
             retVal.add(new Factorization(context, set));
         }
         return retVal;
@@ -213,17 +214,14 @@ public class Factorizer {
         });
     }
 
-    protected static Context makeContextCopy(final Context context) {
+    protected static Context<FCAElementImplementation, FCAElementImplementation>
+                        makeContextCopy(final Context<FCAElementImplementation, FCAElementImplementation> context) {
         final ContextImplementation retVal = new ContextImplementation();
         retVal.setName(context.getName());
         retVal.getObjects().addAll(context.getObjects());
         retVal.getAttributes().addAll(context.getAttributes());
-        for (final Iterator<Object> objIt = retVal.getObjects().iterator(); objIt
-                .hasNext();) {
-            final Object obj = objIt.next();
-            for (final Iterator<Object> attrIt = retVal.getAttributes()
-                    .iterator(); attrIt.hasNext();) {
-                final Object attr = attrIt.next();
+        for (final FCAElementImplementation obj : retVal.getObjects()) {
+            for (final FCAElementImplementation attr : retVal.getAttributes()) {
                 if (context.getRelation().contains(obj, attr)) {
                     retVal.getRelationImplementation().insert(obj, attr);
                 }
@@ -232,18 +230,18 @@ public class Factorizer {
         return retVal;
     }
 
-    private static List<Set<Object>> findAllSubsetsOfSize(
-            final Set<Object> objects, final int n) {
-        final List<Set<Object>> retVal = new ArrayList<Set<Object>>();
+    private static <T extends Object> List<Set<T>> findAllSubsetsOfSize(
+            final Set<T> objects, final int n) {
+        final List<Set<T>> retVal = new ArrayList<Set<T>>();
         if (objects.size() == n) {
             retVal.add(objects);
         } else if (n != 0) {
-            final Object firstObject = objects.iterator().next();
-            final Set<Object> rest = new HashSet<Object>(objects);
+            final T firstObject = objects.iterator().next();
+            final Set<T> rest = new HashSet<T>(objects);
             rest.remove(firstObject);
-            final List<Set<Object>> smallerSets = findAllSubsetsOfSize(rest,
+            final List<Set<T>> smallerSets = findAllSubsetsOfSize(rest,
                     n - 1);
-            for (final Set<Object> set : smallerSets) {
+            for (final Set<T> set : smallerSets) {
                 set.add(firstObject);
                 retVal.add(set);
             }

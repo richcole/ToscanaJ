@@ -12,14 +12,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 
 import org.tockit.context.model.BinaryRelationImplementation;
 import org.tockit.context.model.Context;
 
 public class ContextSetups {
-    private static final FCAElement[] OBJECTS = new FCAElement[] {
+    private static final FCAElementImplementation[] OBJECTS = new FCAElementImplementation[] {
             new FCAElementImplementation("dove"),
             new FCAElementImplementation("hen"),
             new FCAElementImplementation("duck"),
@@ -37,7 +36,7 @@ public class ContextSetups {
             new FCAElementImplementation("zebra"), // 14
             new FCAElementImplementation("cow") };
 
-    private static final FCAElement[] ATTRIBUTES = new FCAElement[] {
+    private static final FCAElementImplementation[] ATTRIBUTES = new FCAElementImplementation[] {
             new FCAElementImplementation("small"),
             new FCAElementImplementation("medium"),
             new FCAElementImplementation("big"),
@@ -52,16 +51,16 @@ public class ContextSetups {
             new FCAElementImplementation("mane"),
             new FCAElementImplementation("hooves") };
 
-    public static Context<FCAElement, FCAElement> createCompleteAnimalContext() {
-        final ContextImplementation<FCAElement, FCAElement> context = new ContextImplementation<FCAElement, FCAElement>();
+    public static Context<FCAElementImplementation, FCAElementImplementation> createCompleteAnimalContext() {
+        final ContextImplementation context = new ContextImplementation();
 
         // taken from Bastian Wormuth's example
         context.setName("Animals");
         context.getObjects().addAll(Arrays.asList(OBJECTS));
         context.getAttributes().addAll(Arrays.asList(ATTRIBUTES));
 
-        final BinaryRelationImplementation<FCAElement, FCAElement> relation = context
-                .getRelationImplementation();
+        final BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> relation =
+                context.getRelationImplementation();
 
         relation.insert(OBJECTS[0], ATTRIBUTES[0]);
         relation.insert(OBJECTS[0], ATTRIBUTES[3]);
@@ -161,20 +160,20 @@ public class ContextSetups {
         return context;
     }
 
-    public static Context<FCAElement, FCAElement> createAnimalMovementContext() {
-        final ContextImplementation<FCAElement, FCAElement> context = new ContextImplementation<FCAElement, FCAElement>();
+    public static Context<FCAElementImplementation, FCAElementImplementation> createAnimalMovementContext() {
+        final ContextImplementation context = new ContextImplementation();
 
         context.setName("Animal Movement");
         context.getObjects().addAll(Arrays.asList(OBJECTS));
-        final List<FCAElement> attribs = new ArrayList<FCAElement>();
+        final List<FCAElementImplementation> attribs = new ArrayList<FCAElementImplementation>();
         attribs.add(ATTRIBUTES[7]);
         attribs.add(ATTRIBUTES[8]);
         attribs.add(ATTRIBUTES[9]);
         attribs.add(ATTRIBUTES[10]);
         context.getAttributes().addAll(attribs);
 
-        final BinaryRelationImplementation<FCAElement, FCAElement> relation = context
-                .getRelationImplementation();
+        final BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> relation =
+                context.getRelationImplementation();
         relation.insert(OBJECTS[0], ATTRIBUTES[7]);
         relation.insert(OBJECTS[2], ATTRIBUTES[7]);
         relation.insert(OBJECTS[2], ATTRIBUTES[10]);
@@ -203,19 +202,19 @@ public class ContextSetups {
         return context;
     }
 
-    public static Context<FCAElement, FCAElement> createAnimalSizeContext() {
-        final ContextImplementation<FCAElement, FCAElement> context = new ContextImplementation<FCAElement, FCAElement>();
+    public static Context<FCAElementImplementation, FCAElementImplementation> createAnimalSizeContext() {
+        final ContextImplementation context = new ContextImplementation();
 
         context.setName("Animal Sizes");
         context.getObjects().addAll(Arrays.asList(OBJECTS));
-        final List<FCAElement> attribs = new ArrayList<FCAElement>();
+        final List<FCAElementImplementation> attribs = new ArrayList<FCAElementImplementation>();
         attribs.add(ATTRIBUTES[0]);
         attribs.add(ATTRIBUTES[1]);
         attribs.add(ATTRIBUTES[2]);
         context.getAttributes().addAll(attribs);
 
-        final BinaryRelationImplementation<FCAElement, FCAElement> relation = context
-                .getRelationImplementation();
+        final BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> relation =
+                context.getRelationImplementation();
         relation.insert(OBJECTS[0], ATTRIBUTES[0]);
         relation.insert(OBJECTS[1], ATTRIBUTES[0]);
         relation.insert(OBJECTS[2], ATTRIBUTES[0]);

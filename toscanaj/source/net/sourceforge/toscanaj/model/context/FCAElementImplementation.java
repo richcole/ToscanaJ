@@ -21,8 +21,7 @@ import org.jdom.Element;
  *       descriptions be functionally dependend on the data? How to model this
  *       in CSX?
  */
-public class FCAElementImplementation implements WritableFCAElement, XMLizable,
-Comparable<FCAElementImplementation> {
+public class FCAElementImplementation implements WritableFCAElement, XMLizable, Comparable<FCAElementImplementation> {
     private Object data;
     private Element description;
     private int contextPosition = -1; // -1 means "not set"

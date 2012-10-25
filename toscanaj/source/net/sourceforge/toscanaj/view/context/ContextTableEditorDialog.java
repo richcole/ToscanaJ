@@ -48,6 +48,7 @@ import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
 import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
 import net.sourceforge.toscanaj.model.events.ConceptualSchemaLoadedEvent;
@@ -224,7 +225,7 @@ public class ContextTableEditorDialog extends JDialog implements
         final Object[] msg = { "Enter name of object: ", newNameField };
         final Object[] buttons = { createObjButton, doneButton };
         final JOptionPane optionPane = new JOptionPane(msg,
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null,
+                JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null,
                 buttons, msg[1]);
         final JDialog dialog = optionPane.createDialog(this, "Add object");
         optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
@@ -254,8 +255,7 @@ public class ContextTableEditorDialog extends JDialog implements
             public void keyReleased(final KeyEvent e) {
                 doneButton.setEnabled(newNameField.getText().trim().equals(""));
                 final boolean createPossible = !colHeader
-                        .collectionContainsString(newNameField.getText(),
-                                context.getAttributes());
+                        .collectionContainsString(newNameField.getText(), context.getAttributes());
                 createAttrButton.setEnabled(createPossible);
                 if (createPossible) {
                     createAttrButton.setToolTipText("Create a new attribute");
@@ -267,8 +267,7 @@ public class ContextTableEditorDialog extends JDialog implements
         });
         newNameField.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
-                if (colHeader.collectionContainsString(newNameField.getText(),
-                        context.getAttributes())) {
+                if (colHeader.collectionContainsString(newNameField.getText(), context.getAttributes())) {
                     return;
                 }
                 addAttribute(doneButton, newNameField);
@@ -278,7 +277,7 @@ public class ContextTableEditorDialog extends JDialog implements
         final Object[] msg = { "Enter name of attribute: ", newNameField };
         final Object[] buttons = { createAttrButton, doneButton };
         final JOptionPane optionPane = new JOptionPane(msg,
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null,
+                JOptionPane.PLAIN_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null,
                 buttons, msg[1]);
         final JDialog dialog = optionPane.createDialog(this, "Add attribute");
         optionPane.setMessageType(JOptionPane.PLAIN_MESSAGE);
@@ -524,14 +523,14 @@ public class ContextTableEditorDialog extends JDialog implements
     private void changeRelationImplementation(final int objectPos,
             final int attributePos) {
 
-        final Set<Object> objectsSet = this.context.getObjects();
-        final WritableFCAElement[] objects = objectsSet
-                .toArray(new WritableFCAElement[objectsSet.size()]);
-        final Set<Object> attributesSet = this.context.getAttributes();
-        final FCAElement[] attributes = attributesSet
-                .toArray(new FCAElement[attributesSet.size()]);
-        final WritableFCAElement object = objects[objectPos];
-        final FCAElement attribute = attributes[attributePos];
+        final Set<FCAElementImplementation> objectsSet = this.context.getObjects();
+        final FCAElementImplementation[] objects = objectsSet
+                .toArray(new FCAElementImplementation[objectsSet.size()]);
+        final Set<FCAElementImplementation> attributesSet = this.context.getAttributes();
+        final FCAElementImplementation[] attributes = attributesSet
+                .toArray(new FCAElementImplementation[attributesSet.size()]);
+        final FCAElementImplementation object = objects[objectPos];
+        final FCAElementImplementation attribute = attributes[attributePos];
         if (context.getRelationImplementation().contains(object, attribute)) {
             context.getRelationImplementation().remove(object, attribute);
         } else {
@@ -563,7 +562,7 @@ public class ContextTableEditorDialog extends JDialog implements
     @Override
     public void paint(final Graphics g) {
         super.paint(g);
-        if (onFirstLoad == true && this.scaleTitleField.getText().length() == 0) {
+        if (onFirstLoad && !this.scaleTitleField.getText().isEmpty()) {
             getInput();
         }
     }

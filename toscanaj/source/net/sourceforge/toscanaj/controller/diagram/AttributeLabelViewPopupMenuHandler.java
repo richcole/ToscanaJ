@@ -10,7 +10,6 @@ package net.sourceforge.toscanaj.controller.diagram;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JMenuItem;
@@ -36,7 +35,7 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
     }
 
     public void processEvent(final Event e) {
-        CanvasItemEventWithPosition itemEvent = null;
+        CanvasItemEventWithPosition itemEvent;
         try {
             itemEvent = (CanvasItemEventWithPosition) e;
         } catch (final ClassCastException e1) {
@@ -44,7 +43,7 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
                     getClass().getName()
                             + " has to be subscribed to CanvasItemEventWithPositions only");
         }
-        AttributeLabelView labelView = null;
+        AttributeLabelView labelView;
         try {
             labelView = (AttributeLabelView) itemEvent.getSubject();
         } catch (final ClassCastException e1) {
@@ -97,15 +96,12 @@ public class AttributeLabelViewPopupMenuHandler implements EventBrokerListener {
     private void addAttributeViewOptions(final List<String> attributeViewNames,
             final String attribute, final JPopupMenu popupMenu) {
         JMenuItem menuItem;
-        final Iterator<String> it = attributeViewNames.iterator();
-        while (it.hasNext()) {
-            final String attributeViewName = it.next();
+        for (final String attributeViewName : attributeViewNames) {
             menuItem = new JMenuItem(attributeViewName);
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     try {
-                        DatabaseViewerManager.showAttribute(attributeViewName,
-                                attribute);
+                        DatabaseViewerManager.showAttribute(attributeViewName, attribute);
                     } catch (final Exception exc) { // we catch any exception
                         // and show it to the user
                         ErrorDialog

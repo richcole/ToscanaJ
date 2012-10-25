@@ -9,7 +9,6 @@ package net.sourceforge.toscanaj.view.context;
 
 import java.awt.Component;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
@@ -42,9 +41,8 @@ public class ContextConsistencyChecker {
         final List<String> validClauses = new ArrayList<String>();
 
         // check if all objects are WHERE clauses
-        Iterator<Object> it = context.getObjects().iterator();
-        while (it.hasNext()) {
-            final String clause = it.next().toString();
+        for (Object o : context.getObjects()) {
+            final String clause = o.toString();
             final String query = "SELECT count(*) FROM "
                     + dbinfo.getTable().getSqlExpression() + " WHERE ("
                     + clause + ");";
@@ -61,13 +59,10 @@ public class ContextConsistencyChecker {
 
         // check if all conjunctions are empty
         if (problems.isEmpty()) {
-            it = context.getObjects().iterator();
-            while (it.hasNext()) {
-                final String clause = it.next().toString();
+            for (Object o : context.getObjects()) {
+                final String clause = o.toString();
                 validClauses.remove(clause);
-                final Iterator<String> it2 = validClauses.iterator();
-                while (it2.hasNext()) {
-                    final String otherClause = it2.next();
+                for (String otherClause : validClauses) {
                     final String query = "SELECT count(*) FROM "
                             + dbinfo.getTable().getSqlExpression() + " WHERE ("
                             + clause + ") AND (" + otherClause + ");";

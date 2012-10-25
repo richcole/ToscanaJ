@@ -77,30 +77,23 @@ public class CheckContextConsistencyAction extends AbstractAction implements
                 // show problems
                 final Element problemDescription = new Element("description");
                 final Element htmlElement = new Element("html");
-                htmlElement.addContent(new Element("title")
-                        .addContent("Consistency problems"));
+                htmlElement.addContent(new Element("title").addContent("Consistency problems"));
                 problemDescription.addContent(htmlElement);
                 final Element body = new Element("body");
                 htmlElement.addContent(body);
-                body
-                        .addContent(new Element("h1")
-                                .addContent("Problems found:"));
+                body.addContent(new Element("h1").addContent("Problems found:"));
 
                 final Enumeration<String> e = allProblems.keys();
                 while (e.hasMoreElements()) {
                     final String diagramTitle = e.nextElement();
-                    final List problems = allProblems.get(diagramTitle);
-                    body.addContent(new Element("h3").addContent("Diagram '"
-                            + diagramTitle + "'"));
-                    final Iterator problemsIterator = problems.iterator();
-                    while (problemsIterator.hasNext()) {
-                        final String problem = (String) problemsIterator.next();
+                    final List<String> problems = allProblems.get(diagramTitle);
+                    body.addContent(new Element("h3").addContent("Diagram '" + diagramTitle + "'"));
+                    for (String problem : problems) {
                         body.addContent(new Element("pre").addContent(problem));
                     }
                 }
 
-                final Frame frame = JOptionPane
-                        .getFrameForComponent(this.parent);
+                final Frame frame = JOptionPane.getFrameForComponent(this.parent);
                 DescriptionViewer.show(frame, problemDescription);
             }
         } catch (final Exception e) {

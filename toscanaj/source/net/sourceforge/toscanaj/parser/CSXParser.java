@@ -98,10 +98,11 @@ public class CSXParser {
      * And IDs are not yet checked for uniqueness.
      * 
      * The code might also have problems when namespaces are used.
+     *
+     * @todo improve exception handling
      */
     public static ConceptualSchema parse(final EventBroker eventBroker,
-            final File csxFile) throws IOException, DataFormatException,
-            Exception {
+            final File csxFile) throws Exception {
         try {
             final SAXBuilder parser = new SAXBuilder();
             _Document = parser.build(csxFile);

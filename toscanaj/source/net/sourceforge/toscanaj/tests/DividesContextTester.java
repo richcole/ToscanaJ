@@ -17,7 +17,6 @@ import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.lattice.Lattice;
@@ -29,11 +28,11 @@ import org.tockit.events.EventBroker;
 public class DividesContextTester {
 
     public static void main(final String[] args) throws Exception {
-        final ContextImplementation<FCAElement, FCAElement> context = new ContextImplementation<FCAElement, FCAElement>();
-        final Collection<FCAElement> objects = context.getObjects();
-        final Collection<FCAElement> finalAttributes = context.getAttributes();
-        final BinaryRelationImplementation<FCAElement, FCAElement> relation = context
-                .getRelationImplementation();
+        final ContextImplementation context = new ContextImplementation();
+        final Collection<FCAElementImplementation> objects = context.getObjects();
+        final Collection<FCAElementImplementation> finalAttributes = context.getAttributes();
+        final BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> relation =
+                context.getRelationImplementation();
 
         int max;
         if (args.length == 0) {
@@ -41,18 +40,16 @@ public class DividesContextTester {
         } else {
             max = Integer.parseInt(args[0]);
         }
-        System.out.println("Generating 'divides'-lattice for numbers up to "
-                + max);
+        System.out.println("Generating 'divides'-lattice for numbers up to " + max);
 
-        final FCAElement[] attributes = new FCAElement[max];
+        final FCAElementImplementation[] attributes = new FCAElementImplementation[max];
         for (int i = 1; i <= max; i++) {
-            attributes[i - 1] = new FCAElementImplementation(new Integer(i));
+            attributes[i - 1] = new FCAElementImplementation(i);
             finalAttributes.add(attributes[i - 1]);
         }
 
         for (int i = 1; i <= max; i++) {
-            final FCAElement object = new FCAElementImplementation(new Integer(
-                    i));
+            final FCAElementImplementation object = new FCAElementImplementation(i);
             objects.add(object);
             for (int j = 1; j <= max; j++) {
                 if (i % j == 0) {
@@ -61,18 +58,17 @@ public class DividesContextTester {
             }
         }
 
-        final LatticeGenerator<FCAElement, FCAElement> lGen = new GantersAlgorithm();
+        final LatticeGenerator<FCAElementImplementation, FCAElementImplementation> lGen =
+                new GantersAlgorithm<FCAElementImplementation, FCAElementImplementation>();
 
         long startMillis = System.currentTimeMillis();
-        final Lattice<FCAElement, FCAElement> lattice = lGen
-                .createLattice(context);
+        final Lattice<FCAElementImplementation, FCAElementImplementation> lattice = lGen.createLattice(context);
         System.out.println("Lattice generation: "
                 + (System.currentTimeMillis() - startMillis) + " ms");
 
         startMillis = System.currentTimeMillis();
-        final Diagram2D<FCAElement, FCAElement> diagram = NDimLayoutOperations
-                .createDiagram(lattice, "test",
-                        new DefaultDimensionStrategy<FCAElement>());
+        final Diagram2D<FCAElementImplementation, FCAElementImplementation> diagram = NDimLayoutOperations
+                .createDiagram(lattice, "test", new DefaultDimensionStrategy<FCAElementImplementation>());
         System.out.println("Diagram layout: "
                 + (System.currentTimeMillis() - startMillis) + " ms");
 

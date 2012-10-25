@@ -854,7 +854,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 final String baseStr = diagramTitle.substring(0, index1).trim();
                 try {
                     final Integer num = new Integer(numStr);
-                    copiedDiagramTitle = baseStr + " (" + (num.intValue() + 1)
+                    copiedDiagramTitle = baseStr + " (" + (num + 1)
                             + ")";
                 } catch (final NumberFormatException e) {
                     // ignore this exception because if whatever is in

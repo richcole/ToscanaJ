@@ -46,7 +46,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
     /**
      * @todo remove and use object list from context instead.
      */
-    private WritableFCAElement[] objects;
+    private FCAElementImplementation[] objects;
 
     public ContextTableRowHeader(final ContextTableEditorDialog dialog) {
         super();
@@ -76,10 +76,9 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
     }
 
     public Dimension calculateNewSize() {
-        final Set<Object> objectsSet = this.dialog.getContext().getObjects();
+        final Set<FCAElementImplementation> objectsSet = this.dialog.getContext().getObjects();
 
-        this.objects = objectsSet.toArray(new WritableFCAElement[objectsSet
-                .size()]);
+        this.objects = objectsSet.toArray(new FCAElementImplementation[objectsSet.size()]);
         final int numRow = this.objects.length + 1;
         return new Dimension(ContextTableView.CELL_WIDTH + 1, numRow
                 * ContextTableView.CELL_HEIGHT + 1);
@@ -190,9 +189,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
                 if (e.isPopupTrigger()) {
                     final ContextTableView.Position pos = dialog
                             .getTablePosition(e.getX(), e.getY());
-                    if (pos == null) {
-                        return;
-                    } else {
+                    if (pos != null) {
                         showPopupMenu(e, pos);
                     }
                 }
@@ -251,9 +248,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
                 if (e.isPopupTrigger()) {
                     final ContextTableView.Position pos = dialog
                             .getTablePosition(e.getX(), e.getY());
-                    if (pos == null) {
-                        return;
-                    } else {
+                    if (pos != null) {
                         showPopupMenu(e, pos);
                     }
                 }
@@ -281,15 +276,14 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
     }
 
     private void removeObject(final int pos) {
-        final Object objToRemove = this.objects[pos];
+        final FCAElementImplementation objToRemove = this.objects[pos];
         this.dialog.getContext().getObjects().remove(objToRemove);
         this.dialog.updateView();
     }
 
     protected boolean addObject(final String newObjectName) {
         if (!collectionContainsString(newObjectName, this.objects)) {
-            final WritableFCAElement object = new FCAElementImplementation(
-                    newObjectName);
+            final FCAElementImplementation object = new FCAElementImplementation(newObjectName);
             this.dialog.getContext().getObjects().add(object);
             return true;
         } else {
@@ -298,9 +292,9 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
     }
 
     private void renameObject(final int num) {
-        String inputValue = "";
+        String inputValue;
         do {
-            final WritableFCAElement oldObject = this.objects[num];
+            final FCAElementImplementation oldObject = this.objects[num];
             final InputTextDialog inputDialog = new InputTextDialog(
                     this.dialog, "Rename Object", "object", oldObject
                             .toString());
@@ -309,19 +303,18 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
                 if (!collectionContainsString(inputValue, this.objects)) {
                     final ContextImplementation context = this.dialog
                             .getContext();
-                    final Set<Object> objectSet = context.getObjects();
-                    final WritableFCAElement newObject = new FCAElementImplementation(
-                            inputValue);
+                    final Set<FCAElementImplementation> objectSet = context.getObjects();
+                    final FCAElementImplementation newObject = new FCAElementImplementation(inputValue);
                     objectSet.remove(oldObject);
                     if (objectSet instanceof List) {
-                        final List<Object> objectList = (List<Object>) objectSet;
+                        final List<FCAElementImplementation> objectList = (List<FCAElementImplementation>) objectSet;
                         objectList.add(num, newObject);
                     } else {
                         objectSet.add(newObject);
                     }
-                    for (final Iterator<Object> iter = context.getAttributes()
-                            .iterator(); iter.hasNext();) {
-                        final Object attribute = iter.next();
+                    for (final Iterator<FCAElementImplementation> iter = context.getAttributes().iterator();
+                         iter.hasNext();) {
+                        final FCAElementImplementation attribute = iter.next();
                         if (context.getRelation()
                                 .contains(oldObject, attribute)) {
                             context.getRelationImplementation().insert(

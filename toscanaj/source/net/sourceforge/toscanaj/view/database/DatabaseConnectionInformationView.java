@@ -268,7 +268,7 @@ public class DatabaseConnectionInformationView extends JDialog implements
 
         protected String createAbsoluteLocation(final String inputLocation) {
             if (inputLocation.startsWith("..")
-                    || inputLocation.indexOf(File.separator) == -1) {
+                    || !inputLocation.contains(File.separator)) {
                 // we assume the schema has a file URL, since we wouldn't have
                 // the relative
                 // path otherwise

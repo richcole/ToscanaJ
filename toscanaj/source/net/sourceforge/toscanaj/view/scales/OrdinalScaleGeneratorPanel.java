@@ -56,7 +56,6 @@ import org.tockit.context.model.Context;
  *       the load on the RDBMS, while making the code more complex.
  */
 public class OrdinalScaleGeneratorPanel extends JPanel {
-    boolean result;
     public static final int INTEGER = 0;
     public static final int FLOAT = 1;
     public static final int UNSUPPORTED = -1;
@@ -64,8 +63,8 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     private JButton addButton;
     private NumberField addField;
     private JList dividersList;
-    private JComboBox typeChooser;
-    private JComboBox columnChooser;
+    private JComboBox<ContextGenerator> typeChooser;
+    private JComboBox<TableColumnPair> columnChooser;
     private JLabel avgLabel;
     private JLabel minLabel;
     private JLabel maxLabel;
@@ -80,8 +79,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
         Context createContext(String name, List<Object> dividers, Column column);
     }
 
-    private static abstract class SingleDimensionScaleGenerator implements
-    ContextGenerator {
+    private static abstract class SingleDimensionScaleGenerator implements ContextGenerator {
         public Context createContext(final String name,
                 final List<Object> dividers, final Column column) {
             final ContextImplementation context = new ContextImplementation();
@@ -89,20 +87,15 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
             for (int i = -1; i < dividers.size(); i++) {
                 final String objectData = createSQLClause(column
                         .getSqlExpression(), dividers, i);
-                final WritableFCAElement object = new FCAElementImplementation(
-                        objectData);
+                final FCAElementImplementation object = new FCAElementImplementation(objectData);
                 final String attributeName = createAttributeName(dividers, i);
                 context.getObjects().add(object);
                 if (attributeName != null) {
                     context.getAttributes().add(
                             new FCAElementImplementation(attributeName));
                 }
-                final Iterator<Object> it = context.getAttributes().iterator();
-                while (it.hasNext()) {
-                    final WritableFCAElement attribute = (WritableFCAElement) it
-                    .next();
-                    context.getRelationImplementation().insert(object,
-                            attribute);
+                for (FCAElementImplementation attribute : context.getAttributes()) {
+                    context.getRelationImplementation().insert(object, attribute);
                 }
             }
             return context;
@@ -243,26 +236,24 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     }
 
     /**
-     * @todo there is another case, which mirrors this but puts the equals on
-     *       the other direction ==> implement.
+     * @todo there is another case, which mirrors this but puts the equals on the other direction ==> implement.
      */
-    private static abstract class InterordinalGenerator implements
-    ContextGenerator {
+    private static abstract class InterordinalGenerator implements ContextGenerator {
         public Context createContext(final String name,
                 final List<Object> dividers, final Column column) {
             final ContextImplementation context = new ContextImplementation();
             context.setName(name);
             final int numDiv = dividers.size();
-            final WritableFCAElement[] upwardsAttributes = new WritableFCAElement[numDiv];
-            final WritableFCAElement[] downwardsAttributes = new WritableFCAElement[numDiv];
+            final FCAElementImplementation[] upwardsAttributes = new FCAElementImplementation[numDiv];
+            final FCAElementImplementation[] downwardsAttributes = new FCAElementImplementation[numDiv];
             for (int i = 0; i < numDiv; i++) {
                 upwardsAttributes[i] = getUpwardsAttribute(dividers, i);
                 downwardsAttributes[i] = getDownwardsAttribute(dividers, i);
                 context.getAttributes().add(upwardsAttributes[i]);
                 context.getAttributes().add(downwardsAttributes[i]);
             }
-            final BinaryRelationImplementation relation = context
-            .getRelationImplementation();
+            final BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> relation =
+                    context.getRelationImplementation();
             for (int i = -1; i < numDiv; i++) {
                 String clause;
                 if (i == -1) {
@@ -277,8 +268,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
                     + column.getSqlExpression() + " "
                     + downwardsAttributes[i + 1];
                 }
-                final FCAElementImplementation object = new FCAElementImplementation(
-                        clause);
+                final FCAElementImplementation object = new FCAElementImplementation(clause);
                 for (int j = 0; j <= i; j++) {
                     relation.insert(object, upwardsAttributes[j]);
                 }
@@ -290,23 +280,21 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
             return context;
         }
 
-        protected abstract WritableFCAElement getUpwardsAttribute(
-                List<Object> dividers, int i);
+        protected abstract FCAElementImplementation getUpwardsAttribute(List<Object> dividers, int i);
 
-        protected abstract WritableFCAElement getDownwardsAttribute(
-                List<Object> dividers, int i);
+        protected abstract FCAElementImplementation getDownwardsAttribute(List<Object> dividers, int i);
     }
 
     private static class Type1InterordinalGenerator extends
     InterordinalGenerator {
         @Override
-        protected WritableFCAElement getUpwardsAttribute(
+        protected FCAElementImplementation getUpwardsAttribute(
                 final List<Object> dividers, final int i) {
             return new FCAElementImplementation(">= " + dividers.get(i));
         }
 
         @Override
-        protected WritableFCAElement getDownwardsAttribute(
+        protected FCAElementImplementation getDownwardsAttribute(
                 final List<Object> dividers, final int i) {
             return new FCAElementImplementation("< " + dividers.get(i));
         }
@@ -320,13 +308,13 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     private static class Type2InterordinalGenerator extends
     InterordinalGenerator {
         @Override
-        protected WritableFCAElement getUpwardsAttribute(
+        protected FCAElementImplementation getUpwardsAttribute(
                 final List<Object> dividers, final int i) {
             return new FCAElementImplementation("> " + dividers.get(i));
         }
 
         @Override
-        protected WritableFCAElement getDownwardsAttribute(
+        protected FCAElementImplementation getDownwardsAttribute(
                 final List<Object> dividers, final int i) {
             return new FCAElementImplementation("<= " + dividers.get(i));
         }
@@ -368,7 +356,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     }
 
     private JPanel makeColumnChooserPane() {
-        this.columnChooser = new JComboBox();
+        this.columnChooser = new JComboBox<TableColumnPair>();
         this.columnChooser.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 final JComboBox cb = (JComboBox) e.getSource();
@@ -441,8 +429,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
         dividersModel = new DefaultListModel();
 
         dividersList = new JList(dividersModel);
-        dividersList
-        .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        dividersList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         final JButton removeButton = new JButton("Remove");
         removeButton.setEnabled(hasSelectedDivider());
@@ -538,8 +525,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
             final List<Column> columns = table.getColumns();
             for (final Column currentColumn : columns) {
                 if (determineDataType(currentColumn.getType()) != UNSUPPORTED) {
-                    this.columnChooser.addItem(new TableColumnPair(table,
-                            currentColumn));
+                    this.columnChooser.addItem(new TableColumnPair(table, currentColumn));
                 }
             }
         }
@@ -632,8 +618,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     public void addDelimiter(final double value) {
         int i;
         for (i = 0; i < dividersModel.size(); i++) {
-            final double currDivider = ((Double) dividersModel.elementAt(i))
-            .doubleValue();
+            final double currDivider = (Double) dividersModel.elementAt(i);
             if (value == currDivider) {
                 return;
             }
@@ -641,15 +626,14 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
                 break;
             }
         }
-        dividersModel.insertElementAt(new Double(value), i);
+        dividersModel.insertElementAt(value, i);
         addField.setText("");
     }
 
     public void addDelimiter(final int value) {
         int i;
         for (i = 0; i < dividersModel.size(); i++) {
-            final int currDivider = ((Integer) dividersModel.elementAt(i))
-            .intValue();
+            final int currDivider = (Integer) dividersModel.elementAt(i);
             if (value == currDivider) {
                 return;
             }

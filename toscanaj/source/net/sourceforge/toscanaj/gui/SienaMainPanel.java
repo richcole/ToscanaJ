@@ -183,7 +183,9 @@ EventBrokerListener {
     private ConceptualSchema conceptualSchema;
 
     private JMenuBar menuBar;
+    @SuppressWarnings("FieldCanBeLocal")
     private JMenu helpMenu;
+    @SuppressWarnings("FieldCanBeLocal")
     private JMenu fileMenu;
     private JMenu mruMenu;
 
@@ -208,9 +210,12 @@ EventBrokerListener {
     private TableView tableView;
     private RowHeader rowHeader;
     private JLabel temporalControlsLabel;
+    @SuppressWarnings("FieldCanBeLocal")
     private JRadioButtonMenuItem showExactMenuItem;
+    @SuppressWarnings("FieldCanBeLocal")
     private JRadioButtonMenuItem showAllMenuItem;
     private JMenuItem printMenuItem;
+    @SuppressWarnings("FieldCanBeLocal")
     private JMenuItem printSetupMenuItem;
 
     public SienaMainPanel(final boolean loadLastFile) {
@@ -221,10 +226,8 @@ EventBrokerListener {
 
         this.diagramExportSettings = new DiagramExportSettings();
 
-        this.eventBroker.subscribe(this, NewConceptualSchemaEvent.class,
-                Object.class);
-        this.eventBroker.subscribe(this, ConceptualSchemaLoadedEvent.class,
-                Object.class);
+        this.eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
+        this.eventBroker.subscribe(this, ConceptualSchemaLoadedEvent.class, Object.class);
 
         setDefaultManyValuedContext();
 
@@ -270,13 +273,9 @@ EventBrokerListener {
                 "Boolean", new String[] { "true", "false" }));
         manyValuedContext.add(StringType.createUnrestrictedType("String"));
         manyValuedContext.add(DecimalType.createUnrestrictedType("Number"));
-        manyValuedContext.add(DecimalType.createDecimalType("Integer", null,
-                false, null, false, new Integer(0)));
-        manyValuedContext.add(DecimalType.createDecimalType(
-                "Non-Negative Integer", new Double(0), true, null, false,
-                new Integer(0)));
-        manyValuedContext.add(DecimalType.createDecimalType("Positive Integer",
-                new Double(0), false, null, false, new Integer(0)));
+        manyValuedContext.add(DecimalType.createDecimalType("Integer", null, false, null, false, 0));
+        manyValuedContext.add(DecimalType.createDecimalType("Non-Negative Integer", 0d, true, null, false, 0));
+        manyValuedContext.add(DecimalType.createDecimalType("Positive Integer", 0d, false, null, false, 0));
         this.conceptualSchema.setManyValuedContext(manyValuedContext);
     }
 
@@ -336,24 +335,22 @@ EventBrokerListener {
     private void insertDiagramIntoView(
             final Diagram2D<FCAElement, FCAElement> diagram,
             final boolean nestDiagram) {
-        Diagram2D oldDiagram = this.diagramEditingView.getDiagramView()
-        .getDiagram();
+        Diagram2D oldDiagram = this.diagramEditingView.getDiagramView().getDiagram();
         Diagram2D newDiagram = diagram;
         final DiagramHistory diagramHistory = new DiagramHistory();
 
         if (nestDiagram && oldDiagram != null) {
             // before nesting make sure apposition is ok by synchronizing object
             // sets to their join
-            final Iterator oldObjectSetIterator = oldDiagram.getTopConcept()
-            .getExtentIterator();
-            final Set oldObjects = new HashSet();
+            final Iterator<FCAElementImplementation> oldObjectSetIterator =
+                    oldDiagram.getTopConcept().getExtentIterator();
+            final Set<FCAElementImplementation> oldObjects = new HashSet<FCAElementImplementation>();
             while (oldObjectSetIterator.hasNext()) {
                 oldObjects.add(oldObjectSetIterator.next());
             }
-            final Iterator<FCAElement> newObjectSetIterator = diagram
-            .getTopConcept().getExtentIterator();
+            final Iterator<FCAElement> newObjectSetIterator = diagram.getTopConcept().getExtentIterator();
             while (newObjectSetIterator.hasNext()) {
-                final FCAElement object = newObjectSetIterator.next();
+                final FCAElementImplementation object = (FCAElementImplementation) newObjectSetIterator.next();
                 if (oldObjects.contains(object)) {
                     // remove the common ones from the old set
                     oldObjects.remove(object);
@@ -368,24 +365,18 @@ EventBrokerListener {
                     // object should be in both diagrams in the
                     // first place
                     if (oldDiagram.getTopConcept().getIntentSize() == 0) {
-                        ((ConceptImplementation) oldDiagram.getTopConcept())
-                        .addObject(object);
+                        ((ConceptImplementation) oldDiagram.getTopConcept()).addObject(object);
                     } else {
                         oldDiagram = extendDiagram(oldDiagram, object);
                     }
                 }
             }
-            // now add the ones that are in the old diagram but not found in the
-            // new one to
-            // the new top concept
-            // this is again only happening if there is no intent attached to
-            // the top node, else
+            // now add the ones that are in the old diagram but not found in the new one to the new top concept
+            // this is again only happening if there is no intent attached to the top node, else
             // we have to create a new diagram
-            for (final Iterator<FCAElement> iter = oldObjects.iterator(); iter
-            .hasNext();) {
+            for (final Iterator<FCAElementImplementation> iter = oldObjects.iterator(); iter.hasNext();) {
                 if (newDiagram.getTopConcept().getIntentSize() == 0) {
-                    ((ConceptImplementation) newDiagram.getTopConcept())
-                    .addObject(iter.next());
+                    ((ConceptImplementation) newDiagram.getTopConcept()).addObject(iter.next());
                 } else {
                     newDiagram = extendDiagram(newDiagram, iter.next());
                 }
@@ -408,10 +399,8 @@ EventBrokerListener {
         .setConceptInterpretationContext(context);
     }
 
-    private Diagram2D extendDiagram(final Diagram2D oldDiagram,
-            final Object newObject) {
-        final ContextImplementation context = (ContextImplementation) DiagramToContextConverter
-        .getContext(oldDiagram);
+    private Diagram2D extendDiagram(final Diagram2D oldDiagram, final FCAElementImplementation newObject) {
+        final ContextImplementation context = (ContextImplementation) DiagramToContextConverter.getContext(oldDiagram);
         context.getObjects().add(newObject);
         final LatticeGenerator lgen = new GantersAlgorithm();
         return NDimLayoutOperations.createDiagram(lgen.createLattice(context),

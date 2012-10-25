@@ -103,8 +103,7 @@ public class InputTextDialog extends JDialog {
                      * Instead of directly closing the window, we're going to
                      * change the JOptionPane's value property.
                      */
-                    InputTextDialog.this.optionPane.setValue(new Integer(
-                            JOptionPane.CLOSED_OPTION));
+                    InputTextDialog.this.optionPane.setValue(JOptionPane.CLOSED_OPTION);
                 }
             }
         });
@@ -133,20 +132,16 @@ public class InputTextDialog extends JDialog {
                     if (value.equals(enterButtonString)) {
                         final String typedText = InputTextDialog.this.textField
                                 .getText();
-                        if ((typedText.equals(null))
-                                || (typedText.trim().equals(""))) {
+                        if ((typedText == null) || (typedText.trim().equals(""))) {
                             setVisible(true);
-                            InputTextDialog.this.optionPane
-                                    .setValue(JOptionPane.UNINITIALIZED_VALUE);
+                            InputTextDialog.this.optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
                         } else {
-                            InputTextDialog.this.optionPane
-                                    .setInputValue(typedText);
+                            InputTextDialog.this.optionPane.setInputValue(typedText);
                             setVisible(false);
                         }
                     } else {
                         setVisible(false);
-                        InputTextDialog.this.optionPane
-                                .setValue(JOptionPane.UNINITIALIZED_VALUE);
+                        InputTextDialog.this.optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
                     }
                 }
             }

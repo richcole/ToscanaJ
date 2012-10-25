@@ -131,11 +131,10 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
             final DatabaseViewerManager viewerManager = getManager();
             List<String[]> tmpList;
 
-            String tmpS = "";
             try {
                 for (int i = 0; i < this.columnDefSQL.size(); i++) {
 
-                    tmpS = (String) this.columnDefSQL.get(i);
+                    String tmpS = (String) this.columnDefSQL.get(i);
                     tmpList = (viewerManager.getConnection()
                             .executeQuery("SELECT " + tmpS + " FROM "
                                     + viewerManager.getTableName()
@@ -283,8 +282,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                     vrelold = Float.parseFloat(this.data.get(i - 1)[0])
                             - this.theMin;
 
-                    g2
-                            .setColor(new Color(
+                    g2.setColor(new Color(
                                     (int) ((this.minCol.getRed() * (1 - (vrel / dist))) + (this.maxCol
                                             .getRed() * (vrel / dist))),
                                     (int) ((this.minCol.getGreen() * (1 - (vrel / dist))) + (this.maxCol
@@ -292,8 +290,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                                     (int) ((this.minCol.getBlue() * (1 - (vrel / dist))) + (this.maxCol
                                             .getBlue() * (vrel / dist)))));
 
-                    g2
-                            .fillRect(
+                    g2.fillRect(
                                     (int) ((vrelold / dist) * this.getWidth()),
                                     0,
                                     ((int) ((vrel / dist) * this.getWidth()) - (int) ((vrelold / dist) * this
@@ -308,8 +305,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                     }
                 }
 
-                final int curpoint = (int) ((this.theCur - this.theMin) * ((this
-                        .getWidth() - 1) / (dist)));
+                final int curpoint = (int) ((this.theCur - this.theMin) * ((this.getWidth() - 1) / (dist)));
                 g2.setColor(Color.white);
 
                 g2.setStroke(new BasicStroke(LINE_OUTER_SIZE));
@@ -352,8 +348,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                             + TEXT_BOX_BUFFER_SIZE * 2, getHeight() / 2);
                 } else {
                     g2.setColor(Color.white);
-                    g2
-                            .fillRect(
+                    g2.fillRect(
                                     (int) (curpoint - bounds.getWidth() - TEXT_BOX_BUFFER_SIZE * 3),
                                     (getHeight() / 2) - 1
                                             - (int) bounds.getHeight()
@@ -363,8 +358,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                                     (int) bounds.getHeight()
                                             + TEXT_BOX_BUFFER_SIZE * 2);
                     g2.setColor(Color.black);
-                    g2
-                            .drawRect(
+                    g2.drawRect(
                                     (int) (curpoint - bounds.getWidth() - TEXT_BOX_BUFFER_SIZE * 3),
                                     (getHeight() / 2) - 1
                                             - (int) bounds.getHeight()
@@ -389,8 +383,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                         && this.hoverPos < this.getWidth()
                                 - (bounds.getWidth() / 2)) {
                     g2.setColor(Color.white);
-                    g2
-                            .fillRect(
+                    g2.fillRect(
                                     (int) (this.hoverPos - TEXT_BOX_BUFFER_SIZE - bounds
                                             .getWidth() / 2), (getHeight() / 2)
                                             - 1 + TEXT_BOX_BUFFER_SIZE,
@@ -399,8 +392,7 @@ public class BarChartDatabaseViewer extends PagingDatabaseViewer {
                                     (int) bounds.getHeight()
                                             + TEXT_BOX_BUFFER_SIZE * 2);
                     g2.setColor(Color.black);
-                    g2
-                            .drawRect(
+                    g2.drawRect(
                                     (int) (this.hoverPos - TEXT_BOX_BUFFER_SIZE - bounds
                                             .getWidth() / 2), (getHeight() / 2)
                                             - 1 + TEXT_BOX_BUFFER_SIZE,

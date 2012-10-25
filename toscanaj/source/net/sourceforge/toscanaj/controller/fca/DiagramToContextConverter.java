@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 import net.sourceforge.toscanaj.model.diagram.Diagram2D;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.lattice.Concept;
@@ -20,39 +21,36 @@ import org.tockit.context.model.Context;
 import org.tockit.util.ListSet;
 
 public class DiagramToContextConverter {
-    public static <O, A> Context<O, A> getContext(final Diagram2D<O, A> diagram) {
-        final ContextImplementation<O, A> context = new ContextImplementation<O, A>(
-                diagram.getTitle());
+    public static Context<FCAElementImplementation, FCAElementImplementation>
+                        getContext(final Diagram2D<FCAElementImplementation, FCAElementImplementation> diagram) {
+        final ContextImplementation context = new ContextImplementation(diagram.getTitle());
 
-        final ListSet<O> objects = context.getObjectList();
-        final ListSet<A> attributes = context.getAttributeList();
-        final BinaryRelationImplementation<O, A> relation = context
+        final ListSet<FCAElementImplementation> objects = context.getObjectList();
+        final ListSet<FCAElementImplementation> attributes = context.getAttributeList();
+        final BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> relation = context
                 .getRelationImplementation();
 
-        final Iterator<DiagramNode<O, A>> nodesIt = diagram.getNodes();
+        final Iterator<DiagramNode<FCAElementImplementation, FCAElementImplementation>> nodesIt = diagram.getNodes();
         while (nodesIt.hasNext()) {
-            final DiagramNode<O, A> node = nodesIt.next();
-            final Concept<O, A> concept = node.getConcept();
+            final DiagramNode<FCAElementImplementation, FCAElementImplementation> node = nodesIt.next();
+            final Concept<FCAElementImplementation, FCAElementImplementation> concept = node.getConcept();
 
-            final Iterator<O> objCont = concept.getObjectContingentIterator();
+            final Iterator<FCAElementImplementation> objCont = concept.getObjectContingentIterator();
             while (objCont.hasNext()) {
-                final O obj = objCont.next();
+                final FCAElementImplementation obj = objCont.next();
                 insertIntoList(objects, obj);
             }
 
-            final Iterator<A> attrCont = concept
+            final Iterator<FCAElementImplementation> attrCont = concept
                     .getAttributeContingentIterator();
             while (attrCont.hasNext()) {
-                final A attrib = attrCont.next();
+                final FCAElementImplementation attrib = attrCont.next();
                 insertIntoList(attributes, attrib);
-                final Iterator<Concept<O, A>> downset = concept.getDownset()
-                        .iterator();
-                while (downset.hasNext()) {
-                    final Concept<O, A> subConcept = downset.next();
-                    final Iterator<O> objIt = subConcept
+                for (Concept<FCAElementImplementation, FCAElementImplementation> subConcept : concept.getDownset()) {
+                    final Iterator<FCAElementImplementation> objIt = subConcept
                             .getObjectContingentIterator();
                     while (objIt.hasNext()) {
-                        final O object = objIt.next();
+                        final FCAElementImplementation object = objIt.next();
                         relation.insert(object, attrib);
                     }
                 }
@@ -63,7 +61,7 @@ public class DiagramToContextConverter {
     }
 
     /**
-     * @todo the specific behaviour for Comparable could be in a separate class.
+     * @todo the specific behaviour for Comparable could be in FCAElementImplementation separate class.
      */
     @SuppressWarnings( { "cast", "unchecked" })
     private static <T> void insertIntoList(final List<T> list, final T object) {

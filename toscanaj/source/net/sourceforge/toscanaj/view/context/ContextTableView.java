@@ -24,6 +24,7 @@ import javax.swing.SwingConstants;
 import javax.swing.ToolTipManager;
 
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
 
 public class ContextTableView extends JComponent implements Scrollable {
     static final Color TEXT_COLOR = Color.BLACK;
@@ -75,10 +76,10 @@ public class ContextTableView extends JComponent implements Scrollable {
         final Paint oldPaint = g2d.getPaint();
         final Font oldFont = g2d.getFont();
 
-        final Iterator<Object> objIt = this.context.getObjects().iterator();
+        final Iterator<FCAElementImplementation> objIt = this.context.getObjects().iterator();
         int row = 0;
         while (objIt.hasNext()) {
-            final Object object = objIt.next();
+            final FCAElementImplementation object = objIt.next();
             drawRow(g2d, object, row);
             row += 1;
         }
@@ -94,16 +95,16 @@ public class ContextTableView extends JComponent implements Scrollable {
         return new Dimension(numCol * CELL_WIDTH + 1, numRow * CELL_HEIGHT + 1);
     }
 
-    protected void drawRow(final Graphics2D g2d, final Object object,
+    protected void drawRow(final Graphics2D g2d, final FCAElementImplementation object,
             final int row) {
         final Font font = g2d.getFont();
         final int y = row * CELL_HEIGHT;
         g2d.setFont(font.deriveFont(Font.PLAIN));
         g2d.setPaint(TABLE_CELL_COLOR);
-        final Iterator<Object> attrIt = this.context.getAttributes().iterator();
+        final Iterator<FCAElementImplementation> attrIt = this.context.getAttributes().iterator();
         int col = 0;
         while (attrIt.hasNext()) {
-            final Object attribute = attrIt.next();
+            final FCAElementImplementation attribute = attrIt.next();
             if (this.context.getRelation().contains(object, attribute)) {
                 drawCell(g2d, "X", col * CELL_WIDTH, y);
             } else {

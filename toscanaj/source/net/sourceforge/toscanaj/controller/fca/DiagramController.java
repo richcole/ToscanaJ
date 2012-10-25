@@ -204,9 +204,7 @@ public class DiagramController implements ChangeObservable {
      * This should not be called if the changes affect only future diagrams.
      */
     protected void notifyObservers() {
-        final Iterator<ChangeObserver> it = this.observers.iterator();
-        while (it.hasNext()) {
-            final ChangeObserver observer = it.next();
+        for (ChangeObserver observer : this.observers) {
             observer.update(this);
         }
     }

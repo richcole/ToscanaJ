@@ -83,8 +83,7 @@ public class AggregateQuery extends Query {
                 final String refVal = referenceValues[i];
                 final QueryField field = fieldIt.next();
                 if (field.isRelative()) {
-                    valuesToUse[i] = new Double(Double.parseDouble(value)
-                            / Double.parseDouble(refVal));
+                    valuesToUse[i] = Double.parseDouble(value) / Double.parseDouble(refVal);
                 } else {
                     valuesToUse[i] = value;
                 }

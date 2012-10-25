@@ -50,23 +50,14 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
     public void initialize(final DatabaseViewerManager manager) {
         this.viewerManager = manager;
 
-        final String openDelimiter = this.viewerManager.getParameters().get(
-        "openDelimiter");
-        final String closeDelimiter = this.viewerManager.getParameters().get(
-        "closeDelimiter");
-        String commandLine = this.viewerManager.getParameters().get(
-        "commandLine");
-        while (commandLine.indexOf(openDelimiter) != -1) {
-            this.textFragments.add(commandLine.substring(0, commandLine
-                    .indexOf(openDelimiter)));
-            commandLine = commandLine.substring(commandLine
-                    .indexOf(openDelimiter)
-                    + openDelimiter.length());
-            this.fieldNames.add(commandLine.substring(0, commandLine
-                    .indexOf(closeDelimiter)));
-            commandLine = commandLine.substring(commandLine
-                    .indexOf(closeDelimiter)
-                    + closeDelimiter.length());
+        final String openDelimiter = this.viewerManager.getParameters().get("openDelimiter");
+        final String closeDelimiter = this.viewerManager.getParameters().get("closeDelimiter");
+        String commandLine = this.viewerManager.getParameters().get("commandLine");
+        while (commandLine.contains(openDelimiter)) {
+            this.textFragments.add(commandLine.substring(0, commandLine.indexOf(openDelimiter)));
+            commandLine = commandLine.substring(commandLine.indexOf(openDelimiter) + openDelimiter.length());
+            this.fieldNames.add(commandLine.substring(0, commandLine.indexOf(closeDelimiter)));
+            commandLine = commandLine.substring(commandLine.indexOf(closeDelimiter) + closeDelimiter.length());
         }
         this.textFragments.add(commandLine);
     }
@@ -76,8 +67,7 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
         String command = "";
         try {
             final List<String[]> results = this.viewerManager.getConnection()
-            .executeQuery(this.fieldNames,
-                    this.viewerManager.getTableName(), whereClause);
+                .executeQuery(this.fieldNames, this.viewerManager.getTableName(), whereClause);
             final String[] fields = results.get(0);
             final Iterator<String> itText = this.textFragments.iterator();
             for (final String result : fields) {
@@ -86,8 +76,7 @@ public class ProgramCallDatabaseViewer implements DatabaseViewer {
             }
             command += itText.next();
         } catch (final DatabaseException e) {
-            // / @todo maybe we should introduce a proper
-            // DatabaseViewerException in the signature
+            // @todo maybe we should introduce a proper DatabaseViewerException in the signature
             throw new DatabaseViewerException("Failed to query database.", e);
         }
         try {

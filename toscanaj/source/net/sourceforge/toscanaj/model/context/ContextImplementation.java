@@ -20,10 +20,11 @@ import org.tockit.util.ListSetImplementation;
 /**
  * @todo hide access to collections and relation by playing man in the middle.
  */
-public class ContextImplementation<O, A> implements ListsContext<O, A> {
-    private final ListSet<O> objects = new ListSetImplementation<O>();
-    private final ListSet<A> attributes = new ListSetImplementation<A>();
-    private final BinaryRelationImplementation<O, A> relation = new BinaryRelationImplementation<O, A>();
+public class ContextImplementation implements ListsContext<FCAElementImplementation, FCAElementImplementation> {
+    private final ListSet<FCAElementImplementation> objects = new ListSetImplementation<FCAElementImplementation>();
+    private final ListSet<FCAElementImplementation> attributes = new ListSetImplementation<FCAElementImplementation>();
+    private final BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> relation =
+            new BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation>();
     private String name = null;
 
     public ContextImplementation() {
@@ -34,19 +35,19 @@ public class ContextImplementation<O, A> implements ListsContext<O, A> {
         this.name = name;
     }
 
-    public Set<O> getObjects() {
+    public Set<FCAElementImplementation> getObjects() {
         return objects;
     }
 
-    public Set<A> getAttributes() {
+    public Set<FCAElementImplementation> getAttributes() {
         return attributes;
     }
 
-    public BinaryRelation<O, A> getRelation() {
+    public BinaryRelation<FCAElementImplementation, FCAElementImplementation> getRelation() {
         return relation;
     }
 
-    public BinaryRelationImplementation<O, A> getRelationImplementation() {
+    public BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> getRelationImplementation() {
         return this.relation;
     }
 
@@ -58,40 +59,22 @@ public class ContextImplementation<O, A> implements ListsContext<O, A> {
         this.name = name;
     }
 
-    public Context<O, A> createSum(final Context<O, A> other, final String title) {
-        final ContextImplementation<O, A> context = new ContextImplementation<O, A>(
-                title);
-        final Set<O> newObjects = context.getObjects();
-        final Set<A> newAttributes = context.getAttributes();
-        final BinaryRelationImplementation<O, A> newRelation = context
+    public Context<FCAElementImplementation, FCAElementImplementation>
+            createSum(final Context<FCAElementImplementation, FCAElementImplementation> other, final String title) {
+        final ContextImplementation context = new ContextImplementation(title);
+        final Set<FCAElementImplementation> newObjects = context.getObjects();
+        final Set<FCAElementImplementation> newAttributes = context.getAttributes();
+        final BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> newRelation = context
                 .getRelationImplementation();
 
-        Iterator<O> objIt = this.getObjects().iterator();
-        while (objIt.hasNext()) {
-            final O object = objIt.next();
-            newObjects.add(object);
-        }
-        objIt = other.getObjects().iterator();
-        while (objIt.hasNext()) {
-            final O object = objIt.next();
-            newObjects.add(object);
-        }
-        Iterator<A> attrIt = this.getAttributes().iterator();
-        while (attrIt.hasNext()) {
-            final A attribute = attrIt.next();
-            newAttributes.add(attribute);
-        }
-        attrIt = other.getAttributes().iterator();
-        while (attrIt.hasNext()) {
-            final A attribute = attrIt.next();
-            newAttributes.add(attribute);
-        }
-        objIt = newObjects.iterator();
-        while (objIt.hasNext()) {
-            final O object = objIt.next();
-            attrIt = newAttributes.iterator();
-            while (attrIt.hasNext()) {
-                final A attribute = attrIt.next();
+        newObjects.addAll(this.getObjects());
+        newObjects.addAll(other.getObjects());
+
+        newAttributes.addAll(this.getAttributes());
+        newAttributes.addAll(other.getAttributes());
+
+        for (FCAElementImplementation object : newObjects) {
+            for (FCAElementImplementation attribute : newAttributes) {
                 if (this.getRelation().contains(object, attribute)
                         || other.getRelation().contains(object, attribute)) {
                     newRelation.insert(object, attribute);
@@ -102,52 +85,38 @@ public class ContextImplementation<O, A> implements ListsContext<O, A> {
     }
 
     /**
-     * @todo this is not a good place, since we assume FCAElements and SQL
-     *       strings here -- it will break if that is not true.
+     * @todo this is not a good place, since we assume FCAElements and SQL strings here -- it will break if that is not true.
      */
     @SuppressWarnings("unchecked")
-    public Context<O, A> createProduct(final Context<O, A> other,
-            final String title) {
-        final ContextImplementation<O, A> context = new ContextImplementation<O, A>(
-                title);
-        final Set<O> newObjects = context.getObjects();
-        final Set<A> newAttributes = context.getAttributes();
-        final BinaryRelationImplementation<O, A> newRelation = context
+    public Context<FCAElementImplementation, FCAElementImplementation> createProduct(
+            final Context<FCAElementImplementation, FCAElementImplementation> other, final String title) {
+        final ContextImplementation context = new ContextImplementation(title);
+        final Set<FCAElementImplementation> newObjects = context.getObjects();
+        final Set<FCAElementImplementation> newAttributes = context.getAttributes();
+        final BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> newRelation = context
                 .getRelationImplementation();
 
-        Iterator<A> attrIt = this.getAttributes().iterator();
-        while (attrIt.hasNext()) {
-            final A attribute = attrIt.next();
-            newAttributes.add(attribute);
-        }
-        attrIt = other.getAttributes().iterator();
-        while (attrIt.hasNext()) {
-            final A attribute = attrIt.next();
-            newAttributes.add(attribute);
-        }
-        final Iterator<O> objIt = this.getObjects().iterator();
-        while (objIt.hasNext()) {
-            final FCAElement objectL = (FCAElement) objIt.next();
-            final Iterator<O> objIt2 = other.getObjects().iterator();
-            while (objIt2.hasNext()) {
-                final FCAElement objectR = (FCAElement) objIt2.next();
+        newAttributes.addAll(this.getAttributes());
+        newAttributes.addAll(other.getAttributes());
+
+        for (FCAElementImplementation objectL : this.getObjects()) {
+            for (FCAElementImplementation objectR : other.getObjects()) {
                 final String newObjectData = "(" + objectL.getData().toString()
                         + ") AND (" + objectR.getData().toString() + ")";
-                final FCAElement newObject = new FCAElementImplementation(
-                        newObjectData);
-                newObjects.add((O) newObject);
-                attrIt = this.getAttributes().iterator();
+                final FCAElementImplementation newObject = new FCAElementImplementation(newObjectData);
+                newObjects.add(newObject);
+                Iterator<FCAElementImplementation> attrIt = this.getAttributes().iterator();
                 while (attrIt.hasNext()) {
-                    final A attribute = attrIt.next();
-                    if (this.getRelation().contains((O) objectL, attribute)) {
-                        newRelation.insert((O) newObject, attribute);
+                    final FCAElementImplementation attribute = attrIt.next();
+                    if (this.getRelation().contains(objectL, attribute)) {
+                        newRelation.insert(newObject, attribute);
                     }
                 }
                 attrIt = other.getAttributes().iterator();
                 while (attrIt.hasNext()) {
-                    final A attribute = attrIt.next();
-                    if (other.getRelation().contains((O) objectR, attribute)) {
-                        newRelation.insert((O) newObject, attribute);
+                    final FCAElementImplementation attribute = attrIt.next();
+                    if (other.getRelation().contains(objectR, attribute)) {
+                        newRelation.insert(newObject, attribute);
                     }
                 }
             }
@@ -155,27 +124,23 @@ public class ContextImplementation<O, A> implements ListsContext<O, A> {
         return context;
     }
 
-    public ListSet<O> getObjectList() {
+    public ListSet<FCAElementImplementation> getObjectList() {
         return this.objects;
     }
 
-    public ListSet<A> getAttributeList() {
+    public ListSet<FCAElementImplementation> getAttributeList() {
         return this.attributes;
     }
 
     public void updatePositionMarkers() {
         int pos = 0;
-        for (final O object : this.objects) {
-            if (object instanceof WritableFCAElement) {
-                ((WritableFCAElement) object).setContextPosition(pos);
-            }
+        for (final FCAElementImplementation object : this.objects) {
+            object.setContextPosition(pos);
             pos++;
         }
         pos = 0;
-        for (final A object : this.attributes) {
-            if (object instanceof WritableFCAElement) {
-                ((WritableFCAElement) object).setContextPosition(pos);
-            }
+        for (final FCAElementImplementation object : this.attributes) {
+            object.setContextPosition(pos);
             pos++;
         }
     }

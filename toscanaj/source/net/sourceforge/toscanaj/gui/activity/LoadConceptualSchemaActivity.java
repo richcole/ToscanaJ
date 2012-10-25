@@ -23,11 +23,7 @@ public class LoadConceptualSchemaActivity implements FileActivity {
     }
 
     public void processFile(final File file) throws Exception {
-        try {
-            CSXParser.parse(this.broker, file);
-        } catch (final DataFormatException e) {
-            throw e;
-        }
+        CSXParser.parse(this.broker, file);
     }
 
     public boolean prepareToProcess() throws Exception {

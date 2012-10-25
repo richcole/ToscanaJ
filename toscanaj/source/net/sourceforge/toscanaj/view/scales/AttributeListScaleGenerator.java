@@ -2,16 +2,13 @@ package net.sourceforge.toscanaj.view.scales;
 
 import java.awt.Frame;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
 import net.sourceforge.toscanaj.controller.db.DatabaseException;
 import net.sourceforge.toscanaj.model.ConceptualSchema;
 import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAElement;
 import net.sourceforge.toscanaj.model.context.FCAElementImplementation;
-import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 
 import org.tockit.context.model.BinaryRelationImplementation;
 import org.tockit.context.model.Context;
@@ -47,12 +44,12 @@ public class AttributeListScaleGenerator implements ScaleGenerator {
         }
         final ContextImplementation context = new ContextImplementation();
         context.setName(scaleDialog.getDiagramTitle());
-        final BinaryRelationImplementation relation = context
-                .getRelationImplementation();
+        final BinaryRelationImplementation<FCAElementImplementation, FCAElementImplementation> relation =
+                context.getRelationImplementation();
 
         final Object[][] tableData = scaleDialog.getData();
         final int dimensions = tableData.length;
-        final FCAElement[] attributes = new FCAElement[dimensions];
+        final FCAElementImplementation[] attributes = new FCAElementImplementation[dimensions];
 
         for (int i = 0; i < dimensions; i++) {
             final String attributeName = createAttributeName(tableData, i);
@@ -63,7 +60,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator {
         final boolean useAllCombi = scaleDialog.getUseAllCombinations();
         for (int i = 0; i < Math.pow(2, dimensions); i++) {
             String objectData = "";
-            final List<FCAElement> relatedAttributes = new ArrayList<FCAElement>();
+            final List<FCAElementImplementation> relatedAttributes = new ArrayList<FCAElementImplementation>();
             for (int j = 0; j < dimensions; j++) {
                 if (j != 0) {
                     objectData += " AND ";
@@ -76,14 +73,11 @@ public class AttributeListScaleGenerator implements ScaleGenerator {
                 objectData += "(" + tableData[j][1] + ")";
             }
 
-            final WritableFCAElement object = new FCAElementImplementation(
-                    objectData);
+            final FCAElementImplementation object = new FCAElementImplementation(objectData);
 
             if (useAllCombi) {
                 context.getObjects().add(object);
-                final Iterator<FCAElement> it = relatedAttributes.iterator();
-                while (it.hasNext()) {
-                    final Object attrib = it.next();
+                for (FCAElementImplementation attrib : relatedAttributes) {
                     relation.insert(object, attrib);
                 }
             } else {
@@ -95,10 +89,7 @@ public class AttributeListScaleGenerator implements ScaleGenerator {
                                     + objectData + " );", 1);
                     if (result != 0) {
                         context.getObjects().add(object);
-                        final Iterator<FCAElement> it = relatedAttributes
-                                .iterator();
-                        while (it.hasNext()) {
-                            final Object attrib = it.next();
+                        for (FCAElementImplementation attrib : relatedAttributes) {
                             relation.insert(object, attrib);
                         }
                     }

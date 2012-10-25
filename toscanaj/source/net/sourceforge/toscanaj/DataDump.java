@@ -183,7 +183,7 @@ public class DataDump {
     }
 
     private static String escapeFileName(final String title) {
-        final StringBuffer retVal = new StringBuffer(title.length());
+        final StringBuilder retVal = new StringBuilder(title.length());
         for (int i = 0; i < title.length(); i++) {
             final char curChar = title.charAt(i);
             if (allowedChars.indexOf(curChar) != -1) {

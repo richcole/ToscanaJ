@@ -94,7 +94,7 @@ public class ReadingHelpDialog extends JDialog {
         final ConceptInterpretationContext conceptInterpretationContext = nodeView
                 .getDiagramView().getConceptInterpretationContext();
 
-        final StringBuffer description = new StringBuffer("<html>");
+        final StringBuilder description = new StringBuilder("<html>");
         description.append("<hr><i>Attributes (");
         description.append(concept.getIntentSize());
         description.append("):</i><hr>");

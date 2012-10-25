@@ -53,11 +53,9 @@ public class NominalScaleGenerator implements ScaleGenerator {
 
         for (final Object value : values) {
             final NominalScaleEditorDialog.SqlFragment sqlFrag = (NominalScaleEditorDialog.SqlFragment) value;
-            final FCAElement object = new FCAElementImplementation(sqlFrag
-                    .getSqlClause());
+            final FCAElementImplementation object = new FCAElementImplementation(sqlFrag.getSqlClause());
             final String attributeName = sqlFrag.getAttributeLabel();
-            final FCAElement attribute = new FCAElementImplementation(
-                    attributeName);
+            final FCAElementImplementation attribute = new FCAElementImplementation(attributeName);
 
             context.getObjects().add(object);
             context.getAttributes().add(attribute);
@@ -70,8 +68,7 @@ public class NominalScaleGenerator implements ScaleGenerator {
             }
         }
 
-        final FCAElement topNodeObject = new FCAElementImplementation(
-                topNodeClause);
+        final FCAElementImplementation topNodeObject = new FCAElementImplementation(topNodeClause);
         context.getObjects().add(topNodeObject);
 
         return context;

@@ -21,7 +21,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -190,7 +189,7 @@ public class CSVImportDetailsDialog extends JDialog {
         final Vector<String> dbTypesVector = new Vector<String>();
         dbTypesVector.add("Choose Column Type");
         dbTypesVector.addAll(dbTypes);
-        dataTypesComboBox = new JComboBox(dbTypesVector);
+        dataTypesComboBox = new JComboBox<String>(dbTypesVector);
         dataTypesComboBox.setEditable(false);
         dataTypesComboBox.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent event) {
@@ -333,9 +332,7 @@ public class CSVImportDetailsDialog extends JDialog {
         try {
             final Collection<SQLTypeInfo> typeNames = connection
                     .getDatabaseSupportedTypeNames();
-            final Iterator<SQLTypeInfo> it = typeNames.iterator();
-            while (it.hasNext()) {
-                final SQLTypeInfo cur = it.next();
+            for (SQLTypeInfo cur : typeNames) {
                 res.add(cur.getTypeName().toLowerCase());
             }
         } catch (final DatabaseException e) {
