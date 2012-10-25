@@ -107,13 +107,11 @@ import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 import org.tockit.swing.preferences.ExtendedPreferences;
 
-public class ElbaMainPanel extends JFrame implements MainPanel,
-EventBrokerListener {
+public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListener {
     private static final String WINDOW_TITLE = "Elba";
     private static final int MaxMruFiles = 8;
 
-    private static final ExtendedPreferences preferences = ExtendedPreferences
-    .userNodeForClass(ElbaMainPanel.class);
+    private static final ExtendedPreferences preferences = ExtendedPreferences.userNodeForClass(ElbaMainPanel.class);
 
     /**
      * Main Controllers

@@ -31,7 +31,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -77,15 +76,16 @@ public class NominalScaleEditorDialog extends JDialog {
     private TableColumnPair selectedTableColumnPair;
     private final DatabaseConnection databaseConnection;
 
-    private JList columnValuesListView;
-    private JList attributeListView;
-    private DefaultListModel columnValuesListModel;
-    private DefaultListModel attributeListModel;
+    private JList<ColumnValue> columnValuesListView;
+    private JList<Object> attributeListView;
+    private DefaultListModel<ColumnValue> columnValuesListModel;
+    private DefaultListModel<Object> attributeListModel;
+    @SuppressWarnings("FieldCanBeLocal")
     private JButton cancelButton;
     private JButton createButton;
 
     private JTextField scaleTitleField;
-    private JComboBox columnChooser;
+    private JComboBox<Object> columnChooser;
     private final DatabaseSchema databaseSchema;
     private JButton andButton;
     private JButton orButton;
@@ -314,8 +314,7 @@ public class NominalScaleEditorDialog extends JDialog {
         public Component getListCellRendererComponent(final JList list,
                 final Object value, final int index, final boolean isSelected,
                 final boolean cellHasFocus) {
-            super.getListCellRendererComponent(list, value, index, isSelected,
-                    cellHasFocus);
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             final ColumnValue colValue = (ColumnValue) value;
             setText(colValue.getValue());
             setFont(colValue.deriveFont(list.getFont()));
@@ -406,7 +405,7 @@ public class NominalScaleEditorDialog extends JDialog {
                         GridBagConstraints.HORIZONTAL, new Insets(5, 5, 5, 5),
                         0, 0));
 
-        this.columnChooser = new JComboBox();
+        this.columnChooser = new JComboBox<Object>();
         this.columnChooser.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 final JComboBox cb = (JComboBox) e.getSource();
@@ -426,10 +425,9 @@ public class NominalScaleEditorDialog extends JDialog {
         });
 
         final JPanel tablePane = new JPanel(new GridBagLayout());
-        this.columnValuesListModel = new DefaultListModel();
-        this.columnValuesListView = new JList(columnValuesListModel);
-        this.columnValuesListView
-                .setCellRenderer(new ColumnValuesListRenderer());
+        this.columnValuesListModel = new DefaultListModel<ColumnValue>();
+        this.columnValuesListView = new JList<ColumnValue>(columnValuesListModel);
+        this.columnValuesListView.setCellRenderer(new ColumnValuesListRenderer());
         this.columnValuesListView.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
@@ -455,8 +453,8 @@ public class NominalScaleEditorDialog extends JDialog {
         });
         moveButtonPane.add(addButton);
         moveButtonPane.add(removeButton);
-        this.attributeListModel = new DefaultListModel();
-        this.attributeListView = new JList(attributeListModel);
+        this.attributeListModel = new DefaultListModel<Object>();
+        this.attributeListView = new JList<Object>(attributeListModel);
         this.attributeListView.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
@@ -580,9 +578,8 @@ public class NominalScaleEditorDialog extends JDialog {
     }
 
     private void addValuesToSelection() {
-        for (int i = this.columnValuesListView.getSelectedValues().length - 1; i >= 0; i--) {
-            final ColumnValue value = (ColumnValue) this.columnValuesListView
-                    .getSelectedValues()[i];
+        for (int i = this.columnValuesListView.getSelectedValuesList().size() - 1; i >= 0; i--) {
+            final ColumnValue value = this.columnValuesListView.getSelectedValuesList().get(i);
             this.attributeListModel.addElement(new TableColumnValueTriple(
                     this.selectedTableColumnPair, value));
             if (this.columnUsed == null) {
@@ -596,9 +593,8 @@ public class NominalScaleEditorDialog extends JDialog {
     }
 
     private void removeValuesFromSelection() {
-        for (int i = this.attributeListView.getSelectedValues().length - 1; i >= 0; i--) {
-            final Object selectedItem = this.attributeListView
-                    .getSelectedValues()[i];
+        for (int i = this.attributeListView.getSelectedValuesList().size() - 1; i >= 0; i--) {
+            final Object selectedItem = this.attributeListView.getSelectedValuesList().get(i);
             this.attributeListModel.removeElement(selectedItem);
         }
         fillAvailableValueList();
@@ -624,25 +620,20 @@ public class NominalScaleEditorDialog extends JDialog {
         if (selectedTableColumnPair == null) {
             return;
         }
-        List<String> resultSet = null;
         try {
             final String query = "SELECT DISTINCT "
                     + selectedTableColumnPair.getSqlExpression() + " FROM "
                     + selectedTableColumnPair.getTable().getSqlExpression()
                     + ";";
-            resultSet = databaseConnection.queryColumn(query, 1);
-            final Iterator<String> it = resultSet.iterator();
-            if (it.hasNext()) {
+            List<String> resultSet = databaseConnection.queryColumn(query, 1);
+            if (!resultSet.isEmpty()) {
                 if (checkIfColumnAllowsNullValues()) {
-                    this.columnValuesListModel.addElement(new NullColumnValue(
-                            "NULL"));
+                    this.columnValuesListModel.addElement(new NullColumnValue("NULL"));
                 }
             }
-            while (it.hasNext()) {
-                final String value = it.next();
+            for (String value : resultSet) {
                 if (!valueSelected(selectedTableColumnPair, value)) {
-                    this.columnValuesListModel
-                            .addElement(new OrdinaryColumnValue(value));
+                    this.columnValuesListModel.addElement(new OrdinaryColumnValue(value));
                 }
             }
         } catch (final DatabaseException e) {
@@ -654,10 +645,8 @@ public class NominalScaleEditorDialog extends JDialog {
             final String value) {
         for (int i = 0; i < this.attributeListModel.size(); i++) {
             if (this.attributeListModel.get(i) instanceof TableColumnValueTriple) {
-                final TableColumnValueTriple tcv = (TableColumnValueTriple) this.attributeListModel
-                        .get(i);
-                if (tcv.getTableColumnPair().equals(tabCol)
-                        && tcv.getValue().equals(value)) {
+                final TableColumnValueTriple tcv = (TableColumnValueTriple) this.attributeListModel.get(i);
+                if (tcv.getTableColumnPair().equals(tabCol) && tcv.getValue().equals(value)) {
                     return true;
                 }
             }
@@ -699,11 +688,10 @@ public class NominalScaleEditorDialog extends JDialog {
 
     private void createConjunction() {
         final int pos = this.attributeListView.getSelectedIndices()[0];
-        final Object[] selectedValues = this.attributeListView
-                .getSelectedValues();
-        final SqlFragment[] selectedFragments = new SqlFragment[selectedValues.length];
-        for (int i = 0; i < selectedValues.length; i++) {
-            final Object curValue = selectedValues[i];
+        final List<Object> selectedValues = this.attributeListView.getSelectedValuesList();
+        final SqlFragment[] selectedFragments = new SqlFragment[selectedValues.size()];
+        for (int i = 0; i < selectedValues.size(); i++) {
+            final Object curValue = selectedValues.get(i);
             final SqlFragment fragment = (SqlFragment) curValue;
             selectedFragments[i] = fragment;
             this.attributeListModel.removeElement(fragment);
@@ -714,11 +702,10 @@ public class NominalScaleEditorDialog extends JDialog {
 
     private void createDisjunction() {
         final int pos = this.attributeListView.getSelectedIndices()[0];
-        final Object[] selectedValues = this.attributeListView
-                .getSelectedValues();
-        final SqlFragment[] selectedFragments = new SqlFragment[selectedValues.length];
-        for (int i = 0; i < selectedValues.length; i++) {
-            final Object curValue = selectedValues[i];
+        final List<Object> selectedValues = this.attributeListView.getSelectedValuesList();
+        final SqlFragment[] selectedFragments = new SqlFragment[selectedValues.size()];
+        for (int i = 0; i < selectedValues.size(); i++) {
+            final Object curValue = selectedValues.get(i);
             final SqlFragment fragment = (SqlFragment) curValue;
             selectedFragments[i] = fragment;
             this.attributeListModel.removeElement(fragment);

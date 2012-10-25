@@ -2,8 +2,6 @@
  * Copyright DSTC Pty.Ltd. (http://www.dstc.com), Technische Universitaet Darmstadt
  * (http://www.tu-darmstadt.de) and the University of Queensland (http://www.uq.edu.au).
  * Please read licence.txt in the toplevel source directory for licensing information.
- *
- * $Id$
  */
 package net.sourceforge.toscanaj.gui;
 
@@ -15,11 +13,7 @@ import java.awt.Rectangle;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.geom.Point2D;
 import java.awt.print.PageFormat;
 import java.awt.print.PrinterJob;
@@ -115,17 +109,15 @@ import org.tockit.swing.preferences.ExtendedPreferences;
 /**
  * This class provides the main GUI panel with menus and a toolbar for ToscanaJ.
  * 
- * @todo store view settings (contingent/extent labels/gradient) in session
- *       management
+ * @todo store view settings (contingent/extent labels/gradient) in session management
  */
-public class ToscanaJMainPanel extends JFrame implements ChangeObserver,
-ClipboardOwner {
+public class ToscanaJMainPanel extends JFrame implements ChangeObserver, ClipboardOwner {
     private ItemMovementManipulator legendMoveManipulator;
 
     private static final String WINDOW_TITLE = "ToscanaJ";
 
-    private static final ExtendedPreferences preferences = ExtendedPreferences
-    .userNodeForClass(ToscanaJMainPanel.class);
+    private static final ExtendedPreferences preferences =
+            ExtendedPreferences.userNodeForClass(ToscanaJMainPanel.class);
 
     /**
      * The central event broker for the main panel
@@ -167,8 +159,10 @@ ClipboardOwner {
     // menu items list
     // FILE menu
     private JMenuItem printMenuItem = null;
+    @SuppressWarnings("FieldCanBeLocal")
     private JMenuItem printSetupMenuItem = null;
     private JMenu mruMenu = null;
+    @SuppressWarnings("FieldCanBeLocal")
     private JMenuItem exitMenuItem = null;
     private JMenuItem diagramDescriptionMenuItem = null;
 
@@ -177,7 +171,9 @@ ClipboardOwner {
     private JRadioButtonMenuItem filterExactMenuItem = null;
 
     // nesting submenu
+    @SuppressWarnings("FieldCanBeLocal")
     private JRadioButtonMenuItem noNestingMenuItem = null;
+    @SuppressWarnings("FieldCanBeLocal")
     private JRadioButtonMenuItem nestingLevel1MenuItem = null;
 
     // view menu
@@ -202,11 +198,6 @@ ClipboardOwner {
      * The pane for selecting the diagrams.
      */
     private DiagramOrganiser diagramOrganiser;
-
-    /**
-     * Flag to indicate if the save icon and menu options should be enabled
-     */
-    private boolean fileIsOpen = false;
 
     /**
      * Keeps a list of most recently files.
@@ -276,9 +267,7 @@ ClipboardOwner {
      * Used when opening ToscanaJ with a file name on the command line.
      */
     public ToscanaJMainPanel(final String schemaFileURL) {
-        // do the normal initialisation first
         this();
-        // open the file
         openSchemaFile(new File(schemaFileURL));
     }
 
@@ -303,13 +292,10 @@ ClipboardOwner {
         contentPane.setLayout(new BorderLayout());
         final DiagramController controller = DiagramController.getController();
         // / @todo move the subscriptions into the handlers
-        final EventBroker diagramEventBroker = this.diagramView.getController()
-        .getEventBroker();
+        final EventBroker<Object> diagramEventBroker = this.diagramView.getController().getEventBroker();
         new FilterOperationEventListener(controller, diagramEventBroker);
-        new HighlightingOperationEventListener(this.diagramView,
-                diagramEventBroker);
-        new HighlightRemovalOperationEventListener(this.diagramView,
-                diagramEventBroker);
+        new HighlightingOperationEventListener(this.diagramView, diagramEventBroker);
+        new HighlightRemovalOperationEventListener(this.diagramView, diagramEventBroker);
         diagramEventBroker.subscribe(new ObjectLabelViewPopupMenuHandler(
                 this.diagramView, this.broker),
                 CanvasItemContextMenuRequestEvent.class, ObjectLabelView.class);
@@ -318,8 +304,7 @@ ClipboardOwner {
                 this.diagramView), CanvasItemContextMenuRequestEvent.class,
                 AttributeLabelView.class);
         new NodeViewPopupMenuHandler(this.diagramView, diagramEventBroker);
-        new BackgroundPopupMenuHandler(this.diagramView, diagramEventBroker,
-                this);
+        new BackgroundPopupMenuHandler(this.diagramView, diagramEventBroker, this);
 
         new LabelClickEventHandler(diagramEventBroker);
         new LabelDragEventHandler(diagramEventBroker);
@@ -331,14 +316,11 @@ ClipboardOwner {
                 this.broker);
         if (preferences.getBoolean("showDiagramPreview", true)) {
             // set preference in case it is not yet there -- otherwise the
-            // options dialog
-            // will show the wrong setting
+            // options dialog will show the wrong setting
             preferences.putBoolean("showDiagramPreview", true);
             this.diagramPreview = new DiagramView();
-            this.diagramPreview
-            .setConceptInterpreter(new DirectConceptInterpreter());
-            this.diagramPreview
-            .setConceptInterpretationContext(new ConceptInterpretationContext(
+            this.diagramPreview.setConceptInterpreter(new DirectConceptInterpreter());
+            this.diagramPreview.setConceptInterpretationContext(new ConceptInterpretationContext(
                     new DiagramHistory(), new EventBroker()));
             this.diagramPreview.setObjectLabelFactory(null);
             this.diagramPreview.setMinimumFontSize(8.0);
@@ -396,7 +378,7 @@ ClipboardOwner {
                     .showDiagram(diagramReference.getDiagram());
                     final Concept zoomedConcept = diagramReference
                     .getFilterConcept();
-                    final EventBroker canvasBroker = ToscanaJMainPanel.this.diagramPreview
+                    final EventBroker<Object> canvasBroker = ToscanaJMainPanel.this.diagramPreview
                     .getController().getEventBroker();
                     if (this.selectionListener != null) {
                         canvasBroker
@@ -458,24 +440,22 @@ ClipboardOwner {
                 updateWindowTitle();
             }
         };
-        this.openFileAction.putValue(Action.MNEMONIC_KEY, new Integer(
-                KeyEvent.VK_O));
+        this.openFileAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
         this.openFileAction.putValue(Action.ACCELERATOR_KEY, KeyStroke
-                .getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+                .getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
 
         this.exportDiagramAction = new ExportDiagramAction(this,
                 this.diagramExportSettings, this.diagramView, KeyEvent.VK_E,
-                KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.CTRL_MASK));
+                KeyStroke.getKeyStroke(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK));
         this.exportDiagramAction.setEnabled(false);
         this.goBackAction = new AbstractAction("Go Back one Diagram") {
             public void actionPerformed(final ActionEvent e) {
                 DiagramController.getController().back();
             }
         };
-        this.goBackAction.putValue(Action.MNEMONIC_KEY, new Integer(
-                KeyEvent.VK_B));
+        this.goBackAction.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_B);
         this.goBackAction.putValue(Action.ACCELERATOR_KEY, KeyStroke
-                .getKeyStroke(KeyEvent.VK_LEFT, ActionEvent.ALT_MASK));
+                .getKeyStroke(KeyEvent.VK_LEFT, InputEvent.ALT_DOWN_MASK));
         this.goBackAction.setEnabled(false);
         // / @todo Change all the other actions into Actions.
     }
@@ -510,7 +490,7 @@ ClipboardOwner {
         this.printMenuItem = new JMenuItem("Print...");
         this.printMenuItem.setMnemonic(KeyEvent.VK_P);
         this.printMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P,
-                ActionEvent.CTRL_MASK));
+                InputEvent.CTRL_DOWN_MASK));
         this.printMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 printDiagram();
@@ -545,7 +525,7 @@ ClipboardOwner {
         // menu item EXIT
         this.exitMenuItem = new JMenuItem("Exit");
         this.exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4,
-                ActionEvent.ALT_MASK));
+                InputEvent.ALT_DOWN_MASK));
         this.exitMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 closeMainPanel();
@@ -566,7 +546,7 @@ ClipboardOwner {
         "Filter: use only exact matches");
         this.filterExactMenuItem.setMnemonic(KeyEvent.VK_X);
         this.filterExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_F, ActionEvent.CTRL_MASK));
+                KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
         this.filterExactMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 ToscanaJMainPanel.this.diagramView
@@ -579,7 +559,7 @@ ClipboardOwner {
         this.filterAllMenuItem = new JRadioButtonMenuItem(
                 "Filter: use all matches");
         this.filterAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_F, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+                KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK));
         this.filterAllMenuItem.setMnemonic(KeyEvent.VK_A);
         this.filterAllMenuItem.setSelected(true);
         this.filterAllMenuItem.addActionListener(new ActionListener() {
@@ -600,7 +580,7 @@ ClipboardOwner {
         this.noNestingMenuItem = new JRadioButtonMenuItem("Flat Diagram");
         this.noNestingMenuItem.setMnemonic(KeyEvent.VK_F);
         this.noNestingMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_1, ActionEvent.CTRL_MASK));
+                KeyEvent.VK_1, InputEvent.CTRL_DOWN_MASK));
         this.noNestingMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 DiagramController.getController().setNestingLevel(0);
@@ -612,7 +592,7 @@ ClipboardOwner {
         this.nestingLevel1MenuItem = new JRadioButtonMenuItem("Nested Diagram");
         this.nestingLevel1MenuItem.setMnemonic(KeyEvent.VK_N);
         this.nestingLevel1MenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_2, ActionEvent.CTRL_MASK));
+                KeyEvent.VK_2, InputEvent.CTRL_DOWN_MASK));
         this.nestingLevel1MenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 DiagramController.getController().setNestingLevel(1);
@@ -631,7 +611,7 @@ ClipboardOwner {
         "Show only exact matches");
         this.showExactMenuItem.setMnemonic(KeyEvent.VK_X);
         this.showExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+                KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         this.showExactMenuItem.setSelected(true);
         this.showExactMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
@@ -644,7 +624,7 @@ ClipboardOwner {
         this.showAllMenuItem = new JRadioButtonMenuItem("Show all matches");
         this.showAllMenuItem.setMnemonic(KeyEvent.VK_A);
         this.showAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_S, ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+                KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK));
         this.showAllMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 updateLabelViews();
@@ -757,9 +737,9 @@ ClipboardOwner {
             final JRadioButtonMenuItem showExactGradientMenuItem = new JRadioButtonMenuItem(
                     "Use colors for exact matches");
             showExactGradientMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                    KeyEvent.VK_G, ActionEvent.CTRL_MASK));
+                    KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK));
             showExactGradientMenuItem
-            .setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
+                    .setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
             showExactGradientMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     setDiagramGradient(diagramSchema.getDefaultGradient(),
@@ -772,10 +752,9 @@ ClipboardOwner {
             final JRadioButtonMenuItem showAllGradientMenuItem = new JRadioButtonMenuItem(
                     "Use colors for all matches");
             showAllGradientMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                    KeyEvent.VK_G, ActionEvent.CTRL_MASK
-                    + ActionEvent.SHIFT_MASK));
+                    KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK));
             showAllGradientMenuItem
-            .setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_EXTENT);
+                    .setSelected(diagramSchema.getGradientType() == ConceptInterpreter.INTERVAL_TYPE_EXTENT);
             showAllGradientMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     setDiagramGradient(diagramSchema.getDefaultGradient(),
@@ -784,7 +763,6 @@ ClipboardOwner {
             });
             colorGradientGroup.add(showAllGradientMenuItem);
             viewMenu.add(showAllGradientMenuItem);
-
         }
 
         if (preferences.getBoolean("offerNodeSizeScalingOptions", false)) {
@@ -793,12 +771,10 @@ ClipboardOwner {
             final JRadioButtonMenuItem nodeSizeExactMenuItem = new JRadioButtonMenuItem(
             "Change node sizes with number of exact matches");
             nodeSizeExactMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                    KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+                    KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
             nodeSizeExactMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
-                    ToscanaJMainPanel.this.diagramView
-                    .getDiagramSchema()
-                    .setNodeSizeScalingType(
+                    ToscanaJMainPanel.this.diagramView.getDiagramSchema().setNodeSizeScalingType(
                             ConceptInterpreter.INTERVAL_TYPE_CONTINGENT);
                     ToscanaJMainPanel.this.diagramView.update(this);
                 }
@@ -809,8 +785,7 @@ ClipboardOwner {
             final JRadioButtonMenuItem nodeSizeAllMenuItem = new JRadioButtonMenuItem(
                     "Change node sizes with number of all matches");
             nodeSizeAllMenuItem.setAccelerator(KeyStroke.getKeyStroke(
-                    KeyEvent.VK_N, ActionEvent.CTRL_MASK
-                    + ActionEvent.SHIFT_MASK));
+                    KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK + InputEvent.SHIFT_DOWN_MASK));
             nodeSizeAllMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
                     ToscanaJMainPanel.this.diagramView.getDiagramSchema()
@@ -882,11 +857,11 @@ ClipboardOwner {
                     if (count < 10) { // first ones get their number (starting
                         // with 1)
                         menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                                KeyEvent.VK_0 + count, ActionEvent.ALT_MASK));
+                                KeyEvent.VK_0 + count, InputEvent.ALT_DOWN_MASK));
                     }
                     if (count == 10) { // tenth gets the zero
                         menuItem.setAccelerator(KeyStroke.getKeyStroke(
-                                KeyEvent.VK_0, ActionEvent.ALT_MASK));
+                                KeyEvent.VK_0, InputEvent.ALT_DOWN_MASK));
                     } // others don't get an accelerator
                     menuItem.addActionListener(new ActionListener() {
                         public void actionPerformed(final ActionEvent e) {
@@ -1041,7 +1016,7 @@ ClipboardOwner {
                 "Diagram Description...");
                 this.diagramDescriptionMenuItem.setMnemonic(KeyEvent.VK_D);
                 this.diagramDescriptionMenuItem.setAccelerator(KeyStroke
-                        .getKeyStroke(KeyEvent.VK_F1, ActionEvent.SHIFT_MASK));
+                        .getKeyStroke(KeyEvent.VK_F1, InputEvent.SHIFT_DOWN_MASK));
                 this.diagramDescriptionMenuItem
                 .addActionListener(new ActionListener() {
                     public void actionPerformed(final ActionEvent e) {
@@ -1322,8 +1297,7 @@ ClipboardOwner {
         DiagramController.getController().addObserver(this.diagramView);
 
         // enable relevant buttons and menus
-        this.fileIsOpen = true;
-        resetButtons(this.fileIsOpen);
+        resetButtons(true);
         if (this.conceptualSchema.getDescription() != null) {
             this.schemaDescriptionButton.setVisible(true);
         } else {
@@ -1479,26 +1453,23 @@ ClipboardOwner {
     }
 
     public static void showAboutDialog(final JFrame parent) {
-        JOptionPane
-        .showMessageDialog(
+        JOptionPane.showMessageDialog(
                 parent,
                 "This program is part of ToscanaJ "
-                + ToscanaJ.VersionString
-                + ".\n\n"
-                + "Copyright (c) DSTC Pty Ltd, Technische Universit�t Darmstadt and the\n"
-                + "University of Queensland\n\n"
-                + "This product includes software developed by the "
-                + "Apache Software Foundation (http://www.apache.org/).\n\n"
-                + "See http://toscanaj.sourceforge.net for more information.",
+                        + ToscanaJ.VersionString
+                        + ".\n\n"
+                        + "Copyright (c) DSTC Pty Ltd, Technische Universität Darmstadt and the\n"
+                        + "University of Queensland\n\n"
+                        + "This product includes software developed by the "
+                        + "Apache Software Foundation (http://www.apache.org/).\n\n"
+                        + "See http://toscanaj.sourceforge.net for more information.",
                 "About this program", JOptionPane.PLAIN_MESSAGE);
     }
 
     public void lostOwnership(final Clipboard clipboard,
             final Transferable comments) {
-        // mandatory method to implement for the copy to systemClipboard
-        // function
-        // don't have to do anything
-        // see exportImage(File selectedFile) method
+        // mandatory method to implement for the copy to systemClipboard function
+        // don't have to do anything see exportImage(File selectedFile) method
     }
 
     public ConceptualSchema getConceptualSchema() {
