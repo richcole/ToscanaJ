@@ -1,4 +1,4 @@
-Changes between version 1.6.1 and the svn version of the ToscanaJ
+Changes between version 1.7 and the svn version of the ToscanaJ
 program suite:
 
 Affecting different programs:
@@ -19,7 +19,7 @@ Other new experimental features:
 
 
 
-Changes between version 1.6 and 1.6.1 of the ToscanaJ
+Changes between version 1.6 and 1.7 of the ToscanaJ
 program suite:
 
 Affecting different programs:
