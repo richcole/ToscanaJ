@@ -29,7 +29,7 @@ public class ToscanaJ {
     /**
      * The version name used in the about dialog.
      */
-    static public final String VersionString = "CVS Build";
+    static public final String VersionString = "Unofficial Developer Build";
 
     /**
      * Main method for running the program

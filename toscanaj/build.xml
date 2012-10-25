@@ -77,7 +77,7 @@
 		</tstamp>
 		<!-- we use the fact that dist.name won't be overridden, so we can set it in
 		     build.properties if we want a release version -->
-		<property name="dist.name" value="unstable-${timestamp}"/>
+		<property name="dist.name" value="development-${timestamp}"/>
 		<property name="target.dir" value="${dist.dir}/${app.name}-${dist.name}"/>
 	</target>
 
