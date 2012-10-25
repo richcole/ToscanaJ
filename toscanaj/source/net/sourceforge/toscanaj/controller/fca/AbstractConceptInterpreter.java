@@ -50,8 +50,8 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
      */
     private class DeviationValuesRef {
         private final int numberOfAllObjectsInDiagram;
-        private int neutralSize;
-        private int outerSize;
+        private final int neutralSize;
+        private final int outerSize;
         private final double expectedSize;
 
         public DeviationValuesRef(final Concept<Oc, A> concept,

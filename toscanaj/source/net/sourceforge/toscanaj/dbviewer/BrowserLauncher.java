@@ -435,11 +435,7 @@ public class BrowserLauncher {
                             .newInstance(new Object[] { finderCreatorCode });
                     final Integer gurlType = (Integer) makeOSType.invoke(null,
                             new Object[] { GURL_EVENT });
-                    final Object appleEvent = appleEventConstructor
-                            .newInstance(new Object[] { gurlType, gurlType,
-                                    aeTarget, kAutoGenerateReturnID,
-                                    kAnyTransactionID });
-                    // Don't set browser = appleEvent because then the next time
+                    // Don't set browser to appleEvent because then the next time
                     // we call
                     // locateBrowser(), we'll get the same AppleEvent, to which
                     // we'll already have
@@ -448,7 +444,10 @@ public class BrowserLauncher {
                     // There's probably a way to do this better; if any has any
                     // ideas, please let
                     // me know.
-                    return appleEvent;
+                    return appleEventConstructor
+                            .newInstance(new Object[] { gurlType, gurlType,
+                                    aeTarget, kAutoGenerateReturnID,
+                                    kAnyTransactionID });
                 } catch (final IllegalAccessException iae) {
                     browser = null;
                     errorMessage = iae.getMessage();

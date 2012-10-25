@@ -66,7 +66,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection,
     /**
      * The event broker for administering the conceptual scheme events.
      */
-    EventBroker eventBroker;
+    final EventBroker eventBroker;
 
     private final List<Query> queries = new ArrayList<Query>();
 

@@ -85,8 +85,7 @@ public abstract class NDimLayoutOperations {
         for (int i = 0; i < perm.length; i++) {
             perm[i] = i;
         }
-        final int numVectors = n;
-        final Vector<Point2D> largeBase = createBase(numVectors);
+        final Vector<Point2D> largeBase = createBase(n);
 
         Vector<Point2D> bestBase = new Vector<Point2D>();
         double maxMinDist = -1;
@@ -101,7 +100,7 @@ public abstract class NDimLayoutOperations {
                 maxMinDist = curDist;
                 bestBase = curBase;
             }
-            perm = findNextPermutation(perm, numVectors);
+            perm = findNextPermutation(perm, n);
         } while (perm != null);
         diagram.setBase(bestBase);
     }

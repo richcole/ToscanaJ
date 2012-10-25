@@ -65,7 +65,7 @@ public class AttributeSelectionDialog extends JDialog implements
     private EventBroker internalBroker;
 
     class TableInfo {
-        Table table;
+        final Table table;
 
         public TableInfo(final Table table) {
             this.table = table;
@@ -82,7 +82,7 @@ public class AttributeSelectionDialog extends JDialog implements
     }
 
     class ColumnInfo {
-        Column column;
+        final Column column;
 
         public ColumnInfo(final Column column) {
             this.column = column;

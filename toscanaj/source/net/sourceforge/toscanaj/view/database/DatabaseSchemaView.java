@@ -91,7 +91,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
     }
 
     private class TableInfo {
-        Table table;
+        final Table table;
 
         public TableInfo(final Table table) {
             this.table = table;
@@ -108,7 +108,7 @@ public class DatabaseSchemaView extends JPanel implements EventBrokerListener {
     }
 
     private class ColumnInfo {
-        Column column;
+        final Column column;
 
         public ColumnInfo(final Column column) {
             this.column = column;

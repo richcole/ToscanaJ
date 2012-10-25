@@ -93,9 +93,7 @@ public class AggregateQuery extends Query {
             valuesToUse = values;
         }
         final String displayString = this.formatResults(valuesToUse, 1);
-        final DatabaseRetrievedObject retVal = new DatabaseRetrievedObject(
-                whereClause, displayString);
-        return retVal;
+        return new DatabaseRetrievedObject(whereClause, displayString);
     }
 
     @Override

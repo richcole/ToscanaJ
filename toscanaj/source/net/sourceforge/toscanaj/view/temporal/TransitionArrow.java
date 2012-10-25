@@ -202,11 +202,12 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
         } else {
             return null;
         }
-        final Color finalColor = new Color(baseColor.getRed(), baseColor
-                .getGreen(), baseColor.getBlue(), (int) (alpha * baseColor
-                .getAlpha()));
 
-        return finalColor;
+        return new Color(baseColor.getRed(),
+                baseColor.getGreen(),
+                baseColor.getBlue(),
+                (int) (alpha * baseColor.getAlpha())
+        );
     }
 
     @Override

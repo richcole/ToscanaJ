@@ -184,7 +184,7 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
     }
 
     private MouseListener createMouseListener() {
-        final MouseListener mouseListener = new MouseAdapter() {
+        return new MouseAdapter() {
             @Override
             public void mousePressed(final MouseEvent e) {
                 if (e.isPopupTrigger()) {
@@ -278,7 +278,6 @@ public class ContextTableRowHeader extends JComponent implements Scrollable {
                 }
             }
         };
-        return mouseListener;
     }
 
     private void removeObject(final int pos) {

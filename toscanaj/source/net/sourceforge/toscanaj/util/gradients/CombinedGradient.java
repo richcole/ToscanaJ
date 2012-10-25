@@ -24,8 +24,8 @@ public class CombinedGradient implements Gradient {
     private final ArrayList<GradientPart> gradientParts = new ArrayList<GradientPart>();
 
     private static class GradientPart {
-        Gradient gradient;
-        double weight;
+        final Gradient gradient;
+        final double weight;
 
         GradientPart(final Gradient gradient, final double weight) {
             this.gradient = gradient;

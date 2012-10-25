@@ -152,8 +152,7 @@ public class NominalScaleEditorDialog extends JDialog {
         }
 
         public Font deriveFont(final Font f) {
-            final Font resFont = f.deriveFont(Font.ITALIC);
-            return resFont;
+            return f.deriveFont(Font.ITALIC);
         }
     }
 
@@ -162,9 +161,9 @@ public class NominalScaleEditorDialog extends JDialog {
         private final ColumnValue colValue;
 
         public TableColumnValueTriple(final TableColumnPair tableColumnPair,
-                final ColumnValue colVallue) {
+                final ColumnValue colValue) {
             this.tableColumnPair = tableColumnPair;
-            this.colValue = colVallue;
+            this.colValue = colValue;
         }
 
         public TableColumnPair getTableColumnPair() {

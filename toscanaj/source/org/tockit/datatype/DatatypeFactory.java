@@ -19,7 +19,7 @@ public abstract class DatatypeFactory {
         Datatype create(Element element);
     }
 
-    private static List<TypeCreator> typeCreators = new ArrayList<TypeCreator>();
+    private static final List<TypeCreator> typeCreators = new ArrayList<TypeCreator>();
 
     public static void registerTypeCreator(final TypeCreator typeCreator) {
         typeCreators.add(typeCreator);

@@ -10,7 +10,7 @@ package net.sourceforge.toscanaj.gui.activity;
 import net.sourceforge.toscanaj.gui.MainPanel;
 
 public class CloseMainPanelActivity implements SimpleActivity {
-    MainPanel frame;
+    final MainPanel frame;
 
     public CloseMainPanelActivity(final MainPanel a_frame) {
         this.frame = a_frame;

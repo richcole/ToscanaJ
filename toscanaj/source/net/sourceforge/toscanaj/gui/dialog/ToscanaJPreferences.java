@@ -27,7 +27,7 @@ import org.tockit.swing.preferences.PreferencePanel;
 
 public class ToscanaJPreferences {
     private final static ExtendedPreferences DIAGRAM_SCHEMA_NODE = new ExtendedPreferences(
-            DiagramSchema.preferences.node("User Defined"));
+            DiagramSchema.PREFERENCES.node("User Defined"));
 
     private static final ConfigurationSection DIAGRAM_COLORS_SECTION = new ConfigurationSection(
             new ConfigurationSubsection[] {

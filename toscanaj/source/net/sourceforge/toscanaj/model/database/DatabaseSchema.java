@@ -26,8 +26,8 @@ import org.tockit.events.EventBrokerListener;
 
 public class DatabaseSchema implements XMLizable, EventBrokerListener {
 
-    EventBroker broker;
-    List<Table> tables;
+    final EventBroker broker;
+    final List<Table> tables;
     public static final String DATABASE_SCHEMA_ELEMENT_NAME = "databaseSchema";
 
     public DatabaseSchema(final EventBroker broker) {

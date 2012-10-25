@@ -1031,10 +1031,9 @@ EventBrokerListener {
 
                 // / @todo we lack support for the number of decimals on the
                 // Cernato side
-                final DecimalType decType = DecimalType.createDecimalType(
+                targetType = DecimalType.createDecimalType(
                         numType.getName(), min.getValue(), max.getValue(),
                         numType.getNumberOfDecimals());
-                targetType = decType;
             } else if (cernatoType instanceof TextualType) {
                 final String[] stringValues = new String[valueRange.length];
                 final TextualType textType = new TextualType(cernatoType

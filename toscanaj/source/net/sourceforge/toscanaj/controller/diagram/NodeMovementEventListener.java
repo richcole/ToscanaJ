@@ -39,8 +39,7 @@ public class NodeMovementEventListener implements EventBrokerListener {
             this.startPosition = oldPosition;
         }
 
-        final Point2D toPosition = canvasToPosition;
-        node.setPosition(toPosition);
+        node.setPosition(canvasToPosition);
 
         if (!diagramView.getDiagram().isHasseDiagram()) {
             node.setPosition(oldPosition);
@@ -66,7 +65,7 @@ public class NodeMovementEventListener implements EventBrokerListener {
 
                     @Override
                     public void redo() throws CannotRedoException {
-                        node.setPosition(toPosition);
+                        node.setPosition(canvasToPosition);
                         diagramView.requestScreenTransformUpdate();
                         diagramView.repaint();
                         super.redo();

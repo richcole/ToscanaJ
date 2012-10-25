@@ -85,11 +85,8 @@ public class ToscanaJ {
         stream.println("Usage:");
         stream.println("  ToscanaJ [Options] [File]");
         stream.println();
-        stream
-                .println("where [File] is one optional file to open and [Options] can be:");
-        for (final Iterator<Option> iter = options.getOptions().iterator(); iter
-                .hasNext();) {
-            final Option option = iter.next();
+        stream.println("where [File] is one optional file to open and [Options] can be:");
+        for (final Option option : (Iterable<Option>) options.getOptions()) {
             stream.println("  " + option.getOpt() + ": "
                     + option.getDescription());
         }

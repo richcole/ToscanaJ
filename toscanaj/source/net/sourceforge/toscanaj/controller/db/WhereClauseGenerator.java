@@ -71,11 +71,10 @@ public class WhereClauseGenerator<O, A> implements
             return null;
         } else {
             String retVal = "(";
-            for (final Iterator<?> iterator = objectIterator; iterator
-                    .hasNext();) {
-                final Object o = iterator.next();
+            while (objectIterator.hasNext()) {
+                final Object o = objectIterator.next();
                 retVal += o.toString();
-                if (iterator.hasNext()) {
+                if (objectIterator.hasNext()) {
                     retVal += " OR ";
                 }
             }

@@ -58,7 +58,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
         /**
          * Stores the main iterator on the concepts.
          */
-        Iterator<Concept<O, A>> mainIterator;
+        final Iterator<Concept<O, A>> mainIterator;
 
         /**
          * Stores the secondary iterator on the attributes of one concept.
@@ -137,7 +137,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
         /**
          * Stores the main iterator on the concepts.
          */
-        Iterator<Concept<O, A>> mainIterator;
+        final Iterator<Concept<O, A>> mainIterator;
 
         /**
          * Stores the secondary iterator on the objects of one concept.
@@ -211,12 +211,12 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
     /**
      * Stores all concepts in the filter, including this.
      */
-    protected Set<Concept<O, A>> filter = new HashSet<Concept<O, A>>();
+    protected final Set<Concept<O, A>> filter = new HashSet<Concept<O, A>>();
 
     /**
      * Stores all concepts in the ideal, including this.
      */
-    protected Set<Concept<O, A>> ideal = new HashSet<Concept<O, A>>();
+    protected final Set<Concept<O, A>> ideal = new HashSet<Concept<O, A>>();
 
     /**
      * Stores the number of objects in the extent to avoid unneccessary
@@ -303,7 +303,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
      * Calculates the ideal and filter for this concept if only direct
      * neighbours are given.
      * 
-     * If only direct neighbours in the neighbourhoud relation where given this
+     * If only direct neighbours in the neighbourhood relation where given this
      * method can be called to create the ideal and filter by building the
      * transitive closures.
      */
@@ -312,9 +312,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
                 ideal);
         while (!idealList.isEmpty()) {
             final Concept<O, A> other = idealList.remove(0);
-            final Iterator<Concept<O, A>> it = other.getDownset().iterator();
-            while (it.hasNext()) {
-                final Concept<O, A> trans = it.next();
+            for (Concept<O, A> trans : other.getDownset()) {
                 if (ideal.add(trans)) {
                     idealList.add(trans);
                 }
@@ -325,9 +323,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
                 filter);
         while (!filterList.isEmpty()) {
             final Concept<O, A> other = filterList.remove(0);
-            final Iterator<Concept<O, A>> it = other.getUpset().iterator();
-            while (it.hasNext()) {
-                final Concept<O, A> trans = it.next();
+            for (Concept<O, A> trans : other.getUpset()) {
                 if (filter.add(trans)) {
                     filterList.add(trans);
                 }

@@ -30,7 +30,7 @@ import org.tockit.swing.preferences.ExtendedPreferences;
  * This class uses a Singleton design pattern.
  */
 public class DiagramSchema implements Comparable {
-    public static ExtendedPreferences preferences = ExtendedPreferences
+    public static ExtendedPreferences PREFERENCES = ExtendedPreferences
             .userNodeForClass(DiagramSchema.class);
 
     private static ArrayList<DiagramSchema> schemas = new ArrayList<DiagramSchema>();
@@ -45,24 +45,24 @@ public class DiagramSchema implements Comparable {
     static {
         try {
             DiagramSchema defaultSchema = null;
-            if (preferences.getInt("margin", -1) != -1) {
+            if (PREFERENCES.getInt("margin", -1) != -1) {
                 // this must be an old-style configuration, just read the
                 // default
                 // and forget the rest -- will result in possibly different
                 // default
-                defaultSchema = readFromPreferences(preferences);
+                defaultSchema = readFromPreferences(PREFERENCES);
                 defaultSchema.name = "Default";
-                ExtendedPreferences.removeBranch(preferences);
+                ExtendedPreferences.removeBranch(PREFERENCES);
                 // recreate the main node
-                preferences = ExtendedPreferences
+                PREFERENCES = ExtendedPreferences
                         .userNodeForClass(DiagramSchema.class);
             }
-            final String[] children = preferences.childrenNames();
-            final String currentSchemaName = preferences.get("currentSchema",
+            final String[] children = PREFERENCES.childrenNames();
+            final String currentSchemaName = PREFERENCES.get("currentSchema",
                     "Default");
             if (children.length != 0) {
                 for (final String schemaName : children) {
-                    final DiagramSchema schema = readFromPreferences(preferences
+                    final DiagramSchema schema = readFromPreferences(PREFERENCES
                             .node(schemaName));
                     schemas.add(schema);
                     if (schemaName.equals(currentSchemaName)) {
@@ -168,7 +168,7 @@ public class DiagramSchema implements Comparable {
     /**
      * The gradient type set.
      * 
-     * @see #setGradientType(int)
+     * @see #setGradientType(net.sourceforge.toscanaj.controller.fca.ConceptInterpreter.IntervalType)
      */
     private ConceptInterpreter.IntervalType gradientType = ConceptInterpreter.INTERVAL_TYPE_EXTENT;
 
@@ -525,12 +525,12 @@ public class DiagramSchema implements Comparable {
      * Stores the schema in the preferences.
      */
     public void store() {
-        writeToPreferences(DiagramSchema.preferences.node(this.name));
+        writeToPreferences(DiagramSchema.PREFERENCES.node(this.name));
     }
 
     public void setAsCurrent() {
         DiagramSchema.currentSchema = this;
-        preferences.put("currentSchema", this.name);
+        PREFERENCES.put("currentSchema", this.name);
     }
 
     private void writeToPreferences(final Preferences prefs) {

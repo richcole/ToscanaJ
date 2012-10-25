@@ -502,7 +502,7 @@ public class ContextTableEditorDialog extends JDialog implements
     }
 
     private MouseListener getMouseListener(final ContextTableView view) {
-        final MouseListener mouseListener = new MouseAdapter() {
+        return new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
                 final ContextTableView.Position pos = view.getTablePosition(e
@@ -519,7 +519,6 @@ public class ContextTableEditorDialog extends JDialog implements
                 changeRelationImplementation(pos.getRow(), pos.getCol());
             }
         };
-        return mouseListener;
     }
 
     private void changeRelationImplementation(final int objectPos,

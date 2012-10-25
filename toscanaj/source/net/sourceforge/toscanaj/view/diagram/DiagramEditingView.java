@@ -144,7 +144,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
     private JButton zoomOutButton;
     private JComboBox movementChooser;
     private JButton editDiagramDescButton;
-    protected ContextTableEditorDialog contextEditingDialog;
+    protected final ContextTableEditorDialog contextEditingDialog;
     private JButton gridIncreaseButton;
     private JButton gridDecreaseButton;
     private JCheckBox gridEnabledCheckBox;

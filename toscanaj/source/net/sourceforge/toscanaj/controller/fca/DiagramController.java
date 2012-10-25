@@ -29,7 +29,7 @@ public class DiagramController implements ChangeObservable {
     /**
      * Stores the only instance of this class.
      */
-    static private DiagramController singleton = new DiagramController();
+    private final static DiagramController SINGLETON = new DiagramController();
 
     /**
      * Stores the diagram history.
@@ -40,7 +40,7 @@ public class DiagramController implements ChangeObservable {
      * Returns the only instance of this class.
      */
     static public DiagramController getController() {
-        return singleton;
+        return SINGLETON;
     }
 
     /**

@@ -43,16 +43,14 @@ public class CernatoDimensionStrategy implements
             if (other.getClass() != this.getClass()) {
                 return false;
             }
-            final OrderedCriterion ocOther = other;
-            return this.getCriterion().isLesserThan(ocOther.getCriterion());
+            return this.getCriterion().isLesserThan(other.getCriterion());
         }
 
         public boolean isEqual(final OrderedCriterion other) {
             if (other.getClass() != this.getClass()) {
                 return false;
             }
-            final OrderedCriterion ocOther = other;
-            return this.getCriterion().isEqual(ocOther.getCriterion());
+            return this.getCriterion().isEqual(other.getCriterion());
         }
     }
 

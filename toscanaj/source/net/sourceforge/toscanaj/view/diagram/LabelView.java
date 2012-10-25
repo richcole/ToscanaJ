@@ -532,8 +532,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver,
             final FontRenderContext frc) {
         String content = getEntryAt(position).toString();
         content = content.replace('\t', ' ').replace('\n', ' ');
-        final TextLayout retVal = new TextLayout(content, this.font, frc);
-        return retVal;
+        return new TextLayout(content, this.font, frc);
     }
 
     /**

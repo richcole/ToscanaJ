@@ -114,9 +114,8 @@ public class DatabaseConnectedConceptInterpreterTest extends TestCase {
         dbInfo.setTable(testTable);
         dbInfo.setKey(new Column("testing", Types.VARCHAR, testTable));
         DatabaseConnection.setConnection(databaseConnection);
-        final DatabaseConnectedConceptInterpreter<FCAElementImplementation, FCAElementImplementation> interpreter = new DatabaseConnectedConceptInterpreter<FCAElementImplementation, FCAElementImplementation>(
+        return new DatabaseConnectedConceptInterpreter<FCAElementImplementation, FCAElementImplementation>(
                 dbInfo);
-        return interpreter;
     }
 
     protected void checkAssertion(final boolean assertion) {
