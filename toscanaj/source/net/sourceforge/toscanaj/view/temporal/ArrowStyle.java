@@ -53,6 +53,7 @@ public class ArrowStyle {
         this.setBorderWidth(style.borderWidth);
     }
 
+    @SuppressWarnings("MagicConstant")
     public ArrowStyle(final Preferences preferences) {
         final ExtendedPreferences prefs = new ExtendedPreferences(preferences);
         this.color = prefs.getColor("color", this.color);

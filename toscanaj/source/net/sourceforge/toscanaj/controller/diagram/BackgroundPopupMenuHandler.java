@@ -62,7 +62,7 @@ public class BackgroundPopupMenuHandler implements EventBrokerListener {
     }
 
     public void processEvent(final Event e) {
-        CanvasItemEventWithPosition itemEvent = null;
+        CanvasItemEventWithPosition itemEvent;
         try {
             itemEvent = (CanvasItemEventWithPosition) e;
         } catch (final ClassCastException e1) {

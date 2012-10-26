@@ -27,14 +27,14 @@ public class HighlightingOperationEventListener implements EventBrokerListener {
     }
 
     public void processEvent(final Event e) {
-        CanvasItemEvent itemEvent = null;
+        CanvasItemEvent itemEvent;
         try {
             itemEvent = (CanvasItemEvent) e;
         } catch (final ClassCastException e1) {
             throw new RuntimeException(getClass().getName()
                     + " has to be subscribed to CanvasItemEvents only");
         }
-        NodeView nodeView = null;
+        NodeView nodeView;
         try {
             nodeView = (NodeView) itemEvent.getSubject();
         } catch (final ClassCastException e1) {

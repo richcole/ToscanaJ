@@ -32,7 +32,7 @@ public class FilterOperationEventListener implements EventBrokerListener {
     }
 
     public void processEvent(final Event e) {
-        CanvasItemEventWithPosition itemEvent = null;
+        CanvasItemEventWithPosition itemEvent;
         try {
             itemEvent = (CanvasItemEventWithPosition) e;
         } catch (final ClassCastException e1) {
@@ -40,7 +40,7 @@ public class FilterOperationEventListener implements EventBrokerListener {
                     getClass().getName()
                             + " has to be subscribed to CanvasItemEventWithPositions only");
         }
-        NodeView nodeView = null;
+        NodeView nodeView;
         try {
             nodeView = (NodeView) itemEvent.getSubject();
         } catch (final ClassCastException e1) {

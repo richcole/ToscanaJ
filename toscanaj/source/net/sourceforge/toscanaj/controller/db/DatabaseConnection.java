@@ -168,16 +168,13 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
             }
         }
 
-        Connection connection = null;
-
-        // connect to the DB
+        Connection connection;
         try {
             final Properties connectionProperties = new Properties();
             connectionProperties.setProperty("user", account);
             connectionProperties.setProperty("password", password);
-            // hsqldb does not remove old tables since version 1.7.2 unless we
-            // tell
-            // it explicitely to shut down after disconnect (requires 1.8.0+)
+            // hsqldb does not remove old tables since version 1.7.2 unless we tell
+            // it explicitly to shut down after disconnect (requires 1.8.0+)
             if (DatabaseInfo.getType(url, driverName) == DatabaseInfo.EMBEDDED) {
                 connectionProperties.setProperty("shutdown", "true");
             }
@@ -587,7 +584,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
         return result;
     }
 
-    public void processEvent(final Event<? extends Object> e) {
+    public void processEvent(final Event<?> e) {
         if (e instanceof DatabaseConnectEvent) {
             final DatabaseConnectEvent event = (DatabaseConnectEvent) e;
             try {
@@ -624,18 +621,17 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
         final List<String> tables = test.getTableNames();
 
         // print out each table
-        for (int i = 0; i < tables.size(); i++) {
-            System.out.println("========== " + tables.get(i) + " ==========");
+        for (String table : tables) {
+            System.out.println("========== " + table + " ==========");
             final List<Column> columns = test.getColumns(new Table(
-                    new EventBroker<Object>(), tables.get(i), false));
+                    new EventBroker<Object>(), table, false));
             // by printing each column
-            for (int j = 0; j < columns.size(); j++) {
-                final Column column = columns.get(j);
+            for (final Column column : columns) {
                 System.out.println("----- " + column.getDisplayName()
                         + " -----");
                 // and querying the contents
                 System.out.println(test.getColumn(column.getDisplayName(),
-                        tables.get(i)));
+                        table));
             }
         }
 
@@ -651,8 +647,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
             final List<Column> columns = test.getColumns(new Table(
                     new EventBroker<Object>(), views.get(i), false));
             // by printing each column
-            for (int j = 0; j < columns.size(); j++) {
-                final Column column = columns.get(j);
+            for (final Column column : columns) {
                 System.out.println("----- " + column.getDisplayName()
                         + " -----");
                 // and querying the contents
@@ -701,8 +696,7 @@ public class DatabaseConnection implements EventBrokerListener<Object> {
                 // according to java documentation the first column should
                 // contain TYPE_NAME and the second column should contain
                 // DATA_TYPE.
-                result.add(new SQLTypeInfo(typeInfo.getInt(2), typeInfo
-                        .getString(1)));
+                result.add(new SQLTypeInfo(typeInfo.getInt(2), typeInfo.getString(1)));
             }
             return result;
         } catch (final SQLException e) {

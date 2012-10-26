@@ -65,7 +65,7 @@ public class ValueSetExpression implements Expression {
 
     private boolean containsValue(final String value) {
         for (final String value2 : values) {
-            if (value2 == value) {
+            if (value2.equals(value)) {
                 return true;
             }
         }

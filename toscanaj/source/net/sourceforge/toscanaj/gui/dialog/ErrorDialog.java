@@ -187,8 +187,7 @@ public class ErrorDialog extends JDialog {
         if (this.isDetailedExceptionsShown) {
             detailButton.setText(closeDetailString);
             this.isDetailedExceptionsShown = false;
-        } else if (this.isDetailedExceptionsShown != true
-                && this.onFirstExecute == true) {
+        } else if (this.onFirstExecute == true) {
             detailButton.setText(closeDetailString);
             this.isDetailedExceptionsShown = false;
             this.onFirstExecute = false;

@@ -49,7 +49,7 @@ public class InterSequenceTransitionArrow extends TransitionArrow {
         final AnimationTimeController controller = this.timeController;
 
         final double timeOffset = controller.getCurrentTime() - this.timePos;
-        double alpha = 0;
+        double alpha;
         if (timeOffset < -controller.getFadeInTime()) {
             return null;
         } else if (timeOffset < 0) {
