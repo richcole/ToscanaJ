@@ -36,7 +36,7 @@ public abstract class NDimLayoutOperations {
         // no instances
     }
 
-    public static final <O, A> NDimDiagram<O, A> createDiagram(
+    public static <O, A> NDimDiagram<O, A> createDiagram(
             final Lattice<O, A> lattice, final String title,
             final DimensionCreationStrategy<A> dimensionStrategy) {
         final List<Dimension<A>> dimensions = dimensionStrategy

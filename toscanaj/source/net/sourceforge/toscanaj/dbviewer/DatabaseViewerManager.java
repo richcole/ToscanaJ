@@ -335,18 +335,12 @@ public class DatabaseViewerManager implements XMLizable {
             final DatabaseRetrievedObject object) {
         final List<String> retVal = new ArrayList<String>();
         if (object.hasKey()) {
-            final Iterator<DatabaseViewerManager> it = OBJECT_VIEWER_REGISTRY
-            .iterator();
-            while (it.hasNext()) {
-                final DatabaseViewerManager manager = it.next();
+            for (DatabaseViewerManager manager : OBJECT_VIEWER_REGISTRY) {
                 retVal.add(manager.screenName);
             }
         }
         if (object.hasSpecialWhereClause()) {
-            final Iterator<DatabaseViewerManager> it = OBJECT_LIST_VIEWER_REGISTRY
-            .iterator();
-            while (it.hasNext()) {
-                final DatabaseViewerManager manager = it.next();
+            for (DatabaseViewerManager manager : OBJECT_LIST_VIEWER_REGISTRY) {
                 retVal.add(manager.screenName);
             }
         }
@@ -355,10 +349,7 @@ public class DatabaseViewerManager implements XMLizable {
 
     public static List<String> getObjectListViewNames() {
         final List<String> retVal = new ArrayList<String>();
-        final Iterator<DatabaseViewerManager> it = OBJECT_LIST_VIEWER_REGISTRY
-        .iterator();
-        while (it.hasNext()) {
-            final DatabaseViewerManager manager = it.next();
+        for (DatabaseViewerManager manager : OBJECT_LIST_VIEWER_REGISTRY) {
             retVal.add(manager.screenName);
         }
         return retVal;
@@ -366,10 +357,7 @@ public class DatabaseViewerManager implements XMLizable {
 
     public static List<String> getAttributeViewNames() {
         final List<String> retVal = new ArrayList<String>();
-        final Iterator<DatabaseViewerManager> it = ATTRIBUTE_VIEWER_REGISTRY
-        .iterator();
-        while (it.hasNext()) {
-            final DatabaseViewerManager manager = it.next();
+        for (DatabaseViewerManager manager : ATTRIBUTE_VIEWER_REGISTRY) {
             retVal.add(manager.screenName);
         }
         return retVal;
@@ -466,15 +454,11 @@ public class DatabaseViewerManager implements XMLizable {
         }
         this.tableName = elem.getChildText(TABLE_ELEMENT_NAME);
         this.keyName = elem.getChildText(KEY_ELEMENT_NAME);
-        final List<Element> parameterElems = elem
-        .getChildren(PARAMETER_ELEMENT_NAME);
-        final Iterator<Element> it = parameterElems.iterator();
-        while (it.hasNext()) {
-            final Element parameterElem = it.next();
-            this.parameters.put(parameterElem
-                    .getAttributeValue(PARAMETER_NAME_ATTRIBUTE_NAME),
-                    parameterElem
-                    .getAttributeValue(PARAMETER_VALUE_ATTRIBUTE_NAME));
+        final List<Element> parameterElems = elem.getChildren(PARAMETER_ELEMENT_NAME);
+        for (Element parameterElem : parameterElems) {
+            this.parameters.put(
+                    parameterElem.getAttributeValue(PARAMETER_NAME_ATTRIBUTE_NAME),
+                    parameterElem.getAttributeValue(PARAMETER_VALUE_ATTRIBUTE_NAME));
         }
     }
 

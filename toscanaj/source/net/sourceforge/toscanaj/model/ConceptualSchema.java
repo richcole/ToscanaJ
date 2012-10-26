@@ -207,7 +207,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection,
                 final Constructor constructor = ciClass
                         .getConstructor(new Class[] { Element.class });
                 this.conceptInterpreter = (ConceptInterpreter) constructor
-                        .newInstance(new Object[] { conceptInterpreterElem });
+                        .newInstance(conceptInterpreterElem);
             } catch (final ClassNotFoundException e) {
                 throw new XMLSyntaxError(
                         "Could not find concept interpreter class", e);
@@ -360,9 +360,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection,
      */
     public Diagram2D getDiagram(final String title) {
         Diagram2D retVal = null;
-        final Iterator<Diagram2D> it = this.diagrams.iterator();
-        while (it.hasNext()) {
-            final Diagram2D cur = it.next();
+        for (Diagram2D cur : this.diagrams) {
             if (cur.getTitle().equals(title)) {
                 retVal = cur;
                 break;
@@ -434,9 +432,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection,
     }
 
     public boolean hasDiagramDescription() {
-        final Iterator<Diagram2D> it = this.diagrams.iterator();
-        while (it.hasNext()) {
-            final Diagram2D diagram = it.next();
+        for (Diagram2D diagram : this.diagrams) {
             if (diagram.getDescription() != null) {
                 return true;
             }
@@ -480,9 +476,7 @@ public class ConceptualSchema implements XMLizable, DiagramCollection,
 
     public void processEvent(final Event e) {
         final DiagramChangedEvent dce = (DiagramChangedEvent) e;
-        final Iterator<Diagram2D> it = this.diagrams.iterator();
-        while (it.hasNext()) {
-            final Diagram2D diag = it.next();
+        for (Diagram2D diag : this.diagrams) {
             if (diag == dce.getDiagram()) {
                 this.dataSaved = false;
             }

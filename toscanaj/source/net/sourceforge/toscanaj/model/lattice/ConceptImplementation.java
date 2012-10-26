@@ -337,9 +337,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
     public int getIntentSize() {
         if (intentSize < 0) { // not yet calculated
             intentSize = 0;
-            final Iterator<Concept<O, A>> it = filter.iterator();
-            while (it.hasNext()) {
-                final Concept<O, A> cur = it.next();
+            for (Concept<O, A> cur : filter) {
                 intentSize += cur.getAttributeContingentSize();
             }
         }
@@ -359,9 +357,7 @@ public class ConceptImplementation<O, A> implements Concept<O, A> {
     public int getExtentSize() {
         if (extentSize < 0) { // not yet calculated
             extentSize = 0;
-            final Iterator<Concept<O, A>> it = ideal.iterator();
-            while (it.hasNext()) {
-                final Concept<O, A> cur = it.next();
+            for (Concept<O, A> cur : ideal) {
                 extentSize += cur.getObjectContingentSize();
             }
         }

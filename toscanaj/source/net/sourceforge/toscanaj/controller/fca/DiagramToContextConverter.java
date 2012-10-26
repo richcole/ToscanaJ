@@ -71,11 +71,10 @@ public class DiagramToContextConverter {
         int insertionPos = list.size();
         if (object instanceof Comparable) {
             // insert in order if possible
-            final T compObj = (T) object;
             while (insertionPos != 0
                     && list.get(insertionPos - 1) instanceof Comparable
                     && ((Comparable<T>) list.get(insertionPos - 1))
-                            .compareTo(compObj) > 0) {
+                            .compareTo(object) > 0) {
                 insertionPos--;
             }
         }

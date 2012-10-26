@@ -641,7 +641,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
                 break;
             }
         }
-        dividersModel.insertElementAt(new Integer(value), i);
+        dividersModel.insertElementAt(value, i);
         addField.setText("");
     }
 
@@ -650,7 +650,7 @@ public class OrdinalScaleGeneratorPanel extends JPanel {
     }
 
     private JPanel makeTypeOptionPane() {
-        this.typeChooser = new JComboBox(new ContextGenerator[] {
+        this.typeChooser = new JComboBox<ContextGenerator>(new ContextGenerator[] {
                 new IncreasingExclusiveGenerator(),
                 new IncreasingInclusiveGenerator(),
                 new DecreasingExclusiveGenerator(),

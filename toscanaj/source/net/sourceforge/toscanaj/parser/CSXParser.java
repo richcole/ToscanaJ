@@ -182,13 +182,11 @@ public class CSXParser {
     private static void parseDatabaseObjectViewerSetups(final Element viewsElem)
             throws DataFormatException {
         final List<Element> viewerElems = viewsElem.getChildren("objectView");
-        final Iterator<Element> it = viewerElems.iterator();
-        while (it.hasNext()) {
-            final Element viewerElem = it.next();
+        for (Element viewerElem : viewerElems) {
             try {
                 new DatabaseViewerManager(viewerElem,
                         _Schema.getDatabaseInfo(), DatabaseConnection
-                                .getConnection());
+                        .getConnection());
             } catch (final DatabaseViewerException e) {
                 throw new DataFormatException(
                         "A database viewer could not be initialized.", e);
@@ -198,15 +196,12 @@ public class CSXParser {
 
     private static void parseDatabaseObjectListViewerSetups(
             final Element viewsElem) throws DataFormatException {
-        final List<Element> viewerElems = viewsElem
-                .getChildren("objectListView");
-        final Iterator<Element> it = viewerElems.iterator();
-        while (it.hasNext()) {
-            final Element viewerElem = it.next();
+        final List<Element> viewerElems = viewsElem.getChildren("objectListView");
+        for (Element viewerElem : viewerElems) {
             try {
                 new DatabaseViewerManager(viewerElem,
                         _Schema.getDatabaseInfo(), DatabaseConnection
-                                .getConnection());
+                        .getConnection());
             } catch (final DatabaseViewerException e) {
                 throw new DataFormatException(
                         "A database viewer could not be initialized.", e);
@@ -216,15 +211,12 @@ public class CSXParser {
 
     private static void parseDatabaseAttributeViewerSetups(
             final Element viewsElem) throws DataFormatException {
-        final List<Element> viewerElems = viewsElem
-                .getChildren("attributeView");
-        final Iterator<Element> it = viewerElems.iterator();
-        while (it.hasNext()) {
-            final Element viewerElem = it.next();
+        final List<Element> viewerElems = viewsElem.getChildren("attributeView");
+        for (Element viewerElem : viewerElems) {
             try {
                 new DatabaseViewerManager(viewerElem,
                         _Schema.getDatabaseInfo(), DatabaseConnection
-                                .getConnection());
+                        .getConnection());
             } catch (final DatabaseViewerException e) {
                 throw new DataFormatException(
                         "A database viewer could not be initialized.", e);
@@ -260,8 +252,7 @@ public class CSXParser {
         }
 
         // build hashtable for attributes
-        elements = _Document.getRootElement().getChild("context").getChildren(
-                "attribute");
+        elements = _Document.getRootElement().getChild("context").getChildren("attribute");
         _Attributes = new Hashtable<String, FCAElementImplementation>(elements
                 .size());
 
@@ -287,11 +278,8 @@ public class CSXParser {
      */
     private static void parseDiagrams() throws DataFormatException {
         // find and store diagrams
-        final List<Element> elements = _Document.getRootElement().getChildren(
-                "diagram");
-        final Iterator<Element> it = elements.iterator();
-        while (it.hasNext()) {
-            final Element diagElem = it.next();
+        final List<Element> elements = _Document.getRootElement().getChildren("diagram");
+        for (Element diagElem : elements) {
             final SimpleLineDiagram diagram = new SimpleLineDiagram();
 
             // set the title of the diagram
@@ -564,10 +552,7 @@ public class CSXParser {
                         && (distinct.equals("true"));
                 final Query query = dbInfo.createListQuery(name, header,
                         isDistinct);
-                final Iterator<Element> it2 = cur.getChildren("column")
-                        .iterator();
-                while (it2.hasNext()) {
-                    final Element curCol = it2.next();
+                for (Object curCol : cur.getChildren("column")) {
                     final String colName = curCol.getAttributeValue("name");
                     final String format = curCol.getAttributeValue("format");
                     final String separator = curCol
@@ -584,8 +569,7 @@ public class CSXParser {
                 final String name = cur.getAttributeValue("name");
                 final String header = cur.getAttributeValue("header");
                 final Query query = dbInfo.createAggregateQuery(name, header);
-                final Iterator<Element> it2 = cur.getChildren("column")
-                        .iterator();
+                final Iterator<Element> it2 = cur.getChildren("column").iterator();
                 while (it2.hasNext()) {
                     final Element curCol = it2.next();
                     final String colName = curCol.getAttributeValue("name");

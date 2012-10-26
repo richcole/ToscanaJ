@@ -180,9 +180,7 @@ public class AttributeSelectionDialog extends JDialog implements
         this.columnsList.clear();
 
         if (table != null) {
-            final Iterator<Column> it = table.getColumns().iterator();
-            while (it.hasNext()) {
-                final Column col = it.next();
+            for (Column col : table.getColumns()) {
                 this.columnsList.addElement(new ColumnInfo(col));
             }
         }
@@ -255,14 +253,9 @@ public class AttributeSelectionDialog extends JDialog implements
             return;
         }
 
-        final Iterator<String> it = this.connection.getTableNames().iterator();
-        while (it.hasNext()) {
-            final String tableName = it.next();
+        for (String tableName : this.connection.getTableNames()) {
             final Table table = new Table(this.eventBroker, tableName, false);
-            final Iterator<Column> itCol = this.connection.getColumns(table)
-                    .iterator();
-            while (itCol.hasNext()) {
-                final Column col = itCol.next();
+            for (Column col : this.connection.getColumns(table)) {
                 table.addColumn(col);
             }
             this.tablesList.addElement(new TableInfo(table));

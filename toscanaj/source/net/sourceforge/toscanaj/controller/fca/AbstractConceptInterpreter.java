@@ -104,7 +104,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
         /**
          * Returns the level of significance of deviation.
          * 
-         * @retVal level of significance as in SIGNIFICANCE_LEVELS, -1 if none
+         * @return level of significance as in SIGNIFICANCE_LEVELS, -1 if none
          *         reached
          */
         public int getChiSquareLevel(final int actualSize) {
@@ -160,9 +160,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
     private int getLocalExtentSize(final Concept<Oc, A> concept,
             final ConceptInterpretationContext<Oc, A> context) {
         int retVal = 0;
-        final Iterator<Concept<Oc, A>> it = concept.getDownset().iterator();
-        while (it.hasNext()) {
-            final Concept<Oc, A> subconcept = it.next();
+        for (Concept<Oc, A> subconcept : concept.getDownset()) {
             retVal += getObjectContingentSize(subconcept, context);
         }
         return retVal;
@@ -227,10 +225,10 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
         final Hashtable<Concept<Oc, A>, Integer> sizes = getContingentSizesCache(context);
         final Integer cacheVal = sizes.get(concept);
         if (cacheVal != null) {
-            return cacheVal.intValue();
+            return cacheVal;
         }
         final int count = calculateContingentSize(concept, context);
-        sizes.put(concept, new Integer(count));
+        sizes.put(concept, count);
         return count;
     }
 
@@ -239,10 +237,10 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
         final Hashtable<Concept<Oc, A>, Integer> sizes = getExtentSizesCache(context);
         final Integer cacheVal = sizes.get(concept);
         if (cacheVal != null) {
-            return cacheVal.intValue();
+            return cacheVal;
         }
         final int count = calculateExtentSize(concept, context);
-        sizes.put(concept, new Integer(count));
+        sizes.put(concept, count);
         return count;
     }
 
@@ -419,8 +417,8 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
         for (final Hashtable<Concept<Oc, A>, Integer> contSizes : this.contingentSizes
                 .values()) {
             for (final Integer curVal : contSizes.values()) {
-                if (curVal.intValue() > maxVal) {
-                    maxVal = curVal.intValue();
+                if (curVal > maxVal) {
+                    maxVal = curVal;
                 }
             }
         }
@@ -429,14 +427,11 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
 
     public boolean isRealized(final Concept<Oc, A> concept,
             final ConceptInterpretationContext<Oc, A> context) {
-        // / @todo do check only lower neighbours
-        // / @todo consider going back to creating the lattice product, this is
-        // too much hacking
+        // @todo do check only lower neighbours
+        // @todo consider going back to creating the lattice product, this is too much hacking
 
-        // first we check the inner diagram if anything below the concept has
-        // the same extent
-        // size (iff any subconcept has the same extent size, the concept is not
-        // realized)
+        // first we check the inner diagram if anything below the concept has the same extent
+        // size (iff any subconcept has the same extent size, the concept is not realized)
         final int extentSize = getExtentSize(concept, context);
         for (final Concept<Oc, A> otherConcept : concept.getDownset()) {
             if (otherConcept == concept) {
@@ -486,13 +481,11 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
 
     private Hashtable<Concept<Oc, A>, Integer> getContingentSizesCache(
             final ConceptInterpretationContext<Oc, A> context) {
-        Hashtable<Concept<Oc, A>, Integer> retVal = this.contingentSizes
-                .get(context);
+        Hashtable<Concept<Oc, A>, Integer> retVal = this.contingentSizes.get(context);
         if (retVal == null) {
             retVal = new Hashtable<Concept<Oc, A>, Integer>();
             this.contingentSizes.put(context, retVal);
-            // / @todo can we get around this by being smarter about the
-            // hashcodes ???
+            // @todo can we get around this by being smarter about the hashcodes ???
             context.getEventBroker().subscribe(this,
                     ConceptInterpretationContextChangedEvent.class,
                     ConceptInterpretationContext.class);

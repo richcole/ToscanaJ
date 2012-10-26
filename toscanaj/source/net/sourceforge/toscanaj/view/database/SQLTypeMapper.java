@@ -14,7 +14,7 @@ import java.sql.Types;
 ///     should give extra information like their size
 
 public class SQLTypeMapper {
-    public static final String getTypeDescription(final int sqlType) {
+    public static String getTypeDescription(final int sqlType) {
         switch (sqlType) {
             case Types.ARRAY:
                 return "Array";
@@ -81,7 +81,7 @@ public class SQLTypeMapper {
         }
     }
 
-    public static final String getSQLName(final int sqlType) {
+    public static String getSQLName(final int sqlType) {
         switch (sqlType) {
             case Types.ARRAY:
                 return "array";

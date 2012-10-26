@@ -215,11 +215,10 @@ public class ToscanaJPreferences {
         return okClicked;
     }
 
-    public static final void removeSettings() throws BackingStoreException {
+    public static void removeSettings() throws BackingStoreException {
         for (final ConfigurationSection section : SECTIONS) {
             for (int j = 0; j < section.getSubsections().length; j++) {
-                final ConfigurationSubsection subsection = section
-                        .getSubsections()[j];
+                final ConfigurationSubsection subsection = section.getSubsections()[j];
                 for (int k = 0; k < subsection.getEntries().length; k++) {
                     final ConfigurationEntry entry = subsection.getEntries()[k];
                     ExtendedPreferences.removeBranch(entry.getNode());

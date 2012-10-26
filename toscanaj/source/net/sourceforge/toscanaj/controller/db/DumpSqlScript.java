@@ -19,7 +19,7 @@ import net.sourceforge.toscanaj.view.database.SQLTypeMapper;
 import org.tockit.events.EventBroker;
 
 public class DumpSqlScript {
-    public static final void dumpSqlScript(final DatabaseConnection connection,
+    public static void dumpSqlScript(final DatabaseConnection connection,
             final OutputStream outStream) throws DatabaseException {
         final PrintStream out = new PrintStream(outStream);
         if (!connection.isConnected()) {

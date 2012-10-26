@@ -125,7 +125,7 @@ public class Factorizer {
         showResults(diagrams);
     }
 
-    private static <T extends Object> List<Factorization> createFactorizedDiagrams(
+    private static <T> List<Factorization> createFactorizedDiagrams(
             final Context context, final List<Set<T>> subsets) {
         final List<Factorization> retVal = new ArrayList<Factorization>();
         for (final Iterator<Set<T>> it = subsets.iterator(); it.hasNext();) {
@@ -230,7 +230,7 @@ public class Factorizer {
         return retVal;
     }
 
-    private static <T extends Object> List<Set<T>> findAllSubsetsOfSize(
+    private static <T> List<Set<T>> findAllSubsetsOfSize(
             final Set<T> objects, final int n) {
         final List<Set<T>> retVal = new ArrayList<Set<T>>();
         if (objects.size() == n) {

@@ -154,24 +154,24 @@ public class DecimalType extends AbstractXSDDatatype {
 
     public boolean isValidDoubleValue(final double value) {
         if (this.min != null) {
-            if (value < this.min.doubleValue()) {
+            if (value < this.min) {
                 return false;
             }
-            if (value == this.min.doubleValue() && !this.minIncluded) {
+            if (value == this.min && !this.minIncluded) {
                 return false;
             }
         }
         if (this.max != null) {
-            if (value > this.max.doubleValue()) {
+            if (value > this.max) {
                 return false;
             }
-            if (value == this.max.doubleValue() && !this.maxIncluded) {
+            if (value == this.max && !this.maxIncluded) {
                 return false;
             }
         }
         if (this.numDecimals != null) {
             final double shifted = value
-                    * Math.pow(10, this.numDecimals.intValue());
+                    * Math.pow(10, this.numDecimals);
             if (shifted != Math.floor(shifted)) {
                 return false;
             }

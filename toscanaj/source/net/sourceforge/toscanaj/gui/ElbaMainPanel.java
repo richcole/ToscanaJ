@@ -166,10 +166,8 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
 
         this.diagramExportSettings = new DiagramExportSettings();
 
-        this.eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class,
-                Object.class);
-        this.eventBroker.subscribe(this, DatabaseInfoChangedEvent.class,
-                Object.class);
+        this.eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
+        this.eventBroker.subscribe(this, DatabaseInfoChangedEvent.class, Object.class);
 
         fillScaleGeneratorList();
 
