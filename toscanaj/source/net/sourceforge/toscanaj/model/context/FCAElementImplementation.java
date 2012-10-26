@@ -160,7 +160,7 @@ public class FCAElementImplementation implements WritableFCAElement, XMLizable, 
             try {
                 final Constructor<?> construct = Class.forName(className)
                 .getConstructor(new Class[] { Element.class });
-                this.data = construct.newInstance(new Object[] { dataElement });
+                this.data = construct.newInstance(dataElement);
             } catch (final Exception e) {
                 throw new XMLSyntaxError("Initialization of object of type "
                         + className + "failed.", e);

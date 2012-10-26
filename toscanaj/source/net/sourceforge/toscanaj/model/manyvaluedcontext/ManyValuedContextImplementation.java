@@ -175,7 +175,7 @@ public class ManyValuedContextImplementation implements
         retVal.addContent(objectsElement);
         final Element typesElement = new Element(TYPES_ELEMENT_NAME);
         for (final Datatype itType : types) {
-            final Element typeElement = ((XMLizable) itType).toXML();
+            final Element typeElement = itType.toXML();
             typesElement.addContent(typeElement);
         }
         retVal.addContent(typesElement);

@@ -46,9 +46,7 @@ public class NDimDiagram<O, A> extends SimpleLineDiagram<O, A> {
     public Element toXML() {
         final Element retVal = super.toXML();
         final Element baseElem = new Element("projectionBase");
-        final Iterator<Point2D> it = this.base.iterator();
-        while (it.hasNext()) {
-            final Point2D baseVec = it.next();
+        for (Point2D baseVec : this.base) {
             final Element vecElem = new Element("vector");
             vecElem.setAttribute("x", String.valueOf(baseVec.getX()));
             vecElem.setAttribute("y", String.valueOf(baseVec.getY()));

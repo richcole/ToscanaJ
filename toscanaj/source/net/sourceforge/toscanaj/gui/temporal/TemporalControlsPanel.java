@@ -487,9 +487,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
     private void fillSequenceChooser() {
         final DefaultComboBoxModel listModel = new DefaultComboBoxModel();
         listModel.addElement("<All Sequences>");
-        final Iterator<Value> it = this.sequenceValues.iterator();
-        while (it.hasNext()) {
-            final Value value = it.next();
+        for (Value value : this.sequenceValues) {
             listModel.addElement(value);
         }
 
@@ -907,9 +905,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
         final ManyValuedAttribute timelineAttribute = (ManyValuedAttribute) this.timelineColumnChooser
                 .getSelectedItem();
 
-        final Iterator<FCAElement> objIt = this.context.getObjects().iterator();
-        while (objIt.hasNext()) {
-            final FCAElement object = objIt.next();
+        for (final FCAElement object : this.context.getObjects()) {
             Value value = this.context.getRelationship(object,
                     sequenceAttribute);
             if (!sequenceValues.contains(value) && value != null) {
@@ -968,10 +964,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
         }
 
         // go over time
-        final Iterator<Value> timeIt = timelineValues.iterator();
-        while (timeIt.hasNext()) {
-            final Value timelineValue = timeIt.next();
-
+        for (Value timelineValue : timelineValues) {
             // try to find matching object for each sequence
             seqValIt = sequenceValues.iterator();
             final Iterator<ArrayList<FCAElement>> seqIt = objectSequences
@@ -980,16 +973,14 @@ public class TemporalControlsPanel extends JTabbedPane implements
                 final Value sequenceValue = seqValIt.next();
                 final List<FCAElement> sequence = seqIt.next();
                 boolean objectFound = false;
-                final Iterator objIt = this.context.getObjects().iterator();
-                while (objIt.hasNext()) {
-                    final FCAElement object = (FCAElement) objIt.next();
+                for (FCAElement object : this.context.getObjects()) {
                     if (this.context.getRelationship(object, sequenceAttribute) != null
                             && this.context.getRelationship(object,
-                                    sequenceAttribute).equals(sequenceValue)
+                            sequenceAttribute).equals(sequenceValue)
                             && this.context.getRelationship(object,
-                                    timelineAttribute) != null
+                            timelineAttribute) != null
                             && this.context.getRelationship(object,
-                                    timelineAttribute).equals(timelineValue)) {
+                            timelineAttribute).equals(timelineValue)) {
                         sequence.add(object);
                         objectFound = true;
                         break;

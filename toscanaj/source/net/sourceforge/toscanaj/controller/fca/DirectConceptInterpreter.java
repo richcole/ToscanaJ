@@ -104,12 +104,9 @@ public class DirectConceptInterpreter<O, A> extends
     private void nestObjects(final List<O> currentSet,
             final ConceptInterpretationContext<O, A> context,
             final boolean contingentOnly) {
-        final Iterator<Concept<O, A>> mainIt = context.getNestingConcepts()
-                .iterator();
-        while (mainIt.hasNext()) {
-            final Concept<O, A> concept = mainIt.next();
+        for (Concept<O, A> concept : context.getNestingConcepts()) {
             for (final Iterator<O> iterator = currentSet.iterator(); iterator
-                    .hasNext();) {
+                    .hasNext(); ) {
                 final O o = iterator.next();
                 boolean found = false;
                 Iterator<O> objectIterator;

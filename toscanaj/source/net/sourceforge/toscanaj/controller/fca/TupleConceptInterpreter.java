@@ -122,10 +122,7 @@ public class TupleConceptInterpreter<O, A> extends
     private void nestObjects(final Set<FCAElement> currentSet,
             final ConceptInterpretationContext<O, A> context,
             final boolean contingentOnly) {
-        final Iterator<Concept<O, A>> mainIt = context.getNestingConcepts()
-                .iterator();
-        while (mainIt.hasNext()) {
-            final Concept<O, A> concept = mainIt.next();
+        for (Concept<O, A> concept : context.getNestingConcepts()) {
             Iterator<O> objectIterator;
             if (contingentOnly) {
                 objectIterator = concept.getObjectContingentIterator();

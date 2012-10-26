@@ -348,9 +348,7 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
             final Object[][] newData = new Object[this.getRowCount() + 1][this
                     .getColumnCount()];
             for (int row = 0; row < modelData.length; row++) {
-                for (int col = 0; col < modelData[row].length; col++) {
-                    newData[row][col] = modelData[row][col];
-                }
+                System.arraycopy(modelData[row], 0, newData[row], 0, modelData[row].length);
             }
             newData[this.getRowCount()][this.getColumnCount() - 1] = null;
             modelData = newData;
@@ -360,9 +358,7 @@ public class AttributeListScaleGeneratorDialog extends JDialog {
         protected Object[][] getTableData() {
             final Object[][] returnData = new Object[getRowCount() - 1][getColumnCount()];
             for (int row = 0; row < returnData.length; row++) {
-                for (int col = 0; col < returnData[row].length; col++) {
-                    returnData[row][col] = this.modelData[row][col];
-                }
+                System.arraycopy(this.modelData[row], 0, returnData[row], 0, returnData[row].length);
             }
             return returnData;
         }

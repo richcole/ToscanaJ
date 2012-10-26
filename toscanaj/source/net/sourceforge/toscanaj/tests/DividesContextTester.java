@@ -9,7 +9,7 @@ package net.sourceforge.toscanaj.tests;
 
 import java.util.Collection;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
 import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
 import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
@@ -82,5 +82,6 @@ public class DividesContextTester {
         mainPanel.setContentPane(edView);
         mainPanel.setBounds(10, 10, 700, 500);
         mainPanel.setVisible(true);
+        mainPanel.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 }

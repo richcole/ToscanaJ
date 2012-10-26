@@ -48,7 +48,7 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
     /**
      * The title used for this diagram.
      */
-    private String title = new String();
+    private String title = "";
 
     /**
      * The list of nodes in the diagram.
@@ -466,9 +466,7 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
             }
             if (!highestNode.getConcept().isTop()) {
                 // inverse coordinates (mirror using x-axis)
-                final Iterator<DiagramNode<O, A>> it = this.nodes.iterator();
-                while (it.hasNext()) {
-                    final DiagramNode<O, A> node = it.next();
+                for (DiagramNode<O, A> node : this.nodes) {
                     node.invertY();
                 }
             }
@@ -498,13 +496,11 @@ public class SimpleLineDiagram<O, A> implements WriteableDiagram2D<O, A> {
     }
 
     public boolean isHasseDiagram() {
-        final Iterator<DiagramLine<O, A>> it = this.lines.iterator();
-        while (it.hasNext()) {
-            final DiagramLine<O, A> line = it.next();
+        for (DiagramLine<O, A> line : this.lines) {
             final double deltaX = Math.abs(line.getToPosition().getX()
                     - line.getFromPosition().getX());
             final double deltaY = line.getToPosition().getY()
-            - line.getFromPosition().getY();
+                    - line.getFromPosition().getY();
             if (deltaY < MINIMUM_STEEPNESS * deltaX) {
                 return false;
             }

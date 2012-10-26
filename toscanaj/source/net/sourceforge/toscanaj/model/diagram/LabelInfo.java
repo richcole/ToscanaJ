@@ -308,9 +308,8 @@ public class LabelInfo implements XMLizable, ChangeObservable {
      */
     private void emitChangeSignal() {
         if (labelObservers != null) {
-            final Iterator<ChangeObserver> iterator = labelObservers.iterator();
-            while (iterator.hasNext()) {
-                iterator.next().update(this);
+            for (ChangeObserver labelObserver : labelObservers) {
+                labelObserver.update(this);
             }
         }
         if (this.node != null) {

@@ -49,11 +49,9 @@ public class DumpSqlScript {
             out.println(");");
             out.println();
 
-            final Iterator<String[]> rowIt = connection.executeQuery(
+            for (String[] rowResults : connection.executeQuery(
                     "SELECT * FROM " + Table.getQuotedIdentifier(tableName)
-                            + ";").iterator();
-            while (rowIt.hasNext()) {
-                final String[] rowResults = rowIt.next();
+                            + ";")) {
                 out.print("INSERT INTO " + Table.getQuotedIdentifier(tableName)
                         + " VALUES (");
 

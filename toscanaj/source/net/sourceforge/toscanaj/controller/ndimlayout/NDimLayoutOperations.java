@@ -66,10 +66,8 @@ public abstract class NDimLayoutOperations {
         }
         // the top node has to be at (0,0), otherwise base changes will affect
         // the overall position of the diagram
-        final Iterator<DiagramNode<O, A>> it = nodemap.values().iterator();
-        while (it.hasNext()) {
-            final NDimDiagramNode<O, A> node = (NDimDiagramNode<O, A>) it
-                    .next();
+        for (DiagramNode<O, A> oaDiagramNode : nodemap.values()) {
+            final NDimDiagramNode<O, A> node = (NDimDiagramNode<O, A>) oaDiagramNode;
             node.setNdimVector(substract(node.getNdimVector(), topVector));
         }
         createConnections(diagram, nodemap);

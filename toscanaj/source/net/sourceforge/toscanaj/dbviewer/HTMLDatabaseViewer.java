@@ -217,9 +217,8 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
                             this.repeatedFieldNames,
                             this.viewerManager.getTableName(), whereClause);
                     this.repeatElement.setContent(null);
-                    final Iterator<String[]> it = results.iterator();
-                    while (it.hasNext()) {
-                        fields = it.next();
+                    for (String[] result1 : results) {
+                        fields = result1;
                         itElems = this.repeatedFieldElements.iterator();
                         for (final String result : fields) {
                             final Element fieldElem = itElems.next();
@@ -234,8 +233,8 @@ public class HTMLDatabaseViewer implements DatabaseViewer {
                         // / @todo only the content of repetitionBlock should be
                         // added (but _all_ content, not just elements)
                         this.repeatElement
-                        .addContent((Element) this.repetitionBlock
-                                .clone());
+                                .addContent((Element) this.repetitionBlock
+                                        .clone());
                     }
                 }
                 final XMLOutputter outputter = new XMLOutputter();

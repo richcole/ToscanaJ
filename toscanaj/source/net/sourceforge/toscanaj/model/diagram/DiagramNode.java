@@ -356,7 +356,7 @@ public class DiagramNode<O, A> implements XMLizable {
             conceptList.add(node.getConcept());
             node = node.getOuterNode();
         }
-        return conceptList.toArray(new Concept[0]);
+        return conceptList.toArray(new Concept[conceptList.size()]);
     }
 
     @Override

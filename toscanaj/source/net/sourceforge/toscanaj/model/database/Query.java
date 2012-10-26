@@ -141,7 +141,7 @@ public abstract class Query implements XMLizable {
      * The return value is a String which returns a formatted version of the row
      */
     public String formatResults(final Object[] values, final int startPosition) {
-        String rowRes = new String();
+        String rowRes = "";
         if (header != null) {
             rowRes += header;
         }

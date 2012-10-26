@@ -10,7 +10,6 @@ package net.sourceforge.toscanaj.controller.diagram;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JMenu;
@@ -49,7 +48,7 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
             this.queries = csce.getConceptualSchema().getQueries();
             return;
         }
-        CanvasItemEventWithPosition itemEvent = null;
+        CanvasItemEventWithPosition itemEvent;
         try {
             itemEvent = (CanvasItemEventWithPosition) e;
         } catch (final ClassCastException e1) {
@@ -57,7 +56,7 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
                     getClass().getName()
                             + " has to be subscribed to CanvasItemEventWithPositions only");
         }
-        ObjectLabelView labelView = null;
+        ObjectLabelView labelView;
         try {
             labelView = (ObjectLabelView) itemEvent.getSubject();
         } catch (final ClassCastException e1) {
@@ -81,15 +80,14 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
             numberOfQueries = this.queries.size();
         }
 
-        final int numberOfViews = 0;
+        int numberOfViews = 0;
         List<String> objectViewNames = null;
         List<String> objectListViewNames = null;
         if (object instanceof DatabaseRetrievedObject) {
             final DatabaseRetrievedObject dbObject = (DatabaseRetrievedObject) object;
-            objectViewNames = DatabaseViewerManager
-                    .getObjectViewNames(dbObject);
-            objectListViewNames = DatabaseViewerManager
-                    .getObjectListViewNames();
+            objectViewNames = DatabaseViewerManager.getObjectViewNames(dbObject);
+            objectListViewNames = DatabaseViewerManager.getObjectListViewNames();
+            numberOfViews = objectViewNames.size() + objectListViewNames.size();
         }
 
         if (numberOfQueries + numberOfViews == 0) { // nothing to display
@@ -123,9 +121,7 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
             final DatabaseRetrievedObject object, final JPopupMenu popupMenu) {
         JMenuItem menuItem;
         final JMenu objectListViewMenu = new JMenu("View all objects");
-        final Iterator<String> it = objectListViewNames.iterator();
-        while (it.hasNext()) {
-            final String objectListViewName = it.next();
+        for (final String objectListViewName : objectListViewNames) {
             menuItem = new JMenuItem(objectListViewName);
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -150,9 +146,7 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
             final DatabaseRetrievedObject object, final JPopupMenu popupMenu) {
         JMenuItem menuItem;
         final JMenu objectViewMenu = new JMenu("View selected");
-        final Iterator<String> it = objectViewNames.iterator();
-        while (it.hasNext()) {
-            final String objectViewName = it.next();
+        for (final String objectViewName : objectViewNames) {
             menuItem = new JMenuItem(objectViewName);
             menuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(final ActionEvent e) {
@@ -177,9 +171,7 @@ public class ObjectLabelViewPopupMenuHandler implements EventBrokerListener {
             final JPopupMenu popupMenu) {
         JRadioButtonMenuItem menuItem;
         final JMenu queryMenu = new JMenu("Change label");
-        final Iterator<Query> it = this.queries.iterator();
-        while (it.hasNext()) {
-            final Query query = it.next();
+        for (final Query query : this.queries) {
             menuItem = new JRadioButtonMenuItem(query.getName(), query
                     .equals(labelView.getQuery()));
             menuItem.addActionListener(new ActionListener() {

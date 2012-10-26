@@ -128,10 +128,8 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     public void setFilterMode(final boolean filterMode) {
-        final Iterator it = this.getCanvasItemsByType(NodeView.class)
-                .iterator();
-        while (it.hasNext()) {
-            final NodeView cur = (NodeView) it.next();
+        for (CanvasItem canvasItem : this.getCanvasItemsByType(NodeView.class)) {
+            final NodeView cur = (NodeView) canvasItem;
             cur.getConceptInterpretationContext().setFilterMode(filterMode);
         }
     }
@@ -356,19 +354,15 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
         if (newDiagram instanceof SimpleLineDiagram) {
             final SimpleLineDiagram sld = (SimpleLineDiagram) newDiagram;
-            for (final Iterator<CanvasItem> iter = sld.getExtraCanvasItems()
-                    .iterator(); iter.hasNext();) {
-                final CanvasItem item = iter.next();
+            for (final CanvasItem item : (Iterable<CanvasItem>) sld.getExtraCanvasItems()) {
                 addCanvasItem(item, "extraItems");
             }
         }
     }
 
     public void setDisplayType(final boolean contingentOnly) {
-        final Iterator it = this.getCanvasItemsByType(NodeView.class)
-                .iterator();
-        while (it.hasNext()) {
-            final NodeView nv = (NodeView) it.next();
+        for (CanvasItem canvasItem : this.getCanvasItemsByType(NodeView.class)) {
+            final NodeView nv = (NodeView) canvasItem;
             nv.getConceptInterpretationContext().setObjectDisplayMode(
                     contingentOnly);
         }
@@ -378,20 +372,16 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     public void updateLabelEntries() {
-        final Iterator it = this.getCanvasItemsByType(LabelView.class)
-                .iterator();
-        while (it.hasNext()) {
-            final LabelView lv = (LabelView) it.next();
+        for (CanvasItem canvasItem : this.getCanvasItemsByType(LabelView.class)) {
+            final LabelView lv = (LabelView) canvasItem;
             lv.updateEntries();
         }
     }
 
     public void setSelectedConcepts(final Concept[] concepts) {
         // notify all nodes and lines
-        final Iterator it = this.getCanvasItemsByType(NodeView.class)
-                .iterator();
-        while (it.hasNext()) {
-            final NodeView nv = (NodeView) it.next();
+        for (CanvasItem canvasItem : this.getCanvasItemsByType(NodeView.class)) {
+            final NodeView nv = (NodeView) canvasItem;
             nv.setSelectedConcepts(concepts);
         }
         getController().getEventBroker().processEvent(
@@ -404,10 +394,8 @@ public class DiagramView extends Canvas implements ChangeObserver {
      */
     public void setQuery(final Query query) {
         // update the current labels
-        final Iterator it = this.getCanvasItemsByType(ObjectLabelView.class)
-                .iterator();
-        while (it.hasNext()) {
-            final ObjectLabelView lv = (ObjectLabelView) it.next();
+        for (CanvasItem canvasItem : this.getCanvasItemsByType(ObjectLabelView.class)) {
+            final ObjectLabelView lv = (ObjectLabelView) canvasItem;
             lv.setQuery(query);
         }
         requestScreenTransformUpdate();
