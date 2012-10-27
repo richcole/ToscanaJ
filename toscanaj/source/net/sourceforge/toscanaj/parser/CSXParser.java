@@ -553,13 +553,12 @@ public class CSXParser {
                 final Query query = dbInfo.createListQuery(name, header,
                         isDistinct);
                 for (Object curCol : cur.getChildren("column")) {
-                    final String colName = curCol.getAttributeValue("name");
-                    final String format = curCol.getAttributeValue("format");
-                    final String separator = curCol
-                            .getAttributeValue("separator");
-                    final String sql = curCol.getText();
-                    query.insertQueryColumn(colName, format, separator, sql,
-                            false);
+                    Element curColElem = (Element) curCol;
+                    final String colName = curColElem.getAttributeValue("name");
+                    final String format = curColElem.getAttributeValue("format");
+                    final String separator = curColElem.getAttributeValue("separator");
+                    final String sql = curColElem.getText();
+                    query.insertQueryColumn(colName, format, separator, sql, false);
                 }
                 _Schema.addQuery(query);
             }
