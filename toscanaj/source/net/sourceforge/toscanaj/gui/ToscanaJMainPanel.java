@@ -702,7 +702,7 @@ public class ToscanaJMainPanel extends JFrame implements ChangeObserver, Clipboa
                     if (showOrthogonalityMenuItem.isSelected()) {
                         this.lastIntervalType = diagramSchema.getGradientType();
                         setDiagramGradient(redGreenGradient,
-                                ConceptInterpreter.INTERVAL_TYPE_ORTHOGONALTIY);
+                                ConceptInterpreter.INTERVAL_TYPE_ORTHOGONALITY);
                         ToscanaJMainPanel.this.diagramView
                         .getConceptInterpreter().showDeviation(true);
                     } else {

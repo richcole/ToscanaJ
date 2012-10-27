@@ -129,8 +129,7 @@ public class CSVImportDetailsDialog extends JDialog {
             }
         });
 
-        final JRadioButton semicolonSeparatorButton = new JRadioButton(
-                "semicolon");
+        final JRadioButton semicolonSeparatorButton = new JRadioButton("semicolon");
         semicolonSeparatorButton.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent arg0) {
                 setFieldSeparator(";");
@@ -358,9 +357,6 @@ public class CSVImportDetailsDialog extends JDialog {
         final String importDataStatement = "SET TABLE "
                 + tableNameField.getText() + " SOURCE \"" + filename + ";fs="
                 + this.fieldSeparator + "\"";
-
-        // System.out.println("statement 1: \n" + createTableStatement);
-        // System.out.println("statement 2: \n" + importDataStatement);
 
         try {
             connection.executeUpdate(createTableStatement);

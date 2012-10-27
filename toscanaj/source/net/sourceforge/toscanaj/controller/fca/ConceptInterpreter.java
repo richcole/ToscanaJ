@@ -75,7 +75,7 @@ public interface ConceptInterpreter<Oc, A, Or> {
     public static final IntervalType INTERVAL_TYPE_FIXED = new IntervalType();
     public static final IntervalType INTERVAL_TYPE_CONTINGENT = new IntervalType();
     public static final IntervalType INTERVAL_TYPE_EXTENT = new IntervalType();
-    public static final IntervalType INTERVAL_TYPE_ORTHOGONALTIY = new IntervalType();
+    public static final IntervalType INTERVAL_TYPE_ORTHOGONALITY = new IntervalType();
 
     /** is dependent on displayMode and filterMode */
     Iterator<Or> getObjectSetIterator(Concept<Oc, A> concept,

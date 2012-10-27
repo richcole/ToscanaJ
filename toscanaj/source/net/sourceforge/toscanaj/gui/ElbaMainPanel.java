@@ -116,7 +116,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     /**
      * Main Controllers
      */
-    private final EventBroker eventBroker;
+    private final EventBroker<Object> eventBroker;
     private final DatabaseConnection databaseConnection;
 
     /**
@@ -159,7 +159,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
     public ElbaMainPanel() {
         super("Elba");
 
-        this.eventBroker = new EventBroker();
+        this.eventBroker = new EventBroker<Object>();
         this.conceptualSchema = new ConceptualSchema(this.eventBroker);
         this.databaseConnection = new DatabaseConnection(this.eventBroker);
         DatabaseConnection.setConnection(this.databaseConnection);
@@ -1105,11 +1105,9 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 final String columnName = "__diagram" + i + "__";
                 try {
                     this.databaseConnection.executeUpdate("ALTER TABLE "
-                            + tableName + " ADD COLUMN " + columnName
-                            + " INTEGER;");
+                            + tableName + " ADD COLUMN " + columnName + " INTEGER;");
                     this.databaseConnection.executeUpdate("CREATE INDEX "
-                            + columnName + "index ON " + tableName + "("
-                            + columnName + ");");
+                            + columnName + "index ON " + tableName + "(" + columnName + ");");
                 } catch (final DatabaseException e) {
                     // that is ok, we just had this column before
                 }
@@ -1118,20 +1116,16 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
                 int contingentCount = 0;
                 while (nodeIt.hasNext()) {
                     final DiagramNode node = nodeIt.next();
-                    final ConceptImplementation concept = (ConceptImplementation) node
-                    .getConcept();
+                    final ConceptImplementation concept = (ConceptImplementation) node.getConcept();
                     if (concept.getObjectContingentSize() != 0) {
-                        final String oldWhereClause = WhereClauseGenerator
-                        .createClause(concept
-                                .getObjectContingentIterator());
-                        final String newWhereClause = columnName + " = "
-                        + contingentCount;
+                        final String oldWhereClause =
+                                WhereClauseGenerator.createClause(concept.getObjectContingentIterator());
+                        final String newWhereClause = columnName + " = "+ contingentCount;
                         this.databaseConnection.executeUpdate("UPDATE "
                                 + tableName + " SET " + newWhereClause
                                 + " WHERE " + oldWhereClause + ";");
                         concept.removeObjectContingent();
-                        concept.addObject(new FCAElementImplementation(
-                                newWhereClause));
+                        concept.addObject(new FCAElementImplementation(newWhereClause));
                         contingentCount++;
                     }
                 }
@@ -1141,8 +1135,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
             return;
         }
 
-        // / @todo it is not really obvious in the UI what is going on -- this
-        // is just a hack to get things going
+        // @todo it is not really obvious in the UI what is going on -- this is just a hack to get things going
         this.saveAsFileAction.actionPerformed(null);
     }
 
@@ -1165,8 +1158,7 @@ public class ElbaMainPanel extends JFrame implements MainPanel, EventBrokerListe
         // 1 : Discard current file
         // 2 : Go back (cancel save/open/close operation)
         final Object[] options = { "Save", "Discard", "Go back" };
-        return JOptionPane
-        .showOptionDialog(
+        return JOptionPane.showOptionDialog(
                 this,
                 "The conceptual schema has been modified. Do you want to save the changes?",
                 "Schema changed", JOptionPane.YES_NO_CANCEL_OPTION,

@@ -277,7 +277,7 @@ public abstract class AbstractConceptInterpreter<Oc, A, Or> implements
             };
         } else if (type == INTERVAL_TYPE_FIXED) {
             return new FixedValueIntervalSource<Oc, A>(1);
-        } else if (type == INTERVAL_TYPE_ORTHOGONALTIY) {
+        } else if (type == INTERVAL_TYPE_ORTHOGONALITY) {
             return new NormedIntervalSource<Oc, A>() {
                 public double getValue(final Concept<Oc, A> concept,
                         final ConceptInterpretationContext<Oc, A> context) {
