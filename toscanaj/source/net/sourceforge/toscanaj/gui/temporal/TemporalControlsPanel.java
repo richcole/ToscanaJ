@@ -564,7 +564,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
                     exportImages(selectedFile);
                 }
             }
-        } while (formatDefined == false);
+        } while (!formatDefined);
     }
 
     protected void exportImages(final File selectedFile) {
@@ -927,7 +927,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
                 }
             }
             value = this.context.getRelationship(object, timelineAttribute);
-            if (!timelineValues.contains(value)) {
+            if (!timelineValues.contains(value) && value != null) {
                 boolean inserted = false;
                 final ListIterator<Value> tlIt = timelineValues.listIterator();
                 while (tlIt.hasNext()) {
@@ -957,16 +957,14 @@ public class TemporalControlsPanel extends JTabbedPane implements
         final List<ArrayList<FCAElement>> objectSequences = new ArrayList<ArrayList<FCAElement>>();
 
         // initialise sequences with empty lists
-        Iterator<Value> seqValIt = sequenceValues.iterator();
-        while (seqValIt.hasNext()) {
-            seqValIt.next();
+        for (Value ignored : sequenceValues) {
             objectSequences.add(new ArrayList<FCAElement>());
         }
 
         // go over time
         for (Value timelineValue : timelineValues) {
             // try to find matching object for each sequence
-            seqValIt = sequenceValues.iterator();
+            Iterator<Value> seqValIt = sequenceValues.iterator();
             final Iterator<ArrayList<FCAElement>> seqIt = objectSequences
                     .iterator();
             while (seqValIt.hasNext()) {
