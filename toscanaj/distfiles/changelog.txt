@@ -3,6 +3,7 @@ program suite:
 
 Affecting different programs:
 =============================
+- movement in additive or chain-based mode now snaps to the grid
 
 Specific for ToscanaJ:
 ======================
@@ -18,7 +19,6 @@ Specific for Siena (still not fully complete):
 
 Other new experimental features:
 ================================
-
 
 
 

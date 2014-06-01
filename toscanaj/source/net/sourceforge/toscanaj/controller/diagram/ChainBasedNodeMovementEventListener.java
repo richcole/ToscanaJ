@@ -40,16 +40,19 @@ public class ChainBasedNodeMovementEventListener implements EventBrokerListener 
     private Point2D startPosition;
 
     public void processEvent(final Event e) {
-        final CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
-        final NodeView nodeView = (NodeView) dragEvent.getSubject();
+        CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
+        NodeView nodeView = (NodeView) dragEvent.getSubject();
 
         final DiagramView diagramView = nodeView.getDiagramView();
-        final DiagramNode node = nodeView.getDiagramNode();
+        DiagramNode node = nodeView.getDiagramNode();
+
+        Point2D fromPosition = dragEvent.getCanvasFromPosition();
         if (e instanceof CanvasItemPickupEvent) {
-            this.startPosition = nodeView.getPosition();
+            this.startPosition = node.getPosition();
+            fromPosition = node.getPosition(); // can differ from event position if grid is used
         }
 
-        final Concept concept = node.getConcept();
+        Concept concept = node.getConcept();
 
         final Set<Concept> meetIrr = ConceptSetHelperFunctions
                 .getMeetIrreduciblesInUpset(concept);
@@ -57,13 +60,12 @@ public class ChainBasedNodeMovementEventListener implements EventBrokerListener 
         final int numUpperMeetIrr = meetIrr.size();
 
         // add the meet-irreducible concepts in the downsets of all the
-        // meet-irreducibles
-        // in the upset
-        final Set<Concept> newMeetIrr = new HashSet<Concept>();
-        for (final Concept superConcept : meetIrr) {
-            final Collection<Object> downset = superConcept.getDownset();
-            for (final Object object : downset) {
-                final Concept lower = (Concept) object;
+        // meet-irreducibles in the upset
+        Set<Concept> newMeetIrr = new HashSet<>();
+        for (Concept superConcept : meetIrr) {
+            Collection<Object> downset = superConcept.getDownset();
+            for (Object object : downset) {
+                Concept lower = (Concept) object;
                 if (lower.isMeetIrreducible()) {
                     newMeetIrr.add(lower);
                 }
@@ -71,13 +73,13 @@ public class ChainBasedNodeMovementEventListener implements EventBrokerListener 
         }
         meetIrr.addAll(newMeetIrr);
 
-        ConceptSetHelperFunctions.applyDragToDiagram(dragEvent
-                .getCanvasFromPosition(), dragEvent.getCanvasToPosition(),
+        ConceptSetHelperFunctions.applyDragToDiagram(
+                fromPosition, dragEvent.getCanvasToPosition(),
                 diagramView, meetIrr, numUpperMeetIrr);
 
         if (!diagramView.getDiagram().isHasseDiagram()) {
-            ConceptSetHelperFunctions.applyDragToDiagram(dragEvent
-                    .getCanvasToPosition(), dragEvent.getCanvasFromPosition(),
+            ConceptSetHelperFunctions.applyDragToDiagram(
+                    fromPosition, dragEvent.getCanvasFromPosition(),
                     diagramView, meetIrr, numUpperMeetIrr);
         }
 

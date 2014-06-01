@@ -28,42 +28,47 @@ import org.tockit.events.EventBrokerListener;
 
 /**
  * Implements node movement in a way that ensures attribute-additivity.
- * 
- * Here is the basic idea: - identify all meet-irreducibles in the upset of the
- * dragged node's concept - find the minimal elements in this - distribute the
- * movement along the nodes of these concepts, moving all downsets with them
- * 
+ * <p/>
+ * Here is the basic idea:
+ * <ul>
+ * <li>identify all meet-irreducibles in the upset of the dragged node's concept</li>
+ * <li>find the minimal elements in this</li>
+ * <li>distribute the movement along the nodes of these concepts, moving all downsets with them</li>
+ * </ul>
+ * <p/>
  * The trick is that this way the movement is restricted to the interval of the
  * dragged node and the join of the upper neighbours, which is in some way the
- * smallest change possible. Most noticably the trivial case (only one upper
+ * smallest change possible. Most noticeably the trivial case (only one upper
  * neighbour) breaks down to moving just the dragged node.
  */
-public class AttributeAdditiveNodeMovementEventListener implements
-        EventBrokerListener {
+public class AttributeAdditiveNodeMovementEventListener implements EventBrokerListener {
     private Point2D startPosition;
 
     public void processEvent(final Event e) {
-        final CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
-        final NodeView nodeView = (NodeView) dragEvent.getSubject();
+        CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
+        NodeView nodeView = (NodeView) dragEvent.getSubject();
 
         final DiagramView diagramView = nodeView.getDiagramView();
-        final DiagramNode node = nodeView.getDiagramNode();
+        DiagramNode node = nodeView.getDiagramNode();
+
+        Point2D fromPosition = dragEvent.getCanvasFromPosition();
         if (e instanceof CanvasItemPickupEvent) {
-            this.startPosition = nodeView.getPosition();
+            this.startPosition = node.getPosition();
+            fromPosition = node.getPosition(); // can differ from event position if grid is used
         }
 
-        final Concept concept = node.getConcept();
+        Concept concept = node.getConcept();
 
-        final Set<Concept> meetIrr = ConceptSetHelperFunctions
-                .getMeetIrreduciblesInUpset(concept);
+        final Set<Concept> meetIrr = ConceptSetHelperFunctions.getMeetIrreduciblesInUpset(concept);
         ConceptSetHelperFunctions.removeNonMinimals(meetIrr);
-        ConceptSetHelperFunctions.applyDragToDiagram(dragEvent
-                .getCanvasFromPosition(), dragEvent.getCanvasToPosition(),
+        ConceptSetHelperFunctions.applyDragToDiagram(
+                fromPosition, dragEvent.getCanvasToPosition(),
                 diagramView, meetIrr, meetIrr.size());
 
         if (!diagramView.getDiagram().isHasseDiagram()) {
-            ConceptSetHelperFunctions.applyDragToDiagram(dragEvent
-                    .getCanvasToPosition(), dragEvent.getCanvasFromPosition(),
+            // revert if diagram became non-Hasse
+            ConceptSetHelperFunctions.applyDragToDiagram(
+                    dragEvent.getCanvasToPosition(), fromPosition,
                     diagramView, meetIrr, meetIrr.size());
         }
 
@@ -76,8 +81,7 @@ public class AttributeAdditiveNodeMovementEventListener implements
             if (undoManager != null) {
                 // make a copy of the current start position
                 final Point2D undoPosition = this.startPosition;
-                // check the actual position of the node -- it might differ from
-                // the
+                // check the actual position of the node -- it might differ from the
                 // requested one due to the Hasse diagram limitations
                 final Point2D toPosition = nodeView.getPosition();
                 undoManager.addEdit(new AbstractUndoableEdit() {
