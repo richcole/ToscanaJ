@@ -12,6 +12,9 @@ Specific for Elba:
 
 Specific for Siena (still not fully complete):
 ==============================================
+- Bugfix for saving/loading files with temporal arrows in them
+- The temporal controls now allow selecting an arbitrary subset of the sequences for display
+- Temporal animations can now be set to repeat until stopped
 
 Other new experimental features:
 ================================
