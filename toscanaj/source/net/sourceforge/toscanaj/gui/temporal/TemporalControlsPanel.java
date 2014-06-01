@@ -96,7 +96,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
     private JComboBox sequenceColumnChooser;
     private JComboBox timelineColumnChooser;
     private JButton addStaticTransitionsButton;
-    private JComboBox sequenceToShowChooser;
+    private JList<Value> sequenceToShowChooser;
     private JButton animateTransitionsButton;
     private JButton exportImagesButton;
     private final DiagramView diagramView;
@@ -306,7 +306,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
         });
 
         final JLabel sequenceLabel = new JLabel("Sequence:");
-        sequenceToShowChooser = new JComboBox();
+        sequenceToShowChooser = new JList<>();
 
         serializeSequencesBox = new JCheckBox(
                 "Serialize when stepping/animating");
@@ -485,13 +485,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
     }
 
     private void fillSequenceChooser() {
-        final DefaultComboBoxModel listModel = new DefaultComboBoxModel();
-        listModel.addElement("<All Sequences>");
-        for (Value value : this.sequenceValues) {
-            listModel.addElement(value);
-        }
-
-        this.sequenceToShowChooser.setModel(listModel);
+        sequenceToShowChooser.setListData(sequenceValues.toArray(new Value[sequenceValues.size()]));
     }
 
     private void setButtonStates(final boolean allDisabled) {
@@ -585,16 +579,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
 
         this.timeController.setVisibleTime(1);
 
-        if (this.serializeSequencesBox.isSelected()
-                && !(this.sequenceToShowChooser.getSelectedItem() instanceof Value)) {
-            final int numSeq = this.sequenceValues.size();
-            this.timeController.setEndTime(length * numSeq);
-            addTransitionsSerialized(this.timeController.getAllFadedTime(),
-                    true);
-        } else {
-            this.timeController.setEndTime(length);
-            addTransitions(this.timeController.getAllFadedTime(), true);
-        }
+        setUpTransitions(length);
 
         final double targetStep = this.timeController.getAllFadedTime();
 
@@ -695,16 +680,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
         this.timeController.setVisibleTime(1);
         this.timeController.setFadeOutTime(0);
         this.timeController.setMillisecondsPerStep(1);
-        if (this.serializeSequencesBox.isSelected()
-                && !(this.sequenceToShowChooser.getSelectedItem() instanceof Value)) {
-            final int numSeq = this.sequenceValues.size();
-            this.timeController.setEndTime(length * numSeq);
-            addTransitionsSerialized(this.timeController.getAllFadedTime(),
-                    true);
-        } else {
-            this.timeController.setEndTime(length);
-            addTransitions(this.timeController.getAllFadedTime(), true);
-        }
+        setUpTransitions(length);
         this.diagramView.updateDiagram();
         gotoStep(1);
     }
@@ -723,29 +699,26 @@ public class TemporalControlsPanel extends JTabbedPane implements
         this.timeController.setMillisecondsPerStep(this.speedField
                 .getIntegerValue());
         this.timeController.reset();
-        if (this.serializeSequencesBox.isSelected()
-                && !(this.sequenceToShowChooser.getSelectedItem() instanceof Value)) {
-            final int numSeq = this.sequenceValues.size();
-            this.timeController.setEndTime(length * numSeq);
-            addTransitionsSerialized(this.timeController.getAllFadedTime(),
-                    true);
-        } else {
-            this.timeController.setEndTime(length);
-            addTransitions(this.timeController.getAllFadedTime(), true);
-        }
+        setUpTransitions(length);
         this.animating = true;
         this.diagramView.updateDiagram();
     }
 
+    private void setUpTransitions(int length) {
+        List<Value> sequences = sequenceToShowChooser.getSelectedValuesList();
+        if (this.serializeSequencesBox.isSelected() && sequences.size() > 1) {
+            int numSeq = sequences.size();
+            timeController.setEndTime(length * numSeq);
+            addTransitionsSerialized(timeController.getAllFadedTime(), true);
+        } else {
+            timeController.setEndTime(length);
+            addTransitions(timeController.getAllFadedTime(), true);
+        }
+    }
+
     private void addTransitions(final double newTargetTime,
             final boolean highlightStates) {
-        Value selectedSequence = null; // no specific sequence selected
-        final Object selectedSequenceItem = this.sequenceToShowChooser
-                .getSelectedItem();
-        if (selectedSequenceItem instanceof Value) {
-            selectedSequence = (Value) selectedSequenceItem;
-        }
-
+        List<Value> selected = sequenceToShowChooser.getSelectedValuesList();
         final List<ArrayList<FCAElement>> objectSequences = calculateObjectSequences();
         final Iterator<ArrayList<FCAElement>> seqIt = objectSequences
                 .iterator();
@@ -762,8 +735,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
             }
             final ArrowStyle[] styles = DiagramSchema.getCurrentSchema()
                     .getArrowStyles();
-            if (selectedSequence == null
-                    || selectedSequence == curSequenceValue) {
+            if (selected.contains(curSequenceValue)) {
                 addTransitions(sequence, styles[styleNum], highlightStates, 0);
             }
             styleNum = (styleNum + 1) % styles.length;
@@ -778,13 +750,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
      */
     private void addTransitionsSerialized(final double newTargetTime,
             final boolean highlightStates) {
-        Value selectedSequence = null; // no specific sequence selected
-        final Object selectedSequenceItem = this.sequenceToShowChooser
-                .getSelectedItem();
-        if (selectedSequenceItem instanceof Value) {
-            selectedSequence = (Value) selectedSequenceItem;
-        }
-
+        List<Value> selected = sequenceToShowChooser.getSelectedValuesList();
         final List<ArrayList<FCAElement>> objectSequences = calculateObjectSequences();
         final Iterator<ArrayList<FCAElement>> seqIt = objectSequences
                 .iterator();
@@ -825,8 +791,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
                 this.targetTime = newTargetTime;
                 this.lastAnimationTime = 0;
             }
-            if (selectedSequence == null
-                    || selectedSequence == curSequenceValue) {
+            if (selected.contains(curSequenceValue)) {
                 addTransitions(sequence, style, highlightStates, seqNum
                         * seqLength);
             }
