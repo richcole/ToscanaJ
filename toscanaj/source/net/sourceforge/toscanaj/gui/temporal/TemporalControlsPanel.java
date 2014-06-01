@@ -121,6 +121,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
     private JLabel stepPositionLabel;
     private JButton startSteppingButton;
     private JButton removeTransitionsButton;
+    private JCheckBox repeatAnimationCheckbox;
     private boolean animating;
 
     public TemporalControlsPanel(final DiagramView diagramView,
@@ -163,8 +164,8 @@ public class TemporalControlsPanel extends JTabbedPane implements
                 .getArrowStyles());
         listView.setCellRenderer(new ListCellRenderer() {
             public Component getListCellRendererComponent(final JList list,
-                    final Object value, final int index,
-                    final boolean isSelected, final boolean cellHasFocus) {
+                                                          final Object value, final int index,
+                                                          final boolean isSelected, final boolean cellHasFocus) {
                 final ArrowStyle style = (ArrowStyle) value;
                 final JPanel retVal = new JPanel() {
                     @Override
@@ -257,6 +258,9 @@ public class TemporalControlsPanel extends JTabbedPane implements
             }
         });
 
+        repeatAnimationCheckbox = new JCheckBox("Repeat Animations");
+        repeatAnimationCheckbox.setSelected(false);
+
         final GridBagConstraints buttonConstraints = new GridBagConstraints(0,
                 GridBagConstraints.RELATIVE, 1, 1, 1, 0,
                 GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL,
@@ -268,6 +272,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
         panel.add(exportImagesButton, buttonConstraints);
         panel.add(animateTransitionsButton, buttonConstraints);
         panel.add(startSteppingButton, buttonConstraints);
+        panel.add(repeatAnimationCheckbox, buttonConstraints);
         panel.add(createStepPanel(), new GridBagConstraints(0,
                 GridBagConstraints.RELATIVE, 1, 1, 1, 0,
                 GridBagConstraints.CENTER, GridBagConstraints.NONE,
@@ -642,14 +647,17 @@ public class TemporalControlsPanel extends JTabbedPane implements
     }
 
     private void animate() {
-        if (this.lastAnimationTime > this.targetTime) {
+        if (lastAnimationTime > targetTime) {
             removeTransitions();
-            this.animating = false;
-            return;
+            animating = false;
+            if(repeatAnimationCheckbox.isSelected()) {
+                addAnimatedTransitions();
+            }
+        } else {
+            timeController.calculateCurrentTime();
+            lastAnimationTime = timeController.getCurrentTime();
+            diagramView.repaint(); // paint it again as time has past
         }
-        this.timeController.calculateCurrentTime();
-        this.lastAnimationTime = this.timeController.getCurrentTime();
-        this.diagramView.repaint(); // paint it again as time has past
     }
 
     private void addFixedTransitions() {
