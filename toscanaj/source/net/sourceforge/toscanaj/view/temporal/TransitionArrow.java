@@ -53,14 +53,18 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
                 retVal.manualEndOffset = new Point2D.Double(offsetX, offsetY);
             } else {
                 offsetElem = element.getChild("startOffset");
-                double offsetX = Double.parseDouble(offsetElem
-                        .getAttributeValue("x"));
-                double offsetY = Double.parseDouble(offsetElem
-                        .getAttributeValue("y"));
+                double offsetX = Double.parseDouble(offsetElem.getAttributeValue("x"));
+                double offsetY = Double.parseDouble(offsetElem.getAttributeValue("y"));
                 retVal.manualStartOffset = new Point2D.Double(offsetX, offsetY);
                 offsetElem = element.getChild("endOffset");
-                offsetX = Double.parseDouble(offsetElem.getAttributeValue("x"));
-                offsetY = Double.parseDouble(offsetElem.getAttributeValue("y"));
+                if(offsetElem != null) {
+                    offsetX = Double.parseDouble(offsetElem.getAttributeValue("x"));
+                    offsetY = Double.parseDouble(offsetElem.getAttributeValue("y"));
+                } else {
+                    // workaround for bug where files were saved without the endOffset element
+                    offsetX = 0;
+                    offsetY = 0;
+                }
                 retVal.manualEndOffset = new Point2D.Double(offsetX, offsetY);
             }
             if (element.getAttributeValue("arrowStyle") != null) {
@@ -81,8 +85,7 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
     }
 
     public static void registerFactory() {
-        SimpleLineDiagram.registerExtraCanvasItemFactory("transitionArrow",
-                new Factory());
+        SimpleLineDiagram.registerExtraCanvasItemFactory("transitionArrow", new Factory());
     }
 
     protected DiagramNode startNode;
@@ -188,7 +191,7 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
         final AnimationTimeController controller = this.timeController;
 
         final double timeOffset = controller.getCurrentTime() - this.timePos;
-        double alpha = 0;
+        double alpha;
         if (timeOffset < -controller.getFadeInTime()) {
             return null;
         } else if (timeOffset < 0) {
@@ -212,10 +215,7 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
 
     @Override
     public boolean containsPoint(final Point2D point) {
-        if (this.currentShape == null) {
-            return false;
-        }
-        return this.currentShape.contains(point);
+        return this.currentShape != null && this.currentShape.contains(point);
     }
 
     @Override
@@ -308,17 +308,9 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
         shiftEndPoint(dx, dy);
     }
 
-    public Point2D getStartPoint() {
-        return this.startPoint;
-    }
-
     public void shiftStartPoint(final double dx, final double dy) {
         this.manualStartOffset.setLocation(this.manualStartOffset.getX() + dx,
                 this.manualStartOffset.getY() + dy);
-    }
-
-    public Point2D getEndPoint() {
-        return this.endPoint;
     }
 
     public void shiftEndPoint(final double dx, final double dy) {
@@ -331,16 +323,13 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
         result.setAttribute("from", this.startNode.getIdentifier());
         result.setAttribute("to", this.endNode.getIdentifier());
         Element offsetElem = new Element("startOffset");
-        offsetElem.setAttribute("x", String.valueOf(this.manualStartOffset
-                .getX()));
-        offsetElem.setAttribute("y", String.valueOf(this.manualStartOffset
-                .getY()));
+        offsetElem.setAttribute("x", String.valueOf(this.manualStartOffset.getX()));
+        offsetElem.setAttribute("y", String.valueOf(this.manualStartOffset.getY()));
         result.addContent(offsetElem);
         offsetElem = new Element("endOffset");
-        offsetElem.setAttribute("x", String
-                .valueOf(this.manualEndOffset.getX()));
-        offsetElem.setAttribute("y", String
-                .valueOf(this.manualEndOffset.getY()));
+        offsetElem.setAttribute("x", String.valueOf(this.manualEndOffset.getX()));
+        offsetElem.setAttribute("y", String.valueOf(this.manualEndOffset.getY()));
+        result.addContent(offsetElem);
         for (int i = 0; i < DiagramSchema.getCurrentSchema().getArrowStyles().length; i++) {
             if (this.style == DiagramSchema.getCurrentSchema().getArrowStyles()[i]) {
                 result.setAttribute("arrowStyle", String.valueOf(i));
