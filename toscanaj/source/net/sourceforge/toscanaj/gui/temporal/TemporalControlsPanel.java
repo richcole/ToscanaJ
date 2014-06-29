@@ -716,50 +716,43 @@ public class TemporalControlsPanel extends JTabbedPane implements
     private void addTransitionsSerialized(final double newTargetTime,
             final boolean highlightStates) {
         List<Value> selected = sequenceToShowChooser.getSelectedValuesList();
-        final List<ArrayList<FCAElement>> objectSequences = calculateObjectSequences();
-        final Iterator<ArrayList<FCAElement>> seqIt = objectSequences
-                .iterator();
-        final Iterator<Value> seqValIt = this.sequenceValues.iterator();
+        List<ArrayList<FCAElement>> objectSequences = calculateObjectSequences();
+        Iterator<Value> seqValIt = sequenceValues.iterator();
         int seqNum = 0;
-        final int seqLength = this.timelineValues.size();
+        int seqLength = timelineValues.size();
         List<FCAElement> lastSequence = null;
-        final ArrowStyle[] styles = DiagramSchema.getCurrentSchema()
-                .getArrowStyles();
+        ArrowStyle[] styles = DiagramSchema.getCurrentSchema().getArrowStyles();
         ArrowStyle style = null;
-        while (seqIt.hasNext()) {
-            final List<FCAElement> sequence = seqIt.next();
-
+        int trailCount = 0;
+        for (ArrayList<FCAElement> sequence : objectSequences) {
+            Value curSequenceValue = seqValIt.next();
+            if(!selected.contains(curSequenceValue)) {
+                seqNum++;
+                continue;
+            }
             if (lastSequence != null) {
-                final Color nextColor = styles[seqNum % styles.length]
-                        .getColor();
-                final DiagramNode endLast = findObjectConceptNode(lastSequence
-                        .get(lastSequence.size() - 1));
-                final DiagramNode startNew = findObjectConceptNode(sequence
-                        .get(0));
+                Color nextColor = styles[seqNum % styles.length].getColor();
+                DiagramNode endLast = findObjectConceptNode(lastSequence.get(lastSequence.size() - 1));
+                DiagramNode startNew = findObjectConceptNode(sequence.get(0));
                 if (endLast == null) {
                     continue;
                 }
                 if (endLast != startNew) {
-                    final SimpleLineDiagram diagram = (SimpleLineDiagram) this.diagramView
-                            .getDiagram();
-                    diagram
-                            .addExtraCanvasItem(new InterSequenceTransitionArrow(
-                                    endLast, startNew, style, nextColor, seqNum
-                                            * seqLength + 0.5,
-                                    this.timeController));
+                    SimpleLineDiagram diagram = (SimpleLineDiagram) diagramView.getDiagram();
+                    diagram.addExtraCanvasItem(
+                            new InterSequenceTransitionArrow(
+                                    endLast, startNew, style, nextColor, trailCount * seqLength + 0.5, timeController));
                 }
             }
 
             style = styles[seqNum % styles.length];
-            final Value curSequenceValue = seqValIt.next();
             if (lastSequence == null) {
                 this.targetTime = newTargetTime;
                 this.lastAnimationTime = 0;
             }
-            if (selected.contains(curSequenceValue)) {
-                addTransitions(curSequenceValue, sequence, style, highlightStates, seqNum * seqLength);
-            }
+            addTransitions(curSequenceValue, sequence, style, highlightStates, trailCount * seqLength);
             seqNum++;
+            trailCount++;
             lastSequence = sequence;
         }
     }
