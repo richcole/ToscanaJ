@@ -7,18 +7,6 @@
  */
 package net.sourceforge.toscanaj.view.temporal;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
 import net.sourceforge.toscanaj.model.diagram.DiagramNode;
 import net.sourceforge.toscanaj.model.diagram.ExtraCanvasItemFactory;
@@ -27,9 +15,11 @@ import net.sourceforge.toscanaj.util.xmlize.XMLHelper;
 import net.sourceforge.toscanaj.util.xmlize.XMLSyntaxError;
 import net.sourceforge.toscanaj.util.xmlize.XMLizable;
 import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
-
 import org.jdom.Element;
 import org.tockit.canvas.CanvasItem;
+
+import java.awt.*;
+import java.awt.geom.*;
 
 public class TransitionArrow extends CanvasItem implements XMLizable {
     private static class Factory implements ExtraCanvasItemFactory {
@@ -102,9 +92,8 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
 
     private Shape currentShape;
 
-    public TransitionArrow(final DiagramNode startNode,
-            final DiagramNode endNode, final ArrowStyle style,
-            final double timePos, final AnimationTimeController timeController) {
+    public TransitionArrow(DiagramNode startNode, DiagramNode endNode, ArrowStyle style,
+            double timePos, AnimationTimeController timeController) {
         this.startNode = startNode;
         this.endNode = endNode;
         this.style = style;

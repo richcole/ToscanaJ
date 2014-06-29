@@ -7,47 +7,6 @@
  */
 package net.sourceforge.toscanaj.gui.temporal;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Paint;
-import java.awt.Shape;
-import java.awt.Stroke;
-import java.awt.SystemColor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Properties;
-
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListModel;
-import javax.swing.border.TitledBorder;
-
 import net.sourceforge.toscanaj.controller.diagram.AnimationTimeController;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
@@ -63,11 +22,7 @@ import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import net.sourceforge.toscanaj.view.diagram.DisplayedDiagramChangedEvent;
 import net.sourceforge.toscanaj.view.scales.NumberField;
-import net.sourceforge.toscanaj.view.temporal.ArrowStyle;
-import net.sourceforge.toscanaj.view.temporal.InterSequenceTransitionArrow;
-import net.sourceforge.toscanaj.view.temporal.StateRing;
-import net.sourceforge.toscanaj.view.temporal.TransitionArrow;
-
+import net.sourceforge.toscanaj.view.temporal.*;
 import org.tockit.canvas.events.CanvasDrawnEvent;
 import org.tockit.canvas.imagewriter.DiagramExportSettings;
 import org.tockit.canvas.imagewriter.GraphicFormat;
@@ -77,6 +32,18 @@ import org.tockit.datatype.Value;
 import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
+
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.io.File;
+import java.util.*;
+import java.util.List;
 
 /**
  * @todo instead of fiddling around everywhere there should be a proper subclass
@@ -160,8 +127,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
     }
 
     private Component createArrowSettingsPanel() {
-        final JList listView = new JList(DiagramSchema.getCurrentSchema()
-                .getArrowStyles());
+        final JList listView = new JList(DiagramSchema.getCurrentSchema().getArrowStyles());
         listView.setCellRenderer(new ListCellRenderer() {
             public Component getListCellRendererComponent(final JList list,
                                                           final Object value, final int index,
@@ -206,12 +172,10 @@ public class TemporalControlsPanel extends JTabbedPane implements
                 if (e.getClickCount() != 2) {
                     return;
                 }
-                final int index = listView.getSelectedIndex();
-                final ListModel listModel = listView.getModel();
-                final ArrowStyle style = (ArrowStyle) listModel
-                        .getElementAt(index);
-                final ArrowStyle newStyle = ArrowStyleChooser.showDialog(
-                        listView, "Edit arrow style", style);
+                int index = listView.getSelectedIndex();
+                ListModel listModel = listView.getModel();
+                ArrowStyle style = (ArrowStyle) listModel.getElementAt(index);
+                ArrowStyle newStyle = ArrowStyleChooser.showDialog(listView, "Edit arrow style", style);
                 if (newStyle != null) {
                     style.copyValues(newStyle);
                     DiagramSchema.getCurrentSchema().store();
@@ -313,8 +277,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
         final JLabel sequenceLabel = new JLabel("Sequence:");
         sequenceToShowChooser = new JList<>();
 
-        serializeSequencesBox = new JCheckBox(
-                "Serialize when stepping/animating");
+        serializeSequencesBox = new JCheckBox("Serialize when stepping/animating");
 
         final JPanel basicSettingsPanel = new JPanel(new GridBagLayout());
         int r = 0;
@@ -491,17 +454,16 @@ public class TemporalControlsPanel extends JTabbedPane implements
 
     private void fillSequenceChooser() {
         sequenceToShowChooser.setListData(sequenceValues.toArray(new Value[sequenceValues.size()]));
+        sequenceToShowChooser.setSelectionInterval(0, sequenceValues.size() - 1);
     }
 
     private void setButtonStates(final boolean allDisabled) {
-        final boolean enabled = !allDisabled
-                && (this.diagramView.getDiagram() != null);
+        final boolean enabled = !allDisabled && (this.diagramView.getDiagram() != null);
         addStaticTransitionsButton.setEnabled(enabled);
         removeTransitionsButton.setEnabled(enabled);
         startSteppingButton.setEnabled(enabled);
         animateTransitionsButton.setEnabled(enabled);
-        exportImagesButton.setEnabled(enabled
-                && this.diagramExportSettings != null);
+        exportImagesButton.setEnabled(enabled && this.diagramExportSettings != null);
         setStepButtonStates(!enabled);
     }
 
@@ -724,27 +686,22 @@ public class TemporalControlsPanel extends JTabbedPane implements
         }
     }
 
-    private void addTransitions(final double newTargetTime,
-            final boolean highlightStates) {
+    private void addTransitions(double newTargetTime, boolean highlightStates) {
         List<Value> selected = sequenceToShowChooser.getSelectedValuesList();
-        final List<ArrayList<FCAElement>> objectSequences = calculateObjectSequences();
-        final Iterator<ArrayList<FCAElement>> seqIt = objectSequences
-                .iterator();
-        final Iterator<Value> seqValIt = this.sequenceValues.iterator();
+        List<ArrayList<FCAElement>> objectSequences = calculateObjectSequences();
+        Iterator<Value> seqValIt = sequenceValues.iterator();
         int styleNum = 0;
         boolean start = true;
-        while (seqIt.hasNext()) {
-            final List<FCAElement> sequence = seqIt.next();
-            final Value curSequenceValue = seqValIt.next();
+        for (List<FCAElement> sequence : objectSequences) {
+            Value curSequenceValue = seqValIt.next();
             if (start) {
                 start = false;
                 this.targetTime = newTargetTime;
                 this.lastAnimationTime = 0;
             }
-            final ArrowStyle[] styles = DiagramSchema.getCurrentSchema()
-                    .getArrowStyles();
+            ArrowStyle[] styles = DiagramSchema.getCurrentSchema().getArrowStyles();
             if (selected.contains(curSequenceValue)) {
-                addTransitions(sequence, styles[styleNum], highlightStates, 0);
+                addTransitions(curSequenceValue, sequence, styles[styleNum], highlightStates, 0);
             }
             styleNum = (styleNum + 1) % styles.length;
         }
@@ -800,44 +757,46 @@ public class TemporalControlsPanel extends JTabbedPane implements
                 this.lastAnimationTime = 0;
             }
             if (selected.contains(curSequenceValue)) {
-                addTransitions(sequence, style, highlightStates, seqNum
-                        * seqLength);
+                addTransitions(curSequenceValue, sequence, style, highlightStates, seqNum * seqLength);
             }
             seqNum++;
             lastSequence = sequence;
         }
     }
 
-    private void addTransitions(final List<FCAElement> sequence,
-            final ArrowStyle style, final boolean highlightStates,
-            final int countStart) {
-        final SimpleLineDiagram diagram = (SimpleLineDiagram) this.diagramView
-                .getDiagram();
+    private void addTransitions(Value curSequenceValue, List<FCAElement> sequence, ArrowStyle style,
+                                boolean highlightStates, int countStart) {
+        SimpleLineDiagram diagram = (SimpleLineDiagram) diagramView.getDiagram();
         DiagramNode oldNode = null;
-        final Iterator<FCAElement> objectIt = sequence.iterator();
         int count = countStart;
-        while (objectIt.hasNext()) {
+        boolean first = true;
+        for (FCAElement object : sequence) {
             count++;
-            final FCAElement object = objectIt.next();
             final DiagramNode curNode = findObjectConceptNode(object);
             if (curNode == null) {
                 continue;
             }
             if (highlightStates) {
-                diagram.addExtraCanvasItem(new StateRing(curNode, style
-                        .getColor(), count, this.timeController));
+                diagram.addExtraCanvasItem(new StateRing(curNode, style.getColor(), count, timeController));
             }
             if (oldNode != null && oldNode != curNode) {
-                diagram.addExtraCanvasItem(new TransitionArrow(oldNode,
-                        curNode, style, count - 0.5, this.timeController));
+                TransitionArrow arrow = new TransitionArrow(oldNode, curNode, style, count - 0.5, timeController);
+                diagram.addExtraCanvasItem(arrow);
+                if((style.getLabelUse() == ArrowStyle.LabelUse.ALWAYS) ||
+                        ((style.getLabelUse() == ArrowStyle.LabelUse.ONLY_FIRST) && first)) {
+                    ArrowLabelView label =
+                            new ArrowLabelView(diagramView, arrow, style, curSequenceValue.getDisplayString(),
+                                    count - 0.5, timeController);
+                    diagram.addExtraCanvasItem(label);
+                }
+                first = false;
             }
             oldNode = curNode;
         }
     }
 
     private DiagramNode findObjectConceptNode(final FCAElement object) {
-        final Iterator<DiagramNode> nodeIt = this.diagramView.getDiagram()
-                .getNodes();
+        final Iterator<DiagramNode> nodeIt = this.diagramView.getDiagram().getNodes();
         final ConceptInterpreter conceptInterpreter = this.diagramView
                 .getConceptInterpreter();
         final ConceptInterpretationContext interpretationContext = this.diagramView
@@ -848,13 +807,11 @@ public class TemporalControlsPanel extends JTabbedPane implements
             ConceptInterpretationContext curContext = interpretationContext;
             DiagramNode curNode = node.getOuterNode();
             while (curNode != null) {
-                curContext = curContext.createNestedContext(curNode
-                        .getConcept());
+                curContext = curContext.createNestedContext(curNode.getConcept());
                 curNode = curNode.getOuterNode();
             }
             // try finding the object in nested context
-            final Iterator objIt = conceptInterpreter.getObjectSetIterator(node
-                    .getConcept(), curContext);
+            final Iterator objIt = conceptInterpreter.getObjectSetIterator(node.getConcept(), curContext);
             while (objIt.hasNext()) {
                 final FCAElement contObj = (FCAElement) objIt.next();
                 if (contObj.equals(object)) {
@@ -866,8 +823,8 @@ public class TemporalControlsPanel extends JTabbedPane implements
     }
 
     private void calculateValueLists() {
-        sequenceValues = new ArrayList<Value>();
-        timelineValues = new ArrayList<Value>();
+        sequenceValues = new ArrayList<>();
+        timelineValues = new ArrayList<>();
 
         final Object selectedSequenceColumn = this.sequenceColumnChooser
                 .getSelectedItem();
@@ -875,12 +832,10 @@ public class TemporalControlsPanel extends JTabbedPane implements
             return;
         }
         final ManyValuedAttribute sequenceAttribute = (ManyValuedAttribute) selectedSequenceColumn;
-        final ManyValuedAttribute timelineAttribute = (ManyValuedAttribute) this.timelineColumnChooser
-                .getSelectedItem();
+        final ManyValuedAttribute timelineAttribute = (ManyValuedAttribute) timelineColumnChooser.getSelectedItem();
 
         for (final FCAElement object : this.context.getObjects()) {
-            Value value = this.context.getRelationship(object,
-                    sequenceAttribute);
+            Value value = this.context.getRelationship(object, sequenceAttribute);
             if (!sequenceValues.contains(value) && value != null) {
                 boolean inserted = false;
                 final ListIterator<Value> seqIt = sequenceValues.listIterator();
@@ -922,12 +877,10 @@ public class TemporalControlsPanel extends JTabbedPane implements
     }
 
     private List<ArrayList<FCAElement>> calculateObjectSequences() {
-        final ManyValuedAttribute sequenceAttribute = (ManyValuedAttribute) this.sequenceColumnChooser
-                .getSelectedItem();
-        final ManyValuedAttribute timelineAttribute = (ManyValuedAttribute) this.timelineColumnChooser
-                .getSelectedItem();
+        final ManyValuedAttribute sequenceAttribute = (ManyValuedAttribute) sequenceColumnChooser.getSelectedItem();
+        final ManyValuedAttribute timelineAttribute = (ManyValuedAttribute) timelineColumnChooser.getSelectedItem();
 
-        final List<ArrayList<FCAElement>> objectSequences = new ArrayList<ArrayList<FCAElement>>();
+        final List<ArrayList<FCAElement>> objectSequences = new ArrayList<>();
 
         // initialise sequences with empty lists
         for (Value ignored : sequenceValues) {

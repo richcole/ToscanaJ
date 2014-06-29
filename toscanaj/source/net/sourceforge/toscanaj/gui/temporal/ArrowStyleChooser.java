@@ -7,38 +7,18 @@
  */
 package net.sourceforge.toscanaj.gui.temporal;
 
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Paint;
-import java.awt.Shape;
-import java.awt.Stroke;
+import net.sourceforge.toscanaj.view.temporal.ArrowStyle;
+import net.sourceforge.toscanaj.view.temporal.TransitionArrow;
+import org.tockit.swing.dialogs.GenericDialog;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
-
-import javax.swing.JButton;
-import javax.swing.JColorChooser;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.JTabbedPane;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import net.sourceforge.toscanaj.view.temporal.ArrowStyle;
-import net.sourceforge.toscanaj.view.temporal.TransitionArrow;
-
-import org.tockit.swing.dialogs.GenericDialog;
 
 public class ArrowStyleChooser extends JComponent {
     private static class StrokeButton extends JButton {
@@ -118,6 +98,7 @@ public class ArrowStyleChooser extends JComponent {
         final JTabbedPane retVal = new JTabbedPane();
         retVal.addTab("Color", createColorPane());
         retVal.addTab("Shape", createStrokePane());
+        retVal.addTab("Label", createLabelPane());
         return retVal;
     }
 
@@ -243,19 +224,53 @@ public class ArrowStyleChooser extends JComponent {
         return retVal;
     }
 
+    private Component createLabelPane() {
+        final JPanel retVal = new JPanel(new GridBagLayout());
+
+        final GridBagConstraints labelconstraints = new GridBagConstraints();
+        labelconstraints.gridx = 0;
+        labelconstraints.anchor = GridBagConstraints.WEST;
+
+        final GridBagConstraints controlconstraints = new GridBagConstraints();
+        controlconstraints.gridx = 1;
+        controlconstraints.gridy = 0;
+        controlconstraints.weightx = 1;
+        controlconstraints.weighty = 0;
+        controlconstraints.fill = GridBagConstraints.HORIZONTAL;
+        controlconstraints.anchor = GridBagConstraints.CENTER;
+
+        final JComboBox<ArrowStyle.LabelUse> labelUseChooser = new JComboBox<>(ArrowStyle.LabelUse.values());
+        labelUseChooser.setSelectedItem(style.getLabelUse());
+        labelUseChooser.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                style.setLabelUse((ArrowStyle.LabelUse) labelUseChooser.getSelectedItem());
+            }
+        });
+
+        retVal.add(new JLabel("Show Labels:"), labelconstraints);
+        retVal.add(labelUseChooser, controlconstraints);
+
+        controlconstraints.gridy++;
+        controlconstraints.weighty = 1;
+        controlconstraints.fill = GridBagConstraints.BOTH;
+        controlconstraints.gridwidth = 2;
+        retVal.add(new JPanel(), controlconstraints);
+
+        return retVal;
+    }
+
     protected void updateStroke() {
-        final BasicStroke oldStroke = this.style.getStroke();
-        final BasicStroke newStroke = new BasicStroke(this.strokeWidthSlider
-                .getValue(), oldStroke.getEndCap(), oldStroke.getLineJoin(),
-                oldStroke.getMiterLimit(), oldStroke.getDashArray(), oldStroke
-                        .getDashPhase());
-        this.style.setStroke(newStroke);
+        BasicStroke oldStroke = this.style.getStroke();
+        BasicStroke newStroke = new BasicStroke(strokeWidthSlider.getValue(),
+                oldStroke.getEndCap(), oldStroke.getLineJoin(), oldStroke.getMiterLimit(), oldStroke.getDashArray(),
+                oldStroke.getDashPhase());
+        style.setStroke(newStroke);
         repaint();
     }
 
-    public static ArrowStyle showDialog(final Component parent,
-            final String title, final ArrowStyle initialStyle) {
-        final ArrowStyleChooser chooser = new ArrowStyleChooser(initialStyle);
+    public static ArrowStyle showDialog(Component parent, String title, ArrowStyle initialStyle) {
+        ArrowStyleChooser chooser = new ArrowStyleChooser(initialStyle);
         if (GenericDialog.showDialog(parent, title, chooser)) {
             return chooser.style;
         } else {

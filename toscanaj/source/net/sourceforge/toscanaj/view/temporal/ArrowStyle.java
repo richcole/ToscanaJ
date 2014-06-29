@@ -7,14 +7,32 @@
  */
 package net.sourceforge.toscanaj.view.temporal;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
+import org.tockit.swing.preferences.ExtendedPreferences;
+
+import java.awt.*;
 import java.util.StringTokenizer;
 import java.util.prefs.Preferences;
 
-import org.tockit.swing.preferences.ExtendedPreferences;
-
 public class ArrowStyle {
+    public enum LabelUse {
+        NEVER("Never"), ONLY_FIRST("Only on the first"), ALWAYS("Always");
+
+        private final String label;
+
+        LabelUse(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+
     // setting some defaults
     private Color color = Color.WHITE;
     private BasicStroke stroke = new BasicStroke(4, BasicStroke.CAP_BUTT,
@@ -22,15 +40,17 @@ public class ArrowStyle {
     private double headWidth = 14;
     private double headLength = 20;
     private float borderWidth = 0.2f;
+    private LabelUse labelUse = LabelUse.ONLY_FIRST;
 
     public ArrowStyle(final Color color, final BasicStroke stroke,
             final double headWidth, final double headLength,
-            final float borderWidth) {
+            final float borderWidth, LabelUse labelUse) {
         this.color = color;
         this.stroke = stroke;
         this.headWidth = headWidth;
         this.headLength = headLength;
         this.borderWidth = borderWidth;
+        this.labelUse = labelUse;
     }
 
     public ArrowStyle(final Color color) {
@@ -43,6 +63,7 @@ public class ArrowStyle {
         this.headWidth = style.headWidth;
         this.headLength = style.headLength;
         this.borderWidth = style.borderWidth;
+        this.labelUse = style.labelUse;
     }
 
     public void copyValues(final ArrowStyle style) {
@@ -51,6 +72,7 @@ public class ArrowStyle {
         this.setHeadLength(style.getHeadLength());
         this.setHeadWidth(style.getHeadWidth());
         this.setBorderWidth(style.borderWidth);
+        this.setLabelUse(style.labelUse);
     }
 
     @SuppressWarnings("MagicConstant")
@@ -73,6 +95,7 @@ public class ArrowStyle {
         this.headWidth = prefs.getDouble("headWidth", this.headWidth);
         this.headLength = prefs.getDouble("headLength", this.headLength);
         this.borderWidth = prefs.getFloat("borderWidth", this.borderWidth);
+        this.labelUse = LabelUse.valueOf(prefs.get("labelUse", "ALWAYS"));
     }
 
     public Color getColor() {
@@ -91,6 +114,10 @@ public class ArrowStyle {
         return this.stroke;
     }
 
+    public LabelUse getLabelUse() {
+        return labelUse;
+    }
+
     public void setColor(final Color color) {
         this.color = color;
     }
@@ -105,6 +132,10 @@ public class ArrowStyle {
 
     public void setStroke(final BasicStroke stroke) {
         this.stroke = stroke;
+    }
+
+    public void setLabelUse(LabelUse labelUse) {
+        this.labelUse = labelUse;
     }
 
     private String serializeFloatArray(final float[] array) {
@@ -155,5 +186,6 @@ public class ArrowStyle {
         prefs.putDouble("headWidth", this.headWidth);
         prefs.putDouble("headLength", this.headLength);
         prefs.putFloat("borderWidth", this.borderWidth);
+        prefs.put("labelUse", this.labelUse.name());
     }
 }
