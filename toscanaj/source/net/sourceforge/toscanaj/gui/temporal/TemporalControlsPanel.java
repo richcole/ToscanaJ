@@ -157,6 +157,12 @@ public class TemporalControlsPanel extends JTabbedPane implements
                 Dimension size = new Dimension(150, 30);
                 retVal.setMinimumSize(size);
                 retVal.setPreferredSize(size);
+
+                if(sequenceValues.size() > index) {
+                    retVal.setToolTipText(sequenceValues.get(index).getDisplayString());
+                } else {
+                    retVal.setToolTipText("n/a");
+                }
                 return retVal;
             }
         });
