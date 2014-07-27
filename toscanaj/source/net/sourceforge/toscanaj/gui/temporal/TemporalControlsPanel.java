@@ -35,6 +35,7 @@ import org.tockit.events.EventBrokerListener;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -103,14 +104,10 @@ public class TemporalControlsPanel extends JTabbedPane implements
         InterSequenceTransitionArrow.registerFactory();
         StateRing.registerFactory();
 
-        eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class,
-                Object.class);
-        diagramView.getController().getEventBroker().subscribe(this,
-                DisplayedDiagramChangedEvent.class, DiagramView.class);
-        diagramView.getController().getEventBroker().subscribe(this,
-                CanvasDrawnEvent.class, Object.class);
-        new TransitionArrowManipulator(diagramView, diagramView.getController()
-                .getEventBroker());
+        eventBroker.subscribe(this, ConceptualSchemaChangeEvent.class, Object.class);
+        diagramView.getController().getEventBroker().subscribe(this, DisplayedDiagramChangedEvent.class, DiagramView.class);
+        diagramView.getController().getEventBroker().subscribe(this, CanvasDrawnEvent.class, Object.class);
+        new TransitionArrowManipulator(diagramView, diagramView.getController().getEventBroker());
 
         this.diagramExportSettings = diagramExportSettings;
         this.timeController = new AnimationTimeController(0, 0, 0, 0, 0);
@@ -127,30 +124,27 @@ public class TemporalControlsPanel extends JTabbedPane implements
     }
 
     private Component createArrowSettingsPanel() {
-        final JList listView = new JList(DiagramSchema.getCurrentSchema().getArrowStyles());
-        listView.setCellRenderer(new ListCellRenderer() {
+        final ArrowStyle[] styles = DiagramSchema.getCurrentSchema().getArrowStyles();
+        final JList<ArrowStyle> listView = new JList<>(styles);
+        listView.setCellRenderer(new ListCellRenderer<ArrowStyle>() {
             public Component getListCellRendererComponent(final JList list,
-                                                          final Object value, final int index,
+                                                          final ArrowStyle style, final int index,
                                                           final boolean isSelected, final boolean cellHasFocus) {
-                final ArrowStyle style = (ArrowStyle) value;
-                final JPanel retVal = new JPanel() {
+                JPanel retVal = new JPanel() {
                     @Override
                     protected void paintComponent(final Graphics g) {
                         super.paintComponent(g);
-                        final Graphics2D g2d = (Graphics2D) g;
-                        final AffineTransform oldTransform = g2d.getTransform();
-                        final Paint oldPaint = g2d.getPaint();
-                        final Stroke oldStroke = g2d.getStroke();
+                        Graphics2D g2d = (Graphics2D) g;
+                        AffineTransform oldTransform = g2d.getTransform();
+                        Paint oldPaint = g2d.getPaint();
+                        Stroke oldStroke = g2d.getStroke();
 
-                        final Shape arrow = TransitionArrow.getArrowShape(
-                                style, this.getWidth() * 0.9);
+                        Shape arrow = TransitionArrow.getArrowShape(style, getWidth() * 0.9);
                         g2d.setPaint(style.getColor());
-                        g2d.translate(this.getWidth() * 0.95,
-                                this.getHeight() / 2);
+                        g2d.translate(getWidth() * 0.95, getHeight() / 2);
                         g2d.fill(arrow);
                         if (style.getBorderWidth() != 0) {
-                            g2d.setStroke(new BasicStroke(style
-                                    .getBorderWidth()));
+                            g2d.setStroke(new BasicStroke(style.getBorderWidth()));
                             g2d.setPaint(Color.BLACK);
                             g2d.draw(arrow);
                         }
@@ -160,7 +154,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
                         g2d.setTransform(oldTransform);
                     }
                 };
-                final Dimension size = new Dimension(150, 30);
+                Dimension size = new Dimension(150, 30);
                 retVal.setMinimumSize(size);
                 retVal.setPreferredSize(size);
                 return retVal;
@@ -183,6 +177,39 @@ public class TemporalControlsPanel extends JTabbedPane implements
                 }
             }
         });
+        MouseInputAdapter dragHandler = new MouseInputAdapter() {
+            private boolean isDragging = false;
+            private int dragStartIndex;
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    dragStartIndex = listView.getSelectedIndex();
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                isDragging = false;
+            }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (isDragging) {
+                    int currentIndex = listView.locationToIndex(e.getPoint());
+                    if (currentIndex != dragStartIndex) {
+                        int dragTargetIndex = listView.getSelectedIndex();
+                        ArrowStyle sourceStyle = styles[dragStartIndex];
+                        styles[dragStartIndex] = styles[dragTargetIndex];
+                        styles[dragTargetIndex] = sourceStyle;
+                        dragStartIndex = currentIndex;
+                    }
+                }
+                isDragging = true;
+            }
+        };
+        listView.addMouseListener(dragHandler);
+        listView.addMouseMotionListener(dragHandler);
         return new JScrollPane(listView);
     }
 
@@ -713,8 +740,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
      *       pressed. The buttons would then change only the time controller and
      *       not affect the canvas items directly.
      */
-    private void addTransitionsSerialized(final double newTargetTime,
-            final boolean highlightStates) {
+    private void addTransitionsSerialized(final double newTargetTime, final boolean highlightStates) {
         List<Value> selected = sequenceToShowChooser.getSelectedValuesList();
         List<ArrayList<FCAElement>> objectSequences = calculateObjectSequences();
         Iterator<Value> seqValIt = sequenceValues.iterator();
@@ -819,8 +845,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
         sequenceValues = new ArrayList<>();
         timelineValues = new ArrayList<>();
 
-        final Object selectedSequenceColumn = this.sequenceColumnChooser
-                .getSelectedItem();
+        final Object selectedSequenceColumn = this.sequenceColumnChooser.getSelectedItem();
         if (!(selectedSequenceColumn instanceof ManyValuedAttribute)) {
             return;
         }
