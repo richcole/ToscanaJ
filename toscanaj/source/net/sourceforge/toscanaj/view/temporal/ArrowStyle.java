@@ -15,16 +15,32 @@ import java.util.prefs.Preferences;
 
 public class ArrowStyle {
     public enum LabelUse {
-        NEVER("Never"), ONLY_FIRST("Only on the first"), ALWAYS("Always");
+        NEVER("Never", false, false, false),
+        ONLY_FIRST("Only on the first", true, false, false),
+        ONLY_LAST("Only on the last", false, false, true),
+        FIRST_AND_LAST("On the first and last", true, false, true),
+        ALWAYS("Always", true, true, true);
 
         private final String label;
+        private final boolean showFirst;
+        private final boolean showAll;
+        private final boolean showLast;
 
-        LabelUse(String label) {
+        LabelUse(String label, boolean showFirst, boolean showAll, boolean showLast) {
             this.label = label;
+            this.showFirst = showFirst;
+            this.showAll = showAll;
+            this.showLast = showLast;
         }
 
         public String getLabel() {
             return label;
+        }
+
+        public boolean shouldShow(boolean isFirst, boolean isLast) {
+            return showAll ||
+                    (isFirst && showFirst) ||
+                    (isLast && showLast);
         }
 
         @Override

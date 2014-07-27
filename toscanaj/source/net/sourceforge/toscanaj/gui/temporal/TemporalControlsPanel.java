@@ -763,7 +763,8 @@ public class TemporalControlsPanel extends JTabbedPane implements
         DiagramNode oldNode = null;
         int count = countStart;
         boolean first = true;
-        for (FCAElement object : sequence) {
+        for (Iterator<FCAElement> iterator = sequence.iterator(); iterator.hasNext(); ) {
+            FCAElement object = iterator.next();
             count++;
             final DiagramNode curNode = findObjectConceptNode(object);
             if (curNode == null) {
@@ -775,8 +776,7 @@ public class TemporalControlsPanel extends JTabbedPane implements
             if (oldNode != null && oldNode != curNode) {
                 TransitionArrow arrow = new TransitionArrow(oldNode, curNode, style, count - 0.5, timeController);
                 diagram.addExtraCanvasItem(arrow);
-                if((style.getLabelUse() == ArrowStyle.LabelUse.ALWAYS) ||
-                        ((style.getLabelUse() == ArrowStyle.LabelUse.ONLY_FIRST) && first)) {
+                if(style.getLabelUse().shouldShow(first, !iterator.hasNext())) {
                     ArrowLabelView label =
                             new ArrowLabelView(diagramView, arrow, style, curSequenceValue.getDisplayString(),
                                     count - 0.5, timeController);
