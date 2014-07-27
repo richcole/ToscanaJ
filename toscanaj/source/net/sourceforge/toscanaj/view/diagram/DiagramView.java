@@ -7,18 +7,6 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import java.awt.Cursor;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.util.Hashtable;
-import java.util.Iterator;
-
 import net.sourceforge.toscanaj.controller.diagram.SelectionChangedEvent;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
 import net.sourceforge.toscanaj.controller.fca.ConceptInterpreter;
@@ -26,20 +14,22 @@ import net.sourceforge.toscanaj.controller.fca.DiagramController;
 import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.model.database.Query;
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.diagram.DiagramLine;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.diagram.LabelInfo;
-import net.sourceforge.toscanaj.model.diagram.NestedDiagramNode;
-import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
+import net.sourceforge.toscanaj.model.diagram.*;
 import net.sourceforge.toscanaj.model.lattice.Concept;
 import net.sourceforge.toscanaj.observer.ChangeObserver;
-
+import net.sourceforge.toscanaj.view.temporal.ArrowLabelView;
 import org.tockit.canvas.Canvas;
 import org.tockit.canvas.CanvasItem;
 import org.tockit.events.EventBroker;
 import org.tockit.swing.undo.ExtendedUndoManager;
+
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
+import java.util.Hashtable;
+import java.util.Iterator;
 
 /**
  * This class paints a diagram defined by the SimpleLineDiagram class.
@@ -270,6 +260,10 @@ public class DiagramView extends Canvas implements ChangeObserver {
         }
         for (final Object element : this.getCanvasItemsByType(LabelView.class)) {
             final LabelView lv = (LabelView) element;
+            lv.setFont(font);
+        }
+        for (final Object element : this.getCanvasItemsByType(ArrowLabelView.class)) {
+            final ArrowLabelView lv = (ArrowLabelView) element;
             lv.setFont(font);
         }
     }
