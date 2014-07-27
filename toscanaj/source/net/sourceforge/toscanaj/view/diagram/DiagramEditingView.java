@@ -7,13 +7,44 @@
  */
 package net.sourceforge.toscanaj.view.diagram;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
+import net.sourceforge.toscanaj.controller.diagram.*;
+import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
+import net.sourceforge.toscanaj.controller.fca.*;
+import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
+import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
+import net.sourceforge.toscanaj.controller.temporal.ArrowEditingLabelViewPopupMenuHandler;
+import net.sourceforge.toscanaj.gui.LabeledPanel;
+import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
+import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
+import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
+import net.sourceforge.toscanaj.model.ConceptualSchema;
+import net.sourceforge.toscanaj.model.context.ContextImplementation;
+import net.sourceforge.toscanaj.model.context.FCAElement;
+import net.sourceforge.toscanaj.model.database.ListQuery;
+import net.sourceforge.toscanaj.model.diagram.*;
+import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
+import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
+import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
+import net.sourceforge.toscanaj.model.lattice.Concept;
+import net.sourceforge.toscanaj.model.lattice.Lattice;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
+import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
+import net.sourceforge.toscanaj.view.context.ContextTableEditorDialog;
+import net.sourceforge.toscanaj.view.temporal.ArrowLabelView;
+import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
+import org.tockit.canvas.events.CanvasItemDraggedEvent;
+import org.tockit.events.Event;
+import org.tockit.events.EventBroker;
+import org.tockit.events.EventBrokerListener;
+import org.tockit.swing.preferences.ExtendedPreferences;
+import org.tockit.swing.undo.ExtendedUndoManager;
+
+import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -23,75 +54,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
-
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JSplitPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.border.BevelBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import net.sourceforge.toscanaj.controller.db.DatabaseConnection;
-import net.sourceforge.toscanaj.controller.diagram.AttributeAdditiveNodeMovementEventListener;
-import net.sourceforge.toscanaj.controller.diagram.AttributeEditingLabelViewPopupMenuHandler;
-import net.sourceforge.toscanaj.controller.diagram.ChainBasedNodeMovementEventListener;
-import net.sourceforge.toscanaj.controller.diagram.FilterMovementEventListener;
-import net.sourceforge.toscanaj.controller.diagram.IdealMovementEventListener;
-import net.sourceforge.toscanaj.controller.diagram.LabelClickEventHandler;
-import net.sourceforge.toscanaj.controller.diagram.LabelDragEventHandler;
-import net.sourceforge.toscanaj.controller.diagram.LabelScrollEventHandler;
-import net.sourceforge.toscanaj.controller.diagram.NodeMovementEventListener;
-import net.sourceforge.toscanaj.controller.events.DatabaseConnectedEvent;
-import net.sourceforge.toscanaj.controller.fca.ConceptInterpretationContext;
-import net.sourceforge.toscanaj.controller.fca.DiagramHistory;
-import net.sourceforge.toscanaj.controller.fca.DiagramToContextConverter;
-import net.sourceforge.toscanaj.controller.fca.DirectConceptInterpreter;
-import net.sourceforge.toscanaj.controller.fca.GantersAlgorithm;
-import net.sourceforge.toscanaj.controller.fca.LatticeGenerator;
-import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
-import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
-import net.sourceforge.toscanaj.gui.LabeledPanel;
-import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
-import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
-import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
-import net.sourceforge.toscanaj.model.ConceptualSchema;
-import net.sourceforge.toscanaj.model.context.ContextImplementation;
-import net.sourceforge.toscanaj.model.context.FCAElement;
-import net.sourceforge.toscanaj.model.database.ListQuery;
-import net.sourceforge.toscanaj.model.diagram.Diagram2D;
-import net.sourceforge.toscanaj.model.diagram.DiagramLine;
-import net.sourceforge.toscanaj.model.diagram.DiagramNode;
-import net.sourceforge.toscanaj.model.diagram.NestedLineDiagram;
-import net.sourceforge.toscanaj.model.diagram.SimpleLineDiagram;
-import net.sourceforge.toscanaj.model.diagram.WriteableDiagram2D;
-import net.sourceforge.toscanaj.model.events.ConceptualSchemaChangeEvent;
-import net.sourceforge.toscanaj.model.events.DiagramListChangeEvent;
-import net.sourceforge.toscanaj.model.events.NewConceptualSchemaEvent;
-import net.sourceforge.toscanaj.model.lattice.Concept;
-import net.sourceforge.toscanaj.model.lattice.Lattice;
-import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagram;
-import net.sourceforge.toscanaj.model.ndimdiagram.NDimDiagramNode;
-import net.sourceforge.toscanaj.view.context.ContextTableEditorDialog;
-
-import org.tockit.canvas.events.CanvasItemContextMenuRequestEvent;
-import org.tockit.canvas.events.CanvasItemDraggedEvent;
-import org.tockit.events.Event;
-import org.tockit.events.EventBroker;
-import org.tockit.events.EventBrokerListener;
-import org.tockit.swing.preferences.ExtendedPreferences;
-import org.tockit.swing.undo.ExtendedUndoManager;
 
 public class DiagramEditingView extends JPanel implements EventBrokerListener {
     public static interface DiagramAction {
@@ -185,6 +147,10 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 new AttributeEditingLabelViewPopupMenuHandler(diagramView),
                 CanvasItemContextMenuRequestEvent.class,
                 AttributeLabelView.class);
+        this.diagramView.getController().getEventBroker().subscribe(
+                new ArrowEditingLabelViewPopupMenuHandler(diagramView),
+                CanvasItemContextMenuRequestEvent.class,
+                ArrowLabelView.class);
     }
 
     protected JPanel makeDiagramViewPanel() {

@@ -51,7 +51,7 @@ public class ArrowLabelView extends CanvasItem implements ChangeObserver {
 
     protected final ArrowStyle style;
 
-    private final String text;
+    private String text;
     private final double timePos;
     private final AnimationTimeController timeController;
 
@@ -279,5 +279,13 @@ public class ArrowLabelView extends CanvasItem implements ChangeObserver {
                 baseColor.getBlue(),
                 (int) (alpha * baseColor.getAlpha())
         );
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }

@@ -7,26 +7,21 @@
  */
 package net.sourceforge.toscanaj.controller.diagram;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.geom.Point2D;
-
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-
 import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
 import net.sourceforge.toscanaj.gui.dialog.XMLEditorDialog;
 import net.sourceforge.toscanaj.model.context.WritableFCAElement;
 import net.sourceforge.toscanaj.view.diagram.AttributeLabelView;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
-
 import org.tockit.canvas.events.CanvasItemEventWithPosition;
 import org.tockit.events.Event;
 import org.tockit.events.EventBrokerListener;
 
-public class AttributeEditingLabelViewPopupMenuHandler implements
-        EventBrokerListener {
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+
+public class AttributeEditingLabelViewPopupMenuHandler implements EventBrokerListener {
     private final DiagramView diagramView;
 
     public AttributeEditingLabelViewPopupMenuHandler(
@@ -35,28 +30,26 @@ public class AttributeEditingLabelViewPopupMenuHandler implements
     }
 
     public void processEvent(final Event e) {
-        CanvasItemEventWithPosition itemEvent = null;
+        CanvasItemEventWithPosition itemEvent;
         try {
             itemEvent = (CanvasItemEventWithPosition) e;
         } catch (final ClassCastException e1) {
-            throw new RuntimeException(
-                    getClass().getName()
+            throw new RuntimeException(getClass().getName()
                             + " has to be subscribed to CanvasItemEventWithPositions only");
         }
-        AttributeLabelView labelView = null;
+        AttributeLabelView labelView;
         try {
             labelView = (AttributeLabelView) itemEvent.getSubject();
         } catch (final ClassCastException e1) {
-            throw new RuntimeException(
-                    getClass().getName()
-                            + " has to be subscribed to events from ObjectLabelViews only");
+            throw new RuntimeException(getClass().getName()
+                            + " has to be subscribed to events from AttributeLabelViews only");
         }
         openPopupMenu(labelView, itemEvent.getCanvasPosition(), itemEvent
                 .getAWTPosition());
     }
 
     public void openPopupMenu(final AttributeLabelView labelView,
-            final Point2D canvasPosition, final Point2D screenPosition) {
+                              final Point2D canvasPosition, final Point2D screenPosition) {
         final WritableFCAElement attribute = (WritableFCAElement) labelView
                 .getEntryAtPosition(canvasPosition);
         if (attribute == null) {
@@ -88,8 +81,7 @@ public class AttributeEditingLabelViewPopupMenuHandler implements
                 if (!dialog.isCancelled()) {
                     final String newValue = dialog.getInput();
                     attribute.setData(newValue);
-                    AttributeEditingLabelViewPopupMenuHandler.this.diagramView
-                            .repaint();
+                    AttributeEditingLabelViewPopupMenuHandler.this.diagramView.repaint();
                 }
             }
         });
