@@ -13,6 +13,10 @@ import net.sourceforge.toscanaj.view.diagram.DiagramSchema;
 import net.sourceforge.toscanaj.view.diagram.DiagramView;
 import org.tockit.canvas.CanvasItem;
 
+import javax.swing.undo.AbstractUndoableEdit;
+import javax.swing.undo.CannotRedoException;
+import javax.swing.undo.CannotUndoException;
+import javax.swing.undo.UndoManager;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
@@ -50,6 +54,14 @@ public class ArrowLabelView extends CanvasItem implements ChangeObserver {
     protected final TransitionArrow arrow;
 
     protected final ArrowStyle style;
+
+    protected static enum DragMode {
+        NOT_DRAGGING, MOVING
+    }
+
+    protected DragMode dragMode = DragMode.NOT_DRAGGING;
+
+    private Point2D startOffset;
 
     private String text;
     private final double timePos;
@@ -163,8 +175,8 @@ public class ArrowLabelView extends CanvasItem implements ChangeObserver {
         this.textmargin = mLayout.getLeading() + mLayout.getDescent();
 
         // find the size and position
-        double x = arrow.getPosition().getX();
-        double y = arrow.getPosition().getY();
+        double x = arrow.getPosition().getX() + arrow.getLabelOffset().getX();
+        double y = arrow.getPosition().getY() + arrow.getLabelOffset().getY();
         this.lineHeight = 0;
         double lw = 0;
 
@@ -189,8 +201,8 @@ public class ArrowLabelView extends CanvasItem implements ChangeObserver {
     }
 
     Point2D getConnectorStartPosition() {
-        double x = arrow.getPosition().getX();
-        double y = arrow.getPosition().getY();
+        double x = arrow.getPosition().getX() + arrow.getLabelOffset().getX();
+        double y = arrow.getPosition().getY() + arrow.getLabelOffset().getY();
         return new Point2D.Double(x, y);
     }
 
@@ -228,10 +240,8 @@ public class ArrowLabelView extends CanvasItem implements ChangeObserver {
         updateBounds(graphics);
         if (stroke instanceof BasicStroke) {
             final double w = ((BasicStroke) stroke).getLineWidth();
-            return new Rectangle2D.Double(this.rect.getX() - w / 2, this.rect
-                    .getY()
-                    - w / 2, this.rect.getWidth() + w, this.rect.getHeight()
-                    + w);
+            return new Rectangle2D.Double(this.rect.getX() - w / 2, this.rect.getY() - w / 2,
+                    this.rect.getWidth() + w, this.rect.getHeight() + w);
         }
         return new Rectangle2D.Double(this.rect.getX(), this.rect.getY(),
                 this.rect.getWidth(), this.rect.getHeight());
@@ -288,4 +298,50 @@ public class ArrowLabelView extends CanvasItem implements ChangeObserver {
     public void setText(String text) {
         this.text = text;
     }
+
+    public void processDragEvent(final Point2D from, final Point2D to, final boolean isDrop) {
+        if (this.dragMode == DragMode.MOVING) {
+            final double deltaX = to.getX() - from.getX();
+            final double deltaY = to.getY() - from.getY();
+            final double newX = this.arrow.getLabelOffset().getX() + deltaX;
+            final double newY = this.arrow.getLabelOffset().getY() + deltaY;
+            arrow.setLabelOffset(newX, newY);
+            if (isDrop) {
+                final UndoManager undoManager = diagramView.getUndoManager();
+                if (undoManager != null) {
+                    // make a copy of the current start position
+                    final Point2D undoOffset = this.startOffset;
+                    undoManager.addEdit(new AbstractUndoableEdit() {
+                        @Override
+                        public void undo() throws CannotUndoException {
+                            arrow.setLabelOffset(undoOffset);
+                            diagramView.requestScreenTransformUpdate();
+                            diagramView.repaint();
+                            super.undo();
+                        }
+
+                        @Override
+                        public void redo() throws CannotRedoException {
+                            arrow.setLabelOffset(newX, newY);
+                            diagramView.requestScreenTransformUpdate();
+                            diagramView.repaint();
+                            super.redo();
+                        }
+
+                        @Override
+                        public String getPresentationName() {
+                            return "Label movement";
+                        }
+                    });
+                }
+            }
+        }
+    }
+
+    public void startDrag(final Point2D from, final Point2D to) {
+        this.startOffset = this.arrow.getLabelOffset();
+        this.dragMode = DragMode.MOVING;
+        processDragEvent(from, to, false);
+    }
+
 }

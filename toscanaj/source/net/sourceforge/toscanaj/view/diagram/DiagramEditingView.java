@@ -14,6 +14,7 @@ import net.sourceforge.toscanaj.controller.fca.*;
 import net.sourceforge.toscanaj.controller.ndimlayout.DefaultDimensionStrategy;
 import net.sourceforge.toscanaj.controller.ndimlayout.NDimLayoutOperations;
 import net.sourceforge.toscanaj.controller.temporal.ArrowEditingLabelViewPopupMenuHandler;
+import net.sourceforge.toscanaj.controller.temporal.ArrowLabelDragEventHandler;
 import net.sourceforge.toscanaj.gui.LabeledPanel;
 import net.sourceforge.toscanaj.gui.dialog.ErrorDialog;
 import net.sourceforge.toscanaj.gui.dialog.InputTextDialog;
@@ -137,20 +138,20 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 this.conceptualSchema, this.databaseConnection, eventBroker,
                 offerConsistencyCheck);
 
-        eventBroker.subscribe(this, NewConceptualSchemaEvent.class,
-                Object.class);
+        eventBroker.subscribe(this, NewConceptualSchemaEvent.class, Object.class);
         eventBroker.subscribe(this, DiagramListChangeEvent.class, Object.class);
         eventBroker.subscribe(this, DatabaseConnectedEvent.class, Object.class);
-        this.diagramView.getController().getEventBroker().subscribe(this,
-                DisplayedDiagramChangedEvent.class, Object.class);
-        this.diagramView.getController().getEventBroker().subscribe(
+        EventBroker<Object> diagramBroker = this.diagramView.getController().getEventBroker();
+        diagramBroker.subscribe(this, DisplayedDiagramChangedEvent.class, Object.class);
+        diagramBroker.subscribe(
                 new AttributeEditingLabelViewPopupMenuHandler(diagramView),
                 CanvasItemContextMenuRequestEvent.class,
                 AttributeLabelView.class);
-        this.diagramView.getController().getEventBroker().subscribe(
+        diagramBroker.subscribe(
                 new ArrowEditingLabelViewPopupMenuHandler(diagramView),
                 CanvasItemContextMenuRequestEvent.class,
                 ArrowLabelView.class);
+        new ArrowLabelDragEventHandler(diagramBroker);
     }
 
     protected JPanel makeDiagramViewPanel() {
@@ -158,11 +159,10 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
 
         diagramView = new DiagramView();
         diagramView.setQuery(ListQuery.KEY_LIST_QUERY);
-        final EventBroker canvasEventBroker = diagramView.getController()
-                .getEventBroker();
+        final EventBroker canvasEventBroker = diagramView.getController().getEventBroker();
         final DirectConceptInterpreter interpreter = new DirectConceptInterpreter();
-        final ConceptInterpretationContext interpretationContext = new ConceptInterpretationContext(
-                new DiagramHistory(), canvasEventBroker);
+        final ConceptInterpretationContext interpretationContext =
+                new ConceptInterpretationContext(new DiagramHistory(), canvasEventBroker);
         diagramView.setConceptInterpreter(interpreter);
         diagramView.setConceptInterpretationContext(interpretationContext);
         diagramView.setGrid(DEFAULT_GRID_SIZE, DEFAULT_GRID_SIZE);
@@ -170,8 +170,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         new LabelDragEventHandler(canvasEventBroker);
         new LabelClickEventHandler(canvasEventBroker);
         new LabelScrollEventHandler(canvasEventBroker);
-        diagramView.setBorder(BorderFactory
-                .createBevelBorder(BevelBorder.LOWERED));
+        diagramView.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
         diagramView.setUndoManager(new ExtendedUndoManager());
 
         final JPanel toolPanel = new JPanel(new GridBagLayout());
@@ -207,8 +206,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
                 try {
                     editContext();
                 } catch (final Throwable t) {
-                    ErrorDialog.showError(component, t,
-                            "Context editing failed");
+                    ErrorDialog.showError(component, t, "Context editing failed");
                 }
             }
         });
@@ -327,8 +325,7 @@ public class DiagramEditingView extends JPanel implements EventBrokerListener {
         } else {
             movementChooser.setEnabled(true);
             if (movementChooser.getModel().getSize() != FULL_MOVEMENT_OPTION_NAMES.length) {
-                movementChooser.setModel(new DefaultComboBoxModel(
-                        FULL_MOVEMENT_OPTION_NAMES));
+                movementChooser.setModel(new DefaultComboBoxModel(FULL_MOVEMENT_OPTION_NAMES));
                 setManipulator(NODE_MANIPULATORS[0]);
             }
         }

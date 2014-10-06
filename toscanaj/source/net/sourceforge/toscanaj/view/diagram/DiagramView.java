@@ -75,10 +75,8 @@ public class DiagramView extends Canvas implements ChangeObserver {
 
     private boolean screenTransformDirty = false;
 
-    private LabelView.LabelFactory attributeLabelFactory = AttributeLabelView
-            .getFactory();
-    private LabelView.LabelFactory objectLabelFactory = ObjectLabelView
-            .getFactory();
+    private LabelView.LabelFactory attributeLabelFactory = AttributeLabelView.getFactory();
+    private LabelView.LabelFactory objectLabelFactory = ObjectLabelView.getFactory();
 
     private class ResizeListener extends ComponentAdapter {
         @Override
@@ -200,9 +198,8 @@ public class DiagramView extends Canvas implements ChangeObserver {
         this.diagram = newDiagram;
         removeSubscriptions();
         clearCanvas();
-        // / @todo we should have different undo managers for each diagram, for
-        // now we just forget
-        // / all edits when changing diagrams
+        // @todo we should have different undo managers for each diagram, for now we just forget
+        // all edits when changing diagrams
         if (this.undoManager != null) {
             this.undoManager.discardAllEdits();
         }
@@ -304,19 +301,15 @@ public class DiagramView extends Canvas implements ChangeObserver {
                 if (node instanceof NestedDiagramNode) {
                     final NestedDiagramNode ndNode = (NestedDiagramNode) node;
                     boolean isTopRealizedConcept = true;
-                    for (final Iterator<Object> iter = concept.getUpset()
-                            .iterator(); iter.hasNext();) {
-                        final Concept superConcept = (Concept) iter.next();
+                    for (Object o : concept.getUpset()) {
+                        final Concept superConcept = (Concept) o;
                         if (superConcept != concept
-                                && this.conceptInterpreter.isRealized(
-                                        superConcept,
-                                        this.conceptInterpretationContext)) {
+                                && conceptInterpreter.isRealized(superConcept, this.conceptInterpretationContext)) {
                             isTopRealizedConcept = false;
                             break;
                         }
                     }
-                    addDiagram(ndNode.getInnerDiagram(), context
-                            .createNestedContext(concept), layer + 1,
+                    addDiagram(ndNode.getInnerDiagram(), context.createNestedContext(concept), layer + 1,
                             isTopRealizedConcept);
                 }
             }
@@ -426,8 +419,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
         return objectLabelFactory;
     }
 
-    public void setAttributeLabelFactory(
-            final LabelView.LabelFactory attributeLabelFactory) {
+    public void setAttributeLabelFactory(LabelView.LabelFactory attributeLabelFactory) {
         this.attributeLabelFactory = attributeLabelFactory;
     }
 
@@ -438,8 +430,7 @@ public class DiagramView extends Canvas implements ChangeObserver {
      * create the object labels. If null is given, no object labels will be
      * used.
      */
-    public void setObjectLabelFactory(
-            final LabelView.LabelFactory objectLabelFactory) {
+    public void setObjectLabelFactory(LabelView.LabelFactory objectLabelFactory) {
         this.objectLabelFactory = objectLabelFactory;
     }
 
@@ -448,9 +439,8 @@ public class DiagramView extends Canvas implements ChangeObserver {
     }
 
     public ExtendedUndoManager getUndoManager() {
-        // / @todo workaround to avoid problems that occur when undo is used in
-        // nested diagrams,
-        // / remove once the problems are fixed.
+        // @todo workaround to avoid problems that occur when undo is used in nested diagrams,
+        // remove once the problems are fixed.
         if (this.diagram instanceof NestedLineDiagram) {
             return null;
         }

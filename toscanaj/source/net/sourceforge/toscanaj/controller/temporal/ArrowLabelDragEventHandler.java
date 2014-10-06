@@ -5,10 +5,9 @@
  *
  * $Id$
  */
-package net.sourceforge.toscanaj.controller.diagram;
+package net.sourceforge.toscanaj.controller.temporal;
 
-import net.sourceforge.toscanaj.view.diagram.LabelView;
-
+import net.sourceforge.toscanaj.view.temporal.ArrowLabelView;
 import org.tockit.canvas.events.CanvasItemDraggedEvent;
 import org.tockit.canvas.events.CanvasItemDroppedEvent;
 import org.tockit.canvas.events.CanvasItemPickupEvent;
@@ -16,14 +15,14 @@ import org.tockit.events.Event;
 import org.tockit.events.EventBroker;
 import org.tockit.events.EventBrokerListener;
 
-public class LabelDragEventHandler implements EventBrokerListener {
-    public LabelDragEventHandler(final EventBroker eventBroker) {
-        eventBroker.subscribe(this, CanvasItemDraggedEvent.class,LabelView.class);
+public class ArrowLabelDragEventHandler implements EventBrokerListener {
+    public  ArrowLabelDragEventHandler(final EventBroker eventBroker) {
+        eventBroker.subscribe(this, CanvasItemDraggedEvent.class, ArrowLabelView.class);
     }
 
     public void processEvent(final Event e) {
         final CanvasItemDraggedEvent dragEvent = (CanvasItemDraggedEvent) e;
-        final LabelView labelView = (LabelView) e.getSubject();
+        final ArrowLabelView labelView = (ArrowLabelView) e.getSubject();
         if (e instanceof CanvasItemPickupEvent) {
             labelView.startDrag(dragEvent.getCanvasFromPosition(), dragEvent.getCanvasToPosition());
         } else {

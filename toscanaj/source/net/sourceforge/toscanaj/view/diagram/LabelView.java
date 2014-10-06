@@ -43,34 +43,33 @@ import org.tockit.events.EventBrokerListener;
  * which are distinguished by position (above vs. below the node) and default
  * display type (list vs. number).
  */
-abstract public class LabelView extends CanvasItem implements ChangeObserver,
-        EventBrokerListener {
+abstract public class LabelView extends CanvasItem implements ChangeObserver, EventBrokerListener {
     private float textmargin;
 
     /**
      * Used when the label should be drawn above the given point.
-     * 
+     * <p/>
      * See Draw( Graphics2D, double ,double ,int ).
      */
     static protected final int ABOVE = 0;
 
     /**
      * Used when the label should be drawn below the given point.
-     * 
+     * <p/>
      * See Draw( Graphics2D, double ,double ,int ).
      */
     static protected final int BELOW = 1;
 
     /**
      * Gives the minimum number of display lines possible.
-     * 
+     *
      * @see #displayLines
      */
     protected static final int MIN_DISPLAY_LINES = 3;
 
     /**
      * Gives the number of display lines used on a new label.
-     * 
+     *
      * @see #displayLines
      */
     protected static final int DEFAULT_DISPLAY_LINES = 4;
@@ -99,14 +98,14 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver,
 
     /**
      * The current display size in lines.
-     * 
+     * <p/>
      * This is the number of items currently displayed.
      */
     protected int displayLines = DEFAULT_DISPLAY_LINES;
 
     /**
      * The first item displayed in the list.
-     * 
+     * <p/>
      * This is used if the number of displayed lines is smaller than the number
      * of items to display to determine the top element in the displayed part.
      */
@@ -121,24 +120,18 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver,
 
     protected Vector<ChangeObserver> observers = new Vector<ChangeObserver>();
 
-    protected DragMode dragMode = NOT_DRAGGING;
-
-    protected static class DragMode {
-        // no declarations
+    protected static enum DragMode {
+            NOT_DRAGGING, RESIZING, MOVING, SCROLLING
     }
 
-    protected static final DragMode NOT_DRAGGING = new DragMode();
-    protected static final DragMode RESIZING = new DragMode();
-    protected static final DragMode MOVING = new DragMode();
-    protected static final DragMode SCROLLING = new DragMode();
+    protected DragMode dragMode = DragMode.NOT_DRAGGING;
 
     private float currentScrollBarWidth;
 
     private Point2D startOffset;
 
     public interface LabelFactory {
-        LabelView createLabelView(DiagramView diagramView, NodeView nodeView,
-                LabelInfo label);
+        LabelView createLabelView(DiagramView diagramView, NodeView nodeView, LabelInfo label);
 
         Class getLabelClass();
     }
@@ -154,8 +147,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver,
      * 
      * @see #getFactory()
      */
-    protected LabelView(final DiagramView diagramView, final NodeView nodeView,
-            final LabelInfo label) {
+    protected LabelView(final DiagramView diagramView, final NodeView nodeView, final LabelInfo label) {
         this.diagramView = diagramView;
         this.nodeView = nodeView;
         this.labelInfo = label;
@@ -163,8 +155,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver,
         final DiagramSchema diagramSchema = diagramView.getDiagramSchema();
         this.font = diagramSchema.getLabelFont();
         updateEntries();
-        diagramView.getController().getEventBroker().subscribe(this,
-                SelectionChangedEvent.class, Object.class);
+        diagramView.getController().getEventBroker().subscribe(this, SelectionChangedEvent.class, Object.class);
     }
 
     public void updateEntries() {
@@ -184,8 +175,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver,
      */
     public void update(final Object source) {
         // we expect someone to cause us to redraw if needed, we don't do it
-        // ourself
-        // maybe we are off-screen or hidden or whatever ...
+        // ourself maybe we are off-screen or hidden or whatever ...
         notifyObservers();
     }
 
@@ -406,10 +396,8 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver,
                 .getFontRenderContext();
 
         // margin is something dependend on the font, but the detailed choice is
-        // a bit
-        // arbitrary
-        final TextLayout mLayout = new TextLayout("M", this.font,
-                fontRenderContext);
+        // a bit arbitrary
+        final TextLayout mLayout = new TextLayout("M", this.font, fontRenderContext);
         this.textmargin = mLayout.getLeading() + mLayout.getDescent();
 
         // find the size and position
@@ -445,8 +433,7 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver,
                 res /= 10;
                 num = num * 10 + 9;
             }
-            final TextLayout layout = getMoreEntriesTextLayout(num,
-                    fontRenderContext);
+            final TextLayout layout = getMoreEntriesTextLayout(num, fontRenderContext);
             if (layout.getBounds().getWidth() > lw) {
                 lw = layout.getBounds().getWidth();
             }
@@ -546,11 +533,10 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver,
         return this.rect.contains(point);
     }
 
-    public void processDragEvent(final Point2D from, final Point2D to,
-            final boolean isDrop) {
-        if (this.dragMode == NOT_DRAGGING) {
+    public void processDragEvent(final Point2D from, final Point2D to, final boolean isDrop) {
+        if (this.dragMode == DragMode.NOT_DRAGGING) {
             return;
-        } else if (this.dragMode == RESIZING) {
+        } else if (this.dragMode == DragMode.RESIZING) {
             final int lineHit = (int) ((from.getY() - this.rect.getY()) / this.lineHeight);
             final int newLine = (int) ((to.getY() - this.rect.getY()) / this.lineHeight);
             // check if it is above/below
@@ -569,18 +555,15 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver,
                     notifyObservers();
                 }
             }
-        } else if (this.dragMode == SCROLLING) {
+        } else if (this.dragMode == DragMode.SCROLLING) {
             // User wants to drag the scrollbar
-            final double scrollbarHeight = (this.displayLines - 3)
-                    * this.lineHeight;
-            final double scrollbarYToPos = to.getY() - this.rect.getY()
-                    - this.lineHeight;
+            final double scrollbarHeight = (this.displayLines - 3) * this.lineHeight;
+            final double scrollbarYToPos = to.getY() - this.rect.getY() - this.lineHeight;
             final double relativePos = scrollbarYToPos / scrollbarHeight;
-            final int newLinePos = (int) (relativePos * (getNumberOfEntries() - this.displayLines));
-            this.firstItem = newLinePos;
+            this.firstItem = (int) (relativePos * (getNumberOfEntries() - this.displayLines));
             ensureFirstItemBounds();
             notifyObservers();
-        } else if (this.dragMode == MOVING) {
+        } else if (this.dragMode == DragMode.MOVING) {
             final double deltaX = to.getX() - from.getX();
             final double deltaY = to.getY() - from.getY();
             final double newX = this.labelInfo.getOffset().getX() + deltaX;
@@ -626,15 +609,15 @@ abstract public class LabelView extends CanvasItem implements ChangeObserver,
             final int lineHit = (int) ((from.getY() - this.rect.getY()) / this.lineHeight);
             if (lineHit == this.displayLines - 1) { // it is on the resize
                 // handle
-                this.dragMode = RESIZING;
+                this.dragMode = DragMode.RESIZING;
             } else if ((lineHit >= 1) && (lineHit <= this.displayLines - 3)) {
-                this.dragMode = SCROLLING;
+                this.dragMode = DragMode.SCROLLING;
             } else {
-                this.dragMode = NOT_DRAGGING;
+                this.dragMode = DragMode.NOT_DRAGGING;
             }
         } else {
             this.startOffset = this.labelInfo.getOffset();
-            this.dragMode = MOVING;
+            this.dragMode = DragMode.MOVING;
         }
         processDragEvent(from, to, false);
     }

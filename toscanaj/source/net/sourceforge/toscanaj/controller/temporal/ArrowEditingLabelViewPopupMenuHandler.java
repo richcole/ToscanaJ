@@ -18,8 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
 
-public class ArrowEditingLabelViewPopupMenuHandler implements
-        EventBrokerListener {
+public class ArrowEditingLabelViewPopupMenuHandler implements EventBrokerListener {
     private final DiagramView diagramView;
 
     public ArrowEditingLabelViewPopupMenuHandler(final DiagramView diagramView) {

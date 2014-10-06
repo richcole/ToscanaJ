@@ -23,22 +23,18 @@ import java.awt.geom.*;
 
 public class TransitionArrow extends CanvasItem implements XMLizable {
     private static class Factory implements ExtraCanvasItemFactory {
-        public CanvasItem createCanvasItem(final SimpleLineDiagram diagram,
-                final Element element) throws XMLSyntaxError {
+        public CanvasItem createCanvasItem(SimpleLineDiagram diagram, Element element) throws XMLSyntaxError {
             final TransitionArrow retVal = new TransitionArrow();
             retVal.timeController = new AnimationTimeController(
                     Double.MAX_VALUE, 0, Double.MAX_VALUE, 0, 1);
             retVal.timeController.setCurrentTime(Double.MAX_VALUE / 2);
-            retVal.startNode = diagram.getNode(element
-                    .getAttributeValue("from"));
+            retVal.startNode = diagram.getNode(element.getAttributeValue("from"));
             retVal.endNode = diagram.getNode(element.getAttributeValue("to"));
             // we used to have just a single offset, so we keep parsing that
             Element offsetElem = element.getChild("offset");
             if (offsetElem != null) {
-                final double offsetX = Double.parseDouble(offsetElem
-                        .getAttributeValue("x"));
-                final double offsetY = Double.parseDouble(offsetElem
-                        .getAttributeValue("y"));
+                double offsetX = Double.parseDouble(offsetElem.getAttributeValue("x"));
+                double offsetY = Double.parseDouble(offsetElem.getAttributeValue("y"));
                 retVal.manualStartOffset = new Point2D.Double(offsetX, offsetY);
                 retVal.manualEndOffset = new Point2D.Double(offsetX, offsetY);
             } else {
@@ -64,8 +60,7 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
             } else {
                 // just to keep parsing older file formats, even though not
                 // correct
-                retVal.style = DiagramSchema.getCurrentSchema()
-                        .getArrowStyles()[0];
+                retVal.style = DiagramSchema.getCurrentSchema().getArrowStyles()[0];
             }
             retVal.updateShiftVector();
             retVal.calculateBounds();
@@ -86,6 +81,7 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
     protected Point2D shiftVector = new Point2D.Double();
     protected Point2D manualStartOffset = new Point2D.Double();
     protected Point2D manualEndOffset = new Point2D.Double();
+    protected Point2D labelOffset = new Point2D.Double();
     protected double timePos;
     protected AnimationTimeController timeController;
     protected ArrowStyle style;
@@ -305,6 +301,18 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
     public void shiftEndPoint(final double dx, final double dy) {
         this.manualEndOffset.setLocation(this.manualEndOffset.getX() + dx,
                 this.manualEndOffset.getY() + dy);
+    }
+
+    public Point2D getLabelOffset() {
+        return labelOffset;
+    }
+
+    public void setLabelOffset(Point2D labelOffset) {
+        this.labelOffset = labelOffset;
+    }
+
+    public void setLabelOffset(double x, double y) {
+        setLabelOffset(new Point2D.Double(x, y));
     }
 
     public Element toXML() {
