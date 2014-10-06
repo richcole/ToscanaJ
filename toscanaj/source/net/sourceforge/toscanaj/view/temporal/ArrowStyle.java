@@ -49,6 +49,8 @@ public class ArrowStyle {
         }
     }
 
+    private static final LabelUse DEFAULT_LABEL_USE = LabelUse.ONLY_FIRST;
+
     // setting some defaults
     private Color color = Color.WHITE;
     private BasicStroke stroke = new BasicStroke(4, BasicStroke.CAP_BUTT,
@@ -56,7 +58,7 @@ public class ArrowStyle {
     private double headWidth = 14;
     private double headLength = 20;
     private float borderWidth = 0.2f;
-    private LabelUse labelUse = LabelUse.ONLY_FIRST;
+    private LabelUse labelUse = DEFAULT_LABEL_USE;
 
     public ArrowStyle(final Color color, final BasicStroke stroke,
             final double headWidth, final double headLength,
@@ -111,7 +113,7 @@ public class ArrowStyle {
         this.headWidth = prefs.getDouble("headWidth", this.headWidth);
         this.headLength = prefs.getDouble("headLength", this.headLength);
         this.borderWidth = prefs.getFloat("borderWidth", this.borderWidth);
-        this.labelUse = LabelUse.valueOf(prefs.get("labelUse", "ALWAYS"));
+        this.labelUse = LabelUse.valueOf(prefs.get("labelUse", DEFAULT_LABEL_USE.name()));
     }
 
     public Color getColor() {
