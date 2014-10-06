@@ -53,6 +53,12 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
                 }
                 retVal.manualEndOffset = new Point2D.Double(offsetX, offsetY);
             }
+            Element labelOffsetElem = element.getChild("labelOffset");
+            if (labelOffsetElem != null) {
+                double offsetX = Double.parseDouble(offsetElem.getAttributeValue("x"));
+                double offsetY = Double.parseDouble(offsetElem.getAttributeValue("y"));
+                retVal.labelOffset = new Point2D.Double(offsetX, offsetY);
+            }
             if (element.getAttributeValue("arrowStyle") != null) {
                 retVal.style = DiagramSchema.getCurrentSchema()
                         .getArrowStyles()[XMLHelper.getIntAttribute(element,
@@ -326,6 +332,10 @@ public class TransitionArrow extends CanvasItem implements XMLizable {
         offsetElem = new Element("endOffset");
         offsetElem.setAttribute("x", String.valueOf(this.manualEndOffset.getX()));
         offsetElem.setAttribute("y", String.valueOf(this.manualEndOffset.getY()));
+        result.addContent(offsetElem);
+        offsetElem = new Element("labelOffset");
+        offsetElem.setAttribute("x", String.valueOf(this.labelOffset.getX()));
+        offsetElem.setAttribute("y", String.valueOf(this.labelOffset.getY()));
         result.addContent(offsetElem);
         for (int i = 0; i < DiagramSchema.getCurrentSchema().getArrowStyles().length; i++) {
             if (this.style == DiagramSchema.getCurrentSchema().getArrowStyles()[i]) {
