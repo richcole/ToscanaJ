@@ -127,7 +127,7 @@ public class DatabaseConnectionDialog extends JDialog {
         }
         @Override
 		void updateContents() {
-        	Type type = databaseInfo.getType();
+        	net.sourceforge.toscanaj.model.database.DatabaseInfo.Type type = databaseInfo.getType();
 			if (type == DatabaseInfo.UNDEFINED) {
 				jdbcRadioButton.setSelected(true);
             } else if (type == DatabaseInfo.JDBC) {
